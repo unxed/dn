@@ -96,10 +96,14 @@
 
 `audit/xclone.py`, `audit/runs.py`, `audit/fetch_reference.sh`, отчёты по DN 1.51 и DN OSP.
 
-## Веха 1. Тулчейн и CI (1–2 сессии)
+## Веха 1. Тулчейн и CI (1–2 сессии) — первый шаг готов (2026-10-01)
 
-- `build.yml`: FPC 3.2.2 (apt) для linux, кросс-компиляция под i386-go32v2 (binutils
-  DJGPP — первый риск, разведать первым делом).
+Готово: кросс-компилятор FPC → go32v2, `hello` запускается в DOSBox-X без экрана
+(`research/2026-10-01-toolchain.md`, workflow `toolchain`). Осталось: скриншот, выбор
+DPMI-хоста для распространения, workflow `audit.yml`.
+
+- `toolchain.yml` (готово): FPC 3.2.2 из исходников, кросс-компиляция под i386-go32v2
+  с binutils DJGPP.
 - go32v2 вне Windows нужен DPMI-хост: CWSDPMI или HDPMI32. Выбрать, сверив лицензии
   на распространение.
 - `hello.pas` под go32v2 в DOSBox-X без экрана, скриншот артефактом. FreeDOS в QEMU —
