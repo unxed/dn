@@ -52,8 +52,37 @@
   истории (`f9c6121`) часть из них скопирована из Borland C++ 4.0. В Pascal-переводе они
   не нужны.
 
-## Что осталось непроверенным
+## Сверка с опубликованным выпуском
 
-- Совпадает ли импорт magiblot «Version 2.0» с опубликованным `tv.zip` байт в байт.
-  Оригинального `tv.zip` (три архива `INCLUDE.ZIP`, `SOURCE.ZIP`, `DOCS.ZIP`) у нас нет.
-  Проверка простая: распаковать и сравнить с `4a67222`.
+Источник опубликованного выпуска — https://github.com/FSharpCSharp/TurboVision, коммит
+`5b9182e` («Adding the unzipped files published by Borland», 2019-02-01). В нём `Include/`,
+`Source/`, `readme.txt` (текст Borland «NOTE ON THE CONTENTS OF THIS ARCHIVE…»),
+`disclaim.txt`.
+
+Сравнение с импортом magiblot `4a67222` («Version 2.0»), пофайлово:
+- 200 из 201 файла совпадают полностью, разница только в переводах строк (CRLF) и символе
+  конца файла;
+- `tv.h` отличается только комментарием-шапкой: в опубликованной версии в ней текст
+  отказа от гарантий и «Copyright (c) 1991, 1994», у magiblot — «Copyright (c) 1994».
+  Код совпадает токен в токен (2076 токенов).
+
+Вывод: код Borland в magiblot происходит из опубликованного выпуска TV 2.0. Импорт
+«Version 1.03» (`adb6e3a`) в опубликованный выпуск не входит, но кода, которого нет в 2.0,
+в текущей библиотеке 0,1 % (одна цепочка в 27 токенов, `tparamte.cpp`).
+
+Оговорка: `FSharpCSharp/TurboVision` — это стороннее зеркало. Канонический `tv.zip`
+лежит на сайте Sergio Sigala, но из сессии он недоступен (sigala.it — 403, web.archive
+закрыт). Сверку с ним можно повторить в CI.
+
+## Ссылки
+
+- Опубликованный выпуск TV 2.0, распакованный: https://github.com/FSharpCSharp/TurboVision
+- Страница исходников на сайте Sergio Sigala (порт TV, BSD):
+  http://www.sigala.it/sergio/tvision/resources.html#sources
+- `tv.zip` от Borland: http://www.sigala.it/sergio/tvision/borland/tv.zip,
+  копия в web.archive:
+  https://web.archive.org/web/20170708213734/http://www.sigala.it/sergio/tvision/borland/tv.zip
+- Исходный адрес Borland/Inprise (по `readme.txt` порта SET, сейчас недоступен):
+  `ftp://ftp.inprise.com/pub/borlandcpp/devsupport/archive/turbovision/tv.zip`
+- Порт SET 2.0.3 (GPL): http://old-dos.ru/dl.php?id=9393
+- magiblot/tvision: https://github.com/magiblot/tvision
