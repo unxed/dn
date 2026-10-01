@@ -38,7 +38,7 @@
 | 2d | `TvCodePg`, `TvText` — кодовые страницы; `TText`: Next, Width, Prev, DrawOne, DrawStr, Scroll | `ttext.h`, `source/platform/{ttext,codepage}.cpp` | сделан (без `equalsIgnoreCase`, UTF-32 и `drawStrEx` с обратным вызовом) |
 | 3a | `TvKeys` — коды клавиш `kb*`, модификаторы, `TKey` (нормализация сочетаний) | `tkeys.h`, `tkey.cpp` | сделан |
 | 3b | `TvEvents` — запись `TEvent`, коды и маски событий | `system.h` (события; очередь, мышь и экран — в бэкендах) | сделан; коды команд `cm*` — в `TvViews` |
-| 4 | `TvDrawBuf` — `TDrawBuffer` | `drawbuf.h`, `tvtext*.cpp` | |
+| 4 | `TvDrawBuf` — `TDrawBuffer`: MoveChar, MoveStr, MoveCStr, MoveBuf | `drawbuf.h`, `drivers.cpp` | сделан |
 | 5 | `TvViews` — `TView`, `TGroup`, `TFrame`, `TScrollBar`, `TWindow` | `views.h`, `tview.cpp`, `tgroup.cpp`, … | |
 | 6 | `TvMenus` — меню и строка статуса | `menus.h`, `tmnuview.cpp`, `tstatusl.cpp` | |
 | 7 | `TvApp` — `TProgram`, `TApplication`, `TDesktop` | `app.h`, `tprogram.cpp`, … | |
@@ -96,3 +96,15 @@
   Модификаторы — набор DOS BIOS (`kbShift=3`, `kbCtrlShift=4`, `kbAltShift=8`,
   `kbScrollState=$10` и т. д.), в отличие от набора magiblot для Windows; добавлено свой
   `kbEnhanced`. `TKey` приводит эквивалентные записи сочетаний к одной.
+- **`TDrawBuffer`** — `object` с буфером ячеек `Data`/`Capacity`; ёмкость
+  `8 + Max(ScreenDim, 80)` (буфер используют и вертикальные виды), размер экрана
+  передаёт вызывающий (`Init(ScreenDim)`); у magiblot он берётся из `TScreen`. «Атрибут 0»
+  значит «оставить атрибут» и означает BIOS-атрибут `$00` (чёрное на чёрном) — его
+  через эти вызовы нарисовать нельзя; нулевая ячейка (`Data = 0`) — это цвета по
+  умолчанию. Реализованы варианты magiblot для 32-битных систем; ассемблерные 16-битные
+  не переводились.
+- **Байты ≥ $80 в строках интерфейса** (рамки окон, кнопки: `'\xC4'`, `'\xB3'`…) — как в
+  оригинале, коды CP437. Они не годятся как UTF-8, поэтому рисуются через кодовую
+  страницу. В DOS-страницах (437, 850, 866) блок псевдографики $B0–$DF один и тот же,
+  так что рамки выглядят одинаково. Для других страниц и для терминала такие константы
+  надо будет задавать в Unicode — решаем при переводе `TFrame`, `TButton`, `TScrollBar`.
