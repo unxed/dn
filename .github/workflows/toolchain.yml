@@ -1,0 +1,39 @@
+name: toolchain
+# Cross toolchain FPC -> DOS (go32v2). Built from the Ubuntu fpc-source package
+# with DJGPP binutils; cached by the hash of the build script.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tools/build-fpc-go32v2.sh
+      - tests/dos/**
+      - .github/workflows/toolchain.yml
+
+jobs:
+  hello:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y fpc fpc-source make bzip2
+      - name: Cross toolchain cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/fpc-go32v2
+          key: fpc-go32v2-${{ hashFiles('tools/build-fpc-go32v2.sh') }}
+      - name: Build cross toolchain
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: tools/build-fpc-go32v2.sh ~/fpc-go32v2
+      - name: Compile hello for go32v2
+        run: |
+          mkdir -p out
+          ~/fpc-go32v2/bin/fpc-go32v2 -FEout tests/dos/hello.pas
+          ls -l out
+          file out/hello* || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hello-go32v2
+          path: out/
