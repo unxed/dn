@@ -1,4 +1,4 @@
-program test_geom;
+program t_geom;
 {$I ../src/tvdefs.inc}
 uses TvGeom;
 {$I testlib.inc}
