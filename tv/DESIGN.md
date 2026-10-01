@@ -33,7 +33,9 @@
 |---|---|---|---|
 | 1 | `TvGeom` — `TPoint`, `TRect` | `objects.h` | сделан, CI зелёный (Linux и DOS) |
 | 2a | `TvColors` — цвета BIOS/RGB/xterm, атрибут (64 бита), квантование в 16 и 256 цветов | `colors.h`, `source/platform/colors.cpp` | сделан |
-| 2b | `TvCell` — ячейка экрана с UTF-8, ширина символов | `scrncell.h`, `ttext.h`, `source/platform/{ttext,utf8,codepage}.cpp` | |
+| 2b | `TvUtf8` — декодирование/кодирование UTF-8, ширина символа | `internal/utf8.h`; ширина — таблицы из базы Unicode (`tools/gen-width.py`) | сделан |
+| 2c | `TvCell` — `TScreenCharacter`, `TScreenCell` (ячейка с UTF-8) | `scrncell.h` | |
+| 2d | `TvText` — `TText`: Next, Width, Prev, DrawOne, DrawStr, Scroll; таблицы кодовых страниц | `ttext.h`, `source/platform/{ttext,codepage}.cpp` | |
 | 3 | `TvEvents`, `TvKeys` — события, коды клавиш и команд | `system.h`, `tkeys.h`, `tevent.cpp`, `tkey.cpp` | |
 | 4 | `TvDrawBuf` — `TDrawBuffer` | `drawbuf.h`, `tvtext*.cpp` | |
 | 5 | `TvViews` — `TView`, `TGroup`, `TFrame`, `TScrollBar`, `TWindow` | `views.h`, `tview.cpp`, `tgroup.cpp`, … | |
@@ -60,3 +62,13 @@
   сводится к BIOS) и `AttrToBIOS` (с квантованием). Как именно сопрягается
   `TDrawBuffer` DN с ячейкой UTF-8, решаем в юните `TvDrawBuf` (№ 4).
 - **Имена файлов тестов** `t_*.pas`: DOS без LFN допускает 8 знаков.
+- **Ширина символа** magiblot берёт у системы (`wcwidth` в Unix, проверка консоли в
+  Windows). У нас таблицы из базы Unicode, сгенерированные скриптом
+  `tools/gen-width.py` (`tv/src/tvwidth.inc`, версия Unicode записана в шапке): так
+  результат одинаков на всех платформах, включая DOS. Ширина: −1 для управляющих,
+  0 для комбинируемых и форматирующих (категории Mn, Me, Cf, кроме U+00AD, плюс
+  U+1160..11FF), 2 для East Asian Wide/Fullwidth, иначе 1. Обновление Unicode — новый
+  прогон скрипта.
+- **Декодер UTF-8 свой:** проверяет кратчайшую форму, суррогаты и верхнюю границу
+  U+10FFFF; при ошибке возвращает `Used`, с которого можно продолжать
+  (как с однобайтным символом кодовой страницы).
