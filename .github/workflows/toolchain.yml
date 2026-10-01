@@ -36,9 +36,6 @@ jobs:
         run: |
           curl -fsSL --retry 4 -o csdpmi.zip https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
           unzip -j -o csdpmi.zip 'bin/CWSDPMI.EXE' -d out
-          echo '--- CWSDPMI license (distribution terms):'
-          unzip -p csdpmi.zip 'docs/cwsdpmi.txt' 2>/dev/null | grep -n -i -B2 -A8 -E 'distribut|licen|copyright' | head -60 || true
-          unzip -l csdpmi.zip
           ls -l out
       - name: Run in DOSBox-X (headless)
         env:
@@ -57,3 +54,11 @@ jobs:
           path: |
             out/hello.exe
             out/OUT.TXT
+
+  cwsdpmi-license:
+    # separate job so that the log stays short: prints the distribution terms
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          curl -fsSL --retry 4 -o csdpmi.zip https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
+          unzip -p csdpmi.zip bin/cwsdpmi.doc | grep -n -i -B1 -A6 -E 'distribut|licen|copyright|redistrib|source' | head -80
