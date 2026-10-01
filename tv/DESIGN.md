@@ -31,8 +31,9 @@
 
 | № | Юнит | Из | Статус |
 |---|---|---|---|
-| 1 | `TvGeom` — `TPoint`, `TRect` | `objects.h` | сделан |
-| 2 | `TvColors`, `TvCell` — атрибуты цвета, ячейка экрана с UTF-8 | `colors.h`, `scrncell.h`, `ttext.h`, `source/platform/{ttext,utf8,codepage}.cpp` | |
+| 1 | `TvGeom` — `TPoint`, `TRect` | `objects.h` | сделан, CI зелёный (Linux и DOS) |
+| 2a | `TvColors` — цвета BIOS/RGB/xterm, атрибут (64 бита), квантование в 16 и 256 цветов | `colors.h`, `source/platform/colors.cpp` | сделан |
+| 2b | `TvCell` — ячейка экрана с UTF-8, ширина символов | `scrncell.h`, `ttext.h`, `source/platform/{ttext,utf8,codepage}.cpp` | |
 | 3 | `TvEvents`, `TvKeys` — события, коды клавиш и команд | `system.h`, `tkeys.h`, `tevent.cpp`, `tkey.cpp` | |
 | 4 | `TvDrawBuf` — `TDrawBuffer` | `drawbuf.h`, `tvtext*.cpp` | |
 | 5 | `TvViews` — `TView`, `TGroup`, `TFrame`, `TScrollBar`, `TWindow` | `views.h`, `tview.cpp`, `tgroup.cpp`, … | |
@@ -47,3 +48,15 @@
 
 - `source/platform` для Unix и Win32 — веха 6.
 - Слой совместимости с Borland C++ (`include/tvision/compat`).
+
+## Принятые решения по ходу перевода
+
+- **Цвет и атрибут** — простые типы с функциями, а не классы с операторами:
+  `TColor` — `LongWord` (24 бита значения и 3 бита типа), `TColorAttr` — запись с 64
+  битами (27 бит `fg`, 27 бит `bg`, 10 бит стиля), как у magiblot. Нулевой атрибут —
+  цвета по умолчанию без стиля. Функции называются `ColorXxx`, `AttrXxx`.
+- **Двухбайтный атрибут DN.** DN привык к атрибуту-байту BIOS и к ячейке из двух
+  байтов. Для него есть `AttrFromBIOS`, `AttrAsBIOSByte` (`$5F`, если атрибут не
+  сводится к BIOS) и `AttrToBIOS` (с квантованием). Как именно сопрягается
+  `TDrawBuffer` DN с ячейкой UTF-8, решаем в юните `TvDrawBuf` (№ 4).
+- **Имена файлов тестов** `t_*.pas`: DOS без LFN допускает 8 знаков.
