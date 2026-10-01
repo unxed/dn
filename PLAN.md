@@ -19,6 +19,12 @@
 |---|---|---|---|
 | `maximmasiutin/Dos-Navigator` | DN 1.51 от RIT, исходный: BP7 + TASM, 16 бит, реальный режим/DPMI16 | ~100k | 11: OBJECTS, DRIVERS, VIEWS, MENUS, DIALOGS, HISTLIST, MEMORY, VALIDATE, COLORSEL, STRINGS, TVHC |
 
+Исходники DN 1.51 от RIT, BT7:
+https://web.archive.org/web/20250406173244/https://download.ritlabs.com/dn/dn151src.zip
+
+Исходники DN OSP 1.51.08, Virtual Pascal:
+https://web.archive.org/web/20220202202636/http://www.dnosp.com/files/dn2/dn2s214.rar
+
 ## Порядок шагов и почему он такой
 
 По сравнению с исходной постановкой поменял порядок: **сначала собираем под FPC, потом
