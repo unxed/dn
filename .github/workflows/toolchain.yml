@@ -1,6 +1,7 @@
 name: toolchain
-# Cross toolchain FPC -> DOS (go32v2). Built from the Ubuntu fpc-source package
-# with DJGPP binutils; cached by the hash of the build script.
+# Cross toolchain FPC -> DOS (go32v2): FPC 3.2.2 built from the official sources
+# with DJGPP binutils, cached by the hash of the build script. Then hello.exe is
+# run in DOSBox-X without a display.
 on:
   workflow_dispatch:
   push:
@@ -15,7 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y fpc fpc-source make bzip2
+        # only the compiler and the RTL: 'fpc' drags in GTK and takes ~13 minutes
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl make bzip2 git curl dosbox-x unzip
       - name: Cross toolchain cache
         id: cache
         uses: actions/cache@v4
@@ -24,16 +26,31 @@ jobs:
           key: fpc-go32v2-${{ hashFiles('tools/build-fpc-go32v2.sh') }}
       - name: Build cross toolchain
         if: steps.cache.outputs.cache-hit != 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: tools/build-fpc-go32v2.sh ~/fpc-go32v2
       - name: Compile hello for go32v2
         run: |
           mkdir -p out
           ~/fpc-go32v2/bin/fpc-go32v2 -FEout tests/dos/hello.pas
+          file out/hello.exe
+      - name: DPMI host (CWSDPMI, not committed)
+        run: |
+          curl -fsSL --retry 4 -o csdpmi.zip https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
+          unzip -j -o csdpmi.zip 'bin/CWSDPMI.EXE' -d out
           ls -l out
-          file out/hello* || true
+      - name: Run in DOSBox-X (headless)
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: |
+          cd out
+          timeout 120 dosbox-x -silent -nogui -noconsole -defaultconf \
+            -c "mount c $PWD" -c "c:" -c "hello.exe > out.txt" -c "exit" || true
+          echo "--- out.txt:"; cat -v OUT.TXT
+          grep -q 'hello from go32v2' OUT.TXT
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: hello-go32v2
-          path: out/
+          path: |
+            out/hello.exe
+            out/OUT.TXT
