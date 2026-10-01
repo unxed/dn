@@ -51,3 +51,20 @@ workflow `toolchain`, около 2 минут). Проверено: `hello.pas` 
   `bin/cwsdpmi.doc` с условиями распространения. Первая попытка прочитать их в логе
   не удалась: неверный путь внутри архива; исправлено отдельной задачей
   `cwsdpmi-license`.
+
+## Лицензия CWSDPMI r7 (из `bin/cwsdpmi.doc`, прочитано в CI: задача `cwsdpmi-license`)
+
+Copyright 1995–2010 Charles W Sandmann. Цитата: «The files in this binary distribution may
+be redistributed under the GPL (with source) or without the source code provided»:
+- `CWSDPMI.EXE` и `CWSDPR0.EXE` не изменяются иначе чем через `CWSPARAM`;
+- внутренности `CWSDSTUB.EXE` не изменяются иначе чем через `CWSPARAM` или `STUBEDIT`
+  (к нему можно дописать образ COFF и данные);
+- пользователям сообщается, что у них есть право получить исходники и обновлённые
+  бинарники CWSDPMI; дистрибьютор указывает в документации сайт с исходниками.
+
+Вывод: `CWSDPMI.EXE` можно класть в релизные архивы DN без изменений, если приложить
+`cwsdpmi.doc` и указать, где взять исходники (ссылка в документации релиза). Выбор:
+- по умолчанию — `CWSDPMI.EXE` рядом с программой (как в CI);
+- вариант в один файл: `CWSDSTUB.EXE` + COFF-образ программы (`copy /b`), см. `cwsdpmi.doc`.
+Условия HDPMI32 (проект HX) не смотрели; нужен ли он, решим по результатам вехи 5
+(FreeDOS, NTVDM).
