@@ -39,7 +39,9 @@
 | 3a | `TvKeys` — коды клавиш `kb*`, модификаторы, `TKey` (нормализация сочетаний) | `tkeys.h`, `tkey.cpp` | сделан |
 | 3b | `TvEvents` — запись `TEvent`, коды и маски событий | `system.h` (события; очередь, мышь и экран — в бэкендах) | сделан; коды команд `cm*` — в `TvViews` |
 | 4 | `TvDrawBuf` — `TDrawBuffer`: MoveChar, MoveStr, MoveCStr, MoveBuf | `drawbuf.h`, `drivers.cpp` | сделан |
-| 5 | `TvViews` — `TView`, `TGroup`, `TFrame`, `TScrollBar`, `TWindow` | `views.h`, `tview.cpp`, `tgroup.cpp`, … | |
+| 5a | `TvScreen` — размер экрана, буфер экрана, крючки бэкенда (запись, каретка) | `TScreen`, `THardwareInfo` (экранная часть) | сделан |
+| 5b | `TvViews` — константы, `TCommandSet`, палитры, `TView`, `TGroup`, движок вывода и проверка видимости | `views.h`, `tview.cpp`, `tgroup.cpp`, `tvwrite.cpp`, `tvexposd.cpp`, `tvcursor.cpp` и др. | сделан (без потоков и таймеров) |
+| 5c | `TvWindow` — `TFrame`, `TScrollBar`, `TScroller`, `TWindow` | `views.h`, `tframe.cpp`, `tscrlbar.cpp`, `twindow.cpp` | |
 | 6 | `TvMenus` — меню и строка статуса | `menus.h`, `tmnuview.cpp`, `tstatusl.cpp` | |
 | 7 | `TvApp` — `TProgram`, `TApplication`, `TDesktop` | `app.h`, `tprogram.cpp`, … | |
 | 8 | Бэкенд «в памяти» (тесты) и бэкенд DOS | свой | |
@@ -114,3 +116,20 @@
   `Dispose(P, Done)` (цепочка деструкторов), `var`-запись через виртуальный метод,
   массив указателей на базовый тип с разными потомками. Работает нативно и под DOS.
   Значит, иерархия видов переводится на `object` без обходных решений.
+- **Порядок видов.** `First` — верхний вид, `Last` — нижний; `Next` идёт сверху вниз, а
+  `Last.Next = First`. `Insert` кладёт новый вид наверх. `NextView` — вид ниже,
+  `DrawUnderRect` перерисовывает виды ниже. `ResetCurrent` ищет подходящий вид с `Last`,
+  поэтому текущим становится самый старый выбираемый.
+- **Движки вывода и видимости** (`tvwrite`, `tvexposd`) сохранены шаг в шаг, с теми же
+  номерами `L0`…`L50` (это переводы ассемблера Borland, которые magiblot уже записал на
+  C++); переписывание «красивее» дало бы риск тонких расхождений. Тени отмечаются в
+  атрибуте флагом `slWindowShadow`.
+- **Палитры** — массив `TColorAttr`, элемент 0 — число записей; `nil` — пустая палитра.
+  Не верхний вид отображает индекс в индекс владельца (через BIOS-байт), верхний (будущий
+  `TApplication`) даёт настоящие цвета. `MakePalette(#1#2#3)` строит палитру из строки
+  индексов, как строки палитр Pascal TV.
+- **Деструктор** `Done` отцепляет вид от группы (как в Pascal TV), поэтому `shutDown` из
+  C++ как отдельный метод не переводится; группа в `Done` скрывает и удаляет подвиды.
+- **`TCommandSet`** — `set of Byte`; команды выше 255 всегда разрешены.
+- **Пока не переведено в `TView`/`TGroup`:** потоки (`read`/`write`/`build`), таймеры,
+  `getEvent` с таймаутом и `textEvent` (их ждёт `TvApp`).

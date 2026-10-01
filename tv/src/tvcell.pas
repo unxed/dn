@@ -39,6 +39,7 @@ type
     Character: TScreenCharacter;
     Attribute: TColorAttr;
   end;
+  PScreenCell = ^TScreenCell;
 
 const
   { flags, stored in the high nibble of Meta }
