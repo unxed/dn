@@ -36,7 +36,8 @@
 | 2b | `TvUtf8` — декодирование/кодирование UTF-8, ширина символа | `internal/utf8.h`; ширина — таблицы из базы Unicode (`tools/gen-width.py`) | сделан |
 | 2c | `TvCell` — `TScreenCharacter`, `TScreenCell` (ячейка с UTF-8) | `scrncell.h` | сделан |
 | 2d | `TvCodePg`, `TvText` — кодовые страницы; `TText`: Next, Width, Prev, DrawOne, DrawStr, Scroll | `ttext.h`, `source/platform/{ttext,codepage}.cpp` | сделан (без `equalsIgnoreCase`, UTF-32 и `drawStrEx` с обратным вызовом) |
-| 3 | `TvEvents`, `TvKeys` — события, коды клавиш и команд | `system.h`, `tkeys.h`, `tevent.cpp`, `tkey.cpp` | |
+| 3a | `TvKeys` — коды клавиш `kb*`, модификаторы, `TKey` (нормализация сочетаний) | `tkeys.h`, `tkey.cpp` | сделан |
+| 3b | `TvEvents` — запись `TEvent`, коды и маски событий | `system.h` (события; очередь, мышь и экран — в бэкендах) | сделан; коды команд `cm*` — в `TvViews` |
 | 4 | `TvDrawBuf` — `TDrawBuffer` | `drawbuf.h`, `tvtext*.cpp` | |
 | 5 | `TvViews` — `TView`, `TGroup`, `TFrame`, `TScrollBar`, `TWindow` | `views.h`, `tview.cpp`, `tgroup.cpp`, … | |
 | 6 | `TvMenus` — меню и строка статуса | `menus.h`, `tmnuview.cpp`, `tstatusl.cpp` | |
@@ -86,3 +87,12 @@
   данные и просто работать с кусками буфера. Ячейки — `PScreenCell` + счётчик. Атрибут
   необязателен (`PColorAttr`, `nil` — не менять). Недопустимый UTF-8 считается символом
   ширины 1 и рисуется через кодовую страницу.
+- **События.** `TEvent` — одна плоская запись, как в Pascal TV (`Event.Where`,
+  `Event.KeyCode`, `Event.Command`, `Event.InfoPtr`), а не вложенные структуры magiblot.
+  `ControlKeyState` общий для клавиатуры и мыши и стоит в общей части записи. Текст
+  клавиши — UTF-8 (`Text`, `TextLength`). Очередь событий, мышь и экран (`TEventQueue`,
+  `THWMouse`, `TScreen`) — платформенный код, их заменяют бэкенды.
+- **Клавиши.** Коды `kb*` — коды BIOS (скан-код в старшем байте, символ в младшем).
+  Модификаторы — набор DOS BIOS (`kbShift=3`, `kbCtrlShift=4`, `kbAltShift=8`,
+  `kbScrollState=$10` и т. д.), в отличие от набора magiblot для Windows; добавлено свой
+  `kbEnhanced`. `TKey` приводит эквивалентные записи сочетаний к одной.
