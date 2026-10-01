@@ -36,6 +36,9 @@ jobs:
         run: |
           curl -fsSL --retry 4 -o csdpmi.zip https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
           unzip -j -o csdpmi.zip 'bin/CWSDPMI.EXE' -d out
+          echo '--- CWSDPMI license (distribution terms):'
+          unzip -p csdpmi.zip 'docs/cwsdpmi.txt' 2>/dev/null | grep -n -i -B2 -A8 -E 'distribut|licen|copyright' | head -60 || true
+          unzip -l csdpmi.zip
           ls -l out
       - name: Run in DOSBox-X (headless)
         env:

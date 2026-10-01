@@ -1,0 +1,26 @@
+name: audit
+# Checks that the Borland reference corpus can be fetched in CI (sha256-verified)
+# and that the clone detector works. The reference is proprietary: it exists only
+# in the runner's temporary tree and is never uploaded.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - audit/**
+      - .github/workflows/audit.yml
+
+jobs:
+  reference:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3
+      - name: Fetch the Borland reference
+        run: audit/fetch_reference.sh
+      - name: Detector self-test (a file against the corpus that contains it)
+        run: |
+          out=$(python3 audit/xclone.py --min 101 --ref audit/ref/list.txt audit/ref/rtl701)
+          echo "$out" | tail -1
+          # every token of the corpus must match itself
+          echo "$out" | tail -1 | grep -q 'raw 100.0%'
