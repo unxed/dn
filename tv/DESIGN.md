@@ -35,7 +35,7 @@
 | 2a | `TvColors` — цвета BIOS/RGB/xterm, атрибут (64 бита), квантование в 16 и 256 цветов | `colors.h`, `source/platform/colors.cpp` | сделан |
 | 2b | `TvUtf8` — декодирование/кодирование UTF-8, ширина символа | `internal/utf8.h`; ширина — таблицы из базы Unicode (`tools/gen-width.py`) | сделан |
 | 2c | `TvCell` — `TScreenCharacter`, `TScreenCell` (ячейка с UTF-8) | `scrncell.h` | сделан |
-| 2d | `TvText` — `TText`: Next, Width, Prev, DrawOne, DrawStr, Scroll; таблицы кодовых страниц | `ttext.h`, `source/platform/{ttext,codepage}.cpp` | |
+| 2d | `TvCodePg`, `TvText` — кодовые страницы; `TText`: Next, Width, Prev, DrawOne, DrawStr, Scroll | `ttext.h`, `source/platform/{ttext,codepage}.cpp` | сделан (без `equalsIgnoreCase`, UTF-32 и `drawStrEx` с обратным вызовом) |
 | 3 | `TvEvents`, `TvKeys` — события, коды клавиш и команд | `system.h`, `tkeys.h`, `tevent.cpp`, `tkey.cpp` | |
 | 4 | `TvDrawBuf` — `TDrawBuffer` | `drawbuf.h`, `tvtext*.cpp` | |
 | 5 | `TvViews` — `TView`, `TGroup`, `TFrame`, `TScrollBar`, `TWindow` | `views.h`, `tview.cpp`, `tgroup.cpp`, … | |
@@ -77,3 +77,12 @@
   символ плюс `TColorAttr`, 24 байта. Это plain data: нулевые байты — валидная пустая
   ячейка, сравнение побайтовое. Конвертер из слова DOS (`CellFromBIOS`) нужен для DN и для
   DOS-бэкенда.
+- **Кодовые страницы** (`TvCodePg`, таблицы из `tools/gen-codepage.py`): сейчас 437 и 866,
+  выбор `CpSelect`, по умолчанию 866 (у magiblot 437). Нижняя половина (0..31 и 7Fh)
+  показывается как графические символы IBM PC (☺, ♥, ⌂…), верхняя — из кодека Python.
+  Таблицу CP437 я сверил с таблицей magiblot: совпадение во всех 256 позициях. Новая
+  страница — строка в `PAGES` скрипта и ветка в `CpSelect`.
+- **Текст** — пары `PByte` + длина (плюс обёртки для `ShortString`): так не копируются
+  данные и просто работать с кусками буфера. Ячейки — `PScreenCell` + счётчик. Атрибут
+  необязателен (`PColorAttr`, `nil` — не менять). Недопустимый UTF-8 считается символом
+  ширины 1 и рисуется через кодовую страницу.
