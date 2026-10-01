@@ -19,6 +19,11 @@
 - magiblot/tvision: https://github.com/magiblot/tvision (на 2026-10-01 — `b4831e2`).
   Лицензия: отказ от гарантий Borland плюс MIT (`COPYRIGHT`). Происхождение проверено:
   `research/2026-10-01-magiblot-provenance.md`.
+- Опубликованный Borland выпуск TV 2.0: https://github.com/FSharpCSharp/TurboVision
+  (распакованный `tv.zip`); сам `tv.zip`: http://www.sigala.it/sergio/tvision/borland/tv.zip,
+  https://web.archive.org/web/20170708213734/http://www.sigala.it/sergio/tvision/borland/tv.zip;
+  страница исходников Sergio Sigala: http://www.sigala.it/sergio/tvision/resources.html#sources.
+  Импорт magiblot «Version 2.0» совпадает с ним по коду во всех 201 файле.
 - Порт SET 2.0.3 (GPL, для сверки происхождения magiblot):
   http://old-dos.ru/dl.php?id=9393, sha256
   `34d27cffff01d0b38b199c035d040bb2b3e88c41935f63d9828dd4db033471ac`.
@@ -163,12 +168,12 @@
 
 ## Открытые вопросы
 
-- **В9.** Есть ли где-то оригинальный `tv.zip` от Borland (`INCLUDE.ZIP`, `SOURCE.ZIP`,
-  `DOCS.ZIP`)? С ним можно сверить импорт magiblot «Version 2.0» байт в байт. Архив
-  `id=9393` оказался портом SET, а не оригиналом.
+- Пока нет.
 
 Закрыто: В1 (эталон — по ссылке выше), В2 (go2xp → go2dos), В3 (FV не используем),
-В8 (основа TV — перевод magiblot, подтверждено),
+В8 (основа TV — перевод magiblot, подтверждено), В9 (импорт magiblot сверен с
+опубликованным выпуском по зеркалу FSharpCSharp; сверку с самим `tv.zip` можно
+повторить в CI),
 В4 (лицензия DN для DN), В5 (пробная сборка обеих баз, веха 4), В6 (FreeDOS/DOSBox-X,
 go2dos позже), В7 (коммиты в `main`).
 
