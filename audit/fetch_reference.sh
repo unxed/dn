@@ -12,6 +12,7 @@
 set -eu
 
 URL='https://web.archive.org/web/20231211134715if_/http://old-dos.ru/dl.php?id=9670'
+URL_ORIG='http://old-dos.ru/dl.php?id=9670'
 SHA256='1ba6251209ae4a56a4f6ce5926bff0eca815ea53a3dd5f57f779d52d1e1dc2fc'
 
 here=$(cd "$(dirname "$0")" && pwd)
@@ -21,7 +22,9 @@ trap 'rm -rf "$tmp"' EXIT
 
 src=${1:-}
 if [ -z "$src" ]; then
-    curl -fsSL --retry 4 -o "$tmp/bp7.rar" "$URL"
+    # web.archive first, the original site as a fallback; the sha256 below is the check
+    curl -fsSL --retry 4 --max-time 600 -o "$tmp/bp7.rar" "$URL" \
+        || curl -fsSL --retry 4 --max-time 600 -o "$tmp/bp7.rar" "$URL_ORIG"
     src="$tmp/bp7.rar"
 fi
 echo "$SHA256  $src" | sha256sum -c -
