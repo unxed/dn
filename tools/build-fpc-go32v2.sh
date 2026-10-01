@@ -1,33 +1,36 @@
 #!/bin/sh
 # Builds an FPC 3.2.2 cross compiler (x86_64 Linux -> i386-go32v2) from the
-# Ubuntu fpc-source package, using the DJGPP binutils of andrewwutw/build-djgpp.
+# official FPC sources (tag release_3_2_2), using the DJGPP binutils of
+# andrewwutw/build-djgpp. The Debian/Ubuntu fpc-source package is not enough:
+# it lacks the top-level Makefile and compiler/msg.
 #
 # usage: tools/build-fpc-go32v2.sh PREFIX
-# needs: fpc, fpc-source, make, gh (with GH_TOKEN), bzip2
-# result: PREFIX/bin/fpc-go32v2 (wrapper: compiles for i386-go32v2)
+# needs: fpc (any 3.2.x, as the bootstrap compiler), make, git, curl, bzip2
+# result: PREFIX/bin/fpc-go32v2  (wrapper: compiles for i386-go32v2)
 set -eu
 PREFIX=$(mkdir -p "$1" && cd "$1" && pwd)
 work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+TP=i586-pc-msdosdjgpp-
 
-# --- DJGPP binutils (and the gcc driver, which FPC does not need) ------------
-gh release download -R andrewwutw/build-djgpp -p 'djgpp-linux64-*.tar.*' -D "$work"
-tar -xf "$work"/djgpp-linux64-* -C "$PREFIX"
+# --- DJGPP binutils ------------------------------------------------------------
+curl -fsSL --retry 4 -o "$work/djgpp.tar.bz2" \
+  https://github.com/andrewwutw/build-djgpp/releases/latest/download/djgpp-linux64-gcc1220.tar.bz2
+tar -xf "$work/djgpp.tar.bz2" -C "$PREFIX"
 DJ="$PREFIX/djgpp"
 export PATH="$DJ/bin:$PATH"
-TP=i586-pc-msdosdjgpp-
 command -v ${TP}as ${TP}ld
 
-# --- cross compiler + RTL ----------------------------------------------------
-cp -r /usr/share/fpcsrc/3.2.2 "$work/src"
+# --- cross compiler + RTL ------------------------------------------------------
+git clone -q --depth 1 --branch release_3_2_2 https://gitlab.com/freepascal.org/fpc/source.git "$work/src"
 cd "$work/src"
-common="OS_TARGET=go32v2 CPU_TARGET=i386 BINUTILSPREFIX=$TP FPC=/usr/bin/fpc"
-# 'make crossall' builds ppcross386 plus the RTL and packages for the target
+common="PP=/usr/bin/fpc OS_TARGET=go32v2 CPU_TARGET=i386 BINUTILSPREFIX=$TP"
 make $common crossall
 make $common crossinstall INSTALL_PREFIX="$PREFIX/fpc"
 
-ppc=$(find "$PREFIX/fpc" -name ppcross386 | head -1)
-units=$(dirname "$ppc")/units/i386-go32v2
-[ -x "$ppc" ] && [ -d "$units" ] || { echo "cross compiler not installed" >&2; exit 1; }
+ppc="$PREFIX/fpc/lib/fpc/3.2.2/ppcross386"
+units="$PREFIX/fpc/lib/fpc/3.2.2/units/go32v2"
+[ -x "$ppc" ] && [ -f "$units/rtl/system.ppu" ] || { echo "cross compiler not installed" >&2; exit 1; }
 
 mkdir -p "$PREFIX/bin"
 cat > "$PREFIX/bin/fpc-go32v2" <<EOS
