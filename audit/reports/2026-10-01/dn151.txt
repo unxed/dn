@@ -1,0 +1,27 @@
+file                          tokens   raw%   ren%  impl% maxrun  ref
+STRINGS.PAS                     1992   100%   100%   100%   1992  STRINGS.PAS
+HELPKERN.PAS                    3404    98%    99%    99%   1416  HELPFILE.PAS
+SCROLLER.PAS                    2897    96%    98%    97%   1340  VIEWS.PAS
+VALIDATE.PAS                    1245    95%    99%    97%    606  VALIDATE.PAS
+OBJECTS.PAS                    14976    94%    96%    94%   3317  OBJECTS.PAS
+VIEWS.PAS                      18337    94%    95%    94%   2788  VIEWS.PAS
+TVHC.PAS                        4971    88%    90%    88%   2150  TVHC.PAS
+DIALOGS.PAS                    14139    74%    77%    71%   1280  DIALOGS.PAS
+MEMORY.PAS                      2708    69%    72%    67%   1343  MEMORY.PAS
+DNSTDDLG.PAS                    6651    66%    76%    63%    250  STDDLG.PAS
+COLORSEL.PAS                    7593    64%    75%    61%   1639  COLORSEL.PAS
+HISTLIST.PAS                    1015    59%    65%    60%    214  HISTLIST.PAS
+ASCIITAB.PAS                    1609    56%    66%    53%    197  ASCIITAB.PAS
+DNAPP.PAS                       6950    39%    51%    37%    821  APP.PAS
+HELPFILE.PAS                    2182    38%    50%    37%    134  HELPFILE.PAS
+MESSAGES.PAS                    2598    28%    44%    32%    105  MSGBOX.PAS
+GAUGES.PAS                      2085    27%    46%    25%    150  TRASH.PAS
+GAUGE.PAS                       2346    22%    37%    19%    199  GAUGES.PAS
+SETUPS.PAS                      5025     4%    50%     5%     32  CHESSDLG.PAS
+EXTRAMEM.PAS                    2089     4%    10%     0%     81  OBJECTS.PAS
+COLORVGA.PAS                    2178     4%    27%     4%     31  COLORSEL.PAS
+COMMANDS.PAS                    5550     4%    98%     0%    133  APP.PAS
+COMLNKIO.PAS                    1318     4%    13%     4%     24  STDDLG.PAS
+CCALC.PAS                       3758     3%    15%     2%     38  CALC.PAS
+FVIEWER.PAS                    11637     2%    15%     2%    112  VIEWS.PAS
+TOTAL 101 files, 543954 tokens: raw 14.1%  ren 27.7%  impl(raw) 13.3%
