@@ -77,6 +77,9 @@ type
             5: (InfoChar: Char));
   end;
 
+type
+  PEvent = ^TEvent;
+
 { All zero: What = evNothing. }
 procedure ClearEvent(out Event: TEvent);
 { The text of a key down event. }

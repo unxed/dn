@@ -21,10 +21,6 @@ interface
 uses
   TvColors, TvCell;
 
-type
-  PScreenCell = ^TScreenCell;
-  PColorAttr = ^TColorAttr;
-
 { Length and width of the character at Text (Len bytes available). False when
   Len = 0. Width is 0 for combining and format characters. }
 function TextNext(Text: PByte; Len: Integer; out CharLen, CharWidth: Integer): Boolean;

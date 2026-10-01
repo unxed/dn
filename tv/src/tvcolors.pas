@@ -29,6 +29,8 @@ type
     Data: QWord;
   end;
 
+  PColorAttr = ^TColorAttr;
+
   TAttrPair = record
     Lo, Hi: TColorAttr;
   end;
@@ -47,6 +49,7 @@ const
   slBlink     = $008;
   slReverse   = $010;       { prefer AttrReversed }
   slStrike    = $020;
+  slWindowShadow = $200;    { set by the view output engine on cells already shadowed }
 
 { --- TColorRGB ------------------------------------------------------------ }
 function RGB(R, G, B: Byte): TColorRGB; inline;

@@ -16,6 +16,7 @@ type
   TPoint = record
     X, Y: Integer;
   end;
+  PPoint = ^TPoint;
 
   TRect = object
     A, B: TPoint;
