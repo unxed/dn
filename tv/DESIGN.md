@@ -34,7 +34,7 @@
 | 1 | `TvGeom` — `TPoint`, `TRect` | `objects.h` | сделан, CI зелёный (Linux и DOS) |
 | 2a | `TvColors` — цвета BIOS/RGB/xterm, атрибут (64 бита), квантование в 16 и 256 цветов | `colors.h`, `source/platform/colors.cpp` | сделан |
 | 2b | `TvUtf8` — декодирование/кодирование UTF-8, ширина символа | `internal/utf8.h`; ширина — таблицы из базы Unicode (`tools/gen-width.py`) | сделан |
-| 2c | `TvCell` — `TScreenCharacter`, `TScreenCell` (ячейка с UTF-8) | `scrncell.h` | |
+| 2c | `TvCell` — `TScreenCharacter`, `TScreenCell` (ячейка с UTF-8) | `scrncell.h` | сделан |
 | 2d | `TvText` — `TText`: Next, Width, Prev, DrawOne, DrawStr, Scroll; таблицы кодовых страниц | `ttext.h`, `source/platform/{ttext,codepage}.cpp` | |
 | 3 | `TvEvents`, `TvKeys` — события, коды клавиш и команд | `system.h`, `tkeys.h`, `tevent.cpp`, `tkey.cpp` | |
 | 4 | `TvDrawBuf` — `TDrawBuffer` | `drawbuf.h`, `tvtext*.cpp` | |
@@ -72,3 +72,8 @@
 - **Декодер UTF-8 свой:** проверяет кратчайшую форму, суррогаты и верхнюю границу
   U+10FFFF; при ошибке возвращает `Used`, с которого можно продолжать
   (как с однобайтным символом кодовой страницы).
+- **Ячейка экрана** — как у magiblot: `TScreenCharacter` (15 байт текста UTF-8 плюс байт
+  «длина−1 / флаги»: широкий, хвост широкого, переполнение), 16 байт; `TScreenCell` —
+  символ плюс `TColorAttr`, 24 байта. Это plain data: нулевые байты — валидная пустая
+  ячейка, сравнение побайтовое. Конвертер из слова DOS (`CellFromBIOS`) нужен для DN и для
+  DOS-бэкенда.
