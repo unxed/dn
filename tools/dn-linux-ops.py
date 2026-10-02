@@ -75,6 +75,14 @@ def main():
         txt = open(os.path.join(w, 'a.txt')).read() if os.path.exists(os.path.join(w, 'a.txt')) else None
         check(txt is not None and txt.startswith('hello first'), 'F4: the edited text is saved (%r)' % (txt,), t.text())
 
+        # into a directory and back
+        key('HOME'); key('DOWN'); key('ENTER', 1.0)
+        title = t.text().split('\n')[1]
+        check('NEWDIR' in title.upper() and 'a' in t.text().split('\n')[3] + t.text().split('\n')[4],
+              'Enter on a directory shows it (the title has newdir)', t.text())
+        key('HOME'); key('ENTER', 1.0)
+        check('NEWDIR' not in t.text().split('\n')[1].upper(), 'Enter on .. goes back up', t.text())
+
         key('ALT-X'); key('ENTER', 0.8)
         status = t.close(2)
         check(status == 0, 'Alt-X ends the program (status %r)' % (status,))
