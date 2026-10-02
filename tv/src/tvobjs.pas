@@ -180,6 +180,8 @@ type
     procedure AtFree(Index: Integer);
     procedure AtInsert(Index: Integer; Item: Pointer);
     procedure AtPut(Index: Integer; Item: Pointer);
+    { used by DN: AtPut that grows the collection with nils up to Index and frees the item that was there }
+    procedure AtReplace(Index: Integer; Item: Pointer);
     procedure Delete(Item: Pointer);
     procedure DeleteAll;
     procedure Error(Code, Info: Integer); virtual;
@@ -1001,6 +1003,18 @@ begin
     Items^[Index] := Item;
     Inc(Count);
   end;
+end;
+
+procedure TCollection.AtReplace(Index: Integer; Item: Pointer);
+var
+  P: Pointer;
+begin
+  while Count < Index + 1 do
+    Insert(nil);
+  P := At(Index);
+  AtPut(Index, Item);
+  if P <> nil then
+    FreeItem(P);
 end;
 
 procedure TCollection.AtPut(Index: Integer; Item: Pointer);

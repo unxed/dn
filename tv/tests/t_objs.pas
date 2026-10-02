@@ -138,6 +138,7 @@ var
   C: PSafeColl;
   IC: PIntColl;
   SC: PStringCollection;
+  C2: PSafeColl;
   PC: PCollection;
   Pt: PPt;
   O: PObject;
@@ -405,6 +406,12 @@ begin
   Check(C^.IndexOf(Pointer(77)) = -1, 'IndexOf: not there');
   C^.AtPut(0, Pointer(11));
   Check(C^.At(0) = Pointer(11), 'AtPut');
+  C^.AtReplace(0, Pointer(12));
+  Check(C^.At(0) = Pointer(12), 'AtReplace replaces an item');
+  New(C2, Init(2, 2));
+  C2^.AtReplace(3, Pointer(33));
+  Check((C2^.Count = 4) and (C2^.At(3) = Pointer(33)) and (C2^.At(1) = nil), 'AtReplace grows the collection with nils');
+  Dispose(C2, Done);
   C^.Delete(Pointer(15));
   Check((C^.Count = 3) and (C^.At(1) = Pointer(20)), 'Delete');
   C^.AtDelete(0);

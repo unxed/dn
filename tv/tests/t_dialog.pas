@@ -104,6 +104,7 @@ begin
   MemClear;
   MemKey(kbEsc);
   Check(DeskTop^.ExecView(Dlg) = cmCancel, 'Esc: cmCancel');
+  Check(ModalCount = 0, 'DN extensions: ModalCount is 0 again after ExecView');
 
   { a click on a button }
   MemClear;

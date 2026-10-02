@@ -366,6 +366,8 @@ function PaletteSize(const P: TPalette): Integer;
 function Message(Receiver: PView; What, Command: Word; InfoPtr: Pointer): Pointer;
 
 var
+  { DN: the number of the modal views that are being executed (ExecView calls that have not returned) }
+  ModalCount: Word = 0;
   { DN: the commands of the features that are not in the program are never enabled (TView.MenuEnabled) }
   CommandHiddenHook: function(Command: Word): Boolean = nil;
   { stream records: RegisterType(RView) makes TView known to the streams }
@@ -2009,7 +2011,9 @@ begin
   SetCurrent(P, enterSelect);
   if SaveOwner = nil then
     Insert(P);
+  Inc(ModalCount);
   Result := P^.Execute;
+  Dec(ModalCount);
   if SaveOwner = nil then
     Delete(P);
   SetCurrent(SaveCurrent, leaveSelect);

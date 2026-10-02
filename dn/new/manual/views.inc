@@ -59,3 +59,6 @@ var
 
 { Message with a long integer in the event (DN; Message takes a pointer). }
 function MessageL(Receiver: PView; What, Command: Word; InfoLng: LongInt): Pointer;
+
+{ The next free number of a window, 1..9 (0 if all are used); the number is free again when the window is destroyed. }
+function GetNum: Integer;

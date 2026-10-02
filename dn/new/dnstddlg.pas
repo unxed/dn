@@ -20,6 +20,8 @@ const
   fdNoLoadDir = TvFileDlg.fdNoLoadDir;
 
 type
+  PSortedListBox = TvFileDlg.PSortedListBox;
+  TSortedListBox = TvFileDlg.TSortedListBox;
   PFileInputLine = TvFileDlg.PFileInputLine;
   TFileInputLine = TvFileDlg.TFileInputLine;
   PFileList = TvFileDlg.PFileList;

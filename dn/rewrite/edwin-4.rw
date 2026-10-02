@@ -1,0 +1,8 @@
+# The rectangle of the information line (Init): the last row, from the third column to the third from the right.
+file: EDWIN.PAS
+after: if not Intern^.isValid then
+from: GetExtent(R);
+to: Dec(R.B.X, 2);
+sha1: 10700c13ea929d394c85fe575e0a0c72d5f9a26a
+---
+R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
