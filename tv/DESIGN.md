@@ -45,8 +45,11 @@
 | 5d | `TvUtil` — горячие клавиши и строки с `~`: `HotKeyStr`, `CStrLen`, `GetAltCode/Char/CharStr`, `GetCtrlCode/Char`, `EqualsIgnoreCase`, `NewStr` | `util.h`, `tvtext2.cpp`, `tinputli.cpp`, `drivers2.cpp`, `ttext.cpp` | сделан |
 | 6a | `TvMenus` — меню: `TMenuView`, `TMenuBar`, `TMenuBox`, `TMenuPopup`, `NewMenu/NewSubMenu/NewItem/NewLine` | `menus.h`, `tmnuview.cpp`, `tmenubar.cpp`, `tmenubox.cpp`, `tmenupop.cpp` | сделан (без потоков) |
 | 6b | `TvMenus` — строка статуса: `TStatusLine`, `TStatusDef`, `TStatusItem`, `NewStatusDef/NewStatusKey` | `menus.h`, `tstatusl.cpp` | сделан (без потоков) |
-| 7 | `TvApp` — `TProgram`, `TApplication`, `TDesktop` | `app.h`, `tprogram.cpp`, … | |
-| 8 | Бэкенд «в памяти» (тесты) и бэкенд DOS | свой | |
+| 7a | `TvSys` — крючки бэкенда: опрос событий, часы, смена видеорежима, режим экрана | свой (в оригинале `THardwareInfo`, `TEventQueue`) | сделан |
+| 7b | `TvTimer` — очередь таймеров `TTimerQueue` | `system.h`, `ttimerqu.cpp` | сделан |
+| 7c | `TvApp` — `TBackground`, `TDeskTop` (Tile, Cascade), `TProgram`, `TApplication` | `app.h`, `tprogram.cpp`, `tapplica.cpp`, `tdesktop.cpp`, `tbkgrnd.cpp` | сделан (без потоков, `LowMemory`; диалог — любой вид) |
+| 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
+| 8b | Бэкенд DOS: видеопамять/int 10h, клавиатура int 16h, мышь int 33h, буфер обмена WinOldAp | свой | |
 
 После пилота (вехи 3–4 плана): диалоги, кластеры, списки, файловые диалоги, справка,
 коллекции и потоки, редактор — в объёме, который использует DN.
@@ -179,3 +182,20 @@
   определения в `Done`. `Hint` возвращает `ShortString`; разделитель подсказки — байт CP437
   $B3 и пробел. `Update` берёт контекст справки у `TopView` — вызывать его будет
   `TProgram.Idle` (юнит `TvApp`).
+- **Бэкенд — набор крючков `TvSys`** (`OnPollEvent`, `GetClockMs`, `OnSetVideoMode`,
+  `OnSuspend/OnResume`, `ScreenMode`) и крючки `TvScreen` (запись, каретка). `PollEvent(TimeoutMs)`
+  ждёт до `TimeoutMs` мс одно событие (мышь важнее клавиатуры) и возвращает `evNothing`, если
+  ничего не случилось; тогда `TProgram.GetEvent` вызывает `Idle`. Так бэкенды DOS, терминала и
+  Windows подключаются без изменений в `TvApp`.
+- **`TProgram`:** рабочий стол, строка статуса и строка меню создаются виртуальными методами
+  `InitDeskTop`, `InitStatusLine`, `InitMenuBar` (в `Init` они вызываются в таком порядке);
+  переменные класса оригинала (`Application`, `StatusLine`, `MenuBar`, `DeskTop`, `AppPalette`,
+  `EventTimeoutMs`) — переменные юнита. Палитры приложения (`cpAppColor` и т. д.) сгенерированы
+  из `app.h` в `tvapppal.inc` (135 значений каждая, число проверено). Для скрытых пунктов
+  строки статуса (клавиша без текста) `NewStatusKey` с пустым текстом хранит `nil`.
+- **Таймеры** отправляют программе `cmTimerExpired` с идентификатором таймера в `InfoPtr`;
+  срабатывание проверяется в `Idle`, а ожидание событий укорачивается до ближайшего таймера.
+- **Тесты используют `TvMem`:** `MemKey`, `MemMouse`, `MemText`, `MemAttr`, `MemIsShadow`.
+  Если сценарий кончился, а программа ждёт события, бэкенд двигает часы на величину
+  таймаута (так проверяются таймеры), а после 500 пустых опросов останавливает тест.
+- **`DosShell`** не покрыт тестами (запускает оболочку из `COMSPEC`/`SHELL`).
