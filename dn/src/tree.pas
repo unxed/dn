@@ -223,7 +223,7 @@ uses
   Lfn, Files, Memory, Startup, Dos, DnIni, DNHelp,
   Advance, Advance1, Advance2, Advance3,
   FlPanelX, DNApp, Messages, Commands, Drives, Eraser, Menus,
-  xTime, FileCopy
+  xTime, FileCopy, VPSysLow
   ;
 
 const
@@ -304,7 +304,8 @@ procedure ReadTree(C: Char; CountLen: Boolean);
       begin
       if not IsDummyDir(SR.SR.Name) then
         begin
-        if SR.SR.Attr and Directory <> 0 then
+        { a link to a directory (SysLinkAttr) is not entered: a loop such as /proc/self/root would never end }
+        if (SR.SR.Attr and Directory <> 0) and (SR.SR.Attr and SysLinkAttr = 0) then
           begin
           New(P);
           CopyShortString(SR.SR.Name, P^.DirName[uLfn]);
