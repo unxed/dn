@@ -1,0 +1,33 @@
+# The interface of TPercentGauge/TBarGauge repeated the gauges of the demo of Borland TV (audit: 53 tokens in a
+# row): the same names, our order and layout.
+file: gauge.pas
+from: cmUpdateGauge = 12000;
+to: PWhileView = ^TWhileView;
+to-keep: yes
+sha1: 772b12c98d281953fade2c326bc8a39e3482092e
+---
+cmUpdateGauge = 12000;
+cmResetGauge = 12001;
+cmAddGauge = 12002;
+
+type
+  PPercentGauge = ^TPercentGauge;
+  PBarGauge = ^TBarGauge;
+
+  { shows how much of the work is done, in per cent (MaxValue is 100 %) }
+  TPercentGauge = object(TView)
+    MaxValue, CurValue: LongInt;
+    procedure AddProgress(Progress: LongInt);
+    procedure Draw; virtual;
+    procedure HandleEvent(var Event: TEvent); virtual;
+    constructor Init(var Bounds: TRect; AMaxValue: LongInt);
+    function SolveForX(Y, Z: LongInt): Integer;
+    function SolveForY(X, Z: LongInt): Integer;
+    procedure UpdateView(Progress: LongInt); virtual;
+    end;
+
+  { the same as a bar }
+  TBarGauge = object(TPercentGauge)
+    procedure Draw; virtual;
+    end;
+

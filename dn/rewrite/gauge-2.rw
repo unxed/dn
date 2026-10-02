@@ -1,0 +1,88 @@
+# The methods of TPercentGauge/TBarGauge repeated the gauges of the demo of Borland TV (audit: 199, 133, 71
+# tokens in a row): our text, the same behaviour.
+file: gauge.pas
+from: constructor TPercentGauge.Init(var Bounds: TRect; AMaxValue: LongInt);
+to: procedure TWhileView.InsBut;
+to-keep: yes
+sha1: 886be7c219e08ecefb823cd35b826bb267529e14
+---
+constructor TPercentGauge.Init(var Bounds: TRect; AMaxValue: LongInt);
+  begin
+  inherited Init(Bounds);
+  CurValue := 0;
+  MaxValue := AMaxValue;
+  EventMask := EventMask or evBroadcast;
+  end;
+
+{ x is y per cent of z: the whole part of z * y / 100 }
+function TPercentGauge.SolveForX(Y, Z: LongInt): Integer;
+  begin
+  Result := Trunc(Z * Y / 100);
+  end;
+
+{ y per cent is x of z }
+function TPercentGauge.SolveForY(X, Z: LongInt): Integer;
+  begin
+  if Z <> 0 then
+    Result := Trunc(X * 100 / Z)
+  else
+    Result := 0;
+  end;
+
+procedure TPercentGauge.UpdateView(Progress: LongInt);
+  begin
+  CurValue := Progress;
+  DrawView;
+  end;
+
+procedure TPercentGauge.AddProgress(Progress: LongInt);
+  begin
+  UpdateView(CurValue + Progress);
+  end;
+
+procedure TPercentGauge.Draw;
+  var
+    Row: TDrawBuffer;
+    Attr: Word;
+    Text: String[10];
+    Percent: LongInt;
+  begin
+  Attr := GetColor(1);
+  Percent := SolveForY(CurValue, MaxValue);
+  FormatStr(Text, '%-3d%%', Percent);
+  MoveChar(Row, ' ', Attr, Size.X);
+  MoveStr(Row, Text, Attr);
+  WriteLine(0, 0, Size.X, Size.Y, Row);
+  end;
+
+procedure TPercentGauge.HandleEvent(var Event: TEvent);
+  begin
+  inherited HandleEvent(Event);
+  if Event.What <> evBroadcast then
+    Exit;
+  if Event.Command = cmUpdateGauge then
+    UpdateView(Event.InfoLong)
+  else if Event.Command = cmAddGauge then
+    AddProgress(Event.InfoLong)
+  else if Event.Command = cmResetGauge then
+    begin
+    MaxValue := Event.InfoLong;
+    UpdateView(0);
+    end;
+  end;
+
+procedure TBarGauge.Draw;
+  var
+    Row: TDrawBuffer;
+    Attr: Word;
+    Filled: Integer;
+  begin
+  Attr := GetColor(1);
+  Filled := SolveForX(SolveForY(CurValue, MaxValue), Size.X);
+  if Filled > Size.X then
+    Filled := Size.X;
+  MoveChar(Row, #176, Attr, Size.X);
+  MoveChar(Row, #178, Attr, Filled);
+  WriteLine(0, 0, Size.X, Size.Y, Row);
+  end;
+
