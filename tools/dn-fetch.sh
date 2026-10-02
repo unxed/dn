@@ -19,11 +19,11 @@ if [ ! -s "$cache/$file" ]; then
 fi
 got=$(sha256sum "$cache/$file" | cut -d' ' -f1)
 if [ "$want" = TOFU ]; then
-    echo "dn-fetch: $name sha256 = $got   (pin it in dn/upstream.env)"
+    echo "dn-fetch: $name sha256 = $got   (pin it in dn/upstream.env)" >&2
 elif [ "$got" != "$want" ]; then
     echo "dn-fetch: $name: sha256 $got, expected $want" >&2
     exit 1
 else
-    echo "dn-fetch: $name sha256 ok"
+    echo "dn-fetch: $name sha256 ok" >&2
 fi
 echo "$cache/$file"
