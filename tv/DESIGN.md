@@ -42,7 +42,9 @@
 | 5a | `TvScreen` — размер экрана, буфер экрана, крючки бэкенда (запись, каретка) | `TScreen`, `THardwareInfo` (экранная часть) | сделан |
 | 5b | `TvViews` — константы, `TCommandSet`, палитры, `TView`, `TGroup`, движок вывода и проверка видимости | `views.h`, `tview.cpp`, `tgroup.cpp`, `tvwrite.cpp`, `tvexposd.cpp`, `tvcursor.cpp` и др. | сделан (без потоков и таймеров) |
 | 5c | `TvWindow` — `TFrame`, `TScrollBar`, `TScroller`, `TWindow` | `views.h`, `tframe.cpp`, `framelin.cpp`, `tscrlbar.cpp`, `tscrolle.cpp`, `twindow.cpp`, `tvtext1.cpp` (таблицы рамки) | сделан (без потоков); `CtrlToArrow` — в `TvKeys` |
-| 6 | `TvMenus` — меню и строка статуса | `menus.h`, `tmnuview.cpp`, `tstatusl.cpp` | |
+| 5d | `TvUtil` — горячие клавиши и строки с `~`: `HotKeyStr`, `CStrLen`, `GetAltCode/Char/CharStr`, `GetCtrlCode/Char`, `EqualsIgnoreCase`, `NewStr` | `util.h`, `tvtext2.cpp`, `tinputli.cpp`, `drivers2.cpp`, `ttext.cpp` | сделан |
+| 6a | `TvMenus` — меню: `TMenuView`, `TMenuBar`, `TMenuBox`, `TMenuPopup`, `NewMenu/NewSubMenu/NewItem/NewLine` | `menus.h`, `tmnuview.cpp`, `tmenubar.cpp`, `tmenubox.cpp`, `tmenupop.cpp` | сделан (без потоков) |
+| 6b | `TvMenus` — строка статуса: `TStatusLine`, `TStatusDef`, `TStatusItem` | `menus.h`, `tstatusl.cpp` | |
 | 7 | `TvApp` — `TProgram`, `TApplication`, `TDesktop` | `app.h`, `tprogram.cpp`, … | |
 | 8 | Бэкенд «в памяти» (тесты) и бэкенд DOS | свой | |
 
@@ -157,3 +159,19 @@
   Это заготовка того, что потом станет `TProgram.GetEvent`.
 - **Пока не переведено в `TvWindow`:** потоки; `TWindow.Palette` и `Flags` имеют те же
   значения, что в оригинале.
+- **Меню строятся функциями Pascal TV** (`NewMenu`, `NewSubMenu`, `NewItem`, `NewLine`), а не
+  перегруженным `operator +` из C++. Клавиша пункта — код клавиши (`Word`), внутри хранится
+  нормализованный `TKey`; сравнение — `KeyEq`. Пункт и меню — записи, имя — указатель на
+  `ShortString` (`nil` — разделитель). `DisposeMenu` освобождает меню с подменю; `TMenuBar`
+  и `TMenuPopup` освобождают своё меню в `Done`, `TMenuBox` — нет (оно принадлежит родителю).
+- **`EqualsIgnoreCase`** понижает регистр по небольшой встроенной таблице (Latin-1, Latin
+  Extended-A, греческий, кириллица), а не по таблицам платформы; байты, не являющиеся UTF-8,
+  считаются символами кодовой страницы (как в оригинале). Остальные алфавиты не различаются
+  по регистру: если понадобится, таблицу надо будет сгенерировать из базы Unicode (как
+  `gen-width.py`).
+- **`TMenuView.Execute`** переведён без изменений логики; `getEvent` берёт события у
+  верхнего вида, поэтому тесты меню (`t_menus.pas`) используют `TTop` с очередью событий и
+  отложенным событием (`PutEvent`/`GetEvent`, как в `TProgram`), а при пустой очереди отдают
+  Esc, чтобы меню всегда закрывалось.
+- **Проверка утечек:** `t_menus.pas` сравнивает `GetFPCHeapStatus.CurrHeapUsed` до и после
+  создания и удаления меню.
