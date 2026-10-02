@@ -16,3 +16,7 @@ if [ "$DN_TARGET" = linux ] && [ -n "${DN_LINUX:-}" ]; then
     u=$DN_LINUX/lib/fpc/3.2.2/units/i386-linux
     if [ -d "$u" ]; then DN_LINUX_FU="-Fu$u/* -Fu$u/rtl"; else DN_LINUX_FU="-Fu$DN_LINUX/units/i386-linux"; fi
 fi
+# DN_ARCH=x86_64 (the 64-bit Linux build, native fpc): its own tree build/dn-linux-x64, and the edits of dn/edits/x64 on top of
+# those of dn/edits/linux (the 32-bit assumptions of Virtual Pascal code)
+DN_ARCH=${DN_ARCH:-i386}
+if [ "$DN_TARGET" = linux ] && [ "$DN_ARCH" = x86_64 ]; then DN_TREE=dn-linux-x64; DN_TARGET_ENV="$here/dn/target-linux-x64.env"; fi
