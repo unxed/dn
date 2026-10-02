@@ -131,6 +131,16 @@ begin
   Check(Txt(0) = #$C3#$87, 'byte 80h in CP437 is C-cedilla');
   Check(not CpSelect(1), 'unknown code page is refused');
   Check(CpCurrent = 437, 'a refused selection keeps the page');
+  { the OEM pages that DOS may choose by the locale of the host }
+  Check(CpSelect(850) and (CpToUnicode($9B) = $00F8), 'CP850: byte 9Bh is o with stroke');
+  Check(CpSelect(852) and (CpToUnicode($A4) = $0104), 'CP852: byte A4h is A with ogonek');
+  Check(CpSelect(855) and (CpToUnicode($80) = $0452), 'CP855: byte 80h is a Serbian letter');
+  Check(CpSelect(737) and (CpToUnicode($80) = $0391), 'CP737: byte 80h is Greek Alpha');
+  Check(CpSelect(862) and (CpToUnicode($80) = $05D0), 'CP862: byte 80h is Hebrew Alef');
+  Check(CpSelect(857) and (CpFromUnicode($011F) = $A7), 'CP857: g with breve gives byte A7h');
+  Check(CpSelect(869) and CpSelect(775) and CpSelect(858) and CpSelect(860) and CpSelect(861) and
+    CpSelect(863) and CpSelect(864) and CpSelect(865), 'the other pages are known');
+  Check(CpSelect(437), 'back to CP437');
   Clear;
   Draw(4, C1Ctl);
   Check(Txt(0) = #$EF#$BF#$BD, 'multi-byte control shown as U+FFFD');

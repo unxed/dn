@@ -17,6 +17,9 @@ interface
 const
   cpIdCp437 = 437;
   cpIdCp866 = 866;
+  { the OEM pages of DOS that are known: 437 737 775 850 852 855 857 858 860 861 862 863 864
+    865 866 869 (tools/gen-codepage.py); the page that DOS has chosen by the locale of the
+    host (INT 21h AX=6601h) is used by TvDos }
 
 { Selects the current code page; False if the page is not known. }
 function CpSelect(Id: Integer): Boolean;
@@ -79,8 +82,22 @@ function CpSelect(Id: Integer): Boolean;
 begin
   Result := True;
   case Id of
-    cpIdCp437: Table := @Cp437;
-    cpIdCp866: Table := @Cp866;
+    437: Table := @Cp437;
+    737: Table := @Cp737;
+    775: Table := @Cp775;
+    850: Table := @Cp850;
+    852: Table := @Cp852;
+    855: Table := @Cp855;
+    857: Table := @Cp857;
+    858: Table := @Cp858;
+    860: Table := @Cp860;
+    861: Table := @Cp861;
+    862: Table := @Cp862;
+    863: Table := @Cp863;
+    864: Table := @Cp864;
+    865: Table := @Cp865;
+    866: Table := @Cp866;
+    869: Table := @Cp869;
   else
     Exit(False);
   end;

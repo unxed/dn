@@ -346,3 +346,7 @@
 - `TTextDevice` — не `streambuf`: интерфейс — виртуальный `DoSputn(S: PByte; Count)`, удобства `PutStr`, `PutLine`, `PutChar` (не `Write`/`WriteLn`: иначе потомки теряют системный `Write`). Вместо `otstream` — `AssignDevice(T, Device)` (как `TextView` Borland Pascal): `Write(T, ...)` идёт в терминал; CR отбрасывается, `LineEnd` текстового файла — LF.
 - `TTerminal`: кольцевой буфер до 32000 байт, старые строки вытесняются целыми; `Draw` рисует с конца, в куске до 256 байт не режет символ UTF-8.
 - Грабли FPC: `FillChar(T, ...)` обнуляет `TextRec.LineEnd`, без него `WriteLn` не даёт перевода строки.
+
+### Кодовые страницы DOS (веха 5а)
+
+- `TvCodePg` знает 16 OEM-страниц DOS (437 737 775 850 852 855 857 858 860 861 862 863 864 865 866 869); таблицы генерирует `tools/gen-codepage.py` из кодеков Python (младшая половина — глифы IBM PC, байты, не определённые в странице, — U+FFFD). Выбор — `CpSelect(Id)`; `TvDos.DosInit` берёт номер у DOS (`INT 21h AX=6601h`), неизвестный — 437.
