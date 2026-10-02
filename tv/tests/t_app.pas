@@ -4,6 +4,15 @@ uses TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvScreen, TvViews, TvWindow, Tv
   TvSys, TvTimer, TvMem, TvApp;
 {$I testlib.inc}
 
+var
+  Save: ShortString;
+
+{ the main block keeps the temporaries (dynamic arrays) until its end: measure in a function }
+function PalLen(A: PApplication): Integer;
+begin
+  Result := PaletteSize(A^.GetPalette);
+end;
+
 type
   PTestApp = ^TTestApp;
   TTestApp = object(TApplication)
@@ -304,6 +313,14 @@ begin
   MemKey(kbAltX, kbAltShift);
   App^.Run;
   Check(App^.EndState = cmQuit, 'Run: Alt-X quits');
+
+  { DN: SystemColors are the palettes of the program and can be changed }
+  Check(Length(SystemColors[apColor]) = PalLen(App), 'DN extensions: GetPalette is made of SystemColors');
+  Save := SystemColors[apColor];
+  SystemColors[apColor] := #1#2#3;
+  AppPalette := apColor;
+  Check(PalLen(App) = 3, 'DN extensions: a changed SystemColors is the palette');
+  SystemColors[apColor] := Save;
 
   Dispose(App, Done);
   Check((Application = nil) and (DeskTop = nil) and (StatusLine = nil) and (MenuBar = nil), 'Done clears the variables');

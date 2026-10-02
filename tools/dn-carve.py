@@ -4,7 +4,7 @@ excluded: its Borland-derived code is replaced by tv/). The classes (their decla
 methods) are copied, with the license header of the source, into a new unit of the tree; the units of the tree that name
 a carved class get the new unit in their uses clause.
 usage: tools/dn-carve.py CARVE_LIST TREE_DIR
-  CARVE_LIST lines `UnitName <- SourceFile : Class, Class ; uses: Unit, Unit [; consts: Name, Name]` (# comments)
+  CARVE_LIST lines `UnitName <- SourceFile : Class, Class ; uses: Unit, Unit [; consts: Name, Name] [; types: Name, Name]` (# comments)
 Run by tools/dn-materialize.sh on the freshly extracted tree, before the exclusions. The source is read as it is
 (the later edits of the tree are applied to the new unit as to any other file)."""
 import os, re, sys
@@ -23,16 +23,17 @@ for line in open(list_file, encoding='utf-8'):
     line = line.split('#', 1)[0].strip()
     if not line:
         continue
-    m = re.match(r'(\w+)\s*<-\s*(\S+)\s*:\s*([^;]+);\s*uses\s*:\s*([^;]+)(?:;\s*consts\s*:\s*(.+))?$', line)
+    m = re.match(r'(\w+)\s*<-\s*(\S+)\s*:\s*([^;]+);\s*uses\s*:\s*([^;]+)(?:;\s*consts\s*:\s*([^;]+))?(?:;\s*types\s*:\s*(.+))?$', line)
     if not m:
         sys.exit('dn-carve: cannot read the line: ' + line)
     specs.append((m.group(1), m.group(2), [c.strip() for c in m.group(3).split(',')], [u.strip() for u in m.group(4).split(',')],
-                  [c.strip() for c in (m.group(5) or '').split(',') if c.strip()]))
+                  [c.strip() for c in (m.group(5) or '').split(',') if c.strip()],
+                  [c.strip() for c in (m.group(6) or '').split(',') if c.strip()]))
 
 ROUTINE = re.compile(r'^(procedure|function|constructor|destructor)\s+(\w+)\.', re.I)
 BOUNDARY = re.compile(r'^(procedure|function|constructor|destructor|initialization|finalization|end\.)', re.I)
 
-for unit, src, classes, uses, consts in specs:
+for unit, src, classes, uses, consts, types in specs:
     sf = files.get(src.lower())
     if not sf:
         sys.exit('dn-carve: %s is not in the tree' % src)
@@ -48,13 +49,22 @@ for unit, src, classes, uses, consts in specs:
     imp = next(i for i, ln in enumerate(lines) if re.match(r'implementation\b', ln, re.I))
     iface, impl = lines[:imp], lines[imp + 1:]
     decl = []
+    for t in types:       # plain type declarations (a record, an array, a pointer type) before the classes
+        i = next((i for i, ln in enumerate(iface) if re.match(r'\s*%s\s*=' % t, ln)), None)
+        if i is None:
+            sys.exit('dn-carve: the type %s is not in %s' % (t, src))
+        j = i
+        if re.search(r'\brecord\b', iface[i], re.I) and not re.search(r'\bend\b', iface[i], re.I):
+            j = next(k for k in range(i, len(iface)) if re.match(r'\s*end;', iface[k]))
+        decl.extend(x.rstrip('\r') for x in iface[i:j + 1])
+        decl.append('')
     for c in classes:
         p = 'P' + c[1:]
         for i, ln in enumerate(iface):
             if re.match(r'\s*%s\s*=\s*\^%s\s*;' % (p, c), ln):
                 decl.append(ln.rstrip('\r'))
                 break
-        start = next((i for i, ln in enumerate(iface) if re.match(r'\s*%s\s*=\s*object\b' % c, ln)), None)
+        start = next((i for i, ln in enumerate(iface) if re.match(r'\s*%s\s*=\s*object\b' % c, ln, re.I)), None)
         if start is None:
             sys.exit('dn-carve: the class %s is not in %s' % (c, src))
         end = next(i for i in range(start, len(iface)) if re.match(r'\s*end;', iface[i]))
@@ -62,10 +72,13 @@ for unit, src, classes, uses, consts in specs:
         decl.append('')
     cdecl = []
     for c in consts:
-        ln = next((x for x in iface if re.match(r'\s*%s\s*=' % c, x)), None)
-        if ln is None:
+        i = next((i for i, x in enumerate(iface) if re.match(r'\s*%s\s*[=:]' % c, x)), None)
+        if i is None:
             sys.exit('dn-carve: the constant %s is not in %s' % (c, src))
-        cdecl.append(ln.rstrip('\r'))
+        j = i
+        while not re.search(r';\s*(//.*|\{.*\})?\s*$', iface[j].rstrip('\r')) and j + 1 < len(iface):
+            j += 1                     # a constant on several lines
+        cdecl.extend(x.rstrip('\r') for x in iface[i:j + 1])
     body, keep, n = [], False, 0
     names = set(classes)
     for ln in impl:

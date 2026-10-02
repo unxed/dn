@@ -41,6 +41,8 @@ type
     Status: Word;
     Options: Word;
     constructor Init;
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     procedure Error; virtual;
     function IsValidInput(var S: ShortString; SuppressFill: Boolean): Boolean; virtual;
     function IsValid(const S: ShortString): Boolean; virtual;
@@ -52,6 +54,8 @@ type
   TPXPictureValidator = object(TValidator)
     Pic: PStr;
     constructor Init(const APic: ShortString; AutoFill: Boolean);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Error; virtual;
     function IsValidInput(var S: ShortString; SuppressFill: Boolean): Boolean; virtual;
@@ -79,6 +83,8 @@ type
     constructor Init(const AValidChars: ShortString); overload;
     { as in the Pascal Turbo Vision: the valid characters as a set (the characters #1..#255 of it) }
     constructor Init(const AValidChars: TCharSet); overload;
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Error; virtual;
     function IsValidInput(var S: ShortString; SuppressFill: Boolean): Boolean; virtual;
@@ -89,6 +95,8 @@ type
   TRangeValidator = object(TFilterValidator)
     Min, Max: LongInt;
     constructor Init(AMin, AMax: LongInt);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     procedure Error; virtual;
     function IsValid(const S: ShortString): Boolean; virtual;
     function Transfer(var S: ShortString; Buffer: Pointer; Flag: TVTransfer): Word; virtual;
@@ -104,6 +112,8 @@ type
   TStringLookupValidator = object(TLookupValidator)
     Strings: PStringCollection;
     constructor Init(AStrings: PStringCollection);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Error; virtual;
     function Lookup(const S: ShortString): Boolean; virtual;
@@ -111,6 +121,8 @@ type
   end;
 
 var
+  { stream records (the numbers of Turbo Vision) }
+  RPXPictureValidator, RFilterValidator, RRangeValidator, RStringLookupValidator: TStreamRec;
   ValidPictureError: ShortString = 'Error in picture format.'#10' %s';
   ValidFilterError: ShortString = 'Invalid character in input';
   ValidRangeError: ShortString = 'Value not in the range %d to %d';
@@ -780,5 +792,127 @@ begin
     Dispose(Strings, Done);
   Strings := AStrings;
 end;
+
+{ --- streams ----------------------------------------------------------------- }
+
+constructor TValidator.Load(var S: TStream);
+begin
+  inherited Init;
+  S.Read(Options, SizeOf(Options));
+  Status := 0;
+end;
+
+procedure TValidator.Store(var S: TStream);
+begin
+  S.Write(Options, SizeOf(Options));
+end;
+
+constructor TPXPictureValidator.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Pic := S.ReadStr;
+end;
+
+procedure TPXPictureValidator.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.WriteStr(Pic);
+end;
+
+constructor TFilterValidator.Load(var S: TStream);
+begin
+  inherited Load(S);
+  ValidChars := S.ReadStr;
+end;
+
+procedure TFilterValidator.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.WriteStr(ValidChars);
+end;
+
+constructor TRangeValidator.Load(var S: TStream);
+begin
+  inherited Load(S);
+  S.Read(Min, SizeOf(Min));
+  S.Read(Max, SizeOf(Max));
+end;
+
+procedure TRangeValidator.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Write(Min, SizeOf(Min));
+  S.Write(Max, SizeOf(Max));
+end;
+
+constructor TStringLookupValidator.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Strings := PStringCollection(S.Get);
+end;
+
+procedure TStringLookupValidator.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Put(Strings);
+end;
+
+function BuildPXPicture(var S: TStream): PObject;
+begin
+  Result := New(PPXPictureValidator, Load(S));
+end;
+
+procedure StorePXPicture(P: PObject; var S: TStream);
+begin
+  PPXPictureValidator(P)^.Store(S);
+end;
+
+function BuildFilter(var S: TStream): PObject;
+begin
+  Result := New(PFilterValidator, Load(S));
+end;
+
+procedure StoreFilter(P: PObject; var S: TStream);
+begin
+  PFilterValidator(P)^.Store(S);
+end;
+
+function BuildRange(var S: TStream): PObject;
+begin
+  Result := New(PRangeValidator, Load(S));
+end;
+
+procedure StoreRange(P: PObject; var S: TStream);
+begin
+  PRangeValidator(P)^.Store(S);
+end;
+
+function BuildStringLookup(var S: TStream): PObject;
+begin
+  Result := New(PStringLookupValidator, Load(S));
+end;
+
+procedure StoreStringLookup(P: PObject; var S: TStream);
+begin
+  PStringLookupValidator(P)^.Store(S);
+end;
+
+initialization
+  RPXPictureValidator.ObjType := 80;
+  RPXPictureValidator.VmtLink := PtrUInt(TypeOf(TPXPictureValidator));
+  RPXPictureValidator.Load := @BuildPXPicture;
+  RPXPictureValidator.Store := @StorePXPicture;
+  RFilterValidator.ObjType := 81;
+  RFilterValidator.VmtLink := PtrUInt(TypeOf(TFilterValidator));
+  RFilterValidator.Load := @BuildFilter;
+  RFilterValidator.Store := @StoreFilter;
+  RRangeValidator.ObjType := 82;
+  RRangeValidator.VmtLink := PtrUInt(TypeOf(TRangeValidator));
+  RRangeValidator.Load := @BuildRange;
+  RRangeValidator.Store := @StoreRange;
+  RStringLookupValidator.ObjType := 83;
+  RStringLookupValidator.VmtLink := PtrUInt(TypeOf(TStringLookupValidator));
+  RStringLookupValidator.Load := @BuildStringLookup;
+  RStringLookupValidator.Store := @StoreStringLookup;
 
 end.

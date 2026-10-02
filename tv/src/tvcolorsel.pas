@@ -163,11 +163,14 @@ function ColorGroup(const Name: ShortString; Items: PColorItem; Next: PColorGrou
 function ColorGroupItems(Group: PColorGroup; Items: PColorItem): PColorGroup;
 procedure FreeColorIndexes;
 
+const
+  { the black and white attributes of the monochrome selector (also used by DN's T_BWSelector) }
+  MonoColors: array[0..4] of Byte = ($07, $0F, $01, $70, $09);
+
 implementation
 
 const
   ColorSelIcon = $DB;
-  MonoColors: array[0..4] of Byte = ($07, $0F, $01, $70, $09);
 
 { --- ColorItem, ColorGroup ----------------------------------------------------- }
 

@@ -1,4 +1,8 @@
 # The classes of DN itself in the files that are excluded as a whole (dn/exclude.list): carved into units of the tree
 # by tools/dn-carve.py. Format: UnitName <- SourceFile : Class, Class ; uses: Unit, Unit [; consts: Name, Name]
 # TComboBox: a DN control (a pop-up choice of a few items over the menus of DN, TMenuItem.Flags)
-DNDlgs <- DIALOGS.PAS : TComboBox ; uses: Defines, Streams, Drivers, Views, Menus, Commands, DNApp, Advance1, TvDialog, TvCluster, TvUtil ; consts: CComboBox
+DNDlgs <- DIALOGS.PAS : TComboBox, THexLine, TParamText, TBookmark, TPage, TPageFrame, TNotepad, TNotepadFrame ; uses: TvDrawBuf, TvColors, Defines, Streams, Drivers, Views, Menus, Commands, DNApp, Advance1, TvDialog, TvCluster, TvUtil, Advance ; consts: CGrayDialog, CDialog, CComboBox, COwner
+# TStringList: the strings of the language file (DN.LNG) with an index in the stream (it was in COLLECT.PAS)
+DNStrL <- COLLECT.PAS : TStringList ; uses: Defines, Objects2, Streams, Advance1 ; types: TStrIndexRec, PStrIndex, TStrIndex
+# T_BWSelector: a DN selector of the black and white colors over the TMonoSelector of tv/
+DNColor <- COLORSEL.PAS : T_BWSelector ; uses: Defines, Streams, Drivers, Views, Commands, Dialogs, TvColorSel

@@ -9,7 +9,7 @@ usage: 93-streamrec.py FILE...   (all the .pas of the tree)"""
 import re, sys, os
 
 REC = re.compile(r'(\w+)(\s*:\s*)TStreamRec(\s*=\s*)\(\s*ObjType\s*:\s*([^;]+?)\s*;\s*VmtLink\s*:\s*\(TypeOf\(([\w.]+)\)\)\s*;\s*'
-                 r'Load\s*:\s*@([\w.]+)\.Load\s*;\s*Store\s*:\s*@([\w.]+)\.Store\s*\)\s*;', re.I)
+                 r'Load\s*:\s*@([\w.]+)\.Load\s*;\s*Store\s*:\s*(@[\w.]+\.Store|nil)\s*\)\s*;', re.I)
 
 def ptr_of(t):
     q, _, n = t.rpartition('.')
@@ -21,20 +21,23 @@ for p in sys.argv[1:]:
     recs = []
     def sub(m):
         name, c1, c2, obj, t = m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
-        recs.append((name, t))
+        recs.append((name, t, m.group(7).lower() != 'nil'))
         return '%s%sTStreamRec%s(ObjType: %s; VmtLink: 0; Load: nil; Store: nil; Next: nil);' % (name, c1, c2, obj)
     new = REC.sub(sub, raw)
     if not recs:
         continue
     nl = '\r\n' if '\r\n' in raw else '\n'
     out = []
-    for name, t in recs:
+    for name, t, has_store in recs:
         pt = ptr_of(t)
         out.append('function Build_%s(var S: TStream): PObject;%sbegin%s  Result := PObject(New(%s, Load(S)));%send;%s' % (name, nl, nl, pt, nl, nl))
-        out.append('procedure Store_%s(P: PObject; var S: TStream);%sbegin%s  %s(P)^.Store(S);%send;%s' % (name, nl, nl, pt, nl, nl))
+        if has_store:
+            out.append('procedure Store_%s(P: PObject; var S: TStream);%sbegin%s  %s(P)^.Store(S);%send;%s' % (name, nl, nl, pt, nl, nl))
     out.append('procedure SetStreamRecs_%s;%sbegin%s' % (os.path.splitext(os.path.basename(p))[0], nl, nl))
-    for name, t in recs:
-        out.append('  %s.VmtLink := PtrUInt(TypeOf(%s));%s  %s.Load := @Build_%s;%s  %s.Store := @Store_%s;%s' % (name, t, nl, name, name, nl, name, name, nl))
+    for name, t, has_store in recs:
+        out.append('  %s.VmtLink := PtrUInt(TypeOf(%s));%s  %s.Load := @Build_%s;%s' % (name, t, nl, name, name, nl))
+        if has_store:
+            out.append('  %s.Store := @Store_%s;%s' % (name, name, nl))
     out.append('end;%s' % nl)
     unit = os.path.splitext(os.path.basename(p))[0]
     is_program = re.search(r'^\s*program\s', new, re.I | re.M) is not None
