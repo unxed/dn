@@ -11,7 +11,7 @@ unit Drivers;
 interface
 
 uses
-  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews;
+  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys;
 
 type
   TEvent = TvEvents.TEvent;
@@ -230,9 +230,20 @@ begin
   Event.What := evNothing;
 end;
 
+{ The next key event of the system without waiting (DN: the loops that can be stopped by Esc ask for it); the other events that come
+  before it (the mouse) are dropped. }
 procedure GetKeyEvent(var Event: TEvent);
+var
+  N: Integer;
 begin
   Event.What := evNothing;
+  for N := 1 to 256 do
+  begin
+    PollEvent(0, Event);
+    if (Event.What = evNothing) or ((Event.What and evKeyDown) <> 0) then
+      Exit;
+    Event.What := evNothing;
+  end;
 end;
 
 procedure SetMouseSpeed(XS, YS: Byte);
