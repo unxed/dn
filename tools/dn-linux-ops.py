@@ -105,6 +105,12 @@ def main():
         key('HOME'); key('DOWN'); key('ENTER', 1.0); key('HOME'); key('ENTER', 1.0)     # into newdir and back: the directory is read again
         check('\u043f\u0430\u043f\u043a\u0430' in t.text(), 'a directory with a Russian name made outside is shown as Russian', t.text())
 
+        # a long Russian name typed into the dialog: the letters were drawn as other characters (the bytes of "ров", "рка" of CP866 are valid UTF-8)
+        key('F7'); key('\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0434\u043b\u0438\u043d\u043d\u044b\u0445 \u0438\u043c\u0451\u043d', 0.8)
+        check('\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0434\u043b\u0438\u043d\u043d\u044b\u0445 \u0438\u043c\u0451\u043d' in t.text(), 'the typed Russian text is drawn as typed in the input line', t.text())
+        key('ENTER', 1.0)
+        check(os.path.isdir(os.path.join(w, '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0434\u043b\u0438\u043d\u043d\u044b\u0445 \u0438\u043c\u0451\u043d')), 'the directory with the long Russian name is made')
+
         # Alt-F1, the drive menu, TEMP: (a temporary drive; the panel info was drawn with an empty list: collection error 213)
         key('\x1b[1;3P'); key('DOWN'); key('ENTER', 1.0)
         check('TEMP:' in t.text().split('\n')[1] and t.alive(), 'Alt-F1: the drive TEMP: opens without an error', t.text())
