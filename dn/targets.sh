@@ -9,3 +9,10 @@ case "$DN_TARGET" in
     linux) DN_TARGET_ENV="$here/dn/target-linux.env"; DN_TREE=dn-linux; DN_NEW_DIR=dn/new-linux ;;
     *) echo "DN_TARGET must be dos or linux" >&2; exit 2 ;;
 esac
+# the units of the i386-linux cross compiler (tools/build-fpc-i386-linux.sh: PREFIX/lib/fpc/3.2.2/units/i386-linux/<package>;
+# a flat directory PREFIX/units/i386-linux works too)
+DN_LINUX_FU=
+if [ "$DN_TARGET" = linux ] && [ -n "${DN_LINUX:-}" ]; then
+    u=$DN_LINUX/lib/fpc/3.2.2/units/i386-linux
+    if [ -d "$u" ]; then DN_LINUX_FU="-Fu$u/* -Fu$u/rtl"; else DN_LINUX_FU="-Fu$DN_LINUX/units/i386-linux"; fi
+fi
