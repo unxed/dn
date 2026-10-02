@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """Evaluates the conditional compilation of Pascal sources ({$IFDEF}, {$IFNDEF}, {$ELSE}, {$ENDIF},
 {$DEFINE}, {$UNDEF}, also the (*$...*) form) for a given set of defined symbols and writes the sources
-with the inactive branches removed. Used to see what a platform (e.g. DPMI32, the DOS target of DN)
-really compiles. Other directives ({$I file}, {$IF expr}) are left alone; {$I} files are not
-included.
+with the inactive branches removed. Used to make the tree of one target (DPMI32: the DOS target of DN)
+and to see what that target really compiles. The files that {$I name} includes are read to learn the
+symbols they define (the include directive itself stays). Other directives ({$IF expr}, {$IFOPT}) are
+left alone.
 
-usage: tools/ifdef-strip.py SRC_DIR OUT_DIR SYMBOL [SYMBOL...]
+usage: tools/ifdef-strip.py SRC_DIR OUT_DIR SYMBOL [SYMBOL...]     (OUT_DIR = SRC_DIR: in place)
 """
 import os, re, sys
 
 src, out = sys.argv[1], sys.argv[2]
 defined0 = set(s.upper() for s in sys.argv[3:])
 os.makedirs(out, exist_ok=True)
-D = re.compile(r'(\{\$|\(\*\$)\s*(IFDEF|IFNDEF|IFOPT|ELSE|ENDIF|DEFINE|UNDEF)\b\s*([A-Za-z0-9_+\-]*)[^}*]*(\}|\*\))', re.I)
+D = re.compile(r'(\{\$|\(\*\$)\s*(IFDEF|IFNDEF|ELSE|ENDIF|DEFINE|UNDEF|I)\b\s*([^}*\s]*)[^}*]*(\}|\*\))', re.I)
+files = {f.lower(): f for f in os.listdir(src)}
 
-def process(text):
-    defined = set(defined0)
-    stack = []                       # (parent_active, this_branch_taken_before, now_active)
+def read(f):
+    return open(os.path.join(src, f), 'rb').read().decode('latin-1')
+
+def process(text, defined, depth=0):
+    stack = []
     active = True
     res = []
     pos = 0
@@ -24,9 +28,17 @@ def process(text):
         if active:
             res.append(text[pos:m.start()])
         pos = m.end()
-        kw, sym = m.group(2).upper(), m.group(3).upper()
-        if kw in ('IFDEF', 'IFNDEF', 'IFOPT'):
-            cond = (sym in defined) if kw == 'IFDEF' else ((sym not in defined) if kw == 'IFNDEF' else True)
+        kw, sym = m.group(2).upper(), m.group(3)
+        if kw == 'I':
+            if active:
+                res.append(m.group(0))
+                name = sym.strip("'\"").lower()
+                if depth < 8 and name in files:
+                    process(read(files[name]), defined, depth + 1)     # only its defines matter
+            continue
+        sym = sym.upper()
+        if kw in ('IFDEF', 'IFNDEF'):
+            cond = (sym in defined) if kw == 'IFDEF' else (sym not in defined)
             stack.append((active, cond))
             active = active and cond
             continue
@@ -41,10 +53,12 @@ def process(text):
                 parent, _ = stack.pop()
                 active = parent
             continue
-        if active and kw == 'DEFINE':
-            defined.add(sym)
-        if active and kw == 'UNDEF':
-            defined.discard(sym)
+        if active:
+            res.append(m.group(0))      # DEFINE and UNDEF stay: the compiler sees them too
+            if kw == 'DEFINE':
+                defined.add(sym)
+            else:
+                defined.discard(sym)
     if active:
         res.append(text[pos:])
     return ''.join(res)
@@ -52,5 +66,5 @@ def process(text):
 for f in sorted(os.listdir(src)):
     p = os.path.join(src, f)
     if os.path.isfile(p) and f.lower().endswith(('.pas', '.inc')):
-        t = open(p, encoding='cp866', errors='replace').read()
-        open(os.path.join(out, f), 'w', encoding='cp866', errors='replace').write(process(t))
+        t = process(read(f), set(defined0))
+        open(os.path.join(out, f), 'wb').write(t.encode('latin-1'))

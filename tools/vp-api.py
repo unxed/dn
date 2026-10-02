@@ -43,7 +43,7 @@ own = os.path.basename(path).lower()
 cnt = collections.Counter(); byf = collections.defaultdict(set)
 for f in sorted(os.listdir(tree)):
     b = f.lower()
-    if not b.endswith('.pas') or b == own or b in flag or b.startswith('vpsyslo') or b == 'lfnvp.pas':
+    if not b.endswith('.pas') or b == own or b in flag:
         continue
     words = re.findall(r'[a-z_][a-z0-9_]*', read(os.path.join(tree, f)).lower())
     # only the files that name the unit (in a uses clause or as a qualifier): the other files

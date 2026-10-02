@@ -44,10 +44,19 @@ done < "$here/dn/patches/series"
 
 # mechanical edits (dn/edits/*.sed; each file names its reason): sed scripts over all the sources
 if [ -d "$here/dn/edits" ]; then
+    for e in "$here"/dn/edits/*.sh; do
+        [ -f "$e" ] || continue
+        sh "$e" "$out"
+        echo "  edit: $(basename "$e")"
+    done
     for e in "$here"/dn/edits/*.sed; do
         [ -f "$e" ] || continue
         find "$out" -maxdepth 1 -type f \( -iname '*.pas' -o -iname '*.inc' \) -print0 | LC_ALL=C xargs -0 sed -i -f "$e"
         echo "  edit: $(basename "$e")"
+    done
+    for e in "$here"/dn/edits/*.py; do
+        [ -f "$e" ] || continue
+        find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 python3 "$e" | sed 's|^.*/||; s|^|  edit '"$(basename "$e")"': |'
     done
 fi
 
