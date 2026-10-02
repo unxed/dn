@@ -234,6 +234,12 @@ type
     procedure WriteLineD(X, Y, W, H: Integer; const B: TDrawBuffer);
     procedure WriteStr(X, Y: Integer; const Str: ShortString; Color: Byte);
     procedure WriteView(X, Y, Count: Integer; B: PScreenCell);
+    { The 16-bit interface of Turbo Vision for Borland Pascal, for programs written for it: a cell is a Word
+      (low byte: the character, high byte: the BIOS attribute) and a color is a BIOS attribute. B is an array
+      of Word (WriteLineW takes W cells, WriteBufW H rows of them); GetColorW(C) = Lo + 256 * Hi of GetColor(C). }
+    procedure WriteBufW(X, Y, W, H: Integer; const B);
+    procedure WriteLineW(X, Y, W, H: Integer; const B);
+    function GetColorW(Color: Word): Word;
   end;
 
   TGroup = object(TView)
@@ -1614,6 +1620,57 @@ end;
 procedure TView.WriteLineD(X, Y, W, H: Integer; const B: TDrawBuffer);
 begin
   WriteLine(X, Y, IMin(W, B.Capacity - X), H, B.Data);
+end;
+
+procedure TView.WriteBufW(X, Y, W, H: Integer; const B);
+var
+  Src: PWord;
+  Buf: PScreenCell;
+  I: Integer;
+begin
+  if (W <= 0) or (H <= 0) then
+    Exit;
+  Src := @B;
+  GetMem(Buf, W * SizeOf(TScreenCell));
+  while H > 0 do
+  begin
+    for I := 0 to W - 1 do
+      Buf[I] := CellFromBIOS(Src[I]);
+    WriteView(X, Y, W, Buf);
+    Inc(Y);
+    Inc(Src, W);
+    Dec(H);
+  end;
+  FreeMem(Buf);
+end;
+
+procedure TView.WriteLineW(X, Y, W, H: Integer; const B);
+var
+  Src: PWord;
+  Buf: PScreenCell;
+  I: Integer;
+begin
+  if (W <= 0) or (H <= 0) then
+    Exit;
+  Src := @B;
+  GetMem(Buf, W * SizeOf(TScreenCell));
+  for I := 0 to W - 1 do
+    Buf[I] := CellFromBIOS(Src[I]);
+  while H > 0 do
+  begin
+    WriteView(X, Y, W, Buf);
+    Inc(Y);
+    Dec(H);
+  end;
+  FreeMem(Buf);
+end;
+
+function TView.GetColorW(Color: Word): Word;
+var
+  P: TAttrPair;
+begin
+  P := GetColor(Color);
+  Result := AttrAsBIOSByte(P.Lo) or (Word(AttrAsBIOSByte(P.Hi)) shl 8);
 end;
 
 procedure TView.WriteChar(X, Y: Integer; C: Byte; Color: Byte; Count: Integer);

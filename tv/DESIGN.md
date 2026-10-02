@@ -62,6 +62,7 @@
 | 10c | `TvChDir` — `TChDirDialog`, `TDirListBox` | `tchdrdlg.cpp`, `tdirlist.cpp` | сделан (без потоков) |
 | 11a | `TvColorSel` — `TColorDialog`, `TColorSelector`, `TMonoSelector`, `TColorDisplay`, `TColorGroupList`, `TColorItemList`, `ColorItem`, `ColorGroup` | `colorsel.cpp` | сделан (без потоков) |
 | 11b | `TvTextView` — `TTextDevice`, `TTerminal`, `AssignDevice` | `textview.cpp`, `ttprvlns.cpp` | сделан |
+| 11c | `TView.WriteBufW/WriteLineW/GetColorW` — интерфейс Turbo Vision для Borland Pascal на 16-битных клетках | — (наше) | сделан |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -350,3 +351,13 @@
 ### Кодовые страницы DOS (веха 5а)
 
 - `TvCodePg` знает 16 OEM-страниц DOS (437 737 775 850 852 855 857 858 860 861 862 863 864 865 866 869); таблицы генерирует `tools/gen-codepage.py` из кодеков Python (младшая половина — глифы IBM PC, байты, не определённые в странице, — U+FFFD). Выбор — `CpSelect(Id)`; `TvDos.DosInit` берёт номер у DOS (`INT 21h AX=6601h`), неизвестный — 437.
+
+
+### Интерфейс 16-битных клеток (11c): решения
+
+- Для программ, написанных под Turbo Vision для Borland Pascal (DN): клетка — `Word` (младший байт — символ, старший —
+  BIOS-атрибут), цвет — BIOS-атрибут. `WriteBufW`/`WriteLineW` переводят клетки `CellFromBIOS` и пишут через `WriteView`;
+  `GetColorW(C)` = `Lo + 256 * Hi` от `GetColor(C)` (`AttrAsBIOSByte`). Это отдельные имена (не перегрузки): аргумент
+  без типа был бы неоднозначен с `PScreenCell`.
+- Символ — байт кодовой страницы экрана (как у `TDrawBuffer.MoveChar`); цвета с RGB/xterm при переводе в BIOS-байт
+  теряют точность — для DOS и 16 цветов это без потерь.

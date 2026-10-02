@@ -61,6 +61,25 @@ begin
     ClearEvent(Event);
 end;
 
+type
+  { a view that draws with the 16-bit interface of Borland Pascal }
+  PLeg = ^TLeg;
+  TLeg = object(TView)
+    procedure Draw; virtual;
+  end;
+
+procedure TLeg.Draw;
+var
+  Line: array[0..3] of Word;
+begin
+  Line[0] := $1E41;       { 'A', yellow on blue }
+  Line[1] := $1F42;       { 'B', white on blue }
+  Line[2] := $4743;       { 'C' }
+  Line[3] := $4744;       { 'D' }
+  WriteLineW(0, 0, 2, Size.Y, Line);
+  WriteBufW(2, 0, 2, 1, Line[2]);
+end;
+
 function Cell(X, Y: Integer): PScreenCell;
 begin
   Result := ScreenBuffer + (Y * ScreenWidth + X);
@@ -106,6 +125,7 @@ var
   Min, Max: TPoint;
   G: PGroup;
   V1, V2, V3: PFill;
+  Leg: PLeg;
   Count: Integer;
 
 procedure CountViews(P: PView; Args: Pointer);
@@ -345,7 +365,20 @@ begin
   Check(AttrEq(V1^.MapColor(2), ErrorAttr), 'a color beyond the palette is the error color');
   Check(AttrEq(V1^.MapColor(0), ErrorAttr), 'color 0 is the error color');
   Check(PaletteSize(MakePalette(#1#2#3)) = 3, 'palette size');
+  Check(V1^.GetColorW(1) = $0007, 'GetColorW: the BIOS attribute of the color');
   Dispose(V1, Done);
+
+  { the 16-bit interface of Borland Pascal: Word cells and BIOS attributes }
+  Leg := New(PLeg, Init(R(0, 6, 4, 8)));
+  Desk.Insert(Leg);
+  Check((Cell(0, 6)^.Character.Text[0] = Ord('A')) and (AttrAsBIOSByte(Cell(0, 6)^.Attribute) = $1E),
+    'WriteLineW: the cell is a character and an attribute');
+  Check((Cell(1, 7)^.Character.Text[0] = Ord('B')) and (AttrAsBIOSByte(Cell(1, 7)^.Attribute) = $1F),
+    'WriteLineW writes the same cells to every row');
+  Check((Cell(2, 6)^.Character.Text[0] = Ord('C')) and (Cell(3, 6)^.Character.Text[0] = Ord('D')),
+    'WriteBufW: W cells of H rows');
+  Desk.Delete(Leg);
+  Dispose(Leg, Done);
 
   Desk.State := Desk.State and not sfExposed;
   Dispose(Bg, Done);
