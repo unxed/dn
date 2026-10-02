@@ -1,0 +1,50 @@
+#!/bin/sh
+# ONE COMMAND: builds DOS Navigator from dn/src and tv/src with your FPC: the programs (rcp, the resource compiler, and dn), the resources
+# (*.LNG, *.DLG, made by rcp from dn/src/RESOURCE) and the help (*.HLP, made by tv/tools/tvhc.pas).
+#
+# usage: tools/build.sh TARGET [OUTDIR]          TARGET: linux64 | linux | dos        (OUTDIR default: out/TARGET)
+#   linux64   x86_64 Linux, the fpc of your system (FPC=...)                          needs: fpc 3.2.x, python3
+#   linux     i386 Linux (static; runs on a 64-bit kernel), DN_LINUX=PREFIX            needs: tools/build-fpc-i386-linux.sh PREFIX
+#   dos       DOS (go32v2), DN_PREFIX=PREFIX                                           needs: tools/build-fpc-go32v2.sh PREFIX, dosbox-x (rcp runs in it)
+# env: DN_EXTRA=-gl (more options of the compiler)
+# Run DN (linux): cd OUTDIR && ./dn        (the *.LNG *.DLG *.HLP files are next to it)
+set -eu
+here=$(cd "$(dirname "$0")/.." && pwd)
+DN_TARGET=${1:?usage: tools/build.sh linux64|linux|dos [OUTDIR]}; export DN_TARGET
+out=${2:-$here/out/$DN_TARGET}; mkdir -p "$out"; out=$(cd "$out" && pwd)
+. "$here/tools/dn-env.sh"
+src=$here/dn/src
+exe=; [ "$DN_TARGET" = dos ] && exe=.exe
+echo "== shims (generated from tv/src)"
+dn_gen_shims
+echo "== compile ($DN_TARGET)"
+for p in rcp dn; do
+    rm -f "$DN_OBJ/$p$exe"
+    dn_compile $p.pas | grep -a -E "Error|Fatal|undefined" || true
+    [ -f "$DN_OBJ/$p$exe" ] || { echo "$p was not built (run tools/dn-try.sh $p.pas for the messages)" >&2; exit 1; }
+done
+echo "== resources (rcp)"
+w=$out/rcp.work; rm -rf "$w"; mkdir -p "$w/EXE.D32"
+# DN names its files in capitals; the file system may be case sensitive: the names that DN asks for
+cp "$src/rcpvpd.ini" "$w/RCPVPD.INI"; cp "$src/dnhelp.pas" "$w/DNHELP.PAS"; cp "$src/commands.pas" "$w/COMMANDS.PAS"; cp "$src/stdefine.inc" "$w/STDEFINE.INC"
+cp -r "$src/RESOURCE" "$w/RESOURCE"
+if [ "$DN_TARGET" = dos ]; then
+    cp "$DN_OBJ/rcp.exe" "$w/RCP.EXE"
+    "$here/tools/dos-run.sh" "$w" RCP.EXE >/dev/null 2>&1 || true          # fetches CWSDPMI.EXE
+    ( cd "$w" && SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 5 "${DOS_TIMEOUT:-150}" dosbox-x -silent -nogui -noconsole -defaultconf \
+        -c "mount c $w" -c "c:" -c "RCP.EXE D > RCP.TXT" -c "exit" >/dev/null 2>&1 ) || true
+    [ -f "$w/RCP.TXT" ] && tr -d '\r' < "$w/RCP.TXT" | sed 's/([0-9]*)//g' | grep -E "Writing|rror|nresolved" || true
+else
+    cp "$DN_OBJ/rcp" "$w/rcp"
+    ( cd "$w" && ./rcp D 2>&1 | sed 's/([0-9]*)//g' | grep -E "Writing|rror|nresolved|Undefined" || true )
+fi
+cp "$w"/EXE.D32/*.LNG "$w"/EXE.D32/*.DLG "$out/" 2>/dev/null || { echo "no resources were made" >&2; exit 1; }
+echo "== help (tv/tools/tvhc.pas, native)"
+th=$tmp/tvhc-o; mkdir -p "$th"
+fpc -Fu"$here/tv/src" -FU"$th" -FE"$th" -vew "$here/tv/tools/tvhc.pas" | grep -E "Error|Fatal" || true
+for l in ENGLISH RUSSIAN UKRAIN; do
+    "$th/tvhc" "$src/RESOURCE/$l/dnhelp.htx" "$out/$l.HLP" /4DN_OSP | sed 's|^|  |'
+done
+cp "$DN_OBJ/dn$exe" "$out/dn$exe"
+[ "$DN_TARGET" != dos ] || [ -f "$out/CWSDPMI.EXE" ] || cp "$w/CWSDPMI.EXE" "$out/" 2>/dev/null || true
+echo "built: $out/dn$exe   (the resources and the help are next to it)"
