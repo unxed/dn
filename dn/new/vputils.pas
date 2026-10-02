@@ -7,6 +7,8 @@ interface
 
 { The hexadecimal text of Value, with at least Digits digits (zeros in front). }
 function Int2Hex(Value: LongInt; Digits: Integer): String;
+{ The time since the start of the system in milliseconds. }
+function GetTimeMSec: LongInt;
 
 implementation
 
@@ -15,6 +17,11 @@ uses SysUtils;
 function Int2Hex(Value: LongInt; Digits: Integer): String;
 begin
   Result := IntToHex(Cardinal(Value), Digits);
+end;
+
+function GetTimeMSec: LongInt;
+begin
+  Result := LongInt(Cardinal(GetTickCount64 and $FFFFFFFF));
 end;
 
 end.

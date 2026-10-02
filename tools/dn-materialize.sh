@@ -35,6 +35,27 @@ grep -v '^[[:space:]]*#' "$here/dn/exclude.list" | grep -v '^[[:space:]]*$' | wh
     find "$out" -ipath "$out/$pat" -type f -print -delete
 done | sed 's|^|  excluded: |' || true
 
+# the libraries of the target (DN OSP keeps the units that differ between the systems in LIB.D32, LIB.OLF,
+# LIB.WLF: events, files, country_, fltl, fnotify...): those of the target go to the root of the tree,
+# the others are dropped. VPSYSD32.PAS is the Virtual Pascal runtime (not DN code): our dn/new/vpsyslow.pas
+# takes its place.
+. "$here/dn/target.env"
+if [ -n "${DN_LIB_DIR:-}" ]; then
+    ld=$(ls "$out" | grep -i "^$DN_LIB_DIR\$" | head -1)
+    if [ -n "$ld" ]; then
+        for f in "$out/$ld"/*; do
+            b=$(basename "$f"); l=$(echo "$b" | tr 'A-Z' 'a-z')
+            case "$l" in
+                vpsysd32.pas) ;;
+                *.pas|*.inc) cp -f "$f" "$out/$b"; echo "  lib: $b" ;;
+            esac
+        done
+    fi
+    for d in "$out"/LIB.* "$out"/lib.*; do
+        [ -d "$d" ] && rm -rf "$d"
+    done
+fi
+
 # patches
 while read -r p; do
     case "$p" in ''|'#'*) continue;; esac

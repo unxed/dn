@@ -162,3 +162,22 @@ LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` 
 - Правка `15-short-headers.py`: заголовки реализации без параметров (стиль VP/BP) — 580 штук в 88 файлах.
 - Ассемблер VP (Intel-синтаксис) компилируется с `-Rintel`; ~55 блоков `asm` (регистры EBX/ESI/EDI в FPC надо сохранять
   самим) — проверять при запуске, не при компиляции.
+
+## 12. LIB.D32: «недостающие» юниты были в архиве (2026-10-02)
+
+Владелец указал, что DN OSP собирался в Virtual Pascal, и приложил архивы (`dn2s214.rar` — sha256 совпал с закреплённым;
+`dn151src.zip` — sha256 закреплён в `dn/upstream.env`). Ошибка была в нашем `tools/dn-materialize.sh`: он брал только
+корень архива, а в архиве есть каталоги платформ `LIB.D32` (DOS 32-bit DPMI = наша цель), `LIB.OLF` (OS/2), `LIB.WLF`
+(Win32) с юнитами `Events`, `files`, `fltl`, `fnotify`, `country_`, `DosLow`, `dn2pmapi` и копией RTL VP (`VPSYSD32.PAS` —
+© vpascal.com, не берём). Теперь `DN_LIB_DIR=LIB.D32` в `dn/target.env`: юниты цели (кроме `vpsysd32`) копируются в корень,
+остальные `LIB.*` удаляются.
+- Это код DN OSP (JO, Cat, AK155): `fltl` (диск, время файлов, FS через INT 21h 71xx/73xx), `country_` (INT 21h 6521h/3800h),
+  `fnotify` (заглушка D32), `Events` (`GetCurMSec` через `VPUtils.GetTimeMSec`), `files` (`TUseLFN`, `uLfn`, `InvLFN`).
+  Наши `dn/new/files.pas`, `country_.pas`, `events` и правка `42-keymap` удалены.
+- Они используют VP-слой: `dpmi32`, `dpmi32df` (`real_mode_call_structure_typ`, `getdosmem`, `dosseg_linear`),
+  `VPUtils` (`GetTimeMSec`), `Mem[segdossyslow32]`, `Ptr(...)`. Наш `Dpmi32` дополнен: `getdosmem`, `dosseg_linear`,
+  `MemFill`, `MemStr` и «тень» `DosShadow` — блок программы, который копируется в DOS-память и обратно вокруг каждого
+  `intr_realmode` (так `DosSegFlat^` работает как при плоской памяти). Правки: `30-dpmi32-mem.py` (lfnvp, fltl, doslow),
+  `21-oneline-bodies.py` (тела в одну строку в interface), `22-smallword.py` (в VP `SmallWord` виден везде).
+- В dn151 (RIT, Borland Pascal 7) этих юнитов нет, зато есть `GAUGE`, `GAUGES`, `HELPFILE`, `HELPKERN`, `ASCIITAB`, `DNSTDDLG`,
+  `MESSAGES`, `DNAPP`, `DRIVERS`, `FVIEWER`, `TVHC`.
