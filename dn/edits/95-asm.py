@@ -86,11 +86,12 @@ ROUTINES = {
       Exit;
       end;
   end;'''),
-  # the original does not look at the first character of the string (kept)
+  # copies the length byte and the characters (to a place declared shorter: see TFileRec)
   ('procedure CopyShortString(const s1, s2: ShortString);', '''procedure CopyShortString(const s1, s2: ShortString);
   begin
-  PByte(@s2)^ := PByte(@s1)^;   { sic: only the length byte is copied, as in the assembler text }
+  Move(PByte(@s1)^, PByte(@s2)^, PByte(@s1)^+1);
   end;'''),
+  # the original does not look at the first character of the string (kept)
   ('function CharCount(C: Char; const S: String): Byte; {DataCompBoy}', '''function CharCount(C: Char; const S: String): Byte; {DataCompBoy}
   var
     I: Integer;
