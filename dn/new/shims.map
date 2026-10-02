@@ -4,8 +4,8 @@
 # UNIT.impl.inc (implementation).
 Defines:  TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow
 _Defines: TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow
-Views:    TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow
-_Views:   TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow
+Views:    TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow -TDrawBuffer
+_Views:   TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow -TDrawBuffer
 Dialogs:  TvDialog TvInput TvCluster TvList TvHist TvValid
 _Dialogs: TvDialog TvInput TvCluster TvList TvHist TvValid
 Collect:  TvObjs
