@@ -4,3 +4,9 @@ n
 n
 s/^  Drivers, Lfn, Files,/  DNErrLog, Drivers, Lfn, Files,/
 }
+# the stack of an exception goes to the trace (test aid): the handler of dn.pas
+/^  on E: Exception do[ \t\r]*$/{
+n
+a\
+    DNErrLog.DNTraceException;
+}

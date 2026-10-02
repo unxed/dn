@@ -3,12 +3,15 @@
   (edit 114), so that it works before the other units start. }
 unit DNErrLog;
 
-{$mode objfpc}
+{$mode objfpc}{$POINTERMATH ON}
 
 interface
 
 { A line of the trace of the start (test aid): written and flushed to DNERR.TXT when DNDUMP is set. }
 procedure DNTrace(const Msg: String);
+{ In an exception handler: the class, the message and the call stack of the exception with the lines of the sources (the
+  program is built with -gl). }
+procedure DNTraceException;
 
 implementation
 
@@ -48,6 +51,21 @@ begin
     end;
 {$ENDIF}
   end;
+end;
+
+procedure DNTraceException;
+var
+  I: Integer;
+  Fr: PPointer;
+begin
+  if not Tracing then
+    Exit;
+  if ExceptObject <> nil then
+    DNTrace('exception ' + ExceptObject.ClassName + ': ' + (ExceptObject as Exception).Message);
+  DNTrace(BackTraceStrFunc(ExceptAddr));
+  Fr := ExceptFrames;
+  for I := 0 to ExceptFrameCount - 1 do
+    DNTrace(BackTraceStrFunc(Fr[I]));
 end;
 
 initialization

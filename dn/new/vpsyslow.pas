@@ -143,7 +143,7 @@ implementation
 
 uses
   SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, DNErrLog, LineInfo
-{$IFDEF GO32V2}, go32{$ENDIF};
+{$IFDEF GO32V2}, go32, TvDos{$ENDIF};
 
 { --- files -------------------------------------------------------------------- }
 
@@ -709,5 +709,14 @@ procedure SysCtrlSetCBreakHandler;
 begin
   CBreakHandlerSet := True;
 end;
+
+{ The program takes over the screen at the start (DN reads the size of the screen before it creates the application; the
+  application of TV needs the screen of TvScreen to be there). Other targets: their backends do the same. }
+{$IFDEF GO32V2}
+initialization
+  DosInit;
+finalization
+  DosDone;
+{$ENDIF}
 
 end.
