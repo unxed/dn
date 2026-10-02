@@ -91,6 +91,15 @@ procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
 { A double click: a flag of the mouse event in tv/ (EventFlags bit 2); DN has the field Double. }
 procedure SetEventDouble(var Event: TEvent; Value: Boolean);
 
+var
+  { where a fatal error happened (DN: the source file and the line of the error, set by the error handler) }
+  SourceFileName: PString = nil;
+  SourceLineNo: LongInt = 0;
+
+{ The end of the program after a fatal error: the place of the error (ErrorAddr, SourceFileName, SourceLineNo) is
+  written to the error output, the program stops with ExitCode. }
+procedure EndFatalError;
+
 procedure InitDrivers;
 procedure DoneDrivers;
 procedure InitEvents;
@@ -178,6 +187,15 @@ end;
 
 procedure InitDrivers;
 begin
+end;
+
+procedure EndFatalError;
+begin
+  Write(StdErr, 'Fatal error ', ExitCode);
+  if (SourceFileName <> nil) and (SourceLineNo <> 0) then
+    Write(StdErr, ' in ', SourceFileName^, ' line ', SourceLineNo);
+  Writeln(StdErr);
+  Halt(ExitCode);
 end;
 
 procedure DoneDrivers;
