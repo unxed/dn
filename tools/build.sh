@@ -18,6 +18,7 @@ exe=; [ "$DN_TARGET" = dos ] && exe=.exe
 echo "== shims (generated from tv/src)"
 dn_gen_shims
 echo "== compile ($DN_TARGET)"
+mkdir -p "$DN_OBJ"
 for p in rcp dn; do
     rm -f "$DN_OBJ/$p$exe"
     dn_compile $p.pas > "$DN_OBJ/$p.log" || true
