@@ -31,11 +31,13 @@ uses
 {$ENDIF}
 
 const
-  { the separator of directories }
+  { the separator of directories and the mask of all the files }
 {$IFDEF DRIVES}
   DirDelim = '\';
+  AllMask = '*.*';
 {$ELSE}
   DirDelim = '/';
+  AllMask = '*';
 {$ENDIF}
   faReadOnly  = $01;
   faHidden    = $02;
@@ -93,8 +95,10 @@ type
 function NewDirEntry(const Txt, ADir: ShortString): PDirEntry;
 function NewSearchRec(const Rec: TSearchRec): PSearchRec;
 
-{ The drive exists (always True on systems without drives for the current one). }
+{ The drive exists (without drive letters only the "drive" C exists). }
 function DriveValid(Drive: Char): Boolean;
+{ The letter of the current drive ('C' without drive letters). }
+function GetDisk: Char;
 function IsDir(const S: ShortString): Boolean;
 function PathValid(const Path: ShortString): Boolean;
 function ValidFileName(const FileName: ShortString): Boolean;
@@ -247,7 +251,22 @@ begin
   Drive := UpCase(Drive);
   Result := (Drive >= 'A') and (Drive <= 'Z') and (DiskSize(Ord(Drive) - Ord('A') + 1) <> -1);
 {$ELSE}
-  Result := True;
+  Result := UpCase(Drive) = 'C';
+{$ENDIF}
+end;
+
+function GetDisk: Char;
+var
+  S: ShortString;
+begin
+{$IFDEF DRIVES}
+  GetDir(0, S);
+  if (Length(S) > 1) and (S[2] = ':') then
+    Result := UpCase(S[1])
+  else
+    Result := 'C';
+{$ELSE}
+  Result := 'C';
 {$ENDIF}
 end;
 

@@ -345,7 +345,7 @@ begin
 
   Path := FExpand(AWildCard);
   FSplit(Path, Dir, Name, Ext);
-  if Finder.First(Dir + '*', faDirectory) then
+  if Finder.First(Dir + AllMask, faDirectory) then
     repeat
       if ((Finder.Rec.Attr and faDirectory) <> 0) and (Finder.Rec.Name[1] <> '.') then
         FileList^.Insert(NewSearchRec(Finder.Rec));

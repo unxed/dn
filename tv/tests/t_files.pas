@@ -65,14 +65,14 @@ begin
   Check(ValidFileName(Base + PathDelim + 'x.txt') and ValidFileName('name.txt'), 'valid file names');
   Check(not ValidFileName('na|me.txt') and not ValidFileName('a.b|c.d'), 'illegal characters');
   Check(not ValidFileName(Base + PathDelim + 'nope' + PathDelim + 'x.txt'), 'a name in a missing directory');
-  Check(DriveValid('C') or True, 'DriveValid does not fail');
+  Check(DriveValid(GetDisk), 'the current drive is valid');
   Dir := GetCurDir;
   Check((Dir <> '') and (Dir[Length(Dir)] in ['/', '\']), 'GetCurDir ends with a separator');
   Check(FExpand('x.txt') = ShortString(ExpandFileName('x.txt')), 'FExpand');
 
   { the search }
   F.Init;
-  Check(F.First(Base + PathDelim + '*', faDirectory), 'First finds something');
+  Check(F.First(Base + PathDelim + AllMask, faDirectory), 'First finds something');
   N := 0;
   repeat
     Inc(N);
@@ -91,7 +91,7 @@ begin
   { the collections }
   New(C, Init(10, 5));
   F.Init;
-  if F.First(Base + PathDelim + '*', faDirectory) then
+  if F.First(Base + PathDelim + AllMask, faDirectory) then
     repeat
       if (F.Rec.Name <> '.') then
         C^.Insert(NewSearchRec(F.Rec));
