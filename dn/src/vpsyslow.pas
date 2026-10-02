@@ -36,6 +36,8 @@ const
   Open_Share_DenyWrite     = $20;
   Open_Share_DenyRead      = $30;
   Open_Share_DenyNone      = $40;
+  { the attribute of a found entry that is a symbolic link (Unix): the bit of a device in DOS, which is never found by a search }
+  SysLinkAttr              = $40;
 
 { --- the screen (a copy of the screen of tv/ in 16-bit cells) ---------------------- }
 
@@ -578,6 +580,8 @@ var
 begin
   N := ShortString(R.Name);
   F.Attr := Byte(R.Attr);
+  if R.Attr and faSymLink <> 0 then
+    F.Attr := F.Attr or SysLinkAttr;
   F.Time := R.Time;
   F.Size := R.Size;
   F.Name := N;
@@ -604,7 +608,7 @@ begin
   if I > MaxSearches then
     Exit(4);                       { too many open files }
   New(Searches[I]);
-  if SysUtils.FindFirst(FixMask(SysOsPath(StrPas(Path))), Attr, Searches[I]^) <> 0 then
+  if SysUtils.FindFirst(FixMask(SysOsPath(StrPas(Path))), Attr or faSymLink, Searches[I]^) <> 0 then
   begin
     SysUtils.FindClose(Searches[I]^);
     Dispose(Searches[I]);

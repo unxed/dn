@@ -80,3 +80,10 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
 - Регистр: имена, которых нет на диске в том регистре, что просит DN, ищутся без учёта регистра (`SysOsPath`); два файла, различающихся
   регистром, DN различить не сможет.
 - Заставка «Warning» (beta) при каждом старте: Esc закрывает.
+
+## Symbolic links (Linux), 2026-10-02
+- `SysFindFirst/Next` mark a found symbolic link with `SysLinkAttr` ($40, the DOS bit of a device that a search never gives) and the
+  search always asks for links (`faSymLink`), so that broken links are found too. The directory tree (`tree.pas`) does not enter a link to
+  a directory (`/proc/self/root` made the scan of `C:\` endless). The panels still enter them (Enter on a link to a directory works);
+  how the panels show a link (a mark, the target) is not done. Other scanners of DN (Find files, the size of a directory, the
+  copy of a tree) may loop on a link cycle: check when they are used on `/`.
