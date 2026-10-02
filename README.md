@@ -1,13 +1,18 @@
 # dn
 
-DOS Navigator на Free Pascal. В репозитории два независимых проекта с разными лицензиями
-и один общий инструментарий:
+Порт DOS Navigator на Free Pascal.
+
+![](https://raw.githubusercontent.com/unxed/f4/refs/heads/main/.github/assets/screenshot.jpg)
+
+В репозитории два независимых проекта с разными лицензиями и один общий инструментарий:
 
 | Каталог | Что это | Лицензия | Откуда код |
 |---|---|---|---|
 | [`tv/`](tv/README.md) | **TV** — Pascal-перевод библиотеки [magiblot/tvision](https://github.com/magiblot/tvision), свои бэкенды (память, DOS), тесты, демо | отказ от гарантий Borland + MIT (`tv/COPYRIGHT.magiblot`, `tv/LICENSE`) | magiblot/tvision (его код — из опубликованного Borland выпуска TV 2.0 и MIT-вклад magiblot) и наш новый код |
 | `dn/` | **DN** — сам файловый менеджер | лицензия DN (не перелицензируется) | публичные выпуски DN (см. [`dn/README.md`](dn/README.md)), наш новый код |
 | `audit/`, `tools/`, `research/`, `.github/` | детектор кода Borland, сборка и проверки, исследования | — | наш код |
+
+Наш новый код следует считать под MIT, как и у magiblot.
 
 Правила разделения (проверяются `tools/check-layout.sh` в CI):
 
