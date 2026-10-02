@@ -45,7 +45,12 @@ for f in sorted(os.listdir(tree)):
     b = f.lower()
     if not b.endswith('.pas') or b == own or b in flag or b.startswith('vpsyslo') or b == 'lfnvp.pas':
         continue
-    for w in re.findall(r'[a-z_][a-z0-9_]*', read(os.path.join(tree, f)).lower()):
+    words = re.findall(r'[a-z_][a-z0-9_]*', read(os.path.join(tree, f)).lower())
+    # only the files that name the unit (in a uses clause or as a qualifier): the other files
+    # may declare names of their own that happen to be the same
+    if os.path.basename(path)[:-4].lower() not in words:
+        continue
+    for w in words:
         if w in decl:
             cnt[w] += 1; byf[w].add(b[:-4])
 print('# %s: names used by the files that we keep' % os.path.basename(path))
