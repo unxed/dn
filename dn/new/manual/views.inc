@@ -2,6 +2,12 @@
 const
   MaxViewWidth = 255;
 
+var
+  { the smallest size of a window (the width and the height) }
+  MinWinSize: TPoint = (X: 16; Y: 6);
+
+const
+
   { palettes (see dialogs.inc) }
   CFrame = #1#1#2#2#3;
   CScrollBar = #4#5#5;
