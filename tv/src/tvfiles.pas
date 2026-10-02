@@ -26,7 +26,17 @@ interface
 uses
   TvObjs, TvUtil;
 
+{$IF DEFINED(GO32V2) OR DEFINED(WINDOWS) OR DEFINED(OS2) OR DEFINED(MSDOS)}
+  {$DEFINE DRIVES}
+{$ENDIF}
+
 const
+  { the separator of directories }
+{$IFDEF DRIVES}
+  DirDelim = '\';
+{$ELSE}
+  DirDelim = '/';
+{$ENDIF}
   faReadOnly  = $01;
   faHidden    = $02;
   faSysFile   = $04;
@@ -92,6 +102,8 @@ function ValidFileName(const FileName: ShortString): Boolean;
 function GetCurDir(Drive: Char = #0): ShortString;
 function IsWild(const F: ShortString): Boolean;
 function FExpand(const Path: ShortString): ShortString;
+{ A relative Path is taken from RelativeTo (itself relative to the current directory). }
+function FExpandFrom(const Path, RelativeTo: ShortString): ShortString;
 { Dir includes the drive and the last separator; Ext starts with a dot. }
 procedure FSplit(const Path: ShortString; out Dir, Name, Ext: ShortString);
 
@@ -99,10 +111,6 @@ implementation
 
 uses
   SysUtils;
-
-{$IF DEFINED(GO32V2) OR DEFINED(WINDOWS) OR DEFINED(OS2) OR DEFINED(MSDOS)}
-  {$DEFINE DRIVES}
-{$ENDIF}
 
 type
   PSysRec = ^SysUtils.TSearchRec;
@@ -318,6 +326,22 @@ end;
 function FExpand(const Path: ShortString): ShortString;
 begin
   Result := ShortString(ExpandFileName(AnsiString(Path)));
+end;
+
+function FExpandFrom(const Path, RelativeTo: ShortString): ShortString;
+var
+  Absolute: Boolean;
+begin
+  Absolute := (Path <> '') and IsSeparator(Path[1]);
+{$IFDEF DRIVES}
+  Absolute := Absolute or ((Length(Path) > 2) and (Path[2] = ':') and IsSeparator(Path[3]));
+{$ENDIF}
+  if Absolute or (RelativeTo = '') then
+    Result := FExpand(Path)
+  else if IsSeparator(RelativeTo[Length(RelativeTo)]) then
+    Result := FExpand(RelativeTo + Path)
+  else
+    Result := FExpand(RelativeTo + PathDelim + Path);
 end;
 
 procedure FSplit(const Path: ShortString; out Dir, Name, Ext: ShortString);
