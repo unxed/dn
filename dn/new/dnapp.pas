@@ -12,7 +12,7 @@ interface
 uses
   SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, TvScreen, TvCell, Menus,
   Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings
-{$IFDEF GO32V2}, TvDos{$ENDIF}, DNErrLog;
+{$IFDEF GO32V2}, TvDos, go32{$ENDIF}, DNErrLog;
 
 const
   apColor = TvApp.apColor;
@@ -125,24 +125,37 @@ begin
   Unlock;
 end;
 
+{ As TProgram.Init of DN (the order matters: the status line, the menu and the desktop are inserted in this order, then the
+  command line is made; the menu views of DN are made with a zero size (TMenuView.Init) and get the height of one row here).
+  The Init of TvApp.TProgram is not called: it makes the views of TV (DN has its own menus). }
 constructor TProgram.Init;
+var
+  R: TRect;
 begin
   DNTrace('TProgram.Init');
-  inherited Init;
-  DNTrace('TProgram.Init: tv done, size=' + IntToStr(Size.X) + 'x' + IntToStr(Size.Y) + ' desktop=' + IntToStr(Desktop^.Size.X) + 'x' +
-    IntToStr(Desktop^.Size.Y) + ' origin=' + IntToStr(Desktop^.Origin.X) + ',' + IntToStr(Desktop^.Origin.Y));
-  DNTrace('StatusLine=' + IntToHex(PtrUInt(StatusLine), 8) + ' MenuBar=' + IntToHex(PtrUInt(MenuBar), 8));
+  Application := @Self;
+  InitScreen;
+  R.Assign(0, 0, ScreenWidth, ScreenHeight);
+  TvViews.TGroup.Init(R);
+  State := sfVisible or sfSelected or sfFocused or sfModal or sfExposed;
+  Options := 0;
+  Buffer := ScreenBuffer;
+  InitStatusLine;
+  InitMenuBar;
+  InitDeskTop;
   if StatusLine <> nil then
     Insert(StatusLine);
-  DNTrace('status inserted');
   if MenuBar <> nil then
     Insert(MenuBar);
-  DNTrace('menu inserted');
-  { the menu views of DN are made with a zero size (TMenuView.Init) and the program gives them the height of one row }
+  if Desktop <> nil then
+    Insert(Desktop);
+  InitCommandLine;
   if StatusLine <> nil then
     StatusLine^.GrowTo(StatusLine^.Size.X, 1);
   if MenuBar <> nil then
     MenuBar^.GrowTo(MenuBar^.Size.X, 1);
+  NewTimer(IdleSecs, 0);
+  DNTrace('TProgram.Init: done, size=' + IntToStr(Size.X) + 'x' + IntToStr(Size.Y));
 end;
 
 procedure TProgram.ActivateView(P: PView);
@@ -188,6 +201,7 @@ var
   Keys: String = '';
   KeysSent: LongInt = 0;
   IdleSeen: Boolean = False;
+  IdleCount: LongInt = 0;
 
 procedure TraceView(P: PView);
 begin
@@ -201,6 +215,7 @@ var
   Name: String;
   Sec, N, I: LongInt;
   V: PView;
+  NoShift: Word;
 begin
   Name := GetEnvironmentVariable('DNDUMP');
   if Name = '' then
@@ -209,6 +224,13 @@ begin
   begin
     DumpStart := GetTickCount64;
     Keys := GetEnvironmentVariable('DNKEYS');
+  end;
+  { DOSBox-X without a display reports Alt as pressed (bit 3 of the shift flags at 0040:0017): clear the flags, the keys are
+    those of a person who holds nothing }
+  if Keys <> '' then
+  begin
+    NoShift := 0;
+    dosmemput($40, $17, NoShift, 2);
   end;
   { one key a second }
   while (Keys <> '') and (GetTickCount64 - DumpStart > QWord(KeysSent + 1) * 1000) do
@@ -232,6 +254,11 @@ begin
     DNTrace('dump: screen ' + IntToStr(ScreenWidth) + 'x' + IntToStr(ScreenHeight) + ', non-blank cells in the buffer: ' + IntToStr(N) +
       ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application^.LockFlag) + ' desktop ' +
       IntToStr(Desktop^.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application^.Buffer = ScreenBuffer, True));
+    { the help context decides what the status line shows }
+    DNTrace('idle calls: ' + IntToStr(IdleCount) + ' shift state ' + IntToHex(ShiftState, 2) + ' ' + IntToHex(ShiftState2, 2) + ' old ' + IntToHex(OldShiftState, 2));
+    DNTrace('help ctx: app ' + IntToStr(Application^.GetHelpCtx) + ' desktop ' + IntToStr(Desktop^.GetHelpCtx) + ' status ' +
+      IntToStr(StatusLine^.HelpCtx) + ' topview ' + IntToHex(PtrUInt(StatusLine^.TopView), 8) + ' app ' + IntToHex(PtrUInt(Application), 8) +
+      ' current ' + IntToHex(PtrUInt(Application^.Current), 8) + ' desktop.current ' + IntToHex(PtrUInt(Desktop^.Current), 8));
     { the geometry of the main views (a test aid) }
     V := Desktop^.Last;
     if V <> nil then
@@ -258,11 +285,18 @@ begin
   if not IdleSeen then
     DNTrace('first Idle');
   IdleSeen := True;
+  Inc(IdleCount);
   inherited Idle;
-  CheckScreenDump;
   if StatusLine <> nil then
+  begin
     StatusLine^.Update;
+    if IdleCount < 4 then
+      DNTrace('idle ' + IntToStr(IdleCount) + ': status help ctx ' + IntToStr(StatusLine^.HelpCtx) + ' top help ctx ' +
+        IntToStr(StatusLine^.TopView^.GetHelpCtx) + ' items ' + IntToHex(PtrUInt(StatusLine^.Items), 8) + ' defs ' +
+        IntToHex(PtrUInt(StatusLine^.Defs), 8));
+  end;
   RunBackground;
+  CheckScreenDump;
 end;
 
 procedure TProgram.InitCommandLine;

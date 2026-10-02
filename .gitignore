@@ -5,3 +5,5 @@ __pycache__/
 *.ppu
 *.a
 build/
+# the DOS build that can be tried without building it (tools/dn-dist.sh)
+!dist/dos/*.EXE
