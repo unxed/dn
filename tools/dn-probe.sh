@@ -33,7 +33,7 @@ for f in $(cd "$tree" && ls | grep -i '\.pas$' | sort); do
     total=$((total+1))
     b=$(echo "$f" | tr 'A-Z' 'a-z'); b=${b%.pas}
     rm -f "$out"/o/*
-    if (cd "$tree" && timeout 60 fpc -M"$mode" -Fu"$tree" -Fu"$out/alias" -FU"$out/o" -vew -Cn "$@" "$f") > "$out/log/$b.txt" 2>&1; then
+    if (cd "$tree" && timeout 60 fpc -M"$mode" -Fu"$tree" -Fu"$here/tv/src" -Fu"$out/alias" -FU"$out/o" -vew -Cn "$@" "$f") > "$out/log/$b.txt" 2>&1; then
         ok=$((ok+1)); echo "ok $b" >> "$out/result.txt"
     else
         # the first error line, without the path

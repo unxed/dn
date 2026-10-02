@@ -1,0 +1,23 @@
+# The units that DN takes from Borland Turbo Vision (replaced by tv/, PLAN.md decisions 6 and 11) and what
+# gives their names: `UnitName: TvUnit TvUnit...` (tools/gen-shim.py, called by tools/dn-materialize.sh).
+# What DN adds to TV, and the names that differ, are in dn/new/manual/UNIT.inc (interface) and
+# UNIT.impl.inc (implementation).
+Defines:  TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput
+_Defines: TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput
+Views:    TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow
+_Views:   TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow
+Dialogs:  TvDialog TvInput TvCluster TvList TvHist TvValid
+_Dialogs: TvDialog TvInput TvCluster TvList TvHist TvValid
+Collect:  TvObjs
+_Collect: TvObjs
+Streams:  TvObjs
+_Streams: TvObjs
+Scroller: TvWindow
+Validate: TvValid
+ColorSel: TvColorSel
+HistList: TvHist
+MsgBox:   TvMsgBox
+App:      TvApp
+_Apps:    TvApp
+Menus:    TvMenus
+StdDlg:   TvFileDlg TvChDir TvFiles
