@@ -25,6 +25,17 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch
       - name: Fetch the archive and make the tree
         run: tools/dn-materialize.sh ${{ matrix.upstream }}
+      - name: Are the units that the sources use but the tree lacks in the archive? (names only)
+        run: |
+          f=$(ls build/cache/*.rar build/cache/*.zip 2>/dev/null | head -1)
+          case "$f" in
+            *.rar) unrar lb "$f" | tr -d '\r' > names.txt ;;
+            *)     unzip -Z1 "$f" | tr -d '\r' > names.txt ;;
+          esac
+          echo "$f: $(wc -l < names.txt) entries"
+          for u in files fltl fnotify use16 vputils gauge gauges helpfile helpkern asciitab edwin dnstddlg events messages dnapp drivers fviewer rtpatch; do
+            printf '%-10s %s\n' "$u" "$(grep -i -E "(^|/)$u\.(pas|inc|001)$" names.txt | tr '\n' ' ')"
+          done
       - name: Size of the tree
         run: |
           find build/dn -type f | sed 's/.*\.//' | tr 'A-Z' 'a-z' | sort | uniq -c | sort -rn | head -12
