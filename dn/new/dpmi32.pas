@@ -13,6 +13,8 @@ unit Dpmi32;
 
 interface
 
+uses VPSysLow;
+
 const
   fCarry = 1;                      { the carry flag in flags_ }
 
@@ -41,12 +43,34 @@ function SizeOfDosBuffer: LongInt;
 { Copy between the buffer (a linear address below 1 MB) and the memory of the program. }
 procedure MemGet(Linear: LongInt; var Dest; Count: LongInt);
 procedure MemPut(Linear: LongInt; const Src; Count: LongInt);
+procedure MemFill(Linear: LongInt; Count: LongInt; Value: Byte);
+{ The zero-terminated string at the linear address (at most 255 characters). }
+function MemStr(Linear: LongInt): String;
+
+{ A block of memory below 1 MB for the data of real-mode calls: Seg is its real-mode segment (the offset is 0).
+  The program does not see that memory: DosShadow gives a block of the program that is copied to the DOS
+  block before and from it after every intr_realmode (so code written for a flat memory works as it is). }
+procedure getdosmem(var Seg: SmallWord; Size: LongInt);
+function dosseg_linear(Seg: SmallWord): LongInt;
+function DosShadow(Seg: SmallWord): Pointer;
 
 implementation
 
 {$IFDEF GO32V2}
-uses go32;
+uses
+  go32;
 {$ENDIF}
+
+type
+  TShadow = record
+    Seg: SmallWord;
+    Size: LongInt;
+    Mem: Pointer;
+  end;
+
+var
+  Shadows: array[1..8] of TShadow;
+  ShadowCount: Integer = 0;
 
 procedure init_register(var Regs: real_mode_call_structure_typ);
 begin
@@ -57,8 +81,13 @@ procedure intr_realmode(var Regs: real_mode_call_structure_typ; IntNo: Byte);
 {$IFDEF GO32V2}
 var
   R: TRealRegs absolute Regs;
+  I: Integer;
 begin
+  for I := 1 to ShadowCount do
+    dosmemput(Shadows[I].Seg, 0, Shadows[I].Mem^, Shadows[I].Size);
   realintr(IntNo, R);
+  for I := 1 to ShadowCount do
+    dosmemget(Shadows[I].Seg, 0, Shadows[I].Mem^, Shadows[I].Size);
 end;
 {$ELSE}
 begin
@@ -108,6 +137,75 @@ begin
 {$IFDEF GO32V2}
   dosmemput(Linear shr 4, Linear and 15, Src, Count);
 {$ENDIF}
+end;
+
+procedure MemFill(Linear: LongInt; Count: LongInt; Value: Byte);
+var
+  Buf: array[0..1023] of Byte;
+  N: LongInt;
+begin
+  FillChar(Buf, SizeOf(Buf), Value);
+  while Count > 0 do
+  begin
+    N := Count;
+    if N > SizeOf(Buf) then
+      N := SizeOf(Buf);
+    MemPut(Linear, Buf, N);
+    Inc(Linear, N);
+    Dec(Count, N);
+  end;
+end;
+
+function MemStr(Linear: LongInt): String;
+var
+  Buf: array[0..255] of Char;
+  I: Integer;
+begin
+  FillChar(Buf, SizeOf(Buf), 0);
+  MemGet(Linear, Buf, 255);
+  I := 0;
+  while (I < 255) and (Buf[I] <> #0) do
+    Inc(I);
+  SetLength(Result, I);
+  Move(Buf, Result[1], I);
+end;
+
+procedure getdosmem(var Seg: SmallWord; Size: LongInt);
+{$IFDEF GO32V2}
+var
+  R: LongInt;
+begin
+  R := global_dos_alloc(Size);
+  Seg := SmallWord(R and $FFFF);
+end;
+{$ELSE}
+begin
+  Seg := 0;
+end;
+{$ENDIF}
+
+function dosseg_linear(Seg: SmallWord): LongInt;
+begin
+  Result := LongInt(Seg) shl 4;
+end;
+
+function DosShadow(Seg: SmallWord): Pointer;
+var
+  I: Integer;
+begin
+  for I := 1 to ShadowCount do
+    if Shadows[I].Seg = Seg then
+      Exit(Shadows[I].Mem);
+  Result := nil;
+  if ShadowCount < High(Shadows) then
+  begin
+    Inc(ShadowCount);
+    Shadows[ShadowCount].Seg := Seg;
+    Shadows[ShadowCount].Size := 1024;
+    GetMem(Shadows[ShadowCount].Mem, 1024);
+    FillChar(Shadows[ShadowCount].Mem^, 1024, 0);
+    Result := Shadows[ShadowCount].Mem;
+  end;
 end;
 
 end.
