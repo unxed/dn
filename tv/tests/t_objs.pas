@@ -172,6 +172,53 @@ begin
   Check((Count = C^.Count) and (Total = 20 + 30 + 60 + 70), 'ForEach with a local procedure');
 end;
 
+{ the extensions of DN: Eof, long strings, zero-terminated strings, ReadBlock, Open/Close }
+procedure StreamExtras;
+var
+  M: TMemoryStream;
+  F: TBufStream;
+  L: AnsiString;
+  PL: PAnsiString;
+  S: ShortString;
+  Z: PChar;
+  B: array[0..9] of Byte;
+  N: Word;
+  Name: string;
+begin
+  M.Init(0, 64);
+  L := StringOfChar('x', 300) + 'END';
+  M.WriteLongStr(@L);
+  M.StrWrite('zero');
+  M.StrWrite(nil);
+  S := 'short';
+  M.WriteStr(@S);
+  M.Seek(0);
+  Check(not M.Eof, 'Eof is false at the start');
+  PL := M.ReadLongStr;
+  Check((PL <> nil) and (PL^ = L) and (Length(PL^) = 303), 'ReadLongStr: a string of more than 255 characters');
+  Dispose(PL);
+  Z := M.StrRead;
+  Check((Z <> nil) and (StrComp(Z, 'zero') = 0), 'StrRead');
+  StrDispose(Z);
+  Check(M.StrRead = nil, 'StrRead of an empty string is nil');
+  M.ReadStrV(S);
+  Check(S = 'short', 'ReadStrV');
+  Check(M.Eof, 'Eof at the end');
+  M.Done;
+
+  Name := 'tvobjs_ext.tmp';
+  F.Init(Name, stCreate, 128);
+  B[0] := 1; B[1] := 2; B[2] := 3;
+  F.Write(B, 3);
+  F.Close;
+  F.Open(Name, stOpenRead);
+  FillChar(B, SizeOf(B), 0);
+  F.ReadBlock(B, 10, N);
+  Check((N = 3) and (B[2] = 3), 'Close, Open again and ReadBlock reads what is there');
+  F.Done;
+  DeleteFile(Name);
+end;
+
 begin
   Used0 := GetFPCHeapStatus.CurrHeapUsed;
 
@@ -371,6 +418,7 @@ begin
   C^.ForEach(@AddTo);
   Check(Sum = 20 + 30 + 60 + 70, 'ForEach');
   NestedCheck(C);
+  StreamExtras;
   C^.AtPut(1, nil);
   C^.Pack;
   Check((C^.Count = 3) and (C^.At(1) = Pointer(60)), 'Pack removes the nil items');

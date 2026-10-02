@@ -62,19 +62,28 @@ type
   TStream = object(TObject)
     Status: Integer;
     ErrorInfo: Integer;
-    procedure CopyFrom(var S: TStream; Count: Longint);
+    procedure CopyFrom(var S: TStream; Count: Int64);
     procedure Error(Code, Info: Integer); virtual;
     procedure Flush; virtual;
     function Get: PObject;
-    function GetPos: Longint; virtual;
-    function GetSize: Longint; virtual;
+    function GetPos: Int64; virtual;
+    function GetSize: Int64; virtual;
     procedure Put(P: PObject);
     procedure Read(var Buf; Count: Longint); virtual;
     function ReadStr: PStr;
+    { Extensions of DN (the strings of more than 255 characters, zero-terminated strings, the end of the stream):
+      long strings are a LongInt length and the characters, zero-terminated ones a Word length and the characters. }
+    procedure ReadStrV(var S: ShortString);
+    function ReadLongStr: PAnsiString;
+    procedure ReadLongStrV(var S: AnsiString);
+    procedure WriteLongStr(P: PAnsiString);
+    function StrRead: PChar;
+    procedure StrWrite(P: PChar);
+    function Eof: Boolean;
     procedure Reset;
-    procedure Seek(Pos: Longint); virtual;
+    procedure Seek(Pos: Int64); virtual;
     procedure Truncate; virtual;
-    procedure Write(var Buf; Count: Longint); virtual;
+    procedure Write(const Buf; Count: Longint); virtual;
     procedure WriteStr(P: PStr);
   end;
 
@@ -92,33 +101,40 @@ type
   PDosStream = ^TDosStream;
   TDosStream = object(TStream)
     Handle: THandle;
+    FName: string;
     constructor Init(const FileName: string; Mode: Word);
     destructor Done; virtual;
-    function GetPos: Longint; virtual;
-    function GetSize: Longint; virtual;
+    { Open takes the name and the mode (Init does it); DoOpen opens the file; Close closes it (Open may follow). }
+    procedure Open(const FileName: string; Mode: Word);
+    procedure DoOpen(OpenMode: Word); virtual;
+    procedure Close; virtual;
+    procedure ReadBlock(var Buf; Count: Longint; var BytesRead: Word);
+    function GetPos: Int64; virtual;
+    function GetSize: Int64; virtual;
     procedure Read(var Buf; Count: Longint); virtual;
-    procedure Seek(Pos: Longint); virtual;
+    procedure Seek(Pos: Int64); virtual;
     procedure Truncate; virtual;
-    procedure Write(var Buf; Count: Longint); virtual;
+    procedure Write(const Buf; Count: Longint); virtual;
   end;
 
   PBufStream = ^TBufStream;
   TBufStream = object(TDosStream)
     Buffer: PByte;
     BufSize: Longint;
-    BufStart: Longint;     { file position of the first byte of the buffer }
+    BufStart: Int64;       { file position of the first byte of the buffer }
     BufLen: Longint;       { valid bytes in the buffer }
     BufPos: Longint;       { current position in the buffer }
     Dirty: Boolean;        { the buffer has bytes not written yet }
     constructor Init(const FileName: string; Mode: Word; Size: Longint);
     destructor Done; virtual;
+    procedure Close; virtual;
     procedure Flush; virtual;
-    function GetPos: Longint; virtual;
-    function GetSize: Longint; virtual;
+    function GetPos: Int64; virtual;
+    function GetSize: Int64; virtual;
     procedure Read(var Buf; Count: Longint); virtual;
-    procedure Seek(Pos: Longint); virtual;
+    procedure Seek(Pos: Int64); virtual;
     procedure Truncate; virtual;
-    procedure Write(var Buf; Count: Longint); virtual;
+    procedure Write(const Buf; Count: Longint); virtual;
   private
     procedure FlushBuffer;
     procedure FillBuffer;
@@ -133,12 +149,12 @@ type
     BlockSize: Longint;
     constructor Init(ALimit: Longint; ABlockSize: Longint);
     destructor Done; virtual;
-    function GetPos: Longint; virtual;
-    function GetSize: Longint; virtual;
+    function GetPos: Int64; virtual;
+    function GetSize: Int64; virtual;
     procedure Read(var Buf; Count: Longint); virtual;
-    procedure Seek(Pos: Longint); virtual;
+    procedure Seek(Pos: Int64); virtual;
     procedure Truncate; virtual;
-    procedure Write(var Buf; Count: Longint); virtual;
+    procedure Write(const Buf; Count: Longint); virtual;
   end;
 
   TItemList = array[0..MaxCollectionSize - 1] of Pointer;
@@ -276,13 +292,13 @@ procedure TStream.Flush;
 begin
 end;
 
-function TStream.GetPos: Longint;
+function TStream.GetPos: Int64;
 begin
   Error(stError, 0);
   Result := -1;
 end;
 
-function TStream.GetSize: Longint;
+function TStream.GetSize: Int64;
 begin
   Error(stError, 0);
   Result := -1;
@@ -293,7 +309,7 @@ begin
   Error(stError, 0);
 end;
 
-procedure TStream.Seek(Pos: Longint);
+procedure TStream.Seek(Pos: Int64);
 begin
   Error(stError, 0);
 end;
@@ -303,7 +319,7 @@ begin
   Error(stError, 0);
 end;
 
-procedure TStream.Write(var Buf; Count: Longint);
+procedure TStream.Write(const Buf; Count: Longint);
 begin
   Error(stError, 0);
 end;
@@ -314,7 +330,7 @@ begin
   ErrorInfo := 0;
 end;
 
-procedure TStream.CopyFrom(var S: TStream; Count: Longint);
+procedure TStream.CopyFrom(var S: TStream; Count: Int64);
 var
   Buf: array[0..4095] of Byte;
   N: Longint;
@@ -344,6 +360,96 @@ begin
   Read(S[1], L);
   if Status = stOk then
     Result := NewStr(S);
+end;
+
+procedure TStream.ReadStrV(var S: ShortString);
+var
+  L: Byte;
+begin
+  S := '';
+  Read(L, 1);
+  if (Status <> stOk) or (L = 0) then
+    Exit;
+  SetLength(S, L);
+  Read(S[1], L);
+  if Status <> stOk then
+    S := '';
+end;
+
+function TStream.ReadLongStr: PAnsiString;
+var
+  S: AnsiString;
+begin
+  Result := nil;
+  ReadLongStrV(S);
+  if Status = stOk then
+  begin
+    New(Result);
+    Result^ := S;
+  end;
+end;
+
+procedure TStream.ReadLongStrV(var S: AnsiString);
+var
+  L: Longint;
+begin
+  S := '';
+  Read(L, SizeOf(L));
+  if (Status <> stOk) or (L <= 0) then
+    Exit;
+  SetLength(S, L);
+  Read(S[1], L);
+  if Status <> stOk then
+    S := '';
+end;
+
+procedure TStream.WriteLongStr(P: PAnsiString);
+var
+  L: Longint;
+begin
+  if P = nil then
+    L := 0
+  else
+    L := Length(P^);
+  Write(L, SizeOf(L));
+  if L > 0 then
+    Write(P^[1], L);
+end;
+
+function TStream.StrRead: PChar;
+var
+  L: Word;
+begin
+  Result := nil;
+  Read(L, SizeOf(L));
+  if (Status <> stOk) or (L = 0) then
+    Exit;
+  Result := StrAlloc(L + 1);
+  Read(Result^, L);
+  Result[L] := #0;
+  if Status <> stOk then
+  begin
+    StrDispose(Result);
+    Result := nil;
+  end;
+end;
+
+procedure TStream.StrWrite(P: PChar);
+var
+  L: Word;
+begin
+  if P = nil then
+    L := 0
+  else
+    L := StrLen(P);
+  Write(L, SizeOf(L));
+  if L > 0 then
+    Write(P^, L);
+end;
+
+function TStream.Eof: Boolean;
+begin
+  Result := GetPos >= GetSize;
 end;
 
 procedure TStream.WriteStr(P: PStr);
@@ -404,15 +510,44 @@ end;
 constructor TDosStream.Init(const FileName: string; Mode: Word);
 begin
   inherited Init;
-  case Mode of
-    stCreate: Handle := FileCreate(FileName);
-    stOpenRead: Handle := FileOpen(FileName, fmOpenRead or fmShareDenyNone);
-    stOpenWrite: Handle := FileOpen(FileName, fmOpenWrite or fmShareDenyNone);
+  Handle := feInvalidHandle;
+  Open(FileName, Mode);
+end;
+
+procedure TDosStream.Open(const FileName: string; Mode: Word);
+begin
+  FName := FileName;
+  DoOpen(Mode);
+end;
+
+procedure TDosStream.DoOpen(OpenMode: Word);
+begin
+  case OpenMode of
+    stCreate: Handle := FileCreate(FName);
+    stOpenRead: Handle := FileOpen(FName, fmOpenRead or fmShareDenyNone);
+    stOpenWrite: Handle := FileOpen(FName, fmOpenWrite or fmShareDenyNone);
   else
-    Handle := FileOpen(FileName, fmOpenReadWrite or fmShareDenyNone);
+    Handle := FileOpen(FName, fmOpenReadWrite or fmShareDenyNone);
   end;
   if Handle = feInvalidHandle then
     Error(stInitError, 2);
+end;
+
+procedure TDosStream.Close;
+begin
+  if Handle <> feInvalidHandle then
+    FileClose(Handle);
+  Handle := feInvalidHandle;
+end;
+
+procedure TDosStream.ReadBlock(var Buf; Count: Longint; var BytesRead: Word);
+begin
+  if Status <> stOk then
+  begin
+    BytesRead := 0;
+    Exit;
+  end;
+  BytesRead := FileRead(Handle, Buf, Count);
 end;
 
 destructor TDosStream.Done;
@@ -423,21 +558,21 @@ begin
   inherited Done;
 end;
 
-function TDosStream.GetPos: Longint;
+function TDosStream.GetPos: Int64;
 begin
   if Status <> stOk then
     Exit(-1);
-  Result := Longint(FileSeek(Handle, 0, 1));
+  Result := FileSeek(Handle, 0, 1);
 end;
 
-function TDosStream.GetSize: Longint;
+function TDosStream.GetSize: Int64;
 var
   P: Int64;
 begin
   if Status <> stOk then
     Exit(-1);
   P := FileSeek(Handle, 0, 1);
-  Result := Longint(FileSeek(Handle, 0, 2));
+  Result := FileSeek(Handle, 0, 2);
   FileSeek(Handle, P, 0);
 end;
 
@@ -460,7 +595,7 @@ begin
   end;
 end;
 
-procedure TDosStream.Seek(Pos: Longint);
+procedure TDosStream.Seek(Pos: Int64);
 begin
   if Status <> stOk then
     Exit;
@@ -477,7 +612,7 @@ begin
     Error(stError, 0);
 end;
 
-procedure TDosStream.Write(var Buf; Count: Longint);
+procedure TDosStream.Write(const Buf; Count: Longint);
 begin
   if Status <> stOk then
     Exit;
@@ -542,14 +677,20 @@ begin
   FlushBuffer;
 end;
 
-function TBufStream.GetPos: Longint;
+procedure TBufStream.Close;
+begin
+  Flush;
+  inherited Close;
+end;
+
+function TBufStream.GetPos: Int64;
 begin
   if Status <> stOk then
     Exit(-1);
   Result := BufStart + BufPos;
 end;
 
-function TBufStream.GetSize: Longint;
+function TBufStream.GetSize: Int64;
 var
   P: Int64;
 begin
@@ -557,7 +698,7 @@ begin
     Exit(-1);
   FlushBuffer;
   P := FileSeek(Handle, 0, 1);
-  Result := Longint(FileSeek(Handle, 0, 2));
+  Result := FileSeek(Handle, 0, 2);
   FileSeek(Handle, P, 0);
 end;
 
@@ -595,7 +736,7 @@ begin
   end;
 end;
 
-procedure TBufStream.Seek(Pos: Longint);
+procedure TBufStream.Seek(Pos: Int64);
 begin
   if Status <> stOk then
     Exit;
@@ -622,7 +763,7 @@ begin
   BufLen := BufPos;
 end;
 
-procedure TBufStream.Write(var Buf; Count: Longint);
+procedure TBufStream.Write(const Buf; Count: Longint);
 var
   Src: PByte;
   N: Longint;
@@ -689,14 +830,14 @@ begin
   inherited Done;
 end;
 
-function TMemoryStream.GetPos: Longint;
+function TMemoryStream.GetPos: Int64;
 begin
   if Status <> stOk then
     Exit(-1);
   Result := Position;
 end;
 
-function TMemoryStream.GetSize: Longint;
+function TMemoryStream.GetSize: Int64;
 begin
   if Status <> stOk then
     Exit(-1);
@@ -730,7 +871,7 @@ begin
   end;
 end;
 
-procedure TMemoryStream.Seek(Pos: Longint);
+procedure TMemoryStream.Seek(Pos: Int64);
 begin
   if Status <> stOk then
     Exit;
@@ -747,7 +888,7 @@ begin
     Size := Position;
 end;
 
-procedure TMemoryStream.Write(var Buf; Count: Longint);
+procedure TMemoryStream.Write(const Buf; Count: Longint);
 var
   NewCap: Longint;
 begin
