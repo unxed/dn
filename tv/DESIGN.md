@@ -365,3 +365,9 @@
 - `TListBox.List` (а не `Items`): имя поля из Pascal TV (`TListBoxRec.List`); в `TSortedListBox` типизированный доступ
   стал функцией `SortedList` (в C++ он `list()`). Формы Pascal TV `GetBounds/GetExtent/GetClipRect(var R)` и
   `MakeLocal/MakeGlobal(Source; var Dest)` — перегрузки (`overload`) функций magiblot.
+- Потоки (`TvObjs`) расширены под DN: позиции и размеры `Int64` (`GetPos`, `GetSize`, `Seek`, `CopyFrom`), `Write(const Buf; ...)`;
+  `Eof`, `ReadStrV`, `ReadLongStr`/`ReadLongStrV`/`WriteLongStr` (длина `LongInt`), `StrRead`/`StrWrite` (длина `Word`),
+  у `TDosStream` — `Open`, `DoOpen`, `Close`, `ReadBlock`, поле `FName`. Формат строк — наш; ресурсы DN
+  компилируются заново, совместимость с чужими файлами ресурсов не нужна.
+- `FirstThat`/`LastThat`/`ForEach` коллекций и групп принимают процедурные переменные вида `is nested`
+  (`{$modeswitch nestedprocvars}` в `tvdefs.inc`): так работают локальные функции, как `@Name` в Turbo Pascal.
