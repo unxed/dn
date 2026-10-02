@@ -38,11 +38,39 @@ const
   Open_Share_DenyNone      = $40;
 
 { --- files -------------------------------------------------------------------- }
-{ 0 when done, else the error code of the system }
+{ The result is 0 when done, else the error code of the system (DOS codes: 2 no such file, 3 no such
+  path, 5 access denied...). }
+function SysFileOpen(FileName: PChar; Mode: LongInt; var Handle: LongInt): LongInt;
+function SysFileCreate(FileName: PChar; Mode, Attr: LongInt; var Handle: LongInt): LongInt;
+{ Method: 0 from the beginning, 1 from the current position, 2 from the end. }
+function SysFileSeek(Handle: THandle; Distance, Method: LongInt; var Actual: LongInt): LongInt;
+function SysFileRead(Handle: THandle; var Buffer; Count: LongInt; var Actual: LongInt): LongInt;
+function SysFileWrite(Handle: THandle; const Buffer; Count: LongInt; var Actual: LongInt): LongInt;
 function SysFileClose(Handle: THandle): LongInt;
 function SysFileSetSize(Handle: THandle; Size: TFileSize): LongInt;
 { nonzero (the low byte) when the handle is a device (a terminal, a printer...), 0 for a file }
 function SysFileIsDevice(Handle: THandle): LongInt;
+
+{ --- searching a directory ---------------------------------------------------- }
+type
+  { The record of a search. The first fields are laid out as DN (vpsyslo2.pas) expects them; the state of
+    the search is kept by the unit (Handle is a number of a slot). Name ends with a zero byte after its
+    last character, so that it can be taken as a PChar too. }
+  POSSearchRec = ^TOSSearchRec;
+  TOSSearchRec = packed record
+    Handle: LongInt;
+    NameLStr: Pointer;
+    Attr: Byte;
+    Time: LongInt;               { DOS date and time }
+    Size: TFileSize;
+    Name: ShortString;
+    Filler: array[0..3] of Char;
+  end;
+
+{ 0 when found, else the error code (18 = nothing more) }
+function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
+function SysFindNext(var F: TOSSearchRec; IsPChar: Boolean): LongInt;
+function SysFindClose(var F: TOSSearchRec): LongInt;
 
 { --- disks -------------------------------------------------------------------- }
 { Free and total space of the disk of the path (the drive letter and the colon of the path are taken,
@@ -78,6 +106,95 @@ uses
 
 { --- files -------------------------------------------------------------------- }
 
+function ErrorOfFile: LongInt;
+begin
+  Result := GetLastOSError;
+  if Result = 0 then
+    Result := 2;
+end;
+
+function SysFileOpen(FileName: PChar; Mode: LongInt; var Handle: LongInt): LongInt;
+var
+  H: THandle;
+  M: Word;
+begin
+  case Mode and 7 of
+    Open_Access_WriteOnly: M := fmOpenWrite;
+    Open_Access_ReadWrite: M := fmOpenReadWrite;
+  else
+    M := fmOpenRead;
+  end;
+  H := FileOpen(StrPas(FileName), M or fmShareDenyNone);
+  if H = THandle(-1) then
+  begin
+    Handle := 0;
+    Result := ErrorOfFile;
+  end
+  else
+  begin
+    Handle := H;
+    Result := 0;
+  end;
+end;
+
+function SysFileCreate(FileName: PChar; Mode, Attr: LongInt; var Handle: LongInt): LongInt;
+var
+  H: THandle;
+begin
+  H := FileCreate(StrPas(FileName));
+  if H = THandle(-1) then
+  begin
+    Handle := 0;
+    Result := ErrorOfFile;
+  end
+  else
+  begin
+    Handle := H;
+    Result := 0;
+  end;
+end;
+
+function SysFileSeek(Handle: THandle; Distance, Method: LongInt; var Actual: LongInt): LongInt;
+var
+  R: Int64;
+begin
+  R := FileSeek(Handle, Int64(Distance), Method);
+  if R < 0 then
+  begin
+    Actual := 0;
+    Result := ErrorOfFile;
+  end
+  else
+  begin
+    Actual := R;
+    Result := 0;
+  end;
+end;
+
+function SysFileRead(Handle: THandle; var Buffer; Count: LongInt; var Actual: LongInt): LongInt;
+begin
+  Actual := FileRead(Handle, Buffer, Count);
+  if Actual < 0 then
+  begin
+    Actual := 0;
+    Result := ErrorOfFile;
+  end
+  else
+    Result := 0;
+end;
+
+function SysFileWrite(Handle: THandle; const Buffer; Count: LongInt; var Actual: LongInt): LongInt;
+begin
+  Actual := FileWrite(Handle, Buffer, Count);
+  if Actual < 0 then
+  begin
+    Actual := 0;
+    Result := ErrorOfFile;
+  end
+  else
+    Result := 0;
+end;
+
 function SysFileClose(Handle: THandle): LongInt;
 begin
   FileClose(Handle);
@@ -112,6 +229,72 @@ begin
   Result := 0;                 { no devices to tell from files on the systems of the tests }
 end;
 {$ENDIF}
+
+{ --- searching a directory ---------------------------------------------------- }
+
+const
+  MaxSearches = 64;
+type
+  PSysSearch = ^SysUtils.TSearchRec;
+var
+  Searches: array[1..MaxSearches] of PSysSearch;
+
+procedure Fill(var F: TOSSearchRec; const R: SysUtils.TSearchRec; IsPChar: Boolean);
+var
+  N: ShortString;
+begin
+  N := ShortString(R.Name);
+  F.Attr := Byte(R.Attr);
+  F.Time := R.Time;
+  F.Size := R.Size;
+  F.Name := N;
+  F.Name[Length(N) + 1] := #0;
+end;
+
+function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
+var
+  I: Integer;
+begin
+  I := 1;
+  while (I <= MaxSearches) and (Searches[I] <> nil) do
+    Inc(I);
+  if I > MaxSearches then
+    Exit(4);                       { too many open files }
+  New(Searches[I]);
+  if SysUtils.FindFirst(StrPas(Path), Attr, Searches[I]^) <> 0 then
+  begin
+    SysUtils.FindClose(Searches[I]^);
+    Dispose(Searches[I]);
+    Searches[I] := nil;
+    F.Handle := 0;
+    Exit(18);
+  end;
+  F.Handle := I;
+  Fill(F, Searches[I]^, IsPChar);
+  Result := 0;
+end;
+
+function SysFindNext(var F: TOSSearchRec; IsPChar: Boolean): LongInt;
+begin
+  if (F.Handle < 1) or (F.Handle > MaxSearches) or (Searches[F.Handle] = nil) then
+    Exit(6);                       { invalid handle }
+  if SysUtils.FindNext(Searches[F.Handle]^) <> 0 then
+    Exit(18);
+  Fill(F, Searches[F.Handle]^, IsPChar);
+  Result := 0;
+end;
+
+function SysFindClose(var F: TOSSearchRec): LongInt;
+begin
+  if (F.Handle >= 1) and (F.Handle <= MaxSearches) and (Searches[F.Handle] <> nil) then
+  begin
+    SysUtils.FindClose(Searches[F.Handle]^);
+    Dispose(Searches[F.Handle]);
+    Searches[F.Handle] := nil;
+  end;
+  F.Handle := 0;
+  Result := 0;
+end;
 
 { --- disks -------------------------------------------------------------------- }
 
