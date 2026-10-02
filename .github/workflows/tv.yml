@@ -7,6 +7,7 @@ on:
     paths:
       - tv/**
       - tools/dos-run.sh
+      - tools/render-dump.py
       - tools/build-fpc-go32v2.sh
       - .github/workflows/tv.yml
 
@@ -31,7 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl make bzip2 git curl dosbox-x unzip
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl make bzip2 git curl dosbox-x unzip python3-pil fonts-dejavu-core
       - name: Cross toolchain cache
         id: cache
         uses: actions/cache@v4
@@ -51,3 +52,27 @@ jobs:
             ../../tools/dos-run.sh ../../out "${t%.pas}.exe" | tee ../../out/${t%.pas}.txt
             grep -q '^ALL OK' ../../out/${t%.pas}.txt
           done
+      - name: Tests of the DOS backend (video memory, keyboard, mouse, clock)
+        run: |
+          mkdir -p out2
+          cd tv/dostests
+          ~/fpc-go32v2/bin/fpc-go32v2 -Fu../src -Fu. -FE../../out2 t_dosbk.pas | grep -E 'Error|Fatal' && exit 1
+          ../../tools/dos-run.sh ../../out2 t_dosbk.exe | tee ../../out2/t_dosbk.txt
+          grep -q '^ALL OK' ../../out2/t_dosbk.txt
+      - name: Demo under DOS (the screen is dumped from video memory)
+        run: |
+          cd tv/demo
+          ~/fpc-go32v2/bin/fpc-go32v2 -Fu../src -Fu. -FE../../out2 tvdemo.pas | grep -E 'Error|Fatal' && exit 1
+          ../../tools/dos-run.sh ../../out2 "tvdemo.exe /auto"
+          dump=$(ls ../../out2 | grep -i '^scr\.dat$' | tail -1)
+          test -n "$dump"
+          python3 ../../tools/render-dump.py "../../out2/$dump" ../../out2/screen.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dos-demo
+          path: |
+            out2/screen.png
+            out2/*.dat
+            out2/*.DAT
+            out2/t_dosbk.txt
