@@ -1,7 +1,7 @@
 program t_vpsys;
 { Tests of dn/new/vpsyslow.pas (the system layer of DN on Free Pascal). }
 {$mode objfpc}{$H-}
-uses SysUtils, Strings, VPSysLow, TvScreen, TvCell, TvColors;
+uses SysUtils, Strings, {$IFDEF UNIX}BaseUnix, {$ENDIF}VPSysLow, TvScreen, TvCell, TvColors;
 {$I dntest.inc}
 
 var
@@ -55,6 +55,20 @@ begin
   StrPCopy(P, 'vpsys2.nothing');
   Check(SysFindFirst(P, 0, Srch, False) <> 0, 'a missing file is not found');
   DeleteFile('vpsys2.tmp');
+{$IFDEF UNIX}
+  { a link to a directory is found with SysLinkAttr (DN does not enter it: /proc/self/root is a loop) }
+  CreateDir('vpsys_dir');
+  FpSymlink('vpsys_dir', 'vpsys_lnk');
+  StrPCopy(P, 'vpsys_lnk');
+  Check((SysFindFirst(P, $10, Srch, False) = 0) and (Srch.Attr and SysLinkAttr <> 0) and (Srch.Attr and $10 <> 0),
+    'a link to a directory: SysLinkAttr and the directory bit');
+  SysFindClose(Srch);
+  StrPCopy(P, 'vpsys_dir');
+  Check((SysFindFirst(P, $10, Srch, False) = 0) and (Srch.Attr and SysLinkAttr = 0), 'a directory is not a link');
+  SysFindClose(Srch);
+  DeleteFile('vpsys_lnk');
+  RemoveDir('vpsys_dir');
+{$ENDIF}
 
   { a file: size, close }
   Name := 'vpsys.tmp';
