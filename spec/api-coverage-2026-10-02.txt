@@ -1,0 +1,99 @@
+unit              names  present       uses
+views.pas       53/60    88%   2852/3031    94%
+_defines.pas    39/60    65%   2150/2653    81%
+_views.pas      55/60    91%   2057/2147    95%
+defines.pas      8/28    28%   1041/1470    70%
+collect.pas     16/20    80%   1050/1070    98%
+_collect.pas    15/16    93%   1049/1058    99%
+messages.pas    15/30    50%    728/794     91%
+tvhc.pas         2/2    100%    792/792    100%
+streams.pas      9/20    45%    595/755     78%
+dnstddlg.pas    14/17    82%    122/700     17%
+helpkern.pas     3/7     42%    679/689     98%
+dialogs.pas     24/37    64%    589/624     94%
+_dialogs.pas    19/19   100%    500/500    100%
+dnapp.pas       14/34    41%    209/492     42%
+colorsel.pas    13/14    92%    414/417     99%
+_streams.pas     4/13    30%    144/296     48%
+_apps.pas       12/15    80%     75/88      85%
+validate.pas     5/5    100%     67/67     100%
+memory.pas       1/6     16%     20/56      35%
+fviewer.pas      1/11     9%      9/55      16%
+histlist.pas     5/8     62%     34/44      77%
+scroller.pas     4/4    100%     42/42     100%
+calendar.pas     1/6     16%      5/36      13%
+version.pas      0/3      0%      0/36       0%
+gauge.pas        0/5      0%      0/20       0%
+_gauge.pas       0/5      0%      0/20       0%
+gauges.pas       0/7      0%      0/15       0%
+asciitab.pas     0/4      0%      0/15       0%
+strview.pas      0/2      0%      0/8        0%
+colorvga.pas     1/1    100%      7/7      100%
+topview_.pas     0/3      0%      0/6        0%
+helpfile.pas     0/3      0%      0/5        0%
+usersavr.pas     0/2      0%      0/4        0%
+advance6.pas     0/3      0%      0/3        0%
+listmakr.pas     0/2      0%      0/3        0%
+TOTAL names 333/532 (62%), uses 15230/18018 (84%)
+
+missing, by uses:
+  sr                             559  (dnstddlg.pas)
+  pstring                        259  (defines.pas)
+  pstring                        259  (_defines.pas)
+  eof                             95  (streams.pas)
+  eof                             95  (_streams.pas)
+  ppalette                        73  (views.pas)
+  ppalette                        73  (_defines.pas)
+  globalmessage                   67  (dnapp.pas)
+  execresource                    67  (dnapp.pas)
+  txlat                           46  (defines.pas)
+  txlat                           46  (_defines.pas)
+  plongstring                     44  (defines.pas)
+  plongstring                     44  (_defines.pas)
+  loadresource                    35  (dnapp.pas)
+  writemsg                        31  (dnapp.pas)
+  putpeerviewptr                  30  (views.pas)
+  putpeerviewptr                  30  (_views.pas)
+  getpeerviewptr                  30  (views.pas)
+  getpeerviewptr                  30  (_views.pas)
+  d2                              25  (version.pas)
+  readstrv                        21  (streams.pas)
+  readstrv                        21  (_streams.pas)
+  tawordarray                     20  (defines.pas)
+  updatewriteview                 15  (dnapp.pas)
+  memalloc                        14  (memory.pas)
+  errmsg                          14  (messages.pas)
+  searchfilestr                   13  (fviewer.pas)
+  getfilenamedialog               13  (dnstddlg.pas)
+  fnamestr                        13  (defines.pas)
+  putsubviewptr                   12  (views.pas)
+  putsubviewptr                   12  (_views.pas)
+  getsubviewptr                   12  (views.pas)
+  getsubviewptr                   12  (_views.pas)
+  tphase                          11  (_defines.pas)
+  searchstring                    11  (fviewer.pas)
+  registertobackground            11  (views.pas)
+  pvideobuf                       11  (views.pas)
+  pvideobuf                       11  (_defines.pas)
+  curdate                         11  (calendar.pas)
+  globalmessagel                  10  (dnapp.pas)
+  adjusttodesktopsize             10  (dnapp.pas)
+  writelongstr                     9  (streams.pas)
+  writelongstr                     9  (_streams.pas)
+  str8                             9  (defines.pas)
+  str8                             9  (_defines.pas)
+  dayofweek                        9  (calendar.pas)
+  atreplace                        9  (collect.pas)
+  atreplace                        9  (_collect.pas)
+  togglecommandline                7  (dnapp.pas)
+  readlongstr                      7  (streams.pas)
+  readlongstr                      7  (_streams.pas)
+  mfallbutton                      7  (messages.pas)
+  mfallbutton                      7  (_defines.pas)
+  donememory                       7  (memory.pas)
+  biginputbox                      7  (messages.pas)
+  str12                            6  (defines.pas)
+  str12                            6  (_defines.pas)
+  reregistertype                   6  (streams.pas)
+  mfquery                          6  (messages.pas)
+  mfquery                          6  (_defines.pas)

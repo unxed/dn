@@ -195,6 +195,17 @@
 - DOS-шаг CI прогоняет все тесты и печатает компактный отчёт `--- t_xxx`; локально DOS
   не запускается (CWSDPMI не скачивается через прокси), только кросс-компиляция.
 
+### Покрытие API DN (2026-10-02)
+
+`tools/api-coverage.py` сверяет имена, которые чистый код DN берёт у заменяемых юнитов
+(`spec/dn-boundary-dnosp214.md`), с идентификаторами `tv/src`; отчёт —
+`spec/api-coverage-2026-10-02.txt`. Грубо: 62 % имён и **84 % употреблений** уже есть в `tv/`.
+Недостающее — это очередь адаптеров в `dn/new`: расширения DN (`GetPeerViewPtr`,
+`PutPeerViewPtr`, `GetSubViewPtr`, `PutSubViewPtr`, `RegisterToBackground`, `PVideoBuf`,
+`ReadStrV`, `GlobalMessage`, `ExecResource`, `LoadResource`, `PString`/`PLongString`...),
+а не работа над самим `tv/`. Совпадение по имени — не гарантия того же поведения: проверяет
+сборка (веха 4).
+
 ## Веха 4. DN на нашем TV (N сессий)
 
 - База: DN OSP 2.14 (решение 10). Дерево воспроизводится скриптами (решение 9):
