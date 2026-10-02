@@ -46,8 +46,11 @@ begin
     RemoveDir(AnsiString(Base + PathDelim + 'sub'));
     RemoveDir(AnsiString(Base));
   end;
+  HeapMark(-3);
   MkDir(Base);
+  HeapMark(-2);
   MkDir(Base + PathDelim + 'sub');
+  HeapMark(-1);
   Touch(Base + PathDelim + 'b.txt', 10);
   Touch(Base + PathDelim + 'a.dat', 0);
   Touch(Base + PathDelim + LongName, 5);
@@ -56,39 +59,60 @@ begin
   { paths }
   FSplit('c:\dir\sub\file.name.ext', Dir, Name, Ext);
   Check((Dir = 'c:\dir\sub\') and (Name = 'file.name') and (Ext = '.ext'), 'FSplit');
+  HeapMark(10);
   FSplit('file', Dir, Name, Ext);
   Check((Dir = '') and (Name = 'file') and (Ext = ''), 'FSplit of a bare name');
+  HeapMark(11);
   FSplit('/a/b/', Dir, Name, Ext);
   Check((Dir = '/a/b/') and (Name = '') and (Ext = ''), 'FSplit of a directory');
+  HeapMark(12);
   Check(IsWild('*.txt') and IsWild('a?') and not IsWild('abc'), 'IsWild');
+  HeapMark(13);
   Check(IsDir(Base) and not IsDir(Base + PathDelim + 'b.txt') and not IsDir(Base + PathDelim + 'nope'), 'IsDir');
+  HeapMark(14);
   Check(PathValid(Base) and PathValid(Base + PathDelim) and not PathValid(Base + PathDelim + 'nope'), 'PathValid');
+  HeapMark(15);
   Check(ValidFileName(Base + PathDelim + 'x.txt') and ValidFileName('name.txt'), 'valid file names');
+  HeapMark(16);
   Check(not ValidFileName('na|me.txt') and not ValidFileName('a.b|c.d'), 'illegal characters');
+  HeapMark(17);
   Check(not ValidFileName(Base + PathDelim + 'nope' + PathDelim + 'x.txt'), 'a name in a missing directory');
+  HeapMark(18);
   Check(DriveValid(GetDisk), 'the current drive is valid');
+  HeapMark(19);
   Dir := GetCurDir;
   Check((Dir <> '') and (Dir[Length(Dir)] in ['/', '\']), 'GetCurDir ends with a separator');
+  HeapMark(20);
   Check(FExpand('x.txt') = ShortString(ExpandFileName('x.txt')), 'FExpand');
+  HeapMark(21);
 
   HeapMark(2);             { 2: the path functions are done }
   { the search }
   F.Init;
   Check(F.First(Base + PathDelim + AllMask, faDirectory), 'First finds something');
+  HeapMark(22);
   N := 0;
   repeat
     Inc(N);
   until not F.Next;
   F.Close;
+  HeapMark(23);
   Check(N >= 4, 'all entries are found (files, the directory, maybe . and ..)');
+  HeapMark(24);
   Check(F.First(Base + PathDelim + 'b.*', 0) and (Same(F.Rec.Name, 'b.txt')) and (F.Rec.Size = 10) and
     ((F.Rec.Attr and faDirectory) = 0), 'a mask: name, size, attributes');
+  HeapMark(25);
   Check(not F.Next, 'one match only');
+  HeapMark(26);
   Check(F.First(Base + PathDelim + Copy(LongName, 1, Pos('.', LongName) - 1) + '.*', 0) and (Same(F.Rec.Name, LongName)),
     'a long name with blanks');
+  HeapMark(27);
   F.Close;
+  HeapMark(28);
   Check(not F.First(Base + PathDelim + '*.zzz', 0), 'nothing found');
+  HeapMark(29);
   F.Done;
+  HeapMark(30);
 
   HeapMark(3);             { 3: the search is done }
   { the collections }
