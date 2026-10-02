@@ -36,3 +36,20 @@ jobs:
         run: |
           awk 'NR>1 && $1!="TOTAL" { r=$3; sub("%","",r); if (r+0 > 2 || $6+0 >= 48) n++ } END { print n+0, "files over the gate" }' audit-${{ matrix.upstream }}.txt
           tail -1 audit-${{ matrix.upstream }}.txt
+
+  probe:
+    # How much of the tree FPC takes as it is (the work list for the porting patches).
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch fp-compiler fp-units-rtl
+      - name: Make the tree (DN OSP 2.14)
+        run: tools/dn-materialize.sh dnosp214
+      - name: Compile every unit (mode tp), the first errors by kind
+        run: tools/dn-probe.sh tp | tee probe-tp.txt
+      - name: The same in mode objfpc
+        run: tools/dn-probe.sh objfpc | tee probe-objfpc.txt
+      - name: Per unit results
+        if: always()
+        run: cat build/probe/result.txt | sort | head -300
