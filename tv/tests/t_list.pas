@@ -150,13 +150,13 @@ begin
 
   { the data }
   L^.GetData(Rec);
-  Check((Rec.Items = L^.Items) and (Rec.Selection = L^.Focused), 'GetData');
-  Rec.Items := Items(3);
+  Check((Rec.List = L^.List) and (Rec.Selection = L^.Focused), 'GetData');
+  Rec.List := Items(3);
   Rec.Selection := 2;
   L^.SetData(Rec);
   Check((L^.Range = 3) and (L^.Focused = 2), 'SetData replaces the items and focuses one');
   L^.NewList(nil);
-  Check((L^.Range = 0) and (L^.Items = nil), 'NewList(nil) empties the list');
+  Check((L^.Range = 0) and (L^.List = nil), 'NewList(nil) empties the list');
 
   Dispose(App, Done);
   MemDone;

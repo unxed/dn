@@ -76,23 +76,23 @@ begin
 
   Check(Same(Dlg^.DirInput^.Data^, NoDrive(Copy(Dir, 1, Length(Dir) - 1))),
     'the input line shows the current directory (without the drive and the end separator)');
-  Check(Dlg^.DirList^.Items^.Count >= 5, 'Drives, the path and the subdirectories are listed');
+  Check(Dlg^.DirList^.List^.Count >= 5, 'Drives, the path and the subdirectories are listed');
   Check(Line(Dlg^.DirList, 0) = DrivesText, 'the first line is "Drives"');
   Check(Pos(PathDirText, Line(Dlg^.DirList, 1)) = 1, 'then the root with the tree mark');
   Check(Dlg^.DirList^.Cur = Dlg^.DirList^.Focused, 'the current directory is focused');
   Check(Same(Dlg^.DirList^.DirItem(Dlg^.DirList^.Cur)^.Dir^, NoDrive(Copy(Dir, 1, Length(Dir) - 1))),
     'and its path is the one of the directory');
   { the subdirectories are the last two lines }
-  Check(PosI('one', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 2)) > 0, 'the first subdirectory');
-  Check(PosI('two', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0, 'the second subdirectory');
-  Check(Pos(#$C0#$C4, Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0,
+  Check(PosI('one', Line(Dlg^.DirList, Dlg^.DirList^.List^.Count - 2)) > 0, 'the first subdirectory');
+  Check(PosI('two', Line(Dlg^.DirList, Dlg^.DirList^.List^.Count - 1)) > 0, 'the second subdirectory');
+  Check(Pos(#$C0#$C4, Line(Dlg^.DirList, Dlg^.DirList^.List^.Count - 1)) > 0,
     'the last line ends the tree');
 
   { choosing a subdirectory with the Chdir command }
-  Dlg^.DirList^.FocusItem(Dlg^.DirList^.Items^.Count - 1);   { two }
+  Dlg^.DirList^.FocusItem(Dlg^.DirList^.List^.Count - 1);   { two }
   Command(Dlg, cmChangeDir);
   Check(Same(Copy(Dlg^.DirInput^.Data^, Length(Dlg^.DirInput^.Data^) - 2, 3), 'two'), 'Chdir puts the directory into the input line');
-  Check(PosI('deep', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0, 'and the list shows its subdirectories');
+  Check(PosI('deep', Line(Dlg^.DirList, Dlg^.DirList^.List^.Count - 1)) > 0, 'and the list shows its subdirectories');
 
   { Revert returns to the current directory }
   Command(Dlg, cmRevert);
@@ -111,8 +111,8 @@ begin
   { the drives }
   Dlg^.DirList^.NewDirectory(DrivesText);
   Check(Line(Dlg^.DirList, 0) = DrivesText, 'drives: the first line');
-  Check(Dlg^.DirList^.Items^.Count >= 2, 'drives: at least one drive');
-  P := Dlg^.DirList^.DirItem(Dlg^.DirList^.Items^.Count - 1);
+  Check(Dlg^.DirList^.List^.Count >= 2, 'drives: at least one drive');
+  P := Dlg^.DirList^.DirItem(Dlg^.DirList^.List^.Count - 1);
   Check(Pos(LastDirText, P^.Text^) = 1, 'the last drive ends the tree');
 
   Dispose(App, Done);

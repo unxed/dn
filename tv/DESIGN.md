@@ -361,3 +361,7 @@
   без типа был бы неоднозначен с `PScreenCell`.
 - Символ — байт кодовой страницы экрана (как у `TDrawBuffer.MoveChar`); цвета с RGB/xterm при переводе в BIOS-байт
   теряют точность — для DOS и 16 цветов это без потерь.
+
+- `TListBox.List` (а не `Items`): имя поля из Pascal TV (`TListBoxRec.List`); в `TSortedListBox` типизированный доступ
+  стал функцией `SortedList` (в C++ он `list()`). Формы Pascal TV `GetBounds/GetExtent/GetClipRect(var R)` и
+  `MakeLocal/MakeGlobal(Source; var Dest)` — перегрузки (`overload`) функций magiblot.
