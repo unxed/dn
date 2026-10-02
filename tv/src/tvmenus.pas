@@ -13,6 +13,9 @@
     - items and menus are records, names are pointers to ShortStrings (nil name =
       separator line);
     - the menu bar and popup menu free their menu in Done, the menu box does not;
+    - the status line is built with NewStatusDef and NewStatusKey (Pascal Turbo
+      Vision) and frees its definitions in Done; its Hint method returns a
+      ShortString;
     - streams are not translated yet. }
 unit TvMenus;
 
@@ -48,6 +51,9 @@ type
   PMenuBar = ^TMenuBar;
   PMenuBox = ^TMenuBox;
   PMenuPopup = ^TMenuPopup;
+  PStatusItem = ^TStatusItem;
+  PStatusDef = ^TStatusDef;
+  PStatusLine = ^TStatusLine;
 
   { Palette: 1 = normal text, 2 = disabled text, 3 = hot key of normal text,
     4 = selected, 5 = disabled selected, 6 = hot key of selected }
@@ -102,6 +108,38 @@ type
     procedure HandleEvent(var Event: TEvent); virtual;
   end;
 
+  TStatusItem = record
+    Next: PStatusItem;
+    Text: PStr;
+    Key: TKey;
+    Command: Word;
+  end;
+
+  { the items shown for the help contexts Min..Max }
+  TStatusDef = record
+    Next: PStatusDef;
+    Min, Max: Word;
+    Items: PStatusItem;
+  end;
+
+  { Palette: 1 = normal text, 2 = disabled text, 3 = hot key of normal text,
+    4 = selected, 5 = disabled selected, 6 = hot key of selected }
+  TStatusLine = object(TView)
+    Items: PStatusItem;
+    Defs: PStatusDef;
+    constructor Init(const Bounds: TRect; ADefs: PStatusDef);
+    destructor Done; virtual;
+    procedure Draw; virtual;
+    function GetPalette: TPalette; virtual;
+    procedure HandleEvent(var Event: TEvent); virtual;
+    function Hint(AHelpCtx: Word): ShortString; virtual;
+    procedure Update;
+  private
+    procedure DrawSelect(Selected: PStatusItem);
+    procedure FindItems;
+    function ItemMouseIsIn(Mouse: TPoint): PStatusItem;
+  end;
+
 function NewMenu(Items: PMenuItem): PMenu;
 function NewSubMenu(const Name: ShortString; AHelpCtx: Word; SubMenu: PMenu;
   Next: PMenuItem): PMenuItem;
@@ -110,6 +148,10 @@ function NewItem(const Name, Param: ShortString; AKeyCode, ACommand, AHelpCtx: W
 function NewLine(Next: PMenuItem): PMenuItem;
 { Frees a menu, its items and submenus. }
 procedure DisposeMenu(Menu: PMenu);
+
+function NewStatusKey(const AText: ShortString; AKeyCode, ACommand: Word;
+  ANext: PStatusItem): PStatusItem;
+function NewStatusDef(AMin, AMax: Word; AItems: PStatusItem; ANext: PStatusDef): PStatusDef;
 
 implementation
 
@@ -938,6 +980,240 @@ begin
       ClearEvent(Event);
   end;
   inherited HandleEvent(Event);
+end;
+
+{ --- status line ------------------------------------------------------------- }
+
+const
+  { the separator between the items and the hint: CP437 vertical line and a space }
+  HintSeparator = #$B3' ';
+
+function NewStatusKey(const AText: ShortString; AKeyCode, ACommand: Word;
+  ANext: PStatusItem): PStatusItem;
+begin
+  New(Result);
+  Result^.Next := ANext;
+  Result^.Text := NewStr(AText);
+  Result^.Key := KeyMake(AKeyCode);
+  Result^.Command := ACommand;
+end;
+
+function NewStatusDef(AMin, AMax: Word; AItems: PStatusItem; ANext: PStatusDef): PStatusDef;
+begin
+  New(Result);
+  Result^.Next := ANext;
+  Result^.Min := AMin;
+  Result^.Max := AMax;
+  Result^.Items := AItems;
+end;
+
+constructor TStatusLine.Init(const Bounds: TRect; ADefs: PStatusDef);
+begin
+  inherited Init(Bounds);
+  Defs := ADefs;
+  Options := Options or ofPreProcess;
+  EventMask := EventMask or evBroadcast;
+  GrowMode := gfGrowLoY or gfGrowHiX or gfGrowHiY;
+  FindItems;
+end;
+
+destructor TStatusLine.Done;
+var
+  T: PStatusDef;
+  I, TI: PStatusItem;
+begin
+  while Defs <> nil do
+  begin
+    T := Defs;
+    Defs := Defs^.Next;
+    I := T^.Items;
+    while I <> nil do
+    begin
+      TI := I;
+      I := I^.Next;
+      DisposeStr(TI^.Text);
+      Dispose(TI);
+    end;
+    Dispose(T);
+  end;
+  Items := nil;
+  inherited Done;
+end;
+
+procedure TStatusLine.Draw;
+begin
+  DrawSelect(nil);
+end;
+
+procedure TStatusLine.DrawSelect(Selected: PStatusItem);
+var
+  B: TDrawBuffer;
+  Color, CNormal, CSelect, CNormDisabled, CSelDisabled: TAttrPair;
+  T: PStatusItem;
+  I, L: Integer;
+  HintText: ShortString;
+begin
+  CNormal := GetColor($0301);
+  CSelect := GetColor($0604);
+  CNormDisabled := GetColor($0202);
+  CSelDisabled := GetColor($0505);
+  B.Init(Size.X);
+  B.MoveChar(0, Ord(' '), CNormal.Lo, Size.X);
+  T := Items;
+  I := 0;
+  while T <> nil do
+  begin
+    if T^.Text <> nil then
+    begin
+      L := CStrLen(T^.Text^);
+      if I + L < Size.X then
+      begin
+        if CommandEnabled(T^.Command) then
+        begin
+          if T = Selected then
+            Color := CSelect
+          else
+            Color := CNormal;
+        end
+        else if T = Selected then
+          Color := CSelDisabled
+        else
+          Color := CNormDisabled;
+        B.MoveChar(I, Ord(' '), Color.Lo, 1);
+        B.MoveCStrS(I + 1, T^.Text^, Color);
+        B.MoveChar(I + L + 1, Ord(' '), Color.Lo, 1);
+      end;
+      Inc(I, L + 2);
+    end;
+    T := T^.Next;
+  end;
+  if I < Size.X - 2 then
+  begin
+    HintText := Hint(HelpCtx);
+    if HintText <> '' then
+    begin
+      B.MoveStrS(I, HintSeparator, CNormal.Lo);
+      Inc(I, 2);
+      B.MoveStrS(I, HintText, CNormal.Lo, Size.X - I);
+    end;
+  end;
+  WriteLineD(0, 0, Size.X, 1, B);
+  B.Done;
+end;
+
+procedure TStatusLine.FindItems;
+var
+  P: PStatusDef;
+begin
+  P := Defs;
+  while (P <> nil) and ((HelpCtx < P^.Min) or (HelpCtx > P^.Max)) do
+    P := P^.Next;
+  if P = nil then
+    Items := nil
+  else
+    Items := P^.Items;
+end;
+
+function TStatusLine.GetPalette: TPalette;
+begin
+  Result := MakePalette(MenuViewPalette);
+end;
+
+function TStatusLine.ItemMouseIsIn(Mouse: TPoint): PStatusItem;
+var
+  I, K: Integer;
+  T: PStatusItem;
+begin
+  Result := nil;
+  if Mouse.Y <> 0 then
+    Exit;
+  I := 0;
+  T := Items;
+  while T <> nil do
+  begin
+    if T^.Text <> nil then
+    begin
+      K := I + CStrLen(T^.Text^) + 2;
+      if (Mouse.X >= I) and (Mouse.X < K) then
+        Exit(T);
+      I := K;
+    end;
+    T := T^.Next;
+  end;
+end;
+
+procedure TStatusLine.HandleEvent(var Event: TEvent);
+var
+  T, Hit: PStatusItem;
+  Mouse: TPoint;
+begin
+  inherited HandleEvent(Event);
+  case Event.What of
+    evMouseDown:
+      begin
+        T := nil;
+        repeat
+          Mouse := MakeLocal(Event.Where);
+          Hit := ItemMouseIsIn(Mouse);
+          if T <> Hit then
+          begin
+            T := Hit;
+            DrawSelect(T);
+          end;
+        until not MouseEvent(Event, evMouseMove);
+        if (T <> nil) and CommandEnabled(T^.Command) then
+        begin
+          Event.What := evCommand;
+          Event.Command := T^.Command;
+          Event.InfoPtr := nil;
+          PutEvent(Event);
+        end;
+        ClearEvent(Event);
+        DrawView;
+      end;
+    evKeyDown:
+      if Event.KeyCode <> kbNoKey then
+      begin
+        T := Items;
+        while T <> nil do
+        begin
+          if KeyEq(EventKey(Event), T^.Key) and CommandEnabled(T^.Command) then
+          begin
+            Event.What := evCommand;
+            Event.Command := T^.Command;
+            Event.InfoPtr := nil;
+            Exit;
+          end;
+          T := T^.Next;
+        end;
+      end;
+    evBroadcast:
+      if Event.Command = cmCommandSetChanged then
+        DrawView;
+  end;
+end;
+
+function TStatusLine.Hint(AHelpCtx: Word): ShortString;
+begin
+  Result := '';
+end;
+
+procedure TStatusLine.Update;
+var
+  P: PView;
+  H: Word;
+begin
+  P := TopView;
+  if P <> nil then
+    H := P^.GetHelpCtx
+  else
+    H := hcNoContext;
+  if HelpCtx <> H then
+  begin
+    HelpCtx := H;
+    FindItems;
+    DrawView;
+  end;
 end;
 
 end.
