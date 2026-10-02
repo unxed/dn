@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+"""Which names defined in the files that fail the audit gate do the passing files use?
+
+usage: dn-deps.py SRC_DIR AUDIT_REPORT [OUT.md]
+
+AUDIT_REPORT is the table of audit/xclone.py (file, tokens, raw%, ren%, impl%, maxrun, ref).
+A file fails the gate if raw% > 2 or maxrun >= 48. The names that the failing files declare
+(types, constants, procedures and functions, global variables) and the passing files use
+are what the replacements (tv/ or our new code) have to provide. Only names are printed.
+"""
+import os
+import re
+import sys
+from collections import defaultdict
+
+def strip(src):
+    src = re.sub(r"\(\*.*?\*\)", " ", src, flags=re.S)
+    src = re.sub(r"\{[^}]*\}", " ", src, flags=re.S)
+    src = re.sub(r"//[^\n]*", " ", src)
+    src = re.sub(r"'(?:[^'\n]|'')*'", " ", src)
+    return src
+
+DECL = [
+    re.compile(r"^\s*(?:type\s+)?([A-Za-z_]\w*)\s*=\s*(?:packed\s+)?(?:object|class|record)\b", re.I | re.M),
+    re.compile(r"^\s*(?:procedure|function)\s+([A-Za-z_]\w*)\s*[(:;]", re.I | re.M),
+    re.compile(r"^\s*([A-Za-z_]\w*)\s*(?::[^=;]+)?=\s*[-+$\d'(#]", re.M),   # constants
+    re.compile(r"^\s*([A-Za-z_]\w*)\s*=\s*(?:\^|array|set|string|procedure|function|\()", re.I | re.M),
+]
+
+def main():
+    srcdir, report = sys.argv[1], sys.argv[2]
+    out = sys.argv[3] if len(sys.argv) > 3 else None
+    bad = set()
+    for line in open(report, encoding="utf-8", errors="replace"):
+        f = line.split()
+        if len(f) >= 7 and f[2].endswith("%") and not line.startswith(("file", "TOTAL")):
+            if int(f[2][:-1]) > 2 or int(f[5]) >= 48:
+                bad.add(f[0].lower())
+    files = {}
+    for root, _, names in os.walk(srcdir):
+        for n in names:
+            if n.lower().endswith((".pas", ".inc")):
+                files[n.lower()] = strip(open(os.path.join(root, n), encoding="cp866", errors="replace").read())
+    declared_in = defaultdict(set)      # name -> failing files that declare it
+    for n, t in files.items():
+        if n in bad:
+            for rx in DECL:
+                for m in rx.finditer(t):
+                    declared_in[m.group(1).lower()].add(n)
+    declared_ok = set()
+    for n, t in files.items():
+        if n not in bad:
+            for rx in DECL:
+                for m in rx.finditer(t):
+                    declared_ok.add(m.group(1).lower())
+    used = defaultdict(lambda: [0, set()])   # name -> [count, passing files]
+    for n, t in files.items():
+        if n in bad:
+            continue
+        for m in re.finditer(r"\b[A-Za-z_]\w*\b", t):
+            w = m.group(0).lower()
+            if w in declared_in and w not in declared_ok:
+                used[w][0] += 1
+                used[w][1].add(n)
+    by_file = defaultdict(list)
+    for w, (c, fs) in used.items():
+        for f in declared_in[w]:
+            by_file[f].append((w, c, len(fs)))
+    lines = ["# Граница между чистым кодом DN и тем, что заменяет TV", "",
+             "Создано `tools/dn-deps.py` (только имена). Файлы, не прошедшие ворота: %d из %d." % (len(bad & set(files)), len(files)),
+             "Для каждого из них — имена, которые он объявляет и которые используют прошедшие файлы.", ""]
+    for f in sorted(by_file, key=lambda f: -sum(c for _, c, _ in by_file[f])):
+        items = sorted(by_file[f], key=lambda x: -x[1])
+        lines.append("## %s — %d имён, %d употреблений" % (f, len(items), sum(c for _, c, _ in items)))
+        lines.append("")
+        lines.append(", ".join("%s (%d/%d)" % x for x in items[:60]) + (" …" if len(items) > 60 else ""))
+        lines.append("")
+    lines.append("(в скобках: употреблений / файлов)")
+    s = "\n".join(lines) + "\n"
+    if out:
+        open(out, "w", encoding="utf-8").write(s)
+    print(s[:6000])
+
+main()
