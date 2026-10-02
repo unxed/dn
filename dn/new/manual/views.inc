@@ -28,3 +28,15 @@ type
 procedure RegisterToBackground(P: PView);
 procedure UnregisterFromBackground(P: PView);
 procedure RunBackground;
+
+type
+  { A scroll bar of the panels of DN. TODO: DN hides the bar by an option of the setup (Startup); here it is an
+    ordinary scroll bar. }
+  PMyScrollBar = ^TMyScrollBar;
+  TMyScrollBar = object(TScrollBar)
+    procedure Draw; virtual;
+  end;
+
+  { the video buffer of DN: 80x25 cells of 16 bits }
+  PVideoBuf = ^TVideoBuf;
+  TVideoBuf = array[0..3999] of Word;
