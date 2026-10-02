@@ -40,6 +40,7 @@ type
   TProgram = object(TvApp.TApplication)
     IdleSecs: TEventTimer;
     constructor Init;
+    destructor Done; virtual;
     procedure ActivateView(P: PView);
     { the screen savers of DN (the list of the available ones, the choice of one): TODO, nothing is done; Data is a TSaversData }
     procedure InsertAvIdlerN(const Data; N: Integer);
@@ -158,6 +159,24 @@ begin
   DNTrace('TProgram.Init: done, size=' + IntToStr(Size.X) + 'x' + IntToStr(Size.Y));
 end;
 
+{ As TProgram.Done of DN: the menu, the status line and the desktop are disposed first and Application is nil before the group
+  is destroyed (the broadcasts that the views send while they go find nobody: the command line looks at Desktop^). The Done of
+  TvApp.TProgram is not called (it clears the pointers and destroys the group in one go). }
+destructor TProgram.Done;
+begin
+  if MenuBar <> nil then
+    Dispose(MenuBar, Done);
+  MenuBar := nil;
+  if StatusLine <> nil then
+    Dispose(StatusLine, Done);
+  StatusLine := nil;
+  if Desktop <> nil then
+    Dispose(Desktop, Done);
+  Desktop := nil;
+  Application := nil;
+  TvViews.TGroup.Done;
+end;
+
 procedure TProgram.ActivateView(P: PView);
 begin
   if P <> nil then
@@ -184,6 +203,8 @@ begin
     if ((Event.What and evKeyDown) <> 0) or
        (((Event.What and evMouseDown) <> 0) and StatusLine^.MouseInView(Event.Where)) then
       StatusLine^.HandleEvent(Event);
+  if Event.What = evKeyDown then
+    DNTrace('key ' + IntToHex(Event.KeyCode, 4) + ' shift ' + IntToHex(Event.ControlKeyState, 4));
   if Event.What <> evNothing then
   begin
     OldShiftState := ShiftState;
@@ -193,9 +214,10 @@ begin
 end;
 
 { A test aid: with the environment variable DNDUMP=file the screen is written to the file (TvDos.DosDumpScreen: see
-  tools/render-dump.py) after DNDUMPSEC seconds (default 3), and the program ends. DNKEYS=1C0D,011B,... (hex key codes,
-  scan code and character: 1C0D is Enter, 011B Esc, 3B00 F1) are put into the keyboard buffer, one a second, starting
-  after the first second: they drive the program before the dump. }
+  tools/render-dump.py) after DNDUMPSEC seconds (default 3), and the program ends. DNKEYS=1C0D,011B,A2D00,... (hex key codes,
+  scan code and character: 1C0D is Enter, 011B Esc, 3B00 F1; the letters S, C, A before the code hold Shift, Ctrl, Alt: A2D00 is
+  Alt-X) are put into the keyboard buffer, one a second, starting after the first second: they drive the program
+  before the dump. }
 var
   DumpStart: QWord = 0;
   Keys: String = '';
@@ -216,6 +238,7 @@ var
   Sec, N, I: LongInt;
   V: PView;
   NoShift: Word;
+  Entry: String;
 begin
   Name := GetEnvironmentVariable('DNDUMP');
   if Name = '' then
@@ -238,7 +261,20 @@ begin
     I := Pos(',', Keys);
     if I = 0 then
       I := Length(Keys) + 1;
-    DosStuffKey(StrToIntDef('$' + Copy(Keys, 1, I - 1), 0));
+    { the modifiers before the code: S (shift), C (ctrl), A (alt): the shift flags of the BIOS while the key is read }
+    Entry := Copy(Keys, 1, I - 1);
+    NoShift := 0;
+    while (Entry <> '') and (UpCase(Entry[1]) in ['S', 'C', 'A']) do
+    begin
+      case UpCase(Entry[1]) of
+        'S': NoShift := NoShift or 2;
+        'C': NoShift := NoShift or 4;
+        'A': NoShift := NoShift or 8;
+      end;
+      Delete(Entry, 1, 1);
+    end;
+    dosmemput($40, $17, NoShift, 2);
+    DosStuffKey(StrToIntDef('$' + Entry, 0));
     Delete(Keys, 1, I);
     Inc(KeysSent);
   end;
@@ -382,12 +418,16 @@ var
   D: PDialog;
 begin
   Result := cmCancel;
+  DNTrace('ExecResource ' + IntToStr(Ord(Key)));
   D := LoadDialog(Key);
+  DNTrace('ExecResource: loaded ' + IntToHex(PtrUInt(D), 8));
   if D = nil then
     Exit;
-  if @PreExecuteDialog <> nil then
+  if Assigned(PreExecuteDialog) then
     PreExecuteDialog(D);
+  DNTrace('ExecResource: executing');
   Result := ExecDialog(D, Data);
+  DNTrace('ExecResource: done ' + IntToStr(Result));
   Dispose(D, Done);
   PreExecuteDialog := nil;
 end;

@@ -32,6 +32,8 @@ type
   TStrCollection = object(TSortedCollection)
     function Compare(Key1, Key2: Pointer): Integer; virtual;
     procedure FreeItem(Item: Pointer); virtual;
+    function GetItem(var S: TStream): Pointer; virtual;
+    procedure PutItem(var S: TStream; Item: Pointer); virtual;
   end;
 
   { a collection of lines (not sorted) }
@@ -40,6 +42,8 @@ type
     LongStrings: Boolean;
     constructor Init(ALimit, ADelta: LongInt; ALongStrings: Boolean);
     procedure FreeItem(Item: Pointer); virtual;
+    function GetItem(var S: TStream): Pointer; virtual;
+    procedure PutItem(var S: TStream; Item: Pointer); virtual;
   end;
 
   { a collection of the names of directories: the names are compared without the case }

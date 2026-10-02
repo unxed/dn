@@ -18,8 +18,9 @@ Run
       c:
       dn
   Start it in a directory you do not mind: DN writes its configuration (DN.INI, DN.HIS...) next to the program.
-  Keys: F10 menu, Tab switches the panel, Enter enters a directory, Alt-X quits (not yet reliable: if the screen
-  stops reacting, close the emulator).
+  Keys: F10 menu, Tab switches the panel, Enter enters a directory, F7 makes a directory, Alt-X quits (asks first).
+  Enter on a program does not work yet (it would run it: the part of DN that starts programs is not ported); if the
+  screen stops reacting, close the emulator.
 
 Based on Dos Navigator by RIT Research Labs.
 Rebuilding: tools/dn-dist.sh in the repository (needs the DOS cross compiler: tools/build-fpc-go32v2.sh).

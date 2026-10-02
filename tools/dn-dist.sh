@@ -37,5 +37,7 @@ scen() {
 scen start 4 ""
 scen panels 5 "011B"
 scen menu 7 "011B,4400,1C0D"
+scen mkdir 6 "011B,4100"
+scen quit 6 "011B,A2D00"
 ( cd "$dist" && sha256sum DN.EXE *.DLG *.LNG CWSDPMI.EXE > SHA256SUMS.TXT )
 echo "dist/dos is made: $(ls "$dist" | wc -l) files"

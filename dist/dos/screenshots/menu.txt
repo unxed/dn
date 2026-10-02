@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            02:34:02p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            03:42:16p
  ┌─────────────────────────────────┐ ══╗↔════════════════ C:\ ═════════════[↕]═╗
  │ About...                        │   ║║                                      ▲
  │ Refresh display                 │   ║║TEM               │                   ■
