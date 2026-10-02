@@ -138,6 +138,11 @@ begin
   if MenuBar <> nil then
     Insert(MenuBar);
   DNTrace('menu inserted');
+  { the menu views of DN are made with a zero size (TMenuView.Init) and the program gives them the height of one row }
+  if StatusLine <> nil then
+    StatusLine^.GrowTo(StatusLine^.Size.X, 1);
+  if MenuBar <> nil then
+    MenuBar^.GrowTo(MenuBar^.Size.X, 1);
 end;
 
 procedure TProgram.ActivateView(P: PView);
@@ -184,11 +189,18 @@ var
   KeysSent: LongInt = 0;
   IdleSeen: Boolean = False;
 
+procedure TraceView(P: PView);
+begin
+  DNTrace('view ' + IntToHex(PtrUInt(P), 8) + ' origin ' + IntToStr(P^.Origin.X) + ',' + IntToStr(P^.Origin.Y) + ' size ' +
+    IntToStr(P^.Size.X) + 'x' + IntToStr(P^.Size.Y) + ' state ' + IntToHex(P^.State, 4) + ' options ' + IntToHex(P^.Options, 4));
+end;
+
 procedure CheckScreenDump;
 {$IFDEF GO32V2}
 var
   Name: String;
   Sec, N, I: LongInt;
+  V: PView;
 begin
   Name := GetEnvironmentVariable('DNDUMP');
   if Name = '' then
@@ -220,6 +232,18 @@ begin
     DNTrace('dump: screen ' + IntToStr(ScreenWidth) + 'x' + IntToStr(ScreenHeight) + ', non-blank cells in the buffer: ' + IntToStr(N) +
       ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application^.LockFlag) + ' desktop ' +
       IntToStr(Desktop^.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application^.Buffer = ScreenBuffer, True));
+    { the geometry of the main views (a test aid) }
+    V := Desktop^.Last;
+    if V <> nil then
+      repeat
+        V := V^.Next;
+        TraceView(V);
+      until V = Desktop^.Last;
+    if MenuBar <> nil then
+      TraceView(MenuBar);
+    if StatusLine <> nil then
+      TraceView(StatusLine);
+    TraceView(Desktop);
     DosDumpScreen(Name);
     Halt(0);
   end;
