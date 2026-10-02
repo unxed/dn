@@ -20,6 +20,7 @@ type
   THandle = LongInt;
   TQuad = Int64;                 { disk sizes are 64-bit }
   TFileSize = Int64;
+  TSize = TFileSize;               { the size of a file as DN names it }
   PLongInt = ^LongInt;
   TSysPoint = record
     X, Y: SmallWord;
