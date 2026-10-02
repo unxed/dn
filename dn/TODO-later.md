@@ -109,3 +109,7 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   after `set DNDUMP=SCR.DAT` + `set DNDUMPSEC=5` before the start (they say how far DN got).
 - Guesses (not checked; no guessing in the code until the data is there): the DPMI host (CWSDPMI) and the 32-bit code under the older DOSBox; a write
   to the read-only Z:; the long path; a video or keyboard call that the old DOSBox does not have (DN reads the BIOS data area, INT 10h/16h).
+
+## Sweep of the menus (Linux x86_64, 2026-10-02, tools/dn-linux-menus.py)
+126 items opened, no crash. The 8 items that the sweep marks "did not quit" are waits, not errors: Disk > Directory tree and Panel >
+Count/Compare (reading the directories of `/` takes ~20 s, Esc stops it), File > last item (the command line of the shell: waits for Enter).
