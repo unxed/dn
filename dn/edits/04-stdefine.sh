@@ -6,5 +6,5 @@
 # which the collections and groups of tv/ take. Also the switches of vpc.cfg that are not the defaults of FPC: $I- (no
 # exception on an I/O error: DN looks at IOResult), $J+ (typed constants are variables), $B- $R- $Q-.
 f=$(ls "$1" | grep -i '^stdefine\.inc$' | head -1)
-[ -n "$f" ] && printf '\r\n{$V-}\r\n{$modeswitch nestedprocvars}\r\n{$I-}\r\n{$J+}\r\n{$B-}\r\n{$R-}\r\n{$Q-}\r\n' >> "$1/$f"
+[ -n "$f" ] && printf '\r\n{$V-}\r\n{$modeswitch nestedprocvars}\r\n{$I-}\r\n{$J+}\r\n{$B-}\r\n{$R-}\r\n{$Q-}\r\n{$PACKRECORDS 1}\r\n' >> "$1/$f"
 exit 0

@@ -83,6 +83,7 @@ end;
 
 var
   RPt: TStreamRec;
+  RPt2: TStreamRec;
 
 procedure TSafeColl.Error(Code, Info: Integer);
 begin
@@ -363,6 +364,14 @@ begin
   RPt.Store := @StorePt;
   RegisterType(RPt);
   Check(FindStreamRec(4001) = @RPt, 'RegisterType');
+  RPt2 := RPt;
+  RegisterType(RPt2);
+  Check(FindStreamRec(4001) = @RPt, 'RegisterType keeps the first record of a number');
+  RPt2.Next := nil;
+  ReRegisterType(RPt2);
+  Check(FindStreamRec(4001) = @RPt2, 'DN extensions: ReRegisterType replaces it');
+  ReRegisterType(RPt);
+  Check(FindStreamRec(4001) = @RPt, 'DN extensions: and back');
   M.Init(0, 64);
   New(Pt, Create(3, -4));
   M.Put(Pt);
