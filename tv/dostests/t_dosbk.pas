@@ -2,7 +2,7 @@ program t_dosbk;
 { Tests of the DOS backend (TvDos); they run only under DOS (DOSBox-X in CI). }
 {$I ../src/tvdefs.inc}
 uses Go32, Dos, TvGeom, TvColors, TvCell, TvCodePg, TvEvents, TvKeys, TvScreen, TvViews,
-  TvWindow, TvMenus, TvSys, TvMouse, TvApp, TvDos;
+  TvWindow, TvMenus, TvSys, TvMouse, TvClip, TvApp, TvDos;
 {$I ../tests/testlib.inc}
 
 function R(A, B, C, D: Integer): TRect;
@@ -34,6 +34,7 @@ var
   Row, Want: ShortString;
   Attr: TColorAttr;
   Cell: TScreenCell;
+  Got: AnsiString;
 begin
   DosInit(866);
   Check((ScreenWidth = 80) and (ScreenHeight = 25), 'the screen is the text mode: 80x25');
@@ -117,6 +118,25 @@ begin
   Regs.bh := 0;
   Intr($10, Regs);
   Check((Regs.ch and $20) <> 0, 'a hidden caret');
+
+  { the clipboard: WinOldAp, if this DOS has it }
+  Check(ClipboardGetText = '', 'the clipboard of the program starts empty');
+  if DosClipboardAvailable then
+  begin
+    WriteLn('INFO WinOldAp is available');
+    Check(Assigned(OnClipboardSet) and Assigned(OnClipboardGet), 'DosInit connected the clipboard');
+    ClipboardSetText('Привет'#10'мир');
+    Check(ClipboardIsSystem, 'the text reached the Windows clipboard');
+    Check(DosClipGet(Got) and (Got = 'Привет'#13#10'мир'), 'and comes back as CP866 text with CR LF');
+    Check(ClipboardGetText = 'Привет'#13#10'мир', 'ClipboardGetText takes it from the system');
+  end
+  else
+  begin
+    WriteLn('INFO WinOldAp is not available in this DOS');
+    Check(not Assigned(OnClipboardSet), 'no WinOldAp: no system clipboard hook');
+    ClipboardSetText('local');
+    Check((ClipboardGetText = 'local') and not ClipboardIsSystem, 'the internal buffer works');
+  end;
 
   { the whole loop: Alt-X typed on the keyboard quits the program }
   DosStuffKey($2D00);
