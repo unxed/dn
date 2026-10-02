@@ -1,24 +1,24 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:27:37p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:45:28p
 x──────────────── C:\ ─────────────────┐x──────────────── C:\ ─────────────────┐
 │       Name       │       Name        ││       Name       │       Name        │
 │TEM           ╔═[■]═════════════════ Help ═════════════════[↑]═╗              │
-│ENGLISH       ║    File panel - is the main panel of the File  ▲              │
-│RUSSIAN       ║ both files and directories, and perform both i ■              │
-│UKRAIN        ║ You can set up each panel in Options|Panel.    ▒              │
+│ENGLISH       ║ ┌────────────                                  ▲              │
+│RUSSIAN       ║ │ File panel █                                 ■              │
+│UKRAIN        ║ └▄▄▄▄▄▄▄▄▄▄▄▄█                                 ▒              │
 │CWSDPMI       ║                                                ▒              │
-│DN            ║    One can also set up the view of the current ▒              │
-│ENGLISH       ║ Panel|Select appearance preset... (Alt-"-"). O ▒              │
-│DN            ║ Ctrl-(1..9,0) for presets.                     ▒              │
-│ENGLISH       ║    Under Windows you can see long or short fil ▒              │
-│RUSSIAN       ║ in the panel's view dialog (the hotkey is Ctrl ▒              │
-│UKRAIN        ║                                                ▒              │
-│CWSDPMI       ║    There are different file operations availab ▒              │
-│DNERR         ║ File and Panel menus.                          ▒              │
-│OUT           ║    You can tag files for group operations with ▒              │
-│              ║ if you want Options|File Manager|Setup...).    ▒              │
-│              ║ Untagging is made by the same keys.            ▒              │
-│              ║    Here is more information about tagging and  ▼              │
-│──────────────└─◄■▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►─┘──────────────│
+│DN            ║    File panel - is the main panel of the File  ▒              │
+│ENGLISH       ║ manager. You can work with both files and      ▒              │
+│RUSSIAN       ║ directories, and perform both individual or    ▒              │
+│UKRAIN        ║ group operations. You can set up each panel in ▒              │
+│DN            ║ Options|Panel.                                 ▒              │
+│ENGLISH       ║                                                ▒              │
+│RUSSIAN       ║    One can also set up the view of the current ▒              │
+│UKRAIN        ║ panel from the menu                            ▒              │
+│CWSDPMI       ║ Panel|Select appearance preset... (Alt-"-").   ▒              │
+│DNERR         ║ Or just use the hotkeys Ctrl-(1..9,0) for      ▒              │
+│OUT           ║ presets.                                       ▒              │
+│              ║    Under Windows you can see long or short     ▼              │
+│──────────────└─◄▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓►─┘──────────────│
 │TEM              4,096 00/00/00  0:00p││TEM              4,096 00/00/00  0:00p│
 └[ C Z * ]─────────────────────────────┘└[ C Z * ]─────────────────────────────┘
 C:\>                                                                            

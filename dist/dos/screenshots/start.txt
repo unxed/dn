@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:27:06p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:44:58p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
 ║       Name       │       Name        ║║       Name       │       Name        ▲
 ║TEM               │                   ║║TEM               │                   ■
@@ -8,15 +8,15 @@ x═[■]════════════ C:\ ══════════
 ║CWSDPMI       EXE │║           DN/2 Open Source           ║                   ▒
 ║DN            EXE │║      Version 2.14 beta/DPMI32,       ║                   ▒
 ║ENGLISH       HLP │║     Compiled Fri, 12 Jun 2025 at     ║                   ▒
-║DN            INI │║               00:00:00               ║                   ▒
-║ENGLISH       LNG │║         http://www.dnosp.ru/         ║                   ▒
-║RUSSIAN       LNG │║                                      ║                   ▒
-║UKRAIN        LNG │║  Based on: Dos Navigator Open Source ║                   ▒
-║CWSDPMI       SWP │║                1.51.08               ║                   ▒
-║DNERR         TXT │║                  OK   ▄              ║                   ▒
-║OUT           TXT │║                ▀▀▀▀▀▀▀▀              ║                   ▒
-║                  │╚══════════════════════════════════════╝                   ▒
-║                  │                   ║║                  │                   ▒
+║RUSSIAN       HLP │║               00:00:00               ║                   ▒
+║UKRAIN        HLP │║         http://www.dnosp.ru/         ║                   ▒
+║DN            INI │║                                      ║                   ▒
+║ENGLISH       LNG │║  Based on: Dos Navigator Open Source ║                   ▒
+║RUSSIAN       LNG │║                1.51.08               ║                   ▒
+║UKRAIN        LNG │║                  OK   ▄              ║                   ▒
+║CWSDPMI       SWP │║                ▀▀▀▀▀▀▀▀              ║                   ▒
+║DNERR         TXT │╚══════════════════════════════════════╝                   ▒
+║OUT           TXT │                   ║║OUT           TXT │                   ▒
 ║                  │                   ║║                  │                   ▼
 ║──────────────────┴───────────────────║║──────────────────┴───────────────────║
 ║TEM              4,096 00/00/00  0:00p║║TEM              4,096 00/00/00  0:00p║
