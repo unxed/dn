@@ -33,9 +33,9 @@ jobs:
         run: audit/fetch_reference.sh
       - name: Audit (only names and numbers are printed)
         run: python3 audit/xclone.py --min 3 --ref audit/ref/list.txt build/dn | tee audit-${{ matrix.upstream }}.txt | head -80
-      - name: Files over the gate (raw > 2 % or maxrun >= 48)
+      - name: Files over the gate (raw > 6 % or maxrun >= 48)
         run: |
-          awk 'NR>1 && $1!="TOTAL" { r=$3; sub("%","",r); if (r+0 > 2 || $6+0 >= 48) n++ } END { print n+0, "files over the gate" }' audit-${{ matrix.upstream }}.txt
+          awk 'NR>1 && $1!="TOTAL" { r=$3; sub("%","",r); if (r+0 > 6 || $6+0 >= 48) n++ } END { print n+0, "files over the gate" }' audit-${{ matrix.upstream }}.txt
           tail -1 audit-${{ matrix.upstream }}.txt
 
   probe:

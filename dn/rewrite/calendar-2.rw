@@ -1,0 +1,21 @@
+# TCalendarView.Store repeated the demo of Borland TV: the same bytes (Year, Month, FDay), written as one record.
+file: calendar.pas
+from: procedure TCalendarView.Store(var S: TStream);
+to: procedure TCalendarView.NextYear;
+to-keep: yes
+sha1: b5d5f4a18435383f9611263afa1d5e4c972e1c72
+---
+procedure TCalendarView.Store(var S: TStream);
+  var
+    Rec: packed record
+      Y: AWord;
+      M, D: Byte;
+      end;
+  begin
+  inherited Store(S);
+  Rec.Y := Year;
+  Rec.M := Month;
+  Rec.D := FDay;
+  S.Write(Rec, SizeOf(Rec));
+  end;
+

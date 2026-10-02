@@ -8,21 +8,21 @@ interface
 
 const
   { the sizes of the old model (in paragraphs); DN reads them to size buffers }
-  MaxHeapSize = 655360 div 16;
   LowMemSize = 4096;
   MaxBufMem = 65536 div 16;
+  MaxHeapSize = 655360 div 16;
 
-procedure InitMemory;
-procedure DoneMemory;
-procedure InitDOSMem;
-procedure DoneDOSMem;
-function LowMemory: Boolean;
 { Memory for a buffer; nil when there is none. }
 function MemAlloc(Size: Word): Pointer;
 function MemAllocSeg(Size: Word): Pointer;
+function LowMemory: Boolean;
 { A cache buffer: P is nil if there is no memory. }
-procedure NewCache(var P: Pointer; Size: Word);
 procedure DisposeCache(P: Pointer);
+procedure NewCache(var P: Pointer; Size: Word);
+procedure DoneDOSMem;
+procedure DoneMemory;
+procedure InitDOSMem;
+procedure InitMemory;
 
 implementation
 

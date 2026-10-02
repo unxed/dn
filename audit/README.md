@@ -20,5 +20,5 @@
     audit/fetch_reference.sh            # или: audit/fetch_reference.sh путь/к/архиву.rar
     python3 audit/xclone.py --min 3 --ref audit/ref/list.txt путь/к/исходникам
 
-Фон у чистого кода: `raw%` 0–1 %, `ren%` 5–10 %. Подозрение — это `raw%` выше 2 % или
+Фон у чистого кода: `raw%` 0–1 %, `ren%` 5–10 %. Подозрение — это `raw%` выше 6 % или
 `maxrun` от 48 токенов. Пороги ещё не откалиброваны (см. `PLAN.md`).

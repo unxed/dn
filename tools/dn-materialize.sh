@@ -42,6 +42,11 @@ while read -r p; do
     echo "  patch: $p"
 done < "$here/dn/patches/series"
 
+# the regions that repeat Borland code are replaced by our text (dn/rewrite/*.rw; before any other edit,
+# the anchors are lines of the pristine sources)
+if [ -d "$here/dn/rewrite" ]; then
+    python3 "$here/tools/dn-rewrite.py" "$out" "$here/dn/rewrite" | grep -v '^  (no sha1' | sed 's|^|  rewrite: |'
+fi
 # mechanical edits (dn/edits/*.sed; each file names its reason): sed scripts over all the sources
 if [ -d "$here/dn/edits" ]; then
     for e in "$here"/dn/edits/*.sh; do
