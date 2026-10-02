@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:42:32
-x═[■]═════ C:\tmp\dntour-8719i_gz\work ══════════╗x═════════ C:\tmp\dntour-8719i_gz\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                23:15:59
+x═[■]═════ C:\tmp\dntour-u1clbd5t\work ══════════╗x═════════ C:\tmp\dntour-u1clbd5t\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-8719i_gz\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-8719i_gz\work>
+C:\tmp\dntour-u1clbd5t\work>
  F1 Help

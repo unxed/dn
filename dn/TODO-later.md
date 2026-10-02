@@ -96,3 +96,16 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
 - The tree (Disk > Directory tree) on `/` reads every directory (30 000 directories took 20 s here), a line "Reading directories: N   Esc - stop" is shown while it works (Esc aborts); `/proc` and `/sys` of the root are skipped.
 - `DN0.SWP` (the saved desktop) is written to the current directory when a command is run from the command line: it shows in the panel; the place
   and the need of the file are to be decided.
+
+## DOS: DN.EXE hangs in the DOSBox that is built into Wine (2026-10-02, reported by the owner; to be investigated)
+- Symptom: `dist/dos/DN.EXE` started in the DOSBox 0.74-3 of Wine ("Cpu speed: max 100% cycles, Frameskip 1") hangs at once: no output, only the
+  blinking cursor under the command line. The same files work in DOSBox-X (our tests: `tools/dn-tour.sh`, `tools/dn-dist.sh`).
+- How it was started (screen of the owner): `mount c ~/dos` (a directory of the owner), `c:`, `mount -z y`, `mount z /home/<user>/.wine/dosdevices/z:`,
+  `Z:`, `cd \home\<user>\dev\dn\dist\dos`, `config -securemode`, then `Z:\home\<user>\dev\dn\dist\dos\DN.EXE` — i.e. the program runs from the drive Z: (the
+  root of the host file system as a long path) with the current directory there; `CWSDPMI.EXE` is in the same directory.
+- What is not known (to ask the owner when they are at the computer): (1) does it start when `dist/dos` is copied into the mounted `C:` (a short
+  path, a directory with write access: DN writes `DN.INI`, `DN.HIS`, `DNERR.TXT`, `DN0.SWP` next to itself and into the current directory)? (2) does
+  a plain go32v2 program (any `*.exe` of FPC for DOS) start in that DOSBox, i.e. does it find `CWSDPMI.EXE`? (3) the files `DNLOG.TXT`/`DNERR.TXT`
+  after `set DNDUMP=SCR.DAT` + `set DNDUMPSEC=5` before the start (they say how far DN got).
+- Guesses (not checked; no guessing in the code until the data is there): the DPMI host (CWSDPMI) and the 32-bit code under the older DOSBox; a write
+  to the read-only Z:; the long path; a video or keyboard call that the old DOSBox does not have (DN reads the BIOS data area, INT 10h/16h).
