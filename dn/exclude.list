@@ -51,3 +51,6 @@ drivers.pas
 # the network browser of Windows (unit Windows, WNet*): not for DOS. Only the registration of its stream type
 # (otNetDrive) is lost, flpanel.pas does not use it otherwise (edit 87).
 netbrwsr.pas
+
+# DN's own TObject/TEmptyObject (Cat) and ObjChangeType: replaced by our unit over the TObject of tv/ (dn/new/objects2.pas)
+objects2.pas

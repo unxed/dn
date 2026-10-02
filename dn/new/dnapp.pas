@@ -11,7 +11,7 @@ interface
 
 uses
   SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvMenus, TvApp,
-  Streams, Views, Drivers, Commands, xTime;
+  Streams, Views, Drivers, Commands, xTime, DnIni;
 
 const
   EventsLen: Byte = 0;
@@ -249,4 +249,14 @@ begin
     R.B.Y := S.Y;
 end;
 
+{ The commands of the features that DN was built without (TView.MenuEnabled of DN, evaluated for the defines of the
+  tree: STDEFINE.INC); the game can be switched off in the setup. }
+function CommandHidden(Command: Word): Boolean;
+begin
+  Result := ((Command = cmGame) and not EnableGame) or (Command = cmPlayCD) or (Command = cmSystemInfo) or
+    (Command = cmMemoryInfo);
+end;
+
+initialization
+  CommandHiddenHook := @CommandHidden;
 end.

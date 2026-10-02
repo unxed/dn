@@ -1,0 +1,4 @@
+# The classes of DN itself in the files that are excluded as a whole (dn/exclude.list): carved into units of the tree
+# by tools/dn-carve.py. Format: UnitName <- SourceFile : Class, Class ; uses: Unit, Unit [; consts: Name, Name]
+# TComboBox: a DN control (a pop-up choice of a few items over the menus of DN, TMenuItem.Flags)
+DNDlgs <- DIALOGS.PAS : TComboBox ; uses: Defines, Streams, Drivers, Views, Menus, Commands, DNApp, Advance1, TvDialog, TvCluster, TvUtil ; consts: CComboBox

@@ -246,6 +246,16 @@ begin
   L^.HandleEvent(E);
   Check((L^.SelStart = 0) and (L^.SelEnd = 10), 'a double click selects all');
 
+  { the extensions used by DN: edge characters and own colors }
+  Check((L2^.LC = ' ') and (L2^.RC = ' ') and (L2^.C[1] = 0), 'DN extensions: the defaults change nothing');
+  L2^.LC := #179;
+  L2^.RC := #186;
+  L2^.C[1] := $1E;
+  L2^.DrawView;
+  Check((MemChar(12, 11) <> ' ') and (MemChar(21, 11) <> ' ') and
+    (MemChar(12, 11) <> MemChar(21, 11)), 'DN extensions: LC and RC are drawn at the edges');
+  Check(MemAttr(15, 11) = $1E, 'DN extensions: C[1] is the color of a passive line');
+
   Dispose(Dlg, Done);
 
   { the input box }

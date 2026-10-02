@@ -194,6 +194,13 @@ type
     function MouseInView(Mouse: TPoint): Boolean;
     function ContainsMouse(var Event: TEvent): Boolean;
     procedure Locate(var Bounds: TRect);
+    { the command set as methods (Turbo Vision 2.0 has them; the unit procedures of the same names do the work) }
+    procedure DisableCommands(const Commands: TCommandSet);
+    procedure EnableCommands(const Commands: TCommandSet);
+    procedure DisableCommand(Command: Word);
+    procedure EnableCommand(Command: Word);
+    { as CommandEnabled, but a command that the program has switched off for good (CommandHiddenHook) is not enabled }
+    function MenuEnabled(Command: Word): Boolean;
     procedure DragView(var Event: TEvent; Mode: Byte; var Limits: TRect;
       MinSize, MaxSize: TPoint); virtual;
     procedure CalcBounds(var Bounds: TRect; Delta: TPoint); virtual;
@@ -359,6 +366,8 @@ function PaletteSize(const P: TPalette): Integer;
 function Message(Receiver: PView; What, Command: Word; InfoPtr: Pointer): Pointer;
 
 var
+  { DN: the commands of the features that are not in the program are never enabled (TView.MenuEnabled) }
+  CommandHiddenHook: function(Command: Word): Boolean = nil;
   { stream records: RegisterType(RView) makes TView known to the streams }
   RView, RGroup: TStreamRec;
   { called at the start of the destructor of every view (DN: the view leaves the list of the views that
@@ -1032,6 +1041,34 @@ end;
 function TView.DataSize: Integer;
 begin
   Result := 0;
+end;
+
+procedure TView.DisableCommands(const Commands: TCommandSet);
+begin
+  TvViews.DisableCommands(Commands);
+end;
+
+procedure TView.EnableCommands(const Commands: TCommandSet);
+begin
+  TvViews.EnableCommands(Commands);
+end;
+
+procedure TView.DisableCommand(Command: Word);
+begin
+  TvViews.DisableCommand(Command);
+end;
+
+procedure TView.EnableCommand(Command: Word);
+begin
+  TvViews.EnableCommand(Command);
+end;
+
+function TView.MenuEnabled(Command: Word): Boolean;
+begin
+  if Assigned(CommandHiddenHook) and CommandHiddenHook(Command) then
+    Result := False
+  else
+    Result := (Command > 255) or (Byte(Command) in CurCommandSet);
 end;
 
 procedure TView.DragView(var Event: TEvent; Mode: Byte; var Limits: TRect;

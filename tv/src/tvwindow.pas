@@ -84,6 +84,9 @@ type
     MaxVal: Integer;
     PgStep: Integer;
     ArStep: Integer;
+    { used by DN: the last step that ScrollStep returned, and True while the step is repeated by a held mouse button }
+    Step: LongInt;
+    ForceScroll: Boolean;
     constructor Init(const Bounds: TRect);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -535,11 +538,12 @@ end;
 
 procedure TScrollBar.HandleEvent(var Event: TEvent);
 var
-  I, ClickPart, Step: Integer;
+  I, ClickPart: Integer;   { Step: the field (DN reads the step of a wheel turn too) }
 begin
   Step := 0;
   I := 0;
   inherited HandleEvent(Event);
+  ForceScroll := False;
   case Event.What of
     evMouseWheel:
       begin
@@ -579,7 +583,10 @@ begin
             repeat
               SbMouse := MakeLocal(Event.Where);
               if GetPartCode = ClickPart then
+              begin
+                ForceScroll := True;
                 SetValue(Value + ScrollStep(ClickPart));
+              end;
             until not MouseEvent(Event, evMouseAuto);
         else
           { otherwise the thumb follows the mouse }
@@ -644,16 +651,16 @@ end;
 
 function TScrollBar.ScrollStep(Part: Integer): Integer;
 var
-  Step: Integer;
+  St: Integer;
 begin
   if (Part and 2) = 0 then
-    Step := ArStep
+    St := ArStep
   else
-    Step := PgStep;
+    St := PgStep;
   if (Part and 1) = 0 then
-    Result := -Step
-  else
-    Result := Step;
+    St := -St;
+  Step := St;
+  Result := St;
 end;
 
 procedure TScrollBar.SetParams(AValue, AMin, AMax, APgStep, AArStep: Integer);

@@ -35,6 +35,10 @@ type
     SelStart: Integer;
     SelEnd: Integer;
     Validator: PValidator;
+    { used by DN: the characters at the edges when the text does not scroll (default: spaces) and own colors of the
+      four palette entries (BIOS attributes in the low bytes; 0 = the palette of the dialog) }
+    LC, RC: Char;
+    C: array[1..4] of Word;
     constructor Init(const Bounds: TRect; AMaxLen: Integer);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -148,6 +152,8 @@ end;
 constructor TInputLine.Init(const Bounds: TRect; AMaxLen: Integer);
 begin
   inherited Init(Bounds);
+  LC := ' ';
+  RC := ' ';
   if AMaxLen < 1 then
     AMaxLen := 1;
   if AMaxLen > 255 then
@@ -210,19 +216,32 @@ var
   L, R: Integer;
   B: TDrawBuffer;
   Color: TColorAttr;
+
+  function Pick(I: Integer): TColorAttr;
+  begin
+    if C[I] <> 0 then
+      Result := AttrFromBIOS(C[I] and $FF)
+    else
+      Result := GetColor(I).Lo;
+  end;
+
 begin
   if (State and sfFocused) <> 0 then
-    Color := GetColor(2).Lo
+    Color := Pick(2)
   else
-    Color := GetColor(1).Lo;
+    Color := Pick(1);
   B.Init(Size.X);
   B.MoveChar(0, Ord(' '), Color, Size.X);
   if Size.X > 1 then
     B.MoveStrS(1, Data^, Color, Size.X - 1, FirstPos);
   if CanScroll(1) then
-    B.MoveChar(Size.X - 1, RightArrow, GetColor(4).Lo, 1);
+    B.MoveChar(Size.X - 1, RightArrow, Pick(4), 1)
+  else if RC <> ' ' then
+    B.MoveChar(Size.X - 1, Ord(RC), Pick(4), 1);
   if CanScroll(-1) then
-    B.MoveChar(0, LeftArrow, GetColor(4).Lo, 1);
+    B.MoveChar(0, LeftArrow, Pick(4), 1)
+  else if LC <> ' ' then
+    B.MoveChar(0, Ord(LC), Pick(4), 1);
   if (State and sfSelected) <> 0 then
   begin
     L := DisplayedPos(SelStart) - FirstPos;
@@ -232,7 +251,7 @@ begin
     if R > Size.X - 2 then
       R := Size.X - 2;
     if L < R then
-      B.MoveChar(L + 1, 0, GetColor(3).Lo, R - L);
+      B.MoveChar(L + 1, 0, Pick(3), R - L);
   end;
   WriteLineD(0, 0, Size.X, Size.Y, B);
   SetCursor(DisplayedPos(CurPos) - FirstPos + 1, 0);

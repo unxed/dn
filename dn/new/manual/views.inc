@@ -51,3 +51,11 @@ type
   { the video buffer of DN: 80x25 cells of 16 bits }
   PVideoBuf = ^TVideoBuf;
   TVideoBuf = array[0..3999] of Word;
+
+var
+  { DN: the data of the dialogs only of the tagged controls (sfTagged); TODO: tv/ TGroup.GetData does not honour it yet }
+  TaggedDataCount: LongInt = 0;
+  TaggedDataOnly: Boolean = False;
+
+{ Message with a long integer in the event (DN; Message takes a pointer). }
+function MessageL(Receiver: PView; What, Command: Word; InfoLng: LongInt): Pointer;

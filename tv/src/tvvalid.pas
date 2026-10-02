@@ -30,6 +30,8 @@ const
   voReserved = $00FC;
 
 type
+  TCharSet = set of Char;
+
   TVTransfer = (vtDataSize, vtSetData, vtGetData);
   TPicResult = (prComplete, prIncomplete, prEmpty, prError, prSyntax, prAmbiguous,
     prIncompNoFill);
@@ -74,7 +76,9 @@ type
   PFilterValidator = ^TFilterValidator;
   TFilterValidator = object(TValidator)
     ValidChars: PStr;
-    constructor Init(const AValidChars: ShortString);
+    constructor Init(const AValidChars: ShortString); overload;
+    { as in the Pascal Turbo Vision: the valid characters as a set (the characters #1..#255 of it) }
+    constructor Init(const AValidChars: TCharSet); overload;
     destructor Done; virtual;
     procedure Error; virtual;
     function IsValidInput(var S: ShortString; SuppressFill: Boolean): Boolean; virtual;
@@ -595,6 +599,18 @@ constructor TFilterValidator.Init(const AValidChars: ShortString);
 begin
   inherited Init;
   ValidChars := NewStr(AValidChars);
+end;
+
+constructor TFilterValidator.Init(const AValidChars: TCharSet);
+var
+  C: Char;
+  T: ShortString;
+begin
+  T := '';
+  for C := #1 to #255 do
+    if C in AValidChars then
+      T := T + C;
+  Init(T);
 end;
 
 destructor TFilterValidator.Done;
