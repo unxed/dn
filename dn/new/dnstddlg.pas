@@ -12,6 +12,9 @@ uses
   TvViews, TvFileDlg, TvFiles;
 
 const
+  cmFileOpen = TvFileDlg.cmFileOpen;
+  cmFileReplace = TvFileDlg.cmFileReplace;
+  cmFileClear = TvFileDlg.cmFileClear;
   fdOKButton = TvFileDlg.fdOKButton;
   fdOpenButton = TvFileDlg.fdOpenButton;
   fdReplaceButton = TvFileDlg.fdReplaceButton;

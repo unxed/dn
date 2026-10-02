@@ -20,6 +20,9 @@ function GetVolumeLabel(Drive: Char): String;
 { The name in FileRec/TextRec (wide characters in FPC) as a string. }
 function NameOfRec(const Name: array of WideChar): String;
 
+{ Dos.GetDate with the day of the week in a LongInt (in VP Word is 32 bit and the variables of DN are LongInt). }
+procedure GetDateDow(var Year, Month, Day: Word; var DayOfWeek: LongInt);
+
 { The text cursor: the size in lines (0 = hidden), show, hide. }
 function GetCursorSize: Word;
 procedure ShowCursor;
@@ -31,7 +34,7 @@ function SetVideoMode(Cols, Rows: Word): Boolean;
 implementation
 
 uses
-  SysUtils, TvScreen, VPSysLow;
+  SysUtils, Dos, TvScreen, VPSysLow;
 
 function Min(A, B: LongInt): LongInt;
 begin
@@ -51,6 +54,14 @@ end;
 function GetTimeMSec: LongInt;
 begin
   Result := LongInt(Cardinal(GetTickCount64 and $FFFFFFFF));
+end;
+
+procedure GetDateDow(var Year, Month, Day: Word; var DayOfWeek: LongInt);
+var
+  W: Word;
+begin
+  Dos.GetDate(Year, Month, Day, W);
+  DayOfWeek := W;
 end;
 
 function NameOfRec(const Name: array of WideChar): String;

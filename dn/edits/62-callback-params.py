@@ -32,6 +32,8 @@ for p in sys.argv[1:]:
                 return m.group(0)
             return '%s%s%s%s(%s_: Pointer)%s;\r\n%svar %s: %s absolute %s_;' % (ind, kind, sp, nm, par, res or '', ind, par, typ, par)
         out = pat.sub(fix, out)   # every routine of that name (a file may have several callers with the same helper name)
+    # a calling convention that follows the header (stdcall of VP) would not match the procedure variable of tv/: dropped
+    out = re.sub(r'(var \w+: \w+ absolute \w+_;\r?\n)[ \t]*(stdcall|cdecl|far|near);[ \t]*\r?\n', r'\1', out)
     if out != raw:
         open(p, 'wb').write(out.encode('latin-1'))
 print('62-callback-params: %d routines' % n)
