@@ -79,7 +79,7 @@ type
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetKey(const S: ShortString): Pointer; virtual;
     procedure NewList(AList: PSortedCollection);
-    function List: PSortedCollection;
+    function SortedList: PSortedCollection;
   private
     KeyBuf: ShortString;
   end;
@@ -171,9 +171,9 @@ begin
   SetCursor(1, 0);
 end;
 
-function TSortedListBox.List: PSortedCollection;
+function TSortedListBox.SortedList: PSortedCollection;
 begin
-  Result := PSortedCollection(Items);
+  Result := PSortedCollection(List);
 end;
 
 function TSortedListBox.GetKey(const S: ShortString): Pointer;
@@ -244,7 +244,7 @@ begin
       CurString[SearchPos + 1] := Ch;
     end;
     K := GetKey(CurString);
-    List^.Search(K, Value);
+    SortedList^.Search(K, Value);
     if Value < Range then
     begin
       NewString := GetText(Value, 255);

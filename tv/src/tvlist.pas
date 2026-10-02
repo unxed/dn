@@ -52,13 +52,13 @@ type
     and the number of the selected item }
   PListBoxRec = ^TListBoxRec;
   TListBoxRec = record
-    Items: PCollection;
+    List: PCollection;
     Selection: Word;
   end;
 
   PListBox = ^TListBox;
   TListBox = object(TListViewer)
-    Items: PCollection;
+    List: PCollection;
     constructor Init(const Bounds: TRect; ANumCols: Integer; AScrollBar: PScrollBar);
     destructor Done; virtual;
     function DataSize: Integer; virtual;
@@ -411,15 +411,15 @@ end;
 constructor TListBox.Init(const Bounds: TRect; ANumCols: Integer; AScrollBar: PScrollBar);
 begin
   inherited Init(Bounds, ANumCols, nil, AScrollBar);
-  Items := nil;
+  List := nil;
   SetRange(0);
 end;
 
 destructor TListBox.Done;
 begin
-  if Items <> nil then
-    Dispose(Items, Done);
-  Items := nil;
+  if List <> nil then
+    Dispose(List, Done);
+  List := nil;
   inherited Done;
 end;
 
@@ -430,15 +430,15 @@ end;
 
 procedure TListBox.GetData(var Rec);
 begin
-  TListBoxRec(Rec).Items := Items;
+  TListBoxRec(Rec).List := List;
   TListBoxRec(Rec).Selection := Focused;
 end;
 
 function TListBox.GetText(Item, MaxLen: Integer): ShortString;
 begin
-  if Items <> nil then
+  if List <> nil then
   begin
-    Result := PStr(Items^.At(Item))^;
+    Result := PStr(List^.At(Item))^;
     if Length(Result) > MaxLen then
       SetLength(Result, MaxLen);
   end
@@ -448,9 +448,9 @@ end;
 
 procedure TListBox.NewList(AList: PCollection);
 begin
-  if Items <> nil then
-    Dispose(Items, Done);
-  Items := AList;
+  if List <> nil then
+    Dispose(List, Done);
+  List := AList;
   if AList <> nil then
     SetRange(AList^.Count)
   else
@@ -462,7 +462,7 @@ end;
 
 procedure TListBox.SetData(var Rec);
 begin
-  NewList(TListBoxRec(Rec).Items);
+  NewList(TListBoxRec(Rec).List);
   FocusItem(TListBoxRec(Rec).Selection);
   DrawView;
 end;

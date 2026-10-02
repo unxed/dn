@@ -107,7 +107,7 @@ end;
 
 function TDirListBox.DirItem(Index: Integer): PDirEntry;
 begin
-  Result := PDirEntry(Items^.At(Index));
+  Result := PDirEntry(List^.At(Index));
 end;
 
 function TDirListBox.GetText(Item, MaxLen: Integer): ShortString;
