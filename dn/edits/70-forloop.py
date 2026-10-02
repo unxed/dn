@@ -2,15 +2,26 @@
 """reason: (д) the modern compiler. VP lets a for loop change its variable (`Inc(j); Break;`); FPC does not.
 In filediz.pas the changed value is never read (j is assigned again before it is used), so the statement goes.
 In decoder.pas (IPrefixes) `i := 255` restarts the scan (the Byte counter wraps to 0): a while loop with Inc(i).
+In tetris.pas the loop that looks for a bad entry of the table of scores (and then resets all of them in an inner loop
+over the same variable) is a search and an `if`.
 In fbb.pas the loop that repeats an item by `Dec(i)` becomes a while loop.
 usage: 70-forloop.py FILE...   (all the .pas of the tree)"""
 import re, sys, os
 for p in sys.argv[1:]:
     b = os.path.basename(p).lower()
-    if b not in ('filediz.pas', 'fbb.pas', 'decoder.pas'):
+    if b not in ('filediz.pas', 'fbb.pas', 'decoder.pas', 'tetris.pas'):
         continue
     s = open(p, 'rb').read().decode('latin-1')
-    if b == 'decoder.pas':
+    if b == 'tetris.pas':
+        s2, k = re.subn(r'([ \t]*)for I := 1 to 20 do(\r?\n)[ \t]*if not \(HiScores\[I\]\.StLv in \[1\.\.10\]\) then(\r?\n)',
+                        lambda m: '%sI := 1;%s%swhile (I <= 20) and (HiScores[I].StLv in [1..10]) do%s%s  Inc(I);%s%sif I <= 20 then%s' % (
+                            m.group(1), m.group(2), m.group(1), m.group(2), m.group(1), m.group(2), m.group(1), m.group(3)), s, count=1)
+        if not k:
+            s2 = s
+        else:
+            # the Break that left the outer loop
+            s2 = re.sub(r'(Dispose\(S, Done\);\r?\n)[ \t]*Break;\r?\n(\s*end;\r?\n\s*NewGame;)', r'\1\2', s2, count=1)
+    elif b == 'decoder.pas':
         s2 = re.sub(r'(procedure IPrefixes;.*?)for i := 0 to PrefN do(\r?\n)', r'\1i := 0;\2    while i <= PrefN do\2      begin', s, count=1, flags=re.S)
         s2 = re.sub(r'(        i := 255;\r?\n        end;\r?\n)(    end \{ IPrefixes \};)', r'\1      Inc(i);\n      end;\n\2', s2, count=1)
     elif b == 'filediz.pas':
