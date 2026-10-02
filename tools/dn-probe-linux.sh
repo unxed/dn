@@ -15,7 +15,7 @@ ok=0; bad=0
 for u in $units; do
     grep -qi '^[[:space:]]*program[[:space:]]' "$u.pas" && continue
     r=$(PATH="$DN_LINUX/bin:$PATH" $PPC -Tlinux -Pi386 -XPi386-linux- $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/dn/new" -Fu"$here/tv/src" \
-        -Fu"$DN_LINUX/units/i386-linux" -FU"$out" -FE"$out" -Cn -vewn "$u.pas" 2>&1 | grep -a -E 'Error|Fatal: (Can|Compilation aborted)' | grep -a -v "Compilation aborted" | head -1)
+        $DN_LINUX_FU -FU"$out" -FE"$out" -Cn -vewn "$u.pas" 2>&1 | grep -a -E 'Error|Fatal: (Can|Compilation aborted)' | grep -a -v "Compilation aborted" | head -1)
     if [ -z "$r" ]; then ok=$((ok+1)); else bad=$((bad+1)); echo "$u: $r"; fi
 done
 echo "ok: $ok  failed: $bad"
