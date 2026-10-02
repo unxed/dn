@@ -52,6 +52,7 @@ begin
   Touch(Base + PathDelim + 'a.dat', 0);
   Touch(Base + PathDelim + LongName, 5);
 
+  HeapMark(1);             { 1: the files are made }
   { paths }
   FSplit('c:\dir\sub\file.name.ext', Dir, Name, Ext);
   Check((Dir = 'c:\dir\sub\') and (Name = 'file.name') and (Ext = '.ext'), 'FSplit');
@@ -70,6 +71,7 @@ begin
   Check((Dir <> '') and (Dir[Length(Dir)] in ['/', '\']), 'GetCurDir ends with a separator');
   Check(FExpand('x.txt') = ShortString(ExpandFileName('x.txt')), 'FExpand');
 
+  HeapMark(2);             { 2: the path functions are done }
   { the search }
   F.Init;
   Check(F.First(Base + PathDelim + AllMask, faDirectory), 'First finds something');
@@ -79,7 +81,7 @@ begin
   until not F.Next;
   F.Close;
   Check(N >= 4, 'all entries are found (files, the directory, maybe . and ..)');
-  Check(F.First(Base + PathDelim + '*.txt', 0) and (Same(F.Rec.Name, 'b.txt')) and (F.Rec.Size = 10) and
+  Check(F.First(Base + PathDelim + 'b.*', 0) and (Same(F.Rec.Name, 'b.txt')) and (F.Rec.Size = 10) and
     ((F.Rec.Attr and faDirectory) = 0), 'a mask: name, size, attributes');
   Check(not F.Next, 'one match only');
   Check(F.First(Base + PathDelim + Copy(LongName, 1, Pos('.', LongName) - 1) + '.*', 0) and (Same(F.Rec.Name, LongName)),
@@ -88,6 +90,7 @@ begin
   Check(not F.First(Base + PathDelim + '*.zzz', 0), 'nothing found');
   F.Done;
 
+  HeapMark(3);             { 3: the search is done }
   { the collections }
   New(C, Init(10, 5));
   F.Init;
@@ -113,6 +116,7 @@ begin
   Check((D^.At2(0)^.Text^ = 'Text') and (D^.At2(0)^.Dir^ = 'dir'), 'a directory entry');
   Dispose(D, Done);
 
+  HeapMark(4);             { 4: the collections are done }
   DeleteFile(AnsiString(Base + PathDelim + 'b.txt'));
   DeleteFile(AnsiString(Base + PathDelim + 'a.dat'));
   DeleteFile(AnsiString(Base + PathDelim + LongName));
@@ -126,7 +130,9 @@ begin
   Base := FExpand('x');
   IsDir('.');
   Used0 := GetFPCHeapStatus.CurrHeapUsed;
+  HeapBase;
   Run;
+  HeapMark(5);               { 5: the test is over }
   Check(GetFPCHeapStatus.CurrHeapUsed = Used0, 'no memory is left behind');
   Finish;
 end.
