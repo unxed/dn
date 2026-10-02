@@ -2990,5 +2990,18 @@ procedure PutInClipLong(const S: LongString);
   end;
 {/Cat}
 
+{ The help window is kept between the calls of F1 (HelpWnd); when it is closed (the window is done) the pointer must not stay: the
+  next F1 would use a freed window }
+procedure HelpWindowDone(P: PView);
+  begin
+  if P = PView(HelpWnd) then
+    begin
+    HelpWnd := nil;
+    HelpInUse := False;
+    end;
+  end;
+
+begin
+  ViewDoneHook := @HelpWindowDone;
 end.
 
