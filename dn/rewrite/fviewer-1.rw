@@ -1,0 +1,27 @@
+# TViewScroll.GetSize and DrawPos repeated the scroll bar of Borland TV (audit: 84 tokens in a row): our own text.
+file: FVIEWER.PAS
+from: function TViewScroll.GetSize: Integer;
+to: procedure TViewScroll.HandleEvent;
+to-keep: yes
+sha1: caaa2110c12b946732e69631a0bc16aadbe0427a
+---
+function TViewScroll.GetSize: Integer;
+  begin
+  GetSize := Size.Y;
+  if GetSize < 3 then
+    GetSize := 3;
+  end;
+
+procedure TViewScroll.DrawPos(Pos: Integer);
+  var
+    Buf: TDrawBuffer;
+    Last: Integer;
+  begin
+  Last := GetSize-1;
+  MoveChar(Buf[0], #177, GetColor(1), Last+1); { the track }
+  MoveChar(Buf[Pos], #254, GetColor(3), 1); { the thumb }
+  MoveChar(Buf[0], #30, GetColor(2), 1); { the arrow up }
+  MoveChar(Buf[Last], #31, GetColor(2), 1); { the arrow down }
+  WriteBuf(0, 0, Size.X, Size.Y, Buf);
+  end;
+

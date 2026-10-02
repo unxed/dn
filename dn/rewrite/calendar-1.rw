@@ -1,0 +1,31 @@
+# The keys of TCalendarView.HandleEvent repeated the calendar of the demo of Borland TV (audit: 49 tokens
+# in a row): the same keys, written with ifs.
+file: calendar.pas
+after: else if Event.What = evKeyDown then
+from: case Event.KeyCode of
+to: until True;
+to-keep: yes
+sha1: 34325d52355b95d36cf5c7190f0b6d7d45eae803
+---
+        if  (Event.KeyCode = kbRight) or (Event.KeyCode = kbGrayPlus) then
+          _NextDay
+        else if  (Event.KeyCode = kbLeft) or (Event.KeyCode = kbGrayMinus) then
+          _PrevDay
+        else if Event.KeyCode = kbUp then
+          PrevWeek
+        else if Event.KeyCode = kbDown then
+          NextWeek
+        else if  (Event.KeyCode = kbCtrlLeft) or (Event.KeyCode = kbPgUp) then
+          PrevMonth
+        else if  (Event.KeyCode = kbCtrlRight) or (Event.KeyCode = kbPgDn) then
+          NextMonth
+        else if  (Event.KeyCode = kbAltLeft) or (Event.KeyCode = kbCtrlPgUp) then
+          PrevYear
+        else if  (Event.KeyCode = kbAltRight) or (Event.KeyCode = kbCtrlPgDn) then
+          NextYear
+        else if  (Event.KeyCode = kbSpace) or (Event.KeyCode = kbHome) then
+          CurDate
+        else
+          break;
+        ClearEvent(Event);
+        DrawView;

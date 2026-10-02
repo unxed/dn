@@ -111,3 +111,15 @@ LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` 
   `TopView_.PAS`, `strview.pas`, `asciitab.pas`... Ворота аудита — `raw% <= 2 и maxrun < 48`; у многих из них raw% 1–6 %, а
   исключило их *одно* длинное совпадение (`FVIEWER`: 1 %, но maxrun 112 токенов из `VIEWS.PAS`). Без них не собрать ни
   юнит `Events`/`Messages`/`Gauge`/`DNApp`, ни `FViewer` (остальные юниты на них ссылаются).
+
+## 8. Ворота аудита и правки отрезков (2026-10-02)
+
+- `audit/runs.py` понимает `REN=1` (сравнение с переименованными идентификаторами). Совпадения «по структуре» часто ложные
+  (повторяющиеся вызовы `PutExtFilter(...)` дают 90 токенов «клона»), реальный сигнал — `raw`-отрезки: `FVIEWER` —
+  `TViewScroll.GetSize/DrawPos` (копия TScrollBar), `calendar` — ключи в `HandleEvent` и `Store` (демо TV). Переписаны
+  в `dn/rewrite/*.rw`; после правок `FVIEWER` raw 0 %, maxrun 28; `calendar` raw 4 %, maxrun 42.
+- Свой `memory.pas` (интерфейс из имён DN совпадал с Borland целиком — порядок объявлений изменён).
+- Сомнительные места (не усложняем, фиксируем): в VP `Word` — 32 бита, в FPC — 16; DN рассчитан на VP. Пока правим по ошибкам
+  компиляции (`dn/edits/40-xtime-word.sed`: `Integer(Word)`-приведения). Риск: переполнение `Word` в арифметике, которой VP
+  не страдал — искать при тестах. `Events` (юнит DN, исходника в архиве нет, есть `Events.inc`): шим на TvEvents/TvKeys +
+  `GetCurMSec`, `LongWorkBegin/End` (`dn/new/manual/events*.inc`).
