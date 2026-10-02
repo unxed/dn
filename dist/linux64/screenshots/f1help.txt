@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:41:50
-x───────── C:\tmp\dntour-wu2193t4\work ──────────┐x───────── C:\tmp\dntour-wu2193t4\work ──────────┐
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:43:21
+x───────── C:\tmp\dntour-dhshs67_\work ──────────┐x───────── C:\tmp\dntour-dhshs67_\work ──────────┐
 │       Name       │       Name       │       Nam││       Name       │       Name       │       Nam│
 │..                │                  │          ││..                │                  │          │
 │c             dat │                  │          ││c             dat │                  │          │
@@ -26,5 +26,5 @@ x───────── C:\tmp\dntour-wu2193t4\work ───────�
 │──────────────────┴──────────────────┴──────────││──────────────────┴──────────────────┴──────────│
 │..            <UP--DIR>  0.00.80 17:17          ││..            <UP--DIR>  0.00.80 17:17          │
 └[ C * ]─────────────────────────────────────────┘└[ C * ]─────────────────────────────────────────┘
-C:\tmp\dntour-wu2193t4\work>
+C:\tmp\dntour-dhshs67_\work>
  F1 Help
