@@ -1,0 +1,15 @@
+# The index records of TStringList (carved from COLLECT.PAS) repeated the declarations of TStringList of Borland TV
+# (audit: 49 tokens in a row): the same types (the file format of DN.LNG), written in another order and form.
+file: dnstrl.pas
+from: TStrIndexRec = record
+to: TStrIndex = array[0..9999] of TStrIndexRec;
+sha1: 1617eeda23960f2e51c168bab156209f73c05e6f
+---
+  TStrIndexRec = record
+    Key: AWord;
+    Count: AWord;
+    Offset: AWord;
+    end;
+
+  TStrIndex = array[0..9999] of TStrIndexRec;
+  PStrIndex = ^TStrIndex;

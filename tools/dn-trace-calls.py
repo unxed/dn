@@ -2,7 +2,7 @@
 """A debugging aid (not part of the build): puts DNErrLog.DNTrace('> Unit.Routine') at the start of the body of every
 routine declared in column 0 (procedure, function, constructor, destructor) of the given files of build/dn, so that the
 trace (DNERR.TXT, or COM1 with DNSERIAL) shows what was entered last when DN dies.
-usage: dn-trace-calls.py FILE.pas...      (run after tools/dn-materialize.sh; the tree is rebuilt by it)"""
+usage: dn-trace-calls.py FILE.pas...      (on a COPY of dn/src: cp -r dn/src build/dn-traced; then DN_SRC=build/dn-traced tools/build.sh ...)"""
 import re, sys, os
 HDR = re.compile(r'^(procedure|function|constructor|destructor)\s+([A-Za-z_][\w.]*)', re.I)
 for p in sys.argv[1:]:

@@ -1,87 +1,63 @@
 name: dn
-# The tree of DOS Navigator is not in git: it is made from the public archive, the exclusion
-# list, the patches and our new files (PLAN.md, decision 9). This workflow fetches the
-# archives, materializes the tree and audits it against the Borland reference.
+# The tree of DOS Navigator (dn/src) is in git. This workflow checks: (1) the audit gate against the Borland reference over the
+# whole tree (every PR), (2) that bootstrap/ still reproduces the tree of the latest tag bootstrap-N (the record of where the first
+# commit came from), (3) the unit tests of our own units.
 on:
   workflow_dispatch:
   push:
     paths:
       - dn/**
-      - tools/dn-*.sh
-      - tools/*.py
+      - bootstrap/**
+      - tools/dn-test.sh
+      - tools/gen-shim.py
       - audit/**
       - .github/workflows/dn.yml
+  pull_request:
 
 jobs:
-  tree:
+  audit:
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        upstream: [dnosp214, dn151]
     steps:
       - uses: actions/checkout@v4
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch
-      - name: Fetch the archive and make the tree
-        run: tools/dn-materialize.sh ${{ matrix.upstream }}
-      - name: Are the units that the sources use but the tree lacks in the archive? (names only)
-        run: |
-          f=$(ls build/cache/*.rar build/cache/*.zip 2>/dev/null | head -1)
-          case "$f" in
-            *.rar) unrar lb "$f" | tr -d '\r' > names.txt ;;
-            *)     unzip -Z1 "$f" | tr -d '\r' > names.txt ;;
-          esac
-          echo "$f: $(wc -l < names.txt) entries"
-          for u in files fltl fnotify use16 vputils gauge gauges helpfile helpkern asciitab edwin dnstddlg events messages dnapp drivers fviewer rtpatch; do
-            printf '%-10s %s\n' "$u" "$(grep -i -E "(^|/)$u\.(pas|inc|001)$" names.txt | tr '\n' ' ')"
-          done
-      - name: Size of the tree
-        run: |
-          find build/dn -type f | sed 's/.*\.//' | tr 'A-Z' 'a-z' | sort | uniq -c | sort -rn | head -12
-          find build/dn -iname '*.pas' | wc -l
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3
       - name: Fetch the Borland reference
         run: audit/fetch_reference.sh
-      - name: Audit (only names and numbers are printed)
-        run: python3 audit/xclone.py --min 3 --ref audit/ref/list.txt build/dn | tee audit-${{ matrix.upstream }}.txt | head -80
-      - name: Files over the gate (raw > 10 % or maxrun >= 48)
+      - name: Audit of dn/src (only names and numbers are printed)
+        run: python3 audit/xclone.py --min 3 --ref audit/ref/list.txt dn/src | tee audit.txt | head -40
+      - name: The gate (raw <= 10 % and maxrun < 48 for every file)
         run: |
-          awk 'NR>1 && $1!="TOTAL" { r=$3; sub("%","",r); if (r+0 > 10 || $6+0 >= 48) n++ } END { print n+0, "files over the gate" }' audit-${{ matrix.upstream }}.txt
-          tail -1 audit-${{ matrix.upstream }}.txt
+          tail -1 audit.txt
+          n=$(awk 'NR>1 && $1!="TOTAL" { r=$3; sub("%","",r); if (r+0 > 10 || $6+0 >= 48) n++ } END { print n+0 }' audit.txt)
+          echo "$n files over the gate"
+          [ "$n" -eq 0 ]
+      - name: Is dn/PROVENANCE.md up to date?
+        run: python3 bootstrap/tools/dn-manifest.py --check
 
-  probe:
-    # How much of the tree FPC takes as it is (the work list for the porting patches).
+  bootstrap:
+    # The record of the path: the public archive -> bootstrap/run.sh -> the tree of the tag bootstrap-N (the latest).
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch
+      - name: Run bootstrap
+        run: bootstrap/run.sh out/bootstrap
+      - name: Is the result the tree of the latest tag bootstrap-N?
+        run: |
+          tag=$(git tag -l 'bootstrap-*' | sort -V | tail -1)
+          echo "tag: $tag"
+          mkdir -p out/ref && git archive "$tag" dn/src dn/data | tar -x -C out/ref
+          diff -r out/bootstrap/src out/ref/dn/src && diff -r out/bootstrap/data out/ref/dn/data && echo "the same as $tag"
+
+  units:
+    # Tests of our own units in dn/tests, natively.
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch fp-compiler fp-units-rtl
-      - name: Make the tree (DN OSP 2.14)
-        run: tools/dn-materialize.sh dnosp214
-      - name: Compile every unit (the options of dn/target.env), the first errors by kind
-        run: tools/dn-probe.sh delphi -Sh- -Rintel -dDPMI32 | tee probe-delphi.txt
-      - name: The same in mode objfpc
-        run: tools/dn-probe.sh objfpc -Rintel -dDPMI32 | tee probe-objfpc.txt
-      - name: Per unit results
-        if: always()
-        run: cat build/probe/result.txt | sort | head -300
-
-  new:
-    # Tests of our own units in dn/new (the replacements of the Virtual Pascal layer), natively.
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
       - name: Build and run the tests
-        run: |
-          mkdir -p out/shim
-          cp -r dn/new/manual out/shim/
-          python3 tools/gen-shim.py dn/new/shims.map out/shim tv/src
-          cd dn/tests
-          for t in t_*.pas; do
-            fpc -Mobjfpc -Fu../new -Fu../../out/shim -Fu../../tv/src -Fi. -FE../../out -FU../../out "$t" | grep -E 'Error|Fatal' && exit 1
-            echo "=== ${t%.pas}"
-            (cd ../../out && ./${t%.pas}) | tee ../../out/${t%.pas}.txt
-            grep -q '^ALL OK' ../../out/${t%.pas}.txt
-          done
+        run: tools/dn-test.sh

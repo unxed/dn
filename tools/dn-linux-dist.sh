@@ -1,13 +1,13 @@
 #!/bin/sh
 # Makes dist/linux/: the Linux build of DN (i386, static) that can be tried without building it, with the screens of
-# the pty tour as text. usage: DN_LINUX=PREFIX [DN_LOCAL_TREE=...] tools/dn-linux-dist.sh
+# the pty tour as text. usage: DN_LINUX=PREFIX tools/dn-linux-dist.sh
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 dist=$here/dist/linux
 tmp=${TMPDIR:-/tmp}; work=$tmp/dn-linux-dist
 mkdir -p "$work" "$dist/screenshots"
 # no symbols: small
-DN_EXTRA="-Xs" "$here/tools/dn-linux.sh" "$work" >/dev/null
+DN_EXTRA="-Xs" "$here/tools/build.sh" linux "$work" >/dev/null
 cp "$work/dn" "$dist/dn"
 cp "$work"/*.LNG "$work"/*.DLG "$work"/*.HLP "$dist/"
 cp "$here/dist/dos/LICENSE-DN.TXT" "$here/dist/dos/LICENSE-TV.TXT" "$here/dist/dos/COPYRIGHT-TV-MAGIBLOT.TXT" "$dist/"

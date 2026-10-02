@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The file operations of the Linux build of DN in a pty, checked on the file system: make a directory, copy, move, delete, edit and
-save a file. usage: tools/dn-linux-ops.py OUTDIR   (OUTDIR: the result of tools/dn-linux.sh)"""
+save a file. usage: tools/dn-linux-ops.py OUTDIR   (OUTDIR: the result of tools/build.sh linux|linux64)"""
 import os
 import shutil
 import sys

@@ -10,7 +10,7 @@ var
 {$IFDEF CPU32}
   T: String;
 {$ENDIF}
-  P: array[0..3] of LongInt;
+  P: array[0..3] of PtrInt;
 begin
   { cells of 16 bits }
   FillChar(Buf, SizeOf(Buf), 0);

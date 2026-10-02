@@ -41,11 +41,6 @@ echo "bootstrap: the archive ($file), $(find "$out" -type f | wc -l) files"
 if [ -f "$boot/carve.list" ]; then
     python3 "$boot/tools/dn-carve.py" "$boot/carve.list" "$out" | sed 's|^|  carve: |'
 fi
-# the exclusions (exclude.list): the files that are replaced by the new TV (tv/) or by our text; their code is of Borland origin
-grep -v '^[[:space:]]*#' "$boot/exclude.list" | grep -v '^[[:space:]]*$' | while read -r pat; do
-    find "$out" -ipath "$out/$pat" -type f -print -delete
-done | sed 's|^|  excluded: |' || true
-
 # the units of the system: DN OSP keeps the units that differ between the systems in LIB.D32 (DOS, 32-bit), LIB.OLF, LIB.WLF
 # (events, files, country_, fltl, fnotify...): those of BOOT_LIB_DIR go to the root of the tree, the others are dropped.
 # VPSYSD32.PAS is the Virtual Pascal runtime (not DN code): our vpsyslow.pas (bootstrap/new) takes its place.
@@ -64,6 +59,11 @@ if [ -n "${BOOT_LIB_DIR:-}" ]; then
         [ -d "$d" ] && rm -rf "$d"
     done
 fi
+
+# the exclusions (exclude.list; after the units of the system are in the root, they may come from there too): the files that are replaced by the new TV (tv/) or by our text; their code is of Borland origin
+grep -v '^[[:space:]]*#' "$boot/exclude.list" | grep -v '^[[:space:]]*$' | while read -r pat; do
+    find "$out" -ipath "$out/$pat" -type f -print -delete
+done | sed 's|^|  excluded: |' || true
 
 # the patches (patches/series)
 while read -r p; do

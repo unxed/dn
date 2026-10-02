@@ -4,7 +4,8 @@
 #  - every tv/src unit says where it comes from: "Translated from magiblot/tvision @"
 #    (then it points to COPYRIGHT.magiblot) or "Written for this port";
 #  - tv/ does not mention dn/;
-#  - dn/ does not contain files of tv/ (same names) and no Borland sources by name.
+#  - dn/ does not contain files of tv/ (same names) and no Borland sources by name;
+#  - dn/PROVENANCE.md (the origin of the files of dn/src) is up to date.
 # usage: tools/check-layout.sh      (from the root of the repository)
 set -u
 fail=0
@@ -12,7 +13,7 @@ err() { echo "layout: $*" >&2; fail=1; }
 
 # 1. units used by tv/
 own=$(ls tv/src/*.pas tv/tests/*.pas | sed 's|.*/||; s|\.pas$||' | tr 'A-Z' 'a-z' | sort -u | tr '\n' ' ')
-allowed="system sysutils dos go32 objpas math strings classes"
+allowed="system sysutils dos go32 objpas math strings classes baseunix unix termio"
 for f in tv/src/*.pas tv/tests/*.pas tv/dostests/*.pas tv/demo/*.pas; do
     [ -f "$f" ] || continue
     # the "uses" clauses: from "uses" to the first ";"
@@ -46,6 +47,9 @@ if [ -d dn ]; then
     done
     find dn -type d -name ref | grep . && err "dn/ must not hold a reference corpus"
 fi
+
+# 5. the manifest of the origin of the files of dn/src
+python3 bootstrap/tools/dn-manifest.py --check >/dev/null || err "dn/PROVENANCE.md is not up to date (run bootstrap/tools/dn-manifest.py)"
 
 [ "$fail" -eq 0 ] && echo "layout: ok"
 exit "$fail"

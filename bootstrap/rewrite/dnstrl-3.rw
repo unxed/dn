@@ -1,0 +1,19 @@
+# The declaration of TStringList (carved from COLLECT.PAS) repeated that of Borland TV (audit: 31 tokens in a row): the same
+# members in another order.
+file: dnstrl.pas
+from: PStringList = ^TStringList;
+to: procedure ReadStr(var S: String; Offset, Skip: AWord);
+sha1: 1da617528e2671b20f65febe0734cee4ea35816e
+---
+  PStringList = ^TStringList;
+  TStringList = object(TObject)
+  private
+    Index: PStrIndex;
+    IndexSize: AWord;
+    BasePos: LongInt;
+    Stream: PStream;
+    procedure ReadStr(var S: String; Offset, Skip: AWord);
+  public
+    function Get(Key: AWord): String;
+    destructor Done; virtual;
+    constructor Load(var S: TStream);

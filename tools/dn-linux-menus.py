@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Opens every item of every menu of the Linux build of DN (in a pty, a fresh start for each) and reports the items after which the program died,
-shows its "Fatal Error" screen or does not answer an Esc. usage: tools/dn-linux-menus.py OUTDIR [WORKERS]   (OUTDIR: the result of tools/dn-linux.sh)
+shows its "Fatal Error" screen or does not answer an Esc. usage: tools/dn-linux-menus.py OUTDIR [WORKERS]   (OUTDIR: the result of tools/build.sh linux|linux64)
 The screens are kept in OUTDIR/menu-M-N.txt (M = the menu from 1, N = the item from 1)."""
 import os, shutil, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
