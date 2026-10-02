@@ -61,6 +61,7 @@
 | 10b | `TvFileDlg` — `TFileDialog`, `TFileList`, `TSortedListBox`, `TFileInputLine`, `TFileInfoPane` | `tfildlg.cpp`, `tfillist.cpp`, `stddlg.cpp` | сделан (без потоков) |
 | 10c | `TvChDir` — `TChDirDialog`, `TDirListBox` | `tchdrdlg.cpp`, `tdirlist.cpp` | сделан (без потоков) |
 | 11a | `TvColorSel` — `TColorDialog`, `TColorSelector`, `TMonoSelector`, `TColorDisplay`, `TColorGroupList`, `TColorItemList`, `ColorItem`, `ColorGroup` | `colorsel.cpp` | сделан (без потоков) |
+| 11b | `TvTextView` — `TTextDevice`, `TTerminal`, `AssignDevice` | `textview.cpp`, `ttprvlns.cpp` | сделан |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -339,3 +340,9 @@
 - Запомненные индексы групп — глобальная `ColorIndexes` (как статическая `colorIndexes` оригинала), `FreeColorIndexes` освобождает.
 - Оригинал в `SetData` берёт индекс пункта группы как индекс палитры (`pal->data[groups->getGroupIndex(...)]`) — повторено как есть, с проверкой границы.
 - BIOS-цвет 0 в `TDrawBuffer` значит «оставить атрибут» — `TColorDisplay` показывает его как `ErrorAttr`, как оригинал.
+
+### TvTextView (11b): решения
+
+- `TTextDevice` — не `streambuf`: интерфейс — виртуальный `DoSputn(S: PByte; Count)`, удобства `PutStr`, `PutLine`, `PutChar` (не `Write`/`WriteLn`: иначе потомки теряют системный `Write`). Вместо `otstream` — `AssignDevice(T, Device)` (как `TextView` Borland Pascal): `Write(T, ...)` идёт в терминал; CR отбрасывается, `LineEnd` текстового файла — LF.
+- `TTerminal`: кольцевой буфер до 32000 байт, старые строки вытесняются целыми; `Draw` рисует с конца, в куске до 256 байт не режет символ UTF-8.
+- Грабли FPC: `FillChar(T, ...)` обнуляет `TextRec.LineEnd`, без него `WriteLn` не даёт перевода строки.
