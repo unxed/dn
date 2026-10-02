@@ -1,0 +1,25 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:17:54p
+╔═[■]═════════════════════════ Edit - C:\OUT.TXT ══════════════════════════[↕]═╗
+║  File  Edit  Search  Paragraph  Block  Misc  Options                         ▲
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▓
+║                                                                              ▼
+└─══════1:1════[000·00]═(↔)══CrLf═DOS══<·········>══◄■▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►─┘
+C:\>                                                                            
+ F1 Help  F2 Save  F3 Open  F5 Block  F6 Fill  F7 Search  F8 KeyMap  F10 Menu   
