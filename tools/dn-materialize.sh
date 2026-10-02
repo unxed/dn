@@ -9,7 +9,9 @@ here=$(cd "$(dirname "$0")/.." && pwd)
 name=${1:-$DN_BASE}
 eval file=\$${name}_FILE
 raw="$here/build/raw-$name"
-out="$here/build/dn"
+# DN_TARGET=linux: the tree of the Linux build (build/dn-linux; dn/target-linux.env, dn/new-linux over dn/new)
+. "$here/dn/targets.sh"
+out="$here/build/$DN_TREE"
 if [ -n "${DN_LOCAL_TREE:-}" ]; then
     # for work without the network: an unpacked copy of the archive (analysis only, never committed)
     rm -rf "$out"; mkdir -p "$out"
@@ -43,7 +45,7 @@ done | sed 's|^|  excluded: |' || true
 # LIB.WLF: events, files, country_, fltl, fnotify...): those of the target go to the root of the tree,
 # the others are dropped. VPSYSD32.PAS is the Virtual Pascal runtime (not DN code): our dn/new/vpsyslow.pas
 # takes its place.
-. "$here/dn/target.env"
+. "$DN_TARGET_ENV"
 if [ -n "${DN_LIB_DIR:-}" ]; then
     ld=$(ls "$out" | grep -i "^$DN_LIB_DIR\$" | head -1)
     if [ -n "$ld" ]; then
@@ -90,10 +92,28 @@ if [ -d "$here/dn/edits" ]; then
     done
 fi
 
+# the edits of the Linux build only (dn/edits/linux)
+if [ "$DN_TARGET" = linux ] && [ -d "$here/dn/edits/linux" ]; then
+    for e in "$here"/dn/edits/linux/*.sed; do
+        [ -f "$e" ] || continue
+        find "$out" -maxdepth 1 -type f \( -iname '*.pas' -o -iname '*.inc' \) -print0 | LC_ALL=C xargs -0 sed -i -f "$e"
+        echo "  edit (linux): $(basename "$e")"
+    done
+    for e in "$here"/dn/edits/linux/*.py; do
+        [ -f "$e" ] || continue
+        find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 python3 "$e" | sed 's|^.*/||; s|^|  edit (linux) '"$(basename "$e")"': |'
+    done
+fi
+
 # new files
 if [ -d "$here/dn/new" ]; then
     (cd "$here/dn/new" && find . -type f ! -name .gitkeep) | while read -r f; do
         mkdir -p "$out/$(dirname "$f")"; cp "$here/dn/new/$f" "$out/$f"; echo "  new: $f"; done
+fi
+# the files of the target (dn/new-linux ...) replace those with the same names
+if [ -n "${DN_NEW_DIR:-}" ] && [ -d "$here/$DN_NEW_DIR" ]; then
+    (cd "$here/$DN_NEW_DIR" && find . -type f ! -name .gitkeep) | while read -r f; do
+        mkdir -p "$out/$(dirname "$f")"; cp "$here/$DN_NEW_DIR/$f" "$out/$f"; echo "  new ($DN_TARGET): $f"; done
 fi
 # the shim units: the names of the TV units of Borland that DN uses, from our tv/ (tools/gen-shim.py)
 if [ -f "$here/dn/new/shims.map" ]; then
@@ -121,4 +141,4 @@ if [ -n "$cfg" ]; then
     done
     find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 python3 "$here/tools/dedup-uses.py" | sed 's|^|  |'
 fi
-echo "dn-materialize: build/dn ready ($(find "$out" -type f | wc -l) files)"
+echo "dn-materialize: build/$DN_TREE ready ($(find "$out" -type f | wc -l) files)"

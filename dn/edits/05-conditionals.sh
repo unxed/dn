@@ -5,5 +5,6 @@
 # the directory of the tree as the argument.
 set -eu
 here=$(cd "$(dirname "$0")/../.." && pwd)
-. "$here/dn/target.env"
+. "$here/dn/targets.sh"
+. "$DN_TARGET_ENV"
 python3 "$here/tools/ifdef-strip.py" "$1" "$1" $DN_DEFINES
