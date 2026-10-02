@@ -25,3 +25,13 @@ was not done now.
 - dpmi32.pas: `ShadowCount: Integer = 0` (an initialized variable of the unit) was 8 when the program started under DOSBox-X
   (DOS, go32v2), so DosShadow found its table full; it is set to 0 in the initialization. The cause is not understood
   (the value of another unit's static data? check that the initialized data of the exe are loaded whole).
+
+## Added with the resource compiler (rcp) run
+- Argument evaluation order: VP evaluates call arguments left to right, FPC right to left. edit 117 hoists the
+  `Token(S, i)` reads of rcp.pas into temporaries. Other places of the tree may depend on the order too (look when a
+  value is "shifted" at run time).
+- `{$PACKRECORDS 1}` is added to STDEFINE.INC (vpc.cfg: `$AlignRec-`): the data records of the dialogs (TSysData...) must
+  be byte-aligned. It also packs the `object`s of DN units (VP aligns objects by `$AlignData+`): check if it matters.
+- tv `TListBoxRec` is `packed` with a LongInt `Selection` (DN: Integer, 32 bits in the Delphi mode). The Word of the
+  original TV is not kept; `TvList.ListBoxOwnsList` (default True, TV) is set to False by DNApp: TListBox.Done of DN does
+  not dispose the list (TSysDialog.Done does it).
