@@ -993,7 +993,10 @@ function NewStatusKey(const AText: ShortString; AKeyCode, ACommand: Word;
 begin
   New(Result);
   Result^.Next := ANext;
-  Result^.Text := NewStr(AText);
+  if AText = '' then
+    Result^.Text := nil      { a hidden item: only its key works }
+  else
+    Result^.Text := NewStr(AText);
   Result^.Key := KeyMake(AKeyCode);
   Result^.Command := ACommand;
 end;

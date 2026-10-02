@@ -30,6 +30,7 @@ type
     function Equals(const R: TRect): Boolean;
     function Empty: Boolean;
   end;
+  PRect = ^TRect;
 
 function Point(AX, AY: Integer): TPoint; inline;
 function PointAdd(const P1, P2: TPoint): TPoint; inline;
