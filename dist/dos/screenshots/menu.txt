@@ -1,6 +1,6 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            03:42:16p
- ┌─────────────────────────────────┐ ══╗↔════════════════ C:\ ═════════════[↕]═╗
- │ About...                        │   ║║                                      ▲
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            03:47:08p
+ ┌─────────────────────────────────┐ ══╗x════════════════ C:\ ═════════════[↕]═╗
+ │ About...                        │   ║║       Name       │       Name        ▲
  │ Refresh display                 │   ║║TEM               │                   ■
  │ Screen rest                     │   ║║ENGLISH       DLG │                   ▒
  │ Change language         Alt-F12 │   ║║RUSSIAN       DLG │                   ▒

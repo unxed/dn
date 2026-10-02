@@ -1,18 +1,18 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            03:41:21p
-↔═[■]════════════ C:\ ═════════════════╗↔════════════════ C:\ ═════════════[↕]═╗
-║                                      ║║                                      ▲
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            03:46:53p
+x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
+║       Name       │       Name        ║║       Name       │       Name        ▲
 ║TEM               │                   ║║TEM               │                   ■
 ║ENGLISH       DLG │╔═[■]══════════ Warning ═══════════════╗                   ▒
 ║RUSSIAN       DLG │║                                      ║                   ▒
-║UKRAIN        DLG │║  ♪♥DN/2 Open Source♪♥Version 2.14    ║                   ▒
-║CWSDPMI       EXE │║  beta/DPMI32, ♪♥Compiled Fri, 12 Jun ║                   ▒
-║DN            EXE │║  2025 at                             ║                   ▒
-║DN            INI │║  00:00:00♪♥http://www.dnosp.ru/♪♪♥Ba ║                   ▒
-║ENGLISH       LNG │║  sed on: Dos Navigator Open Source   ║                   ▒
-║RUSSIAN       LNG │║  1.51.08♪♥http://www.dnosp.ru♪♪♥Than ║                   ▒
-║UKRAIN        LNG │║  ks to fPrint (UK) Ltd for copy of   ║                   ▒
-║CWSDPMI       SWP │║  VP♪♥http://www.vpascal.com♪♪♪♪♥Base ║                   ▒
-║DNERR         TXT │║  d on                                ║                   ▒
+║UKRAIN        DLG │║                                      ║                   ▒
+║CWSDPMI       EXE │║           DN/2 Open Source           ║                   ▒
+║DN            EXE │║      Version 2.14 beta/DPMI32,       ║                   ▒
+║DN            INI │║     Compiled Fri, 12 Jun 2025 at     ║                   ▒
+║ENGLISH       LNG │║               00:00:00               ║                   ▒
+║RUSSIAN       LNG │║         http://www.dnosp.ru/         ║                   ▒
+║UKRAIN        LNG │║                                      ║                   ▒
+║CWSDPMI       SWP │║  Based on: Dos Navigator Open Source ║                   ▒
+║DNERR         TXT │║                1.51.08               ║                   ▒
 ║OUT           TXT │║                  OK   ▄              ║                   ▒
 ║                  │║                ▀▀▀▀▀▀▀▀              ║                   ▒
 ║                  │╚══════════════════════════════════════╝                   ▒
