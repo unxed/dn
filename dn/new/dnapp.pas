@@ -10,7 +10,7 @@ unit DNApp;
 interface
 
 uses
-  SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, TvScreen, TvCell, Menus,
+  SysUtils, TvInput, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, TvScreen, TvCell, Menus,
   Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings
 {$IFDEF GO32V2}, TvDos, go32{$ENDIF}, DNErrLog;
 
@@ -297,6 +297,13 @@ begin
     DNTrace('help ctx: app ' + IntToStr(Application^.GetHelpCtx) + ' desktop ' + IntToStr(Desktop^.GetHelpCtx) + ' status ' +
       IntToStr(StatusLine^.HelpCtx) + ' topview ' + IntToHex(PtrUInt(StatusLine^.TopView), 8) + ' app ' + IntToHex(PtrUInt(Application), 8) +
       ' current ' + IntToHex(PtrUInt(Application^.Current), 8) + ' desktop.current ' + IntToHex(PtrUInt(Desktop^.Current), 8));
+    { the focused control of the window on top of the desktop, if that is a group (a test aid) }
+    if (Desktop^.Current <> nil) and (PGroup(Desktop^.Current)^.Current <> nil) then
+      begin
+        TraceView(PGroup(Desktop^.Current)^.Current);
+        if PGroup(Desktop^.Current)^.Current^.Size.Y = 1 then
+          DNTrace('as input line: maxlen ' + IntToStr(PInputLine(PGroup(Desktop^.Current)^.Current)^.MaxLen) + ' curpos ' + IntToStr(PInputLine(PGroup(Desktop^.Current)^.Current)^.CurPos) + ' data [' + PInputLine(PGroup(Desktop^.Current)^.Current)^.Data^ + ']');
+      end;
     { the geometry of the main views (a test aid) }
     V := Desktop^.Last;
     if V <> nil then
