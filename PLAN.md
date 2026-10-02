@@ -178,10 +178,10 @@
 `TvInput`, `TvValid`, `TvCluster` (чекбоксы, радиокнопки), `TvList` (`TListViewer`,
 `TListBox`), `TvHist` (история), `TvFiles` (поиск с LFN, пути, коллекции),
 `TvFileDlg` (`TFileDialog`, `TSortedListBox` и др.), `TvChDir` (`TChDirDialog`),
+`TvColorSel` (`TColorDialog` и селекторы),
 бэкенды `TvMem`, `TvDos`.
 
-Осталось в вехе 3: `TColorDialog` и селекторы цвета, справка (`helpbase`, `tvhc`),
-`TTextDevice`/`TTerminal`, потоки и ресурсы для видов (`Load`/`Store` у виджетов),
+Осталось в вехе 3: справка (`helpbase`, `tvhc`), `TTextDevice`/`TTerminal`, потоки и ресурсы для видов (`Load`/`Store` у виджетов),
 `TProgram`-мелочи по результатам `spec/api-usage.md`. Адаптеры под API DN — в `dn/new`.
 
 Как писать тесты (чтобы не повторять ошибки):
