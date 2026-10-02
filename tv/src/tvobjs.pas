@@ -236,9 +236,15 @@ procedure ReRegisterType(var S: TStreamRec);
 { The record registered for a type number, nil if none. }
 function FindStreamRec(ObjType: Word): PStreamRec;
 
+type
+  { the name of a file of the program into the name that the system takes (DN: DOS names on Unix) }
+  TFileNameHook = function(const Name: string): string;
+
 var
   { stream records of the collections: RegisterType(RCollection) (TCollection), RStringCollection }
   RCollection, RStringCollection: TStreamRec;
+  { when set, TDosStream passes the names of its files through it }
+  OnFileName: TFileNameHook = nil;
 
 implementation
 
@@ -550,6 +556,8 @@ end;
 procedure TDosStream.Open(const FileName: string; Mode: Word);
 begin
   FName := FileName;
+  if Assigned(OnFileName) then
+    FName := OnFileName(FileName);
   DoOpen(Mode);
 end;
 

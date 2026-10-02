@@ -77,6 +77,15 @@ function SysFileIsDevice(Handle: THandle): LongInt;
 { The label of the volume of the drive ('' if there is none). }
 function SysGetVolumeLabel(Drive: Char): ShortString;
 
+{ --- names of files ----------------------------------------------------------- }
+{ The names of DN are those of DOS: "C:\DIR\FILE.EXT", in any case. On Unix (the Linux build) they are turned into the
+  names of the system: the drive letter is dropped (the only disk, C:, is the root), "\" becomes "/", and the case of the
+  names that exist is found (a name that does not exist is left as it is, so that it can be created). Elsewhere the name is
+  returned as it is. }
+function SysOsPath(const S: string): string;
+{ GetDir for DN: the current directory as "C:\DIR" (on Unix: C: is the root). }
+procedure SysGetDirDos(D: Byte; var S: string);
+
 { --- searching a directory ---------------------------------------------------- }
 type
   { The record of a search. The first fields are laid out as DN (vpsyslo2.pas) expects them; the state of
@@ -149,8 +158,118 @@ var
 implementation
 
 uses
-  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, DNErrLog, LineInfo
-{$IFDEF GO32V2}, go32, TvDos{$ENDIF};
+  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, DNErrLog, LineInfo
+{$IFDEF GO32V2}, go32, TvDos{$ENDIF}
+{$IFDEF UNIX}, BaseUnix, TvUnix{$ENDIF};
+
+{ --- names of files ----------------------------------------------------------- }
+
+{$IFDEF UNIX}
+function PathExists(const P: string): Boolean;
+begin
+  Result := fpAccess(P, F_OK) = 0;
+end;
+
+{ the case of the names of the path that exist is found by listing the directories }
+function ResolveCase(const P: string): string;
+var
+  I, Start: Integer;
+  Base, Comp, Cand, Dir: string;
+  SR: SysUtils.TSearchRec;
+  Found: Boolean;
+begin
+  if (P = '') or PathExists(P) then
+    Exit(P);
+  Base := '';
+  I := 1;
+  if P[1] = '/' then
+  begin
+    Base := '/';
+    I := 2;
+  end;
+  while I <= Length(P) do
+  begin
+    Start := I;
+    while (I <= Length(P)) and (P[I] <> '/') do
+      Inc(I);
+    Comp := Copy(P, Start, I - Start);
+    if Comp = '' then
+    begin
+      Inc(I);
+      Continue;
+    end;
+    Cand := Base + Comp;
+    if not PathExists(Cand) then
+    begin
+      Dir := Base;
+      if Dir = '' then
+        Dir := '.';
+      Found := False;
+      if SysUtils.FindFirst(IncludeTrailingPathDelimiter(Dir) + '*', faAnyFile, SR) = 0 then
+      begin
+        repeat
+          if SameText(SR.Name, Comp) then
+          begin
+            Cand := Base + SR.Name;
+            Found := True;
+            Break;
+          end;
+        until SysUtils.FindNext(SR) <> 0;
+        SysUtils.FindClose(SR);
+      end;
+      if not Found then
+        Exit(Base + Copy(P, Start, MaxInt));       { it does not exist: as it is }
+    end;
+    Base := Cand;
+    if I <= Length(P) then
+    begin
+      Base := Base + '/';
+      Inc(I);
+    end;
+  end;
+  Result := Base;
+end;
+
+function SysOsPath(const S: string): string;
+var
+  I: Integer;
+begin
+  Result := S;
+  if (Length(Result) >= 2) and (Result[2] = ':') and (UpCase(Result[1]) in ['A'..'Z']) then
+  begin
+    Delete(Result, 1, 2);
+    if Result = '' then
+      Result := '.';
+  end;
+  for I := 1 to Length(Result) do
+    if Result[I] = '\' then
+      Result[I] := '/';
+  Result := ResolveCase(Result);
+end;
+
+procedure SysGetDirDos(D: Byte; var S: string);
+var
+  I: Integer;
+begin
+  S := GetCurrentDir;
+  for I := 1 to Length(S) do
+    if S[I] = '/' then
+      S[I] := '\';
+  if S = '' then
+    S := '\';
+  S := 'C:' + S;
+end;
+{$ELSE}
+function SysOsPath(const S: string): string;
+begin
+  Result := S;
+end;
+
+procedure SysGetDirDos(D: Byte; var S: string);
+begin
+  GetDir(D, S);
+end;
+{$ENDIF}
 
 { --- files -------------------------------------------------------------------- }
 
@@ -176,7 +295,7 @@ begin
   else
     M := fmOpenRead;
   end;
-  H := FileOpen(StrPas(FileName), M or fmShareDenyNone);
+  H := FileOpen(SysOsPath(StrPas(FileName)), M or fmShareDenyNone);
   if H = THandle(-1) then
   begin
     Handle := 0;
@@ -193,7 +312,7 @@ function SysFileCreate(FileName: PChar; Mode, Attr: LongInt; var Handle: LongInt
 var
   H: THandle;
 begin
-  H := FileCreate(StrPas(FileName));
+  H := FileCreate(SysOsPath(StrPas(FileName)));
   if H = THandle(-1) then
   begin
     Handle := 0;
@@ -466,6 +585,16 @@ begin
   F.Name[Length(N) + 1] := #0;
 end;
 
+{ the DOS mask "*.*" is every file (on Unix it would be the files with a dot in the name) }
+function FixMask(const P: string): string;
+begin
+  Result := P;
+{$IFDEF UNIX}
+  if (Length(P) >= 3) and (Copy(P, Length(P) - 2, 3) = '*.*') and ((Length(P) = 3) or (P[Length(P) - 3] = '/')) then
+    Result := Copy(P, 1, Length(P) - 2);
+{$ENDIF}
+end;
+
 function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
 var
   I: Integer;
@@ -476,7 +605,7 @@ begin
   if I > MaxSearches then
     Exit(4);                       { too many open files }
   New(Searches[I]);
-  if SysUtils.FindFirst(StrPas(Path), Attr, Searches[I]^) <> 0 then
+  if SysUtils.FindFirst(FixMask(SysOsPath(StrPas(Path))), Attr, Searches[I]^) <> 0 then
   begin
     SysUtils.FindClose(Searches[I]^);
     Dispose(Searches[I]);
@@ -740,6 +869,13 @@ initialization
   DosInit;
 finalization
   DosDone;
+{$ENDIF}
+{$IFDEF UNIX}
+initialization
+  OnFileName := @SysOsPath;
+  UnixInit;                        { False when the program has no terminal (the resource compiler): no screen then }
+finalization
+  UnixDone;
 {$ENDIF}
 
 end.

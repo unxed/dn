@@ -188,10 +188,11 @@ class PtyTerm:
         self.set_size(cols, rows)
         os.kill(self.pid, signal.SIGWINCH)
 
-    def pump(self, timeout=0.3):
-        """reads what the program wrote until it is quiet for `timeout` seconds"""
+    def pump(self, timeout=0.3, limit=8.0):
+        """reads what the program wrote until it is quiet for `timeout` seconds (at most `limit` seconds)"""
+        stop = time.time() + limit
         end = time.time() + timeout
-        while time.time() < end:
+        while time.time() < end and time.time() < stop:
             r, _, _ = select.select([self.fd], [], [], max(end - time.time(), 0))
             if not r:
                 break
