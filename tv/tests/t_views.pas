@@ -436,7 +436,8 @@ begin
   Check(PFill(GL^.At(2))^.Peer = GL^.At(1), 'a pointer to a sibling view is made again (b -> c)');
   Check(PFill(GL^.At(1))^.Peer = nil, 'a nil pointer stays nil');
   Check(GL^.Current = GL^.At(2), 'the current view is the same');
-  Check(GL^.At(2)^.State and (sfSelected or sfFocused or sfActive or sfExposed) = 0, 'a loaded view is not active');
+  Check(((GL^.At(2)^.State and sfSelected) <> 0) and ((GL^.At(2)^.State and (sfFocused or sfActive or sfExposed)) = 0),
+    'the current view of a loaded group is selected (SetCurrent), but not focused, active or exposed');
   Check(GL^.Size.X = 20, 'the size of the group');
   Dispose(GL, Done);
   Dispose(GS, Done);

@@ -2638,7 +2638,9 @@ begin
     if P <> nil then
       InsertView(P, nil);
   end;
-  Current := ReadChildPtr(S);
+  { as in Borland (SetCurrent(V, NormalSelect)): the current view is selected, else it does not take the keys (a dialog loaded from a
+    resource: the input line had the focus but not sfSelected) }
+  SetCurrent(ReadChildPtr(S), NormalSelect);
   { the views of this group that pointed to each other get their pointers }
   for I := Base to High(Fixups) do
     if (Fixups[I].Index >= 1) and (Fixups[I].Index <= Count) then
