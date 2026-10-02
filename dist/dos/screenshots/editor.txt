@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:17:54p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:28:26p
 ╔═[■]═════════════════════════ Edit - C:\OUT.TXT ══════════════════════════[↕]═╗
 ║  File  Edit  Search  Paragraph  Block  Misc  Options                         ▲
 ║                                                                              ▓

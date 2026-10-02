@@ -57,3 +57,12 @@ is not tried: it changes the sizes of records that go to `tv/` (TCluster data, T
 it (user screen, screen savers) and writes back with SysTvShowBuf. The user screen is the text screen that was there before DN
 (VPSysLow grabs it at the start). Not done: the characters above 255 / combined ones of tv/ become '?' in the copy; the copy is
 converted at every idle even when nobody reads it (cheap: 2000 cells).
+
+## Справка (tvhc/TvHelp)
+- `.hlp` занимает 449 КБ из-за индекса: топик `_=65535` (контекст «нет справки») растягивает индекс `THelpIndex` до 65536 позиций.
+  Можно хранить индекс разреженным (отсортированные пары) — формат наш, менять можно; пока не мешает.
+- `tvhc` терпит `{` без `}` в строке (в справке DN есть листинги `asm{ … }`), считает такой текст обычным; `;`-комментарий и
+  `{автор}` в конце строки `.topic` отбрасываются; ссылка `{текст:Топик}` берёт топик после ПОСЛЕДНЕГО двоеточия
+  (`{:chow !.!+:_}`). Оригинальный `tvhc` мы не видели (его нет в архиве) — правила выведены из `dnhelp.htx`.
+- `.title` пока не используется (окно справки одно, заголовок «Help»).
+- Окно справки — 50x18 как в Borland; настройка размера — позже (вынести в настройку).

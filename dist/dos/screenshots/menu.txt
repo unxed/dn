@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:16:58p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:27:21p
  ┌─────────────────────────────────┐ ══╗x════════════════ C:\ ═════════════[↕]═╗
  │ About...                        │   ║║       Name       │       Name        ▲
  │ Refresh display                 │   ║║TEM               │                   ■
@@ -7,14 +7,14 @@
  ├─────────────────────────────────┤   ║║UKRAIN        DLG │                   ▒
  │ Screen grabber    Shift-Alt-Ins │   ║║CWSDPMI       EXE │                   ▒
  │ User screen              Alt-F5 │   ║║DN            EXE │                   ▒
- │ Output window            Ctrl-O │   ║║DN            INI │                   ▒
- │ SmartPad (TM)             Alt-Q │   ║║ENGLISH       LNG │                   ▒
- │ Show Clipboard                  │   ║║RUSSIAN       LNG │                   ▒
- │ Trashcan on/off                 │   ║║UKRAIN        LNG │                   ▒
- │ Execute OS command              │   ║║CWSDPMI       SWP │                   ▒
- ├─────────────────────────────────┤   ║║DNERR         TXT │                   ▒
- │ EGA/VGA lines         Shift-F10 │   ║║OUT           TXT │                   ▒
- │ Custom video mode 1     Alt-F10 │   ║║                  │                   ▒
+ │ Output window            Ctrl-O │   ║║ENGLISH       HLP │                   ▒
+ │ SmartPad (TM)             Alt-Q │   ║║DN            INI │                   ▒
+ │ Show Clipboard                  │   ║║ENGLISH       LNG │                   ▒
+ │ Trashcan on/off                 │   ║║RUSSIAN       LNG │                   ▒
+ │ Execute OS command              │   ║║UKRAIN        LNG │                   ▒
+ ├─────────────────────────────────┤   ║║CWSDPMI       SWP │                   ▒
+ │ EGA/VGA lines         Shift-F10 │   ║║DNERR         TXT │                   ▒
+ │ Custom video mode 1     Alt-F10 │   ║║OUT           TXT │                   ▒
  │ Custom video mode 2    Ctrl-F10 │   ║║                  │                   ▒
  │ Change Screen  Mode  Shift-F12  │   ║║                  │                   ▒
  ├─────────────────────────────────┤   ║║                  │                   ▼
