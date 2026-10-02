@@ -53,6 +53,10 @@ jobs:
             ../../tools/dos-run.sh ../../out "${t%.pas}.exe" | tee ../../out/${t%.pas}.txt
             grep -q '^ALL OK' ../../out/${t%.pas}.txt || failed="$failed ${t%.pas}"
           done
+          # a compact report of what failed (the full output is above)
+          for t in $failed; do
+            echo "--- $t"; grep -E '^FAIL|heap since|checks FAILED|Runtime error|Exception|Bad command' ../../out/$t.txt | head -20
+          done
           # all the tests are run, so that one round of CI shows all the failures
           if [ -n "$failed" ]; then echo "FAILED:$failed"; exit 1; fi
       - name: Tests of the DOS backend (video memory, keyboard, mouse, clock)
