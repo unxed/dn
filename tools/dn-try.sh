@@ -11,6 +11,13 @@ here=$(cd "$(dirname "$0")/.." && pwd)
 . "$DN_TARGET_ENV"
 out=${TMPDIR:-/tmp}/dn-try-o; [ "$DN_TARGET" = dos ] || out=$out-$DN_TARGET; mkdir -p "$out"
 cd "$here/build/$DN_TREE" || exit 1
+# DN_ARCH=x86_64 (with DN_TARGET=linux): the native fpc of the host, 64-bit
+if [ "$DN_TARGET" = linux ] && [ "${DN_ARCH:-i386}" = x86_64 ]; then
+    out=$out-x64; mkdir -p "$out"
+    fpc $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/dn/new" -Fu"$here/tv/src" -FU"$out" -FE"$out" $DN_EXTRA -vewn "$1" 2>&1 \
+        | grep -a -E 'Error|Fatal|undefined|Linking|bytes' | head -${2:-12}
+    exit 0
+fi
 if [ "$DN_TARGET" = linux ]; then
     : "${DN_LINUX:?set DN_LINUX (tools/build-fpc-i386-linux.sh PREFIX)}"
     PPC=$DN_LINUX/lib/fpc/3.2.2/ppcross386; [ -x "$PPC" ] || PPC=$DN_CROSS/lib/fpc/3.2.2/ppcross386
