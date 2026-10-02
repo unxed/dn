@@ -1,4 +1,4 @@
-program t_cluster;
+program t_clust;
 {$I ../src/tvdefs.inc}
 uses TvGeom, TvCell, TvCodePg, TvEvents, TvKeys, TvViews, TvObjs, TvUtil, TvMem, TvApp,
   TvDialog, TvCluster;
