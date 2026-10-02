@@ -1,0 +1,9 @@
+# The placement of the menu bar of the editor window (Load): extent, Grow(-1, -1), one line high repeated the same
+# lines of the demo of Borland TV (audit: 31 tokens in a row): the same rectangle written as a rectangle.
+file: EDWIN.PAS
+after: Fail;
+from: GetExtent(R);
+to: R.B.Y := R.A.Y+1;
+sha1: 9ea216885007d13fa777e3ef71d513d5625bcbca
+---
+R.Assign(1, 1, Size.X - 1, 2);

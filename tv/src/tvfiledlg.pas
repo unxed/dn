@@ -78,7 +78,7 @@ type
     constructor Init(const Bounds: TRect; ANumCols: Integer; AScrollBar: PScrollBar);
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetKey(const S: ShortString): Pointer; virtual;
-    procedure NewList(AList: PSortedCollection);
+    procedure NewList(AList: PCollection);   { DN passes a PCollection (the list must be sorted) }
     function SortedList: PSortedCollection;
   private
     KeyBuf: ShortString;
@@ -182,7 +182,7 @@ begin
   Result := @KeyBuf;
 end;
 
-procedure TSortedListBox.NewList(AList: PSortedCollection);
+procedure TSortedListBox.NewList(AList: PCollection);
 begin
   inherited NewList(AList);
   SearchPos := -1;

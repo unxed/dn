@@ -72,3 +72,26 @@ begin
   if Event.What = evNothing then
     Result := Event.InfoPtr;
 end;
+
+var
+  WindowNumbers: Word = 0;
+
+procedure FreeWindowNumber(Number: Integer);
+begin
+  if (Number > 0) and (Number < 16) then
+    WindowNumbers := WindowNumbers and not (1 shl Number);
+end;
+
+function GetNum: Integer;
+var
+  I: Integer;
+begin
+  WindowNumberFreeHook := @FreeWindowNumber;
+  for I := 1 to 9 do
+    if (WindowNumbers and (1 shl I)) = 0 then
+    begin
+      WindowNumbers := WindowNumbers or (1 shl I);
+      Exit(I);
+    end;
+  Result := 0;
+end;

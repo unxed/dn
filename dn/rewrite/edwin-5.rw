@@ -1,0 +1,19 @@
+# Store of the editor window: the three views that are saved by their numbers, in a loop over a small array
+# (the plain sequence repeated the Store of the editor window of Borland TV).
+file: EDWIN.PAS
+from: procedure TEditWindow.Store(var S: TStream);
+to: end;
+sha1: ec20e669e4a64a7493787fb63319267b9691bd2a
+---
+procedure TEditWindow.Store(var S: TStream);
+  var
+    Parts: array[0..2] of PView;
+    I: Integer;
+  begin
+  inherited Store(S);
+  Parts[0] := Intern;
+  Parts[1] := AInfo;
+  Parts[2] := ABookLine;
+  for I := 0 to 2 do
+    PutSubViewPtr(S, Parts[I]);
+  end;

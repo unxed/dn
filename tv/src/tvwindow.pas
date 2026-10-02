@@ -154,6 +154,8 @@ type
   end;
 
 var
+  { DN: called when a window with a number is destroyed (DN hands the numbers out itself: Views.GetNum) }
+  WindowNumberFreeHook: procedure(Number: Integer) = nil;
   { stream records (see RView of TvViews) }
   RFrame, RScrollBar, RScroller, RWindow: TStreamRec;
 
@@ -846,6 +848,8 @@ end;
 destructor TWindow.Done;
 begin
   { the frame is destroyed with the other subviews }
+  if Assigned(WindowNumberFreeHook) and (Number > 0) then
+    WindowNumberFreeHook(Number);
   Frame := nil;
   inherited Done;
   DisposeStr(Title);

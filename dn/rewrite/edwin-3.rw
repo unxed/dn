@@ -1,0 +1,8 @@
+# The rectangle of the editor under the menu bar (Init).
+file: EDWIN.PAS
+after: {MenuBar^.Options := MenuBar^.Options or ofPostProcess;}
+from: GetExtent(R);
+to: Inc(R.A.Y);
+sha1: 63c242d536ad5b22902a80ebe05fae2b94fd3565
+---
+R.Assign(1, 2, Size.X - 1, Size.Y - 1);
