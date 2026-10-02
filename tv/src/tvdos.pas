@@ -6,7 +6,9 @@
   current code page of TvCodePg, which must be the one of the video font: DosInit selects it
   from the DOS code page (437 and 866 are known) unless it is given.
 
-  Not done yet: the system clipboard (WinOldAp, int 2Fh), video modes with more lines,
+  The system clipboard is WinOldAp (INT 2Fh AX=17xxh), text only (CF_OEMTEXT).
+
+  Not done yet: video modes with more lines,
   graphics fonts for code pages other than the hardware one. }
 unit TvDos;
 
@@ -17,7 +19,7 @@ interface
 {$IFDEF GO32V2}
 uses
   Go32, Dos, TvGeom, TvColors, TvCell, TvCodePg, TvUtf8, TvKeys, TvEvents, TvScreen,
-  TvSys, TvMouse;
+  TvSys, TvMouse, TvClip;
 
 { Takes over the screen, the keyboard and the mouse: the screen of TvScreen has the size
   of the current text mode. CodePage = 0 detects it. }
@@ -28,6 +30,13 @@ procedure DosDone;
 { Writes the screen as it is in video memory to a file: width and height (words), then
   width * height words (character and attribute). Used by the tests and the demo. }
 procedure DosDumpScreen(const FileName: string);
+
+{ The Windows clipboard through WinOldAp (INT 2Fh, AX=17xxh): available when Windows (3.x,
+  9x, XP DOS box) or an emulator has it. DosInit connects it to TvClip. Text is UTF-8 in the
+  program and CF_OEMTEXT in the current code page in the clipboard. }
+function DosClipboardAvailable: Boolean;
+function DosClipSet(const Text: AnsiString): Boolean;
+function DosClipGet(out Text: AnsiString): Boolean;
 
 { Reads a row of video memory: the characters (code page bytes). }
 function DosReadRow(Y: Integer; X0, X1: Integer): ShortString;
@@ -385,6 +394,114 @@ begin
   end;
 end;
 
+{ --- clipboard (WinOldAp) --------------------------------------------------------------- }
+
+const
+  CF_OEMTEXT = 7;
+  ClipMax = 262144;     { the largest text taken or given (conventional memory) }
+
+function ClipCall(Ax, Dx: Word; var R: TRealRegs): Boolean;
+begin
+  FillChar(R, SizeOf(R), 0);
+  R.ax := Ax;
+  R.dx := Dx;
+  realintr($2F, R);
+  Result := R.ax <> 0;
+end;
+
+function DosClipboardAvailable: Boolean;
+var
+  R: TRealRegs;
+begin
+  FillChar(R, SizeOf(R), 0);
+  R.ax := $1700;
+  realintr($2F, R);
+  Result := R.ax <> $1700;
+end;
+
+function DosClipSet(const Text: AnsiString): Boolean;
+var
+  R: TRealRegs;
+  Data: AnsiString;
+  L: LongInt;
+  Seg: Word;
+  Size: LongInt;
+  Opened: Boolean;
+begin
+  Result := False;
+  Data := ToCrLf(Utf8ToOem(Text));
+  if Length(Data) > ClipMax then
+    SetLength(Data, ClipMax);
+  Size := Length(Data) + 1;                  { the text ends with a NUL }
+  L := global_dos_alloc(Size);
+  if L = 0 then
+    Exit;
+  Seg := L and $FFFF;
+  Data := Data + #0;
+  dosmemput(Seg, 0, Data[1], Size);
+  Opened := ClipCall($1701, 0, R);
+  if Opened then
+  begin
+    ClipCall($1702, 0, R);                    { empty }
+    FillChar(R, SizeOf(R), 0);
+    R.ax := $1703;
+    R.dx := CF_OEMTEXT;
+    R.es := Seg;
+    R.bx := 0;
+    R.si := Size shr 16;
+    R.cx := Size and $FFFF;
+    realintr($2F, R);
+    Result := R.ax <> 0;
+    ClipCall($1708, 0, R);                    { close }
+  end;
+  global_dos_free(L shr 16);
+end;
+
+function DosClipGet(out Text: AnsiString): Boolean;
+var
+  R: TRealRegs;
+  L: LongInt;
+  Seg: Word;
+  Size: LongInt;
+  Data: AnsiString;
+begin
+  Result := False;
+  Text := '';
+  if not ClipCall($1701, 0, R) then
+    Exit;
+  FillChar(R, SizeOf(R), 0);
+  R.ax := $1704;
+  R.dx := CF_OEMTEXT;
+  realintr($2F, R);
+  Size := (LongInt(R.dx) shl 16) or R.ax;     { DX:AX }
+  if (Size > 0) and (Size <= ClipMax) then
+  begin
+    L := global_dos_alloc(Size);
+    if L <> 0 then
+    begin
+      Seg := L and $FFFF;
+      FillChar(R, SizeOf(R), 0);
+      R.ax := $1705;
+      R.dx := CF_OEMTEXT;
+      R.es := Seg;
+      R.bx := 0;
+      realintr($2F, R);
+      if R.ax <> 0 then
+      begin
+        SetLength(Data, Size);
+        dosmemget(Seg, 0, Data[1], Size);
+        { the text is NUL-terminated }
+        if Pos(#0, Data) > 0 then
+          SetLength(Data, Pos(#0, Data) - 1);
+        Text := OemToUtf8(Data);
+        Result := True;
+      end;
+      global_dos_free(L shr 16);
+    end;
+  end;
+  ClipCall($1708, 0, R);
+end;
+
 { --- events ------------------------------------------------------------------ }
 
 procedure Yield;
@@ -480,6 +597,11 @@ begin
   OnPollEvent := @DosPollEvent;
   GetClockMs := @DosClock;
   InitMouse;
+  if DosClipboardAvailable then
+  begin
+    OnClipboardSet := @DosClipSet;
+    OnClipboardGet := @DosClipGet;
+  end;
   Active := True;
 end;
 
@@ -495,6 +617,8 @@ begin
   OnCaretSize := nil;
   OnPollEvent := nil;
   GetClockMs := nil;
+  OnClipboardSet := nil;
+  OnClipboardGet := nil;
   if MouseOk then
   begin
     R.ax := 2;
