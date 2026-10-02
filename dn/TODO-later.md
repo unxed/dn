@@ -22,3 +22,6 @@ was not done now.
   (FPC cannot convert Real48): the spreadsheet files of the original cannot be read, ours cannot be read there (edit 92).
 - wfMaxi (views.inc): the flag and the command cmMaxi (maximize a window over the desktop, DN) are not implemented in tv/ yet.
 - GetPalette^ := X (dbview.pas and others): DN changes the palette of a view by writing into it; the assignments are dropped (edit 105), the default palettes are used.
+- dpmi32.pas: `ShadowCount: Integer = 0` (an initialized variable of the unit) was 8 when the program started under DOSBox-X
+  (DOS, go32v2), so DosShadow found its table full; it is set to 0 in the initialization. The cause is not understood
+  (the value of another unit's static data? check that the initialized data of the exe are loaded whole).
