@@ -38,10 +38,18 @@ was not done now.
 
 ## Seen in DOSBox-X (2026-10-02), not done yet
 - The text of message boxes has the control characters of DN (`^C` = #3 centers a line, #13): shown as glyphs (♪♥) in the
-  About box. The message boxes (dn/new/messages.pas) must interpret them.
-- Alt-X (Quit) does not quit; Enter on a panel line ran a command-line code path (fixed by the DN-style TProgram.Init, check
-  again); F7 (MkDir) shows no dialog in the first seconds (not investigated: the trace slows the run, wait longer).
-- DN.HIS stays empty after a normal exit; the saved desktop (DN.DSK / swap) is not restored: panels do not open at the next
-  start with the state kept.
+  About box, and the text of the "Exit" confirmation is not shown at all. The message boxes (dn/new/messages.pas) must
+  interpret them and Msg() must be checked.
+- Enter on a file or on the command line runs a program: DN (DPMI32 build) shuts the application down and gives the command to
+  the loader (DN.COM, absent here): the application is destroyed and the program ends (dnexec.pas ExecStringRR). Needs a
+  port of the execution (run through DOS, then restore the screen).
+- The saved desktop (DN.DSK / swap) is not checked: the panels open at the next start only because no desktop is saved.
 - DOSBox-X without a display reports Alt as pressed (BIOS flags 0040:0017 bit 3): the status line shows the Alt labels;
   DNApp clears the flags while DNKEYS drives the run (a test aid only).
+
+## Word of VP (2026-10-02): a systemic doubt
+Virtual Pascal's Word has 32 bits (the type `AWord` of DN is the 16-bit one for the file formats; the key codes
+`kbAltX = $082D00` are stored in `KeyCode: Word`). FPC has 16 bits. Edit 118 fixes the key codes of the menus and the status
+line (Alt-X was Ctrl-Alt-X). Everywhere else DN keeps a value above 65535 in a Word the value is silently cut (range checks are
+off): look for it when something "shifted" is seen. A global way (the type Word = LongWord in each unit, `Lo`/`Hi` of it)
+is not tried: it changes the sizes of records that go to `tv/` (TCluster data, TEvent).

@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            03:41:49p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            03:42:42p
 ↔═[■]════════════ C:\ ═════════════════╗↔════════════════ C:\ ═════════════[↕]═╗
 ║                                      ║║                                      ▲
 ║TEM               │                   ║║TEM               │                   ■
@@ -6,13 +6,13 @@
 ║RUSSIAN       DLG │                   ║║RUSSIAN       DLG │                   ▒
 ║UKRAIN        DLG │                   ║║UKRAIN        DLG │                   ▒
 ║CWSDPMI       EXE │                   ║║CWSDPMI       EXE │                   ▒
-║DN            EXE │                   ║║DN            EXE │                   ▒
-║DN            INI │                   ║║DN            INI │                   ▒
-║ENGLISH       LNG │                   ║║ENGLISH       LNG │                   ▒
-║RUSSIAN       LNG │                   ║║RUSSIAN       LNG │                   ▒
-║UKRAIN        LNG │                   ║║UKRAIN        LNG │                   ▒
-║CWSDPMI       SWP │                   ║║CWSDPMI       SWP │                   ▒
-║DNERR         TXT │                   ║║DNERR         TXT │                   ▒
+║DN  ╔═[■]═════════════════════ Make directory ══════════════════════════╗     ▒
+║DN  ║  Directory name                                                   ║     ▒
+║ENGL║                                                               ▐↓▌ ║     ▒
+║RUSS║                                                                   ║     ▒
+║UKRA║                                         OK   ▄  Cancel ▄   Help  ▄║     ▒
+║CWSD║                                       ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀║     ▒
+║DNER╚═══════════════════════════════════════════════════════════════════╝     ▒
 ║OUT           TXT │                   ║║OUT           TXT │                   ▒
 ║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▒
@@ -22,4 +22,4 @@
 ║TEM              4,096 00/00/00  0:00p║║TEM              4,096 00/00/00  0:00p║
 └[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
 C:\>                                                                            
- F1 Help  F2 User  F3 View  F4 Edit  F5 Copy  F6 Ren  F7 MkDir  F8 Del  F10 Menu
+ F1 Help                                                                        
