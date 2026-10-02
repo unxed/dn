@@ -69,6 +69,6 @@ jobs:
           for t in t_*.pas; do
             fpc -Mobjfpc -Fu../new -Fi. -FE../../out -FU../../out "$t" | grep -E 'Error|Fatal' && exit 1
             echo "=== ${t%.pas}"
-            (cd ../../out && ./${t%.pas}) | tee ../out/${t%.pas}.txt
+            (cd ../../out && ./${t%.pas}) | tee ../../out/${t%.pas}.txt
             grep -q '^ALL OK' ../../out/${t%.pas}.txt
           done
