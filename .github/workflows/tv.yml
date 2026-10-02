@@ -46,12 +46,15 @@ jobs:
         run: |
           mkdir -p out
           cd tv/tests
+          failed=""
           for t in t_*.pas; do
             ~/fpc-go32v2/bin/fpc-go32v2 -Fu../src -Fu. -FE../../out "$t" | grep -E 'Error|Fatal' && exit 1
             echo "=== ${t%.pas}"
             ../../tools/dos-run.sh ../../out "${t%.pas}.exe" | tee ../../out/${t%.pas}.txt
-            grep -q '^ALL OK' ../../out/${t%.pas}.txt
+            grep -q '^ALL OK' ../../out/${t%.pas}.txt || failed="$failed ${t%.pas}"
           done
+          # all the tests are run, so that one round of CI shows all the failures
+          if [ -n "$failed" ]; then echo "FAILED:$failed"; exit 1; fi
       - name: Tests of the DOS backend (video memory, keyboard, mouse, clock)
         run: |
           mkdir -p out2
