@@ -1,7 +1,7 @@
 { VPSysLow: the system layer that DN OSP takes from the runtime library of Virtual Pascal, written anew
   for Free Pascal. It replaces vpsyslow.pas of the archive (code of vpascal.com, see dn/exclude.list).
 
-  License of DN (see dn/README.md). The names and the way they are called
+  MIT (see LICENSE). The names and the way they are called
   come from the call sites in DN (spec/vp-api-vpsyslow.md, tools/vp-api.py).
 
   Done here: the types, the open mode constants, the file, disk and system functions that DN calls on
