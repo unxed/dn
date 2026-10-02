@@ -21,3 +21,5 @@ App:      TvApp
 _Apps:    TvApp
 Menus:    TvMenus
 StdDlg:   TvFileDlg TvChDir TvFiles
+Messages: TvViews
+Events: TvEvents TvKeys
