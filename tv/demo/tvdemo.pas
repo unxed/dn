@@ -8,7 +8,7 @@ uses TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvDrawBuf, TvScreen, TvViews, T
 
 const
   cmNewWin = 100;
-  Lines: array[0..17] of string[72] = (
+  Lines: array[0..17] of string[200] = (
     'Turbo Vision для DOS на Free Pascal',
     '',
     'Эта программа собрана компилятором FPC для go32v2 и работает',
