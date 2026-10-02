@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
 F = {'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~',
-     'DOWN': '\x1b[B', 'UP': '\x1b[A', 'ENTER': '\r', 'HOME': '\x1b[H', 'ESC': '\x1b', 'ALT-X': '\x1bx', 'TAB': '\t', 'INS': '\x1b[2~'}
+     'DOWN': '\x1b[B', 'UP': '\x1b[A', 'ENTER': '\r', 'HOME': '\x1b[H', 'END': '\x1b[F', 'ESC': '\x1b', 'ALT-X': '\x1bx', 'TAB': '\t', 'INS': '\x1b[2~'}
 fails = count = 0
 
 
@@ -36,6 +36,8 @@ def main():
         open(os.path.join(w, 'a.txt'), 'w').write('first\n')
         open(os.path.join(w, 'b.txt'), 'w').write('other\n')
         open(os.path.join(w, 'c.txt'), 'w').write('third\n')
+        payload = os.urandom(3 * 1024 * 1024 + 123)       # more than 64K: the copy buffer (Word was 16 bits)
+        open(os.path.join(w, 'z.txt'), 'wb').write(payload)
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
         t.pump(1.5, 6)
         t.send(F['ESC'], 0.5)
@@ -65,6 +67,12 @@ def main():
         key('F8'); key('ENTER', 1.2)
         gone = not os.path.exists(os.path.join(w, 'c.txt'))
         check(gone, 'F8: the file under the cursor is deleted (c.txt)', t.text())
+
+        # a big file (the last one in the list): the copy must be the same bytes
+        key('END')
+        key('F5'); key('newdir'); key('ENTER', 2.5)
+        got = os.path.join(w, 'newdir', 'z.txt')
+        check(os.path.isfile(got) and open(got, 'rb').read() == payload, 'F5: a file of 3 MB is copied byte by byte', t.text())
 
         # edit a.txt: the cursor on a.txt; F4, a line at the top, F2 saves, Esc leaves
         key('HOME'); key('DOWN'); key('DOWN')
