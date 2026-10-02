@@ -3,8 +3,15 @@ var
   TestFailed: Integer = 0;
   TestCount: Integer = 0;
 
+{ Quiet: a warm-up run of the test body (the RTL allocates some state at its first use, DOS
+  does it for the file functions): checks are not counted or shown. }
+var
+  Quiet: Boolean = False;
+
 procedure Check(Cond: Boolean; const Name: ShortString);
 begin
+  if Quiet then
+    Exit;
   Inc(TestCount);
   if Cond then
     begin WriteLn('PASS ', Name); Flush(Output); end
@@ -30,6 +37,8 @@ end;
 
 procedure HeapMark(Id: Integer);
 begin
+  if Quiet then
+    Exit;
   if MarkCount <= High(MarkVals) then
   begin
     MarkVals[MarkCount] := Int64(GetFPCHeapStatus.CurrHeapUsed) - MarkBase;

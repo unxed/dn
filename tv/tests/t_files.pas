@@ -129,6 +129,9 @@ begin
   { the RTL allocates some state at the first use: not a leak }
   Base := FExpand('x');
   IsDir('.');
+  Quiet := True;
+  Run;                       { a warm-up run }
+  Quiet := False;
   Used0 := GetFPCHeapStatus.CurrHeapUsed;
   HeapBase;
   Run;

@@ -129,7 +129,11 @@ begin
   Base := FExpand('x');
   Base := GetCurDir;
   IsDir('.');
+  Quiet := True;
+  Run;                       { a warm-up run }
+  Quiet := False;
   Used0 := GetFPCHeapStatus.CurrHeapUsed;
+  HeapBase;
   Run;
   Check(DirGone(Base), 'the test directory is removed');
   Check(GetFPCHeapStatus.CurrHeapUsed = Used0, 'no memory is left behind');
