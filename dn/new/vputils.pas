@@ -17,6 +17,9 @@ function GetTimeMSec: LongInt;
 { The label of the volume of the drive ('' if there is none). }
 function GetVolumeLabel(Drive: Char): String;
 
+{ The name in FileRec/TextRec (wide characters in FPC) as a string. }
+function NameOfRec(const Name: array of WideChar): String;
+
 { The text cursor: the size in lines (0 = hidden), show, hide. }
 function GetCursorSize: Word;
 procedure ShowCursor;
@@ -48,6 +51,19 @@ end;
 function GetTimeMSec: LongInt;
 begin
   Result := LongInt(Cardinal(GetTickCount64 and $FFFFFFFF));
+end;
+
+function NameOfRec(const Name: array of WideChar): String;
+var
+  I: Integer;
+begin
+  Result := '';
+  I := 0;
+  while (I <= High(Name)) and (Name[I] <> #0) and (Length(Result) < 255) do
+  begin
+    Result := Result + Char(Ord(Name[I]) and $FF);
+    Inc(I);
+  end;
 end;
 
 function GetVolumeLabel(Drive: Char): String;
