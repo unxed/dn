@@ -48,6 +48,7 @@
 | 7a | `TvSys` — крючки бэкенда: опрос событий, часы, смена видеорежима, режим экрана | свой (в оригинале `THardwareInfo`, `TEventQueue`) | сделан |
 | 7b | `TvTimer` — очередь таймеров `TTimerQueue` | `system.h`, `ttimerqu.cpp` | сделан |
 | 7c | `TvApp` — `TBackground`, `TDeskTop` (Tile, Cascade), `TProgram`, `TApplication` | `app.h`, `tprogram.cpp`, `tapplica.cpp`, `tdesktop.cpp`, `tbkgrnd.cpp` | сделан (без потоков, `LowMemory`; диалог — любой вид) |
+| 7d | `TvMouse` — состояние мыши → события (нажатие, отпускание, перемещение, автоповтор, колесо, двойной и тройной щелчок) | `tevent.cpp` (`getMouseEvent`) | сделан; задержки в мс (в оригинале тики по 55 мс), настраиваются переменными |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | Бэкенд DOS: видеопамять/int 10h, клавиатура int 16h, мышь int 33h, буфер обмена WinOldAp | свой | |
 
