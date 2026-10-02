@@ -58,24 +58,26 @@ uses
 
 type
   TStrIndexRec = record
-    Key, Count, Offset: AWord;
+    Key: AWord;
+    Count: AWord;
+    Offset: AWord;
     end;
 
-  PStrIndex = ^TStrIndex;
-
   TStrIndex = array[0..9999] of TStrIndexRec;
+  PStrIndex = ^TStrIndex;
 
   PStringList = ^TStringList;
   TStringList = object(TObject)
-    constructor Load(var S: TStream);
-    destructor Done; virtual;
-    function Get(Key: AWord): String;
   private
-    Stream: PStream;
-    BasePos: LongInt;
-    IndexSize: AWord;
     Index: PStrIndex;
+    IndexSize: AWord;
+    BasePos: LongInt;
+    Stream: PStream;
     procedure ReadStr(var S: String; Offset, Skip: AWord);
+  public
+    function Get(Key: AWord): String;
+    destructor Done; virtual;
+    constructor Load(var S: TStream);
     end;
 
 implementation
@@ -83,15 +85,19 @@ implementation
 constructor TStringList.Load(var S: TStream);
   var
     Size: AWord;
+    N: LongInt;
   begin
-  TObject.Init;
+  inherited Init;
   Stream := @S;
   S.Read(Size, SizeOf(Size));
   BasePos := i32(S.GetPos);
-  S.Seek(BasePos+Size);
+  S.Seek(Size + BasePos);
   S.Read(IndexSize, SizeOf(IndexSize));
-  GetMem(Index, IndexSize*SizeOf(TStrIndexRec));
-  S.Read(Index^, IndexSize*SizeOf(TStrIndexRec));
+  N := IndexSize;
+  N := N * SizeOf(TStrIndexRec);
+  GetMem(Index, N);
+  if N > 0 then
+    S.Read(Index^, N);
   end;
 
 destructor TStringList.Done;

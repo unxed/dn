@@ -178,15 +178,14 @@ constructor TParamText.Load(var S: TStream);
 
 function TParamText.DataSize: Integer;
   begin
-  DataSize := ParamCount*SizeOf(LongInt);
+  Result := ParamCount * SizeOf(LongInt);
   end;
 
 procedure TParamText.GetText(var S: String);
   begin
+  S := '';
   if Text <> nil then
-    FormatStr(S, Text^, ParamList^)
-  else
-    S := '';
+    FormatStr(S, Text^, ParamList^);
   end;
 
 procedure TParamText.SetData(var Rec);

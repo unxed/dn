@@ -1,0 +1,32 @@
+MIT License
+
+Copyright (c) 2026 the authors of the dn project
+
+This license covers the code that we wrote: the tools (`tools/`, `audit/`, `bootstrap/tools/`), the project
+documentation, the files of `tv/` marked "MIT", and in `dn/` the files that the manifest
+`dn/PROVENANCE.md` lists as "Our files" (and the files that are added to `dn/` after the first commit and are not derived
+from the files of RIT Labs).
+
+It does NOT cover:
+  - the files of `tv/` translated from magiblot/tvision: see `tv/COPYRIGHT.magiblot` (the Borland disclaimer and the MIT
+    license of magiblot and contributors);
+  - the files of `dn/` that are DOS Navigator code (the classes "Code of DN", "Carved", "Contributors", "Upstream without a
+    notice" of `dn/PROVENANCE.md`) and everything derived from them: they are under the license in their heads (Dos Navigator
+    Open Source, RIT Research Labs), which must stay in them and cannot be changed; see `dn/LICENSE.md`.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be included in all copies
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.

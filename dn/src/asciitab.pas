@@ -30,17 +30,17 @@ type
   PReport = ^TReport;
   TReport = object(TView)
     ASCIIChar: LongInt;
-    constructor Load(var S: TStream);
-    procedure Draw; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Store(var S: TStream);
+    procedure Draw; virtual;
+    constructor Load(var S: TStream);
   end;
 
   PASCIIChart = ^TASCIIChart;
   TASCIIChart = object(TWindow)
-    constructor Init(var R: TRect);
-    procedure HandleEvent(var Event: TEvent); virtual;
     destructor Done; virtual;
+    procedure HandleEvent(var Event: TEvent); virtual;
+    constructor Init(var R: TRect);
   end;
 
 { Shows the table; the chosen character is sent to the program as a key. }
@@ -70,9 +70,12 @@ begin
   Color := Byte(GetColorW(6));
   for Y := 0 to Size.Y - 1 do
   begin
-    MoveChar(Buf, ' ', Color, Size.X);
-    for X := 0 to Size.X - 1 do
-      MoveChar(Buf[X], Chr((32 * Y + X) and $FF), Color, 1);
+    X := 0;
+    while X < Size.X do
+    begin
+      MoveChar(Buf[X], Chr((Y * 32 + X) and $FF), Color, 1);
+      Inc(X);
+    end;
     WriteLineW(0, Y, Size.X, 1, Buf);
   end;
   ShowCursor;
@@ -205,11 +208,10 @@ end;
 procedure TReport.HandleEvent(var Event: TEvent);
 begin
   inherited HandleEvent(Event);
-  if (Event.What = evBroadcast) and (Event.Command = AsciiTableCommandBase + cmCharacterFocused) then
-  begin
-    ASCIIChar := Event.InfoLong;
-    DrawView;
-  end;
+  if Event.What <> evBroadcast then Exit;
+  if Event.Command <> AsciiTableCommandBase + cmCharacterFocused then Exit;
+  ASCIIChar := Event.InfoLong;
+  DrawView;
 end;
 
 procedure TReport.Store(var S: TStream);
@@ -223,6 +225,7 @@ end;
 constructor TASCIIChart.Init(var R: TRect);
 var
   Control: PView;
+  T: TRect;
 begin
   R.Assign(0, 0, 34, 12);
   inherited Init(R, GetString(dlASCIIChart), wnNoNumber);
@@ -231,18 +234,17 @@ begin
   HelpCtx := hcAsciiChart;
   Palette := wpGrayWindow;
 
-  R.Grow(-1, -1);
-  R.A.Y := R.B.Y - 1;
-  Control := New(PReport, Init(R));
-  Control^.Options := Control^.Options or ofFramed;
-  Control^.EventMask := Control^.EventMask or evBroadcast;
-  Insert(Control);
-
+  { inside the frame: the line with the code at the bottom (one row), the table over it }
   GetExtent(R);
   R.Grow(-1, -1);
-  R.B.Y := R.B.Y - 2;
-  Control := New(PTable, Init(R));
-  Control^.Options := Control^.Options or ofFramed or ofSelectable;
+  T.Assign(R.A.X, R.B.Y - 1, R.B.X, R.B.Y);
+  Control := New(PReport, Init(T));
+  Control^.Options := Control^.Options or ofFramed;
+  Control^.EventMask := evBroadcast or Control^.EventMask;
+  Insert(Control);
+  T.Assign(R.A.X, R.A.Y, R.B.X, R.B.Y - 2);
+  Control := New(PTable, Init(T));
+  Control^.Options := Control^.Options or ofSelectable or ofFramed;
   Control^.EventMask := $FFFF;
   Control^.BlockCursor;
   Insert(Control);
