@@ -60,6 +60,7 @@ procedure TextDrawChar(Cells: PScreenCell; CellCount: Integer; Ch: Byte; Attr: P
   byte of the current code page (0 if there is none). }
 function TextToCodePage(Text: PByte; Len: Integer): Byte;
 
+
 implementation
 
 uses
@@ -81,7 +82,7 @@ begin
   if Len <= 0 then
     Exit(False);
   Result := True;
-  if Utf8Decode(Text, Len, CP, Used) and (Used > 1) then
+  if Utf8Enabled and Utf8Decode(Text, Len, CP, Used) and (Used > 1) then
   begin
     W := TvUtf8.CharWidth(CP);
     CharLen := Used;
@@ -126,6 +127,8 @@ var
 begin
   if Index <= 0 then
     Exit(0);
+  if not Utf8Enabled then
+    Exit(1);
   { read backwards until a valid character that ends exactly at Index is found;
     this tolerates invalid characters }
   Lead := Index;
@@ -197,7 +200,7 @@ begin
   if J >= TextLen then
     Exit;
   Text := Text + J;
-  if Utf8Decode(Text, TextLen - J, CP, Used) and (Used > 1) then
+  if Utf8Enabled and Utf8Decode(Text, TextLen - J, CP, Used) and (Used > 1) then
   begin
     W := CharWidth(CP);
     if W < 0 then
