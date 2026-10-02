@@ -28,11 +28,7 @@ function SetVideoMode(Cols, Rows: Word): Boolean;
 implementation
 
 uses
-  SysUtils, TvScreen
-{$IFDEF GO32V2}
-  , Dos
-{$ENDIF}
-  ;
+  SysUtils, TvScreen, VPSysLow;
 
 function Min(A, B: LongInt): LongInt;
 begin
@@ -55,23 +51,9 @@ begin
 end;
 
 function GetVolumeLabel(Drive: Char): String;
-{$IFDEF GO32V2}
-var
-  SR: SearchRec;
 begin
-  Result := '';
-  FindFirst(UpCase(Drive) + ':\*.*', VolumeID, SR);
-  if DosError = 0 then
-  begin
-    Result := SR.Name;
-    FindClose(SR);
-  end;
+  Result := SysGetVolumeLabel(Drive);
 end;
-{$ELSE}
-begin
-  Result := '';
-end;
-{$ENDIF}
 
 function GetCursorSize: Word;
 begin

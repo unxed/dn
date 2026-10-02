@@ -8,7 +8,7 @@ Views:    TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs 
 _Views:   TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow -TDrawBuffer
 Dialogs:  TvDialog TvInput TvCluster TvList TvHist TvValid
 _Dialogs: TvDialog TvInput TvCluster TvList TvHist TvValid
-Collect:  TvObjs
+Collect:  TvObjs -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection +Strings +Defines
 _Collect: TvObjs
 Streams:  TvObjs
 _Streams: TvObjs

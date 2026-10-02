@@ -15,7 +15,8 @@ var
   Rc: LongInt;
   Pt: TSysPoint;
   Cells: PWord;
-  CX, CY, Y1, Y2: SmallWord;
+  CX, CY: Word;
+  Y1, Y2: Integer;
   Vis: Boolean;
   HI, Act: LongInt;
   Srch: TOSSearchRec;
