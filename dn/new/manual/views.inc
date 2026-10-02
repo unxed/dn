@@ -65,3 +65,6 @@ function MessageL(Receiver: PView; What, Command: Word; InfoLng: LongInt): Point
 
 { The next free number of a window, 1..9 (0 if all are used); the number is free again when the window is destroyed. }
 function GetNum: Integer;
+
+{ Updates the periodic views now: those whose time has come (All = False) or all of them. }
+procedure UpdateAll(All: Boolean);
