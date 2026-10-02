@@ -8,6 +8,7 @@ on:
     paths:
       - dn/**
       - tools/dn-*.sh
+      - tools/*.py
       - audit/**
       - .github/workflows/dn.yml
 
@@ -53,3 +54,21 @@ jobs:
       - name: Per unit results
         if: always()
         run: cat build/probe/result.txt | sort | head -300
+
+  new:
+    # Tests of our own units in dn/new (the replacements of the Virtual Pascal layer), natively.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl
+      - name: Build and run the tests
+        run: |
+          mkdir -p out
+          cd dn/tests
+          for t in t_*.pas; do
+            fpc -Mobjfpc -Fu../new -Fi. -FE../../out -FU../../out "$t" | grep -E 'Error|Fatal' && exit 1
+            echo "=== ${t%.pas}"
+            (cd ../../out && ./${t%.pas}) | tee ../out/${t%.pas}.txt
+            grep -q '^ALL OK' ../../out/${t%.pas}.txt
+          done
