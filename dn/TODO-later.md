@@ -93,7 +93,6 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   characters of the current code page (CP866) is turned into the bytes of that page and back; other names (other alphabets, not UTF-8)
   stay as bytes and are shown wrong. `DN_NAME_CONV=0` switches the conversion off. The typed text is converted by `InputLineOem` (dnapp).
   The real fix is PLAN.md item 4 (UTF-8 inside).
-- The tree (Disk > Directory tree) on `/` reads every directory (30 000 directories took 20 s here), nothing is shown while it works (Esc
-  aborts); `/proc` and `/sys` of the root are skipped. A progress indication is not done.
-- Quit with the Info panel on (Panel > Info, then Alt-X, Yes) ends with `Access violation` in `TView.Prev` ("Fatal Error" screen waits for
-  a key): not found yet. `MoveChar` took a negative count as a Word (`TSeparator.Draw` with Size.Y < 2): fixed (LongInt), may be unrelated.
+- The tree (Disk > Directory tree) on `/` reads every directory (30 000 directories took 20 s here), a line "Reading directories: N   Esc - stop" is shown while it works (Esc aborts); `/proc` and `/sys` of the root are skipped.
+- `DN0.SWP` (the saved desktop) is written to the current directory when a command is run from the command line: it shows in the panel; the place
+  and the need of the file are to be decided.
