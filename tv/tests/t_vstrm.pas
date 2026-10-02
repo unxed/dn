@@ -84,6 +84,8 @@ begin
   Lb^.NewList(Coll);
   D^.Insert(Lb);
 
+  D^.DirectLink[1] := Inp;           { DN: the controls of a dialog by number }
+  D^.DirectLink[2] := Chk;
   M.Init(0, 1024);
   M.Put(D);
   Check(M.Status = stOk, 'a dialog is stored');
@@ -93,6 +95,8 @@ begin
   Check((L <> nil) and (L^.Title^ = 'Options') and (L^.Size.X = 50), 'the window part');
   Find;
   Check(Inp2 <> nil, 'the input line');
+  Check((L <> nil) and (L^.DirectLink[1] = PView(Inp2)) and (L^.DirectLink[2] = PView(Chk2)) and (L^.DirectLink[3] = nil),
+    'DirectLink: the numbers of the controls of the dialog are stored and give the loaded controls');
   Check((Inp2 <> nil) and (Inp2^.Data^ = 'abc') and (Inp2^.MaxLen = 20),
     'the text and the length of the input line (Awaken selects all, as in Borland TV)');
   Check((Lab2 <> nil) and (Lab2^.Link = PView(Inp2)), 'the label points to its input line');
