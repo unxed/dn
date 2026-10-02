@@ -58,6 +58,7 @@
 | 9f | `TvList` — `TListViewer`, `TListBox`, `TListBoxRec` | `tlstview.cpp`, `tlistbox.cpp` | сделан (без потоков) |
 | 9g | `TvHist` — `HistoryAdd/Count/Str`, `THistory`, `THistoryWindow`, `THistoryViewer` | `histlist.cpp`, `thistory.cpp`, `thistwin.cpp`, `thstview.cpp` | сделан (без потоков) |
 | 10a | `TvFiles` — `TSearchRec`, `TFileFinder`, `TFileCollection`, `TDirCollection`, `FExpand`, `FSplit`, `PathValid`... | `stddlg.h`, `tfilecol.cpp`, `tdircoll.cpp` | сделан (без потоков) |
+| 10b | `TvFileDlg` — `TFileDialog`, `TFileList`, `TSortedListBox`, `TFileInputLine`, `TFileInfoPane` | `tfildlg.cpp`, `tfillist.cpp`, `stddlg.cpp` | сделан (без потоков) |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -311,3 +312,13 @@
 - `Insert` в сортированную коллекцию не вставляет дубликат (как в оригинале): вызывающий освобождает отвергнутую запись.
 - Диски (`DriveValid`, префикс диска в `GetCurDir`, `:` в `FSplit`) — только где есть буквы дисков (DOS/Windows/OS2); иначе единственный «диск» всегда валиден.
 - Тест создаёт каталог `tvf_test` в текущем каталоге (в DOS без LFN длинное имя заменяется на 8.3).
+
+### TvFileDlg (10b): решения
+
+- Запись данных диалога — `ShortString` (поле ввода до 255 символов; оригинал — `MAXPATH`).
+- Чтение каталога: файлы (`faReadOnly or faArchive`, скрытые/системные не показываются, как в оригинале), затем каталоги (кроме начинающихся с `.`), затем `..` (если не корень). Сообщение «Too many files» убрано.
+- Разделитель в списке и в строке ввода — `DirDelim` (`\` где есть буквы дисков, иначе `/`).
+- `FExpandFrom(Path, RelativeTo)` в `TvFiles` заменяет двухаргументный `fexpand` оригинала (путь относительно каталога диалога).
+- Размеры диалога подгоняются под экран как в magiblot (экран >90 колонок / >34 строк).
+- Тест `t_fdlg` выполняет `ChDir` во временный каталог `tvf_dlg` в текущем каталоге.
+- Известное ограничение: типизированный поиск по первым буквам в `TSortedListBox` сравнивает без учёта регистра, как оригинал на DOS (`strnicmp`).
