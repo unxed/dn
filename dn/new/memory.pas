@@ -12,13 +12,14 @@ const
   MaxBufMem = 65536 div 16;
   MaxHeapSize = 655360 div 16;
 
-{ Memory for a buffer; nil when there is none. }
-function MemAlloc(Size: Word): Pointer;
-function MemAllocSeg(Size: Word): Pointer;
+{ Memory for a buffer; nil when there is none. The size is a LongInt: in Virtual Pascal Word is 32 bits, DN asks for buffers of megabytes (a Word here made a
+  buffer of the size modulo 64K that the copy then overran). }
+function MemAlloc(Size: LongInt): Pointer;
+function MemAllocSeg(Size: LongInt): Pointer;
 function LowMemory: Boolean;
 { A cache buffer: P is nil if there is no memory. }
 procedure DisposeCache(P: Pointer);
-procedure NewCache(var P: Pointer; Size: Word);
+procedure NewCache(var P: Pointer; Size: LongInt);
 procedure DoneDOSMem;
 procedure DoneMemory;
 procedure InitDOSMem;
@@ -47,7 +48,7 @@ begin
   Result := False;
 end;
 
-function MemAlloc(Size: Word): Pointer;
+function MemAlloc(Size: LongInt): Pointer;
 begin
   try
     GetMem(Result, Size);
@@ -56,12 +57,12 @@ begin
   end;
 end;
 
-function MemAllocSeg(Size: Word): Pointer;
+function MemAllocSeg(Size: LongInt): Pointer;
 begin
   Result := MemAlloc(Size);
 end;
 
-procedure NewCache(var P: Pointer; Size: Word);
+procedure NewCache(var P: Pointer; Size: LongInt);
 begin
   P := MemAlloc(Size);
 end;

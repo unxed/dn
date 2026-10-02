@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Runs the Linux build of DN in a pty with a list of keys and shows the screen and DN.ERR: for reproducing a crash.
 usage: tools/dn-linux-try.py OUTDIR 'F7 newdir ENTER ...' [--cols N --rows N]   (names as in tools/dn-linux-tour.py; other words are typed)
-The directory `work` (a.txt b.txt c.txt, sub/, big.txt) is made in a temp directory, DN starts in it."""
+The directory `work` (a.txt b.txt c.txt, sub/deep, dst/, big.txt, link.txt, ro.txt) is made in a temp directory, DN starts in it."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
@@ -29,7 +29,17 @@ def main():
             if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
                 shutil.copy(os.path.join(out, f), d)
         w = os.path.join(d, 'work')
-        os.makedirs(os.path.join(w, 'sub'))
+        os.makedirs(os.path.join(w, 'sub', 'deep'))
+        os.makedirs(os.path.join(w, 'dst'))
+        open(os.path.join(w, 'sub', 'deep', 'x.txt'), 'w').write('deep\n')
+        open(os.path.join(w, 'file-ru.txt'), 'w').write('x\n')
+        os.symlink('a.txt', os.path.join(w, 'link.txt'))
+        if os.environ.get('HUGE'):
+            with open(os.path.join(w, 'huge.bin'), 'wb') as h:
+                for _ in range(int(os.environ['HUGE'])):
+                    h.write(os.urandom(1 << 20))
+        open(os.path.join(w, 'ro.txt'), 'w').write('read only\n')
+        os.chmod(os.path.join(w, 'ro.txt'), 0o444)
         for n in ('a.txt', 'b.txt', 'c.txt'):
             open(os.path.join(w, n), 'w').write('file ' + n + '\n')
         open(os.path.join(w, 'sub', 'in.txt'), 'w').write('inner\n')
