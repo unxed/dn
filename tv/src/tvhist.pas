@@ -36,6 +36,12 @@ procedure DoneHistory;
 function HistoryCount(Id: Byte): Integer;
 procedure HistoryAdd(Id: Byte; const Str: ShortString);
 function HistoryStr(Id: Byte; Index: Integer): ShortString;
+{ the history in a stream (used by DN to keep it between the runs; the format is ours: the count, then the id and the
+  string of every record). Load replaces the history and makes HistorySize big enough for it. }
+{ drops the strings that end with the character (DN: the strings that end with a blank are not kept) }
+procedure HistoryRemoveEndingWith(C: Char);
+procedure HistoryStore(var S: TStream);
+procedure HistoryLoad(var S: TStream);
 
 const
   HistoryIcon = #$DE'~'#$19'~'#$DD;
@@ -120,6 +126,45 @@ begin
   Used := 0;
 end;
 
+procedure HistoryStore(var S: TStream);
+var
+  I: Integer;
+begin
+  S.Write(RecCount, SizeOf(RecCount));
+  for I := 0 to RecCount - 1 do
+  begin
+    S.Write(Recs[I].Id, 1);
+    S.WriteStr(@Recs[I].Str);
+  end;
+end;
+
+procedure HistoryLoad(var S: TStream);
+var
+  I, N: Integer;
+  Id: Byte;
+  T: ShortString;
+begin
+  S.Read(N, SizeOf(N));
+  if (S.Status <> stOK) or (N < 0) or (N > 65535) then
+    Exit;
+  ClearHistory;
+  for I := 1 to N do
+  begin
+    S.Read(Id, 1);
+    S.ReadStrV(T);
+    if S.Status <> stOK then
+      Break;
+    if RecCount >= Length(Recs) then
+      SetLength(Recs, Length(Recs) * 2 + 16);
+    Recs[RecCount].Id := Id;
+    Recs[RecCount].Str := T;
+    Inc(RecCount);
+    Inc(Used, Length(T) + 3);
+  end;
+  if Used + 256 > HistorySize then
+    HistorySize := Used + 256;
+end;
+
 procedure AdvanceStringPointer;
 begin
   Inc(CurRec);
@@ -137,6 +182,19 @@ begin
   for I := Index to RecCount - 2 do
     Recs[I] := Recs[I + 1];
   Dec(RecCount);
+end;
+
+procedure HistoryRemoveEndingWith(C: Char);
+var
+  I: Integer;
+begin
+  I := 0;
+  while I < RecCount do
+    if (Length(Recs[I].Str) > 0) and (Recs[I].Str[Length(Recs[I].Str)] = C) then
+      DeleteRec(I)
+    else
+      Inc(I);
+  CurRec := -1;
 end;
 
 procedure InsertString(Id: Byte; const Str: ShortString);

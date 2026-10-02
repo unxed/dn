@@ -47,6 +47,9 @@ def process(path):
             sig, end = take_signature(raw, m.end())
             if sig is None:
                 continue
+            # the comments of the declaration are not copied (a // comment would hide the rest of the joined line)
+            sig = re.sub(r'//[^\n]*', '', sig)
+            sig = re.sub(r'\{[^}]*\}|\(\*.*?\*\)', '', sig, flags=re.S)
             sig = re.sub(r'\s+', ' ', sig.strip())
             key = (cls + '.' if cls else '') + m.group('name').lower()
             if m.start() < imp or cls:

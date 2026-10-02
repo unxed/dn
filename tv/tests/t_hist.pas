@@ -10,6 +10,7 @@ begin
 end;
 
 var
+  MS: TMemoryStream;
   App: PApplication;
   Dlg: PDialog;
   L: PInputLine;
@@ -44,6 +45,27 @@ begin
     HistoryAdd(3, 'abcde' + Chr(Ord('0') + I));
   Check((HistoryCount(3) = 4) and (HistoryStr(3, 0) = 'abcde3') and (HistoryStr(3, 3) = 'abcde6'),
     'old strings are dropped when the block is full');
+  HistorySize := 1024;
+  ClearHistory;
+
+  { the history in a stream }
+  HistoryAdd(1, 'one');
+  HistoryAdd(2, 'other');
+  HistoryAdd(1, 'two');
+  MS.Init(0, 256);
+  HistoryStore(MS);
+  ClearHistory;
+  HistorySize := 20;
+  MS.Seek(0);
+  HistoryLoad(MS);
+  Check((HistoryCount(1) = 2) and (HistoryStr(1, 0) = 'one') and (HistoryStr(1, 1) = 'two') and
+    (HistoryStr(2, 0) = 'other'), 'HistoryStore and HistoryLoad');
+  Check(HistorySize >= 20 + 256 - 20, 'HistoryLoad makes HistorySize big enough');
+  MS.Done;
+  HistoryAdd(1, 'secret ');
+  HistoryAdd(2, 'x ');
+  HistoryRemoveEndingWith(' ');
+  Check((HistoryCount(1) = 2) and (HistoryCount(2) = 1), 'HistoryRemoveEndingWith drops the strings that end with a blank');
   HistorySize := 1024;
   ClearHistory;
 
