@@ -15,7 +15,7 @@ if [ "$DN_TARGET" = linux ]; then
     : "${DN_LINUX:?set DN_LINUX (tools/build-fpc-i386-linux.sh PREFIX)}"
     PPC=$DN_LINUX/lib/fpc/3.2.2/ppcross386; [ -x "$PPC" ] || PPC=$DN_CROSS/lib/fpc/3.2.2/ppcross386
     PATH="$DN_LINUX/bin:$PATH" $PPC -Tlinux -Pi386 -XPi386-linux- $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/dn/new" \
-        -Fu"$here/tv/src" -Fu"$DN_LINUX/units/i386-linux" -FU"$out" -FE"$out" $DN_EXTRA -vewn "$1" 2>&1 \
+        -Fu"$here/tv/src" $DN_LINUX_FU -FU"$out" -FE"$out" $DN_EXTRA -vewn "$1" 2>&1 \
         | grep -a -E 'Error|Fatal|undefined|Linking|bytes' | head -${2:-12}
     exit 0
 fi

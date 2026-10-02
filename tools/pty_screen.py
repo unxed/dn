@@ -166,7 +166,7 @@ class Screen:
 
 
 class PtyTerm:
-    def __init__(self, cmd, cols=80, rows=25, env=None):
+    def __init__(self, cmd, cols=80, rows=25, env=None, cwd=None, exe=None):
         self.screen = Screen(cols, rows)
         self.raw = b''
         e = dict(os.environ)
@@ -174,9 +174,12 @@ class PtyTerm:
         if env:
             e.update(env)
         self.pid, self.fd = pty.fork()
+        self.status = None
         if self.pid == 0:
+            if cwd:
+                os.chdir(cwd)
             os.environ.update(e)
-            os.execvpe(cmd[0], cmd, e)
+            os.execve(exe or cmd[0], cmd, e) if (exe or '/' in cmd[0]) else os.execvpe(cmd[0], cmd, e)
         self.set_size(cols, rows)
 
     def set_size(self, cols, rows):
@@ -212,6 +215,16 @@ class PtyTerm:
         os.write(self.fd, data)
         self.pump(settle)
 
+    def alive(self):
+        """False when the program has ended (its status is in self.status)"""
+        if self.status is not None:
+            return False
+        pid, st = os.waitpid(self.pid, os.WNOHANG)
+        if pid:
+            self.status = os.waitstatus_to_exitcode(st)
+            return False
+        return True
+
     def text(self):
         return '\n'.join(self.screen.lines())
 
@@ -226,13 +239,11 @@ class PtyTerm:
     def close(self, wait=3.0):
         """the exit status of the program (kills it if it does not end)"""
         end = time.time() + wait
-        status = None
-        while time.time() < end:
+        status = self.status
+        while status is None and time.time() < end:
             self.pump(0.1)
-            pid, st = os.waitpid(self.pid, os.WNOHANG)
-            if pid:
-                status = os.waitstatus_to_exitcode(st)
-                break
+            if not self.alive():
+                status = self.status
         if status is None:
             os.kill(self.pid, signal.SIGKILL)
             os.waitpid(self.pid, 0)
