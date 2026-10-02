@@ -111,10 +111,15 @@ function SysGetValidDrives: LongWord;
 { -1 OS/2, 0 DOS, 1 Windows 9x, 2 Windows NT; here: 0 (DOS) on DOS, 2 elsewhere }
 function SysPlatformId: LongInt;
 procedure SysCtrlSleep(Milliseconds: LongInt);
+{ The disk buffers go to the disks (DOS INT 21h AH=0Dh); elsewhere: nothing. }
+procedure SysDiskReset;
+{ A line of the trace of the start (a test aid, see DNErrLog): written when the environment variable DNDUMP is set. }
+procedure SysTrace(const Msg: String);
 { The keyboard of the plain console: is a key waiting, and the character of the key (SysReadKey waits for one). }
 function SysKeyPressed: Boolean;
 function SysReadKey: Char;
-{ The place in the source of an address (VP: from the debug information). Here none: nil. }
+{ The place in the source of an address (VP: from the debug information); here the line information of FPC (the units are
+  compiled with -gl): the file with the routine, the line; nil if there is none. }
 function GetLocationInfo(Addr: Pointer; var FileName: ShortString; var LineNo: LongInt): Pointer;
 procedure SysBeepEx(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
@@ -137,7 +142,7 @@ procedure SysCtrlSetCBreakHandler;
 implementation
 
 uses
-  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys
+  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, DNErrLog, LineInfo
 {$IFDEF GO32V2}, go32{$ENDIF};
 
 { --- files -------------------------------------------------------------------- }
@@ -552,14 +557,52 @@ begin
 {$ENDIF}
 end;
 
+procedure SysDiskReset;
+{$IFDEF GO32V2}
+var
+  R: Registers;
+begin
+  FillChar(R, SizeOf(R), 0);
+  R.AH := $0D;
+  Intr($21, R);
+end;
+{$ELSE}
+begin
+end;
+{$ENDIF}
+
+procedure SysTrace(const Msg: String);
+begin
+  DNTrace(Msg);
+end;
+
 var
   KeyIsPending: Boolean = False;
   PendingKey: TEvent;
+
+var
+  AutoKeyStart: QWord = 0;
+  AutoKeyDone: Boolean = False;
 
 function SysKeyPressed: Boolean;
 var
   E: TEvent;
 begin
+  { a test aid: with DNDUMP set the "press any key" of the fatal error screen of DN is answered after 3 seconds, so that the
+    program ends and its files are closed (DOS keeps the data of a file that is not closed only in memory) }
+  if (not KeyIsPending) and (not AutoKeyDone) and (GetEnvironmentVariable('DNDUMP') <> '') then
+  begin
+    if AutoKeyStart = 0 then
+      AutoKeyStart := GetTickCount64;
+    if GetTickCount64 - AutoKeyStart > 3000 then
+    begin
+      FillChar(PendingKey, SizeOf(PendingKey), 0);
+      PendingKey.What := evKeyDown;
+      PendingKey.CharCode := 13;
+      KeyIsPending := True;
+      AutoKeyDone := True;
+    end;
+  end;
   if not KeyIsPending then
   begin
     TvSys.PollEvent(0, E);
@@ -581,10 +624,19 @@ begin
 end;
 
 function GetLocationInfo(Addr: Pointer; var FileName: ShortString; var LineNo: LongInt): Pointer;
+var
+  Func: ShortString;
 begin
   FileName := '';
   LineNo := 0;
   Result := nil;
+  Func := ShortString(BackTraceStrFunc(Addr));       { '  $0001FF3  ROUTINE,  line 12 of file.pas' }
+  if (Func <> '') and (Pos('line', Func) > 0) then
+  begin
+    FileName := Func;
+    LineNo := 0;
+    Result := Addr;
+  end;
 end;
 
 procedure SysCtrlSleep(Milliseconds: LongInt);

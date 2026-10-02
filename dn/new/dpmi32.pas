@@ -61,10 +61,9 @@ function DosShadow(Seg: SmallWord): Pointer;
 
 implementation
 
-{$IFDEF GO32V2}
 uses
-  go32;
-{$ENDIF}
+  SysUtils, DNErrLog
+{$IFDEF GO32V2}, go32{$ENDIF};
 
 type
   TShadow = record
@@ -88,9 +87,11 @@ var
   R: TRealRegs absolute Regs;
   I: Integer;
 begin
+  DNTrace('intr_realmode ' + IntToHex(IntNo, 2) + ' ax=' + IntToHex(R.ax, 4) + ' ds=' + IntToHex(R.ds, 4) + ' shadows=' + IntToStr(ShadowCount));
   for I := 1 to ShadowCount do
     dosmemput(Shadows[I].Seg, 0, Shadows[I].Mem^, Shadows[I].Size);
   realintr(IntNo, R);
+  DNTrace('intr_realmode done');
   for I := 1 to ShadowCount do
     dosmemget(Shadows[I].Seg, 0, Shadows[I].Mem^, Shadows[I].Size);
 end;
@@ -182,6 +183,7 @@ var
 begin
   R := global_dos_alloc(Size);
   Seg := SmallWord(R and $FFFF);
+  DNTrace('getdosmem size=' + IntToStr(Size) + ' -> ' + IntToHex(R, 8));
 end;
 {$ELSE}
 begin
@@ -221,4 +223,8 @@ begin
   end;
 end;
 
+initialization
+  { the initialized variable had a wrong value at the start of the program under DOSBox-X (8): set here, see
+    dn/TODO-later.md }
+  ShadowCount := 0;
 end.

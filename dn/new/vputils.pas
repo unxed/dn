@@ -23,6 +23,10 @@ function NameOfRec(const Name: array of WideChar): String;
 { Dos.GetDate with the day of the week in a LongInt (in VP Word is 32 bit and the variables of DN are LongInt). }
 procedure GetDateDow(var Year, Month, Day: Word; var DayOfWeek: LongInt);
 
+{ The scrambling of the table of the records of the game (tetris.pas): every byte xor ($AA xor the number of the bytes
+  that are left, as a byte). }
+procedure XorScramble(var B; Count: LongInt);
+
 { The address as hexadecimal digits (VP: Ptr2Hex). }
 function Ptr2Hex(P: Pointer): String;
 
@@ -65,6 +69,21 @@ var
 begin
   Dos.GetDate(Year, Month, Day, W);
   DayOfWeek := W;
+end;
+
+procedure XorScramble(var B; Count: LongInt);
+var
+  P: PByte;
+  Left: LongInt;
+begin
+  P := @B;
+  Left := Count;
+  while Left > 0 do
+  begin
+    P^ := P^ xor (Byte(Left) xor $AA);
+    Inc(P);
+    Dec(Left);
+  end;
 end;
 
 function Ptr2Hex(P: Pointer): String;

@@ -13,7 +13,7 @@ if [ -n "$DN_CROSS" ]; then
     LINKOPT=-Cn
     [ -n "$DN_LINK" ] && { PATH="$DN_LINK/djgpp/bin:$PATH"; LINKOPT=; }
     $X/ppcross386 -Tgo32v2 -XPi586-pc-msdosdjgpp- $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/dn/new" \
-        -Fu"$here/tv/src" -Fu"$U/*" -Fu"$U/rtl" -FU"$out" -FE"$out" $LINKOPT -vewn "$1" 2>&1 | grep -a -E 'Error|Fatal|undefined|Linking|bytes' | head -${2:-12}
+        -Fu"$here/tv/src" -Fu"$U/*" -Fu"$U/rtl" -FU"$out" -FE"$out" $LINKOPT $DN_EXTRA -vewn "$1" 2>&1 | grep -a -E 'Error|Fatal|undefined|Linking|bytes' | head -${2:-12}
     exit 0
 fi
 fpc $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/dn/new" -Fu"$here/tv/src" -FU"$out" -Cn -vewn "$1" 2>&1 \
