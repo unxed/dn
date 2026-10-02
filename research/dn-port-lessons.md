@@ -137,3 +137,12 @@ LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` 
   `Init(var R)`; `Pattern: Byte` / `Char`; `PPalette` / `TPalette`; нет `Load/Store` (потоки представлений не
   переведены); нет ресурсов диалогов. `drivers.pas`/`videoman.pas` держатся на `SysTv*` (VP) — нужен выбор: реализовать
   `SysTv*` поверх `TvScreen/TvSys` или заменить свои `Drivers`/`VideoMan` адаптерами.
+
+## 10. Выбор (а) и модель клеток (2026-10-02)
+
+Решено (владелец: «А»): свой `dn/new/dnapp.pas` поверх `TvApp`, `Drivers`/`VideoMan` DN остаются, `SysTv*` — поверх `TvScreen/TvSys`.
+Находка по пути: DN рисует **16-битными клетками** (`Word`: символ OEM + атрибут, `TDrawBuffer`, `MoveChar(B, ...)` из
+собственного `drivers.pas` DN, `WriteBuf/WriteLine(…, B)`: ~250 мест в 15 файлах), у нашего `tv/` клетка — `TScreenCell`
+(UTF-8 + атрибут), а `TDrawBuffer` — объект. План: в `tv/` добавить перегрузки `TView.WriteBuf/WriteLine` для старых
+буферов из `Word` (с таблицей кодовой страницы), из шима `Views` исключить `TDrawBuffer` (в DN он свой, из `Drivers`).
+`SysTv*`: `ScreenBuffer` DN — буфер `Word`, `SysTvShowBuf` переводит его в `ScreenWrite`.
