@@ -96,6 +96,14 @@ begin
   K := KeyMake(kbNoKey, kbShift or kbAltShift);
   Check((K.Code = 0) and (K.Mods = 0), 'no key has no modifiers');
 
+  { Wordstar keys }
+  Check(CtrlToArrow(kbCtrlS) = kbLeft, 'CtrlToArrow: Ctrl+S is Left');
+  Check(CtrlToArrow(kbCtrlD) = kbRight, 'CtrlToArrow: Ctrl+D is Right');
+  Check(CtrlToArrow(kbCtrlE) = kbUp, 'CtrlToArrow: Ctrl+E is Up');
+  Check(CtrlToArrow(kbCtrlX) = kbDown, 'CtrlToArrow: Ctrl+X is Down');
+  Check(CtrlToArrow(kbCtrlH) = kbBack, 'CtrlToArrow: Ctrl+H is Backspace');
+  Check(CtrlToArrow(kbF1) = kbF1, 'CtrlToArrow: other keys are returned as they are');
+
   Check(not Same(KeyMake(kbF1), KeyMake(kbF2)), 'different keys differ');
   Check(not Same(KeyMake(kbF1), KeyMake(kbF1, kbShift)), 'different modifiers differ');
 

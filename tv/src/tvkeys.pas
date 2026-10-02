@@ -101,6 +101,9 @@ type
 
 function KeyMake(KeyCode: Word; ShiftState: Word = 0): TKey;
 function KeyEq(const A, B: TKey): Boolean; inline;
+{ Maps the Wordstar control keys (Ctrl+S, Ctrl+D, ...) to the arrow keys; other keys
+  are returned unchanged (drivers2.cpp: ctrlToArrow). }
+function CtrlToArrow(KeyCode: Word): Word;
 
 implementation
 
@@ -250,6 +253,23 @@ end;
 function KeyEq(const A, B: TKey): Boolean;
 begin
   Result := (A.Code = B.Code) and (A.Mods = B.Mods);
+end;
+
+function CtrlToArrow(KeyCode: Word): Word;
+const
+  CtrlCodes: array[0..10] of Byte = (
+    kbCtrlS, kbCtrlD, kbCtrlE, kbCtrlX, kbCtrlA, kbCtrlF, kbCtrlG, kbCtrlV,
+    kbCtrlR, kbCtrlC, kbCtrlH);
+  ArrowCodes: array[0..10] of Word = (
+    kbLeft, kbRight, kbUp, kbDown, kbHome, kbEnd, kbDel, kbIns, kbPgUp, kbPgDn,
+    kbBack);
+var
+  I: Integer;
+begin
+  for I := 0 to 10 do
+    if (KeyCode and $FF) = CtrlCodes[I] then
+      Exit(ArrowCodes[I]);
+  Result := KeyCode;
 end;
 
 initialization

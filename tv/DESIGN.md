@@ -41,7 +41,7 @@
 | 4 | `TvDrawBuf` — `TDrawBuffer`: MoveChar, MoveStr, MoveCStr, MoveBuf | `drawbuf.h`, `drivers.cpp` | сделан |
 | 5a | `TvScreen` — размер экрана, буфер экрана, крючки бэкенда (запись, каретка) | `TScreen`, `THardwareInfo` (экранная часть) | сделан |
 | 5b | `TvViews` — константы, `TCommandSet`, палитры, `TView`, `TGroup`, движок вывода и проверка видимости | `views.h`, `tview.cpp`, `tgroup.cpp`, `tvwrite.cpp`, `tvexposd.cpp`, `tvcursor.cpp` и др. | сделан (без потоков и таймеров) |
-| 5c | `TvWindow` — `TFrame`, `TScrollBar`, `TScroller`, `TWindow` | `views.h`, `tframe.cpp`, `tscrlbar.cpp`, `twindow.cpp` | |
+| 5c | `TvWindow` — `TFrame`, `TScrollBar`, `TScroller`, `TWindow` | `views.h`, `tframe.cpp`, `framelin.cpp`, `tscrlbar.cpp`, `tscrolle.cpp`, `twindow.cpp`, `tvtext1.cpp` (таблицы рамки) | сделан (без потоков); `CtrlToArrow` — в `TvKeys` |
 | 6 | `TvMenus` — меню и строка статуса | `menus.h`, `tmnuview.cpp`, `tstatusl.cpp` | |
 | 7 | `TvApp` — `TProgram`, `TApplication`, `TDesktop` | `app.h`, `tprogram.cpp`, … | |
 | 8 | Бэкенд «в памяти» (тесты) и бэкенд DOS | свой | |
@@ -133,3 +133,27 @@
 - **`TCommandSet`** — `set of Byte`; команды выше 255 всегда разрешены.
 - **Пока не переведено в `TView`/`TGroup`:** потоки (`read`/`write`/`build`), таймеры,
   `getEvent` с таймаутом и `textEvent` (их ждёт `TvApp`).
+- **`ResetCurrent` и порядок обхода.** `FirstMatch` начинает с `Last` (нижнего вида), затем
+  идёт сверху вниз (`Last.Next = First`). Новое окно становится текущим потому, что нижний
+  вид рабочего стола (фон) не выбираемый; если фона нет, а нижнее окно выбираемое, оно
+  останется текущим (так же в оригинале). Тесты окон поэтому кладут под окна фон.
+- **`TWindow`:** рамка создаётся виртуальным методом `InitFrame` (как в Pascal TV), а не
+  вспомогательным классом `TWindowInit`. Заголовок — `ShortString`; пустой заголовок
+  рисуется как отсутствие заголовка (в оригинале пустая строка давала два пробела).
+  `Done` обнуляет `Frame` до удаления подвидов; `Close` делает `Frame := nil` и `Dispose`.
+  Номер окна — `Integer`.
+- **Рамка:** таблицы `FrameInit`/`FrameChars` и значки `[■]`, `[↑]`, `[↕]`, уголки
+  изменения размера — коды CP437 (в том числе управляющие $12 и $18, их показывает таблица
+  кодовой страницы, см. тест). Подмену `frameChars[30]` для не-437 страниц оригинал делает
+  в `updateIntlChars`; здесь не нужна, потому что страница сама отображает $CD.
+  Рамки соседних видов с `ofFramed` соединяются в `FrameLine` (проверено тестом). Рисование
+  вида внутри окна рамку не перерисовывает: после вставки такого вида рамку надо перерисовать
+  (`Frame^.DrawView`), в оригинале тоже.
+- **`TScrollBar`:** состояние мыши (`SbMouse`, `SbP`, `SbS`, `SbExtent`) — переменные юнита,
+  как статические переменные в оригинале; одновременно двух полос не обрабатывают.
+  Арифметика положения ползунка — `Int64` (в оригинале `long`).
+- **Тесты окон** (`t_window.pas`) используют верхний вид `TTop` с очередью событий: он отдаёт
+  циклам `MouseEvent` рамки и полосы заранее заготовленные события и запоминает `PutEvent`.
+  Это заготовка того, что потом станет `TProgram.GetEvent`.
+- **Пока не переведено в `TvWindow`:** потоки; `TWindow.Palette` и `Flags` имеют те же
+  значения, что в оригинале.
