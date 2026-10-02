@@ -7,7 +7,7 @@ procedure Check(Cond: Boolean; const Name: ShortString);
 begin
   Inc(TestCount);
   if Cond then
-    WriteLn('PASS ', Name)
+    begin WriteLn('PASS ', Name); Flush(Output); end
   else
   begin
     WriteLn('FAIL ', Name);

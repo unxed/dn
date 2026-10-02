@@ -25,7 +25,7 @@ unit TvViews;
 interface
 
 uses
-  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen;
+  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen, TvObjs;
 
 const
   { standard command codes }
@@ -144,7 +144,7 @@ type
   TForEachProc = procedure(P: PView; Args: Pointer);
   TFirstThatFunc = function(P: PView; Args: Pointer): Boolean;
 
-  TView = object
+  TView = object(TObject)
     Next: PView;
     Size: TPoint;
     Options: Word;
@@ -901,6 +901,7 @@ end;
 
 constructor TView.Init(const Bounds: TRect);
 begin
+  inherited Init;       { zeroes all the fields, also those of the descendants }
   Next := nil;
   Options := 0;
   EventMask := evMouseDown or evKeyDown or evCommand;
@@ -921,6 +922,7 @@ begin
   Hide;
   if Owner <> nil then
     Owner^.Delete(@Self);
+  inherited Done;
 end;
 
 procedure TView.Awaken;
