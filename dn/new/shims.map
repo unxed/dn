@@ -2,8 +2,8 @@
 # gives their names: `UnitName: TvUnit TvUnit...` (tools/gen-shim.py, called by tools/dn-materialize.sh).
 # What DN adds to TV, and the names that differ, are in dn/new/manual/UNIT.inc (interface) and
 # UNIT.impl.inc (implementation).
-Defines:  TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput
-_Defines: TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput
+Defines:  TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow
+_Defines: TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow
 Views:    TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow
 _Views:   TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow
 Dialogs:  TvDialog TvInput TvCluster TvList TvHist TvValid
