@@ -1775,6 +1775,26 @@ procedure LoadPalFromFile(const FN: String);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
+{ A view is in the group (by the pointers only: it may be a freed one). The help window is kept between the calls of F1 (HelpWnd),
+  but the window of TV is destroyed when it is closed, and the pointer stayed: the next F1 used a freed window. }
+function IsOnDesktop(P: PView): Boolean;
+  var
+    V: PView;
+  begin
+  IsOnDesktop := False;
+  V := Desktop^.Last;
+  if V = nil then
+    Exit;
+  repeat
+    if V = P then
+      begin
+      IsOnDesktop := True;
+      Exit;
+      end;
+    V := V^.Prev;
+  until V = Desktop^.Last;
+  end;
+
 procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   var
@@ -2812,7 +2832,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
          так как иначе окно хелпа (если оно есть, и Current)
          захватит cmHelp и выдаст Help on Help, а сюда управление
          просто не попадёт }
-      if  (not HelpInUse) or (HelpWnd = nil) then
+      if  (not HelpInUse) or (HelpWnd = nil) or not IsOnDesktop(HelpWnd) then
         begin { создаём окно хелпа }
         HelpStrm := New(PDosStream,
             Init(SourceDir+HelpLngId+'.HLP', stOpenRead {stOpenPacked})
@@ -2990,18 +3010,4 @@ procedure PutInClipLong(const S: LongString);
   end;
 {/Cat}
 
-{ The help window is kept between the calls of F1 (HelpWnd); when it is closed (the window is done) the pointer must not stay: the
-  next F1 would use a freed window }
-procedure HelpWindowDone(P: PView);
-  begin
-  if P = PView(HelpWnd) then
-    begin
-    HelpWnd := nil;
-    HelpInUse := False;
-    end;
-  end;
-
-begin
-  ViewDoneHook := @HelpWindowDone;
 end.
-
