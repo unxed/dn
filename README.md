@@ -22,3 +22,37 @@ DOS Navigator на Free Pascal. В репозитории два независ�
    проверяет sha256 (`audit/fetch_reference.sh`).
 
 План работ: [`PLAN.md`](PLAN.md). Устройство TV: [`tv/DESIGN.md`](tv/DESIGN.md).
+
+## Как потестить то, что уже готово
+
+*(Этот раздел обновляется вместе с каждым изменением, которое меняет способ проверки или то, что можно увидеть.)*
+
+**Что есть сейчас (2026-10-02):** TV (`tv/`) собирается и проходит свои тесты нативно и под DOS; DN (OSP 2.14) собирается
+целиком в `dn.exe` для DOS (go32v2), компилятор ресурсов `rcp.exe` работает под DOSBox-X и делает `.DLG/.LNG` на трёх
+языках; `dn.exe` запускается в DOSBox-X, читает конфигурацию, загружает ресурсы, создаёт меню и строку статуса и **падает
+в начале работы** (идёт отладка; экрана с панелями пока нет).
+
+1. **Тесты TV** (нужен только `fpc` 3.2.x):
+
+       cd tv/tests
+       for t in t_*.pas; do fpc -Fu../src -Fu. $t && ./${t%.pas}; done     # каждый печатает «ALL OK»
+
+2. **Тесты наших юнитов DN** (`dn/new`): те же команды запускает job `new` в `.github/workflows/dn.yml`.
+
+3. **Инструменты для DOS** (один раз; нужны `fpc`, `make`, `git`, `curl`, `bzip2`, `dosbox-x`, `unrar`, `unzip`, `python3`, `patch`):
+
+       tools/build-fpc-go32v2.sh $HOME/go32     # кросс-компилятор FPC → DOS и DJGPP binutils, ~15 минут
+
+4. **DN: собрать и запустить в DOSBox-X** (без окна, на заглушках SDL):
+
+       DN_PREFIX=$HOME/go32 tools/dn-run.sh            # результат в out/dnrun/
+       DN_PREFIX=$HOME/go32 DN_TRACE=1 tools/dn-run.sh # и трасса запуска в out/dnrun/SER.TXT
+
+   Скрипт: скачивает архив DN OSP 2.14 и делает дерево `build/dn/`; собирает `rcp.exe` и `dn.exe`; запускает `rcp.exe`
+   (получаются `ENGLISH/RUSSIAN/UKRAIN.DLG/.LNG`); запускает `dn.exe` и, если тот дошёл до первого цикла ожидания, пишет
+   дамп экрана `SCR.DAT` (и `SCR.PNG`, если есть Pillow) — их можно смотреть `python3 tools/render-dump.py out/dnrun/SCR.DAT`.
+   Если DN упал раньше, смотрите `out/dnrun/DNERR.TXT` и `SER.TXT`. Переменные: `DN_LOCAL_TREE`, `DN_NO_MATERIALIZE`,
+   `DUMPSEC`, `DN_EXTRA` (описаны в начале `tools/dn-run.sh`).
+
+5. **Посмотреть работу руками:** каталог `out/dnrun/` — готовый набор для DOS (`DN.EXE`, `CWSDPMI.EXE`, `*.DLG`, `*.LNG`):
+   смонтируйте его в DOSBox-X (`mount c out/dnrun`, `c:`, `dn`) или скопируйте на машину с DOS.
