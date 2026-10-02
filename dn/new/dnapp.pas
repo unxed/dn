@@ -104,6 +104,8 @@ var
 
 implementation
 
+uses Advance, Advance2, Advance7;
+
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
   inherited Init(Bounds, Ord(APattern));
@@ -128,10 +130,13 @@ begin
   DNTrace('TProgram.Init');
   inherited Init;
   DNTrace('TProgram.Init: tv done');
+  DNTrace('StatusLine=' + IntToHex(PtrUInt(StatusLine), 8) + ' MenuBar=' + IntToHex(PtrUInt(MenuBar), 8));
   if StatusLine <> nil then
     Insert(StatusLine);
+  DNTrace('status inserted');
   if MenuBar <> nil then
     Insert(MenuBar);
+  DNTrace('menu inserted');
 end;
 
 procedure TProgram.ActivateView(P: PView);
@@ -232,25 +237,83 @@ procedure UpdateWriteView(P: Pointer);
 begin
 end;
 
-procedure OpenResource;
+procedure ResourceFail(const S: String);
 begin
-  { TODO: resources }
+  Writeln('Could not open resource file (' + S + ')');
+  Halt(219);
 end;
 
-function ExecResource(Key: TDlgIdx; var Data): Word;
+{ The resource files lie in the directory named by the environment variable DNDLG, else in that of the program (SourceDir),
+  else in the startup directory. Names: <language>.DLG (dialogs and menus), <language>.LNG (strings): see rcp. }
+function OpenResourceStream(const Ext: String): PBufStream;
+var
+  S: String;
+  PS: PBufStream;
 begin
-  PreExecuteDialog := nil;
-  Result := cmCancel;             { TODO: resources }
+  S := GetEnvironmentVariable('DNDLG');
+  if S = '' then
+    S := SourceDir;
+  MakeSlash(S);
+  PS := New(PBufStream, Init(S + LngId + Ext, stOpenRead, 1024));
+  if PS^.Status <> stOK then
+  begin
+    Dispose(PS, Done);
+    PS := New(PBufStream, Init(StartupDir + LngId + Ext, stOpenRead, 1024));
+    if PS^.Status <> stOK then
+      ResourceFail(LngId + Ext);
+  end;
+  Result := PS;
+end;
+
+procedure OpenResource;
+begin
+  if Resource <> nil then
+    Exit;
+  ResourceStream := OpenResourceStream('.DLG');
+  New(Resource, Init(ResourceStream));
+end;
+
+function LoadDialog(Key: TDlgIdx): PDialog;
+begin
+  Result := nil;
+  OpenResource;
+  if Resource = nil then
+    Exit;
+  Result := PDialog(Resource^.Get(Key));
+  Result := PDialog(Application^.ValidView(Result));
 end;
 
 function ExecDialog(D: PDialog; var Data): Word;
 begin
-  Result := Application^.ExecuteDialog(D, @Data);
+  D^.SetData(Data);
+  Result := Desktop^.ExecView(D);
+  if Result <> cmCancel then
+    D^.GetData(Data);
+end;
+
+{ TODO: PreExecuteDialog may be a procedure local to the caller (the original ExecResource had no stack frame for that: VP asm) }
+function ExecResource(Key: TDlgIdx; var Data): Word;
+var
+  D: PDialog;
+begin
+  Result := cmCancel;
+  D := LoadDialog(Key);
+  if D = nil then
+    Exit;
+  if @PreExecuteDialog <> nil then
+    PreExecuteDialog(D);
+  Result := ExecDialog(D, Data);
+  Dispose(D, Done);
+  PreExecuteDialog := nil;
 end;
 
 function LoadResource(Key: TDlgIdx): PObject;
 begin
-  Result := nil;                  { TODO: resources }
+  Result := nil;
+  OpenResource;
+  if Resource = nil then
+    Exit;
+  Result := Resource^.Get(Key);
 end;
 
 function GlobalMessage(What, Command: Word; InfoPtr: Pointer): Pointer;
@@ -293,12 +356,41 @@ procedure ForceWriteShow(P: Pointer);
 begin
 end;
 
+procedure InitLngStream;
+var
+  PS, XS: PStream;
+begin
+  PS := OpenResourceStream('.LNG');
+  { the strings are read from memory: the file is copied (as the original does) }
+  XS := New(PMemoryStream, Init(PS^.GetSize, PS^.GetSize));
+  if XS^.Status <> stOK then
+  begin
+    Dispose(XS, Done);
+    XS := nil;
+  end;
+  if XS <> nil then
+  begin
+    XS^.CopyFrom(PS^, PS^.GetSize);
+    if XS^.Status = stOK then
+    begin
+      Dispose(PS, Done);
+      PS := XS;
+    end
+    else
+      Dispose(XS, Done);
+  end;
+  LngStream := PS;
+  PS^.Seek(0);
+  LStringList := PStringList(PS^.Get);
+  if (PS^.Status <> stOK) or (LStringList = nil) then
+    ResourceFail('reading ' + LngId + '.LNG');
+end;
+
 function GetString(Index: TStrIdx): String;
 begin
-  if LStringList <> nil then
-    Result := LStringList^.Get(Word(Ord(Index)))
-  else
-    Result := '';
+  if LStringList = nil then
+    InitLngStream;
+  Result := LStringList^.Get(Word(Ord(Index)));
 end;
 
 procedure ToggleCommandLine(OnOff: Boolean);
