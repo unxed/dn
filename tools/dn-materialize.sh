@@ -74,4 +74,11 @@ fi
 if [ -f "$here/dn/new/shims.map" ]; then
     python3 "$here/tools/gen-shim.py" "$here/dn/new/shims.map" "$out" "$here/tv/src" | sed 's|^|  shim: |'
 fi
+# the names of the units in lower case (FPC on a case-sensitive file system looks for unit.pas and UNIT.PAS only,
+# not for TopView_.PAS)
+for f in "$out"/*.[Pp][Aa][Ss]; do
+    [ -f "$f" ] || continue
+    b=$(basename "$f"); l=$(echo "$b" | tr 'A-Z' 'a-z')
+    [ "$b" = "$l" ] || mv "$f" "$out/$l"
+done
 echo "dn-materialize: build/dn ready ($(find "$out" -type f | wc -l) files)"

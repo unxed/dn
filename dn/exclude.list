@@ -46,3 +46,6 @@ sysutils.pas
 rtpatch.pas
 regexp.pas
 eaoper.pas
+
+# the helpers of DN over tv/ (event record, keys, Move* of 16-bit cells...) are our unit dn/new/drivers.pas
+drivers.pas
