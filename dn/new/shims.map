@@ -19,5 +19,4 @@ HistList: TvHist
 MsgBox:   TvMsgBox
 App:      TvApp
 _Apps:    TvApp
-Menus:    TvMenus
 StdDlg:   TvFileDlg TvChDir TvFiles

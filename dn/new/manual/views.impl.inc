@@ -56,3 +56,19 @@ procedure TMyScrollBar.Draw;
 begin
   inherited Draw;
 end;
+
+function MessageL(Receiver: PView; What, Command: Word; InfoLng: LongInt): Pointer;
+var
+  Event: TEvent;
+begin
+  Result := nil;
+  if Receiver = nil then
+    Exit;
+  ClearEvent(Event);
+  Event.What := What;
+  Event.Command := Command;
+  Event.InfoLong := InfoLng;
+  Receiver^.HandleEvent(Event);
+  if Event.What = evNothing then
+    Result := Event.InfoPtr;
+end;

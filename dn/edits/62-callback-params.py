@@ -8,7 +8,7 @@ absolute P_;`. Which parameter type the caller needs is told by the table of kin
 usage: 62-callback-params.py FILE...   (all the .pas of the tree)"""
 import re, sys
 
-CALL = re.compile(r'\.(FirstThat|LastThat|ForEach)\(([A-Za-z_]\w*)\)')
+CALL = re.compile(r'(?<![A-Za-z_0-9])(FirstThat|LastThat|ForEach)\(([A-Za-z_]\w*)\)')
 n = 0
 for p in sys.argv[1:]:
     raw = open(p, 'rb').read().decode('latin-1')

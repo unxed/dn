@@ -50,6 +50,11 @@ begin
   New(F, Init('0123456789'));
   Check(F^.IsValid('12345') and F^.IsValid(''), 'TFilterValidator: digits are valid');
   Check(not F^.IsValid('12a45'), 'a letter is not');
+  Dispose(F, Done);
+  New(F, Init(['0'..'9', 'a'..'c']));
+  Check(F^.IsValid('09ab') and not F^.IsValid('d') and (F^.ValidChars^ = '0123456789abc'), 'a filter made from a set');
+  Dispose(F, Done);
+  New(F, Init('0123456789'));
   S := '12';
   Check(F^.IsValidInput(S, False), 'input of digits');
   S := '1 2';

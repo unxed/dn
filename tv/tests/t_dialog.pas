@@ -28,6 +28,8 @@ begin
   Check((Dlg^.Flags = (wfMove or wfClose)) and (Dlg^.GrowMode = 0), 'a dialog moves and closes, does not grow');
   Check(Dlg^.Palette = dpGrayDialog, 'a gray dialog');
   Check(Dlg^.Number = wnNoNumber, 'a dialog has no number');
+  Check((Dlg^.DirectLink[1] = nil) and (Dlg^.DirectLink[9] = nil), 'DN extensions: DirectLink starts empty');
+  Check(Dlg^.Title^ = 'Title', 'the title is a heap string (PStr), as in Borland');
 
   New(Txt, Init(R(2, 1, 14, 4), 'Hello brave new world'));
   Dlg^.Insert(Txt);

@@ -65,6 +65,11 @@ begin
   Ch := Ord(ACh);
 end;
 
+function HideZoom(Command: Word): Boolean;
+begin
+  Result := Command = cmZoom;
+end;
+
 procedure TFill.Draw;
 var
   B: TDrawBuffer;
@@ -297,6 +302,16 @@ begin
   Bar^.SetParams(0, 0, 10, 4, 1);
   Check((Bar^.ScrollStep(sbDownArrow) = 1) and (Bar^.ScrollStep(sbUpArrow) = -1) and
     (Bar^.ScrollStep(sbPageDown) = 4) and (Bar^.ScrollStep(sbPageUp) = -4), 'ScrollStep');
+  Check((Bar^.Step = -4) and not Bar^.ForceScroll, 'DN extensions: Step is the last step of ScrollStep, ForceScroll is off');
+  EnableCommands([cmZoom]);
+  Bar^.DisableCommands([cmZoom]);
+  Check(not (cmZoom in CurCommandSet), 'DN extensions: DisableCommands as a method of a view');
+  Bar^.EnableCommand(cmZoom);
+  Check(cmZoom in CurCommandSet, 'DN extensions: EnableCommand as a method of a view');
+  Check(Bar^.MenuEnabled(cmZoom) and Bar^.MenuEnabled(3000), 'DN extensions: MenuEnabled follows the command set (above 255 always)');
+  CommandHiddenHook := @HideZoom;
+  Check(not Bar^.MenuEnabled(cmZoom) and Bar^.MenuEnabled(cmClose), 'DN extensions: a hidden command is not enabled');
+  CommandHiddenHook := nil;
 
   { keys }
   FillChar(Ev, SizeOf(Ev), 0);

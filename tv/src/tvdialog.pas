@@ -51,6 +51,8 @@ type
   { Palette: 32 entries, mapped to the application palette through the dialog palette
     of the application (see TvApp) }
   TDialog = object(TWindow)
+    { used by DN: the controls of a dialog by number (the loader of its resources fills them; nil = none) }
+    DirectLink: array[1..9] of PView;
     constructor Init(const Bounds: TRect; const ATitle: ShortString);
     constructor Load(var S: TStream);
     function GetPalette: TPalette; virtual;

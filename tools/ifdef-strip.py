@@ -13,18 +13,33 @@ import os, re, sys
 src, out = sys.argv[1], sys.argv[2]
 defined0 = set(s.upper() for s in sys.argv[3:])
 os.makedirs(out, exist_ok=True)
+# comments and strings: a directive inside them is not a directive (`(* old code {$ELSE} !! *) new code` in DN)
+TOK = re.compile(r"\(\*\$.*?\*\)|\(\*.*?\*\)|\{\$[^}]*\}|\{[^}]*\}|//[^\r\n]*|'[^'\r\n]*'", re.S)
 D = re.compile(r'(\{\$|\(\*\$)\s*(IFDEF|IFNDEF|ELSE|ENDIF|DEFINE|UNDEF|I)\b\s*([^}*\s]*)[^}*]*(\}|\*\))', re.I)
 files = {f.lower(): f for f in os.listdir(src)}
 
 def read(f):
     return open(os.path.join(src, f), 'rb').read().decode('latin-1')
 
+class _Shift:
+    """the match of a directive with the positions in the whole text"""
+    def __init__(self, m, base):
+        self.m, self.base = m, base
+    def start(self): return self.base + self.m.start()
+    def end(self): return self.base + self.m.end()
+    def group(self, i): return self.m.group(i)
+
+
 def process(text, defined, depth=0):
     stack = []
     active = True
     res = []
     pos = 0
-    for m in D.finditer(text):
+    for tk in TOK.finditer(text):
+        m = D.fullmatch(tk.group(0))
+        if m is None:
+            continue                # a comment or a string
+        m = _Shift(m, tk.start())
         if active:
             res.append(text[pos:m.start()])
         pos = m.end()
