@@ -31,7 +31,7 @@ for p in sys.argv[1:]:
             if want == 'PView':
                 return m.group(0)
             return '%s%s%s%s(%s_: Pointer)%s;\r\n%svar %s: %s absolute %s_;' % (ind, kind, sp, nm, par, res or '', ind, par, typ, par)
-        out = pat.sub(fix, out, count=1)
+        out = pat.sub(fix, out)   # every routine of that name (a file may have several callers with the same helper name)
     if out != raw:
         open(p, 'wb').write(out.encode('latin-1'))
 print('62-callback-params: %d routines' % n)

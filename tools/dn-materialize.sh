@@ -102,4 +102,19 @@ for f in "$out"/*.[Pp][Aa][Ss]; do
     b=$(basename "$f"); l=$(echo "$b" | tr 'A-Z' 'a-z')
     [ "$b" = "$l" ] || mv "$f" "$out/$l"
 done
+# the unit aliases of vpc.cfg (-ALFN=LFNVP;WINCLP=WINCLPVP: VP maps the unit name LFN to the unit LFNVP, so both names
+# mean one unit). FPC has no such option: the unit gets the name that the others use (file, `unit` line, and the
+# other mentions of the old name in the sources).
+cfg=$(ls "$out" | grep -i '^vpc\.cfg$' | head -1)
+if [ -n "$cfg" ]; then
+    grep -i '^-A' "$out/$cfg" | tr -d '\r' | sed 's/^-[Aa]//' | tr ';' '\n' | while IFS== read -r alias real; do
+        [ -n "$alias" ] && [ -n "$real" ] || continue
+        lr=$(echo "$real" | tr 'A-Z' 'a-z'); la=$(echo "$alias" | tr 'A-Z' 'a-z')
+        [ -f "$out/$lr.pas" ] || continue
+        mv "$out/$lr.pas" "$out/$la.pas"
+        find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | LC_ALL=C xargs -0 sed -i "s/\b$real\b/$alias/Ig"
+        echo "  alias: unit $real is named $alias"
+    done
+    find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 python3 "$here/tools/dedup-uses.py" | sed 's|^|  |'
+fi
 echo "dn-materialize: build/dn ready ($(find "$out" -type f | wc -l) files)"

@@ -427,7 +427,7 @@ begin
   SM.Seek(0);
   SL := PWindow(SM.Get);
   Check((SL <> nil) and (SM.Status = stOk), 'a window is loaded');
-  Check((SL^.Title = 'Hello') and (SL^.Number = 3) and (SL^.Flags and wfZoom = 0), 'the title, the number and the flags');
+  Check((SL^.Title^ = 'Hello') and (SL^.Number = 3) and (SL^.Flags and wfZoom = 0), 'the title, the number and the flags');
   Check((SL^.Frame <> nil) and (SL^.Frame^.Owner = PGroup(SL)), 'the frame is a view of the window');
   SSc2 := nil;
   SSb2 := nil;

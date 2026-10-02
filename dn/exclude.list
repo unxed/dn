@@ -47,3 +47,7 @@ eaoper.pas
 
 # the helpers of DN over tv/ (event record, keys, Move* of 16-bit cells...) are our unit dn/new/drivers.pas
 drivers.pas
+
+# the network browser of Windows (unit Windows, WNet*): not for DOS. Only the registration of its stream type
+# (otNetDrive) is lost, flpanel.pas does not use it otherwise (edit 87).
+netbrwsr.pas
