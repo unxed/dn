@@ -161,9 +161,13 @@ type
     { Hides the view and removes it from its owner. }
     destructor Done; virtual;
     procedure SizeLimits(out Min, Max: TPoint); virtual;
-    function GetBounds: TRect;
-    function GetExtent: TRect;
-    function GetClipRect: TRect;
+    function GetBounds: TRect; overload;
+    function GetExtent: TRect; overload;
+    function GetClipRect: TRect; overload;
+    { The forms of Turbo Vision for Borland Pascal: the result goes to a variable. }
+    procedure GetBounds(var R: TRect); overload;
+    procedure GetExtent(var R: TRect); overload;
+    procedure GetClipRect(var R: TRect); overload;
     function MouseInView(Mouse: TPoint): Boolean;
     function ContainsMouse(var Event: TEvent): Boolean;
     procedure Locate(var Bounds: TRect);
@@ -212,8 +216,10 @@ type
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     procedure KeyEvent(var Event: TEvent);
     function MouseEvent(var Event: TEvent; Mask: Word): Boolean;
-    function MakeGlobal(Source: TPoint): TPoint;
-    function MakeLocal(Source: TPoint): TPoint;
+    function MakeGlobal(Source: TPoint): TPoint; overload;
+    function MakeLocal(Source: TPoint): TPoint; overload;
+    procedure MakeGlobal(Source: TPoint; var Dest: TPoint); overload;
+    procedure MakeLocal(Source: TPoint; var Dest: TPoint); overload;
     function NextView: PView;
     function PrevView: PView;
     function Prev: PView;
@@ -1191,6 +1197,31 @@ begin
           Result := False;
       end;
     end;
+end;
+
+procedure TView.GetBounds(var R: TRect);
+begin
+  R := GetBounds;
+end;
+
+procedure TView.GetExtent(var R: TRect);
+begin
+  R := GetExtent;
+end;
+
+procedure TView.GetClipRect(var R: TRect);
+begin
+  R := GetClipRect;
+end;
+
+procedure TView.MakeGlobal(Source: TPoint; var Dest: TPoint);
+begin
+  Dest := MakeGlobal(Source);
+end;
+
+procedure TView.MakeLocal(Source: TPoint; var Dest: TPoint);
+begin
+  Dest := MakeLocal(Source);
 end;
 
 function TView.GetBounds: TRect;

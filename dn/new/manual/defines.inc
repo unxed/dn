@@ -24,6 +24,13 @@ type
   TCharSet = set of Char;
   PCharSet = ^TCharSet;
 
+  WordRec = record
+    Lo, Hi: Byte;
+  end;
+  LongRec = record
+    Lo, Hi: SmallWord;
+  end;
+
   SW_Word = LongInt;
   Sw_Integer = LongInt;
 
