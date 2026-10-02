@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:28:26p
-╔═[■]═════════════════════════ Edit - C:\OUT.TXT ══════════════════════════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:46:19p
+╔═[■]═══════════════════════ Edit - C:\CWSDPMI.SWP ════════════════════════[↕]═╗
 ║  File  Edit  Search  Paragraph  Block  Misc  Options                         ▲
 ║                                                                              ▓
 ║                                                                              ▓

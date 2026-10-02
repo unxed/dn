@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:27:28p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:45:20p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
 ║       Name       │       Name        ║║       Name       │       Name        ▲
 ║TEM               │                   ║║TEM               │                   ■
@@ -8,15 +8,15 @@ x═[■]════════════ C:\ ══════════
 ║CWSDPMI       EXE │                   ║║CWSDPMI       EXE │                   ▒
 ║DN  ╔═[■]═════════════════════ Make directory ══════════════════════════╗     ▒
 ║ENGL║  Directory name                                                   ║     ▒
-║DN  ║                                                               ▐↓▌ ║     ▒
-║ENGL║                                                                   ║     ▒
-║RUSS║                                         OK   ▄  Cancel ▄   Help  ▄║     ▒
-║UKRA║                                       ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀║     ▒
-║CWSD╚═══════════════════════════════════════════════════════════════════╝     ▒
+║RUSS║                                                               ▐↓▌ ║     ▒
+║UKRA║                                                                   ║     ▒
+║DN  ║                                         OK   ▄  Cancel ▄   Help  ▄║     ▒
+║ENGL║                                       ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀║     ▒
+║RUSS╚═══════════════════════════════════════════════════════════════════╝     ▒
+║UKRAIN        LNG │                   ║║UKRAIN        LNG │                   ▒
+║CWSDPMI       SWP │                   ║║CWSDPMI       SWP │                   ▒
 ║DNERR         TXT │                   ║║DNERR         TXT │                   ▒
 ║OUT           TXT │                   ║║OUT           TXT │                   ▒
-║                  │                   ║║                  │                   ▒
-║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▼
 ║──────────────────┴───────────────────║║──────────────────┴───────────────────║
 ║TEM              4,096 00/00/00  0:00p║║TEM              4,096 00/00/00  0:00p║

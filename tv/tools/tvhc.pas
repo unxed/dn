@@ -1,22 +1,27 @@
-(* TVHC: the help compiler of this Turbo Vision (Written for this port, MIT: tv/LICENSE). It makes the help file (.hlp) that
-  THelpFile of TvHelp reads from the text of a help (.htx).
+(* TVHC: the help compiler of this Turbo Vision (written for this port, MIT: tv/LICENSE). It makes the help file (.hlp) that
+  THelpFile of TvHelp reads, from the text of a help (.htx). The format of the text is that of the help compiler of Borland
+  Turbo Vision (the help of DN is written in it); the compiler is not a copy of it: the format was learned from the text of
+  DN and from the behaviour of the old tool.
 
-  usage: tvhc INPUT.HTX OUTPUT.HLP [CONSTANTS.PAS] [options]
-    CONSTANTS.PAS  (optional) a unit-less list of the constants of the topics, `hcName = Number;`, for the programs
-    options        words like /x or -x (the defines of the DN build, /4DN_OSP) are accepted and ignored
+  usage: tvhc INPUT.HTX OUTPUT.HLP [SYMBOLS.PAS] [options]
+    SYMBOLS.PAS  (optional) a unit with the constants hcName = Number for the names of the topics
+    options      words like /x or -x are accepted and ignored (/4DN_OSP of the build of DN)
 
-  The text of a help:
-    ;...               a comment (the whole line)
-    .topic Name=N      a topic begins: Name is its name (for the references), N its number (a context of the program); without
-                       =N the number is the next one after the greatest so far. .topic Name1=N1, Name2=N2: two names, one text
-    .title Text        the title of the topic (kept in the list of the names, not in the file: the window has one title)
-    {text}             a cross reference to the topic that is named `text`
-    {text:Name}        a cross reference to the topic Name, shown as `text` (the last colon counts)
-    {{                 one brace (a brace without a closing one in the line is text too)
-    other lines        the text. A run of lines without a blank line between them is a paragraph; the paragraph whose first
-                       line begins with a blank is not wrapped (its lines are kept), the others are wrapped to the width of
-                       the window.
-  The bytes of the text are not changed (the code page of the file is the one of the program). *)
+  The text:
+    ; ...                a comment: the whole line is dropped
+    .topic Name=N, Name2  a topic begins. Name is its name (for the references), N its number (the context of the program).
+                          A name without =N gets the next number (the counter starts from 2; =N sets it; the contexts of
+                          Turbo Vision (hcNew, hcOpen ... hcZoom) and Dragging have their own numbers). Several names: one
+                          text. The rest of the line is a comment.
+    .title Text           the title of the topic: a box with the text (as the first paragraph)
+    a paragraph           lines up to a blank one. The first line decides: if it begins with a vertical bar (#179), the lines
+                          (each begins with it, it is cut off) are not wrapped; else the paragraph is wrapped to the width of
+                          the window, and a line that begins with a blank or with a bar begins a new paragraph.
+    {text}                a cross reference to the topic named `text`
+    {text:Name}           the same, shown as `text`. {{ is a brace, }} and :: in the reference are a brace and a colon.
+    the topic `_` (65535) is the one that has no text: the references to it are marks that lead nowhere
+  Topics with no text are not written to the file (the viewer says "no help in this context" for them). The blanks in the
+  text of a reference are written as #$FF (so that the wrapping does not break the reference); TvHelp shows them as blanks. *)
 program tvhc;
 
 {$mode objfpc}
@@ -26,237 +31,66 @@ uses
   SysUtils, Classes, TvObjs, TvHelp;
 
 type
-  TTopicInfo = record
+  TNameDef = record
     Name: string;
     Number: LongInt;
-    Title: string;
-    Same: Integer;             { >= 0: the text of that topic (`.topic A=1, B=2`: two names, one text) }
   end;
 
   TRefInfo = record
     TopicName: string;
-    Topic: Integer;            { the index in Topics }
     Offset: LongInt;
     Length: Integer;
     Line: Integer;
   end;
 
+  TTopicInfo = record
+    Names: array of TNameDef;
+    Paras: array of string;
+    Wrap: array of Boolean;
+    Refs: array of TRefInfo;
+  end;
+
+const
+  { the contexts of Turbo Vision (the constants of its application unit) }
+  BuiltIn: array[0..21] of TNameDef = (
+    (Name: 'Cascade'; Number: $FF21), (Name: 'ChangeDir'; Number: $FF06), (Name: 'Clear'; Number: $FF14),
+    (Name: 'Close'; Number: $FF27), (Name: 'CloseAll'; Number: $FF22), (Name: 'Copy'; Number: $FF12),
+    (Name: 'Cut'; Number: $FF11), (Name: 'DosShell'; Number: $FF07), (Name: 'Dragging'; Number: 1),
+    (Name: 'Exit'; Number: $FF08), (Name: 'New'; Number: $FF01), (Name: 'Next'; Number: $FF25),
+    (Name: 'Open'; Number: $FF02), (Name: 'Paste'; Number: $FF13), (Name: 'Prev'; Number: $FF26),
+    (Name: 'Resize'; Number: $FF23), (Name: 'Save'; Number: $FF03), (Name: 'SaveAll'; Number: $FF05),
+    (Name: 'SaveAs'; Number: $FF04), (Name: 'Tile'; Number: $FF20), (Name: 'Undo'; Number: $FF10),
+    (Name: 'Zoom'; Number: $FF24));
+  Bar = #179;                      { the vertical bar of the code page of the help (DOS 437/866) }
+  MaxParagraph = 4095;
+  Unresolved = 65535;
+
 var
+  Lines: array of string;          { the text, comments dropped }
+  LineNums: array of Integer;      { the numbers of the lines in the file }
+  Cur: Integer = 0;                { the next line to read }
   Topics: array of TTopicInfo;
-  { the paragraphs and the references of the topics, kept until all the names are known }
-  ParaText: array of array of string;
-  ParaWrap: array of array of Boolean;
-  Refs: array of array of TRefInfo;
   Errors: Integer = 0;
-  InName, OutName, ConstName: string;
-  LineNo: Integer = 0;
+  InName, OutName, SymName: string;
+  ErrLine: Integer = 0;
+  Counter: LongInt = 2;            { 1 is Dragging }
 
 procedure Fail(const Msg: string);
 begin
-  Writeln(StdErr, InName, '(', LineNo, '): ', Msg);
+  Writeln(StdErr, InName, '(', ErrLine, '): error: ', Msg);
   Inc(Errors);
 end;
 
-function FindTopic(const Name: string): Integer;
-var
-  I: Integer;
+procedure Warn(const Msg: string);
 begin
-  for I := 0 to High(Topics) do
-    if SameText(Topics[I].Name, Name) then
-      Exit(I);
-  Result := -1;
+  Writeln(StdErr, InName, ': warning: ', Msg);
 end;
 
-var
-  NextNumber: LongInt = 0;
-  FirstOfDirective: Integer;
-
-{ a trailing ; comment or braced comment of a directive line is dropped }
-function StripComment(const S: string): string;
-var
-  P: Integer;
-begin
-  P := Pos(';', S);
-  if (Pos('{', S) > 0) and ((P = 0) or (Pos('{', S) < P)) then
-    P := Pos('{', S);
-  if P = 0 then
-    Result := S
-  else
-    Result := Copy(S, 1, P - 1);
-end;
-
-{ .topic Name=N, Name2=N2 }
-procedure BeginTopics(const Rest: string);
-var
-  Count: Integer;
-  Part, Name: string;
-  P, Eq, Num, Code: Integer;
-  S: string;
-begin
-  S := Rest;
-  Count := 0;
-  repeat
-    P := Pos(',', S);
-    if P = 0 then
-      Part := S
-    else
-      Part := Copy(S, 1, P - 1);
-    if P = 0 then
-      S := ''
-    else
-      S := Copy(S, P + 1, Length(S));
-    Part := Trim(Part);
-    if Part = '' then
-      Continue;
-    Eq := Pos('=', Part);
-    if Eq = 0 then
-    begin
-      Name := Part;
-      Num := NextNumber;
-    end
-    else
-    begin
-      Name := Trim(Copy(Part, 1, Eq - 1));
-      Val(Trim(Copy(Part, Eq + 1, Length(Part))), Num, Code);
-      if Code <> 0 then
-      begin
-        Fail('the number of the topic ' + Name + ' is not a number');
-        Num := NextNumber;
-      end;
-    end;
-    if FindTopic(Name) >= 0 then
-      Fail('the topic ' + Name + ' is defined twice');
-    SetLength(Topics, Length(Topics) + 1);
-    SetLength(ParaText, Length(Topics));
-    SetLength(ParaWrap, Length(Topics));
-    SetLength(Refs, Length(Topics));
-    Topics[High(Topics)].Name := Name;
-    Topics[High(Topics)].Number := Num;
-    Topics[High(Topics)].Title := '';
-    if Count = 0 then
-    begin
-      FirstOfDirective := High(Topics);
-      Topics[High(Topics)].Same := -1;
-    end
-    else
-      Topics[High(Topics)].Same := FirstOfDirective;
-    Inc(Count);
-    if Num >= NextNumber then
-      NextNumber := Num + 1;
-  until S = '';
-end;
-
-{ the text of a paragraph: the braces of the references are cut out, the offsets of the references (1-based, over the text of the
-  topic: Base is the size of the paragraphs before this one) are kept }
-function CutRefs(const Line: string; T: Integer; Base: LongInt): string;
-var
-  I, J, Colon: Integer;
-  Inner, Shown, Target: string;
-  R: TRefInfo;
-begin
-  Result := '';
-  I := 1;
-  while I <= Length(Line) do
-  begin
-    if (Line[I] = '{') and (I < Length(Line)) and (Line[I + 1] = '{') then
-    begin
-      Result := Result + '{';           { two braces: a brace }
-      Inc(I, 2);
-    end
-    else if Line[I] = '{' then
-    begin
-      J := Pos('}', Copy(Line, I, Length(Line)));
-      if J = 0 then
-      begin
-        { a brace with no closing one in the line is plain text (DN's help has such listings) }
-        Result := Result + Copy(Line, I, Length(Line));
-        Break;
-      end;
-      Inner := Copy(Line, I + 1, J - 2);
-      Colon := Length(Inner);
-      while (Colon > 0) and (Inner[Colon] <> ':') do
-        Dec(Colon);
-      if Colon = 0 then
-      begin
-        Shown := Inner;
-        Target := Inner;
-      end
-      else
-      begin
-        Shown := Copy(Inner, 1, Colon - 1);
-        Target := Trim(Copy(Inner, Colon + 1, Length(Inner)));
-      end;
-      R.TopicName := Target;
-      R.Topic := -1;
-      R.Offset := Base + Length(Result) + 1;
-      R.Length := Length(Shown);
-      R.Line := LineNo;
-      SetLength(Refs[T], Length(Refs[T]) + 1);
-      Refs[T][High(Refs[T])] := R;
-      Result := Result + Shown;
-      Inc(I, J);
-    end
-    else
-    begin
-      Result := Result + Line[I];
-      Inc(I);
-    end;
-  end;
-end;
-
-procedure ReadText;
+procedure Load;
 var
   F: TextFile;
-  Line: string;
-  Cur: Integer;
-  Run: TStringList;
-  RunWrap: Boolean;
-  Blank: Integer;
-
-  function SizeBefore: LongInt;
-  var
-    K: Integer;
-  begin
-    Result := 0;
-    for K := 0 to High(ParaText[Cur]) do
-      Inc(Result, Length(ParaText[Cur][K]));
-  end;
-
-  { the run of lines (and the blank lines after it) becomes a paragraph of the current topic }
-  procedure Flush;
-  var
-    K: Integer;
-    Txt, One: string;
-    Base: LongInt;
-  begin
-    if (Cur < 0) or ((Run.Count = 0) and (Blank = 0)) then
-      Exit;
-    Base := SizeBefore;
-    Txt := '';
-    for K := 0 to Run.Count - 1 do
-    begin
-      One := CutRefs(Run[K], Cur, Base + Length(Txt));
-      if RunWrap then
-      begin
-        if K > 0 then
-          Txt := Txt + ' ';
-        Txt := Txt + One;
-      end
-      else
-        Txt := Txt + One + #10;
-    end;
-    if RunWrap and (Run.Count > 0) then
-      Txt := Txt + #10;
-    for K := 1 to Blank do
-      Txt := Txt + #10;
-    SetLength(ParaText[Cur], Length(ParaText[Cur]) + 1);
-    SetLength(ParaWrap[Cur], Length(ParaWrap[Cur]) + 1);
-    ParaText[Cur][High(ParaText[Cur])] := Txt;
-    ParaWrap[Cur][High(ParaWrap[Cur])] := RunWrap and (Run.Count > 0);
-    Run.Clear;
-    Blank := 0;
-  end;
-
+  L: string;
+  N: Integer;
 begin
   AssignFile(F, InName);
   {$I-}
@@ -267,127 +101,448 @@ begin
     Writeln(StdErr, 'cannot open ', InName);
     Halt(2);
   end;
-  Run := TStringList.Create;
-  Cur := -1;
-  Blank := 0;
-  RunWrap := True;
+  N := 0;
   while not Eof(F) do
   begin
-    Readln(F, Line);
-    Inc(LineNo);
-    while (Line <> '') and (Line[Length(Line)] in [#13, #10]) do
-      SetLength(Line, Length(Line) - 1);
-    if (Line <> '') and (Line[1] = ';') then
+    Readln(F, L);
+    Inc(N);
+    while (L <> '') and (L[Length(L)] in [#13, #10, #26]) do
+      SetLength(L, Length(L) - 1);
+    if (L <> '') and (L[1] = ';') then
       Continue;
-    if (Length(Line) >= 6) and SameText(Copy(Line, 1, 6), '.topic') and ((Length(Line) = 6) or (Line[7] in [' ', #9])) then
-    begin
-      Flush;
-      BeginTopics(Trim(StripComment(Copy(Line, 7, Length(Line)))));
-      Cur := FirstOfDirective;
-      Blank := 0;
-      Continue;
-    end;
-    if (Length(Line) >= 6) and SameText(Copy(Line, 1, 6), '.title') and ((Length(Line) = 6) or (Line[7] in [' ', #9])) then
-    begin
-      if Cur >= 0 then
-        Topics[Cur].Title := Trim(Copy(Line, 7, Length(Line)));  { not stripped: a title may hold ';' }
-      Continue;
-    end;
-    if Cur < 0 then
-      Continue;                   { text before the first topic is ignored }
-    if Line = '' then
-    begin
-      if Run.Count > 0 then
-        Inc(Blank)
-      else if Blank > 0 then
-        Inc(Blank)
-      else
-        Inc(Blank);
-      Continue;
-    end;
-    { a text line after blank lines: the previous paragraph is closed }
-    if Blank > 0 then
-      Flush;
-    if Run.Count = 0 then
-      RunWrap := Line[1] <> ' ';
-    Run.Add(Line);
+    SetLength(Lines, Length(Lines) + 1);
+    SetLength(LineNums, Length(LineNums) + 1);
+    Lines[High(Lines)] := L;
+    LineNums[High(LineNums)] := N;
   end;
-  Flush;
   CloseFile(F);
-  Run.Free;
 end;
 
-procedure ResolveRefs;
+function AtEnd: Boolean;
+begin
+  Result := Cur >= Length(Lines);
+end;
+
+{ ---- the words of a directive line ---------------------------------------------------------------------------------- }
+
+function IsWordChar(C: Char): Boolean;
+begin
+  Result := C in ['A'..'Z', 'a'..'z', '0'..'9', '_', #128..#175, #224..#239];
+end;
+
+function GetWord(const L: string; var I: Integer): string;
+var
+  J: Integer;
+begin
+  while (I <= Length(L)) and (L[I] in [' ', #9]) do
+    Inc(I);
+  J := I;
+  if J > Length(L) then
+    Exit('');
+  Inc(I);
+  if IsWordChar(L[J]) then
+    while (I <= Length(L)) and IsWordChar(L[I]) do
+      Inc(I);
+  Result := Copy(L, J, I - J);
+end;
+
+function BuiltInNumber(const Name: string; out Number: LongInt): Boolean;
+var
+  K: Integer;
+begin
+  for K := Low(BuiltIn) to High(BuiltIn) do
+    if BuiltIn[K].Name = Name then
+    begin
+      Number := BuiltIn[K].Number;
+      Exit(True);
+    end;
+  Result := False;
+end;
+
+{ `.topic A=1, B, C=7 ...`: the names and numbers of the topic, the line is in L }
+procedure ParseTopicLine(const L: string; var T: TTopicInfo);
+var
+  I, J, Code: Integer;
+  W, Name: string;
+  Num: LongInt;
+  V: LongInt;
+begin
+  I := 1;
+  if GetWord(L, I) <> '.' then
+  begin
+    Fail('TOPIC expected');
+    Exit;
+  end;
+  if UpperCase(GetWord(L, I)) <> 'TOPIC' then
+  begin
+    Fail('TOPIC expected');
+    Exit;
+  end;
+  repeat
+    Name := GetWord(L, I);
+    if Name = '' then
+    begin
+      Fail('a topic name is expected');
+      Exit;
+    end;
+    J := I;
+    W := GetWord(L, J);
+    if W = '=' then
+    begin
+      I := J;
+      W := GetWord(L, I);
+      Val(W, V, Code);
+      if Code <> 0 then
+      begin
+        Fail('a number is expected after =');
+        V := Counter;
+      end;
+      Counter := V;
+      Num := V;
+    end
+    else if not BuiltInNumber(Name, Num) then
+    begin
+      Inc(Counter);
+      Num := Counter;
+    end;
+    SetLength(T.Names, Length(T.Names) + 1);
+    T.Names[High(T.Names)].Name := Name;
+    T.Names[High(T.Names)].Number := Num;
+    J := I;
+    W := GetWord(L, J);
+    if W = ',' then
+      I := J;                       { past the comma: the next name }
+  until W <> ',';
+end;
+
+{ ---- the text of a topic -------------------------------------------------------------------------------------------- }
+
+{ Cuts the references out of the line; the shown text is the result, its offset in the topic is Base + the length of what
+  was cut before. }
+function ScanRefs(const Line: string; var T: TTopicInfo; Base: LongInt): string;
+var
+  I, K: Integer;
+  Disp, Topic: string;
+  InTopic, Done: Boolean;
+  R: TRefInfo;
+begin
+  Result := '';
+  I := 1;
+  while I <= Length(Line) do
+  begin
+    if Line[I] <> '{' then
+    begin
+      Result := Result + Line[I];
+      Inc(I);
+      Continue;
+    end;
+    if (I < Length(Line)) and (Line[I + 1] = '{') then
+    begin
+      Result := Result + '{';
+      Inc(I, 2);
+      Continue;
+    end;
+    K := I + 1;
+    Disp := '';
+    Topic := '';
+    InTopic := False;
+    Done := False;
+    while (K <= Length(Line)) and not Done do
+    begin
+      if Line[K] = '}' then
+      begin
+        if (K < Length(Line)) and (Line[K + 1] = '}') then
+        begin
+          if InTopic then
+            Topic := Topic + '}'
+          else
+            Disp := Disp + '}';
+          Inc(K, 2);
+        end
+        else
+          Done := True;
+      end
+      else if (Line[K] = ':') and not InTopic then
+      begin
+        if (K < Length(Line)) and (Line[K + 1] = ':') then
+        begin
+          Disp := Disp + ':';
+          Inc(K, 2);
+        end
+        else
+        begin
+          InTopic := True;
+          Inc(K);
+        end;
+      end
+      else
+      begin
+        if InTopic then
+          Topic := Topic + Line[K]
+        else
+          Disp := Disp + Line[K];
+        Inc(K);
+      end;
+    end;
+    if not Done then
+    begin
+      Fail('unterminated topic reference');
+      Result := Result + Copy(Line, I, Length(Line));
+      Exit;
+    end;
+    if not InTopic then
+      Topic := Disp;
+    R.TopicName := Topic;
+    R.Offset := Base + Length(Result) + 1;
+    R.Length := Length(Disp);
+    R.Line := ErrLine;
+    SetLength(T.Refs, Length(T.Refs) + 1);
+    T.Refs[High(T.Refs)] := R;
+    I := K + 1;                     { past the closing brace }
+    for K := 1 to Length(Disp) do
+      if Disp[K] = ' ' then
+        Disp[K] := #$FF;
+    Result := Result + Disp;
+  end;
+end;
+
+function TrimLeft(const S: string): string;
+var
+  I: Integer;
+begin
+  I := 1;
+  while (I <= Length(S)) and (S[I] = ' ') do
+    Inc(I);
+  Result := Copy(S, I, Length(S));
+end;
+
+function IsEndParagraph(Wrapping: Boolean; NotWrapping: Boolean): Boolean;
+begin
+  Result := AtEnd or (Lines[Cur] = '') or (Lines[Cur][1] = '.') or
+    (Wrapping and (Lines[Cur][1] in [' ', Bar])) or
+    (NotWrapping and (Lines[Cur][1] <> Bar));
+end;
+
+{ The next paragraph of the topic T; False if there is none (the blank lines before the end are dropped). }
+function ReadParagraph(var T: TTopicInfo; var Offset: LongInt): Boolean;
+var
+  Buf: string;
+  Wrapping, NotWrapping: Boolean;
+  Line, Title: string;
+  Undefined: Boolean;
+
+  procedure Add(const S: string; Wrap: Boolean);
+  begin
+    if Length(Buf) + Length(S) > MaxParagraph then
+      Fail('topic too large')
+    else if Wrap then
+      Buf := Buf + S + ' '
+    else
+      Buf := Buf + S + #10;
+  end;
+
+  procedure Finish;
+  begin
+    SetLength(T.Paras, Length(T.Paras) + 1);
+    SetLength(T.Wrap, Length(T.Wrap) + 1);
+    T.Paras[High(T.Paras)] := Buf;
+    T.Wrap[High(T.Wrap)] := Wrapping;
+    Inc(Offset, Length(Buf));
+  end;
+
+begin
+  Result := False;
+  Buf := '';
+  Wrapping := False;
+  NotWrapping := False;
+  Undefined := True;
+  while (not AtEnd) and (Lines[Cur] = '') do
+  begin
+    Add('', False);                 { a blank line: it is kept (in front of the text of the paragraph) }
+    Inc(Cur);
+  end;
+  if AtEnd then
+    Exit;
+  ErrLine := LineNums[Cur];
+  Line := Lines[Cur];
+  if Copy(UpperCase(TrimLeft(Line)), 1, 6) = '.TITLE' then
+  begin
+    Title := TrimLeft(Copy(TrimLeft(Line), 7, Length(Line)));
+    Inc(Cur);
+    Add(#218 + StringOfChar(#196, Length(Title) + 2), False);
+    Add(Bar + ' ' + Title + ' ' + #219, False);
+    Add(#192 + StringOfChar(#220, Length(Title) + 2) + #219, False);
+    Add('', False);
+    NotWrapping := True;
+    Finish;
+    Exit(True);
+  end;
+  if IsEndParagraph(False, False) then
+    Exit;
+  while not IsEndParagraph(Wrapping, NotWrapping) do
+  begin
+    ErrLine := LineNums[Cur];
+    Line := Lines[Cur];
+    if Undefined then
+    begin
+      Undefined := False;
+      NotWrapping := Line[1] = Bar;
+      Wrapping := not NotWrapping;
+    end;
+    if NotWrapping then
+      Line := Copy(Line, 2, Length(Line));
+    Add(ScanRefs(Line, T, Offset + Length(Buf)), Wrapping);
+    Inc(Cur);
+  end;
+  Finish;
+  Result := True;
+end;
+
+procedure ReadTopics;
+var
+  T: TTopicInfo;
+  Offset: LongInt;
+begin
+  while True do
+  begin
+    while (not AtEnd) and (Lines[Cur] = '') do
+      Inc(Cur);
+    if AtEnd then
+      Break;
+    ErrLine := LineNums[Cur];
+    T := Default(TTopicInfo);
+    ParseTopicLine(Lines[Cur], T);
+    Inc(Cur);
+    Offset := 0;
+    while ReadParagraph(T, Offset) do
+      ;
+    SetLength(Topics, Length(Topics) + 1);
+    Topics[High(Topics)] := T;
+    if Errors > 20 then
+      Break;
+  end;
+end;
+
+{ ---- the numbers of the names ------------------------------------------------------------------------------------- }
+
+function NameNumber(const Name: string; out Number: LongInt): Boolean;
 var
   T, K: Integer;
 begin
-  for T := 0 to High(Refs) do
-    for K := 0 to High(Refs[T]) do
-    begin
-      Refs[T][K].Topic := FindTopic(Refs[T][K].TopicName);
-      if Refs[T][K].Topic < 0 then
+  for T := 0 to High(Topics) do
+    for K := 0 to High(Topics[T].Names) do
+      if SameText(Topics[T].Names[K].Name, Name) then
       begin
-        LineNo := Refs[T][K].Line;
-        Fail('the topic ' + Refs[T][K].TopicName + ' is not defined (a reference in the topic ' + Topics[T].Name + ')');
+        Number := Topics[T].Names[K].Number;
+        Exit(True);
       end;
-    end;
+  Number := Unresolved;
+  Result := False;
+end;
+
+procedure CheckNames;
+var
+  T, K, T2, K2: Integer;
+begin
+  for T := 0 to High(Topics) do
+    for K := 0 to High(Topics[T].Names) do
+      for T2 := T to High(Topics) do
+        for K2 := 0 to High(Topics[T2].Names) do
+          if ((T2 > T) or (K2 > K)) and SameText(Topics[T].Names[K].Name, Topics[T2].Names[K2].Name) then
+          begin
+            ErrLine := 0;
+            Fail('redefinition of ' + Topics[T].Names[K].Name);
+          end;
 end;
 
 procedure WriteHelp;
 var
   HF: PHelpFile;
   Topic: PHelpTopic;
-  T, K, Src: Integer;
+  T, K: Integer;
   P: PParagraph;
   C: TCrossRef;
+  N: LongInt;
 begin
   New(HF, Init(New(PBufStream, Init(OutName, stCreate, 4096))));
   for T := 0 to High(Topics) do
   begin
-    Src := T;
-    if Topics[T].Same >= 0 then
-      Src := Topics[T].Same;
+    if Length(Topics[T].Paras) = 0 then
+      Continue;
     New(Topic, Init);
-    for K := 0 to High(ParaText[Src]) do
+    for K := 0 to High(Topics[T].Paras) do
     begin
       New(P);
-      P^.Size := Length(ParaText[Src][K]);
+      P^.Size := Length(Topics[T].Paras[K]);
       GetMem(P^.Text, P^.Size + 1);
       if P^.Size > 0 then
-        Move(ParaText[Src][K][1], P^.Text^, P^.Size);
+        Move(Topics[T].Paras[K][1], P^.Text^, P^.Size);
       P^.Text[P^.Size] := 0;
-      P^.Wrap := ParaWrap[Src][K];
+      P^.Wrap := Topics[T].Wrap[K];
       P^.Next := nil;
       Topic^.AddParagraph(P);
     end;
-    for K := 0 to High(Refs[Src]) do
+    for K := 0 to High(Topics[T].Refs) do
     begin
-      if Refs[Src][K].Topic < 0 then
-        Continue;
-      C.Ref := Topics[Refs[Src][K].Topic].Number;
-      C.Offset := Refs[Src][K].Offset;
-      C.Length := Refs[Src][K].Length;
+      if not NameNumber(Topics[T].Refs[K].TopicName, N) then
+        Warn('unresolved forward reference "' + Topics[T].Refs[K].TopicName + '" (line ' +
+          IntToStr(Topics[T].Refs[K].Line) + ')');
+      C.Ref := N;
+      C.Offset := Topics[T].Refs[K].Offset;
+      C.Length := Topics[T].Refs[K].Length;
       Topic^.AddCrossRef(C);
     end;
-    HF^.RecordPositionInIndex(Topics[T].Number);
+    { every name of the topic leads to the one text: the same position in the index }
+    for K := 0 to High(Topics[T].Names) do
+      HF^.RecordPositionInIndex(Topics[T].Names[K].Number);
     HF^.PutTopic(Topic);
     Dispose(Topic, Done);
   end;
   Dispose(HF, Done);
 end;
 
-procedure WriteConstants;
+{ the unit with the constants: the names of the topics (and of the references) that are not the contexts of Turbo Vision }
+procedure WriteSymbols;
 var
   F: TextFile;
-  T: Integer;
+  Names: TStringList;
+  T, K, I: Integer;
+  N, Dummy: LongInt;
+  S: string;
 begin
-  AssignFile(F, ConstName);
+  Names := TStringList.Create;
+  Names.CaseSensitive := False;
+  Names.Sorted := True;
+  Names.Duplicates := dupIgnore;
+  for T := 0 to High(Topics) do
+  begin
+    for K := 0 to High(Topics[T].Names) do
+      Names.Add(Topics[T].Names[K].Name);
+    for K := 0 to High(Topics[T].Refs) do
+      Names.Add(Topics[T].Refs[K].TopicName);
+  end;
+  AssignFile(F, SymName);
   Rewrite(F);
   Writeln(F, '{ made by tvhc from ', ExtractFileName(InName), ' }');
+  Writeln(F, 'unit ', ChangeFileExt(ExtractFileName(SymName), ''), ';');
+  Writeln(F);
+  Writeln(F, 'interface');
+  Writeln(F);
   Writeln(F, 'const');
-  for T := 0 to High(Topics) do
-    Writeln(F, '  hc', Topics[T].Name, ' = ', Topics[T].Number, ';');
+  for I := 0 to Names.Count - 1 do
+    if NameNumber(Names[I], N) and not BuiltInNumber(Names[I], Dummy) then
+    begin
+      S := Names[I];
+      while Length(S) < 20 do
+        S := S + ' ';
+      Writeln(F, ' hc', S, ' = ', N:5, ';');
+    end;
+  Writeln(F);
+  Writeln(F, 'implementation');
+  Writeln(F);
+  Writeln(F, 'end.');
   CloseFile(F);
+  Names.Free;
 end;
 
 var
@@ -397,31 +552,33 @@ begin
   for I := 1 to ParamCount do
   begin
     { an option: -x, or /x without more slashes (a path on Unix begins with a slash too) }
-    if (ParamStr(I) <> '') and ((ParamStr(I)[1] = '-') or ((ParamStr(I)[1] = '/') and (Pos('/', Copy(ParamStr(I), 2, MaxInt)) = 0))) then
+    if (ParamStr(I) <> '') and ((ParamStr(I)[1] = '-') or
+      ((ParamStr(I)[1] = '/') and (Pos('/', Copy(ParamStr(I), 2, MaxInt)) = 0))) then
       Continue;
     Inc(N);
     case N of
       1: InName := ParamStr(I);
       2: OutName := ParamStr(I);
-      3: ConstName := ParamStr(I);
+      3: SymName := ParamStr(I);
     end;
   end;
   if (InName = '') or (OutName = '') then
   begin
-    Writeln('usage: tvhc INPUT.HTX OUTPUT.HLP [CONSTANTS.PAS] [options]');
+    Writeln('usage: tvhc INPUT.HTX OUTPUT.HLP [SYMBOLS.PAS] [options]');
     Halt(1);
   end;
   RegisterType(RHelpTopic);
   RegisterType(RHelpIndex);
-  ReadText;
-  ResolveRefs;
+  Load;
+  ReadTopics;
+  CheckNames;
   if Errors > 0 then
   begin
     Writeln(StdErr, Errors, ' error(s): the help file is not written');
     Halt(1);
   end;
   WriteHelp;
-  if ConstName <> '' then
-    WriteConstants;
+  if SymName <> '' then
+    WriteSymbols;
   Writeln(Length(Topics), ' topics, ', OutName);
 end.

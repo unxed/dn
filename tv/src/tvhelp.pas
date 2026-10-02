@@ -407,6 +407,10 @@ begin
         SetLength(Result, LL);
         if LL > 0 then
           Move(P^.Text[LS], Result[1], LL);
+        { tvhc puts #$FF for the blanks inside a cross reference (the wrapping does not break them) }
+        for Offset := 1 to LL do
+          if Result[Offset] = #$FF then
+            Result[Offset] := ' ';
         Exit;
       end;
     end;
