@@ -54,6 +54,7 @@
 | 9b | `TvMsgBox` — `MessageBox`, `MessageBoxRect`, форматированные варианты | `msgbox.h`, `msgbox.cpp` | сделан; `InputBox` — в `TvInput` |
 | 9c | `TvValid` — `TValidator`, `TPXPictureValidator`, `TFilterValidator`, `TRangeValidator`, `TLookupValidator`, `TStringLookupValidator` | `validate.h`, `tvalidat.cpp` | сделан (без потоков) |
 | 9d | `TvInput` — `TInputLine`, `InputBox`, `InputBoxRect` | `tinputli.cpp`, `msgbox.cpp` | сделан (без потоков) |
+| 9e | `TvCluster` — `TCluster`, `TRadioButtons`, `TCheckBoxes`, `TMultiCheckBoxes`, `TSItem`/`NewSItem` | `tcluster.cpp`, `tradiobu.cpp`, `tcheckbo.cpp`, `tmulchkb.cpp` | сделан (без потоков) |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -274,3 +275,11 @@
 - `InputLineOem` (по умолчанию False): набранный UTF-8 превращается в один байт кодовой страницы (для строк DN, хранящих OEM); при копировании в буфер — обратно в UTF-8.
 - Вставка из буфера синхронная, берётся первая строка буфера.
 - Тест: ссылки на литералы в главном блоке держат временные AnsiString до конца программы — для проверки «память не течёт» сравнения с буфером вынесены в функцию `ClipIs`.
+
+### TvCluster (9e): решения
+
+- Список текстов — цепочка `TSItem` через `NewSItem(Str, Next)` вместо `operator+`; кластер забирает тексты в `TStringCollection` (AtInsert, без сортировки) и освобождает цепочку.
+- `Value` и `EnableMask` — `LongWord`; `DataSize` = 2 (Word) как в оригинале, у `TMultiCheckBoxes` — 4.
+- `SpecialChars` перенесён в interface-часть `TvDialog` (нужен кластерам).
+- Строки отрисовки `0..Size.Y-1` (оригинал рисует ещё одну строку за пределами вида — без эффекта).
+- Сдвиги больше 31 бита (`TMultiCheckBoxes` с большими `Flags`/номерами) в оригинале не определены; у нас дают 0 / нет действия.

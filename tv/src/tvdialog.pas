@@ -23,6 +23,8 @@ uses
   TvUtil, TvTimer, TvViews, TvWindow;
 
 const
+  { the characters of the markers shown instead of colors on monochrome screens }
+  SpecialChars: array[0..5] of Byte = (175, 174, 26, 27, 32, 32);
   { button flags }
   bfNormal    = $00;
   bfDefault   = $01;
@@ -109,8 +111,6 @@ const
   ButtonPalette = #$0A#$0B#$0C#$0D#$0E#$0E#$0E#$0F;
   StaticTextPalette = #$06;
   LabelPalette = #$07#$08#$09#$09;
-  { the characters of the markers shown instead of colors on monochrome screens }
-  SpecialChars: array[0..5] of Byte = (175, 174, 26, 27, 32, 32);
   ButtonShadows: array[0..2] of Byte = ($DC, $DB, $DF);
   AnimationDurationMs = 100;
 
