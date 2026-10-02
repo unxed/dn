@@ -261,6 +261,28 @@ procedure ReadTree(C: Char; CountLen: Boolean);
     DC: PDirCollection;
     Tmr: TEventTimer;
 
+  { the directories are read for a long time on a big disk and nothing else is seen: a line in the middle of the screen }
+  procedure ShowProgress;
+    var
+      Pt: TSysPoint;
+      Cells: PWord;
+      Msg: String;
+      I, X0, Y0: Integer;
+    begin
+    if DC = nil then
+      Exit;
+    Msg := ' Reading directories: '+ItoS(DC^.Count)+'   Esc - stop ';
+    SysTvGetScrMode(@Pt, True);
+    Cells := SysTvGetSrcBuf;
+    if (Cells = nil) or (Pt.X < Length(Msg)+2) then
+      Exit;
+    X0 := (Pt.X-Length(Msg)) div 2;
+    Y0 := Pt.Y div 2;
+    for I := 1 to Length(Msg) do
+      PWordArray(Cells)^[Y0*Pt.X+X0+I-1] := Byte(Msg[I]) or ($70 shl 8);
+    SysTvShowBuf(Y0*Pt.X+X0, Length(Msg));
+    end;
+
   procedure ChkESC;
     begin
     if Abort then
@@ -269,6 +291,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
       begin
       NewTimer(Tmr, 150);
       Abort := ESC_Pressed;
+      ShowProgress;
       end;
     end;
 

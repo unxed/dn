@@ -592,6 +592,9 @@ begin
     Inc(Pos, N);
     Dec(Size, N);
   end;
+{$IFDEF UNIX}
+  UnixFlush;                 { DN writes the screen and goes on working (a long loop): the terminal gets it now }
+{$ENDIF}
 end;
 
 procedure SysTvClrScr;
