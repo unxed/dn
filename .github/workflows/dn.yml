@@ -1,6 +1,6 @@
 name: dn
 # The tree of DOS Navigator (dn/src) is in git. This workflow checks: (1) the audit gate against the Borland reference over the
-# whole tree (every PR), (2) that bootstrap/ still reproduces the tree of the latest tag bootstrap-N (the record of where the first
+# whole tree (every PR), (2) that bootstrap/ still reproduces the tree of the baseline commit (the record of where the first
 # commit came from), (3) the unit tests of our own units.
 on:
   workflow_dispatch:
@@ -35,7 +35,7 @@ jobs:
         run: python3 bootstrap/tools/dn-manifest.py --check
 
   bootstrap:
-    # The record of the path: the public archive -> bootstrap/run.sh -> the tree of the tag bootstrap-N (the latest).
+    # The record of the path: the public archive -> bootstrap/run.sh -> the tree of the baseline commit (bootstrap/BASELINE).
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -45,10 +45,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch
       - name: Run bootstrap
         run: bootstrap/run.sh out/bootstrap
-      - name: Is the result the tree of the latest tag bootstrap-N?
+      - name: Is the result the tree of the baseline commit?
         run: |
-          tag=$(git tag -l 'bootstrap-*' | sort -V | tail -1)
-          echo "tag: $tag"
+          tag=$(grep -v '^#' bootstrap/BASELINE | tail -1)
+          echo "baseline commit: $tag"
           mkdir -p out/ref && git archive "$tag" dn/src dn/data | tar -x -C out/ref
           diff -r out/bootstrap/src out/ref/dn/src && diff -r out/bootstrap/data out/ref/dn/data && echo "the same as $tag"
 

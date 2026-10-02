@@ -97,8 +97,7 @@ var
   LngStream: PStream = nil;
   LStringList: PStringList = nil;
   Resource: PIdxResource = nil;
-  { the palettes of the program (the strings of attributes): those of tv/ for now. TODO: the palettes of DN are longer
-    (CComboBox = #35#36 and others index above the 32 entries of the dialog palette of tv/) }
+  { the palettes of the program (the strings of attributes): those of DN (DNPalet), set in the initialization }
   CColor, CBlackWhite, CMonochrome: ShortString;
   appPalette: Integer absolute TvApp.AppPalette;
   SystemColors: array[0..2] of ShortString absolute TvApp.SystemColors;
@@ -107,7 +106,7 @@ var
 
 implementation
 
-uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist;
+uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, DNPalet;
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -662,6 +661,10 @@ end;
 initialization
   CommandHiddenHook := @CommandHidden;
   ListBoxOwnsList := False;       { DN: the owner of the list disposes it }
+  { the palettes of DN (DNPalet: carved from the archive) replace those of tv/ }
+  SystemColors[apColor] := DNPalet.CColor;
+  SystemColors[apBlackWhite] := DNPalet.CBlackWhite;
+  SystemColors[apMonochrome] := DNPalet.CMonochrome;
   CColor := SystemColors[apColor];
   CBlackWhite := SystemColors[apBlackWhite];
   CMonochrome := SystemColors[apMonochrome];
