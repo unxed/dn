@@ -10,7 +10,8 @@
 #        python3, patch (for the tree); CWSDPMI.EXE is fetched by tools/dos-run.sh into OUTDIR
 # env: DN_LOCAL_TREE=<unpacked archive>  use it instead of fetching;  DN_TRACE=1  also write the trace of the start to
 #      OUTDIR/SER.TXT through the emulated COM1 (the files of DOS are lost when DN dies, the port is not);
-#      DUMPSEC=N  seconds before the dump;  DN_EXTRA=...  more options of the compiler (e.g. -gl: line numbers)
+#      DUMPSEC=N  seconds before the dump;  DN_KEYS=1C0D,3B00  keys (hex: scan code and character) put into the keyboard buffer one
+#      a second before the dump (1C0D Enter, 011B Esc, 3B00 F1);  DN_EXTRA=...  more options of the compiler (e.g. -gl: line numbers)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 out=${1:-$here/out/dnrun}; mkdir -p "$out"; out=$(cd "$out" && pwd)
@@ -37,7 +38,7 @@ dbx() {   # dbx 'DOS command line' [extra dosbox-x options]
     cmd=$1; shift
     (cd "$out" && SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 5 "${DOS_TIMEOUT:-150}" dosbox-x -silent -nogui \
         -noconsole -defaultconf "$@" -c "mount c $out" -c "c:" -c "set DNDUMP=SCR.DAT" -c "set DNDUMPSEC=${DUMPSEC:-4}" \
-        ${DN_TRACE:+-c "set DNSERIAL=1"} -c "$cmd" -c "exit" >/dev/null 2>&1) || true
+        ${DN_KEYS:+-c "set DNKEYS=$DN_KEYS"} ${DN_TRACE:+-c "set DNSERIAL=1"} -c "$cmd" -c "exit" >/dev/null 2>&1) || true
 }
 dbx "RCP.EXE D > RCP.TXT"
 tr -d '\r' < "$out/RCP.TXT" | sed 's/([0-9]*)//g' | grep -E "Writing|rror|nresolved" || true
@@ -45,6 +46,8 @@ cp "$out"/EXE.D32/*.LNG "$out"/EXE.D32/*.DLG "$out/" 2>/dev/null || { echo "no r
 echo "== DN (dosbox-x)"
 cp "$tmp/dn-try-o/dn.exe" "$out/DN.EXE"
 rm -f "$out/SCR.DAT" "$out/DNLOG.TXT" "$out/DNERR.TXT" "$out/SER.TXT"
+# the state that DN saves (a file that a dead run left empty is a "damaged" file for the next one)
+rm -rf "$out/DN.HIS" "$out/DN.INI" "$out/DN.ERR" "$out/DN0.SWP" "$out/DNINI.IN_" "$out/TEM"
 if [ -n "${DN_TRACE:-}" ]; then dbx "DN.EXE > OUT.TXT" -set "serial serial1=file file:SER.TXT"; else dbx "DN.EXE > OUT.TXT"; fi
 [ -f "$out/DNLOG.TXT" ] && cat "$out/DNLOG.TXT"
 if [ -f "$out/SCR.DAT" ]; then

@@ -153,6 +153,12 @@ begin
   Check(MemText(0, 0, 5) = '  File', 'menu bar text');
   Check(MemText(24, 0, 11) = ' Alt-X Exit ', 'status line text');
   Check(MemChar(0, 1) = '░', 'background pattern');
+  { what a locked program lost is drawn again at Unlock (the buffer of the program is the screen: Draw of the group repaints
+    the subviews, not the buffer onto itself) }
+  FillChar(ScreenBuffer^, ScreenWidth * ScreenHeight * SizeOf(TScreenCell), 0);
+  App^.Lock;
+  App^.Unlock;
+  Check((MemText(0, 0, 5) = '  File') and (MemChar(0, 1) = '░'), 'Unlock of the program repaints it');
   Check(MemChar(59, 23) = '░', 'background fills the desktop');
   Check(MemAttr(0, 1) = $71, 'application palette: background');
   Check(MemAttr(0, 0) = $70, 'application palette: menu bar');
