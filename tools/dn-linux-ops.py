@@ -91,6 +91,10 @@ def main():
         key('HOME'); key('ENTER', 1.0)
         check('NEWDIR' not in t.text().split('\n')[1].upper(), 'Enter on .. goes back up', t.text())
 
+        # Alt-F1, the drive menu, TEMP: (a temporary drive; the panel info was drawn with an empty list: collection error 213)
+        key('\x1b[1;3P'); key('DOWN'); key('ENTER', 1.0)
+        check('TEMP:' in t.text().split('\n')[1] and t.alive(), 'Alt-F1: the drive TEMP: opens without an error', t.text())
+
         key('ALT-X'); key('ENTER', 0.8)
         status = t.close(2)
         check(status == 0, 'Alt-X ends the program (status %r)' % (status,))

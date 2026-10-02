@@ -1696,7 +1696,8 @@ procedure TInfoView.Draw;
     TotalInfoInDividerMin := 1; TotalInfoInDividerMax := 0;
     SelectedInfoInDividerMin := 1; SelectedInfoInDividerMax := 0;
     end;
-  if Panel^.Files <> nil then
+  { the list may be empty (a new temporary drive is shown before its directory is read: At(0) was a collection error) }
+  if (Panel^.Files <> nil) and (Panel^.ScrollBar^.Value < Panel^.Files^.Count) and (Panel^.ScrollBar^.Value >= 0) then
       {AK155 nil бывает при запуске DN с сохранённым десктопом,
        когда размер окна не соответствует тому, при котором
        десктоп был сохранён.}
