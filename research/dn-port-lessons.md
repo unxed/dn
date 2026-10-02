@@ -123,3 +123,17 @@ LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` 
   компиляции (`dn/edits/40-xtime-word.sed`: `Integer(Word)`-приведения). Риск: переполнение `Word` в арифметике, которой VP
   не страдал — искать при тестах. `Events` (юнит DN, исходника в архиве нет, есть `Events.inc`): шим на TvEvents/TvKeys +
   `GetCurMSec`, `LongWorkBegin/End` (`dn/new/manual/events*.inc`).
+
+## 9. Следующий корень: DNApp, Drivers, VideoMan (2026-10-02)
+
+- `Country_` (нет в архиве) — свой `dn/new/country_.pas` (`CountryInfo` из настроек системы), тест `t_countr`.
+  Проба: 37 из 175. `drivers.pas`: `SysErrorFunc = SystemError` → `@SystemError` (`dn/edits/41-drivers.sed`).
+- Корень 58 юнитов — `drivers.pas`, он упирается в `videoman.pas` → `DNApp` (исключён аудитом: 33 % Borland, это копия `App`).
+  `DNApp` — 51 юнит его используют. В нём: `TBackground`, `TDesktop`, `TProgram`, `TApplication` (с дополнениями DN:
+  `IdleSecs`, `CanMoveFocus`, `ExecuteDialog`, `InsertWindow`, `ActivateView`, `Clock`, `ShowUserScreen`, `WhenShow`,
+  `GetTileRect`), ресурсы (`OpenResource`, `ExecResource`, `LoadResource`, `GetString`, `Resource`, `LngStream`,
+  `LStringList`), `GlobalMessage*`, `WriteMsg`, `ViewPresent`, `PreExecuteDialog`.
+- Расхождения с нашим `tv/` (`TvApp`), которые придётся закрывать: `TDeskTop` (у нас) / `TDesktop` (у DN); `Init(const R)` /
+  `Init(var R)`; `Pattern: Byte` / `Char`; `PPalette` / `TPalette`; нет `Load/Store` (потоки представлений не
+  переведены); нет ресурсов диалогов. `drivers.pas`/`videoman.pas` держатся на `SysTv*` (VP) — нужен выбор: реализовать
+  `SysTv*` поверх `TvScreen/TvSys` или заменить свои `Drivers`/`VideoMan` адаптерами.
