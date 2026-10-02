@@ -159,6 +159,9 @@ begin
     Fill
   else
   begin
+    { a failed search is closed too: the DOS RTL keeps the LFN search record (304 bytes)
+      allocated otherwise (found with the heap marks of t_files) }
+    FindClose(PSysRec(Sys)^);
     Dispose(PSysRec(Sys));
     Sys := nil;
   end;
