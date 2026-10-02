@@ -212,7 +212,7 @@ function NextChar(const S: ShortString; var I: Integer): LongWord;
 var
   Used: Integer;
 begin
-  if Utf8Decode(@S[I], Length(S) - I + 1, Result, Used) then
+  if Utf8Enabled and Utf8Decode(@S[I], Length(S) - I + 1, Result, Used) then
     Inc(I, Used)
   else
   begin

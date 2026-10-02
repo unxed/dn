@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, DNPalet;
+uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, DNPalet;
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -659,6 +659,7 @@ end;
 {$ENDIF}
 
 initialization
+  Utf8Enabled := False;           { the strings of DN are bytes of the code page, never UTF-8 (TvUtf8)}
   InputLineOem := True;           { the lines of DN keep the bytes of its code page: the typed text (UTF-8) is converted }
   CommandHiddenHook := @CommandHidden;
   ListBoxOwnsList := False;       { DN: the owner of the list disposes it }

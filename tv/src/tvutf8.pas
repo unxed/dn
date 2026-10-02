@@ -27,6 +27,12 @@ function Utf8BytesLeft(FirstByte: Byte): Integer; inline;
   sets CodePoint/Used when the bytes form a valid, shortest-form, non-surrogate
   sequence of at most U+10FFFF; otherwise False (Used := 1 for resynchronization,
   or the number of bytes that were present when the sequence is truncated). }
+var
+  { False: the bytes of the text are always the bytes of the current code page (a program whose strings are one-byte, such as DN: the
+    bytes "ров" of CP866 are a valid UTF-8 character, which would be drawn as another one). True (the default): text that is valid
+    UTF-8 is UTF-8 (TvText and TvUtil look at it). }
+  Utf8Enabled: Boolean = True;
+
 function Utf8Decode(P: PByte; Len: Integer; out CodePoint: LongWord; out Used: Integer): Boolean;
 
 { Encodes CodePoint; Buf must have room for MaxCharSize bytes. Returns the length. }
