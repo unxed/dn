@@ -23,6 +23,9 @@ function NameOfRec(const Name: array of WideChar): String;
 { Dos.GetDate with the day of the week in a LongInt (in VP Word is 32 bit and the variables of DN are LongInt). }
 procedure GetDateDow(var Year, Month, Day: Word; var DayOfWeek: LongInt);
 
+{ The address as hexadecimal digits (VP: Ptr2Hex). }
+function Ptr2Hex(P: Pointer): String;
+
 { The text cursor: the size in lines (0 = hidden), show, hide. }
 function GetCursorSize: Word;
 procedure ShowCursor;
@@ -62,6 +65,11 @@ var
 begin
   Dos.GetDate(Year, Month, Day, W);
   DayOfWeek := W;
+end;
+
+function Ptr2Hex(P: Pointer): String;
+begin
+  Result := IntToHex(PtrUInt(P), 8);
 end;
 
 function NameOfRec(const Name: array of WideChar): String;

@@ -111,6 +111,11 @@ function SysGetValidDrives: LongWord;
 { -1 OS/2, 0 DOS, 1 Windows 9x, 2 Windows NT; here: 0 (DOS) on DOS, 2 elsewhere }
 function SysPlatformId: LongInt;
 procedure SysCtrlSleep(Milliseconds: LongInt);
+{ The keyboard of the plain console: is a key waiting, and the character of the key (SysReadKey waits for one). }
+function SysKeyPressed: Boolean;
+function SysReadKey: Char;
+{ The place in the source of an address (VP: from the debug information). Here none: nil. }
+function GetLocationInfo(Addr: Pointer; var FileName: ShortString; var LineNo: LongInt): Pointer;
 procedure SysBeepEx(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
 function PhysMemAvail: LongInt;
@@ -132,7 +137,7 @@ procedure SysCtrlSetCBreakHandler;
 implementation
 
 uses
-  SysUtils, Dos, TvCell, TvColors, TvScreen
+  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys
 {$IFDEF GO32V2}, go32{$ENDIF};
 
 { --- files -------------------------------------------------------------------- }
@@ -545,6 +550,41 @@ begin
 {$ELSE}
   Result := 2;
 {$ENDIF}
+end;
+
+var
+  KeyIsPending: Boolean = False;
+  PendingKey: TEvent;
+
+function SysKeyPressed: Boolean;
+var
+  E: TEvent;
+begin
+  if not KeyIsPending then
+  begin
+    TvSys.PollEvent(0, E);
+    if E.What = evKeyDown then
+    begin
+      PendingKey := E;
+      KeyIsPending := True;
+    end;
+  end;
+  Result := KeyIsPending;
+end;
+
+function SysReadKey: Char;
+begin
+  while not SysKeyPressed do
+    SysCtrlSleep(20);
+  KeyIsPending := False;
+  Result := Chr(PendingKey.CharCode);
+end;
+
+function GetLocationInfo(Addr: Pointer; var FileName: ShortString; var LineNo: LongInt): Pointer;
+begin
+  FileName := '';
+  LineNo := 0;
+  Result := nil;
 end;
 
 procedure SysCtrlSleep(Milliseconds: LongInt);

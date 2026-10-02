@@ -14,6 +14,9 @@ uses
   Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings;
 
 const
+  apColor = TvApp.apColor;
+  apBlackWhite = TvApp.apBlackWhite;
+  apMonochrome = TvApp.apMonochrome;
   EventsLen: Byte = 0;
   MaxEvents = 15;
   IdleWas: Boolean = False;
