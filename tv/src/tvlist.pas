@@ -34,6 +34,8 @@ type
     Focused: Integer;
     Range: Integer;
     constructor Init(const Bounds: TRect; ANumCols: Integer; AHScrollBar, AVScrollBar: PScrollBar);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure ChangeBounds(const Bounds: TRect); virtual;
     procedure Draw; virtual;
@@ -60,6 +62,8 @@ type
   TListBox = object(TListViewer)
     List: PCollection;
     constructor Init(const Bounds: TRect; ANumCols: Integer; AScrollBar: PScrollBar);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     function DataSize: Integer; virtual;
     procedure GetData(var Rec); virtual;
@@ -70,6 +74,10 @@ type
 
 const
   ListViewerPalette = #$1A#$1A#$1B#$1C#$1D;
+
+var
+  { stream records (see RView of TvViews) }
+  RListViewer, RListBox: TStreamRec;
 
 implementation
 
@@ -466,5 +474,73 @@ begin
   FocusItem(TListBoxRec(Rec).Selection);
   DrawView;
 end;
+
+{ --- Streams ------------------------------------------------------------------ }
+
+constructor TListViewer.Load(var S: TStream);
+begin
+  inherited Load(S);
+  GetPeerViewPtr(S, HScrollBar);
+  GetPeerViewPtr(S, VScrollBar);
+  S.Read(NumCols, SizeOf(NumCols));
+  S.Read(TopItem, SizeOf(TopItem));
+  S.Read(Focused, SizeOf(Focused));
+  S.Read(Range, SizeOf(Range));
+end;
+
+procedure TListViewer.Store(var S: TStream);
+begin
+  inherited Store(S);
+  PutPeerViewPtr(S, HScrollBar);
+  PutPeerViewPtr(S, VScrollBar);
+  S.Write(NumCols, SizeOf(NumCols));
+  S.Write(TopItem, SizeOf(TopItem));
+  S.Write(Focused, SizeOf(Focused));
+  S.Write(Range, SizeOf(Range));
+end;
+
+constructor TListBox.Load(var S: TStream);
+begin
+  inherited Load(S);
+  List := PCollection(S.Get);
+  if List <> nil then
+    Range := List^.Count;
+end;
+
+procedure TListBox.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Put(List);
+end;
+
+function BuildListViewer(var S: TStream): PObject;
+begin
+  Result := New(PListViewer, Load(S));
+end;
+
+procedure StoreListViewer(P: PObject; var S: TStream);
+begin
+  PListViewer(P)^.Store(S);
+end;
+
+function BuildListBox(var S: TStream): PObject;
+begin
+  Result := New(PListBox, Load(S));
+end;
+
+procedure StoreListBox(P: PObject; var S: TStream);
+begin
+  PListBox(P)^.Store(S);
+end;
+
+initialization
+  RListViewer.ObjType := 5;
+  RListViewer.VmtLink := PtrUInt(TypeOf(TListViewer));
+  RListViewer.Load := @BuildListViewer;
+  RListViewer.Store := @StoreListViewer;
+  RListBox.ObjType := 17;
+  RListBox.VmtLink := PtrUInt(TypeOf(TListBox));
+  RListBox.Load := @BuildListBox;
+  RListBox.Store := @StoreListBox;
 
 end.

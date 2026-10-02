@@ -1,6 +1,6 @@
 program t_views;
 {$I ../src/tvdefs.inc}
-uses TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvDrawBuf, TvScreen, TvViews;
+uses TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvDrawBuf, TvScreen, TvObjs, TvViews;
 {$I testlib.inc}
 
 const
@@ -13,7 +13,10 @@ type
   TFill = object(TView)
     Ch: Byte;
     Col: Byte;
+    Peer: PView;
     constructor Init(const Bounds: TRect; ACh: Char; ACol: Byte);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Draw; virtual;
     function GetPalette: TPalette; virtual;
@@ -27,9 +30,39 @@ var
 constructor TFill.Init(const Bounds: TRect; ACh: Char; ACol: Byte);
 begin
   inherited Init(Bounds);
+  Peer := nil;
   Ch := Ord(ACh);
   Col := ACol;
 end;
+
+constructor TFill.Load(var S: TStream);
+begin
+  inherited Load(S);
+  S.Read(Ch, 1);
+  S.Read(Col, 1);
+  GetPeerViewPtr(S, Peer);
+end;
+
+procedure TFill.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Write(Ch, 1);
+  S.Write(Col, 1);
+  PutPeerViewPtr(S, Peer);
+end;
+
+function BuildFill(var S: TStream): PObject;
+begin
+  Result := New(PFill, Load(S));
+end;
+
+procedure StoreFill(P: PObject; var S: TStream);
+begin
+  PFill(P)^.Store(S);
+end;
+
+var
+  RFill: TStreamRec;
 
 destructor TFill.Done;
 begin
@@ -127,6 +160,9 @@ var
   G: PGroup;
   V1, V2, V3: PFill;
   Leg: PLeg;
+  GS, GL: PGroup;
+  SA, SB, SC: PFill;
+  M: TMemoryStream;
   Count: Integer;
 
 procedure CountViews(P: PView; Args: Pointer);
@@ -369,6 +405,42 @@ begin
   Check(V1^.GetColorW(1) = $0007, 'GetColorW: the BIOS attribute of the color');
   Dispose(V1, Done);
 
+  { streams: a group with views that point to each other }
+  RFill.ObjType := 4100;
+  RFill.VmtLink := PtrUInt(TypeOf(TFill));
+  RFill.Load := @BuildFill;
+  RFill.Store := @StoreFill;
+  RegisterType(RFill);
+  RegisterType(RGroup);
+  GS := New(PGroup, Init(R(0, 0, 20, 8)));
+  SA := New(PFill, Init(R(0, 0, 5, 2), 'a', $17));
+  SB := New(PFill, Init(R(5, 0, 10, 2), 'b', $27));
+  SC := New(PFill, Init(R(10, 0, 15, 2), 'c', $37));
+  GS^.Insert(SA);
+  GS^.Insert(SB);
+  GS^.Insert(SC);
+  SB^.Peer := SC;
+  SA^.Peer := SB;
+  GS^.Current := SB;
+  M.Init(0, 256);
+  M.Put(GS);
+  Check(M.Status = stOk, 'a group is stored');
+  M.Seek(0);
+  GL := PGroup(M.Get);
+  Check((GL <> nil) and (M.Status = stOk), 'a group is loaded');
+  Check((GL^.IndexOf(GL^.At(1)) = 1) and (GL^.At(3) <> nil), 'three views in the group');
+  { At(1) is the view that was inserted last (the top one) }
+  Check((PFill(GL^.At(1))^.Ch = Ord('c')) and (PFill(GL^.At(2))^.Ch = Ord('b')) and
+    (PFill(GL^.At(3))^.Ch = Ord('a')), 'the views are in the same order');
+  Check(PFill(GL^.At(3))^.Peer = GL^.At(2), 'a pointer to a sibling view is made again (a -> b)');
+  Check(PFill(GL^.At(2))^.Peer = GL^.At(1), 'a pointer to a sibling view is made again (b -> c)');
+  Check(PFill(GL^.At(1))^.Peer = nil, 'a nil pointer stays nil');
+  Check(GL^.Current = GL^.At(2), 'the current view is the same');
+  Check(GL^.At(2)^.State and (sfSelected or sfFocused or sfActive or sfExposed) = 0, 'a loaded view is not active');
+  Check(GL^.Size.X = 20, 'the size of the group');
+  Dispose(GL, Done);
+  Dispose(GS, Done);
+  M.Done;
   { the procedure forms of Borland Pascal }
   New(V1, Init(R(3, 2, 9, 5), 'p', $07));
   V1^.GetBounds(Rc);

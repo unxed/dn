@@ -229,6 +229,10 @@ procedure RegisterType(var S: TStreamRec);
 { The record registered for a type number, nil if none. }
 function FindStreamRec(ObjType: Word): PStreamRec;
 
+var
+  { stream records of the collections: RegisterType(RCollection) (TCollection), RStringCollection }
+  RCollection, RStringCollection: TStreamRec;
+
 implementation
 
 { --- TObject ----------------------------------------------------------------- }
@@ -1258,5 +1262,36 @@ procedure TStringCollection.PutItem(var S: TStream; Item: Pointer);
 begin
   S.WriteStr(PStr(Item));
 end;
+
+function BuildCollection(var S: TStream): PObject;
+begin
+  Result := New(PCollection, Load(S));
+end;
+
+procedure StoreCollection(P: PObject; var S: TStream);
+begin
+  PCollection(P)^.Store(S);
+end;
+
+function BuildStringCollection(var S: TStream): PObject;
+begin
+  Result := New(PStringCollection, Load(S));
+end;
+
+procedure StoreStringCollection(P: PObject; var S: TStream);
+begin
+  PStringCollection(P)^.Store(S);
+end;
+
+
+initialization
+  RCollection.ObjType := 50;
+  RCollection.VmtLink := PtrUInt(TypeOf(TCollection));
+  RCollection.Load := @BuildCollection;
+  RCollection.Store := @StoreCollection;
+  RStringCollection.ObjType := 51;
+  RStringCollection.VmtLink := PtrUInt(TypeOf(TStringCollection));
+  RStringCollection.Load := @BuildStringCollection;
+  RStringCollection.Store := @StoreStringCollection;
 
 end.
