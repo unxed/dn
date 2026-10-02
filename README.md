@@ -2,7 +2,7 @@
 
 Порт DOS Navigator на Free Pascal.
 
-![](https://raw.githubusercontent.com/unxed/f4/refs/heads/main/.github/assets/screenshot.jpg)
+![](https://raw.githubusercontent.com/unxed/dn/refs/heads/main/.github/assets/screenshot.jpg)
 
 В репозитории два независимых проекта с разными лицензиями и один общий инструментарий:
 
