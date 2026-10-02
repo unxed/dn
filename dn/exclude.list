@@ -1,0 +1,5 @@
+# Files of the upstream archive that are not taken (one path or glob per line, relative to
+# the root of the unpacked archive, compared case-insensitively). Why a file is here:
+# it is replaced by the new TV (tv/) or rewritten, and its code is of Borland origin
+# (the audit gate: raw% <= 2 and maxrun < 48 per file, see audit/README.md).
+# The list is made from the audit of the pinned archive; empty until the first audit.

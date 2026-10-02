@@ -1,0 +1,38 @@
+name: dn
+# The tree of DOS Navigator is not in git: it is made from the public archive, the exclusion
+# list, the patches and our new files (PLAN.md, decision 9). This workflow fetches the
+# archives, materializes the tree and audits it against the Borland reference.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - dn/**
+      - tools/dn-*.sh
+      - audit/**
+      - .github/workflows/dn.yml
+
+jobs:
+  tree:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        upstream: [dnosp214, dn151]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch
+      - name: Fetch the archive and make the tree
+        run: tools/dn-materialize.sh ${{ matrix.upstream }}
+      - name: Size of the tree
+        run: |
+          find build/dn -type f | sed 's/.*\.//' | tr 'A-Z' 'a-z' | sort | uniq -c | sort -rn | head -12
+          find build/dn -iname '*.pas' | wc -l
+      - name: Fetch the Borland reference
+        run: audit/fetch_reference.sh
+      - name: Audit (only names and numbers are printed)
+        run: python3 audit/xclone.py --min 3 --ref audit/ref/list.txt build/dn | tee audit-${{ matrix.upstream }}.txt | head -80
+      - name: Files over the gate (raw > 2 % or maxrun >= 48)
+        run: |
+          awk 'NR>1 && $1!="TOTAL" { r=$3; sub("%","",r); if (r+0 > 2 || $6+0 >= 48) n++ } END { print n+0, "files over the gate" }' audit-${{ matrix.upstream }}.txt
+          tail -1 audit-${{ matrix.upstream }}.txt
