@@ -87,3 +87,13 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   a directory (`/proc/self/root` made the scan of `C:\` endless). The panels still enter them (Enter on a link to a directory works);
   how the panels show a link (a mark, the target) is not done. Other scanners of DN (Find files, the size of a directory, the
   copy of a tree) may loop on a link cycle: check when they are used on `/`.
+
+## Names of files and keyboard (Linux), 2026-10-02 — stop-gap until DN is UTF-8 inside
+- At the border with the file system (`vpsyslow.pas`: `NameFromOs`, `NameToOs`, `SysOsPath`) a name that is valid UTF-8 and has only
+  characters of the current code page (CP866) is turned into the bytes of that page and back; other names (other alphabets, not UTF-8)
+  stay as bytes and are shown wrong. `DN_NAME_CONV=0` switches the conversion off. The typed text is converted by `InputLineOem` (dnapp).
+  The real fix is PLAN.md item 4 (UTF-8 inside).
+- The tree (Disk > Directory tree) on `/` reads every directory (30 000 directories took 20 s here), nothing is shown while it works (Esc
+  aborts); `/proc` and `/sys` of the root are skipped. A progress indication is not done.
+- Quit with the Info panel on (Panel > Info, then Alt-X, Yes) ends with `Access violation` in `TView.Prev` ("Fatal Error" screen waits for
+  a key): not found yet. `MoveChar` took a negative count as a Word (`TSeparator.Draw` with Size.Y < 2): fixed (LongInt), may be unrelated.

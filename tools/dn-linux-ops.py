@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
 F = {'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~',
-     'DOWN': '\x1b[B', 'UP': '\x1b[A', 'ENTER': '\r', 'HOME': '\x1b[H', 'END': '\x1b[F', 'ESC': '\x1b', 'ALT-X': '\x1bx', 'TAB': '\t', 'INS': '\x1b[2~'}
+     'DOWN': '\x1b[B', 'UP': '\x1b[A', 'ENTER': '\r', 'HOME': '\x1b[H', 'END': '\x1b[F', 'ESC': '\x1b', 'ALT-X': '\x1bx', 'TAB': '\t', 'CTRL-R': '\x12', 'INS': '\x1b[2~'}
 fails = count = 0
 
 
@@ -90,6 +90,15 @@ def main():
               'Enter on a directory shows it (the title has newdir)', t.text())
         key('HOME'); key('ENTER', 1.0)
         check('NEWDIR' not in t.text().split('\n')[1].upper(), 'Enter on .. goes back up', t.text())
+
+        # Russian names: a directory made by F7 has the name in UTF-8 in the file system and is shown as Russian
+        key('F7'); key('\u0442\u0435\u0441\u0442'); key('ENTER', 1.0)
+        check(os.path.isdir(os.path.join(w, '\u0442\u0435\u0441\u0442')), 'F7: a Russian name is a UTF-8 name in the file system', t.text())
+        check('\u0442\u0435\u0441\u0442' in t.text(), 'the Russian name is shown as Russian', t.text())
+        os.makedirs(os.path.join(w, '\u043f\u0430\u043f\u043a\u0430'))
+        open(os.path.join(w, '\u043f\u0430\u043f\u043a\u0430', 'x.txt'), 'w').write('x')
+        key('HOME'); key('DOWN'); key('ENTER', 1.0); key('HOME'); key('ENTER', 1.0)     # into newdir and back: the directory is read again
+        check('\u043f\u0430\u043f\u043a\u0430' in t.text(), 'a directory with a Russian name made outside is shown as Russian', t.text())
 
         # Alt-F1, the drive menu, TEMP: (a temporary drive; the panel info was drawn with an empty list: collection error 213)
         key('\x1b[1;3P'); key('DOWN'); key('ENTER', 1.0)
