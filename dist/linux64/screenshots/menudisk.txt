@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:42:43
-x═[ ┌───────────────────────────────────┐ ═══════╗x═════════ C:\tmp\dntour-taeit8jo\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:44:14
+x═[ ┌───────────────────────────────────┐ ═══════╗x═════════ C:\tmp\dntour-sw02wggh\work ══════[↕]═╗
 ║   │ View                            ► │     Nam║║       Name       │       Name       │       Nam▲
 ║.. │ Edit                            ► │        ║║..                │                  │          ■
 ║c  │ Find...                 Alt-F7    │        ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[ ┌───────────────────────�
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-taeit8jo\work>
+C:\tmp\dntour-sw02wggh\work>
  F1 Help

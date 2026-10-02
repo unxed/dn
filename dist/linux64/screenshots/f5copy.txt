@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:42:22
-x═[■]═════ C:\tmp\dntour-nirctb90\work ══════════╗x═════════ C:\tmp\dntour-nirctb90\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:43:53
+x═[■]═════ C:\tmp\dntour-5hp1nd8r\work ══════════╗x═════════ C:\tmp\dntour-5hp1nd8r\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-nirctb90\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-nirctb90\work>
+C:\tmp\dntour-5hp1nd8r\work>
  F1 Help  F10 Tree
