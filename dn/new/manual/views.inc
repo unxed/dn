@@ -1,4 +1,9 @@
 { What DN calls differently from tv/ (the interface part of the unit Views). }
+type
+  { DN units see these through Views (in the original they came with the Views of DN); same meaning as in Defines }
+  AInt = SmallInt;
+  AWord = Word;
+
 const
   MaxViewWidth = 255;
 

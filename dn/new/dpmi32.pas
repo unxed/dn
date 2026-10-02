@@ -135,7 +135,7 @@ end;
 procedure MemPut(Linear: LongInt; const Src; Count: LongInt);
 begin
 {$IFDEF GO32V2}
-  dosmemput(Linear shr 4, Linear and 15, Src, Count);
+  dosmemput(Linear shr 4, Linear and 15, PByte(@Src)^, Count); { go32 declares Src as var }
 {$ENDIF}
 end;
 
