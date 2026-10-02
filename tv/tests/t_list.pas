@@ -170,6 +170,12 @@ begin
   Dispose(Keep, Done);
   ListBoxOwnsList := True;
 
+  { DN focuses the last item of an empty list (-1) and draws it: no item is asked for (the draw used to ask for item -1) }
+  L^.NewList(Items(0));
+  L^.FocusItem(-1);
+  L^.DrawView;
+  Check((L^.Range = 0) and (L^.Focused = -1), 'FocusItem(-1) on an empty list is drawn without asking for an item');
+
   Dispose(App, Done);
   MemDone;
   Check(GetFPCHeapStatus.CurrHeapUsed = Used0, 'no memory is left behind');

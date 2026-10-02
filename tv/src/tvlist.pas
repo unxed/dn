@@ -179,7 +179,7 @@ begin
         ScOff := 0;
         FocusedVis := True;
       end
-      else if (Item < Range) and IsSelected(Item) then
+      else if (Item >= 0) and (Item < Range) and IsSelected(Item) then   { DN focuses item -1 of an empty list: TopItem is -1 }
       begin
         Color := SelectedColor;
         ScOff := 2;
@@ -190,7 +190,7 @@ begin
         ScOff := 4;
       end;
       B.MoveChar(CurCol, Ord(' '), Color, ColWidth);
-      if Item < Range then
+      if (Item >= 0) and (Item < Range) then
       begin
         if Indent < 255 then
           B.MoveStrS(CurCol + 1, GetText(Item, 255), Color, ColWidth, Indent);
