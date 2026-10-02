@@ -279,8 +279,13 @@ end;
 { --- strings ------------------------------------------------------------------ }
 
 procedure FormatStr(var Result: String; const Format: String; var Params);
+type
+  { the slots of the parameters: numbers and pointers, as large as a pointer (32 bits in Virtual Pascal, and so for the
+    32-bit builds; 64 bits on x86_64 where the sources declare them as PtrInt: dn/edits/x64/10-param-slots.sed) }
+  PSlotArr = ^TSlotArr;
+  TSlotArr = array[0..255] of PtrInt;
 var
-  P: PLongArr;
+  P: PSlotArr;
   N, I, W, Len: Integer;
   Left: Boolean;
   S: String;
@@ -329,7 +334,7 @@ begin
              if PtrUInt(P^[N]) = 0 then S := '' else S := PShortString(PtrUInt(P^[N]))^;
              Inc(N);
            end;
-      'd': begin Str(P^[N], S); Inc(N); end;
+      'd': begin Str(LongInt(P^[N]), S); Inc(N); end;
       'u': begin Str(Cardinal(P^[N]), S); Inc(N); end;
       'x': begin S := LowerCase(IntToHex(Cardinal(P^[N]), 1)); Inc(N); end;
       'X': begin S := IntToHex(Cardinal(P^[N]), 1); Inc(N); end;
