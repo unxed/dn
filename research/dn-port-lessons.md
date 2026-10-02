@@ -199,3 +199,36 @@ Borland — в `dn/rewrite`, как для `gauge`).
 - Свои юниты в `dn/new`: `vpsyslow` (+`SysTv*` над `TvScreen`), `dpmi32`, `dpmi32df`, `vputils`, `use16`, `memory`, `drivers`,
   `messages`, `dnapp`, `dnstddlg`, + `manual/*.inc` для шимов. Из архива: `LIB.D32` (`files`, `fltl`, `fnotify`, `events`,
   `country_`, `doslow`, `dn2pmapi`). Вернулись с правками отрезков: `FVIEWER`, `calendar`, `gauge`.
+
+## 14. Компиляция `dn.pas` под go32v2 (2026-10-02, ночь)
+
+`DN_CROSS=<каталог кросс-компилятора> TMPDIR=<tmp> tools/dn-try.sh dn.pas` компилирует дерево кросс-компилятором для DOS
+(цель настоящая: нативный `Dos` отличается). Дерево собирается до `calc.pas` (десятки юнитов подряд).
+- **Корень, найденный по дороге:** `tools/ifdef-strip.py` считал директивы внутри комментариев `(* ... *)` и строк
+  (в `fltools` это ломало `case`, в `fltools` же — `(* ... {$ELSE} !! *) новый код`). Теперь директивы внутри комментариев
+  и строк пропускаются. Вторая находка: `STDEFINE.INC` берёт ветку настоящей сборки (BIT_32, FILE_32, DualName, USELFN...)
+  только если задан `VIRTUALPASCAL` — он теперь в `DN_DEFINES` (`dn/target.env`). FPC этого символа не видит: ветки вычтены.
+- **Алиасы юнитов `vpc.cfg`** (`-ALFN=LFNVP;WINCLP=WINCLPVP`): `dn-materialize.sh` переименовывает файл и `unit` и остальные
+  упоминания (два имени — один юнит, как в VP), затем `tools/dedup-uses.py` убирает повторы в `uses`.
+- **Свой `Menus` из архива** (код DN, RIT; расширенные `TMenuItem`: `Flags`, `Param`, `miSubmenu`...) вместо шима над
+  `TvMenus`: шим убран, `menus.pas` компилируется с небольшими правками. `dnapp.pas` ещё использует `TvMenus` (TODO: переход
+  на меню DN: `MenuBar`, `StatusLine`).
+- **`tools/dn-carve.py` + `dn/carve.list`:** классы, которые DN добавил сам в исключённых файлах (`TComboBox` из `DIALOGS.PAS`),
+  вырезаются в новые юниты дерева (`DNDlgs`), в `uses` юнитов, которые их называют, юнит добавляется. Следующие кандидаты:
+  `THexLine`, `TParamText`, `TPage`, `TPageFrame`, `TNotepad`, `TNotepadFrame` (по ошибкам компиляции).
+- Свои юниты: `objects2` (`TObject` из tv/, `ObjChangeType`), `strview`, `asciitab` (оригинал — копия демо Borland), `edwin`
+  вернулся с правками отрезков (`dn/rewrite/edwin-*.rw`, raw 13% -> 0%).
+- Правки (`dn/edits`): `70` (циклы `for` с изменяемым счётчиком: `decoder`, `tetris`), `71` (двойной `+` во всех файлах),
+  `73` (`with` над указателем), `80` (ключи только у событий, `Double`), `81` (имена `FileRec`), `82` (`Comp` -> `Int64`),
+  `83` (`as`), `84` (поле записи как счётчик цикла), `85`, `86`, `87` (без `netbrwsr`), `88`, `89` (`TInputLine.Data^`),
+  `91` (копия `Bounds` в `ChangeBounds`), `92` (`Real48` -> `Double`), `93` (записи `TStreamRec` -> фабрики tv/, `RegisterAll`
+  по именам).
+- tv/: `TWindow.Title` — `PStr` (как в Borland), `TDialog.DirectLink`, `TScrollBar.Step/ForceScroll`, `TInputLine.LC/RC/C`,
+  методы команд у `TView` и `MenuEnabled` (+`CommandHiddenHook`), `TFilterValidator.Init(set of Char)`,
+  `TSortedListBox.NewList(PCollection)`, `TCollection.AtReplace`, `ModalCount`, `WindowNumberFreeHook` (`GetNum` в шиме Views).
+  Тесты tv и `dn/tests/t_objects2` проходят.
+- **Ресурсы:** в архиве есть текстовые исходники ресурсов — `RESOURCE/ENGLISH|RUSSIAN|UKRAIN` (`dn.dnr` — диалоги и меню,
+  `dn.dnl` — строки, `dnhelp.htx` — справка), компилятор ресурсов `rcp.pas`. Без собранного `DN.RES` `LoadResource` пуст:
+  это следующий крупный шаг после компиляции (сборка `rcp`, генерация ресурсов, `LoadResource`/`ExecResource`/`GetString`).
+- Хвост ошибок в `calc.pas`: `TScrollBar.Min/Max` (в tv `MinVal/MaxVal`), `TFileDialog.GetFileName` с параметрами,
+  `Decimals`, цикл со счётчиком `I`; дальше — `Gauges`-соседи, `scroller`, `histlist`, `colorsel`, `validate`, `listmakr`, `tvhc`.
