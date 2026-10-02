@@ -6,6 +6,9 @@ type
 
 const
   MaxViewWidth = 255;
+  { DN: the window can be maximized over the desktop (cmMaxi). TODO: the flag is only a name here, tv/ does not
+    maximize (the command cmMaxi is not handled by the windows) }
+  wfMaxi = $10;
 
 var
   { the smallest size of a window (the width and the height) }
