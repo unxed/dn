@@ -35,3 +35,13 @@ was not done now.
 - tv `TListBoxRec` is `packed` with a LongInt `Selection` (DN: Integer, 32 bits in the Delphi mode). The Word of the
   original TV is not kept; `TvList.ListBoxOwnsList` (default True, TV) is set to False by DNApp: TListBox.Done of DN does
   not dispose the list (TSysDialog.Done does it).
+
+## Seen in DOSBox-X (2026-10-02), not done yet
+- The text of message boxes has the control characters of DN (`^C` = #3 centers a line, #13): shown as glyphs (♪♥) in the
+  About box. The message boxes (dn/new/messages.pas) must interpret them.
+- Alt-X (Quit) does not quit; Enter on a panel line ran a command-line code path (fixed by the DN-style TProgram.Init, check
+  again); F7 (MkDir) shows no dialog in the first seconds (not investigated: the trace slows the run, wait longer).
+- DN.HIS stays empty after a normal exit; the saved desktop (DN.DSK / swap) is not restored: panels do not open at the next
+  start with the state kept.
+- DOSBox-X without a display reports Alt as pressed (BIOS flags 0040:0017 bit 3): the status line shows the Alt labels;
+  DNApp clears the flags while DNKEYS drives the run (a test aid only).
