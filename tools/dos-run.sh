@@ -15,6 +15,6 @@ if [ ! -f "$dir/CWSDPMI.EXE" ]; then
 fi
 rm -f "$dir/OUT.TXT"
 cd "$dir"
-SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 5 120 dosbox-x -silent -nogui -noconsole -defaultconf \
+SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 5 ${DOS_TIMEOUT:-120} dosbox-x -silent -nogui -noconsole -defaultconf \
     -c "mount c $dir" -c "c:" -c "$exe > out.txt" -c "exit" >/dev/null 2>&1 || true
 cat OUT.TXT

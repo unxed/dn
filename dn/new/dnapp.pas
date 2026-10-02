@@ -11,7 +11,8 @@ interface
 
 uses
   SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, Menus,
-  Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings;
+  Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings
+{$IFDEF GO32V2}, TvDos{$ENDIF}, DNErrLog;
 
 const
   apColor = TvApp.apColor;
@@ -124,7 +125,9 @@ end;
 
 constructor TProgram.Init;
 begin
+  DNTrace('TProgram.Init');
   inherited Init;
+  DNTrace('TProgram.Init: tv done');
   if StatusLine <> nil then
     Insert(StatusLine);
   if MenuBar <> nil then
@@ -165,9 +168,42 @@ begin
   end;
 end;
 
+{ A test aid: with the environment variable DNDUMP=file the screen is written to the file (TvDos.DosDumpScreen: see
+  tools/render-dump.py) after DNDUMPSEC seconds (default 3), and the program ends. }
+var
+  DumpStart: QWord = 0;
+  IdleSeen: Boolean = False;
+
+procedure CheckScreenDump;
+{$IFDEF GO32V2}
+var
+  Name: String;
+  Sec: LongInt;
+begin
+  Name := GetEnvironmentVariable('DNDUMP');
+  if Name = '' then
+    Exit;
+  if DumpStart = 0 then
+    DumpStart := GetTickCount64;
+  Sec := StrToIntDef(GetEnvironmentVariable('DNDUMPSEC'), 3);
+  if GetTickCount64 - DumpStart > QWord(Sec) * 1000 then
+  begin
+    DosDumpScreen(Name);
+    Halt(0);
+  end;
+end;
+{$ELSE}
+begin
+end;
+{$ENDIF}
+
 procedure TProgram.Idle;
 begin
+  if not IdleSeen then
+    DNTrace('first Idle');
+  IdleSeen := True;
   inherited Idle;
+  CheckScreenDump;
   if StatusLine <> nil then
     StatusLine^.Update;
   RunBackground;
@@ -300,9 +336,32 @@ begin
     (Command = cmMemoryInfo);
 end;
 
+{ A test aid (see CheckScreenDump): at the end of the program the exit code and the address of the error go to DNLOG.TXT
+  and the screen to the file named by DNDUMP (if it was not written yet). }
+procedure DumpAtExit;
+{$IFDEF GO32V2}
+var
+  T: Text;
+begin
+  if GetEnvironmentVariable('DNDUMP') = '' then
+    Exit;
+  Assign(T, 'DNLOG.TXT');
+  Rewrite(T);
+  Writeln(T, 'exit code ', ExitCode, ' error address ', IntToHex(PtrUInt(ErrorAddr), 8));
+  Close(T);
+  if DumpStart = 0 then
+    DosDumpScreen(GetEnvironmentVariable('DNDUMP'));
+end;
+{$ELSE}
+begin
+end;
+{$ENDIF}
+
 initialization
   CommandHiddenHook := @CommandHidden;
   CColor := SystemColors[apColor];
   CBlackWhite := SystemColors[apBlackWhite];
   CMonochrome := SystemColors[apMonochrome];
+finalization
+  DumpAtExit;
 end.
