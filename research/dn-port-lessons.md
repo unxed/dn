@@ -146,3 +146,19 @@ LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` 
 (UTF-8 + атрибут), а `TDrawBuffer` — объект. План: в `tv/` добавить перегрузки `TView.WriteBuf/WriteLine` для старых
 буферов из `Word` (с таблицей кодовой страницы), из шима `Views` исключить `TDrawBuffer` (в DN он свой, из `Drivers`).
 `SysTv*`: `ScreenBuffer` DN — буфер `Word`, `SysTvShowBuf` переводит его в `ScreenWrite`.
+
+## 11. Достижимость и список недостающего (2026-10-02)
+
+- `tools/dn-reach.py build/dn dn.pas`: из `dn.pas` по `uses` достижимы 131 юнит из 178; не нужны для сборки 47: плагинные
+  копии `_*.pas`, `dnfuncs`, `vars`, `rcp`, `plugin*`, `tetris`, `calc`, `version`, `app`, `msgbox`, `stddlg`, `objects`...
+  (часть — наши шимы, которые DN подключал под другим именем). Плагинная модель в первой версии не нужна.
+- Нужны, но их нет в архиве (RTL VP или файлы, не попавшие в OSP): `asciitab`, `dnstddlg`, `edwin`, `fltl`, `fnotify`,
+  `gauge`, `gauges`, `helpfile`, `helpkern`, `use16`, `vputils`; `Drivers._vp` — VP-вариант `drivers`. Файлы `*.001` — не
+  исходники, а **заметки AK155 к правкам** (`fltl.001`: `GetDriveTypeNew`, `TDrvTypeNew`, `GetFSString`;
+  `fnotify.001`: `NotifySuspend/NotifyResume` отключают автообновление панелей на время диалога) — это наши спецификации.
+- `drivers.pas` DN объявляет свой `TEvent` (с `Double`, `ShiftCode`, `KeyCode: LongInt`), он конфликтует с `TEvent` из tv.
+  `drivers.pas` заменён нашим `dn/new/drivers.pas` (пока заглушка: имена добавляются по ошибкам компиляции).
+- Имена файлов `*.pas` приводятся к нижнему регистру (`TopView_.PAS`: FPC на Linux не найдёт `topview_`).
+- Правка `15-short-headers.py`: заголовки реализации без параметров (стиль VP/BP) — 580 штук в 88 файлах.
+- Ассемблер VP (Intel-синтаксис) компилируется с `-Rintel`; ~55 блоков `asm` (регистры EBX/ESI/EDI в FPC надо сохранять
+  самим) — проверять при запуске, не при компиляции.
