@@ -62,3 +62,6 @@ type
   TXlat = array[Char] of Char;
 
 procedure Beep(Freq, Dur: LongInt);
+{ The free memory of the heap and its largest free block (bytes; VP and BP have them built in). }
+function MemAvail: LongInt;
+function MaxAvail: LongInt;

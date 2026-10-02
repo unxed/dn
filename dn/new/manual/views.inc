@@ -20,7 +20,7 @@ type
 
 type
   { the title of a window (Borland TV: String[80]) }
-  TTitleStr = String[80];
+  TTitleStr = ShortString;
 
 { The views that are updated from time to time (DN): RegisterToBackground adds a view, its Update is called by
   RunBackground (the idle loop of the program, TProgram.Idle of DNApp) when the view's UpdTicks milliseconds have

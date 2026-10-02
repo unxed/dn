@@ -41,3 +41,9 @@ type
     constructor Init(ALimit, ADelta: LongInt; ALongStrings: Boolean);
     procedure FreeItem(Item: Pointer); virtual;
   end;
+
+  { a collection of the names of directories: the names are compared without the case }
+  PDirCol = ^TDirCol;
+  TDirCol = object(TStringCollection)
+    function Compare(Key1, Key2: Pointer): Integer; virtual;
+  end;

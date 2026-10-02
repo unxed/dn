@@ -2,16 +2,16 @@
 # gives their names: `UnitName: TvUnit TvUnit...` (tools/gen-shim.py, called by tools/dn-materialize.sh).
 # What DN adds to TV, and the names that differ, are in dn/new/manual/UNIT.inc (interface) and
 # UNIT.impl.inc (implementation).
-Defines:  TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow
-_Defines: TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow
-Views:    TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow -TDrawBuffer +SysUtils
-_Views:   TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow -TDrawBuffer +SysUtils
+Defines:  TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
+_Defines: TvGeom TvObjs TvUtil TvEvents TvKeys TvViews TvWindow TvDialog TvMsgBox TvCluster TvList TvInput +VPSysLow -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
+Views:    TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow -TDrawBuffer +SysUtils -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
+_Views:   TvGeom TvColors TvCell TvKeys TvEvents TvDrawBuf TvText TvUtil TvObjs TvViews TvWindow -TDrawBuffer +SysUtils -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
 Dialogs:  TvDialog TvInput TvCluster TvList TvHist TvValid -InputBox -InputBoxRect
 _Dialogs: TvDialog TvInput TvCluster TvList TvHist TvValid
-Collect:  TvObjs -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection +Strings +Defines
+Collect:  TvObjs -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection +Strings +Defines +SysUtils
 _Collect: TvObjs
-Streams:  TvObjs
-_Streams: TvObjs
+Streams:  TvObjs -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
+_Streams: TvObjs -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
 Scroller: TvWindow
 Validate: TvValid
 ColorSel: TvColorSel
