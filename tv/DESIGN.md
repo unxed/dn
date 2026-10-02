@@ -44,7 +44,7 @@
 | 5c | `TvWindow` — `TFrame`, `TScrollBar`, `TScroller`, `TWindow` | `views.h`, `tframe.cpp`, `framelin.cpp`, `tscrlbar.cpp`, `tscrolle.cpp`, `twindow.cpp`, `tvtext1.cpp` (таблицы рамки) | сделан (без потоков); `CtrlToArrow` — в `TvKeys` |
 | 5d | `TvUtil` — горячие клавиши и строки с `~`: `HotKeyStr`, `CStrLen`, `GetAltCode/Char/CharStr`, `GetCtrlCode/Char`, `EqualsIgnoreCase`, `NewStr` | `util.h`, `tvtext2.cpp`, `tinputli.cpp`, `drivers2.cpp`, `ttext.cpp` | сделан |
 | 6a | `TvMenus` — меню: `TMenuView`, `TMenuBar`, `TMenuBox`, `TMenuPopup`, `NewMenu/NewSubMenu/NewItem/NewLine` | `menus.h`, `tmnuview.cpp`, `tmenubar.cpp`, `tmenubox.cpp`, `tmenupop.cpp` | сделан (без потоков) |
-| 6b | `TvMenus` — строка статуса: `TStatusLine`, `TStatusDef`, `TStatusItem` | `menus.h`, `tstatusl.cpp` | |
+| 6b | `TvMenus` — строка статуса: `TStatusLine`, `TStatusDef`, `TStatusItem`, `NewStatusDef/NewStatusKey` | `menus.h`, `tstatusl.cpp` | сделан (без потоков) |
 | 7 | `TvApp` — `TProgram`, `TApplication`, `TDesktop` | `app.h`, `tprogram.cpp`, … | |
 | 8 | Бэкенд «в памяти» (тесты) и бэкенд DOS | свой | |
 
@@ -175,3 +175,7 @@
   Esc, чтобы меню всегда закрывалось.
 - **Проверка утечек:** `t_menus.pas` сравнивает `GetFPCHeapStatus.CurrHeapUsed` до и после
   создания и удаления меню.
+- **Строка статуса** строится `NewStatusDef`/`NewStatusKey` (как в Pascal TV) и освобождает
+  определения в `Done`. `Hint` возвращает `ShortString`; разделитель подсказки — байт CP437
+  $B3 и пробел. `Update` берёт контекст справки у `TopView` — вызывать его будет
+  `TProgram.Idle` (юнит `TvApp`).
