@@ -97,3 +97,17 @@ DN OSP 2.14 (186 `.pas`, 182 юнита без программ). Записыв
 LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` в архиве отсутствует (RTL Virtual Pascal для DOS): пишем свой
 `dn/new/dpmi32.pas`/`dpmi32df.pas` поверх `go32` FPC (`realintr`, `TRealRegs`, `dosmemput`), имена — по вызовам в
 `lfnvp.pas`, `winclpvp.pas` (WinOldAp-буфер обмена DN — тоже оттуда), `vpsyslo2.pas`.
+
+## 7. Слой VP/Dpmi32 и первые юниты (2026-10-02)
+
+- Сделано: `dn/new/vpsyslow.pas` — файлы (`SysFileOpen/Create/Seek/Read/Write`) и поиск (`TOSSearchRec`, `SysFind*`);
+  `dn/new/dpmi32.pas`/`dpmi32df.pas` — реальный режим через `go32` (`realintr`, буфер передачи `transfer_buffer`; на
+  не-DOS — заглушки с CF=1), `MemGet/MemPut` вместо `Mem[]`/`Ptr()` VP (правка `dn/edits/30-dpmi32-mem.py`: память ниже
+  1 МБ не лежит в сегменте данных); `manual/defines.inc` — имена из `defines.pas` DN (`Str*`, `LongString`, `TXlat`, `TSize`...),
+  плюс `TFileSize/SmallWord/TQuad` из VPSysLow (в VP они видны всем). `gen-shim.py`: `+Unit` в `shims.map` — только в `uses` шима.
+- Проба (`tools/dn-probe.sh objfpc -dDPMI32`): 31 из 162 юнитов компилируется (было 25). `lfnvp.pas` проходит до `drivers.pas`.
+- **Находка.** В `exclude.list` из аудита попали не только «борландовские» юниты, но и ядро DN: `DNAPP.PAS`, `FVIEWER.PAS`,
+  `edwin.pas`, `calendar.pas`, `memory.pas`, `filetype.pas`, `version.pas`, `usersavr.pas`, `colorvga.pas`, `advance6.pas`,
+  `TopView_.PAS`, `strview.pas`, `asciitab.pas`... Ворота аудита — `raw% <= 2 и maxrun < 48`; у многих из них raw% 1–6 %, а
+  исключило их *одно* длинное совпадение (`FVIEWER`: 1 %, но maxrun 112 токенов из `VIEWS.PAS`). Без них не собрать ни
+  юнит `Events`/`Messages`/`Gauge`/`DNApp`, ни `FViewer` (остальные юниты на них ссылаются).
