@@ -29,7 +29,7 @@
   `34d27cffff01d0b38b199c035d040bb2b3e88c41935f63d9828dd4db033471ac`.
 - **DN OSP 2.14** (Virtual Pascal) — база нашего DN (решение 10):
   https://web.archive.org/web/20220202202636/http://www.dnosp.com/files/dn2/dn2s214.rar
-  (sha256 фиксируется первым прогоном `dn.yml`, см. `dn/upstream.env`).
+  (sha256 закреплён в `dn/upstream.env`; это тот же состав, что мы разбирали раньше: 210 файлов, 751658 токенов).
 - DN 1.51 от RIT (BP7), запасной вариант и для сравнения:
   https://web.archive.org/web/20250406173244/https://download.ritlabs.com/dn/dn151src.zip
 - Эталон Borland для аудита (BP 7.0 + обновление 7.01), sha256
