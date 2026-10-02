@@ -88,6 +88,7 @@ type
     destructor Done; virtual;
     function CanMoveFocus: Boolean; virtual;
     function ExecuteDialog(P: PView; Data: Pointer): Word; virtual;
+    procedure Draw; virtual;
     procedure GetEvent(var Event: TEvent); virtual;
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -562,6 +563,13 @@ begin
   R := GetExtent;
   R.B.Y := R.A.Y + 1;
   New(MenuBar, Init(R, nil));
+end;
+
+{ The buffer of the program is the screen itself, so the Draw of a group (WriteBuf of the buffer) would copy it onto itself and
+  repaint nothing: what was lost while the program was locked (Lock / Unlock, DN does it) must be drawn by the subviews. }
+procedure TProgram.Draw;
+begin
+  DrawSubViews(First, nil);
 end;
 
 procedure TProgram.InitScreen;

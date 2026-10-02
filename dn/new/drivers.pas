@@ -93,7 +93,7 @@ procedure SetEventDouble(var Event: TEvent; Value: Boolean);
 
 var
   { where a fatal error happened (DN: the source file and the line of the error, set by the error handler) }
-  SourceFileName: PString = nil;
+  SourceFileName: PShortString = nil;
   SourceLineNo: LongInt = 0;
 
 { The end of the program after a fatal error: the place of the error (ErrorAddr, SourceFileName, SourceLineNo) is
@@ -323,7 +323,7 @@ begin
     Inc(I);
     case C of
       's': begin
-             if PtrUInt(P^[N]) = 0 then S := '' else S := PString(PtrUInt(P^[N]))^;
+             if PtrUInt(P^[N]) = 0 then S := '' else S := PShortString(PtrUInt(P^[N]))^;
              Inc(N);
            end;
       'd': begin Str(P^[N], S); Inc(N); end;

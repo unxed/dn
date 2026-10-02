@@ -4,13 +4,13 @@
 
   Not done yet (marked TODO): the resources of dialogs and strings (tv/ has no Load/Store of views), the
   window of messages (WriteMsg), the command line. They return nil / '' / cmCancel. }
-{$mode objfpc}{$H-}
+{$mode objfpc}{$H-}{$POINTERMATH ON}
 unit DNApp;
 
 interface
 
 uses
-  SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, Menus,
+  SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, TvScreen, TvCell, Menus,
   Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings
 {$IFDEF GO32V2}, TvDos{$ENDIF}, DNErrLog;
 
@@ -129,7 +129,8 @@ constructor TProgram.Init;
 begin
   DNTrace('TProgram.Init');
   inherited Init;
-  DNTrace('TProgram.Init: tv done');
+  DNTrace('TProgram.Init: tv done, size=' + IntToStr(Size.X) + 'x' + IntToStr(Size.Y) + ' desktop=' + IntToStr(Desktop^.Size.X) + 'x' +
+    IntToStr(Desktop^.Size.Y) + ' origin=' + IntToStr(Desktop^.Origin.X) + ',' + IntToStr(Desktop^.Origin.Y));
   DNTrace('StatusLine=' + IntToHex(PtrUInt(StatusLine), 8) + ' MenuBar=' + IntToHex(PtrUInt(MenuBar), 8));
   if StatusLine <> nil then
     Insert(StatusLine);
@@ -174,25 +175,51 @@ begin
 end;
 
 { A test aid: with the environment variable DNDUMP=file the screen is written to the file (TvDos.DosDumpScreen: see
-  tools/render-dump.py) after DNDUMPSEC seconds (default 3), and the program ends. }
+  tools/render-dump.py) after DNDUMPSEC seconds (default 3), and the program ends. DNKEYS=1C0D,011B,... (hex key codes,
+  scan code and character: 1C0D is Enter, 011B Esc, 3B00 F1) are put into the keyboard buffer, one a second, starting
+  after the first second: they drive the program before the dump. }
 var
   DumpStart: QWord = 0;
+  Keys: String = '';
+  KeysSent: LongInt = 0;
   IdleSeen: Boolean = False;
 
 procedure CheckScreenDump;
 {$IFDEF GO32V2}
 var
   Name: String;
-  Sec: LongInt;
+  Sec, N, I: LongInt;
 begin
   Name := GetEnvironmentVariable('DNDUMP');
   if Name = '' then
     Exit;
   if DumpStart = 0 then
+  begin
     DumpStart := GetTickCount64;
+    Keys := GetEnvironmentVariable('DNKEYS');
+  end;
+  { one key a second }
+  while (Keys <> '') and (GetTickCount64 - DumpStart > QWord(KeysSent + 1) * 1000) do
+  begin
+    I := Pos(',', Keys);
+    if I = 0 then
+      I := Length(Keys) + 1;
+    DosStuffKey(StrToIntDef('$' + Copy(Keys, 1, I - 1), 0));
+    Delete(Keys, 1, I);
+    Inc(KeysSent);
+  end;
   Sec := StrToIntDef(GetEnvironmentVariable('DNDUMPSEC'), 3);
   if GetTickCount64 - DumpStart > QWord(Sec) * 1000 then
   begin
+    { the trace of a dump that is blank: the state of the screen of TV and of the hooks of the backend }
+    N := 0;
+    if ScreenBuffer <> nil then
+      for I := 0 to ScreenWidth * ScreenHeight - 1 do
+        if not (PByte(ScreenBuffer)[I * SizeOf(TScreenCell)] in [0, 32]) then
+          Inc(N);
+    DNTrace('dump: screen ' + IntToStr(ScreenWidth) + 'x' + IntToStr(ScreenHeight) + ', non-blank cells in the buffer: ' + IntToStr(N) +
+      ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application^.LockFlag) + ' desktop ' +
+      IntToStr(Desktop^.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application^.Buffer = ScreenBuffer, True));
     DosDumpScreen(Name);
     Halt(0);
   end;
