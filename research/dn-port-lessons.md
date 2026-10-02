@@ -181,3 +181,21 @@ LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` 
   `21-oneline-bodies.py` (тела в одну строку в interface), `22-smallword.py` (в VP `SmallWord` виден везде).
 - В dn151 (RIT, Borland Pascal 7) этих юнитов нет, зато есть `GAUGE`, `GAUGES`, `HELPFILE`, `HELPKERN`, `ASCIITAB`, `DNSTDDLG`,
   `MESSAGES`, `DNAPP`, `DRIVERS`, `FVIEWER`, `TVHC`.
+
+## 13. Где мы на `dn.pas` (2026-10-02, вечер)
+
+Компиляция главной программы `tools/dn-try.sh dn.pas` (опции из `dn/target.env`: `-Mdelphi -Sh- -Rintel -dDPMI32`) проходит
+десятки юнитов; остановка — `Gauges` (нужен свой: `TTrashCan`, `TKeyMacros`, `THeapView`, `TClockView`, регионы под
+Borland — в `dn/rewrite`, как для `gauge`).
+- Режим Delphi + короткие строки — как в VP: процедуры как значения без `@`, `Result`. `@Name` локальной процедуры в Delphi-режиме
+  — нетипизированный указатель, поэтому `FirstThat/ForEach(@X)` правится на `(X)` (`61-callbacks.sed`), параметры
+  типизированных указателей — `62-callback-params.py`; `tv` принимает `is nested` (`{$modeswitch nestedprocvars}`).
+- `{$V-}` и `nestedprocvars` добавляются в `STDEFINE.INC` (`04-stdefine.sh`).
+- tv: `TView.WriteBufW/WriteLineW/GetColorW`, формы `GetBounds/GetExtent/...(var R)`, `TListBox.List`, потоки на `Int64`
+  и с расширениями DN, `FirstThat/ForEach` с вложенными процедурами. Все тесты tv проходят.
+- DN-расширения `TView`, которых нет в `tv/`: `UpdTicks`, `UpTmr`, `Update` (виртуальный), `ClearPositionalEvents`,
+  `GetPeerViewPtr/PutPeerViewPtr`, `GetSubViewPtr/PutSubViewPtr`, `RegisterToBackground` (16 вызовов), `MenuEnabled`;
+  `Load/Store` у представлений (потоки) — следующий крупный шаг в `tv/`.
+- Свои юниты в `dn/new`: `vpsyslow` (+`SysTv*` над `TvScreen`), `dpmi32`, `dpmi32df`, `vputils`, `use16`, `memory`, `drivers`,
+  `messages`, `dnapp`, `dnstddlg`, + `manual/*.inc` для шимов. Из архива: `LIB.D32` (`files`, `fltl`, `fnotify`, `events`,
+  `country_`, `doslow`, `dn2pmapi`). Вернулись с правками отрезков: `FVIEWER`, `calendar`, `gauge`.
