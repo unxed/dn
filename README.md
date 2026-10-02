@@ -40,6 +40,15 @@ DOS Navigator на Free Pascal. В репозитории два независ�
        cd tv/tests
        for t in t_*.pas; do fpc -Fu../src -Fu. $t && ./${t%.pas}; done     # каждый печатает «ALL OK»
 
+1a. **TV в терминале Linux** (нужны `fpc` и `python3`; терминалом служит `tools/pty_screen.py`):
+
+        fpc -Futv/src -FUout -FEout tv/demo/tvdemo.pas
+        python3 tv/tests/pty/test_tvdemo.py out/tvdemo      # меню, окна, мышь, смена размера, выход: «ALL OK»
+        out/tvdemo                                          # руками, в настоящем терминале (Alt-X — выход)
+
+    Тесты разбора клавиш и вывода (`t_termio`, `t_ansi`) идут в общем цикле пункта 1. Цвета: `TV_COLORS=0|8|16|256|direct`,
+    мышь: `TV_MOUSE=0`, задержка Esc: `ESCDELAY=мс`.
+
 2. **Тесты наших юнитов DN** (`dn/new`): те же команды запускает job `new` в `.github/workflows/dn.yml`.
 
 3. **Инструменты для DOS** (один раз; нужны `fpc`, `make`, `git`, `curl`, `bzip2`, `dosbox-x`, `unrar`, `unzip`, `python3`, `patch`):
