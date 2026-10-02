@@ -1,7 +1,8 @@
 { TvScreen: the screen as the views see it: its size, the cell buffer of the
   whole screen, the shadow settings and the hooks a backend plugs in.
 
-  Replaces the screen-related parts of magiblot/tvision @ b4831e2:
+  Translated from magiblot/tvision @ b4831e2 (the screen-related parts, turned into
+  variables and hooks):
     TScreen (screenWidth, screenHeight, screenBuffer, cursorLines),
     THardwareInfo::screenWrite / setCaretPosition / setCaretSize,
     shadowSize and shadowAttr (source/tvision/tview.cpp).

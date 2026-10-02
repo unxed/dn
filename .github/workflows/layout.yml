@@ -1,0 +1,16 @@
+name: layout
+# The separation of the projects (tv/ and dn/) and the origin notes of the units.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tv/**
+      - dn/**
+      - tools/check-layout.sh
+      - .github/workflows/layout.yml
+jobs:
+  layout:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/check-layout.sh
