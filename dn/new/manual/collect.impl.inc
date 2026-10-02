@@ -67,12 +67,18 @@ end;
 
 function TStringCollection.GetItem(var S: TStream): Pointer;
 begin
-  Result := S.ReadStr;      { TODO: long strings }
+  if LongStrings then
+    Result := S.ReadLongStr
+  else
+    Result := S.ReadStr;
 end;
 
 procedure TStringCollection.PutItem(var S: TStream; Item: Pointer);
 begin
-  S.WriteStr(PStr(Item));   { TODO: long strings }
+  if LongStrings then
+    S.WriteLongStr(PLongString(Item))
+  else
+    S.WriteStr(PStr(Item));
 end;
 
 procedure TUnSortedStrCollection.Insert(Item: Pointer);
@@ -104,6 +110,32 @@ begin
     Dispose(PLongString(Item))
   else
     DisposeStr(PStr(Item));
+end;
+
+function TLineCollection.GetItem(var S: TStream): Pointer;
+begin
+  if LongStrings then
+    Result := S.ReadLongStr
+  else
+    Result := S.ReadStr;
+end;
+
+procedure TLineCollection.PutItem(var S: TStream; Item: Pointer);
+begin
+  if LongStrings then
+    S.WriteLongStr(PLongString(Item))
+  else
+    S.WriteStr(PStr(Item));
+end;
+
+function TStrCollection.GetItem(var S: TStream): Pointer;
+begin
+  Result := S.StrRead;
+end;
+
+procedure TStrCollection.PutItem(var S: TStream; Item: Pointer);
+begin
+  S.StrWrite(PChar(Item));
 end;
 
 function TDirCol.Compare(Key1, Key2: Pointer): Integer;
