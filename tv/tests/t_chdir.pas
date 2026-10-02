@@ -21,6 +21,19 @@ begin
   Result := not DirectoryExists(D);
 end;
 
+{ the dialog shows the current directory without the drive }
+function NoDrive(const S: ShortString): ShortString;
+begin
+  Result := S;
+  if (Length(Result) > 1) and (Result[2] = ':') then
+    Delete(Result, 1, 2);
+end;
+
+function PosI(const Sub, S: ShortString): Integer;
+begin
+  Result := Pos(UpperCase(Sub), UpperCase(S));
+end;
+
 function Line(L: PListBox; I: Integer): ShortString;
 begin
   Result := L^.GetText(I, 255);
@@ -61,17 +74,17 @@ begin
   New(Dlg, Init(cdNormal, 2));
   App^.InsertWindow(Dlg);
 
-  Check(Same(Dlg^.DirInput^.Data^, Copy(Dir, 1, Length(Dir) - 1)) or Same(Dlg^.DirInput^.Data^, Dir),
-    'the input line shows the current directory (without the end separator)');
+  Check(Same(Dlg^.DirInput^.Data^, NoDrive(Copy(Dir, 1, Length(Dir) - 1))),
+    'the input line shows the current directory (without the drive and the end separator)');
   Check(Dlg^.DirList^.Items^.Count >= 5, 'Drives, the path and the subdirectories are listed');
   Check(Line(Dlg^.DirList, 0) = DrivesText, 'the first line is "Drives"');
   Check(Pos(PathDirText, Line(Dlg^.DirList, 1)) = 1, 'then the root with the tree mark');
   Check(Dlg^.DirList^.Cur = Dlg^.DirList^.Focused, 'the current directory is focused');
-  Check(Same(Dlg^.DirList^.DirItem(Dlg^.DirList^.Cur)^.Dir^, Copy(Dir, 1, Length(Dir) - 1)),
+  Check(Same(Dlg^.DirList^.DirItem(Dlg^.DirList^.Cur)^.Dir^, NoDrive(Copy(Dir, 1, Length(Dir) - 1))),
     'and its path is the one of the directory');
   { the subdirectories are the last two lines }
-  Check(Pos('one', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 2)) > 0, 'the first subdirectory');
-  Check(Pos('two', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0, 'the second subdirectory');
+  Check(PosI('one', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 2)) > 0, 'the first subdirectory');
+  Check(PosI('two', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0, 'the second subdirectory');
   Check(Pos(#$C0#$C4, Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0,
     'the last line ends the tree');
 
@@ -79,7 +92,7 @@ begin
   Dlg^.DirList^.FocusItem(Dlg^.DirList^.Items^.Count - 1);   { two }
   Command(Dlg, cmChangeDir);
   Check(Same(Copy(Dlg^.DirInput^.Data^, Length(Dlg^.DirInput^.Data^) - 2, 3), 'two'), 'Chdir puts the directory into the input line');
-  Check(Pos('deep', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0, 'and the list shows its subdirectories');
+  Check(PosI('deep', Line(Dlg^.DirList, Dlg^.DirList^.Items^.Count - 1)) > 0, 'and the list shows its subdirectories');
 
   { Revert returns to the current directory }
   Command(Dlg, cmRevert);
