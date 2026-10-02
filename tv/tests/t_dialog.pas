@@ -12,7 +12,7 @@ end;
 var
   App: PApplication;
   Dlg: PDialog;
-  Txt, Ctr: PStaticText;
+  Txt, Ctr, Txt2: PStaticText;
   Lbl: PLabel;
   Ok, Cancel: PButton;
   Res: Word;
@@ -41,6 +41,8 @@ begin
   Dlg^.Insert(Cancel);
   New(Lbl, Init(R(2, 3, 14, 4), '~N~ame', Cancel));
   Dlg^.Insert(Lbl);
+  New(Txt2, Init(R(20, 1, 30, 4), 'AB'#13'CD'));
+  Dlg^.Insert(Txt2);
   Dlg^.SelectNext(False);   { the last inserted control has the focus: go back to the first }
   App^.InsertWindow(Dlg);
 
@@ -48,6 +50,7 @@ begin
   Check(MemText(7, 12, 23) = 'Hello brave ', 'static text: the first line is cut at a space');
   Check(MemText(8, 12, 23) = 'new world   ', 'static text: the rest goes to the next line');
   Check(MemText(11, 12, 23) = '     Hi     ', 'static text: #3 centers the line');
+  Check((MemText(7, 30, 31) = 'AB') and (MemText(8, 30, 31) = 'CD'), 'static text: #13 ends a line as #10 does (Borland, DN)');
   Check(MemAttr(12, 7) = $70, 'static text color: the text of the gray dialog');
   Check((Txt^.GrowMode and gfFixed) <> 0, 'static text is fixed');
 

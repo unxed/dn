@@ -221,11 +221,17 @@ begin
 end;
 
 procedure TStaticText.GetText(var S: ShortString);
+var
+  I: Integer;
 begin
   if Text = nil then
     S := ''
   else
     S := Text^;
+  { Borland's Turbo Vision (and DN) end a line with #13, magiblot's with #10: both do here }
+  for I := 1 to Length(S) do
+    if S[I] = #13 then
+      S[I] := #10;
 end;
 
 function TStaticText.GetPalette: TPalette;
