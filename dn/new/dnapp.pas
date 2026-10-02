@@ -56,6 +56,8 @@ type
   PApplication = ^TApplication;
   TApplication = object(TProgram)
     Clock: PView;
+    constructor Init;
+    destructor Done; virtual;
     procedure ShowUserScreen;
     procedure WhenShow; virtual;
   end;
@@ -105,7 +107,7 @@ var
 
 implementation
 
-uses Advance, Advance2, Advance7;
+uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist;
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -140,7 +142,7 @@ begin
   TvViews.TGroup.Init(R);
   State := sfVisible or sfSelected or sfFocused or sfModal or sfExposed;
   Options := 0;
-  Buffer := ScreenBuffer;
+  Buffer := TvScreen.ScreenBuffer;
   InitStatusLine;
   InitMenuBar;
   InitDeskTop;
@@ -283,13 +285,13 @@ begin
   begin
     { the trace of a dump that is blank: the state of the screen of TV and of the hooks of the backend }
     N := 0;
-    if ScreenBuffer <> nil then
+    if TvScreen.ScreenBuffer <> nil then
       for I := 0 to ScreenWidth * ScreenHeight - 1 do
-        if not (PByte(ScreenBuffer)[I * SizeOf(TScreenCell)] in [0, 32]) then
+        if not (PByte(TvScreen.ScreenBuffer)[I * SizeOf(TScreenCell)] in [0, 32]) then
           Inc(N);
     DNTrace('dump: screen ' + IntToStr(ScreenWidth) + 'x' + IntToStr(ScreenHeight) + ', non-blank cells in the buffer: ' + IntToStr(N) +
       ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application^.LockFlag) + ' desktop ' +
-      IntToStr(Desktop^.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application^.Buffer = ScreenBuffer, True));
+      IntToStr(Desktop^.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application^.Buffer = TvScreen.ScreenBuffer, True));
     { the help context decides what the status line shows }
     DNTrace('idle calls: ' + IntToStr(IdleCount) + ' shift state ' + IntToHex(ShiftState, 2) + ' ' + IntToHex(ShiftState2, 2) + ' old ' + IntToHex(OldShiftState, 2));
     DNTrace('help ctx: app ' + IntToStr(Application^.GetHelpCtx) + ' desktop ' + IntToStr(Desktop^.GetHelpCtx) + ' status ' +
@@ -323,6 +325,8 @@ begin
   IdleSeen := True;
   Inc(IdleCount);
   inherited Idle;
+  if Drivers.ScreenBuffer <> nil then
+    SysTvGetSrcBuf;               { the copy of the screen that DN reads }
   if StatusLine <> nil then
   begin
     StatusLine^.Update;
@@ -343,6 +347,37 @@ function TProgram.SetScreenMode(Mode: Word): Boolean;
 begin
   inherited SetScreenMode(Mode);
   Result := True;
+end;
+
+{ As TApplication.Init / Done of DN: the video manager of DN (videoman.pas) is started and stopped here, the user screen is the
+  screen that was there before DN (vpsyslow grabbed it). The language files and the resources are disposed at the end. }
+constructor TApplication.Init;
+begin
+  Videoman.InitVideo;
+  if (UserScreen <> nil) and (Length(SysStartScreen) > 0) and (SysStartScreenWidth = UserScreenWidth) and
+     (Length(SysStartScreen) * 2 <= UserScreenSize) then
+  begin
+    Move(SysStartScreen[0], UserScreen^, Length(SysStartScreen) * 2);
+    ScreenSaved := True;
+  end;
+  inherited Init;
+end;
+
+destructor TApplication.Done;
+begin
+  if LStringList <> nil then
+    Dispose(LStringList, Done);
+  LStringList := nil;
+  if LngStream <> nil then
+    Dispose(LngStream, Done);
+  LngStream := nil;
+  if Resource <> nil then
+    Dispose(Resource, Done);
+  Resource := nil;
+  inherited Done;
+  DoneHistory;
+  DoneSysError;
+  Videoman.DoneVideo;
 end;
 
 procedure TApplication.ShowUserScreen;

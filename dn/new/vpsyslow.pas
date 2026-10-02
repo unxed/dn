@@ -139,6 +139,12 @@ procedure SysDisableHardErrors;
 { A place for the Ctrl-Break handler of the program; here it only remembers that it was set. }
 procedure SysCtrlSetCBreakHandler;
 
+var
+  { the text screen of the program that started DN (16-bit cells: character + attribute), copied before the application takes
+    the screen over: the "user screen" of DN (Ctrl-O, Alt-F5) and what is seen after the exit }
+  SysStartScreen: array of Word;
+  SysStartScreenWidth: Integer = 0;
+
 implementation
 
 uses
@@ -713,7 +719,23 @@ end;
 { The program takes over the screen at the start (DN reads the size of the screen before it creates the application; the
   application of TV needs the screen of TvScreen to be there). Other targets: their backends do the same. }
 {$IFDEF GO32V2}
+procedure GrabStartScreen;
+var
+  Rows: Byte;
+  Cols: Word;
+begin
+  dosmemget($40, $84, Rows, 1);
+  dosmemget($40, $4A, Cols, 2);
+  Inc(Rows);
+  if (Cols = 0) or (Cols > 255) or (Rows < 2) or (Rows > 100) then
+    Exit;
+  SetLength(SysStartScreen, Cols * Rows);
+  dosmemget($B800, 0, SysStartScreen[0], Cols * Rows * 2);
+  SysStartScreenWidth := Cols;
+end;
+
 initialization
+  GrabStartScreen;
   DosInit;
 finalization
   DosDone;
