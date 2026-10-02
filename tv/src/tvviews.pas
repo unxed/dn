@@ -25,7 +25,7 @@ unit TvViews;
 interface
 
 uses
-  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen, TvObjs;
+  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen, TvObjs, TvTimer;
 
 const
   { standard command codes }
@@ -220,6 +220,10 @@ type
     procedure MakeFirst;
     procedure PutInFrontOf(Target: PView);
     function TopView: PView;
+    { Timers: the group chain ends at the program, which owns the timer queue; a view
+      outside a group has none (SetTimer returns nil). }
+    function SetTimer(TimeoutMs: LongWord; PeriodMs: Integer = -1): TTimerId; virtual;
+    procedure KillTimer(Id: TTimerId); virtual;
     { Writing into the view: coordinates are in the view, clipped to the part of
       the view that is visible. WriteBuf writes H rows of W cells, taken one
       after the other from B; WriteLine writes the same W cells to H rows. }
@@ -1541,6 +1545,20 @@ begin
     Max.X := MaxInt;
     Max.Y := MaxInt;
   end;
+end;
+
+function TView.SetTimer(TimeoutMs: LongWord; PeriodMs: Integer): TTimerId;
+begin
+  if Owner <> nil then
+    Result := Owner^.SetTimer(TimeoutMs, PeriodMs)
+  else
+    Result := nil;
+end;
+
+procedure TView.KillTimer(Id: TTimerId);
+begin
+  if Owner <> nil then
+    Owner^.KillTimer(Id);
 end;
 
 function TView.TopView: PView;
