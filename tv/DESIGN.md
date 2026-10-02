@@ -53,6 +53,7 @@
 | 9a | `TvDialog` — `TDialog`, `TStaticText`, `TLabel`, `TButton` | `dialogs.h`, `tdialog.cpp`, `tstatict.cpp`, `tlabel.cpp`, `tbutton.cpp` | сделан (без потоков) |
 | 9b | `TvMsgBox` — `MessageBox`, `MessageBoxRect`, форматированные варианты | `msgbox.h`, `msgbox.cpp` | сделан; `InputBox` — в `TvInput` |
 | 9c | `TvValid` — `TValidator`, `TPXPictureValidator`, `TFilterValidator`, `TRangeValidator`, `TLookupValidator`, `TStringLookupValidator` | `validate.h`, `tvalidat.cpp` | сделан (без потоков) |
+| 9d | `TvInput` — `TInputLine`, `InputBox`, `InputBoxRect` | `tinputli.cpp`, `msgbox.cpp` | сделан (без потоков) |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -266,3 +267,10 @@
   `array of const`. Сообщения валидаторов (`ValidRangeError` и др.) — тоже переменные.
   Поле «пусто» (`prEmpty`) валидатора-картинки не считается правильным: `IsValid('')` ложно,
   как в оригинале.
+
+### TvInput (9d): решения
+
+- `Data: PStr` (GetMem MaxLen+1), лимит — только в байтах, `MaxLen` 1..255.
+- `InputLineOem` (по умолчанию False): набранный UTF-8 превращается в один байт кодовой страницы (для строк DN, хранящих OEM); при копировании в буфер — обратно в UTF-8.
+- Вставка из буфера синхронная, берётся первая строка буфера.
+- Тест: ссылки на литералы в главном блоке держат временные AnsiString до конца программы — для проверки «память не течёт» сравнения с буфером вынесены в функцию `ClipIs`.
