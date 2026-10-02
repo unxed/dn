@@ -39,6 +39,9 @@ type
     procedure ActivateView(P: PView);
     { the screen savers of DN (the list of the available ones, the choice of one): TODO, nothing is done; Data is a TSaversData }
     procedure InsertAvIdlerN(const Data; N: Integer);
+    { the idler views (the screen saver, the clock...): TODO, nothing is done }
+    procedure InsertIdler;
+    procedure InsertIdlerN(N: Integer);
     procedure GetEvent(var Event: TEvent); virtual;
     procedure Idle; virtual;
     procedure InitCommandLine; virtual;
@@ -87,6 +90,9 @@ var
   LngStream: PStream = nil;
   LStringList: PStringList = nil;
   Resource: PIdxResource = nil;
+  { the palettes of the program (the strings of attributes): those of tv/ for now. TODO: the palettes of DN are longer
+    (CComboBox = #35#36 and others index above the 32 entries of the dialog palette of tv/) }
+  CColor, CBlackWhite, CMonochrome: ShortString;
   appPalette: Integer absolute TvApp.AppPalette;
   SystemColors: array[0..2] of ShortString absolute TvApp.SystemColors;
   { a procedure that prepares a dialog for ExecResource; ExecResource clears it }
@@ -129,6 +135,14 @@ begin
 end;
 
 procedure TProgram.InsertAvIdlerN(const Data; N: Integer);
+begin
+end;
+
+procedure TProgram.InsertIdler;
+begin
+end;
+
+procedure TProgram.InsertIdlerN(N: Integer);
 begin
 end;
 
@@ -285,4 +299,7 @@ end;
 
 initialization
   CommandHiddenHook := @CommandHidden;
+  CColor := SystemColors[apColor];
+  CBlackWhite := SystemColors[apBlackWhite];
+  CMonochrome := SystemColors[apMonochrome];
 end.

@@ -199,6 +199,8 @@ type
     procedure EnableCommands(const Commands: TCommandSet);
     procedure DisableCommand(Command: Word);
     procedure EnableCommand(Command: Word);
+    procedure GetCommands(out Commands: TCommandSet);
+    procedure SetCommands(const Commands: TCommandSet);
     { as CommandEnabled, but a command that the program has switched off for good (CommandHiddenHook) is not enabled }
     function MenuEnabled(Command: Word): Boolean;
     procedure DragView(var Event: TEvent; Mode: Byte; var Limits: TRect;
@@ -1063,6 +1065,16 @@ end;
 procedure TView.EnableCommand(Command: Word);
 begin
   TvViews.EnableCommand(Command);
+end;
+
+procedure TView.GetCommands(out Commands: TCommandSet);
+begin
+  TvViews.GetCommands(Commands);
+end;
+
+procedure TView.SetCommands(const Commands: TCommandSet);
+begin
+  TvViews.SetCommands(Commands);
 end;
 
 function TView.MenuEnabled(Command: Word): Boolean;

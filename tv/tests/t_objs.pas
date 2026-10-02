@@ -292,6 +292,7 @@ begin
   Check(F.Status = stOk, 'a file is created');
   F.Write(Buf, 10000);
   Check((F.GetPos = 10000) and (F.GetSize = 10000), 'TDosStream: position and size');
+  Check((F.Position = 10000) and (F.StreamSize = 10000), 'DN extensions: Position and StreamSize follow the writes');
   F.Seek(9000);
   F.Read(Back, 500);
   Check(CompareByte(Back, Buf[9000], 500) = 0, 'TDosStream: Seek and Read');
@@ -302,6 +303,7 @@ begin
   F.Seek(50);
   F.Truncate;
   Check(F.GetSize = 50, 'TDosStream: Truncate');
+  Check((F.StreamSize = 50) and (F.Position = 50), 'DN extensions: Truncate sets StreamSize');
   F.Done;
   F.Init('NO_SUCH.DIR/NOFILE.TMP', stOpenRead);
   Check(F.Status = stInitError, 'opening a missing file: stInitError');

@@ -102,6 +102,9 @@ type
   TDosStream = object(TStream)
     Handle: THandle;
     FName: string;
+    { used by DN: the position that the stream keeps itself and the size of the file (a viewer of a growing file reads
+      the size again with SysFileSeek(Handle, 0, 2, StreamSize)) }
+    Position, StreamSize: LongInt;
     constructor Init(const FileName: string; Mode: Word);
     destructor Done; virtual;
     { Open takes the name and the mode (Init does it); DoOpen opens the file; Close closes it (Open may follow). }
@@ -536,7 +539,13 @@ begin
     Handle := FileOpen(FName, fmOpenReadWrite or fmShareDenyNone);
   end;
   if Handle = feInvalidHandle then
-    Error(stInitError, 2);
+    Error(stInitError, 2)
+  else
+  begin
+    Position := 0;
+    StreamSize := FileSeek(Handle, 0, 2);
+    FileSeek(Handle, 0, 0);
+  end;
 end;
 
 procedure TDosStream.Close;
@@ -592,6 +601,8 @@ begin
     Exit;
   end;
   N := FileRead(Handle, Buf, Count);
+  if N > 0 then
+    Inc(Position, N);
   if N <> Count then
   begin
     if N < 0 then
@@ -608,6 +619,7 @@ begin
   if Pos < 0 then
     Pos := 0;
   FileSeek(Handle, Pos, 0);
+  Position := Pos;
 end;
 
 procedure TDosStream.Truncate;
@@ -615,7 +627,9 @@ begin
   if Status <> stOk then
     Exit;
   if not FileTruncate(Handle, FileSeek(Handle, 0, 1)) then
-    Error(stError, 0);
+    Error(stError, 0)
+  else
+    StreamSize := Position;
 end;
 
 procedure TDosStream.Write(const Buf; Count: Longint);
@@ -623,7 +637,13 @@ begin
   if Status <> stOk then
     Exit;
   if FileWrite(Handle, Buf, Count) <> Count then
-    Error(stWriteError, 0);
+    Error(stWriteError, 0)
+  else
+  begin
+    Inc(Position, Count);
+    if Position > StreamSize then
+      StreamSize := Position;
+  end;
 end;
 
 { --- TBufStream -------------------------------------------------------------- }

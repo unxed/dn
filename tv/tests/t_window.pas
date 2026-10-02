@@ -31,6 +31,7 @@ type
   end;
 
 var
+  SaveCmds: TCommandSet;
   Desk: TTop;
 
 procedure TTop.GetEvent(var Event: TEvent);
@@ -312,6 +313,11 @@ begin
   CommandHiddenHook := @HideZoom;
   Check(not Bar^.MenuEnabled(cmZoom) and Bar^.MenuEnabled(cmClose), 'DN extensions: a hidden command is not enabled');
   CommandHiddenHook := nil;
+  Bar^.GetCommands(SaveCmds);
+  Bar^.SetCommands([cmClose]);
+  Check((cmClose in CurCommandSet) and not (cmZoom in CurCommandSet), 'DN extensions: SetCommands as a method of a view');
+  Bar^.SetCommands(SaveCmds);
+  Check(cmZoom in CurCommandSet, 'DN extensions: GetCommands saved the set');
 
   { keys }
   FillChar(Ev, SizeOf(Ev), 0);
