@@ -49,6 +49,7 @@
 | 7b | `TvTimer` — очередь таймеров `TTimerQueue` | `system.h`, `ttimerqu.cpp` | сделан |
 | 7c | `TvApp` — `TBackground`, `TDeskTop` (Tile, Cascade), `TProgram`, `TApplication` | `app.h`, `tprogram.cpp`, `tapplica.cpp`, `tdesktop.cpp`, `tbkgrnd.cpp` | сделан (без потоков, `LowMemory`; диалог — любой вид) |
 | 7d | `TvMouse` — состояние мыши → события (нажатие, отпускание, перемещение, автоповтор, колесо, двойной и тройной щелчок) | `tevent.cpp` (`getMouseEvent`) | сделан; задержки в мс (в оригинале тики по 55 мс), настраиваются переменными |
+| 7e | `TvObjs` — `TObject`, потоки `TStream`/`TDosStream`/`TBufStream`/`TMemoryStream` с реестром типов (`RegisterType`, `Get`, `Put`), коллекции `TCollection`/`TSortedCollection`/`TStringCollection` | свой, по API Pascal TV и семантике `TNSCollection` magiblot | написан; `TView` теперь потомок `TObject` |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -231,3 +232,22 @@
   при чтении текст остаётся как есть (CR LF). Факты об API — по Ralf Brown's Interrupt List
   (по памяти), сверяются с эмуляцией в DOSBox-X; на настоящей Windows (9x, XP) проверка
   остаётся на веху 5. Только текст.
+- **`TvObjs` — Pascal-API объектов, потоков и коллекций** (нужны DN: `TCollection` в 17 файлах,
+  `TBufStream`/`TDosStream` в 13 и 6, `TStreamRec`/`RegisterType` в 9). Написан заново по
+  поведению API, а не по исходникам Borland или FPC (`objects.pp` у FPC совпадает с Borland на
+  20 %, поэтому не берём). Отличия:
+  - `TObject.Init` обнуляет поля типа и всех предков (на этом держится код DN): размер
+    экземпляра берётся из первого поля VMT; `TView` теперь `object(TObject)`;
+  - регистрация типа: `Load` — функция-фабрика `function(var S: TStream): PObject`, `Store` —
+    процедура `procedure(P: PObject; var S: TStream)`, `VmtLink` — `PtrUInt(TypeOf(TFoo))`
+    (вызов конструктора по указателю между целями FPC непереносим); записи вида
+    `Load: @TFoo.Load` в DN при импорте надо заменить фабриками (скрипт импорта, веха 4);
+  - размеры и счётчики 32-битные; `ForEach`/`FirstThat`/`LastThat` принимают указатель на
+    обычную процедуру/функцию, не на вложенную (вложенные в DN придётся вынести);
+  - повторная регистрация номера типа игнорируется;
+  - у `TBufStream` свой алгоритм окна буфера (запись в середину файла сначала читает окно).
+- **Ловушка FPC:** `SizeOf(X)` для переменной объектного типа с VMT читает размер из VMT
+  экземпляра (неинициализированный экземпляр — падение); для статического размера пишите
+  `SizeOf(TFoo)`.
+- Тестовые программы теперь сбрасывают вывод после каждой строки `PASS` (`Flush`), иначе при
+  зависании теста вывод теряется.
