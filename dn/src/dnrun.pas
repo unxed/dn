@@ -1,7 +1,8 @@
 { DNRun: runs an external program from DN (an own unit; it replaces the DN.COM loader of the DPMI32 build, which shuts the
   application down, lets the loader run the command and starts DN again with the saved desktop). Here the application stays
   alive: the screen goes to the text mode (cleared), the program runs through COMMAND.COM, a key returns to DN and the caller
-  redraws the application. On the targets that are not DOS: TODO (the terminal is suspended and resumed by the backend). }
+  redraws the application. On Unix: the terminal is given to /bin/sh -c for the command (SysRunShell), Enter returns. A terminal inside DN (as in far2l, F4: tvterm of
+  magiblot ported on tv/) is in PLAN.md. }
 {$mode objfpc}{$H-}
 unit DNRun;
 
@@ -12,7 +13,7 @@ procedure RunExternal(const CmdLine: String);
 implementation
 
 uses
-  SysUtils, Dos{$IFDEF GO32V2}, go32{$ENDIF}, DNErrLog;
+  SysUtils, Dos{$IFDEF GO32V2}, go32{$ENDIF}, VPSysLow, DNErrLog;
 
 procedure RunExternal(const CmdLine: String);
 {$IFDEF GO32V2}
@@ -39,7 +40,7 @@ begin
     Intr($16, R);
   end;
 {$ELSE}
-  Exec(GetEnv('SHELL'), '-c ' + CmdLine);
+  SysRunShell(CmdLine);      { Unix: the terminal is given to the shell for the command }
 {$ENDIF}
 end;
 

@@ -84,6 +84,11 @@ function SysGetVolumeLabel(Drive: Char): ShortString;
   names that exist is found (a name that does not exist is left as it is, so that it can be created). Elsewhere the name is
   returned as it is. }
 function SysOsPath(const S: string): string;
+{ The bytes of a text of DN (its code page) as the system wants them: UTF-8 on Unix (see NameToOs), else the text as it is. }
+function SysNameToOs(const S: string): string;
+{ Unix: runs a command of the shell with the terminal (the screen of the application is left, the command writes to the terminal, Enter
+  returns to DN and the screen is drawn again); returns the exit code of the shell. Elsewhere: -1 (nothing is run). }
+function SysRunShell(const CmdLine: string): LongInt;
 { GetDir for DN: the current directory as "C:\DIR" (on Unix: C: is the root). }
 procedure SysGetDirDos(D: Byte; var S: string);
 
@@ -161,7 +166,7 @@ implementation
 uses
   SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
 {$IFDEF GO32V2}, go32, TvDos{$ENDIF}
-{$IFDEF UNIX}, BaseUnix, TvUnix{$ENDIF};
+{$IFDEF UNIX}, BaseUnix, Unix, TvUnix{$ENDIF};
 
 { --- names of files ----------------------------------------------------------- }
 
@@ -324,6 +329,25 @@ begin
   Result := ResolveCase(Result);
 end;
 
+function SysNameToOs(const S: string): string;
+begin
+  Result := NameToOs(S);
+end;
+
+function SysRunShell(const CmdLine: string): LongInt;
+begin
+  UnixSuspend;
+  Writeln;
+  Writeln('$ ', NameToOs(CmdLine));
+  Flush(Output);
+  Result := fpSystem(NameToOs(CmdLine));
+  Writeln;
+  Write('[DN] Press Enter to return...');
+  Flush(Output);
+  Readln;
+  UnixResume;
+end;
+
 procedure SysGetDirDos(D: Byte; var S: string);
 var
   I: Integer;
@@ -340,6 +364,16 @@ end;
 function SysOsPath(const S: string): string;
 begin
   Result := S;
+end;
+
+function SysNameToOs(const S: string): string;
+begin
+  Result := S;
+end;
+
+function SysRunShell(const CmdLine: string): LongInt;
+begin
+  Result := -1;
 end;
 
 procedure SysGetDirDos(D: Byte; var S: string);
@@ -911,9 +945,16 @@ end;
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
 begin
+{$IFDEF UNIX}
+  { through the shell, with the terminal: the program may write to it and read from it }
+  Result := 0;
+  if SysRunShell('"' + StrPas(Path) + '" ' + StrPas(Args)) < 0 then
+    Result := 2;
+{$ELSE}
   Dos.DosError := 0;
   Dos.Exec(StrPas(Path), StrPas(Args));
   Result := Dos.DosError;          { 0 = the program was run; its exit code is Dos.DosExitCode }
+{$ENDIF}
 end;
 
 procedure SysDisableHardErrors;

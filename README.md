@@ -15,7 +15,18 @@
 
 Наш новый код, не входящий в исходные файлы RIT Labs и их потомки - под MIT, как у magiblot ([`LICENSE`](LICENSE)).
 
-**Собрать DN одной командой:** `tools/build.sh linux64` (нужны только `fpc` 3.2.x и `python3`; результат — `out/linux64/dn`).
+## Собрать DN своим fpc
+
+Нужны: `fpc` 3.2.x (проверка: `fpc -iV`; в Debian/Ubuntu `sudo apt install fp-compiler fp-units-rtl`), `python3`, `git`. Больше ничего (ни Lazarus, ни библиотек).
+
+    git clone https://github.com/unxed/dn && cd dn
+    tools/build.sh linux64            # x86_64 Linux: компилирует DN, ресурсы и справку, результат в out/linux64/
+    cd out/linux64 && ./dn            # нужен терминал не меньше 80x25; выход — Alt-X
+
+Что дальше: правьте `dn/src` (исходники DN) или `tv/src` (библиотека), снова `tools/build.sh linux64` (несколько секунд); проверки —
+`tools/dn-test.sh` (юнит-тесты DN), `python3 tools/dn-linux-ops.py out/linux64` (F5/F6/F7/F8/F4 и команда на настоящих файлах в pty),
+тесты TV — п. 1 ниже. Для i386 Linux и DOS нужны кросс-компиляторы (`tools/build-fpc-i386-linux.sh`, `tools/build-fpc-go32v2.sh`), см. `dn/README.md`.
+Перед PR: `tools/check-layout.sh` и ворота аудита (`dn/README.md`, «Правила работы»).
 
 Правила разделения (проверяются `tools/check-layout.sh` в CI):
 
