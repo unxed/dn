@@ -1,0 +1,30 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:45:03
+╔═[■]Edit - C:\tmp\claude-0\-home-user\88ba927e-44f7-589c-8619-4b527bc33219\scratchpad\dntour-h[↕]═╗
+║  File  Edit  Search  Paragraph  Block  Misc  Options                                             ▲
+║first file                                                                                        ■
+║second line                                                                                       ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▼
+└─══════1:1════[102·66]═(↔)═══Lf══DOS══<·········>══◄■▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►─┘
+C:\tmp\claude-0\-home-user\88ba927e-44f7-589►work>
+ F1 Help  F2 Save  F3 Open  F5 Block  F6 Fill  F7 Search  F8 KeyMap  F10 Menu

@@ -1,0 +1,30 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:44:41
+x────C:\tmp\claude-0\-home-user\88ba927e-44f►work┐x─C:\tmp\claude-0\-home-user\88ba927e-44►work────┐
+│       Name       │       Name       │       Nam││       Name       │       Name       │       Nam│
+│..                │                  │          ││..                │                  │          │
+│c             dat │                  │          ││c             dat │                  │          │
+│a             txt │     ╔═[■]═════════════════ Help ═════════════════[↑]═╗             │          │
+│b             txt │     ║ ┌────────────                                  ▲             │          │
+│                  │     ║ │ File panel █                                 ■             │          │
+│                  │     ║ └▄▄▄▄▄▄▄▄▄▄▄▄█                                 ▒             │          │
+│                  │     ║                                                ▒             │          │
+│                  │     ║    File panel - is the main panel of the File  ▒             │          │
+│                  │     ║ manager. You can work with both files and      ▒             │          │
+│                  │     ║ directories, and perform both individual or    ▒             │          │
+│                  │     ║ group operations. You can set up each panel in ▒             │          │
+│                  │     ║ Options|Panel.                                 ▒             │          │
+│                  │     ║                                                ▒             │          │
+│                  │     ║    One can also set up the view of the current ▒             │          │
+│                  │     ║ panel from the menu                            ▒             │          │
+│                  │     ║ Panel|Select appearance preset... (Alt-"-").   ▒             │          │
+│                  │     ║ Or just use the hotkeys Ctrl-(1..9,0) for      ▒             │          │
+│                  │     ║ presets.                                       ▒             │          │
+│                  │     ║    Under Windows you can see long or short     ▼             │          │
+│                  │     └─◄▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓►─┘             │          │
+│                  │                  │          ││                  │                  │          │
+│                  │                  │          ││                  │                  │          │
+│──────────────────┴──────────────────┴──────────││──────────────────┴──────────────────┴──────────│
+│..            <UP--DIR>  0.00.00  0:00          ││..            <UP--DIR>  0.00.00  0:00          │
+└[ C * ]─────────────────────────────────────────┘└[ C * ]─────────────────────────────────────────┘
+C:\tmp\claude-0\-home-user\88ba927e-44f7-589►work>
+ F1 Help

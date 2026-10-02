@@ -1,0 +1,30 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:45:35
+x═[ ┌───────────────────────────────────┐ 4f►work╗x═C:\tmp\claude-0\-home-user\88ba927e-44►work[↕]═╗
+║   │ View                            ► │     Nam║║       Name       │       Name       │       Nam▲
+║.. │ Edit                            ► │        ║║..                │                  │          ■
+║c  │ Find...                 Alt-F7    │        ║║c             dat │                  │          ▒
+║a  │ Copy...                     F5    │        ║║a             txt │                  │          ▒
+║b  │ Rename/Move...              F6    │        ║║b             txt │                  │          ▒
+║   │ Change name case...Ctrl-Alt-F6    │        ║║                  │                  │          ▒
+║   │ Copy to archive...    Shift-F1    │        ║║                  │                  │          ▒
+║   │ Extract archive...    Shift-F2    │        ║║                  │                  │          ▒
+║   │ Split/combine...   Ctrl-Alt-F5    │        ║║                  │                  │          ▒
+║   │ Print                  Ctrl-F9    │        ║║                  │                  │          ▒
+║   │ Make directory              F7    │        ║║                  │                  │          ▒
+║   │ Delete                      F8    │        ║║                  │                  │          ▒
+║   │ File Attributes...       Alt-E    │        ║║                  │                  │          ▒
+║   │ Single file attributes..Ctrl-A    │        ║║                  │                  │          ▒
+║   │ Copy single file...   Shift-F5    │        ║║                  │                  │          ▒
+║   │ Move single file...   Shift-F6    │        ║║                  │                  │          ▒
+║   │ Delete single file    Shift-F8    │        ║║                  │                  │          ▒
+║   ├───────────────────────────────────┤        ║║                  │                  │          ▒
+║   │ Restart             Ctrl-Alt-X    │        ║║                  │                  │          ▒
+║   │ Exit                     Alt-X    │        ║║                  │                  │          ▒
+║   └───────────────────────────────────┘        ║║                  │                  │          ▒
+║                  │                  │          ║║                  │                  │          ▒
+║                  │                  │          ║║                  │                  │          ▼
+║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
+║..            <UP--DIR>  0.00.00  0:00          ║║..            <UP--DIR>  0.00.00  0:00          ║
+└[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
+C:\tmp\claude-0\-home-user\88ba927e-44f7-589►work>
+ F1 Help

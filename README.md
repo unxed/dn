@@ -40,6 +40,10 @@ DOS Navigator на Free Pascal. В репозитории два независ�
        cd tv/tests
        for t in t_*.pas; do fpc -Fu../src -Fu. $t && ./${t%.pas}; done     # каждый печатает «ALL OK»
 
+0. **DN под Linux без сборки:** `cd dist/linux && ./dn` (i386, статический ELF; нужен терминал не меньше 80x25; описание — `dist/linux/README.TXT`,
+   экраны — `dist/linux/screenshots/*.txt`). Собрать самому: `tools/build-fpc-i386-linux.sh ПРЕФИКС`, затем
+   `DN_LINUX=ПРЕФИКС tools/dn-linux.sh` (дерево `build/dn-linux`, `rcp`, `dn`, ресурсы, справка) и `tools/dn-linux-tour.py out/dnlinux` (обход в pty).
+
 1a. **TV в терминале Linux** (нужны `fpc` и `python3`; терминалом служит `tools/pty_screen.py`):
 
         fpc -Futv/src -FUout -FEout tv/demo/tvdemo.pas
