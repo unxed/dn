@@ -361,6 +361,9 @@ function Message(Receiver: PView; What, Command: Word; InfoPtr: Pointer): Pointe
 var
   { stream records: RegisterType(RView) makes TView known to the streams }
   RView, RGroup: TStreamRec;
+  { called at the start of the destructor of every view (DN: the view leaves the list of the views that
+    are updated in the background) }
+  ViewDoneHook: procedure(P: PView) = nil;
 
 implementation
 
@@ -969,6 +972,8 @@ end;
 
 destructor TView.Done;
 begin
+  if Assigned(ViewDoneHook) then
+    ViewDoneHook(@Self);
   Hide;
   if Owner <> nil then
     Owner^.Delete(@Self);

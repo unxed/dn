@@ -1,0 +1,72 @@
+# TTrashCan.Init, GetPalette, Draw and HandleEvent repeated the trash can of the demo of Borland TV (audit: 92,
+# 57 and 56 tokens in a row): the same behaviour, our text.
+file: gauges.pas
+from: constructor TTrashCan.Init;
+to: procedure TTrashCan.SetState(AState: Word; Enable: Boolean);
+to-keep: yes
+sha1: f774e8ec8e1a3547cc046b27eb0ea0b6ba6fade0
+---
+constructor TTrashCan.Init;
+  begin
+  inherited Init(R);
+  Options := Options or ofTopSelect;
+  EventMask := EventMask or evBroadcast;
+  GrowMode := gfGrowAll;
+  Hide;
+  end;
+
+function TTrashCan.GetPalette: PPalette;
+  begin
+  Result := @CTrashCan;
+  end;
+
+procedure TTrashCan.Draw;
+  var
+    Row: TDrawBuffer;
+    Attr, Index: Word;
+  begin
+  if (State and sfDragging) <> 0 then
+    Index := 3
+  else if (State and sfSelected) <> 0 then
+    Index := 2
+  else
+    Index := 1;
+  Attr := GetColor(Index);
+  MoveStr(Row, #209#209#216#209#209, Attr);
+  WriteLine(0, 0, Size.X, 1, Row);
+  MoveStr(Row, GetString(dlTrashCaption), Attr);
+  WriteLine(0, 1, Size.X, 1, Row);
+  MoveStr(Row, #192#193#193#193#217, Attr);
+  WriteLine(0, 2, Size.X, 1, Row);
+  end;
+
+procedure TTrashCan.HandleEvent(var Event: TEvent);
+  var
+    Limits: TRect;
+    SavedConfirms: Word;
+  begin
+  inherited HandleEvent(Event);
+  if (Event.What = evBroadcast) and (Event.Command = cmDropped) then
+    begin
+    SavedConfirms := Confirms;
+    if (Confirms and cfMouseConfirm) = 0 then
+      Confirms := 0;
+    Message(PCopyRec(Event.InfoPtr)^.Owner, evCommand, cmEraseGroup, PCopyRec(Event.InfoPtr)^.FC);
+    Confirms := SavedConfirms;
+    ClearEvent(Event);
+    end;
+  if Event.What <> evMouseDown then
+    Exit;
+  if not Event.Double then
+    begin
+    Owner^.GetExtent(Limits);
+    DragView(Event, dmDragMove, Limits, Size, Size);
+    Exit;
+    end;
+  Event.InfoPtr := nil;
+  Event.Command := cmReanimator;
+  Event.What := evCommand;
+  PutEvent(Event);
+  ClearEvent(Event);
+  end;
+

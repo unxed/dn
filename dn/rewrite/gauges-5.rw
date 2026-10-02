@@ -1,0 +1,15 @@
+# LeadingZero repeated the clock of the demo of Borland TV (audit: 42 tokens in a row): two digits, with a zero in
+# front when there is one.
+file: gauges.pas
+from: function LeadingZero(w: Word): String;
+to: constructor TClockView.Init(var Bounds: TRect);
+to-keep: yes
+sha1: c256a2641e1dc6050705fa93b159127b2d4cbcaf
+---
+function LeadingZero(w: Word): String;
+  begin
+  Str(w, Result);
+  if Length(Result) < 2 then
+    Result := '0' + Result;
+  end;
+

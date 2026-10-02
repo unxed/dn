@@ -1,0 +1,64 @@
+# The classes of Gauges followed the gadgets of the demo of Borland TV member by member (audit: runs of 26-39 tokens):
+# the same classes with the members in another order.
+file: gauges.pas
+from: PTrashCan = ^TTrashCan;
+to: {$IFDEF Printer}
+to-keep: yes
+sha1: 65a3c377cc3dbaef93208839bbd08a044f394947
+---
+  PTrashCan = ^TTrashCan;
+  TTrashCan = object(TView)
+    ImVisible: Boolean;
+    constructor Init(var R: TRect);
+    function GetPalette: PPalette; virtual;
+    procedure Draw; virtual;
+    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    end;
+  {$ENDIF}
+
+  PKeyMacros = ^TKeyMacros;
+  TKeyMacros = object(TObject)
+    Keys: PWordArray;
+    Count: AInt;
+    Limit: AInt;
+    constructor Init;
+    constructor Load(var S: TStream);
+    destructor Done; virtual;
+    procedure Play;
+    procedure PutKey(KeyCode: Word);
+    procedure Store(var S: TStream);
+    end;
+
+const
+  LastHour: Word = $FF;
+  LastMin: Word = 0;
+
+const
+  KeyMacroses: PCollection = nil;
+  MacroRecord: Boolean = False;
+
+type
+  PHeapView = ^THeapView;
+  THeapView = object(TView)
+    OldMem: LongInt;
+    constructor Init(var Bounds: TRect);
+    procedure Update; virtual;
+    procedure Draw; virtual;
+    end;
+
+  PClockView = ^TClockView;
+  TClockView = object(TView)
+    Refresh: Byte;
+    LastTime: DateTime;
+    LastSemi: Boolean;
+    TimeStr: String[16]; {-SSK (old version: string[12])}
+    OldXCoord: AInt; {-SSK}
+    OldShowSeconds: Boolean;
+    Utimer: TEventTimer;
+    constructor Init(var Bounds: TRect);
+    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure Update; virtual;
+    procedure Draw; virtual;
+    end;
+
