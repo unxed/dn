@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:45:23
-x═[■]C:\tmp\claude-0\-home-user\88ba927e-44f►work╗x═C:\tmp\claude-0\-home-user\88ba927e-44►work[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                21:23:00
+x═[■]═════ C:\tmp\dntour-kz9a63p9\work ══════════╗x═════════ C:\tmp\dntour-kz9a63p9\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -24,7 +24,7 @@ x═[■]C:\tmp\claude-0\-home-user\88ba927e-44f►work╗x═C:\tmp\claude-0\-h
 ║                  │                  │          ║║                  │                  │          ▒
 ║                  │                  │          ║║                  │                  │          ▼
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
-║..            <UP--DIR>  0.00.00  0:00          ║║..            <UP--DIR>  0.00.00  0:00          ║
+║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\claude-0\-home-user\88ba927e-44f7-589►work>
+C:\tmp\dntour-kz9a63p9\work>
  F1 Help

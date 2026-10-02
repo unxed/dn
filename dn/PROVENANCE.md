@@ -6,7 +6,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 | Class | Files |
 |---|---|
 | Our files (MIT, see `LICENSE`) | 20 |
-| Carved (the license of DN) | 3 |
+| Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 121 |
 | Contributors of DN OSP | 4 |
 | Upstream without a notice | 17 |
@@ -21,7 +21,7 @@ Written by us: the replacements of the units that were excluded (their code is o
 
 The classes of DN itself (not of Borland) that were cut out of the files excluded as a whole (`bootstrap/carve.list`), then rewritten where the audit asked for it (`bootstrap/rewrite/`). The notice of RIT Labs stays in the head.
 
-`dncolor.pas`, `dndlgs.pas`, `dnstrl.pas`
+`dncolor.pas`, `dndlgs.pas`, `dnpalet.pas`, `dnstrl.pas`
 
 ## Code of DN (the license of DN)
 

@@ -6,3 +6,5 @@ DNDlgs <- DIALOGS.PAS : TComboBox, THexLine, TParamText, TBookmark, TPage, TPage
 DNStrL <- COLLECT.PAS : TStringList ; uses: Defines, Objects2, Streams, Advance1 ; types: TStrIndexRec, PStrIndex, TStrIndex
 # T_BWSelector: a DN selector of the black and white colors over the TMonoSelector of tv/
 DNColor <- COLORSEL.PAS : T_BWSelector ; uses: Defines, Streams, Drivers, Views, Commands, Dialogs, TvColorSel
+# the palettes of DN (the color tables of the program: DN has some 200 entries, the TV 1.0 palette has 63): DN data, not Borland's code
+DNPalet <- DNAPP.PAS : - ; uses: Defines ; consts: CColor, CBlackWhite, CMonochrome
