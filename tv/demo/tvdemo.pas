@@ -1,6 +1,7 @@
 program tvdemo;
 { Demo of the Turbo Vision port: windows with scrollers, menus, a status line.
-  With /auto it types a few keys itself, writes the screen to SCR.DAT and quits (CI). }
+  With /auto it types a few keys itself, writes the screen to SCR.DAT and quits (CI).
+  /437 selects the code page 437 instead of 866. }
 {$I ../src/tvdefs.inc}
 uses TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvDrawBuf, TvScreen, TvViews, TvWindow,
   TvMenus, TvSys, TvApp, TvDos;
@@ -166,12 +167,27 @@ begin
   end;
 end;
 
+function HasParam(const P: string): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if ParamStr(I) = P then
+      Result := True;
+end;
+
 var
   App: TDemoApp;
   Auto: Boolean;
 begin
-  Auto := (ParamCount > 0) and (ParamStr(1) = '/auto');
-  DosInit;
+  Auto := HasParam('/auto');
+  { the text is Russian: CP866 unless /437 (the code page of the video font is the
+    setting of the program: DOS says 437 until it is changed with CHCP) }
+  if HasParam('/437') then
+    DosInit(437)
+  else
+    DosInit(866);
   App.Init(Auto);
   if Auto then
   begin
