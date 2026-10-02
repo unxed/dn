@@ -52,6 +52,11 @@ function MemStr(Linear: LongInt): String;
   block before and from it after every intr_realmode (so code written for a flat memory works as it is). }
 procedure getdosmem(var Seg: SmallWord; Size: LongInt);
 function dosseg_linear(Seg: SmallWord): LongInt;
+
+{ The end of the program: restore INT 24h and the exception handlers. Nothing to restore here (the critical error
+  handler is set by VPSysLow.SysDisableHardErrors, the exceptions are those of the FPC runtime). }
+procedure remove_i24;
+procedure RemoveDpmi32ExceptionHandlers;
 function DosShadow(Seg: SmallWord): Pointer;
 
 implementation
@@ -183,6 +188,14 @@ begin
   Seg := 0;
 end;
 {$ENDIF}
+
+procedure remove_i24;
+begin
+end;
+
+procedure RemoveDpmi32ExceptionHandlers;
+begin
+end;
 
 function dosseg_linear(Seg: SmallWord): LongInt;
 begin

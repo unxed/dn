@@ -90,7 +90,7 @@ begin
   M.Seek(0);
   L := PDialog(M.Get);
   Check((L <> nil) and (M.Status = stOk), 'a dialog is loaded');
-  Check((L <> nil) and (L^.Title = 'Options') and (L^.Size.X = 50), 'the window part');
+  Check((L <> nil) and (L^.Title^ = 'Options') and (L^.Size.X = 50), 'the window part');
   Find;
   Check(Inp2 <> nil, 'the input line');
   Check((Inp2 <> nil) and (Inp2^.Data^ = 'abc') and (Inp2^.MaxLen = 20),

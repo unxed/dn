@@ -22,7 +22,7 @@ unit TvWindow;
 interface
 
 uses
-  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen, TvObjs, TvViews;
+  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen, TvObjs, TvViews, TvUtil;
 
 const
   { window flags }
@@ -134,7 +134,7 @@ type
     Number: Integer;
     Palette: Integer;
     Frame: PFrame;
-    Title: ShortString;
+    Title: PStr;   { as in Borland TV: a heap string (NewStr/DisposeStr), nil = none; DN changes it directly }
     constructor Init(const Bounds: TRect; const ATitle: ShortString; ANumber: Integer);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -826,7 +826,7 @@ begin
   ZoomRect := GetBounds;
   Number := ANumber;
   Palette := wpBlueWindow;
-  Title := ATitle;
+  Title := NewStr(ATitle);
   State := State or sfShadow;
   Options := Options or (ofSelectable or ofTopSelect);
   GrowMode := gfGrowAll or gfGrowRel;
@@ -841,6 +841,8 @@ begin
   { the frame is destroyed with the other subviews }
   Frame := nil;
   inherited Done;
+  DisposeStr(Title);
+  Title := nil;
 end;
 
 procedure TWindow.InitFrame;
@@ -872,7 +874,10 @@ end;
 
 function TWindow.GetTitle(MaxSize: Integer): ShortString;
 begin
-  Result := Title;
+  if Title <> nil then
+    Result := Title^
+  else
+    Result := '';
 end;
 
 procedure TWindow.HandleEvent(var Event: TEvent);
@@ -1060,7 +1065,7 @@ begin
   S.Read(Number, SizeOf(Number));
   S.Read(Palette, SizeOf(Palette));
   Frame := PFrame(ReadChildPtr(S));
-  S.ReadStrV(Title);
+  Title := S.ReadStr;
 end;
 
 procedure TWindow.Store(var S: TStream);
@@ -1071,7 +1076,7 @@ begin
   S.Write(Number, SizeOf(Number));
   S.Write(Palette, SizeOf(Palette));
   PutSubViewPtr(S, Frame);
-  S.WriteStr(@Title);
+  S.WriteStr(Title);
 end;
 
 function BuildFrame(var S: TStream): PObject;

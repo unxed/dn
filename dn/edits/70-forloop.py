@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """reason: (д) the modern compiler. VP lets a for loop change its variable (`Inc(j); Break;`); FPC does not.
 In filediz.pas the changed value is never read (j is assigned again before it is used), so the statement goes.
+In decoder.pas (IPrefixes) `i := 255` restarts the scan (the Byte counter wraps to 0): a while loop with Inc(i).
 In fbb.pas the loop that repeats an item by `Dec(i)` becomes a while loop.
 usage: 70-forloop.py FILE...   (all the .pas of the tree)"""
 import re, sys, os
 for p in sys.argv[1:]:
     b = os.path.basename(p).lower()
-    if b not in ('filediz.pas', 'fbb.pas'):
+    if b not in ('filediz.pas', 'fbb.pas', 'decoder.pas'):
         continue
     s = open(p, 'rb').read().decode('latin-1')
-    if b == 'filediz.pas':
+    if b == 'decoder.pas':
+        s2 = re.sub(r'(procedure IPrefixes;.*?)for i := 0 to PrefN do(\r?\n)', r'\1i := 0;\2    while i <= PrefN do\2      begin', s, count=1, flags=re.S)
+        s2 = re.sub(r'(        i := 255;\r?\n        end;\r?\n)(    end \{ IPrefixes \};)', r'\1      Inc(i);\n      end;\n\2', s2, count=1)
+    elif b == 'filediz.pas':
         s2 = re.sub(r'(NameEnd := j;\r?\n)[ \t]*Inc\(j\);\r?\n([ \t]*Break;)', r'\1\2', s, count=1)
     else:
         # fbb.pas MaxWrite: `for i := 1 to NBf do begin ... Dec(i); end` repeats the item: a while loop
