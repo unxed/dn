@@ -1,7 +1,9 @@
 DN (Dos Navigator Open Source 2.14) built by this repository for DOS (32-bit protected mode, DJGPP go32v2), on our
 Pascal translation of Turbo Vision (magiblot/tvision) and our replacement of the Virtual Pascal layer.
-Status: EXPERIMENTAL. It starts, shows two file panels, the menu (F10), the status line and the command line;
-a lot does not work yet (see the repository: PLAN.md, dn/TODO-later.md). Do not trust it with real data.
+Status: EXPERIMENTAL. It starts, shows two file panels, the menu (F10), the status line and the command line; copy, delete,
+make directory, the viewer (F3), the editor (F4), disk information (Ctrl-L), the user screen (Ctrl-O) and running programs work
+in the first tries. Not done: the help (F1), the mouse was not tried, the saved desktop, a lot of details (see the repository:
+PLAN.md, dn/TODO-later.md). Do not trust it with real data.
 
 Files
   DN.EXE            the program (a stripped build, no source line numbers)
