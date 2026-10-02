@@ -5,23 +5,11 @@ uses SysUtils, TvGeom, TvCell, TvCodePg, TvEvents, TvKeys, TvViews, TvObjs, TvUt
 {$I testlib.inc}
 
 var
-  Probes: array[0..15] of Int64;
-  NProbes: Integer = 0;
   Used0: PtrUInt;
   App: PApplication;
   Dlg: PFileDialog;
   Orig, Base: ShortString;
   E: TEvent;
-
-{ the heap in use since the start, kept for the report when memory is left behind }
-procedure Probe;
-begin
-  if NProbes <= High(Probes) then
-  begin
-    Probes[NProbes] := Int64(GetFPCHeapStatus.CurrHeapUsed) - Int64(Used0);
-    Inc(NProbes);
-  end;
-end;
 
 procedure Touch(const FileName: ShortString);
 var
@@ -81,12 +69,13 @@ begin
   Touch('c.dat');
   MkDir('sub');
 
+  HeapMark(-1);            { -1: the files are made }
   MemInit(80, 25);
   New(App, Init);
   New(Dlg, Init('*.txt', 'Open a file', '~N~ame', fdOpenButton or fdHelpButton, 1));
-  Probe;                   { 0: the dialog is made }
+  HeapMark(0);                   { the dialog is made }
   App^.InsertWindow(Dlg);
-  Probe;                   { 1: it is shown }
+  HeapMark(1);                   { it is shown }
 
   Check(Dlg^.FileName^.Data^ = '*.txt', 'the input line holds the mask');
   Check(Dlg^.FileList^.Range = 4, 'two files, a directory and ".." are listed');
@@ -115,14 +104,14 @@ begin
   Check(Dlg^.Valid(cmOK), 'a new file name is valid too');
   Check(Dlg^.Valid(cmCancel), 'Cancel is valid');
 
-  Probe;                   { 2: after the typing, a file name }
+  HeapMark(2);                   { after the typing, a file name }
   { a mask }
   Dlg^.FileName^.Data^ := '*.dat';
   Check(not Dlg^.Valid(cmOK), 'a mask is not a result');
   Check(Same(Dlg^.WildCard, '*.dat') and (Dlg^.FileList^.Range = 3), 'it rereads the directory');
   Check(Same(Dlg^.FileList^.GetText(0, 255), 'c.dat'), 'with the files of the mask');
 
-  Probe;                   { 3: after the mask }
+  HeapMark(3);                   { after the mask }
   { a directory }
   Dlg^.FileName^.Data^ := 'sub';
   Check(not Dlg^.Valid(cmOK), 'a directory is not a result');
@@ -132,7 +121,7 @@ begin
   Check(not Dlg^.Valid(cmOK), 'go up');
   Check(Dlg^.FileList^.Range = 3, 'the list is the one of the parent directory again');
 
-  Probe;                   { 4: after the directories }
+  HeapMark(4);                   { after the directories }
   { an invalid name: a message box with OK }
   Dlg^.FileName^.Data^ := 'na|me';
   MemKey(kbEnter);
@@ -147,11 +136,11 @@ begin
   Check(E.What = evNothing, 'a double click is handled');
   Check(Dlg^.FileList^.SearchPos = -1, 'no search is running');
 
-  Probe;                   { 5: after the message box }
+  HeapMark(5);                   { after the message box }
   Dispose(App, Done);
-  Probe;                   { 6: the application is disposed }
+  HeapMark(6);                   { the application is disposed }
   MemDone;
-  Probe;                   { 7: the screen is freed }
+  HeapMark(7);                   { the screen is freed }
   ChDir(Orig);
   ChDir(Base);
   Cleanup;
@@ -159,24 +148,16 @@ begin
   RemoveDir(Base);
 end;
 
-var
-  N: Integer;
-
 begin
   { the RTL allocates some state at the first use: not a leak }
   Base := FExpand('x');
   Base := GetCurDir;
   IsDir('.');
   Used0 := GetFPCHeapStatus.CurrHeapUsed;
+  HeapBase;
   Run;
+  HeapMark(8);               { 8: the test is over }
   Check(DirGone(Base), 'the test directory is removed');
   Check(GetFPCHeapStatus.CurrHeapUsed = Used0, 'no memory is left behind');
-  if GetFPCHeapStatus.CurrHeapUsed <> Used0 then
-  begin
-    Write('heap since the start:');
-    for N := 0 to NProbes - 1 do
-      Write(' ', Probes[N]);
-    WriteLn(' end ', Int64(GetFPCHeapStatus.CurrHeapUsed) - Int64(Used0));
-  end;
   Finish;
 end.
