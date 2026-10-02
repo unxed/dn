@@ -55,6 +55,7 @@ type
     DirectLink: array[1..9] of PView;
     constructor Init(const Bounds: TRect; const ATitle: ShortString);
     constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function Valid(Command: Word): Boolean; virtual;
@@ -649,9 +650,23 @@ end;
 
 { --- Streams ------------------------------------------------------------------ }
 
+{ DirectLink (DN) follows the views of the group in the stream: the numbers of the controls in the dialog (0 = none) }
 constructor TDialog.Load(var S: TStream);
+var
+  I: Integer;
 begin
   inherited Load(S);
+  for I := 1 to 9 do
+    DirectLink[I] := ReadChildPtr(S);
+end;
+
+procedure TDialog.Store(var S: TStream);
+var
+  I: Integer;
+begin
+  inherited Store(S);
+  for I := 1 to 9 do
+    PutSubViewPtr(S, DirectLink[I]);
 end;
 
 constructor TStaticText.Load(var S: TStream);
