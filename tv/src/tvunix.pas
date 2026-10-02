@@ -28,6 +28,10 @@ interface
 function UnixInit: Boolean;
 procedure UnixDone;
 function UnixActive: Boolean;
+{ The terminal is given back for a while (a program is run that uses it): the alternate screen is left and the mode of the
+  terminal is restored; UnixResume takes the terminal again and the whole screen is drawn again at the next update. }
+procedure UnixSuspend;
+procedure UnixResume;
 
 { For tests: the bytes of the output that were not written yet, and writing them. }
 procedure UnixFlush;
@@ -424,6 +428,45 @@ begin
   Result := Active;
 end;
 
+procedure UnixSuspend;
+begin
+  if not Active then
+    Exit;
+  UnixFlush;
+  RestoreTerminal;
+end;
+
+procedure UnixResume;
+var
+  Raw: Termios;
+  Seq: string;
+begin
+  if not Active then
+    Exit;
+  TCGetAttr(0, SavedTios);
+  Raw := SavedTios;
+  CFMakeRaw(Raw);
+  Raw.c_cc[VMIN] := 1;
+  Raw.c_cc[VTIME] := 0;
+  TCSetAttr(0, TCSANOW, Raw);
+  Seq := #27'[?1049h'#27'[?7l';
+  WriteAll(@Seq[1], Length(Seq));
+  Seq := SeqKeyModsOn;
+  WriteAll(@Seq[1], Length(Seq));
+  if MouseOn then
+  begin
+    Seq := SeqMouseOn;
+    WriteAll(@Seq[1], Length(Seq));
+  end;
+  InPos := 0;
+  InLen := 0;
+  FillChar(InState, SizeOf(InState), 0);
+  FillChar(MState, SizeOf(MState), 0);
+  MouseQueueReset;
+  NewScreen;                              { the size may have changed; nothing is known on the screen: all is drawn }
+  Dirty := True;
+end;
+
 function UnixInit: Boolean;
 var
   Raw: Termios;
@@ -513,6 +556,14 @@ begin
 end;
 
 {$ELSE}
+
+procedure UnixSuspend;
+begin
+end;
+
+procedure UnixResume;
+begin
+end;
 
 function UnixInit: Boolean;
 begin

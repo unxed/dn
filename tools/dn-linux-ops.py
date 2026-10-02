@@ -9,7 +9,7 @@ import tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
-F = {'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~',
+F = {'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~', 'F10': '\x1b[21~',
      'DOWN': '\x1b[B', 'UP': '\x1b[A', 'ENTER': '\r', 'HOME': '\x1b[H', 'END': '\x1b[F', 'ESC': '\x1b', 'ALT-X': '\x1bx', 'TAB': '\t', 'CTRL-R': '\x12', 'INS': '\x1b[2~'}
 fails = count = 0
 
@@ -104,9 +104,21 @@ def main():
         key('\x1b[1;3P'); key('DOWN'); key('ENTER', 1.0)
         check('TEMP:' in t.text().split('\n')[1] and t.alive(), 'Alt-F1: the drive TEMP: opens without an error', t.text())
 
-        key('ALT-X'); key('ENTER', 0.8)
-        status = t.close(2)
-        check(status == 0, 'Alt-X ends the program (status %r)' % (status,))
+        # a command of the command line: the terminal is given to the shell, Enter returns to DN (it hung before)
+        key('echo ran-ok > ran.txt; echo shown-ok'); key('ENTER', 1.5)
+        check('shown-ok' in t.text() and 'Press Enter' in t.text(), 'a command: its output is on the screen and DN waits for Enter', t.text())
+        key('ENTER', 1.5)
+        check(os.path.isfile(os.path.join(w, 'ran.txt')) and open(os.path.join(w, 'ran.txt')).read() == 'ran-ok\n', 'the command was run in the directory of the panel')
+        check('Name' in t.text() and t.alive(), 'DN is back with its panels', t.text())
+
+        # the Info panel is on at the end: quitting disposes the windows (TGroup.Done followed a view that had been disposed: Access violation)
+        key('\x1b'); key('F10'); [key('\x1b[C', 0.2) for _ in range(5)]; [key('DOWN', 0.2) for _ in range(3)]; key('ENTER', 1.0)
+        check(t.alive() and 'Current directory' in t.text(), 'the Info panel is on', t.text())
+
+        key('ALT-X'); key('ENTER', 1.5)
+        scr = t.text()
+        status = t.close(4)
+        check(status == 0, 'Alt-X ends the program (status %r)' % (status,), scr)
     finally:
         shutil.rmtree(d, ignore_errors=True)
     print('ALL OK (%d checks)' % count if not fails else '%d of %d checks FAILED' % (fails, count))

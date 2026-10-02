@@ -1851,7 +1851,7 @@ end;
 
 destructor TGroup.Done;
 var
-  P, T: PView;
+  P: PView;
 begin
   Hide;
   P := Last;
@@ -1861,11 +1861,10 @@ begin
       P^.Hide;
       P := P^.Prev;
     until P = Last;
-    repeat
-      T := P^.Prev;
-      Dispose(P, Done);
-      P := T;
-    until Last = nil;
+    { the top view is disposed again and again, not a view that was taken before: the Done of a view may dispose another
+      view of the group (DN: a panel disposes its info panel), which would leave the remembered one dangling }
+    while Last <> nil do
+      Dispose(Last, Done);
   end;
   FreeBuffer;
   Current := nil;
