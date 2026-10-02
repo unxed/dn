@@ -1,5 +1,12 @@
 # License of the files of `dn/`
 
+Why two licenses can live in one program: the license of DN OSP (RIT Research Labs) binds the DN code and *its versions and
+derivatives* ("the licence and distribution terms for any publically available version or derivative of this code cannot be
+changed", in the head of every file). It does not reach a separate file that is not derived from that code, even if the
+program that is linked of both is one: the files are separate works, each under its own license. So the rule is by file:
+a file that is DN code (or an edit of it, or a piece cut out of it) stays under the license of DN; a file that we wrote
+without taking DN code is MIT, whatever the program does with it.
+
 Two licenses live in `dn/src`; the file `PROVENANCE.md` says which file is under which.
 
 1. **Our files** ("Our files" in `PROVENANCE.md`): MIT, the root file [`../LICENSE`](../LICENSE). New files added to `dn/`
