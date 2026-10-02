@@ -20,7 +20,7 @@ KEYS = {
     'INSERT-KEY': '\x1b[2~', 'PLUS': '+', 'MINUS': '-', 'STAR': '*',
 }
 SCEN = [
-    ('start', ''), ('tab', 'TAB'), ('f1help', 'ESC F1'), ('f2user', 'F2'), ('f3view', 'DOWN DOWN F3'), ('f4edit', 'DOWN DOWN F4'),
+    ('start', ''), ('tab', 'TAB'), ('f1help', 'F1'), ('f2user', 'F2'), ('f3view', 'DOWN DOWN F3'), ('f4edit', 'DOWN DOWN F4'),
     ('f5copy', 'F5'), ('f6ren', 'F6'), ('f7mkdir', 'F7'), ('f8del', 'DOWN DOWN F8'), ('altf1drive', 'ALT-F1'), ('altf7find', 'ALT-F7'),
     ('altf10tree', 'ALT-F10'), ('ctrll', 'CTRL-L'), ('ctrlo', 'CTRL-O'), ('insert', 'INS INS'), ('plus', 'PLUS'),
     ('menudisk', 'F10 RIGHT DOWN'), ('menuutil', 'F10 RIGHT RIGHT DOWN'), ('menupanel', 'F10 RIGHT RIGHT RIGHT DOWN'),
@@ -46,6 +46,7 @@ def run(out, name, spec, cols=100, rows=30):
             open(os.path.join(d, 'work', n), 'w').write(c)
         t = PtyTerm(['./dn'], cols, rows, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'))
         t.pump(1.5, 6)
+        t.send('\x1b', 0.5)             # the beta notice (a box with OK) is closed by Esc
         for k in tokens(spec):
             t.send(k, 0.5)
         t.pump(0.8, 4)
