@@ -108,9 +108,13 @@ uses
 
 function ErrorOfFile: LongInt;
 begin
+{$IFDEF GO32V2}
+  Result := 2;                     { the RTL of go32v2 has no GetLastOSError }
+{$ELSE}
   Result := GetLastOSError;
   if Result = 0 then
     Result := 2;
+{$ENDIF}
 end;
 
 function SysFileOpen(FileName: PChar; Mode: LongInt; var Handle: LongInt): LongInt;
