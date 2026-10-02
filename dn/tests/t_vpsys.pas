@@ -1,7 +1,7 @@
 program t_vpsys;
 { Tests of dn/new/vpsyslow.pas (the system layer of DN on Free Pascal). }
 {$mode objfpc}{$H-}
-uses SysUtils, Strings, VPSysLow;
+uses SysUtils, Strings, VPSysLow, TvScreen, TvCell, TvColors;
 {$I dntest.inc}
 
 var
@@ -13,6 +13,10 @@ var
   Drives: LongWord;
   P: array[0..255] of Char;
   Rc: LongInt;
+  Pt: TSysPoint;
+  Cells: PWord;
+  CX, CY, Y1, Y2: SmallWord;
+  Vis: Boolean;
   HI, Act: LongInt;
   Srch: TOSSearchRec;
 
@@ -93,5 +97,29 @@ begin
   { running a program that is not there: an error code, not an exception }
   Rc := SysExecute('no_such_program_vpsys', '', nil, False, nil, -1, -1, -1);
   Check(Rc <> 0, 'running a missing program gives an error code');
+  { the screen: a copy of 16-bit cells, written back to the screen of tv/ }
+  ScreenCreate(80, 25);
+  Check(SysTvGetScrMode(@Pt, True) = 3, 'SysTvGetScrMode: 80x25 is the mode 3');
+  Check((Pt.X = 80) and (Pt.Y = 25), 'SysTvGetScrMode gives the size');
+  SysTvClrScr;
+  Cells := SysTvGetSrcBuf;
+  Check((Cells <> nil) and (Cells[0] = $0720) and (Cells[80 * 25 - 1] = $0720), 'SysTvClrScr: blanks, attribute 7');
+  Cells[81] := $1E41;                                    { 'A' at (1,1) }
+  SysTvShowBuf(81, 1);
+  Check((ScreenBuffer[81].Character.Text[0] = Ord('A')) and (AttrAsBIOSByte(ScreenBuffer[81].Attribute) = $1E),
+    'SysTvShowBuf writes the cells to the screen of tv/');
+  Cells := SysTvGetSrcBuf;
+  Check(Cells[81] = $1E41, 'SysTvGetSrcBuf reads them back');
+  SysTvSetCurPos(5, 7);
+  SysGetCurPos(CX, CY);
+  Check((CX = 5) and (CY = 7), 'cursor position');
+  SysTvSetCurType(14, 15, True);
+  SysTvGetCurType(Y1, Y2, Vis);
+  Check(Vis and (Y2 = 15) and (Y1 = 14), 'cursor type round trip');
+  SysTvSetCurType(0, 0, False);
+  SysTvGetCurType(Y1, Y2, Vis);
+  Check(not Vis, 'hidden cursor');
+  Check(SysSetVideoMode(80, 25) and not SysSetVideoMode(80, 50), 'SysSetVideoMode: only the size that is there');
+  ScreenDestroy;
   Finish;
 end.

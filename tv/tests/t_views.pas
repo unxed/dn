@@ -120,6 +120,7 @@ end;
 var
   Bg, A, B, E, F, C: PFill;
   Rc: TRect;
+  Pt, Pt2: TPoint;
   Ev: TEvent;
   Cmds: TCommandSet;
   Min, Max: TPoint;
@@ -366,6 +367,19 @@ begin
   Check(AttrEq(V1^.MapColor(0), ErrorAttr), 'color 0 is the error color');
   Check(PaletteSize(MakePalette(#1#2#3)) = 3, 'palette size');
   Check(V1^.GetColorW(1) = $0007, 'GetColorW: the BIOS attribute of the color');
+  Dispose(V1, Done);
+
+  { the procedure forms of Borland Pascal }
+  New(V1, Init(R(3, 2, 9, 5), 'p', $07));
+  V1^.GetBounds(Rc);
+  Check((Rc.A.X = 3) and (Rc.B.Y = 5), 'GetBounds(var R)');
+  V1^.GetExtent(Rc);
+  Check((Rc.A.X = 0) and (Rc.B.X = 6) and (Rc.B.Y = 3), 'GetExtent(var R)');
+  Pt.X := 1; Pt.Y := 1;
+  V1^.MakeGlobal(Pt, Pt2);
+  Check(PointEq(V1^.MakeGlobal(Pt), Pt2), 'MakeGlobal(Source, var Dest)');
+  V1^.MakeLocal(Pt2, Pt);
+  Check((Pt.X = 1) and (Pt.Y = 1), 'MakeLocal(Source, var Dest)');
   Dispose(V1, Done);
 
   { the 16-bit interface of Borland Pascal: Word cells and BIOS attributes }

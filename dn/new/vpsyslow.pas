@@ -6,9 +6,10 @@
   Virtual Pascal sources.
 
   Done here: the types, the open mode constants, the file, disk and system functions that DN calls on
-  the DOS target (DPMI32). The screen, keyboard and mouse functions (SysTv*, SysSetVideoMode) are not
-  here: in DN they serve its own drivers.pas and videoman.pas, which have to be fitted to our TV (tv/)
-  (PLAN.md, milestone 4). }
+  the DOS target (DPMI32), and the screen functions of its videoman.pas (SysTv*, SysSetVideoMode) over
+  TvScreen of tv/. The screen of DN is an array of 16-bit cells (character + BIOS attribute); here it is
+  a copy that is made from the screen of tv/ when DN asks for it and goes back to it by SysTvShowBuf.
+  The keyboard and the mouse are done by tv/ (TvSys): SysTvKbd*, SysTvDetectMouse do nothing. }
 unit VPSysLow;
 
 {$mode objfpc}
@@ -36,6 +37,28 @@ const
   Open_Share_DenyWrite     = $20;
   Open_Share_DenyRead      = $30;
   Open_Share_DenyNone      = $40;
+
+{ --- the screen (a copy of the screen of tv/ in 16-bit cells) ---------------------- }
+
+{ The size of the screen; the result is the mode of DN: 3 (80x25 and the like) or $0103 (more lines, small
+  font). Size may be nil. }
+function SysTvGetScrMode(Size: PSysPoint; Flag: Boolean): Word;
+function SysTvSetScrMode(Mode: Word): Boolean;
+function SysSetVideoMode(Cols, Rows: Word): Boolean;
+{ The screen as an array of 16-bit cells; it is filled from the screen of tv/ at every call. }
+function SysTvGetSrcBuf: Pointer;
+{ Writes Size cells from the position Pos (the number of the cell) of that array to the screen of tv/. }
+procedure SysTvShowBuf(Pos, Size: LongInt);
+procedure SysTvClrScr;
+procedure SysTvInitCursor;
+procedure SysTvGetCurType(var Y1, Y2: SmallWord; var Visible: Boolean);
+procedure SysTvSetCurType(Y1, Y2: SmallWord; Visible: Boolean);
+procedure SysTvSetCurPos(X, Y: SmallWord);
+procedure SysGetCurPos(var X, Y: SmallWord);
+procedure SysTvKbdInit;
+procedure SysTvKbdDone;
+procedure SysTvDetectMouse;
+procedure SysTvHideMouse;
 
 { --- files -------------------------------------------------------------------- }
 { The result is 0 when done, else the error code of the system (DOS codes: 2 no such file, 3 no such
@@ -101,7 +124,7 @@ procedure SysCtrlSetCBreakHandler;
 implementation
 
 uses
-  SysUtils, Dos
+  SysUtils, Dos, TvCell, TvColors, TvScreen
 {$IFDEF GO32V2}, go32{$ENDIF};
 
 { --- files -------------------------------------------------------------------- }
@@ -233,6 +256,150 @@ begin
   Result := 0;                 { no devices to tell from files on the systems of the tests }
 end;
 {$ENDIF}
+
+{ --- the screen ---------------------------------------------------------------- }
+
+const
+  FontHeight = 16;                 { the lines of a character cell; the caret size of tv/ is in percent }
+
+var
+  CellCopy: array of Word;
+
+function SysTvGetScrMode(Size: PSysPoint; Flag: Boolean): Word;
+begin
+  if Size <> nil then
+  begin
+    Size^.X := ScreenWidth;
+    Size^.Y := ScreenHeight;
+  end;
+  if ScreenHeight > 25 then
+    Result := $0103
+  else
+    Result := 3;
+end;
+
+function SysTvSetScrMode(Mode: Word): Boolean;
+begin
+  Result := True;                  { TODO: the size of the screen is the business of tv/ }
+end;
+
+function SysSetVideoMode(Cols, Rows: Word): Boolean;
+begin
+  Result := (ScreenWidth = Cols) and (ScreenHeight = Rows);
+end;
+
+function SysTvGetSrcBuf: Pointer;
+var
+  I, N: Integer;
+  C: PScreenCell;
+begin
+  N := ScreenWidth * ScreenHeight;
+  if Length(CellCopy) <> N then
+    SetLength(CellCopy, N);
+  C := ScreenBuffer;
+  for I := 0 to N - 1 do
+  begin
+    if (C <> nil) and (ScLength(C^.Character) = 1) then
+      CellCopy[I] := C^.Character.Text[0] or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
+    else if C <> nil then
+      CellCopy[I] := Ord('?') or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
+    else
+      CellCopy[I] := $0720;
+    if C <> nil then
+      Inc(C);
+  end;
+  if N = 0 then
+    Exit(nil);
+  Result := @CellCopy[0];
+end;
+
+procedure SysTvShowBuf(Pos, Size: LongInt);
+var
+  Row: array of TScreenCell;
+  X, Y, N, I: Integer;
+begin
+  if (ScreenWidth <= 0) or (Length(CellCopy) = 0) then
+    Exit;
+  SetLength(Row, ScreenWidth);
+  while (Size > 0) and (Pos < Length(CellCopy)) do
+  begin
+    Y := Pos div ScreenWidth;
+    X := Pos mod ScreenWidth;
+    N := ScreenWidth - X;
+    if N > Size then
+      N := Size;
+    for I := 0 to N - 1 do
+      Row[I] := CellFromBIOS(CellCopy[Pos + I]);
+    if ScreenBuffer <> nil then
+      Move(Row[0], (ScreenBuffer + Y * ScreenWidth + X)^, N * SizeOf(TScreenCell));
+    ScreenWrite(X, Y, @Row[0], N);
+    Inc(Pos, N);
+    Dec(Size, N);
+  end;
+end;
+
+procedure SysTvClrScr;
+var
+  I: Integer;
+begin
+  SetLength(CellCopy, ScreenWidth * ScreenHeight);
+  for I := 0 to High(CellCopy) do
+    CellCopy[I] := $0720;
+  SysTvShowBuf(0, Length(CellCopy));
+end;
+
+procedure SysTvInitCursor;
+begin
+end;
+
+procedure SysTvGetCurType(var Y1, Y2: SmallWord; var Visible: Boolean);
+var
+  H: Integer;
+begin
+  Visible := CaretSize > 0;
+  H := (CaretSize * FontHeight + 99) div 100;
+  if H < 1 then
+    H := 1;
+  Y2 := FontHeight - 1;
+  Y1 := FontHeight - H;
+end;
+
+procedure SysTvSetCurType(Y1, Y2: SmallWord; Visible: Boolean);
+begin
+  if not Visible then
+    SetCaretSize(0)
+  else if Y2 >= Y1 then
+    SetCaretSize((Y2 - Y1 + 1) * 100 div FontHeight)
+  else
+    SetCaretSize(CursorLines);
+end;
+
+procedure SysTvSetCurPos(X, Y: SmallWord);
+begin
+  SetCaretPosition(X, Y);
+end;
+
+procedure SysGetCurPos(var X, Y: SmallWord);
+begin
+  X := CaretX;
+  Y := CaretY;
+end;
+
+procedure SysTvKbdInit;
+begin
+end;
+
+procedure SysTvKbdDone;
+begin
+end;
+
+procedure SysTvDetectMouse;
+begin
+end;
+
+procedure SysTvHideMouse;
+begin
+end;
 
 { --- searching a directory ---------------------------------------------------- }
 
