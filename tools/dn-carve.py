@@ -108,6 +108,14 @@ for unit, src, classes, uses, consts, types in specs:
         if re.search(r'\buses\b[^;]*\b%s\b' % unit, code_of(raw), re.I):
             continue
         im = re.search(r'^[ \t]*implementation\b[^\n]*\n', raw, re.I | re.M)
+        if im is None:      # a program: the first uses clause
+            u = re.search(r'\buses\b([^;]*);', raw, re.I)
+            if u:
+                pos = u.end() - 1
+                raw = raw[:pos] + ', ' + unit + raw[pos:]
+                open(os.path.join(tree, f), 'wb').write(raw.encode('latin-1'))
+                added += 1
+            continue
         pos_name = want.search(code_of(raw)).start()
         # the first mention decides: before `implementation` (the interface) or after it
         use_iface = im is not None and re.search(r'\b(%s)\b' % '|'.join(sorted(names | {"P" + c[1:] for c in classes})), code_of(raw[:im.start()])) is not None

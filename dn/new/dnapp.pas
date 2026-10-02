@@ -10,7 +10,7 @@ unit DNApp;
 interface
 
 uses
-  SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, Menus,
+  SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, Menus,
   Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings
 {$IFDEF GO32V2}, TvDos{$ENDIF}, DNErrLog;
 
@@ -359,6 +359,7 @@ end;
 
 initialization
   CommandHiddenHook := @CommandHidden;
+  ListBoxOwnsList := False;       { DN: the owner of the list disposes it }
   CColor := SystemColors[apColor];
   CBlackWhite := SystemColors[apBlackWhite];
   CMonochrome := SystemColors[apMonochrome];

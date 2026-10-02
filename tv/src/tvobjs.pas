@@ -231,6 +231,8 @@ type
   end;
 
 procedure RegisterType(var S: TStreamRec);
+{ DN: registers the record in place of the one that is registered for the same type number (RegisterType keeps the first). }
+procedure ReRegisterType(var S: TStreamRec);
 { The record registered for a type number, nil if none. }
 function FindStreamRec(ObjType: Word): PStreamRec;
 
@@ -285,6 +287,26 @@ procedure RegisterType(var S: TStreamRec);
 begin
   if FindStreamRec(S.ObjType) <> nil then
     Exit;
+  S.Next := Registry;
+  Registry := @S;
+end;
+
+procedure ReRegisterType(var S: TStreamRec);
+var
+  P, L: PStreamRec;
+begin
+  P := Registry;
+  L := nil;
+  while (P <> nil) and (P^.ObjType <> S.ObjType) do
+  begin
+    L := P;
+    P := P^.Next;
+  end;
+  if P <> nil then
+    if L <> nil then
+      L^.Next := P^.Next
+    else
+      Registry := P^.Next;
   S.Next := Registry;
   Registry := @S;
 end;

@@ -29,7 +29,8 @@ for p in sys.argv[1:]:
     nl = '\r\n' if '\r\n' in raw else '\n'
     out = []
     for name, t, has_store in recs:
-        pt = ptr_of(t)
+        pt = 'PR_' + name
+        out.append('type%s  %s = ^%s;%s' % (nl, pt, t, nl))
         out.append('function Build_%s(var S: TStream): PObject;%sbegin%s  Result := PObject(New(%s, Load(S)));%send;%s' % (name, nl, nl, pt, nl, nl))
         if has_store:
             out.append('procedure Store_%s(P: PObject; var S: TStream);%sbegin%s  %s(P)^.Store(S);%send;%s' % (name, nl, nl, pt, nl, nl))

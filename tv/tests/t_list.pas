@@ -53,6 +53,8 @@ var
   L2: PListBox;
   Used0: PtrUInt;
   Rec: TListBoxRec;
+  L3: PListBox;
+  Keep: PCollection;
   E: TEvent;
 
 begin
@@ -157,6 +159,16 @@ begin
   Check((L^.Range = 3) and (L^.Focused = 2), 'SetData replaces the items and focuses one');
   L^.NewList(nil);
   Check((L^.Range = 0) and (L^.List = nil), 'NewList(nil) empties the list');
+
+  Check(SizeOf(TListBoxRec) = SizeOf(Pointer) + 4, 'the data record: a pointer and a 32-bit number, no padding');
+  New(L3, Init(R(0, 0, 10, 3), 1, nil));
+  L3^.NewList(Items(2));
+  Keep := L3^.List;
+  ListBoxOwnsList := False;
+  Dispose(L3, Done);
+  Check(Keep^.Count = 2, 'ListBoxOwnsList = False: Done leaves the list to its owner');
+  Dispose(Keep, Done);
+  ListBoxOwnsList := True;
 
   Dispose(App, Done);
   MemDone;
