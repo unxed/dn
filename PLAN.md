@@ -303,11 +303,13 @@ go32v2-билд (демо `tv/demo`, потом DN), кладёт рядом DPM
 
 ## Открытые вопросы
 
-- **Исключённые аудитом файлы DN (38).** Среди них ядро DN (`DNAPP`, `FVIEWER`, `edwin`, `calendar`, `memory`,
-  `filetype`, `version`...), у многих сходство с Borland 1–6 %, а исключило одно длинное совпадение (`maxrun >= 48`).
-  Предложение: два класса. (а) raw% <= ~6 % — файл остаётся, найденный отрезок вырезается и заменяется нашим текстом правкой в
-  `dn/edits` (в git только наш текст); (б) raw% выше (`scroller`, `DNAPP`, `DNStdDlg`, `helpfile`, `HELPKERN`, `listmakr`,
-  `asciitab` ...) — файл заменяется шимом на tv/ или переписывается. Нужно решение владельца.
+- ~~**Исключённые аудитом файлы DN (38).**~~ Решено (2026-10-02, «Продолжаем»): два класса. Файл остаётся, если
+  `raw% <= 6` и нет совпавшего отрезка >= 48 токенов; совпавшие отрезки заменяются нашим текстом правками `dn/rewrite/*.rw`
+  (`tools/dn-rewrite.py`: якорные строки + sha1 заменяемого, сам заменяемый текст в git не попадает). Остальные (29 файлов:
+  `scroller`, `DNAPP`, `DNStdDlg`, `helpfile`, `HELPKERN`, `listmakr`, `asciitab`, `edwin`, `strview`, `memory`...) —
+  шимы на tv/ или наш код в `dn/new`. Вернулись: `FVIEWER`, `calendar` (с правками), `advance6`, `usersavr`, `TopView_`,
+  `version`, `colorvga`, `filetype`. Аудит дерева после правок (`tools/dn-materialize.sh` + `audit/xclone.py`) не должен
+  показывать файлов за воротами (шаг CI «Files over the gate»).
 
 - Лицензия наших дополнений в `tv/` (`TvSys`, `TvMem`, `TvDos`, `TvMouse`-часть и тесты):
   я поставил MIT с «the authors of the dn project» (`tv/LICENSE`). Подтвердите или
