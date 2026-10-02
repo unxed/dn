@@ -130,11 +130,16 @@ procedure InvalidateTempDir;
   TempDir := GetEnv('TMP');
   if not BadTemp(TempDir) then
     Exit;
+{$IFDEF UNIX}
+  TempDir := 'C:\tmp\';           { Unix: TEMP and TMP are not set by the shell as a rule }
+  if not BadTemp(TempDir) then
+    Exit;
+{$ENDIF}
   TempDir := SourceDir;
   if not BadTemp(TempDir) then
     begin
     TempDir := TempDir+'TEMP';
-    MkDir(SysOsPath(Copy(TempDir, 1, Length(TempDir)-1)));
+    MkDir(SysOsPath(TempDir));          { it was Copy(TempDir, 1, Length(TempDir)-1): the directory TEM was made (the name has no \ at its end) }
     MakeSlash(TempDir);
     ClrIO;
     if not BadTemp(TempDir) then
