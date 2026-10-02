@@ -58,10 +58,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3 patch fp-compiler fp-units-rtl
       - name: Make the tree (DN OSP 2.14)
         run: tools/dn-materialize.sh dnosp214
-      - name: Compile every unit (mode tp), the first errors by kind
-        run: tools/dn-probe.sh tp | tee probe-tp.txt
+      - name: Compile every unit (the options of dn/target.env), the first errors by kind
+        run: tools/dn-probe.sh delphi -Sh- -Rintel -dDPMI32 | tee probe-delphi.txt
       - name: The same in mode objfpc
-        run: tools/dn-probe.sh objfpc | tee probe-objfpc.txt
+        run: tools/dn-probe.sh objfpc -Rintel -dDPMI32 | tee probe-objfpc.txt
       - name: Per unit results
         if: always()
         run: cat build/probe/result.txt | sort | head -300
