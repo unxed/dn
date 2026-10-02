@@ -1,0 +1,190 @@
+RIT    ADVANCE.PAS        
+RIT    ADVANCE2.PAS       
+RIT    ADVANCE3.PAS       
+RIT    ADVANCE7.PAS       
+RIT    ARCHDET.PAS        
+RIT    ARCHIVER.PAS       
+RIT    ARC_7Z.PAS         
+RIT    ARC_IS3.PAS        
+RIT    ARC_RAR.PAS        
+RIT    ARC_TGZ.PAS        
+RIT    ARVID.PAS          
+RIT    ARVIDAVT.PAS       
+RIT    ARVIDTDR.PAS       
+RIT    COLLECT.PAS        
+RIT    Calc.PAS           
+THIRD  Calculat.pas       //  Any Copyright notices in the code are not to be removed.
+RIT    DBVIEW.PAS         
+RIT    DBWATCH.PAS        
+RIT    DIALOGS.PAS        
+RIT    DISKINFO.PAS       
+RIT    DN1.PAS            
+RIT    DNAPP.PAS          
+THIRD  DNFuncs.pas        Written by Cat 2:5030/1326.13
+RIT    DNStdDlg.pas       
+RIT    DNUTIL.PAS         
+RIT    DblWnd.pas         
+RIT    EDITOR.PAS         
+NONE   Events.inc         
+RIT    FBB.PAS            
+RIT    FILECOPY.PAS       
+RIT    FLTools.pas        
+RIT    FSTORAGE.PAS       
+RIT    FVIEWER.PAS        
+RIT    HELPKERN.PAS       
+RIT    MICROED.PAS        
+RIT    MICROED2.PAS       
+RIT    PRINTMAN.PAS       
+RIT    PROFILE.PAS        
+RIT    RSTRINGS.PAS       
+NONE   STREAMS.PAS        
+NONE   TopView_.PAS       
+RIT    USERMENU.PAS       
+RIT    UUCODE.PAS         
+RIT    U_KEYMAP.PAS       
+RIT    U_MYAPP.PAS        
+NONE   XCode.pas          
+RIT    XDblWnd.pas        
+THIRD  _apps.pas          Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _collect.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _defines.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _dialogs.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _dnfuncs.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _drives.pas        Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _editors.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _fviewer.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _gauge.pas         Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _menus.pas         Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _model1.pas        Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _model2.pas        Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _objects.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _regexp.pas        Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _streams.pas       Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _views.pas         Copyright (C) 2002 Aleksej Kozlov (Cat)
+THIRD  _vmtreg.pas        Copyright (C) 2002 Aleksej Kozlov (Cat)
+RIT    advance1.pas       
+RIT    advance4.pas       
+RIT    advance6.pas       
+RIT    arc_ace.pas        
+RIT    arc_ain.pas        
+RIT    arc_arc.pas        
+RIT    arc_bs2.pas        
+RIT    arc_bsa.pas        
+RIT    arc_bz2.pas        
+RIT    arc_cab.pas        
+RIT    arc_chz.pas        
+RIT    arc_ha.pas         
+RIT    arc_hap.pas        
+RIT    arc_hpk.pas        
+RIT    arc_hyp.pas        
+RIT    arc_lha.pas        
+RIT    arc_lim.pas        
+RIT    arc_qrk.pas        
+RIT    arc_sqz.pas        
+RIT    arc_tar.pas        
+RIT    arc_uc2.pas        
+RIT    arc_ufa.pas        
+RIT    arc_zip.pas        
+RIT    arc_zoo.pas        
+RIT    arc_zxz.pas        
+RIT    archread.pas       
+RIT    archset.pas        
+RIT    arcview.pas        
+RIT    asciitab.pas       
+RIT    calendar.pas       
+NONE   callspcb.pas       
+RIT    ccalc.pas          
+RIT    cellscol.pas       
+RIT    cmdline.pas        
+RIT    colors.pas         
+RIT    colorsel.pas       
+RIT    colorvga.pas       
+RIT    commands.pas       
+NONE   copyini.pas        
+RIT    decoder.pas        
+RIT    defcoll.pas        
+NONE   defines.pas        
+RIT    diskimg.pas        
+RIT    dn.pas             
+RIT    dnexec.pas         
+RIT    dnhelp.pas         
+RIT    dnini.pas          
+RIT    dnini_p.pas        
+THIRD  dnpmapil.pas       //█      by Jaroslaw Osadtchiy (JO), 2:5030/1082.53       █
+RIT    drivers.pas        
+RIT    drivers2.pas       
+RIT    drives.pas         
+THIRD  eaoper.pas         {  Extended Attributes handling library (c) 2000 by Alexander Trunov [2:5069/10, jnc@os2.ru]}
+RIT    ed2.pas            
+RIT    edwin.pas          
+RIT    eraser.pas         
+NONE   errmess.pas        
+RIT    filediz.pas        
+RIT    filefind.pas       
+RIT    filelst.pas        
+RIT    filescol.pas       
+NONE   filetype.pas       
+RIT    findobj.pas        
+RIT    flpanel.pas        
+RIT    flpanelx.pas       
+RIT    gauge.pas          
+RIT    gauges.pas         
+RIT    getconst.pas       
+NONE   hash.pas           
+RIT    helpfile.pas       
+RIT    highlite.pas       
+RIT    histlist.pas       
+RIT    histries.pas       
+RIT    idlers.pas         
+RIT    inifiles.pas       
+RIT    lfnvp.pas          
+RIT    listmakr.pas       
+RIT    macro.pas          
+RIT    memory.pas         
+RIT    menus.pas          
+RIT    messages.pas       
+THIRD  modules.pas        Written by Cat 2:5030/1326.13
+NONE   netbrwsr.pas       
+NONE   objects.pas        
+NONE   objects2.pas       
+RIT    objtype.pas        
+THIRD  openobj.pas        Writeln('(c) J.Osadtchiy, 2001');
+NONE   pdsetup.pas        
+RIT    phones.pas         
+RIT    pktview.pas        
+THIRD  plugin.pas         Written by Cat 2:5030/1326.13
+THIRD  plugman.pas        Written by Cat 2:5030/1326.13
+THIRD  plugrez.pas        Written by Cat 2:5030/1326.13
+RIT    rcp.pas            
+RIT    regall.pas         
+THIRD  regexp.pas         * Copyright (C), 2001 Pawel Ziemian, All rights reserved        *
+VP     rtpatch.pas        Runtime Patch (for Virtual Pascal)
+RIT    scroller.pas       
+RIT    setups.pas         
+RIT    startup.pas        
+RIT    startupp.pas       
+NONE   stdefine.inc       
+RIT    strview.pas        
+RIT    swe.pas            
+NONE   sysutils.inc       
+BORLAND sysutils.pas       {       Copyright (C) 1995,96 Borland International     }
+THIRD  tasklst.pas        Copyright (C) 2002 Aleksej Kozlov (Cat)
+RIT    tetris.pas         
+RIT    titleset.pas       
+RIT    tree.pas           
+RIT    tvhc.pas           
+RIT    u_srchf.pas        
+NONE   ufnmatch.pas       
+RIT    uniwin.pas         
+NONE   usersavr.pas       
+THIRD  uue2inc.pas        Written by Cat 2:5030/1326.13
+RIT    validate.pas       
+THIRD  vars.pas           Written by Cat 2:5030/1326.13
+RIT    version.pas        
+RIT    videoman.pas       
+RIT    views.pas          
+RIT    vpsyslo2.pas       
+VP     vpsyslow.pas       // |     Virtual Pascal Runtime Library.  Version 2.1.       |
+RIT    winclpvp.pas       
+RIT    xtime.pas          
+TOTAL {'RIT': 138, 'THIRD': 30, 'NONE': 18, 'VP': 2, 'BORLAND': 1} files 189
