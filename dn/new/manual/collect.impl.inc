@@ -105,3 +105,11 @@ begin
   else
     DisposeStr(PStr(Item));
 end;
+
+function TDirCol.Compare(Key1, Key2: Pointer): Integer;
+begin
+  if LongStrings then
+    Result := CompareText(PLongString(Key1)^, PLongString(Key2)^)
+  else
+    Result := CompareText(PStr(Key1)^, PStr(Key2)^);
+end;
