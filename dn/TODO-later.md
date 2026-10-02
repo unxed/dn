@@ -37,9 +37,10 @@ was not done now.
   not dispose the list (TSysDialog.Done does it).
 
 ## Seen in DOSBox-X (2026-10-02), not done yet
-- Enter on a file or on the command line runs a program: DN (DPMI32 build) shuts the application down and gives the command to
-  the loader (DN.COM, absent here): the application is destroyed and the program ends (dnexec.pas ExecStringRR). Needs a
-  port of the execution (run through DOS, then restore the screen).
+- Running a program (edit 121, dn/new/dnrun.pas): the application stays alive, the screen goes to the text mode, COMMAND.COM runs
+  the command, a key returns. Not done: the screen of the program is not kept for the user screen (Ctrl-O, Alt-F5), the
+  program is not run in a window, no time information (TimerMark), the cursor and the video mode that the program left are
+  not restored in all cases.
 - The saved desktop (DN.DSK / swap) is not checked: the panels open at the next start only because no desktop is saved.
 - DOSBox-X without a display reports Alt as pressed (BIOS flags 0040:0017 bit 3): the status line shows the Alt labels;
   DNApp clears the flags while DNKEYS drives the run (a test aid only).
