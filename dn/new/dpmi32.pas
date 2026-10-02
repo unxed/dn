@@ -62,7 +62,7 @@ function DosShadow(Seg: SmallWord): Pointer;
 implementation
 
 uses
-  SysUtils, DNErrLog
+  SysUtils
 {$IFDEF GO32V2}, go32{$ENDIF};
 
 type
@@ -87,11 +87,9 @@ var
   R: TRealRegs absolute Regs;
   I: Integer;
 begin
-  DNTrace('intr_realmode ' + IntToHex(IntNo, 2) + ' ax=' + IntToHex(R.ax, 4) + ' ds=' + IntToHex(R.ds, 4) + ' shadows=' + IntToStr(ShadowCount));
   for I := 1 to ShadowCount do
     dosmemput(Shadows[I].Seg, 0, Shadows[I].Mem^, Shadows[I].Size);
   realintr(IntNo, R);
-  DNTrace('intr_realmode done');
   for I := 1 to ShadowCount do
     dosmemget(Shadows[I].Seg, 0, Shadows[I].Mem^, Shadows[I].Size);
 end;
@@ -183,7 +181,6 @@ var
 begin
   R := global_dos_alloc(Size);
   Seg := SmallWord(R and $FFFF);
-  DNTrace('getdosmem size=' + IntToStr(Size) + ' -> ' + IntToHex(R, 8));
 end;
 {$ELSE}
 begin

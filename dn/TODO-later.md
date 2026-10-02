@@ -51,3 +51,9 @@ Virtual Pascal's Word has 32 bits (the type `AWord` of DN is the 16-bit one for 
 line (Alt-X was Ctrl-Alt-X). Everywhere else DN keeps a value above 65535 in a Word the value is silently cut (range checks are
 off): look for it when something "shifted" is seen. Found so far: the key codes (edit 118, 119), the range test of the string lists (edit 120: `Key-Base < Count` wraps in VP). A global way (the type Word = LongWord in each unit, `Lo`/`Hi` of it)
 is not tried: it changes the sizes of records that go to `tv/` (TCluster data, TEvent).
+
+## The screen of DN (2026-10-02)
+`Drivers.ScreenBuffer` is the 16-bit copy of the screen of tv/ (VPSysLow.SysTvGetSrcBuf), refreshed by DNApp at every idle; DN reads
+it (user screen, screen savers) and writes back with SysTvShowBuf. The user screen is the text screen that was there before DN
+(VPSysLow grabs it at the start). Not done: the characters above 255 / combined ones of tv/ become '?' in the copy; the copy is
+converted at every idle even when nobody reads it (cheap: 2000 cells).
