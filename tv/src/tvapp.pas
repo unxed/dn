@@ -129,6 +129,9 @@ var
   MenuBar: PMenuBar = nil;
   DeskTop: PDeskTop = nil;
   AppPalette: Integer = apColor;
+  { DN: the palettes of the program by AppPalette (apColor, apBlackWhite, apMonochrome) as strings of attributes; the
+    program can change them (the colors dialog); they start as the palettes of Turbo Vision }
+  SystemColors: array[0..2] of ShortString;
   { how long the program waits for an event before it calls Idle, in ms (-1: until
     something happens) }
   EventTimeoutMs: Integer = 20;
@@ -492,10 +495,10 @@ end;
 function TProgram.GetPalette: TPalette;
 begin
   case AppPalette of
-    apBlackWhite: Result := MakePalette(AppBlackWhitePalette);
-    apMonochrome: Result := MakePalette(AppMonochromePalette);
+    apBlackWhite: Result := MakePalette(SystemColors[apBlackWhite]);
+    apMonochrome: Result := MakePalette(SystemColors[apMonochrome]);
   else
-    Result := MakePalette(AppColorPalette);
+    Result := MakePalette(SystemColors[apColor]);
   end;
 end;
 
@@ -754,6 +757,9 @@ begin
 end;
 
 initialization
+  SystemColors[apColor] := AppColorPalette;
+  SystemColors[apBlackWhite] := AppBlackWhitePalette;
+  SystemColors[apMonochrome] := AppMonochromePalette;
   Pending.What := evNothing;
   TimerQueue.Init(nil);
 

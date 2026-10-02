@@ -12,7 +12,7 @@ Collect:  TvObjs -TSortedCollection -PSortedCollection -TStringCollection -PStri
 _Collect: TvObjs
 Streams:  TvObjs -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
 _Streams: TvObjs -TCollection -PCollection -TSortedCollection -PSortedCollection -TStringCollection -PStringCollection -TItemList -PItemList
-Scroller: TvWindow
+Scroller: TvWindow TvList
 Validate: TvValid
 ColorSel: TvColorSel
 HistList: TvHist

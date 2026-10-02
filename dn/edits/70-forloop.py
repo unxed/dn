@@ -9,10 +9,22 @@ usage: 70-forloop.py FILE...   (all the .pas of the tree)"""
 import re, sys, os
 for p in sys.argv[1:]:
     b = os.path.basename(p).lower()
-    if b not in ('filediz.pas', 'fbb.pas', 'decoder.pas', 'tetris.pas'):
+    if b not in ('filediz.pas', 'fbb.pas', 'decoder.pas', 'tetris.pas', 'calc.pas'):
         continue
     s = open(p, 'rb').read().decode('latin-1')
-    if b == 'tetris.pas':
+    if b == 'calc.pas':
+        # the export to CSV: `for I := 0 to Maxr do begin ... Inc(I) ... end` skips empty columns by changing I: a while loop
+        m = re.search(r'^([ \t]*)for I := 0 to Maxr do(\r?\n)\1  begin\r?\n', s, re.M)
+        s2, k = s, 0
+        if m:
+            ind = m.group(1)
+            e = re.compile(r'^' + ind + r'  end;[ \t]*\r?\n', re.M).search(s, m.end())
+            if e:
+                nl = m.group(2)
+                s2 = (s[:m.start()] + ind + 'I := 0;' + nl + ind + 'while I <= Maxr do' + nl + ind + '  begin' + nl + s[m.end():e.start()]
+                      + ind + '  Inc(I);' + nl + s[e.start():])
+                k = 1
+    elif b == 'tetris.pas':
         s2, k = re.subn(r'([ \t]*)for I := 1 to 20 do(\r?\n)[ \t]*if not \(HiScores\[I\]\.StLv in \[1\.\.10\]\) then(\r?\n)',
                         lambda m: '%sI := 1;%s%swhile (I <= 20) and (HiScores[I].StLv in [1..10]) do%s%s  Inc(I);%s%sif I <= 20 then%s' % (
                             m.group(1), m.group(2), m.group(1), m.group(2), m.group(1), m.group(2), m.group(1), m.group(3)), s, count=1)

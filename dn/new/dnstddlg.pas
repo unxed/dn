@@ -9,7 +9,7 @@ unit DNStdDlg;
 interface
 
 uses
-  TvViews, TvFileDlg;
+  TvViews, TvFileDlg, TvFiles;
 
 const
   fdOKButton = TvFileDlg.fdOKButton;
@@ -20,6 +20,8 @@ const
   fdNoLoadDir = TvFileDlg.fdNoLoadDir;
 
 type
+  PFileCollection = TvFiles.PFileCollection;
+  TFileCollection = TvFiles.TFileCollection;
   PSortedListBox = TvFileDlg.PSortedListBox;
   TSortedListBox = TvFileDlg.TSortedListBox;
   PFileInputLine = TvFileDlg.PFileInputLine;

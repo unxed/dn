@@ -10,6 +10,8 @@ var
   Rg: PRangeValidator;
   Pic: PPXPictureValidator;
   L: PStringLookupValidator;
+  M: TMemoryStream;
+  PV: PValidator;
   SC: PStringCollection;
   S: ShortString;
   Num: LongInt;
@@ -159,6 +161,36 @@ begin
   Pic^.Error;
   Check(MemPending = 0, 'the picture error message box');
   Dispose(Pic, Done);
+
+  { streams }
+  RegisterType(RPXPictureValidator);
+  RegisterType(RFilterValidator);
+  RegisterType(RRangeValidator);
+  RegisterType(RStringLookupValidator);
+  M.Init(0, 1024);
+  New(F, Init(['0'..'9']));
+  New(Rg, Init(-5, 99));
+  New(Pic, Init('{##}-{##}', True));
+  M.Put(F);
+  M.Put(Rg);
+  M.Put(Pic);
+  Dispose(F, Done);
+  Dispose(Rg, Done);
+  Dispose(Pic, Done);
+  M.Seek(0);
+  PV := PValidator(M.Get);
+  Check((PV <> nil) and (TypeOf(PV^) = TypeOf(TFilterValidator)) and PFilterValidator(PV)^.IsValid('123') and
+    not PFilterValidator(PV)^.IsValid('1a'), 'a filter validator through a stream');
+  Dispose(PV, Done);
+  PV := PValidator(M.Get);
+  Check((PV <> nil) and (TypeOf(PV^) = TypeOf(TRangeValidator)) and (PRangeValidator(PV)^.Min = -5) and
+    (PRangeValidator(PV)^.Max = 99), 'a range validator through a stream');
+  Dispose(PV, Done);
+  PV := PValidator(M.Get);
+  Check((PV <> nil) and (TypeOf(PV^) = TypeOf(TPXPictureValidator)) and
+    (PPXPictureValidator(PV)^.Pic^ = '{##}-{##}') and ((PV^.Options and voFill) <> 0), 'a picture validator through a stream');
+  Dispose(PV, Done);
+  M.Done;
 
   Dispose(App, Done);
   MemDone;
