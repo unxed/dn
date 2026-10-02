@@ -70,3 +70,30 @@ DN OSP 2.14 (186 `.pas`, 182 юнита без программ). Записыв
 | `use16`, `Os2Def`, `Events` | по 1 | ветки OS/2 и `use16` отключаем (`{$IFDEF}` в патче «д»), `Events.inc` — включаемый файл |
 
 Дальше проба пойдёт каскадом: каждый добавленный юнит открывает следующий слой ошибок — это и есть порядок работ вехи 4.
+
+## 6. Первые замены (2026-10-02, вечер)
+
+Проба на дереве после исключения, шимов (`dn/new/shims.map`, `tools/gen-shim.py`) и правок (`dn/edits/`):
+**25 из 160 юнитов компилируются** (было 4 из 182). Это цифра локальной пробы на разобранном
+архиве (`DN_LOCAL_TREE=... tools/dn-materialize.sh`, `tools/dn-probe.sh tp -dDPMI32`); CI-проба — то же.
+
+Что сделано:
+- **Шимы** (`dn/new/shims.map`): юниты с именами Borland-овских (`Views`, `Defines`, `Dialogs`, `Collect`, `Streams`,
+  `Scroller`, `Validate`, `ColorSel`, `HistList`, `MsgBox`, `App`, `Menus`, `StdDlg`, `_Views`...) дают имена наших
+  `tv/` (типы и константы — псевдонимами, переменные — `absolute`, процедуры — обёртками, члены перечислений — константами).
+  Что DN называет иначе — `dn/new/manual/*.inc` (пока `TPhase = TPhaseType`).
+- **Правки** (`dn/edits`, применяет `tools/dn-materialize.sh`): `05-conditionals.sh` — условная компиляция вычисляется для цели
+  из `dn/target.env` (`DPMI32`, `tools/ifdef-strip.py`: понимает `{$I файл}`); `10-getpalette.sed` — `GetPalette: PPalette` →
+  `TPalette`, `:= @S` → `MakePalette(S)`; `20-interface-bodies.py` — тела функций в `interface` (стиль VP) переносятся
+  в `implementation`, `inline;` убирается.
+
+Что мешает дальше (корни пробы): `vpsyslo2.pas` (44 юнита) — нужны `TOSSearchRec`, `SysFindFirst/Next/Close` из `VPSysLow`;
+`archiver.pas` (31) и `filescol.pas` (8) — юнит `Files` (VP); `_model1` — `TRegExpStatus`, `AsciiZ`, `TXlat`... (имена DN,
+которые были в `defines.pas`: руками в `manual/defines.inc`); `_menus` — `PMenu`, `PMenuItem` (шим `Menus` нужен там, где DN ждёт `Menus`);
+`objects.pas` — файл-заглушка (`Нефиг!`, 1 строка, не Pascal); `ufnmatch.pas` — пустой.
+
+**Важное открытие.** `lfnvp.pas` (DN) — это реализация LFN для DOS через вызовы реального режима (`INT 21h AX=71xx`) на слое
+`Dpmi32`/`Dpmi32df` (`real_mode_call_structure_typ`, `init_register`, `intr_realmode`, `segdossyslow16/32`) — то есть **именно та
+LFN-часть, которая нужна нам на DOS**. Слой `Dpmi32*` в архиве отсутствует (RTL Virtual Pascal для DOS): пишем свой
+`dn/new/dpmi32.pas`/`dpmi32df.pas` поверх `go32` FPC (`realintr`, `TRealRegs`, `dosmemput`), имена — по вызовам в
+`lfnvp.pas`, `winclpvp.pas` (WinOldAp-буфер обмена DN — тоже оттуда), `vpsyslo2.pas`.
