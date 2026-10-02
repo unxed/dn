@@ -10,5 +10,3 @@ shows a notice of the beta (Esc closes it). Settings and history are written to 
 DN.HIS).
 screenshots/*.txt are the screens of tools/dn-linux-tour.py.
 DN is licensed as in LICENSE-DN.TXT, Turbo Vision as in LICENSE-TV.TXT and COPYRIGHT-TV-MAGIBLOT.TXT.
-
-Based on Dos Navigator by RIT Research Labs. The license of DN is in LICENSE-DN.TXT, the license of TV in LICENSE-TV.TXT.

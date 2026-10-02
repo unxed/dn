@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:45:05p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            09:20:45p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
 ║       Name       │       Name        ║║       Name       │       Name        ▲
 ║TEM               │                   ║║TEM               │                   ■
@@ -19,7 +19,7 @@ x═[■]════════════ C:\ ══════════
 ║OUT           TXT │                   ║║OUT           TXT │                   ▒
 ║                  │                   ║║                  │                   ▼
 ║──────────────────┴───────────────────║║──────────────────┴───────────────────║
-║TEM              4,096 00/00/00  0:00p║║TEM              4,096 00/00/00  0:00p║
+║TEM              4,096 10/02/26  9:20p║║TEM              4,096 10/02/26  9:20p║
 └[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
 C:\>                                                                            
  F1 Help  F2 User  F3 View  F4 Edit  F5 Copy  F6 Ren  F7 MkDir  F8 Del  F10 Menu

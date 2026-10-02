@@ -4,7 +4,7 @@ excluded: its Borland-derived code is replaced by tv/). The classes (their decla
 methods) are copied, with the license header of the source, into a new unit of the tree; the units of the tree that name
 a carved class get the new unit in their uses clause.
 usage: tools/dn-carve.py CARVE_LIST TREE_DIR
-  CARVE_LIST lines `UnitName <- SourceFile : Class, Class ; uses: Unit, Unit [; consts: Name, Name] [; types: Name, Name]` (# comments)
+  CARVE_LIST lines `UnitName <- SourceFile : Class, Class (or `-`: no classes) ; uses: Unit, Unit [; consts: Name, Name] [; types: Name, Name]` (# comments)
 Run by bootstrap/run.sh on the freshly extracted tree, before the exclusions. The source is read as it is
 (the later edits of the tree are applied to the new unit as to any other file)."""
 import os, re, sys
@@ -26,7 +26,7 @@ for line in open(list_file, encoding='utf-8'):
     m = re.match(r'(\w+)\s*<-\s*(\S+)\s*:\s*([^;]+);\s*uses\s*:\s*([^;]+)(?:;\s*consts\s*:\s*([^;]+))?(?:;\s*types\s*:\s*(.+))?$', line)
     if not m:
         sys.exit('dn-carve: cannot read the line: ' + line)
-    specs.append((m.group(1), m.group(2), [c.strip() for c in m.group(3).split(',')], [u.strip() for u in m.group(4).split(',')],
+    specs.append((m.group(1), m.group(2), [c.strip() for c in m.group(3).split(',') if c.strip() != '-'], [u.strip() for u in m.group(4).split(',')],
                   [c.strip() for c in (m.group(5) or '').split(',') if c.strip()],
                   [c.strip() for c in (m.group(6) or '').split(',') if c.strip()]))
 
@@ -92,10 +92,12 @@ for unit, src, classes, uses, consts, types in specs:
             body.append(ln.rstrip('\r'))
     out = list(x.rstrip('\r') for x in head)
     out += ['{$I STDEFINE.INC}', '', 'unit %s;' % unit, '',
-            '{ Carved by tools/dn-carve.py from %s: the classes %s of Dos Navigator. }' % (sf, ', '.join(classes)), '',
-            'interface', '', 'uses', '  ' + ', '.join(uses) + ';', ''] + (['const'] + cdecl + ['']) * bool(cdecl) + ['type'] + decl + ['implementation', ''] + body + ['', 'end.', '']
+            '{ Carved by tools/dn-carve.py from %s: %s of Dos Navigator. }' % (sf, ('the classes ' + ', '.join(classes)) if classes else ('the constants ' + ', '.join(consts))), '',
+            'interface', '', 'uses', '  ' + ', '.join(uses) + ';', ''] + (['const'] + cdecl + ['']) * bool(cdecl) + ['type'] * bool(decl) + decl + ['implementation', ''] + body + ['', 'end.', '']
     open(os.path.join(tree, unit.lower() + '.pas'), 'wb').write('\r\n'.join(out).encode('latin-1'))
     print('dn-carve: %s <- %s: %d classes, %d routines' % (unit, sf, len(classes), n))
+    if not classes:
+        continue              # constants only: the units that need them name the unit themselves
     # the units that name a carved class use the new unit
     want = re.compile(r'\b(%s)\b' % '|'.join(sorted(names | {'P' + c[1:] for c in classes})))
     added = 0
