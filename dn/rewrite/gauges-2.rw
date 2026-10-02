@@ -1,0 +1,27 @@
+# THeapView.Init and Draw repeated the heap view of the demo of Borland TV (audit: 81 tokens in a row).
+file: gauges.pas
+from: constructor THeapView.Init(var Bounds: TRect);
+to: procedure THeapView.Update;
+to-keep: yes
+sha1: cb01cf47132537a4c24f9ee5c0a99471d45ca8f2
+---
+constructor THeapView.Init(var Bounds: TRect);
+  begin
+  inherited Init(Bounds);
+  OldMem := 0;
+  end;
+
+procedure THeapView.Draw;
+  var
+    Row: TDrawBuffer;
+    Attr: Word;
+    Text: String;
+  begin
+  OldMem := MemAvail;
+  Attr := GetColor(2);
+  Str(OldMem, Text);
+  MoveChar(Row, ' ', Attr, Size.X);
+  MoveStr(Row, Text, Attr);
+  WriteLine(0, 0, Size.X, 1, Row);
+  end;
+

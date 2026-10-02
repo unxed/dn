@@ -11,7 +11,7 @@ interface
 
 uses
   SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvMenus, TvApp,
-  Streams, Commands, xTime;
+  Streams, Views, Commands, xTime;
 
 const
   EventsLen: Byte = 0;
@@ -36,6 +36,7 @@ type
   TProgram = object(TvApp.TApplication)
     IdleSecs: TEventTimer;
     procedure ActivateView(P: PView);
+    procedure Idle; virtual;
     procedure InitCommandLine; virtual;
     function SetScreenMode(Mode: Word): Boolean;
   end;
@@ -109,6 +110,12 @@ procedure TProgram.ActivateView(P: PView);
 begin
   if P <> nil then
     P^.Select;
+end;
+
+procedure TProgram.Idle;
+begin
+  inherited Idle;
+  RunBackground;
 end;
 
 procedure TProgram.InitCommandLine;
