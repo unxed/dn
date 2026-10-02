@@ -257,7 +257,9 @@ end;
 
 procedure TObject.Free;
 begin
-  Dispose(PObject(@Self), Done);
+  { as in Delphi (and DN): a call on nil does nothing (DN: Info^.Free with Info = nil) }
+  if @Self <> nil then
+    Dispose(PObject(@Self), Done);
 end;
 
 destructor TObject.Done;

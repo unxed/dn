@@ -467,14 +467,51 @@ begin
   Result := PView(Message(Application, evBroadcast, Command, InfoPtr));
 end;
 
+{ A window with a text (the program shows it while it does something long: "Reading the file..."); the caller disposes it
+  (Info^.Free). It is made at once: DN shows it only if the work takes time (TWriteWin.Tmr), TODO. }
 function WriteMsg(Text: String): PView;
+var
+  R: TRect;
+  W: PWriteWin;
+  T: PStaticText;
+  I, Lines, Wd, Cur: Integer;
 begin
-  Result := nil;                  { TODO: the window of messages }
+  Lines := 1;
+  Wd := 1;
+  Cur := 0;
+  for I := 1 to Length(Text) do
+    case Text[I] of
+      #13, #10:
+        begin
+          Inc(Lines);
+          Cur := 0;
+        end;
+      #3: ;
+    else
+      begin
+        Inc(Cur);
+        if Cur > Wd then
+          Wd := Cur;
+      end;
+    end;
+  if Wd > 60 then
+    Wd := 60;
+  R.Assign(0, 0, Wd + 6, Lines + 4);
+  if Desktop <> nil then
+    R.Move((Desktop^.Size.X - (R.B.X - R.A.X)) div 2, (Desktop^.Size.Y - (R.B.Y - R.A.Y)) div 2);
+  New(W, Init(R, '', wnNoNumber));
+  W^.Flags := 0;
+  R.Assign(2, 1, Wd + 4, Lines + 3);
+  New(T, Init(R, Text));
+  W^.Insert(T);
+  if Desktop <> nil then
+    Desktop^.Insert(W);
+  Result := W;
 end;
 
 function _WriteMsg(const Text: String): PView;
 begin
-  Result := nil;
+  Result := WriteMsg(Text);
 end;
 
 procedure ForceWriteShow(P: Pointer);

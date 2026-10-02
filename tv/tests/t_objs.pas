@@ -136,6 +136,7 @@ var
   W: Word;
   Ok: Boolean;
   Used0: PtrUInt;
+  FreeObj: PObject;
   C: PSafeColl;
   IC: PIntColl;
   SC: PStringCollection;
@@ -223,6 +224,14 @@ end;
 
 begin
   Used0 := GetFPCHeapStatus.CurrHeapUsed;
+
+  { --- Free (DN): a call on nil does nothing, a call on an object disposes it ----- }
+  FreeObj := nil;
+  FreeObj^.Free;
+  Check(True, 'Free on nil does nothing');
+  New(FreeObj, Init);
+  FreeObj^.Free;
+  Check(GetFPCHeapStatus.CurrHeapUsed = Used0, 'Free disposes the object');
 
   { --- TObject.Init zeroes the descendants ------------------------------------- }
   { SizeOf of a variable of an object type with a VMT reads the VMT: use the type }
