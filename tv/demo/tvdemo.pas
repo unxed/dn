@@ -74,10 +74,10 @@ end;
 
 constructor TDemoApp.Init(AAuto: Boolean);
 begin
+  inherited Init;      { Init zeroes the object: the fields are set after it }
   Auto := AAuto;
   Quiet := 0;
   Count := 0;
-  inherited Init;
 end;
 
 procedure TDemoApp.InitMenuBar;
