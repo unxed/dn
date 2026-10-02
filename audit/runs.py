@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """List verbatim token runs (>= MIN tokens) of CAND that occur in reference files,
 with candidate line range, enclosing routine and reference file:line range.
-usage: runs.py CAND REF_LIST [MIN]"""
+usage: [REN=1] runs.py CAND REF_LIST [MIN]"""
 import re, sys, os
 sys.path.insert(0, os.path.dirname(__file__))
 import xclone as X
 K = 24
+REN = bool(os.environ.get('REN'))     # REN=1: compare with renamed identifiers
 
 def strip_keep_lines(t):
     # like X.strip_comments, but comments are replaced by their newlines
@@ -35,7 +36,11 @@ def toks(path):
     raw, lines = [], []
     for m in X.TOK.finditer(t):
         k = m.lastgroup; v = m.group(k)
-        raw.append(v.lower() if k in ('id', 'str', 'num') else v)
+        if REN:      # identifiers, literals and numbers replaced as in xclone (copy with renamed identifiers)
+            raw.append(v.lower() if k == 'id' and v.lower() in X.KEYWORDS else
+                       {'id': 'ID', 'str': 'LIT', 'num': 'NUM'}.get(k, v))
+        else:
+            raw.append(v.lower() if k in ('id', 'str', 'num') else v)
         lines.append(t.count('\n', 0, m.start()) + 1)
     return raw, lines
 
