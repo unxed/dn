@@ -146,7 +146,7 @@ procedure PrintStr(const S: String);
 { Cells of 16 bits: the low byte is the character, the high byte is the attribute (0 = leave as it is). }
 procedure MoveColor(var Buf; Num: Word; Attr: Byte);
 procedure MoveBuf(var Dest; var Source; Attr: Byte; Count: Word);
-procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: Word);
+procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: LongInt);
 procedure MoveCStr(var Dest; const Str: String; Attrs: Word);
 procedure MoveStr(var Dest; const Str: String; Attr: Byte);
 function CStrLen(const S: String): Integer;
@@ -374,7 +374,7 @@ begin
       PWordArr(@Dest)^[I] := PByte(@Source)[I] or (Word(Attr) shl 8);
 end;
 
-procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: Word);
+procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: LongInt);
 var
   I: Integer;
   W: PWordArr;

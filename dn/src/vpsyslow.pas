@@ -159,7 +159,7 @@ var
 implementation
 
 uses
-  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, DNErrLog, LineInfo
+  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
 {$IFDEF GO32V2}, go32, TvDos{$ENDIF}
 {$IFDEF UNIX}, BaseUnix, TvUnix{$ENDIF};
 
@@ -169,6 +169,73 @@ uses
 function PathExists(const P: string): Boolean;
 begin
   Result := fpAccess(P, F_OK) = 0;
+end;
+
+{ The names of the files in DN are bytes of its code page (CP866 for the Russian text of the language files and the screen), in
+  Linux they are UTF-8. At the border the names are converted: a name that is valid UTF-8 and has only characters that the
+  page of DN has is turned into the bytes of the page (so that Russian names are shown as Russian); a name that is not (other
+  characters, not UTF-8) stays as it is. The way back (SysOsPath) takes the converted name if such a file exists, else the
+  name as it is. This is a stop-gap until DN is UTF-8 inside (PLAN.md, item 4). DN_NAME_CONV=0 switches it off. }
+var
+  NameConv: Boolean = True;
+
+function HasHigh(const S: string): Boolean;
+var
+  I: Integer;
+begin
+  for I := 1 to Length(S) do
+    if Byte(S[I]) >= $80 then
+      Exit(True);
+  Result := False;
+end;
+
+function NameFromOs(const S: string): string;
+var
+  I, Used: Integer;
+  CP: LongWord;
+  B: Byte;
+begin
+  Result := S;
+  if not NameConv or not HasHigh(S) then
+    Exit;
+  Result := '';
+  I := 1;
+  while I <= Length(S) do
+  begin
+    if Byte(S[I]) < $80 then
+    begin
+      Result := Result + S[I];
+      Inc(I);
+      Continue;
+    end;
+    if not Utf8Decode(@S[I], Length(S) - I + 1, CP, Used) then
+      Exit(S);
+    B := CpFromUnicode(CP);
+    if B = 0 then
+      Exit(S);
+    Result := Result + Chr(B);
+    Inc(I, Used);
+  end;
+end;
+
+function NameToOs(const S: string): string;
+var
+  I, J, N: Integer;
+  Buf: array[0..7] of Byte;
+begin
+  Result := S;
+  if not NameConv or not HasHigh(S) then
+    Exit;
+  Result := '';
+  for I := 1 to Length(S) do
+    if Byte(S[I]) < $80 then
+      Result := Result + S[I]
+    else
+    begin
+      N := Utf8Encode(CpToUnicode(Byte(S[I])), @Buf[0]);
+      for J := 0 to N - 1 do
+        Result := Result + Chr(Buf[J]);
+    end;
 end;
 
 { the case of the names of the path that exist is found by listing the directories }
@@ -234,6 +301,7 @@ end;
 function SysOsPath(const S: string): string;
 var
   I: Integer;
+  Raw: string;
 begin
   Result := S;
   if (Length(Result) >= 2) and (Result[2] = ':') and (UpCase(Result[1]) in ['A'..'Z']) then
@@ -245,6 +313,14 @@ begin
   for I := 1 to Length(Result) do
     if Result[I] = '\' then
       Result[I] := '/';
+  if NameConv and HasHigh(Result) then
+  begin
+    Raw := Result;
+    Result := ResolveCase(NameToOs(Raw));
+    if not PathExists(Result) and PathExists(ResolveCase(Raw)) then
+      Result := ResolveCase(Raw);          { a file whose name is not in the page of DN: its bytes }
+    Exit;
+  end;
   Result := ResolveCase(Result);
 end;
 
@@ -252,7 +328,7 @@ procedure SysGetDirDos(D: Byte; var S: string);
 var
   I: Integer;
 begin
-  S := GetCurrentDir;
+  S := NameFromOs(GetCurrentDir);
   for I := 1 to Length(S) do
     if S[I] = '/' then
       S[I] := '\';
@@ -579,6 +655,9 @@ var
   N: ShortString;
 begin
   N := ShortString(R.Name);
+{$IFDEF UNIX}
+  N := NameFromOs(N);
+{$ENDIF}
   F.Attr := Byte(R.Attr);
   if R.Attr and faSymLink <> 0 then
     F.Attr := F.Attr or SysLinkAttr;
@@ -876,6 +955,7 @@ finalization
 {$IFDEF UNIX}
 initialization
   OnFileName := @SysOsPath;
+  NameConv := GetEnvironmentVariable('DN_NAME_CONV') <> '0';
   UnixInit;                        { False when the program has no terminal (the resource compiler): no screen then }
 finalization
   UnixDone;

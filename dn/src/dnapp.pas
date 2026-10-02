@@ -659,6 +659,7 @@ end;
 {$ENDIF}
 
 initialization
+  InputLineOem := True;           { the lines of DN keep the bytes of its code page: the typed text (UTF-8) is converted }
   CommandHiddenHook := @CommandHidden;
   ListBoxOwnsList := False;       { DN: the owner of the list disposes it }
   { the palettes of DN (DNPalet: carved from the archive) replace those of tv/ }
