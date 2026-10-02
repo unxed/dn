@@ -14,3 +14,10 @@ const
   CHistoryWindow = #19#19#21#24#23#19#20;
   CHistoryViewer = #6#6#7#6#6;
   CInfoPane = #30;
+
+type
+  { an input line for long text (DN: strings of more than 255 characters). TODO: it is an ordinary input
+    line for now. }
+  PLongInputLine = ^TLongInputLine;
+  TLongInputLine = object(TInputLine)
+  end;

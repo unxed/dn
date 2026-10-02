@@ -142,6 +142,8 @@ type
   TSelectMode = (normalSelect, enterSelect, leaveSelect);
 
   TForEachProc = procedure(P: PView; Args: Pointer);
+  TNestedViewTest = function(P: PView): Boolean is nested;
+  TNestedViewAction = procedure(P: PView) is nested;
   TFirstThatFunc = function(P: PView; Args: Pointer): Boolean;
 
   TView = object(TObject)
@@ -267,9 +269,12 @@ type
     procedure ResetCurrent;
     procedure SetCurrent(P: PView; Mode: TSelectMode);
     procedure SelectNext(Forwards: Boolean);
-    function FirstThat(Func: TFirstThatFunc; Args: Pointer): PView;
+    function FirstThat(Func: TFirstThatFunc; Args: Pointer): PView; overload;
+    { The forms of Turbo Vision for Borland Pascal (a routine that is declared inside the caller is fine). }
+    function FirstThat(Test: TNestedViewTest): PView; overload;
     function FocusNext(Forwards: Boolean): Boolean;
-    procedure ForEach(Func: TForEachProc; Args: Pointer);
+    procedure ForEach(Func: TForEachProc; Args: Pointer); overload;
+    procedure ForEach(Action: TNestedViewAction); overload;
     procedure Insert(P: PView);
     procedure InsertBefore(P, Target: PView);
     function At(Index: Integer): PView;
@@ -2144,6 +2149,37 @@ begin
     Temp := NextV;
     NextV := Temp^.Next;
     Func(Temp, Args);
+  until Temp = Term;
+end;
+
+function TGroup.FirstThat(Test: TNestedViewTest): PView;
+var
+  Temp: PView;
+begin
+  Temp := Last;
+  if Temp = nil then
+    Exit(nil);
+  repeat
+    Temp := Temp^.Next;
+    if Test(Temp) then
+      Exit(Temp);
+  until Temp = Last;
+  Result := nil;
+end;
+
+procedure TGroup.ForEach(Action: TNestedViewAction);
+var
+  Term, Temp, NextV: PView;
+begin
+  Term := Last;
+  Temp := Last;
+  if Temp = nil then
+    Exit;
+  NextV := Temp^.Next;
+  repeat
+    Temp := NextV;
+    NextV := Temp^.Next;
+    Action(Temp);
   until Temp = Term;
 end;
 
