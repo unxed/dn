@@ -57,6 +57,7 @@
 | 9e | `TvCluster` — `TCluster`, `TRadioButtons`, `TCheckBoxes`, `TMultiCheckBoxes`, `TSItem`/`NewSItem` | `tcluster.cpp`, `tradiobu.cpp`, `tcheckbo.cpp`, `tmulchkb.cpp` | сделан (без потоков) |
 | 9f | `TvList` — `TListViewer`, `TListBox`, `TListBoxRec` | `tlstview.cpp`, `tlistbox.cpp` | сделан (без потоков) |
 | 9g | `TvHist` — `HistoryAdd/Count/Str`, `THistory`, `THistoryWindow`, `THistoryViewer` | `histlist.cpp`, `thistory.cpp`, `thistwin.cpp`, `thstview.cpp` | сделан (без потоков) |
+| 10a | `TvFiles` — `TSearchRec`, `TFileFinder`, `TFileCollection`, `TDirCollection`, `FExpand`, `FSplit`, `PathValid`... | `stddlg.h`, `tfilecol.cpp`, `tdircoll.cpp` | сделан (без потоков) |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -301,3 +302,12 @@
 - `HistoryStr` возвращает `''`, если строки нет (оригинал — nil).
 - `THistoryWindow` получает просмотрщик из виртуального `InitViewer` (вместо указателя на функцию `THistInit`).
 - DN-совместимость (отдельные стили, `HistoryAdd` с длинными строками, хранение в файле) — задача слоя адаптеров в `dn/new`.
+
+### TvFiles (10a): решения
+
+- Поиск файлов — `TFileFinder` поверх `SysUtils.FindFirst/FindNext`: в DOS RTL сама использует LFN API (Windows 9x, DOSLFN), если он есть; имя — `ShortString` (длинное имя до 255), размер — `Int64`.
+- `TSearchRec` назван как в оригинале; при одновременном `uses SysUtils` нужно квалифицировать (`TvFiles.TSearchRec`).
+- `TFileCollection`: файлы, потом каталоги, `..` последним; имена сравниваются без учёта регистра (оригинал — побайтово), равные без учёта регистра различаются побайтово.
+- `Insert` в сортированную коллекцию не вставляет дубликат (как в оригинале): вызывающий освобождает отвергнутую запись.
+- Диски (`DriveValid`, префикс диска в `GetCurDir`, `:` в `FSplit`) — только где есть буквы дисков (DOS/Windows/OS2); иначе единственный «диск» всегда валиден.
+- Тест создаёт каталог `tvf_test` в текущем каталоге (в DOS без LFN длинное имя заменяется на 8.3).
