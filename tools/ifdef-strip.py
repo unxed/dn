@@ -6,12 +6,16 @@ and to see what that target really compiles. The files that {$I name} includes a
 symbols they define (the include directive itself stays). Other directives ({$IF expr}, {$IFOPT}) are
 left alone.
 
-usage: tools/ifdef-strip.py SRC_DIR OUT_DIR SYMBOL [SYMBOL...]     (OUT_DIR = SRC_DIR: in place)
+usage: tools/ifdef-strip.py SRC_DIR OUT_DIR SYMBOL [SYMBOL...] [--keep SYMBOL...]     (OUT_DIR = SRC_DIR: in place)
+  --keep: the conditionals on these symbols are not evaluated: the directives and both branches stay (the compiler decides, with
+  -dSYMBOL), so one tree serves several builds (LINUX, NOASM, ...).
 """
 import os, re, sys
 
 src, out = sys.argv[1], sys.argv[2]
-defined0 = set(s.upper() for s in sys.argv[3:])
+args = sys.argv[3:]
+keep = set(s.upper() for s in args[args.index('--keep') + 1:]) if '--keep' in args else set()
+defined0 = set(s.upper() for s in (args[:args.index('--keep')] if '--keep' in args else args))
 os.makedirs(out, exist_ok=True)
 # comments and strings: a directive inside them is not a directive (`(* old code {$ELSE} !! *) new code` in DN)
 TOK = re.compile(r"\(\*\$.*?\*\)|\(\*.*?\*\)|\{\$[^}]*\}|\{[^}]*\}|//[^\r\n]*|'[^'\r\n]*'", re.S)
@@ -52,20 +56,35 @@ def process(text, defined, depth=0):
                     process(read(files[name]), defined, depth + 1)     # only its defines matter
             continue
         sym = sym.upper()
+        if kw in ('IFDEF', 'IFNDEF') and sym in keep:
+            # not evaluated: the directive and both branches stay
+            if active:
+                res.append(m.group(0))
+            stack.append((active, True, True))
+            continue
+        if kw == 'ELSE' and stack and stack[-1][2]:
+            if active:
+                res.append(m.group(0))
+            continue
+        if kw == 'ENDIF' and stack and stack[-1][2]:
+            if active:
+                res.append(m.group(0))
+            active = stack.pop()[0]
+            continue
         if kw in ('IFDEF', 'IFNDEF'):
             cond = (sym in defined) if kw == 'IFDEF' else (sym not in defined)
-            stack.append((active, cond))
+            stack.append((active, cond, False))
             active = active and cond
             continue
         if kw == 'ELSE':
             if stack:
-                parent, taken = stack[-1]
+                parent, taken, _ = stack[-1]
                 active = parent and not taken
-                stack[-1] = (parent, True)
+                stack[-1] = (parent, True, False)
             continue
         if kw == 'ENDIF':
             if stack:
-                parent, _ = stack.pop()
+                parent = stack.pop()[0]
                 active = parent
             continue
         if active:
