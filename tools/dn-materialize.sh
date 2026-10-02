@@ -105,6 +105,19 @@ if [ "$DN_TARGET" = linux ] && [ -d "$here/dn/edits/linux" ]; then
     done
 fi
 
+# the edits of the 64-bit build only (dn/edits/x64)
+if [ "$DN_TARGET" = linux ] && [ "$DN_ARCH" = x86_64 ] && [ -d "$here/dn/edits/x64" ]; then
+    for e in "$here"/dn/edits/x64/*.sed; do
+        [ -f "$e" ] || continue
+        find "$out" -maxdepth 1 -type f \( -iname '*.pas' -o -iname '*.inc' \) -print0 | LC_ALL=C xargs -0 sed -i -f "$e"
+        echo "  edit (x64): $(basename "$e")"
+    done
+    for e in "$here"/dn/edits/x64/*.py; do
+        [ -f "$e" ] || continue
+        find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 python3 "$e" | sed 's|^.*/||; s|^|  edit (x64) '"$(basename "$e")"': |'
+    done
+fi
+
 # new files
 if [ -d "$here/dn/new" ]; then
     (cd "$here/dn/new" && find . -type f ! -name .gitkeep) | while read -r f; do
