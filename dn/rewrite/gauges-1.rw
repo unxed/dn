@@ -1,0 +1,20 @@
+# TKeyMacros.Play repeated the demo gadgets of Borland TV (audit: 52 tokens in a row): the same keys are sent
+# to the application, written differently.
+file: gauges.pas
+from: procedure TKeyMacros.Play;
+to: {------ Heap Window object ----------}
+to-keep: yes
+sha1: 8e8405b4d1c99bb20e760f7c6823741625b0e2c2
+---
+procedure TKeyMacros.Play;
+  var
+    N: Integer;
+  begin
+  N := 0;
+  while N < Count do
+    begin
+    Message(Application, evKeyDown, Keys^[N], nil);
+    Inc(N);
+    end;
+  end;
+
