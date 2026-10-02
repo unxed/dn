@@ -8,6 +8,7 @@ on:
       - tv/**
       - tools/dos-run.sh
       - tools/render-dump.py
+      - tools/pty_screen.py
       - tools/build-fpc-go32v2.sh
       - .github/workflows/tv.yml
 
@@ -27,6 +28,18 @@ jobs:
             ../../out/${t%.pas} | tee ../../out/${t%.pas}.txt
             grep -q '^ALL OK' ../../out/${t%.pas}.txt
           done
+
+  unix:
+    # the terminal backend (TvUnix) in a pty: tools/pty_screen.py is the terminal that checks the screen
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+      - name: Build tvdemo and run it in a pty
+        run: |
+          mkdir -p out
+          fpc -Futv/src -FUout -FEout tv/demo/tvdemo.pas | grep -E 'Error|Fatal' && exit 1
+          python3 tv/tests/pty/test_tvdemo.py out/tvdemo
 
   dos:
     runs-on: ubuntu-24.04

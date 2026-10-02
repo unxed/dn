@@ -1,10 +1,10 @@
 program tvdemo;
 { Demo of the Turbo Vision port: windows with scrollers, menus, a status line.
-  With /auto it types a few keys itself, writes the screen to SCR.DAT and quits (CI).
-  /437 selects the code page 437 instead of 866. }
+  DOS: with /auto it types a few keys itself, writes the screen to SCR.DAT and quits (CI);
+  /437 selects the code page 437 instead of 866. Unix: runs on the terminal (TvUnix); Alt-X quits. }
 {$I ../src/tvdefs.inc}
 uses TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvDrawBuf, TvScreen, TvViews, TvWindow,
-  TvMenus, TvSys, TvApp, TvDos;
+  TvMenus, TvSys, TvApp{$IFDEF GO32V2}, TvDos{$ELSE}, TvUnix{$ENDIF};
 
 const
   cmNewWin = 100;
@@ -153,6 +153,7 @@ var
   Ev: TEvent;
 begin
   inherited Idle;
+{$IFDEF GO32V2}
   if Auto and DosKeyBufferEmpty then
   begin
     Inc(Quiet);
@@ -165,6 +166,7 @@ begin
       PutEvent(Ev);
     end;
   end;
+{$ENDIF}
 end;
 
 function HasParam(const P: string): Boolean;
@@ -182,13 +184,22 @@ var
   Auto: Boolean;
 begin
   Auto := HasParam('/auto');
+{$IFDEF GO32V2}
   { the text is Russian: CP866 unless /437 (the code page of the video font is the
     setting of the program: DOS says 437 until it is changed with CHCP) }
   if HasParam('/437') then
     DosInit(437)
   else
     DosInit(866);
+{$ELSE}
+  if not UnixInit then
+  begin
+    Writeln('tvdemo needs a terminal');
+    Halt(1);
+  end;
+{$ENDIF}
   App.Init(Auto);
+{$IFDEF GO32V2}
   if Auto then
   begin
     { F4 x3: three windows; F7: tile; Alt-F: the File menu stays open }
@@ -197,8 +208,13 @@ begin
     DosStuffKey(kbAltF);
   end
   else
+{$ENDIF}
     App.NewWindow;
   App.Run;
   App.Done;
+{$IFDEF GO32V2}
   DosDone;
+{$ELSE}
+  UnixDone;
+{$ENDIF}
 end.
