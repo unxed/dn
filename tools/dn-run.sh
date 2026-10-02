@@ -2,7 +2,7 @@
 # Builds the DN of this repository for DOS (go32v2) and runs it in DOSBox-X without a display. The whole way:
 #   1. the tree of DN (tools/dn-materialize.sh)            skip it: DN_NO_MATERIALIZE=1 (keeps build/dn as it is)
 #   2. rcp.exe (the resource compiler) and dn.exe          (tools/dn-try.sh)
-#   3. rcp.exe in DOSBox-X: the dialogs and strings -> ENGLISH.DLG/.LNG, RUSSIAN.*, UKRAIN.*
+#   3. rcp.exe in DOSBox-X: the dialogs and strings -> ENGLISH.DLG/.LNG, RUSSIAN.*, UKRAIN.*; then the help files *.HLP (tvhc)
 #   4. dn.exe in DOSBox-X: after DNDUMPSEC seconds (default 4) the screen is dumped and DN stops; the dump is rendered
 # usage: tools/dn-run.sh [OUTDIR]       (default out/dnrun; all its files are rewritten)
 # needs: the cross compiler and DJGPP binutils made by tools/build-fpc-go32v2.sh PREFIX (DN_PREFIX=PREFIX), or
@@ -43,6 +43,13 @@ dbx() {   # dbx 'DOS command line' [extra dosbox-x options]
 dbx "RCP.EXE D > RCP.TXT"
 tr -d '\r' < "$out/RCP.TXT" | sed 's/([0-9]*)//g' | grep -E "Writing|rror|nresolved" || true
 cp "$out"/EXE.D32/*.LNG "$out"/EXE.D32/*.DLG "$out/" 2>/dev/null || { echo "no resources were made" >&2; exit 1; }
+# the help files: tvhc (tv/tools, native) compiles RESOURCE/<LANG>/dnhelp.htx to <LANG>.HLP
+echo "== help (tvhc)"
+mkdir -p "$tmp/tvhc-o"
+fpc -Fu"$here/tv/src" -FU"$tmp/tvhc-o" -FE"$tmp/tvhc-o" -vew "$here/tv/tools/tvhc.pas" | grep -E "Error|Fatal" || true
+for l in ENGLISH RUSSIAN UKRAIN; do
+    "$tmp/tvhc-o/tvhc" "$b/RESOURCE/$l/dnhelp.htx" "$out/$l.HLP" /4DN_OSP || echo "help $l failed" >&2
+done
 echo "== DN (dosbox-x)"
 cp "$tmp/dn-try-o/dn.exe" "$out/DN.EXE"
 rm -f "$out/SCR.DAT" "$out/DNLOG.TXT" "$out/DNERR.TXT" "$out/SER.TXT"

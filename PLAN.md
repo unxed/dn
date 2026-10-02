@@ -195,7 +195,8 @@
 `TvColorSel` (`TColorDialog` и селекторы), `TvTextView` (`TTerminal`),
 бэкенды `TvMem`, `TvDos`.
 
-Осталось в вехе 3: справка (`helpbase`, `tvhc`), потоки и ресурсы для видов (`Load`/`Store` у виджетов),
+Справка сделана (`tv/src/tvhelp.pas` — перевод `helpbase/help` magiblot; `tv/tools/tvhc.pas` — наш компилятор `.htx`→`.hlp`;
+в DN `HelpKern/HelpFile` — только имена). Осталось в вехе 3: потоки и ресурсы для видов (`Load`/`Store` у виджетов),
 `TProgram`-мелочи по результатам `spec/api-usage.md`. Адаптеры под API DN — в `dn/new`.
 
 Как писать тесты (чтобы не повторять ошибки):
@@ -352,7 +353,7 @@ go2dos позже), В7 (коммиты в `main`).
 
 - Собирается (кросс-компилятор go32v2, `DN_CROSS=... tools/dn-try.sh dn.pas`): **128 из 131** достижимых от `dn.pas` юнитов; не
   собираются `dn1` (идёт), `colorvga` и сам `dn.pas`. Все юниты `tv/` и все тесты `tv/` и `dn/tests` проходят.
-- «Собирается» не значит «работает»: заглушки — справка (`helpkern/helpfile/tvhc`), хранители экрана, `GetFileNameMenu`, палитры DN,
+- «Собирается» не значит «работает»: заглушки — хранители экрана, `GetFileNameMenu`, палитры DN,
   `wfMaxi/cmMaxi`, `TaggedDataOnly`, `OpenResource/ExecResource/LoadResource`.
 - Оценка пути до «DN запускается в DOSBox-X, показывает панели, меню и основные диалоги работают» — **около 40%** (разброс ±15):
   ядро `tv/` ~100% (15% веса); компиляция слоя DN ~95% (25%); линковка go32v2 (размер, внешние символы, инлайн-асм) 0%

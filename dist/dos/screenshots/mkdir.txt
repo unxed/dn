@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:17:05p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:27:28p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
 ║       Name       │       Name        ║║       Name       │       Name        ▲
 ║TEM               │                   ║║TEM               │                   ■
@@ -7,14 +7,14 @@ x═[■]════════════ C:\ ══════════
 ║UKRAIN        DLG │                   ║║UKRAIN        DLG │                   ▒
 ║CWSDPMI       EXE │                   ║║CWSDPMI       EXE │                   ▒
 ║DN  ╔═[■]═════════════════════ Make directory ══════════════════════════╗     ▒
-║DN  ║  Directory name                                                   ║     ▒
-║ENGL║                                                               ▐↓▌ ║     ▒
-║RUSS║                                                                   ║     ▒
-║UKRA║                                         OK   ▄  Cancel ▄   Help  ▄║     ▒
-║CWSD║                                       ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀║     ▒
-║DNER╚═══════════════════════════════════════════════════════════════════╝     ▒
+║ENGL║  Directory name                                                   ║     ▒
+║DN  ║                                                               ▐↓▌ ║     ▒
+║ENGL║                                                                   ║     ▒
+║RUSS║                                         OK   ▄  Cancel ▄   Help  ▄║     ▒
+║UKRA║                                       ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀║     ▒
+║CWSD╚═══════════════════════════════════════════════════════════════════╝     ▒
+║DNERR         TXT │                   ║║DNERR         TXT │                   ▒
 ║OUT           TXT │                   ║║OUT           TXT │                   ▒
-║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▼

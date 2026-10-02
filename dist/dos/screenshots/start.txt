@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:16:44p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:27:06p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
 ║       Name       │       Name        ║║       Name       │       Name        ▲
 ║TEM               │                   ║║TEM               │                   ■
@@ -7,14 +7,14 @@ x═[■]════════════ C:\ ══════════
 ║UKRAIN        DLG │║                                      ║                   ▒
 ║CWSDPMI       EXE │║           DN/2 Open Source           ║                   ▒
 ║DN            EXE │║      Version 2.14 beta/DPMI32,       ║                   ▒
-║DN            INI │║     Compiled Fri, 12 Jun 2025 at     ║                   ▒
-║ENGLISH       LNG │║               00:00:00               ║                   ▒
-║RUSSIAN       LNG │║         http://www.dnosp.ru/         ║                   ▒
-║UKRAIN        LNG │║                                      ║                   ▒
-║CWSDPMI       SWP │║  Based on: Dos Navigator Open Source ║                   ▒
-║DNERR         TXT │║                1.51.08               ║                   ▒
-║OUT           TXT │║                  OK   ▄              ║                   ▒
-║                  │║                ▀▀▀▀▀▀▀▀              ║                   ▒
+║ENGLISH       HLP │║     Compiled Fri, 12 Jun 2025 at     ║                   ▒
+║DN            INI │║               00:00:00               ║                   ▒
+║ENGLISH       LNG │║         http://www.dnosp.ru/         ║                   ▒
+║RUSSIAN       LNG │║                                      ║                   ▒
+║UKRAIN        LNG │║  Based on: Dos Navigator Open Source ║                   ▒
+║CWSDPMI       SWP │║                1.51.08               ║                   ▒
+║DNERR         TXT │║                  OK   ▄              ║                   ▒
+║OUT           TXT │║                ▀▀▀▀▀▀▀▀              ║                   ▒
 ║                  │╚══════════════════════════════════════╝                   ▒
 ║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▼

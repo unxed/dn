@@ -13,7 +13,7 @@ tmp=${TMPDIR:-/tmp}; work=$tmp/dn-dist; rm -rf "$work"; mkdir -p "$work" "$dist/
 DN_EXTRA="-Xs" DN_TRACE="" DN_KEYS="" tools/dn-run.sh "$work/run" >/dev/null 2>&1 || true
 [ -f "$work/run/DN.EXE" ] && [ -f "$work/run/ENGLISH.DLG" ] || { echo "the build failed: run tools/dn-run.sh" >&2; exit 1; }
 cp "$work/run/DN.EXE" "$dist/DN.EXE"
-cp "$work"/run/*.DLG "$work"/run/*.LNG "$dist/"
+cp "$work"/run/*.DLG "$work"/run/*.LNG "$work"/run/*.HLP "$dist/"
 cp "$work/run/CWSDPMI.EXE" "$dist/"
 # the documentation of CWSDPMI (its terms: the doc goes with the program)
 if [ ! -f "$dist/CWSDPMI.DOC" ]; then
@@ -23,7 +23,7 @@ fi
 # a screenshot: scen NAME SECONDS KEYS   (a clean directory: the state that DN saves would change the run)
 scen() {
     d=$work/$1; rm -rf "$d"; mkdir -p "$d"
-    cp "$dist"/DN.EXE "$dist"/*.DLG "$dist"/*.LNG "$dist"/CWSDPMI.EXE "$d/"
+    cp "$dist"/DN.EXE "$dist"/*.DLG "$dist"/*.LNG "$dist"/*.HLP "$dist"/CWSDPMI.EXE "$d/"
     (cd "$d" && SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 5 150 dosbox-x -silent -nogui -noconsole -defaultconf \
         -c "mount c $d" -c "c:" -c "set DNDUMP=SCR.DAT" -c "set DNDUMPSEC=$2" ${3:+-c "set DNKEYS=$3"} -c "DN.EXE > OUT.TXT" \
         -c "exit" >/dev/null 2>&1) || true
@@ -38,9 +38,10 @@ scen start 4 ""
 scen panels 5 "011B"
 scen menu 7 "011B,4400,1C0D"
 scen mkdir 6 "011B,4100"
+scen help 8 "011B,3B00"
 scen quit 6 "011B,A2D00"
 scen copy 6 "011B,3F00"
 scen viewer 8 "011B,5000,5000,5000,5000,3D00"
 scen editor 24 "011B,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,3E00"
-( cd "$dist" && sha256sum DN.EXE *.DLG *.LNG CWSDPMI.EXE > SHA256SUMS.TXT )
+( cd "$dist" && sha256sum DN.EXE *.DLG *.LNG *.HLP CWSDPMI.EXE > SHA256SUMS.TXT )
 echo "dist/dos is made: $(ls "$dist" | wc -l) files"

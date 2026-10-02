@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:16:50p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            04:27:11p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
 ║       Name       │       Name        ║║       Name       │       Name        ▲
 ║TEM               │                   ║║TEM               │                   ■
@@ -7,6 +7,7 @@ x═[■]════════════ C:\ ══════════
 ║UKRAIN        DLG │                   ║║UKRAIN        DLG │                   ▒
 ║CWSDPMI       EXE │                   ║║CWSDPMI       EXE │                   ▒
 ║DN            EXE │                   ║║DN            EXE │                   ▒
+║ENGLISH       HLP │                   ║║ENGLISH       HLP │                   ▒
 ║DN            INI │                   ║║DN            INI │                   ▒
 ║ENGLISH       LNG │                   ║║ENGLISH       LNG │                   ▒
 ║RUSSIAN       LNG │                   ║║RUSSIAN       LNG │                   ▒
@@ -14,7 +15,6 @@ x═[■]════════════ C:\ ══════════
 ║CWSDPMI       SWP │                   ║║CWSDPMI       SWP │                   ▒
 ║DNERR         TXT │                   ║║DNERR         TXT │                   ▒
 ║OUT           TXT │                   ║║OUT           TXT │                   ▒
-║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▒
 ║                  │                   ║║                  │                   ▼
