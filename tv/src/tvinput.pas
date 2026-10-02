@@ -36,6 +36,8 @@ type
     SelEnd: Integer;
     Validator: PValidator;
     constructor Init(const Bounds: TRect; AMaxLen: Integer);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     function DataSize: Integer; virtual;
     procedure Draw; virtual;
@@ -75,6 +77,10 @@ var
 function InputBox(const Title, ALabel: ShortString; var S: ShortString; Limit: Byte): Word;
 function InputBoxRect(const Bounds: TRect; const Title, ALabel: ShortString;
   var S: ShortString; Limit: Byte): Word;
+
+var
+  { stream records (see RView of TvViews) }
+  RInputLine: TStreamRec;
 
 implementation
 
@@ -719,5 +725,63 @@ begin
   R.Move((DeskTop^.Size.X - R.B.X) div 2, (DeskTop^.Size.Y - R.B.Y) div 2);
   Result := InputBoxRect(R, Title, ALabel, S, Limit);
 end;
+
+{ --- Streams ------------------------------------------------------------------ }
+
+constructor TInputLine.Load(var S: TStream);
+var
+  T: PStr;
+begin
+  inherited Load(S);
+  S.Read(MaxLen, SizeOf(MaxLen));
+  S.Read(CurPos, SizeOf(CurPos));
+  S.Read(FirstPos, SizeOf(FirstPos));
+  S.Read(SelStart, SizeOf(SelStart));
+  S.Read(SelEnd, SizeOf(SelEnd));
+  if MaxLen < 1 then
+    MaxLen := 1;
+  if MaxLen > 255 then
+    MaxLen := 255;
+  GetMem(Data, MaxLen + 1);
+  GetMem(OldData, MaxLen + 1);
+  Data^ := '';
+  OldData^ := '';
+  T := S.ReadStr;
+  if T <> nil then
+  begin
+    Data^ := Copy(T^, 1, MaxLen);
+    DisposeStr(T);
+  end;
+  Validator := PValidator(S.Get);
+  Anchor := -1;
+end;
+
+procedure TInputLine.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Write(MaxLen, SizeOf(MaxLen));
+  S.Write(CurPos, SizeOf(CurPos));
+  S.Write(FirstPos, SizeOf(FirstPos));
+  S.Write(SelStart, SizeOf(SelStart));
+  S.Write(SelEnd, SizeOf(SelEnd));
+  S.WriteStr(Data);
+  S.Put(Validator);
+end;
+
+function BuildInputLine(var S: TStream): PObject;
+begin
+  Result := New(PInputLine, Load(S));
+end;
+
+procedure StoreInputLine(P: PObject; var S: TStream);
+begin
+  PInputLine(P)^.Store(S);
+end;
+
+initialization
+  RInputLine.ObjType := 11;
+  RInputLine.VmtLink := PtrUInt(TypeOf(TInputLine));
+  RInputLine.Load := @BuildInputLine;
+  RInputLine.Store := @StoreInputLine;
 
 end.

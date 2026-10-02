@@ -38,6 +38,8 @@ type
     Sel: Integer;
     Strings: PStringCollection;
     constructor Init(const Bounds: TRect; AStrings: PSItem);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     function DataSize: Integer; virtual;
     procedure DrawBox(const Icon: ShortString; Marker: Char);
@@ -63,6 +65,7 @@ type
 
   PRadioButtons = ^TRadioButtons;
   TRadioButtons = object(TCluster)
+    constructor Load(var S: TStream);
     procedure Draw; virtual;
     function Mark(Item: Integer): Boolean; virtual;
     procedure MovedTo(Item: Integer); virtual;
@@ -72,6 +75,7 @@ type
 
   PCheckBoxes = ^TCheckBoxes;
   TCheckBoxes = object(TCluster)
+    constructor Load(var S: TStream);
     procedure Draw; virtual;
     function Mark(Item: Integer): Boolean; virtual;
     procedure Press(Item: Integer); virtual;
@@ -86,6 +90,8 @@ type
     States: PStr;
     constructor Init(const Bounds: TRect; AStrings: PSItem; ASelRange: Byte; AFlags: Word;
       const AStates: ShortString);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     function DataSize: Integer; virtual;
     procedure Draw; virtual;
@@ -99,6 +105,10 @@ function NewSItem(const Str: ShortString; ANext: PSItem): PSItem;
 
 const
   ClusterPalette = #$10#$11#$12#$12#$1F;
+
+var
+  { stream records (see RView of TvViews) }
+  RCluster, RRadioButtons, RCheckBoxes, RMultiCheckBoxes: TStreamRec;
 
 implementation
 
@@ -599,5 +609,109 @@ begin
   Value := LongWord(Rec);
   DrawView;
 end;
+
+{ --- Streams ------------------------------------------------------------------ }
+
+constructor TCluster.Load(var S: TStream);
+begin
+  inherited Load(S);
+  S.Read(Value, SizeOf(Value));
+  S.Read(Sel, SizeOf(Sel));
+  S.Read(EnableMask, SizeOf(EnableMask));
+  New(Strings, Load(S));
+end;
+
+procedure TCluster.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Write(Value, SizeOf(Value));
+  S.Write(Sel, SizeOf(Sel));
+  S.Write(EnableMask, SizeOf(EnableMask));
+  Strings^.Store(S);
+end;
+
+constructor TRadioButtons.Load(var S: TStream);
+begin
+  inherited Load(S);
+end;
+
+constructor TCheckBoxes.Load(var S: TStream);
+begin
+  inherited Load(S);
+end;
+
+constructor TMultiCheckBoxes.Load(var S: TStream);
+begin
+  inherited Load(S);
+  S.Read(SelRange, SizeOf(SelRange));
+  S.Read(Flags, SizeOf(Flags));
+  States := S.ReadStr;
+end;
+
+procedure TMultiCheckBoxes.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Write(SelRange, SizeOf(SelRange));
+  S.Write(Flags, SizeOf(Flags));
+  S.WriteStr(States);
+end;
+
+function BuildCluster(var S: TStream): PObject;
+begin
+  Result := New(PCluster, Load(S));
+end;
+
+procedure StoreCluster(P: PObject; var S: TStream);
+begin
+  PCluster(P)^.Store(S);
+end;
+
+function BuildRadioButtons(var S: TStream): PObject;
+begin
+  Result := New(PRadioButtons, Load(S));
+end;
+
+procedure StoreRadioButtons(P: PObject; var S: TStream);
+begin
+  PRadioButtons(P)^.Store(S);
+end;
+
+function BuildCheckBoxes(var S: TStream): PObject;
+begin
+  Result := New(PCheckBoxes, Load(S));
+end;
+
+procedure StoreCheckBoxes(P: PObject; var S: TStream);
+begin
+  PCheckBoxes(P)^.Store(S);
+end;
+
+function BuildMultiCheckBoxes(var S: TStream): PObject;
+begin
+  Result := New(PMultiCheckBoxes, Load(S));
+end;
+
+procedure StoreMultiCheckBoxes(P: PObject; var S: TStream);
+begin
+  PMultiCheckBoxes(P)^.Store(S);
+end;
+
+initialization
+  RCluster.ObjType := 13;
+  RCluster.VmtLink := PtrUInt(TypeOf(TCluster));
+  RCluster.Load := @BuildCluster;
+  RCluster.Store := @StoreCluster;
+  RRadioButtons.ObjType := 14;
+  RRadioButtons.VmtLink := PtrUInt(TypeOf(TRadioButtons));
+  RRadioButtons.Load := @BuildRadioButtons;
+  RRadioButtons.Store := @StoreRadioButtons;
+  RCheckBoxes.ObjType := 15;
+  RCheckBoxes.VmtLink := PtrUInt(TypeOf(TCheckBoxes));
+  RCheckBoxes.Load := @BuildCheckBoxes;
+  RCheckBoxes.Store := @StoreCheckBoxes;
+  RMultiCheckBoxes.ObjType := 16;
+  RMultiCheckBoxes.VmtLink := PtrUInt(TypeOf(TMultiCheckBoxes));
+  RMultiCheckBoxes.Load := @BuildMultiCheckBoxes;
+  RMultiCheckBoxes.Store := @StoreMultiCheckBoxes;
 
 end.

@@ -52,6 +52,7 @@ type
     of the application (see TvApp) }
   TDialog = object(TWindow)
     constructor Init(const Bounds: TRect; const ATitle: ShortString);
+    constructor Load(var S: TStream);
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function Valid(Command: Word): Boolean; virtual;
@@ -62,6 +63,8 @@ type
   TStaticText = object(TView)
     Text: PStr;
     constructor Init(const Bounds: TRect; const AText: ShortString);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Draw; virtual;
     function GetPalette: TPalette; virtual;
@@ -74,6 +77,8 @@ type
     Link: PView;
     Light: Boolean;
     constructor Init(const Bounds: TRect; const AText: ShortString; ALink: PView);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Draw; virtual;
     function GetPalette: TPalette; virtual;
@@ -92,6 +97,8 @@ type
     AnimationTimer: TTimerId;
     constructor Init(const Bounds: TRect; const ATitle: ShortString; ACommand: Word;
       AFlags: Word);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Draw; virtual;
     procedure DrawState(Down: Boolean);
@@ -104,6 +111,10 @@ type
     procedure DrawTitle(var B: TDrawBuffer; S, I: Integer; const CButton: TAttrPair;
       Down: Boolean);
   end;
+
+var
+  { stream records (see RView of TvViews) }
+  RDialog, RStaticText, RLabel, RButton: TStreamRec;
 
 implementation
 
@@ -628,7 +639,117 @@ begin
   end;
 end;
 
+{ --- Streams ------------------------------------------------------------------ }
+
+constructor TDialog.Load(var S: TStream);
+begin
+  inherited Load(S);
+end;
+
+constructor TStaticText.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Text := S.ReadStr;
+end;
+
+procedure TStaticText.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.WriteStr(Text);
+end;
+
+constructor TLabel.Load(var S: TStream);
+begin
+  inherited Load(S);
+  GetPeerViewPtr(S, Link);
+  Light := False;
+end;
+
+procedure TLabel.Store(var S: TStream);
+begin
+  inherited Store(S);
+  PutPeerViewPtr(S, Link);
+end;
+
+constructor TButton.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Title := S.ReadStr;
+  S.Read(Command, SizeOf(Command));
+  S.Read(Flags, SizeOf(Flags));
+  S.Read(AmDefault, SizeOf(AmDefault));
+  AnimationTimer := nil;
+  if not CommandEnabled(Command) then
+    State := State or sfDisabled;
+end;
+
+procedure TButton.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.WriteStr(Title);
+  S.Write(Command, SizeOf(Command));
+  S.Write(Flags, SizeOf(Flags));
+  S.Write(AmDefault, SizeOf(AmDefault));
+end;
+
+function BuildDialog(var S: TStream): PObject;
+begin
+  Result := New(PDialog, Load(S));
+end;
+
+procedure StoreDialog(P: PObject; var S: TStream);
+begin
+  PDialog(P)^.Store(S);
+end;
+
+function BuildStaticText(var S: TStream): PObject;
+begin
+  Result := New(PStaticText, Load(S));
+end;
+
+procedure StoreStaticText(P: PObject; var S: TStream);
+begin
+  PStaticText(P)^.Store(S);
+end;
+
+function BuildLabel(var S: TStream): PObject;
+begin
+  Result := New(PLabel, Load(S));
+end;
+
+procedure StoreLabel(P: PObject; var S: TStream);
+begin
+  PLabel(P)^.Store(S);
+end;
+
+function BuildButton(var S: TStream): PObject;
+begin
+  Result := New(PButton, Load(S));
+end;
+
+procedure StoreButton(P: PObject; var S: TStream);
+begin
+  PButton(P)^.Store(S);
+end;
+
+
 initialization
+  RDialog.ObjType := 10;
+  RDialog.VmtLink := PtrUInt(TypeOf(TDialog));
+  RDialog.Load := @BuildDialog;
+  RDialog.Store := @StoreDialog;
+  RStaticText.ObjType := 18;
+  RStaticText.VmtLink := PtrUInt(TypeOf(TStaticText));
+  RStaticText.Load := @BuildStaticText;
+  RStaticText.Store := @StoreStaticText;
+  RLabel.ObjType := 19;
+  RLabel.VmtLink := PtrUInt(TypeOf(TLabel));
+  RLabel.Load := @BuildLabel;
+  RLabel.Store := @StoreLabel;
+  RButton.ObjType := 12;
+  RButton.VmtLink := PtrUInt(TypeOf(TButton));
+  RButton.Load := @BuildButton;
+  RButton.Store := @StoreButton;
   GrayDialog := RangePalette($20);
   BlueDialog := RangePalette($40);
   CyanDialog := RangePalette($60);

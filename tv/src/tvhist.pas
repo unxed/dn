@@ -70,6 +70,8 @@ type
     Link: PInputLine;
     HistoryId: Word;
     constructor Init(const Bounds: TRect; ALink: PInputLine; AHistoryId: Word);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Draw; virtual;
     function GetPalette: TPalette; virtual;
@@ -77,6 +79,10 @@ type
     function InitHistoryWindow(const Bounds: TRect): PHistoryWindow; virtual;
     procedure RecordHistory(const S: ShortString); virtual;
   end;
+
+var
+  { stream records (see RView of TvViews) }
+  RHistory: TStreamRec;
 
 implementation
 
@@ -383,7 +389,38 @@ begin
   HistoryAdd(Byte(HistoryId), S);
 end;
 
+{ --- Streams ------------------------------------------------------------------ }
+
+constructor THistory.Load(var S: TStream);
+begin
+  inherited Load(S);
+  GetPeerViewPtr(S, Link);
+  S.Read(HistoryId, SizeOf(HistoryId));
+end;
+
+procedure THistory.Store(var S: TStream);
+begin
+  inherited Store(S);
+  PutPeerViewPtr(S, Link);
+  S.Write(HistoryId, SizeOf(HistoryId));
+end;
+
+function BuildHistory(var S: TStream): PObject;
+begin
+  Result := New(PHistory, Load(S));
+end;
+
+procedure StoreHistory(P: PObject; var S: TStream);
+begin
+  PHistory(P)^.Store(S);
+end;
+
+
 initialization
+  RHistory.ObjType := 22;
+  RHistory.VmtLink := PtrUInt(TypeOf(THistory));
+  RHistory.Load := @BuildHistory;
+  RHistory.Store := @StoreHistory;
   ClearHistory;
 finalization
   DoneHistory;

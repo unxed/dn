@@ -22,7 +22,7 @@ unit TvWindow;
 interface
 
 uses
-  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen, TvViews;
+  TvGeom, TvColors, TvCell, TvKeys, TvEvents, TvText, TvDrawBuf, TvScreen, TvObjs, TvViews;
 
 const
   { window flags }
@@ -65,6 +65,7 @@ type
     title, 5 = icons }
   TFrame = object(TView)
     constructor Init(const Bounds: TRect);
+    constructor Load(var S: TStream);
     procedure Draw; virtual;
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -84,6 +85,8 @@ type
     PgStep: Integer;
     ArStep: Integer;
     constructor Init(const Bounds: TRect);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     procedure Draw; virtual;
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -108,6 +111,8 @@ type
     VScrollBar: PScrollBar;
     Limit: TPoint;
     constructor Init(const Bounds: TRect; AHScrollBar, AVScrollBar: PScrollBar);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure ChangeBounds(const Bounds: TRect); virtual;
     function GetPalette: TPalette; virtual;
@@ -131,6 +136,8 @@ type
     Frame: PFrame;
     Title: ShortString;
     constructor Init(const Bounds: TRect; const ATitle: ShortString; ANumber: Integer);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
     destructor Done; virtual;
     procedure Close; virtual;
     function GetPalette: TPalette; virtual;
@@ -142,6 +149,10 @@ type
     function StandardScrollBar(AOptions: Word): PScrollBar;
     procedure Zoom; virtual;
   end;
+
+var
+  { stream records (see RView of TvViews) }
+  RFrame, RScrollBar, RScroller, RWindow: TStreamRec;
 
 implementation
 
@@ -991,7 +1002,135 @@ begin
     Locate(ZoomRect);
 end;
 
+
+{ --- Streams ------------------------------------------------------------------ }
+
+constructor TFrame.Load(var S: TStream);
+begin
+  inherited Load(S);
+end;
+
+constructor TScrollBar.Load(var S: TStream);
+begin
+  inherited Load(S);
+  S.Read(Value, SizeOf(Value));
+  S.Read(MinVal, SizeOf(MinVal));
+  S.Read(MaxVal, SizeOf(MaxVal));
+  S.Read(PgStep, SizeOf(PgStep));
+  S.Read(ArStep, SizeOf(ArStep));
+  S.Read(Chars, SizeOf(Chars));
+end;
+
+procedure TScrollBar.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Write(Value, SizeOf(Value));
+  S.Write(MinVal, SizeOf(MinVal));
+  S.Write(MaxVal, SizeOf(MaxVal));
+  S.Write(PgStep, SizeOf(PgStep));
+  S.Write(ArStep, SizeOf(ArStep));
+  S.Write(Chars, SizeOf(Chars));
+end;
+
+constructor TScroller.Load(var S: TStream);
+begin
+  inherited Load(S);
+  GetPeerViewPtr(S, HScrollBar);
+  GetPeerViewPtr(S, VScrollBar);
+  S.Read(Delta, SizeOf(Delta));
+  S.Read(Limit, SizeOf(Limit));
+  DrawLock := 0;
+  DrawFlag := False;
+end;
+
+procedure TScroller.Store(var S: TStream);
+begin
+  inherited Store(S);
+  PutPeerViewPtr(S, HScrollBar);
+  PutPeerViewPtr(S, VScrollBar);
+  S.Write(Delta, SizeOf(Delta));
+  S.Write(Limit, SizeOf(Limit));
+end;
+
+constructor TWindow.Load(var S: TStream);
+begin
+  inherited Load(S);
+  S.Read(Flags, SizeOf(Flags));
+  S.Read(ZoomRect, SizeOf(ZoomRect));
+  S.Read(Number, SizeOf(Number));
+  S.Read(Palette, SizeOf(Palette));
+  Frame := PFrame(ReadChildPtr(S));
+  S.ReadStrV(Title);
+end;
+
+procedure TWindow.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.Write(Flags, SizeOf(Flags));
+  S.Write(ZoomRect, SizeOf(ZoomRect));
+  S.Write(Number, SizeOf(Number));
+  S.Write(Palette, SizeOf(Palette));
+  PutSubViewPtr(S, Frame);
+  S.WriteStr(@Title);
+end;
+
+function BuildFrame(var S: TStream): PObject;
+begin
+  Result := New(PFrame, Load(S));
+end;
+
+procedure StoreFrame(P: PObject; var S: TStream);
+begin
+  PFrame(P)^.Store(S);
+end;
+
+function BuildScrollBar(var S: TStream): PObject;
+begin
+  Result := New(PScrollBar, Load(S));
+end;
+
+procedure StoreScrollBar(P: PObject; var S: TStream);
+begin
+  PScrollBar(P)^.Store(S);
+end;
+
+function BuildScroller(var S: TStream): PObject;
+begin
+  Result := New(PScroller, Load(S));
+end;
+
+procedure StoreScroller(P: PObject; var S: TStream);
+begin
+  PScroller(P)^.Store(S);
+end;
+
+function BuildWindow(var S: TStream): PObject;
+begin
+  Result := New(PWindow, Load(S));
+end;
+
+procedure StoreWindow(P: PObject; var S: TStream);
+begin
+  PWindow(P)^.Store(S);
+end;
+
 initialization
+  RFrame.ObjType := 2;
+  RFrame.VmtLink := PtrUInt(TypeOf(TFrame));
+  RFrame.Load := @BuildFrame;
+  RFrame.Store := @StoreFrame;
+  RScrollBar.ObjType := 3;
+  RScrollBar.VmtLink := PtrUInt(TypeOf(TScrollBar));
+  RScrollBar.Load := @BuildScrollBar;
+  RScrollBar.Store := @StoreScrollBar;
+  RScroller.ObjType := 4;
+  RScroller.VmtLink := PtrUInt(TypeOf(TScroller));
+  RScroller.Load := @BuildScroller;
+  RScroller.Store := @StoreScroller;
+  RWindow.ObjType := 7;
+  RWindow.VmtLink := PtrUInt(TypeOf(TWindow));
+  RWindow.Load := @BuildWindow;
+  RWindow.Store := @StoreWindow;
   FramePalette := MakePalette(#1#1#2#2#3);
   ScrollBarPalette := MakePalette(#4#5#5);
   ScrollerPalette := MakePalette(#6#7);

@@ -146,6 +146,11 @@ type
   TNestedViewAction = procedure(P: PView) is nested;
   TFirstThatFunc = function(P: PView; Args: Pointer): Boolean;
 
+  { a timer of DN: the time of the start and of the end in milliseconds (the fields of DN views) }
+  TEventTimer = record
+    StartMSecs, ExpireMSecs: LongInt;
+  end;
+
   TView = object(TObject)
     Next: PView;
     Size: TPoint;
@@ -159,7 +164,23 @@ type
     HelpCtx: Word;
     Owner: PGroup;
     ResizeBalance: TPoint;
+    { the fields of DN: the interval of Update in milliseconds, its timer, a flag of the mouse events }
+    UpdTicks: LongInt;
+    UpTmr: TEventTimer;
+    ClearPositionalEvents: Boolean;
     constructor Init(const Bounds: TRect);
+    { Streams (the format is ours): a view is read back as it was stored, but not active, selected, focused,
+      exposed. Load is called by the function of the stream record of the type (RView...). }
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
+    { A pointer to another view of the same owner is stored as its number and made a pointer again when the
+      owner has loaded all its views (the same for GetPeerViewPtr and GetSubViewPtr). P is a pointer variable. }
+    procedure GetSubViewPtr(var S: TStream; var P);
+    procedure PutSubViewPtr(var S: TStream; P: PView);
+    procedure GetPeerViewPtr(var S: TStream; var P);
+    procedure PutPeerViewPtr(var S: TStream; P: PView);
+    { Called by the program from time to time for the views that asked for it (DN: RegisterToBackground). }
+    procedure Update; virtual;
     { Hides the view and removes it from its owner. }
     destructor Done; virtual;
     procedure SizeLimits(out Min, Max: TPoint); virtual;
@@ -258,6 +279,10 @@ type
     LockFlag: Byte;
     EndState: Word;
     Current: PView;
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
+    { Reads the number that PutSubViewPtr wrote and gives the view of this group (nil for 0). }
+    function ReadChildPtr(var S: TStream): PView;
     constructor Init(const Bounds: TRect);
     destructor Done; virtual;
     function ExecView(P: PView): Word;
@@ -332,6 +357,10 @@ function PaletteSize(const P: TPalette): Integer;
 { Sends a message to a view: the view's HandleEvent gets an event with the
   command and Info; if the view cleared the event, its InfoPtr is returned. }
 function Message(Receiver: PView; What, Command: Word; InfoPtr: Pointer): Pointer;
+
+var
+  { stream records: RegisterType(RView) makes TView known to the streams }
+  RView, RGroup: TStreamRec;
 
 implementation
 
@@ -2436,7 +2465,198 @@ begin
   Result := H;
 end;
 
+
+{ --- Streams ------------------------------------------------------------------ }
+
+type
+  TViewStore = packed record
+    Origin, Size, Cursor: TPoint;
+    GrowMode, DragMode: Byte;
+    HelpCtx, State, Options, EventMask: Word;
+  end;
+
+  TFixup = record
+    Target: PPointer;
+    Index: Integer;
+  end;
+
+var
+  Fixups: array of TFixup;
+
+constructor TView.Load(var S: TStream);
+var
+  R: TViewStore;
+begin
+  inherited Init;
+  S.Read(R, SizeOf(R));
+  Origin := R.Origin;
+  Size := R.Size;
+  Cursor := R.Cursor;
+  GrowMode := R.GrowMode;
+  DragMode := R.DragMode;
+  HelpCtx := R.HelpCtx;
+  State := R.State;
+  Options := R.Options;
+  EventMask := R.EventMask;
+  Owner := nil;
+  Next := nil;
+  ResizeBalance.X := 0;
+  ResizeBalance.Y := 0;
+end;
+
+procedure TView.Store(var S: TStream);
+var
+  R: TViewStore;
+begin
+  R.Origin := Origin;
+  R.Size := Size;
+  R.Cursor := Cursor;
+  R.GrowMode := GrowMode;
+  R.DragMode := DragMode;
+  R.HelpCtx := HelpCtx;
+  R.State := State and not (sfActive or sfSelected or sfFocused or sfExposed);
+  R.Options := Options;
+  R.EventMask := EventMask;
+  S.Write(R, SizeOf(R));
+end;
+
+procedure TView.GetSubViewPtr(var S: TStream; var P);
+var
+  Index: Word;
+begin
+  S.Read(Index, SizeOf(Index));
+  Pointer(P) := nil;
+  if Index = 0 then
+    Exit;
+  SetLength(Fixups, Length(Fixups) + 1);
+  Fixups[High(Fixups)].Target := @Pointer(P);
+  Fixups[High(Fixups)].Index := Index;
+end;
+
+procedure TView.PutSubViewPtr(var S: TStream; P: PView);
+var
+  Index: Word;
+begin
+  if (P = nil) or (P^.Owner = nil) then
+    Index := 0
+  else
+    Index := P^.Owner^.IndexOf(P);
+  S.Write(Index, SizeOf(Index));
+end;
+
+procedure TView.GetPeerViewPtr(var S: TStream; var P);
+begin
+  GetSubViewPtr(S, P);
+end;
+
+procedure TView.PutPeerViewPtr(var S: TStream; P: PView);
+begin
+  PutSubViewPtr(S, P);
+end;
+
+procedure TView.Update;
+begin
+end;
+
+constructor TGroup.Load(var S: TStream);
+var
+  Base, I: Integer;
+  Count: Word;
+  P: PView;
+begin
+  inherited Load(S);
+  Last := nil;
+  Current := nil;
+  Phase := phFocused;
+  Buffer := nil;
+  LockFlag := 0;
+  EndState := 0;
+  Clip := GetExtent;
+  Base := Length(Fixups);
+  S.Read(Count, SizeOf(Count));
+  for I := 1 to Count do
+  begin
+    P := PView(S.Get);
+    if P <> nil then
+      InsertView(P, nil);
+  end;
+  Current := ReadChildPtr(S);
+  { the views of this group that pointed to each other get their pointers }
+  for I := Base to High(Fixups) do
+    if (Fixups[I].Index >= 1) and (Fixups[I].Index <= Count) then
+      Fixups[I].Target^ := At(Fixups[I].Index);
+  SetLength(Fixups, Base);
+  Awaken;
+end;
+
+function TGroup.ReadChildPtr(var S: TStream): PView;
+var
+  Index: Word;
+begin
+  S.Read(Index, SizeOf(Index));
+  if Index = 0 then
+    Result := nil
+  else
+    Result := At(Index);
+end;
+
+procedure TGroup.Store(var S: TStream);
+var
+  Count: Word;
+  P: PView;
+begin
+  inherited Store(S);
+  Count := 0;
+  if Last <> nil then
+  begin
+    P := Last;
+    repeat
+      Inc(Count);
+      P := P^.Next;
+    until P = Last;
+  end;
+  S.Write(Count, SizeOf(Count));
+  if Last <> nil then
+  begin
+    P := Last^.Next;                   { the first view: the lowest }
+    repeat
+      S.Put(P);
+      P := P^.Next;
+    until P = Last^.Next;
+  end;
+  PutSubViewPtr(S, Current);
+end;
+
+{ the stream records of the types (the numbers are those of Turbo Vision) }
+function BuildView(var S: TStream): PObject;
+begin
+  Result := New(PView, Load(S));
+end;
+
+procedure StoreView(P: PObject; var S: TStream);
+begin
+  PView(P)^.Store(S);
+end;
+
+function BuildGroup(var S: TStream): PObject;
+begin
+  Result := New(PGroup, Load(S));
+end;
+
+procedure StoreGroup(P: PObject; var S: TStream);
+begin
+  PGroup(P)^.Store(S);
+end;
+
 initialization
+  RView.ObjType := 1;
+  RView.VmtLink := PtrUInt(TypeOf(TView));
+  RView.Load := @BuildView;
+  RView.Store := @StoreView;
+  RGroup.ObjType := 6;
+  RGroup.VmtLink := PtrUInt(TypeOf(TGroup));
+  RGroup.Load := @BuildGroup;
+  RGroup.Store := @StoreGroup;
   InitCommands;
   ErrorAttr := AttrFromBIOS($CF);
 end.

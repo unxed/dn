@@ -1,6 +1,6 @@
 program t_window;
 {$I ../src/tvdefs.inc}
-uses TvCodePg, TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvDrawBuf, TvScreen, TvViews,
+uses TvCodePg, TvGeom, TvColors, TvCell, TvEvents, TvKeys, TvDrawBuf, TvScreen, TvObjs, TvViews,
   TvWindow;
 {$I testlib.inc}
 
@@ -132,6 +132,11 @@ var
   Win, Win2: PWindow;
   Bar, HBar: PScrollBar;
   Scr: PScroller;
+  SW, SL: PWindow;
+  SSb, SSb2: PScrollBar;
+  SSc, SSc2: PScroller;
+  SM: TMemoryStream;
+  I: Integer;
   Ev: TEvent;
   Min, Max: TPoint;
   Rc: TRect;
@@ -401,5 +406,44 @@ begin
   Desk.ForEach(@CountViews, @Count);
   Check(Count = 1, 'Dispose removes a window from the desk');
   Desk.Done;
+  { streams: a window with a frame, a scroll bar and a scroller that points to it }
+  RegisterType(RView);
+  RegisterType(RGroup);
+  RegisterType(RFrame);
+  RegisterType(RScrollBar);
+  RegisterType(RScroller);
+  RegisterType(RWindow);
+  SW := New(PWindow, Init(R(0, 0, 30, 10), 'Hello', 3));
+  SW^.Flags := SW^.Flags and not wfZoom;
+  SSb := SW^.StandardScrollBar(sbVertical or sbHandleKeyboard);
+  SSc := New(PScroller, Init(R(1, 1, 28, 9), nil, SSb));
+  SSc^.Limit.X := 100;
+  SSc^.Limit.Y := 50;
+  SSb^.SetParams(3, 0, 40, 5, 1);
+  SW^.Insert(SSc);
+  SM.Init(0, 512);
+  SM.Put(SW);
+  Check(SM.Status = stOk, 'a window is stored');
+  SM.Seek(0);
+  SL := PWindow(SM.Get);
+  Check((SL <> nil) and (SM.Status = stOk), 'a window is loaded');
+  Check((SL^.Title = 'Hello') and (SL^.Number = 3) and (SL^.Flags and wfZoom = 0), 'the title, the number and the flags');
+  Check((SL^.Frame <> nil) and (SL^.Frame^.Owner = PGroup(SL)), 'the frame is a view of the window');
+  SSc2 := nil;
+  SSb2 := nil;
+  for I := 1 to 8 do
+    if SL^.At(I) <> nil then
+    begin
+      if TypeOf(SL^.At(I)^) = TypeOf(TScroller) then SSc2 := PScroller(SL^.At(I));
+      if TypeOf(SL^.At(I)^) = TypeOf(TScrollBar) then SSb2 := PScrollBar(SL^.At(I));
+    end;
+  Check((SSc2 <> nil) and (SSb2 <> nil), 'the scroller and the scroll bar are loaded');
+  Check(SSc2^.VScrollBar = PScrollBar(SSb2), 'the scroller points to the loaded scroll bar');
+  Check((SSb2^.Value = 3) and (SSb2^.MaxVal = 40) and (SSb2^.PgStep = 5), 'the values of the scroll bar');
+  Check((SSc2^.Limit.X = 100) and (SSc2^.Limit.Y = 50), 'the limit of the scroller');
+  Dispose(SL, Done);
+  Dispose(SW, Done);
+  SM.Done;
+
   Finish;
 end.

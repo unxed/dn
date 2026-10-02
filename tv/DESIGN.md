@@ -371,3 +371,18 @@
   компилируются заново, совместимость с чужими файлами ресурсов не нужна.
 - `FirstThat`/`LastThat`/`ForEach` коллекций и групп принимают процедурные переменные вида `is nested`
   (`{$modeswitch nestedprocvars}` в `tvdefs.inc`): так работают локальные функции, как `@Name` в Turbo Pascal.
+
+### Потоки представлений (Load/Store, 2026-10-02)
+
+- `TView.Load/Store`, `TGroup.Load/Store` и остальные классы (`TFrame`, `TScrollBar`, `TScroller`, `TWindow`, `TDialog`,
+  `TStaticText`, `TLabel`, `TButton`, `TInputLine`, `THistory`, `TCluster` и потомки, `TListViewer`, `TListBox`,
+  коллекции) пишут свои поля; формат — наш. Записи типов `RView`, `RGroup`, `RFrame`, `RScrollBar`, `RScroller`, `RWindow`, `RDialog`,
+  `RStaticText`, `RLabel`, `RButton`, `RInputLine`, `RCluster`, `RRadioButtons`, `RCheckBoxes`, `RMultiCheckBoxes`, `RListViewer`,
+  `RListBox`, `RHistory`, `RCollection`, `RStringCollection` — с номерами Turbo Vision (1, 6, 2, 7, 3, 4, ...); регистрирует
+  программа: `RegisterType(RView)`.
+- Ссылка на соседний вид (`GetPeerViewPtr`/`PutPeerViewPtr`, `GetSubViewPtr`/`PutSubViewPtr`) пишется как номер в списке
+  владельца и становится указателем, когда группа прочитала все виды (`TGroup.Load`; список поправок — в модуле).
+  `TGroup.ReadChildPtr` читает номер дочернего вида группы сразу (для `Frame` окна и `Current`).
+- Прочитанный вид не активен, не выбран, не в фокусе: `State` очищен от `sfActive`, `sfSelected`, `sfFocused`, `sfExposed`;
+  `TInputLine.Awaken` выделяет весь текст (позиция курсора после загрузки 0, как в Borland TV).
+- Поля DN в `TView`: `UpdTicks`, `UpTmr` (`TEventTimer`), `ClearPositionalEvents`, метод `Update` (ничего не делает).
