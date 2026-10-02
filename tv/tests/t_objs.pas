@@ -144,6 +144,34 @@ var
   Dummy: TObject;
   Bytes: array[0..3] of Byte;
 
+{ routines declared inside the caller, passed as @Name (Turbo Pascal style): they use the variables of the caller }
+procedure NestedCheck(C: PCollection);
+var
+  Limit, Count, Total: Integer;
+
+  function Over(P: Pointer): Boolean;
+  begin
+    Result := PtrInt(P) > Limit;
+  end;
+
+  procedure Add(P: Pointer);
+  begin
+    Inc(Count);
+    Inc(Total, PtrInt(P));
+  end;
+
+begin
+  Limit := 50;
+  Check(C^.FirstThat(@Over) = Pointer(60), 'FirstThat with a local function');
+  Check(C^.LastThat(@Over) = Pointer(70), 'LastThat with a local function');
+  Limit := 1000;
+  Check(C^.FirstThat(@Over) = nil, 'the local function sees the changed variable of the caller');
+  Count := 0;
+  Total := 0;
+  C^.ForEach(@Add);
+  Check((Count = C^.Count) and (Total = 20 + 30 + 60 + 70), 'ForEach with a local procedure');
+end;
+
 begin
   Used0 := GetFPCHeapStatus.CurrHeapUsed;
 
@@ -342,6 +370,7 @@ begin
   Sum := 0;
   C^.ForEach(@AddTo);
   Check(Sum = 20 + 30 + 60 + 70, 'ForEach');
+  NestedCheck(C);
   C^.AtPut(1, nil);
   C^.Pack;
   Check((C^.Count = 3) and (C^.At(1) = Pointer(60)), 'Pack removes the nil items');

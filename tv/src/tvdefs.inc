@@ -2,5 +2,6 @@
 {$mode objfpc}
 {$H-}
 {$modeswitch advancedrecords}
+{$modeswitch nestedprocvars}
 {$inline on}
 {$R-}{$Q-}

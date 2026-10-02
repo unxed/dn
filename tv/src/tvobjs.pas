@@ -145,6 +145,12 @@ type
   PItemList = ^TItemList;
 
   PCollection = ^TCollection;
+  { Routines declared inside another routine (Turbo Pascal lets one pass them as @Name to FirstThat, LastThat
+    and ForEach) are procedure variables of the nested kind: a program that does that is compiled with
+    {$modeswitch nestedprocvars} (tvdefs.inc has it); a plain function is accepted too. }
+  TNestedTestProc = function(Item: Pointer): Boolean is nested;
+  TNestedActionProc = procedure(Item: Pointer) is nested;
+
   TCollection = object(TObject)
     Items: PItemList;
     Count: Integer;
@@ -161,15 +167,15 @@ type
     procedure Delete(Item: Pointer);
     procedure DeleteAll;
     procedure Error(Code, Info: Integer); virtual;
-    function FirstThat(Test: Pointer): Pointer;
-    procedure ForEach(Action: Pointer);
+    function FirstThat(Test: TNestedTestProc): Pointer;
+    procedure ForEach(Action: TNestedActionProc);
     procedure Free(Item: Pointer);
     procedure FreeAll;
     procedure FreeItem(Item: Pointer); virtual;
     function GetItem(var S: TStream): Pointer; virtual;
     function IndexOf(Item: Pointer): Integer; virtual;
     procedure Insert(Item: Pointer); virtual;
-    function LastThat(Test: Pointer): Pointer;
+    function LastThat(Test: TNestedTestProc): Pointer;
     procedure Pack;
     procedure PutItem(var S: TStream; Item: Pointer); virtual;
     procedure SetLimit(ALimit: Integer); virtual;
@@ -875,27 +881,36 @@ begin
   RunError(212 - Code);
 end;
 
-function TCollection.FirstThat(Test: Pointer): Pointer;
+function TCollection.FirstThat(Test: TNestedTestProc): Pointer;
 var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
-    if TCollTestProc(Test)(Items^[I]) then
+    if Test(Items^[I]) then
       Exit(Items^[I]);
   Result := nil;
 end;
 
-procedure TCollection.ForEach(Action: Pointer);
+procedure TCollection.ForEach(Action: TNestedActionProc);
 var
   I: Integer;
 begin
   I := 0;
-  { an action may delete items: Count is read again every time }
   while I < Count do
   begin
-    TCollActionProc(Action)(Items^[I]);
+    Action(Items^[I]);
     Inc(I);
   end;
+end;
+
+function TCollection.LastThat(Test: TNestedTestProc): Pointer;
+var
+  I: Integer;
+begin
+  for I := Count - 1 downto 0 do
+    if Test(Items^[I]) then
+      Exit(Items^[I]);
+  Result := nil;
 end;
 
 procedure TCollection.Free(Item: Pointer);
@@ -937,16 +952,6 @@ end;
 procedure TCollection.Insert(Item: Pointer);
 begin
   AtInsert(Count, Item);
-end;
-
-function TCollection.LastThat(Test: Pointer): Pointer;
-var
-  I: Integer;
-begin
-  for I := Count - 1 downto 0 do
-    if TCollTestProc(Test)(Items^[I]) then
-      Exit(Items^[I]);
-  Result := nil;
 end;
 
 procedure TCollection.Pack;
