@@ -15,6 +15,12 @@ interface
 type
   TPoint = record
     X, Y: Integer;
+    { the methods of the point of DN (Dos Navigator): equality, assignment, order (by rows, then by columns) }
+    procedure Assign(AX, AY: Integer);
+    function Equals(const P: TPoint): Boolean;
+    function EqualsXY(AX, AY: Integer): Boolean;
+    function isLE(const P: TPoint): Boolean;
+    function isGE(const P: TPoint): Boolean;
   end;
   PPoint = ^TPoint;
 
@@ -38,6 +44,32 @@ function PointSub(const P1, P2: TPoint): TPoint; inline;
 function PointEq(const P1, P2: TPoint): Boolean; inline;
 
 implementation
+
+procedure TPoint.Assign(AX, AY: Integer);
+begin
+  X := AX;
+  Y := AY;
+end;
+
+function TPoint.Equals(const P: TPoint): Boolean;
+begin
+  Result := (X = P.X) and (Y = P.Y);
+end;
+
+function TPoint.EqualsXY(AX, AY: Integer): Boolean;
+begin
+  Result := (X = AX) and (Y = AY);
+end;
+
+function TPoint.isLE(const P: TPoint): Boolean;
+begin
+  Result := (Y < P.Y) or ((Y = P.Y) and (X <= P.X));
+end;
+
+function TPoint.isGE(const P: TPoint): Boolean;
+begin
+  Result := (Y > P.Y) or ((Y = P.Y) and (X >= P.X));
+end;
 
 function Point(AX, AY: Integer): TPoint;
 begin

@@ -5,6 +5,7 @@ uses TvGeom;
 
 var
   R, S, T: TRect;
+  Pt1, Pt2: TPoint;
 begin
   R.Assign(1, 2, 11, 7);
   Check((R.A.X = 1) and (R.A.Y = 2) and (R.B.X = 11) and (R.B.Y = 7), 'Assign');
@@ -54,5 +55,14 @@ begin
   Check(PointEq(PointSub(Point(10, 20), Point(1, 2)), Point(9, 18)), 'PointSub');
   Check(not PointEq(Point(1, 2), Point(2, 1)), 'PointEq false');
 
+  { the methods of the point of DN }
+  Pt1.Assign(3, 4);
+  Check((Pt1.X = 3) and (Pt1.Y = 4), 'TPoint.Assign');
+  Pt2.Assign(3, 4);
+  Check(Pt1.Equals(Pt2) and Pt1.EqualsXY(3, 4) and not Pt1.EqualsXY(4, 3), 'TPoint.Equals, EqualsXY');
+  Pt2.Assign(5, 4);
+  Check(Pt1.isLE(Pt2) and not Pt1.isGE(Pt2), 'TPoint.isLE, isGE in a row');
+  Pt2.Assign(1, 5);
+  Check(Pt1.isLE(Pt2) and not Pt1.isGE(Pt2), 'a lower row is less');
   Finish;
 end.

@@ -51,3 +51,8 @@ begin
     Inc(I);
   end;
 end;
+
+procedure TMyScrollBar.Draw;
+begin
+  inherited Draw;
+end;
