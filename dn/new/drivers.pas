@@ -11,14 +11,32 @@ unit Drivers;
 interface
 
 uses
-  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil;
+  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews;
 
 type
   TEvent = TvEvents.TEvent;
   PEvent = ^TEvent;
   CharDef = array[0..15] of Byte;
 
+var
+  LSliceTimer: TEventTimer;
+  LSliceCnt: LongInt;
+
+{ Called by DN where the program may give time to others; nothing to do here. }
+procedure SliceAwake;
+
 const
+  AltCodes1: array[$10..$34] of Char =
+    'QWERTYUIOP'#0#0#0#0'ASDFGHJKL'#0#0#0#0#0'ZXCVBNM'#0#0;
+  mbLeftButton = $01;
+  mbRightButton = $02;
+  { the state of the shift keys of the last event (the bits of the BIOS: right shift 1, left shift 2, ctrl 4,
+    alt 8...), and the second byte (left/right ctrl and alt, DN); set by TProgram.GetEvent of DNApp }
+  ShiftState: Byte = 0;
+  ShiftState2: Byte = 0;
+  OldShiftState: Byte = 0;
+  DoubleAltUnlock: Boolean = True;
+  DoubleCtrlUnlock: Boolean = True;
   ButtonCount: Byte = 0;
   MouseEvents: Boolean = False;
   MouseReverse: Boolean = False;
@@ -62,6 +80,13 @@ var
   { TODO: DN reads and writes the screen as an array of 16-bit cells; the buffer of tv/ has other cells }
   ScreenBuffer: Pointer absolute TvScreen.ScreenBuffer;
   CursorLines: Word absolute TvScreen.CursorLines;
+
+{ The key code of an event in the form of DN: the low word is the code of Turbo Vision (scan code * 256 + character),
+  bits 16..19 are the state of the shift keys (1 and 2: shift, 4: ctrl, 8: alt; the shifts together are 3), as in
+  the constants kbLeft, kbShiftLeft, kbAltLeft... of DN. tv/ keeps the shift state in ControlKeyState. }
+function DNKeyCode(const Event: TEvent): LongInt;
+{ The reverse: the code in the form of DN goes into KeyCode and ControlKeyState of the event. }
+procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
 
 procedure InitDrivers;
 procedure DoneDrivers;
@@ -118,6 +143,27 @@ type
   TWordArr = array[0..65534] of Word;
   PLongArr = ^TLongArr;
   TLongArr = array[0..255] of LongInt;
+
+procedure SliceAwake;
+begin
+end;
+
+function DNKeyCode(const Event: TEvent): LongInt;
+var
+  Shift: LongInt;
+begin
+  Shift := 0;
+  if (Event.ControlKeyState and 3) <> 0 then
+    Shift := 3;
+  Shift := Shift or (Event.ControlKeyState and 12);
+  Result := LongInt(Event.KeyCode) or (Shift shl 16);
+end;
+
+procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
+begin
+  Event.KeyCode := Word(Code);
+  Event.ControlKeyState := (Event.ControlKeyState and not Word($F)) or Word((Code shr 16) and $F);
+end;
 
 procedure InitDrivers;
 begin

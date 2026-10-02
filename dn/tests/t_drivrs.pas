@@ -1,10 +1,11 @@
 { Tests of dn/new/drivers.pas }
 {$mode objfpc}{$H-}
 program t_drivrs;
-uses Drivers;
+uses Drivers, TvEvents;
 {$I dntest.inc}
 var
   Buf: array[0..9] of Word;
+  Ev: TEvent;
   S: String;
 {$IFDEF CPU32}
   T: String;
@@ -32,6 +33,22 @@ begin
   { keys }
   Check(GetAltChar(GetAltCode('Q')) = 'Q', 'Alt-Q and back');
   Check(GetAltChar(GetAltCode('5')) = '5', 'Alt-5 and back');
+  { the key codes of DN: the shift state in bits 16..19 }
+  FillChar(Ev, SizeOf(Ev), 0);
+  Ev.What := evKeyDown;
+  Ev.KeyCode := $4B00;
+  Check(DNKeyCode(Ev) = $004B00, 'DNKeyCode: Left');
+  Ev.ControlKeyState := 2;
+  Check(DNKeyCode(Ev) = $034B00, 'DNKeyCode: Shift-Left (any shift is 3)');
+  Ev.ControlKeyState := 4;
+  Ev.KeyCode := $7300;
+  Check(DNKeyCode(Ev) = $047300, 'DNKeyCode: Ctrl-Left');
+  Ev.ControlKeyState := 8 or $40;
+  Ev.KeyCode := $9B00;
+  Check(DNKeyCode(Ev) = $089B00, 'DNKeyCode: Alt-Left (the other flags do not count)');
+  SetDNKeyCode(Ev, $034B00);
+  Check((Ev.KeyCode = $4B00) and ((Ev.ControlKeyState and 15) = 3), 'SetDNKeyCode');
+  Check(DNKeyCode(Ev) = $034B00, 'SetDNKeyCode and DNKeyCode are reverse to each other');
   { FormatStr }
   { the parameters are 4-byte slots (as in Borland TV): a pointer fits only in a 32-bit program }
 {$IFDEF CPU32}
