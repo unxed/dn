@@ -60,6 +60,7 @@
 | 10a | `TvFiles` — `TSearchRec`, `TFileFinder`, `TFileCollection`, `TDirCollection`, `FExpand`, `FSplit`, `PathValid`... | `stddlg.h`, `tfilecol.cpp`, `tdircoll.cpp` | сделан (без потоков) |
 | 10b | `TvFileDlg` — `TFileDialog`, `TFileList`, `TSortedListBox`, `TFileInputLine`, `TFileInfoPane` | `tfildlg.cpp`, `tfillist.cpp`, `stddlg.cpp` | сделан (без потоков) |
 | 10c | `TvChDir` — `TChDirDialog`, `TDirListBox` | `tchdrdlg.cpp`, `tdirlist.cpp` | сделан (без потоков) |
+| 11a | `TvColorSel` — `TColorDialog`, `TColorSelector`, `TMonoSelector`, `TColorDisplay`, `TColorGroupList`, `TColorItemList`, `ColorItem`, `ColorGroup` | `colorsel.cpp` | сделан (без потоков) |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -330,3 +331,11 @@
 - `ChDir` вместо `chdir`+`setdisk`; на системах без букв дисков «диск» один — `C` (`DriveValid`, `GetDisk`).
 - Маска «все файлы» — `AllMask` (`*.*` для DOS/Windows, `*` иначе) — используется и файловым диалогом.
 - Тест `t_chdir` меняет текущий каталог во временный `tvf_cd` и возвращается назад.
+
+### TvColorSel (11a): решения
+
+- Списки групп и пунктов строятся `ColorItem(Name, Index, Next)` и `ColorGroup(Name, Items, Next)` (вместо `operator+`); диалог забирает и освобождает их; `ColorGroupItems` добавляет пункты к последней группе.
+- Палитра — `TPalette` (динамический массив `TColorAttr`, элемент 0 — размер); данные диалога — `TPalette`: `GetData` отдаёт копию, `SetData` берёт копию. Цвета правятся как BIOS-цвета (16 цветов) через `AttrToBIOS`/`AttrFromBIOS`.
+- Запомненные индексы групп — глобальная `ColorIndexes` (как статическая `colorIndexes` оригинала), `FreeColorIndexes` освобождает.
+- Оригинал в `SetData` берёт индекс пункта группы как индекс палитры (`pal->data[groups->getGroupIndex(...)]`) — повторено как есть, с проверкой границы.
+- BIOS-цвет 0 в `TDrawBuffer` значит «оставить атрибут» — `TColorDisplay` показывает его как `ErrorAttr`, как оригинал.
