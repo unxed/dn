@@ -50,6 +50,7 @@
 | 7c | `TvApp` — `TBackground`, `TDeskTop` (Tile, Cascade), `TProgram`, `TApplication` | `app.h`, `tprogram.cpp`, `tapplica.cpp`, `tdesktop.cpp`, `tbkgrnd.cpp` | сделан (без потоков, `LowMemory`; диалог — любой вид) |
 | 7d | `TvMouse` — состояние мыши → события (нажатие, отпускание, перемещение, автоповтор, колесо, двойной и тройной щелчок) | `tevent.cpp` (`getMouseEvent`) | сделан; задержки в мс (в оригинале тики по 55 мс), настраиваются переменными |
 | 7e | `TvObjs` — `TObject`, потоки `TStream`/`TDosStream`/`TBufStream`/`TMemoryStream` с реестром типов (`RegisterType`, `Get`, `Put`), коллекции `TCollection`/`TSortedCollection`/`TStringCollection` | свой, по API Pascal TV и семантике `TNSCollection` magiblot | написан; `TView` теперь потомок `TObject` |
+| 9a | `TvDialog` — `TDialog`, `TStaticText`, `TLabel`, `TButton` | `dialogs.h`, `tdialog.cpp`, `tstatict.cpp`, `tlabel.cpp`, `tbutton.cpp` | сделан (без потоков) |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -251,3 +252,10 @@
   `SizeOf(TFoo)`.
 - Тестовые программы теперь сбрасывают вывод после каждой строки `PASS` (`Flush`), иначе при
   зависании теста вывод теряется.
+- **Диалоги.** Первый вставленный выбираемый вид диалога получает фокус только после
+  `SelectNext(False)`: `FirstMatch` начинает с нижнего вида, а потом идёт сверху вниз, так что
+  текущим становится последний вставленный (как в оригинале; код диалогов вызывает
+  `SelectNext(False)` в конце). Таймеры видов: `TView.SetTimer`/`KillTimer` — виртуальные,
+  цепочка владельцев кончается на `TProgram`, у которого очередь таймеров; кнопка оживляется
+  на 100 мс (`cmTimerExpired`), поэтому тесты диалогов идут на `TvMem` с часами, которые
+  двигаются при ожидании события.
