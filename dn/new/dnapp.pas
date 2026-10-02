@@ -10,8 +10,8 @@ unit DNApp;
 interface
 
 uses
-  SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvMenus, TvApp,
-  Streams, Views, Drivers, Commands, xTime, DnIni;
+  SysUtils, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, Menus,
+  Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings;
 
 const
   EventsLen: Byte = 0;
@@ -35,7 +35,10 @@ type
   PProgram = ^TProgram;
   TProgram = object(TvApp.TApplication)
     IdleSecs: TEventTimer;
+    constructor Init;
     procedure ActivateView(P: PView);
+    { the screen savers of DN (the list of the available ones, the choice of one): TODO, nothing is done; Data is a TSaversData }
+    procedure InsertAvIdlerN(const Data; N: Integer);
     procedure GetEvent(var Event: TEvent); virtual;
     procedure Idle; virtual;
     procedure InitCommandLine; virtual;
@@ -75,14 +78,17 @@ var
   { the same variables as in TvApp (the objects there are the same) }
   Application: PProgram absolute TvApp.Application;
   Desktop: PDesktop absolute TvApp.DeskTop;
-  StatusLine: PStatusLine absolute TvApp.StatusLine;
-  MenuBar: PMenuView absolute TvApp.MenuBar;
+  { the menu bar and the status line of DN (the unit Menus of DN, not those of tv/); set by InitMenuBar and InitStatusLine
+    of TDNApplication, put into the program by TProgram.Init }
+  StatusLine: Menus.PStatusLine = nil;
+  MenuBar: Menus.PMenuView = nil;
   CommandLine: PView = nil;
   ResourceStream: PStream = nil;
   LngStream: PStream = nil;
   LStringList: PStringList = nil;
   Resource: PIdxResource = nil;
   appPalette: Integer absolute TvApp.AppPalette;
+  SystemColors: array[0..2] of ShortString absolute TvApp.SystemColors;
   { a procedure that prepares a dialog for ExecResource; ExecResource clears it }
   PreExecuteDialog: procedure(D: PView) = nil;
 
@@ -107,15 +113,33 @@ begin
   Unlock;
 end;
 
+constructor TProgram.Init;
+begin
+  inherited Init;
+  if StatusLine <> nil then
+    Insert(StatusLine);
+  if MenuBar <> nil then
+    Insert(MenuBar);
+end;
+
 procedure TProgram.ActivateView(P: PView);
 begin
   if P <> nil then
     P^.Select;
 end;
 
+procedure TProgram.InsertAvIdlerN(const Data; N: Integer);
+begin
+end;
+
 procedure TProgram.GetEvent(var Event: TEvent);
 begin
   inherited GetEvent(Event);
+  { as in Turbo Vision: the status line sees the keys and the clicks on it }
+  if (Event.What <> evNothing) and (StatusLine <> nil) then
+    if ((Event.What and evKeyDown) <> 0) or
+       (((Event.What and evMouseDown) <> 0) and StatusLine^.MouseInView(Event.Where)) then
+      StatusLine^.HandleEvent(Event);
   if Event.What <> evNothing then
   begin
     OldShiftState := ShiftState;
@@ -127,6 +151,8 @@ end;
 procedure TProgram.Idle;
 begin
   inherited Idle;
+  if StatusLine <> nil then
+    StatusLine^.Update;
   RunBackground;
 end;
 
