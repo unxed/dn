@@ -1,0 +1,239 @@
+"""A pty and a tiny terminal emulator, for the tests of the terminal backend (tv/src/tvunix.pas).
+
+PtyTerm runs a program in a pseudo terminal of a given size, sends keys to it and keeps the screen that the
+program draws (the text of the cells, the attributes of the cells and the cursor). It understands what TvUnix
+writes: cursor moves (CSI H, G), SGR (colors and styles), clear screen (CSI 2J), the alternate screen, the
+visibility of the cursor, and ignores the other private modes. It is a test aid, not a terminal.
+
+  t = PtyTerm(['./tvdemo'], cols=80, rows=25)
+  t.wait_for('File')        # until the text is on the screen
+  t.send(b'\\x1b[15~')       # F5
+  print(t.text())           # the screen as 25 lines
+  t.close()
+"""
+import fcntl
+import os
+import pty
+import re
+import select
+import signal
+import struct
+import termios
+import time
+import unicodedata
+
+
+class Screen:
+    def __init__(self, cols, rows):
+        self.cols, self.rows = cols, rows
+        self.reset()
+
+    def reset(self):
+        self.cells = [[(' ', None)] * self.cols for _ in range(self.rows)]
+        self.x = self.y = 0
+        self.attr = (None, None, 0)         # fg, bg, style
+        self.cursor_visible = True
+        self.alt = False
+        self.log = []                        # the private modes that were set (for the tests)
+
+    def put(self, ch):
+        if len(ch) != 1:
+            ch = '?'
+        w = 2 if unicodedata.east_asian_width(ch) in 'WF' else 1
+        if unicodedata.combining(ch):
+            return
+        if self.x + w > self.cols:
+            return                           # no wrapping (TvUnix switches it off)
+        self.cells[self.y][self.x] = (ch, self.attr)
+        if w == 2 and self.x + 1 < self.cols:
+            self.cells[self.y][self.x + 1] = ('', self.attr)
+        self.x += w
+
+    def sgr(self, params):
+        fg, bg, style = self.attr
+        i = 0
+        ps = params or [0]
+        while i < len(ps):
+            p = ps[i]
+            if p == 0:
+                fg, bg, style = None, None, 0
+            elif p in (1, 3, 4, 5, 7, 9):
+                style |= 1 << p
+            elif p in (22, 23, 24, 25, 27, 29):
+                style &= ~(1 << (p - 20))
+                if p == 22:
+                    style &= ~(1 << 1)
+            elif 30 <= p <= 37:
+                fg = ('i', p - 30)
+            elif 40 <= p <= 47:
+                bg = ('i', p - 40)
+            elif 90 <= p <= 97:
+                fg = ('i', p - 90 + 8)
+            elif 100 <= p <= 107:
+                bg = ('i', p - 100 + 8)
+            elif p == 39:
+                fg = None
+            elif p == 49:
+                bg = None
+            elif p in (38, 48) and i + 1 < len(ps):
+                if ps[i + 1] == 5 and i + 2 < len(ps):
+                    c = ('i', ps[i + 2]); i += 2
+                elif ps[i + 1] == 2 and i + 4 < len(ps):
+                    c = ('rgb', ps[i + 2], ps[i + 3], ps[i + 4]); i += 4
+                else:
+                    c = None
+                if p == 38:
+                    fg = c
+                else:
+                    bg = c
+            i += 1
+        self.attr = (fg, bg, style)
+
+    CSI = re.compile(rb'\x1b\[([?<>=]?)([0-9;:]*)([ -/]*)([@-~])')
+
+    def feed(self, data):
+        text = self.pending + data if hasattr(self, 'pending') else data
+        self.pending = b''
+        i = 0
+        while i < len(text):
+            b = text[i:i + 1]
+            if b == b'\x1b':
+                m = self.CSI.match(text, i)
+                if not m:
+                    if i + 1 >= len(text) or text[i + 1:i + 2] == b'[':
+                        self.pending = text[i:]      # an incomplete sequence: wait for the rest
+                        return
+                    i += 2
+                    continue
+                self.csi(m.group(1).decode(), m.group(2).decode(), m.group(3).decode(), m.group(4).decode())
+                i = m.end()
+                continue
+            if b == b'\r':
+                self.x = 0
+            elif b == b'\n':
+                self.y = min(self.y + 1, self.rows - 1)
+            elif b == b'\x07':
+                pass
+            else:
+                n = 1
+                c = text[i]
+                if c >= 0xF0: n = 4
+                elif c >= 0xE0: n = 3
+                elif c >= 0xC0: n = 2
+                if i + n > len(text):
+                    self.pending = text[i:]
+                    return
+                self.put(text[i:i + n].decode('utf-8', 'replace'))
+                i += n
+                continue
+            i += 1
+
+    def csi(self, priv, params, inter, final):
+        nums = [int(p) if p else 0 for p in re.split('[;:]', params)] if params else []
+        n = lambda d=1: nums[0] if nums and nums[0] else d
+        if priv == '?':
+            for p in nums:
+                if final == 'h':
+                    self.log.append(('h', p))
+                    if p == 25: self.cursor_visible = True
+                    if p == 1049: self.alt = True
+                elif final == 'l':
+                    self.log.append(('l', p))
+                    if p == 25: self.cursor_visible = False
+                    if p == 1049: self.alt = False
+            return
+        if priv:
+            return
+        if final == 'H' or final == 'f':
+            self.y = min(max(n() - 1, 0), self.rows - 1)
+            self.x = min(max((nums[1] if len(nums) > 1 and nums[1] else 1) - 1, 0), self.cols - 1)
+        elif final == 'G':
+            self.x = min(max(n() - 1, 0), self.cols - 1)
+        elif final == 'A': self.y = max(self.y - n(), 0)
+        elif final == 'B': self.y = min(self.y + n(), self.rows - 1)
+        elif final == 'C': self.x = min(self.x + n(), self.cols - 1)
+        elif final == 'D': self.x = max(self.x - n(), 0)
+        elif final == 'm':
+            self.sgr(nums)
+        elif final == 'J' and (not nums or nums[0] in (2, 3)):
+            self.cells = [[(' ', None)] * self.cols for _ in range(self.rows)]
+        elif final == 'K':
+            for x in range(self.x, self.cols):
+                self.cells[self.y][x] = (' ', None)
+
+    def lines(self):
+        return [''.join(c for c, _ in row).rstrip() for row in self.cells]
+
+
+class PtyTerm:
+    def __init__(self, cmd, cols=80, rows=25, env=None):
+        self.screen = Screen(cols, rows)
+        self.raw = b''
+        e = dict(os.environ)
+        e.update({'TERM': 'xterm-256color', 'COLORTERM': ''})
+        if env:
+            e.update(env)
+        self.pid, self.fd = pty.fork()
+        if self.pid == 0:
+            os.environ.update(e)
+            os.execvpe(cmd[0], cmd, e)
+        self.set_size(cols, rows)
+
+    def set_size(self, cols, rows):
+        fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack('HHHH', rows, cols, 0, 0))
+        self.screen.cols, self.screen.rows = cols, rows
+        self.screen.cells = [[(' ', None)] * cols for _ in range(rows)]
+
+    def resize(self, cols, rows):
+        self.set_size(cols, rows)
+        os.kill(self.pid, signal.SIGWINCH)
+
+    def pump(self, timeout=0.3):
+        """reads what the program wrote until it is quiet for `timeout` seconds"""
+        end = time.time() + timeout
+        while time.time() < end:
+            r, _, _ = select.select([self.fd], [], [], max(end - time.time(), 0))
+            if not r:
+                break
+            try:
+                data = os.read(self.fd, 65536)
+            except OSError:
+                break
+            if not data:
+                break
+            self.raw += data
+            self.screen.feed(data)
+            end = time.time() + timeout
+
+    def send(self, data, settle=0.3):
+        if isinstance(data, str):
+            data = data.encode()
+        os.write(self.fd, data)
+        self.pump(settle)
+
+    def text(self):
+        return '\n'.join(self.screen.lines())
+
+    def wait_for(self, text, timeout=5.0):
+        end = time.time() + timeout
+        while time.time() < end:
+            self.pump(0.2)
+            if text in self.text():
+                return True
+        return False
+
+    def close(self, wait=3.0):
+        """the exit status of the program (kills it if it does not end)"""
+        end = time.time() + wait
+        status = None
+        while time.time() < end:
+            self.pump(0.1)
+            pid, st = os.waitpid(self.pid, os.WNOHANG)
+            if pid:
+                status = os.waitstatus_to_exitcode(st)
+                break
+        if status is None:
+            os.kill(self.pid, signal.SIGKILL)
+            os.waitpid(self.pid, 0)
+        os.close(self.fd)
+        return status
