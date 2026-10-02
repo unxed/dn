@@ -1,2 +1,6 @@
 audit/ref/
 __pycache__/
+*.exe
+*.o
+*.ppu
+*.a
