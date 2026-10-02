@@ -60,3 +60,26 @@ objects2.pas
 
 # the 8-byte placeholder of DN in place of the Objects of Borland (its text means "no way"): the unit Objects is the shim of tv/
 objects.pas
+
+# --- files of the contributors of DN OSP (Cat, JO) that no build of ours uses (the plugin interface of DN/2, the OS/2 PM API
+# adapters, a utility of the OS/2 shell; not reachable from dn.pas and rcp.pas by `uses`: bootstrap/tools/dn-reach.py). Their headers name
+# the authors and give no license: we do not take what we do not need (dn/PROVENANCE.md).
+_dnfuncs.pas
+_drives.pas
+_editors.pas
+_fviewer.pas
+_menus.pas
+_model1.pas
+_objects.pas
+_regexp.pas
+_vmtreg.pas
+dn2pmapi.pas
+dnfuncs.pas
+dnpmapil.pas
+modules.pas
+openobj.pas
+plugin.pas
+plugman.pas
+plugrez.pas
+tasklst.pas
+vars.pas

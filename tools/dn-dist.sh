@@ -1,18 +1,17 @@
 #!/bin/sh
 # Makes dist/dos/: the DOS build of DN that can be tried without building it (DN.EXE for go32v2, the resources, the DPMI
 # host, the licence texts) and screenshots of it in DOSBox-X. Run it when something visible changed (not for every commit:
-# the binary is in git). usage: tools/dn-dist.sh   (the same environment as tools/dn-run.sh: DN_PREFIX or DN_CROSS+DN_LINK,
-# DN_LOCAL_TREE)
+# the binary is in git). usage: tools/dn-dist.sh   (the same environment as tools/build.sh dos: DN_PREFIX or DN_CROSS+DN_LINK)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 dist=$here/dist/dos
 if [ -n "${DN_PREFIX:-}" ]; then : "${DN_LINK:=$DN_PREFIX}"; fi
 : "${DN_LINK:?set DN_PREFIX or DN_LINK}"
 tmp=${TMPDIR:-/tmp}; work=$tmp/dn-dist; rm -rf "$work"; mkdir -p "$work" "$dist/screenshots"
-# a build without line numbers and symbols (small: -Xs); the tree, rcp, the resources: tools/dn-run.sh
-DN_EXTRA="-Xs" DN_TRACE="" DN_KEYS="" tools/dn-run.sh "$work/run" >/dev/null 2>&1 || true
-[ -f "$work/run/DN.EXE" ] && [ -f "$work/run/ENGLISH.DLG" ] || { echo "the build failed: run tools/dn-run.sh" >&2; exit 1; }
-cp "$work/run/DN.EXE" "$dist/DN.EXE"
+# a build without line numbers and symbols (small: -Xs): tools/build.sh dos
+DN_EXTRA="-Xs" "$here/tools/build.sh" dos "$work/run" >/dev/null 2>&1 || true
+[ -f "$work/run/dn.exe" ] && [ -f "$work/run/ENGLISH.DLG" ] || { echo "the build failed: run tools/build.sh dos" >&2; exit 1; }
+cp "$work/run/dn.exe" "$dist/DN.EXE"
 cp "$work"/run/*.DLG "$work"/run/*.LNG "$work"/run/*.HLP "$dist/"
 cp "$work/run/CWSDPMI.EXE" "$dist/"
 # the documentation of CWSDPMI (its terms: the doc goes with the program)

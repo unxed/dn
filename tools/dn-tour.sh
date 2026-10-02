@@ -1,7 +1,7 @@
 #!/bin/sh
 # A smoke tour of DN in DOSBox-X: each scenario is a start of DN from a clean state, some keys (DNKEYS, see dn/new/dnapp.pas), a
 # dump of the screen; the script prints for each scenario "ok" or the top of the stack of the exception, and keeps the screens
-# in OUTDIR/<name>.txt. Needs a build with line numbers (tools/dn-run.sh with DN_EXTRA=-gl) in OUTDIR (DN.EXE, *.DLG, *.LNG).
+# in OUTDIR/<name>.txt. Needs a build with line numbers (tools/build.sh dos with DN_EXTRA=-gl) in OUTDIR (DN.EXE, *.DLG, *.LNG).
 # usage: tools/dn-tour.sh OUTDIR [NAME...]      (no names: all the scenarios)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
@@ -11,7 +11,7 @@ SCEN="tab:011B,0F09 f1help:011B,3B00 f2user:011B,3C00 f5copy:011B,3F00 f6ren:011
 for s in $SCEN; do
     name=${s%%:*}; keys=${s#*:}
     d=$out/tour-$name; rm -rf "$d"; mkdir -p "$d"
-    cp "$out/DN.EXE" "$out"/*.DLG "$out"/*.LNG "$out"/*.HLP "$out/CWSDPMI.EXE" "$d/"
+    cp "$out"/[Dd][Nn].[Ee][Xx][Ee] "$d/DN.EXE"; cp "$out"/*.DLG "$out"/*.LNG "$out"/*.HLP "$out/CWSDPMI.EXE" "$d/"
     n=$(printf '%s' "$keys" | tr ',' '\n' | wc -l)
     (cd "$d" && SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 5 "${DOS_TIMEOUT:-100}" dosbox-x -silent -nogui -noconsole -defaultconf \
         -set "serial serial1=file file:SER.TXT" -c "mount c $d" -c "c:" -c "set DNDUMP=SCR.DAT" -c "set DNSERIAL=1" \

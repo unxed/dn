@@ -34,7 +34,7 @@ DN_OPTS="$DN_FPC_COMMON $DN_OPT ${DN_EXTRA:-}"
 DN_STAGE=${DN_STAGE:-$tmp/dn-stage-$DN_TARGET}
 dn_stage() {
     rm -rf "$DN_STAGE"; mkdir -p "$DN_STAGE"
-    for f in "$here"/dn/src/*.pas "$here"/dn/src/*.inc; do ln -s "$f" "$DN_STAGE/$(basename "$f")"; done
+    for f in "${DN_SRC:-$here/dn/src}"/*.pas "${DN_SRC:-$here/dn/src}"/*.inc; do ln -s "$f" "$DN_STAGE/$(basename "$f")"; done
     for d in $DN_UNITS_EXTRA; do
         for f in "$here/dn/$d"/*; do ln -sf "$f" "$DN_STAGE/$(basename "$f")"; done
     done

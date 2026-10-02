@@ -19,14 +19,10 @@ type
     procedure Put(Key: AWord; S: String);
     procedure Store(var S: TStream);
   private
-    StrPos: AWord;
-    StrSize: AWord;
-    Strings: PByteArray;
-    IndexPos: AWord;
-    IndexSize: AWord;
-    Index: PStrIndex;
-    Cur: TStrIndexRec;
-    procedure CloseCurrent;
+    Text: array of Byte;      { the strings, one after another (a length byte, the characters) }
+    TextLen: LongInt;
+    Runs: array of TStrIndexRec;  { the index: the runs of consecutive keys, up to 16 in a run }
+    RunCount: LongInt;
   end;
 
 var
@@ -34,57 +30,65 @@ var
 
 implementation
 
+const
+  MaxRun = 16;
+
+{ the sizes of the arguments are a hint only: the arrays grow as needed }
 constructor TStrListMaker.Init(AStrSize, AIndexSize: AWord);
 begin
   inherited Init;
-  StrSize := AStrSize;
-  IndexSize := AIndexSize;
-  GetMem(Strings, AStrSize);
-  GetMem(Index, AIndexSize * SizeOf(TStrIndexRec));
-  StrPos := 0;
-  IndexPos := 0;
-  FillChar(Cur, SizeOf(Cur), 0);
+  SetLength(Text, AStrSize);
+  SetLength(Runs, AIndexSize);
+  TextLen := 0;
+  RunCount := 0;
 end;
 
 destructor TStrListMaker.Done;
 begin
-  FreeMem(Index, IndexSize * SizeOf(TStrIndexRec));
-  FreeMem(Strings, StrSize);
+  Text := nil;
+  Runs := nil;
   inherited Done;
 end;
 
-procedure TStrListMaker.CloseCurrent;
-begin
-  if Cur.Count <> 0 then
-  begin
-    Index^[IndexPos] := Cur;
-    Inc(IndexPos);
-    Cur.Count := 0;
-  end;
-end;
-
 procedure TStrListMaker.Put(Key: AWord; S: String);
+var
+  N: LongInt;
+  Last: ^TStrIndexRec;
 begin
-  { a new record of the index when 16 strings are in the current one or the number does not follow the last }
-  if (Cur.Count = 16) or (Key <> Cur.Key + Cur.Count) then
-    CloseCurrent;
-  if Cur.Count = 0 then
+  N := Length(S) + 1;
+  if TextLen + N > Length(Text) then
+    SetLength(Text, (TextLen + N) * 2);
+  Move(S[0], Text[TextLen], N);
+  { the key goes to the last run when it is the next one after it and the run is not full }
+  if RunCount > 0 then
   begin
-    Cur.Key := Key;
-    Cur.Offset := StrPos;
+    Last := @Runs[RunCount - 1];
+    if (Last^.Count < MaxRun) and (Key = Last^.Key + Last^.Count) then
+    begin
+      Inc(Last^.Count);
+      Inc(TextLen, N);
+      Exit;
+    end;
   end;
-  Inc(Cur.Count);
-  Move(S, Strings^[StrPos], Length(S) + 1);
-  Inc(StrPos, Length(S) + 1);
+  if RunCount = Length(Runs) then
+    SetLength(Runs, RunCount * 2 + 16);
+  Runs[RunCount].Key := Key;
+  Runs[RunCount].Count := 1;
+  Runs[RunCount].Offset := TextLen;
+  Inc(RunCount);
+  Inc(TextLen, N);
 end;
 
 procedure TStrListMaker.Store(var S: TStream);
+var
+  Sz, Cnt: AWord;
 begin
-  CloseCurrent;
-  S.Write(StrPos, SizeOf(StrPos));
-  S.Write(Strings^, StrPos);
-  S.Write(IndexPos, SizeOf(IndexPos));
-  S.Write(Index^, IndexPos * SizeOf(TStrIndexRec));
+  Sz := TextLen;
+  Cnt := RunCount;
+  S.Write(Sz, SizeOf(Sz));
+  if TextLen > 0 then S.Write(Text[0], TextLen);
+  S.Write(Cnt, SizeOf(Cnt));
+  if RunCount > 0 then S.Write(Runs[0], RunCount * SizeOf(TStrIndexRec));
 end;
 
 function BuildNothing(var S: TStream): PObject;

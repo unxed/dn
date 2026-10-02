@@ -1,0 +1,29 @@
+# TParamText (carved from DIALOGS.PAS) repeated four methods of TParamText of Borland TV in a row (audit: 93 tokens): the same
+# actions, in another order and form.
+file: dndlgs.pas
+from: function TParamText.DataSize: Word;
+to: S.Write(ParamCount, SizeOf(AInt));
+sha1: ce3091924597cf3315f04b988297cdfd274d4bee
+---
+function TParamText.DataSize: Word;
+  begin
+  Result := ParamCount * SizeOf(LongInt);
+  end;
+
+procedure TParamText.GetText(var S: String);
+  begin
+  S := '';
+  if Text <> nil then
+    FormatStr(S, Text^, ParamList^);
+  end;
+
+procedure TParamText.SetData(var Rec);
+  begin
+  ParamList := @Rec;
+  DrawView;
+  end;
+
+procedure TParamText.Store(var S: TStream);
+  begin
+  TStaticText.Store(S);
+  S.Write(ParamCount, SizeOf(AInt));

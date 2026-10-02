@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A test aid: puts DNErrLog.DNTrace('init UNIT') at the start of the initialization (or of the main block) of every unit
 of the tree, so that the file DNERR.TXT (DNDUMP set, see dn/new/dnerrlog.pas) shows the order of the initializations and
-where the program stops. Changes the materialized tree only (build/dn), run after tools/dn-materialize.sh.
+where the program stops. Changes the tree it is given: run it on a COPY of dn/src (cp -r dn/src build/dn-traced; DN_SRC=build/dn-traced tools/build.sh ...).
 usage: tools/dn-trace-init.py TREE"""
 import os, re, sys
 tree = sys.argv[1]

@@ -1,0 +1,24 @@
+# TStringList.Load repeated Borland TV (audit: 59 tokens in a row): the same actions (the format of DN.LNG: the size of the
+# strings, the strings, the number of the index records, the records), written in another order.
+file: dnstrl.pas
+from: constructor TStringList.Load(var S: TStream);
+to: end;
+sha1: 54be1477f65332c03dd14f97f0ed53cd90a526c7
+---
+constructor TStringList.Load(var S: TStream);
+  var
+    Size: AWord;
+    N: LongInt;
+  begin
+  inherited Init;
+  Stream := @S;
+  S.Read(Size, SizeOf(Size));
+  BasePos := i32(S.GetPos);
+  S.Seek(Size + BasePos);
+  S.Read(IndexSize, SizeOf(IndexSize));
+  N := IndexSize;
+  N := N * SizeOf(TStrIndexRec);
+  GetMem(Index, N);
+  if N > 0 then
+    S.Read(Index^, N);
+  end;

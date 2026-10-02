@@ -53,8 +53,8 @@ type
   { the data record of a list box: the collection (owned by the list box after SetData)
     and the number of the selected item }
   PListBoxRec = ^TListBoxRec;
-  { packed and Selection a LongInt: the layout of the data record of Virtual Pascal (DN builds its records on it; Integer there
-    has 32 bits and the records are byte-aligned), see dn/TODO-later.md }
+  { packed and Selection a LongInt: the layout of the data record of Virtual Pascal (the application builds its records on it; Integer there
+    has 32 bits and the records are byte-aligned), the layout is a compatibility requirement of the application }
   TListBoxRec = packed record
     List: PCollection;
     Selection: LongInt;
@@ -80,8 +80,8 @@ const
 var
   { stream records (see RView of TvViews) }
   RListViewer, RListBox: TStreamRec;
-  { TListBox.Done disposes the list (as in Turbo Vision); the fork of DN does not and its code disposes the list itself
-    (TSysDialog.Done): DNApp sets False }
+  { TListBox.Done disposes the list (as in Turbo Vision); the fork of the application does not and its code disposes the list itself
+    (TSysDialog.Done): the application sets False }
   ListBoxOwnsList: Boolean = True;
 
 implementation

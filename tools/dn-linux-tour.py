@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A smoke tour of the Linux build of DN in a pty: each scenario is a start of DN from a clean state, some keys, the screen.
 Prints "ok" or what went wrong (the program ended, or does not answer) and keeps the screens in OUTDIR/tour-NAME.txt.
-usage: tools/dn-linux-tour.py OUTDIR [NAME...]     (OUTDIR: the result of tools/dn-linux.sh: dn, *.LNG, *.DLG, *.HLP)"""
+usage: tools/dn-linux-tour.py OUTDIR [NAME...]     (OUTDIR: the result of tools/build.sh linux|linux64: dn, *.LNG, *.DLG, *.HLP)"""
 import os
 import shutil
 import sys
