@@ -10,6 +10,19 @@ begin
   Result.Assign(A, B, C, D);
 end;
 
+{ the first mouse state differs from "nothing": that is an event; take all of them }
+procedure Drain;
+var
+  E: TEvent;
+  N: Integer;
+begin
+  N := 0;
+  repeat
+    PollEvent(0, E);
+    Inc(N);
+  until (E.What = evNothing) or (N > 100);
+end;
+
 var
   App: PApplication;
   W: PWindow;
@@ -55,8 +68,8 @@ begin
   Check(DosReadAttr(2, 3) = $1F, 'active frame color');
 
   { keyboard: keys put in the BIOS buffer come out as events }
-  while not DosKeyBufferEmpty do
-    DosReadKey(Ev);
+  Drain;
+  Check(DosKeyBufferEmpty, 'the keyboard buffer is empty');
   DosStuffKey($3B00);
   PollEvent(0, Ev);
   Check((Ev.What = evKeyDown) and (Ev.KeyCode = kbF1), 'F1');
@@ -84,6 +97,7 @@ begin
   Check((St.Where.X = 10) and (St.Where.Y = 5) and (St.Buttons = 0), 'the position is in cells');
 
   { the clock and waiting }
+  Drain;
   T0 := ClockMs;
   DosYields := 0;
   PollEvent(150, Ev);
