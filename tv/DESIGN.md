@@ -56,6 +56,7 @@
 | 9d | `TvInput` — `TInputLine`, `InputBox`, `InputBoxRect` | `tinputli.cpp`, `msgbox.cpp` | сделан (без потоков) |
 | 9e | `TvCluster` — `TCluster`, `TRadioButtons`, `TCheckBoxes`, `TMultiCheckBoxes`, `TSItem`/`NewSItem` | `tcluster.cpp`, `tradiobu.cpp`, `tcheckbo.cpp`, `tmulchkb.cpp` | сделан (без потоков) |
 | 9f | `TvList` — `TListViewer`, `TListBox`, `TListBoxRec` | `tlstview.cpp`, `tlistbox.cpp` | сделан (без потоков) |
+| 9g | `TvHist` — `HistoryAdd/Count/Str`, `THistory`, `THistoryWindow`, `THistoryViewer` | `histlist.cpp`, `thistory.cpp`, `thistwin.cpp`, `thstview.cpp` | сделан (без потоков) |
 | 8a | `TvMem` — бэкенд «в памяти»: экран в буфере, события из сценария, поддельные часы | свой | сделан |
 | 8b | `TvDos` — бэкенд DOS: видеопамять, int 10h (каретка, режим), клавиатура int 16h, мышь int 33h, часы BIOS | свой | написан; проверяется в DOSBox-X (`tv/dostests/t_dosbk.pas`, демо `tv/demo/tvdemo.pas`) |
 | 8c | `TvClip` — буфер обмена (UTF-8, внутренний буфер, крючки системного, перекодировка OEM и CR LF); в `TvDos` — WinOldAp (int 2Fh AX=17xxh) | свой | написан; WinOldAp проверяется в DOSBox-X (`t_dosbk`) и ещё надо в Windows (веха 5) |
@@ -291,3 +292,12 @@
 - Элементы `TListBox` — `PStr` (как у `TStringCollection`); `Items` принадлежит списку (`NewList`/`SetData` освобождают прежнюю коллекцию).
 - `Done` заменяет `shutDown`: обнуляет указатели на полосы прокрутки (то же решение, что в `TScroller`).
 - `TListBoxRec` = `(Items: PCollection; Selection: Word)`; `DataSize` = его размер.
+
+### TvHist (9g): решения
+
+- Список строк — динамический массив записей (Id, строка) вместо блока байт; учёт `HistorySize` тот же (3 байта + длина на запись), старейшие записи вытесняются.
+- Пустой первый элемент оригинала не нужен: после его вытеснения оригинал пропускает первую строку списка (баг), у нас этого нет.
+- Инициализация/освобождение — в `initialization`/`finalization` юнита; `ClearHistory`, `DoneHistory` — по требованию (тесты).
+- `HistoryStr` возвращает `''`, если строки нет (оригинал — nil).
+- `THistoryWindow` получает просмотрщик из виртуального `InitViewer` (вместо указателя на функцию `THistInit`).
+- DN-совместимость (отдельные стили, `HistoryAdd` с длинными строками, хранение в файле) — задача слоя адаптеров в `dn/new`.
