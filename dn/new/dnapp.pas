@@ -207,7 +207,8 @@ begin
       StatusLine^.HandleEvent(Event);
   if Event.What = evKeyDown then
     DNTrace('key ' + IntToHex(Event.KeyCode, 4) + ' shift ' + IntToHex(Event.ControlKeyState, 4));
-  if Event.What <> evNothing then
+  { the state of the shift keys is that of keyboard and mouse events: the field is not set in the messages (commands, broadcasts) }
+  if (Event.What and (evKeyDown or evMouse)) <> 0 then
   begin
     OldShiftState := ShiftState;
     ShiftState := Byte(Event.ControlKeyState);

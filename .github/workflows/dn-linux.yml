@@ -1,0 +1,55 @@
+name: dn-linux
+# The Linux build of DN (i386, static) from the public archive of DN OSP: the tree (DN_TARGET=linux), the cross compiler for
+# i386-linux built from the sources of FPC (cached), rcp and dn, the resources; then the tour and the file operations in a pty
+# (tools/dn-linux-tour.py, tools/dn-linux-ops.py). The result is an artifact.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - dn/**
+      - tv/**
+      - tools/dn-*.sh
+      - tools/dn-*.py
+      - tools/pty_screen.py
+      - tools/build-fpc-i386-linux.sh
+      - tools/gen-shim.py
+      - tools/ifdef-strip.py
+      - .github/workflows/dn-linux.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl make git binutils unrar unzip curl python3 patch
+      - name: Cross compiler cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/fpc-i386-linux
+          key: fpc-i386-linux-${{ hashFiles('tools/build-fpc-i386-linux.sh') }}
+      - name: Build the cross compiler
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: tools/build-fpc-i386-linux.sh ~/fpc-i386-linux
+      - name: Build DN (the tree, rcp, dn, the resources, the help)
+        run: DN_LINUX=~/fpc-i386-linux tools/dn-linux.sh out/dnlinux
+      - name: Does a 32-bit program run here?
+        run: file out/dnlinux/dn
+      - name: Tour in a pty
+        run: |
+          python3 tools/dn-linux-tour.py out/dnlinux | tee tour.txt
+          ! grep -v ' ok$' tour.txt
+      - name: File operations in a pty
+        run: python3 tools/dn-linux-ops.py out/dnlinux
+      - name: The screens of the tour
+        if: always()
+        run: for f in out/dnlinux/tour-start.txt out/dnlinux/tour-f1help.txt out/dnlinux/tour-f7mkdir.txt; do echo "=== $f"; cat "$f"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dn-linux-i386
+          path: |
+            out/dnlinux/dn
+            out/dnlinux/*.LNG
+            out/dnlinux/*.DLG
+            out/dnlinux/*.HLP
