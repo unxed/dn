@@ -10,7 +10,7 @@
 # vpsyslo2.pas and lfnvp.pas are DN OSP code (their headers say so), they stay and are adapted by patches.
 vpsyslow.pas
 
-# --- from the audit (tools/gen-exclude.py audit/reports/2026-10-01/dnosp214.txt dn/rewrite): 29 files over the gate
+# --- from the audit (tools/gen-exclude.py audit/reports/2026-10-01/dnosp214.txt dn/rewrite): 28 files over the gate
 _apps.pas
 _collect.pas
 _defines.pas
@@ -26,7 +26,6 @@ DIALOGS.PAS
 DNAPP.PAS
 DNStdDlg.pas
 edwin.pas
-gauge.pas
 gauges.pas
 helpfile.pas
 HELPKERN.PAS
