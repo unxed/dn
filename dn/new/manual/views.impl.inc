@@ -95,3 +95,17 @@ begin
     end;
   Result := 0;
 end;
+
+procedure UpdateAll(All: Boolean);
+var
+  I: Integer;
+begin
+  if not All then
+  begin
+    RunBackground;
+    Exit;
+  end;
+  for I := 0 to High(Background) do
+    if Background[I].View <> nil then
+      Background[I].View^.Update;
+end;
