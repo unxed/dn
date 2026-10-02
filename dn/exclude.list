@@ -2,4 +2,49 @@
 # the root of the unpacked archive, compared case-insensitively). Why a file is here:
 # it is replaced by the new TV (tv/) or rewritten by us, and its code is of Borland origin
 # (the audit gate: raw% <= 2 and maxrun < 48 per file, see audit/README.md).
-# The list is made from the audit of the pinned archive; empty until the first audit.
+# The part after "from the audit" is made by tools/gen-exclude.py from the audit of the pinned archive.
+
+# Virtual Pascal runtime (© 1995-2003 vpascal.com), not DN code: replaced by our own dn/new/vpsyslow.pas
+# (the API that DN uses is listed in spec/vp-api-vpsyslow.md; no code is copied).
+# vpsyslo2.pas and lfnvp.pas are DN OSP code (their headers say so), they stay and are adapted by patches.
+vpsyslow.pas
+
+# --- from the audit (tools/gen-exclude.py audit/reports/2026-10-01/dnosp214.txt): 38 files over the gate
+_apps.pas
+_collect.pas
+_defines.pas
+_dialogs.pas
+_gauge.pas
+_model2.pas
+_streams.pas
+_views.pas
+advance6.pas
+asciitab.pas
+calendar.pas
+COLLECT.PAS
+colorsel.pas
+colorvga.pas
+defines.pas
+DIALOGS.PAS
+DNAPP.PAS
+DNStdDlg.pas
+edwin.pas
+filetype.pas
+FVIEWER.PAS
+gauge.pas
+gauges.pas
+helpfile.pas
+HELPKERN.PAS
+histlist.pas
+listmakr.pas
+memory.pas
+messages.pas
+scroller.pas
+STREAMS.PAS
+strview.pas
+TopView_.PAS
+tvhc.pas
+usersavr.pas
+validate.pas
+version.pas
+views.pas
