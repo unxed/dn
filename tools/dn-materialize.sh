@@ -30,6 +30,10 @@ fi
 cp -a "$src"/. "$out"/
 echo "dn-materialize: sources from ${src#$raw/} ($(find "$out" -type f | wc -l) files)"
 
+# the classes of DN itself in the files that are excluded as a whole: carved into new units (dn/carve.list)
+if [ -f "$here/dn/carve.list" ]; then
+    python3 "$here/tools/dn-carve.py" "$here/dn/carve.list" "$out" | sed 's|^|  |'
+fi
 # exclusions
 grep -v '^[[:space:]]*#' "$here/dn/exclude.list" | grep -v '^[[:space:]]*$' | while read -r pat; do
     find "$out" -ipath "$out/$pat" -type f -print -delete

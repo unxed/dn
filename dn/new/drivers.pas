@@ -88,6 +88,9 @@ function DNKeyCode(const Event: TEvent): LongInt;
 { The reverse: the code in the form of DN goes into KeyCode and ControlKeyState of the event. }
 procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
 
+{ A double click: a flag of the mouse event in tv/ (EventFlags bit 2); DN has the field Double. }
+procedure SetEventDouble(var Event: TEvent; Value: Boolean);
+
 procedure InitDrivers;
 procedure DoneDrivers;
 procedure InitEvents;
@@ -157,6 +160,14 @@ begin
     Shift := 3;
   Shift := Shift or (Event.ControlKeyState and 12);
   Result := LongInt(Event.KeyCode) or (Shift shl 16);
+end;
+
+procedure SetEventDouble(var Event: TEvent; Value: Boolean);
+begin
+  if Value then
+    Event.EventFlags := Event.EventFlags or 2
+  else
+    Event.EventFlags := Event.EventFlags and not Word(2);
 end;
 
 procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
