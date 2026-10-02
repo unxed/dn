@@ -8,7 +8,9 @@ usage: python3 tools/gen-codepage.py > tv/src/tvcp.inc
 """
 import sys
 
-PAGES = [("Cp437", "cp437"), ("Cp866", "cp866")]
+# the OEM code pages of DOS that Python knows (what DOS reports by INT 21h AX=6601h)
+IDS = [437, 737, 775, 850, 852, 855, 857, 858, 860, 861, 862, 863, 864, 865, 866, 869]
+PAGES = [("Cp%d" % i, "cp%d" % i) for i in IDS]
 
 # Unicode code points of the IBM PC glyphs for bytes 00h..1Fh and 7Fh
 LOW = [0x0000, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
@@ -27,7 +29,10 @@ def table(codec):
         elif b < 0x80:
             t.append(b)
         else:
-            c = bytes([b]).decode(codec)
+            try:
+                c = bytes([b]).decode(codec)
+            except UnicodeDecodeError:
+                c = "\ufffd"          # undefined in the page
             assert len(c) == 1 and ord(c) <= 0xFFFF
             t.append(ord(c))
     return t
