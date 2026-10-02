@@ -48,3 +48,9 @@ usersavr.pas
 validate.pas
 version.pas
 views.pas
+
+# --- not RIT/OSP code (tools/dn-provenance.py; PLAN.md decision 11): replaced by FPC RTL units or ours
+sysutils.pas
+rtpatch.pas
+regexp.pas
+eaoper.pas
