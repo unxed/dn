@@ -116,6 +116,12 @@ procedure SysBeepEx(Frequency, Duration: LongInt);
 function PhysMemAvail: LongInt;
 { Runs a program and waits for it; returns the DOS error code (0 = the program was run). Env, Async and the
   redirection handles of the Virtual Pascal version are ignored: DOS has no use for them. }
+type
+  { how DN starts a program (DNExec compares ExecFlags with efAsync; here only the names, the value is not used) }
+  TExecFlags = (efSync, efAsync, efDetach, efInherit);
+var
+  ExecFlags: TExecFlags = efSync;
+
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
 { In DOS: the critical error handler does not stop the program (INT 24h answers "fail"). }

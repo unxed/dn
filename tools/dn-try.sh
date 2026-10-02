@@ -9,9 +9,9 @@ out=${TMPDIR:-/tmp}/dn-try-o; mkdir -p "$out"
 cd "$here/build/dn" || exit 1
 if [ -n "$DN_CROSS" ]; then
     X=$DN_CROSS/lib/fpc/3.2.2; U=$X/units/go32v2
-    $X/ppcross386 -Tgo32v2 -XPi586-pc-msdosdjgpp- $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/build/probe/alias" -Fu"$here/dn/new" \
+    $X/ppcross386 -Tgo32v2 -XPi586-pc-msdosdjgpp- $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/dn/new" \
         -Fu"$here/tv/src" -Fu"$U/*" -Fu"$U/rtl" -FU"$out" -Cn -vewn "$1" 2>&1 | grep -a -E 'Error|Fatal' | head -${2:-12}
     exit 0
 fi
-fpc $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/build/probe/alias" -Fu"$here/dn/new" -Fu"$here/tv/src" -FU"$out" -Cn -vewn "$1" 2>&1 \
+fpc $DN_FPC_OPTS -Se300 -Fu. -Fu"$here/dn/new" -Fu"$here/tv/src" -FU"$out" -Cn -vewn "$1" 2>&1 \
     | grep -a -E 'Error|Fatal' | head -${2:-12}
