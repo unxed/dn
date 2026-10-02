@@ -51,10 +51,10 @@ function SysTvGetSrcBuf: Pointer;
 procedure SysTvShowBuf(Pos, Size: LongInt);
 procedure SysTvClrScr;
 procedure SysTvInitCursor;
-procedure SysTvGetCurType(var Y1, Y2: SmallWord; var Visible: Boolean);
-procedure SysTvSetCurType(Y1, Y2: SmallWord; Visible: Boolean);
-procedure SysTvSetCurPos(X, Y: SmallWord);
-procedure SysGetCurPos(var X, Y: SmallWord);
+procedure SysTvGetCurType(var Y1, Y2: Integer; var Visible: Boolean);
+procedure SysTvSetCurType(Y1, Y2: Integer; Visible: Boolean);
+procedure SysTvSetCurPos(X, Y: Word);
+procedure SysGetCurPos(var X, Y: Word);
 procedure SysTvKbdInit;
 procedure SysTvKbdDone;
 procedure SysTvDetectMouse;
@@ -73,6 +73,9 @@ function SysFileClose(Handle: THandle): LongInt;
 function SysFileSetSize(Handle: THandle; Size: TFileSize): LongInt;
 { nonzero (the low byte) when the handle is a device (a terminal, a printer...), 0 for a file }
 function SysFileIsDevice(Handle: THandle): LongInt;
+
+{ The label of the volume of the drive ('' if there is none). }
+function SysGetVolumeLabel(Drive: Char): ShortString;
 
 { --- searching a directory ---------------------------------------------------- }
 type
@@ -352,7 +355,7 @@ procedure SysTvInitCursor;
 begin
 end;
 
-procedure SysTvGetCurType(var Y1, Y2: SmallWord; var Visible: Boolean);
+procedure SysTvGetCurType(var Y1, Y2: Integer; var Visible: Boolean);
 var
   H: Integer;
 begin
@@ -364,7 +367,7 @@ begin
   Y1 := FontHeight - H;
 end;
 
-procedure SysTvSetCurType(Y1, Y2: SmallWord; Visible: Boolean);
+procedure SysTvSetCurType(Y1, Y2: Integer; Visible: Boolean);
 begin
   if not Visible then
     SetCaretSize(0)
@@ -374,12 +377,12 @@ begin
     SetCaretSize(CursorLines);
 end;
 
-procedure SysTvSetCurPos(X, Y: SmallWord);
+procedure SysTvSetCurPos(X, Y: Word);
 begin
   SetCaretPosition(X, Y);
 end;
 
-procedure SysGetCurPos(var X, Y: SmallWord);
+procedure SysGetCurPos(var X, Y: Word);
 begin
   X := CaretX;
   Y := CaretY;
@@ -400,6 +403,25 @@ end;
 procedure SysTvHideMouse;
 begin
 end;
+
+function SysGetVolumeLabel(Drive: Char): ShortString;
+{$IFDEF GO32V2}
+var
+  SR: Dos.SearchRec;
+begin
+  Result := '';
+  Dos.FindFirst(UpCase(Drive) + ':\*.*', Dos.VolumeID, SR);
+  if Dos.DosError = 0 then
+  begin
+    Result := SR.Name;
+    Dos.FindClose(SR);
+  end;
+end;
+{$ELSE}
+begin
+  Result := '';
+end;
+{$ENDIF}
 
 { --- searching a directory ---------------------------------------------------- }
 
