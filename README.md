@@ -42,7 +42,7 @@ DOS Navigator на Free Pascal. В репозитории два независ�
 
 0. **DN под Linux без сборки:** `cd dist/linux && ./dn` (i386, статический ELF; нужен терминал не меньше 80x25; описание — `dist/linux/README.TXT`,
    экраны — `dist/linux/screenshots/*.txt`). Собрать самому: `tools/build-fpc-i386-linux.sh ПРЕФИКС`, затем
-   `DN_LINUX=ПРЕФИКС tools/dn-linux.sh` (дерево `build/dn-linux`, `rcp`, `dn`, ресурсы, справка) и `tools/dn-linux-tour.py out/dnlinux` (обход в pty).
+   `DN_LINUX=ПРЕФИКС tools/dn-linux.sh` (дерево `build/dn-linux`, `rcp`, `dn`, ресурсы, справка) и `tools/dn-linux-tour.py out/dnlinux` (обход в pty) и `tools/dn-linux-ops.py out/dnlinux` (F7/F5/F6/F8/F4 на настоящих файлах, проверка по файловой системе).
 
 1a. **TV в терминале Linux** (нужны `fpc` и `python3`; терминалом служит `tools/pty_screen.py`):
 
