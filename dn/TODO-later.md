@@ -258,3 +258,13 @@ the old window of the stored screen (`PUserWindow`, `GetUserScreen` in `dnutil.p
 `tools/need-tv.sh` (sourced by `build.sh`, `tv-test.sh`, `dn-test.sh`, `check-layout.sh`) fetches the submodule if the clone was made without `--recurse-submodules`;
 `DN_TV=/path` uses another checkout (a link). The workflows have `submodules: true`. Open: the workflow `tv.yml` of `dn` duplicates what `unxed/tv` should test itself (it now also checks the pin); the `tv/` text in
 `dn/README.md` and `PLAN.md` (history, "tv/ and dn/ code is not mixed") is left as it is.
+
+## DOS: the mouse (2026-10-03)
+
+Test seam: `DNMOUSE=D3:0,U3:0,DD10:5,...` (`dnapp.pas`, next to `DNKEYS`): mouse events (D down, U up, M move, DD down of a double click, a leading R: the right button)
+go into the queue of the application once a second (half a second after the keys); the driver is not used (DOSBox-X without a display has no pointer).
+The driver itself: `DosMousePresent` is True in DOSBox-X (INT 33h found by `TvDos`); real button presses are not possible in this harness, so by hand only.
+Checked: a click on "File" in the menu bar opens the menu; a right click on a file marks it (the row is right); the left click activates the panel.
+**Found, not fixed:** a double click on a directory does not enter it, and **Ctrl-PgDn on a directory (the keyboard) does not enter it either** (Enter does): both go
+through `_CtrlPgDn` -> `GotoFile(MakeNormName(S, '.'))` in `flpanelx.pas`. Next step: a trace in `_CtrlPgDn` on a copy of the sources (`DN_SRC`), see what `GotoFile` gets and returns.
+**Tv is separate:** the repository `unxed/tv` is developed on its own (the owner's decision: "split, not copy"); `dn` only moves the submodule pointer.
