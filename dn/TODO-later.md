@@ -202,9 +202,10 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
 ## DOS: UTF-8 names and the clipboard (go2dos, DOSBox-X), 2026-10-03
 - go2dos: `DOS-UTF8/NAMES` was already there; the UTF-8 clipboard is made: provider `DOS-UTF8/CLIPBRD` (`unxed/go2dos`, branch `claude/utf8-clipboard`, spec `docs/UTF8CLIPBOARD.md`,
   tests `machine/utf8clip_test.go`): to be merged by the owner of go2dos (its rules: a patch for `git am`).
-- DOSBox-X: the patch `docs/patches/dosbox-x-amis-utf8-clipboard.patch` (AMIS + `CLIPBRD`) is ready and was run in a build of DOSBox-X (SDL2, Linux); the PR is not opened: the session cannot
-  fork or push to `joncampbell123/dosbox-x` (no fork of `unxed`). `DOS-UTF8/NAMES` for DOSBox-X is not done: `drive_cache.cpp` keeps `orgname`/`shortname` in the guest code page and
-  `localDrive::read_directory_*` skips the files that the page cannot hold ("non-representable"), so a UTF-8 mode needs the cache to hold host (UTF-8) long names, ASCII short names
-  (aliases for non-ASCII), and the conversion at each border (FindFirst/FindNext, the open/create/rename calls, `6502h/6504h` tables); that is a change of the core of the drive layer.
+- DOSBox-X: both parts are made and pushed to the fork `unxed/dosbox-x`: `claude/amis-utf8-clipboard` (AMIS + `CLIPBRD`, `docs/patches/dosbox-x-pr-clipboard.md`) and `claude/utf8-names`
+  (stacked on it: option `utf8 file names`, escape `{U+XXXX}` in the guest-code-page cache, AMIS `DOS-UTF8/NAMES`, border conversion at the 71xx functions; `docs/patches/dosbox-x-pr-utf8-names.md`).
+  Both ran in a build (SDL2, Linux, headless). The PRs to `joncampbell123/dosbox-x` are to be opened by the owner (the session cannot open a PR in a foreign repository): compare links are in the PR texts.
+  Doubts: the escape is also used by the other users of the conversion (mount paths, CD-ROM); short names with non-ASCII source are ordinary mangled names (no uniqueness guarantee beyond
+  DOSBox-X); the Windows host branch and DBCS code pages are not tested; the cache is still in the guest code page (a design with host names in the cache would be a larger change).
 - DN for DOS in the UTF-8 mode is not done: the DOS build keeps the code page inside (`DN_UTF8=0` for `dos`); it needs the border conversion of names when the provider is absent and the use of the two
   providers when it is there; `winclp.pas` would ask `CLIPBRD` for UTF-8.

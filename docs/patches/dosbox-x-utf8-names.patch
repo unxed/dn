@@ -1,0 +1,742 @@
+diff --git a/CHANGELOG b/CHANGELOG
+index 3c64cd7..c1965d0 100644
+--- a/CHANGELOG
++++ b/CHANGELOG
+@@ -7,6 +7,15 @@ Next version:
+     page are not lost on the way. The mode belongs to the calling process and
+     ends with it. Specification: docs/UTF8CLIPBOARD.md in github.com/unxed/go2dos,
+     which implements the same interface. (unxed)
++  - DOS: Added the option "utf8 file names" to [dos]. A host file whose name has a
++    character that the DOS code page lacks is no longer hidden: the character
++    is shown as "{U+XXXX}" (its code point in hexadecimal), and such a name can
++    be opened, created, renamed and deleted (the escape is turned back into the
++    character on the host). A DOS program that knows UTF-8 can also ask for
++    UTF-8 long file names (INT 21h AH=71h) for itself with the AMIS provider
++    "DOS-UTF8" "NAMES" (AL=10h BX=65001); short names stay ASCII/OEM, the case
++    tables 6502h/6504h are the identity on 80h-FFh, invalid UTF-8 in a name is
++    error 2. Specification: docs/UTF8NAMES.md in github.com/unxed/go2dos. (unxed)
+   - BOOT: Added option to mount 'Empty' floppy/CD-ROM drives in advance if no 
+     floppy/CD-ROM drives are mounted. (maron2000)
+   - FPU: Consolidated remaining x87 instruction handling across the normal,
+diff --git a/include/dos_inc.h b/include/dos_inc.h
+index 42db642..eb1f3ab 100644
+--- a/include/dos_inc.h
++++ b/include/dos_inc.h
+@@ -368,6 +368,10 @@ void DOS_SetupMisc(void);
+ /* AMIS (INT 2Dh) provider "DOS-UTF8" "CLIPBRD": UTF-8 text of the clipboard API for the processes that ask for it */
+ bool DOS_UTF8Clipboard(void);
+ void DOS_UTF8_ProcessEnded(uint16_t psp);
++bool DOS_UTF8Names_Available(void);
++bool DOS_UTF8Names_Call(uint8_t fn);
++bool DOS_UTF8NamesMode(void);
++void DOS_UTF8Names_ProcessEnded(uint16_t psp);
+ 
+ /* The DOS Tables */
+ void DOS_SetupTables(void);
+diff --git a/src/dos/Makefile.am b/src/dos/Makefile.am
+index c3ec1da..7136301 100644
+--- a/src/dos/Makefile.am
++++ b/src/dos/Makefile.am
+@@ -3,7 +3,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src
+ noinst_LIBRARIES = libdos.a
+ EXTRA_DIST = scsidefs.h wnaspi32.h dos_codepages.h dos_keyboard_layout_data.h
+ libdos_a_SOURCES = dos.cpp dos_devices.cpp dos_execute.cpp dos_files.cpp dos_ioctl.cpp dos_memory.cpp \
+-                   dos_misc.cpp dos_classes.cpp dos_programs.cpp dos_tables.cpp \
++                   dos_misc.cpp dos_utf8names.cpp dos_classes.cpp dos_programs.cpp dos_tables.cpp \
+ 		   drives.cpp drives.h drive_virtual.cpp drive_local.cpp drive_cache.cpp drive_fat.cpp \
+ 		   drive_overlay.cpp drive_physfs.cpp drive_iso.cpp dev_con.h dos_mscdex.cpp dos_keyboard_layout.cpp \
+ 		   cdrom.h cdrom.cpp cdrom_ioctl_win32.cpp cdrom_aspi_win32.cpp cdrom_ioctl_linux.cpp cdrom_image.cpp \
+diff --git a/src/dos/dos.cpp b/src/dos/dos.cpp
+index 2d89329..c91f9e7 100644
+--- a/src/dos/dos.cpp
++++ b/src/dos/dos.cpp
+@@ -178,7 +178,7 @@ bool uselfn, winautorun=false;
+ extern int infix, log_dev_con;
+ extern bool int15_wait_force_unmask_irq, shellrun, logging_con, ctrlbrk;
+ extern bool winrun, startcmd, startwait, startquiet, starttranspath, i4dos;
+-extern bool startup_state_numlock, mountwarning, clipboard_dosapi;
++extern bool startup_state_numlock, mountwarning, clipboard_dosapi, dos_utf8names;
+ std::string startincon;
+ 
+ uint32_t dos_hma_allocator = 0; /* physical memory addr */
+@@ -594,6 +594,12 @@ static Bitu DOS_21Handler(void);
+ void XMS_DOS_LocalA20DisableIfNotEnabled(void);
+ void XMS_DOS_LocalA20DisableIfNotEnabled_XMSCALL(void);
+ #if !defined(OSFREE)
++/* UTF-8 names (dos_utf8names.cpp): for a process in the UTF-8 mode the names of the long file name functions are converted */
++void DOS_LFN_StrCopy(PhysPt src, char *dst, Bitu max);
++void DOS_LFN_NameWrite(PhysPt dst, const char *name, Bitu len);
++void DOS_LFN_FindData(char *finddata);
++bool DOS_LFN_InputOK(void);
++uint32_t DOS_UTF8Names_IdentityUpcase(void);
+ void DOS_Int21_7139(char *name1, const char *name2);
+ void DOS_Int21_713a(char *name1, const char *name2);
+ void DOS_Int21_713b(char *name1, const char *name2);
+@@ -2805,7 +2811,7 @@ static Bitu DOS_21Handler(void) {
+                     case 0x02: // Get pointer to uppercase table
+                     case 0x04: // Get pointer to filename uppercase table
+                         mem_writeb(data + 0x00, reg_al);
+-                        mem_writed(data + 0x01, dos.tables.upcase);
++                        mem_writed(data + 0x01, DOS_UTF8NamesMode() ? DOS_UTF8Names_IdentityUpcase() : dos.tables.upcase);
+                         reg_cx = 5;
+                         CALLBACK_SCF(false);
+                         break;
+@@ -2827,7 +2833,7 @@ static Bitu DOS_21Handler(void) {
+                     case 0x20: /* Capitalize Character */
+                         {
+                             int in  = reg_dl;
+-                            int out = toupper(in);
++                            int out = (DOS_UTF8NamesMode() && in >= 0x80) ? in : toupper(in);
+                             reg_dl  = (uint8_t)out;
+                         }
+                         CALLBACK_SCF(false);
+@@ -2844,7 +2850,7 @@ static Bitu DOS_21Handler(void) {
+                             dos_copybuf[len] = 0;
+                             //No upcase as String(0x21) might be multiple asciz strings
+                             for (Bitu count = 0; count < len;count++)
+-                                dos_copybuf[count] = (uint8_t)toupper(*reinterpret_cast<unsigned char*>(dos_copybuf+count));
++                                dos_copybuf[count] = (DOS_UTF8NamesMode() && dos_copybuf[count] >= 0x80) ? dos_copybuf[count] : (uint8_t)toupper(*reinterpret_cast<unsigned char*>(dos_copybuf+count));
+                             MEM_BlockWrite(data,dos_copybuf,len);
+                         }
+                         CALLBACK_SCF(false);
+@@ -3028,6 +3034,11 @@ static Bitu DOS_21Handler(void) {
+ 		    break;
+ 	    }
+ #if !defined(OSFREE)
++	    if (!DOS_LFN_InputOK()) {   /* UTF-8 mode: the name is not valid UTF-8 */
++		    reg_ax=2;
++		    CALLBACK_SCF(true);
++		    break;
++	    }
+ 	    switch(reg_al) {
+ 		    case 0x39:              /* LFN MKDIR */
+ 			    DOS_Int21_7139(name1, name2);
+@@ -4369,6 +4380,7 @@ public:
+ 		dos_clipboard_device_name = section->Get_string("dos clipboard device name");
+ 		clipboard_dosapi = section->Get_bool("dos clipboard api");
+ 		if (control->SecureMode()) clipboard_dosapi = false;
++		dos_utf8names = section->Get_bool("utf8 file names");
+ 		pipetmpdev = section->Get_bool("pipe temporary device");
+ 		force_conversion=true;
+ 		mainMenu.get_item("clipboard_dosapi").check(clipboard_dosapi).enable(true).refresh_item(mainMenu);
+@@ -5200,7 +5212,7 @@ void DOS_Int21_7139(char *name1, const char *name2) {
+ #if !defined(OSFREE)
+ void DOS_Int21_713a(char *name1, const char *name2) {
+ 	(void)name2;
+-	MEM_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
+ 	*name1='\"';
+ 	char *p=name1+strlen(name1);
+ 	while (*p==' '||*p==0) p--;
+@@ -5220,7 +5232,7 @@ void DOS_Int21_713a(char *name1, const char *name2) {
+ #if !defined(OSFREE)
+ void DOS_Int21_713b(char *name1, const char *name2) {
+ 	(void)name2;
+-	MEM_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
+ 	*name1='\"';
+ 	char *p=name1+strlen(name1);
+ 	while (*p==' '||*p==0) p--;
+@@ -5239,7 +5251,7 @@ void DOS_Int21_713b(char *name1, const char *name2) {
+ #if !defined(OSFREE)
+ void DOS_Int21_7141(char *name1, const char *name2) {
+ 	(void)name2;
+-	MEM_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
+ 	*name1='\"';
+ 	char *p=name1+strlen(name1);
+ 	while (*p==' '||*p==0) p--;
+@@ -5258,7 +5270,7 @@ void DOS_Int21_7141(char *name1, const char *name2) {
+ #if !defined(OSFREE)
+ void DOS_Int21_7143(char *name1, const char *name2) {
+ 	(void)name2;
+-	MEM_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
+ 	*name1='\"';
+ 	char *p=name1+strlen(name1);
+ 	while (*p==' '||*p==0) p--;
+@@ -5377,7 +5389,7 @@ void DOS_Int21_7147(char *name1, const char *name2) {
+ 	DOS_PSP psp(dos.psp());
+ 	psp.StoreCommandTail();
+ 	if (DOS_GetCurrentDir(reg_dl,name1,true)) {
+-		MEM_BlockWrite(SegPhys(ds)+reg_si,name1,(Bitu)(strlen(name1)+1));
++		DOS_LFN_NameWrite(SegPhys(ds)+reg_si,name1,(Bitu)(strlen(name1)+1));
+ 		psp.RestoreCommandTail();
+ 		reg_ax=0;
+ 		CALLBACK_SCF(false);
+@@ -5390,7 +5402,7 @@ void DOS_Int21_7147(char *name1, const char *name2) {
+ 
+ #if !defined(OSFREE)
+ void DOS_Int21_714e(char *name1, char *name2) {
+-	MEM_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
+ 	*name1='\"';
+ 	char *p=name1+strlen(name1);
+ 	while (*p==' '||*p==0) p--;
+@@ -5451,7 +5463,7 @@ void DOS_Int21_714e(char *name1, char *name2) {
+ 		DOS_DTA dta(dos.dta());
+ 		char finddata[CROSS_LEN];
+ 		int c=0;
+-		MEM_BlockWrite(SegPhys(es)+reg_di,finddata,dta.GetFindData((int)reg_si,finddata,&c));
++		int fdlen=dta.GetFindData((int)reg_si,finddata,&c); DOS_LFN_FindData(finddata); MEM_BlockWrite(SegPhys(es)+reg_di,finddata,fdlen);
+ 		reg_cx=c;
+ 		CALLBACK_SCF(false);
+ 	} else {
+@@ -5477,7 +5489,7 @@ void DOS_Int21_714f(const char *name1, const char *name2) {
+ 		DOS_DTA dta(dos.dta());
+ 		char finddata[CROSS_LEN];
+ 		int c=0;
+-		MEM_BlockWrite(SegPhys(es)+reg_di,finddata,dta.GetFindData((int)reg_si,finddata,&c));
++		int fdlen=dta.GetFindData((int)reg_si,finddata,&c); DOS_LFN_FindData(finddata); MEM_BlockWrite(SegPhys(es)+reg_di,finddata,fdlen);
+ 		reg_cx=c;
+ 		CALLBACK_SCF(false);
+ 		reg_ax=0x4f00+handle;
+@@ -5491,13 +5503,13 @@ void DOS_Int21_714f(const char *name1, const char *name2) {
+ 
+ #if !defined(OSFREE)
+ void DOS_Int21_7156(char *name1, char *name2) {
+-	MEM_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_dx,name1+1,DOSNAMEBUF);
+ 	*name1='\"';
+ 	char *p=name1+strlen(name1);
+ 	while (*p==' '||*p==0) p--;
+ 	*(p+1)='\"';
+ 	*(p+2)=0;
+-	MEM_StrCopy(SegPhys(es)+reg_di,name2+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(es)+reg_di,name2+1,DOSNAMEBUF);
+ 	*name2='\"';
+ 	p=name2+strlen(name2);
+ 	while (*p==' '||*p==0) p--;
+@@ -5515,7 +5527,7 @@ void DOS_Int21_7156(char *name1, char *name2) {
+ 
+ #if !defined(OSFREE)
+ void DOS_Int21_7160(char *name1, char *name2) {
+-	MEM_StrCopy(SegPhys(ds)+reg_si,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_si,name1+1,DOSNAMEBUF);
+ 	if (*(name1+1)>=0 && *(name1+1)<32) {
+ 		reg_ax=!*(name1+1)?2:3;
+ 		CALLBACK_SCF(true);
+@@ -5537,7 +5549,7 @@ void DOS_Int21_7160(char *name1, char *name2) {
+ 			case 0:         // Canonoical path name
+                 //if(tail) strcat(name2, "\\");
+                 if(tail && name2[strlen(name2) - 1] != '\\') strcat(name2, "\\");
+-                MEM_BlockWrite(SegPhys(es)+reg_di,name2,(Bitu)(strlen(name2)+1));
++                DOS_LFN_NameWrite(SegPhys(es)+reg_di,name2,(Bitu)(strlen(name2)+1));
+ 				reg_ax=0;
+ 				CALLBACK_SCF(false);
+ 				break;
+@@ -5546,7 +5558,7 @@ void DOS_Int21_7160(char *name1, char *name2) {
+ 				if (DOS_GetSFNPath(name1,name2,false)) {
+                     //if(tail) strcat(name2, "\\");
+                     if(tail && name2[strlen(name2) - 1] != '\\') strcat(name2, "\\");
+-                    MEM_BlockWrite(SegPhys(es)+reg_di,name2,(Bitu)(strlen(name2)+1));
++                    DOS_LFN_NameWrite(SegPhys(es)+reg_di,name2,(Bitu)(strlen(name2)+1));
+ 					reg_ax=0;
+ 					CALLBACK_SCF(false);
+ 				} else {
+@@ -5559,7 +5571,7 @@ void DOS_Int21_7160(char *name1, char *name2) {
+ 				if (DOS_GetSFNPath(name1,name2,true)) {
+ 					//if(tail) strcat(name2, "\\");
+                     if(tail && name2[strlen(name2) - 1] != '\\') strcat(name2, "\\");
+-					MEM_BlockWrite(SegPhys(es)+reg_di,name2,(Bitu)(strlen(name2)+1));
++					DOS_LFN_NameWrite(SegPhys(es)+reg_di,name2,(Bitu)(strlen(name2)+1));
+ 					reg_ax=0;
+ 					CALLBACK_SCF(false);
+ 				} else {
+@@ -5580,7 +5592,7 @@ void DOS_Int21_7160(char *name1, char *name2) {
+ #if !defined(OSFREE)
+ void DOS_Int21_716c(char *name1, const char *name2) {
+ 	(void)name2;
+-	MEM_StrCopy(SegPhys(ds)+reg_si,name1+1,DOSNAMEBUF);
++	DOS_LFN_StrCopy(SegPhys(ds)+reg_si,name1+1,DOSNAMEBUF);
+ 	*name1='\"';
+ 	char *p=name1+strlen(name1);
+ 	while (*p==' '||*p==0) p--;
+diff --git a/src/dos/dos_execute.cpp b/src/dos/dos_execute.cpp
+index 7aa0418..6ba9ffa 100644
+--- a/src/dos/dos_execute.cpp
++++ b/src/dos/dos_execute.cpp
+@@ -117,6 +117,7 @@ void DOS_Terminate(uint16_t pspseg,bool tsr,uint8_t exitcode) {
+ 	if (pspseg==curpsp.GetParent()) return;
+ 	/* the UTF-8 modes of the AMIS providers end with the process */
+ 	DOS_UTF8_ProcessEnded(pspseg);
++	DOS_UTF8Names_ProcessEnded(pspseg);
+ 	/* Free Files owned by process */
+ 	if (!tsr) curpsp.CloseFiles();
+ 	
+diff --git a/src/dos/dos_misc.cpp b/src/dos/dos_misc.cpp
+index 1d7df02..7a015d0 100644
+--- a/src/dos/dos_misc.cpp
++++ b/src/dos/dos_misc.cpp
+@@ -115,6 +115,7 @@ static Bitu INT2F_Handler(void) {
+  *
+  *   "DOS-UTF8" "CLIPBRD "  AL=10h BX=65001|0: the text of the clipboard API (INT 2Fh AX=17xxh, formats 01h and 07h)
+  *                          is UTF-8 (65001) or OEM (0, the default) for the calling process; AL=11h: get the mode.
++ *   "DOS-UTF8" "NAMES   "  the same for the long file names of INT 21h AH=71h (dos_utf8names.cpp)
+  *
+  * The calling process is the one whose PSP is current; the mode ends with the process and is not inherited. */
+ struct AmisProvider {
+@@ -192,6 +193,7 @@ static bool DOS_Clipboard_UTF8Text(std::string &out) {
+ 
+ static AmisProvider amis_providers[] = {
+ 	{ "DOS-UTF8", "CLIPBRD", "UTF-8 text of the clipboard for DOS programs", 0x0100, amis_clipbrd_available, amis_clipbrd_call, 0, 0, 0 },
++	{ "DOS-UTF8", "NAMES", "UTF-8 long file names for DOS programs", 0x0100, DOS_UTF8Names_Available, DOS_UTF8Names_Call, 0, 0, 0 },
+ };
+ static const size_t amis_provider_count = sizeof(amis_providers)/sizeof(amis_providers[0]);
+ static const uint8_t amis_first_mux = 0xC0;   /* a choice of the emulator: the specification reserves no number */
+diff --git a/src/dos/dos_utf8names.cpp b/src/dos/dos_utf8names.cpp
+new file mode 100644
+index 0000000..4e75935
+--- /dev/null
++++ b/src/dos/dos_utf8names.cpp
+@@ -0,0 +1,337 @@
++/*
++ *  Copyright (C) 2002-2021  The DOSBox Team
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
++ */
++
++/* UTF-8 file names for DOS programs: the AMIS provider "DOS-UTF8" "NAMES" and the escape form of the names that the guest
++ * code page cannot hold (config option "utf8 file names" of [dos]).
++ *
++ * The directory cache and the DOS file layer of DOSBox-X keep every name in the guest code page. A host file whose name has a
++ * character that the code page lacks used to be skipped. With the option on, such a character is kept in the name as the escape
++ * "{U+XXXX}" (4 to 6 hexadecimal digits of the code point): the conversion from the host to the guest turns it into the escape,
++ * the conversion back turns the escape into the character, so the file is visible to every program (under the escaped name) and
++ * can be opened, created, renamed and deleted. A host name that has the text "{U+" itself gets its "{" escaped as "{U+007B}".
++ *
++ * A DOS program that knows UTF-8 asks for it with the AMIS provider (AL=10h BX=65001; the specification is UTF8NAMES.md of
++ * github.com/unxed/go2dos): the long names of the INT 21h AH=71h functions are then UTF-8 for this process (the names that the
++ * program gives are turned into the guest form, the names that it gets are turned from it). The mode belongs to the process
++ * (the current PSP) and ends with it. Short names are not changed: they stay in the OEM code page, so that they keep meaning the
++ * same file for every program. */
++
++#include "dosbox.h"
++#include "dos_inc.h"
++#include "cross.h"
++#include "control.h"
++#include "regs.h"
++#include "support.h"
++#include "bios.h"
++#include "mem.h"
++
++#define DOSNAMEBUF_UTF8 256
++
++#include <set>
++#include <string>
++#include <vector>
++#include <cstring>
++#include <cstdio>
++
++bool dos_utf8names = false;                       /* [dos] utf8 file names */
++
++static std::set<uint16_t> utf8_names_psp;
++
++bool DOS_UTF8Names_Available(void) {
++	return dos_utf8names && !control->SecureMode();
++}
++
++bool DOS_UTF8NamesMode(void) {
++	return dos_utf8names && utf8_names_psp.count(dos.psp()) != 0;
++}
++
++void DOS_UTF8Names_ProcessEnded(uint16_t psp) {
++	utf8_names_psp.erase(psp);
++}
++
++bool DOS_UTF8Names_Call(uint8_t fn) {
++	const uint16_t cur = DOS_UTF8NamesMode() ? 65001 : 0;
++	switch (fn) {
++		case 0x10:
++			if (reg_bx == 65001) utf8_names_psp.insert(dos.psp());
++			else if (reg_bx == 0) utf8_names_psp.erase(dos.psp());
++			else { reg_al = 0x00; return true; }   /* not supported, nothing changed */
++			reg_al = 0xFF;
++			reg_bx = cur;                          /* the previous setting */
++			return true;
++		case 0x11:
++			reg_al = 0xFF;
++			reg_bx = cur;
++			return true;
++	}
++	return false;
++}
++
++/* ---- UTF-8 and UTF-16 ---------------------------------------------------------------------------------------------------- */
++
++/* one code point of the UTF-8 text at s (NUL terminated); the number of bytes in *used; a byte that is not valid UTF-8 is 0xFFFD */
++static uint32_t Utf8At(const char *s, size_t *used) {
++	const unsigned char c = (unsigned char)s[0];
++	size_t n = 0;
++	uint32_t cp = 0;
++	if (c < 0x80) { *used = 1; return c; }
++	else if (c >= 0xC2 && c <= 0xDF) { n = 1; cp = c & 0x1F; }
++	else if (c >= 0xE0 && c <= 0xEF) { n = 2; cp = c & 0x0F; }
++	else if (c >= 0xF0 && c <= 0xF4) { n = 3; cp = c & 0x07; }
++	else { *used = 1; return 0xFFFD; }
++	for (size_t k = 1; k <= n; k++) {
++		const unsigned char t = (unsigned char)s[k];
++		if ((t & 0xC0) != 0x80) { *used = 1; return 0xFFFD; }
++		cp = (cp << 6) | (t & 0x3F);
++	}
++	if ((n == 2 && cp < 0x800) || (n == 3 && (cp < 0x10000 || cp > 0x10FFFF)) || (cp >= 0xD800 && cp <= 0xDFFF)) { *used = 1; return 0xFFFD; }
++	*used = n + 1;
++	return cp;
++}
++
++static void Utf8Put(std::string &out, uint32_t cp) {
++	if (cp < 0x80) out += (char)cp;
++	else if (cp < 0x800) { out += (char)(0xC0 | (cp >> 6)); out += (char)(0x80 | (cp & 0x3F)); }
++	else if (cp < 0x10000) { out += (char)(0xE0 | (cp >> 12)); out += (char)(0x80 | ((cp >> 6) & 0x3F)); out += (char)(0x80 | (cp & 0x3F)); }
++	else { out += (char)(0xF0 | (cp >> 18)); out += (char)(0x80 | ((cp >> 12) & 0x3F)); out += (char)(0x80 | ((cp >> 6) & 0x3F)); out += (char)(0x80 | (cp & 0x3F)); }
++}
++
++bool DOS_Utf16ToUtf8(const uint16_t *s, std::string &out) {
++	out.clear();
++	for (; *s; s++) {
++		uint32_t cp = *s;
++		if (cp >= 0xD800 && cp <= 0xDBFF && s[1] >= 0xDC00 && s[1] <= 0xDFFF) {
++			cp = 0x10000 + ((cp - 0xD800) << 10) + (s[1] - 0xDC00);
++			s++;
++		} else if (cp >= 0xD800 && cp <= 0xDFFF) cp = 0xFFFD;
++		Utf8Put(out, cp);
++	}
++	return true;
++}
++
++bool DOS_Utf8ToUtf16(const char *s, uint16_t *d, size_t dmax) {
++	size_t n = 0;
++	while (*s) {
++		size_t used;
++		uint32_t cp = Utf8At(s, &used);
++		s += used;
++		if (cp >= 0x10000) {
++			if (n + 2 >= dmax) return false;
++			cp -= 0x10000;
++			d[n++] = (uint16_t)(0xD800 + (cp >> 10));
++			d[n++] = (uint16_t)(0xDC00 + (cp & 0x3FF));
++		} else {
++			if (n + 1 >= dmax) return false;
++			d[n++] = (uint16_t)cp;
++		}
++	}
++	d[n] = 0;
++	return true;
++}
++
++/* ---- the escape form ------------------------------------------------------------------------------------------------------- */
++
++static int HexVal(char c) {
++	if (c >= '0' && c <= '9') return c - '0';
++	if (c >= 'A' && c <= 'F') return c - 'A' + 10;
++	if (c >= 'a' && c <= 'f') return c - 'a' + 10;
++	return -1;
++}
++
++/* the escape "{U+XXXX}" at s: the code point and the length, else 0 */
++static size_t EscapeAt(const char *s, uint32_t *cp) {
++	if (s[0] != '{' || (s[1] != 'U' && s[1] != 'u') || s[2] != '+') return 0;
++	uint32_t v = 0;
++	size_t n = 0;
++	while (n < 6 && HexVal(s[3 + n]) >= 0) { v = (v << 4) | (uint32_t)HexVal(s[3 + n]); n++; }
++	if (n < 4 || s[3 + n] != '}') return 0;
++	if (v > 0x10FFFF || (v >= 0xD800 && v <= 0xDFFF) || v == 0) return 0;
++	*cp = v;
++	return 3 + n + 1;
++}
++
++static const size_t NAME_MAX_LEN = CROSS_LEN - 1;
++
++typedef bool (*DOS_CpConv)(char *d, const char *s);
++
++/* the conversions of drive_local.cpp for the guest code page; they fail on a character that the code page does not have */
++bool CodePageHostToGuestUTF8_Core(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/);
++bool CodePageGuestToHostUTF8_Core(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/);
++bool CodePageHostToGuestUTF16_Core(char *d/*CROSS_LEN*/,const uint16_t *s/*CROSS_LEN*/);
++bool CodePageGuestToHostUTF16_Core(uint16_t *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/);
++
++static bool HostToGuest(char *d, const char *s, DOS_CpConv core) {
++	std::string out;
++	char one[8], conv[CROSS_LEN + 8];
++	if (!strstr(s, "{U+") && !strstr(s, "{u+") && core(conv, s)) {      /* the usual case: nothing to escape */
++		memcpy(d, conv, strlen(conv) + 1);
++		return true;
++	}
++	while (*s) {
++		size_t used;
++		const uint32_t cp = Utf8At(s, &used);
++		if (cp == 0xFFFD && used == 1) return false;                   /* not UTF-8 at all */
++		if (cp == '{' && (s[1] == 'U' || s[1] == 'u') && s[2] == '+') out += "{U+007B}";   /* the text of an escape: escape it */
++		else if (cp < 0x80) out += (char)cp;
++		else {
++			memcpy(one, s, used);
++			one[used] = 0;
++			if (core(conv, one)) out += conv;
++			else {
++				char esc[16];
++				snprintf(esc, sizeof(esc), cp > 0xFFFF ? "{U+%05X}" : "{U+%04X}", (unsigned)cp);
++				out += esc;
++			}
++		}
++		s += used;
++		if (out.size() > NAME_MAX_LEN) return false;
++	}
++	memcpy(d, out.c_str(), out.size() + 1);
++	return true;
++}
++
++static bool GuestToHost(char *d, const char *s, DOS_CpConv core) {
++	std::string out, seg;
++	char conv[CROSS_LEN + 8];
++	while (true) {
++		uint32_t cp = 0;
++		size_t esc = *s ? EscapeAt(s, &cp) : 0;
++		if (esc == 0 && *s) { seg += *s++; continue; }
++		if (!seg.empty()) {
++			if (seg.size() > NAME_MAX_LEN || !core(conv, seg.c_str())) return false;
++			out += conv;
++			seg.clear();
++		}
++		if (!*s) break;
++		Utf8Put(out, cp);
++		s += esc;
++		if (out.size() > NAME_MAX_LEN) return false;
++	}
++	memcpy(d, out.c_str(), out.size() + 1);
++	return true;
++}
++
++/* the conversions that the rest of DOSBox-X calls (they were in drive_local.cpp): with the option on, the characters that the
++ * code page lacks are kept in the escape form, so no file is lost */
++bool CodePageHostToGuestUTF8(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
++	if (!dos_utf8names) return CodePageHostToGuestUTF8_Core(d, s);
++	return HostToGuest(d, s, CodePageHostToGuestUTF8_Core);
++}
++
++bool CodePageGuestToHostUTF8(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
++	if (!dos_utf8names || !strstr(s, "{")) return CodePageGuestToHostUTF8_Core(d, s);
++	return GuestToHost(d, s, CodePageGuestToHostUTF8_Core);
++}
++
++bool CodePageHostToGuestUTF16(char *d/*CROSS_LEN*/,const uint16_t *s/*CROSS_LEN*/) {
++	if (!dos_utf8names) return CodePageHostToGuestUTF16_Core(d, s);
++	std::string u8;
++	DOS_Utf16ToUtf8(s, u8);
++	return CodePageHostToGuestUTF8(d, u8.c_str());
++}
++
++bool CodePageGuestToHostUTF16(uint16_t *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
++	if (!dos_utf8names) return CodePageGuestToHostUTF16_Core(d, s);
++	char u8[CROSS_LEN + 8];
++	return CodePageGuestToHostUTF8(u8, s) && DOS_Utf8ToUtf16(u8, d, CROSS_LEN);
++}
++
++/* ---- the border of the INT 21h AH=71h functions for a process in the UTF-8 mode -------------------------------------------- */
++
++/* the name that the program gave (UTF-8) -> the guest form; the name for the program -> UTF-8 */
++bool DOS_UTF8_NameIn(char *name, size_t size) {
++	char conv[CROSS_LEN + 8];
++	if (!HostToGuest(conv, name, CodePageHostToGuestUTF8_Core) || strlen(conv) >= size) return false;
++	strcpy(name, conv);
++	return true;
++}
++
++bool DOS_UTF8_NameOut(char *name, size_t size) {
++	char conv[CROSS_LEN + 8];
++	if (!GuestToHost(conv, name, CodePageGuestToHostUTF8_Core) || strlen(conv) >= size) return false;
++	strcpy(name, conv);
++	return true;
++}
++
++/* ---- the long file name functions: the names that go in and out of the guest memory -------------------------------------------- */
++
++/* the name at src (the guest memory) as the DOS file layer wants it: the guest form */
++void DOS_LFN_StrCopy(PhysPt src, char *dst, Bitu max) {
++	MEM_StrCopy(src, dst, max);
++	if (DOS_UTF8NamesMode()) DOS_UTF8_NameIn(dst, max);          /* too long or not UTF-8: left as it is, the lookup then fails */
++}
++
++/* the name for the program: the whole of it, with the NUL */
++void DOS_LFN_NameWrite(PhysPt dst, const char *name, Bitu len) {
++	if (DOS_UTF8NamesMode()) {
++		char conv[CROSS_LEN + 8];
++		strncpy(conv, name, CROSS_LEN - 1);
++		conv[CROSS_LEN - 1] = 0;
++		if (DOS_UTF8_NameOut(conv, CROSS_LEN)) { MEM_BlockWrite(dst, conv, strlen(conv) + 1); return; }
++	}
++	MEM_BlockWrite(dst, name, len);
++}
++
++/* the long name of a find data record (offset 44, 260 bytes) */
++void DOS_LFN_FindData(char *finddata) {
++	if (!DOS_UTF8NamesMode()) return;
++	DOS_UTF8_NameOut(finddata + 44, 260);
++	for (char *p = finddata + 304; *p; p++)                      /* short names are ASCII in this mode (a name from the OEM page could be mistaken for UTF-8) */
++		if ((unsigned char)*p >= 0x80) *p = '_';
++}
++
++/* the input names of a long file name function must be valid UTF-8 (the specification: else error 2) */
++static bool Utf8Valid(const char *s) {
++	while (*s) {
++		size_t used;
++		if (Utf8At(s, &used) == 0xFFFD && used == 1) return false;
++		s += used;
++	}
++	return true;
++}
++
++bool DOS_LFN_InputOK(void) {
++	if (!DOS_UTF8NamesMode()) return true;
++	char name[DOSNAMEBUF_UTF8 + 2];
++	PhysPt first = 0, second = 0;
++	switch (reg_al) {
++		case 0x39: case 0x3a: case 0x3b: case 0x41: case 0x43: case 0x4e: first = SegPhys(ds) + reg_dx; break;
++		case 0x56: first = SegPhys(ds) + reg_dx; second = SegPhys(es) + reg_di; break;
++		case 0x60: case 0x6c: case 0xa8: first = SegPhys(ds) + reg_si; break;
++		default: return true;
++	}
++	MEM_StrCopy(first, name, DOSNAMEBUF_UTF8);
++	if (!Utf8Valid(name)) return false;
++	if (second) {
++		MEM_StrCopy(second, name, DOSNAMEBUF_UTF8);
++		if (!Utf8Valid(name)) return false;
++	}
++	return true;
++}
++
++/* the upper-case table for 6502h/6504h in the UTF-8 mode: 80h-FFh map to themselves */
++uint32_t DOS_UTF8Names_IdentityUpcase(void) {
++	static uint32_t where = 0;
++	if (where == 0) {
++		const PhysPt p = ROMBIOS_GetMemory(2 + 128, "UTF-8 identity upcase table");
++		mem_writew(p, 128);
++		for (unsigned i = 0; i < 128; i++) mem_writeb(p + 2 + i, (uint8_t)(0x80 + i));
++		where = RealMake((uint16_t)(p >> 4), (uint16_t)(p & 15));
++	}
++	return where;
++}
+diff --git a/src/dos/drive_local.cpp b/src/dos/drive_local.cpp
+index 291160a..0919909 100644
+--- a/src/dos/drive_local.cpp
++++ b/src/dos/drive_local.cpp
+@@ -675,7 +675,14 @@ bool isemptyhit(uint16_t code) {
+     }
+ }
+ 
+-bool CodePageHostToGuestUTF16(char *d/*CROSS_LEN*/,const uint16_t *s/*CROSS_LEN*/) {
++/* The names that the rest of the file (and DOSBox-X) uses are in dos_utf8names.cpp: they call these _Core functions, and with
++ * the option "utf8 file names" keep the characters that the code page lacks in the escape form "{U+XXXX}" instead of failing. */
++bool CodePageHostToGuestUTF16(char *d/*CROSS_LEN*/,const uint16_t *s/*CROSS_LEN*/);
++bool CodePageHostToGuestUTF8(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/);
++bool CodePageGuestToHostUTF16(uint16_t *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/);
++bool CodePageGuestToHostUTF8(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/);
++
++bool CodePageHostToGuestUTF16_Core(char *d/*CROSS_LEN*/,const uint16_t *s/*CROSS_LEN*/) {
+     if (altcp && dos.loaded_codepage == altcp) return String_HOST_TO_SBCS_UTF16<uint16_t>(d,s,altcp_to_unicode,sizeof(altcp_to_unicode)/sizeof(altcp_to_unicode[0]));
+     if (customcp && dos.loaded_codepage == customcp) return String_HOST_TO_SBCS_UTF16<uint16_t>(d,s,customcp_to_unicode,sizeof(customcp_to_unicode)/sizeof(customcp_to_unicode[0]));
+     switch (dos.loaded_codepage) {
+@@ -773,7 +780,7 @@ bool CodePageHostToGuestUTF16(char *d/*CROSS_LEN*/,const uint16_t *s/*CROSS_LEN*
+     }
+ }
+ 
+-bool CodePageHostToGuestUTF8(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
++bool CodePageHostToGuestUTF8_Core(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
+     if (altcp && dos.loaded_codepage == altcp) return String_HOST_TO_SBCS_UTF8<uint16_t>(d,s,altcp_to_unicode,sizeof(altcp_to_unicode)/sizeof(altcp_to_unicode[0]));
+     if (customcp && dos.loaded_codepage == customcp) return String_HOST_TO_SBCS_UTF8<uint16_t>(d,s,customcp_to_unicode,sizeof(customcp_to_unicode)/sizeof(customcp_to_unicode[0]));
+     switch (dos.loaded_codepage) {
+@@ -871,7 +878,7 @@ bool CodePageHostToGuestUTF8(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
+     }
+ }
+ 
+-bool CodePageGuestToHostUTF16(uint16_t *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
++bool CodePageGuestToHostUTF16_Core(uint16_t *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
+     if (altcp && dos.loaded_codepage == altcp) return String_SBCS_TO_HOST_UTF16<uint16_t>(d,s,altcp_to_unicode,sizeof(altcp_to_unicode)/sizeof(altcp_to_unicode[0]));
+     if (customcp && dos.loaded_codepage == customcp) return String_SBCS_TO_HOST_UTF16<uint16_t>(d,s,customcp_to_unicode,sizeof(customcp_to_unicode)/sizeof(customcp_to_unicode[0]));
+     switch (dos.loaded_codepage) {
+@@ -969,7 +976,7 @@ bool CodePageGuestToHostUTF16(uint16_t *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*
+     }
+ }
+ 
+-bool CodePageGuestToHostUTF8(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
++bool CodePageGuestToHostUTF8_Core(char *d/*CROSS_LEN*/,const char *s/*CROSS_LEN*/) {
+     if (altcp && dos.loaded_codepage == altcp) return String_SBCS_TO_HOST_UTF8<uint16_t>(d,s,altcp_to_unicode,sizeof(altcp_to_unicode)/sizeof(altcp_to_unicode[0]));
+     if (customcp && dos.loaded_codepage == customcp) return String_SBCS_TO_HOST_UTF8<uint16_t>(d,s,customcp_to_unicode,sizeof(customcp_to_unicode)/sizeof(customcp_to_unicode[0]));
+     switch (dos.loaded_codepage) {
+diff --git a/src/dosbox.cpp b/src/dosbox.cpp
+index 0a86b71..214f0b4 100644
+--- a/src/dosbox.cpp
++++ b/src/dosbox.cpp
+@@ -5241,6 +5241,13 @@ void DOSBOX_SetupConfigSections(void) {
+ 		    "Caution: Enabling this API may cause some programs to think they are running under Windows");
+     Pbool->SetBasic(true);
+ 
++    Pbool = secprop->Add_bool("utf8 file names",Property::Changeable::WhenIdle, false);
++    Pbool->Set_help("If set, host files whose names have characters that the DOS code page lacks are shown to DOS programs with such a character as \"{U+XXXX}\" (its Unicode code point in hexadecimal) instead of being hidden,\n"
++		    "and names written that way are turned back into the characters on the host, so these files can be opened, created, renamed and deleted.\n"
++		    "A DOS program that knows UTF-8 can also ask for UTF-8 long file names (INT 21h AH=71h) for itself with the AMIS interface (\"DOS-UTF8\" \"NAMES\", see src/dos/dos_utf8names.cpp).\n"
++		    "It is deactivated if the secure mode is enabled.");
++    Pbool->SetBasic(true);
++
+     Pbool = secprop->Add_bool("dos idle api",Property::Changeable::OnlyAtStart,true);
+     Pbool->Set_help("If set, DOSBox-X can lower the host system's CPU load when a supported guest program is idle.");
+     Pbool->SetBasic(true);
+diff --git a/src/misc/programs.cpp b/src/misc/programs.cpp
+index 5af74c9..404bfda 100644
+--- a/src/misc/programs.cpp
++++ b/src/misc/programs.cpp
+@@ -64,7 +64,7 @@ extern const char *modifier;
+ extern unsigned int sendkeymap;
+ extern std::string langname, configfile, dosbox_title;
+ extern int autofixwarn, enablelfn, fat32setver, paste_speed, wheel_key, freesizecap, wpType, wpVersion, wpBG, wpFG, lastset, blinkCursor, msgcodepage;
+-extern bool dos_kernel_disabled, force_nocachedir, wpcolon, convertimg, lockmount, enable_config_as_shell_commands, lesssize, load, winrun, winautorun, startcmd, startwait, startquiet, starttranspath, mountwarning, wheel_guest, clipboard_dosapi, noremark_save_state, force_load_state, sync_time, manualtime, ttfswitch, loadlang, showbold, showital, showline, showsout, char512, printfont, rtl, gbk, chinasea, uao, showdbcs, dbcs_sbcs, autoboxdraw, halfwidthkana, ticksLocked, outcon, enable_dbcs_tables, show_recorded_filename, internal_program, pipetmpdev, notrysgf, uselangcp, incall;
++extern bool dos_kernel_disabled, force_nocachedir, wpcolon, convertimg, lockmount, enable_config_as_shell_commands, lesssize, load, winrun, winautorun, startcmd, startwait, startquiet, starttranspath, mountwarning, wheel_guest, clipboard_dosapi, dos_utf8names, noremark_save_state, force_load_state, sync_time, manualtime, ttfswitch, loadlang, showbold, showital, showline, showsout, char512, printfont, rtl, gbk, chinasea, uao, showdbcs, dbcs_sbcs, autoboxdraw, halfwidthkana, ticksLocked, outcon, enable_dbcs_tables, show_recorded_filename, internal_program, pipetmpdev, notrysgf, uselangcp, incall;
+ extern bool clipboard_biospaste;
+ /* This registers a file on the virtual drive and creates the correct structure for it*/
+ 
+@@ -1048,6 +1048,8 @@ void ApplySetting(std::string pvar, std::string inputline, bool quiet) {
+                 } else if (!strcasecmp(inputline.substr(0, 18).c_str(), "dos clipboard api=")) {
+                     clipboard_dosapi = section->Get_bool("dos clipboard api");
+                     mainMenu.get_item("clipboard_dosapi").check(clipboard_dosapi).refresh_item(mainMenu);
++                } else if (!strcasecmp(inputline.substr(0, 16).c_str(), "utf8 file names=")) {
++                    dos_utf8names = section->Get_bool("utf8 file names");
+                 } else if (!strcasecmp(inputline.substr(0, 22).c_str(), "pipe temporary device=")) {
+                     pipetmpdev = section->Get_bool("pipe temporary device");
+ #if defined(WIN32) && !defined(HX_DOS)
+diff --git a/vs/dosbox-x.vcxproj b/vs/dosbox-x.vcxproj
+index f4e5cd6..6f65332 100644
+--- a/vs/dosbox-x.vcxproj
++++ b/vs/dosbox-x.vcxproj
+@@ -1249,6 +1249,7 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
+     <ClCompile Include="..\src\dos\dos_keyboard_layout.cpp" />
+     <ClCompile Include="..\src\dos\dos_memory.cpp" />
+     <ClCompile Include="..\src\dos\dos_misc.cpp" />
++    <ClCompile Include="..\src\dos\dos_utf8names.cpp" />
+     <ClCompile Include="..\src\dos\dos_mscdex.cpp" />
+     <ClCompile Include="..\src\dos\dos_programs.cpp" />
+     <ClCompile Include="..\src\dos\dos_tables.cpp" />
+diff --git a/vs/dosbox-x.vcxproj.filters b/vs/dosbox-x.vcxproj.filters
+index 6e0634d..29e7626 100644
+--- a/vs/dosbox-x.vcxproj.filters
++++ b/vs/dosbox-x.vcxproj.filters
+@@ -324,6 +324,9 @@
+     <ClCompile Include="..\src\dos\dos_misc.cpp">
+       <Filter>Sources\dos</Filter>
+     </ClCompile>
++    <ClCompile Include="..\src\dos\dos_utf8names.cpp">
++      <Filter>Sources\dos</Filter>
++    </ClCompile>
+     <ClCompile Include="..\src\dos\dos_mscdex.cpp">
+       <Filter>Sources\dos</Filter>
+     </ClCompile>
