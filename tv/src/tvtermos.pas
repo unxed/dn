@@ -25,6 +25,9 @@ function OsInputReady(TimeoutMs: Integer): Boolean;
 { Reads up to Size bytes that are ready; <= 0 if there is nothing. }
 function OsRead(var Buf; Size: Integer): Integer;
 procedure OsSize(out W, H: Integer);
+{ The system clipboard of the OS, text in UTF-8; False when the OS layer has none (Unix: the terminal has it, TvUnix uses OSC 52). Windows: CF_UNICODETEXT. }
+function OsClipSet(const Text: AnsiString): Boolean;
+function OsClipGet(out Text: AnsiString): Boolean;
 { Sets OsResizeFlag when the size of the terminal changes; ends the program with the terminal in order when it is killed. }
 procedure OsHandlersOn(AfterDeath: TOsHook);
 procedure OsHandlersOff;
@@ -167,6 +170,17 @@ end;
 procedure OsExit(Code: Integer);
 begin
   FpExit(Code);
+end;
+
+function OsClipSet(const Text: AnsiString): Boolean;
+begin
+  Result := False;
+end;
+
+function OsClipGet(out Text: AnsiString): Boolean;
+begin
+  Text := '';
+  Result := False;
 end;
 
 {$ENDIF UNIX}
@@ -1107,6 +1121,70 @@ begin
   ExitProcess(Code);
 end;
 
+const
+  CF_UNICODETEXT_ = 13;
+
+function OsClipSet(const Text: AnsiString): Boolean;
+var
+  N: Integer;
+  H: HGLOBAL;
+  P: PWideChar;
+begin
+  Result := False;
+  if not OpenClipboard(0) then
+    Exit;
+  EmptyClipboard;
+  N := MultiByteToWideChar(CP_UTF8, 0, PAnsiChar(Text), Length(Text), nil, 0);
+  H := GlobalAlloc(GMEM_MOVEABLE, (N + 1) * SizeOf(WideChar));
+  if H <> 0 then
+  begin
+    P := GlobalLock(H);
+    if P <> nil then
+    begin
+      if N > 0 then
+        MultiByteToWideChar(CP_UTF8, 0, PAnsiChar(Text), Length(Text), P, N);
+      P[N] := #0;
+      GlobalUnlock(H);
+      Result := SetClipboardData(CF_UNICODETEXT_, H) <> 0;
+    end;
+    if not Result then
+      GlobalFree(H);
+  end;
+  CloseClipboard;
+end;
+
+function OsClipGet(out Text: AnsiString): Boolean;
+var
+  H: THandle;
+  P: PWideChar;
+  N, M: Integer;
+begin
+  Text := '';
+  Result := False;
+  if not OpenClipboard(0) then
+    Exit;
+  H := GetClipboardData(CF_UNICODETEXT_);
+  if H <> 0 then
+  begin
+    P := GlobalLock(H);
+    if P <> nil then
+    begin
+      N := 0;
+      while P[N] <> #0 do
+        Inc(N);
+      if N > 0 then
+      begin
+        M := WideCharToMultiByte(CP_UTF8, 0, P, N, nil, 0, nil, nil);
+        SetLength(Text, M);
+        WideCharToMultiByte(CP_UTF8, 0, P, N, PAnsiChar(Text), M, nil, nil);
+        Result := True;
+      end;
+      GlobalUnlock(H);
+    end;
+  end;
+  CloseClipboard;
+end;
+
 {$ENDIF WINDOWS}
 
 {$IF NOT DEFINED(UNIX) AND NOT DEFINED(WINDOWS)}
@@ -1145,6 +1223,15 @@ end;
 procedure OsExit(Code: Integer);
 begin
   Halt(Code);
+end;
+function OsClipSet(const Text: AnsiString): Boolean;
+begin
+  Result := False;
+end;
+function OsClipGet(out Text: AnsiString): Boolean;
+begin
+  Text := '';
+  Result := False;
 end;
 {$ENDIF}
 

@@ -377,8 +377,8 @@ begin
     else
       C := #0;
     if (Event.KeyCode <> 0) and
-      ((GetAltCode(C) = Event.KeyCode) or
-       ((C <> #0) and (Owner^.Phase = phPostProcess) and (C = UpCase(Chr(Event.CharCode))))) then
+      ((GetAltCode(C) = Event.KeyCode) or HotKeyAlt(C, Event) or
+       ((C <> #0) and (Owner^.Phase = phPostProcess) and (C = UpCaseCp(Chr(Event.CharCode))))) then
       FocusLink(Event);
   end
   else if (Event.What = evBroadcast) and (Link <> nil) and
@@ -564,8 +564,8 @@ begin
       end;
     evKeyDown:
       if (Event.KeyCode <> 0) and
-        ((Event.KeyCode = GetAltCode(C)) or
-         ((Owner^.Phase = phPostProcess) and (C <> #0) and (C = UpCase(Chr(Event.CharCode)))) or
+        ((Event.KeyCode = GetAltCode(C)) or HotKeyAlt(C, Event) or
+         ((Owner^.Phase = phPostProcess) and (C <> #0) and (C = UpCaseCp(Chr(Event.CharCode)))) or
          (((State and sfFocused) <> 0) and (Event.CharCode = Ord(' ')))) then
       begin
         DrawState(True);

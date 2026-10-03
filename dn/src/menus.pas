@@ -301,7 +301,7 @@ var
 
 implementation
 uses
-  Advance, Advance1, Advance2, Commands, DNHelp, DNApp
+  Advance, Advance1, Advance2, Commands, DNHelp, DNApp, DNUtf8
   , U_KeyMap
   ;
 
@@ -846,7 +846,7 @@ lEnter:
                 begin
 lHotkey:
                 Target := @Self;
-                Ch := GetAltChar(DNKeyCode(E));
+                Ch := Drivers.GetAltChar(DNKeyCode(E));
                 if Ch = #0 then
                   Ch := Char(E.CharCode)
                 else
@@ -854,7 +854,7 @@ lHotkey:
                 P := Target^.FindItem(Ch);
                 if  (Target = @Self) and (P = nil)
                 then
-                  P := FindItem(GetAltChar(DNKeyCode(E) and $FFFF00));
+                  P := FindItem(Drivers.GetAltChar(DNKeyCode(E) and $FFFF00));
                 if P = nil then
                   begin
                   P := TopMenu^.HotKey(DNKeyCode(E));
@@ -982,7 +982,11 @@ function TMenuView.FindItem(Ch: Char): PMenuItem;
     if  (P^.Name <> nil) and ((P^.Flags and miDisabled) = 0) then
       begin
       I := Pos('~', P^.Name^);
+{$IFDEF DNUTF8}
+      if  (I <> 0) and HotMatches(P^.Name^, I+1, Ch) then
+{$ELSE}
       if  (I <> 0) and (Ch = UpCaseArray[P^.Name^[I+1]]) then
+{$ENDIF}
         begin
         FindItem := P;
         Exit;
@@ -1083,7 +1087,7 @@ procedure TMenuView.HandleEvent(var Event: TEvent);
 пусть проверяются все. Реально есть, как минимум, такие:
 GrayPlus, GrayMinus, F2, F10, F11, F12 }
         if  ( (DNKeyCode(Event) and $F0000) <> 0) {AK155} and
-            (FindItem(GetAltChar(DNKeyCode(Event))) <> nil)
+            (FindItem(Drivers.GetAltChar(DNKeyCode(Event))) <> nil)
         then
           DoSelect
         else
@@ -1568,7 +1572,7 @@ procedure TMenuPopup.HandleEvent(var Event: TEvent);
         PutEvent(Event);
         ClearEvent(Event);
         end
-      else if GetAltChar(DNKeyCode(Event)) <> #0 then
+      else if Drivers.GetAltChar(DNKeyCode(Event)) <> #0 then
         ClearEvent(Event);
       end;
   end {case};
@@ -1849,8 +1853,12 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
         if  (DNKeyCode(Event) = T^.KeyCode) and
           CommandEnabled(T^.Command) or
             (T^.KeyCode = kbShortCut) and
+{$IFDEF DNUTF8}
+            HotMatches(S, PosChar('~', S)+1, Char(Event.CharCode))
+{$ELSE}
             (UpCaseArray[S[PosChar('~', S)+1]] =
              UpCaseArray[Char(Event.CharCode)])
+{$ENDIF}
         then
           begin
           Event.What := evCommand;

@@ -133,7 +133,8 @@ const
 procedure InitSysError;
 procedure DoneSysError;
 
-function GetAltChar(KeyCode: Word): Char;
+function GetAltChar(KeyCode: LongInt): Char;
+{ UTF-8 inside: Alt and a character that is not Latin (a letter of the code page, KeyCode = $0000xx with the Alt bit in the high word) gives that character }
 function GetAltCode(Ch: Char): Word;
 function GetCtrlChar(KeyCode: Word): Char;
 function GetCtrlCode(Ch: Char): Word;
@@ -291,9 +292,11 @@ end;
 
 { --- keys --------------------------------------------------------------------- }
 
-function GetAltChar(KeyCode: Word): Char;
+function GetAltChar(KeyCode: LongInt): Char;
 begin
-  Result := TvUtil.GetAltChar(KeyCode);
+  Result := TvUtil.GetAltChar(Word(KeyCode));
+  if Utf8Enabled and (Result = #0) and ((KeyCode shr 16) and 8 <> 0) and (KeyCode and $FF00 = 0) and (KeyCode and $FF >= $80) then
+    Result := Char(KeyCode and $FF);
 end;
 
 function GetAltCode(Ch: Char): Word;

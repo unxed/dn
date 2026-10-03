@@ -31,6 +31,10 @@ procedure CpBytesToUtf8(var S: String; From: Integer);
   {` The bytes $80 and up of S from the position From on are the bytes of the current code page: they become UTF-8 (one character each, so the
   columns do not change). Used for a text that DN has put through a code table; does nothing without -dDNUTF8. `}
 
+function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
+  {` Is the hot letter of a menu item (the character of Name at At, which may be UTF-8) the key Ch, the character of the code page that DN
+  takes from the keyboard (CharCode)? The case does not matter. `}
+
 function Utf8ToProxy(const S: String; var Tab: String): String;
   {` S with each non-ASCII character as one byte #128+i; Tab[i+1] is that character (its bytes). `}
 
@@ -191,6 +195,26 @@ procedure CpBytesToUtf8(var S: String; From: Integer);
   begin
   end;
 {$ENDIF}
+
+function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
+  var
+    Cp, Cp2: LongWord;
+    Used: Integer;
+  begin
+  Result := False;
+  if (At < 1) or (At > Length(Name)) then
+    Exit;
+  if  Byte(Name[At]) < $80 then
+    begin
+    Result := (Byte(Ch) < $80) and (CpUpper(Byte(Name[At])) = CpUpper(Byte(Ch)));
+    Exit;
+    end;
+  if  (Byte(Ch) >= $80) and Utf8Decode(@Name[At], Length(Name) - At + 1, Cp, Used) and (Used > 1) then
+    begin
+    Cp2 := CpToUnicode(Byte(Ch));
+    Result := CpUpper(Cp) = CpUpper(Cp2);
+    end;
+  end;
 
 function Utf8ToProxy(const S: String; var Tab: String): String;
   var

@@ -41,7 +41,7 @@ implementation
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
 
 uses
-  SysUtils, TvTermOs, TvGeom, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvMouse, TvViews, TvTermIO, TvAnsi, TvCodePg;
+  SysUtils, TvTermOs, TvGeom, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvMouse, TvViews, TvTermIO, TvAnsi, TvCodePg, TvClip;
 
 const
   AutoSliceMs = 20;           { the wait between the checks of the mouse timers while a button is down }
@@ -205,6 +205,30 @@ end;
 procedure UnixCaretSize(Size: Integer);
 begin
   CaretMoved := True;
+end;
+
+{ --- the clipboard ------------------------------------------------------------------------------------------ }
+
+{ The clipboard of the system (Windows) or of the terminal (OSC 52: most terminals take it, some ask the user or have it off; the Linux console
+  prints it, so it is not sent there). TV_CLIPBOARD=0 turns the OSC 52 off. Reading the clipboard of a terminal is not done: it is not
+  allowed in most of them; TvClip keeps the text of the program for the paste inside it. }
+function ClipSetHook(const Text: AnsiString): Boolean;
+var
+  Seq: AnsiString;
+begin
+  if OsClipSet(Text) then
+    Exit(True);
+  Result := False;
+  if (GetEnvironmentVariable('TV_CLIPBOARD') = '0') or (GetEnvironmentVariable('TERM') = 'linux') or (Length(Text) > 74000) then
+    Exit;
+  Seq := #27']52;c;' + Base64Encode(Text) + #7;
+  OsWrite(PByte(PAnsiChar(Seq)), Length(Seq));
+  Result := True;
+end;
+
+function ClipGetHook(out Text: AnsiString): Boolean;
+begin
+  Result := OsClipGet(Text);
 end;
 
 { --- input -------------------------------------------------------------------------------------------------- }
@@ -464,6 +488,8 @@ begin
   OnPollEvent := @UnixPollEvent;
   GetClockMs := @UnixClock;
   OnSetVideoMode := @UnixSetVideoMode;
+  OnClipboardSet := @ClipSetHook;
+  OnClipboardGet := @ClipGetHook;
   Result := True;
 end;
 
@@ -478,6 +504,8 @@ begin
   OnPollEvent := nil;
   GetClockMs := nil;
   OnSetVideoMode := nil;
+  OnClipboardSet := nil;
+  OnClipboardGet := nil;
   OsHandlersOff;
   RestoreTerminal;
   Active := False;

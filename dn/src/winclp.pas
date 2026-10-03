@@ -76,42 +76,130 @@ procedure CopyStream2Lines(PCS: PStream; var PC: PCollection);
 
 implementation
 
+{ The system clipboard through TvClip (tv/): the text there is UTF-8 and the backend does the rest (the Windows clipboard, OSC 52, WinOldAp of DOS).
+  The lines of DN are UTF-8 in the build with -dDNUTF8, else the bytes of the code page of DN (OEM): at the border they are turned into UTF-8 and back.
+  The lines of the clipboard of DN are the lines of the text; the system text has the line breaks of the system, any of them splits the lines. }
 
+uses
+  TvClip, Microed, Advance1
+  ;
 
-function SetWinClip(PC: PLineCollection): Boolean; 
-  
-  begin {Cat:todo DPMI32}
-  end; 
+function ToSys(const S: LongString): AnsiString;
+  begin
+{$IFDEF DNUTF8}
+  Result := S;
+{$ELSE}
+  Result := OemToUtf8(S);
+{$ENDIF}
+  end;
+
+function FromSys(const S: AnsiString): LongString;
+  begin
+{$IFDEF DNUTF8}
+  Result := S;
+{$ELSE}
+  Result := Utf8ToOem(S);
+{$ENDIF}
+  end;
+
+function LinesText(PC: PLineCollection): AnsiString;
+  var
+    I: LongInt;
+    L: AnsiString;
+  begin
+  Result := '';
+  if PC = nil then
+    Exit;
+  for I := 0 to PC^.Count - 1 do
+    begin
+    if PC^.LongStrings then
+      L := PLongString(PC^.At(I))^
+    else
+      L := PStr(PC^.At(I))^;
+    if I > 0 then
+      Result := Result + #10;
+    Result := Result + ToSys(L);
+    end;
+  end;
+
+{ the text of the system into the lines (a new collection) }
+function TextLines(const T: AnsiString): PLineCollection;
+  var
+    P, Q: LongInt;
+    S: AnsiString;
+  begin
+  Result := New(PLineCollection, Init(10, 10, True));
+  P := 1;
+  while P <= Length(T) do
+    begin
+    Q := P;
+    while (Q <= Length(T)) and not (T[Q] in [#10, #13]) do
+      Inc(Q);
+    S := FromSys(Copy(T, P, Q - P));
+    Result^.Insert(NewLongStr(S));
+    if (Q < Length(T)) and (T[Q] = #13) and (T[Q + 1] = #10) then
+      Inc(Q);
+    P := Q + 1;
+    end;
+  if Result^.Count = 0 then
+    Result^.Insert(NewLongStr(''));
+  end;
+
+function SetWinClip(PC: PLineCollection): Boolean;
+  begin
+  Result := False;
+  if PC = nil then
+    Exit;
+  ClipboardSetText(LinesText(PC));
+  Result := True;
+  end;
 
 function GetWinClip(var PCL: PLineCollection {; NeedStream: boolean})
-  : Boolean; 
-  
-  begin {Cat:todo DPMI32}
-  end; 
+  : Boolean;
+  var
+    T: AnsiString;
+  begin
+  Result := False;
+  T := ClipboardGetText;
+  if T = '' then
+    Exit;
+  if PCL <> nil then
+    Dispose(PCL, Done);
+  PCL := TextLines(T);
+  Result := True;
+  end;
 
-function GetWinClipSize: Boolean; 
-  
-  begin {Cat:todo DPMI32}
-  end; 
+function GetWinClipSize: Boolean;
+  begin
+  Result := ClipboardGetText <> '';
+  end;
 
-procedure SyncClipIn; 
-  
-  begin {Cat:todo DPMI32}
-  end; 
+procedure SyncClipIn;
+  begin
+  if Microed.ClipBoard <> nil then
+    SetWinClip(PLineCollection(Microed.ClipBoard));
+  end;
 
-procedure SyncClipOut {(NeedStream: boolean)}; 
-  
-  begin {Cat:todo DPMI32}
-  end; 
+procedure SyncClipOut {(NeedStream: boolean)};
+  var
+    T: AnsiString;
+  begin
+  T := ClipboardGetText;
+  if (T = '') or (T = LinesText(PLineCollection(Microed.ClipBoard))) then
+    Exit;
+  if Microed.ClipBoard <> nil then
+    Dispose(Microed.ClipBoard, Done);
+  Microed.ClipBoard := TextLines(T);
+  end;
 
 procedure CopyLines2Stream(PC: PCollection; var PCS: PStream);
- 
+
   begin {Cat:todo DPMI32}
-  end; 
+  end;
 
 procedure CopyStream2Lines(PCS: PStream; var PC: PCollection);
- 
+
   begin {Cat:todo DPMI32}
-  end; 
+  end;
 
 end.

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """The file operations of the Linux build of DN in a pty, checked on the file system: make a directory, copy, move, delete, edit and
 save a file. usage: tools/dn-linux-ops.py OUTDIR   (OUTDIR: the result of tools/build.sh linux|linux64)"""
+import base64
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -154,6 +156,47 @@ def main():
             t.send(F['END'], 0.5)
             t.send(F['F3'], 1.2)
             check('\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440' in t.text(), 'UTF-8: F3 shows a Russian text file', t.text())
+            t.send(F['ESC'], 0.5)
+            t.send(F['ALT-X'], 0.8)
+            t.send(F['ENTER'], 1.0)
+            t.close(3)
+
+            # the Russian interface: Alt and a Cyrillic letter (the keyboard sends Esc and the letter in UTF-8)
+            ru = os.path.join(d, 'u8ru')                                   # a new copy of the program: DN.INI of the first session keeps its language
+            os.makedirs(os.path.join(ru, 'w'))
+            for f in os.listdir(out):
+                if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
+                    shutil.copy(os.path.join(out, f), ru)
+                elif f == 'XLT':
+                    shutil.copytree(os.path.join(out, f), os.path.join(ru, f))
+            t = PtyTerm(['./dn'], 100, 30, env={'DNLNG': 'Russian'}, cwd=os.path.join(ru, 'w'), exe=os.path.join(ru, 'dn'))
+            t.pump(1.5, 6)
+            t.send(F['ESC'], 0.5)
+            t.send('\x1b\u0444', 1.0)                                   # Alt-\u0444: the menu "\u0424\u0430\u0439\u043b"
+            check('\u0421\u043c\u043e\u0442\u0440\u0435\u0442\u044c' in t.text(), 'UTF-8: Alt and a Cyrillic letter opens the menu', t.text())
+            t.send(F['ESC'], 0.5)
+            t.send(F['F7'], 1.0)
+            t.send('\u0442\u0435\u0441\u0442\u0032', 0.5)
+            t.send('\x1b\u043a', 1.2)                                   # Alt-\u043a: the button "\u041e~\u041a~"
+            check(os.path.isdir(os.path.join(ru, 'w', '\u0442\u0435\u0441\u0442\u0032')), 'UTF-8: Alt and a Cyrillic letter presses the button of a dialog', t.text())
+            t.send(F['ALT-X'], 0.8)
+            t.send(F['ENTER'], 1.0)
+            t.close(3)
+
+            # the system clipboard: Edit/Copy of the editor puts the text on the clipboard of the terminal (OSC 52, UTF-8)
+            t = PtyTerm(['./dn'], 100, 30, env={'TERM': 'xterm-256color'}, cwd=u, exe=os.path.join(d, 'dn'))
+            t.pump(1.5, 6)
+            t.send(F['ESC'], 0.5)
+            t.send(F['END'], 0.5)
+            t.send(F['F4'], 1.2)
+            for _ in range(6):
+                t.send('\x1b[1;2C', 0.5)                                   # Shift-Right: select
+            t.send(F['F10'], 0.5)
+            t.send('\x1b[C', 0.5)
+            t.send(F['ENTER'], 0.8)
+            t.send('c', 1.0)                                             # Copy
+            got = [base64.b64decode(x).decode('utf-8', 'replace') for x in re.findall(rb'\x1b\]52;c;([A-Za-z0-9+/=]*)\x07', t.raw)]
+            check(got and got[-1].startswith('\u041f\u0440\u0438'), 'UTF-8: Edit/Copy puts the selected Russian text on the clipboard (OSC 52; the selection of the editor is by bytes yet: dn/TODO-later.md)', repr(got))
             t.send(F['ESC'], 0.5)
             t.send(F['ALT-X'], 0.8)
             t.send(F['ENTER'], 1.0)

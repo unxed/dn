@@ -38,6 +38,8 @@ function Utf8ToOem(const S: AnsiString): AnsiString;
 function OemToUtf8(const S: AnsiString): AnsiString;
 { Every line break becomes CR LF (a lone LF or a lone CR too). }
 function ToCrLf(const S: AnsiString): AnsiString;
+{ Base64 (RFC 4648, with the padding): for OSC 52. }
+function Base64Encode(const S: AnsiString): AnsiString;
 { Every line break becomes LF. }
 function ToLf(const S: AnsiString): AnsiString;
 
@@ -185,6 +187,34 @@ begin
     Inc(I);
   end;
   SetLength(Result, N);
+end;
+
+function Base64Encode(const S: AnsiString): AnsiString;
+const
+  Digits: string[64] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+var
+  I, N: Integer;
+  A, B, C: Byte;
+begin
+  Result := '';
+  I := 1;
+  while I <= Length(S) do
+  begin
+    N := Length(S) - I + 1;
+    A := Byte(S[I]);
+    if N > 1 then B := Byte(S[I + 1]) else B := 0;
+    if N > 2 then C := Byte(S[I + 2]) else C := 0;
+    Result := Result + Digits[(A shr 2) + 1] + Digits[(((A and 3) shl 4) or (B shr 4)) + 1];
+    if N > 1 then
+      Result := Result + Digits[(((B and 15) shl 2) or (C shr 6)) + 1]
+    else
+      Result := Result + '=';
+    if N > 2 then
+      Result := Result + Digits[(C and 63) + 1]
+    else
+      Result := Result + '=';
+    Inc(I, 3);
+  end;
 end;
 
 end.
