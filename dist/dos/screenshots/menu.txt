@@ -1,7 +1,7 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            10:45:13p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            12:31:52p
  ┌─────────────────────────────────┐ ══╗x════════════════ C:\ ═════════════[↕]═╗
- │ About...                        │   ║║       Name       │       Name        ▲
- │ Refresh display                 │   ║║TEM               │                   ■
+ │ About...                        │  │║║       Name       │       Name       │▲
+ │ Refresh display                 │   ║║TEMP              │                   ■
  │ Screen rest                     │   ║║ENGLISH       DLG │                   ▒
  │ Change language         Alt-F12 │   ║║RUSSIAN       DLG │                   ▒
  ├─────────────────────────────────┤   ║║UKRAIN        DLG │                   ▒
@@ -19,7 +19,7 @@
  │ Change Screen  Mode  Shift-F12  │   ║║OUT           TXT │                   ▒
  ├─────────────────────────────────┤   ║║                  │                   ▼
  │ Game                     Alt-F9 │ ──║║──────────────────┴───────────────────║
- └─────────────────────────────────┘ 5p║║TEM              4,096 10/02/26 10:45p║
+ └─────────────────────────────────┘ 1p║║TEMP             4,096 10/03/26 12:31p║
 └[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
 C:\>                                                                            
  F1 Help                                                                        
