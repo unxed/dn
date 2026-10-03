@@ -44,7 +44,7 @@ try:
     t.clip = 'ПРИВЕТ из терминала'.encode()
     t.gesture = time.time()                                     # the paste gesture: the terminal lets the clipboard be read
     k(0x2D, cs=SHIFT, sc=0x52, wait=1.0)                        # Shift+Ins: paste
-    check('ПРИВЕТ из терминала' in t.text(), 'Shift+Ins: the clipboard of the terminal is pasted into the editor', t.text())
+    check('ПРИВЕТ из терминала' in t.text(), 'Shift+Ins: the clipboard of the terminal is pasted into the editor', 'clip now: %r' % t.clip + chr(10) + t.text())
     k(0x1B, wait=0.8)                                           # Esc: leave the editor (asks about saving)
     t.send(key(True, ord('n'), 0, 0x31, 0x4E)); t.pump(0.8)
     k(0x58, ord('x'), LALT, 0x2D, wait=0.8)                     # Alt-X
