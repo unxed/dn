@@ -1039,6 +1039,7 @@ initialization
 {$ELSE}
   NameConv := GetEnvironmentVariable('DN_NAME_CONV') <> '0';
 {$ENDIF}
+{$ENDIF}
   UnixInit;                        { False when the program has no terminal (the resource compiler): no screen then }
 finalization
   UnixDone;
