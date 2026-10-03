@@ -3,10 +3,10 @@
   scrolling region, the alternate screen, the history (scrollback), the modes that the program sets (application cursor keys, bracketed paste, mouse
   reporting) and the answers it must send back (device attributes, cursor position): TakeReply.
 
-  Written for this project (MIT, see LICENSE) after the description of the control sequences of xterm (XTerm Control Sequences, ECMA-48, DEC STD 070
-  for the line drawing set); the shape of the interface follows the widget of magiblot/tvterm (a screen that a view draws), the code is not
-  a translation of libvterm. Not done (see dn/TODO-later.md): sixel and other graphics, DECRQM, rectangular operations, double width and height
-  lines, text reflow on resize. }
+  Written for this port (the original has libvterm for this: the emulator behind the view of tvterm). The code is made after the description of
+  the control sequences of xterm (XTerm Control Sequences, ECMA-48, DEC STD 070 for the line drawing set); the shape of the interface follows
+  the widget of magiblot/tvterm (a screen that a view draws), it is not a translation of libvterm. Not done: sixel and other graphics, DECRQM,
+  rectangular operations, double width and height lines, text reflow on resize (the list is kept in the notes of the project, TODO-later.md). }
 unit TvVt;
 
 {$I tvdefs.inc}
