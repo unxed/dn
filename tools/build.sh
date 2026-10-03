@@ -44,6 +44,9 @@ w=$out/rcp.work; rm -rf "$w"; mkdir -p "$w/EXE.D32"
 # DN names its files in capitals; the file system may be case sensitive: the names that DN asks for
 cp "$src/rcpvpd.ini" "$w/RCPVPD.INI"; cp "$src/dnhelp.pas" "$w/DNHELP.PAS"; cp "$src/commands.pas" "$w/COMMANDS.PAS"; cp "$src/stdefine.inc" "$w/STDEFINE.INC"
 cp -r "$src/RESOURCE" "$w/RESOURCE"
+case "${DN_EXTRA:-}" in *-dDNUTF8*)      # DN inside in UTF-8 (the branch utf8-inside): the texts of the resources are UTF-8
+    for f in "$w"/RESOURCE/RUSSIAN/dn.dn? "$w"/RESOURCE/UKRAIN/dn.dn?; do iconv -f cp866 -t utf-8 "$f" > "$f.u8" && mv "$f.u8" "$f"; done ;;
+esac
 if [ "$DN_TARGET" = dos ]; then
     cp "$DN_OBJ/rcp.exe" "$w/RCP.EXE"
     "$here/tools/dos-run.sh" "$w" RCP.EXE >/dev/null 2>&1 || true          # fetches CWSDPMI.EXE

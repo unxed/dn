@@ -306,7 +306,7 @@ type
 implementation
 
 uses
-  xTime, Startup, Advance1, VPUtils,
+  xTime, Startup, Advance1, VPUtils, DNUtf8,
   VpSysLow, Advance2,
   Commands
   ;
@@ -465,9 +465,10 @@ destructor TTextReader.Done;
 Я сомневаюсь в полезности этих PString даже в 16bit версии,
 а в 32bit - это совершенно лишнее.
    А также ввёл пару мелких оптимизаций и добавил комментариев.}
-function FormatLongName(Name: String; Size, ExtSize: Byte;
+function FormatLongNameB(Name: String; Size, ExtSize: Byte;
      Options: Word;
     FormatMode: TNameFormatMode): String;
+  { one byte, one column (the proxy of DNUtf8 for UTF-8 names): FormatLongName below }
 
   var
     PSize, ESize: Integer; {PathSize, ExtensionSize}
@@ -641,7 +642,23 @@ drivers._vp.MoveCStr. 06.01.2001}
   then
     AddStr(Res^, '~');
 /AK155}
-  end { FormatLongName };
+  end { FormatLongNameB };
+
+function FormatLongName(Name: String; Size, ExtSize: Byte;
+     Options: Word;
+    FormatMode: TNameFormatMode): String;
+{$IFDEF DNUTF8}
+  var
+    Tab: String;
+  begin
+  Name := Utf8ToProxy(Name, Tab);
+  Result := ProxyToUtf8(FormatLongNameB(Name, Size, ExtSize, Options, FormatMode), Tab);
+  end;
+{$ELSE}
+  begin
+  Result := FormatLongNameB(Name, Size, ExtSize, Options, FormatMode);
+  end;
+{$ENDIF}
 
 procedure CheckOS;
   begin
