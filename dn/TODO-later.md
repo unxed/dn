@@ -240,5 +240,7 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   nil and `Fail` was called. Borland TV has `TGroup.GetSubViewPtr`, which gives the view of the group at once; added in `tv/src/tvviews.pas`; test `tv/tests/t_subptr.pas` (3 of 6 checks fail without the fix).
   How it was found: the traces of `Put`/`Get` of every nested object (positions in the file), then of the steps of `TDoubleWindow.Store/Load`; the first 5 builds only showed that DN reads 4 bytes less than it writes.
   Other classes of DN that call `GetSubViewPtr` after `inherited Load`: `calc`, `dbview`, `dndlgs`, `edwin` (the same fix helps them).
-- **Not checked yet:** the option "save the desktop on exit" switched on in Options -> Startup (then the sort and the directories of the panels must come back after a restart), "Save setup", and the user screen after an external
+- **Verified after the fix (DOS, DOSBox-X master with the guard):** panel sort by size (Alt-B), Options -> Save desktop (`DN.DSK`, 6628 bytes), restart, Options -> Load desktop: no error, the panel comes back in the size
+  order (the base start shows the extension order). The same code is in the Linux/Windows/aarch64 builds, where the bug was the same; their `dist/` are not rebuilt yet (a refresh of all `dist/` is due after the next fixes).
+- **Not checked yet:** the option "save the desktop on exit" switched on in Options -> Startup (the automatic version of the same), "Save setup", and the user screen after an external
   program. The keys of the harness (`DNKEYS`) drive the menus well but each step needs a look at the screen (the first guesses of a hotkey, Ctrl-F3, opened the drive menu instead of a sort).
