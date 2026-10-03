@@ -295,6 +295,10 @@ type
     procedure Store(var S: TStream);
     { Reads the number that PutSubViewPtr wrote and gives the view of this group (nil for 0). }
     function ReadChildPtr(var S: TStream): PView;
+    { As in Borland TV: the number that PutSubViewPtr wrote gives a view of THIS group at once (a group that loads its own fields after
+      "inherited Load" has all its views already; TView.GetSubViewPtr would only put the pointer into the list of fixups of an enclosing
+      group, which no longer waits for it). P is a pointer variable. }
+    procedure GetSubViewPtr(var S: TStream; var P);
     constructor Init(const Bounds: TRect);
     destructor Done; virtual;
     function ExecView(P: PView): Word;
@@ -2670,6 +2674,11 @@ begin
     Result := nil
   else
     Result := At(Index);
+end;
+
+procedure TGroup.GetSubViewPtr(var S: TStream; var P);
+begin
+  Pointer(P) := ReadChildPtr(S);
 end;
 
 procedure TGroup.Store(var S: TStream);

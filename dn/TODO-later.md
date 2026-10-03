@@ -235,5 +235,10 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   `StartupData.Unload and osuAutosave` (the startup option "save the desktop on exit", off by default): no `.DSK` file was written in my runs, because that option was not on.
 - Checked: the panel sort by size (Alt-B, Down, Down, Enter) works inside a run (the order of the files changes). After Alt-X and a new start the sort is the default again: **expected** with the defaults (nothing
   saves a panel sort unless the setup is saved or the autosave of the desktop is on); not a defect of the port as far as I can tell.
+- **Found and fixed (2026-10-03): "Load desktop" gave "Error reading desktop file"** for any desktop that has a file panel window. Cause: `TDoubleWindow.Load` reads the pointers to its own views (`Separator`, the panels) with
+  `GetSubViewPtr` after `inherited Load`; in `tv/` that was `TView.GetSubViewPtr`, which only puts the pointer into the list of fixups of an enclosing group (applied at the end of that group's `Load`), so the pointers stayed
+  nil and `Fail` was called. Borland TV has `TGroup.GetSubViewPtr`, which gives the view of the group at once; added in `tv/src/tvviews.pas`; test `tv/tests/t_subptr.pas` (3 of 6 checks fail without the fix).
+  How it was found: the traces of `Put`/`Get` of every nested object (positions in the file), then of the steps of `TDoubleWindow.Store/Load`; the first 5 builds only showed that DN reads 4 bytes less than it writes.
+  Other classes of DN that call `GetSubViewPtr` after `inherited Load`: `calc`, `dbview`, `dndlgs`, `edwin` (the same fix helps them).
 - **Not checked yet:** the option "save the desktop on exit" switched on in Options -> Startup (then the sort and the directories of the panels must come back after a restart), "Save setup", and the user screen after an external
   program. The keys of the harness (`DNKEYS`) drive the menus well but each step needs a look at the screen (the first guesses of a hotkey, Ctrl-F3, opened the drive menu instead of a sort).
