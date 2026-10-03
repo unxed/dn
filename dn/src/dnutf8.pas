@@ -31,6 +31,11 @@ procedure CpBytesToUtf8(var S: String; From: Integer);
   {` The bytes $80 and up of S from the position From on are the bytes of the current code page: they become UTF-8 (one character each, so the
   columns do not change). Used for a text that DN has put through a code table; does nothing without -dDNUTF8. `}
 
+function CpCharToUtf8(B: Byte): String;
+  {` The character of the code page with the byte B (the key of the keyboard of DN) in UTF-8; ASCII stays. `}
+procedure Utf8DeleteLast(var S: String);
+  {` Removes the last character of the UTF-8 string S (not a byte). `}
+
 function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
   {` Is the hot letter of a menu item (the character of Name at At, which may be UTF-8) the key Ch, the character of the code page that DN
   takes from the keyboard (CharCode)? The case does not matter. `}
@@ -229,6 +234,29 @@ procedure CpBytesToUtf8(var S: String; From: Integer);
   begin
   end;
 {$ENDIF}
+
+function CpCharToUtf8(B: Byte): String;
+  var
+    Buf: array[0..7] of Byte;
+    N: Integer;
+  begin
+  if B < $80 then
+    Exit(Chr(B));
+  N := CpToUtf8(B, @Buf[0]);
+  SetString(Result, PChar(@Buf[0]), N);
+  end;
+
+procedure Utf8DeleteLast(var S: String);
+  var
+    L: Integer;
+  begin
+  L := Length(S);
+  if L = 0 then
+    Exit;
+  while (L > 1) and ((Byte(S[L]) and $C0) = $80) do
+    Dec(L);
+  SetLength(S, L - 1);
+  end;
 
 function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
   var

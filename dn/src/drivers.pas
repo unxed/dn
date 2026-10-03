@@ -188,15 +188,26 @@ procedure SliceAwake;
 begin
 end;
 
+const
+  { the scan codes of the keys A..Z (DOS): DN has Ctrl-letter as scan code and the control character (kbCtrlS = $041F13), tv/ as the character only }
+  CtrlScan: array[1..26] of Byte = (
+    $1E, $30, $2E, $20, $12, $21, $22, $23, $17, $24, $25, $26, $32,
+    $31, $18, $19, $10, $13, $1F, $14, $16, $2F, $11, $2D, $15, $2C);
+
 function DNKeyCode(const Event: TEvent): LongInt;
 var
   Shift: LongInt;
+  Key: LongInt;
 begin
   Shift := 0;
   if (Event.ControlKeyState and 3) <> 0 then
     Shift := 3;
   Shift := Shift or (Event.ControlKeyState and 12);
-  Result := LongInt(Event.KeyCode) or (Shift shl 16);
+  Key := Event.KeyCode;
+  if  ((Event.ControlKeyState and 4) <> 0) and ((Event.ControlKeyState and 8) = 0) and (Key >= 1) and (Key <= 26)
+      and not (Key in [8, 9, 13]) then
+    Key := Key or (LongInt(CtrlScan[Key]) shl 8);
+  Result := Key or (Shift shl 16);
 end;
 
 procedure SetEventDouble(var Event: TEvent; Value: Boolean);
