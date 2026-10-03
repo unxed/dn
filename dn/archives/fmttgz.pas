@@ -45,66 +45,54 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_BS2; {BS2}
+unit fmttgz; {TGZ & TAZ & TAR.GZ}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
+   fileutil
   ;
 
 type
-  PBS2Archive = ^TBS2Archive;
-  TBS2Archive = object(TARJArchive)
+  PTGZArchive = ^TTGZArchive;
+  TTGZArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     end;
 
-type
-  BSA2Hdr = record
-    Unknown: array[1..12] of Char;
-    Id: array[1..4] of Char;
-    Date: LongInt;
-    OriginSize: LongInt;
-    PackedSize: LongInt;
-    Data: LongInt;
-    NameLen: Byte;
-    end;
-
 implementation
+{ ----------------------------- TAR ------------------------------------}
 
-{ ----------------------------- BS2 ------------------------------------}
-
-constructor TBS2Archive.Init;
+constructor TTGZArchive.Init;
   var
     Sign: TStr5;
     q: String;
   begin
+  TObject.Init;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'BS2'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'BS2'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-xy'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-xy'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-ar'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-am'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, '-d'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-xg'));
+  
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, ''));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'UNTGZOS2'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-d'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-d'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, ''));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
   Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, '+s'));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
-         ''));
-  SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PStoreCompression, ''));
@@ -122,62 +110,85 @@ constructor TBS2Archive.Init;
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
+  
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
-  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '0');
   PutDirs := q <> '0';
   
   q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '0');
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TBS2Archive.Init };
+  end { TTGZArchive.Init };
 
-function TBS2Archive.GetID: Byte;
+function TTGZArchive.GetID: Byte;
   begin
-  GetID := arcBS2;
+  GetID := arcTGZ;
   end;
 
-function TBS2Archive.GetSign: TStr4;
+function TTGZArchive.GetSign: TStr4;
   begin
-  GetSign := sigBS2;
+  GetSign := sigTGZ;
   end;
 
-procedure TBS2Archive.GetFile;
+procedure TTGZArchive.GetFile;
+  type
+    GZipHdr = record
+      Id: AWord;
+      Flag: AWord;
+      Time: LongInt;
+      end;
   var
-    P: BSA2Hdr;
+    P: GZipHdr;
+    DT: DateTime;
+    C: Char;
   begin
-  ArcFile^.Read(P, 6);
-  { if (Copy(P.ID,1,2) = #0#0) then begin FileInfo.Last := 1;Exit;end;}
-  if  (ArcFile^.Status <> stOK) then
-    begin
-    FileInfo.Last := 2;
-    Exit;
-    end;
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  ArcFile^.Read(P, SizeOf(P));
+  if ArcFile^.Eof then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P.Unknown[7], SizeOf(P)-6);
-  if  (ArcFile^.Status <> stOK) then
+  GetUNIXDate(P.Time, DT.Year, DT.Month, DT.Day, DT.Hour, DT.Min, DT.Sec);
+  PackTime(DT, FileInfo.Date);
+  FileInfo.FName := '';
+  if  (P.Flag and $800 = 0) or (P.Id = $9d1f)
+  then
+    if {(UpStrg(GetExt(ArcFileName)) = '.GZ') or}
+        (UpCase(ArcFileName[Length(ArcFileName)]) = 'Z')
+      {gzip changes last char of extension to 'z' or adds '.gz' extension}
+      then
+      FileInfo.FName := GetSName(ArcFileName)
+    else
+      FileInfo.FName := GetName(ArcFileName)
+  else
     begin
-    FileInfo.Last := 2;
-    Exit;
+    if P.Flag and $400 = 0 then
+      P.Time := 10 {skip 10 bytes}
+    else
+      begin
+      ArcFile^.Read(P.Time, SizeOf(P.Time));
+      P.Time := P.Time shr 16+12;
+      end;
+    ArcFile^.Seek(ArcPos+P.Time);
+    repeat
+      ArcFile^.Read(C, 1);
+      if C <> #0 then
+        FileInfo.FName := FileInfo.FName+C
+      else
+        Break;
+    until ArcFile^.Status <> stOK;
     end;
-  {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
-  FileInfo.Last := 0;
+  FileInfo.PSize := ArcFile^.GetSize;
+  ArcFile^.Seek(CompToFSize(FileInfo.PSize-4));
+  ArcFile^.Read(FileInfo.USize, SizeOf(FileInfo.USize));
   FileInfo.Attr := 0;
-  FileInfo.USize := P.OriginSize;
-  FileInfo.PSize := P.PackedSize;
-  FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
-  FileInfo.FName[0] := Char(P.NameLen);
-  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
-  end { TBS2Archive.GetFile };
+  FileInfo.Last := 0;
+  end { TTGZArchive.GetFile };
 
 end.

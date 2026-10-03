@@ -1,6 +1,6 @@
 {/////////////////////////////////////////////////////////////////////////
 //
-//  Dos Navigator Open Source
+//  Dos Navigator Open Source 1.51.08
 //  Based on Dos Navigator (C) 1991-99 RIT Research Labs
 //
 //  This programs is free for commercial and non-commercial use as long as
@@ -43,25 +43,19 @@
 //  cannot simply be copied and put under another distribution licence
 //  (including the GNU Public Licence).
 //
-//////////////////////////////////////////////////////////////////////////
-//
-//  2007.06.15
-//  BZip2 reader for Dos Navigator
-//  Initial version by Max Piwamoto
-//
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_BZ2; {bzip2}
+unit fmtqrk; {QuArk}
 
 interface
 
 uses
-  Archiver, basics, strutil, fileutil, baseobjs
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
   ;
 
 type
-  PBZ2Archive = ^TBZ2Archive;
-  TBZ2Archive = object(TARJArchive)
+  PQuarkArchive = ^TQuArkArchive;
+  TQuArkArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -69,53 +63,54 @@ type
     end;
 
 implementation
-{ ----------------------------- BZIP2 ------------------------------------ }
 
-constructor TBZ2Archive.Init;
+{ --------------------- Quark (by Luzin Aleksey) -------------------------}
+
+constructor TQuArkArchive.Init;
   var
     Sign: TStr5;
     q: String;
   begin
-  TObject.Init;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'bzip2'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'bzip2'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-dk'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-dk'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-k'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
+  TObject.Init;
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'QuArk'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'QuArk'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'm'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-g'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
-  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-y'));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, '-s'));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
+         ''));
+  SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PStoreCompression, ''));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, '-1'));
+         PFastestCompression, ''));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, '-2'));
+         PFastCompression, '-m3'));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, ''));
+         PNormalCompression, '-m1'));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PGoodCompression, ''));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, '-9'));
+         PUltraCompression, '-m5'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
-  
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
@@ -126,40 +121,61 @@ constructor TBZ2Archive.Init;
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
   UseLFN := q <> '0';
   
-  end { TBZ2Archive.Init };
+  end { TQuArkArchive.Init };
 
-function TBZ2Archive.GetID: Byte;
+function TQuArkArchive.GetID: Byte;
   begin
-  GetID := arcBZ2;
+  GetID := arcQUARK;
   end;
 
-function TBZ2Archive.GetSign: TStr4;
+function TQuArkArchive.GetSign: TStr4;
   begin
-  GetSign := sigBZ2;
+  GetSign := sigQUARK;
   end;
 
-procedure TBZ2Archive.GetFile;
+procedure TQuArkArchive.GetFile;
   var
-    S: String;
+    FH: record
+      Tmp: array[1..3] of Char;
+      LengthOfName: Byte;
+      end;
+    FH1: record
+      Attr: AWord;
+      DateTime: LongInt;
+      RealSize: LongInt;
+      PackSize: LongInt;
+      CRC: AWord;
+      TPC: Byte;
+      end;
   begin
   if ArcFile^.GetPos = ArcFile^.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  S := UpStrg(GetExt(ArcFileName));
-  FileInfo.FName := GetSName(ArcFileName);
-  if (S = '.TBZ') or (S = '.TBZ2') then
-    FileInfo.FName := FileInfo.FName + '.TAR';
-  FileInfo.PSize := ArcFile^.GetSize;
-  FileInfo.USize := 0;
-  FileInfo.Date := 0;
-  FileInfo.Attr := 0;
+  ArcFile^.Read(FH, SizeOf(FH));
+  if  (ArcFile^.Status <> 0) then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  SetLength(FileInfo.FName, FH.LengthOfName);
+  ArcFile^.Read(FileInfo.FName[1], FH.LengthOfName);
+  if FileInfo.FName = '' then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  ArcFile^.Read(FH1, SizeOf(FH1));
   FileInfo.Last := 0;
-  ArcFile^.Seek(ArcFile^.GetSize);
-  end { TBZ2Archive.GetFile };
+  FileInfo.Date := FH1.DateTime;
+  FileInfo.Attr := FH1.Attr and not Hidden;
+  FileInfo.USize := FH1.RealSize;
+  FileInfo.PSize := FH1.PackSize;
+  ArcFile^.Seek(ArcFile^.GetPos+FH1.PackSize);
+  end { TQuArkArchive.GetFile };
 
 end.

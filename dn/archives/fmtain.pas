@@ -45,46 +45,35 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_HPK; {HPK}
+unit fmtain; {AIN}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
-  Collect
+  Archiver
   ;
 
 type
-  PHPKArchive = ^THPKArchive;
-  THPKArchive = object(TARJArchive)
+  PAINArchive = ^TAINArchive;
+  TAINArchive = object(TARJArchive)
+    ListFileName: String;
+    ListFile: System.Text;
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     end;
 
-type
-  PHPKRec = ^THPKRec;
-  THPKRec = record
-    parentIndex: LongInt;
-    PSize, USize: LongInt;
-    Date: LongInt;
-    Name: PString;
-    end;
-
-  PHPKCollection = ^THPKCollection;
-  THPKCollection = object(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
-    end;
-
-var
-  HPKCol: PHPKCollection;
-
 implementation
 
-{ ----------------------------- HPK ------------------------------------}
+uses
+  baseobjs, fileutil, basics, mainapp, DnExec, Commands, strutil, Messages,
+  Dos
+  ;
 
-constructor THPKArchive.Init;
+{ ------------------------------- AIN ------------------------------------- }
+
+constructor TAINArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -94,100 +83,161 @@ constructor THPKArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HPACK'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HPACK'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'X'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'X'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'A -DA -A'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'A -DA -A'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'D'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-C'));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'T'));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'AIN'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'AIN'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'm'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-g'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
-  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
-  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, '-E'));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-y'));
+  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, '-e'));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
          ''));
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, '-0'));
+         PStoreCompression, '-m4'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, ''));
+         PFastestCompression, '-m3'));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, ''));
+         PFastCompression, '-m3'));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, ''));
+         PNormalCompression, '-m2'));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PGoodCompression, ''));
+         PGoodCompression, '-m1'));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, ''));
+         PUltraCompression, '-m1'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
-         ' '));
+         '@'));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
-       ' '));
+       '@'));
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
-  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '1');
   PutDirs := q <> '0';
   
   q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '0');
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
   UseLFN := q <> '0';
   
-  end { THPKArchive.Init };
+  end { TAINArchive.Init };
 
-function THPKArchive.GetID: Byte;
+function TAINArchive.GetID: Byte;
   begin
-  GetID := arcHPK;
+  GetID := arcAIN;
   end;
 
-function THPKArchive.GetSign: TStr4;
+function TAINArchive.GetSign: TStr4;
   begin
-  GetSign := sigHPK;
+  GetSign := sigAIN;
   end;
 
-procedure THPKCollection.FreeItem(P: Pointer);
-  begin
-  if P <> nil then
-    begin
-    DisposeStr(PHPKRec(P)^.Name);
-    Dispose(PHPKRec(P));
-    end;
-  end;
+{
+Модуль настраивался на ain 2.2
 
-procedure THPKArchive.GetFile;
+Для файлов с не очень длинными именами формат однострочный.
+В этом же примере видно 'решение' проблемы y2k
+
+TEMP\WINL                   5883  18.01.101  20:35:50
+
+Для файлов с более длинными именами формат двухстрочный:
+
+TEMP\KBM35012\KMBR.BIN
+                             338  20.08.97  20:43:38
+
+}
+procedure TAINArchive.GetFile;
   var
+    l: LongInt;
     DT: DateTime;
-    R: PHPKRec;
+    s: String;
   begin
-  if HPKCol^.Count = 0 then
+  if TextRec(ListFile).Handle = 0 then
+    begin { первый вызов: вызов архиватора для вывода оглавления }
+    FileInfo.Last := 2;
+    ArcFile^.Close;
+    ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
+    s := '/C '
+      
+      +UnPacker^+' v '+ArcFileName
+      
+      +' > '+ListFileName
+      
+      ;
+    if Length(s) < 126 then
+      AnsiExec(GetEnv('COMSPEC'), s)
+    else
+      MessageBox(^C+GetString(dlCmdLineTooLong), nil, mfOKButton+mfError);
+    System.Assign(ListFile, ListFileName);
+    System.Reset(ListFile);
+    if IOResult <> 0 then
+      Exit;
+    { Пропуск шапки и чтение первой строки файлов }
+    repeat
+      if Eof(ListFile) then
+        Exit;
+      Readln(ListFile, s);
+      if IOResult <> 0 then
+        Exit;
+    until (Pos('File name', s) <> 0) or (Pos('Имя файла', s) <> 0);
+    repeat
+      if Eof(ListFile) then
+        Exit;
+      Readln(ListFile, s);
+      if IOResult <> 0 then
+        Exit;
+    until s <> '';
+    end
+  else
+    System.Readln(ListFile, s);
+  l := Pos(' ', s);
+  if l = 1 then
     begin
+    Close(ListFile);
+    EraseFile(ListFileName);
+    TextRec(ListFile).Handle := 0;
     FileInfo.Last := 1;
-    Dispose(HPKCol, Done);
-    HPKCol := nil;
     Exit;
     end;
-  FileInfo.USize := PHPKRec(HPKCol^.At(0))^.USize;
-  FileInfo.PSize := PHPKRec(HPKCol^.At(0))^.PSize;
-  GetUNIXDate(PHPKRec(HPKCol^.At(0))^.Date, DT.Year, DT.Month, DT.Day,
-     DT.Hour, DT.Min, DT.Sec);
-  PackTime(DT, FileInfo.Date);
-  if PHPKRec(HPKCol^.At(0))^.Name <> nil {DataCompBoy}
-    then
-    FileInfo.FName := PHPKRec(HPKCol^.At(0))^.Name^ {DataCompBoy}
-  else
-    FileInfo.FName := ''; {DataCompBoy}
   FileInfo.Last := 0;
-  FileInfo.Attr := 0;
-  HPKCol^.AtFree(0);
-  end { THPKArchive.GetFile };
+
+  { чтение данных об очередном файле}
+  if l = 0 then
+    begin { длина и прочее в следующей строке }
+    FileInfo.FName := s;
+    Readln(ListFile, s);
+    end
+  else
+    begin
+    FileInfo.FName := Copy(s, 1, l-1);
+    System.Delete(s, 1, l);
+    end;
+  DelLeft(s);
+  l := Pos(' ', s);
+  FileInfo.USize := StoI(Copy(s, 1, l-1));
+  FileInfo.PSize := FileInfo.USize;
+  System.Delete(s, 1, l);
+  DelLeft(s);
+  DT.Day := StoI(Copy(s, 1, 2));
+  DT.Month := StoI(Copy(s, 4, 2));
+  DT.Year := 1900 + StoI(fDelRight(Copy(S,7,3)));
+  System.Delete(s, 1, 10);
+  DelLeft(s);
+  DT.Hour := StoI(Copy(s, 1, 2));
+  DT.Min := StoI(Copy(s, 4, 2));
+  DT.Sec := StoI(Copy(s, 7, 4));
+  PackTime(DT, FileInfo.Date);
+  end { TAINArchive.GetFile };
 
 end.
