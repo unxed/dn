@@ -72,7 +72,7 @@ initialization
   RaiseMaxFrameCount := 64;       { the stack of an exception in the trace: more frames than the 16 of the default }
   if GetEnvironmentVariable('DNDUMP') <> '' then
   begin
-    Assign(StdErr, 'DNERR.TXT');
+    Assign(StdErr, 'dnerr.txt');
     Rewrite(StdErr);
     Tracing := True;
     UseSerial := GetEnvironmentVariable('DNSERIAL') <> '';

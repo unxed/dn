@@ -31,7 +31,7 @@ const
   mbLeftButton = $01;
   mbRightButton = $02;
   { the state of the shift keys of the last event (the bits of the BIOS: right shift 1, left shift 2, ctrl 4,
-    alt 8...), and the second byte (left/right ctrl and alt, DN); set by TProgram.GetEvent of DNApp }
+    alt 8...), and the second byte (left/right ctrl and alt, DN); set by TProgram.GetEvent of mainapp }
   ShiftState: Byte = 0;
   ShiftState2: Byte = 0;
   OldShiftState: Byte = 0;
@@ -79,7 +79,7 @@ var
   ScreenHeight: Word absolute TvScreen.ScreenHeight;
   { TODO: DN reads and writes the screen as an array of 16-bit cells; the buffer of tv/ has other cells }
   { the screen of DN: 16-bit cells (character + attribute), a copy of the screen of tv/ that SysTvGetSrcBuf (VPSysLow) makes and
-    DNApp refreshes at every idle; DN reads it (user screen, screen savers) and writes back with SysTvShowBuf. NOT the buffer of
+    mainapp refreshes at every idle; DN reads it (user screen, screen savers) and writes back with SysTvShowBuf. NOT the buffer of
     TvScreen (that one has the cells of tv/) }
   ScreenBuffer: Pointer = nil;
   CursorLines: Word absolute TvScreen.CursorLines;

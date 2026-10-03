@@ -232,7 +232,7 @@ RNotepadFrame : TStreamRec = (ObjType: otNotepadFrame; VmtLink: 0; Load: nil; St
     { DiskInfo }
 RDiskInfo : TStreamRec = (ObjType: otDiskInfo; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RDriveView : TStreamRec = (ObjType: otDriveView; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-    { DnApp }
+    { mainapp }
 RBackground : TStreamRec = (ObjType: otBackground; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RDesktop : TStreamRec = (ObjType: otDesktop; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     { DnStdDlg }
@@ -246,7 +246,7 @@ RSortedListBox : TStreamRec = (ObjType: otSortedListBox; VmtLink: 0; Load: nil; 
 RDataSaver : TStreamRec = (ObjType: otDataSaver; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     { Drives }
 RDrive : TStreamRec = (ObjType: otDrive; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-    { Ed2 }
+    { editundo }
 RInfoLine : TStreamRec = (ObjType: otInfoLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RBookLine : TStreamRec = (ObjType: otBookLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     { Editor }
@@ -257,7 +257,7 @@ RTempDrive : TStreamRec = (ObjType: otTempDrive; VmtLink: 0; Load: nil; Store: n
     
     { FilesCol }
 RFilesCollection : TStreamRec = (ObjType: otFilesCollection; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-    { FlPanel }
+    { filepanel }
 RFilePanel : TStreamRec = (ObjType: otFilePanel; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RFlPInfoView : TStreamRec = (ObjType: otFlPInfoView; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RDirView : TStreamRec = (ObjType: otDirView; VmtLink: 0; Load: nil; Store: nil; Next: nil);
@@ -291,7 +291,7 @@ RMenuBox : TStreamRec = (ObjType: otMenuBox; VmtLink: 0; Load: nil; Store: nil; 
 RStatusLine : TStreamRec = (ObjType: otStatusLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RMenuPopup : TStreamRec = (ObjType: otMenuPopup; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     
-    { Microed }
+    { editcore }
 RFileEditor : TStreamRec = (ObjType: otFileEditor; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 REditWindow : TStreamRec = (ObjType: otEditWindow; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     
@@ -348,7 +348,7 @@ REditFrame : TStreamRec = (ObjType: otEditFrame; VmtLink: 0; Load: nil; Store: n
 RUserWindow : TStreamRec = (ObjType: otUserWindow; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RUserView : TStreamRec = (ObjType: otUserView; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RMyScrollBar : TStreamRec = (ObjType: otMyScrollBar; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-    { XDblWnd }
+    { panelwinx }
 RDoubleWindow : TStreamRec = (ObjType: otDoubleWindow; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     
 {last TStreamRec used in RegisterAll}

@@ -94,7 +94,7 @@ function BadTemp(var s: String): Boolean;
   ClrIO;
   if not PathExist(s) then
     Exit;
-  Assign(f, SysOsPath(s+'$DNTEST.SWP'));
+  Assign(f, SysOsPath(s+'$dntest.swp'));
   Rewrite(f);
   if IOResult = 0 then
     begin
@@ -271,7 +271,7 @@ procedure DoStartup;
     begin { ReadConfig: }
     ReadConfig := -1;
     CFGVer := 0;
-    S.Init(SourceDir+'DN'+GetEnv('DNCFG')+'.CFG', stOpenRead, 16384);
+    S.Init(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stOpenRead, 16384);
     if  (S.Status = stOK) and (S.GetSize <> 0) then
       GetVer;
     if  (CFGVer  = 0) or (CFGVer > VersionWord) then
@@ -543,7 +543,7 @@ procedure DoStartup;
     else
       SwpDir := TempDir;
     if RunFirst then
-      EraseFile(SwpDir+'DN'+ItoS(DNNumber)+'.SWP');
+      EraseFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
     end;
 
   procedure ReadIni;
@@ -709,7 +709,7 @@ procedure RUN_IT;
     if  (StartupData.Load and osuKillHistory <> 0) then
       ClearHistories;
   if not RunFirst then
-    EraseFile(SwpDir+'DN'+ItoS(DNNumber)+'.SWP');
+    EraseFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
   if RunFirst then
     begin
     if  (Message(@MyApplication, evBroadcast, cmLookForPanels, nil) = nil)

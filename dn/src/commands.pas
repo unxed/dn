@@ -1780,7 +1780,7 @@ const
   upsExecutables = 3;
   upsHidSysFiles = 4;
 
-  { DblWnd Commands }
+  { panelwin Commands }
 
   DblWndCommands = [cmMaxi, 200..219];
 

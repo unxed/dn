@@ -107,7 +107,7 @@ def main():
         t = WinTerm(os.path.join(d, 'dn.exe'), w)
         ok = t.wait_for('Utilities', 30)
         check(ok, 'start: the menu bar is drawn', t.text())
-        check(b'Error in country' not in t.raw, 'start: no country setup error (XLT next to the program)')
+        check(b'Error in country' not in t.raw, 'start: no country setup error (xlt next to the program)')
         t.wait_for('txt', 10)
         check('Name' in t.text() and re.search(r'a\s+txt', t.text()), 'start: the panel shows the files of the directory', t.text())
         shot(t, 'start')

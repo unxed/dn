@@ -132,7 +132,7 @@ const
   otColorDialog = 26;
   otR_BWSelector = 28;
 
-  { --- SWE }
+  { --- inputfname }
   otColorPoint = 9;
 
   { --- DBView }
@@ -174,7 +174,7 @@ const
 
   otNetInfo = 3362; {-$VIV}
 
-  { --- DnApp }
+  { --- mainapp }
 
   otBackground = 30;
   otDesktop = 31;
@@ -207,7 +207,7 @@ const
 
   otFilesCollection = 3360;
 
-  { --- FlPanel }
+  { --- filepanel }
 
   otFilePanel = 3350;
   otFlPInfoView = 3351;
@@ -252,7 +252,7 @@ const
   otStatusLine = 42;
   otMenuPopup = 43;
 
-  { --- MicroEd }
+  { --- editcore }
 
   otFileEditor = 6340;
   otInfoLine = 6341;
@@ -376,11 +376,11 @@ const
   otGroup = 6;
   otWindow = 7;
 
-  { --- XDblWnd }
+  { --- panelwinx }
 
   otDoubleWindow = 3340;
 
-  { 12335 used internally in MicroEd2 }
+  { 12335 used internally in editfile }
 
   otEditStorer = 12335;
 

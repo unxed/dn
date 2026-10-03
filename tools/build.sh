@@ -1,6 +1,6 @@
 #!/bin/sh
 # ONE COMMAND: builds DOS Navigator from dn/src and tv/src with your FPC: the programs (rcp, the resource compiler, and dn), the resources
-# (*.LNG, *.DLG, made by rcp from dn/src/RESOURCE) and the help (*.HLP, made by tv/tools/tvhc.pas).
+# (*.lng, *.dlg, made by rcp from dn/src/resource) and the help (*.hlp, made by tv/tools/tvhc.pas); all the names of the files of DN are in lower case.
 #
 # usage: tools/build.sh TARGET [OUTDIR]          TARGET: linux64 | linux | aarch64 | dos | win64 | win32        (OUTDIR default: out/TARGET)
 #   linux64   x86_64 Linux, the fpc of your system (FPC=...)                          needs: fpc 3.2.x, python3
@@ -10,7 +10,7 @@
 #   win32     Windows i386, DN_WIN32=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win32
 #   dos       DOS (go32v2), DN_PREFIX=PREFIX                                           needs: tools/build-fpc-go32v2.sh PREFIX, dosbox-x (rcp runs in it)
 # env: DN_UTF8=0 (linux, windows: the old DN with the code page inside; the default is UTF-8 inside); DN_EXTRA=-gl (more options of the compiler); DN_SRC=<a copy of dn/src> (e.g. with the traces of tools/dn-trace-*.py)
-# Run DN (linux): cd OUTDIR && ./dn        (the *.LNG *.DLG *.HLP files are next to it)
+# Run DN (linux): cd OUTDIR && ./dn        (the *.lng *.dlg *.hlp files are next to it)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 . "$here/tools/need-tv.sh"
@@ -40,9 +40,9 @@ win*|aarch64)
     echo "== resources and help (made by the build for linux64: the same files for all the targets)"
     host=$tmp/dn-res-host
     "$here/tools/build.sh" linux64 "$host" >/dev/null
-    cp "$host"/*.LNG "$host"/*.DLG "$host"/*.HLP "$out/"
+    cp "$host"/*.lng "$host"/*.dlg "$host"/*.hlp "$out/"
     cp "$DN_OBJ/dn$exe" "$out/dn$exe"
-    rm -rf "$out/XLT"; cp -r "$here/dn/data/XLT" "$out/XLT"      # the layout tables (ru441.xlt: DN looks for them in XLT next to the program)
+    rm -rf "$out/xlt"; cp -r "$here/dn/data/xlt" "$out/xlt"      # the layout tables (ru441.xlt: DN looks for them in xlt next to the program)
     echo "built: $out/dn$exe   (the resources and the help are next to it)"
     exit 0 ;;
 esac
@@ -50,7 +50,8 @@ echo "== resources (rcp)"
 w=$out/rcp.work; rm -rf "$w"; mkdir -p "$w/EXE.D32"
 # DN names its files in capitals; the file system may be case sensitive: the names that DN asks for
 cp "$src/rcpvpd.ini" "$w/RCPVPD.INI"; cp "$src/dnhelp.pas" "$w/DNHELP.PAS"; cp "$src/commands.pas" "$w/COMMANDS.PAS"; cp "$src/stdefine.inc" "$w/STDEFINE.INC"
-cp -r "$src/RESOURCE" "$w/RESOURCE"
+# the resource compiler is an old program: it asks for RESOURCE\ENGLISH (capitals) in its own directory; the repository has lower case
+for l in english russian ukrain; do u=$(echo $l | tr a-z A-Z); mkdir -p "$w/RESOURCE/$u"; cp "$src/resource/$l"/* "$w/RESOURCE/$u/"; done
 case "${DN_EXTRA:-}" in *-dDNUTF8*)      # DN inside in UTF-8 (the branch utf8-inside): the texts of the resources are UTF-8
     for f in "$w"/RESOURCE/RUSSIAN/dn.dn? "$w"/RESOURCE/UKRAIN/dn.dn?; do iconv -f cp866 -t utf-8 "$f" > "$f.u8" && mv "$f.u8" "$f"; done ;;
 esac
@@ -64,18 +65,19 @@ else
     cp "$DN_OBJ/rcp" "$w/rcp"
     ( cd "$w" && ./rcp D 2>&1 | sed 's/([0-9]*)//g' | grep -E "Writing|rror|nresolved|Undefined" || true )
 fi
-cp "$w"/EXE.D32/*.LNG "$w"/EXE.D32/*.DLG "$out/" 2>/dev/null || { echo "no resources were made" >&2; exit 1; }
+ls "$w"/EXE.D32/*.LNG "$w"/EXE.D32/*.DLG >/dev/null 2>&1 || { echo "no resources were made" >&2; exit 1; }
+for f in "$w"/EXE.D32/*.LNG "$w"/EXE.D32/*.DLG; do cp "$f" "$out/$(basename "$f" | tr A-Z a-z)"; done      # DN asks for lower case
 echo "== help (tv/tools/tvhc.pas, native)"
 th=$tmp/tvhc-o; mkdir -p "$th"
 fpc -Fu"$here/tv/src" -FU"$th" -FE"$th" -vew "$here/tv/tools/tvhc.pas" | grep -E "Error|Fatal" || true
-for l in ENGLISH RUSSIAN UKRAIN; do
-    htx=$src/RESOURCE/$l/dnhelp.htx
+for l in english russian ukrain; do
+    htx=$src/resource/$l/dnhelp.htx
     case "${DN_EXTRA:-}" in *-dDNUTF8*)      # the help in UTF-8 as well (the text is CP866 in the sources)
-        if [ "$l" != ENGLISH ]; then htx=$tmp/dnhelp-$l.htx; iconv -f cp866 -t utf-8 "$src/RESOURCE/$l/dnhelp.htx" > "$htx"; fi ;;
+        if [ "$l" != english ]; then htx=$tmp/dnhelp-$l.htx; iconv -f cp866 -t utf-8 "$src/resource/$l/dnhelp.htx" > "$htx"; fi ;;
     esac
-    "$th/tvhc" "$htx" "$out/$l.HLP" /4DN_OSP | sed 's|^|  |'
+    "$th/tvhc" "$htx" "$out/$l.hlp" /4DN_OSP | sed 's|^|  |'
 done
 cp "$DN_OBJ/dn$exe" "$out/dn$exe"
-rm -rf "$out/XLT"; cp -r "$here/dn/data/XLT" "$out/XLT"      # the layout tables (ru441.xlt: DN looks for them in XLT next to the program)
-[ "$DN_TARGET" != dos ] || [ -f "$out/CWSDPMI.EXE" ] || cp "$w/CWSDPMI.EXE" "$out/" 2>/dev/null || true
+rm -rf "$out/xlt"; cp -r "$here/dn/data/xlt" "$out/xlt"      # the layout tables (ru441.xlt: DN looks for them in xlt next to the program)
+[ "$DN_TARGET" != dos ] || [ -f "$out/cwsdpmi.exe" ] || cp "$w/CWSDPMI.EXE" "$out/cwsdpmi.exe" 2>/dev/null || true
 echo "built: $out/dn$exe   (the resources and the help are next to it)"

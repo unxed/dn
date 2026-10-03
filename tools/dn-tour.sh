@@ -1,7 +1,7 @@
 #!/bin/sh
 # A smoke tour of DN in DOSBox-X: each scenario is a start of DN from a clean state, some keys (DNKEYS, see dn/new/dnapp.pas), a
 # dump of the screen; the script prints for each scenario "ok" or the top of the stack of the exception, and keeps the screens
-# in OUTDIR/<name>.txt. Needs a build with line numbers (tools/build.sh dos with DN_EXTRA=-gl) in OUTDIR (DN.EXE, *.DLG, *.LNG).
+# in OUTDIR/<name>.txt. Needs a build with line numbers (tools/build.sh dos with DN_EXTRA=-gl) in OUTDIR (DN.EXE, *.dlg, *.lng).
 # usage: tools/dn-tour.sh OUTDIR [NAME...]      (no names: all the scenarios)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
@@ -12,7 +12,7 @@ for s in $SCEN; do
     name=${s%%:*}; keys=${s#*:}; mouse=''
     case $keys in *@*) mouse=${keys#*@}; keys=${keys%%@*};; esac   # name:keys@mouse (DNMOUSE, see dnapp.pas)
     d=$out/tour-$name; rm -rf "$d"; mkdir -p "$d"
-    cp "$out"/[Dd][Nn].[Ee][Xx][Ee] "$d/DN.EXE"; cp "$out"/*.DLG "$out"/*.LNG "$out"/*.HLP "$out/CWSDPMI.EXE" "$d/"
+    cp "$out"/[Dd][Nn].[Ee][Xx][Ee] "$d/DN.EXE"; cp "$out"/*.dlg "$out"/*.lng "$out"/*.hlp "$out/cwsdpmi.exe" "$d/"
     redir=' > OUT.TXT'; [ "$name" = userscr ] && redir=''   # userscr needs the output of the programs on the screen
     n=$(printf '%s' "$keys" | tr ',' '\n' | wc -l)
     m=0; [ -n "$mouse" ] && m=$(printf '%s' "$mouse" | tr ',' '\n' | wc -l)   # a mouse event a second too

@@ -257,7 +257,7 @@ function ExistFile(const FName: String): Boolean;
   end;
 {-DataCompBoy-}
 {AK155 21-01-2002 Эта программа дублирует PathExist, все ее вызовы
- (в dn1 и startup) заменил на вызовы PathExist}
+ (в boot и startup) заменил на вызовы PathExist}
 (*
 { VK/ }
 function  ExistDir(const DName: string): Boolean; {based on ExistFile}

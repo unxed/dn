@@ -39,7 +39,7 @@ type
   TTitleStr = ShortString;
 
 { The views that are updated from time to time (DN): RegisterToBackground adds a view, its Update is called by
-  RunBackground (the idle loop of the program, TProgram.Idle of DNApp) when the view's UpdTicks milliseconds have
+  RunBackground (the idle loop of the program, TProgram.Idle of mainapp) when the view's UpdTicks milliseconds have
   passed since the last call. A view that is destroyed leaves the list by itself. }
 procedure RegisterToBackground(P: PView);
 procedure UnregisterFromBackground(P: PView);

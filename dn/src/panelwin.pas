@@ -121,7 +121,7 @@ type
     function Valid(C: Word): Boolean; virtual;
     procedure ChangeBounds(const Bounds: TRect); virtual;
     procedure HandleCommand(var Event: TEvent);
-      {`DblWnd`}
+      {`panelwin`}
     procedure SwitchPanel(N: TPanelNum);
       {`скрыть/показать панель`}
     procedure ChangeDrv(N: TPanelNum);
@@ -675,7 +675,7 @@ procedure TDoubleWindow.SwitchPanel(N: TPanelNum);
     R.A.X := OldBounds.A.X;
     R.B.X := OldBounds.B.X;
     end;
-  if OldBounds.B.X - OldBounds.A.X = MinWinSize.X then {<Dblwnd.002>}
+  if OldBounds.B.X - OldBounds.A.X = MinWinSize.X then {<panelwin.002>}
     begin
     Inc(R.B.X);
     ChangeBounds(R);
@@ -1048,7 +1048,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
         cmPushFullName,
         cmPushFirstName,
         cmPushInternalName:
-          begin {< dblwnd.001 >}
+          begin {< panelwin.001 >}
           if Visible[not Selected] then
              Panel[not Selected].AnyPanel^.HandleEvent(Event);
           CE;

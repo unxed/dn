@@ -1,4 +1,4 @@
-{ DNApp: the application of DN (our unit; it replaces mainapp.PAS of the archive, which repeated the App of
+{ mainapp: the application of DN (our unit; it replaces mainapp.PAS of the archive, which repeated the App of
   Borland TV). The classes lie on TvApp (tv/), what DN adds is added here. The names are those that the
   sources of DN use (spec/dn-boundary-dnosp214.md).
 
@@ -518,7 +518,7 @@ procedure OpenResource;
 begin
   if Resource <> nil then
     Exit;
-  ResourceStream := OpenResourceStream('.DLG');
+  ResourceStream := OpenResourceStream('.dlg');
   New(Resource, Init(ResourceStream));
 end;
 
@@ -650,7 +650,7 @@ procedure InitLngStream;
 var
   PS, XS: PStream;
 begin
-  PS := OpenResourceStream('.LNG');
+  PS := OpenResourceStream('.lng');
   { the strings are read from memory: the file is copied (as the original does) }
   XS := New(PMemoryStream, Init(PS^.GetSize, PS^.GetSize));
   if XS^.Status <> stOK then
@@ -673,7 +673,7 @@ begin
   PS^.Seek(0);
   LStringList := PStringList(PS^.Get);
   if (PS^.Status <> stOK) or (LStringList = nil) then
-    ResourceFail('reading ' + LngId + '.LNG');
+    ResourceFail('reading ' + LngId + '.lng');
 end;
 
 function GetString(Index: TStrIdx): String;
@@ -727,7 +727,7 @@ var
 begin
   if GetEnvironmentVariable('DNDUMP') = '' then
     Exit;
-  Assign(T, 'DNLOG.TXT');
+  Assign(T, 'dnlog.txt');
   Rewrite(T);
   Writeln(T, 'exit code ', ExitCode, ' error address ', IntToHex(PtrUInt(ErrorAddr), 8));
   Close(T);

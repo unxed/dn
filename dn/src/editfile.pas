@@ -244,7 +244,7 @@ procedure MISaveFile(AED: PFileEditor);
         MILockFile(AED);
         Exit;
         end;
-      if FileExist then  {<MicroEd2.001>}
+      if FileExist then  {<editfile.001>}
         begin
         TempEAContainerName := SwpDir+'DN'+ItoS(DNNumber)+'.EA_';
         lAssignFile(TempEAContainer, TempEAContainerName);
@@ -304,7 +304,7 @@ procedure MISaveFile(AED: PFileEditor);
     Owner^.Redraw;
     if not (SmartPad or ClipBrd) then
       FileChanged(EditName);
-    if UpStrg(EditName) = UpStrg(MakeNormName(SourceDir, 'DN.INI')) then
+    if UpStrg(EditName) = UpStrg(MakeNormName(SourceDir, 'dn.ini')) then
       begin
       LoadDnIniSettings;
       DoneIniEngine;

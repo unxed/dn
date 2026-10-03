@@ -46,7 +46,7 @@
 //////////////////////////////////////////////////////////////////////////}
 
 unit keymap;
-{<U_KeyMap.001>}
+{<keymap.001>}
 
 interface
 
@@ -282,7 +282,7 @@ function ProcessDefCodepage(DefCodepageS: String): TKeyMap;
     k: TKeyMap;
   begin
 { Хочется написать UpStr(DefCodepageS), но лучше этого не делать, так
-как это создаёт жуткую закрутку ссылок между модулями через advance1.
+как это создаёт жуткую закрутку ссылок между модулями через strutil.
 и, главное, работает с какой-то заранее неизвестной UpCaseArray.
 Поскольку параметры в dn.ini все английские, делаем просто:}
   for i := 1 to Length(DefCodepageS) do

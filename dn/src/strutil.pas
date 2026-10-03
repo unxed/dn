@@ -1612,7 +1612,7 @@ procedure CompressString(var S: LongString);
 
 (*
 {Cat: добавил поддержку длинных строк
-      теперь эта процедура используется вместо аналогичных из MicroEd и Ed2}
+      теперь эта процедура используется вместо аналогичных из editcore и editundo}
 procedure CompressString(var S: LongString);
 {$IFDEF USELONGSTRING}
 {Cat}

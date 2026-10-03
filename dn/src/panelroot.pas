@@ -115,7 +115,7 @@ type
          BuildList: Boolean);
     procedure ReadDirectory;
     procedure RereadDir;
-    procedure RedrawPanelInfoDir; virtual; {<flpanelx.001>}
+    procedure RedrawPanelInfoDir; virtual; {<panelroot.001>}
       {` Перерисовать панель, подвал и заголовок. Полоса дисков
       не перерисовывается `}
     procedure SendLocated;
@@ -2853,7 +2853,7 @@ WrongArc:
             end;
 
         (*AK155 19-06-2002. Такого, вроде, не бывает никогда. Почти идентичный
-кусок есть в flpanel, так он действительно работает. И если тот кусок
+кусок есть в filepanel, так он действительно работает. И если тот кусок
 закоментарить, то DN глючит, но сюда управление все равно не попадает.
                  cmScrollBarChanged: if ScrollBar = Event.InfoPtr then begin
                                       if MSelect then

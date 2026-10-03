@@ -444,7 +444,7 @@ destructor TAttrBufStream.Done;
   end;
 
 {-DataCompBoy-}
-function CheckForOver(Name: String): PStream; {<Microed2.001>}
+function CheckForOver(Name: String): PStream; {<editfile.001>}
   var
     S: PAttrBufStream;
     F: lFile;
@@ -578,7 +578,7 @@ procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
     P: PLongString;
 
     {Cat: эта процедура теперь умеет работать с длинными строками
-      и находится в модуле Advance1}
+      и находится в модуле strutil}
     (*
   procedure CompressString; {та, кот. при сохранении файла}
   var PP: Pointer;

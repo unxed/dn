@@ -1088,7 +1088,7 @@ procedure LoadHistories;
     S: TBufStream;
     A: AWord;
   begin
-  S.Init(SourceDir+'DN'+HistNameSuffix+'.HIS', stOpenRead, 2048);
+  S.Init(SourceDir+'dn'+HistNameSuffix+'.his', stOpenRead, 2048);
   if S.Status = stOK then
     begin
     S.Read(FreeStr[1], Length(HistoryFileSign));
@@ -1111,7 +1111,7 @@ procedure SaveHistories;
     S: TBufStream;
     A: AWord;
   begin
-  S.Init(SourceDir+'DN'+HistNameSuffix+'.HIS', stCreate, 2048);
+  S.Init(SourceDir+'dn'+HistNameSuffix+'.his', stCreate, 2048);
   if S.Status = stOK then
     begin
     FreeStr := HistoryFileSign;

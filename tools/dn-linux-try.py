@@ -53,7 +53,7 @@ def main():
         print(t.text())
         alive = t.alive()
         print('--- alive:', alive, 'status:', t.status)
-        for n in ('DN.ERR', 'DNERR.TXT'):
+        for n in ('dn.err', 'dnerr.txt'):
             p = os.path.join(w, n)
             if os.path.exists(p):
                 print('--- ' + n); print(open(p, errors='replace').read()[:1500])

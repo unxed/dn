@@ -65,6 +65,7 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   var
     S1, S2: String;
   begin
+  LI := LowerCase(LI);                { the names of the files are in lower case (the language is not case sensitive) }
   ValidLngId := False;
   S1 := GetEnv('DNDLG');
   if S1 = '' then
@@ -74,12 +75,12 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   S2 := StartupDir;
   if not (S2[Length(S2)] in ['\', '/']) then
     S2 := S2+'\';
-  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.DLG')) and
-      (not ExistFile(S2+LI+'.DLG'))
+  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.dlg')) and
+      (not ExistFile(S2+LI+'.dlg'))
   then
     Exit;
-  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.LNG')) and
-      (not ExistFile(S2+LI+'.LNG'))
+  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.lng')) and
+      (not ExistFile(S2+LI+'.lng'))
   then
     Exit;
   if CheckForHelp then
@@ -87,7 +88,7 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
     S1 := SourceDir;
     if not (S1[Length(S1)] in ['\', '/']) then
       S1 := S1+'\';
-    if  (not ExistFile(S1+LI+'.HLP')) and (not ExistFile(S2+LI+'.HLP'))
+    if  (not ExistFile(S1+LI+'.hlp')) and (not ExistFile(S2+LI+'.hlp'))
     then
       Exit
     end;
@@ -105,7 +106,7 @@ function HelpLngId: String;
     S := GetEnv('DNLNG');
   if not ValidLngId(S, True) then
     S := 'English';
-  HelpLngId := S
+  HelpLngId := LowerCase(S)
   end;
 
 function LngId: String;
@@ -120,7 +121,7 @@ function LngId: String;
     S := 'English';
   if not ValidLngId(S, False) then
     begin
-     lFindFirst(StartupDir+'*.LNG', AnyFileDir - Directory, SR);
+     lFindFirst(StartupDir+'*.lng', AnyFileDir - Directory, SR);
      S := SR.FullName;
      if S <> '' then
        SetLength(S, Length(s)-4);
@@ -131,7 +132,7 @@ function LngId: String;
       ActiveLanguage := S;
       SaveDnIniSettings ( @ActiveLanguage );
     end;
-  LngId := S
+  LngId := LowerCase(S)
   end;
 
 end.

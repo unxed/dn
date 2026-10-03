@@ -33,7 +33,7 @@ def main():
         for f in os.listdir(out):
             if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
                 shutil.copy(os.path.join(out, f), d)
-            elif f == 'XLT':
+            elif f == 'xlt':
                 shutil.copytree(os.path.join(out, f), os.path.join(d, f))
         w = os.path.join(d, 'work')
         os.makedirs(w)
@@ -44,7 +44,7 @@ def main():
         open(os.path.join(w, 'z.txt'), 'wb').write(payload)
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
         t.pump(1.5, 6)
-        check(b'Error in country' not in t.raw, 'start: no country setup error (XLT next to the program)')
+        check(b'Error in country' not in t.raw, 'start: no country setup error (xlt next to the program)')
         t.send(F['ESC'], 0.5)
 
         def key(k, settle=0.6):
@@ -196,7 +196,7 @@ def main():
             for f in os.listdir(out):
                 if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
                     shutil.copy(os.path.join(out, f), ru)
-                elif f == 'XLT':
+                elif f == 'xlt':
                     shutil.copytree(os.path.join(out, f), os.path.join(ru, f))
             t = PtyTerm(['./dn'], 100, 30, env={'DNLNG': 'Russian'}, cwd=os.path.join(ru, 'w'), exe=os.path.join(ru, 'dn'))
             t.pump(1.5, 6)
@@ -275,8 +275,8 @@ def main():
         for f in os.listdir(out):
             if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
                 shutil.copy(os.path.join(out, f), dd)
-            elif f == 'XLT':
-                shutil.copytree(os.path.join(out, f), os.path.join(dd, 'XLT'))
+            elif f == 'xlt':
+                shutil.copytree(os.path.join(out, f), os.path.join(dd, 'xlt'))
         dw = os.path.join(dd, 'work')
 
         def dsk_start():
@@ -314,8 +314,8 @@ def main():
         t.send(F['ENTER'], 1.0)                            # into sub
         check(dsk_cwd(t).endswith('sub>'), 'autosave desktop: the panel is in sub before the exit', t.text())
         dsk_quit(t)
-        check(os.path.isfile(os.path.join(dd, 'DN.DSK')), 'autosave desktop: DN.DSK is written at Alt-X')
-        check(os.path.isfile(os.path.join(dd, 'DN.CFG')), 'autosave desktop: the option itself is saved (DN.CFG)')
+        check(os.path.isfile(os.path.join(dd, 'dn.dsk')), 'autosave desktop: dn.dsk is written at Alt-X')
+        check(os.path.isfile(os.path.join(dd, 'dn.cfg')), 'autosave desktop: the option itself is saved (DN.CFG)')
         t = dsk_start()
         check(dsk_cwd(t).endswith('sub>'), 'autosave desktop: the next start restores the panel directory (sub)', t.text())
         dsk_quit(t)

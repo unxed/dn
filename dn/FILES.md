@@ -33,8 +33,8 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `menus.pas` | menus, the menu bar, the status line (the hot letters) |
 | `setups.pas`, `paneldlgs.pas` (was `fltools`) | the dialogs of the settings; the dialogs of the panel (select group, filter, the button "Save setup") |
 | `panelsetup.pas` (was `pdsetup`), `panelwinx.pas` (was `xdblwnd`), `fsinfo.pas` (was `fltl`) | the settings records of a panel (show, sort); the window with two panels, the extended one; the information of the file system (cluster, serial number, file ages) |
-| `dnini.pas`, `iniengine.pas` (was `dnini_p`) | `DN.INI`: reading and writing the settings |
-| `boot.pas` (was `dn1.pas`) | reading `DN.CFG` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
+| `dnini.pas`, `iniengine.pas` (was `dnini_p`) | `dn.ini`: reading and writing the settings |
+| `boot.pas` (was `dn1.pas`) | reading `dn.cfg` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
 | `macro.pas` | the macros of the editor (record, play) |
 
 ## Panels and files
@@ -52,16 +52,28 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `fstorage.pas` | the storage of directories (a hash of the names of directories) |
 | `diskinfo.pas`, `diskimg.pas` | the information about a disk; disk images (?) |
 
-## Settings and the desktop: who writes what, and when
-The question that comes first when a setting "is not kept" or the panels "do not come back". Checked in the sources and in a run on Linux (2026-10-03).
+## The names of the files (a rule, 2026-10-04) and which file holds what
+All names are lower case (the sources, the directories, the files that the program reads and writes, `dist/`): the Linux file systems tell `DN.INI` from `dn.ini`, DOS does not care, and one case is enough. The names stay 8.3 where the program writes them (DOS).
+The names of the units are words without digits and underscores (a unit has the name of its file). Where a name is in capitals on purpose (`README`, `LICENSE`, `CWSDPMI`'s own texts) it is a document, not a file of the program.
 
 | What | File on disk (next to the program) | Written by | Read by |
 |---|---|---|---|
-| Settings of the dialogs (`StartupData`, `SystemData`, panel presets...) | `DN.CFG` (blocks `cfg*` in `dnutil.pas`) | `WriteConfig` (`dnutil.pas`): at the exit **only if** `ConfigModified` (`startup.pas`; the dialogs set it) and right after some dialogs (colors, `UpdateConfig`) | `ReadConfig` (`dn1.pas`) |
-| Settings in text form | `DN.INI` (and the cache `DNINI.IN_`) | the ini engine: `dnini.pas` (the variables), `dnini_p.pas` (`RegisterVar`: what is in the file); `copyini.pas` carries values over to `StartupData` | at the start |
-| Desktop saved by the user or by autosave | `DN.DSK` | `SaveRealDsk` (`dnutil.pas`): Options -> Save desktop (`cmSaveDesk`) and at the exit when `StartupData.Unload and osuAutosave` (Options -> Startup, "Autosave Desktop") | `Init` of `TDNApplication` (if there is no `DN<n>.SWP`), Options -> Load desktop (`cmLoadDesk`, `RetrieveDesktop`) |
-| Desktop for the return from an external program | `DN<n>.SWP` (in `SwpDir`) | `SaveDsk` (`dnutil.pas`) at the exit, except the total exit | `Init`, then the file is erased |
-| Histories | `DN.HIS` | `SaveHistories` at a normal exit | at the start |
+| Settings of the dialogs (`StartupData`, `SystemData`, panel presets...): a **binary** dump of the records (the old way) | `dn.cfg` (blocks `cfg*` in `dnutil.pas`) | `WriteConfig` (`dnutil.pas`): at the exit **only if** `ConfigModified` (`startup.pas`; the dialogs set it) and at some other places | `ReadConfig` (`boot.pas`) at the start |
+| Settings in **text** form (the new way, a person may edit it: Options -> edit `dn.ini`) | `dn.ini` | the ini engine: `iniengine.pas` (`RegisterVar`: what is in the file), the variables are in `dnini.pas`; `copyini.pas` carries values over to `StartupData` | at the start |
+| The cache of the parsed `dn.ini` (the start is faster; safe to delete; was `dnini.in_`) | `dn.cac` | `iniengine.pas` | `iniengine.pas` |
+| Desktop saved by the user or by autosave | `dn.dsk` | `SaveRealDsk` (`dnutil.pas`): Options -> Save desktop (`cmSaveDesk`) and at the exit when `StartupData.Unload and osuAutosave` (Options -> Startup, "Autosave Desktop") | `Init` of the application |
+| Desktop for the return from an external program | `dn<n>.swp` (in `SwpDir`) | `SaveDsk` (`dnutil.pas`) at the exit, except the total exit | `Init`, then the file is erased |
+| Histories | `dn.his` | `SaveHistories` at a normal exit | at the start |
+| The clipboard of the editor between runs (was `clipboar.dn`) | `dn.clp` | `TDNApplication.Done` when "save the clipboard" is on | at the start |
+| Tetris | `tetris.cfg` | `tetris.pas` | `tetris.pas` |
+| The groups of files for the colors/highlight of the panels (?) | `dnhgl.grp` | by hand | `boot.pas`, `dnutil.pas` |
+| The commands of the archivers | `archiver.ini` | by hand | `archiver.pas` |
+| The flag of a running copy in the swap directory | `dn.flg` | `dnutil.pas` | `dnutil.pas` |
+| Reports of a crash and the log of the start | `dn.err`, `dnerr.txt`, `dnlog.txt` | `dn.pas`, `dnerrlog.pas`, `mainapp.pas` | people |
+| Resources: dialogs, menus, strings, help of a language | `<language>.dlg`, `<language>.lng`, `<language>.hlp` (`english`, `russian`, `ukrain`) | the build (`rcp`, `tvhc`) | `mainapp.pas`, `langid.pas` |
+| Tables of the layouts of the keyboard, the palettes | `xlt/*.xlt`, `colors/*.pal` (from `dn/data/`) | people | `xcode.pas`, `dnutil.pas` |
+
+Why two files for the settings: `dn.cfg` is the memory dump of the records of the dialogs (what DN did first); `dn.ini` is the text file that came later and holds the rest. Merging them (everything in `dn.ini`) is in `TODO-refactoring.md`.
 
 * The flags of the Startup dialog are `osu*` in `commands.pas` (`osuAutosave = $02`, `osuPreserveDir = $08`...); `StartupData.Load` is for the start, `.Unload` is for the exit. The dialog is in `setups.pas`.
 * What goes into the desktop file is decided by the `Store` of each view: `TDoubleWindow` (`dblwnd.pas`), the panels (`flpanelx.pas`). For example the directory of the **active** disk panel is stored only with "Preserve directory" (`osuPreserveDir`); the passive panel always keeps it.
@@ -116,7 +128,7 @@ The question that comes first when a setting "is not kept" or the panels "do not
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
 | `compat/`: `vpsyslow.pas`, `vputils.pas`, `use16.pas` (ours); `vpsysext.pas` (was `vpsyslo2`: the extension of the layer written by JO of DN OSP) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
 | `compat/country.pas` (was `country_`; DOS), `compat/linux/country.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
-| `rcp.pas` | the resource compiler (a separate program: `RESOURCE/*` → `*.LNG`, `*.DLG`) |
+| `rcp.pas` | the resource compiler (a separate program: `resource/*` → `*.LNG`, `*.DLG`) |
 
 ## Where to look for what (the first hour)
 * A key does not work → `apploop.pas` (the loop), then the `HandleEvent` of the view that has the focus; the key codes are in `commands.pas`.
