@@ -68,7 +68,7 @@ uses
   
   profile, Defines, Streams, strutil, fileutil,
   Messages,
-  FViewer, U_KeyMap, Commands
+  FViewer, keymap, Commands
   ;
 function ZIPDetect: Boolean;
   var

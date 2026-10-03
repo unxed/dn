@@ -53,7 +53,7 @@ interface
 
 uses
   Defines, Streams, Views, Drivers, FilesCol,
-  panelroot, Collect, TopView_
+  panelroot, Collect, topview
   ;
 
 type
@@ -169,7 +169,7 @@ uses
   Files, VpSysLow, Dos, Eraser, Drives, DNHelp, TitleSet,
   Lfn, DNUtil, mainapp, basics, strutil, fileutil, envutil, Startup,
   Memory, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
-  HistList, Tree, FBB, ArcView, CmdLine, Histries, Archiver,
+  HistList, Tree, copyio, ArcView, CmdLine, Histries, Archiver,
   Gauges, Gauge, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz
   
   , UUCode

@@ -78,8 +78,8 @@ const
 implementation
 uses
   DNStdDlg, basics, mainapp, Commands, Lfn, fileutil, editundo, strutil, Views,
-  Collect, WinClp, Dos, Messages, Startup, DnIni, DnIni_p, CopyIni, DNUtf8,
-  {SBlocks,}U_KeyMap, Macro,
+  Collect, WinClp, Dos, Messages, Startup, DnIni, iniengine, CopyIni, DNUtf8,
+  {SBlocks,}keymap, Macro,
   xTime, Memory, Drivers,
   fsinfo,
   fnotify,

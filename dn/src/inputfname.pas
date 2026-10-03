@@ -45,118 +45,106 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-{AK155  3.06.2007 Для уменьшения циклических ссылок между модулями
- бывший startupp.pas разбит на два маодуля: startupp.pas и startupp.pas,
- при том первый из них содержит бОьшую часть того на что ссылаются
- другие модулиЮ но имеет почти пустой uses-список }
 
-unit Startupp;
+unit inputfname;
 
 interface
 
 uses
-  Defines, Startup, Collect, CCalc
+  Drivers, Defines, Streams, Views, Dialogs
   ;
 
 type
-
-  {Cat: выкинул, т.к. TTextCollection = TLineCollection}
-  (*
-  PTextCollection =^TTextCollection;
-  TTextCollection = Object( TCollection )
-    procedure FreeItem( Item: Pointer ); virtual;
-    procedure PutItem(var S: TStream; Item: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
-  end;
-*)
-  PTextCollection = PLineCollection;
-  TTextCollection = TLineCollection;
-  {/Cat}
-
-  TListBoxRec = record
-    List: PCollection;
-    Focus: Integer
-    end;
-  TTextListboxRec = record
-    List: PTextCollection;
-    Focus: Integer
+   { строка быстрого переименования (Alt-F6). Она исполняется прямо
+   в менедждере, без объемлющего диалога, поэтому имеет свой метод
+   Execute. Цвета палитры (C) заносятся в CM_RenameSingleL}
+  PInputFName = ^TInputFName;
+  TInputFName = object(TInputLine)
+    EndView: Word;
+    function Execute: Word; virtual;
+    procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
-  
-  TSaversData = record
-    Selected: TTextListboxRec;
-    Available: TTextListboxRec;
-    Time: String[3]; {DataCompBoy}
-    Mouse: Boolean;
-    _: Byte;
+  PColorPoint = ^TColorPoint;
+  TColorPoint = object(TView)
+    Color: Byte;
+    constructor Init(var ABounds: TRect; AColor: Byte);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream); virtual;
+    procedure Draw; virtual;
     end;
-
-  TOldSaversData = record
-    Selected: TTextListboxRec;
-    Available: TTextListboxRec;
-    Time: AWord;
-    Mouse: Boolean;
-    _: Byte;
-    end;
-  
-const
-  
-  SaversData: TSaversData = (
-    Selected: (List: nil; Focus: 0);
-    Available: (List: nil; Focus: 0);
-    Time: '5';
-    Mouse: True
-    );
-  
-
-  MaxCalcFormat: TCalcFormat =
-    (18, 8, 32, 11, 18, 9);
-  CalcFormat: TCalcFormat =
-    (18, 8, 32, 11, 18, 1);
 
 implementation
+
 uses
-  VpSysLow, basics, strutil, fileutil,
-  Lfn
-  , Dos;
+  basics, Commands, mainapp
+  ;
 
-begin
-TempDir := '';
-TempFile := '';
-
-SourceDir := lFExpand(ParamStr(0));
-while SourceDir[Length(SourceDir)] <> '\' do
-  SetLength(SourceDir, Length(SourceDir)-1);
-StartupDir := SourceDir;
-{SourceDir := Dos.GetEnv('DN')}
-{Cat: заменил DNVP на DN2 - так намного логичнее}
-(*
-  if ExistDir(Dos.GetEnv('DNVP')) or (Dos.GetEnv('DNVP')='') then
-      SourceDir := Dos.GetEnv('DNVP')
-     else
-      Writeln('Warning! Path specified in DNVP environment variable does not exist!');
-*)
-SourceDir := Dos.GetEnv('DN2');
-DelLeft(SourceDir);
-if (SourceDir <> '') and not PathExist(SourceDir) then
+function TInputFName.Execute: Word;
+  var
+    Event: TEvent;
   begin
-  Writeln(
-    'Warning! Path specified in DN2 environment variable does not exist!');
-  SourceDir := '';
+  EndView := 0;
+  repeat
+    Owner^.GetEvent(Event);
+    if Event.What = evNothing then
+      TinySlice;
+    HandleEvent(Event);
+  until EndView <> 0;
+  Result := EndView;
   end;
 
-if SourceDir = '' then
-  SourceDir := StartupDir;
-MakeSlash(SourceDir);
+procedure TInputFName.HandleEvent(var Event: TEvent);
+  begin
+  case Event.What of
+    evKeyDown:
+      begin
+      case DNKeyCode(Event) of
+        kbEnter:
+          begin
+          EndView := cmOK;
+          ClearEvent(Event);
+          Exit;
+          end;
+        kbESC:
+          begin
+          EndView := cmCancel;
+          ClearEvent(Event);
+          Exit;
+          end;
+        end {case};
+      end;
+  end {case};
+  if  (Event.What <> evNothing) then
+    inherited HandleEvent(Event);
+  end { TInputFName.HandleEvent };
 
+constructor TColorPoint.Init(var ABounds: TRect; AColor: Byte);
+  begin
+  ABounds.B.X := ABounds.A.X+1;
+  ABounds.B.Y := ABounds.A.Y+1;
+  inherited Init(ABounds);
+  Color := AColor;
+  end;
 
-StartupDir := lfGetLongFileName(StartupDir);
-SourceDir := lfGetLongFileName(SourceDir);
-TempDir := lfGetLongFileName(TempDir);
-TempFile := lfGetLongFileName(TempFile);
+constructor TColorPoint.Load(var S: TStream);
+  begin
+  inherited Load(S);
+  S.Read(Color, SizeOf(Color));
+  end;
 
+procedure TColorPoint.Store(var S: TStream);
+  begin
+  inherited Store(S);
+  S.Write(Color, SizeOf(Color));
+  end;
 
-if  (SysPlatformId <> -1) and (SysPlatformId <> 2) then
-  CmdExt := '.BAT'
+procedure TColorPoint.Draw;
+  var
+    B: Word;
+  begin
+  B := Application^.GetColorW(Color) shl 8+$00FE {*};
+  WriteLineW(0, 0, 1, 1, B);
+  end;
+
 end.
-

@@ -219,7 +219,7 @@ uses
   Messages, mainapp, DNHelp, Startup, Commands, Histries, HistList, paneldlgs,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
   DNUtil, fsinfo, Dos, Filediz, Collect, VPUtils,
-  DnIni_p, DnIni {-$VIV}
+  iniengine, DnIni {-$VIV}
   
   , UUCode 
   

@@ -54,7 +54,7 @@ procedure RegisterAll;
 implementation
 
 uses
-  panelwin, TopView_, startupp, strview,
+  panelwin, topview, dlgrecs, strview,
   
   arc_Zip, arc_LHA, arc_RAR, arc_ACE, arc_HA, arc_CAB,
   
@@ -81,7 +81,7 @@ uses
   
   ColorSel,
   Dialogs, Menus, Streams, ObjType, Scroller, Setups,
-  Validate, Views, SWE 
+  Validate, Views, inputfname 
   , editwin
   , DNDlgs, DNStrL, DNColor;
 
@@ -1894,7 +1894,7 @@ begin
 end;
 
 type
-  PR_RSortView = ^TopView_.TSortView;
+  PR_RSortView = ^topview.TSortView;
 
 function Build_RSortView(var S: TStream): PObject;
 begin
@@ -2375,7 +2375,7 @@ begin
 end;
 
 type
-  PR_RTextCollection = ^Startupp.TTextCollection;
+  PR_RTextCollection = ^dlgrecs.TTextCollection;
 
 function Build_RTextCollection(var S: TStream): PObject;
 begin
@@ -2609,7 +2609,7 @@ begin
 end;
 
 type
-  PR_RColorPoint = ^SWE.TColorPoint;
+  PR_RColorPoint = ^inputfname.TColorPoint;
 
 function Build_RColorPoint(var S: TStream): PObject;
 begin
@@ -3152,7 +3152,7 @@ begin
 
   RDirView.Store := @Store_RDirView;
 
-  RSortView.VmtLink := PtrUInt(TypeOf(TopView_.TSortView));
+  RSortView.VmtLink := PtrUInt(TypeOf(topview.TSortView));
   RSortView.Load := @Build_RSortView;
 
   RSortView.Store := @Store_RSortView;
@@ -3337,7 +3337,7 @@ begin
 
   RSaversListBox.Store := @Store_RSaversListBox;
 
-  RTextCollection.VmtLink := PtrUInt(TypeOf(Startupp.TTextCollection));
+  RTextCollection.VmtLink := PtrUInt(TypeOf(dlgrecs.TTextCollection));
   RTextCollection.Load := @Build_RTextCollection;
 
   RTextCollection.Store := @Store_RTextCollection;
@@ -3427,7 +3427,7 @@ begin
 
   RDoubleWindow.Store := @Store_RDoubleWindow;
 
-  RColorPoint.VmtLink := PtrUInt(TypeOf(SWE.TColorPoint));
+  RColorPoint.VmtLink := PtrUInt(TypeOf(inputfname.TColorPoint));
   RColorPoint.Load := @Build_RColorPoint;
 
   RColorPoint.Store := @Store_RColorPoint;

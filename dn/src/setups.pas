@@ -52,7 +52,7 @@ interface
 
 uses
   Defines, Drivers, Views, Dialogs, Collect,
-  Commands, Startup, Startupp
+  Commands, Startup, dlgrecs
   ;
 
 {                                System Setup                                }
@@ -142,7 +142,7 @@ const
 implementation
 uses
   Dos, Tree, Drives, basics, strutil, fileutil, Messages, DNHelp,
-  linepos, DnIni, DnIni_p, Country_, U_KeyMap, fnotify
+  linepos, DnIni, iniengine, country, keymap, fnotify
   , lfn, mainapp, Validate
   ;
 

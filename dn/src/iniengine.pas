@@ -49,9 +49,9 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit DnIni_p;
+unit iniengine;
 {AK155  3.06.2007 Для уменьшения циклических ссылок между модулями
- бывший dnini.pas разбит на два маодуля: dnini.pas и dnini_p.pas,
+ бывший dnini.pas разбит на два маодуля: dnini.pas и iniengine.pas,
  при том первый из них содержит бОьшую часть того на что ссылаются
  другие модулиЮ но имеет почти пустой uses-список }
 
@@ -82,7 +82,7 @@ implementation
 uses
   Dos, Lfn, profile, basics, strutil, Collect, Messages, mainapp,
   
-  U_KeyMap, Country_,
+  keymap, country,
   Strings, Streams, fileutil
   ;
 

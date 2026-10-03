@@ -93,7 +93,7 @@ implementation
 uses
   basics, strutil, fileutil,
   mainapp, DNUtil,
-  Commands, HistList, startup, startupp
+  Commands, HistList, startup, dlgrecs
   , objects2
   ;
 

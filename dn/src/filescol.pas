@@ -216,7 +216,7 @@ uses
   
   , VpSysLow, VPUtils
   
-  , fsinfo, DnIni, Dos, FileType, panelsetup, U_KeyMap
+  , fsinfo, DnIni, Dos, FileType, panelsetup, keymap
   , DNHelp, basics, strutil, fileutil, Memory, Startup
   ;
 

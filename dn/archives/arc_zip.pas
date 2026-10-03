@@ -99,7 +99,7 @@ var
 
 implementation
 uses
-  U_KeyMap, FViewer
+  keymap, FViewer
   ;
 
 { ----------------------------- ZIP ------------------------------------}

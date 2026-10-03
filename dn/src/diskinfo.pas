@@ -51,7 +51,7 @@ unit DiskInfo;
 interface
 
 uses
-  Defines, Streams, Drivers, Views, Collect, TopView_
+  Defines, Streams, Drivers, Views, Collect, topview
   ;
 
 type
@@ -156,7 +156,7 @@ implementation
 uses
   Startup, mainapp, Commands, DNHelp, Tree, xTime
   , basics, strutil, fileutil, VPUtils
-  , VpSysLow, Lfn, U_KeyMap, Events, Objects2
+  , VpSysLow, Lfn, keymap, Events, Objects2
   , fsinfo, panelroot, panelsetup, Dos
   , Strings;
 

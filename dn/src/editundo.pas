@@ -51,7 +51,7 @@ unit editundo;
 interface
 
 uses
-  Commands, U_KeyMap, Collect, Views, Drivers, Defines, Streams,
+  Commands, keymap, Collect, Views, Drivers, Defines, Streams,
   Lfn {, SBlocks}
   ;
 

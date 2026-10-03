@@ -1,6 +1,10 @@
 # new name -> the name in the public archive of DN OSP 2.14 (written by tools/rename-unit.py, read by bootstrap/tools/dn-manifest.py)
+apploop.pas u_myapp.pas
 basics.pas advance.pas
 boot.pas dn1.pas
+copyio.pas fbb.pas
+country.pas country_.pas
+dlgrecs.pas startupp.pas
 editcore.pas microed.pas
 editfile.pas microed2.pas
 editundo.pas ed2.pas
@@ -8,7 +12,11 @@ editwin.pas edwin.pas
 envutil.pas advance3.pas
 filepanel.pas flpanel.pas
 fileutil.pas advance2.pas
+findspf.pas u_srchf.pas
 fsinfo.pas fltl.pas
+iniengine.pas dnini_p.pas
+inputfname.pas swe.pas
+keymap.pas u_keymap.pas
 langid.pas advance7.pas
 linepos.pas advance6.pas
 mainapp.pas dnapp.pas
@@ -19,4 +27,5 @@ panelsetup.pas pdsetup.pas
 panelwin.pas dblwnd.pas
 panelwinx.pas xdblwnd.pas
 strutil.pas advance1.pas
+topview.pas topview_.pas
 vpsysext.pas vpsyslo2.pas

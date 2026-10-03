@@ -5,17 +5,17 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 20 |
+| Our files (MIT, see `LICENSE`) | 19 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 121 |
-| Contributors of DN OSP | 5 |
-| Upstream without a notice | 17 |
+| Contributors of DN OSP | 6 |
+| Upstream without a notice | 15 |
 
 ## Our files (MIT, see `LICENSE`)
 
 The replacements of the units that were excluded (their code is of Borland origin or of the Virtual Pascal runtime), the adapters to `tv/`, the system layer. They carry the MIT notice of this project in their head; the audit (`dn/audit`) checks them against the archive.
 
-`asciitab.pas`, `country_.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `dpmi32.pas`, `dpmi32df.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `memory.pas`, `messages.pas`, `objects2.pas`, `strview.pas`, `use16.pas`, `version.inc`, `vpsyslow.pas`, `vputils.pas`
+`asciitab.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `dpmi32.pas`, `dpmi32df.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `memory.pas`, `messages.pas`, `objects2.pas`, `strview.pas`, `use16.pas`, `version.inc`, `vpsyslow.pas`, `vputils.pas`
 
 ## Carved (the license of DN)
 
@@ -27,16 +27,16 @@ The classes of DN itself (not of Borland) that were cut out of the files exclude
 
 Files of the public DN OSP 2.14 with the notice of RIT Research Labs; changed by the edits of `bootstrap/edits/` (and after the first commit by ordinary commits). The notice must stay in each of them.
 
-`arc_7z.pas`, `arc_ace.pas`, `arc_ain.pas`, `arc_arc.pas`, `arc_bs2.pas`, `arc_bsa.pas`, `arc_bz2.pas`, `arc_cab.pas`, `arc_chz.pas`, `arc_ha.pas`, `arc_hap.pas`, `arc_hpk.pas`, `arc_hyp.pas`, `arc_is3.pas`, `arc_lha.pas`, `arc_lim.pas`, `arc_qrk.pas`, `arc_rar.pas`, `arc_sqz.pas`, `arc_tar.pas`, `arc_tgz.pas`, `arc_uc2.pas`, `arc_ufa.pas`, `arc_zip.pas`, `arc_zoo.pas`, `arc_zxz.pas`, `archdet.pas`, `archiver.pas`, `archread.pas`, `archset.pas`, `arcview.pas`, `arvid.pas`, `arvidavt.pas`, `arvidtdr.pas`, `basics.pas`, `boot.pas`, `calc.pas`, `calculat.pas`, `calendar.pas`, `ccalc.pas`, `cellscol.pas`, `cmdline.pas`, `colors.pas`, `colorvga.pas`, `commands.pas`, `dbview.pas`, `dbwatch.pas`, `decoder.pas`, `defcoll.pas`, `diskimg.pas`, `diskinfo.pas`, `dn.pas`, `dnexec.pas`, `dnhelp.pas`, `dnini.pas`, `dnini_p.pas`, `dnutil.pas`, `drivers2.pas`, `drives.pas`, `editcore.pas`, `editfile.pas`, `editor.pas`, `editundo.pas`, `editwin.pas`, `envutil.pas`, `eraser.pas`, `fbb.pas`, `filecopy.pas`, `filediz.pas`, `filefind.pas`, `filelst.pas`, `filepanel.pas`, `filescol.pas`, `fileutil.pas`, `findobj.pas`, `fstorage.pas`, `fviewer.pas`, `gauge.pas`, `gauges.pas`, `getconst.pas`, `highlite.pas`, `histries.pas`, `idlers.pas`, `inifiles.pas`, `langid.pas`, `lfn.pas`, `linepos.pas`, `macro.pas`, `menus.pas`, `objtype.pas`, `os2sess.pas`, `paneldlgs.pas`, `panelroot.pas`, `panelwin.pas`, `panelwinx.pas`, `phones.pas`, `pktview.pas`, `printman.pas`, `profile.pas`, `rcp.pas`, `regall.pas`, `rstrings.pas`, `setups.pas`, `startup.pas`, `startupp.pas`, `strutil.pas`, `swe.pas`, `tetris.pas`, `titleset.pas`, `tree.pas`, `u_keymap.pas`, `u_myapp.pas`, `u_srchf.pas`, `uniwin.pas`, `usermenu.pas`, `uucode.pas`, `version.pas`, `videoman.pas`, `vpsysext.pas`, `winclp.pas`, `xtime.pas`
+`apploop.pas`, `arc_7z.pas`, `arc_ace.pas`, `arc_ain.pas`, `arc_arc.pas`, `arc_bs2.pas`, `arc_bsa.pas`, `arc_bz2.pas`, `arc_cab.pas`, `arc_chz.pas`, `arc_ha.pas`, `arc_hap.pas`, `arc_hpk.pas`, `arc_hyp.pas`, `arc_is3.pas`, `arc_lha.pas`, `arc_lim.pas`, `arc_qrk.pas`, `arc_rar.pas`, `arc_sqz.pas`, `arc_tar.pas`, `arc_tgz.pas`, `arc_uc2.pas`, `arc_ufa.pas`, `arc_zip.pas`, `arc_zoo.pas`, `arc_zxz.pas`, `archdet.pas`, `archiver.pas`, `archread.pas`, `archset.pas`, `arcview.pas`, `arvid.pas`, `arvidavt.pas`, `arvidtdr.pas`, `basics.pas`, `boot.pas`, `calc.pas`, `calculat.pas`, `calendar.pas`, `ccalc.pas`, `cellscol.pas`, `cmdline.pas`, `colors.pas`, `colorvga.pas`, `commands.pas`, `copyio.pas`, `dbview.pas`, `dbwatch.pas`, `decoder.pas`, `defcoll.pas`, `diskimg.pas`, `diskinfo.pas`, `dlgrecs.pas`, `dn.pas`, `dnexec.pas`, `dnhelp.pas`, `dnini.pas`, `dnutil.pas`, `drivers2.pas`, `drives.pas`, `editcore.pas`, `editfile.pas`, `editor.pas`, `editundo.pas`, `editwin.pas`, `envutil.pas`, `eraser.pas`, `filecopy.pas`, `filediz.pas`, `filefind.pas`, `filelst.pas`, `filepanel.pas`, `filescol.pas`, `fileutil.pas`, `findobj.pas`, `findspf.pas`, `fstorage.pas`, `fviewer.pas`, `gauge.pas`, `gauges.pas`, `getconst.pas`, `highlite.pas`, `histries.pas`, `idlers.pas`, `iniengine.pas`, `inifiles.pas`, `inputfname.pas`, `keymap.pas`, `langid.pas`, `lfn.pas`, `linepos.pas`, `macro.pas`, `menus.pas`, `objtype.pas`, `os2sess.pas`, `paneldlgs.pas`, `panelroot.pas`, `panelwin.pas`, `panelwinx.pas`, `phones.pas`, `pktview.pas`, `printman.pas`, `profile.pas`, `rcp.pas`, `regall.pas`, `rstrings.pas`, `setups.pas`, `startup.pas`, `strutil.pas`, `tetris.pas`, `titleset.pas`, `tree.pas`, `uniwin.pas`, `usermenu.pas`, `uucode.pas`, `version.pas`, `videoman.pas`, `vpsysext.pas`, `winclp.pas`, `xtime.pas`
 
 ## Contributors of DN OSP
 
 Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155...) and give no license of their own: they came in the same public release as the rest, and are used as part of it. This is the thing to ask the owner of the project about (PLAN.md).
 
-`dnutf8.pas`, `events.pas`, `fnotify.pas`, `fsinfo.pas`, `uue2inc.pas`
+`country.pas`, `dnutf8.pas`, `events.pas`, `fnotify.pas`, `fsinfo.pas`, `uue2inc.pas`
 
 ## Upstream without a notice
 
 Files of the public DN OSP 2.14 with no notice in the head (small adapters, tables, include files). Part of the same release.
 
-`callspcb.pas`, `copyini.pas`, `doslow.pas`, `errmess.pas`, `Events.inc`, `files.pas`, `filetype.pas`, `hash.pas`, `panelsetup.pas`, `rcpvpd.ini`, `read.me`, `stdefine.inc`, `sysutils.inc`, `topview_.pas`, `ufnmatch.pas`, `usersavr.pas`, `xcode.pas`
+`copyini.pas`, `doslow.pas`, `errmess.pas`, `Events.inc`, `files.pas`, `filetype.pas`, `hash.pas`, `panelsetup.pas`, `rcpvpd.ini`, `read.me`, `stdefine.inc`, `sysutils.inc`, `topview.pas`, `usersavr.pas`, `xcode.pas`

@@ -207,7 +207,7 @@ implementation
 uses
   basics, strutil, fileutil, Startup, DNHelp, mainapp, Messages,
   Histries, Gauge, xTime, DnIni
-  , Events, lfn, Dos, Memory, U_KeyMap
+  , Events, lfn, Dos, Memory, keymap
   ;
 
 function MaxAvail: LongInt;

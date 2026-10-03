@@ -166,7 +166,7 @@ const
 implementation
 
 uses
-  DNHelp, fileutil, U_KeyMap, xTime, Commands, mainapp
+  DNHelp, fileutil, keymap, xTime, Commands, mainapp
 
   , VPSysLow;
 

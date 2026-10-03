@@ -271,7 +271,7 @@ function Str2Comp(const s: String): Int64;
 implementation
 
 uses
-  DnIni, Startup, Commands, basics, U_KeyMap, DNUtf8
+  DnIni, Startup, Commands, basics, keymap, DNUtf8
   ;
 procedure AddStr(var S: String; C: Char);
   

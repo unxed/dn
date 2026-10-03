@@ -72,7 +72,7 @@ interface
 uses
   Defines, Streams, Drivers, Views,
   basics, Menus,
-  Commands, {SBlocks,}ObjType, U_KeyMap, Collect, DNUtf8,
+  Commands, {SBlocks,}ObjType, keymap, Collect, DNUtf8,
   
   editundo, highlite
   ;
@@ -296,7 +296,7 @@ uses
   
   Messages, mainapp, Dos, Lfn, Memory, strutil, fileutil, Startup,
   Gauge, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
-  xTime, FileCopy, ASCIITab, DnIni, U_SrchF, editwin, editfile {-$VIV}
+  xTime, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
   , Events, VpSysLow, DNStdDlg, Dialogs, DNHelp, VPUtils
   ;
 

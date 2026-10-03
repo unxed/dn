@@ -27,13 +27,13 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `mainapp.pas` (ours; was `dnapp.pas`) | the application class on top of `tv/` (`TApplication`, the background, the user screen) |
 | `commands.pas` | all constants: commands `cm*`, key codes `kb*` (DN's codes include the scan code: `kbCtrlS = $041F13`), help contexts |
 | `dnutil.pas` | the central dispatcher of the commands of the application (`TDNApplication`: menu items, windows, Ctrl-O...) |
-| `u_myapp.pas` | the event loop of the application (keys before the dispatch, macros, the idle work) |
+| `apploop.pas` (was `u_myapp`) | the event loop of the application (keys before the dispatch, macros, the idle work) |
 | `dnexec.pas`, `dnrun.pas` (ours) | running an external program / a command of the command line (on Linux: the embedded terminal) |
 | `cmdline.pas` | the command line of the panels (`TCommandLine`) |
 | `menus.pas` | menus, the menu bar, the status line (the hot letters) |
 | `setups.pas`, `paneldlgs.pas` (was `fltools`) | the dialogs of the settings; the dialogs of the panel (select group, filter, the button "Save setup") |
 | `panelsetup.pas` (was `pdsetup`), `panelwinx.pas` (was `xdblwnd`), `fsinfo.pas` (was `fltl`) | the settings records of a panel (show, sort); the window with two panels, the extended one; the information of the file system (cluster, serial number, file ages) |
-| `dnini.pas`, `dnini_p.pas` | `DN.INI`: reading and writing the settings |
+| `dnini.pas`, `iniengine.pas` (was `dnini_p`) | `DN.INI`: reading and writing the settings |
 | `boot.pas` (was `dn1.pas`) | reading `DN.CFG` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
 | `macro.pas` | the macros of the editor (record, play) |
 
@@ -105,16 +105,21 @@ The question that comes first when a setting "is not kept" or the panels "do not
 | `dndlgs.pas`, `dnstrl.pas`, `dncolor.pas`, `dnpalet.pas` | the classes of DN that were carved out of the files that came from Borland (combo box, notepad pages, the string list, the palettes) |
 | `compat/drivers.pas` (ours) | the keys, the events, the draw buffers on top of `tv/` (`DNKeyCode`, `GetAltChar`, `LegacyText`) |
 | `dnutf8.pas` (ours) | UTF-8 inside DN: columns, the proxy of a string, the table of a document of the editor |
-| `u_keymap.pas` | the code page detector and the key maps of the editor |
+| `keymap.pas` (was `u_keymap`) | the code page detector and the key maps of the editor |
 | `videoman.pas` | the video modes and the palette (as far as the terminal has them) |
+| `copyio.pas` (was `fbb`) | the low level of copying a file: reading and writing in big blocks, the overwrite question, the info of the copy (`LongCopy`, `CopyDialog`) |
+| `inputfname.pas` (was `swe`) | the input line of a file name (`TInputFName`) and the colour point of the colour dialogs (`TColorPoint`) |
+| `findspf.pas` (was `u_srchf`) | search of a file by a path template (`FindFileWithSPF`) (?) |
+| `dlgrecs.pas` (was `startupp`) | the records of the dialogs: list boxes, the savers (`TListBoxRec`, `TSaversData`); split from `startup.pas` to cut the circular uses |
+| `topview.pas` (was `topview_`) | the view that shows the top of a stack of windows and the sorted view (`TTopView`, `TSortView`) |
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
 | `compat/`: `vpsyslow.pas`, `vputils.pas`, `use16.pas` (ours); `vpsysext.pas` (was `vpsyslo2`: the extension of the layer written by JO of DN OSP) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
-| `compat/country_.pas` (DOS), `compat/linux/country_.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
+| `compat/country.pas` (was `country_`; DOS), `compat/linux/country.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `RESOURCE/*` → `*.LNG`, `*.DLG`) |
 
 ## Where to look for what (the first hour)
-* A key does not work → `u_myapp.pas` (the loop), then the `HandleEvent` of the view that has the focus; the key codes are in `commands.pas`.
+* A key does not work → `apploop.pas` (the loop), then the `HandleEvent` of the view that has the focus; the key codes are in `commands.pas`.
 * A panel draws wrong → `filepanel.pas` `TFilePanel.Draw` (the partial redraw is in the same procedure: after a cursor move only two lines are drawn).
 * A name is cut or padded wrong → `advance.pas` `FormatLongName` (and `dnutf8.pas` for the columns).
 * The editor → `editcore.pas` (everything is one byte per column; `DocTab` in `dnutf8.pas` makes it UTF-8).
