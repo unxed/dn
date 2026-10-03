@@ -72,7 +72,7 @@ uses
   Dialogs, Validate, IniFiles, Scroller, ListMakr, ObjType, RegAll,
    DefColl,
   ColorSel,
-  SWE
+  inputfname
   , DNDlgs, DNStrL;
 
 const

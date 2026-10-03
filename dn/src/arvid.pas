@@ -241,7 +241,7 @@ var
 implementation
 uses
   basics, fileutil, strutil, filepanel, Commands, Startup, mainapp,
-  Drivers, Messages, Dialogs, Memory, FileFind, DNUtil, FileCopy, U_KeyMap,
+  Drivers, Messages, Dialogs, Memory, FileFind, DNUtil, FileCopy, keymap,
   ArvidAvt, ArvidTdr
   , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}
   , VPUtils

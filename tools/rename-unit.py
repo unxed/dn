@@ -19,10 +19,11 @@ for d in dirs:
         if os.path.isfile(os.path.join(p, f)) and f.lower().endswith(('.pas', '.inc')):
             files.append(os.path.join(p, f))
 src = [f for f in files if os.path.basename(f).lower() == old.lower() + '.pas']
-if len(src) != 1:
-    sys.exit('the unit %s: %d files found' % (old, len(src)))
+if not src:
+    sys.exit('the unit %s: no file found' % old)
 if any(os.path.basename(f).lower() == new + '.pas' for f in files):
     sys.exit('there is a file %s.pas already' % new)
+srcs = src      # a unit can have a replacement for a platform (compat/linux/country_.pas): all of them are renamed
 src = src[0]
 word = re.compile(rb'\b' + old.encode().replace(b'_', b'_') + rb'\b', re.I)
 uses = re.compile(rb'(\buses\b)(.*?;)', re.I | re.S)
@@ -33,13 +34,14 @@ for f in files:
     data = open(f, 'rb').read()
     out = uses.sub(lambda m: m.group(1) + word.sub(newb, m.group(2)), data)
     out = qual.sub(newb + b'.', out)
-    if f == src:
+    if f in srcs:
         out = re.sub(rb'(^|\n)(\s*unit\s+)' + re.escape(old.encode()) + rb'\s*;', lambda m: m.group(1) + m.group(2) + newb + b';', out, count=1, flags=re.I)
     if out != data:
         open(f, 'wb').write(out)
         changed[os.path.relpath(f, root)] = True
+for one in srcs:
+    subprocess.check_call(['git', 'mv', one, os.path.join(os.path.dirname(one), new + '.pas')], cwd=root)
 dst = os.path.join(os.path.dirname(src), new + '.pas')
-subprocess.check_call(['git', 'mv', src, dst], cwd=root)
 # the map new -> original name (dn/renames.map): the origin of a file (dn/PROVENANCE.md) and the old names for whoever reads the archive
 mp = os.path.join(root, 'dn', 'renames.map')
 pairs = {}

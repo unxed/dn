@@ -254,7 +254,7 @@ uses
   DNRun,
 {$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, VPUtils,
-  DNHelp, DnIni, DnIni_p, Histries,
+  DNHelp, DnIni, iniengine, Histries,
   VideoMan, Memory, panelwin, Messages, HistList, FileFind,
   
   Phones, 
@@ -272,12 +272,12 @@ uses
   Setups, RegAll, panelwinx,
   Idlers, panelroot, WinClp,
   Drives, Archiver, ArchSet,
-  ArcView, FViewer, CmdLine, FBB, DNStdDlg,
+  ArcView, FViewer, CmdLine, copyio, DNStdDlg,
   Colors, editcore, editundo, Editor, editwin,
   basics, strutil, fileutil, envutil, os2sess, langid,
   ColorSel, Eraser,  DiskInfo
-  , FileType, panelsetup, U_KeyMap
-  , Startup, Startupp
+  , FileType, panelsetup, keymap
+  , Startup, dlgrecs
   , VPSysLow;
 
 { Load and Store Palette routines }

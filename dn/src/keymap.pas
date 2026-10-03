@@ -45,7 +45,7 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 
-unit U_KeyMap;
+unit keymap;
 {<U_KeyMap.001>}
 
 interface
@@ -210,7 +210,7 @@ function CharToOemStr(const CharS: String): String;
 
 implementation
   uses
-    Country_, basics, Streams;
+    country, basics, Streams;
 
 procedure XLatBuf(var B; Len: Integer; const XTable: TXLat);
   var

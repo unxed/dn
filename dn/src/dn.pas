@@ -61,7 +61,7 @@ uses
   Menus, panelroot, filepanel, FileCopy, Filediz, Filelst, Eraser,
   DiskInfo, basics, strutil, fileutil, os2sess, highlite,
   Startup, Dialogs, Gauges, Memory, panelwin, Messages, HistList,
-  FileFind, Commands, Tree, FViewer, CmdLine, FBB, DNStdDlg,
+  FileFind, Commands, Tree, FViewer, CmdLine, copyio, DNStdDlg,
   FilesCol, UserMenu, Colors, editcore, Editor, Macro,
   ArcView, HelpFile, Validate, ASCIITab, xTime, Drives, Archiver,
   ArchSet, ArchDet, Setups, DNUtil, panelwinx, Histries, CCalc,

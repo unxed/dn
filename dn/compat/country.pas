@@ -1,7 +1,7 @@
 { DPMI32-specific country tools unit by A.Korop (AK155)}
 
 
-unit Country_;
+unit country;
 
 interface
 
@@ -25,7 +25,7 @@ implementation
 
 uses
   dpmi32df, dpmi32, DosLow, VPSysLow,
-  basics, strutil, Strings, U_KeyMap;
+  basics, strutil, Strings, keymap;
 
 procedure QueryUpcaseTable;
   var

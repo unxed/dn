@@ -53,7 +53,7 @@ interface
 
 uses
   Collect, Drivers, Defines, Objects2, Streams, Views,
-  Drives, basics, U_KeyMap
+  Drives, basics, keymap
   , DBView 
   ;
 

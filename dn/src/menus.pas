@@ -302,7 +302,7 @@ var
 implementation
 uses
   basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8
-  , U_KeyMap
+  , keymap
   ;
 
 const

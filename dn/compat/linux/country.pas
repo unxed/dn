@@ -3,7 +3,7 @@
   OEM bytes, the Russian resources are in it) and the settings of a country that do not depend on the system (the
   defaults of DN). TODO: the settings of the country from the locale (LC_*), the tables of other code pages. }
 {$mode objfpc}{$H-}
-unit Country_;
+unit country;
 
 interface
 
