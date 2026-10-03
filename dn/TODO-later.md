@@ -127,3 +127,14 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
 и при старте печаталось «Error in country setups» (на Linux его скрывал альтернативный экран; таблица смены раскладки не строилась).
 Теперь `tools/build.sh` кладёт `dn/data/XLT` рядом с `dn`/`dn.exe`, dist-скрипты тоже; тест `tools/dn-linux-ops.py` проверяет, что ошибки нет.
 Остальное из `dn/data` (`COLORS`, `DN.FLG`) пока не используется: проверить, нужно ли оно, когда дойдём до настроек цветов.
+
+## Windows (win64/win32)
+
+- Сборка: `tools/build-fpc-windows.sh`, `tools/build.sh win64|win32`, `tools/dn-win-dist.sh`; CI: workflow `dn-windows` (кросс-сборка на Linux,
+  запуск на `windows-latest` через ConPTY: `tools/dn-win-smoke.py`). Терминальный слой — `tv/src/tvtermos.pas` (консоль Windows в режиме
+  VT, ввод через ReadConsoleInputW → байты UTF-8 → общий разбор `TvTermIO`), поверх тот же `TvUnix`, что и на Linux.
+- Имена файлов: сейчас — байты системной (ANSI) кодовой страницы как есть; перекодирование ANSI↔OEM (`CharToOemBuff`/`OemToCharBuff`) и
+  `GetOEMCP` → `TvLocale` ещё не сделаны (сделаем вместе с этапом UTF-8: имена целиком в UTF-8 через `...W`-функции API).
+- Wine: консоль в pty искажает вывод (wine пересобирает экран по-своему; минимальная программа из `TvTermOs` под wine в pty вообще ничего не вывела), поэтому
+  стендом служит только настоящий Windows (CI). Запуск в wine без pty (X-сервер, wineconsole) не пробовали.
+- Не проверено на Windows: изменение размера окна, мышь, вставка из буфера (bracketed paste), запуск команды (`SysRunShell` через `COMSPEC`).
