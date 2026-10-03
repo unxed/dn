@@ -243,8 +243,7 @@ uses
   basics, fileutil, strutil, filepanel, Commands, Startup, mainapp,
   Drivers, Messages, Dialogs, Memory, FileFind, DNUtil, FileCopy, keymap,
   ArvidAvt, ArvidTdr
-  , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}
-  , VPUtils, Math
+  , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}, Math
   , VPSysLow;
 
 constructor TArvidDrive.Init(const AName: String);

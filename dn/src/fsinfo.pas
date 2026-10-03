@@ -43,7 +43,7 @@ function GetErrorText(ErrCode: Integer; var Msg: String): Boolean;
 implementation
 
 uses
-  dpmi32df, dpmi32, Dos, VPUtils, Strings, strutil;
+  dpmi32df, dpmi32, Dos, Strings, strutil;
 function GetErrorText(ErrCode: Integer; var Msg: String): Boolean;
   
   begin

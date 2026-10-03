@@ -188,7 +188,7 @@ implementation
 uses
   Dos, Drivers, Defines, mainapp,
   DnIni, iniengine, Startup,
-  Commands, VPUtils , Messages
+  Commands , Messages
   ,Dpmi32, Dpmi32df
   ;
 

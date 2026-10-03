@@ -143,7 +143,7 @@ implementation
 
 uses
   xTime, Startup, DNHelp, Events, basics, strutil, fileutil
-  , mainapp, Messages, Commands, VPUtils, Math
+  , mainapp, Messages, Commands, Math
   ;
 
 
@@ -186,6 +186,20 @@ const
   CRot: array[0..MaxFig-1] of Byte =
     (4, 4, 4, 4, 3, 4, 4, 1, 2, 3, 2, 5, 3, 4, 4, 3, 3, 4, 4, 3, 3, 3, 3,
      3, 4, 4, 3, 4);
+
+{ The scrambling of the table of the records: every byte xor ($AA xor the number of the bytes that are left, as a byte). }
+procedure XorScramble(var B; Count: LongInt);
+var
+  P: PByte;
+begin
+  P := @B;
+  while Count > 0 do
+  begin
+    P^ := P^ xor (Byte(Count) xor $AA);
+    Inc(P);
+    Dec(Count);
+  end;
+end;
 
 function LevelDelay(Level: Byte): Word;
   var
@@ -390,7 +404,7 @@ constructor TGameView.Init;
     S^.Read(B, SizeOf(HiScores));
   Dispose(S, Done);
   I := SizeOf(HiScores);
-  VPUtils.XorScramble(B, I);
+  XorScramble(B, I);
   Move(B, HiScores, SizeOf(HiScores));
   I := 1;
   while (I <= 20) and (HiScores[I].StLv in [1..10]) do
@@ -581,7 +595,7 @@ function TGameView.MoveDown;
     S := New(PDosStream, Init(SourceDir+'tetris.cfg', stCreate));
     Move(HiScores, B, SizeOf(HiScores));
     J := SizeOf(HiScores);
-    VPUtils.XorScramble(B, J);
+    XorScramble(B, J);
     S^.Write(B, SizeOf(HiScores));
     Dispose(S, Done);
     ShowScores(I);

@@ -248,7 +248,7 @@ implementation
 
 uses
   Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, strutil, fileutil, keymap
-  , editcore, Macro, linepos, VPUtils, Math
+  , editcore, Macro, linepos, Math
   , Memory, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
    {Cat}

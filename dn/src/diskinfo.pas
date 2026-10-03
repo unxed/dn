@@ -50,7 +50,7 @@ unit DiskInfo;
 
 interface
 
-uses
+uses SysUtils,
   Defines, Streams, Drivers, Views, Collect, topview
   ;
 
@@ -155,7 +155,7 @@ var
 implementation
 uses
   Startup, mainapp, Commands, DNHelp, Tree, xTime
-  , basics, strutil, fileutil, VPUtils, Math
+  , basics, strutil, fileutil, Math
   , VpSysLow, Lfn, keymap, Events, baseobjs
   , fsinfo, panelroot, panelsetup, Dos
   , Strings;
@@ -832,8 +832,8 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
   B.VolumeID := NewStr(GetString(dlDIVolumeID) + VolumeLabel+'~');
   if SerialNo <> 0 then
     begin
-    S := Int2Hex(LongRec(SerialNo).Hi, 4) + '-' +
-         Int2Hex(LongRec(SerialNo).Lo, 4);
+    S := IntToHex(LongRec(SerialNo).Hi, 4) + '-' +
+         IntToHex(LongRec(SerialNo).Lo, 4);
     B.SerialNo := NewStr(GetString(dlDISerialNo) + S + '~');
     end;
   if FileSys <> '' then

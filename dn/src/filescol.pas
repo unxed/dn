@@ -214,7 +214,7 @@ uses
   {!!}CmdLine
   
   
-  , VpSysLow, VPUtils, Math
+  , VpSysLow, Math
   
   , fsinfo, DnIni, Dos, FileType, panelsetup, keymap
   , DNHelp, basics, strutil, fileutil, Memory, Startup
@@ -1242,7 +1242,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
             and (InterfaceData.DrvInfType.VLabShowFor and ditProgr <> 0)))
         then
           begin
-          FullS := FullS + ' ' + GetVolumeLabel(Dr);
+          FullS := FullS + ' ' + SysGetVolumeLabel(Dr);
           if MaxFullSLength < Length(FullS) then
             MaxFullSLength := Length(FullS);
           end;

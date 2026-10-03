@@ -77,7 +77,7 @@ uses
   , Idlers 
   , ColorSel, ColorVGA
   
-  , SysUtils, VPUtils 
+  , SysUtils 
   
   , VpSysLow
  , dpmi32 
@@ -146,7 +146,7 @@ except
     if GetLocationInfo(ExceptAddr, FileName, LineNo) <> nil then
       Writeln(DNErrFile, 'Source location: '+FileName+' line ', LineNo)
     else
-      Writeln(DNErrFile, 'Exception at addr '+Ptr2Hex(ExceptAddr));
+      Writeln(DNErrFile, 'Exception at addr '+IntToHex(PtrUInt(ExceptAddr), 8));
     Close(DNErrFile);
     repeat
       SysCtrlSleep(1); {JO}

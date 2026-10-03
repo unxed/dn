@@ -46,8 +46,8 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-uses
-  Dos, VPUtils, Defines
+uses SysUtils,
+  Dos, Defines
   , VPSysLow;
 
 //===============================
@@ -225,7 +225,7 @@ Writeln(F,
 Writeln(F, '  Const');
 Writeln(F, '     VersionName =''', VersionName, ''';');
 Writeln(F, '     VersionDate =''', VersionDate, ''';');
-Writeln(F, '     VersionWord:AWord = $', Int2Hex(VersionWord, 4), ';');
+Writeln(F, '     VersionWord:AWord = $', IntToHex(VersionWord, 4), ';');
 
 Close(F);
 end.

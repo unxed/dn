@@ -181,7 +181,34 @@ function CellAttr(const Cell: TScreenCell): Byte;
 procedure WordsToCells(var Dest: TScreenCell; const Source; Count: Integer);
 function CStrLen(const S: String): Integer;
 
+{ The text cursor: the size in lines (0 = hidden), show, hide; the size of the screen in characters (True when it is as asked: it is not changed here). }
+function GetCursorSize: Word;
+procedure ShowCursor;
+procedure HideCursor;
+function SetVideoMode(Cols, Rows: Word): Boolean;
+
 implementation
+
+function GetCursorSize: Word;
+begin
+  Result := CaretSize;
+end;
+
+procedure ShowCursor;
+begin
+  SetCaretSize(CursorLines);
+end;
+
+procedure HideCursor;
+begin
+  SetCaretSize(0);
+end;
+
+function SetVideoMode(Cols, Rows: Word): Boolean;
+begin
+  Result := (ScreenWidth = Cols) and (ScreenHeight = Rows);
+end;
+
 
 type
   PWordArr = ^TWordArr;

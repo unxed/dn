@@ -119,7 +119,7 @@ const
 
 implementation
 uses
-  Startup, Lfn, Files, VPUtils, Math, strutil, fileutil, Dos
+  Startup, Lfn, Files, Math, strutil, fileutil, Dos
   ;
 
 procedure __Error;
