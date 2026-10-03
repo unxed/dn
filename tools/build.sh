@@ -9,7 +9,7 @@
 #   win64     Windows x86_64, DN_WIN=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win64 (+ the fpc of the host for the resources)
 #   win32     Windows i386, DN_WIN32=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win32
 #   dos       DOS (go32v2), DN_PREFIX=PREFIX                                           needs: tools/build-fpc-go32v2.sh PREFIX, dosbox-x (rcp runs in it)
-# env: DN_BUILD_DATE=now (the moment of the build in the About box; the default is the date of the last commit); DN_UTF8=0 (linux, windows: the old DN with the code page inside; the default is UTF-8 inside); DN_EXTRA=-gl (more options of the compiler); DN_SRC=<a copy of dn/src> (e.g. with the traces of tools/dn-trace-*.py)
+# env: DN_BUILD_DATE=now (the moment of the build in the About box; the default is the date of the last commit), DN_BUILD_REV (the tag or the hash shown there); DN_UTF8=0 (linux, windows: the old DN with the code page inside; the default is UTF-8 inside); DN_EXTRA=-gl (more options of the compiler); DN_SRC=<a copy of dn/src> (e.g. with the traces of tools/dn-trace-*.py)
 # Run DN (linux): cd OUTDIR && ./dn        (the *.lng *.dlg *.hlp files are next to it)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
@@ -23,13 +23,21 @@ export DN_EXTRA
 out=${2:-$here/out/$DN_TARGET}; mkdir -p "$out"; out=$(cd "$out" && pwd)
 . "$here/tools/dn-env.sh"
 src=${DN_SRC:-$here/dn/src}
-# the date of the build that DN shows (Help -> About): the date of the last commit (reproducible), DN_BUILD_DATE=now: the moment of the build; version.inc reads it
+# What DN shows in Help -> About and in the crash report: the date (numbers, UTC: the same in every language), the revision and the platform. The date is that of the last commit
+# (the same sources give the same binary); DN_BUILD_DATE=now: the moment of the build. The revision is the tag of the commit if it has one, else its short hash (+dirty: changes not committed).
+# version.inc reads DN_BUILD_DATE, DN_BUILD_REV and DN_BUILD_TARGET (the macros of the compiler).
 if [ -z "${DN_BUILD_DATE:-}" ] || [ "$DN_BUILD_DATE" = commit ]; then
-    DN_BUILD_DATE=$(TZ=UTC date -d "@$(git -C "$here" log -1 --format=%ct 2>/dev/null || date +%s)" '+%a, %d %b %Y at %H:%M:%S' 2>/dev/null || echo unknown)
+    DN_BUILD_DATE=$(LC_ALL=C TZ=UTC date -d "@$(git -C "$here" log -1 --format=%ct 2>/dev/null || date +%s)" '+%Y-%m-%d %H:%M:%S UTC' 2>/dev/null || echo unknown)
 elif [ "$DN_BUILD_DATE" = now ]; then
-    DN_BUILD_DATE=$(TZ=UTC date '+%a, %d %b %Y at %H:%M:%S')
+    DN_BUILD_DATE=$(LC_ALL=C TZ=UTC date '+%Y-%m-%d %H:%M:%S UTC')
 fi
-export DN_BUILD_DATE
+if [ -z "${DN_BUILD_REV:-}" ]; then
+    DN_BUILD_REV=$(git -C "$here" describe --tags --exact-match 2>/dev/null || git -C "$here" rev-parse --short HEAD 2>/dev/null || echo unknown)
+    git -C "$here" diff --quiet HEAD 2>/dev/null || DN_BUILD_REV="$DN_BUILD_REV+dirty"
+fi
+case "$DN_TARGET" in dos) DN_BUILD_TARGET="DOS";; linux) DN_BUILD_TARGET="Linux i386";; linux64) DN_BUILD_TARGET="Linux x86_64";; aarch64) DN_BUILD_TARGET="Linux aarch64";;
+    win32) DN_BUILD_TARGET="Windows i386";; win64) DN_BUILD_TARGET="Windows x86_64";; *) DN_BUILD_TARGET="$DN_TARGET";; esac
+export DN_BUILD_DATE DN_BUILD_REV DN_BUILD_TARGET
 exe=; case "$DN_TARGET" in dos|win*) exe=.exe;; esac
 echo "== shims (generated from tv/src)"
 dn_gen_shims
