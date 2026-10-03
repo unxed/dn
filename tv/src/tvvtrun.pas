@@ -189,7 +189,14 @@ begin
     until (Ev.What = evKeyDown) and ((Ev.KeyCode = kbEnter) or (Ev.KeyCode = kbEsc));
   end;
   SetCaretSize(0);
-  ScreenAgain;                                { the caller redraws everything }
+  { the terminal is taken again as after a shell: the state of the input parser is clean, the whole screen is drawn again by the caller }
+  if Assigned(OnSuspend) and Assigned(OnResume) then
+  begin
+    OnSuspend;
+    OnResume;
+  end
+  else
+    ScreenAgain;
 end;
 
 procedure VtShowScreen(var Emu: TVtEmu);

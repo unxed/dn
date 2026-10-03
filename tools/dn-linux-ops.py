@@ -144,7 +144,7 @@ def main():
         check('Name' in t.text() and t.alive(), 'a key leaves the screen of the user: the panels are back', t.text())
 
         # the Info panel is on at the end: quitting disposes the windows (TGroup.Done followed a view that had been disposed: Access violation)
-        key('\x1b'); key('F10'); [key('\x1b[C', 0.2) for _ in range(5)]; [key('DOWN', 0.2) for _ in range(3)]; key('ENTER', 1.0)
+        key('F10'); [key('\x1b[C', 0.2) for _ in range(5)]      # (no Esc before: on an empty command line Esc shows the screen of the user); [key('DOWN', 0.2) for _ in range(3)]; key('ENTER', 1.0)
         check(t.alive() and 'Current directory' in t.text(), 'the Info panel is on', t.text())
 
         key('ALT-X'); key('ENTER', 1.5)
