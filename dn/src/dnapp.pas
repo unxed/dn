@@ -684,8 +684,13 @@ end;
 
 initialization
   ApplyCodePage(False);           { by the locale of the host (the language of the resources is known later: OpenResourceStream calls it again) }
+{$IFDEF DNUTF8}
+  Utf8Enabled := True;            { UTF-8 inside (PLAN.md, item 4; the build with -dDNUTF8): text that is valid UTF-8 is UTF-8 }
+  InputLineOem := False;          { the typed text stays UTF-8 }
+{$ELSE}
   Utf8Enabled := False;           { the strings of DN are bytes of the code page, never UTF-8 (TvUtf8)}
   InputLineOem := True;           { the lines of DN keep the bytes of its code page: the typed text (UTF-8) is converted }
+{$ENDIF}
   CommandHiddenHook := @CommandHidden;
   ListBoxOwnsList := False;       { DN: the owner of the list disposes it }
   { the palettes of DN (DNPalet: carved from the archive) replace those of tv/ }
