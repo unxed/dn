@@ -72,7 +72,7 @@ interface
 uses
   Defines, Streams, Drivers, Views,
   Advance, Menus,
-  Commands, {SBlocks,}ObjType, U_KeyMap, Collect,
+  Commands, {SBlocks,}ObjType, U_KeyMap, Collect, DNUtf8,
   
   ed2, highlite
   ;
@@ -154,6 +154,9 @@ type
     LastDir: Integer;
     MemEnough: Boolean;
     KeyMap: TKeyMap; {-$VIV}
+    DocU8: Boolean;
+      {` UTF-8 inside (-dDNUTF8): the file is UTF-8, the lines of the editor are one byte per character by DocTab `}
+    DocTab: TDocTab;
     EdOpt: TEditOptions;
 
     HiLitePar: THighliteParams;
@@ -179,6 +182,12 @@ type
     function GetLine(Index: LongInt): LongString;
       {` строка перекодируется из KeyMap в ASCII `}
     function GetSelection: PCollection;
+    function BlockToClip(P: PCollection): PCollection;
+      {` the lines of a block of the editor (internal) into the text of the clipboard (UTF-8 with -dDNUTF8); P is changed `}
+    function BlockFromClip(P: PCollection): PCollection;
+      {` the lines of the clipboard into the internal lines: P itself or a new collection (then dispose it) `}
+    function IntLen(const S: LongString): LongInt;
+      {` the length of a line of the user (UTF-8) in the columns of the editor `}
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     function ValidBlock: Boolean;
     procedure CalcMenu;
@@ -455,6 +464,14 @@ EndS:
 
 procedure TFileEditor.StrToAscii(var S: LongString);
   begin
+{$IFDEF DNUTF8}
+  if DocU8 then
+    begin
+    if S <> '' then
+      S := TabToInternal(DocTab, S, True);
+    Exit;
+    end;
+{$ENDIF}
   if (KeyMap <> kmAscii) and (S <> '') then
     XLatBuf(S[1], Length(S), KeyMapDescr[KeyMap].XLatCP^[ToAscii]);
   end;
@@ -462,8 +479,69 @@ procedure TFileEditor.StrToAscii(var S: LongString);
 
 procedure TFileEditor.StrFromAscii(var S: LongString);
   begin
+{$IFDEF DNUTF8}
+  if DocU8 then
+    begin
+    if S <> '' then
+      S := TabToUtf8(DocTab, S);
+    Exit;
+    end;
+{$ENDIF}
   if (KeyMap <> kmAscii) and (S <> '') then
     XLatBuf(S[1], Length(S), KeyMapDescr[KeyMap].XLatCP^[FromAscii]);
+  end;
+
+function TFileEditor.BlockToClip(P: PCollection): PCollection;
+  var
+    I: LongInt;
+    L: PLongString;
+  begin
+{$IFDEF DNUTF8}
+  if P <> nil then
+    for I := 0 to P^.Count-1 do
+      begin
+      L := P^.At(I);
+      if L <> nil then
+        L^ := TabToUtf8(DocTab, L^);
+      end;
+{$ENDIF}
+  Result := P;
+  end;
+
+function TFileEditor.BlockFromClip(P: PCollection): PCollection;
+{$IFDEF DNUTF8}
+  var
+    I: LongInt;
+    L: PLongString;
+    R: PLineCollection;
+  begin
+  Result := P;
+  if P = nil then
+    Exit;
+  R := New(PLineCollection, Init(P^.Count+1, 10, True));
+  for I := 0 to P^.Count-1 do
+    begin
+    L := P^.At(I);
+    if L = nil then
+      R^.Insert(nil)
+    else
+      R^.Insert(NewLongStr(TabToInternal(DocTab, L^, DocU8)));
+    end;
+  Result := R;
+  end;
+{$ELSE}
+  begin
+  Result := P;
+  end;
+{$ENDIF}
+
+function TFileEditor.IntLen(const S: LongString): LongInt;
+  begin
+{$IFDEF DNUTF8}
+  Result := Utf8CharsL(S);
+{$ELSE}
+  Result := Length(S);
+{$ENDIF}
   end;
 
 procedure TFileEditor.KeyMapAtInsert(N: LongInt; P: PLongString);
@@ -837,6 +915,8 @@ constructor TFileEditor.Init(var Bounds: TRect; AHScrollBar, AVScrollBar: PScrol
   UnMark := True;
   EventMask := $FFFF;
   isValid := True;
+  DocU8 := False;
+  TabNatural(DocTab);
 
   EdOpt.HiliteColumn := EditorDefaults.EdOpt and ebfHCl <> 0;
   EdOpt.HiliteLine := EditorDefaults.EdOpt and ebfHLn <> 0;
@@ -1519,6 +1599,8 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
     ShortW: String;
     XLat: ^TXLat; // для поиска в текущей кодировке
     CaseSensitive: Boolean;
+    RepW: LongString; { SearchData.What in the lines of the editor }
+    SearchLen: LongInt; { the length of SearchData.Line in the columns of the editor }
 
   procedure _DrawViews;
     begin
@@ -1539,6 +1621,14 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
     goto LExit;
   Search := False;
   F := True;
+  RepW := SearchData.What;
+  SearchLen := Length(SearchData.Line);
+{$IFDEF DNUTF8}
+  { UTF-8 inside: the text to find and the text to put in are made of the characters of the user; the lines of the editor are internal }
+  if SearchData.What <> #0 then
+    RepW := TabToInternal(DocTab, SearchData.What, DocU8);
+  SearchLen := Utf8CharsL(SearchData.Line);
+{$ENDIF}
   Prompt := (SearchData.What <> #0)
        and (SearchData.Options and efoReplacePrompt <> 0);
   {запрос на замену}
@@ -1549,9 +1639,9 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
         текст, только что найденный в другом направлении }
     begin
     if (SearchData.Dir and 1) <> 0 then
-      Dec(D.X, length(SearchData.Line))
+      Dec(D.X, SearchLen)
     else
-      Inc(D.X, length(SearchData.Line))
+      Inc(D.X, SearchLen)
     end;
 
   {AK155 6-10-2003}
@@ -1572,6 +1662,10 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
     end;
   {/AK155}
   W := SearchData.Line;
+{$IFDEF DNUTF8}
+  if W <> '' then
+    W := TabToInternal(DocTab, W, DocU8);
+{$ENDIF}
   if W = '' then
     goto LExit;
   UnMark := False;
@@ -1586,13 +1680,21 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
       Create_BMTable(BMT, ShortW, CaseSensitive)
     else
       Create_BackBMTable(BMT, ShortW, CaseSensitive);
+{$IFDEF DNUTF8}
+  XLat := @KeyMapDescr[kmAscii].XlatCP^[Ord(CaseSensitive)]; { the lines are internal already }
+{$ELSE}
   XLat := @KeyMapDescr[KeyMap].XlatCP^[Ord(CaseSensitive)];
+{$ENDIF}
   while (Dir > 0) and (D.Y < FileLines^.Count) or
       (Dir < 0) and (D.Y >= 0)
   do
     begin
 1:
+{$IFDEF DNUTF8}
+    S1 := GetLine(D.Y); { internal: the positions are the columns of the editor }
+{$ELSE}
     S1 := GetLineAsIs(D.Y);
+{$ENDIF}
     TrX := Length(S1); {S := S1;}
     if  (Dir < 0) then
       {поиск назад}
@@ -1749,22 +1851,24 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
           begin
           Modified := True;
           Inc(NumRep); {piwamoto}
+{$IFNDEF DNUTF8}
           StrToAscii(S1);
+{$ENDIF}
           
             S := Copy(S1, DD.X+1, Length(W));
-          Insert(Char(Length(SearchData.What)), S, 1);
+          Insert(Char(Length(RepW)), S, 1);
           if ReplaceAll then
             StoreUndoInfo(udReplaceAll, DD, S) {-$VOL}
           else
             StoreUndoInfo(udReplace, DD, S);
           
             Delete(S1, DD.X+1, Length(W));
-          Insert(SearchData.What, S1, DD.X+1);
+          Insert(RepW, S1, DD.X+1);
           ModifyLine(Delta.Y, S1, True);
           WorkModified := False;
           if Dir > 0 then
             
-              Dec(Delta.X, Length(W)-Length(SearchData.What));
+              Dec(Delta.X, Length(W)-Length(RepW));
           if  (SearchData.What = #0) or Prompt then
             ScrollTo(Delta.X, Delta.Y);
           D := Delta;
@@ -1969,6 +2073,7 @@ procedure TFileEditor.Draw;
     HP: String[6];
     CC: array[1..12] of Byte;
     I, A: LongInt;
+    J: Integer;
     S: LongString;
     P: PString;
     WM, BV: Boolean;
@@ -2130,7 +2235,13 @@ procedure TFileEditor.Draw;
         S := GetLine(A)
       else
         S := WorkString;
+{$IFDEF DNUTF8}
+      { UTF-8 inside: the line is internal (one byte per column), the screen gets UTF-8; one cell per character }
+      for J := 0 to (Size.X-1) div 64 do
+        MoveStr(B[J*64], TabToUtf8(DocTab, Copy(S, Pos.X+1+J*64, Min(64, Size.X-J*64))), C);
+{$ELSE}
       MoveStr(B, Copy(S, Pos.X+1, Size.X), C);
+{$ENDIF}
       if EdOpt.HiLite then
         begin
         {Cat}
@@ -2184,6 +2295,9 @@ procedure TFileEditor.Draw;
       
         begin
         X2 := Length(SearchData.Line);
+{$IFDEF DNUTF8}
+        X2 := Utf8CharsL(SearchData.Line);
+{$ENDIF}
         if SearchData.Dir = 0 then
           Dec(X1, X2);
         end;
@@ -2645,7 +2759,7 @@ L1:
 
   procedure PasteBlock;
     var
-      Block: PCollection;
+      Block, CB: PCollection;
       i: Integer;
       P1, P2: PLongString;
       InUse: Boolean;
@@ -2657,6 +2771,7 @@ L1:
     EnableMarking := False;
     Marking := False;
     ChangeLine;
+    CB := BlockFromClip(ClipBoard);
     Block := GetSelection;
     InUse := False;
     if Block <> nil then
@@ -2671,7 +2786,7 @@ L1:
         for i := 0 to Block^.Count-1 do
           begin
           P1 := Block^.Items^[i];
-          P2 := ClipBoard^.Items^[i];
+          P2 := CB^.Items^[i];
           if P1 = P2 then { в частности, оба nil }
             Continue;
           if (P1 = nil) or (P2 = nil) or (P1^ <> P2^) then
@@ -2688,7 +2803,9 @@ EndDel:
       end;
 
     BlockOff;
-    InsertBlock(ClipBoard, True);
+    InsertBlock(CB, True);
+    if CB <> ClipBoard then
+      Dispose(CB, Done);
     ChangeLine;
     EnableMarking := True;
     end;
@@ -2700,7 +2817,7 @@ EndDel:
     ChangeLine;
     if  (ClipBoard <> nil) then
       Dispose(ClipBoard, Done);
-    ClipBoard := GetSelection;
+    ClipBoard := BlockToClip(GetSelection);
     if SystemData.Options and ossUseSysClip <> 0 then
       SyncClipIn;
 
@@ -3338,6 +3455,8 @@ EndDel:
     end;
 
   procedure PasteWinBlock;
+    var
+      CB: PCollection;
     begin
     EnableMarking := False;
     Marking := False;
@@ -3349,7 +3468,10 @@ EndDel:
 
     if GetWinClip(PLineCollection(ClipBoard) {, On}) then
       begin
-      InsertBlock(ClipBoard, True);
+      CB := BlockFromClip(ClipBoard);
+      InsertBlock(CB, True);
+      if CB <> ClipBoard then
+        Dispose(CB, Done);
 
       ChangeLine;
       EnableMarking := True;

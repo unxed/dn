@@ -1397,7 +1397,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     ChangeLine;
     if  (ClipBoard <> nil) then
       Dispose(ClipBoard, Done);
-    ClipBoard := GetSelection;
+    ClipBoard := BlockToClip(GetSelection);
     SetWinClip(PLineCollection(ClipBoard));
     end;
 
