@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                06:29:36
-x═[■]═════ C:\tmp\dntour-uxkagpiv\work ══════════╗x═════════ C:\tmp\dntour-uxkagpiv\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                07:48:08
+x═[■]═════ C:\tmp\dntour-_9s78k60\work ══════════╗x═════════ C:\tmp\dntour-_9s78k60\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-uxkagpiv\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-uxkagpiv\work>
+C:\tmp\dntour-_9s78k60\work>
  F1 Help

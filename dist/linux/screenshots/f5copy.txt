@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                06:51:16
-x═[■]═════ C:\tmp\dntour-kmvq16qr\work ══════════╗x═════════ C:\tmp\dntour-kmvq16qr\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                07:49:32
+x═[■]═════ C:\tmp\dntour-np76h735\work ══════════╗x═════════ C:\tmp\dntour-np76h735\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-kmvq16qr\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-kmvq16qr\work>
+C:\tmp\dntour-np76h735\work>
  F1 Help  F10 Tree
