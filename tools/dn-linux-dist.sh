@@ -1,9 +1,10 @@
 #!/bin/sh
 # Makes dist/linux/: the Linux build of DN (i386, static) that can be tried without building it, with the screens of
-# the pty tour as text. usage: DN_LINUX=PREFIX tools/dn-linux-dist.sh [linux|linux64]
+# the pty tour as text. usage: DN_LINUX=PREFIX tools/dn-linux-dist.sh [linux|linux64|aarch64]  (aarch64: DN_AARCH64=PREFIX of tools/build-fpc-aarch64-linux.sh; the tour runs under qemu-aarch64-static)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
-T=${1:-linux}     # linux (i386, static) or linux64 (x86_64)
+T=${1:-linux}     # linux (i386, static), linux64 (x86_64) or aarch64 (ARM64, static)
+[ "$T" = aarch64 ] && export PTY_RUN_PREFIX=${PTY_RUN_PREFIX:-qemu-aarch64-static}
 dist=$here/dist/$T
 tmp=${TMPDIR:-/tmp}; work=$tmp/dn-linux-dist
 mkdir -p "$work" "$dist/screenshots"
@@ -26,7 +27,7 @@ The old build with the code page inside: DN_UTF8=0 tools/build.sh.
 The commands of the command line run in an embedded terminal (the screen of the user: Ctrl-O or Esc on an empty command line; DN_EMBED_TERM=0 gives the terminal to
 the shell as before, DN_RUN_PAUSE=0|1|2 sets what happens when the command ends).
 
-  cd dist/linux && ./dn            (dist/linux: i386, dist/linux64: x86_64; the files of the program, *.LNG *.DLG *.HLP, must be next to it)
+  cd dist/linux && ./dn            (dist/linux: i386, dist/linux64: x86_64, dist/aarch64: ARM64; the files of the program, *.LNG *.DLG *.HLP, must be next to it)
 
 Keys: F10 menu, Tab switches the panel, Enter enters a directory, F1 help, F3 view, F4 edit, F5 copy, F7 make a directory,
 Alt-X quit. DN names the files as DOS does: the disk C: is the root of the file system ("C:\home\you"). The first start
