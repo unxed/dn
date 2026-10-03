@@ -100,8 +100,8 @@ Why two files for the settings: `dn.cfg` is the memory dump of the records of th
 | `uucode.pas`, `decoder.pas` | uuencode and decoding of mail files |
 
 ## Tools and extras
-`calc.pas` (the calculator window, the dBase writer), `calculat.pas` (the evaluator of expressions), `calendar.pas`, `tetris.pas`, `phones.pas` (the telephone book),
-`printman.pas` (the print manager), `gauges.pas` and `gauge.pas` (progress and indicators: heap, clock), `idlers.pas` (the screen savers), `colorvga.pas` (the colors dialog),
+`calcwin.pas` (was `calc`: the calculator window, the dBase writer), `evaluator.pas` (was `calculat`: the evaluator of expressions), `calcline.pas` (was `ccalc`: the line of the calculator and its indicator), `bwselect.pas` (was `dncolor`: the selector of the black and white colors), `calendar.pas`, `tetris.pas`, `phones.pas` (the telephone book),
+`printman.pas` (the print manager), `progress.pas` (was `gauge`: the progress windows and bars) and `gadgets.pas` (was `gauges`: the trash can, the key macros, the heap and clock indicators), `idlers.pas` (the screen savers), `colorvga.pas` (the colors dialog),
 `usermenu.pas` (the user menu F2, the output window, the screen grabber), `cellscol.pas` (the collection of the cells of the calculator).
 
 ## Basics that everything uses

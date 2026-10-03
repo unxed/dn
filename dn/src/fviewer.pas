@@ -254,7 +254,7 @@ uses
    {Cat}
   ErrMess, {AK155}
   DiskInfo, Files,
-  Gauge, DNStdDlg, Histries, Drives, DNUtil, DnIni
+  progress, DNStdDlg, Histries, Drives, DNUtil, DnIni
   , FileDiz
   ;
 

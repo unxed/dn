@@ -170,7 +170,7 @@ uses
   Lfn, DNUtil, mainapp, basics, strutil, fileutil, envutil, Startup,
   Memory, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, copyio, ArcView, CmdLine, Histries, Archiver,
-  Gauges, Gauge, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz
+  gadgets, progress, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz
   
   , UUCode
    {, Crt}

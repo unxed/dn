@@ -65,11 +65,11 @@ uses
   
   Arvid,
   
-  Archiver, ArcView, ASCIITab, CCalc, Collect, DiskInfo, mainapp,
+  Archiver, ArcView, ASCIITab, calcline, Collect, DiskInfo, mainapp,
   DNStdDlg, DNUtil, Drives, editundo, Editor, FileFind, FilesCol,
-  filepanel, FStorage, FViewer, Gauges, Histries, editcore, Startup,
+  filepanel, FStorage, FViewer, gadgets, Histries, editcore, Startup,
   Tree, UniWin, UserMenu, panelwinx, HelpKern,
-  Calc, CellsCol, 
+  calcwin, CellsCol, 
   Calendar, 
   DBView, 
   
@@ -83,7 +83,7 @@ uses
   Dialogs, Menus, Streams, ObjType, Scroller, Setups,
   Validate, Views, inputfname 
   , editwin
-  , DNDlgs, DNStrL, DNColor;
+  , DNDlgs, DNStrL, bwselect;
 
 const
     { Validate }
@@ -1041,7 +1041,7 @@ begin
 end;
 
 type
-  PR_RCalcWindow = ^Calc.TCalcWindow;
+  PR_RCalcWindow = ^calcwin.TCalcWindow;
 
 function Build_RCalcWindow(var S: TStream): PObject;
 begin
@@ -1054,7 +1054,7 @@ begin
 end;
 
 type
-  PR_RCalcView = ^Calc.TCalcView;
+  PR_RCalcView = ^calcwin.TCalcView;
 
 function Build_RCalcView(var S: TStream): PObject;
 begin
@@ -1067,7 +1067,7 @@ begin
 end;
 
 type
-  PR_RCalcInfo = ^Calc.TCalcInput;
+  PR_RCalcInfo = ^calcwin.TCalcInput;
 
 function Build_RCalcInfo(var S: TStream): PObject;
 begin
@@ -1080,7 +1080,7 @@ begin
 end;
 
 type
-  PR_RInfoView = ^Calc.TInfoView;
+  PR_RInfoView = ^calcwin.TInfoView;
 
 function Build_RInfoView(var S: TStream): PObject;
 begin
@@ -1132,7 +1132,7 @@ begin
 end;
 
 type
-  PR_RCalcLine = ^CCalc.TCalcLine;
+  PR_RCalcLine = ^calcline.TCalcLine;
 
 function Build_RCalcLine(var S: TStream): PObject;
 begin
@@ -1145,7 +1145,7 @@ begin
 end;
 
 type
-  PR_RIndicator = ^CCalc.TIndicator;
+  PR_RIndicator = ^calcline.TIndicator;
 
 function Build_RIndicator(var S: TStream): PObject;
 begin
@@ -1296,7 +1296,7 @@ begin
 end;
 
 type
-  PR_RR_BWSelector = ^DNColor.T_BWSelector;
+  PR_RR_BWSelector = ^bwselect.T_BWSelector;
 
 function Build_RR_BWSelector(var S: TStream): PObject;
 begin
@@ -2024,7 +2024,7 @@ begin
 end;
 
 type
-  PR_RTrashCan = ^Gauges.TTrashCan;
+  PR_RTrashCan = ^gadgets.TTrashCan;
 
 function Build_RTrashCan(var S: TStream): PObject;
 begin
@@ -2037,7 +2037,7 @@ begin
 end;
 
 type
-  PR_RKeyMacros = ^Gauges.TKeyMacros;
+  PR_RKeyMacros = ^gadgets.TKeyMacros;
 
 function Build_RKeyMacros(var S: TStream): PObject;
 begin
@@ -2824,22 +2824,22 @@ begin
 
   RASCIIChart.Store := @Store_RASCIIChart;
 
-  RCalcWindow.VmtLink := PtrUInt(TypeOf(Calc.TCalcWindow));
+  RCalcWindow.VmtLink := PtrUInt(TypeOf(calcwin.TCalcWindow));
   RCalcWindow.Load := @Build_RCalcWindow;
 
   RCalcWindow.Store := @Store_RCalcWindow;
 
-  RCalcView.VmtLink := PtrUInt(TypeOf(Calc.TCalcView));
+  RCalcView.VmtLink := PtrUInt(TypeOf(calcwin.TCalcView));
   RCalcView.Load := @Build_RCalcView;
 
   RCalcView.Store := @Store_RCalcView;
 
-  RCalcInfo.VmtLink := PtrUInt(TypeOf(Calc.TCalcInput));
+  RCalcInfo.VmtLink := PtrUInt(TypeOf(calcwin.TCalcInput));
   RCalcInfo.Load := @Build_RCalcInfo;
 
   RCalcInfo.Store := @Store_RCalcInfo;
 
-  RInfoView.VmtLink := PtrUInt(TypeOf(Calc.TInfoView));
+  RInfoView.VmtLink := PtrUInt(TypeOf(calcwin.TInfoView));
   RInfoView.Load := @Build_RInfoView;
 
   RInfoView.Store := @Store_RInfoView;
@@ -2859,12 +2859,12 @@ begin
 
   RCalendarWindow.Store := @Store_RCalendarWindow;
 
-  RCalcLine.VmtLink := PtrUInt(TypeOf(CCalc.TCalcLine));
+  RCalcLine.VmtLink := PtrUInt(TypeOf(calcline.TCalcLine));
   RCalcLine.Load := @Build_RCalcLine;
 
   RCalcLine.Store := @Store_RCalcLine;
 
-  RIndicator.VmtLink := PtrUInt(TypeOf(CCalc.TIndicator));
+  RIndicator.VmtLink := PtrUInt(TypeOf(calcline.TIndicator));
   RIndicator.Load := @Build_RIndicator;
 
   RIndicator.Store := @Store_RIndicator;
@@ -2922,7 +2922,7 @@ begin
 
   RColorDialog.Store := @Store_RColorDialog;
 
-  RR_BWSelector.VmtLink := PtrUInt(TypeOf(DNColor.T_BWSelector));
+  RR_BWSelector.VmtLink := PtrUInt(TypeOf(bwselect.T_BWSelector));
   RR_BWSelector.Load := @Build_RR_BWSelector;
 
   RR_BWSelector.Store := @Store_RR_BWSelector;
@@ -3202,12 +3202,12 @@ begin
 
   RViewInfo.Store := @Store_RViewInfo;
 
-  RTrashCan.VmtLink := PtrUInt(TypeOf(Gauges.TTrashCan));
+  RTrashCan.VmtLink := PtrUInt(TypeOf(gadgets.TTrashCan));
   RTrashCan.Load := @Build_RTrashCan;
 
   RTrashCan.Store := @Store_RTrashCan;
 
-  RKeyMacros.VmtLink := PtrUInt(TypeOf(Gauges.TKeyMacros));
+  RKeyMacros.VmtLink := PtrUInt(TypeOf(gadgets.TKeyMacros));
   RKeyMacros.Load := @Build_RKeyMacros;
 
   RKeyMacros.Store := @Store_RKeyMacros;

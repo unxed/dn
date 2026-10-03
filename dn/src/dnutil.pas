@@ -59,7 +59,7 @@ uses
   Defines, baseobjs,
    {SBlocks,}Drivers, Streams,
   Views, Scroller, mainapp,
-  Dialogs, Gauges,
+  Dialogs, gadgets,
   Commands, Tree,
   FilesCol, UserMenu,
   HelpFile, xTime
@@ -261,13 +261,13 @@ uses
   ASCIITab,
   Tetris, 
   Calendar,  {JO}
-  Calc, CellsCol, 
+  calcwin, CellsCol, 
   DBView, DBWatch, 
    ArchRead,  
   Arvid, 
   PrintMan, 
   
-  CCalc, Collect, {-$VIV}
+  calcline, Collect, {-$VIV}
   DnExec,
   Setups, RegAll, panelwinx,
   Idlers, panelroot, WinClp,

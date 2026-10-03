@@ -49,13 +49,13 @@
 {KV = Kirill Vodonosov}
 {20.08.2002 AK Почти весь текст в той или иной степени переработан.
   См. также CellsCol. Основное нововведение - TSort и новый Recalc }
-unit Calc;
+unit calcwin;
 {&Delphi+}
 interface
 
 uses
   Defines, Streams, Views, CellsCol, Drivers, Dialogs,
-  UniWin, Commands, DNHelp, Calculat
+  UniWin, Commands, DNHelp, evaluator
   ;
 
 const
@@ -110,9 +110,9 @@ type
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetCellValue(const S: String): Boolean;
-    {S - имя ячейки; результат - в calculat.Res}
+    {S - имя ячейки; результат - в evaluator.Res}
     function GetFuncValue(S: String): Boolean;
-    {S - функция SUM или MUL, результат - в calculat.Res}
+    {S - функция SUM или MUL, результат - в evaluator.Res}
     procedure CalcError(Index: TStrIdx);
     procedure LoadSheet(FName: String); {DataCompBoy}
     procedure SaveSheet;
@@ -2118,7 +2118,7 @@ function TCalcView.GetCellValue(const S: String): Boolean;
 диапазоны, ячейки и числа. Пробелы игнорируются. Наличие закрывающей
 скобки должно быть проверено перед вызовом.
    Пример: =SUM(A 1:B7, C1 8, 1).
-   Вычисленное число кладется в Calculat.Res}
+   Вычисленное число кладется в evaluator.Res}
 function TCalcView.GetFuncValue(S: String): Boolean;
   procedure DoSum(PP: PCellrec);
     begin

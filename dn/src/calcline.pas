@@ -46,12 +46,12 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit CCalc;
+unit calcline;
 
 interface
 
 uses
-  Defines, Streams, Dialogs, Views, Drivers, Calculat
+  Defines, Streams, Dialogs, Views, Drivers, evaluator
   ;
 
 type

@@ -26,7 +26,7 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 {(c) Alexey Korop (AK155), 2002, 2007}
-unit Calculat;
+unit evaluator;
 {&Delphi+}
 
 interface
@@ -72,7 +72,7 @@ uses
   strutil
   , math, sysutils
 
-  , Calc
+  , calcwin
 
   ;
 

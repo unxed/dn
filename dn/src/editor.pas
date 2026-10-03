@@ -66,8 +66,8 @@ implementation
 uses
   Lfn, Views, Defines, Streams, keymap, Collect, editundo,
   basics, strutil, fileutil, Dos, Dialogs, mainapp,
-  {SBlocks,}Memory, Gauge, Startup, WinClp, Messages, Commands, Macro,
-  editwin, xTime, DnIni, DNUtil, linepos, Calculat, FViewer {AK155}
+  {SBlocks,}Memory, progress, Startup, WinClp, Messages, Commands, Macro,
+  editwin, xTime, DnIni, DNUtil, linepos, evaluator, FViewer {AK155}
   
   ;
 
