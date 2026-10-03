@@ -3,6 +3,7 @@
 Linux tests (tools/pty_screen.py): start, the menu bar, no country-setup error, F7 makes a directory, the quit.
 usage: python tools/dn-win-smoke.py OUTDIR   (OUTDIR: the result of tools/build.sh win64|win32; needs: pip install pywinpty)"""
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -96,8 +97,8 @@ def main():
         ok = t.wait_for('Utilities', 30)
         check(ok, 'start: the menu bar is drawn', t.text())
         check(b'Error in country' not in t.raw, 'start: no country setup error (XLT next to the program)')
-        t.wait_for('a.txt', 10)
-        check('Name' in t.text() and 'a.txt' in t.text(), 'start: the panel shows the files of the directory', t.text())
+        t.wait_for('txt', 10)
+        check('Name' in t.text() and re.search(r'a\s+txt', t.text()), 'start: the panel shows the files of the directory', t.text())
         t.send('\x1b', 0.5)
         t.send('\x1b[18~', 1.0)                       # F7
         t.send('newdir', 0.5)
