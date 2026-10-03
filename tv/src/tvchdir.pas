@@ -170,6 +170,7 @@ var
   IsFirst: Boolean;
   Last: PDirEntry;
   T: ShortString;
+  Names: PStringCollection;
 begin
   Indent := IndentSize;
   { the root directory }
@@ -198,23 +199,28 @@ begin
     Dec(Q);
   Path := Copy(Dir, 1, Q);
   IsFirst := True;
+  { the names are sorted: the order of the file system (a hash on ext4) differs from machine to machine }
+  New(Names, Init(8, 8));
   Finder.Init;
   if Finder.First(Path + AllMask, faDirectory) then
     repeat
       if ((Finder.Rec.Attr and faDirectory) <> 0) and (Finder.Rec.Name[1] <> '.') then
-      begin
-        if IsFirst then
-        begin
-          Marker := FirstDirText;
-          IsFirst := False;
-        end
-        else
-          Marker := MiddleDirText;
-        Dirs^.Insert(NewDirEntry(StringOfChar(' ', Indent) + Marker + Finder.Rec.Name,
-          Path + Finder.Rec.Name));
-      end;
+        Names^.Insert(NewStr(Finder.Rec.Name));
     until not Finder.Next;
   Finder.Done;
+  for I := 0 to Names^.Count - 1 do
+  begin
+    if IsFirst then
+    begin
+      Marker := FirstDirText;
+      IsFirst := False;
+    end
+    else
+      Marker := MiddleDirText;
+    Name := PStr(Names^.At(I))^;
+    Dirs^.Insert(NewDirEntry(StringOfChar(' ', Indent) + Marker + Name, Path + Name));
+  end;
+  Dispose(Names, Done);
 
   { the line of the last entry ends the tree }
   Last := Dirs^.At2(Dirs^.Count - 1);

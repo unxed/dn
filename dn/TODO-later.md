@@ -209,3 +209,7 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   DOSBox-X); the Windows host branch and DBCS code pages are not tested; the cache is still in the guest code page (a design with host names in the cache would be a larger change).
 - DN for DOS in the UTF-8 mode is not done: the DOS build keeps the code page inside (`DN_UTF8=0` for `dos`); it needs the border conversion of names when the provider is absent and the use of the two
   providers when it is there; `winclp.pas` would ask `CLIPBRD` for UTF-8.
+
+## aarch64 CI: t_chdir (2026-10-03)
+- The first ARM run of `tv` failed in `t_chdir` (4 checks): `TDirListBox.ShowDirs` listed the subdirectories in the order of `FindFirst`, i.e. of the file system (a hash on ext4), so "one"/"two" were not in the order that the test expects
+  on that runner. Fixed: the names are collected into a `TStringCollection` and shown sorted (`tv/src/tvchdir.pas`). Other places that show directories in the file system order are not searched for.
