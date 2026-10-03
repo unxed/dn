@@ -77,7 +77,7 @@
 
    Без сборки: `dist/win64/DN.EXE`, `dist/win32/DN.EXE` (описание — `README.TXT` рядом; нужна консоль Windows 10 1809+ или Windows Terminal).
    Вывод на Windows по умолчанию идёт через Console API (`WriteConsoleOutputW`: работает в wine и в Windows старше 10); `DN_WIN_OUTPUT=vt` включает прежний режим
-   с VT-последовательностями (консоль Windows 10 1809+ / Windows Terminal). Проверяет CI на настоящем Windows (`tools/dn-win-smoke.py`).
+   с VT-последовательностями (консоль Windows 10 1809+ / Windows Terminal). В wine яркий фон (палитра DN) терминал wine рисует неровно, поэтому там фон без яркости; `DN_WIN_BRIGHT_BG=1|0` переключает. Проверяет CI на настоящем Windows (`tools/dn-win-smoke.py`).
 
 1a. **TV в терминале Linux** (нужны `fpc` и `python3`; терминалом служит `tools/pty_screen.py`):
 
