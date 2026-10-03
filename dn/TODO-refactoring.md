@@ -6,6 +6,8 @@ before and after). Add what you find; do not stop for it outside of the step. Ma
 ## Done
 - [x] 2026-10-03: the results of the build are not in the source directories (tests of tv/ and dn/ are built into their own directory): `tools/tv-test.sh`.
 
+- [x] 2026-10-03 (after the embedded terminal): the map "file -> what it holds" for a newcomer: `dn/FILES.md` (the renames are still to be decided).
+
 ## Candidates (rough order of how much they hurt)
 - The names of DN files in `dn/src` are the DOS names of the archive (`microed`, `microed2`, `u_myapp`, `topview_`, `country_`, `advance`, `advance1`, `advance2`...): what a file
   holds is not visible from its name. A map "old name -> what it holds" in `dn/README.md` first, renames later (they break the diffs with the archive and

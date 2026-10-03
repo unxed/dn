@@ -1,0 +1,81 @@
+# What is in which file of `dn/src`
+
+The names are the DOS names of the archive (8 characters), so the name often says little. This is a map for a newcomer: the files that you meet first,
+what each holds and the main types in it (`T…` classes are `object` types of Turbo Vision style). It is not complete; "(?)" marks what was guessed
+from a name and not checked: fix it when you know. The class of every file by origin is in [`PROVENANCE.md`](PROVENANCE.md).
+
+## The program and its commands
+| File | What it holds |
+|---|---|
+| `dn.pas` | the main program (starts the application, the loop) |
+| `dnapp.pas` (ours) | the application class on top of `tv/` (`TApplication`, the background, the user screen) |
+| `commands.pas` | all constants: commands `cm*`, key codes `kb*` (DN's codes include the scan code: `kbCtrlS = $041F13`), help contexts |
+| `dnutil.pas` | the central dispatcher of the commands of the application (`TDNApplication`: menu items, windows, Ctrl-O...) |
+| `u_myapp.pas` | the event loop of the application (keys before the dispatch, macros, the idle work) |
+| `dnexec.pas`, `dnrun.pas` (ours) | running an external program / a command of the command line (on Linux: the embedded terminal) |
+| `cmdline.pas` | the command line of the panels (`TCommandLine`) |
+| `menus.pas` | menus, the menu bar, the status line (the hot letters) |
+| `setups.pas`, `fltools.pas` | the dialogs of the settings; the dialogs of the panel (select group, filter) |
+| `dnini.pas`, `dnini_p.pas` | `DN.INI`: reading and writing the settings |
+| `dn1.pas` (?) | the startup and shutdown of the program, the state of the desktop |
+| `macro.pas` | the macros of the editor (record, play) |
+
+## Panels and files
+| File | What it holds |
+|---|---|
+| `flpanel.pas` | one file panel: drawing, keys, quick search, the info and the title lines (`TFilePanel`, `TInfoView`, `TDirView`) |
+| `flpanelx.pas` | the panel with its settings, sort and selection (`TFilePanelRoot`) |
+| `dblwnd.pas` | the window with two panels (`TDoubleWindow`) |
+| `filescol.pas` | the collection of the records of files and their sort keys (`TFilesCollection`) |
+| `drives.pas` | a drive: where the list of a panel comes from (`TDrive`); `filefind.pas`: the drive of the search results; `arcview.pas`: an archive as a drive; `arvid.pas`, `arvidavt.pas`: the drive of the Arvid video-tape streamer (historic) |
+| `filecopy.pas` | copy, move, delete (the engine and the dialogs) |
+| `tree.pas` | the directory tree |
+| `lfn.pas` | long file names (DOS: the services of Windows 95; elsewhere: thin) |
+| `filediz.pas` | the descriptions of files (`descript.ion`, `files.bbs`) (?) |
+| `fstorage.pas` | the storage of directories (a hash of the names of directories) |
+| `diskinfo.pas`, `diskimg.pas` | the information about a disk; disk images (?) |
+
+## The viewer and the editor
+| File | What it holds |
+|---|---|
+| `fviewer.pas` | the viewer (F3): text, hex, the other modes (`TFileViewer` and its variants) |
+| `microed.pas` | the core of the editor (`TFileEditor`): the text as lines, the cursor, the block, search, undo |
+| `microed2.pas` | the support of the editor: load and save of files, the scan of a document (`ScanDocU8`) |
+| `editor.pas` | the editor windows and the entry points (`TXFileEditor`, `EditFile`) |
+| `ed2.pas` | the undo list, the bookmarks, the info line (`TDoCollection`, `TBookmarkLine`) |
+| `highlite.pas` | the syntax highlighting of the editor |
+| `dbview.pas` | the viewer of dBase files |
+| `histries.pas` | the histories of the edited and viewed files |
+
+## Archives
+| File | What it holds |
+|---|---|
+| `archiver.pas` | the work with archivers (the external programs: lists, extraction); `archdet.pas`: the detection of the type of an archive; `arc_*.pas`: one archive format each |
+| `uucode.pas`, `decoder.pas` | uuencode and decoding of mail files |
+
+## Tools and extras
+`calc.pas` (the calculator window, the dBase writer), `calculat.pas` (the evaluator of expressions), `calendar.pas`, `tetris.pas`, `phones.pas` (the telephone book),
+`printman.pas` (the print manager), `gauges.pas` and `gauge.pas` (progress and indicators: heap, clock), `idlers.pas` (the screen savers), `colorvga.pas` (the colors dialog),
+`usermenu.pas` (the user menu F2, the output window, the screen grabber), `cellscol.pas` (the collection of the cells of the calculator).
+
+## Basics that everything uses
+| File | What it holds |
+|---|---|
+| `advance.pas`, `advance1.pas`, `advance2.pas`, `advance7.pas` | the general functions: strings, names of files, dates, small dialogs (the names say nothing: look for the function with the search of the sources) |
+| `dndlgs.pas`, `dnstrl.pas`, `dncolor.pas`, `dnpalet.pas` | the classes of DN that were carved out of the files that came from Borland (combo box, notepad pages, the string list, the palettes) |
+| `drivers.pas` (ours) | the keys, the events, the draw buffers on top of `tv/` (`DNKeyCode`, `GetAltChar`, `LegacyText`) |
+| `dnutf8.pas` (ours) | UTF-8 inside DN: columns, the proxy of a string, the table of a document of the editor |
+| `u_keymap.pas` | the code page detector and the key maps of the editor |
+| `videoman.pas` | the video modes and the palette (as far as the terminal has them) |
+| `regall.pas` | the registration of all the object types for the streams (the resource files) |
+| `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
+| `vpsyslow.pas`, `vputils.pas`, `use16.pas` (ours) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
+| `country_.pas` (`src-linux`, ours) | the country information and the upper-case table of CP866 for Linux |
+| `rcp.pas` | the resource compiler (a separate program: `RESOURCE/*` → `*.LNG`, `*.DLG`) |
+
+## Where to look for what (the first hour)
+* A key does not work → `u_myapp.pas` (the loop), then the `HandleEvent` of the view that has the focus; the key codes are in `commands.pas`.
+* A panel draws wrong → `flpanel.pas` `TFilePanel.Draw` (the partial redraw is in the same procedure: after a cursor move only two lines are drawn).
+* A name is cut or padded wrong → `advance.pas` `FormatLongName` (and `dnutf8.pas` for the columns).
+* The editor → `microed.pas` (everything is one byte per column; `DocTab` in `dnutf8.pas` makes it UTF-8).
+* A command is run → `dnexec.pas` → `dnrun.pas` → `tv/src/tvvtrun.pas`.
