@@ -18,7 +18,7 @@ unit TvUtil;
 interface
 
 uses
-  TvUtf8, TvCodePg, TvKeys, TvEvents;
+  TvUtf8, TvCodePg, TvKeys, TvEvents, TvText;
 
 type
   PStr = ^ShortString;
@@ -97,7 +97,17 @@ end;
 function CStrLen(const S: ShortString): Integer;
 var
   I: Integer;
+  T: ShortString;
 begin
+  if Utf8Enabled then
+  begin
+    { columns, not bytes: the text without the marks of the hot key }
+    T := '';
+    for I := 1 to Length(S) do
+      if S[I] <> '~' then
+        T := T + S[I];
+    Exit(TextWidthS(T));
+  end;
   Result := 0;
   for I := 1 to Length(S) do
     if S[I] <> '~' then
