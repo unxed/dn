@@ -108,6 +108,17 @@ begin
   Dispose(HF, Done);
   Check(Pos('hcThird', ReadAll(Sym)) > 0, 'the unit of the constants has hcThird');
 
+  { a text in UTF-8 (the help of DN built with -dDNUTF8): the box of .title is as wide as the text in columns }
+  WriteText('t_tvhc_u8.htx', ['.topic U=1', '.title Привет', 'Текст.']);
+  Check(ExecuteProcess(Tool, ['t_tvhc_u8.htx', 't_tvhc_u8.hlp', 't_tvhc_u8.sym', '/4DN_OSP']) = 0, 'a text in UTF-8 is compiled');
+  HF := New(PHelpFile, Init(New(PBufStream, Init('t_tvhc_u8.hlp', stOpenRead, 1024))));
+  T := HF^.GetTopic(1);
+  T^.SetWidth(40);
+  Check(T^.GetLine(1) = #218 + StringOfChar(#196, 8), '.title in UTF-8: the top of the box has 6 + 2 columns: ' + IntToStr(Length(T^.GetLine(1))));
+  Dispose(T, Done);
+  Dispose(HF, Done);
+  DeleteFile('t_tvhc_u8.htx'); DeleteFile('t_tvhc_u8.hlp'); DeleteFile('t_tvhc_u8.sym');
+
   WriteText(Bad, ['.topic A=1', 'a {b:Nowhere']);
   Check(ExecuteProcess(Tool, [Bad, 't_tvhc_bad.hlp']) <> 0, 'an unterminated reference is an error');
   Check(not FileExists('t_tvhc_bad.hlp'), '... and no file is written');

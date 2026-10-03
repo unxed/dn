@@ -86,6 +86,53 @@ begin
   Writeln(StdErr, InName, ': warning: ', Msg);
 end;
 
+var
+  Utf8Text: Boolean = False;             { the text is UTF-8 (the build of DN with -dDNUTF8 converts the help): columns are characters }
+  SawMulti, SawBad: Boolean;
+
+{ looks at the line: a UTF-8 sequence of more than one byte, or a byte that cannot be a part of UTF-8 }
+procedure CheckUtf8(const S: string);
+var
+  I, K, N: Integer;
+begin
+  I := 1;
+  while I <= Length(S) do
+  begin
+    if Byte(S[I]) < $80 then
+      Inc(I)
+    else
+    begin
+      if (Byte(S[I]) and $E0) = $C0 then N := 1
+      else if (Byte(S[I]) and $F0) = $E0 then N := 2
+      else if (Byte(S[I]) and $F8) = $F0 then N := 3
+      else
+      begin
+        SawBad := True;
+        Inc(I);
+        Continue;
+      end;
+      for K := 1 to N do
+        if (I + K > Length(S)) or ((Byte(S[I + K]) and $C0) <> $80) then
+          SawBad := True;
+      SawMulti := True;
+      Inc(I, N + 1);
+    end;
+  end;
+end;
+
+{ the width of the text in columns }
+function Cols(const S: string): Integer;
+var
+  I: Integer;
+begin
+  if not Utf8Text then
+    Exit(Length(S));
+  Result := 0;
+  for I := 1 to Length(S) do
+    if (Byte(S[I]) and $C0) <> $80 then
+      Inc(Result);
+end;
+
 procedure Load;
 var
   F: TextFile;
@@ -114,8 +161,10 @@ begin
     SetLength(LineNums, Length(LineNums) + 1);
     Lines[High(Lines)] := L;
     LineNums[High(LineNums)] := N;
+    CheckUtf8(L);
   end;
   CloseFile(F);
+  Utf8Text := SawMulti and not SawBad;
 end;
 
 function AtEnd: Boolean;
@@ -369,9 +418,9 @@ begin
   begin
     Title := TrimLeft(Copy(TrimLeft(Line), 7, Length(Line)));
     Inc(Cur);
-    Add(#218 + StringOfChar(#196, Length(Title) + 2), False);
+    Add(#218 + StringOfChar(#196, Cols(Title) + 2), False);
     Add(Bar + ' ' + Title + ' ' + #219, False);
-    Add(#192 + StringOfChar(#220, Length(Title) + 2) + #219, False);
+    Add(#192 + StringOfChar(#220, Cols(Title) + 2) + #219, False);
     Add('', False);
     NotWrapping := True;
     Finish;
