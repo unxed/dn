@@ -291,3 +291,6 @@ selection on the clipboard of the far2l terminal (the script checks it: PASS).
 **Open:** Shift+Ins (paste) in that script is still RED: DN sends CLIP_OPEN and CLIP_GETDATA (so TvClip asks the terminal), the terminal gives the text, but the editor shows no pasted text. Not diagnosed: look at
 `PasteBlock` / `SyncClipOut` in microed.pas and winclp.pas (`FromSys`, `TextLines`) with a selection present (the script pastes over a selected block). If the paste does not work for you in the far2l terminal now,
 `TV_FAR2L=0` gives the old behaviour (the terminal types the text itself on Shift+Ins; Ctrl+Ins then stays with the terminal). The script is not in CI yet. Next: F-key titles, notifications, window size, palette, DECRQM, then the far2l images / drag and drop.
+
+**Confirmed by the owner (2026-10-03, the far2l terminal on Linux Mint, dist built from 18b36b9):** Ctrl+Ins copies and Shift+Ins pastes in the editor now. The red Shift+Ins check of `tools/dn-linux-far2l.py`
+(a block is selected when it pastes) stays as a note: a possible difference between pasting over a selected block and pasting without one; not seen by the owner.
