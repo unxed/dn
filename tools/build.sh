@@ -8,11 +8,14 @@
 #   win64     Windows x86_64, DN_WIN=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win64 (+ the fpc of the host for the resources)
 #   win32     Windows i386, DN_WIN32=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win32
 #   dos       DOS (go32v2), DN_PREFIX=PREFIX                                           needs: tools/build-fpc-go32v2.sh PREFIX, dosbox-x (rcp runs in it)
-# env: DN_EXTRA=-gl (more options of the compiler); DN_SRC=<a copy of dn/src> (e.g. with the traces of tools/dn-trace-*.py)
+# env: DN_UTF8=0 (linux: the old DN with the code page inside; the default is UTF-8 inside); DN_EXTRA=-gl (more options of the compiler); DN_SRC=<a copy of dn/src> (e.g. with the traces of tools/dn-trace-*.py)
 # Run DN (linux): cd OUTDIR && ./dn        (the *.LNG *.DLG *.HLP files are next to it)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 DN_TARGET=${1:?usage: tools/build.sh linux64|linux|dos|win64|win32 [OUTDIR]}; export DN_TARGET
+# UTF-8 inside DN (-dDNUTF8) is the default on Linux; DN_UTF8=0 builds the old one (the code page inside); Windows/DOS: the code page
+case "$DN_TARGET" in linux*) if [ "${DN_UTF8:-1}" != 0 ]; then case "${DN_EXTRA:-}" in *-dDNUTF8*) ;; *) DN_EXTRA="${DN_EXTRA:-} -dDNUTF8";; esac; fi;; esac
+export DN_EXTRA
 out=${2:-$here/out/$DN_TARGET}; mkdir -p "$out"; out=$(cd "$out" && pwd)
 . "$here/tools/dn-env.sh"
 src=${DN_SRC:-$here/dn/src}

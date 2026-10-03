@@ -20,7 +20,9 @@ done
 cat > "$dist/README.TXT" <<'EOS'
 DN for Linux (static: no libraries needed). EXPERIMENTAL: the Linux build of the
 open DN OSP 2.14 on Turbo Vision (this repository: tv/ and dn/). It needs a terminal of at least 80x25 (xterm, the Linux
-console, kitty, alacritty...); Russian file names (UTF-8) are shown as Russian; names with other alphabets are shown wrong (DN is not UTF-8 inside yet).
+console, kitty, alacritty...); DN is UTF-8 inside: file names, the viewer, the editor,
+the clipboard (OSC 52) and Alt+Cyrillic work in any alphabet (wide CJK letters and combining marks are not yet counted right).
+The old build with the code page inside: DN_UTF8=0 tools/build.sh.
 
   cd dist/linux && ./dn            (dist/linux: i386, dist/linux64: x86_64; the files of the program, *.LNG *.DLG *.HLP, must be next to it)
 
