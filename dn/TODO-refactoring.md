@@ -11,8 +11,7 @@ before and after). Add what you find; do not stop for it outside of the step. Ma
 - [x] 2026-10-03 (after aarch64 and the DOSBox-X patches): one table "script -> what it does -> which workflow calls it": `tools/README.md` (linked from `README.md`).
 
 ## Candidates (rough order of how much they hurt)
-- **Final step (owner decision 2026-10-03):** move DN to the Safe Pascal style (`unxed/sandbox` PR #4, `safe-pascal/`): see PLAN.md, section "Safe Pascal как стиль кода DN" (stages 1-6, measured counts, the open question of
-  `object` vs `class`). Earlier than the end if it turns out cheap (the pilot on new code, stage 3).
+- **Final step (owner decision 2026-10-03):** move DN to the Safe Pascal style (`unxed/sandbox` PR #4, `safe-pascal/`): see PLAN.md, section "Safe Pascal как стиль кода DN" (the order S0-S10 chosen by RUP: (c) first, then (a) with a decision point, (b) only as a fallback). Earlier than the end if it turns out cheap (the pilot on new code, stage 3).
 - The names of DN files in `dn/src` are the DOS names of the archive (`microed`, `microed2`, `u_myapp`, `topview_`, `country_`, `advance`, `advance1`, `advance2`...): what a file
   holds is not visible from its name. A map "old name -> what it holds" in `dn/README.md` first, renames later (they break the diffs with the archive and
   `bootstrap/`: needs a decision how `bootstrap/` follows).
