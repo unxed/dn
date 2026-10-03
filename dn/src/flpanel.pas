@@ -1980,6 +1980,8 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
 
       if  ( ( (DNKeyCode(Event) = kbDoubleAlt)) and (FMSetup.Quick =
            pqsAlt)) or
+          { a terminal gives no double Alt: Ctrl-S starts the quick search (the command line is empty: else it is the cursor left there) }
+          ( (DNKeyCode(Event) = kbCtrlS) and (CmdLine.Str = '')) or
           ( (DNKeyCode(Event) = kbDoubleCtrl) and (FMSetup.Quick = pqsCtrl)) or
           ( (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254) and
             (Char(Event.CharCode) <> '\') and (FMSetup.Quick = pqsCaps) and

@@ -196,7 +196,7 @@ procedure MakeNoSlash(var S: String);
 
 implementation
 uses
-  Drivers, Dos, Lfn, VPUtils,
+  Drivers, Dos, Lfn, VPUtils, DNUtf8,
   
   Advance1, Strings,
   Commands, DNApp, DnIni, Memory, FlPanelX, dnHelp
@@ -1267,11 +1267,19 @@ procedure DoQuickSearch(Key: Word);
     kbBack:
       begin
       if QSMask <> '' then
+{$IFDEF DNUTF8}
+        Utf8DeleteLast(QSMask);
+{$ELSE}
         Delete(QSMask, Length(QSMask), 1);
+{$ENDIF}
       end
     else
       if (Char(Lo(Key)) <> '*') or (QSMask[Length(QSMask)] <> '*') then
+{$IFDEF DNUTF8}
+        QSMask := QSMask+CpCharToUtf8(Lo(Key));
+{$ELSE}
         QSMask := QSMask+Char(Lo(Key));
+{$ENDIF}
   end {case};
   end { DoQuickSearch };
 
