@@ -11,7 +11,7 @@ unit Drivers;
 interface
 
 uses
-  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys, TvCell, TvColors, TvDrawBuf, TvText;
+  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys, TvCell, TvColors, TvDrawBuf, TvText, TvUtf8;
 
 type
   TEvent = TvEvents.TEvent;
@@ -566,7 +566,16 @@ end;
 function CStrLen(const S: String): Integer;
 var
   I: Integer;
+  T: String;
 begin
+  if Utf8Enabled then
+  begin
+    T := '';
+    for I := 1 to Length(S) do
+      if S[I] <> '~' then
+        T := T + S[I];
+    Exit(TextWidthS(T));
+  end;
   Result := 0;
   for I := 1 to Length(S) do
     if S[I] <> '~' then
