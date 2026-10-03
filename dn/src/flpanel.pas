@@ -768,7 +768,7 @@ Scroll:
     for i := 0 to pred(Owner^.Size.Y) do
       begin
       MoveChar(B, ' ', C1, Size.X);
-      WriteLineW(0, i, Owner^.Size.X, 1, B[0]);
+      WriteLineC(0, i, Owner^.Size.X, 1, B[0]);
       end;
     Exit;
     end;
@@ -858,7 +858,7 @@ Scroll:
             else
               B[Idx-1] := CellFromBIOS(CW);
             Idx := j*LineLength;
-            WriteLineW(Idx, i, LineLength-1, 1, B[Idx+DeltaX]);
+            WriteLineC(Idx, i, LineLength-1, 1, B[Idx+DeltaX]);
             end;
           end;
       end
