@@ -11,7 +11,7 @@ begin
     WriteLn('no terminal');
     Halt(1);
   end;
-  St := VtRunScreen(Emu, '/bin/sh', ['sh', '-c', 'echo hello; read x; echo got:$x; exit 5'], '', '$ mycommand', True);
+  St := VtRunScreen(Emu, '/bin/sh', ['sh', '-c', 'echo hello; read x; echo got:$x; exit 5'], '', '$ mycommand', 1);
   VtShowScreen(Emu);
   UnixDone;
   WriteLn('DONE ', St);
