@@ -15,6 +15,11 @@ Check (the client is in `dosbox-x-test/utf8clip.asm`, `nasm -f bin -o UCLIP.COM 
 The answer must have `SET=FF PREV=0000`, `SETC=0001`, `SIZE2=00000015` (the text "Привет", CR LF, "мир" as UTF-8 and the final 0), `MODE=FDE9`; with
 `dos clipboard api = false` it prints `NOT FOUND`.
 
-Not in the patch (see `dn/TODO-later.md`, "DOSBox-X"): the provider `DOS-UTF8` / `NAMES` (UTF-8 file names). The directory cache of DOSBox-X keeps the names in the
-guest code page and skips the files whose names that page cannot hold, so UTF-8 names need the cache to keep host (UTF-8) names and convert at the border.
-The Windows part of the patch (`CF_UNICODETEXT`) is written but was not compiled.
+## `dosbox-x-utf8-names.patch`: UTF-8 file names for DOSBox-X (stacked on the clipboard patch)
+
+Made as `git diff claude/amis-utf8-clipboard claude/utf8-names` (branch `unxed/dosbox-x` `claude/utf8-names`); apply after the clipboard patch. Option `[dos] utf8 file names`:
+the characters that the code page lacks are kept in the names as `{U+XXXX}` so no file is hidden, and a program that asks (AMIS `DOS-UTF8` / `NAMES`, `AL=10h BX=65001`)
+gets UTF-8 long names. The PR text is `dosbox-x-pr-utf8-names.md`. Tests (nasm -f bin): the go2dos client `testdata/progs/utf8names.asm` and `dosbox-x-test/utf8names-create.asm`
+(creates `716Ch` and renames `7156h` with UTF-8 names). Config for the check: `[dos]` `utf8 file names = true`, `lfn = true`, `ver = 7.1`.
+
+The Windows part of the clipboard patch (`CF_UNICODETEXT`) is written but was not compiled.
