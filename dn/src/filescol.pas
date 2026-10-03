@@ -209,7 +209,7 @@ function SameFile(P1, P2: PFileRec): Boolean;
 
 implementation
 uses
-  Lfn, DNApp, Menus, Views, FlPanelX, FlPanel, Drives,
+  Lfn, DNUtf8, DNApp, Menus, Views, FlPanelX, FlPanel, Drives,
   Objects2, Commands, Messages,
   {!!}CmdLine
   
@@ -619,6 +619,19 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
     CompareXlat: array[0..2] of PXLat =
       (@ABCSortXlat, @UpCaseArray, @LowCaseArray);
 
+  procedure CmpKey(var S: String; M: Integer);
+    { the key of the comparison of names: by the method of the panel }
+    begin
+{$IFDEF DNUTF8}
+    if M = 2 then
+      Utf8LowStr(S)
+    else
+      Utf8UpStr(S);
+{$ELSE}
+    XLatStr(S, CompareXlat[M]^);
+{$ENDIF}
+    end;
+
   begin { TFilesCollection.Compare }
   NameDirsSortEnabled := False;
   if Panel <> nil then
@@ -661,8 +674,8 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
     Name1 := P1^.FlName[uLfn];
     Name2 := FlName[uLfn];
 
-    XLatStr(Name1, CompareXlat[CmpMethod]^);
-    XLatStr(Name2, CompareXlat[CmpMethod]^);
+    CmpKey(Name1, CmpMethod);
+    CmpKey(Name2, CmpMethod);
 
     if P1^.Owner <> nil then
       Own1 := P1^.Owner^
@@ -679,8 +692,8 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
       begin
       MakeNoSlash(Own1);
       MakeNoSlash(Own2);
-      XLatStr(Own1, CompareXlat[CmpMethod]^);
-      XLatStr(Own2, CompareXlat[CmpMethod]^);
+      CmpKey(Own1, CmpMethod);
+      CmpKey(Own2, CmpMethod);
       end;
 
     SM := SortMode;
@@ -849,14 +862,14 @@ Lab1:
           if  (P1^.DIZ <> nil) then
             begin
             ST1 := P1^.DIZ^.DIZText;
-            XLatStr(ST1, CompareXlat[CmpMethod]^);
+            CmpKey(ST1, CmpMethod);
             end
           else
             ST1 := '';
           if  (P2^.DIZ <> nil) then
             begin
             ST2 := P2^.DIZ^.DIZText;
-            XLatStr(ST2, CompareXlat[CmpMethod]^);
+            CmpKey(ST2, CmpMethod);
             end
           else
             ST2 := '';

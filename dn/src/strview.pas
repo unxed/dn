@@ -26,10 +26,10 @@ begin
   C := Byte(GetColorW(1));
   MoveChar(B, ' ', C, Size.X);
   MoveStr(B, S1, C);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveStr(B, S2, C);
-  WriteLineW(0, 1, Size.X, 1, B);
+  WriteLineC(0, 1, Size.X, 1, B);
 end;
 
 function TDStringView.GetPalette: TPalette;

@@ -191,7 +191,7 @@ procedure TTeamView.Draw;
   MoveChar(B, ' ', C, Size.X);
   S := GetString(dlTeamAll);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   for I := 1 to Size.Y-1 do
     begin
     MoveChar(B, ' ', C, Size.X);
@@ -200,7 +200,7 @@ procedure TTeamView.Draw;
       S := GetString(TStrIdx(Integer(dlTeamAll)+Strings[I]));
       MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
       end;
-    WriteLineW(0, I, Size.X, 1, B);
+    WriteLineC(0, I, Size.X, 1, B);
     end;
   end { TTeamView.Draw };
 
@@ -495,7 +495,7 @@ procedure TDiskInfo.Draw;
     if  (I < 0) or CC then
       I := 0;
     MoveCStr(B[I], S, C);
-    WriteLineW(0, Y, Size.X, 1, B);
+    WriteLineC(0, Y, Size.X, 1, B);
     Inc(Y);
     end;
 
@@ -511,7 +511,7 @@ procedure TDiskInfo.Draw;
     S := '~'#0+S;
     {MoveStr(B[I], S, Lo(C));}
     MoveCStr(B[I], S, C);
-    WriteLineW(0, Y, Size.X, 1, B);
+    WriteLineC(0, Y, Size.X, 1, B);
     Inc(Y);
     end;
 
@@ -521,7 +521,7 @@ procedure TDiskInfo.Draw;
     begin
     MoveChar(B, ' ', C, Size.X);
     MoveCStr(B[0], S, C);
-    WriteLineW(0, Y, Size.X, 1, B);
+    WriteLineC(0, Y, Size.X, 1, B);
     Inc(Y);
     end;
 
@@ -624,7 +624,7 @@ procedure TDiskInfo.Draw;
     end;
   MoveChar(B, ' ', C, Size.X);
   if Y <= Size.Y-1 then
-    WriteLineW(0, Y, Size.X, Size.Y-Y+1, B);
+    WriteLineC(0, Y, Size.X, Size.Y-Y+1, B);
   end { TDiskInfo.Draw };
 
 {-DataCompBoy-}

@@ -76,7 +76,7 @@ begin
       MoveChar(Buf[X], Chr((Y * 32 + X) and $FF), Color, 1);
       Inc(X);
     end;
-    WriteLineW(0, Y, Size.X, 1, Buf);
+    WriteLineC(0, Y, Size.X, 1, Buf);
   end;
   ShowCursor;
 end;
@@ -202,7 +202,7 @@ begin
   MoveChar(Buf[16], ' ', Value, 0);
   if (ASCIIChar > 0) and (Size.X > 7) then
     MoveChar(Buf[7], Chr(ASCIIChar and $FF), Value, 1);
-  WriteLineW(0, 0, Size.X, 1, Buf);
+  WriteLineC(0, 0, Size.X, 1, Buf);
 end;
 
 procedure TReport.HandleEvent(var Event: TEvent);
