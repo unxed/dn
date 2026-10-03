@@ -67,7 +67,7 @@ program RCP;
 uses
   Lfn, Collect, Drivers, Dos, Defines, Objects2, Streams, Advance,
   Advance1, Advance2,
-  RStrings, GetConst, Menus, Commands, Setups, DNHelp, Views, DNApp,
+  RStrings, GetConst, Menus, Commands, Setups, DNHelp, Views, mainapp,
    Startup,
   Dialogs, Validate, IniFiles, Scroller, ListMakr, ObjType, RegAll,
    DefColl,

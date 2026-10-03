@@ -14,6 +14,13 @@ for d in (os.path.join(root, 'bootstrap', 'new'), os.path.join(root, 'dn', 'comp
     for f in os.listdir(d):
         if f != '.gitkeep':
             ours.add(f.lower())
+renames = {}      # dn/renames.map: new name -> the name in the archive (a file renamed after the first commit keeps its class)
+rp = os.path.join(root, 'dn', 'renames.map')
+if os.path.exists(rp):
+    for line in open(rp, encoding='utf-8'):
+        if line.strip() and not line.startswith('#'):
+            a, b = line.split()
+            renames[a] = b
 carved = set()
 for line in open(os.path.join(root, 'bootstrap', 'carve.list'), encoding='utf-8'):
     m = re.match(r'(\w+)\s*<-', line)
@@ -35,7 +42,7 @@ classes = {'OURS': [], 'CARVED': [], 'RIT': [], 'CONTRIB': [], 'NONE': []}
 for f, p in sorted(((f, os.path.join(d, f)) for d in srcdirs for f in os.listdir(d)), key=lambda t: t[0].lower()):
     if not os.path.isfile(p) or low_ext(f) in ('.o', '.ppu'):      # the objects of a stray compilation in the tree are not sources
         continue
-    low = f.lower()
+    low = renames.get(f.lower(), f.lower())
     c = 'OURS' if low in ours else 'CARVED' if low in carved else head_class(p)
     classes[c].append(f)
 

@@ -48,7 +48,7 @@
 
 unit DNPalet;
 
-{ Carved by tools/dn-carve.py from DNAPP.PAS: the constants CColor, CBlackWhite, CMonochrome of Dos Navigator. }
+{ Carved by tools/dn-carve.py from mainapp.PAS: the constants CColor, CBlackWhite, CMonochrome of Dos Navigator. }
 
 interface
 

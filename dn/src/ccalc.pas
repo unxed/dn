@@ -92,7 +92,7 @@ implementation
 
 uses
   Advance, Advance1, Advance2,
-  DNApp, DNUtil,
+  mainapp, DNUtil,
   Commands, HistList, startup, startupp
   , objects2
   ;

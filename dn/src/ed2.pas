@@ -134,7 +134,7 @@ procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
 implementation
 uses
   Advance, Advance1, Advance2
-  , Messages, Dos, DNApp, Microed, Startup, DnIni, EdWin
+  , Messages, Dos, mainapp, Microed, Startup, DnIni, EdWin
   ;
 
 { TDoCollection }

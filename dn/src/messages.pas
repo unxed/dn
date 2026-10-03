@@ -60,7 +60,7 @@ function FmtFileId(Id: TStrIdx; const FName: String): String;
 implementation
 
 uses
-  SysUtils, TvMsgBox, TvInput, Drivers, DNApp;
+  SysUtils, TvMsgBox, TvInput, Drivers, mainapp;
 
 function ToTv(AOptions: Word): Word;
 begin

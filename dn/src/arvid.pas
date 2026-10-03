@@ -240,7 +240,7 @@ var
 
 implementation
 uses
-  Advance, Advance2, Advance1, FlPanel, Commands, Startup, DNApp,
+  Advance, Advance2, Advance1, FlPanel, Commands, Startup, mainapp,
   Drivers, Messages, Dialogs, Memory, FileFind, DNUtil, FileCopy, U_KeyMap,
   ArvidAvt, ArvidTdr
   , PDSetup, FindObj{ не забыть прибить вместе с Арвидом}

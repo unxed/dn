@@ -186,7 +186,7 @@ const
 
 implementation
 uses
-  Dos, Drivers, Defines, DNApp,
+  Dos, Drivers, Defines, mainapp,
   DnIni, DnIni_p, Startup,
   Commands, VPUtils , Messages
   ,Dpmi32, Dpmi32df

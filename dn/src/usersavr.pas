@@ -29,7 +29,7 @@ procedure InsertUserSaver(ACheck: Boolean);
 implementation
 
 uses
-  Memory, Drivers, DNUtil, Messages, Commands, DNApp
+  Memory, Drivers, DNUtil, Messages, Commands, mainapp
   ;
 
 { ------------------------------------------------------------------------- }

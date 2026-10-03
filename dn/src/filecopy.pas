@@ -100,7 +100,7 @@ procedure CloseWriteStream;
 
 implementation
 uses
-  DNApp, Startup, Memory, Messages, HistList, Commands,
+  mainapp, Startup, Memory, Messages, HistList, Commands,
   xTime, Validate, TitleSet, UserMenu, Dos, DnIni,
   
   VpSysLow, Filediz , ArvidAvt ,

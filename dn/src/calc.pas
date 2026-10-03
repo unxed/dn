@@ -155,7 +155,7 @@ implementation
 uses
   Advance, Lfn, Messages, HistList, VPUtils,
   Collect, Strings, ErrMess,
-  Memory, Dos, DNApp, DNStdDlg, Advance1, Advance2,
+  Memory, Dos, mainapp, DNStdDlg, Advance1, Advance2,
   MicroEd2, Histries
   ;
 
@@ -1891,7 +1891,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           end;
         cmMainMenu:
           begin
-          Message(DNApp.MenuBar, evCommand, cmMenu, nil);
+          Message(mainapp.MenuBar, evCommand, cmMenu, nil);
           CE;
           end;
       end {case};

@@ -112,7 +112,7 @@ procedure PhoneBook(Manual: Boolean);
 
 implementation
 uses
-  DNApp, Startup, Commands, Messages, ObjType
+  mainapp, Startup, Commands, Messages, ObjType
   , DNHelp, Advance, Advance1, Advance2
   
   ;

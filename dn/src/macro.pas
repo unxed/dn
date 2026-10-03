@@ -107,7 +107,7 @@ function InitHighLight
 
 implementation
 uses
-  Messages, Drivers, Dialogs, Commands, DNHelp, DNApp,
+  Messages, Drivers, Dialogs, Commands, DNHelp, mainapp,
   Startup, Advance1, Advance2, VPUtils
   , VPSysLow {JO: for SysBeepEx}
   ;

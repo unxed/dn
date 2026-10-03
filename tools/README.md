@@ -7,6 +7,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 
 | Script | What it does | CI |
 |---|---|---|
+| `rename-unit.py OLD NEW` | renames a unit of DN (the file, `unit`, every `uses` and `OLD.Name`): one family of names per commit, then the build and the tests | dn |
 | `build.sh TARGET` | **The one command**: builds `rcp`, the resources and `dn` from `dn/src` + `tv/src` for `linux64`, `linux`, `aarch64`, `dos`, `win64`, `win32` into `out/TARGET` (or the second argument) | dn-linux, dn-windows |
 | `dn-env.sh` | sourced by the scripts: the compiler, the units, the flags of a target (`DN_TARGET`, `DN_PREFIX`) | (via the others) |
 | `build-fpc-go32v2.sh` | FPC cross compiler x86_64 Linux -> DOS (go32v2) from the official sources | toolchain, tv |

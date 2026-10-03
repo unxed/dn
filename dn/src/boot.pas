@@ -48,7 +48,7 @@
 {.$DEFINE GRABPalette}
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
-unit DN1;
+unit boot;
 
 interface
 
@@ -68,7 +68,7 @@ uses
   
   Advance, Advance1, Advance2, Advance3, Advance4,
   Startup, Startupp, Defines, Streams,
-  Setups, DNUtil, Drivers, Commands, DNApp, Messages, Lfn, Dos, FlPanelX,
+  Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, FlPanelX,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
   DnIni, DnIni_p, CopyIni, Archiver,
   U_MyApp, Microed, ArchSet, Advance6, RegAll, DnExec, Histries, Menus,

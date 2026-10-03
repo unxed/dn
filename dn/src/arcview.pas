@@ -154,7 +154,7 @@ implementation
 
 uses
   VpSysLow, Eraser,
-  Menus, DNApp, Messages, Dialogs, Gauge, FileCopy, Memory, Startup,
+  Menus, mainapp, Messages, Dialogs, Gauge, FileCopy, Memory, Startup,
   Arvid, xTime, VideoMan, DnExec, FileFind
   , UserMenu {JO: для скрывания панелей при разархивировании }
   , arc_Zip {JO: для CentralDirRecPresent}

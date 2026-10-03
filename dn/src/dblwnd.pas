@@ -164,7 +164,7 @@ const
 implementation
 uses
   DiskInfo, Commands, FileCopy, FilesCol, Advance, Advance1, Advance2,
-  Startup, DNApp, TopView_, Tree, FViewer
+  Startup, mainapp, TopView_, Tree, FViewer
   
   , Dos, VPUtils
   ;

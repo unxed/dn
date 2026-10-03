@@ -71,9 +71,9 @@ implementation
 
 uses
   
-  VpSysLow, fnotify, Advance2, DNApp, Gauges,
+  VpSysLow, fnotify, Advance2, mainapp, Gauges,
   Drives, Advance, Advance3, Commands,
-  DN1, Events, UserMenu, Messages, Startup,
+  boot, Events, UserMenu, Messages, Startup,
   FlPanelX, Macro
   ;
 

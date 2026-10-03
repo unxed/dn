@@ -143,7 +143,7 @@ implementation
 
 uses
   xTime, Startup, DNHelp, Events, Advance, Advance1, Advance2
-  , DNApp, Messages, Commands, VPUtils
+  , mainapp, Messages, Commands, VPUtils
   ;
 
 

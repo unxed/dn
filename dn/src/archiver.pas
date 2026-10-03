@@ -276,7 +276,7 @@ const
 implementation
 
 uses
-  Lfn, Advance, Advance1, Advance2, DNApp, Commands,
+  Lfn, Advance, Advance1, Advance2, mainapp, Commands,
   Dialogs, FilesCol, FViewer, Startup,
   ArcView, FileCopy, HistList, {FStorage,}Menus, ArchDet,
    {UserSavr,}DnIni, Messages,

@@ -57,7 +57,7 @@ program DN;
 uses
 
   DNErrLog, Drivers, Lfn, Files,
-  DN1, Dos, DNApp,
+  boot, Dos, mainapp,
   Menus, FlPanelX, FlPanel, FileCopy, Filediz, Filelst, Eraser,
   DiskInfo, Advance, Advance1, Advance2, Advance4, highlite,
   Startup, Dialogs, Gauges, Memory, DblWnd, Messages, HistList,

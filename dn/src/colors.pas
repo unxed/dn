@@ -72,7 +72,7 @@ type
 
 implementation
 uses
-  Messages, Drives, Startup, DnIni, VideoMan, Defines, DNApp,
+  Messages, Drives, Startup, DnIni, VideoMan, Defines, mainapp,
   Drivers, Views, Memory, Commands, DNStdDlg, Advance, DNHelp, Advance2
   , FileType
   ;

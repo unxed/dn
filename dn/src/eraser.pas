@@ -63,7 +63,7 @@ uses
   Defines, Files, Filediz,
   Dos, Lfn {DataCompBoy}, FilesCol, Commands, Advance, Advance1, Advance2,
   Startup, Messages, xTime, Drivers, Tree, Memory,
-  DNApp, Gauge, Views, Dialogs, Drives, FileCopy
+  mainapp, Gauge, Views, Dialogs, Drives, FileCopy
   , fnotify, Events
   {JO} , FlTl
 

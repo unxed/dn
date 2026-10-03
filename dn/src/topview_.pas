@@ -35,7 +35,7 @@ type
 implementation
 
 uses
-  Defines, DblWnd, Advance1, DNUtf8, flpanelx, Commands, dnApp, PDSetup
+  Defines, DblWnd, Advance1, DNUtf8, flpanelx, Commands, mainapp, PDSetup
   ;
 
 const
