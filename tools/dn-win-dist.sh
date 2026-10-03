@@ -18,7 +18,7 @@ DN for Windows (EXPERIMENTAL): the Windows build of the open DN OSP 2.14 on Turb
 It is cross-compiled on Linux and checked on a real Windows console by CI (tools/dn-win-smoke.py).
 
   dn.exe             run it in a console window (conhost, Windows Terminal, Wine); the console needs at least 80x25.
-  *.lng *.dlg *.hlp  the resources and the help, XLT\  the layout tables: they must be next to dn.exe.
+  *.lng *.dlg *.hlp  the resources and the help, xlt\  the layout tables: they must be next to dn.exe.
 
 Keys: F10 menu, Tab switches the panel, Enter enters a directory, F1 help, F3 view, F4 edit, F5 copy, F7 make a directory,
 Alt-X quit. Settings and history are written to the directory where DN is started (dn.ini, dn.his).

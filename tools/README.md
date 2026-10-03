@@ -20,7 +20,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 
 | Script | What it does | CI |
 |---|---|---|
-| `dn-dist.sh` | `dist/dos/`: DN.EXE for DOS, resources, DPMI host, licences, screenshots | by hand |
+| `dn-dist.sh` | `dist/dos/`: dn.exe for DOS, resources, DPMI host, licences, screenshots | by hand |
 | `dn-linux-dist.sh` | `dist/linux`, `linux64`, `aarch64` with the screens of the pty tour | by hand |
 | `dn-win-dist.sh` | `dist/win64`, `dist/win32` | by hand |
 

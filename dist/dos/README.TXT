@@ -6,10 +6,10 @@ in the first tries. Not done: the mouse was not tried, the saved desktop, a lot 
 PLAN.md, dn/TODO-later.md). Do not trust it with real data.
 
 Files
-  DN.EXE            the program (a stripped build, no source line numbers)
-  CWSDPMI.EXE       the DPMI host (it must be in the same directory or on PATH); CWSDPMI.DOC is its documentation and terms
-  ENGLISH.DLG/.LNG, RUSSIAN.DLG/.LNG, UKRAIN.DLG/.LNG   the dialogs, menus and strings, made by the resource compiler
-                    rcp.exe from the files of the DN sources (the language is chosen as in DN: DN.INI, or DNLNG=English)
+  dn.exe            the program (a stripped build, no source line numbers)
+  cwsdpmi.exe       the DPMI host (it must be in the same directory or on PATH); cwsdpmi.doc is its documentation and terms
+  english.dlg/.lng, russian.dlg/.lng, ukrain.dlg/.lng   the dialogs, menus and strings, made by the resource compiler
+                    rcp.exe from the files of the DN sources (the language is chosen as in DN: dn.ini, or DNLNG=English)
   SHA256SUMS.TXT    checksums of the files
   screenshots/      what it looks like in DOSBox-X
   LICENSE-DN.TXT, LICENSE-TV.TXT, COPYRIGHT-TV-MAGIBLOT.TXT   the licences (the binary contains code under all of them)
@@ -19,7 +19,7 @@ Run
       mount c <this directory>
       c:
       dn
-  Start it in a directory you do not mind: DN writes its configuration (DN.INI, DN.HIS...) next to the program.
+  Start it in a directory you do not mind: DN writes its configuration (dn.ini, dn.his...) next to the program.
   Keys: F10 menu, Tab switches the panel, Enter enters a directory, F7 makes a directory, Alt-X quits (asks first).
   Enter on a program does not work yet (it would run it: the part of DN that starts programs is not ported); if the
   screen stops reacting, close the emulator.

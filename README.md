@@ -80,11 +80,11 @@ our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not 
 0w. **DN on Windows** (cross build on Linux; needs `fpc`, `make`, `git`, `binutils-mingw-w64-x86-64` / `-i686`, `python3`):
 
        tools/build-fpc-windows.sh PREFIX win64      # a cross compiler from the FPC sources (once; win32 the same way, with `win32`)
-       DN_WIN=PREFIX tools/build.sh win64          # the result is out/win64/dn.exe, the resources, the help and XLT\ next to it (win32: DN_WIN32=...)
+       DN_WIN=PREFIX tools/build.sh win64          # the result is out/win64/dn.exe, the resources, the help and xlt\ next to it (win32: DN_WIN32=...)
        python tools/dn-win-smoke.py out/win64       # on Windows: a real console (ConPTY), pip install pywinpty; in CI the workflow dn-windows
 
    DN on Windows is also UTF-8 inside (names in any script through the wide APIs); the old build with a code page: `DN_UTF8=0 tools/build.sh win64`.
-   Without building: `dist/win64/DN.EXE`, `dist/win32/DN.EXE` (description: `README.TXT` next to them; needs a Windows 10 1809+ console or Windows Terminal).
+   Without building: `dist/win64/dn.exe`, `dist/win32/dn.exe` (description: `README.TXT` next to them; needs a Windows 10 1809+ console or Windows Terminal).
    Output on Windows goes through the Console API by default (`WriteConsoleOutputW`: works in wine and in Windows older than 10); `DN_WIN_OUTPUT=vt` turns on the former mode
    with VT sequences (a Windows 10 1809+ console / Windows Terminal). In wine the terminal of wine draws the bright background (the DN palette) unevenly, so there the background has no brightness; `DN_WIN_BRIGHT_BG=1|0` switches it. CI checks on real Windows (`tools/dn-win-smoke.py`).
 
@@ -116,9 +116,9 @@ our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not 
    Debugging: `tools/dn-trace-calls.py` / `tools/dn-trace-init.py` put traces into a **copy** of `dn/src` (`cp -r dn/src build/traced`),
    build with `DN_SRC=build/traced`. To look at the screen dump `SCR.DAT`: `python3 tools/render-dump.py SCR.DAT`.
 
-0. **Without building:** `dist/dos/` holds a ready DOS version (`DN.EXE`, the resources, the DPMI host `CWSDPMI.EXE`, the license texts,
+0. **Without building:** `dist/dos/` holds a ready DOS version (`dn.exe`, the resources, the DPMI host `cwsdpmi.exe`, the license texts,
    `screenshots/`): mount the directory in DOSBox-X and run `dn` (see `dist/dos/README.TXT`). It is updated by the script
    `tools/dn-dist.sh` at noticeable changes; it is built from the commit named in the message of the `dist` commit.
 
-5. **Try it by hand:** the directory `out/dos/` is a ready set for DOS (`dn.exe`, `CWSDPMI.EXE`, `*.DLG`, `*.LNG`):
+5. **Try it by hand:** the directory `out/dos/` is a ready set for DOS (`dn.exe`, `cwsdpmi.exe`, `*.dlg`, `*.lng`):
    mount it in DOSBox-X (`mount c out/dos`, `c:`, `dn`) or copy it to a machine with DOS.
