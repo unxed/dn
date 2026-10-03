@@ -80,6 +80,13 @@ class WinTerm:
             pass
 
 
+def shot(t, name):
+    """the screen as text between markers (the log of CI; tools/dn-win-smoke.py > dist/win64/screenshots)"""
+    print('=== SCREEN %s ===' % name)
+    print('\n'.join(l.rstrip() for l in t.text().split('\n')).rstrip())
+    print('=== END ===', flush=True)
+
+
 def main():
     out = os.path.abspath(sys.argv[1])
     d = tempfile.mkdtemp(prefix='dnwin-')
@@ -99,8 +106,18 @@ def main():
         check(b'Error in country' not in t.raw, 'start: no country setup error (XLT next to the program)')
         t.wait_for('txt', 10)
         check('Name' in t.text() and re.search(r'a\s+txt', t.text()), 'start: the panel shows the files of the directory', t.text())
+        shot(t, 'start')
         t.send('\x1b', 0.5)
+        shot(t, 'panels')
+        t.send('\x1b[20~', 1.0)                       # F9: the menu
+        shot(t, 'menu')
+        t.send('\x1b', 0.5)
+        t.send('\x1bOP', 1.0)                         # F1: help
+        shot(t, 'f1help')
+        for _ in range(3):
+            t.send('\x1b', 0.5)
         t.send('\x1b[18~', 1.0)                       # F7
+        shot(t, 'f7mkdir')
         t.send('newdir', 0.5)
         t.send('\r', 1.5)
         check(os.path.isdir(os.path.join(w, 'newdir')), 'F7: the directory is made', t.text())
