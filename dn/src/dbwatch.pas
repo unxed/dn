@@ -70,8 +70,7 @@ unit DBWatch;
 interface
 
 uses
-  Collect, baseobjs, Streams, Defines,
-  use16
+  Collect, baseobjs, Streams, Defines
   ;
 
 type
@@ -98,7 +97,7 @@ type
     Date, NumRec: LongInt;
     HeaderLen, RecLen: AWord;
     Unused: array[0..31] of Byte;
-    NumFields: Integer;
+    NumFields: SmallInt;
     Loc: LongInt;
     Fields: PCollection;
     constructor Init(FileName: String); {DataCompBoy}
@@ -107,7 +106,7 @@ type
     procedure Seek(NewLoc: LongInt);
     function GetField(Name: String; var Buf): String;
     function GetNField(N: Word; var Buf): String;
-    function GetFieldRec(N: Integer): PFieldRec;
+    function GetFieldRec(N: SmallInt): PFieldRec;
     procedure OpenMode(Mode: Word);
     end;
 
@@ -171,7 +170,7 @@ constructor TDBFile.Init(FileName: String);
   type
     TFldLenRec = record
       { Kirill }
-      case Integer of
+      case SmallInt of
         0: (len, Dec: Byte);
         1: (CharFieldLen: AWord);
       end;
@@ -185,12 +184,12 @@ constructor TDBFile.Init(FileName: String);
 
   var
     FBuf: frec;
-    RL: Integer;
+    RL: SmallInt;
     Par: TParams; {JOHN_SW}
 
   function ReadFldStru(CharSizeWord: Boolean): Boolean;
     var
-      I, J: Integer;
+      I, J: SmallInt;
       S: String;
       FieldLen: AWord;
       FieldDec: Byte;
@@ -334,14 +333,14 @@ procedure TDBFile.Seek(NewLoc: LongInt);
   Loc := NewLoc;
   end;
 
-function TDBFile.GetFieldRec(N: Integer): PFieldRec;
+function TDBFile.GetFieldRec(N: SmallInt): PFieldRec;
   begin
   GetFieldRec := Fields^.At(N);
   end;
 
 function TDBFile.GetField(Name: String; var Buf): String;
   var
-    I, K, N: Integer;
+    I, K, N: SmallInt;
     B: array[0..65000] of Char absolute Buf;
     S: String;
     L: Word;
@@ -361,7 +360,7 @@ function TDBFile.GetField(Name: String; var Buf): String;
 
 function TDBFile.GetNField(N: Word; var Buf): String;
   var
-    I, K, J: Integer;
+    I, K, J: SmallInt;
     B: array[0..65000] of Char absolute Buf;
     S: String;
     L: Word;

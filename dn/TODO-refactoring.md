@@ -54,9 +54,9 @@ dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `vpsysex
 | `vpsysext` | the "new" search record (creation time, last access) | `TSearchRec` has them (`FindData` on Windows; `stat` on Unix) | with the search above |
 | `memory` (`MemAlloc` 22, `LowMemory` 22, `InitMemory` 5, caches) | the memory manager API of Turbo Pascal | `GetMem`, `HeapStatus` | **candidate:** `MemAlloc` = `GetMem` with `nil` on failure; `LowMemory` is always False in a flat memory |
 | `dpmi32`, `dpmi32df`, `doslow` | real-mode calls of DOS (LFN of Windows 95, the clipboard, FAT32) | `go32` of FPC (DOS only) | **DOS only:** `{$IFDEF GO32V2}` in `lfn.pas`, `fsinfo.pas`, `videoman.pas`, `dnexec.pas`; on Linux and Windows they are stubs that fail |
-| `use16` | `Integer` and `Word` of 16 bits in the structures of the old formats | `SmallInt`, `Word` in the records | **candidate:** 4 files (`dbwatch`, `pktview`, `uucode`, `uue2inc`), ~130 places; replace the types by `SmallInt`/`SmallWord` and drop the unit |
+| `use16` | (deleted 2026-10-04) | `SmallInt` in `dbwatch`, `pktview`, `uucode`, `uue2inc` (`Word` is 16 bits in FPC anyway) | **done** |
 | `baseobjs` | `TObject` of DN = `TObject` of `tv/`; `FreeObject`, `ObjChangeType` | `tv/` | with the shims |
 | `country` | the country table | `SysUtils` formats + the table of CP866 (ours) | keep |
 | `drivers` | the keys, the events, `DNKeyCode`, `MessageKey`, the cursor | — (it is the adapter to `tv/`) | keep, it is the border |
 
-The order (each is a step with the same proof: the tests, the builds, the binary behaves): 1) `use16` -> `SmallInt`; 2) the small things of `vpsyslow`; 3) `memory`; 4) the screen glue -> `tv/`; 5) DOS-only `dpmi32*`; 6) the files and the search (the biggest).
+The order (each is a step with the same proof: the tests, the builds, the binary behaves): 1) (done) `use16` -> `SmallInt`; 2) the small things of `vpsyslow`; 3) `memory`; 4) the screen glue -> `tv/`; 5) DOS-only `dpmi32*`; 6) the files and the search (the biggest).

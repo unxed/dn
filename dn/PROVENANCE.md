@@ -5,7 +5,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 19 |
+| Our files (MIT, see `LICENSE`) | 18 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 120 |
 | Contributors of DN OSP | 5 |
@@ -15,7 +15,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 Written by us: the replacements of the units that were excluded (their code is of Borland origin or of the Virtual Pascal runtime), the adapters to `tv/`, the system layer. They carry no notice of RIT Labs and are not derived from the files of the archive.
 
-`asciitab.pas`, `baseobjs.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `dpmi32.pas`, `dpmi32df.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `memory.pas`, `messages.pas`, `strview.pas`, `use16.pas`, `version.inc`, `vpsyslow.pas`
+`asciitab.pas`, `baseobjs.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `dpmi32.pas`, `dpmi32df.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `memory.pas`, `messages.pas`, `strview.pas`, `version.inc`, `vpsyslow.pas`
 
 ## Carved (the license of DN)
 

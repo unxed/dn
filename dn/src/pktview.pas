@@ -55,7 +55,6 @@ uses
   Defines, baseobjs, Streams, Strings, FViewer, Dialogs, Views, Drivers,
   Messages, Dos, Collect, strutil, basics, Lfn,
   Scroller
-  , use16
   ;
 
 type
@@ -229,9 +228,9 @@ type
         nextReply: Word);
     end;
 
-function Spaces(num: Integer): String;
+function Spaces(num: SmallInt): String;
   var
-    sp1: Integer;
+    sp1: SmallInt;
     space: String;
   begin
   space := '';
@@ -240,7 +239,7 @@ function Spaces(num: Integer): String;
   Spaces := space;
   end;
 
-function rpad(ch: String; Num: Integer): String;
+function rpad(ch: String; Num: SmallInt): String;
   begin
   rpad := Copy(ch+Spaces(Num), 1, Num);
   end;
@@ -251,10 +250,10 @@ function DLS(S: String): String;
   DLS := S;
   end;
 
-function lpad(ch: String; Num: Integer): String;
+function lpad(ch: String; Num: SmallInt): String;
   var
-    sp1: Integer;
-    sp2: Integer;
+    sp1: SmallInt;
+    sp2: SmallInt;
   begin
   sp1 := Length(ch);
   sp2 := Num-sp1;
@@ -285,7 +284,7 @@ function just(S: String; len, LRC: LongInt): String;
   end {case};
   end { just };
 
-function fns_z(n: Integer): String;
+function fns_z(n: SmallInt): String;
   var
     c: String;
   begin
@@ -301,7 +300,7 @@ procedure Msg2Strs(FName: String; var FromUser, ToUser, Subj, Date: String;
   var
     message: TBufStream; {file of char;}
     header: MessageHeader;
-    i, j: Integer;
+    i, j: SmallInt;
     buf: Char;
     txtbuf: String;
   begin
@@ -732,7 +731,7 @@ function PktHeaderDlg(AText: String): PDialog;
   PktHeaderDlg := Dialog
   end;
 
-procedure ViewPktHeader(MsgCount: Integer);
+procedure ViewPktHeader(MsgCount: SmallInt);
   var
     W: Word;
     s1, s2, s3: String;
@@ -803,7 +802,7 @@ procedure TLineViewer.Draw;
   var
     B: TDrawBuffer;
     CNormal: Byte;
-    I: Integer;
+    I: SmallInt;
     S: String;
     P: PString;
     Color: Byte;
