@@ -291,18 +291,17 @@ procedure TCommandLine.SetState(AState: Word; Enable: Boolean);
 
 procedure TCommandLine.Draw;
   var
-    B: array[0..200] of record
-      C: Char;
-      A: Byte;
-      end;
+    B: array[0..200] of TScreenCell;
     C1, C2, C3: Word;
     S: ^Str50;
+    SW: Integer; { the width of the prompt in columns }
   begin
   if CmdDisabled then
     Exit;
   New(S);
   S^:= (Cut(Copy(Dir, 1,
            Length(Dir)-1), 49)+Dir[Length(Dir)]);
+  SW := CStrLen(S^);
   C3 := $0F;
   C1 := $07;
   if Overwrite then
@@ -319,7 +318,7 @@ procedure TCommandLine.Draw;
     DeltaX := CurX-Size.X+Min(Length(Dir), 50)+1;
   MoveChar(B, ' ', C1, Size.X);
   MoveStr(B, S^, C3);
-  MoveStr(B[Length(S^)], Copy(Str, DeltaX+1, Size.X-Length(S^)), C1);
+  MoveStr(B[SW], Copy(Str, DeltaX+1, Size.X-SW), C1);
   if not MenuActive then
     ShowCursor
   else
@@ -330,7 +329,7 @@ procedure TCommandLine.Draw;
   else
     NormalCursor;
   Update;
-  WriteLineW(0, 0, Size.X, Size.Y, B);
+  WriteLineC(0, 0, Size.X, Size.Y, B);
   Dispose(S)
   end { TCommandLine.Draw };
 
