@@ -61,7 +61,6 @@ function SysFindFirstNew(Path: PChar; Attr: LongInt;
 function SysFindNextNew(var F: TOSSearchRecNew; IsPChar: Boolean): LongInt;
 function SysFindCloseNew(var F: TOSSearchRecNew): LongInt;
 
-procedure SysTVKbdDone;
 
 implementation
 
@@ -89,11 +88,6 @@ function SysFindCloseNew(var F: TOSSearchRecNew): LongInt;
  
   begin
   SysFindCloseNew := SysFindClose(POSSearchRec(@F)^);
-  end; 
-
-procedure SysTVKbdDone;
- 
-  begin
   end; 
 
 

@@ -96,15 +96,7 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
     c: Longint;
     S: String;
   begin
-  Ans1 := ComLine+#0;
-
-  SysTVKbdDone;
-  {JO: см. osfind ; если этого не делать - при вызове     }
-  {    консольных программ вроде архиваторов без командного }
-  {    процессора или с "неправильным" командным процессором}
-  {    (например, 4OS2) внешние программы не видят ввода с  }
-  {    клавиатуры                                           }
-  S := ActiveDir;
+  Ans1 := ComLine+#0;  S := ActiveDir;
   MakeNoSlash(S);
   ChDir(SysOsPath(S));
   c := IOResult;
@@ -116,10 +108,6 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
     ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
 
   ChDir(SysOsPath(StartDir));
-
-  SysTVKbdInit;
-  {Cat: в OS/2: боремся с интерпретацией Ctrl-C как Ctrl-Break
-                      в WinNT: боремся с пропаданием мышиного курсора}
   end { AnsiExec };
 {/JO}
 

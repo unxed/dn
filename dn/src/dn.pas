@@ -152,12 +152,11 @@ except
       Writeln(DNErrFile, 'Exception at addr '+IntToHex(PtrUInt(ExceptAddr), 8));
     Close(DNErrFile);
     repeat
-      SysCtrlSleep(1); {JO}
+      Sleep(1); {JO}
 
     until SysKeyPressed;
     while SysKeyPressed do
       SysReadKey;
-    SysTVInitCursor;
     end;
 end;
  {LINEPOSIT}

@@ -60,3 +60,6 @@ dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `osfind`
 | `drivers` | the keys, the events, `DNKeyCode`, `MessageKey`, the cursor | — (it is the adapter to `tv/`) | keep, it is the border |
 
 The order (each is a step with the same proof: the tests, the builds, the binary behaves): 1) (done) `use16` -> `SmallInt`; 2) the small things of `osdep`; 3) (done) `memory`; 4) the screen glue -> `tv/`; 5) DOS-only `dpmi32*`; 6) the files and the search (the biggest).
+
+- osdep: SysCtrlSleep, SysPlatformId and the no-op SysTv* (KbdInit/KbdDone/InitCursor/SetScrMode) are gone; the platform
+  checks are `{$IFDEF GO32V2}`, the sleep is `Sleep(1)` (done).

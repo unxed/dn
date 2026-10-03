@@ -45,20 +45,16 @@ const
 { The size of the screen; the result is the mode of DN: 3 (80x25 and the like) or $0103 (more lines, small
   font). Size may be nil. }
 function SysTvGetScrMode(Size: PSysPoint; Flag: Boolean): Word;
-function SysTvSetScrMode(Mode: Word): Boolean;
 function SysSetVideoMode(Cols, Rows: Word): Boolean;
 { The screen as an array of 16-bit cells; it is filled from the screen of tv/ at every call. }
 function SysTvGetSrcBuf: Pointer;
 { Writes Size cells from the position Pos (the number of the cell) of that array to the screen of tv/. }
 procedure SysTvShowBuf(Pos, Size: LongInt);
 procedure SysTvClrScr;
-procedure SysTvInitCursor;
 procedure SysTvGetCurType(var Y1, Y2: Integer; var Visible: Boolean);
 procedure SysTvSetCurType(Y1, Y2: Integer; Visible: Boolean);
 procedure SysTvSetCurPos(X, Y: Word);
 procedure SysGetCurPos(var X, Y: Word);
-procedure SysTvKbdInit;
-procedure SysTvKbdDone;
 
 { --- files -------------------------------------------------------------------- }
 { The result is 0 when done, else the error code of the system (DOS codes: 2 no such file, 3 no such
@@ -123,9 +119,6 @@ function SysDiskFreeLong(Drive: Byte): TQuad;
 function SysGetValidDrives: LongWord;
 
 { --- the system --------------------------------------------------------------- }
-{ -1 OS/2, 0 DOS, 1 Windows 9x, 2 Windows NT; here: 0 (DOS) on DOS, 2 elsewhere }
-function SysPlatformId: LongInt;
-procedure SysCtrlSleep(Milliseconds: LongInt);
 { The disk buffers go to the disks (DOS INT 21h AH=0Dh); elsewhere: nothing. }
 procedure SysDiskReset;
 { The keyboard of the plain console: is a key waiting, and the character of the key (SysReadKey waits for one). }
@@ -560,11 +553,6 @@ begin
     Result := 3;
 end;
 
-function SysTvSetScrMode(Mode: Word): Boolean;
-begin
-  Result := True;                  { TODO: the size of the screen is the business of tv/ }
-end;
-
 function SysSetVideoMode(Cols, Rows: Word): Boolean;
 begin
   Result := (ScreenWidth = Cols) and (ScreenHeight = Rows);
@@ -633,10 +621,6 @@ begin
   SysTvShowBuf(0, Length(CellCopy));
 end;
 
-procedure SysTvInitCursor;
-begin
-end;
-
 procedure SysTvGetCurType(var Y1, Y2: Integer; var Visible: Boolean);
 var
   H: Integer;
@@ -668,14 +652,6 @@ procedure SysGetCurPos(var X, Y: Word);
 begin
   X := CaretX;
   Y := CaretY;
-end;
-
-procedure SysTvKbdInit;
-begin
-end;
-
-procedure SysTvKbdDone;
-begin
 end;
 
 function SysGetVolumeLabel(Drive: Char): ShortString;
@@ -822,15 +798,6 @@ end;
 
 { --- the system --------------------------------------------------------------- }
 
-function SysPlatformId: LongInt;
-begin
-{$IFDEF GO32V2}
-  Result := 0;
-{$ELSE}
-  Result := 2;
-{$ENDIF}
-end;
-
 procedure SysDiskReset;
 {$IFDEF GO32V2}
 var
@@ -887,7 +854,7 @@ end;
 function SysReadKey: Char;
 begin
   while not SysKeyPressed do
-    SysCtrlSleep(20);
+    Sleep(20);
   KeyIsPending := False;
   Result := Chr(PendingKey.CharCode);
 end;
@@ -906,12 +873,6 @@ begin
     LineNo := 0;
     Result := Addr;
   end;
-end;
-
-procedure SysCtrlSleep(Milliseconds: LongInt);
-begin
-  if Milliseconds > 0 then
-    Sleep(Milliseconds);
 end;
 
 procedure SysBeepEx(Frequency, Duration: LongInt);

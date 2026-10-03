@@ -381,7 +381,6 @@ procedure FatalError(const S: String);
   begin
   InOutRes := 0;
   Writeln(S);
-  SysTVInitCursor;
   Halt(1);
   end;
 
@@ -390,7 +389,8 @@ procedure FatalError(const S: String);
 { becouse there is TOO MUCH filetypes with these extensions }
 
 begin
-if  (SysPlatformId <> -1) and (SysPlatformId <> 2) then
-  CmdExt := '.BAT'
+{$IFDEF GO32V2}
+  CmdExt := '.BAT'                { DOS (and Windows 9x): batch files; elsewhere the default }
+{$ENDIF}
 end.
 

@@ -100,9 +100,7 @@ begin
 {$ENDIF}
 
   { the system }
-  Check((SysPlatformId >= -1) and (SysPlatformId <= 2), 'the platform id is one of the known');
-  SysCtrlSleep(0);
-  SysCtrlSleep(5);
+  Sleep(5);
   Check(PhysMemAvail > 0, 'there is memory');
   SysDisableHardErrors;
   SysCtrlSetCBreakHandler;
