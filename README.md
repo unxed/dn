@@ -58,7 +58,7 @@ A table "script -> what it does -> which workflow calls it": `tools/README.md`.
 completely into `dn.exe` for DOS (go32v2), the resource compiler `rcp.exe` works under DOSBox-X and makes the `.DLG/.LNG` files in three
 languages; `dn.exe` in DOSBox-X: two file panels with real file names, the menu (F10), the status line, the command line,
 dialogs from the resources (copy, delete, make directory, choose drive), the viewer (F3) and the built-in editor (F4),
-disk information (Ctrl-L), the user screen (Ctrl-O), running programs (Enter on a file), help (F1: the `*.HLP` files are made by
+disk information (Ctrl-L), the user screen (Ctrl-O: the screen that started DN and the output of the programs DN ran), running programs (Enter on a file), help (F1: the `*.HLP` files are made by
 our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not work:** the mouse was not checked, some keys, saving of the desktop. See
 `dn/TODO-later.md` and `dist/dos/screenshots/`. A run of the "tour" scenarios: `tools/dn-tour.sh`.
 

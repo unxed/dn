@@ -244,3 +244,14 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   order (the base start shows the extension order). The same code is in the Linux/Windows/aarch64 builds, where the bug was the same; their `dist/` are not rebuilt yet (a refresh of all `dist/` is due after the next fixes).
 - **Not checked yet:** the option "save the desktop on exit" switched on in Options -> Startup (the automatic version of the same), "Save setup", and the user screen after an external
   program. The keys of the harness (`DNKEYS`) drive the menus well but each step needs a look at the screen (the first guesses of a hotkey, Ctrl-F3, opened the drive menu instead of a sort).
+
+## DOS: the user screen after an external program (2026-10-03)
+
+Done: `DNRun.RunExternal` (GO32V2) puts `UserScreen` (the screen of DN's start, then what the previous programs left) into the video memory and
+the saved cursor in place before the program (the screen is not cleared any more), and copies the video memory and the cursor back into `UserScreen`
+after it; Ctrl-O (`TApplication.ShowUserScreen`, DOS branch: `DNRun.ShowUserScreenDos`) shows it until a key. Test: `tools/dn-tour.sh OUT userscr`
+(`echo hi`, then Ctrl-O; with DNDUMP the lines of the user screen go to the trace and the scenario checks for `hi`).
+Doubts: the text modes other than the width of `UserScreen` are skipped silently (no restore); the graphics modes of the programs are not saved;
+the old window of the stored screen (`PUserWindow`, `GetUserScreen` in `dnutil.pas`) is no longer reachable on DOS. Mouse on DOS: not checked yet (next).
+**tv/ moved (2026-10-03, owner, a22fa0e):** `tv/` is now the repository `unxed/tv` (its root = our former `tv/`); `tools/build.sh` still wants `tv/src` in this tree:
+for now `ln -s /path/to/unxed-tv tv` (not committed). How `dn` should reference it (submodule / checkout in CI / a path setting) is the owner's decision.

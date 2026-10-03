@@ -160,6 +160,8 @@ var
     the screen over: the "user screen" of DN (Ctrl-O, Alt-F5) and what is seen after the exit }
   SysStartScreen: array of Word;
   SysStartScreenWidth: Integer = 0;
+  { the cursor of that screen as the BIOS keeps it (0040:0050): low byte the column, high byte the row; 0 elsewhere }
+  SysStartCursor: Word = 0;
 
 implementation
 
@@ -1021,6 +1023,7 @@ begin
   SetLength(SysStartScreen, Cols * Rows);
   dosmemget($B800, 0, SysStartScreen[0], Cols * Rows * 2);
   SysStartScreenWidth := Cols;
+  dosmemget($40, $50, SysStartCursor, 2);
 end;
 
 initialization
