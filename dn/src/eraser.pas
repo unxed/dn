@@ -65,7 +65,7 @@ uses
   Startup, Messages, xTime, Drivers, Tree, Memory,
   mainapp, Gauge, Views, Dialogs, Drives, FileCopy
   , fnotify, Events
-  {JO} , FlTl
+  {JO} , fsinfo
 
   , VPSysLow;
 

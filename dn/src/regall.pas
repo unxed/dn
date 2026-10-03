@@ -54,7 +54,7 @@ procedure RegisterAll;
 implementation
 
 uses
-  DblWnd, TopView_, startupp, strview,
+  panelwin, TopView_, startupp, strview,
   
   arc_Zip, arc_LHA, arc_RAR, arc_ACE, arc_HA, arc_CAB,
   
@@ -67,8 +67,8 @@ uses
   
   Archiver, ArcView, ASCIITab, CCalc, Collect, DiskInfo, mainapp,
   DNStdDlg, DNUtil, Drives, editundo, Editor, FileFind, FilesCol,
-  FlPanel, FStorage, FViewer, Gauges, Histries, editcore, Startup,
-  Tree, UniWin, UserMenu, XDblWnd, HelpKern,
+  filepanel, FStorage, FViewer, Gauges, Histries, editcore, Startup,
+  Tree, UniWin, UserMenu, panelwinx, HelpKern,
   Calc, CellsCol, 
   Calendar, 
   DBView, 
@@ -1855,7 +1855,7 @@ begin
 end;
 
 type
-  PR_RFilePanel = ^FlPanel.TFilePanel;
+  PR_RFilePanel = ^filepanel.TFilePanel;
 
 function Build_RFilePanel(var S: TStream): PObject;
 begin
@@ -1868,7 +1868,7 @@ begin
 end;
 
 type
-  PR_RFlPInfoView = ^FlPanel.TInfoView;
+  PR_RFlPInfoView = ^filepanel.TInfoView;
 
 function Build_RFlPInfoView(var S: TStream): PObject;
 begin
@@ -1881,7 +1881,7 @@ begin
 end;
 
 type
-  PR_RDirView = ^FlPanel.TDirView;
+  PR_RDirView = ^filepanel.TDirView;
 
 function Build_RDirView(var S: TStream): PObject;
 begin
@@ -1907,7 +1907,7 @@ begin
 end;
 
 type
-  PR_RSeparator = ^DblWnd.TSeparator;
+  PR_RSeparator = ^panelwin.TSeparator;
 
 function Build_RSeparator(var S: TStream): PObject;
 begin
@@ -1920,7 +1920,7 @@ begin
 end;
 
 type
-  PR_RDriveLine = ^FlPanel.TDriveLine;
+  PR_RDriveLine = ^filepanel.TDriveLine;
 
 function Build_RDriveLine(var S: TStream): PObject;
 begin
@@ -2596,7 +2596,7 @@ begin
 end;
 
 type
-  PR_RDoubleWindow = ^XDblWnd.TXDoubleWindow;
+  PR_RDoubleWindow = ^panelwinx.TXDoubleWindow;
 
 function Build_RDoubleWindow(var S: TStream): PObject;
 begin
@@ -3137,17 +3137,17 @@ begin
 
   RFilesCollection.Store := @Store_RFilesCollection;
 
-  RFilePanel.VmtLink := PtrUInt(TypeOf(FlPanel.TFilePanel));
+  RFilePanel.VmtLink := PtrUInt(TypeOf(filepanel.TFilePanel));
   RFilePanel.Load := @Build_RFilePanel;
 
   RFilePanel.Store := @Store_RFilePanel;
 
-  RFlPInfoView.VmtLink := PtrUInt(TypeOf(FlPanel.TInfoView));
+  RFlPInfoView.VmtLink := PtrUInt(TypeOf(filepanel.TInfoView));
   RFlPInfoView.Load := @Build_RFlPInfoView;
 
   RFlPInfoView.Store := @Store_RFlPInfoView;
 
-  RDirView.VmtLink := PtrUInt(TypeOf(FlPanel.TDirView));
+  RDirView.VmtLink := PtrUInt(TypeOf(filepanel.TDirView));
   RDirView.Load := @Build_RDirView;
 
   RDirView.Store := @Store_RDirView;
@@ -3157,12 +3157,12 @@ begin
 
   RSortView.Store := @Store_RSortView;
 
-  RSeparator.VmtLink := PtrUInt(TypeOf(DblWnd.TSeparator));
+  RSeparator.VmtLink := PtrUInt(TypeOf(panelwin.TSeparator));
   RSeparator.Load := @Build_RSeparator;
 
   RSeparator.Store := @Store_RSeparator;
 
-  RDriveLine.VmtLink := PtrUInt(TypeOf(FlPanel.TDriveLine));
+  RDriveLine.VmtLink := PtrUInt(TypeOf(filepanel.TDriveLine));
   RDriveLine.Load := @Build_RDriveLine;
 
   RDriveLine.Store := @Store_RDriveLine;
@@ -3422,7 +3422,7 @@ begin
 
   RMyScrollBar.Store := @Store_RMyScrollBar;
 
-  RDoubleWindow.VmtLink := PtrUInt(TypeOf(XDblWnd.TXDoubleWindow));
+  RDoubleWindow.VmtLink := PtrUInt(TypeOf(panelwinx.TXDoubleWindow));
   RDoubleWindow.Load := @Build_RDoubleWindow;
 
   RDoubleWindow.Store := @Store_RDoubleWindow;

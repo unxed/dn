@@ -46,12 +46,12 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit XDblWnd;
+unit panelwinx;
 
 interface
 
 uses
-  DblWnd, Drivers, Views, Objects2
+  panelwin, Drivers, Views, Objects2
   ;
 
 type

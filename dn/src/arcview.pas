@@ -159,8 +159,8 @@ uses
   , UserMenu {JO: для скрывания панелей при разархивировании }
   , arc_Zip {JO: для CentralDirRecPresent}
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
-  , PDSetup, FlPanelX, fnotify, Drivers
-  , Lfn, Files, Tree, Dos, Histries, HistList, FlPanel
+  , panelsetup, panelroot, fnotify, Drivers
+  , Lfn, Files, Tree, Dos, Histries, HistList, filepanel
   , basics, strutil, fileutil, ArchDet
   , arc_RAR, arc_ACE
   ;

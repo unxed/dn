@@ -104,15 +104,15 @@ uses
   xTime, Validate, TitleSet, UserMenu, Dos, DnIni,
   
   VpSysLow, Filediz , ArvidAvt ,
-  fnotify, FlTl, basics, strutil, fileutil,
+  fnotify, fsinfo, basics, strutil, fileutil,
   Gauge, FileFind, VPUtils,
   DNUtil, Tree, Archiver, Drives, DiskInfo
   , ErrMess
-  , FlPanelX {JO: PFilePanelRoot нужен чтобы делать недоступным }
+  , panelroot {JO: PFilePanelRoot нужен чтобы делать недоступным }
   {    копирование описаний }
   
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
-  , PDSetup, Lfn, Files, Streams, Drivers, Objects2, Dialogs
+  , panelsetup, Lfn, Files, Streams, Drivers, Objects2, Dialogs
   , Strings;
 
 const

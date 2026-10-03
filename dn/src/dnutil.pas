@@ -255,7 +255,7 @@ uses
 {$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, VPUtils,
   DNHelp, DnIni, DnIni_p, Histries,
-  VideoMan, Memory, DblWnd, Messages, HistList, FileFind,
+  VideoMan, Memory, panelwin, Messages, HistList, FileFind,
   
   Phones, 
   ASCIITab,
@@ -269,14 +269,14 @@ uses
   
   CCalc, Collect, {-$VIV}
   DnExec,
-  Setups, RegAll, XDblWnd,
-  Idlers, FlPanelX, WinClp,
+  Setups, RegAll, panelwinx,
+  Idlers, panelroot, WinClp,
   Drives, Archiver, ArchSet,
   ArcView, FViewer, CmdLine, FBB, DNStdDlg,
   Colors, editcore, editundo, Editor, editwin,
   basics, strutil, fileutil, envutil, os2sess, langid,
   ColorSel, Eraser,  DiskInfo
-  , FileType, PDSetup, U_KeyMap
+  , FileType, panelsetup, U_KeyMap
   , Startup, Startupp
   , VPSysLow;
 

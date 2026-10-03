@@ -74,7 +74,7 @@ uses
   VpSysLow, fnotify, fileutil, mainapp, Gauges,
   Drives, basics, envutil, Commands,
   boot, Events, UserMenu, Messages, Startup,
-  FlPanelX, Macro
+  panelroot, Macro
   ;
 
 (*{$I  runcmd.inc}*)

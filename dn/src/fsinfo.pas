@@ -7,7 +7,7 @@
    04/12/2001 - в WinNT поддерживается копирование Security Attributes
 }
 
-unit FlTl;
+unit fsinfo;
 interface
 
 uses VPSysLow;

@@ -53,7 +53,7 @@ interface
 uses
   Defines, Objects2, Streams, Views, Drivers,
   FilesCol, DiskInfo, Collect
-  , PDSetup
+  , panelsetup
   ;
 
 const
@@ -144,9 +144,9 @@ const
 
 implementation
 uses
-  VPSysLow, Lfn, Files, FlTl,
-  Startup, Tree, mainapp, FileCopy, Eraser, FlPanel, Commands,
-  Dialogs, FileFind, FlPanelX, Filediz, CmdLine
+  VPSysLow, Lfn, Files, fsinfo,
+  Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
+  Dialogs, FileFind, panelroot, Filediz, CmdLine
   , xTime, Messages, Events, fnotify, Dos
   , Gauge {для PWhileView}, DnIni, basics, strutil, fileutil
   ;

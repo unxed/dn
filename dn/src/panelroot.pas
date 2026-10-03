@@ -49,13 +49,13 @@
 {AK155 = Alexey Korop, 2:461/155@fidonet}
 
 unit
-FlPanelX;
+panelroot;
 
 interface
 
 uses
   Defines, Streams,
-  Views, Drivers, FilesCol, PDSetup, Drives, xTime
+  Views, Drivers, FilesCol, panelsetup, Drives, xTime
   ;
 
 type
@@ -172,7 +172,7 @@ type
   {`}
 
   {                                                                        }
-  { WARNING: The following vars are mirrored in FLPANEL.PAS via ABSOLUTEs! }
+  { WARNING: The following vars are mirrored in filepanel.PAS via ABSOLUTEs! }
   { Это был комментарий Cat. Если б он ещё и объяснил, зачем это нужно.
     Я этот фокус выкинул, вроде, хуже не стало. Так что отбой.}
 
@@ -216,15 +216,15 @@ implementation
 
 uses
   Lfn, Files, basics, strutil, fileutil, envutil, VpSysLow,
-  Messages, mainapp, DNHelp, Startup, Commands, Histries, HistList, FLTools,
+  Messages, mainapp, DNHelp, Startup, Commands, Histries, HistList, paneldlgs,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
-  DNUtil, FlTl, Dos, Filediz, Collect, VPUtils,
+  DNUtil, fsinfo, Dos, Filediz, Collect, VPUtils,
   DnIni_p, DnIni {-$VIV}
   
   , UUCode 
   
   
-  , DblWnd, FlPanel, FileType
+  , panelwin, filepanel, FileType
   
   , Arvid 
   ;

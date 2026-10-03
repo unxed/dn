@@ -35,7 +35,7 @@ type
 implementation
 
 uses
-  Defines, DblWnd, strutil, DNUtf8, flpanelx, Commands, mainapp, PDSetup
+  Defines, panelwin, strutil, DNUtf8, panelroot, Commands, mainapp, panelsetup
   ;
 
 const

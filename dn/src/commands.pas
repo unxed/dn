@@ -988,7 +988,7 @@ const
   cfMouseConfirm = $0020;
   cfExitConfirm = $0040;
 
-  { Column data items. See also PDSetup.FixColWidht}
+  { Column data items. See also panelsetup.FixColWidht}
 
 type
   TFileColNumber =

@@ -47,13 +47,13 @@
 {$I STDEFINE.INC}
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 {&Delphi+}
-unit FlPanel;
+unit filepanel;
 
 interface
 
 uses
   Defines, Streams, Views, Drivers, FilesCol,
-  FlPanelX, Collect, TopView_
+  panelroot, Collect, TopView_
   ;
 
 type
@@ -148,19 +148,19 @@ const
 
 (* AK155 16.05.05
    Я не понял, зачем вообще здесь нужны эти определения, поскольку
-в uses интерфейсной части FlPanelX есть и все эти переменные видны
+в uses интерфейсной части panelroot есть и все эти переменные видны
 без всяких ухищрений. И вдвойне я не понял, зачем нужно было их помещать
 в интерфейсной части с типами, отличающимися от оригинальных
 (типа Pointer вместо PFilesPanelRoot), так как после этого в прочих
 модулях получается, что тип этих пероеменных зависит от порядка
-FlPanelX и FlPanel в их uses. Так что убираю эту секцию нафиг.
+panelroot и filepanel в их uses. Так что убираю эту секцию нафиг.
 var
-  ActivePanel: Pointer absolute FlPanelX.ActivePanel;
-  PassivePanel: Pointer absolute FlPanelX.PassivePanel;
-  CtrlWas: Boolean absolute FlPanelX.CtrlWas;
-  DirsToChange: array[0..9] of PString absolute FlPanelX.DirsToChange;
+  ActivePanel: Pointer absolute panelroot.ActivePanel;
+  PassivePanel: Pointer absolute panelroot.PassivePanel;
+  CtrlWas: Boolean absolute panelroot.CtrlWas;
+  DirsToChange: array[0..9] of PString absolute panelroot.DirsToChange;
 var
-  CurrentDirectory: String absolute FlPanelX.CurrentDirectory;
+  CurrentDirectory: String absolute panelroot.CurrentDirectory;
 /AK155 *)
 
 implementation
@@ -170,12 +170,12 @@ uses
   Lfn, DNUtil, mainapp, basics, strutil, fileutil, envutil, Startup,
   Memory, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, FBB, ArcView, CmdLine, Histries, Archiver,
-  Gauges, Gauge, FileFind, FLTools, DnIni, XDblWnd, DblWnd, Filediz
+  Gauges, Gauge, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz
   
   , UUCode
    {, Crt}
   , xTime
-  , PDSetup, VPUtils
+  , panelsetup, VPUtils
   
   
   ;

@@ -31,7 +31,8 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `dnexec.pas`, `dnrun.pas` (ours) | running an external program / a command of the command line (on Linux: the embedded terminal) |
 | `cmdline.pas` | the command line of the panels (`TCommandLine`) |
 | `menus.pas` | menus, the menu bar, the status line (the hot letters) |
-| `setups.pas`, `fltools.pas` | the dialogs of the settings; the dialogs of the panel (select group, filter) |
+| `setups.pas`, `paneldlgs.pas` (was `fltools`) | the dialogs of the settings; the dialogs of the panel (select group, filter, the button "Save setup") |
+| `panelsetup.pas` (was `pdsetup`), `panelwinx.pas` (was `xdblwnd`), `fsinfo.pas` (was `fltl`) | the settings records of a panel (show, sort); the window with two panels, the extended one; the information of the file system (cluster, serial number, file ages) |
 | `dnini.pas`, `dnini_p.pas` | `DN.INI`: reading and writing the settings |
 | `boot.pas` (was `dn1.pas`) | reading `DN.CFG` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
 | `macro.pas` | the macros of the editor (record, play) |
@@ -39,9 +40,9 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 ## Panels and files
 | File | What it holds |
 |---|---|
-| `flpanel.pas` | one file panel: drawing, keys, quick search, the info and the title lines (`TFilePanel`, `TInfoView`, `TDirView`) |
-| `flpanelx.pas` | the panel with its settings, sort and selection (`TFilePanelRoot`) |
-| `dblwnd.pas` | the window with two panels (`TDoubleWindow`) |
+| `filepanel.pas` (was `flpanel`) | one file panel: drawing, keys, quick search, the info and the title lines (`TFilePanel`, `TInfoView`, `TDirView`) |
+| `panelroot.pas` (was `flpanelx`) | the panel with its settings, sort and selection (`TFilePanelRoot`) |
+| `panelwin.pas` (was `dblwnd`) | the window with two panels (`TDoubleWindow`) |
 | `filescol.pas` | the collection of the records of files and their sort keys (`TFilesCollection`) |
 | `drives.pas` | a drive: where the list of a panel comes from (`TDrive`); `filefind.pas`: the drive of the search results; `arcview.pas`: an archive as a drive; `arvid.pas`, `arvidavt.pas`: the drive of the Arvid video-tape streamer (historic) |
 | `filecopy.pas` | copy, move, delete (the engine and the dialogs) |
@@ -64,7 +65,7 @@ The question that comes first when a setting "is not kept" or the panels "do not
 
 * The flags of the Startup dialog are `osu*` in `commands.pas` (`osuAutosave = $02`, `osuPreserveDir = $08`...); `StartupData.Load` is for the start, `.Unload` is for the exit. The dialog is in `setups.pas`.
 * What goes into the desktop file is decided by the `Store` of each view: `TDoubleWindow` (`dblwnd.pas`), the panels (`flpanelx.pas`). For example the directory of the **active** disk panel is stored only with "Preserve directory" (`osuPreserveDir`); the passive panel always keeps it.
-* The button "Save setup" of the panel setup dialogs is `TSaveSetupButton` in `fltools.pas`: it writes the panel settings into the presets 1..10 (and sets `ConfigModified`) or into the active/passive panel (they are kept in the desktop only).
+* The button "Save setup" of the panel setup dialogs is `TSaveSetupButton` in `paneldlgs.pas`: it writes the panel settings into the presets 1..10 (and sets `ConfigModified`) or into the active/passive panel (they are kept in the desktop only).
 * A setting is not kept → is `ConfigModified` set for it? does the exit reach `Done` (Alt-X, exit code 0)? is it in `WriteConfig` or in `DN.INI`? A panel is not restored → is it in `Store`?
 
 ## The viewer and the editor
@@ -114,7 +115,7 @@ The question that comes first when a setting "is not kept" or the panels "do not
 
 ## Where to look for what (the first hour)
 * A key does not work → `u_myapp.pas` (the loop), then the `HandleEvent` of the view that has the focus; the key codes are in `commands.pas`.
-* A panel draws wrong → `flpanel.pas` `TFilePanel.Draw` (the partial redraw is in the same procedure: after a cursor move only two lines are drawn).
+* A panel draws wrong → `filepanel.pas` `TFilePanel.Draw` (the partial redraw is in the same procedure: after a cursor move only two lines are drawn).
 * A name is cut or padded wrong → `advance.pas` `FormatLongName` (and `dnutf8.pas` for the columns).
-* The editor → `microed.pas` (everything is one byte per column; `DocTab` in `dnutf8.pas` makes it UTF-8).
+* The editor → `editcore.pas` (everything is one byte per column; `DocTab` in `dnutf8.pas` makes it UTF-8).
 * A command is run → `dnexec.pas` → `dnrun.pas` → `tv/src/tvvtrun.pas`.

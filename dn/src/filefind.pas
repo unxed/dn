@@ -221,15 +221,15 @@ var
 implementation
 uses
   Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos,
-  Memory, Messages, HistList, Commands, FlPanelX, FlPanel
+  Memory, Messages, HistList, Commands, panelroot, filepanel
   , FViewer, editcore,
   Tree, xTime, DNUtil, U_KeyMap, {!!}CmdLine, Histries,
   Archiver, ArchDet {JO},
   ArcView {JO: для разархивирования файлов найденных в архивах}
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
-  , FlTl {JO: для GetDriveTypeNew}
+  , fsinfo {JO: для GetDriveTypeNew}
   , filetype, Eraser, basics, Files, DnIni, Menus, FileCopy
-  , PDSetup, VPUtils
+  , panelsetup, VPUtils
   ;
 
 const
@@ -908,7 +908,7 @@ Skip:
 //JO: нижележащий кусок закомментирован, т.к. InitPanel тянет за собой
 //    TFilePanelRoot.ReadDirectory , а в ней уничтожается коллекция файлов
 //    текущей панели, с которой у SrcFC будуть общие записи, если последняя
-//    получена с текущей панели помощью FLTools.GetSelection , и это может
+//    получена с текущей панели помощью paneldlgs.GetSelection , и это может
 //    приводить к падениям во время поиска
 //    То, что мы делаем InitPanel по завершении цикла, имеет только то
 //    последствие, что панель с результатами поиска мы увидим по завершении

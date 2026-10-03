@@ -103,9 +103,9 @@ const
 implementation
 uses
   Dos, Commands, mainapp, Dialogs, basics, strutil, fileutil,
-  XDblWnd, Gauges, 
+  panelwinx, Gauges, 
   Startup, xTime, Messages, DNUtil
-  , editcore, Histries, FViewer, FlPanelX
+  , editcore, Histries, FViewer, panelroot
   , Idlers 
   , VpSysLow, Lfn, UserMenu, Menus
   , DnIni, VPUtils
