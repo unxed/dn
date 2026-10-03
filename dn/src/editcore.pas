@@ -297,7 +297,7 @@ uses
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
   xTime, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
-  , Events, osdep, DNStdDlg, Dialogs, DNHelp, Math
+, osdep, DNStdDlg, Dialogs, DNHelp, Math
   ;
 
 const
@@ -1618,7 +1618,6 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
     end;
 
   begin { TFileEditor.Search }
-  LongWorkBegin;
   SearchActive := True;
   NewTimer(Tmr, 0);
   Marking := False;
@@ -1948,7 +1947,6 @@ LExit:
 
 _LExit:
   SearchActive := False;
-  LongWorkEnd;
   LastPos := Delta;
   end { TFileEditor.Search };
 {/Cat}

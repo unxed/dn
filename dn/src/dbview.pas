@@ -207,7 +207,7 @@ implementation
 uses
   basics, strutil, fileutil, Startup, DNHelp, mainapp, Messages,
   Histries, progress, xTime, DnIni
-  , Events, lfn, Dos, keymap
+, lfn, Dos, keymap
   ;
 
 function MaxAvail: LongInt;
@@ -761,7 +761,6 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       R: TRect;
       T: TEventTimer;
     begin
-    LongWorkBegin;
     SS := SearchData.S;
     if SearchData.OPT and 1 = 0 then
       UpStr(SS);
@@ -841,7 +840,6 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
           Delta.X := CurFld;
           DrawView;
           V^.Free;
-          LongWorkEnd;
           Exit;
           end;
         if SearchData.Direction = 1 then
@@ -861,7 +859,6 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     V^.Free;
     if not Abort then
       ErrMsg(dlDBViewSearchNot);
-    LongWorkEnd;
     end { ContSearch };
 
   procedure StartSearch;

@@ -51,7 +51,7 @@ interface
 
 uses
   Arvid, baseobjs, Streams, Messages, mainapp, Commands, Collect,
-  Views, Drivers, Startup, keymap, basics, Lfn, Files, Dos, Tree,
+  Views, Drivers, Startup, keymap, basics, Lfn, uselfn, Dos, Tree,
   FilesCol, fileutil, Drives, filepanel
   , Defines
   ;

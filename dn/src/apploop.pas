@@ -71,9 +71,9 @@ implementation
 
 uses
   
-  osdep, fnotify, fileutil, mainapp, gadgets,
+  osdep, dirwatch, fileutil, mainapp, gadgets,
   Drives, basics, envutil, Commands,
-  boot, Events, UserMenu, Messages, Startup,
+  boot, UserMenu, Messages, Startup,
   panelroot, Macro
   ;
 
@@ -121,7 +121,6 @@ procedure MyApp.GetEvent(var Event: TEvent);
     SetDNKeyCode(Event, CurrentMacro^.Keys^[MacroKey]);
     Inc(MacroKey);
     MacroPlaying := MacroKey < CurrentMacro^.Count;
-    if not MacroPlaying then LongWorkEnd; {JO}
     end;
   case Event.What of
     evNothing:
@@ -205,7 +204,6 @@ procedure MyApp.GetEvent(var Event: TEvent);
             end;
           CurrentMacro := KeyMacroses^.At(WW);
           MacroPlaying := CurrentMacro <> nil;
-          if MacroPlaying then LongWorkBegin else LongWorkEnd; {JO}
           MacroKey := 0;
           end;
         ClearEvent(Event);

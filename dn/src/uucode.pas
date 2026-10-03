@@ -88,12 +88,12 @@ procedure UUEncode(const FName: String);
 implementation
 
 uses
-  Files, Math, Tree
+  uselfn, Math, Tree
   , Dos, Lfn {DataCompBoy}
   , basics, strutil, fileutil, Views, Startup, Dialogs,
   xTime, FilesCol, mainapp, Drivers, progress, Messages, Commands,
   FileCopy, HistList, DNUtil
-  , Events
+
   ;
 
 function longmul(X, Y: LongInt): LongInt;
@@ -1611,7 +1611,6 @@ procedure DecodeStr(var Src, Dst);
       InputStream := New(PTextReader, Init(InputFileName));
       if  (InputStream = nil) then
         Exit;
-      LongWorkBegin;
       Get_String;
       if not EndOfFile then
         begin
@@ -1657,7 +1656,6 @@ procedure DecodeStr(var Src, Dst);
       Dispose(InputStream, Done);
       InputStream := nil;
       Message(Application, evCommand, cmCopyUnselect, PF);
-      LongWorkEnd;
       end { DoUuDecode };
 
     {var
@@ -2512,11 +2510,9 @@ beg:
       end { DoIt };
 
     begin { UUEncode }
-    LongWorkBegin;
     Inc(SkyEnabled);
     DoIt;
     Dec(SkyEnabled);
-    LongWorkEnd;
     end { UUEncode };
   {-DataCompBoy-}
 

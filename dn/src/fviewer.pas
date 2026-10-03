@@ -251,8 +251,8 @@ uses
   , editcore, Macro, linepos, Math, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
    {Cat}
-  ErrMess, {AK155}
-  DiskInfo, Files,
+  fileerrors, {AK155}
+  DiskInfo, uselfn,
   progress, DNStdDlg, Histries, Drives, DNUtil, DnIni
   , FileDiz
   ;

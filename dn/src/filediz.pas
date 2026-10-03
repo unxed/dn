@@ -105,7 +105,7 @@ procedure ReadFileList(ProcessDizName: TDizNameProc;
 
 implementation
 uses
-  files, Startup, strutil, fileutil, basics,
+  uselfn, Startup, strutil, fileutil, basics,
   Lfn, Dos, Messages, mainapp, Drives
 
   , dnini
@@ -358,7 +358,7 @@ procedure ReadFileList(ProcessDizName: TDizNameProc;
 
     {AK155: Дочитываем многострочное описание.
 Признаком дополнительной строки является побел или Tab в начале,
-а также '>' в начале (files.bbs в формате AllFix).}
+а также '>' в начале (uselfn.bbs в формате AllFix).}
     while True do
       begin
       if not ReadNextS then

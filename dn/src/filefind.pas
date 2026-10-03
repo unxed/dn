@@ -225,9 +225,9 @@ uses
   Tree, xTime, DNUtil, keymap, {!!}CmdLine, Histries,
   Archiver, ArchDet {JO},
   ArcView {JO: для разархивирования файлов найденных в архивах}
-  , Events {AK155 для LongWorkBegin - LongWorkEnd}
+
   , fsinfo {JO: для GetDriveTypeNew}
-  , filetype, Eraser, basics, Files, DnIni, Menus, FileCopy
+  , filetype, Eraser, basics, uselfn, DnIni, Menus, FileCopy
   , panelsetup, Math
   ;
 
@@ -492,7 +492,6 @@ function FindFiles(var Files: PFilesCollection;
     if ShortNameSearch then // в панели короткие имена
       PName := @SR.SR.Name;
     
-    LongWorkBegin;
     New(DirCol, Init($10, $10, False));
     DirCol^.Insert(NewStr(Path));
     {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
@@ -795,7 +794,6 @@ Skip:
       end;
     Dispose(DirCol, Done);
     DirCol := nil;
-    LongWorkEnd;
     end { SearchData };
 
   { Flash >>> } {JO - вынес в отдельную пpоцедуру}
@@ -864,7 +862,6 @@ Skip:
 
     LCol := New(PStringCollection, Init(10, 10, False));
 
-    LongWorkBegin;
 
     for CurSel1 := 0 to SrcFC^.Count-1 do {начало цикла}
       begin
@@ -982,7 +979,6 @@ Skip:
       end;
     if PInfo <> nil then
       PInfo^.DrawView;
-    LongWorkEnd;
     end;
    {/JO}
 
@@ -2500,12 +2496,10 @@ procedure TFindDrive.DrvFindFile(FC: PFilesCollection);
   PInfo^.Bottom := GetString(dlNoFilesFound);
   PInfo^.Write(1, GetString(dlDBViewSearchingIn));
   Desktop^.Insert(PInfo);
-  LongWorkBegin;
   if FindRec.Where = 0 then
     BB := FindFiles(FFiles, Directories, FindRec, PInfo, Files, True)
   else
     BB := FindFiles(FFiles, Directories, FindRec, PInfo, FC, True);
-  LongWorkEnd;
   Desktop^.Delete(PInfo);
   Dec(SkyEnabled);
   Dispose(PInfo, Done);

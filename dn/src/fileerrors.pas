@@ -1,6 +1,6 @@
 {$I STDEFINE.INC} {Cat}
 
-unit ErrMess;
+unit fileerrors;
 
 interface
 {AK155}

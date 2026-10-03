@@ -154,7 +154,7 @@ implementation
 
 uses
   basics, Lfn, Messages, HistList, Math,
-  Collect, Strings, ErrMess, Dos, mainapp, DNStdDlg, strutil, fileutil,
+  Collect, Strings, fileerrors, Dos, mainapp, DNStdDlg, strutil, fileutil,
   editfile, Histries
   ;
 

@@ -8,8 +8,8 @@ The files that are not in the tables are not in the repository: the Borland-orig
 | Our files (MIT, see `LICENSE`) | 16 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 120 |
-| Contributors of DN OSP | 6 |
-| Upstream without a notice | 14 |
+| Contributors of DN OSP | 5 |
+| Upstream without a notice | 13 |
 
 ## Our files (MIT, see `LICENSE`)
 
@@ -33,10 +33,10 @@ Files of the public DN OSP 2.14 with the notice of RIT Research Labs; changed by
 
 Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155...) and give no license of their own: they came in the same public release as the rest, and are used as part of it. This is the thing to ask the owner of the project about (PLAN.md).
 
-`dnscreen.pas`, `dnutf8.pas`, `events.pas`, `fnotify.pas`, `fsinfo.pas`, `uue2inc.pas`
+`dirwatch.pas`, `dnscreen.pas`, `dnutf8.pas`, `fsinfo.pas`, `uue2inc.pas`
 
 ## Upstream without a notice
 
 Files of the public DN OSP 2.14 with no notice in the head (small adapters, tables, include files). Part of the same release.
 
-`copyini.pas`, `errmess.pas`, `Events.inc`, `files.pas`, `filetype.pas`, `hash.pas`, `panelsetup.pas`, `rcpvpd.ini`, `read.me`, `stdefine.inc`, `sysutils.inc`, `topview.pas`, `usersavr.pas`, `xcode.pas`
+`copyini.pas`, `fileerrors.pas`, `filetype.pas`, `hash.pas`, `panelsetup.pas`, `rcpvpd.ini`, `read.me`, `stdefine.inc`, `sysutils.inc`, `topview.pas`, `uselfn.pas`, `usersavr.pas`, `xcode.pas`

@@ -166,7 +166,7 @@ var
 implementation
 
 uses
-  Files, osdep, Dos, Eraser, Drives, DNHelp, TitleSet,
+  uselfn, osdep, Dos, Eraser, Drives, DNHelp, TitleSet,
   Lfn, DNUtil, mainapp, basics, strutil, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, copyio, ArcView, CmdLine, Histries, Archiver,
   gadgets, progress, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz

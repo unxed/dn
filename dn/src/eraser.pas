@@ -60,11 +60,11 @@ function ValidErase(Files: PCollection): Boolean;
 
 implementation
 uses
-  Defines, Files, Filediz,
+  Defines, uselfn, Filediz,
   Dos, Lfn {DataCompBoy}, FilesCol, Commands, basics, strutil, fileutil,
   Startup, Messages, xTime, Drivers, Tree,
   mainapp, progress, Views, Dialogs, Drives, FileCopy
-  , fnotify, Events
+  , dirwatch
   {JO} , fsinfo
 
   , osdep;
@@ -383,7 +383,6 @@ TryDel:
     NotifyResume;
     Exit;
     end;
-  LongWorkBegin;
   DeleteAllFiles := False;
   SkipAll := False;
   Abort := False;
@@ -403,7 +402,6 @@ TryDel:
     begin
     Dispose(PInfo, Done);
     NotifyResume; {Cat}
-    LongWorkEnd;
     Exit;
     end;
   Inc(SkyEnabled);
@@ -563,7 +561,6 @@ DeleteDirDIZ:
   
   Dec(SkyEnabled);
   NotifyResume; {Cat}
-  LongWorkEnd;
   end { EraseFiles };
 {-DataCompBoy-}
 

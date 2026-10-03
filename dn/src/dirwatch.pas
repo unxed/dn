@@ -1,4 +1,4 @@
-unit fnotify;
+unit dirwatch;
 (******
 
 {Заглушка для D32}

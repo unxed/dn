@@ -59,6 +59,9 @@ interface
 
 uses TvViews;
 
+{ The system uptime in milliseconds (a 32-bit counter that wraps around; was the unit Events). }
+function GetCurMSec: Longint;
+
 type
 
   {For calculating timeouts}
@@ -89,8 +92,13 @@ procedure GetUNIXDate(Julian: LongInt;
 
 implementation
 uses
-  Dos, Events
+  SysUtils, Dos
   ;
+
+function GetCurMSec: Longint;
+begin
+  Result := LongInt(Cardinal(SysUtils.GetTickCount64 and $FFFFFFFF));
+end;
 type
   DayType = (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday,
      Saturday);
