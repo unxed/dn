@@ -53,7 +53,7 @@ interface
 uses
   Defines, Collect, baseobjs, Streams, Dos, Drives, FilesCol, Views,
    DiskInfo, Tree, Histries,
-  Lfn, Files
+  Lfn, uselfn
   ;
 
 type

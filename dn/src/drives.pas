@@ -144,10 +144,10 @@ const
 
 implementation
 uses
-  osdep, Lfn, Files, fsinfo,
+  osdep, Lfn, uselfn, fsinfo,
   Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
   Dialogs, FileFind, panelroot, Filediz, CmdLine
-  , xTime, Messages, Events, fnotify, Dos
+  , xTime, Messages, dirwatch, Dos
   , progress {для PWhileView}, DnIni, basics, strutil, fileutil
   ;
 
@@ -1191,7 +1191,6 @@ function TDrive.OpenDirectory(const Dir: String;
     end { ReadDir };
 
   begin { TDrive.OpenDirectory }
-  LongWorkBegin;
   NewTimer(tmr, 0);
   Dirs := New(PStringCollection, Init($10, $10, False));
   DirsToProcess := New(PStringCollection, Init($10, $10, False));
@@ -1228,7 +1227,6 @@ function TDrive.OpenDirectory(const Dir: String;
   PDrv := New(PFindDrive, Init('><'+Dir, Dirs, Files));
   PDrv^.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
-  LongWorkEnd;
   end { TDrive.OpenDirectory };
 
 {-DataCompBoy-} {JO - 31-03-2006 - сделал виртуальным методом TDrive}
@@ -1273,9 +1271,7 @@ procedure TDrive.DrvFindFile(FC: PFilesCollection);
   PInfo^.Bottom := GetString(dlNoFilesFound);
   PInfo^.Write(1, GetString(dlDBViewSearchingIn));
   Desktop^.Insert(PInfo);
-  LongWorkBegin;
   BB := FindFiles(Files, Directories, FindRec, PInfo, FC, False);
-  LongWorkEnd;
   Desktop^.Delete(PInfo);
   Dec(SkyEnabled);
   Dispose(PInfo, Done);

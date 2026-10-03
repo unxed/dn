@@ -63,7 +63,7 @@ uses
   basics, HistList, Commands, mainapp, DNUtil, Tree, Views, Drivers, Drives
   {, dnfuncs} {надо вставлять до Dos}
   , Dos, Dialogs, baseobjs
-  , ErrMess, panelroot
+  , fileerrors, panelroot
   ;
 type
   { Диалог создания списка файлов. В ресурсе должны быть

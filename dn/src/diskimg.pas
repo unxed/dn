@@ -61,7 +61,7 @@ implementation
 uses
   Dos, Lfn, Messages, Views, Commands, Defines, Streams, mainapp, Drivers,
   strutil, fileutil, FileCopy, progress, xTime
-  , Files, Tree, Math
+  , uselfn, Tree, Math
   ;
 
 {Cat: добавил сюда эти типы, вместо того, чтобы подключать модуль DiskTool}

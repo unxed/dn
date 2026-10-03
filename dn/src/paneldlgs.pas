@@ -97,13 +97,13 @@ function FirstNameNum(P: PFilePanelRoot): LongInt;
 
 implementation
 uses
-  fnotify,
-  Lfn, Files, Collect, xTime, DnIni, HistList,
+  dirwatch,
+  Lfn, uselfn, Collect, xTime, DnIni, HistList,
   basics, strutil, fileutil, Dos, Defines, Dialogs,
   Views, mainapp, Commands, Drivers, filepanel, Drives, FileCopy,
   progress, gadgets, Archiver, Startup, inputfname, Validate, Messages, Menus, DNHelp,
   FileFind, Tree, copyio, DNUtil, Filediz, Filelst, fsinfo, panelwin,
-  ErrMess, baseobjs, Math
+  fileerrors, baseobjs, Math
   , DNDlgs;
 
 type

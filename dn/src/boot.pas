@@ -72,8 +72,8 @@ uses
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
   DnIni, iniengine, CopyIni, Archiver,
   apploop, editcore, ArchSet, linepos, RegAll, DnExec, Histries, Menus,
-   VideoMan, Events,
-  fnotify, realmode, 
+   VideoMan, xTime,
+  dirwatch, realmode, 
   Tree
   , filetype, panelsetup
   , osdep;

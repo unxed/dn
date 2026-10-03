@@ -104,15 +104,15 @@ uses
   xTime, Validate, TitleSet, UserMenu, Dos, DnIni,
   
   osdep, Filediz , ArvidAvt ,
-  fnotify, fsinfo, basics, strutil, fileutil,
+  dirwatch, fsinfo, basics, strutil, fileutil,
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
-  , ErrMess
+  , fileerrors
   , panelroot {JO: PFilePanelRoot нужен чтобы делать недоступным }
   {    копирование описаний }
   
-  , Events {AK155 для LongWorkBegin - LongWorkEnd}
-  , panelsetup, Lfn, Files, Streams, Drivers, baseobjs, Dialogs
+
+  , panelsetup, Lfn, uselfn, Streams, Drivers, baseobjs, Dialogs
   , Strings;
 
 const
@@ -2919,12 +2919,10 @@ procedure CopyFiles(Files: PCollection; SourcePanel: PView; MoveMode: Boolean; F
     end;
   
   Inc(SkyEnabled);
-  LongWorkBegin;
   NotifySuspend; {Cat}
   FilesCopy(Files, SourcePanel, CopyDir, Mask, CopyMode, CopyOpt,
             CopyPrn, True);
   NotifyResume; {Cat}
-  LongWorkEnd;
   Dec(SkyEnabled);
   
   end { CopyFiles };
@@ -2967,12 +2965,10 @@ procedure CopyDirContent(Source, Destination: String;
 
   MakeSlash(Destination);
   Inc(SkyEnabled);
-  LongWorkBegin;
   NotifySuspend;
   FilesCopy(FC, nil, Destination, x_x, cpmAskOver*Byte(not Forced),
     cpoMove*Byte(MoveMode), False, False);
   NotifyResume;
-  LongWorkEnd;
   Dec(SkyEnabled);
   FC^.DeleteAll;
   Dispose(FC, Done);

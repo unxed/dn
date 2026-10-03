@@ -52,7 +52,7 @@ unit FilesCol;
 interface
 
 uses
-  Files, Defines, Streams,
+  uselfn, Defines, Streams,
   Collect, Drivers, Hash
   ;
 
@@ -100,7 +100,7 @@ type
     UsageCount: Byte; {DataCompBoy}
     FDate, FDateCreat, FDateLAcc: LongInt; {фактически - TDate4}
     FlName: TFlName;
-    {см. files.pas }
+    {см. uselfn.pas }
     Dummy: array[1..SizeOf(ShortString)-SizeOf(TShortName)] of Char;
     {а это место, куда будет свешиваться хвост длинного имени в тех
       случаях, когда заводится локальная переменна типа TFileRec или

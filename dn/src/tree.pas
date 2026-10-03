@@ -220,7 +220,7 @@ var
 
 implementation
 uses
-  Lfn, Files, Startup, Dos, DnIni, DNHelp,
+  Lfn, uselfn, Startup, Dos, DnIni, DNHelp,
   basics, strutil, fileutil, envutil,
   panelroot, mainapp, Messages, Commands, Drives, Eraser, Menus,
   xTime, FileCopy, osdep, dnscreen

@@ -82,10 +82,10 @@ uses
   {SBlocks,}keymap, Macro,
   xTime, Drivers,
   fsinfo,
-  fnotify,
+  dirwatch,
   
-  ErrMess
-  , Events {AK155 для LongWorkBegin - LongWorkEnd}
+  fileerrors
+
   ;
 
 type
@@ -404,10 +404,8 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
       end
     else
       begin
-      LongWorkBegin;
       FileLines := MIReadBlock(AED, Name, True);
       {/Cat}
-      LongWorkEnd;
       if not isValid then
         Exit;
       if FileLines = nil then

@@ -259,7 +259,7 @@ uses
   Strings, Commands {Cat}
   , strutil, fileutil, Math
    ,Startup ,realmode 
-  , fnotify
+  , dirwatch
   ;
 procedure lResetText(var F: lText);
   

@@ -307,7 +307,7 @@ const
     LFN_Difference: 0; {Combo}
     TagChar: #251;
     RestChar: #16;
-    DIZ: 'descript.ion;files.bbs';
+    DIZ: 'descript.ion;uselfn.bbs';
     NewPanelPreset: 2; {нумерация от нуля, то есть 2 - это как Ctrl-3}
     LeftPanelType: fdoDriveDrive
     );

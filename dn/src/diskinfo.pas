@@ -156,7 +156,7 @@ implementation
 uses
   Startup, mainapp, Commands, DNHelp, Tree, xTime
   , basics, strutil, fileutil, Math
-  , osdep, Lfn, keymap, Events, baseobjs
+  , osdep, Lfn, keymap, baseobjs
   , fsinfo, panelroot, panelsetup, Dos
   , Strings;
 
@@ -642,7 +642,6 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
   L := 0;
   NumFiles := 0;
   NumDirs := 0;
-  LongWorkBegin;
 
   New(DC, Init($10, $10, False));
   DC^.Insert(NewStr(Dir));
@@ -724,7 +723,6 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
   DC^.FreeAll;
   Dispose(DC, Done);
   CountDirLen := L;
-  LongWorkEnd;
   end { CountDirLen };
 {-DataCompBoy-}
 

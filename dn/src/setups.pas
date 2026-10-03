@@ -142,7 +142,7 @@ const
 implementation
 uses
   Dos, Tree, Drives, basics, strutil, fileutil, Messages, DNHelp,
-  linepos, DnIni, iniengine, country, keymap, fnotify
+  linepos, DnIni, iniengine, country, keymap, dirwatch
   , lfn, mainapp, Validate
   ;
 

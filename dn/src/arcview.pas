@@ -158,9 +158,9 @@ uses
   Arvid, xTime, VideoMan, DnExec, FileFind
   , UserMenu {JO: для скрывания панелей при разархивировании }
   , fmtzip {JO: для CentralDirRecPresent}
-  , Events {AK155 для LongWorkBegin - LongWorkEnd}
-  , panelsetup, panelroot, fnotify, Drivers
-  , Lfn, Files, Tree, Dos, Histries, HistList, filepanel
+
+  , panelsetup, panelroot, dirwatch, Drivers
+  , Lfn, uselfn, Tree, Dos, Histries, HistList, filepanel
   , basics, strutil, fileutil, ArchDet
   , fmtrar, fmtace
   ;
@@ -475,7 +475,6 @@ function TArcDrive.ReadArchive: Boolean;
     if (ArcFile <> nil{see TUC2Archive.GetFile}) and TimerExpired(T)
     then
       begin
-      LongWorkBegin;
       if P = nil then
         begin
         New(P, Init(R));
@@ -525,7 +524,6 @@ function TArcDrive.ReadArchive: Boolean;
   if CtrlBreakHit then
     StdMsg(5);
   CtrlBreakHit := False;
-  LongWorkEnd;
   Dec(SkyEnabled);
   if P <> nil then
     P^.Free;
@@ -1841,7 +1839,6 @@ function TArcDrive.OpenDirectory(const Dir: String;
     MemReq: LongInt;
     MAvail: LongInt;
   begin
-  LongWorkBegin;
   NewTimer(tmr, 0);
   Dirs := New(PStringCollection, Init($10, $10, False));
   PI := WriteMsg(GetString(dlReadingList));
@@ -1918,7 +1915,6 @@ function TArcDrive.OpenDirectory(const Dir: String;
   PDrv := New(PFindDrive, Init('><'+Dir, Dirs, Fils));
   PDrv^.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
-  LongWorkEnd;
   end { TArcDrive.OpenDirectory };
 
 procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
@@ -1983,7 +1979,6 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
       Attr := Attr or ReadOnly;
     end;
 
-  LongWorkBegin;
   Dirs := New(PStringCollection, Init($10, $10, False));
   PI := WriteMsg(^M^M^C+GetString(dlSearching)+'...');
   New(Fils, Init($10, $10));
@@ -2087,7 +2082,6 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
   else
     MessageBox(^C+GetString(dlNoFilesFound), nil,
                  mfInformation+mfOKButton);
-  LongWorkEnd;
   end { TArcDrive.DrvFindFile };
 
 procedure TArcDrive.ReadDescrptions(FilesC: PFilesCollection);

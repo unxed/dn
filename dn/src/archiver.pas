@@ -51,7 +51,7 @@ unit Archiver;
 interface
 
 uses
-  Files,
+  uselfn,
   Views, Defines, baseobjs, Streams, Collect
   ;
 

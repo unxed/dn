@@ -142,7 +142,7 @@ const
 implementation
 
 uses
-  xTime, Startup, DNHelp, Events, basics, strutil, fileutil
+  xTime, Startup, DNHelp, basics, strutil, fileutil
   , mainapp, Messages, Commands, Math
   ;
 
