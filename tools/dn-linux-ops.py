@@ -137,6 +137,27 @@ def main():
         scr = t.text()
         status = t.close(4)
         check(status == 0, 'Alt-X ends the program (status %r)' % (status,), scr)
+
+        if os.environ.get('DN_OPS_UTF8') == '1':          # the build with -dDNUTF8 (UTF-8 inside): what the legacy build cannot show
+            u = os.path.join(d, 'u8')
+            os.makedirs(u)
+            for n in ('\u042f\u0431\u043b\u043e\u043a\u043e', '\u0430\u0440\u0431\u0443\u0437', '\u0410\u043b\u044c\u0444\u0430', '\u0431\u0435\u0442\u0430', 'Zeta'):
+                open(os.path.join(u, n), 'w').write('x')
+            open(os.path.join(u, '\u0444\u0430\u0439\u043b.txt'), 'w').write('\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440\nsecond\n')
+            t = PtyTerm(['./dn'], 100, 30, cwd=u, exe=os.path.join(d, 'dn'))
+            t.pump(1.5, 6)
+            t.send(F['ESC'], 0.5)
+            lines = [l for l in t.text().split('\n')]
+            order = [n for n in ('Zeta', '\u0410\u043b\u044c\u0444\u0430', '\u0430\u0440\u0431\u0443\u0437', '\u0431\u0435\u0442\u0430', '\u042f\u0431\u043b\u043e\u043a\u043e')]
+            pos = [next((i for i, l in enumerate(lines) if n in l), -1) for n in order]
+            check(all(p >= 0 for p in pos) and pos == sorted(pos), 'UTF-8: the names are sorted ignoring the case (Zeta, \u0410\u043b\u044c\u0444\u0430, \u0430\u0440\u0431\u0443\u0437, \u0431\u0435\u0442\u0430, \u042f\u0431\u043b\u043e\u043a\u043e)', t.text())
+            t.send(F['END'], 0.5)
+            t.send(F['F3'], 1.2)
+            check('\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440' in t.text(), 'UTF-8: F3 shows a Russian text file', t.text())
+            t.send(F['ESC'], 0.5)
+            t.send(F['ALT-X'], 0.8)
+            t.send(F['ENTER'], 1.0)
+            t.close(3)
     finally:
         shutil.rmtree(d, ignore_errors=True)
     print('ALL OK (%d checks)' % count if not fails else '%d of %d checks FAILED' % (fails, count))

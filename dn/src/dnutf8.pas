@@ -27,6 +27,10 @@ procedure Utf8UpStr(var S: String);
 procedure Utf8LowStr(var S: String);
   {` The case of a UTF-8 string, character by character (a byte that is not UTF-8 stays as it is). `}
 
+procedure CpBytesToUtf8(var S: String; From: Integer);
+  {` The bytes $80 and up of S from the position From on are the bytes of the current code page: they become UTF-8 (one character each, so the
+  columns do not change). Used for a text that DN has put through a code table; does nothing without -dDNUTF8. `}
+
 function Utf8ToProxy(const S: String; var Tab: String): String;
   {` S with each non-ASCII character as one byte #128+i; Tab[i+1] is that character (its bytes). `}
 
@@ -36,7 +40,7 @@ function ProxyToUtf8(const S, Tab: String): String;
 implementation
 
 uses
-  TvUtf8;
+  TvUtf8, TvCodePg;
 
 function CharLen(const S: String; I: Integer): Integer;
   var
@@ -160,6 +164,33 @@ procedure Utf8LowStr(var S: String);
   begin
   Utf8Case(S, False);
   end;
+
+procedure CpBytesToUtf8(var S: String; From: Integer);
+{$IFDEF DNUTF8}
+  var
+    I, N: Integer;
+    R: String;
+    Buf: array[0..7] of Byte;
+  begin
+  if From < 1 then
+    From := 1;
+  R := Copy(S, 1, From - 1);
+  for I := From to Length(S) do
+    if Byte(S[I]) < $80 then
+      R := R + S[I]
+    else
+      begin
+      N := CpToUtf8(Byte(S[I]), @Buf[0]);
+      if Length(R) + N > 255 then
+        Break;
+      R := R + Copy(PChar(@Buf[0]), 1, N);
+      end;
+  S := R;
+  end;
+{$ELSE}
+  begin
+  end;
+{$ENDIF}
 
 function Utf8ToProxy(const S: String; var Tab: String): String;
   var
