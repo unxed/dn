@@ -13,6 +13,7 @@
 # Run DN (linux): cd OUTDIR && ./dn        (the *.LNG *.DLG *.HLP files are next to it)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
+. "$here/tools/need-tv.sh"
 DN_TARGET=${1:?usage: tools/build.sh linux64|linux|dos|win64|win32 [OUTDIR]}; export DN_TARGET
 # UTF-8 inside DN (-dDNUTF8) is the default on Linux and Windows; DN_UTF8=0 builds the old one (the code page inside); DOS: always the code page
 case "$DN_TARGET" in linux*|aarch64) : "${DN_UTF8:=1}";; win*) : "${DN_UTF8:=1}";; *) DN_UTF8=0;; esac

@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Packages
         # only the compiler and the RTL: 'fpc' drags in GTK and takes ~13 minutes
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl make bzip2 git curl dosbox-x unzip
