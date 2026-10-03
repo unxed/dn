@@ -63,7 +63,7 @@ type
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetPalette: TPalette; virtual;
-    procedure DrawTop(var B); virtual;
+    procedure DrawTop(var B: TScreenCell); virtual;
     end;
 
   TPanelBottomDnD = record
@@ -278,11 +278,11 @@ procedure TDriveLine.Draw;
   MoveStr(B, ViewLine, GetColorW(1));
   I := PosChar(Panel^.DriveLetter, ViewLine);
   if I > 0 then
-    WordRec(B[I-1]).Hi := GetColorW(3);
+    SetCellAttr(B[I-1], GetColorW(3));
 
-  WordRec(B[0]).Hi := GetColorW(2);
-  WordRec(B[Size.X-1]).Hi := GetColorW(2);
-  WriteLineW(0, 0, Size.X, 1, B);
+  SetCellAttr(B[0], GetColorW(2));
+  SetCellAttr(B[Size.X-1], GetColorW(2));
+  WriteLineC(0, 0, Size.X, 1, B);
   end { TDriveLine.Draw };
 
 procedure TDriveLine.HandleEvent(var Event: TEvent);
@@ -470,13 +470,9 @@ var
   Idx, CurPos, i, j: LongInt;
   C, C1, C2, C3, C4, C5, C6, C7, C8, C9: Byte;
   C2_3, C8_9: AWord;
-  B: array[0..300] of AWord;
-  B1: array[0..200] of record
-    C: Char;
-    A: Byte;
-    end absolute B;
+  B: array[0..300] of TScreenCell;
 
-procedure TFilePanel.DrawTop(var B);
+procedure TFilePanel.DrawTop(var B: TScreenCell);
   var
     S: String;
     I, J: Integer;
@@ -488,7 +484,7 @@ procedure TFilePanel.DrawTop(var B);
   J := CStrLen(S);
   while I < Size.X do
     begin
-    MoveCStr(TAWordArray(B)[I], S, C);
+    MoveCStr(PCellArray(@B)^[I], S, C);
     Inc(I, J);
     end;
   end;
@@ -858,9 +854,9 @@ Scroll:
             DrawAtIdx;
             Idx := (j+1)*LineLength;
             if Idx < Size.X then
-              B[Idx-1] := CS
+              B[Idx-1] := CellFromBIOS(CS)
             else
-              B[Idx-1] := CW;
+              B[Idx-1] := CellFromBIOS(CW);
             Idx := j*LineLength;
             WriteLineW(Idx, i, LineLength-1, 1, B[Idx+DeltaX]);
             end;
@@ -879,10 +875,10 @@ Scroll:
   PosChanged := False;
   if ColumnTitles then
     begin
-    DrawTop(B);
-    if WordRec(B[Size.X-1]).Lo = 179 then
-      WordRec(B[Size.X-1]).Lo := 32;
-    WriteLineW(0, 0, Size.X, 1, B[DeltaX]);
+    DrawTop(B[0]);
+    if CellChar(B[Size.X-1]) = 179 then
+      SetCellChar(B[Size.X-1], 32);
+    WriteLineC(0, 0, Size.X, 1, B[DeltaX]);
     end;
   for i := Byte(ColumnTitles) to Size.Y-1 do
     begin
@@ -894,11 +890,11 @@ Scroll:
       DrawAtIdx;
       Idx := (j+1)*LineLength;
       if Idx < Size.X then
-        B[Idx-1] := CS
+        B[Idx-1] := CellFromBIOS(CS)
       else
-        B[Idx-1] := CW;
+        B[Idx-1] := CellFromBIOS(CW);
       end;
-    WriteLineW(0, i, Size.X, 1, B[DeltaX]);
+    WriteLineC(0, i, Size.X, 1, B[DeltaX]);
     end;
   if GetState(sfFocused) then
     SetTitle(DirectoryName);
@@ -1083,7 +1079,7 @@ function MakeDivider(IV: PInfoView): Boolean;
       Panel^.GetEmpty(B[I], C, True);
       Inc(I, Panel^.LineLength);
       if I = Size.X then
-        B[I-1] := (C and $FF00)+196;
+        B[I-1] := CellFromBIOS((C and $FF00)+196);
       end;
     end;
   end;
@@ -1098,7 +1094,7 @@ function MakeCurFile(IV: PInfoView): Boolean;
     if PF = nil then
       Exit;
     DnD.CurrentY1 := Y;
-    Panel^.Drive^.GetDown(B, C1, PF, LFN_inCurFileLine);
+    Panel^.Drive^.GetDown(B[0], C1, PF, LFN_inCurFileLine);
     end;
   Result := True;
   end;
@@ -1653,7 +1649,7 @@ procedure TInfoView.Draw;
         Break;
       inc(I);
       end;
-    WriteLineW(0, Y, Size.X, 1, B);
+    WriteLineC(0, Y, Size.X, 1, B);
     MoveChar(B, ' ', C1, Size.X);
     end;
 

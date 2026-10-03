@@ -140,7 +140,7 @@ type
      {` Сформировать строку имени для колонки, L - фактическая ширина
        (может быть не LFNLen, а 12, если под DualName установлен
        показ коротких имён) `}
-    procedure GetEmpty(var B; SC: Word; Scroll: Boolean); virtual;
+    procedure GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean); virtual;
      {` Записать в заранее заполненный буфер B в нужные места Draw-код
         разделителя колонок (SC). Используется для формирования
         пустых элементов панели и для соединения разделителя
@@ -3254,7 +3254,7 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
     S := FormatLongName(S, L, ThisEXTLen, OPT, NFM);
   end {TFilePanelRoot.FormatName};
 
-procedure TFilePanelRoot.GetEmpty(var B; SC: Word; Scroll: Boolean);
+procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean);
   var
     X: AWord;
     Flags: Word;
@@ -3267,7 +3267,7 @@ procedure TFilePanelRoot.GetEmpty(var B; SC: Word; Scroll: Boolean);
     begin
     X := CalcNameLength+1;
     if X-(DeltaX*Byte(Scroll)) > 0 then
-      TAWordArray(B)[X-(DeltaX*Byte(Scroll))-1] := SC;
+      PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := CellFromBIOS(SC);
     end;
   i := Low(TFileColNumber);
   while Flags <> 0 do
@@ -3286,7 +3286,7 @@ procedure TFilePanelRoot.GetEmpty(var B; SC: Word; Scroll: Boolean);
         if X > 250 then
           Exit;
         if X-(DeltaX*Byte(Scroll)) > 0 then
-          TAWordArray(B)[X-(DeltaX*Byte(Scroll))-1] := SC;
+          PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := CellFromBIOS(SC);
         end;
       end;
     Flags := Flags shr 1;

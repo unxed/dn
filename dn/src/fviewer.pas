@@ -144,7 +144,7 @@ type
     function Valid(Command: Word): Boolean; virtual;
     procedure ChangeBounds(const Bounds: TRect); virtual;
     function GetPalette: TPalette; virtual;
-    procedure DoHighlite(var B; const S: String; const Attr: String);
+    procedure DoHighlite(var B: TScreenCell; const S: String; const Attr: String);
     procedure Update; virtual; {AK155}
     procedure SeekEof;
     procedure SeekBof;
@@ -247,7 +247,7 @@ type
 implementation
 
 uses
-  Lfn, Dos, VPSysLow, Commands, DNHelp, Advance1, Advance2, U_KeyMap
+  Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, Advance1, Advance2, U_KeyMap
   , Microed, Macro, Advance6, VPUtils
   , Memory, Messages, DNApp, Startup, Dialogs,
   Decoder,  {piwamoto}
@@ -481,7 +481,7 @@ procedure TViewInfo.Draw;
       begin
       Color := PWindow(Owner)^.Frame^.GetColorW(1);
       MoveChar(B, #196, Color, Size.X);
-      WriteLineW(0, 0, Size.X, 1, B);
+      WriteLineC(0, 0, Size.X, 1, B);
       Exit;
       end
     else if Owner^.GetState(sfDragging) then
@@ -554,7 +554,7 @@ procedure TViewInfo.Draw;
     end;
   MoveChar(B, Ch2, Color, Size.X);
   MoveStr(B, S, Color);
-  Self.WriteLineW(0, 0, Size.X, Size.Y, B);
+  Self.WriteLineC(0, 0, Size.X, Size.Y, B);
   end { TViewInfo.Draw };
 
 procedure TViewInfo.HandleEvent(var Event: TEvent);
@@ -770,7 +770,7 @@ procedure TViewScroll.DrawPos(Pos: Integer);
   MoveChar(Buf[Pos], #254, GetColorW(3), 1); { the thumb }
   MoveChar(Buf[0], #30, GetColorW(2), 1); { the arrow up }
   MoveChar(Buf[Last], #31, GetColorW(2), 1); { the arrow down }
-  WriteBufW(0, 0, Size.X, Size.Y, Buf);
+  WriteBufC(0, 0, Size.X, Size.Y, Buf);
   end;
 procedure TViewScroll.HandleEvent(var Event: TEvent);
   var
@@ -922,21 +922,17 @@ function TViewScroll.GetPalette: TPalette;
 procedure TViewScroll.Draw;
   var
     B1: TDrawBuffer;
-    B: array[0..128] of record
-      C: Char;
-      B: Byte;
-      end absolute B1;
     C1, C2: Byte;
     i: Integer;
   begin
   C1 := GetColorW(1);
   C2 := GetColorW(2);
-  MoveChar(B, #177, C1, Size.Y);
+  MoveChar(B1, #177, C1, Size.Y);
   i := GetPartCode;
-  B1[i] := 254+LongInt(C2*256);
-  B1[0] := 30+LongInt(C2*256);
-  B1[Size.Y-1] := 31+LongInt(C2*256);
-  WriteBufW(0, 0, 1, Size.Y, B);
+  B1[i] := CellFromBIOS(254+LongInt(C2*256));
+  B1[0] := CellFromBIOS(30+LongInt(C2*256));
+  B1[Size.Y-1] := CellFromBIOS(31+LongInt(C2*256));
+  WriteBufC(0, 0, 1, Size.Y, B1);
   end;
 
 { TQFileViewer }
@@ -1371,6 +1367,7 @@ procedure TFileViewer.Draw;
             else
               SZ[IZ] := #0;
           XLatBuf(S[W2+1], Length(S)-W2, XCoder.XLatCP[ToAscii]);
+          CpBytesToUtf8(S, W2+1); { UTF-8 inside: every byte is one character of the page }
           {-DataCompBoy & Axel: apply filter-}
           case Filter of
             0:
@@ -1431,8 +1428,8 @@ procedure TFileViewer.Draw;
           Inc(W, J);
           L := L + J;
           end;
-        {WriteLineW(0, I, Size.X, 1, B[XDelta]);} {???}
-        WriteLineW(0, I, WDH, 1, B[XDelta]);
+        {WriteLineC(0, I, Size.X, 1, B[XDelta]);} {???}
+        WriteLineC(0, I, WDH, 1, B[XDelta]);
         end;
       end;
     vmDump:
@@ -1462,6 +1459,7 @@ procedure TFileViewer.Draw;
           begin
           XDumpStr(S, Buf^[W], L, J, Filter); //!!s
           XLatBuf(S[10], Length(S)-9, XCoder.XLatCP[ToAscii]);
+          CpBytesToUtf8(S, 10);
           Drivers.MoveStr(B, S, C);
           if SearchActive then
             begin
@@ -1480,7 +1478,7 @@ procedure TFileViewer.Draw;
           Inc(W, J);
           L := L + J;
           end;
-        WriteLineW(0, I, WDH, 1, B[XDelta]);
+        WriteLineC(0, I, WDH, 1, B[XDelta]);
         end;
       
       end;
@@ -1521,7 +1519,7 @@ procedure TFileViewer.Draw;
           Drivers.MoveStr(B, S, C);
           L := L + D.InstrLen;
           end;
-        WriteLineW(0, I, WDH, 1, B[XDelta]);
+        WriteLineC(0, I, WDH, 1, B[XDelta]);
         end;
       end
       {GRM!}
@@ -1599,6 +1597,8 @@ procedure TFileViewer.Draw;
             begin
             SetLength(S, W-XDelta);
             XLatBuf(S[1], Length(S), XCoder.XLatCP[ToAscii]);
+            if XCoder.KeyMap <> kmAscii then
+              CpBytesToUtf8(S, 1); { UTF-8 inside: the text that went through a table is of the code page; the text with no table is shown as UTF-8 }
             {Cat: фильтр перенесён сюда - он должен быть использован
       уже после применения таблицы перекодировки}
             case Filter of
@@ -1629,7 +1629,7 @@ procedure TFileViewer.Draw;
               { Keywords 1 }
               HP[Ord(hhKeyword2)] := Chr(C1 or (CC[8] and 15));
               { Keywords 2 }
-              DoHighlite(B, S, HP);
+              DoHighlite(B[0], S, HP);
               end;
             end;
 
@@ -1637,7 +1637,7 @@ procedure TFileViewer.Draw;
         if I = SearchLineNum then
           { раскраска найденного текста }
           MoveColor(B[SearchTextStart], Length(SearchString.What), CC[2]);
-        WriteLineW(0, I, Size.X, 1, B[0]);
+        WriteLineC(0, I, Size.X, 1, B[0]);
         end;
       end;
     if ExposedLine > MaxLines then
@@ -3164,7 +3164,7 @@ NotKb:
   end { TFileViewer.HandleEvent };
 
 procedure TFileViewer.DoHighlite
-    (var B; const S: String; const Attr: String);
+    (var B: TScreenCell; const S: String; const Attr: String);
   var
     i: Integer;
     j: Integer;
@@ -3182,7 +3182,7 @@ procedure TFileViewer.DoHighlite
     while (k <= l) and (S[k] = c) do
       Inc(k);
     if  (c <> #0) and (Ord(c) <= Length(Attr)) then
-      MoveColor(TAWordArray(B)[j], k-i, Ord(Attr[Ord(c)]));
+      MoveColor(PCellArray(@B)^[j], k-i, Ord(Attr[Ord(c)]));
     Inc(j, k-i);
     i := k;
     end;

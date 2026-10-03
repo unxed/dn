@@ -155,7 +155,7 @@ procedure TPercentGauge.Draw;
   FormatStr(Text, '%-3d%%', Percent);
   MoveChar(Row, ' ', Attr, Size.X);
   MoveStr(Row, Text, Attr);
-  WriteLineW(0, 0, Size.X, Size.Y, Row);
+  WriteLineC(0, 0, Size.X, Size.Y, Row);
   end;
 
 procedure TPercentGauge.HandleEvent(var Event: TEvent);
@@ -186,7 +186,7 @@ procedure TBarGauge.Draw;
     Filled := Size.X;
   MoveChar(Row, #176, Attr, Size.X);
   MoveChar(Row, #178, Attr, Filled);
-  WriteLineW(0, 0, Size.X, Size.Y, Row);
+  WriteLineC(0, 0, Size.X, Size.Y, Row);
   end;
 procedure TWhileView.InsBut;
   var
@@ -434,13 +434,13 @@ procedure TWhileView.Draw;
     MoveStr(B[(Size.X-Length(Top)) div 2-1], ' '+Top+' ', C1);
   B1[0].C := #201;
   B1[Size.X-1].C := #187;
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   MoveChar(B, #205, C1, Size.X);
   if Bottom <> '' then
     MoveStr(B[(Size.X-Length(Bottom)) div 2-1], ' '+Bottom+' ', C1);
   B1[0].C := #200;
   B1[Size.X-1].C := #188;
-  WriteLineW(0, Size.Y-1, Size.X, 1, B);
+  WriteLineC(0, Size.Y-1, Size.X, 1, B);
 
   B1[0].C := #186;
   B1[Size.X-1].C := #186;
@@ -453,11 +453,11 @@ procedure TWhileView.Draw;
       if PS <> nil then
         MoveStr(B[(Size.X-Length(PS^)) div 2], PS^, C2);
       end;
-    WriteLineW(0, I+1, Size.X, 1, B);
+    WriteLineC(0, I+1, Size.X, 1, B);
     end;
   MoveChar(B[1], ' ', C2, Size.X-2);
-  WriteLineW(0, But^.Origin.Y, But^.Origin.X, 2, B);
-  WriteLineW(But^.Origin.X+But^.Size.X, But^.Origin.Y, Size.X, 2,
+  WriteLineC(0, But^.Origin.Y, But^.Origin.X, 2, B);
+  WriteLineC(But^.Origin.X+But^.Size.X, But^.Origin.Y, Size.X, 2,
     B[But^.Origin.X+But^.Size.X]);
   But^.Draw;
   end { TWhileView.Draw };
