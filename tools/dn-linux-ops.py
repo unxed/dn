@@ -161,6 +161,22 @@ def main():
             t.send(F['ENTER'], 1.0)
             t.close(3)
 
+            # the columns: a name with wide (CJK) letters takes two columns each, the next column stays in its place
+            cj = os.path.join(d, 'u8cjk')
+            os.makedirs(cj)
+            for n in ('abc.txt', '\u65e5\u672c\u8a9e.txt', 'e\u0301x.txt'):
+                open(os.path.join(cj, n), 'w').write('x')
+            t = PtyTerm(['./dn'], 100, 30, cwd=cj, exe=os.path.join(d, 'dn'))
+            t.pump(1.5, 6)
+            t.send(F['ESC'], 0.5)
+            rows = {k: next((l for l in t.text().split('\n') if k in l), '') for k in ('abc', '\u65e5\u672c\u8a9e', 'ex')}     # the screen of the test has no cell for a combining mark
+            ok = all(rows.values())
+            col = {k: v.find('txt') for k, v in rows.items()}
+            check(ok and col['abc'] == col['\u65e5\u672c\u8a9e'] + 3 and col['abc'] == col['ex'], 'UTF-8: wide letters take two columns and a combining mark none (the extension stays in its column)', t.text())
+            t.send(F['ALT-X'], 0.8)
+            t.send(F['ENTER'], 1.0)
+            t.close(3)
+
             # the Russian interface: Alt and a Cyrillic letter (the keyboard sends Esc and the letter in UTF-8)
             ru = os.path.join(d, 'u8ru')                                   # a new copy of the program: DN.INI of the first session keeps its language
             os.makedirs(os.path.join(ru, 'w'))
