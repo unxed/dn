@@ -1008,7 +1008,11 @@ finalization
 {$IFDEF UNIX}
 initialization
   OnFileName := @SysOsPath;
+{$IFDEF DNUTF8}
+  NameConv := False;               { the names are UTF-8 inside DN: no conversion at the border }
+{$ELSE}
   NameConv := GetEnvironmentVariable('DN_NAME_CONV') <> '0';
+{$ENDIF}
   UnixInit;                        { False when the program has no terminal (the resource compiler): no screen then }
 finalization
   UnixDone;
