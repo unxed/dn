@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                12:37:36
-x═[■]═════ C:\tmp\dntour-3ijdkv07\work ══════════╗x═════════ C:\tmp\dntour-3ijdkv07\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:06:26
+x═[■]═════ C:\tmp\dntour-68wj7qxv\work ══════════╗x═════════ C:\tmp\dntour-68wj7qxv\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                ││                  ││        ■
 ║c             dat │                  │          ║║c             dat ││                  ││        ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-3ijdkv07\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴┴──────────────────┴┴────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-3ijdkv07\work>
+C:\tmp\dntour-68wj7qxv\work>
  F1 Help  F2 User  F3 View  F4 Edit  F5 Copy  F6 Ren  F7 MkDir  F8 Del  F10 Menu
