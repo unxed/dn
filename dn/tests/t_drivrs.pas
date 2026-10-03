@@ -1,7 +1,7 @@
 { Tests of dn/new/drivers.pas }
 {$mode objfpc}{$H-}
 program t_drivrs;
-uses Drivers, TvEvents, TvCell, TvColors, TvUtf8;
+uses Drivers, TvEvents, TvCell, TvColors, TvUtf8, TvCodePg;
 {$I dntest.inc}
 var
   Buf: array[0..9] of Word;
@@ -94,5 +94,16 @@ begin
   P[0] := 7; P[1] := 255; P[2] := 255; P[3] := Ord('Z');
   FormatStr(S, '[%5d][%-4d][%x][%c][%%]', P);
   Check(S = '[    7][255 ][ff][Z][%]', 'FormatStr widths, %x, %c, %%');
+  { a 16-bit buffer holds one byte per cell: with UTF-8 inside the text goes in as the bytes of the code page }
+  CpSelect(866);
+  Utf8Enabled := True;
+  FillChar(Buf, SizeOf(Buf), 0);
+  MoveStr(Buf, 'При' + 'a', 7);
+  Check((Buf[0] and $FF = $8F) and (Buf[1] and $FF = $E0) and (Buf[2] and $FF = $A8) and (Buf[3] and $FF = Ord('a')) and (Buf[0] shr 8 = 7),
+    'MoveStr into a word buffer: UTF-8 becomes the code page 866');
+  FillChar(Buf, SizeOf(Buf), 0);
+  MoveStr(Buf, #196#191'x', 7);
+  Check((Buf[0] and $FF = 196) and (Buf[1] and $FF = 191) and (Buf[2] and $FF = Ord('x')), 'MoveStr into a word buffer: the frame bytes of the page stay');
+  Utf8Enabled := False;
   Finish;
 end.

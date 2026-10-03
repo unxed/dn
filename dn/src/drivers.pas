@@ -11,7 +11,7 @@ unit Drivers;
 interface
 
 uses
-  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys, TvCell, TvColors, TvDrawBuf, TvText, TvUtf8;
+  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys, TvCell, TvColors, TvDrawBuf, TvText, TvUtf8, TvCodePg;
 
 type
   TEvent = TvEvents.TEvent;
@@ -409,6 +409,37 @@ begin
       PWordArr(@Dest)^[I] := PByte(@Source)[I] or (Word(Attr) shl 8);
 end;
 
+{ The 16-bit buffers (a character of the code page and an attribute) hold one byte per cell. With UTF-8 inside DN a text that is put into
+  such a buffer is turned into the bytes of the current code page: the characters that the page has; whatever the page does not have
+  (and the bytes that are not UTF-8: the frame characters of DN are bytes of the page) stay as they are. }
+function LegacyText(const S: String): String;
+var
+  I, L: Integer;
+  Cp: LongWord;
+  Used: Integer;
+  B: Byte;
+begin
+  if not Utf8Enabled then
+    Exit(S);
+  Result := '';
+  I := 1;
+  while I <= Length(S) do
+  begin
+    if (Byte(S[I]) >= $C0) and Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) and (Used > 1) then
+    begin
+      B := CpFromUnicode(Cp);
+      if B <> 0 then
+      begin
+        Result := Result + Chr(B);
+        Inc(I, Used);
+        Continue;
+      end;
+    end;
+    Result := Result + S[I];
+    Inc(I);
+  end;
+end;
+
 procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: LongInt);
 var
   I: Integer;
@@ -428,13 +459,15 @@ procedure MoveStr(var Dest; const Str: String; Attr: Byte);
 var
   I: Integer;
   W: PWordArr;
+  S: String;
 begin
   W := @Dest;
-  for I := 1 to Length(Str) do
+  S := LegacyText(Str);
+  for I := 1 to Length(S) do
     if Attr = 0 then
-      W^[I - 1] := (W^[I - 1] and $FF00) or Ord(Str[I])
+      W^[I - 1] := (W^[I - 1] and $FF00) or Ord(S[I])
     else
-      W^[I - 1] := Ord(Str[I]) or (Word(Attr) shl 8);
+      W^[I - 1] := Ord(S[I]) or (Word(Attr) shl 8);
 end;
 
 procedure MoveCStr(var Dest; const Str: String; Attrs: Word);
@@ -443,17 +476,19 @@ var
   W: PWordArr;
   Hi: Boolean;
   A: Byte;
+  S: String;
 begin
   W := @Dest;
+  S := LegacyText(Str);
   J := 0;
   Hi := False;
-  for I := 1 to Length(Str) do
-    if Str[I] = '~' then
+  for I := 1 to Length(S) do
+    if S[I] = '~' then
       Hi := not Hi
     else
     begin
       if Hi then A := Attrs shr 8 else A := Attrs and $FF;
-      W^[J] := Ord(Str[I]) or (Word(A) shl 8);
+      W^[J] := Ord(S[I]) or (Word(A) shl 8);
       Inc(J);
     end;
 end;
