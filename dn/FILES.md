@@ -4,6 +4,22 @@ The names are the DOS names of the archive (8 characters), so the name often say
 what each holds and the main types in it (`T…` classes are `object` types of Turbo Vision style). It is not complete; "(?)" marks what was guessed
 from a name and not checked: fix it when you know. The class of every file by origin is in [`PROVENANCE.md`](PROVENANCE.md).
 
+## How `dn/` is laid out (since 2026-10-03)
+
+The sources are grouped by role, not by the date they arrived. The unit names are still the old ones (the renames are the next steps, see `TODO-refactoring.md`); a build puts the
+directories together (`tools/dn-env.sh`, one flat stage of links), so a unit does not know in which directory it lies.
+
+| Directory | What is in it |
+|---|---|
+| `src/` | DN itself: the program, the panels, the editor, the viewer, the dialogs, the basics; the texts of the resources (`RESOURCE/`) |
+| `archives/` | one unit per archive format (`arc_zip`, `arc_rar`, `arc_7z`, `arc_tar`... 26 of them); the common code is `archiver.pas`, `archdet.pas` in `src/` |
+| `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`vpsyslow`, `vpsyslo2`, `vputils`, `use16`, `memory`), the Borland units on `tv/` (`drivers`, `objects2`), the layer of DPMI32 (`dpmi32`, `dpmi32df`, `doslow`), the country table (`country_`) |
+| `compat/linux/` | units that replace those of `compat/` in the builds that are not for DOS (`country_.pas`: the table of CP866 for Linux and Windows) |
+| `compat/shims/` | the map of what DN takes from `tv/` (`shims.map`) and the hand-written parts (`manual/*.inc`); the shim units are generated from it by `tools/gen-shim.py` |
+| `data/`, `tests/` | the data that DN reads, the tests of our units |
+
+What is in `compat/` is not DN: it is what makes the code of DN run on a modern runtime. When the code of DN no longer asks for a unit of `compat/`, the unit goes away.
+
 ## The program and its commands
 | File | What it holds |
 |---|---|
@@ -79,14 +95,14 @@ The question that comes first when a setting "is not kept" or the panels "do not
 |---|---|
 | `advance.pas`, `advance1.pas`, `advance2.pas`, `advance7.pas` | the general functions: strings, names of files, dates, small dialogs (the names say nothing: look for the function with the search of the sources) |
 | `dndlgs.pas`, `dnstrl.pas`, `dncolor.pas`, `dnpalet.pas` | the classes of DN that were carved out of the files that came from Borland (combo box, notepad pages, the string list, the palettes) |
-| `drivers.pas` (ours) | the keys, the events, the draw buffers on top of `tv/` (`DNKeyCode`, `GetAltChar`, `LegacyText`) |
+| `compat/drivers.pas` (ours) | the keys, the events, the draw buffers on top of `tv/` (`DNKeyCode`, `GetAltChar`, `LegacyText`) |
 | `dnutf8.pas` (ours) | UTF-8 inside DN: columns, the proxy of a string, the table of a document of the editor |
 | `u_keymap.pas` | the code page detector and the key maps of the editor |
 | `videoman.pas` | the video modes and the palette (as far as the terminal has them) |
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
-| `vpsyslow.pas`, `vputils.pas`, `use16.pas` (ours) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
-| `country_.pas` (`src-linux`, ours) | the country information and the upper-case table of CP866 for Linux |
+| `compat/`: `vpsyslow.pas`, `vputils.pas`, `use16.pas` (ours); `vpsyslo2.pas` (the extension of the layer written by JO of DN OSP) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
+| `compat/country_.pas` (DOS), `compat/linux/country_.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `RESOURCE/*` → `*.LNG`, `*.DLG`) |
 
 ## Where to look for what (the first hour)

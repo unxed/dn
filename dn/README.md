@@ -17,10 +17,11 @@
 
 | Путь | Что |
 |---|---|
-| `src/` | исходники DN (Pascal), тексты ресурсов (`RESOURCE/`), `rcpvpd.ini` |
-| `src-linux/` | юниты, заменяющие юниты `src/` при сборке под Linux (`country_.pas`) |
+| `src/` | исходники DN (Pascal): программа, панели, редактор, просмотрщик; тексты ресурсов (`RESOURCE/`), `rcpvpd.ini` |
+| `archives/` | по юниту на формат архива (`arc_*.pas`: zip, rar, 7z, tar...) |
+| `compat/` | среда, которую ждёт код DN: слой Virtual Pascal (`vpsyslow`, `vputils`, `use16`, `memory`...), Borland-юниты поверх `tv/` (`drivers`, `objects2`), слой DPMI32 (`dpmi32`, `doslow`); `compat/linux/` — замены юнитов для сборок не под DOS (`country_.pas`) |
 | `data/` | данные, которые DN читает при работе (таблицы кодовых страниц, палитры, настройки по умолчанию) |
-| `shims/` | описание того, что DN берёт из `tv/` (юниты-прокладки генерирует `tools/gen-shim.py`) |
+| `compat/shims/` | описание того, что DN берёт из `tv/` (юниты-прокладки генерирует `tools/gen-shim.py`) |
 | `tests/` | тесты наших юнитов (`t_*.pas`; `tools/dn-test.sh`) |
 | `build.env` | опции компилятора по целям |
 | `PROVENANCE.md` | происхождение файлов (генерируется `bootstrap/tools/dn-manifest.py`) |
