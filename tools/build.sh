@@ -33,7 +33,7 @@ elif [ "$DN_BUILD_DATE" = now ]; then
 fi
 if [ -z "${DN_BUILD_REV:-}" ]; then
     DN_BUILD_REV=$(git -C "$here" describe --tags --exact-match 2>/dev/null || git -C "$here" rev-parse --short HEAD 2>/dev/null || echo unknown)
-    git -C "$here" diff --quiet HEAD 2>/dev/null || DN_BUILD_REV="$DN_BUILD_REV+dirty"
+    git -C "$here" diff --quiet HEAD -- . ":(exclude)dist" 2>/dev/null || DN_BUILD_REV="$DN_BUILD_REV+dirty"      # dist/ is the output of the build, not a source
 fi
 case "$DN_TARGET" in dos) DN_BUILD_TARGET="DOS";; linux) DN_BUILD_TARGET="Linux i386";; linux64) DN_BUILD_TARGET="Linux x86_64";; aarch64) DN_BUILD_TARGET="Linux aarch64";;
     win32) DN_BUILD_TARGET="Windows i386";; win64) DN_BUILD_TARGET="Windows x86_64";; *) DN_BUILD_TARGET="$DN_TARGET";; esac
