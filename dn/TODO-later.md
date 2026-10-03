@@ -213,3 +213,11 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
 ## aarch64 CI: t_chdir (2026-10-03)
 - The first ARM run of `tv` failed in `t_chdir` (4 checks): `TDirListBox.ShowDirs` listed the subdirectories in the order of `FindFirst`, i.e. of the file system (a hash on ext4), so "one"/"two" were not in the order that the test expects
   on that runner. Fixed: the names are collected into a `TStringCollection` and shown sorted (`tv/src/tvchdir.pas`). Other places that show directories in the file system order are not searched for.
+
+## DN for DOS under DOSBox-X master (2026-10-03)
+- The DOS build (`dist/dos/DN.EXE`) does not make the screen dump (no `SCR.DAT`, the harness of `tools/dn-tour.sh`) on DOSBox-X built from `master` (2026.10.01, the base of the patches in
+  `docs/patches/`); it does on the apt package 2024.03.01 that CI uses. The same on `master` **without** the patches (checked: built `e013b8b` by itself), so it is not the AMIS/UTF-8 patches. DN starts
+  (creates `TEM`, `DNERR.TXT`) and then nothing is dumped within `DNDUMPSEC`. Not investigated further: either a change of DOSBox-X (timer/INT 1Ah, DPMI) or a timing assumption of DN. To find out:
+  run `DN.EXE` by hand under `master` and see where it waits (no `DNKEYS`), try `cycles=max`/`fixed`.
+- With the apt package 2024.03.01 and `lfn = true`, DN shows the long names (the column cuts them with the `►` mark; the panel is in the 8.3 width). Files whose names the code page lacks are hidden
+  (no `utf8 file names`, that option is only in the patched DOSBox-X): to be tried with DN when the master problem is understood.
