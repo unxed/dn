@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:40:47
-x═[■]═════ C:\tmp\dntour-rd509stl\work ══════════╗x═════════ C:\tmp\dntour-rd509stl\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                23:17:34
+x═[■]═════ C:\tmp\dntour-i0om5wsf\work ══════════╗x═════════ C:\tmp\dntour-i0om5wsf\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-rd509stl\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-rd509stl\work>
+C:\tmp\dntour-i0om5wsf\work>
  F1 Help  F10 Tree

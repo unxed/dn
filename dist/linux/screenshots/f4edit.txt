@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:39:03
-╔═[■]════════════════════════ Edit - C:\tmp\dntour-bk1m2ir3\work\a.txt ════════════════════════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                23:15:49
+╔═[■]════════════════════════ Edit - C:\tmp\dntour-zorul49q\work\a.txt ════════════════════════[↕]═╗
 ║  File  Edit  Search  Paragraph  Block  Misc  Options                                             ▲
 ║first file                                                                                        ■
 ║second line                                                                                       ▒
@@ -26,5 +26,5 @@
 ║                                                                                                  ▒
 ║                                                                                                  ▼
 └─══════1:1════[102·66]═(↔)═══Lf══DOS══<·········>══◄■▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►─┘
-C:\tmp\dntour-bk1m2ir3\work>
+C:\tmp\dntour-zorul49q\work>
  F1 Help  F2 Save  F3 Open  F5 Block  F6 Fill  F7 Search  F8 KeyMap  F10 Menu

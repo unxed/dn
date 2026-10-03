@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:42:19
-╔═[■]═══════════════════════════ C:\tmp\dntour-z0ifd2sg\work\a.txt ════════════════════════════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                23:19:00
+╔═[■]═══════════════════════════ C:\tmp\dntour-d0crnnw9\work\a.txt ════════════════════════════[↕]═╗
 ║first file                                                                                        ▲
 ║second line                                                                                       ■
 ║                                                                                                  ▒
@@ -26,5 +26,5 @@
 ║                                                                                                  ▒
 ║                                                                                                  ▼
 └═<=>══<·········>══DOS     {00-255}══100% of 23 Bytes════════════════════════════════════════════─┘
-C:\tmp\dntour-z0ifd2sg\work>
+C:\tmp\dntour-d0crnnw9\work>
  F1 Help  F2 (Un)Wrap  F4 Hex/Asc/Dmp  F5 Goto  F6 Filter  F7 Search  F8 KeyMap  F10 Menu
