@@ -1721,7 +1721,7 @@ function TFileViewer.ReadFile;
     Exit;
     end;
   BreakOnStreamReadError;
-  {см. flpanelx, TFilePanelRoot.SendLocated;}
+  {см. panelroot, TFilePanelRoot.SendLocated;}
 
   (*  if (not ExistFile(FName) or isDir(FName)) and
      (FName <> '') and (FName <> ' ') then begin ReadFile:=false; Exit; end;

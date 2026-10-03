@@ -1,4 +1,4 @@
-{ Country_ for Linux: the country tools of DN (our unit; it replaces the DPMI32 unit of the archive, which asks DOS for them:
+{ country for Linux: the country tools of DN (our unit; it replaces the DPMI32 unit of the archive, which asks DOS for them:
   INT 21h AX=6521h and 3800h). Here: the table of the upper case of the code page of DN (CP866: the texts of DN are DOS
   OEM bytes, the Russian resources are in it) and the settings of a country that do not depend on the system (the
   defaults of DN). TODO: the settings of the country from the locale (LC_*), the tables of other code pages. }

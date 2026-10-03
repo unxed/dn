@@ -124,7 +124,7 @@ except
     CloseWriteStream;
     ClearScreen;
     SysTvShowBuf(0, ScreenWidth*ScreenHeight);
-    SourceDir := SourceDir+'DN.ERR';
+    SourceDir := SourceDir+'dn.err';
     Writeln('Fatal Error'^M^J'-----------'^M^J^M^J+
       'Exception 0', Hex2(ExitCode), 'h at address ',
            Hex8(LongInt(ExceptAddr)));

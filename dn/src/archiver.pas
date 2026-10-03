@@ -56,7 +56,7 @@ uses
   ;
 
 const
-  DNARC = 'ARCHIVER.INI'#0;
+  DNARC = 'archiver.ini'#0;
 
 type
   TStr4 = String[4];

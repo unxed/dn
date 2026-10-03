@@ -1,4 +1,4 @@
-{ The unit Objects2 of DN over tv/: DN has its own TEmptyObject/TObject there (the objects "taken out of the
+{ The unit baseobjs of DN over tv/: DN has its own TEmptyObject/TObject there (the objects "taken out of the
   library"); here they are the TObject of tv/ (TvObjs), so that the views and the other objects of DN have one root.
   ObjChangeType changes the VMT link of an object (its type): the first pointer of the instance (an object type that
   has virtual methods; see tv/DESIGN.md on the VMT). }

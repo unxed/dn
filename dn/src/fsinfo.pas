@@ -36,7 +36,7 @@ procedure GetSerFileSys(Drive: Char; var SerialNo: Longint;
 function GetFSString(Drive: Char): String; {AK155}
 function GetShare(Drive: Char): String; {AK155}
 function GetSubst(Drive: Char): String; {AK155}
-function GetDriveTypeNew(Drive: Char): TDrvTypeNew; {JO} {<fltl.001>}
+function GetDriveTypeNew(Drive: Char): TDrvTypeNew; {JO} {<fsinfo.001>}
 
 function GetErrorText(ErrCode: Integer; var Msg: String): Boolean;
 

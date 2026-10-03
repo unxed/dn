@@ -313,7 +313,7 @@ const
   kbShiftDown, kbCtrlShiftDown);
 
   {SmartWindow: PEditWindow = nil;}
-  {Cat: перенёс эти переменные в модуль MicroEd2}
+  {Cat: перенёс эти переменные в модуль editfile}
   {ClipboardWindow: PEditWindow = nil;}
   {Cat: внимание! появились указатели SmartWindowPtr и ClipboardWindowPtr}
 
@@ -3091,7 +3091,7 @@ EndDel:
       A: Word;
 
       {Cat: эта процедура теперь умеет работать с длинными строками
-      и находится в модуле Advance1}
+      и находится в модуле strutil}
       (*
   procedure CompressString;
   var PP: Pointer;
@@ -3952,7 +3952,7 @@ Ex:
   const { AK155 11-01-2006 Текстовые конфиги, к которым по F1 вызывается
      специальный хелп. Значения FName надо записывать на верхнем регистре,
      программа берёт их "как есть", без дополнительного перевода регистра.
-      } {<Microed.001>}
+      } {<editcore.001>}
     SpecialFile: array[1..6] of record
       FName: string[13];
       hcLocal, hcGlobal: Word;

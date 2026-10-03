@@ -11,8 +11,8 @@ mkdir -p "$work" "$dist/screenshots"
 # no symbols: small
 DN_EXTRA="-Xs" "$here/tools/build.sh" "$T" "$work" >/dev/null
 cp "$work/dn" "$dist/dn"
-cp "$work"/*.LNG "$work"/*.DLG "$work"/*.HLP "$dist/"
-rm -rf "$dist/XLT"; cp -r "$work/XLT" "$dist/XLT"
+cp "$work"/*.lng "$work"/*.dlg "$work"/*.hlp "$dist/"
+rm -rf "$dist/xlt"; cp -r "$work/xlt" "$dist/xlt"
 cp "$here/dist/dos/LICENSE-DN.TXT" "$here/dist/dos/LICENSE-TV.TXT" "$here/dist/dos/COPYRIGHT-TV-MAGIBLOT.TXT" "$dist/"
 python3 "$here/tools/dn-linux-tour.py" "$work" start f1help f3view f4edit f7mkdir f5copy menudisk quitask quit
 for n in start f1help f3view f4edit f7mkdir f5copy menudisk; do
@@ -27,15 +27,15 @@ The old build with the code page inside: DN_UTF8=0 tools/build.sh.
 The commands of the command line run in an embedded terminal (the screen of the user: Ctrl-O or Esc on an empty command line; DN_EMBED_TERM=0 gives the terminal to
 the shell as before, DN_RUN_PAUSE=0|1|2 sets what happens when the command ends).
 
-  cd dist/linux && ./dn            (dist/linux: i386, dist/linux64: x86_64, dist/aarch64: ARM64; the files of the program, *.LNG *.DLG *.HLP, must be next to it)
+  cd dist/linux && ./dn            (dist/linux: i386, dist/linux64: x86_64, dist/aarch64: ARM64; the files of the program, *.lng *.dlg *.hlp, must be next to it)
 
 Keys: F10 menu, Tab switches the panel, Enter enters a directory, F1 help, F3 view, F4 edit, F5 copy, F7 make a directory,
 Alt-X quit. DN names the files as DOS does: the disk C: is the root of the file system ("C:\home\you"). The first start
 shows a notice of the beta (Esc closes it). Settings and history are written to the directory where DN is started (DN.INI,
-DN.HIS).
+dn.his).
 screenshots/*.txt are the screens of tools/dn-linux-tour.py.
 Based on Dos Navigator by RIT Research Labs.
 DN is licensed as in LICENSE-DN.TXT, Turbo Vision as in LICENSE-TV.TXT and COPYRIGHT-TV-MAGIBLOT.TXT.
 EOS
-( cd "$dist" && sha256sum dn *.LNG *.DLG *.HLP > SHA256SUMS.TXT )
+( cd "$dist" && sha256sum dn *.lng *.dlg *.hlp > SHA256SUMS.TXT )
 echo "dist/linux is made: $(ls "$dist" | wc -l) files"

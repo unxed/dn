@@ -1907,7 +1907,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             begin
             
             { AK155 13.02.05 Фактичекси сюда можно попасть только из
-            DblWnd при обработке Ctrl-[ и Ctrl-], возможно, с Alt.
+            panelwin при обработке Ctrl-[ и Ctrl-], возможно, с Alt.
             Вот этот самый Alt и используем для инверсии
             признака работы с длинным или коротким именем }
             if (PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0) =

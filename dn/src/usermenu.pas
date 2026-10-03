@@ -123,7 +123,7 @@ constructor TUserWindow.Init;
            StandardScrollBar(sbHorizontal+sbHandleKeyboard),
         StandardScrollBar(sbVertical+sbHandleKeyboard))));
   ClearPositionalEvents := False;
-    { пусть единообразно обработается в dnapp }
+    { пусть единообразно обработается в mainapp }
   end;
 
 procedure TUserWindow.CalcBounds(var Bounds: TRect; Delta: TPoint);

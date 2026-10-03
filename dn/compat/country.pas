@@ -9,7 +9,7 @@ uses
   Defines;
 
 procedure GetSysCountryInfo;
-  {` Заполняет CountryInfo (advance) данными от системы `}
+  {` Заполняет CountryInfo (basics) данными от системы `}
 
 procedure QueryUpcaseTable;
   {` Для текущей кодовой страницы запрашивается у ОС таблица перекодировки

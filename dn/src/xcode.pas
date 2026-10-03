@@ -104,7 +104,7 @@ procedure TXCoder.LoadXlatTable; {JO}
   None := KeyMap = kmXlat;
    if SkipXLatMenu then
      goto SkipMenu;
-  FN := GetFileNameMenu(SourceDir+'XLT\', '*.XLT', FN, True, More, None);
+  FN := GetFileNameMenu(SourceDir+'XLT\', '*.xlt', FN, True, More, None);
   if None then
     begin
     UseKeyMap;
@@ -112,7 +112,7 @@ procedure TXCoder.LoadXlatTable; {JO}
     end;
   if More then
 SkipMenu:
-    FN := GetFileNameDialog(SourceDir+'XLT\*.XLT',
+    FN := GetFileNameDialog(SourceDir+'xlt\*.xlt',
         GetString(dlSelectXLT),
         GetString(dlOpenFileName),
         fdOKButton+fdHelpButton,

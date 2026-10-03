@@ -512,9 +512,9 @@ procedure ClearSwap;
   GetDateDow(DT.Year, DT.Month, DT.Day, L);
 
   PackTime(DT, L);
-  SetFileAttr(SwpDir+'DN.FLG', 0);
+  SetFileAttr(SwpDir+'dn.flg', 0);
   ClrIO;
-  ClearFiles('DN*.SWP');
+  ClearFiles('dn*.swp');
   ClearFiles('$DN*.*');
   ClearFiles('$$DN*.*');
   ClearFiles('$$$DN*.*');
@@ -576,9 +576,9 @@ constructor TDNApplication.Init;
     NewArchiveName:='';
    end;
 *)
-  LoadStream := PresentFile(SwpDir+'DN'+ItoS(DNNumber)+'.SWP');
+  LoadStream := PresentFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
   if LoadStream = nil then
-    LoadStream := PresentFile(SourceDir+'DN'+GetEnv('DNDSK')+'.DSK');
+    LoadStream := PresentFile(SourceDir+'dn'+GetEnv('DNDSK')+'.dsk');
   if LoadStream <> nil then
     RetrieveDesktop('', LoadStream, True);
   InitDrivers;
@@ -587,7 +587,7 @@ constructor TDNApplication.Init;
   if not RunFirst or cbAutoSave then
     begin
     ClipBoardStream := GetMeMemoStream;
-    LoadStream := PresentFile(SourceDir+'CLIPBOAR'+'.DN');
+    LoadStream := PresentFile(SourceDir+'dn'+'.clp');
     if  (LoadStream <> nil) and (ClipBoardStream <> nil) then
       begin
       LoadStream^.Seek(0);
@@ -622,8 +622,8 @@ constructor TDNApplication.Init;
     Event.Command := cmUserMenu;
     PutEvent(Event);
     end;
-  if ExistFile(SwpDir+'DN'+ItoS(DNNumber)+'.SWP') then
-    EraseByName(SwpDir+'DN'+ItoS(DNNumber)+'.SWP');
+  if ExistFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp') then
+    EraseByName(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
   end { TDNApplication.Init };
 {-DataCompBoy-}
 
@@ -654,7 +654,7 @@ procedure TDNApplication.InitCommandLine;
 procedure SaveRealDsk;
   begin
   PDNApplication(Application)^.SaveDesktop
-    (SourceDir+'DN'+GetEnv('DNDSK')+'.DSK');
+    (SourceDir+'dn'+GetEnv('DNDSK')+'.dsk');
   end;
 {-DataCompBoy-}
 
@@ -669,7 +669,7 @@ procedure SaveDsk;
       StartDir := '<' + StartDir; {помечаем, что StartDir нужно сохpанить}
    
     PDNApplication(Application)^.SaveDesktop
-      (SwpDir+'DN'+ItoS(DNNumber)+'.SWP');
+      (SwpDir+'dn'+ItoS(DNNumber)+'.swp');
     end;
   end;
 
@@ -683,7 +683,7 @@ destructor TDNApplication.Done;
   {-$VOL begin} {if CBAutoSave added by piwamoto}
   if cbAutoSave then
     begin
-    SaveStream := New(PBufStream, Init(SourceDir+'CLIPBOAR'+'.DN',
+    SaveStream := New(PBufStream, Init(SourceDir+'dn'+'.clp',
            stCreate, 2048));
     if  (SaveStream <> nil) and (SaveStream^.Status = stOK)
          and (ClipBoardStream <> nil)
@@ -800,7 +800,7 @@ procedure WriteConfig;
   begin { WriteConfig }
   
   ConfigModified := False;
-  S.Init(SourceDir+'DN'+GetEnv('DNCFG')+'.CFG', stCreate, 16384);
+  S.Init(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stCreate, 16384);
   if S.Status <> stOK then
     begin
     Msg(erCantOpenConfig, nil, mfError+mfOKButton);
@@ -1999,7 +1999,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   procedure StoreColors;
     begin
-    FN := GetFileNameDialog(SourceDir+'COLORS\*.PAL',
+    FN := GetFileNameDialog(SourceDir+'colors\*.pal',
            GetString(dlStoreColorPal), GetString(dlFileName),
         fdOKButton+fdHelpButton, hsColors);
     if FN = '' then
@@ -2026,7 +2026,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
   { procedure LoadColors;
  begin
   asm int 3 end;
-  FN := GetFileNameDialog(SourceDir+'COLORS\*.PAL', GetString(dlLoadColorPal), GetString(dlFileName),
+  FN := GetFileNameDialog(SourceDir+'colors\*.pal', GetString(dlLoadColorPal), GetString(dlFileName),
                           fdOKButton + fdHelpButton, hsColors);
   if FN = '' then Exit;
   LoadPalFromFile(FN);
@@ -2039,10 +2039,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     begin
     More := True;
     None := False;
-    FN := GetFileNameMenu(SourceDir+'COLORS\', '*.PAL', '', True, More,
+    FN := GetFileNameMenu(SourceDir+'colors\', '*.pal', '', True, More,
          None);
     if More then
-      FN := GetFileNameDialog(SourceDir+'COLORS\*.PAL',
+      FN := GetFileNameDialog(SourceDir+'colors\*.pal',
              GetString(dlLoadColorPal), GetString(dlFileName),
           fdOKButton+fdHelpButton, hsColors);
     if FN = '' then
@@ -2404,7 +2404,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     L.Init(5, 5, False);
     S := SourceDir;
     MakeSlash(S);
-    lFindFirst(S+'*.LNG', AnyFileDir, SR);
+    lFindFirst(S+'*.lng', AnyFileDir, SR);
     while DosError = 0 do
       begin
       if  ( (SR.SR.Attr and Directory) = 0) and (SR.FullSize > 0) then
@@ -2422,7 +2422,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     lFindClose(SR);
     S := StartupDir;
     MakeSlash(S);
-    lFindFirst(S+'*.LNG', AnyFileDir, SR);
+    lFindFirst(S+'*.lng', AnyFileDir, SR);
     while DosError = 0 do
       begin
       if  ( (SR.SR.Attr and Directory) = 0) and (SR.FullSize > 0) then
@@ -2732,7 +2732,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmHistoryList:
       CmdHistory;
     cmLoadDesk:
-      RetrieveDesktop(SourceDir+'DN'+GetEnv('DNDSK')+'.DSK', nil, True);
+      RetrieveDesktop(SourceDir+'dn'+GetEnv('DNDSK')+'.dsk', nil, True);
     cmRetrieveSwp:
       ProcessTempFile(TempFileSWP);
     cmSaveDesk:
@@ -2849,14 +2849,14 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       if  (not HelpInUse) or (HelpWnd = nil) or not IsOnDesktop(HelpWnd) then
         begin { создаём окно хелпа }
         HelpStrm := New(PDosStream,
-            Init(SourceDir+HelpLngId+'.HLP', stOpenRead {stOpenPacked})
+            Init(SourceDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked})
             );
         if (HelpStrm^.Status <> stOK) and (SourceDir<> StartupDir)
         then
           begin
           Dispose(HelpStrm, Done);
           HelpStrm := New(PDosStream,
-              Init(StartupDir+HelpLngId+'.HLP', stOpenRead {stOpenPacked})
+              Init(StartupDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked})
               );
           end;
         if HelpStrm^.Status <> stOK then
