@@ -729,7 +729,7 @@ procedure TSaversDialog.Awaken;
     Insert(NewStr(#249' Flash-light'));
     Insert(NewStr(#249' Clock'));
     Insert(NewStr(#249' Blackness'));
-    lFindFirst(SourceDir+'SSAVERS\*.SS', AnyFileDir, lSR);
+    lFindFirst(SourceDir+'ssavers\*.SS', AnyFileDir, lSR);
     while DosError = 0 do
       begin
       Insert(NewStr(lSR.FullName));

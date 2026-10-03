@@ -144,7 +144,7 @@ function FindFileWithSPF(pFileName: String; Info: PWhileView): String;
   Result := '';
   if CharCount('.', pFileName) = 0 then
     pFileName := pFileName+'.';
-  lAssignText(F, SourceDir+'DN.SPF');
+  lAssignText(F, SourceDir+'dn.spf');
   lResetText(F);
   if IOResult <> 0 then
     begin

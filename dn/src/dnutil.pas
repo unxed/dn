@@ -1554,7 +1554,7 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
 
   function Edit: Boolean;
     begin
-    Edit := ExecExtFile('DN.EDT', @up, dlLoadingEditor);
+    Edit := ExecExtFile('dn.edt', @up, dlLoadingEditor);
     end;
 
   label ex;

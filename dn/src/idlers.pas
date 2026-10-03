@@ -524,7 +524,7 @@ procedure CallExternalSaver(const FN: String);
   {/JO}
   SwapVectors;
   {  DoneSysError;} {X-Man}
-  AnsiExec(SourceDir+'SSAVERS\'+FN, '');
+  AnsiExec(SourceDir+'ssavers\'+FN, '');
   {  InitSysError;} {X-Man}
   SwapVectors;
   InitVideo;

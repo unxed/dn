@@ -1216,13 +1216,13 @@ function QuickExecExternal(N: Integer): Boolean;
   QuickExecExternal := False;
 
   Local := True;
-  F := New(PTextReader, Init('DN.XRN'));
+  F := New(PTextReader, Init('dn.xrn'));
 
   if F = nil then
     begin
 RL:
     Local := False;
-    F := New(PTextReader, Init(SourceDir+'DN.XRN'));
+    F := New(PTextReader, Init(SourceDir+'dn.xrn'));
     end;
   if F = nil then
     Exit;

@@ -3879,7 +3879,7 @@ EndDel:
       case ExecResource(dlgSrchFailed, Q) of
         cmYes:
           PDNApplication(Application)^.EditFile(True,
-             SourceDir+'DN.SPF');
+             SourceDir+'dn.spf');
         cmNo:
           PDNApplication(Application)^.EditFile(True, S);
       end
