@@ -35,6 +35,33 @@ function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
   {` Is the hot letter of a menu item (the character of Name at At, which may be UTF-8) the key Ch, the character of the code page that DN
   takes from the keyboard (CharCode)? The case does not matter. `}
 
+{ --- the table of a document of the editor ---------------------------------------------------------------------
+  The editor of DN works on one byte per column. With UTF-8 inside, a document has a table: the byte $80..$FF of its lines (the internal text)
+  stands for a character. The table starts as the current code page (so a Cyrillic letter has the same byte as in the code page of DN, the keyboard
+  gives that byte, the tables of DN fit); the characters of the document that the page does not have take the cells of the frame characters
+  ($B0..$DF of 866: U+2500..U+259F) that the document does not use. The file keeps UTF-8; the table is made when the file is read. }
+type
+  TDocTab = record
+    Cp: array[128..255] of LongWord;          { the character of the byte }
+    Seen: array[0..191] of LongWord;          { the characters of the document that are not ASCII (before TabBuild) }
+    SeenN: Integer;
+    Over: Boolean;                            { more different characters than the table can have }
+  end;
+
+function Utf8CharsL(const S: AnsiString): LongInt;
+  {` The number of characters of a long UTF-8 string (the bytes that are not continuation bytes). `}
+procedure TabNatural(var T: TDocTab);
+  {` The table of the current code page, nothing seen. `}
+function TabSee(var T: TDocTab; const S: AnsiString): Boolean;
+  {` The non-ASCII characters of the UTF-8 line S are noted; False when S is not UTF-8. `}
+function TabBuild(var T: TDocTab): Boolean;
+  {` The cells for the noted characters; False when they do not fit. `}
+function TabToInternal(var T: TDocTab; const S: AnsiString; Alloc: Boolean): AnsiString;
+  {` The UTF-8 line S as the internal line (one byte per character). A character that the table does not have takes a free cell when Alloc,
+  else '?'. `}
+function TabToUtf8(const T: TDocTab; const S: AnsiString): AnsiString;
+  {` The internal line as UTF-8. `}
+
 function Utf8ToProxy(const S: String; var Tab: String): String;
   {` S with each non-ASCII character as one byte #128+i; Tab[i+1] is that character (its bytes). `}
 
@@ -214,6 +241,174 @@ function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
     Cp2 := CpToUnicode(Byte(Ch));
     Result := CpUpper(Cp) = CpUpper(Cp2);
     end;
+  end;
+
+function Utf8CharsL(const S: AnsiString): LongInt;
+  var
+    I: LongInt;
+  begin
+  Result := 0;
+  for I := 1 to Length(S) do
+    if (Byte(S[I]) and $C0) <> $80 then
+      Inc(Result);
+  end;
+
+procedure TabNatural(var T: TDocTab);
+  var
+    B: Integer;
+  begin
+  for B := 128 to 255 do
+    T.Cp[B] := CpToUnicode(B);
+  T.SeenN := 0;
+  T.Over := False;
+  end;
+
+function TabHas(const T: TDocTab; Cp: LongWord): Integer;
+  var
+    B: Integer;
+  begin
+  if Cp < $80 then
+    Exit(Integer(Cp));
+  for B := 128 to 255 do
+    if T.Cp[B] = Cp then
+      Exit(B);
+  Result := -1;
+  end;
+
+function TabSee(var T: TDocTab; const S: AnsiString): Boolean;
+  var
+    I, K: Integer;
+    Cp: LongWord;
+    Used: Integer;
+  begin
+  Result := True;
+  I := 1;
+  while I <= Length(S) do
+    begin
+    if  Byte(S[I]) < $80 then
+      begin
+      Inc(I);
+      Continue;
+      end;
+    if not (Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) and (Used > 1)) then
+      Exit(False);
+    Inc(I, Used);
+    K := 0;
+    while (K < T.SeenN) and (T.Seen[K] <> Cp) do
+      Inc(K);
+    if K = T.SeenN then
+      if T.SeenN > High(T.Seen) then
+        T.Over := True
+      else
+        begin
+        T.Seen[K] := Cp;
+        Inc(T.SeenN);
+        end;
+    end;
+  end;
+
+function TabIsFrame(Cp: LongWord): Boolean;
+  begin
+  Result := (Cp >= $2500) and (Cp <= $259F);
+  end;
+
+function TabFreeCell(var T: TDocTab; const Used: array of Boolean): Integer;
+  var
+    B: Integer;
+  begin
+  for B := 128 to 255 do
+    if  TabIsFrame(T.Cp[B]) and not Used[B - 128] then
+      Exit(B);
+  Result := -1;
+  end;
+
+function TabBuild(var T: TDocTab): Boolean;
+  var
+    I, B: Integer;
+    Used: array[0..127] of Boolean;
+  begin
+  Result := not T.Over;
+  if T.Over then
+    Exit;
+  FillChar(Used, SizeOf(Used), 0);
+  { the cells of the characters that the document has already (the table is the page) }
+  for I := 0 to T.SeenN - 1 do
+    begin
+    B := TabHas(T, T.Seen[I]);
+    if B >= 0 then
+      Used[B - 128] := True;
+    end;
+  for I := 0 to T.SeenN - 1 do
+    if TabHas(T, T.Seen[I]) < 0 then
+      begin
+      B := TabFreeCell(T, Used);
+      if B < 0 then
+        Exit(False);
+      T.Cp[B] := T.Seen[I];
+      Used[B - 128] := True;
+      end;
+  T.SeenN := 0;
+  end;
+
+function TabToInternal(var T: TDocTab; const S: AnsiString; Alloc: Boolean): AnsiString;
+  var
+    I, B, K: Integer;
+    Cp: LongWord;
+    Used: Integer;
+    Taken: array[0..127] of Boolean;
+  begin
+  Result := '';
+  I := 1;
+  while I <= Length(S) do
+    begin
+    if  Byte(S[I]) < $80 then
+      begin
+      Result := Result + S[I];
+      Inc(I);
+      Continue;
+      end;
+    if  Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) and (Used > 1) then
+      begin
+      B := TabHas(T, Cp);
+      if (B < 0) and Alloc then
+        begin
+        { a free cell: a frame cell that no character of the text needs: here the cells are found by what the table has now }
+        FillChar(Taken, SizeOf(Taken), 0);
+        for K := 128 to 255 do
+          if not TabIsFrame(T.Cp[K]) or (T.Cp[K] <> CpToUnicode(K)) then
+            Taken[K - 128] := True;
+        B := TabFreeCell(T, Taken);
+        if B >= 0 then
+          T.Cp[B] := Cp;
+        end;
+      if B < 0 then
+        Result := Result + '?'
+      else
+        Result := Result + Chr(B);
+      Inc(I, Used);
+      end
+    else
+      begin
+      Result := Result + '?';
+      Inc(I);
+      end;
+    end;
+  end;
+
+function TabToUtf8(const T: TDocTab; const S: AnsiString): AnsiString;
+  var
+    I, N: Integer;
+    Buf: array[0..7] of Byte;
+  begin
+  Result := '';
+  for I := 1 to Length(S) do
+    if Byte(S[I]) < $80 then
+      Result := Result + S[I]
+    else
+      begin
+      N := Utf8Encode(T.Cp[Byte(S[I])], @Buf[0]);
+      Result := Result + Copy(PChar(@Buf[0]), 1, N);
+      end;
   end;
 
 function Utf8ToProxy(const S: String; var Tab: String): String;

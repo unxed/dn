@@ -78,7 +78,7 @@ const
 implementation
 uses
   DNStdDlg, Advance, DNApp, Commands, Lfn, Advance2, ed2, Advance1, Views,
-  Collect, WinClp, Dos, Messages, Startup, DnIni, DnIni_p, CopyIni,
+  Collect, WinClp, Dos, Messages, Startup, DnIni, DnIni_p, CopyIni, DNUtf8,
   {SBlocks,}U_KeyMap, Macro,
   xTime, Memory, Drivers,
   FlTl,
@@ -318,6 +318,39 @@ procedure MISaveFile(AED: PFileEditor);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
+{$IFDEF DNUTF8}
+{ UTF-8 inside: is the file UTF-8 (then the editor works with it by the table of the document) or bytes of a code page (then by the code page) }
+procedure ScanDocU8(AED: PFileEditor);
+  var
+    I: LongInt;
+    P: PLongString;
+    Ok: Boolean;
+  begin
+  with AED^ do
+    begin
+    TabNatural(DocTab);
+    DocU8 := False;
+    Ok := True;
+    for I := 0 to FileLines^.Count-1 do
+      begin
+      P := FileLines^.At(I);
+      if (P <> nil) and not TabSee(DocTab, P^) then
+        begin
+        Ok := False;
+        Break;
+        end;
+      end;
+    if Ok and TabBuild(DocTab) then
+      begin
+      DocU8 := True;
+      KeyMap := kmAscii;
+      end
+    else
+      TabNatural(DocTab);
+    end;
+  end;
+{$ENDIF}
+
 procedure MILoadFile(AED: PFileEditor; Name: String);
   label
     1;
@@ -388,6 +421,9 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
       if Name <> '' then
         Name := lFExpand(Name);
       end;
+{$IFDEF DNUTF8}
+    ScanDocU8(AED);
+{$ENDIF}
     SetLimits;
     Pos.X := 0;
     Pos.Y := 0;
