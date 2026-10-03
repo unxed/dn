@@ -278,3 +278,13 @@ letters, digits, the functional keys, AltGr, Alt+numpad, characters above U+FFFF
 by default it is asked for only in Windows Terminal (`WT_SESSION`). Tests: `t_termio` (19 checks), `tv/tests/pty/test_win32input.py` (tvdemo), `tools/dn-linux-win32.py` (DN: F7, Esc, Alt-X + Enter).
 Open: ask the terminal (DECRQM `ESC[?9001$p`) instead of guessing by `WT_SESSION` (WezTerm, conhost, far2l have the mode too); the repeat count and the key releases are dropped; Ctrl+digit and the
 OEM keys with Ctrl give nothing without a character; Windows (the console API of `TvTermOs`) does not use it; the next steps: OSC 52, the kitty keyboard flags as a setting, far2l extensions.
+
+## Terminal protocols, step 2: the far2l extensions (2026-10-03)
+
+Done in `tv` (`TvFar2l`, `TvTermIO.ParseApc`, `TvUnix`): DN asks the terminal (`ESC _ far2l1 ST` + `ESC [ 5 n`), and when it answers `far2lok` the keys and the mouse come as events of the terminal and
+the clipboard goes through it (open / empty / pieces of 16 KiB / set / close; read only after a paste gesture); `TV_FAR2L=0` switches it off, `TV_FAR2L_WAIT` is how long the terminal may ask the user.
+Why: the far2l terminal takes Ctrl+Ins and Shift+Ins for its own copy and paste, so DN never got them (reported by the owner: Ctrl+Ins in the editor copied nothing, Edit-Copy did; Shift+Ins "worked" because
+the terminal typed the text). Checked: `t_far2l` (33, the examples of the documentation), `t_termio` (110), `tv/tests/pty/test_far2l.py` (a terminal of the test: keys, mouse, set and get of the clipboard, 40 KB in pieces).
+**Open:** `tools/dn-linux-far2l.py` (DN in the editor with that terminal: Shift+End, Ctrl+Ins must put the line on the clipboard of the terminal, Shift+Ins must paste it) is RED: the editor opens with the
+text, but after Shift+End and Ctrl+Ins the clipboard of the terminal is empty and the editor shows no text at the end. Not diagnosed yet: first check that the keys of the script (Shift+End: virtual key 0x23 with the Shift
+bit) are the ones DN selects with, then what `SyncClipIn` (winclp.pas) sends. The script is not in CI yet. Next: F-key titles, notifications, window size, palette, DECRQM, then the far2l images / drag and drop.
