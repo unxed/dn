@@ -294,3 +294,11 @@ selection on the clipboard of the far2l terminal (the script checks it: PASS).
 
 **Confirmed by the owner (2026-10-03, the far2l terminal on Linux Mint, dist built from 18b36b9):** Ctrl+Ins copies and Shift+Ins pastes in the editor now. The red Shift+Ins check of `tools/dn-linux-far2l.py`
 (a block is selected when it pastes) stays as a note: a possible difference between pasting over a selected block and pasting without one; not seen by the owner.
+
+## DOS: "save the desktop on exit" and "Save setup" (2026-10-03, started, not finished)
+
+What exists in the sources (no new code needed to start): the option "Autosave ~D~esktop" in the dialog Options -> Startup (`RESOURCE/ENGLISH/dn.dnr` line ~3557) is `StartupData.Unload and osuAutosave`; `TDNApplication.Done` (`dnutil.pas` ~710)
+then calls `SaveRealDsk` (writes `DN.DSK`), else `SaveDsk` (the swap file `DNn.SWP`); the command `cmSaveDesk` (Options -> Save desktop, `dnutil.pas` ~2738) writes it on demand; the config is `WriteConfig` (`ConfigModified`).
+Next steps (a tour scenario each): (1) `tools/dn-tour.sh` scenario that switches "Autosave Desktop" on in Options -> Startup, opens a window (F3 on a file), exits with Alt-X and checks that `DN.DSK` exists and a new start brings the window back;
+(2) the same for Options -> "Save setup": change a setting, save, restart, the setting is there (`DN.INI`). Keys: F10, then Right x6 for the menu Options (x5 is Panel), `DNDUMPSEC` must count the keys (n + m + 4). The earlier fix of loading a saved desktop
+(`TGroup.GetSubViewPtr`) is in. Not checked on DOS yet: that the autosave on exit really runs there (the exit path of DN-DOS under DOSBox-X: `Halt` in the dump mode skips `Done`).
