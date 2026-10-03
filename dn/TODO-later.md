@@ -192,3 +192,9 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   the owner must keep (hotkeys) are told by `KeyFilter`; the program is read on a timer of 20 ms (the event loop of `tv/` does not wait on the pty): a
   wait on the descriptor of the pty in `TvUnix` would save the idle wakeups; the redraw of the whole view at each change (the dirty rows are known, the
   clip of the view is not used); the colors of the terminal are the default colors of the real terminal, not the palette of the window.
+
+## Embedded terminal in DN (2026-10-03)
+- The user screen starts empty (it does not hold the screen that was before DN); it keeps what the commands drew (history of 2000 lines). Not done: the screen of the program that started DN; the command line of DN stays DN's own (no
+  completion by the shell); the panels are not shown while the command runs (no half-screen terminal); the F-keys of DN are given to the program while it runs (no way to leave it before it ends except its own exit);
+  Windows has no embedded terminal (`TvPty` is Linux only: ConPTY is item 8.5).
+- `Esc` on an empty command line shows the user screen (the DN option `ouiEsc`), also when there is nothing but the output of the last command.
