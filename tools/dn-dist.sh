@@ -13,6 +13,7 @@ DN_EXTRA="-Xs" "$here/tools/build.sh" dos "$work/run" >/dev/null 2>&1 || true
 [ -f "$work/run/dn.exe" ] && [ -f "$work/run/ENGLISH.DLG" ] || { echo "the build failed: run tools/build.sh dos" >&2; exit 1; }
 cp "$work/run/dn.exe" "$dist/DN.EXE"
 cp "$work"/run/*.DLG "$work"/run/*.LNG "$work"/run/*.HLP "$dist/"
+rm -rf "$dist/XLT"; cp -r "$here/dn/data/XLT" "$dist/XLT"
 cp "$work/run/CWSDPMI.EXE" "$dist/"
 # the documentation of CWSDPMI (its terms: the doc goes with the program)
 if [ ! -f "$dist/CWSDPMI.DOC" ]; then
