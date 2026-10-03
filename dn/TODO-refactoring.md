@@ -10,6 +10,8 @@ before and after). Add what you find; do not stop for it outside of the step. Ma
 
 - [x] 2026-10-03 (after aarch64 and the DOSBox-X patches): one table "script -> what it does -> which workflow calls it": `tools/README.md` (linked from `README.md`).
 
+- [x] 2026-10-03 (after the autosave of the desktop): "who writes what and when" for the settings and the desktop (`DN.CFG`, `DN.INI`, `DN.DSK`, `DN<n>.SWP`, `DN.HIS`): a section in `dn/FILES.md`; the guess "(?)" at `dn1.pas` is replaced by what it holds. No code changed.
+
 ## Candidates (rough order of how much they hurt)
 - **Final step (owner decision 2026-10-03):** move DN to the Safe Pascal style (repository `unxed/sp`): see `DN-ADOPTION.md` there and the short section "Safe Pascal как стиль кода DN" in PLAN.md (the order S0-S10 chosen by RUP: (c) first, then (a) with a decision point, (b) only as a fallback). Earlier than the end if it turns out cheap (the pilot on new code, stage 3).
 - The names of DN files in `dn/src` are the DOS names of the archive (`microed`, `microed2`, `u_myapp`, `topview_`, `country_`, `advance`, `advance1`, `advance2`...): what a file
