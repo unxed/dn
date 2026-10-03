@@ -107,7 +107,7 @@ uses
   Startup, xTime, Messages, DNUtil
   , editcore, Histries, FViewer, panelroot
   , Idlers 
-  , osdep, Lfn, UserMenu, Menus
+  , osdep, dnscreen, Lfn, UserMenu, Menus
   , DnIni, Math
   ;
 
@@ -242,8 +242,8 @@ procedure TCommandLine.Update;
     Exit;
 
   { А теперь делаем, чтобы курсор действиельно имел нужный вид }
-  SysGetCurPos(A1, A2);
-  SysTVGetCurType(CursorStartScanLine, CursorEndScanLine, CursorVisible);
+  GetCursorXY(A1, A2);
+  GetCursorType(CursorStartScanLine, CursorEndScanLine, CursorVisible);
   if
     (SSaver <> nil) or 
       (Size.X = 0) or (Size.Y = 0) or
@@ -268,11 +268,11 @@ procedure TCommandLine.Update;
     CursorMinY := 0;
     if not Overwrite then
       CursorMinY := CursorMaxY-1;
-    SysTVSetCurType(CursorMinY, CursorMaxY, True);
+    SetCursorType(CursorMinY, CursorMaxY, True);
     OldOverwrite := Ord(Overwrite);
     end;
   if  (A1 <> P.X) or (A2 <> Origin.Y) then
-    SysTVSetCurPos(P.X, Origin.Y);
+    MoveCursorTo(P.X, Origin.Y);
   {/AK155}
   end { TCommandLine.Update };
 

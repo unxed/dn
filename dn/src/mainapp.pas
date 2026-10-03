@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, osdep, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
+uses basics, fileutil, langid, Videoman, osdep, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -383,7 +383,7 @@ begin
   Inc(IdleCount);
   inherited Idle;
   if Drivers.ScreenBuffer <> nil then
-    SysTvGetSrcBuf;               { the copy of the screen that DN reads }
+    ReadScreenCells;               { the copy of the screen that DN reads }
   if StatusLine <> nil then
   begin
     StatusLine^.Update;
