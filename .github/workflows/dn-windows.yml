@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [win64, win32]
-        utf8: ['0', '1']        # 1: UTF-8 inside DN (the names through the wide API of Windows), 0: the code page
+        utf8: ['1', '0']        # 1: UTF-8 inside DN (the default; the names through the wide API of Windows), 0: the code page
     steps:
       - uses: actions/checkout@v4
       - name: Packages

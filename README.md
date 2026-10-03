@@ -77,6 +77,7 @@
        DN_WIN=ПРЕФИКС tools/build.sh win64          # результат out/win64/dn.exe, ресурсы, справка и XLT\ рядом (win32: DN_WIN32=...)
        python tools/dn-win-smoke.py out/win64       # на Windows: настоящая консоль (ConPTY), pip install pywinpty; в CI — workflow dn-windows
 
+   DN под Windows тоже с UTF-8 внутри (имена любых алфавитов через широкие API); старая сборка с кодовой страницей: `DN_UTF8=0 tools/build.sh win64`.
    Без сборки: `dist/win64/DN.EXE`, `dist/win32/DN.EXE` (описание — `README.TXT` рядом; нужна консоль Windows 10 1809+ или Windows Terminal).
    Вывод на Windows по умолчанию идёт через Console API (`WriteConsoleOutputW`: работает в wine и в Windows старше 10); `DN_WIN_OUTPUT=vt` включает прежний режим
    с VT-последовательностями (консоль Windows 10 1809+ / Windows Terminal). В wine яркий фон (палитра DN) терминал wine рисует неровно, поэтому там фон без яркости; `DN_WIN_BRIGHT_BG=1|0` переключает. Проверяет CI на настоящем Windows (`tools/dn-win-smoke.py`).

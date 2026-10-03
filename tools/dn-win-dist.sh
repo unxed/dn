@@ -27,8 +27,9 @@ The program draws with the console API (WriteConsoleOutputW), so it works in Win
 environment variable DN_WIN_OUTPUT=vt to use the virtual terminal sequences (Windows 10 1809 or newer, Windows Terminal).
 In Wine the bright background colors of DN are drawn without the intensity bit (the terminal of Wine draws them unevenly);
 DN_WIN_BRIGHT_BG=1 turns that off, =0 turns it on in Windows.
-Known: file names with non-ASCII letters are shown as the system code page gives them (not converted to the OEM page yet);
-the Russian interface shows in the OEM page 866 (tools: see dn/TODO-later.md).
+DN is UTF-8 inside: file names of any alphabet (the wide API of Windows), the Russian interface, the viewer, the editor and
+the clipboard work; wide CJK letters and combining marks are not counted right yet. The old build with the code page inside:
+DN_UTF8=0 tools/build.sh win64.
 Based on Dos Navigator by RIT Research Labs.
 DN is licensed as in LICENSE-DN.TXT, Turbo Vision as in LICENSE-TV.TXT and COPYRIGHT-TV-MAGIBLOT.TXT.
 EOS
