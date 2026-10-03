@@ -8,7 +8,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 | Our files (MIT, see `LICENSE`) | 20 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 121 |
-| Contributors of DN OSP | 4 |
+| Contributors of DN OSP | 5 |
 | Upstream without a notice | 17 |
 
 ## Our files (MIT, see `LICENSE`)
@@ -33,7 +33,7 @@ Files of the public DN OSP 2.14 with the notice of RIT Research Labs; changed by
 
 Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155...) and give no license of their own: they came in the same public release as the rest, and are used as part of it. This is the thing to ask the owner of the project about (PLAN.md).
 
-`events.pas`, `fltl.pas`, `fnotify.pas`, `uue2inc.pas`
+`dnutf8.pas`, `events.pas`, `fltl.pas`, `fnotify.pas`, `uue2inc.pas`
 
 ## Upstream without a notice
 
