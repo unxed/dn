@@ -174,3 +174,11 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   (non-UTF-8) file: typed characters outside the code page are dropped there (`microed.pas`, evKeyDown).
 - Frame characters typed by hand mark their cell as used (`TabMark`), but a frame cell given to a rare character stays given for the session of the file.
 - Events with key code 0 and a text (characters outside the code page) now reach all views in the UTF-8 build (`u_myapp.pas`); only the editor uses them.
+
+## Found by looking at the Russian screens (2026-10-03)
+- The message boxes (F8 delete confirmation etc.) have the title `Confirm` and the buttons `Yes`/`No` in English in the Russian interface
+  (both builds): the stock strings of `tv/` (`MessageBox`), not the language file of DN. To check where DN's own texts should go in.
+- Fixed: after the move of the cursor the two redrawn lines of the panel were drawn by `WriteLineW` from a buffer of cells (garbage `♂ ◘` in the
+  panel): a leftover of the conversion of the draw buffers to cells (commit 86cb12f), `flpanel.pas` now uses `WriteLineC`; the ops test has a check.
+  Other leftovers of that kind may exist: the places that still hand cell buffers to the word-based `WriteLineW/WriteBufW` (the DBF viewer and
+  `calendar`, `ed2`, `idlers`, `swe`, `topview_` use word buffers on purpose).
