@@ -128,7 +128,7 @@ Why two files for the settings: `dn.cfg` is the memory dump of the records of th
 | `topview.pas` (was `topview_`) | the view that shows the top of a stack of windows and the sorted view (`TTopView`, `TSortView`) |
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
-| `compat/`: `vpsyslow.pas`, `use16.pas` (ours); `vpsysext.pas` (was `vpsyslo2`: the extension of the layer written by JO of DN OSP) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
+| `compat/`: `vpsyslow.pas`, (`use16` is gone: `SmallInt`); `vpsysext.pas` (was `vpsyslo2`: the extension of the layer written by JO of DN OSP) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
 | `compat/country.pas` (was `country_`; DOS), `compat/linux/country.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `resource/*` → `*.LNG`, `*.DLG`) |
 

@@ -94,7 +94,6 @@ uses
   xTime, FilesCol, mainapp, Drivers, progress, Messages, Commands,
   FileCopy, HistList, DNUtil
   , Events
-  , use16
   ;
 
 function longmul(X, Y: LongInt): LongInt;
@@ -144,8 +143,8 @@ var
   PI: PWhileView;
   R: TRect;
 var
-  ErrorNumber: Integer;
-  GoodNumber: Integer;
+  ErrorNumber: SmallInt;
+  GoodNumber: SmallInt;
 const
   Digits: set of Char = ['0'..'9'];
   OutBufSize = $1000;
@@ -254,8 +253,8 @@ function MatchCurFileName(const FName: string): Boolean;
   усекается до длины FName.
   }
   var
-    l: Integer;
-    i: Integer;
+    l: SmallInt;
+    i: SmallInt;
   begin
   l := Length(FName);
   Result := False;
@@ -465,7 +464,7 @@ function UUString(var s: String; var CRC: Word): Boolean;
     var
       Sum: Word;
       C: Byte;
-      L: Integer;
+      L: SmallInt;
     begin
     { the assembler text: only the first character (the length of the line) is checked and translated and goes into the
       sum; the rest of the string is looked at for a zero and the tail of 70 bytes after the string is cleared }
@@ -827,7 +826,7 @@ function MemEqu(var A, B; Size: LongInt): Boolean;
       E: String;
       nl: Byte absolute N;
       el: Byte absolute E;
-      i, i1: Integer;
+      i, i1: SmallInt;
     begin
     {AK155  8-11-2004
     В качестве имени файла не просто берём первое слово, что неверно для
@@ -943,7 +942,7 @@ function MemEqu(var A, B; Size: LongInt): Boolean;
 
 procedure CalcLnCRC(var Strng: String; var CRC: Word);
       var
-        I: Integer;
+        I: SmallInt;
         Sum: Word;
       begin
       if Length(Strng) = 0 then
@@ -1255,7 +1254,7 @@ procedure DecodeStr(var Src, Dst);
     var
       S: PByte;
       D: PByte;
-      I: Integer;
+      I: SmallInt;
       C1, C2, C3, C4: Byte;
     begin
     S := @Src;
@@ -1783,7 +1782,7 @@ procedure Clear64(n:T64);near;external;
       NLines: LongInt;
       L, FL, CRC, RSize: LongInt;
       S: String;
-      I, Start: Integer;
+      I, Start: SmallInt;
       Nm: String;
       Xt: String;
       Dr: String;
@@ -1958,7 +1957,7 @@ function GetDecimal(Number: Word): String;
 
       function GetMonth(Month: Word): String;
         begin
-        GetMonth := GetString(TStrIdx(Integer(dlJanuary)+Month-1))
+        GetMonth := GetString(TStrIdx(SmallInt(dlJanuary)+Month-1))
         end;
 
       function StdDateTime(Year, Month, Day, Hour, Minute, Second: Word)
@@ -2017,7 +2016,7 @@ function GetDecimal(Number: Word): String;
       var
         LocalFreeStr, o: String;
         P: Pointer;
-        II: Integer;
+        II: SmallInt;
       begin
       Inc(SectNo);
       Skip := False; { Flash 30-04-2003 }
@@ -2317,7 +2316,7 @@ end;
     procedure DoIt;
       var
         sss, Ma: LongInt;
-        II: Integer;
+        II: SmallInt;
         LocalFreeStr, UUEncodeDataName: String;
         Err: LongInt;
       label beg;
