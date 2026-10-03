@@ -9,6 +9,8 @@ Alt-X quit. Settings and history are written to the directory where DN is starte
 screenshots\*.txt are screens of the Windows build on a real Windows console (ConPTY, from CI: tools/dn-win-smoke.py).
 The program draws with the console API (WriteConsoleOutputW), so it works in Wine and in Windows before 10 too; set the
 environment variable DN_WIN_OUTPUT=vt to use the virtual terminal sequences (Windows 10 1809 or newer, Windows Terminal).
+In Wine the bright background colors of DN are drawn without the intensity bit (the terminal of Wine draws them unevenly);
+DN_WIN_BRIGHT_BG=1 turns that off, =0 turns it on in Windows.
 Known: file names with non-ASCII letters are shown as the system code page gives them (not converted to the OEM page yet);
 the Russian interface shows in the OEM page 866 (tools: see dn/TODO-later.md).
 Based on Dos Navigator by RIT Research Labs.
