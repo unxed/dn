@@ -70,7 +70,7 @@ procedure SysGetDirDos(D: Byte; var S: string);
 
 { --- searching a directory ---------------------------------------------------- }
 type
-  { The record of a search. The first fields are laid out as DN (osfind.pas) expects them; the state of
+  { The record of a search. The state of
     the search is kept by the unit (Handle is a number of a slot). Name ends with a zero byte after its
     last character, so that it can be taken as a PChar too. }
   POSSearchRec = ^TOSSearchRec;
@@ -82,6 +82,8 @@ type
     Size: TFileSize;
     Name: ShortString;
     Filler: array[0..3] of Char;
+    CreationTime: LongInt;       { DOS date and time; 0 when the system does not tell }
+    LastAccessTime: LongInt;
   end;
 
 { 0 when found, else the error code (18 = nothing more) }

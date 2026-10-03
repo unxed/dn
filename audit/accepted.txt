@@ -3,7 +3,7 @@
 # every run (audit/gate.py): nothing is hidden. Decided by the owner on 2026-10-04: the names and the signatures of an API are not under copyright
 # (the same reason why a compatible implementation of an API, like Wine, can exist). NOT only signatures, checked line by line on 2026-10-04: besides the class and method
 # declarations, the files hold literal tables of palette indexes (CGrayDialog, CButton... ~25 lines of numbers, dialogs.inc and views.inc); they are functional data (how a view
-# maps its colors to the colors of its owner), not names, and this is the part for which the owner's confirmation is open.
+# maps its colors to the colors of its owner), not names, and this was accepted by the owner on 2026-10-04 on that ground (the numbers are fixed by the compatibility of the color mapping).
 # collect.inc: the four virtual overrides of TStringCollection and TStrCollection (Compare/FreeItem/GetItem/PutItem): DN code overrides exactly these methods.
 # dialogs.inc, views.inc: the names of the standard palettes (CButton, CGrayDialog...) with the numeric indexes of the palette; the values are those of tv/.
 shims/manual/collect.inc 60 80 320   # signatures of the Borland collections that DN code overrides
