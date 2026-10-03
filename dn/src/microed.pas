@@ -356,9 +356,23 @@ procedure TFileEditor.ChangeBlockCase(C: Word);
     CapTable: PXLat;
     WordSelect: Boolean;
     C1: Char;
+    UpTab, LowTab, TogTab: PXLat;
+{$IFDEF DNUTF8}
+    DocUp, DocLow, DocTog: TCaseTab;
+{$ENDIF}
   label
     EndS;
   begin
+  UpTab := @UpCaseArray;
+  LowTab := @LowCaseArray;
+  TogTab := @ToggleCaseArray;
+{$IFDEF DNUTF8}
+  { UTF-8 inside: the tables of the code page do not fit the bytes of the document; the case is by its table }
+  TabCase(DocTab, DocUp, DocLow, DocTog);
+  UpTab := PXLat(@DocUp);
+  LowTab := PXLat(@DocLow);
+  TogTab := PXLat(@DocTog);
+{$ENDIF}
   OldMark := Mark;
   FlushWorkString;
   {AK155 28.12.2004 Выделение области для перекодировки }
@@ -424,27 +438,27 @@ procedure TFileEditor.ChangeBlockCase(C: Word);
       теней S не создаётся}
     case C of
       cmUpcaseBlock, cmUpString:
-        CaseArray := @UpCaseArray;
+        CaseArray := UpTab;
       cmLowcaseBlock, cmLowString:
-        CaseArray := @LowCaseArray;
+        CaseArray := LowTab;
       cmRusEngConvBlock, cmRusEngConvString:
         CaseArray := @LayoutConvXlat;
       cmToggleCaseBlock, cmToggleCaseString:
-        CaseArray := @ToggleCaseArray;
+        CaseArray := TogTab;
       cmCapitalizeBlock, cmCapString:
         begin
-        CapTable := @UpCaseArray;
+        CapTable := UpTab;
         if (J > 1) and not (S[J-1] in BreakChars) then
-          CapTable := @LowCaseArray;
+          CapTable := LowTab;
         for K := J to L do
           begin
           C1 := S[K];
           if (C1 in BreakChars) then
-            CapTable := @UpCaseArray
+            CapTable := UpTab
           else
             begin
             S[K] := CapTable^[S[K]];
-            CapTable := @LowCaseArray;
+            CapTable := LowTab;
             end;
           end;
         goto EndS;
