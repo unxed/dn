@@ -8,3 +8,6 @@ build/
 # the DOS build that can be tried without building it (tools/dn-dist.sh)
 !dist/dos/*.EXE
 out/
+tv/tests/tvhc-o/
+tv/tests/t_tvhc
+tv/tests/t_util
