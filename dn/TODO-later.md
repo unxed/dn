@@ -265,6 +265,8 @@ Test seam: `DNMOUSE=D3:0,U3:0,DD10:5,...` (`dnapp.pas`, next to `DNKEYS`): mouse
 go into the queue of the application once a second (half a second after the keys); the driver is not used (DOSBox-X without a display has no pointer).
 The driver itself: `DosMousePresent` is True in DOSBox-X (INT 33h found by `TvDos`); real button presses are not possible in this harness, so by hand only.
 Checked: a click on "File" in the menu bar opens the menu; a right click on a file marks it (the row is right); the left click activates the panel.
-**Found, not fixed:** a double click on a directory does not enter it, and **Ctrl-PgDn on a directory (the keyboard) does not enter it either** (Enter does): both go
-through `_CtrlPgDn` -> `GotoFile(MakeNormName(S, '.'))` in `flpanelx.pas`. Next step: a trace in `_CtrlPgDn` on a copy of the sources (`DN_SRC`), see what `GotoFile` gets and returns.
+**Found and fixed:** a double click on a directory did not enter it, and Ctrl-PgDn did not either. The cause was wider: `Message(R, evKeyDown, kbXxx, nil)` (46 calls in 13 units: the command
+line, the viewer, the panels, the history, macros, the gauges...) did nothing, because in tv/ the fields `Command` and `KeyCode` of `TEvent` are not at the same place (in the Borland TV they are).
+Now `Drivers.MessageKey(Receiver, Code)` (the code in the form of DN with the shift bits, `kbCtrlPgDn = $047600`: `SetDNKeyCode`) does it, and the calls use it. Test: the tour scenario `mousedir` (DOS) and `DNKEYS=011B,C7600`.
+Not checked: the Linux and Windows builds with this change (the same code), the callers that give the key as a plain Word (macros: a character, gauges: the table `Keys`).
 **Tv is separate:** the repository `unxed/tv` is developed on its own (the owner's decision: "split, not copy"); `dn` only moves the submodule pointer.

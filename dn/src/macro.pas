@@ -488,7 +488,7 @@ procedure TMacroString.ExecCommand(Editor: PView);
     Exit;
   for J := 1 to Max(1, Repetitions) do
     for I := 1 to Length(S^) do
-      Message(Application, evKeyDown, Byte(S^[I]), nil);
+      MessageKey(Application, Byte(S^[I]));
   end;
 
 destructor TMacroString.Done;

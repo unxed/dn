@@ -1633,7 +1633,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
         then
           begin
           ScrollBar^.SetValue(MP.Y+Delta.Y);
-          Message(@Self, evKeyDown, $3920, nil);
+          MessageKey(@Self, $3920);
           while MouseEvent(Event, evMouseAuto+evMouseMove) do
             ;
           end

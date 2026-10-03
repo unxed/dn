@@ -91,6 +91,11 @@ function DNKeyCode(const Event: TEvent): LongInt;
 { The reverse: the code in the form of DN goes into KeyCode and ControlKeyState of the event. }
 procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
 
+{ Sends a key press (the code in the form of DN, with the shift bits: kbCtrlPgDn = $047600) to a view, as a person would press it. Message(R, evKeyDown, Code, nil)
+  of the Borland TV put the code into the field that is the key code there; in tv/ the fields Command and KeyCode of TEvent are not the same
+  place and the old call did nothing. }
+function MessageKey(Receiver: PView; Code: LongInt): Pointer;
+
 { A double click: a flag of the mouse event in tv/ (EventFlags bit 2); DN has the field Double. }
 procedure SetEventDouble(var Event: TEvent; Value: Boolean);
 
@@ -222,6 +227,21 @@ procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
 begin
   Event.KeyCode := Word(Code);
   Event.ControlKeyState := (Event.ControlKeyState and not Word($F)) or Word((Code shr 16) and $F);
+end;
+
+function MessageKey(Receiver: PView; Code: LongInt): Pointer;
+var
+  Event: TEvent;
+begin
+  Result := nil;
+  if Receiver = nil then
+    Exit;
+  ClearEvent(Event);
+  Event.What := evKeyDown;
+  SetDNKeyCode(Event, Code);
+  Receiver^.HandleEvent(Event);
+  if Event.What = evNothing then
+    Result := Event.InfoPtr;
 end;
 
 procedure InitDrivers;

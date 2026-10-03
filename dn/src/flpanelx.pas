@@ -2324,7 +2324,7 @@ WrongArc:
       I := kbIns
     else
       I := kbDown;
-    Message(Owner, evKeyDown, I, nil);
+    MessageKey(Owner, I);
     CE;
     end;
 
@@ -2601,9 +2601,9 @@ WrongArc:
           begin
           if  (PF <> nil) then
             if  (PF^.Attr and Directory <> 0) then
-              Message(@Self, evKeyDown, kbCtrlPgDn, nil)
+              MessageKey(@Self, kbCtrlPgDn)
             else if PF^.TType = ttExec then
-              Message(@Self, evKeyDown, kbEnter, nil)
+              MessageKey(@Self, kbEnter)
             else
               ViewFile(cmViewFile);
           CE;
@@ -2903,7 +2903,7 @@ WrongArc:
             SelectFlag := not PF^.Selected;
             end;
           repeat
-            Message(Owner, evKeyDown, kbUp, nil)
+            MessageKey(Owner, kbUp)
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
           RepeatDelay := LastRDelay;
           CE;
@@ -2929,16 +2929,16 @@ WrongArc:
               PF := Files^.At(ScrollBar^.Value);
               if PF^.Attr and Directory <> 0 then
                 begin
-                Message(@Self, evKeyDown, kbCtrlPgDn, nil);
+                MessageKey(@Self, kbCtrlPgDn);
                 CE;
                 Exit
                 end;
               if ShiftState and kbCtrlShift <> 0 then
-                Message(@Self, evKeyDown, kbCtrlEnter, nil)
+                MessageKey(@Self, kbCtrlEnter)
               else
                 begin
-                Message(CommandLine, evKeyDown, kbDown, nil);
-                Message(@Self, evKeyDown, kbEnter, nil);
+                MessageKey(CommandLine, kbDown);
+                MessageKey(@Self, kbEnter);
                 CE
                 end;
               end;
