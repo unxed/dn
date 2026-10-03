@@ -45,17 +45,17 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit archyp; {HYP}
+unit arc_LIM; {LIM}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
   ;
 
 type
-  PHYPArchive = ^THYPArchive;
-  THYPArchive = object(TARJArchive)
+  PLIMArchive = ^TLIMArchive;
+  TLIMArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -63,21 +63,22 @@ type
     end;
 
 type
-  HYPHdr = record
-    Id: LongInt;
-    PackedSize: LongInt;
-    OriginSize: LongInt;
+  LIMHdr = record
+    Id: AWord;
+    Method: Byte;
+    ThreeZeros: array[1..3] of Byte;
     Date: LongInt;
+    ThreeSym: array[1..3] of Byte;
+    OriginSize: LongInt;
+    PackedSize: LongInt;
     Data: LongInt;
-    Attr: Byte;
-    NameLen: Byte;
     end;
 
 implementation
 
-{ ----------------------------- HYP ------------------------------------}
+{ ----------------------------- LIM ------------------------------------}
 
-constructor THYPArchive.Init;
+constructor TLIMArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -87,19 +88,19 @@ constructor THYPArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HYPER'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HYPER'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-x'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-x'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-a'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-m'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, '-d'));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'LIMIT'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'LIMIT'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'e -p'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a -whs'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'm -whs'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'Del'));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, ''));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths,
          '-p'));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
-  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-y'));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
   SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
@@ -108,21 +109,21 @@ constructor THYPArchive.Init;
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, ''));
+         PStoreCompression, '-m0'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, ''));
+         PFastestCompression, '-ms'));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, ''));
+         PFastCompression, '-ms'));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, ''));
+         PNormalCompression, '-m1'));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PGoodCompression, ''));
+         PGoodCompression, '-mx'));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, ''));
+         PUltraCompression, '-mx'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
-         ' '));
+         '@'));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
-       ' '));
+       '@'));
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
@@ -136,41 +137,63 @@ constructor THYPArchive.Init;
   q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
   UseLFN := q <> '0';
   
-  end { THYPArchive.Init };
+  end { TLIMArchive.Init };
 
-function THYPArchive.GetID: Byte;
+function TLIMArchive.GetID: Byte;
   begin
-  GetID := arcHYP;
+  GetID := arcLIM;
   end;
 
-function THYPArchive.GetSign: TStr4;
+function TLIMArchive.GetSign: TStr4;
   begin
-  GetSign := sigHYP;
+  GetSign := sigLIM;
   end;
 
-procedure THYPArchive.GetFile;
+procedure TLIMArchive.GetFile;
   var
-    P: HYPHdr;
-  begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+    i: AWord;
+    P: LIMHdr;
+    C: Char;
+  label 1;
+
+  procedure GetName;
     begin
-    FileInfo.Last := 1;
-    Exit;
+    i := 1;
+    FileInfo.FName := '';
+    C := #1;
+    while (i < 80) and (C <> #0)
+         and not Abort and (ArcFile^.Status = stOK)
+    do
+      begin
+      ArcFile^.Read(C, 1);
+      if C <> #0 then
+        FileInfo.FName := FileInfo.FName+C;
+      Inc(i);
+      end;
     end;
+
+  begin { TLIMArchive.GetFile }
+1:
   ArcFile^.Read(P, 4);
-  if  (P.Id and $ffff = 0) then
+  if  (ArcFile^.Status = stOK) and (P.Id = $F813) and (P.Method = 5)
+  then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  if  (ArcFile^.Status <> stOK) or
-      ( (P.Id <> $2550481A {^Z'HP%'}) and (P.Id <> $2554531A {^Z'ST%'}))
+  if  (ArcFile^.Status = stOK) and (P.Id = $D180)
   then
+    begin
+    GetName;
+    CDir := FileInfo.FName;
+    goto 1;
+    end;
+  if  (ArcFile^.Status <> stOK) or (P.Id <> $f123) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Read(P.PackedSize, SizeOf(P)-4);
+  ArcFile^.Read(P.ThreeZeros[2], SizeOf(P)-4);
   if  (ArcFile^.Status <> stOK) then
     begin
     FileInfo.Last := 2;
@@ -182,9 +205,11 @@ procedure THYPArchive.GetFile;
   FileInfo.USize := P.OriginSize;
   FileInfo.PSize := P.PackedSize;
   FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
-  FileInfo.FName[0] := Char(P.NameLen);
-  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
+  GetName;
+  FileInfo.FName := CDir+'\'+FileInfo.FName;
+  if P.ThreeZeros[3] and Directory <> 0 then
+    goto 1;
   ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
-  end { THYPArchive.GetFile };
+  end { TLIMArchive.GetFile };
 
 end.

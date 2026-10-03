@@ -157,12 +157,12 @@ uses
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Memory, Startup,
   Arvid, xTime, VideoMan, DnExec, FileFind
   , UserMenu {JO: для скрывания панелей при разархивировании }
-  , arczip {JO: для CentralDirRecPresent}
+  , arc_Zip {JO: для CentralDirRecPresent}
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
   , panelsetup, panelroot, fnotify, Drivers
   , Lfn, Files, Tree, Dos, Histries, HistList, filepanel
   , basics, strutil, fileutil, ArchDet
-  , arcrar, arcace
+  , arc_RAR, arc_ACE
   ;
 
 const
