@@ -65,7 +65,7 @@ interface
 
 uses
   osdep, // см. комментарий в конце vpsysos2
-  osfind, Dos, Defines
+  Dos, Defines
   ;
 
 type
@@ -78,7 +78,7 @@ type
 
   {Extended search structure to be used instead of SearchRec}
   lSearchRec = record
-    SR: TOSSearchRecNew; {Basic field set}
+    SR: TOSSearchRec; {Basic field set}
     FullSize: TSize; {True file size}
     (*  LoCreationTime: Longint; {Time created (low-order byte)}
     HiCreationTime: Longint; {Time created (high-order byte)}
@@ -977,7 +977,7 @@ procedure lFindFirst(const Path: String; Attr: Word; var R: lSearchRec);
   if lAPI = lDOS then begin
   R.FindFirstMode := lDOS;
 
-  SetDosError(SysFindFirstNew(StrPCopy(PathBuf, Path), Attr, R.SR, False));
+  SetDosError(SysFindFirst(StrPCopy(PathBuf, Path), Attr, R.SR, False));
   CorrectSearchRec(R);
 
   end else begin
@@ -994,7 +994,7 @@ procedure lFindNext(var R: lSearchRec);
 
   if R.FindFirstMode = lDOS then begin
 
-  SetDosError(SysFindNextNew(R.SR, False));
+  SetDosError(SysFindNext(R.SR, False));
   CorrectSearchRec(R);
 
   end else lWIN95FindNext(R);
@@ -1012,7 +1012,7 @@ procedure lFindClose(var R: lSearchRec);
   
   if R.FindFirstMode = lWin95 then lWIN95FindClose(R) else
   
-  SysFindCloseNew(R.SR);
+  SysFindClose(R.SR);
   DosError := DEr; {JO}
   end;
 

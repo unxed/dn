@@ -56,7 +56,6 @@ linepos.pas advance6.pas
 mainapp.pas dnapp.pas
 os2sess.pas advance4.pas
 osdep.pas vpsyslow.pas
-osfind.pas vpsyslo2.pas
 paneldlgs.pas fltools.pas
 panelroot.pas flpanelx.pas
 panelsetup.pas pdsetup.pas
