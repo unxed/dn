@@ -8,7 +8,7 @@
   the DOS target (DPMI32), and the screen functions of its videoman.pas (SysTv*, SysSetVideoMode) over
   TvScreen of tv/. The screen of DN is an array of 16-bit cells (character + BIOS attribute); here it is
   a copy that is made from the screen of tv/ when DN asks for it and goes back to it by SysTvShowBuf.
-  The keyboard and the mouse are done by tv/ (TvSys): SysTvKbd*, SysTvDetectMouse do nothing. }
+  The keyboard and the mouse are done by tv/ (TvSys): SysTvKbd* do nothing. }
 unit VPSysLow;
 
 {$mode objfpc}
@@ -58,8 +58,6 @@ procedure SysTvSetCurPos(X, Y: Word);
 procedure SysGetCurPos(var X, Y: Word);
 procedure SysTvKbdInit;
 procedure SysTvKbdDone;
-procedure SysTvDetectMouse;
-procedure SysTvHideMouse;
 
 { --- files -------------------------------------------------------------------- }
 { The result is 0 when done, else the error code of the system (DOS codes: 2 no such file, 3 no such
@@ -129,8 +127,6 @@ function SysPlatformId: LongInt;
 procedure SysCtrlSleep(Milliseconds: LongInt);
 { The disk buffers go to the disks (DOS INT 21h AH=0Dh); elsewhere: nothing. }
 procedure SysDiskReset;
-{ A line of the trace of the start (a test aid, see DNErrLog): written when the environment variable DNDUMP is set. }
-procedure SysTrace(const Msg: String);
 { The keyboard of the plain console: is a key waiting, and the character of the key (SysReadKey waits for one). }
 function SysKeyPressed: Boolean;
 function SysReadKey: Char;
@@ -681,14 +677,6 @@ procedure SysTvKbdDone;
 begin
 end;
 
-procedure SysTvDetectMouse;
-begin
-end;
-
-procedure SysTvHideMouse;
-begin
-end;
-
 function SysGetVolumeLabel(Drive: Char): ShortString;
 {$IFDEF GO32V2}
 var
@@ -855,11 +843,6 @@ end;
 begin
 end;
 {$ENDIF}
-
-procedure SysTrace(const Msg: String);
-begin
-  DNTrace(Msg);
-end;
 
 var
   KeyIsPending: Boolean = False;

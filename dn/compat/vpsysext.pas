@@ -14,7 +14,6 @@ uses
   
   ;
 
-function SysTVGetShiftState2: Byte;
 
 
 type
@@ -71,13 +70,6 @@ implementation
 uses
   Strings
   ;
-function SysTVGetShiftState2: Byte;
-
-
-  
-  begin
-  Result := 0;
-  end;
 
 function SysFindFirstNew(Path: PChar; Attr: LongInt;
      var F: TOSSearchRecNew; IsPChar: Boolean): LongInt;
