@@ -38,3 +38,25 @@ before and after). Add what you find; do not stop for it outside of the step. Ma
   of the console mode can use `TvVt` (PLAN.md item 8) instead of its own.
 - The names of the entities in the sources of DN that came from the archive (`SysXXX`, `DnXXX`, abbreviations of Russian words) — rename only the ones that a newcomer meets in
   the first hour: the entry points (`DN.pas`, `u_myapp`, `flpanel`, `filescol`, `drives`).
+
+## What is left of Virtual Pascal (the review of 2026-10-04: what FPC can do instead)
+
+Done in this step: `vputils` is gone (`Min`/`Max` are `Math`, the hex functions `IntToHex`, the time `GetTickCount64`, the date `Dos.GetDate`, the label `SysGetVolumeLabel`; the rest moved to the unit that uses it or to `compat/drivers.pas`);
+dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `vpsysext`. What is left in `dn/compat/` and what it would take to drop it (the number is the call sites outside of `compat/`):
+
+| Unit | What it does | Instead | Verdict |
+|---|---|---|---|
+| `vpsyslow` (the files: `SysFileOpen/Create/Seek/Read/Write/Close/SetSize` ~35) | the file API of VP with the names of DN (DOS names, `SysOsPath`, the code page) | `SysUtils.FileOpen...` + the conversion of the name in one place | **candidate:** a rewrite of `lfn.pas` over `TFileStream`/`FileOpen`; the conversion of names (`SysOsPath`, 28) stays: it is not an RTL thing |
+| `vpsyslow` (`SysFindFirst/Next/Close`, 12) | the search of a directory in the record of VP | `SysUtils.FindFirst` (it already lies on it) | **candidate** together with `vpsysext` (the "new" record) and `lfn.pas` |
+| `vpsyslow` (the disks: `SysDiskFree/SizeLongX`, `SysGetValidDrives`, `SysGetVolumeLabel`, ~20) | free space, drives, label | `DiskFree`, `DiskSize` of FPC (by number of the drive; the Unix mapping of C: is ours) | keep, thin |
+| `vpsyslow` (the screen/keys: `SysTv*`, `SysGetCurPos`, `SysSetVideoMode`, ~35) | glue to `tv/` (`TvSys`, `TvScreen`) | the functions of `tv/` directly | **candidate:** replace the calls by `tv/` (`CaretSize`, `SetCaretSize`...) and drop the glue |
+| `vpsyslow` (`SysCtrlSleep` 4, `SysBeepEx` 6, `SysKeyPressed/ReadKey` 3, `PhysMemAvail` 3, `SysPlatformId` 6) | small things | `Sleep`, the beep of `tv/`, `tv/` events, `GetHeapStatus`, `{$IFDEF}` | **candidates** one by one (each is a few lines) |
+| `vpsysext` | the "new" search record (creation time, last access) | `TSearchRec` has them (`FindData` on Windows; `stat` on Unix) | with the search above |
+| `memory` (`MemAlloc` 22, `LowMemory` 22, `InitMemory` 5, caches) | the memory manager API of Turbo Pascal | `GetMem`, `HeapStatus` | **candidate:** `MemAlloc` = `GetMem` with `nil` on failure; `LowMemory` is always False in a flat memory |
+| `dpmi32`, `dpmi32df`, `doslow` | real-mode calls of DOS (LFN of Windows 95, the clipboard, FAT32) | `go32` of FPC (DOS only) | **DOS only:** `{$IFDEF GO32V2}` in `lfn.pas`, `fsinfo.pas`, `videoman.pas`, `dnexec.pas`; on Linux and Windows they are stubs that fail |
+| `use16` | `Integer` and `Word` of 16 bits in the structures of the old formats | `SmallInt`, `Word` in the records | **candidate:** 4 files (`dbwatch`, `pktview`, `uucode`, `uue2inc`), ~130 places; replace the types by `SmallInt`/`SmallWord` and drop the unit |
+| `baseobjs` | `TObject` of DN = `TObject` of `tv/`; `FreeObject`, `ObjChangeType` | `tv/` | with the shims |
+| `country` | the country table | `SysUtils` formats + the table of CP866 (ours) | keep |
+| `drivers` | the keys, the events, `DNKeyCode`, `MessageKey`, the cursor | — (it is the adapter to `tv/`) | keep, it is the border |
+
+The order (each is a step with the same proof: the tests, the builds, the binary behaves): 1) `use16` -> `SmallInt`; 2) the small things of `vpsyslow`; 3) `memory`; 4) the screen glue -> `tv/`; 5) DOS-only `dpmi32*`; 6) the files and the search (the biggest).
