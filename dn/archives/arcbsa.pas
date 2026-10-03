@@ -45,73 +45,38 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_TAR; {TAR}
+unit arcbsa; {BSA}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type
-  PTARArchive = ^TTARArchive;
-  TTARArchive = object(TARJArchive)
+  PBSAArchive = ^TBSAArchive;
+  TBSAArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     end;
 
-const
-  MaxTName = 100;
-  Txt_Word = 8;
-  Txt_Long = 12;
-  BlkSize = 512;
-
 type
-  TARHdr = record
-    FName: array[1..MaxTName] of Char;
-    Mode: array[1..Txt_Word] of Char;
-    uid: array[1..Txt_Word] of Char;
-    gid: array[1..Txt_Word] of Char;
-    Size: array[1..Txt_Long] of Char;
-    mtime: array[1..Txt_Long] of Char;
-    chksum: array[1..Txt_Word] of Char;
-    filetype: Char;
-    linkname: array[1..MaxTName] of Char;
-    case Byte of
-      0: (
-        (* old-fashion data & padding *)
-        comment:
-         array[1..BlkSize-MaxTName-8-8-8-12-12-8-1-MaxTName-12-12] of Char;
-        SrcSum: array[1..Txt_Long] of Char;
-        SrcLen: array[1..Txt_Long] of Char;
-        );
-      1: (
-        (* System V extensions *)
-        extent: array[1..4] of Char;
-        AllExt: array[1..4] of Char;
-        Total: array[1..Txt_Long] of Char;
-        );
-      2: (
-        (* P1003 & GNU extensions *)
-        magic: array[1..8] of Char;
-        UName: array[1..32] of Char;
-        gname: array[1..32] of Char;
-        devmajor: array[1..Txt_Word] of Char;
-        devminor: array[1..Txt_Word] of Char;
-        (* the following fields are added gnu and NOT standard *)
-        ATime: array[1..12] of Char;
-        ctime: array[1..12] of Char;
-        Offset: array[1..12] of Char;
-        );
+  BSAHdr = record
+    Id: array[1..4] of Char;
+    PackedSize: LongInt;
+    OriginSize: LongInt;
+    Date: LongInt;
+    Data: array[1..6] of Byte;
+    NameLen: Byte;
     end;
 
 implementation
 
-{ ----------------------------- TAR ------------------------------------}
+{ ----------------------------- BSA ------------------------------------}
 
-constructor TTARArchive.Init;
+constructor TBSAArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -121,28 +86,29 @@ constructor TTARArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'TAR'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'TAR'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'xf'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'xf'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'cvf'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'cvf'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'df'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'tf'));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'BSARC'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'BSARC'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-xy'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-xy'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-ar'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-am'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, '-D'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-xg'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, '+s'));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
+         ''));
+  SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PStoreCompression, ''));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, ''));
+         PFastestCompression, '+q'));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PFastCompression, ''));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
@@ -155,73 +121,69 @@ constructor TTARArchive.Init;
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
-  
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
-  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '1');
   PutDirs := q <> '0';
   
   q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '0');
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
   UseLFN := q <> '0';
   
-  end { TTARArchive.Init };
+  end { TBSAArchive.Init };
 
-function TTARArchive.GetID: Byte;
+function TBSAArchive.GetID: Byte;
   begin
-  GetID := arcTAR;
+  GetID := arcBSA;
   end;
 
-function TTARArchive.GetSign: TStr4;
+function TBSAArchive.GetSign: TStr4;
   begin
-  GetSign := sigTAR;
+  GetSign := sigBSA;
   end;
 
-procedure TTARArchive.GetFile;
+procedure TBSAArchive.GetFile;
   var
-    Buffer: array[0..BlkSize-1] of Char;
-    Hdr: TARHdr absolute Buffer;
-    DT: DateTime;
-    W: AWord;
+    P: BSAHdr;
   begin
   if ArcFile^.GetPos = ArcFile^.GetSize then
     begin
     FileInfo.Last := 1;
-    Exit
+    Exit;
     end;
-  ArcFile^.Read(Buffer, BlkSize);
-  if ArcFile^.Status <> stOK then
-    begin
-    FileInfo.Last := 2;
-    Exit
-    end;
-  FileInfo.Last := 0;
-  if Hdr.filetype = '5' {directory}
-    then FileInfo.Attr := Directory
-    else FileInfo.Attr := 0;
-  FileInfo.FName := Hdr.FName+#0;
-  SetLength(FileInfo.FName, PosChar(#0, FileInfo.FName)-1);
-  if FileInfo.FName = '' then
+  ArcFile^.Read(P, 4);
+  if  (Copy(P.Id, 1, 2) = #0#0)
+  then
     begin
     FileInfo.Last := 1;
-    Exit
+    Exit;
     end;
-  FileInfo.USize := FromOct(Hdr.Size);
-  FileInfo.PSize := FileInfo.USize;
-  GetUNIXDate(i32(FromOct(Hdr.mtime)), DT.Year, DT.Month, DT.Day, DT.Hour,
-     DT.Min, DT.Sec);
-  PackTime(DT, FileInfo.Date);
-(*
-  ArcFile^.Seek(ArcFile^.GetPos+
-     (Trunc((FileInfo.PSize+BlkSize-1) / BlkSize)*BlkSize));
-*)
-  W := Word(CompRec(FileInfo.PSize).Lo) and (BlkSize-1);
-  ArcFile^.Seek(CompToFSize(ArcFile^.GetPos + FileInfo.PSize -
-                            W + BlkSize*Byte(W<>0)));
-  end { TTARArchive.GetFile };
+  if  (ArcFile^.Status <> stOK)
+           or not ((P.Id[4] in [#0, #7]) and (Copy(P.Id, 2, 2) = #0#$AE))
+  then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  ArcFile^.Read(P.PackedSize, SizeOf(P)-4);
+  if  (ArcFile^.Status <> stOK) then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
+  FileInfo.Last := 0;
+  FileInfo.Attr := 0;
+  FileInfo.USize := P.OriginSize;
+  FileInfo.PSize := P.PackedSize;
+  FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
+  FileInfo.FName[0] := Char(P.NameLen);
+  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
+  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize+1);
+  end { TBSAArchive.GetFile };
 
 end.

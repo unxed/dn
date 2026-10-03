@@ -45,17 +45,18 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_ZXZ; {ZXZ}
+unit archpk; {HPK}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
+  Collect
   ;
 
 type
-  PZXZArchive = ^TZXZArchive;
-  TZXZArchive = object(TARJArchive)
+  PHPKArchive = ^THPKArchive;
+  THPKArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -63,22 +64,27 @@ type
     end;
 
 type
-  ZXZHdr = record
-    Name: array[0..7] of Char;
-    Extension: array[0..2] of Char;
-    OriginSize: AWord;
-    SectorSize: Byte;
-    PackedSize: AWord;
-    CRC32: LongInt;
-    MethodID: Byte;
-    Flags: Byte;
+  PHPKRec = ^THPKRec;
+  THPKRec = record
+    parentIndex: LongInt;
+    PSize, USize: LongInt;
+    Date: LongInt;
+    Name: PString;
     end;
+
+  PHPKCollection = ^THPKCollection;
+  THPKCollection = object(TCollection)
+    procedure FreeItem(P: Pointer); virtual;
+    end;
+
+var
+  HPKCol: PHPKCollection;
 
 implementation
 
-{ ------------------------------ ZXZip aka $Z ----------------------------- }
+{ ----------------------------- HPK ------------------------------------}
 
-constructor TZXZArchive.Init;
+constructor THPKArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -88,21 +94,19 @@ constructor TZXZArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ZXZIP386'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ZXUNZIP'));
-  
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, ''));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, ''));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-start8224'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HPACK'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HPACK'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'X'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'X'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'A -DA -A'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'A -DA -A'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'D'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-C'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'T'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
-  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
+  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, '-E'));
   SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
@@ -110,7 +114,7 @@ constructor TZXZArchive.Init;
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, ''));
+         PStoreCompression, '-0'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PFastestCompression, ''));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
@@ -135,73 +139,55 @@ constructor TZXZArchive.Init;
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TZXZArchive.Init };
+  end { THPKArchive.Init };
 
-function TZXZArchive.GetID: Byte;
+function THPKArchive.GetID: Byte;
   begin
-  GetID := arcZXZ;
+  GetID := arcHPK;
   end;
 
-function TZXZArchive.GetSign: TStr4;
+function THPKArchive.GetSign: TStr4;
   begin
-  GetSign := sigZXZ;
+  GetSign := sigHPK;
   end;
 
-procedure TZXZArchive.GetFile;
-  var
-    FP: TFileSize;
-    P: ZXZHdr;
-    Len: AWord;
+procedure THPKCollection.FreeItem(P: Pointer);
   begin
-  ArcFile^.Read(P, SizeOf(P));
-  FP := ArcFile^.GetPos;
-  if  (ArcFile^.Status <> stOK) or (FP > 65280) then
+  if P <> nil then
     begin
-    FileInfo.Last := 2;
-    Exit;
+    DisposeStr(PHPKRec(P)^.Name);
+    Dispose(PHPKRec(P));
     end;
-  if  (P.Name[0] < #32) or
-      (P.PackedSize > P.SectorSize*256) or
-      ( (P.PackedSize+FP-SizeOf(P)-17) > ArcFile^.GetSize) or
-      (P.MethodID > 3) or
-      (P.SectorSize = 0)
-  then
+  end;
+
+procedure THPKArchive.GetFile;
+  var
+    DT: DateTime;
+    R: PHPKRec;
+  begin
+  if HPKCol^.Count = 0 then
     begin
     FileInfo.Last := 1;
+    Dispose(HPKCol, Done);
+    HPKCol := nil;
     Exit;
     end;
-  FileInfo.FName := P.Name;
-  DelRight(FileInfo.FName);
-  if  (P.Extension[0] <> 'B') and
-      (P.Extension[1] >= #32) and (P.Extension[1] <= #127) and
-      (P.Extension[2] >= #32) and (P.Extension[2] <= #127)
-  then
-    FileInfo.FName := FileInfo.FName+'.'+P.Extension
+  FileInfo.USize := PHPKRec(HPKCol^.At(0))^.USize;
+  FileInfo.PSize := PHPKRec(HPKCol^.At(0))^.PSize;
+  GetUNIXDate(PHPKRec(HPKCol^.At(0))^.Date, DT.Year, DT.Month, DT.Day,
+     DT.Hour, DT.Min, DT.Sec);
+  PackTime(DT, FileInfo.Date);
+  if PHPKRec(HPKCol^.At(0))^.Name <> nil {DataCompBoy}
+    then
+    FileInfo.FName := PHPKRec(HPKCol^.At(0))^.Name^ {DataCompBoy}
   else
-    FileInfo.FName := FileInfo.FName+'.'+P.Extension[0];
-  DelRight(FileInfo.FName);
+    FileInfo.FName := ''; {DataCompBoy}
   FileInfo.Last := 0;
   FileInfo.Attr := 0;
-  if  (P.OriginSize and $ff) = 0 then
-    Len := 0
-  else
-    Len := 256;
-  Len := Trunc((Len+P.OriginSize)/256);
-  if Len <> P.SectorSize then
-    Len := P.SectorSize*256
-  else
-    begin
-    Len := P.OriginSize;
-    if P.Extension[0] = 'B' then
-      Len := 4+Ord(P.Extension[1])+Ord(P.Extension[2])*256;
-    end;
-  FileInfo.USize := LongInt(Len);
-  FileInfo.PSize := LongInt(P.PackedSize);
-  FileInfo.Date := 0;
-  ArcFile^.Seek(FP+P.PackedSize);
-  end { TZXZArchive.GetFile };
+  HPKCol^.AtFree(0);
+  end { THPKArchive.GetFile };
 
 end.

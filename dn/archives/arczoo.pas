@@ -45,18 +45,19 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_HPK; {HPK}
+unit arczoo; {ZOO}
+
+{.$DEFINE DeadCode} {piwamoto}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
-  Collect
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type
-  PHPKArchive = ^THPKArchive;
-  THPKArchive = object(TARJArchive)
+  PZOOArchive = ^TZOOArchive;
+  TZOOArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -64,27 +65,24 @@ type
     end;
 
 type
-  PHPKRec = ^THPKRec;
-  THPKRec = record
-    parentIndex: LongInt;
-    PSize, USize: LongInt;
+  ZOOHdr = record
+    Id: LongInt;
+    Info: AWord;
+    NextHDR: LongInt;
+    CurStart: LongInt;
     Date: LongInt;
-    Name: PString;
+    W: AWord;
+    OriginSize: LongInt;
+    PackedSize: LongInt;
+    C: Char;
+    Reserved: array[1..9] of Byte;
     end;
-
-  PHPKCollection = ^THPKCollection;
-  THPKCollection = object(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
-    end;
-
-var
-  HPKCol: PHPKCollection;
 
 implementation
 
-{ ----------------------------- HPK ------------------------------------}
+{ ----------------------------- ZOO ------------------------------------}
 
-constructor THPKArchive.Init;
+constructor TZOOArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -94,19 +92,19 @@ constructor THPKArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HPACK'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HPACK'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'X'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'X'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'A -DA -A'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'A -DA -A'));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ZOO'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ZOO'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'eo'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'xo'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'aM'));
   Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'D'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-C'));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'T'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'eN'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
-  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, '-E'));
+  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
   SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
@@ -114,7 +112,7 @@ constructor THPKArchive.Init;
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, '-0'));
+         PStoreCompression, '+f'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PFastestCompression, ''));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
@@ -124,7 +122,7 @@ constructor THPKArchive.Init;
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PGoodCompression, ''));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, ''));
+         PUltraCompression, '+h'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
@@ -134,60 +132,74 @@ constructor THPKArchive.Init;
   AllVersion := q <> '0';
   q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '0');
   PutDirs := q <> '0';
-  
+ 
   q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '0');
   SwapWhenExec := q <> '0';
+ 
   
-  
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
   UseLFN := q <> '0';
   
-  end { THPKArchive.Init };
+  end { TZOOArchive.Init };
 
-function THPKArchive.GetID: Byte;
+function TZOOArchive.GetID: Byte;
   begin
-  GetID := arcHPK;
+  GetID := arcZOO;
   end;
 
-function THPKArchive.GetSign: TStr4;
+function TZOOArchive.GetSign: TStr4;
   begin
-  GetSign := sigHPK;
+  GetSign := sigZOO;
   end;
 
-procedure THPKCollection.FreeItem(P: Pointer);
-  begin
-  if P <> nil then
-    begin
-    DisposeStr(PHPKRec(P)^.Name);
-    Dispose(PHPKRec(P));
-    end;
-  end;
-
-procedure THPKArchive.GetFile;
+procedure TZOOArchive.GetFile;
   var
-    DT: DateTime;
-    R: PHPKRec;
+    P: ZOOHdr;
+    FP: TFileSize;
+    C: Char;
+    S: String;
   begin
-  if HPKCol^.Count = 0 then
+  ArcFile^.Read(P, 4);
+  if  (ArcFile^.Status <> stOK) or (P.Id <> $FDC4A7DC) then
     begin
-    FileInfo.Last := 1;
-    Dispose(HPKCol, Done);
-    HPKCol := nil;
+    FileInfo.Last := 2;
     Exit;
     end;
-  FileInfo.USize := PHPKRec(HPKCol^.At(0))^.USize;
-  FileInfo.PSize := PHPKRec(HPKCol^.At(0))^.PSize;
-  GetUNIXDate(PHPKRec(HPKCol^.At(0))^.Date, DT.Year, DT.Month, DT.Day,
-     DT.Hour, DT.Min, DT.Sec);
-  PackTime(DT, FileInfo.Date);
-  if PHPKRec(HPKCol^.At(0))^.Name <> nil {DataCompBoy}
-    then
-    FileInfo.FName := PHPKRec(HPKCol^.At(0))^.Name^ {DataCompBoy}
-  else
-    FileInfo.FName := ''; {DataCompBoy}
+  ArcFile^.Read(P.Info, 2);
+  if  (ArcFile^.Status <> stOK) then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  {if (P.Info = $0002) then begin FileInfo.Last := 1;Exit;end;}
+  ArcFile^.Read(P.NextHDR, SizeOf(P)-6);
+  {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
   FileInfo.Last := 0;
   FileInfo.Attr := 0;
-  HPKCol^.AtFree(0);
-  end { THPKArchive.GetFile };
+  FileInfo.USize := P.OriginSize;
+  FileInfo.PSize := P.PackedSize;
+  FileInfo.Date := (P.Date shl 16) or (P.Date shr 16);
+  FileInfo.FName := '';
+  FP := ArcFile^.GetPos;
+  repeat
+    ArcFile^.Read(C, 1);
+    if C <> #0 then
+      FileInfo.FName := FileInfo.FName+C;
+  until (C = #0) or (Length(FileInfo.FName) > 77);
+  ArcFile^.Seek(FP+19);
+  ArcFile^.Read(S[0], 1);
+  if S <> '' then
+    begin
+    ArcFile^.Read(S[1], Byte(S[0]));
+    S[Length(S)] := '\';
+    end;
+  FileInfo.FName := S+FileInfo.FName;
+  if FileInfo.FName = '' then
+    begin
+    FileInfo.Last := 1;
+    Exit;
+    end;
+  ArcFile^.Seek(P.NextHDR);
+  end { TZOOArchive.GetFile };
 
 end.

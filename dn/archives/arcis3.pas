@@ -45,72 +45,95 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_TGZ; {TGZ & TAZ & TAR.GZ}
+unit arcis3; {IS3}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
-   fileutil
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type
-  PTGZArchive = ^TTGZArchive;
-  TTGZArchive = object(TARJArchive)
+  PIS3Archive = ^TIS3Archive;
+  TIS3Archive = object(TARJArchive)
+    FoldersOffs: LongInt; {!!s}
+    FilesNumber: LongInt;
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     end;
 
-implementation
-{ ----------------------------- TAR ------------------------------------}
+type
+  IS3FileHdr = record
+    HZ1: Byte;
+    FolderNum: AWord;
+    OriginSize: LongInt;
+    PackedSize: LongInt;
+    HZ2: LongInt;
+    DateTime: LongInt;
+    Attr: LongInt;
+    HZ3: LongInt;
+    HZ4: AWord;
+    NameLen: Byte;
+    end;
 
-constructor TTGZArchive.Init;
+type
+  IS3FolderHdr = record
+    FileNumber: AWord;
+    SizeOfHdr: AWord;
+    SizeOfName: AWord;
+    end;
+
+implementation
+
+{ --- Z --- aka LIB --- aka InstallShield 3.00.xxx --- by piwamoto ------- }
+
+constructor TIS3Archive.Init;
   var
     Sign: TStr5;
     q: String;
   begin
-  TObject.Init;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, ''));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'UNTGZOS2'));
+  TObject.Init;
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ICOMP'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ICOMP'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-d'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-d'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, ''));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-d -i'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-c'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-c'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, '-r'));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-dt -i'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
   SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
-  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
+  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PRecurseSubDirs, '-i'));
+  SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, ''));
+         PStoreCompression, '-sn'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, ''));
+         PFastestCompression, '-sl'));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, ''));
+         PFastCompression, '-sm'));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, ''));
+         PNormalCompression, '-sh'));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PGoodCompression, ''));
+         PGoodCompression, '-sh'));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, ''));
+         PUltraCompression, '-sh'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
-  
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
@@ -124,71 +147,89 @@ constructor TTGZArchive.Init;
   q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TTGZArchive.Init };
 
-function TTGZArchive.GetID: Byte;
+  FoldersOffs := -1;
+  FilesNumber := -1;
+  end { TIS3Archive.Init };
+
+function TIS3Archive.GetID: Byte;
   begin
-  GetID := arcTGZ;
+  GetID := arcIS3;
   end;
 
-function TTGZArchive.GetSign: TStr4;
+function TIS3Archive.GetSign: TStr4;
   begin
-  GetSign := sigTGZ;
+  GetSign := sigIS3;
   end;
 
-procedure TTGZArchive.GetFile;
-  type
-    GZipHdr = record
-      Id: AWord;
-      Flag: AWord;
-      Time: LongInt;
-      end;
+procedure TIS3Archive.GetFile;
   var
-    P: GZipHdr;
-    DT: DateTime;
+    P: IS3FileHdr;
+    P1: IS3FolderHdr;
+    FP, FO: LongInt;  {!!s}
     C: Char;
+    I: Integer;
+    S: String;
   begin
-  ArcFile^.Read(P, SizeOf(P));
-  if ArcFile^.Eof then
+  if FoldersOffs < 0 then
+    begin
+    ArcFile^.Seek(ArcPos+$c);
+    ArcFile^.Read(FP, SizeOf(FP));
+    FilesNumber := FP and $ffff;
+    ArcFile^.Seek(ArcPos+$29);
+    ArcFile^.Read(FP, SizeOf(FP));
+    FoldersOffs := i32(FP+ArcPos);
+    ArcFile^.Seek(ArcPos+$33);
+    ArcFile^.Read(FP, SizeOf(FP));
+    FP := i32(FP+ArcPos);
+    ArcFile^.Seek(FP);
+    end;
+  FP := i32(ArcFile^.GetPos);
+  if  (FilesNumber = 0) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  GetUNIXDate(P.Time, DT.Year, DT.Month, DT.Day, DT.Hour, DT.Min, DT.Sec);
-  PackTime(DT, FileInfo.Date);
-  FileInfo.FName := '';
-  if  (P.Flag and $800 = 0) or (P.Id = $9d1f)
-  then
-    if {(UpStrg(GetExt(ArcFileName)) = '.GZ') or}
-        (UpCase(ArcFileName[Length(ArcFileName)]) = 'Z')
-      {gzip changes last char of extension to 'z' or adds '.gz' extension}
-      then
-      FileInfo.FName := GetSName(ArcFileName)
-    else
-      FileInfo.FName := GetName(ArcFileName)
-  else
+  ArcFile^.Read(P, SizeOf(P));
+  if  (ArcFile^.Status <> stOK) then
     begin
-    if P.Flag and $400 = 0 then
-      P.Time := 10 {skip 10 bytes}
-    else
-      begin
-      ArcFile^.Read(P.Time, SizeOf(P.Time));
-      P.Time := P.Time shr 16+12;
-      end;
-    ArcFile^.Seek(ArcPos+P.Time);
-    repeat
-      ArcFile^.Read(C, 1);
-      if C <> #0 then
-        FileInfo.FName := FileInfo.FName+C
-      else
-        Break;
-    until ArcFile^.Status <> stOK;
+    FileInfo.Last := 2;
+    Exit;
     end;
-  FileInfo.PSize := ArcFile^.GetSize;
-  ArcFile^.Seek(CompToFSize(FileInfo.PSize-4));
-  ArcFile^.Read(FileInfo.USize, SizeOf(FileInfo.USize));
-  FileInfo.Attr := 0;
+  FO := FoldersOffs;
+  FileInfo.FName := '';
+  S := '';
+
+  for I := 1 to P.NameLen do
+    begin
+    ArcFile^.Read(C, 1);
+    FileInfo.FName := FileInfo.FName+C;
+    end;
+
+  for I := 0 to P.FolderNum do
+    begin
+    ArcFile^.Seek(FO);
+    ArcFile^.Read(P1, SizeOf(P1));
+    FO := FO+P1.SizeOfHdr;
+    end;
+  FO := FO-P1.SizeOfHdr+SizeOf(P1);
+  if P1.SizeOfName > 255 then
+    P1.SizeOfName := 255;
+  SetLength(S, (P1.SizeOfName));
+  if S <> '' then
+    begin
+    ArcFile^.Seek(FO);
+    ArcFile^.Read(S[1], P1.SizeOfName);
+    FileInfo.FName := S+'\'+FileInfo.FName;
+    end;
+
   FileInfo.Last := 0;
-  end { TTGZArchive.GetFile };
+  FileInfo.USize := P.OriginSize;
+  FileInfo.PSize := P.PackedSize;
+  FileInfo.Attr := 0;
+  FileInfo.Date := (P.DateTime shr 16) or (P.DateTime shl 16);
+  Dec(FilesNumber);
+  ArcFile^.Seek(FP+SizeOf(P)+P.NameLen+13);
+  end { TIS3Archive.GetFile };
 
 end.

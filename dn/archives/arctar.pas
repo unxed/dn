@@ -45,28 +45,73 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_QRK; {QuArk}
+unit arctar; {TAR}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime
   ;
 
 type
-  PQuarkArchive = ^TQuArkArchive;
-  TQuArkArchive = object(TARJArchive)
+  PTARArchive = ^TTARArchive;
+  TTARArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     end;
 
+const
+  MaxTName = 100;
+  Txt_Word = 8;
+  Txt_Long = 12;
+  BlkSize = 512;
+
+type
+  TARHdr = record
+    FName: array[1..MaxTName] of Char;
+    Mode: array[1..Txt_Word] of Char;
+    uid: array[1..Txt_Word] of Char;
+    gid: array[1..Txt_Word] of Char;
+    Size: array[1..Txt_Long] of Char;
+    mtime: array[1..Txt_Long] of Char;
+    chksum: array[1..Txt_Word] of Char;
+    filetype: Char;
+    linkname: array[1..MaxTName] of Char;
+    case Byte of
+      0: (
+        (* old-fashion data & padding *)
+        comment:
+         array[1..BlkSize-MaxTName-8-8-8-12-12-8-1-MaxTName-12-12] of Char;
+        SrcSum: array[1..Txt_Long] of Char;
+        SrcLen: array[1..Txt_Long] of Char;
+        );
+      1: (
+        (* System V extensions *)
+        extent: array[1..4] of Char;
+        AllExt: array[1..4] of Char;
+        Total: array[1..Txt_Long] of Char;
+        );
+      2: (
+        (* P1003 & GNU extensions *)
+        magic: array[1..8] of Char;
+        UName: array[1..32] of Char;
+        gname: array[1..32] of Char;
+        devmajor: array[1..Txt_Word] of Char;
+        devminor: array[1..Txt_Word] of Char;
+        (* the following fields are added gnu and NOT standard *)
+        ATime: array[1..12] of Char;
+        ctime: array[1..12] of Char;
+        Offset: array[1..12] of Char;
+        );
+    end;
+
 implementation
 
-{ --------------------- Quark (by Luzin Aleksey) -------------------------}
+{ ----------------------------- TAR ------------------------------------}
 
-constructor TQuArkArchive.Init;
+constructor TTARArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -76,41 +121,41 @@ constructor TQuArkArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'QuArk'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'QuArk'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'm'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-g'));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
+  
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'TAR'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'TAR'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'xf'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'xf'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'cvf'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'cvf'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'df'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'tf'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
-  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-y'));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, '-s'));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
-         ''));
-  SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PStoreCompression, ''));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PFastestCompression, ''));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, '-m3'));
+         PFastCompression, ''));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, '-m1'));
+         PNormalCompression, ''));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PGoodCompression, ''));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, '-m5'));
+         PUltraCompression, ''));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
+  
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
@@ -121,61 +166,62 @@ constructor TQuArkArchive.Init;
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TQuArkArchive.Init };
+  end { TTARArchive.Init };
 
-function TQuArkArchive.GetID: Byte;
+function TTARArchive.GetID: Byte;
   begin
-  GetID := arcQUARK;
+  GetID := arcTAR;
   end;
 
-function TQuArkArchive.GetSign: TStr4;
+function TTARArchive.GetSign: TStr4;
   begin
-  GetSign := sigQUARK;
+  GetSign := sigTAR;
   end;
 
-procedure TQuArkArchive.GetFile;
+procedure TTARArchive.GetFile;
   var
-    FH: record
-      Tmp: array[1..3] of Char;
-      LengthOfName: Byte;
-      end;
-    FH1: record
-      Attr: AWord;
-      DateTime: LongInt;
-      RealSize: LongInt;
-      PackSize: LongInt;
-      CRC: AWord;
-      TPC: Byte;
-      end;
+    Buffer: array[0..BlkSize-1] of Char;
+    Hdr: TARHdr absolute Buffer;
+    DT: DateTime;
+    W: AWord;
   begin
   if ArcFile^.GetPos = ArcFile^.GetSize then
     begin
     FileInfo.Last := 1;
-    Exit;
+    Exit
     end;
-  ArcFile^.Read(FH, SizeOf(FH));
-  if  (ArcFile^.Status <> 0) then
+  ArcFile^.Read(Buffer, BlkSize);
+  if ArcFile^.Status <> stOK then
     begin
     FileInfo.Last := 2;
-    Exit;
+    Exit
     end;
-  SetLength(FileInfo.FName, FH.LengthOfName);
-  ArcFile^.Read(FileInfo.FName[1], FH.LengthOfName);
+  FileInfo.Last := 0;
+  if Hdr.filetype = '5' {directory}
+    then FileInfo.Attr := Directory
+    else FileInfo.Attr := 0;
+  FileInfo.FName := Hdr.FName+#0;
+  SetLength(FileInfo.FName, PosChar(#0, FileInfo.FName)-1);
   if FileInfo.FName = '' then
     begin
-    FileInfo.Last := 2;
-    Exit;
+    FileInfo.Last := 1;
+    Exit
     end;
-  ArcFile^.Read(FH1, SizeOf(FH1));
-  FileInfo.Last := 0;
-  FileInfo.Date := FH1.DateTime;
-  FileInfo.Attr := FH1.Attr and not Hidden;
-  FileInfo.USize := FH1.RealSize;
-  FileInfo.PSize := FH1.PackSize;
-  ArcFile^.Seek(ArcFile^.GetPos+FH1.PackSize);
-  end { TQuArkArchive.GetFile };
+  FileInfo.USize := FromOct(Hdr.Size);
+  FileInfo.PSize := FileInfo.USize;
+  GetUNIXDate(i32(FromOct(Hdr.mtime)), DT.Year, DT.Month, DT.Day, DT.Hour,
+     DT.Min, DT.Sec);
+  PackTime(DT, FileInfo.Date);
+(*
+  ArcFile^.Seek(ArcFile^.GetPos+
+     (Trunc((FileInfo.PSize+BlkSize-1) / BlkSize)*BlkSize));
+*)
+  W := Word(CompRec(FileInfo.PSize).Lo) and (BlkSize-1);
+  ArcFile^.Seek(CompToFSize(ArcFile^.GetPos + FileInfo.PSize -
+                            W + BlkSize*Byte(W<>0)));
+  end { TTARArchive.GetFile };
 
 end.
