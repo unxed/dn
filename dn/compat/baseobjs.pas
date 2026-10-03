@@ -2,7 +2,7 @@
   library"); here they are the TObject of tv/ (TvObjs), so that the views and the other objects of DN have one root.
   ObjChangeType changes the VMT link of an object (its type): the first pointer of the instance (an object type that
   has virtual methods; see tv/DESIGN.md on the VMT). }
-unit Objects2;
+unit baseobjs;
 
 {$mode objfpc}{$H-}
 

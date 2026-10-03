@@ -50,7 +50,7 @@ unit arc_HPK; {HPK}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, Objects2, Streams, Dos, xTime,
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
   Collect
   ;
 

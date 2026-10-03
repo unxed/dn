@@ -54,7 +54,7 @@ unit DNStrL;
 interface
 
 uses
-  Defines, Objects2, Streams, strutil;
+  Defines, baseobjs, Streams, strutil;
 
 type
   TStrIndexRec = record

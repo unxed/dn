@@ -91,7 +91,7 @@ type
 
 implementation
 uses
-  basics, strutil, fileutil, Defines, Objects2, Streams, Dos, DnExec
+  basics, strutil, fileutil, Defines, baseobjs, Streams, Dos, DnExec
   ;
 
 { --- 7-Zip implemented by piwamoto --- }

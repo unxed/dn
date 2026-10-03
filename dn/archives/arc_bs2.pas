@@ -50,7 +50,7 @@ unit arc_BS2; {BS2}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, Objects2, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type

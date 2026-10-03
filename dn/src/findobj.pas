@@ -50,7 +50,7 @@ unit FindObj;
 interface
 
 uses
-  Defines, Objects2, Dialogs, Collect
+  Defines, baseobjs, Dialogs, Collect
   ;
 
 type

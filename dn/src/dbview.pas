@@ -93,7 +93,7 @@ unit DBView;
 interface
 
 uses
-  DBWatch, Defines, Objects2, Streams,
+  DBWatch, Defines, baseobjs, Streams,
   Views, Drivers, Dialogs,
   FViewer, Commands, XCode
   ;

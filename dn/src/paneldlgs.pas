@@ -103,7 +103,7 @@ uses
   Views, mainapp, Commands, Drivers, filepanel, Drives, FileCopy,
   Gauge, Gauges, Archiver, Startup, inputfname, Validate, Messages, Menus, DNHelp,
   FileFind, Tree, copyio, DNUtil, Filediz, Filelst, fsinfo, panelwin,
-  ErrMess, Objects2, VPUtils
+  ErrMess, baseobjs, VPUtils
   , DNDlgs;
 
 type

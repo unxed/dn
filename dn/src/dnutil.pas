@@ -56,7 +56,7 @@ unit DNUtil;
 interface
 
 uses
-  Defines, Objects2,
+  Defines, baseobjs,
    {SBlocks,}Drivers, Streams,
   Views, Scroller, mainapp,
   Dialogs, Gauges,

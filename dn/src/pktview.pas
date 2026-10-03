@@ -52,7 +52,7 @@ unit PktView;
 interface
 
 uses
-  Defines, Objects2, Streams, Strings, FViewer, Dialogs, Views, Drivers,
+  Defines, baseobjs, Streams, Strings, FViewer, Dialogs, Views, Drivers,
   Messages, Dos, Collect, strutil, basics, Lfn,
   Scroller
   , use16

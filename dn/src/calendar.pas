@@ -18,7 +18,7 @@ unit Calendar;
 interface
 
 uses
-  Defines, Drivers, Objects2, Streams, Views
+  Defines, Drivers, baseobjs, Streams, Views
   ;
 
 type

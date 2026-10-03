@@ -50,7 +50,7 @@ unit arc_IS3; {IS3}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, Objects2, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type

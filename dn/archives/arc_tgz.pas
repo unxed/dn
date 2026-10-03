@@ -50,7 +50,7 @@ unit arc_TGZ; {TGZ & TAZ & TAR.GZ}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, Objects2, Streams, Dos, xTime,
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
    fileutil
   ;
 

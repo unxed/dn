@@ -51,7 +51,7 @@ unit Drives;
 interface
 
 uses
-  Defines, Objects2, Streams, Views, Drivers,
+  Defines, baseobjs, Streams, Views, Drivers,
   FilesCol, DiskInfo, Collect
   , panelsetup
   ;

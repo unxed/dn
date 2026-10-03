@@ -1,7 +1,7 @@
-{ Tests of dn/new/objects2.pas: FreeObject and ObjChangeType over the TObject of tv/ }
+{ Tests of dn/new/baseobjs.pas: FreeObject and ObjChangeType over the TObject of tv/ }
 {$mode objfpc}{$H-}
-program t_objects2;
-uses Objects2;
+program t_baseobjs;
+uses baseobjs;
 {$I dntest.inc}
 type
   PA = ^TA;

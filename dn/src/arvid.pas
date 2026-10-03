@@ -51,7 +51,7 @@ unit Arvid;
 interface
 
 uses
-  Defines, Collect, Objects2, Streams, Dos, Drives, FilesCol, Views,
+  Defines, Collect, baseobjs, Streams, Dos, Drives, FilesCol, Views,
    DiskInfo, Tree, Histries,
   Lfn, Files
   ;

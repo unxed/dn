@@ -112,7 +112,7 @@ uses
   {    копирование описаний }
   
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
-  , panelsetup, Lfn, Files, Streams, Drivers, Objects2, Dialogs
+  , panelsetup, Lfn, Files, Streams, Drivers, baseobjs, Dialogs
   , Strings;
 
 const
