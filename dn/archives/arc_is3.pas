@@ -50,7 +50,7 @@ unit arc_IS3; {IS3}
 interface
 
 uses
-  Archiver, Advance, Advance1, Defines, Objects2, Streams
+  Archiver, basics, strutil, Defines, Objects2, Streams
   ;
 
 type

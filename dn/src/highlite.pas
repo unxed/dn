@@ -170,8 +170,8 @@ implementation
 uses
   {Consts,} {Cat: зачем? и без этого отлично компилится}
   Defines, { TCharSet }
-  Advance, { BreakChars }
-  Advance1
+  basics, { BreakChars }
+  strutil
   ; { UpStr, UpCase }
 
 const

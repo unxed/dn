@@ -274,7 +274,7 @@ uses
   Drives, Archiver, ArchSet,
   ArcView, FViewer, CmdLine, FBB, DNStdDlg,
   Colors, Microed, ed2, Editor, EdWin,
-  Advance, Advance1, Advance2, Advance3, Advance4, Advance7,
+  basics, strutil, fileutil, envutil, os2sess, langid,
   ColorSel, Eraser,  DiskInfo
   , FileType, PDSetup, U_KeyMap
   , Startup, Startupp

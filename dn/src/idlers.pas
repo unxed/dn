@@ -122,7 +122,7 @@ const
 implementation
 
 uses
-  Dos, DnExec, mainapp, Advance, Advance1, Memory, Startup, Commands,
+  Dos, DnExec, mainapp, basics, strutil, Memory, Startup, Commands,
    VideoMan
   ;
 

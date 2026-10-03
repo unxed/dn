@@ -90,7 +90,7 @@ implementation
 
 uses
   Dos, lfn,
-  Advance, Advance1, Advance2, Commands
+  basics, strutil, fileutil, Commands
   ;
 
 procedure Error(const S: String);

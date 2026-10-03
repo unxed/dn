@@ -46,12 +46,12 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit Advance2; {File related functions}
+unit fileutil; {File related functions}
 
 interface
 
 uses
-  Defines, Advance, Views
+  Defines, basics, Views
   , Streams
   ;
 
@@ -198,7 +198,7 @@ implementation
 uses
   Drivers, Dos, Lfn, VPUtils, DNUtf8,
   
-  Advance1, Strings,
+  strutil, Strings,
   Commands, mainapp, DnIni, Memory, FlPanelX, dnHelp
   , VpSysLow, U_KeyMap
   ;

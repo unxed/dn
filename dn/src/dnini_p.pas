@@ -80,10 +80,10 @@ function ReadIniCache(INItime, INIsize: LongInt): Boolean;
 
 implementation
 uses
-  Dos, Lfn, profile, Advance, Advance1, Collect, Messages, mainapp,
+  Dos, Lfn, profile, basics, strutil, Collect, Messages, mainapp,
   
   U_KeyMap, Country_,
-  Strings, Streams, Advance2
+  Strings, Streams, fileutil
   ;
 
 const

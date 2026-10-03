@@ -106,7 +106,7 @@ procedure DispatchEvents(InfoView: PWhileView; var CancelParam: Boolean);
 
 implementation
 uses
-  mainapp, Commands, Dos, TitleSet, Advance, Advance1, Advance2
+  mainapp, Commands, Dos, TitleSet, basics, strutil, fileutil
   ;
 
 constructor TPercentGauge.Init(var Bounds: TRect; AMaxValue: LongInt);

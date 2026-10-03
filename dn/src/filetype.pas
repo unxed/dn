@@ -67,7 +67,7 @@ const
 implementation
 
 uses
-  Commands, Dos, Advance1
+  Commands, Dos, strutil
   , Collect
   ;
 

@@ -45,97 +45,93 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-
-unit Advance3; {Misc stuff}
+unit langid;
 
 interface
 
-function GetSTime: LongInt;
+uses
+  basics, fileutil
+  ;
 
-function FindParam(const S: String): Integer;
-  {` Находит среди ParamStr тот параметр, который начинается
-    с '/' или '-' и последующего S. Результат - номер этого параметра. `}
-
-function Chk4Dos: Boolean;
-
-function GetEnv(S: String): String;
-function GetCrc(StartCrc: LongInt; var Buf; BufSize: Word): LongInt;
+function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
+function HelpLngId: String;
+function LngId: String;
 
 implementation
 
-uses
-  Advance, Dos,
-  Advance1, Advance6, Commands {Cat}
-  ;
+uses Dos, lfn, DnIni, DnIni_p;
 
-function GetSTime: LongInt;
+function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   var
-    H, M, S, SS: Word;
+    S1, S2: String;
   begin
-  GetTime(H, M, S, SS);
-  GetSTime := SS+LongInt(S)*100+LongInt(M)*6000+LongInt(H)*360000;
-  end;
-
-function FindParam(const S: String): Integer;
-  var
-    I: Integer;
-  begin
-  FindParam := 0;
-  for I := 1 to ParamCount do
-    if S = Copy(UpStrg(ParamStr(I)), 1, Length(S)) then
-      begin
-      FindParam := I;
-      Exit
-      end;
-  if S[1] = '/' then
-    FindParam := FindParam('-'+Copy(S, 2, MaxStringLength));
-  end;
-
-
-function Chk4Dos: Boolean;
-  begin
-  Result := False;   { INT 2Fh AX=D44Dh: the loader of DN (DN.COM) is not there }
-  end;
-
-
-function GetEnv(S: String): String;
-  begin
-  S := Dos.GetEnv(S);
-  DelSpace(S);
-  GetEnv := S;
-  end;
-
-{-DataCompBoy-}
-function UpdateCrc32(CurByte: Byte;
-    CurCrc: LongInt): LongInt;
-  {-Returns an updated crc32}
-
-  (* Model for inline code below
-  UpdateCrc32 := Crc_Table^[Byte(CurCrc xor LongInt(CurByte))] xor
-                 ((CurCrc shr 8) and $00FFFFFF);
-  *)
-  inline;
-  begin
-  UpdateCrc32 := Crc_Table^[Byte(CurCrc xor LongInt(CurByte))] xor
-      ( (CurCrc shr 8) and $00FFFFFF);
-  end;
-
-function GetCrc(StartCrc: LongInt; var Buf; BufSize: Word): LongInt;
-  type
-    AA = array[1..$F000] of Byte;
-  var
-    CNT: Word;
-    CRC: LongInt;
-  begin
-  if Crc_Table_Empty then
-    MakeCRCTable;
-  CRC := StartCrc;
-  GetCrc := StartCrc;
-  if BufSize = 0 then
+  ValidLngId := False;
+  S1 := GetEnv('DNDLG');
+  if S1 = '' then
+    S1 := SourceDir;
+  if not (S1[Length(S1)] in ['\', '/']) then
+    S1 := S1+'\';
+  S2 := StartupDir;
+  if not (S2[Length(S2)] in ['\', '/']) then
+    S2 := S2+'\';
+  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.DLG')) and
+      (not ExistFile(S2+LI+'.DLG'))
+  then
     Exit;
-  for CNT := 1 to BufSize do
-    CRC := UpdateCrc32(AA(Buf)[CNT], CRC);
-  GetCrc := CRC;
+  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.LNG')) and
+      (not ExistFile(S2+LI+'.LNG'))
+  then
+    Exit;
+  if CheckForHelp then
+    begin
+    S1 := SourceDir;
+    if not (S1[Length(S1)] in ['\', '/']) then
+      S1 := S1+'\';
+    if  (not ExistFile(S1+LI+'.HLP')) and (not ExistFile(S2+LI+'.HLP'))
+    then
+      Exit
+    end;
+  ValidLngId := True;
+  end { ValidLngId };
+
+function HelpLngId: String;
+  var
+    S: String;
+  begin
+  S := HelpLanguageOverride;
+  if not ValidLngId(S, True) then
+    S := ActiveLanguage;
+  if not ValidLngId(S, True) then
+    S := GetEnv('DNLNG');
+  if not ValidLngId(S, True) then
+    S := 'English';
+  HelpLngId := S
+  end;
+
+function LngId: String;
+  var
+    SR: lSearchRec;
+    S: String;
+  begin
+  S := ActiveLanguage;
+  if not ValidLngId(S, False) then
+    S := GetEnv('DNLNG');
+  if not ValidLngId(S, False) then
+    S := 'English';
+  if not ValidLngId(S, False) then
+    begin
+     lFindFirst(StartupDir+'*.LNG', AnyFileDir - Directory, SR);
+     S := SR.FullName;
+     if S <> '' then
+       SetLength(S, Length(s)-4);
+     lFindClose(SR);
+    end;
+  if not ValidLngId(ActiveLanguage, False) then
+    begin
+      ActiveLanguage := S;
+      SaveDnIniSettings ( @ActiveLanguage );
+    end;
+  LngId := S
   end;
 
 end.

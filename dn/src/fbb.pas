@@ -54,7 +54,7 @@ procedure LongCopy(Fn1: String);
 
 implementation
 uses
-  Lfn, Dos, Tree, VPSysLow, Advance, Advance1, Advance2, FileCopy, mainapp,
+  Lfn, Dos, Tree, VPSysLow, basics, strutil, fileutil, FileCopy, mainapp,
   Messages, Views, Defines, Dialogs, Commands, Drivers, Memory, HistList,
   Gauge, Startup, xTime, ErrMess, VPUtils
   , Strings;

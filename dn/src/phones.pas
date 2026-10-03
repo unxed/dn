@@ -113,7 +113,7 @@ procedure PhoneBook(Manual: Boolean);
 implementation
 uses
   mainapp, Startup, Commands, Messages, ObjType
-  , DNHelp, Advance, Advance1, Advance2
+  , DNHelp, basics, strutil, fileutil
   
   ;
 

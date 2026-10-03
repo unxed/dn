@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
+uses basics, fileutil, langid, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin

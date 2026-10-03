@@ -45,93 +45,99 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit Advance7;
+
+unit os2sess; {OS/2 support}
 
 interface
 
-uses
-  Advance, Advance2
-  ;
+type
+  SessionType = (stOS2SYS, stOS2FullScreen, stOS2Windowed, stPMSession,
+    stVDMFullScreen, stWinFullScreen, stWinWindow, stVDMWindow);
 
-function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
-function HelpLngId: String;
-function LngId: String;
+procedure RunSession(Command: String; Bckg: Boolean;
+     Session: SessionType);
 
 implementation
 
-uses Dos, lfn, DnIni, DnIni_p;
+uses
+  basics, Lfn, strutil, Drivers
+  , Dos, DnExec, Startup
+  ;
 
-function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
+{-DataCompBoy-}
+procedure RunSession(Command: String; Bckg: Boolean; Session: SessionType);
   var
-    S1, S2: String;
+    T: lText;
+    I: Integer;
+    S, M, EX: String;
+    CmdExt1: String[4];
   begin
-  ValidLngId := False;
-  S1 := GetEnv('DNDLG');
-  if S1 = '' then
-    S1 := SourceDir;
-  if not (S1[Length(S1)] in ['\', '/']) then
-    S1 := S1+'\';
-  S2 := StartupDir;
-  if not (S2[Length(S2)] in ['\', '/']) then
-    S2 := S2+'\';
-  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.DLG')) and
-      (not ExistFile(S2+LI+'.DLG'))
-  then
+  if not (OS2exec or Win32exec) then
     Exit;
-  if  (not CheckForHelp) and (not ExistFile(S1+LI+'.LNG')) and
-      (not ExistFile(S2+LI+'.LNG'))
-  then
-    Exit;
-  if CheckForHelp then
+  I := 1;
+  repeat
+    ClrIO;
+    CmdExt1 := CmdExt;
+   
+    if OS2exec then CmdExt1 := '.CMD';
+   
+    EX := SwpDir+'$DN'+ItoS(I)+'$'+CmdExt1;
+    lAssignText(T, EX);
+    FileMode := $40;
+    lResetText(T);
+    if IOResult <> 0 then
+      Break;
+    Close(T.T);
+    if InOutRes = 0 then
+      Inc(I);
+  until IOResult <> 0;
+  ClrIO;
+  lAssignText(T, EX);
+  lRewriteText(T);
+  lGetDir(0, S);
+  Writeln(T.T, '@'+Copy(S, 1, 2));
+  Writeln(T.T, '@cd "'+S+'"');
+  S := Command;
+  if PosChar(';', S) > 0 then
     begin
-    S1 := SourceDir;
-    if not (S1[Length(S1)] in ['\', '/']) then
-      S1 := S1+'\';
-    if  (not ExistFile(S1+LI+'.HLP')) and (not ExistFile(S2+LI+'.HLP'))
-    then
-      Exit
-    end;
-  ValidLngId := True;
-  end { ValidLngId };
-
-function HelpLngId: String;
-  var
-    S: String;
-  begin
-  S := HelpLanguageOverride;
-  if not ValidLngId(S, True) then
-    S := ActiveLanguage;
-  if not ValidLngId(S, True) then
-    S := GetEnv('DNLNG');
-  if not ValidLngId(S, True) then
-    S := 'English';
-  HelpLngId := S
-  end;
-
-function LngId: String;
-  var
-    SR: lSearchRec;
-    S: String;
-  begin
-  S := ActiveLanguage;
-  if not ValidLngId(S, False) then
-    S := GetEnv('DNLNG');
-  if not ValidLngId(S, False) then
-    S := 'English';
-  if not ValidLngId(S, False) then
-    begin
-     lFindFirst(StartupDir+'*.LNG', AnyFileDir - Directory, SR);
-     S := SR.FullName;
-     if S <> '' then
-       SetLength(S, Length(s)-4);
-     lFindClose(SR);
-    end;
-  if not ValidLngId(ActiveLanguage, False) then
-    begin
-      ActiveLanguage := S;
-      SaveDnIniSettings ( @ActiveLanguage );
-    end;
-  LngId := S
-  end;
-
+    Replace(';;', #0, S);
+    while (S <> '') and (PosChar(';', S) <> 0) do
+      begin
+      I := PosChar(';', S);
+      M := Copy(S, 1, I-1);
+      Replace(#0, ';', M);
+      Writeln(T.T, M);
+      Delete(S, 1, I);
+      end;
+    Replace(#0, ';', S);
+    Writeln(T.T, S);
+    end
+  else
+    Writeln(T.T, Command);
+  if not Bckg and (ShiftState and $20 = 0) then
+    Writeln(T.T, '@pause');
+  if OS2exec or (opSys and opWNT <> 0) then
+    Write(T.T, '@del "'+EX+'" & exit'^Z)
+  else
+    Write(T.T, '@del "'+EX+'"'^Z);
+  Close(T.T);
+ 
+  if (opSys and opWNT <> 0) then
+    M := 'START "'+Command+'" '+EX
+  else
+    
+    if OS2exec then
+      begin
+      if Session = stOS2FullScreen then
+        M := 'HSTART "'+Command+'" /C /FS '+EX
+      else
+        M := 'HSTART "'+Command+'" /C /WIN '+EX;
+      end
+    else
+    
+      M := 'START '+GetEnv('COMSPEC')+' /C '+EX;
+ 
+  ExecString(M, '');
+  end { RunSession };
+{DataCompBoy}
 end.

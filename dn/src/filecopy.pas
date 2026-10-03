@@ -104,7 +104,7 @@ uses
   xTime, Validate, TitleSet, UserMenu, Dos, DnIni,
   
   VpSysLow, Filediz , ArvidAvt ,
-  fnotify, FlTl, Advance, Advance1, Advance2,
+  fnotify, FlTl, basics, strutil, fileutil,
   Gauge, FileFind, VPUtils,
   DNUtil, Tree, Archiver, Drives, DiskInfo
   , ErrMess
@@ -539,7 +539,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     var
       S: String;
     begin
-    S := Advance2.MkName(Nm, Mask);
+    S := fileutil.MkName(Nm, Mask);
     if  (S[Length(S)] = '.') and (Length(S) > 1) then
       SetLength(S, Length(S)-1); {JO}
     MkName := S;

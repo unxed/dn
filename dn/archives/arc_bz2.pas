@@ -56,7 +56,7 @@ unit arc_BZ2; {bzip2}
 interface
 
 uses
-  Archiver, Advance, Advance1, Advance2, Objects2
+  Archiver, basics, strutil, fileutil, Objects2
   ;
 
 type

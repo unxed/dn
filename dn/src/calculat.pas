@@ -69,7 +69,7 @@ var
 implementation
 
 uses
-  Advance1
+  strutil
   , math, sysutils
 
   , Calc

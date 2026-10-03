@@ -114,7 +114,7 @@ type
 implementation
 
 uses
-  Messages, Commands, mainapp, Lfn, Advance1
+  Messages, Commands, mainapp, Lfn, strutil
   ;
 
 procedure TFieldCollection.FreeItem(P: Pointer);

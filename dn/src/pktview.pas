@@ -53,7 +53,7 @@ interface
 
 uses
   Defines, Objects2, Streams, Strings, FViewer, Dialogs, Views, Drivers,
-  Messages, Dos, Collect, Advance1, Advance, Lfn,
+  Messages, Dos, Collect, strutil, basics, Lfn,
   Scroller
   , use16
   ;
@@ -166,7 +166,7 @@ const
 implementation
 
 uses
-  DNHelp, Advance2, U_KeyMap, xTime, Commands, mainapp
+  DNHelp, fileutil, U_KeyMap, xTime, Commands, mainapp
 
   , VPSysLow;
 

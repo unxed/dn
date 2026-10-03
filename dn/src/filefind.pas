@@ -220,7 +220,7 @@ var
 
 implementation
 uses
-  Lfn {DataCompBoy}, mainapp, Advance1, Advance2, Startup, Dos,
+  Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos,
   Memory, Messages, HistList, Commands, FlPanelX, FlPanel
   , FViewer, Microed,
   Tree, xTime, DNUtil, U_KeyMap, {!!}CmdLine, Histries,
@@ -228,7 +228,7 @@ uses
   ArcView {JO: для разархивирования файлов найденных в архивах}
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
   , FlTl {JO: для GetDriveTypeNew}
-  , filetype, Eraser, Advance, Files, DnIni, Menus, FileCopy
+  , filetype, Eraser, basics, Files, DnIni, Menus, FileCopy
   , PDSetup, VPUtils
   ;
 

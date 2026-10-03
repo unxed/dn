@@ -53,7 +53,7 @@ unit DNDlgs;
 interface
 
 uses
-  TvDrawBuf, TvColors, Defines, Streams, Drivers, Views, Menus, Commands, mainapp, Advance1, TvDialog, TvCluster, TvUtil, Advance;
+  TvDrawBuf, TvColors, Defines, Streams, Drivers, Views, Menus, Commands, mainapp, strutil, TvDialog, TvCluster, TvUtil, basics;
 
 const
   CGrayDialog = #32#33#34#35#36#37#38#39#40#41#42#43#44#45#46#47+

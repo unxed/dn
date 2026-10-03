@@ -54,7 +54,7 @@ interface
 uses
   SysUtils,
   Defines, Streams, Views, Drivers,
-  Advance, highlite, xTime,
+  basics, highlite, xTime,
   Collect, FilesCol, XCode
   ;
 
@@ -247,8 +247,8 @@ type
 implementation
 
 uses
-  Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, Advance1, Advance2, U_KeyMap
-  , Microed, Macro, Advance6, VPUtils
+  Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, strutil, fileutil, U_KeyMap
+  , Microed, Macro, linepos, VPUtils
   , Memory, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
    {Cat}

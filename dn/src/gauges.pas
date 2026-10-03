@@ -120,7 +120,7 @@ procedure PrintFiles(Files: PCollection; Own: PView);
 
 implementation
 uses
-  Memory, Tree, Messages, mainapp, Advance, Advance1, Advance2,
+  Memory, Tree, Messages, mainapp, basics, strutil, fileutil,
    {AK155}
   FilesCol, Startup, DnIni, FileCopy, Eraser, Commands
   , Calendar 

@@ -148,7 +148,7 @@ uses
   Startup, Tree, mainapp, FileCopy, Eraser, FlPanel, Commands,
   Dialogs, FileFind, FlPanelX, Filediz, CmdLine
   , xTime, Messages, Events, fnotify, Dos
-  , Gauge {для PWhileView}, DnIni, Advance, Advance1, Advance2
+  , Gauge {для PWhileView}, DnIni, basics, strutil, fileutil
   ;
 
 const

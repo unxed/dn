@@ -217,7 +217,7 @@ uses
   , VpSysLow, VPUtils
   
   , FlTl, DnIni, Dos, FileType, PDSetup, U_KeyMap
-  , DNHelp, Advance, Advance1, Advance2, Memory, Startup
+  , DNHelp, basics, strutil, fileutil, Memory, Startup
   ;
 
 const

@@ -18,7 +18,7 @@ function QueryABCSort(CP: Word; var ABCSortXlat: TXLat): Boolean;
 implementation
 
 uses
-  advance, advance1;
+  basics, strutil;
 
 procedure QueryUpcaseTable;
 var
@@ -42,8 +42,8 @@ end;
 procedure GetSysCountryInfo;
 begin
   { the defaults of DN stay: dd.mm.yy is not forced here, the 24-hour clock is what a terminal user expects }
-  advance.CountryInfo.TimeFmt := 1;
-  advance.CountryInfo.DateFmt := 1;
+  basics.CountryInfo.TimeFmt := 1;
+  basics.CountryInfo.DateFmt := 1;
 end;
 
 function QueryToAscii(CP: Word; var ToAscii: TXLat): Boolean;

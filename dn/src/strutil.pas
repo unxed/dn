@@ -55,7 +55,7 @@
    LongInt Ά¬¥αβ® Word
 }
 
-unit Advance1; {String functions}
+unit strutil; {String functions}
 
 interface
 
@@ -271,7 +271,7 @@ function Str2Comp(const s: String): Int64;
 implementation
 
 uses
-  DnIni, Startup, Commands, Advance, U_KeyMap, DNUtf8
+  DnIni, Startup, Commands, basics, U_KeyMap, DNUtf8
   ;
 procedure AddStr(var S: String; C: Char);
   

@@ -61,7 +61,7 @@ procedure DoDump;
 implementation
 
 uses
-  Dos, Advance, Lfn, Advance1, Drivers
+  Dos, basics, Lfn, strutil, Drivers
   {, SysUtils}, VpSysLow
   ;
 

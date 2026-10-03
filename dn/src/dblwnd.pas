@@ -163,7 +163,7 @@ const
 
 implementation
 uses
-  DiskInfo, Commands, FileCopy, FilesCol, Advance, Advance1, Advance2,
+  DiskInfo, Commands, FileCopy, FilesCol, basics, strutil, fileutil,
   Startup, mainapp, TopView_, Tree, FViewer
   
   , Dos, VPUtils

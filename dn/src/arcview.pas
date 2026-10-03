@@ -161,7 +161,7 @@ uses
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
   , PDSetup, FlPanelX, fnotify, Drivers
   , Lfn, Files, Tree, Dos, Histries, HistList, FlPanel
-  , Advance, Advance1, Advance2, ArchDet
+  , basics, strutil, fileutil, ArchDet
   , arc_RAR, arc_ACE
   ;
 

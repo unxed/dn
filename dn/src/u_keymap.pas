@@ -51,7 +51,7 @@ unit U_KeyMap;
 interface
 
 uses
-  Objects2, Defines, Advance1
+  Objects2, Defines, strutil
   ;
 
 type
@@ -210,7 +210,7 @@ function CharToOemStr(const CharS: String): String;
 
 implementation
   uses
-    Country_, advance, Streams;
+    Country_, basics, Streams;
 
 procedure XLatBuf(var B; Len: Integer; const XTable: TXLat);
   var

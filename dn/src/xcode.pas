@@ -39,7 +39,7 @@ type
 
 implementation
 uses
-  Advance, Advance1, Lfn, DNStdDlg, mainapp, Commands, DnIni
+  basics, strutil, Lfn, DNStdDlg, mainapp, Commands, DnIni
   ;
 
 constructor TXCoder.Init(AMaxCodeTagLen: Byte);

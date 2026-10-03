@@ -51,7 +51,7 @@ unit Macro;
 interface
 
 uses
-  Advance, Defines, Objects2, Views, Collect,
+  basics, Defines, Objects2, Views, Collect,
   Microed, highlite, Strings
   ;
 
@@ -108,7 +108,7 @@ function InitHighLight
 implementation
 uses
   Messages, Drivers, Dialogs, Commands, DNHelp, mainapp,
-  Startup, Advance1, Advance2, VPUtils
+  Startup, strutil, fileutil, VPUtils
   , VPSysLow {JO: for SysBeepEx}
   ;
 

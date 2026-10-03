@@ -77,7 +77,7 @@ type
 
 implementation
 uses
-  Advance, Advance1, Defines, Objects2, Streams, Dos, xTime, VPUtils
+  basics, strutil, Defines, Objects2, Streams, Dos, xTime, VPUtils
   ;
 
 { ----------------------------- LHA ------------------------------------}

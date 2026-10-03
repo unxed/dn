@@ -52,7 +52,7 @@ unit RStrings;
 interface
 
 uses
-  Defines, Objects2, Streams, Advance6, Commands
+  Defines, Objects2, Streams, linepos, Commands
   ;
 
 type
@@ -86,7 +86,7 @@ type
   {----------------------------------------------------------------------------}
 implementation
 uses
-  DNUtil, Advance1
+  DNUtil, strutil
   , VPSysLow;
 {----------------------------------------------------------------------------}
 const
