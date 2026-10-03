@@ -41,6 +41,7 @@ jobs:
           mkdir -p out
           fpc -Futv/src -FUout -FEout tv/demo/tvdemo.pas | grep -E 'Error|Fatal' && exit 1
           python3 tv/tests/pty/test_tvdemo.py out/tvdemo
+          python3 tv/tests/pty/test_win32input.py out/tvdemo
       - name: The terminal view (tvterm, a shell in a window) in a pty
         run: |
           mkdir -p out
