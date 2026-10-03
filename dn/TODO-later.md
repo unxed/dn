@@ -224,5 +224,7 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
 - **Not known:** who zeroes `00F9:0000`. A `gdb` watchpoint (the first dword of the header becoming 0) did not fire in one run. Candidates: DN (a write through its DOS transfer buffer `tb_segment`/`dpmi32`),
   the stub or CWSDPMI, or the emulator. To find out: a watchpoint set from the start of the run, or a check of what `tb_segment` is in DN; the known odd thing of the same kind is `ShadowCount` (a variable that had a wrong
   value at the start of the program under DOSBox-X, `dpmi32.pas`). Until it is known a bug of DN cannot be excluded.
+- Checked (2026-10-03): `master` + the guard + the patches of `docs/patches/`, `lfn = true`, `utf8 file names = true`: `dist/dos` DN starts and draws the panels; the file "дом 世界.txt" is **in the panel** as
+  `{U+0434}{U+043E}{U+043C} {U+4E16}{U+754C}.txt` (cut by the column with the `►` mark; without the option it is hidden). Not yet tried on it: copy, view, rename, delete in DN.
 - With the apt package 2024.03.01 and `lfn = true`, DN shows the long names (the column cuts them with the `►` mark; the panel is in the 8.3 width). Files whose names the code page lacks are hidden
   (no `utf8 file names`, that option is only in the patched DOSBox-X): to be tried with DN now that it runs under `master`.
