@@ -109,8 +109,10 @@ def main():
         shot(t, 'start')
         t.send('\x1b', 0.5)
         shot(t, 'panels')
-        t.send('\x1b[21~', 1.0)                       # F10: the menu
+        t.send('\x1b[21~', 0.5)                       # F10: the menu bar
+        t.send('\r', 1.0)                            # Enter: the first menu
         shot(t, 'menu')
+        t.send('\x1b', 0.5)
         t.send('\x1b', 0.5)
         t.send('\x1bOP', 1.0)                         # F1: help
         shot(t, 'f1help')
