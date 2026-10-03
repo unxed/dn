@@ -253,7 +253,7 @@ uses
 {$IFDEF LINUX}
   DNRun,
 {$ENDIF}
-  Dos, Lfn, HelpKern, Menus, FileCopy, VPUtils, Math,
+  Dos, Lfn, HelpKern, Menus, FileCopy, Math,
   DNHelp, DnIni, iniengine, Histries,
   VideoMan, Memory, panelwin, Messages, HistList, FileFind,
   
@@ -491,6 +491,7 @@ function CheckExit: Boolean;
 procedure ClearSwap;
   var
     DT: Dos.DateTime;
+    W: Word;
     L: LongInt;
     SR: lSearchRec;
 
@@ -509,7 +510,7 @@ procedure ClearSwap;
 
   begin
   FillChar(DT, SizeOf(DT), 0);
-  GetDateDow(DT.Year, DT.Month, DT.Day, L);
+  Dos.GetDate(DT.Year, DT.Month, DT.Day, W);
 
   PackTime(DT, L);
   SetFileAttr(SwpDir+'dn.flg', 0);

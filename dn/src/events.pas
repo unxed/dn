@@ -8,13 +8,12 @@ interface
 
 implementation
 
-uses
-  VPUtils
+uses SysUtils
   ;
 
 function GetCurMSec: Longint;
   begin
-  Result := GetTimeMSec;
+  Result := LongInt(Cardinal(GetTickCount64 and $FFFFFFFF));
   end;
 
 procedure LongWorkBegin;

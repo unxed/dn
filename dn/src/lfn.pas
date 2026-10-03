@@ -257,7 +257,7 @@ implementation
 uses
   
   Strings, Commands {Cat}
-  , strutil, fileutil, VPUtils, Math
+  , strutil, fileutil, Math
    ,Startup ,Dpmi32 ,Dpmi32df 
   , fnotify
   ;
@@ -1133,6 +1133,20 @@ procedure lFSplit(const Path: String; var Dir, Name, ext: String);
     end;
   end;
   end { lFSplit };
+
+{ The name in FileRec/TextRec (wide characters in FPC) as a string. }
+function NameOfRec(const Name: array of WideChar): String;
+var
+  I: Integer;
+begin
+  Result := '';
+  I := 0;
+  while (I <= High(Name)) and (Name[I] <> #0) and (Length(Result) < 255) do
+  begin
+    Result := Result + Char(Ord(Name[I]) and $FF);
+    Inc(I);
+  end;
+end;
 
 function lFileNameOf(var lF: lFile): String;
   begin

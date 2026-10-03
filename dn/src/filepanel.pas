@@ -175,7 +175,7 @@ uses
   , UUCode
    {, Crt}
   , xTime
-  , panelsetup, VPUtils, Math
+  , panelsetup, Math
   
   
   ;

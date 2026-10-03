@@ -92,7 +92,7 @@ uses
   Lfn, {DataCompBoy}
   mainapp, basics, strutil, fileutil, Startup, Messages, Menus,
   Commands, editcore, WinClp, DNHelp, Dos, Memory, Dialogs, Tree
-  , filediz, Collect, VPUtils, Math
+  , filediz, Collect, Math
   ;
 
 type

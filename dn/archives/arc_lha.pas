@@ -77,7 +77,7 @@ type
 
 implementation
 uses
-  basics, strutil, Defines, baseobjs, Streams, Dos, xTime, VPUtils, Math
+  basics, strutil, Defines, baseobjs, Streams, Dos, xTime, Math
   ;
 
 { ----------------------------- LHA ------------------------------------}
