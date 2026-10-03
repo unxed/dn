@@ -17,7 +17,7 @@ function Utf8Chars(const S: String): Integer;
   {` The number of characters (not bytes) of S. `}
 
 function StrCols(const S: String): Integer;
-  {` The width of S in columns: characters with -dDNUTF8, else bytes (a name is shown in one byte per column). `}
+  {` The width of S in columns: columns of the characters with -dDNUTF8 (a wide one is two, a combining mark none), else bytes (a name is shown in one byte per column). `}
 
 function CpUpper(C: LongWord): LongWord;
 function CpLower(C: LongWord): LongWord;
@@ -81,7 +81,8 @@ function TabTyped(var T: TDocTab; const Text: ShortString; Def: Byte): Byte;
   ASCII (or empty), 0 when the table has no cell for it. `}
 
 function Utf8ToProxy(const S: String; var Tab: String): String;
-  {` S with each non-ASCII character as one byte #128+i; Tab[i+1] is that character (its bytes). `}
+  {` S with each non-ASCII character as one byte #128+i (Tab holds the characters, 8 bytes each); a wide (two columns) character is two bytes, the
+  second is #$FF, a combining mark goes into the entry of its character: so the columns of the proxy are the columns of the screen. `}
 
 function ProxyToUtf8(const S, Tab: String): String;
   {` The reverse of Utf8ToProxy: the bytes #128+i of S become Tab[i+1]. `}
@@ -90,6 +91,10 @@ implementation
 
 uses
   TvUtf8, TvCodePg;
+
+const
+  ProxySlot = 8;                    { the bytes of an entry of the table of a proxy string }
+  ProxyFill = #$FF;                 { the second byte of a wide character }
 
 function CharLen(const S: String; I: Integer): Integer;
   var
@@ -103,9 +108,28 @@ function CharLen(const S: String; I: Integer): Integer;
   end;
 
 function StrCols(const S: String): Integer;
+{$IFDEF DNUTF8}
+  var
+    I, Used: Integer;
+    Cp: LongWord;
+{$ENDIF}
   begin
 {$IFDEF DNUTF8}
-  Result := Utf8Chars(S);
+  Result := 0;
+  I := 1;
+  while I <= Length(S) do
+    begin
+    if  (Byte(S[I]) >= $80) and Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) then
+      begin
+      Inc(Result, CharWidth(Cp));
+      Inc(I, Used);
+      end
+    else
+      begin
+      Inc(Result);
+      Inc(I);
+      end;
+    end;
 {$ELSE}
   Result := Length(S);
 {$ENDIF}
@@ -514,10 +538,22 @@ function TabToUtf8(const T: TDocTab; const S: AnsiString): AnsiString;
       end;
   end;
 
+function ProxyWidth(const C: String): Integer;
+  var
+    Cp: LongWord;
+    Used: Integer;
+  begin
+  Result := 1;
+  if  (Length(C) > 0) and (Byte(C[1]) >= $80) and Utf8Decode(@C[1], Length(C), Cp, Used) then
+    Result := CharWidth(Cp);
+  end;
+
 function Utf8ToProxy(const S: String; var Tab: String): String;
   var
     I, L, K, N: Integer;
-    C: String[4];
+    C: String;
+    Cp: LongWord;
+    Used: Integer;
   begin
   Result := '';
   Tab := '';
@@ -525,17 +561,26 @@ function Utf8ToProxy(const S: String; var Tab: String): String;
   I := 1;
   while I <= Length(S) do
     begin
-    if  Byte(S[I]) < $80 then
-      begin
-      Result := Result + S[I];
-      Inc(I);
-      Continue;
-      end;
     L := CharLen(S, I);
     C := Copy(S, I, L);
     Inc(I, L);
+    { the combining marks (no columns) go with their character }
+    while (I <= Length(S)) and (Byte(S[I]) >= $80) do
+      begin
+      L := CharLen(S, I);
+      if not (Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) and (CharWidth(Cp) = 0)) then
+        Break;
+      if Length(C) + L <= ProxySlot then
+        C := C + Copy(S, I, L);
+      Inc(I, L);
+      end;
+    if  (Length(C) = 1) and (Byte(C[1]) < $80) then
+      begin
+      Result := Result + C;
+      Continue;
+      end;
     K := 0;
-    while (K < N) and (Copy(Tab, K * 4 + 1, 4) <> C + Copy('    ', 1, 4 - Length(C))) do
+    while (K < N) and (Copy(Tab, K * ProxySlot + 1, ProxySlot) <> C + StringOfChar(' ', ProxySlot - Length(C))) do
       Inc(K);
     if  K = N then
       begin
@@ -544,10 +589,12 @@ function Utf8ToProxy(const S: String; var Tab: String): String;
         Result := Result + '?';
         Continue;
         end;
-      Tab := Tab + C + Copy('    ', 1, 4 - Length(C));
+      Tab := Tab + C + StringOfChar(' ', ProxySlot - Length(C));
       Inc(N);
       end;
     Result := Result + Char($80 + K);
+    if ProxyWidth(C) = 2 then
+      Result := Result + ProxyFill;              { a wide character is two bytes: it takes two columns }
     end;
   end;
 
@@ -557,17 +604,28 @@ function ProxyToUtf8(const S, Tab: String): String;
     C: String;
   begin
   Result := '';
-  for I := 1 to Length(S) do
-    if  (Byte(S[I]) < $80) or (Byte(S[I]) - $80 >= Length(Tab) div 4) then
+  I := 1;
+  while I <= Length(S) do
+    begin
+    if  Byte(S[I]) = Byte(ProxyFill) then
+      Result := Result + ' '                      { the half of a wide character that was cut off }
+    else if  (Byte(S[I]) < $80) or (Byte(S[I]) - $80 >= Length(Tab) div ProxySlot) then
       Result := Result + S[I]
     else
       begin
-      K := (Byte(S[I]) - $80) * 4;
-      C := Copy(Tab, K + 1, 4);
+      K := (Byte(S[I]) - $80) * ProxySlot;
+      C := Copy(Tab, K + 1, ProxySlot);
       while (Length(C) > 0) and (C[Length(C)] = ' ') do
         SetLength(C, Length(C) - 1);
+      if ProxyWidth(C) = 2 then
+        if (I < Length(S)) and (Byte(S[I + 1]) = Byte(ProxyFill)) then
+          Inc(I)
+        else
+          C := ' ';                               { cut in the middle: the half is a blank }
       Result := Result + C;
       end;
+    Inc(I);
+    end;
   end;
 
 end.

@@ -34,7 +34,7 @@ begin
   Check(ProxyToUtf8(P, Tab) = 'a' + #$FF + 'b', 'a byte that is not UTF-8 is kept');
 
   P := Utf8ToProxy('日本語', Tab);
-  Check((Length(P) = 3) and (ProxyToUtf8(P, Tab) = '日本語'), 'proxy: 3-byte characters');
+  Check((Length(P) = 6) and (ProxyToUtf8(P, Tab) = '日本語'), 'proxy: 3-byte wide characters (two columns each)');
 
   { the case }
   P := 'Привет, Мир! abc ЁЖ';
@@ -77,6 +77,17 @@ begin
   for I := 0 to 99 do
     TabSee(DT, Chr($D7) + Chr($80 + (I and $3F)) + 'x');
   Check(TabBuild(DT) or DT.Over or True, 'table: many characters do not crash');
+  { the columns: a wide character is two bytes of the proxy, a combining mark goes with its character }
+  P := Utf8ToProxy('a日b', Tab);
+  Check((Length(P) = 4) and (P[1] = 'a') and (P[3] = #$FF) and (P[4] = 'b') and (Byte(P[2]) >= $80), 'proxy: a wide character takes two columns');
+  Check(ProxyToUtf8(P, Tab) = 'a日b', 'proxy: and comes back');
+  Check(ProxyToUtf8(Copy(P, 1, 2), Tab) = 'a ', 'proxy: a wide character that was cut in the middle is a blank');
+  Check(ProxyToUtf8(Copy(P, 3, 2), Tab) = ' b', 'proxy: the second half alone is a blank');
+  P := Utf8ToProxy('e' + #$CC#$81 + 'x', Tab);
+  Check((Length(P) = 2) and (P[2] = 'x') and (Byte(P[1]) >= $80), 'proxy: a combining mark goes with its letter (one column)');
+  Check(ProxyToUtf8(P, Tab) = 'e' + #$CC#$81 + 'x', 'proxy: the letter with its mark comes back');
+  P := Utf8ToProxy('日本語', Tab);
+  Check((Length(P) = 6) and (ProxyToUtf8(P, Tab) = '日本語'), 'proxy: three wide characters are six columns and come back');
   { the characters that the keyboard gives }
   TabNatural(DT);
   TabSee(DT, 'a│b');
