@@ -1032,6 +1032,12 @@ finalization
 {$ENDIF}
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
 initialization
+{$IF DEFINED(WINDOWS) AND DEFINED(DNUTF8)}
+  { the names of the files are UTF-8 strings inside DN: the RTL turns them into UTF-16 for the wide API of Windows (not the ANSI page) }
+  SetMultiByteConversionCodePage(CP_UTF8);
+  SetMultiByteFileSystemCodePage(CP_UTF8);
+  SetMultiByteRTLFileSystemCodePage(CP_UTF8);
+{$ENDIF}
 {$IFDEF UNIX}
   OnFileName := @SysOsPath;
 {$IFDEF DNUTF8}

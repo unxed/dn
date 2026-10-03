@@ -14,7 +14,9 @@ set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 DN_TARGET=${1:?usage: tools/build.sh linux64|linux|dos|win64|win32 [OUTDIR]}; export DN_TARGET
 # UTF-8 inside DN (-dDNUTF8) is the default on Linux; DN_UTF8=0 builds the old one (the code page inside); Windows/DOS: the code page
-case "$DN_TARGET" in linux*) if [ "${DN_UTF8:-1}" != 0 ]; then case "${DN_EXTRA:-}" in *-dDNUTF8*) ;; *) DN_EXTRA="${DN_EXTRA:-} -dDNUTF8";; esac; fi;; esac
+case "$DN_TARGET" in linux*) : "${DN_UTF8:=1}";; win*) : "${DN_UTF8:=0}";; *) DN_UTF8=0;; esac
+export DN_UTF8
+if [ "$DN_UTF8" != 0 ]; then case "${DN_EXTRA:-}" in *-dDNUTF8*) ;; *) DN_EXTRA="${DN_EXTRA:-} -dDNUTF8";; esac; fi
 export DN_EXTRA
 out=${2:-$here/out/$DN_TARGET}; mkdir -p "$out"; out=$(cd "$out" && pwd)
 . "$here/tools/dn-env.sh"
