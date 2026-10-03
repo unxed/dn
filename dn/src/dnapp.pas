@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF};
+uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -402,7 +402,11 @@ begin
     Redraw;
     end;
 {$ENDIF}
-  { TODO: the screen of the program that started DN (the shell) }
+{$IFDEF GO32V2}
+  { the screen of the programs that DN ran (and before that of the one that started DN), DNRun.RunExternal keeps it in UserScreen }
+  ShowUserScreenDos;
+  Redraw;
+{$ENDIF}
 end;
 
 procedure TApplication.WhenShow;
