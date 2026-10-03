@@ -285,6 +285,9 @@ Done in `tv` (`TvFar2l`, `TvTermIO.ParseApc`, `TvUnix`): DN asks the terminal (`
 the clipboard goes through it (open / empty / pieces of 16 KiB / set / close; read only after a paste gesture); `TV_FAR2L=0` switches it off, `TV_FAR2L_WAIT` is how long the terminal may ask the user.
 Why: the far2l terminal takes Ctrl+Ins and Shift+Ins for its own copy and paste, so DN never got them (reported by the owner: Ctrl+Ins in the editor copied nothing, Edit-Copy did; Shift+Ins "worked" because
 the terminal typed the text). Checked: `t_far2l` (33, the examples of the documentation), `t_termio` (110), `tv/tests/pty/test_far2l.py` (a terminal of the test: keys, mouse, set and get of the clipboard, 40 KB in pieces).
-**Open:** `tools/dn-linux-far2l.py` (DN in the editor with that terminal: Shift+End, Ctrl+Ins must put the line on the clipboard of the terminal, Shift+Ins must paste it) is RED: the editor opens with the
-text, but after Shift+End and Ctrl+Ins the clipboard of the terminal is empty and the editor shows no text at the end. Not diagnosed yet: first check that the keys of the script (Shift+End: virtual key 0x23 with the Shift
-bit) are the ones DN selects with, then what `SyncClipIn` (winclp.pas) sends. The script is not in CI yet. Next: F-key titles, notifications, window size, palette, DECRQM, then the far2l images / drag and drop.
+**Fixed (found with `tools/dn-linux-far2l.py`):** the cause of "Ctrl+Ins copies nothing" was in DN, not in the terminal alone: `DNKeyCode` (drivers.pas) got the codes of tv/ for Ctrl+Ins, Shift+Ins, Ctrl+Del and Shift+Del
+($0400, $0500, $0600, $0700) while DN looks for the BIOS scan codes ($9200, $5200, $9300, $5300); so the hotkeys of the menu (Edit-Copy, Edit-Paste) did not work with any terminal. Now Ctrl+Ins in the editor puts the
+selection on the clipboard of the far2l terminal (the script checks it: PASS).
+**Open:** Shift+Ins (paste) in that script is still RED: DN sends CLIP_OPEN and CLIP_GETDATA (so TvClip asks the terminal), the terminal gives the text, but the editor shows no pasted text. Not diagnosed: look at
+`PasteBlock` / `SyncClipOut` in microed.pas and winclp.pas (`FromSys`, `TextLines`) with a selection present (the script pastes over a selected block). If the paste does not work for you in the far2l terminal now,
+`TV_FAR2L=0` gives the old behaviour (the terminal types the text itself on Shift+Ins; Ctrl+Ins then stays with the terminal). The script is not in CI yet. Next: F-key titles, notifications, window size, palette, DECRQM, then the far2l images / drag and drop.
