@@ -4,7 +4,7 @@
 {&OrgName+,Speed+,AlignCode+,AlignRec-,CDecl-,Far16-,Frame+,Delphi+}
 {$X+,W-,I-,J+,H-,Delphi+,R-,S-,Q-,B-,T-,Use32+}
 
-unit VPSysLo2;
+unit vpsysext;
 
 interface
 
