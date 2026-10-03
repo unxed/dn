@@ -167,3 +167,10 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   (DOS и старый режим); в режиме UTF-8 строки DN уже UTF-8.
 - Windows: данные не перекодируются, нужна только передача имён в `...W`-API (UTF-8 в DN ↔ UTF-16 в системе). Проверить в CI файлами с именами вне ANSI-страницы:
   `SetMultiByteFileSystemCodePage(CP_UTF8)` в RTL FPC; юнит `Dos` может звать ANSI-варианты API напрямую.
+
+## Editor: typing characters outside the code page (2026-10-03)
+- In a UTF-8 file a typed character that the code page has not takes a free frame cell of the table of the document (`TabTyped`, `DocTab.Used`).
+  When the table is full the character is dropped silently (no message). A file that does not fit the table at load time is opened as a legacy
+  (non-UTF-8) file: typed characters outside the code page are dropped there (`microed.pas`, evKeyDown).
+- Frame characters typed by hand mark their cell as used (`TabMark`), but a frame cell given to a rare character stays given for the session of the file.
+- Events with key code 0 and a text (characters outside the code page) now reach all views in the UTF-8 build (`u_myapp.pas`); only the editor uses them.

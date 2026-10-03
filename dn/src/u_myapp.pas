@@ -133,7 +133,12 @@ procedure MyApp.GetEvent(var Event: TEvent);
     evKeyDown:
       begin
       {          if (DNKeyCode(Event) = kbAltQ) and Desktop^.GetState(sfFocused) then begin OpenSmartpad; ClearEvent(Event) end;}
+{$IFDEF DNUTF8}
+      { a character outside the code page has no key code, but it has the text (the editor puts it into the table of the document) }
+      if (DNKeyCode(Event) = kbNoKey) and (Event.TextLength = 0) then
+{$ELSE}
       if DNKeyCode(Event) = kbNoKey then
+{$ENDIF}
         begin
         Event.What := evNothing;
         Exit
