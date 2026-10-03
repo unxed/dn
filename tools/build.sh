@@ -62,7 +62,11 @@ echo "== help (tv/tools/tvhc.pas, native)"
 th=$tmp/tvhc-o; mkdir -p "$th"
 fpc -Fu"$here/tv/src" -FU"$th" -FE"$th" -vew "$here/tv/tools/tvhc.pas" | grep -E "Error|Fatal" || true
 for l in ENGLISH RUSSIAN UKRAIN; do
-    "$th/tvhc" "$src/RESOURCE/$l/dnhelp.htx" "$out/$l.HLP" /4DN_OSP | sed 's|^|  |'
+    htx=$src/RESOURCE/$l/dnhelp.htx
+    case "${DN_EXTRA:-}" in *-dDNUTF8*)      # the help in UTF-8 as well (the text is CP866 in the sources)
+        if [ "$l" != ENGLISH ]; then htx=$tmp/dnhelp-$l.htx; iconv -f cp866 -t utf-8 "$src/RESOURCE/$l/dnhelp.htx" > "$htx"; fi ;;
+    esac
+    "$th/tvhc" "$htx" "$out/$l.HLP" /4DN_OSP | sed 's|^|  |'
 done
 cp "$DN_OBJ/dn$exe" "$out/dn$exe"
 rm -rf "$out/XLT"; cp -r "$here/dn/data/XLT" "$out/XLT"      # the layout tables (ru441.xlt: DN looks for them in XLT next to the program)
