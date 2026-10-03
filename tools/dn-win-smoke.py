@@ -12,6 +12,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import Screen
 
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')      # the screen has box characters; the console of CI is cp1252
 fails = count = 0
 
 
@@ -95,6 +96,7 @@ def main():
         ok = t.wait_for('Utilities', 30)
         check(ok, 'start: the menu bar is drawn', t.text())
         check(b'Error in country' not in t.raw, 'start: no country setup error (XLT next to the program)')
+        t.wait_for('a.txt', 10)
         check('Name' in t.text() and 'a.txt' in t.text(), 'start: the panel shows the files of the directory', t.text())
         t.send('\x1b', 0.5)
         t.send('\x1b[18~', 1.0)                       # F7
