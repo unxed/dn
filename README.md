@@ -76,7 +76,8 @@
        python tools/dn-win-smoke.py out/win64       # на Windows: настоящая консоль (ConPTY), pip install pywinpty; в CI — workflow dn-windows
 
    Без сборки: `dist/win64/DN.EXE`, `dist/win32/DN.EXE` (описание — `README.TXT` рядом; нужна консоль Windows 10 1809+ или Windows Terminal).
-   Под wine в pty экран рисуется с искажениями (консоль wine в pty не годится как стенд): проверяет CI на настоящем Windows.
+   Вывод на Windows по умолчанию идёт через Console API (`WriteConsoleOutputW`: работает в wine и в Windows старше 10); `DN_WIN_OUTPUT=vt` включает прежний режим
+   с VT-последовательностями (консоль Windows 10 1809+ / Windows Terminal). Проверяет CI на настоящем Windows (`tools/dn-win-smoke.py`).
 
 1a. **TV в терминале Linux** (нужны `fpc` и `python3`; терминалом служит `tools/pty_screen.py`):
 
