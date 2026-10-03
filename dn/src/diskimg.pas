@@ -60,7 +60,7 @@ implementation
 
 uses
   Dos, Lfn, Messages, Views, Commands, Defines, Streams, mainapp, Drivers,
-  strutil, fileutil, FileCopy, progress, xTime
+  strutil, fileutil, FileCopy, progress, timeutil
   , uselfn, Tree, Math
   ;
 

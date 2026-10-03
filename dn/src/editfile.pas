@@ -80,7 +80,7 @@ uses
   DNStdDlg, basics, mainapp, Commands, Lfn, fileutil, editundo, strutil, Views,
   Collect, WinClp, Dos, Messages, Startup, DnIni, iniengine, CopyIni, DNUtf8,
   {SBlocks,}keymap, Macro,
-  xTime, Drivers,
+  timeutil, Drivers,
   fsinfo,
   dirwatch,
   

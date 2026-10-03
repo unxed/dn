@@ -147,7 +147,7 @@ uses
   osdep, Lfn, uselfn, fsinfo,
   Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
   Dialogs, FileFind, panelroot, Filediz, CmdLine
-  , xTime, Messages, dirwatch, Dos
+  , timeutil, Messages, dirwatch, Dos
   , progress {для PWhileView}, DnIni, basics, strutil, fileutil
   ;
 

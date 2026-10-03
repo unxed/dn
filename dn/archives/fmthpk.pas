@@ -50,7 +50,7 @@ unit fmthpk; {HPK}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, timeutil,
   Collect
   ;
 

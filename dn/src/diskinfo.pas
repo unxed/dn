@@ -154,7 +154,7 @@ var
 
 implementation
 uses
-  Startup, mainapp, Commands, DNHelp, Tree, xTime
+  Startup, mainapp, Commands, DNHelp, Tree, timeutil
   , basics, strutil, fileutil, Math
   , osdep, Lfn, keymap, baseobjs
   , fsinfo, panelroot, panelsetup, Dos

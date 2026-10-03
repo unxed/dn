@@ -67,7 +67,7 @@ uses
   
   Archiver, ArcView, ASCIITab, calcline, Collect, DiskInfo, mainapp,
   DNStdDlg, DNUtil, Drives, editundo, Editor, FileFind, FilesCol,
-  filepanel, FStorage, FViewer, gadgets, Histries, editcore, Startup,
+  filepanel, FStorage, FViewer, gadgets, histories, editcore, Startup,
   Tree, UniWin, UserMenu, panelwinx, HelpKern,
   calcwin, CellsCol, 
   Calendar, 
@@ -2076,7 +2076,7 @@ begin
 end;
 
 type
-  PR_REditHistoryCol = ^Histries.TEditHistoryCol;
+  PR_REditHistoryCol = ^histories.TEditHistoryCol;
 
 function Build_REditHistoryCol(var S: TStream): PObject;
 begin
@@ -2089,7 +2089,7 @@ begin
 end;
 
 type
-  PR_RViewHistoryCol = ^Histries.TViewHistoryCol;
+  PR_RViewHistoryCol = ^histories.TViewHistoryCol;
 
 function Build_RViewHistoryCol(var S: TStream): PObject;
 begin
@@ -3222,12 +3222,12 @@ begin
 
   RHelpIndex.Store := @Store_RHelpIndex;
 
-  REditHistoryCol.VmtLink := PtrUInt(TypeOf(Histries.TEditHistoryCol));
+  REditHistoryCol.VmtLink := PtrUInt(TypeOf(histories.TEditHistoryCol));
   REditHistoryCol.Load := @Build_REditHistoryCol;
 
   REditHistoryCol.Store := @Store_REditHistoryCol;
 
-  RViewHistoryCol.VmtLink := PtrUInt(TypeOf(Histries.TViewHistoryCol));
+  RViewHistoryCol.VmtLink := PtrUInt(TypeOf(histories.TViewHistoryCol));
   RViewHistoryCol.Load := @Build_RViewHistoryCol;
 
   RViewHistoryCol.Store := @Store_RViewHistoryCol;

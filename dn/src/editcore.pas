@@ -295,8 +295,8 @@ implementation
 uses
   
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
-  progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
-  xTime, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
+  progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, histories,
+  timeutil, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
 , osdep, DNStdDlg, Dialogs, DNHelp, Math
   ;
 

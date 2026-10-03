@@ -67,7 +67,7 @@ uses
   Lfn, Views, Defines, Streams, keymap, Collect, editundo,
   basics, strutil, fileutil, Dos, Dialogs, mainapp,
   {SBlocks,}progress, Startup, WinClp, Messages, Commands, Macro,
-  editwin, xTime, DnIni, DNUtil, linepos, evaluator, FViewer {AK155}
+  editwin, timeutil, DnIni, DNUtil, linepos, evaluator, FViewer {AK155}
   
   ;
 

@@ -142,7 +142,7 @@ const
 implementation
 
 uses
-  xTime, Startup, DNHelp, basics, strutil, fileutil
+  timeutil, Startup, DNHelp, basics, strutil, fileutil
   , mainapp, Messages, Commands, Math
   ;
 
@@ -662,9 +662,9 @@ function TGameView.MoveDown;
 загрузку процессора не меняет. Соответственно, переменная BB
 и вся работа с ней тоже исключены.
     if BB then
-      xTime.DelayTics(2)
+      timeutil.DelayTics(2)
     else
-      xTime.DelayTics(1);
+      timeutil.DelayTics(1);
 /AK155}
     if Stop then
       begin

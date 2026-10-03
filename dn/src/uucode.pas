@@ -91,7 +91,7 @@ uses
   uselfn, Math, Tree
   , Dos, Lfn {DataCompBoy}
   , basics, strutil, fileutil, Views, Startup, Dialogs,
-  xTime, FilesCol, mainapp, Drivers, progress, Messages, Commands,
+  timeutil, FilesCol, mainapp, Drivers, progress, Messages, Commands,
   FileCopy, HistList, DNUtil
 
   ;

@@ -56,7 +56,7 @@ implementation
 uses
   Lfn, Dos, Tree, osdep, basics, strutil, fileutil, FileCopy, mainapp,
   Messages, Views, Defines, Dialogs, Commands, Drivers, HistList,
-  progress, Startup, xTime, fileerrors, Math
+  progress, Startup, timeutil, fileerrors, Math
   , Strings;
 
 type

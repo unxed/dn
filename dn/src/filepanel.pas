@@ -168,12 +168,12 @@ implementation
 uses
   uselfn, osdep, Dos, Eraser, Drives, DNHelp, TitleSet,
   Lfn, DNUtil, mainapp, basics, strutil, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
-  HistList, Tree, copyio, ArcView, CmdLine, Histries, Archiver,
+  HistList, Tree, copyio, ArcView, CmdLine, histories, Archiver,
   gadgets, progress, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz
   
   , UUCode
    {, Crt}
-  , xTime
+  , timeutil
   , panelsetup, Math
   
   

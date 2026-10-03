@@ -11,7 +11,7 @@ interface
 
 uses
   SysUtils, TvInput, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, TvScreen, TvCell, Menus,
-  Streams, Views, Drivers, Commands, xTime, DnIni, DNStrL, RStrings
+  Streams, Views, Drivers, Commands, timeutil, DnIni, DNStrL, RStrings
 {$IFDEF GO32V2}, TvDos, go32{$ENDIF}, DNErrLog;
 
 const
@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, osdep, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
+uses basics, fileutil, langid, Videoman, osdep, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -751,9 +751,9 @@ initialization
   CommandHiddenHook := @CommandHidden;
   ListBoxOwnsList := False;       { DN: the owner of the list disposes it }
   { the palettes of DN (DNPalet: carved from the archive) replace those of tv/ }
-  SystemColors[apColor] := DNPalet.CColor;
-  SystemColors[apBlackWhite] := DNPalet.CBlackWhite;
-  SystemColors[apMonochrome] := DNPalet.CMonochrome;
+  SystemColors[apColor] := palettes.CColor;
+  SystemColors[apBlackWhite] := palettes.CBlackWhite;
+  SystemColors[apMonochrome] := palettes.CMonochrome;
   CColor := SystemColors[apColor];
   CBlackWhite := SystemColors[apBlackWhite];
   CMonochrome := SystemColors[apMonochrome];

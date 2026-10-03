@@ -98,7 +98,7 @@ function FirstNameNum(P: PFilePanelRoot): LongInt;
 implementation
 uses
   dirwatch,
-  Lfn, uselfn, Collect, xTime, DnIni, HistList,
+  Lfn, uselfn, Collect, timeutil, DnIni, HistList,
   basics, strutil, fileutil, Dos, Defines, Dialogs,
   Views, mainapp, Commands, Drivers, filepanel, Drives, FileCopy,
   progress, gadgets, Archiver, Startup, inputfname, Validate, Messages, Menus, DNHelp,

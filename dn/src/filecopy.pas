@@ -101,7 +101,7 @@ procedure CloseWriteStream;
 implementation
 uses
   mainapp, Startup, Messages, HistList, Commands,
-  xTime, Validate, TitleSet, UserMenu, Dos, DnIni,
+  timeutil, Validate, TitleSet, UserMenu, Dos, DnIni,
   
   osdep, Filediz , ArvidAvt ,
   dirwatch, fsinfo, basics, strutil, fileutil,

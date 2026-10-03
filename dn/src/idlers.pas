@@ -51,7 +51,7 @@ unit Idlers;
 interface
 
 uses
-  Views, Drivers, Defines, xTime
+  Views, Drivers, Defines, timeutil
   ;
 
 type

@@ -62,7 +62,7 @@ uses
   Dialogs, gadgets,
   Commands, Tree,
   FilesCol, UserMenu,
-  HelpFile, xTime
+  HelpFile, timeutil
   ;
 
 const
@@ -254,7 +254,7 @@ uses
   DNRun,
 {$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
-  DNHelp, DnIni, iniengine, Histries,
+  DNHelp, DnIni, iniengine, histories,
   VideoMan, panelwin, Messages, HistList, FileFind,
   
   Phones, 

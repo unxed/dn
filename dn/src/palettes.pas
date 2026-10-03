@@ -46,7 +46,7 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit DNPalet;
+unit palettes;
 
 { Carved by tools/dn-carve.py from mainapp.PAS: the constants CColor, CBlackWhite, CMonochrome of Dos Navigator. }
 

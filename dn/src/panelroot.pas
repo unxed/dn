@@ -55,7 +55,7 @@ interface
 
 uses
   Defines, Streams,
-  Views, Drivers, FilesCol, panelsetup, Drives, xTime
+  Views, Drivers, FilesCol, panelsetup, Drives, timeutil
   ;
 
 type
@@ -216,7 +216,7 @@ implementation
 
 uses
   Lfn, uselfn, basics, strutil, fileutil, envutil, osdep,
-  Messages, mainapp, DNHelp, Startup, Commands, Histries, HistList, paneldlgs,
+  Messages, mainapp, DNHelp, Startup, Commands, histories, HistList, paneldlgs,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
   DNUtil, fsinfo, Dos, Filediz, Collect, Math,
   iniengine, DnIni {-$VIV}
