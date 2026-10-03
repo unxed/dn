@@ -856,7 +856,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y >= -1)
                  and (P.Y <= 1)
             then
-              Message(Owner, evKeyDown, kbUp, nil);
+              MessageKey(Owner, kbUp);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
           end
         else if P.Y = Size.Y-1 then
@@ -866,7 +866,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y >= Size.Y-2)
                  and (P.Y <= Size.Y)
             then
-              Message(Owner, evKeyDown, kbDown, nil);
+              MessageKey(Owner, kbDown);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
           end
         else if P.Y < SP then
@@ -876,7 +876,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
             GetPartCode;
             MakeLocal(Event.Where, P);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y < SP) then
-              Message(Owner, evKeyDown, kbPgUp, nil);
+              MessageKey(Owner, kbPgUp);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
           end
         else if P.Y > SP then
@@ -886,7 +886,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
             GetPartCode;
             MakeLocal(Event.Where, P);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y > SP) then
-              Message(Owner, evKeyDown, kbPgDn, nil);
+              MessageKey(Owner, kbPgDn);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
           end;
         RepeatDelay := RD;
@@ -2884,7 +2884,7 @@ DoSave:
                 Dec(Cur.X)
               else
                 begin
-                Message(@Self, evKeyDown, kbUp, nil);
+                MessageKey(@Self, kbUp);
                 if  (BufPos+FilePos <> 0) then
                   Cur.X := Lines[Cur.Y].len*2+9;
                 end;
@@ -2920,7 +2920,7 @@ DoSave:
              if ViewMode = vmAsm then
               begin
               if Cur.X >= Lines[Cur.Y].len*2+9 then
-                Message(@Self, evKeyDown, kbDown, nil)
+                MessageKey(@Self, kbDown)
               else
                 Inc(Cur.X);
               DrawView;
@@ -3106,7 +3106,7 @@ NotKb:
                           Buf^[P.X] := (Buf^[P.X] and $F) or (I shl 4);
                         if ViewMode = vmAsm then
                           MakeLines; {JO}
-                        Message(@Self, evKeyDown, kbRight, nil);
+                        MessageKey(@Self, kbRight);
                         CE
                         end;
                       end
@@ -3116,7 +3116,7 @@ NotKb:
                       Event.CharCode := Byte(XCoder.XLatCP[FromAscii][Char(Event.CharCode)]);
                       Char(Buf^[Cur.X+Cur.Y*HexPos+BufPos])
                          := Char(Event.CharCode);
-                      Message(@Self, evKeyDown, kbRight, nil);
+                      MessageKey(@Self, kbRight);
                       CE
                       end;
                     end;
@@ -3137,13 +3137,13 @@ NotKb:
             RepeatDelay := 6-Round((I/(Size.Y shr 1))*6);
             AutoRepeat := RepeatDelay;
             if P.X < Size.X div 4 then
-              Message(@Self, evKeyDown, kbLeft, nil)
+              MessageKey(@Self, kbLeft)
             else if P.X >= (Size.X*3) div 4 then
-              Message(@Self, evKeyDown, kbRight, nil)
+              MessageKey(@Self, kbRight)
             else if P.Y < Size.Y div 2 then
-              Message(@Self, evKeyDown, kbUp, nil)
+              MessageKey(@Self, kbUp)
             else
-              Message(@Self, evKeyDown, kbDown, nil)
+              MessageKey(@Self, kbDown)
             end
           else
             RepeatDelay := 0;

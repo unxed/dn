@@ -1322,7 +1322,7 @@ CurTime:
       {$ENDIF}
        Dispose( Dlg, Done );
        NotifyResume; {Cat}
-       Message(Application, evKeyDown, kbDown, nil);
+       MessageKey(Application, kbDown);
        Message(Application, evCommand, cmSingleAttr, nil);
        Exit;
       end;

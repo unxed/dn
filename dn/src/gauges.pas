@@ -182,7 +182,7 @@ procedure TKeyMacros.Play;
   N := 0;
   while N < Count do
     begin
-    Message(Application, evKeyDown, Keys^[N], nil);
+    MessageKey(Application, Keys^[N]);
     Inc(N);
     end;
   end;

@@ -2105,7 +2105,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     TryRunSession := True;
     RunSession(Copy(S^, 2, MaxStringLength), B, ST);
     CmdLine.StrModified := True;
-    Message(CommandLine, evKeyDown, kbDown, nil);
+    MessageKey(CommandLine, kbDown);
     ClearEvent(Event);
     end { TryRunSession };
 

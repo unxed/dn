@@ -867,9 +867,9 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       if ((Event.EventFlags and 2) <> 0) then
         begin
         if Event.Buttons and mbRightButton = 0 then
-          Message(Owner, evKeyDown, kbEnter, nil)
+          MessageKey(Owner, kbEnter)
         else
-          Message(Owner, evKeyDown, kbSpace, nil);
+          MessageKey(Owner, kbSpace);
         CE;
         end;
     evCommand:

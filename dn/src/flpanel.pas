@@ -1030,12 +1030,12 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
             begin
             SelectFlag := not PFileRec
               (Files^.At(ScrollBar^.Value))^.Selected;
-            Message(Panel, evKeyDown, kbIns, nil);
+            MessageKey(Panel, kbIns);
             end;
           end;
         RepeatDelay := 0;
         repeat
-          Message(Self.Owner, evKeyDown, kbDown, nil);
+          MessageKey(Self.Owner, kbDown);
         until not MouseEvent(Event, evMouseMove+evMouseAuto);
         RepeatDelay := 2;
         Panel^.MSelect := False;

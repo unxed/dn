@@ -526,8 +526,8 @@ procedure ExecFile(const FileName: String);
     CmdLine.Str := M;
     CmdLine.StrModified := True;
     CmdDisabled := B;
-    Message(CommandLine, evKeyDown, kbDown, nil);
-    Message(CommandLine, evKeyDown, kbUp, nil);
+    MessageKey(CommandLine, kbDown);
+    MessageKey(CommandLine, kbUp);
     end;
 
   procedure RunCommand(B: Boolean);
@@ -545,7 +545,7 @@ procedure ExecFile(const FileName: String);
         ST := stOS2Windowed;
       RunSession(M, False, ST);
       CmdLine.StrModified := True;
-      Message(CommandLine, evKeyDown, kbDown, nil);
+      MessageKey(CommandLine, kbDown);
       Exit;
       end;
     {AK155, см. dnutil.ExecCommandLine}

@@ -1069,14 +1069,14 @@ procedure CmdHistory;
 
   if I = cmCancel then
     Exit;
-  Message(CommandLine, evKeyDown, kbDown, nil);
+  MessageKey(CommandLine, kbDown);
 
   CurString := DT.I;
   Str := GetCommand(DT.I);
   CommandLine^.DrawView;
-  Message(CommandLine, evKeyDown, kbEnd, nil);
+  MessageKey(CommandLine, kbEnd);
   if I <> cmYes then
-    Message(CommandLine, evKeyDown, kbEnter, nil);
+    MessageKey(CommandLine, kbEnter);
   end { CmdHistory };
 
 const

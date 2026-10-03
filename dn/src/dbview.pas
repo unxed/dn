@@ -1330,13 +1330,13 @@ redat:
         MakeLocal(Event.Where, P);
         if MouseInView(Event.Where) then
           if P.X < Size.X div 4 then
-            Message(@Self, evKeyDown, kbLeft, nil)
+            MessageKey(@Self, kbLeft)
           else if P.X >= (Size.X*3) div 4 then
-            Message(@Self, evKeyDown, kbRight, nil)
+            MessageKey(@Self, kbRight)
           else if P.Y < Size.Y div 2 then
-            Message(@Self, evKeyDown, kbUp, nil)
+            MessageKey(@Self, kbUp)
           else
-            Message(@Self, evKeyDown, kbDown, nil)
+            MessageKey(@Self, kbDown)
       until not MouseEvent(Event, evMouseMove+evMouseAuto);
       RepeatDelay := RD;
       CE
