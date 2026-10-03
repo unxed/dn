@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:05:11
-x═[■]═════ C:\tmp\dntour-00ppc3f2\work ══════════╗x═════════ C:\tmp\dntour-00ppc3f2\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                18:00:12
+x═[■]═════ C:\tmp\dntour-rbisnq_b\work ══════════╗x═════════ C:\tmp\dntour-rbisnq_b\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-00ppc3f2\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-00ppc3f2\work>
+C:\tmp\dntour-rbisnq_b\work>
  F1 Help

@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:03:26
-x═[■]═════ C:\tmp\dntour-ee985jim\work ══════════╗x═════════ C:\tmp\dntour-ee985jim\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                17:58:29
+x═[■]═════ C:\tmp\dntour-089eipdx\work ══════════╗x═════════ C:\tmp\dntour-089eipdx\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-ee985jim\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-ee985jim\work>
+C:\tmp\dntour-089eipdx\work>
  F1 Help  F10 Tree
