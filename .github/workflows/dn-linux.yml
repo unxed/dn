@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
-      - name: Build DN (one command; DN_UTF8=0: the old one, the code page inside)
+      - name: Build DN (one command, DN_UTF8=0 is the old one with the code page inside)
         run: DN_UTF8=0 tools/build.sh linux64 out/dn
       - name: Tour in a pty
         run: |
@@ -75,7 +75,7 @@ jobs:
         run: |
           python3 tools/dn-linux-tour.py out/dn | tee tour.txt
           ! grep -v ' ok$' tour.txt
-      - name: File operations in a pty (and the UTF-8 checks: UTF-8 inside is the default; the locale test is for DN_UTF8=0 only)
+      - name: File operations in a pty and the UTF-8 checks (the locale test is for DN_UTF8=0 only)
         run: DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
       - uses: actions/upload-artifact@v4
         with:
