@@ -182,3 +182,9 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   panel): a leftover of the conversion of the draw buffers to cells (commit 86cb12f), `flpanel.pas` now uses `WriteLineC`; the ops test has a check.
   Other leftovers of that kind may exist: the places that still hand cell buffers to the word-based `WriteLineW/WriteBufW` (the DBF viewer and
   `calendar`, `ed2`, `idlers`, `swe`, `topview_` use word buffers on purpose).
+
+## TvVt (the emulator of the terminal view), 2026-10-03
+- Not done: DECRQM, sixel and other graphics, rectangular operations (DECCRA, DECFRA...), double width and height lines, left/right margins (DECSLRM), text reflow when
+  the width changes, the title stack (CSI 22/23 t), the answers to OSC 10/11 (colors). The answer to DA says "VT220 with color" (`?62;22`), not xterm.
+- The history keeps the rows as they were at the time (no reflow); a row is a reference, not a copy: the memory of 1000 lines x width x 24 bytes per cell.
+- `Resize` does not pull the lines back from the history when the window grows.
