@@ -3392,6 +3392,10 @@ EndDel:
       S1: String[2];
     begin
     Ch := Char(Event.CharCode);
+{$IFDEF DNUTF8}
+    if DocU8 then
+      TabMark(DocTab, Byte(Ch));
+{$ENDIF}
     S1 := Ch;
     if EdOpt.AutoBrackets and ((LastX >= Length(WorkString)) or
            (WorkString[LastX+1] = ' '))
@@ -4680,6 +4684,24 @@ Ex:
       end {case};
     evKeyDown:
       begin
+{$IFDEF DNUTF8}
+      { the typed character by the table of the document: any character of the keyboard, not only of the code page. A character that the
+        table has no cell for is dropped (its key code is 0: it must not meet the commands of the editor) }
+      if DocU8 and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) and ((Event.ControlKeyState and 12) = 0) then
+        begin
+        Event.CharCode := TabTyped(DocTab, EventText(Event), 0);
+        if Event.CharCode = 0 then
+          begin
+          ClearEvent(Event);
+          Exit;
+          end;
+        end
+      else if (Event.TextLength > 0) and (Event.KeyCode = 0) then      { a character that this file cannot have }
+        begin
+        ClearEvent(Event);
+        Exit;
+        end;
+{$ENDIF}
       {AK155 Для вертикальных стрелок (возможно, с шифтом) ScrollLock,
       WheelEvent и Ctrl берутся по xor. См. чуть ниже обработку
       kbCtrlUp и далее}

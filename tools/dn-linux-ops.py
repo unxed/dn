@@ -229,6 +229,12 @@ def main():
             check('\u0416\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440!' in scr and '\u0432\u0442\u043e\u0440\u0430\u044f \u2014 \u0441\u0442\u0440\u043e\u043a\u0430 \u00ab' in scr, 'UTF-8 editor: the typed text is on the screen, Backspace removes characters', scr)
             t.send(F['F2'], 1.0)
             check(open(fn, encoding='utf-8').read() == '\u0416\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440!\n\u0432\u0442\u043e\u0440\u0430\u044f \u2014 \u0441\u0442\u0440\u043e\u043a\u0430 \u00ab\n', 'UTF-8 editor: the file is saved as UTF-8 (the dash and the quotes are kept)')
+            t.send(F['UP'], 0.4)
+            t.send(F['END'], 0.4)
+            for ch in '\u03b1\u03b2\u2502\u2026':                 # Greek letters (the code page has none), a frame character (a cell of the table), the ellipsis
+                t.send(ch, 0.4)
+            t.send(F['F2'], 1.0)
+            check(open(fn, encoding='utf-8').read() == '\u0416\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440!\u03b1\u03b2\u2502\u2026\n\u0432\u0442\u043e\u0440\u0430\u044f \u2014 \u0441\u0442\u0440\u043e\u043a\u0430 \u00ab\n', 'UTF-8 editor: characters outside the code page are typed and saved', open(fn, encoding='utf-8').read())
             t.send(F['ESC'], 0.5)
             t.send(F['ALT-X'], 0.8)
             t.send(F['ENTER'], 1.0)
