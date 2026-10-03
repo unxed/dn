@@ -11,7 +11,7 @@ unit Drivers;
 interface
 
 uses
-  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys;
+  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys, TvCell, TvColors, TvDrawBuf, TvText;
 
 type
   TEvent = TvEvents.TEvent;
@@ -144,11 +144,35 @@ procedure FormatStr(var Result: String; const Format: String; var Params);
 procedure PrintStr(const S: String);
 
 { Cells of 16 bits: the low byte is the character, the high byte is the attribute (0 = leave as it is). }
-procedure MoveColor(var Buf; Num: Word; Attr: Byte);
-procedure MoveBuf(var Dest; var Source; Attr: Byte; Count: Word);
-procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: LongInt);
-procedure MoveCStr(var Dest; const Str: String; Attrs: Word);
-procedure MoveStr(var Dest; const Str: String; Attr: Byte);
+procedure MoveColor(var Buf; Num: Word; Attr: Byte); overload;
+procedure MoveBuf(var Dest; var Source; Attr: Byte; Count: Word); overload;
+procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: LongInt); overload;
+procedure MoveCStr(var Dest; const Str: String; Attrs: Word); overload;
+procedure MoveStr(var Dest; const Str: String; Attr: Byte); overload;
+{ The same for the cells of tv/ (TScreenCell: TDrawBuffer of DN is an array of them, or an element of it: the cells from there on, or any array
+  of TScreenCell). The text is put by the text functions of tv/ (TvText): code page bytes while TvUtf8.Utf8Enabled is False, else UTF-8. }
+procedure MoveColor(var Buf: TScreenCell; Num: Word; Attr: Byte); overload;
+procedure MoveBuf(var Dest: TScreenCell; var Source; Attr: Byte; Count: Word); overload;
+procedure MoveChar(var Dest: TScreenCell; C: Char; Attr: Byte; Count: LongInt); overload;
+procedure MoveCStr(var Dest: TScreenCell; const Str: String; Attrs: Word); overload;
+procedure MoveStr(var Dest: TScreenCell; const Str: String; Attr: Byte); overload;
+procedure MoveColor(var Buf: array of TScreenCell; Num: Word; Attr: Byte); overload;
+procedure MoveBuf(var Dest: array of TScreenCell; var Source; Attr: Byte; Count: Word); overload;
+procedure MoveChar(var Dest: array of TScreenCell; C: Char; Attr: Byte; Count: LongInt); overload;
+procedure MoveCStr(var Dest: array of TScreenCell; const Str: String; Attrs: Word); overload;
+procedure MoveStr(var Dest: array of TScreenCell; const Str: String; Attr: Byte); overload;
+
+type
+  TCellArray = array[0..65534] of TScreenCell;
+  PCellArray = ^TCellArray;
+
+{ The parts of a cell, with the BIOS attribute and the byte of the code page as DN has them. }
+procedure SetCellChar(var Cell: TScreenCell; Ch: Byte);
+procedure SetCellAttr(var Cell: TScreenCell; Attr: Byte);
+function CellChar(const Cell: TScreenCell): Byte;
+function CellAttr(const Cell: TScreenCell): Byte;
+{ Count cells from words of the DOS text mode (the character in the low byte, the BIOS attribute in the high byte), as the video memory has them. }
+procedure WordsToCells(var Dest: TScreenCell; const Source; Count: Integer);
 function CStrLen(const S: String): Integer;
 
 implementation
@@ -432,6 +456,111 @@ begin
       W^[J] := Ord(Str[I]) or (Word(A) shl 8);
       Inc(J);
     end;
+end;
+
+{ --- cells of tv/ ---------------------------------------------------------------- }
+
+{ a TDrawBuffer of tv/ laid over the memory of the cells (no memory of its own); Capacity is as large as the caller can mean }
+procedure Over(var B: TvDrawBuf.TDrawBuffer; var First);
+begin
+  B.Data := @First;
+  B.Capacity := MaxInt div 64;
+end;
+
+procedure MoveColor(var Buf: TScreenCell; Num: Word; Attr: Byte);
+var
+  B: TvDrawBuf.TDrawBuffer;
+begin
+  Over(B, Buf);
+  B.MoveChar(0, 0, AttrFromBIOS(Attr), Num);
+end;
+
+procedure MoveBuf(var Dest: TScreenCell; var Source; Attr: Byte; Count: Word);
+var
+  B: TvDrawBuf.TDrawBuffer;
+begin
+  Over(B, Dest);
+  B.MoveBuf(0, @Source, AttrFromBIOS(Attr), Count);
+end;
+
+procedure MoveChar(var Dest: TScreenCell; C: Char; Attr: Byte; Count: LongInt);
+var
+  B: TvDrawBuf.TDrawBuffer;
+begin
+  Over(B, Dest);
+  B.MoveChar(0, Ord(C), AttrFromBIOS(Attr), Count);
+end;
+
+procedure MoveStr(var Dest: TScreenCell; const Str: String; Attr: Byte);
+var
+  B: TvDrawBuf.TDrawBuffer;
+begin
+  Over(B, Dest);
+  B.MoveStrS(0, Str, AttrFromBIOS(Attr), Length(Str));
+end;
+
+procedure MoveCStr(var Dest: TScreenCell; const Str: String; Attrs: Word);
+var
+  B: TvDrawBuf.TDrawBuffer;
+  P: TAttrPair;
+begin
+  Over(B, Dest);
+  P.Lo := AttrFromBIOS(Attrs and $FF);
+  P.Hi := AttrFromBIOS(Attrs shr 8);
+  B.MoveCStrS(0, Str, P, Length(Str));
+end;
+
+procedure MoveColor(var Buf: array of TScreenCell; Num: Word; Attr: Byte);
+begin
+  MoveColor(Buf[0], Num, Attr);
+end;
+
+procedure MoveBuf(var Dest: array of TScreenCell; var Source; Attr: Byte; Count: Word);
+begin
+  MoveBuf(Dest[0], Source, Attr, Count);
+end;
+
+procedure MoveChar(var Dest: array of TScreenCell; C: Char; Attr: Byte; Count: LongInt);
+begin
+  MoveChar(Dest[0], C, Attr, Count);
+end;
+
+procedure MoveStr(var Dest: array of TScreenCell; const Str: String; Attr: Byte);
+begin
+  MoveStr(Dest[0], Str, Attr);
+end;
+
+procedure MoveCStr(var Dest: array of TScreenCell; const Str: String; Attrs: Word);
+begin
+  MoveCStr(Dest[0], Str, Attrs);
+end;
+
+procedure SetCellChar(var Cell: TScreenCell; Ch: Byte);
+begin
+  ScInitChar(Cell.Character, Ch);
+end;
+
+procedure SetCellAttr(var Cell: TScreenCell; Attr: Byte);
+begin
+  Cell.Attribute := AttrFromBIOS(Attr);
+end;
+
+function CellChar(const Cell: TScreenCell): Byte;
+begin
+  Result := Cell.Character.Text[0];
+end;
+
+function CellAttr(const Cell: TScreenCell): Byte;
+begin
+  Result := AttrAsBIOSByte(Cell.Attribute);
+end;
+
+procedure WordsToCells(var Dest: TScreenCell; const Source; Count: Integer);
+var
+  I: Integer;
+begin
+  for I := 0 to Count - 1 do
+    PScreenCell(@Dest)[I] := CellFromBIOS(PWord(@Source)[I]);
 end;
 
 function CStrLen(const S: String): Integer;

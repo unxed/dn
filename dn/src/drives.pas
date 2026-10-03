@@ -101,7 +101,7 @@ type
     function Disposable: Boolean; virtual;
     function GetRealName: String; virtual;
     function GetInternalName: String; virtual;
-    procedure GetFull(var B; P: PFileRec; C, Sc: Word); virtual;
+    procedure GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word); virtual;
      {` Сформировать в буфере B элемент файловой панели для файла
       P в цвете С с Draw-кодом разделителя колонок Sc (цвет
       разделителя может отличаться от цвета файла).
@@ -112,7 +112,7 @@ type
      Этот метод действительно перекрывается в разных классах
      панелей. `}
     procedure RereadDirectory(S: String); virtual; {DataCompBoy}
-    procedure GetDown(var B; C: Word; P: PFileRec;
+    procedure GetDown(var B: TScreenCell; C: Word; P: PFileRec;
         var LFN_inCurFileLine: Boolean); virtual;
       {` Сформировать строку текущего файла для подвала
       в буфере B цветом С. LFN_inCurFileLine показывает,
@@ -406,7 +406,7 @@ procedure TDrive.MakeTop(var S: String);
     end;
   end { TDrive.MakeTop };
 
-procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
+procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
   var
     X: Word;
     Flags: Word;
@@ -423,21 +423,21 @@ procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
         FillChar(S1[1], Length(S1), ' ');
       if Flags and DateFlag <> 0 then
         begin
-        MoveStr(TAWordArray(B)[X],
+        MoveStr(PCellArray(@B)^[X],
            Copy(S1, 1, FileColWidht[psnShowDate]-1), C);
         Inc(X, FileColWidht[psnShowDate]);
         if X >= 255 then
           Exit;
-        TAWordArray(B)[X-1] := Sc;
+        PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
         end;
       if Flags and TimeFlag <> 0 then
         begin
         Delete(S1, 1, FileColWidht[psnShowDate]);
-        MoveStr(TAWordArray(B)[X], S1, C);
+        MoveStr(PCellArray(@B)^[X], S1, C);
         Inc(X, Length(S1)+1);
         if X >= 255 then
           Exit;
-        TAWordArray(B)[X-1] := Sc;
+        PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
         end;
       end;
     end;
@@ -466,9 +466,9 @@ procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
   X := 0;
   if not PFilePanelRoot(Panel)^.LFNLonger250 then
     begin
-    MoveCStr(TAWordArray(B)[0], NameString, C);
+    MoveCStr(PCellArray(@B)^[0], NameString, C);
     X := NameLen;
-    TAWordArray(B)[X] := Sc;
+    PCellArray(@B)^[X] := CellFromBIOS(Sc);
     Inc(X);
     end;
   if X >= 255 then
@@ -477,11 +477,11 @@ procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
   if Flags and psShowSize <> 0 then
     begin
     S := FormatSizeCol(P);
-    MoveStr(TAWordArray(B)[X], S, C);
+    MoveStr(PCellArray(@B)^[X], S, C);
     Inc(X, FileColWidht[psnShowSize]);
     if X >= 255 then
       Exit;
-    TAWordArray(B)[X-1] := Sc;
+    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
     end;
 
   if Flags and psShowPacked <> 0 then
@@ -490,11 +490,11 @@ procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
       S := FileSizeStr(P^.PSize)
     else
       S := AddSpace('', FileColWidht[psnShowPacked]-1);
-    MoveStr(TAWordArray(B)[X], S, C);
+    MoveStr(PCellArray(@B)^[X], S, C);
     Inc(X, FileColWidht[psnShowPacked]);
     if X >= 255 then
       Exit;
-    TAWordArray(B)[X-1] := Sc;
+    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
     end;
 
   if Flags and psShowRatio <> 0 then
@@ -504,11 +504,11 @@ procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
     else
       S := '';
     S := PredSpace(S, FileColWidht[psnShowRatio]);
-    MoveStr(TAWordArray(B)[X], S, C);
+    MoveStr(PCellArray(@B)^[X], S, C);
     Inc(X, FileColWidht[psnShowRatio]);
     if X >= 255 then
       Exit;
-    TAWordArray(B)[X-1] := Sc;
+    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
     end;
 
   FormatDateTime(psShowDate, psShowTime, P^.FDate, P^.Yr);
@@ -517,7 +517,7 @@ procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
 
   if PFilePanelRoot(Panel)^.LFNLonger250 then
     begin { длинное имя в конце подавляет вывод комментария и пути }
-    MoveCStr(TAWordArray(B)[X], NameString, C);
+    MoveCStr(PCellArray(@B)^[X], NameString, C);
     Exit;
     end;
 
@@ -527,13 +527,13 @@ procedure TDrive.GetFull(var B; P: PFileRec; C, Sc: Word);
     if P^.DIZ <> nil then
       S := DizMaxLine(P^.DIZ);
     S := AddSpace(S, MaxViewWidth-X-1);
-    MoveStr(TAWordArray(B)[X], S, C);
+    MoveStr(PCellArray(@B)^[X], S, C);
     Exit;
     end;
 
   if Flags and psShowDir <> 0 then
     begin
-    MoveStr(TAWordArray(B)[X], AddSpace( (P^.Owner^), MaxViewWidth-X-1), C);
+    MoveStr(PCellArray(@B)^[X], AddSpace( (P^.Owner^), MaxViewWidth-X-1), C);
     Exit;
     end;
 end;
@@ -923,7 +923,7 @@ procedure TDrive.KillUse;
     Prev^.KillUse;
   end;
 
-procedure TDrive.GetDown(var B; C: Word; P: PFileRec; var LFN_inCurFileLine: Boolean);
+procedure TDrive.GetDown(var B: TScreenCell; C: Word; P: PFileRec; var LFN_inCurFileLine: Boolean);
   var
     S, S1, S2, SCreat, SLAcc: String;
     w, NameWidht: Word;
@@ -970,7 +970,7 @@ procedure TDrive.GetDown(var B; C: Word; P: PFileRec; var LFN_inCurFileLine: Boo
       MakeDate(Day, Month, P^.YrLAcc, Hour, Minute, SLAcc);
       S2 := S2 + ' ' + GetString(dlLac)+SLAcc;
       end;
-  MoveStr(TAWordArray(B)[0], S2, C);
+  MoveStr(PCellArray(@B)^[0], S2, C);
   end { TDrive.GetDown };
 
 function TDrive.GetRealName: String;

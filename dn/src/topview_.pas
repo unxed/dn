@@ -105,7 +105,7 @@ procedure TTopView.Draw;
   if not Panel^.GetState(sfSelected) then
     C := GetColorW(2);
   MoveStr(B[0], S, C);
-  WriteLineW(0, 0, Size.X, Size.Y, B);
+  WriteLineC(0, 0, Size.X, Size.Y, B);
   end { TTopView.Draw };
 
 { ---------------------------- TSortView ------------------------------ }

@@ -283,31 +283,31 @@ procedure TGameInfo.Draw;
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
   MoveChar(B, #218, C, 1);
   MoveChar(B[Size.X-1], #191, C, 1);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
 
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B, GetString(dlGameScore2)+ItoS(Gm^.Score)+'~', C);
   MoveChar(B[Size.X-1], #179, C, 1);
-  WriteLineW(0, 1, Size.X, 1, B);
+  WriteLineC(0, 1, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B, GetString(dlGameLines)+ItoS(Gm^.Lines)+'~', C);
   MoveChar(B[Size.X-1], #179, C, 1);
-  WriteLineW(0, 2, Size.X, 1, B);
+  WriteLineC(0, 2, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B, GetString(dlGameLevel)+ItoS(Gm^.Level)+'~', C);
   MoveChar(B[Size.X-1], #179, C, 1);
-  WriteLineW(0, 3, Size.X, 1, B);
+  WriteLineC(0, 3, Size.X, 1, B);
   { MoveChar(B, #196, C, Size.X);
  MoveChar(B, #192, C, 1);
  MoveChar(B[Size.X-1], #217, C, 1);
- WriteLineW(0,4,Size.X,1,B);}
+ WriteLineC(0,4,Size.X,1,B);}
 
   MoveChar(B, #196, C, Size.X);
   S := GetString(dlTetrisNext);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
   MoveChar(B, #195, C, 1);
   MoveChar(B[Size.X-1], #180, C, 1);
-  WriteLineW(0, 4, Size.X, 1, B);
+  WriteLineC(0, 4, Size.X, 1, B);
   K := ((15-Gm^.NextFig mod 7) shl 8)+219;
   for I := 5 to 10 do
     begin
@@ -317,23 +317,23 @@ procedure TGameInfo.Draw;
       for J := 1 to ColPo[Gm^.NextFig] do
         if Figures[Gm^.NextFig*5+J, 1] = I-4 then
           begin
-          B[Figures[Gm^.NextFig*5+J, 2]*2+3] := K;
-          B[Figures[Gm^.NextFig*5+J, 2]*2+4] := K;
+          B[Figures[Gm^.NextFig*5+J, 2]*2+3] := CellFromBIOS(K);
+          B[Figures[Gm^.NextFig*5+J, 2]*2+4] := CellFromBIOS(K);
           end;
       end;
     MoveChar(B, #179, C, 1);
     MoveChar(B[Size.X-1], #179, C, 1);
-    WriteLineW(0, I, Size.X, 1, B);
+    WriteLineC(0, I, Size.X, 1, B);
     end;
   MoveChar(B, #196, C, Size.X);
   MoveChar(B, #192, C, 1);
   MoveChar(B[Size.X-1], #217, C, 1);
-  WriteLineW(0, 10, Size.X, 1, B);
+  WriteLineC(0, 10, Size.X, 1, B);
 
 { Для высокого пентикса - пустое место между следующей фигурой и кнопками }
   MoveChar(B, ' ', C, Size.X);
   for I := 15 to Vis-5 do
-    WriteLineW(0, I, Size.X, 1, B);
+    WriteLineC(0, I, Size.X, 1, B);
 
   C := Owner^.GetColorW($1112);
   MoveChar(B, #196, C, Size.X);
@@ -341,21 +341,21 @@ procedure TGameInfo.Draw;
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
   MoveChar(B, #218, C, 1);
   MoveChar(B[Size.X-1], #191, C, 1);
-  WriteLineW(0, 11, Size.X, 1, B);
+  WriteLineC(0, 11, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B,
      GetString(dlTetName)+Gm^.HiScores[1+10*Byte(Gm^.Pentix)].Name, C);
   MoveChar(B[Size.X-1], #179, C, 1);
-  WriteLineW(0, 12, Size.X, 1, B);
+  WriteLineC(0, 12, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B, GetString(dlGameScore) +
     ItoS(Gm^.HiScores[1+10*Byte(Gm^.Pentix)].Score), C);
   MoveChar(B[Size.X-1], #179, C, 1);
-  WriteLineW(0, 13, Size.X, 1, B);
+  WriteLineC(0, 13, Size.X, 1, B);
   MoveChar(B, #196, C, Size.X);
   MoveChar(B, #192, C, 1);
   MoveChar(B[Size.X-1], #217, C, 1);
-  WriteLineW(0, 14, Size.X, 1, B);
+  WriteLineC(0, 14, Size.X, 1, B);
   end { TGameInfo.Draw };
 
 constructor TGameView.Init;
@@ -680,19 +680,19 @@ procedure TGameView.Draw;
       for J := 1 to Shi do
         begin
         K := (J-1)*2;
-        B[K] := (Glass[I, J] shl 8)+219;
+        B[K] := CellFromBIOS((Glass[I, J] shl 8)+219);
         B[K+1] := B[K];
         end;
-      WriteLineW(0, I, Shi*2, 1, B);
+      WriteLineC(0, I, Shi*2, 1, B);
       end;
 
   if not Stop then
     begin
     K := (( (15-CurFig mod 7) shl 8)+219)*Byte(not HideFig);
-    B[0] := K;
-    B[1] := K;
+    B[0] := CellFromBIOS(K);
+    B[1] := CellFromBIOS(K);
     for I := 1 to ColPo[CurFig] do
-      WriteBufW((X+Fig[I, 2])*2, Y+Fig[I, 1], 2, 1, B);
+      WriteBufC((X+Fig[I, 2])*2, Y+Fig[I, 1], 2, 1, B);
 
     end;
   ChPos := False;

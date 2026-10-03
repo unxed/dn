@@ -366,7 +366,7 @@ procedure TInfoLine.Draw;
     end;
   MoveChar(B, Ch2, Color, Size.X);
   MoveStr(B, S, Color);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   end { TInfoLine.Draw };
 
 {TBookmarkLine}
