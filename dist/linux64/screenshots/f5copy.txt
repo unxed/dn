@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                07:47:58
-x═[■]═════ C:\tmp\dntour-zy0di_ql\work ══════════╗x═════════ C:\tmp\dntour-zy0di_ql\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                08:35:49
+x═[■]═════ C:\tmp\dntour-lf_auagl\work ══════════╗x═════════ C:\tmp\dntour-lf_auagl\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-zy0di_ql\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-zy0di_ql\work>
+C:\tmp\dntour-lf_auagl\work>
  F1 Help  F10 Tree

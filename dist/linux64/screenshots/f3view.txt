@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                07:47:37
-╔═[■]═══════════════════════════ C:\tmp\dntour-n5n0v6c0\work\a.txt ════════════════════════════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                08:35:28
+╔═[■]═══════════════════════════ C:\tmp\dntour-84hv_bio\work\a.txt ════════════════════════════[↕]═╗
 ║first file                                                                                        ▲
 ║second line                                                                                       ■
 ║                                                                                                  ▒
@@ -26,5 +26,5 @@
 ║                                                                                                  ▒
 ║                                                                                                  ▼
 └═<=>══<·········>══DOS     {00-255}══100% of 23 Bytes════════════════════════════════════════════─┘
-C:\tmp\dntour-n5n0v6c0\work>
+C:\tmp\dntour-84hv_bio\work>
  F1 Help  F2 (Un)Wrap  F4 Hex/Asc/Dmp  F5 Goto  F6 Filter  F7 Search  F8 KeyMap  F10 Menu
