@@ -198,3 +198,13 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   completion by the shell); the panels are not shown while the command runs (no half-screen terminal); the F-keys of DN are given to the program while it runs (no way to leave it before it ends except its own exit);
   Windows has no embedded terminal (`TvPty` is Linux only: ConPTY is item 8.5).
 - `Esc` on an empty command line shows the user screen (the DN option `ouiEsc`), also when there is nothing but the output of the last command.
+
+## DOS: UTF-8 names and the clipboard (go2dos, DOSBox-X), 2026-10-03
+- go2dos: `DOS-UTF8/NAMES` was already there; the UTF-8 clipboard is made: provider `DOS-UTF8/CLIPBRD` (`unxed/go2dos`, branch `claude/utf8-clipboard`, spec `docs/UTF8CLIPBOARD.md`,
+  tests `machine/utf8clip_test.go`): to be merged by the owner of go2dos (its rules: a patch for `git am`).
+- DOSBox-X: the patch `docs/patches/dosbox-x-amis-utf8-clipboard.patch` (AMIS + `CLIPBRD`) is ready and was run in a build of DOSBox-X (SDL2, Linux); the PR is not opened: the session cannot
+  fork or push to `joncampbell123/dosbox-x` (no fork of `unxed`). `DOS-UTF8/NAMES` for DOSBox-X is not done: `drive_cache.cpp` keeps `orgname`/`shortname` in the guest code page and
+  `localDrive::read_directory_*` skips the files that the page cannot hold ("non-representable"), so a UTF-8 mode needs the cache to hold host (UTF-8) long names, ASCII short names
+  (aliases for non-ASCII), and the conversion at each border (FindFirst/FindNext, the open/create/rename calls, `6502h/6504h` tables); that is a change of the core of the drive layer.
+- DN for DOS in the UTF-8 mode is not done: the DOS build keeps the code page inside (`DN_UTF8=0` for `dos`); it needs the border conversion of names when the provider is absent and the use of the two
+  providers when it is there; `winclp.pas` would ask `CLIPBRD` for UTF-8.
