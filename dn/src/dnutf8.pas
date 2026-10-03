@@ -16,6 +16,9 @@ interface
 function Utf8Chars(const S: String): Integer;
   {` The number of characters (not bytes) of S. `}
 
+function StrCols(const S: String): Integer;
+  {` The width of S in columns: characters with -dDNUTF8, else bytes (a name is shown in one byte per column). `}
+
 function Utf8ToProxy(const S: String; var Tab: String): String;
   {` S with each non-ASCII character as one byte #128+i; Tab[i+1] is that character (its bytes). `}
 
@@ -36,6 +39,15 @@ function CharLen(const S: String; I: Integer): Integer;
     Result := Used
   else
     Result := 1;
+  end;
+
+function StrCols(const S: String): Integer;
+  begin
+{$IFDEF DNUTF8}
+  Result := Utf8Chars(S);
+{$ELSE}
+  Result := Length(S);
+{$ENDIF}
   end;
 
 function Utf8Chars(const S: String): Integer;

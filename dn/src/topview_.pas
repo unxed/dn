@@ -35,7 +35,7 @@ type
 implementation
 
 uses
-  Defines, DblWnd, Advance1, flpanelx, Commands, dnApp, PDSetup
+  Defines, DblWnd, Advance1, DNUtf8, flpanelx, Commands, dnApp, PDSetup
   ;
 
 const
@@ -82,19 +82,19 @@ procedure TTopView.Draw;
   if Width < 1 then
     Exit;
   S := GetText(Width);
-  if Length(S) < Width - 2 then
+  if StrCols(S) < Width - 2 then
     S := ' ' + S + ' ';
   R.A := Panel^.Origin;
   R.B.Y := R.A.Y;
   Dec(R.A.Y);
-  D := (Width - Length(S) + 4) div 2;
+  D := (Width - StrCols(S) + 4) div 2;
   if D >= 4 then
     Inc(R.A.X, D) { пока можно, центрируем без учёта асимметрии }
   else if Right then { правая панель, прижимаем к кнопке максимизации }
-    inc(R.A.X, Width - Length(S) + 1)
+    inc(R.A.X, Width - StrCols(S) + 1)
   else { левая панель, прижимаем к номеру окна }
     inc(R.A.X, 4);
-  R.B.X := R.A.X + Length(S);
+  R.B.X := R.A.X + StrCols(S);
   GetBounds(OldR);
   if not MemEqual(R, OldR, SizeOf(R)) then
     begin
@@ -104,6 +104,7 @@ procedure TTopView.Draw;
   C := GetColorW(1);
   if not Panel^.GetState(sfSelected) then
     C := GetColorW(2);
+  MoveChar(B, ' ', C, Size.X);
   MoveStr(B[0], S, C);
   WriteLineC(0, 0, Size.X, Size.Y, B);
   end { TTopView.Draw };
