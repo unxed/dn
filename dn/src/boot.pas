@@ -71,7 +71,7 @@ uses
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, FlPanelX,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
   DnIni, DnIni_p, CopyIni, Archiver,
-  U_MyApp, Microed, ArchSet, linepos, RegAll, DnExec, Histries, Menus,
+  U_MyApp, editcore, ArchSet, linepos, RegAll, DnExec, Histries, Menus,
    VideoMan, Events,
   fnotify, Dpmi32, Dpmi32df, 
   Tree

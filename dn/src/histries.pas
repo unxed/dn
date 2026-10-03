@@ -180,11 +180,11 @@ implementation
 uses
   Lfn, Dos, Commands, mainapp, Dialogs, HistList,
   Startup, xTime, Messages, DNUtil, DnIni,
-  VpSysLow, EdWin, strutil,  fileutil,
+  VpSysLow, editwin, strutil,  fileutil,
   
   Idlers,
   
-  FViewer, CmdLine, PDSetup, Microed
+  FViewer, CmdLine, PDSetup, editcore
   , FlPanelX {для ActivePanel}
   , Calc 
   ;

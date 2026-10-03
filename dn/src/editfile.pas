@@ -45,12 +45,12 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit MicroEd2;
+unit editfile;
 
 interface
 
 uses
-  Defines, Streams, Microed, EdWin
+  Defines, Streams, editcore, editwin
   ;
 
 const
@@ -77,7 +77,7 @@ const
 
 implementation
 uses
-  DNStdDlg, basics, mainapp, Commands, Lfn, fileutil, ed2, strutil, Views,
+  DNStdDlg, basics, mainapp, Commands, Lfn, fileutil, editundo, strutil, Views,
   Collect, WinClp, Dos, Messages, Startup, DnIni, DnIni_p, CopyIni, DNUtf8,
   {SBlocks,}U_KeyMap, Macro,
   xTime, Memory, Drivers,

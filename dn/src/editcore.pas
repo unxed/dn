@@ -65,7 +65,7 @@
   `-------------------------------------------- 70 Frame passive
 }
 
-unit Microed;
+unit editcore;
 
 interface
 
@@ -74,7 +74,7 @@ uses
   basics, Menus,
   Commands, {SBlocks,}ObjType, U_KeyMap, Collect, DNUtf8,
   
-  ed2, highlite
+  editundo, highlite
   ;
 
 const
@@ -296,7 +296,7 @@ uses
   
   Messages, mainapp, Dos, Lfn, Memory, strutil, fileutil, Startup,
   Gauge, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
-  xTime, FileCopy, ASCIITab, DnIni, U_SrchF, EdWin, MicroEd2 {-$VIV}
+  xTime, FileCopy, ASCIITab, DnIni, U_SrchF, editwin, editfile {-$VIV}
   , Events, VpSysLow, DNStdDlg, Dialogs, DNHelp, VPUtils
   ;
 

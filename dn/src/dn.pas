@@ -62,7 +62,7 @@ uses
   DiskInfo, basics, strutil, fileutil, os2sess, highlite,
   Startup, Dialogs, Gauges, Memory, DblWnd, Messages, HistList,
   FileFind, Commands, Tree, FViewer, CmdLine, FBB, DNStdDlg,
-  FilesCol, UserMenu, Colors, Microed, Editor, Macro,
+  FilesCol, UserMenu, Colors, editcore, Editor, Macro,
   ArcView, HelpFile, Validate, ASCIITab, xTime, Drives, Archiver,
   ArchSet, ArchDet, Setups, DNUtil, XDblWnd, Histries, CCalc,
   DnIni, Collect, Objects2, Views, Scroller, Calculat,

@@ -51,7 +51,7 @@ unit Editor;
 interface
 
 uses
-  Drivers, Microed
+  Drivers, editcore
   ;
 
 type
@@ -64,10 +64,10 @@ type
 implementation
 
 uses
-  Lfn, Views, Defines, Streams, U_KeyMap, Collect, ed2,
+  Lfn, Views, Defines, Streams, U_KeyMap, Collect, editundo,
   basics, strutil, fileutil, Dos, Dialogs, mainapp,
   {SBlocks,}Memory, Gauge, Startup, WinClp, Messages, Commands, Macro,
-  EdWin, xTime, DnIni, DNUtil, linepos, Calculat, FViewer {AK155}
+  editwin, xTime, DnIni, DNUtil, linepos, Calculat, FViewer {AK155}
   
   ;
 

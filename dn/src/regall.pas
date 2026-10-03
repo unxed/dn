@@ -66,8 +66,8 @@ uses
   Arvid,
   
   Archiver, ArcView, ASCIITab, CCalc, Collect, DiskInfo, mainapp,
-  DNStdDlg, DNUtil, Drives, ed2, Editor, FileFind, FilesCol,
-  FlPanel, FStorage, FViewer, Gauges, Histries, Microed, Startup,
+  DNStdDlg, DNUtil, Drives, editundo, Editor, FileFind, FilesCol,
+  FlPanel, FStorage, FViewer, Gauges, Histries, editcore, Startup,
   Tree, UniWin, UserMenu, XDblWnd, HelpKern,
   Calc, CellsCol, 
   Calendar, 
@@ -82,7 +82,7 @@ uses
   ColorSel,
   Dialogs, Menus, Streams, ObjType, Scroller, Setups,
   Validate, Views, SWE 
-  , EdWin
+  , editwin
   , DNDlgs, DNStrL, DNColor;
 
 const
@@ -1777,7 +1777,7 @@ begin
 end;
 
 type
-  PR_RInfoLine = ^ed2.TInfoLine;
+  PR_RInfoLine = ^editundo.TInfoLine;
 
 function Build_RInfoLine(var S: TStream): PObject;
 begin
@@ -1790,7 +1790,7 @@ begin
 end;
 
 type
-  PR_RBookLine = ^ed2.TBookmarkLine;
+  PR_RBookLine = ^editundo.TBookmarkLine;
 
 function Build_RBookLine(var S: TStream): PObject;
 begin
@@ -2154,7 +2154,7 @@ begin
 end;
 
 type
-  PR_RFileEditor = ^Microed.TFileEditor;
+  PR_RFileEditor = ^editcore.TFileEditor;
 
 function Build_RFileEditor(var S: TStream): PObject;
 begin
@@ -2167,7 +2167,7 @@ begin
 end;
 
 type
-  PR_REditWindow = ^EdWin.TEditWindow;
+  PR_REditWindow = ^editwin.TEditWindow;
 
 function Build_REditWindow(var S: TStream): PObject;
 begin
@@ -3107,12 +3107,12 @@ begin
 
   RDrive.Store := @Store_RDrive;
 
-  RInfoLine.VmtLink := PtrUInt(TypeOf(ed2.TInfoLine));
+  RInfoLine.VmtLink := PtrUInt(TypeOf(editundo.TInfoLine));
   RInfoLine.Load := @Build_RInfoLine;
 
   RInfoLine.Store := @Store_RInfoLine;
 
-  RBookLine.VmtLink := PtrUInt(TypeOf(ed2.TBookmarkLine));
+  RBookLine.VmtLink := PtrUInt(TypeOf(editundo.TBookmarkLine));
   RBookLine.Load := @Build_RBookLine;
 
   RBookLine.Store := @Store_RBookLine;
@@ -3252,12 +3252,12 @@ begin
 
   RMenuPopup.Store := @Store_RMenuPopup;
 
-  RFileEditor.VmtLink := PtrUInt(TypeOf(Microed.TFileEditor));
+  RFileEditor.VmtLink := PtrUInt(TypeOf(editcore.TFileEditor));
   RFileEditor.Load := @Build_RFileEditor;
 
   RFileEditor.Store := @Store_RFileEditor;
 
-  REditWindow.VmtLink := PtrUInt(TypeOf(EdWin.TEditWindow));
+  REditWindow.VmtLink := PtrUInt(TypeOf(editwin.TEditWindow));
   REditWindow.Load := @Build_REditWindow;
 
   REditWindow.Store := @Store_REditWindow;

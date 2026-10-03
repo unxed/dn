@@ -81,7 +81,7 @@ implementation
   The lines of the clipboard of DN are the lines of the text; the system text has the line breaks of the system, any of them splits the lines. }
 
 uses
-  TvClip, Microed, strutil
+  TvClip, editcore, strutil
   ;
 
 function ToSys(const S: LongString): AnsiString;
@@ -176,8 +176,8 @@ function GetWinClipSize: Boolean;
 
 procedure SyncClipIn;
   begin
-  if Microed.ClipBoard <> nil then
-    SetWinClip(PLineCollection(Microed.ClipBoard));
+  if editcore.ClipBoard <> nil then
+    SetWinClip(PLineCollection(editcore.ClipBoard));
   end;
 
 procedure SyncClipOut {(NeedStream: boolean)};
@@ -185,11 +185,11 @@ procedure SyncClipOut {(NeedStream: boolean)};
     T: AnsiString;
   begin
   T := ClipboardGetText;
-  if (T = '') or (T = LinesText(PLineCollection(Microed.ClipBoard))) then
+  if (T = '') or (T = LinesText(PLineCollection(editcore.ClipBoard))) then
     Exit;
-  if Microed.ClipBoard <> nil then
-    Dispose(Microed.ClipBoard, Done);
-  Microed.ClipBoard := TextLines(T);
+  if editcore.ClipBoard <> nil then
+    Dispose(editcore.ClipBoard, Done);
+  editcore.ClipBoard := TextLines(T);
   end;
 
 procedure CopyLines2Stream(PC: PCollection; var PCS: PStream);
