@@ -51,6 +51,7 @@ type
     Seen: array[0..191] of LongWord;          { the characters of the document that are not ASCII (before TabBuild) }
     SeenN: Integer;
     Over: Boolean;                            { more different characters than the table can have }
+    Used: array[128..255] of Boolean;         { the cells that the text has (or had): a frame cell that is not Used can be given to a rare character }
   end;
 
 type
@@ -64,6 +65,8 @@ function Utf8CharsL(const S: AnsiString): LongInt;
   {` The number of characters of a long UTF-8 string (the bytes that are not continuation bytes). `}
 procedure TabNatural(var T: TDocTab);
   {` The table of the current code page, nothing seen. `}
+procedure TabMark(var T: TDocTab; B: Byte);
+  {` The byte B is typed or pasted as it is: its cell is used. `}
 function TabSee(var T: TDocTab; const S: AnsiString): Boolean;
   {` The non-ASCII characters of the UTF-8 line S are noted; False when S is not UTF-8. `}
 function TabBuild(var T: TDocTab): Boolean;
@@ -73,6 +76,9 @@ function TabToInternal(var T: TDocTab; const S: AnsiString; Alloc: Boolean): Ans
   else '?'. `}
 function TabToUtf8(const T: TDocTab; const S: AnsiString): AnsiString;
   {` The internal line as UTF-8. `}
+function TabTyped(var T: TDocTab; const Text: ShortString; Def: Byte): Byte;
+  {` The byte of a typed character (the UTF-8 text of a key event) in the table of the document: the cell it has or a free one; Def when the text is
+  ASCII (or empty), 0 when the table has no cell for it. `}
 
 function Utf8ToProxy(const S: String; var Tab: String): String;
   {` S with each non-ASCII character as one byte #128+i; Tab[i+1] is that character (its bytes). `}
@@ -335,6 +341,13 @@ procedure TabNatural(var T: TDocTab);
     T.Cp[B] := CpToUnicode(B);
   T.SeenN := 0;
   T.Over := False;
+  FillChar(T.Used, SizeOf(T.Used), 0);
+  end;
+
+procedure TabMark(var T: TDocTab; B: Byte);
+  begin
+  if B >= 128 then
+    T.Used[B] := True;
   end;
 
 function TabHas(const T: TDocTab; Cp: LongWord): Integer;
@@ -421,6 +434,9 @@ function TabBuild(var T: TDocTab): Boolean;
       T.Cp[B] := T.Seen[I];
       Used[B - 128] := True;
       end;
+  for B := 128 to 255 do
+    if Used[B - 128] then
+      T.Used[B] := True;
   T.SeenN := 0;
   end;
 
@@ -447,14 +463,14 @@ function TabToInternal(var T: TDocTab; const S: AnsiString; Alloc: Boolean): Ans
       if (B < 0) and Alloc then
         begin
         { a free cell: a frame cell that no character of the text needs: here the cells are found by what the table has now }
-        FillChar(Taken, SizeOf(Taken), 0);
         for K := 128 to 255 do
-          if not TabIsFrame(T.Cp[K]) or (T.Cp[K] <> CpToUnicode(K)) then
-            Taken[K - 128] := True;
+          Taken[K - 128] := T.Used[K] or not TabIsFrame(T.Cp[K]) or (T.Cp[K] <> CpToUnicode(K));
         B := TabFreeCell(T, Taken);
         if B >= 0 then
           T.Cp[B] := Cp;
         end;
+      if B >= 0 then
+        T.Used[B] := True;
       if B < 0 then
         Result := Result + '?'
       else
@@ -467,6 +483,19 @@ function TabToInternal(var T: TDocTab; const S: AnsiString; Alloc: Boolean): Ans
       Inc(I);
       end;
     end;
+  end;
+
+function TabTyped(var T: TDocTab; const Text: ShortString; Def: Byte): Byte;
+  var
+    R: AnsiString;
+  begin
+  Result := Def;
+  if (Length(Text) = 0) or (Byte(Text[1]) < $80) then
+    Exit;
+  Result := 0;
+  R := TabToInternal(T, Copy(Text, 1, Length(Text)), True);
+  if (Length(R) = 1) and (Byte(R[1]) >= $80) then
+    Result := Byte(R[1]);
   end;
 
 function TabToUtf8(const T: TDocTab; const S: AnsiString): AnsiString;

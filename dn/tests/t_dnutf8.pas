@@ -7,7 +7,7 @@ uses DNUtf8, TvCodePg;
 var
   Tab, P: String;
   DT: TDocTab;
-  I: Integer;
+  I, K: Integer;
   UpT, LowT, TogT: TCaseTab;
 begin
   Check(Utf8Chars('abc') = 3, 'chars: ASCII');
@@ -77,6 +77,20 @@ begin
   for I := 0 to 99 do
     TabSee(DT, Chr($D7) + Chr($80 + (I and $3F)) + 'x');
   Check(TabBuild(DT) or DT.Over or True, 'table: many characters do not crash');
+  { the characters that the keyboard gives }
+  TabNatural(DT);
+  TabSee(DT, 'a│b');
+  TabBuild(DT);
+  Check(TabTyped(DT, 'п', 7) = $AF, 'typed: a letter of the page has its byte');
+  Check(TabTyped(DT, 'x', 7) = 7, 'typed: ASCII stays as it is');
+  I := TabTyped(DT, 'α', 0);
+  Check((I >= $B0) and (I <> $B3) and (DT.Cp[I] = $3B1), 'typed: Greek alpha takes a free cell (not the cell of the frame character that the text has)');
+  Check(TabTyped(DT, 'α', 0) = I, 'typed: and the same cell again');
+  Check(TabTyped(DT, '│', 0) = $B3, 'typed: the frame character of the text is its own cell');
+  TabMark(DT, $C4);
+  for K := 1 to 200 do
+    TabTyped(DT, Chr($D7) + Chr($80 + (K and $3F)), 0);
+  Check(DT.Cp[$B3] = $2502, 'typed: the cell that the text uses is never given away');
   { the case tables of a document }
   TabNatural(DT);
   TabCase(DT, UpT, LowT, TogT);
