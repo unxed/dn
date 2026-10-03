@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The Windows build of DN on a real Windows console (ConPTY, via pywinpty), the screen is read with the same emulator as in the
 Linux tests (tools/pty_screen.py): start, the menu bar, no country-setup error, F7 makes a directory, the quit.
-usage: python tools/dn-win-smoke.py OUTDIR   (OUTDIR: the result of tools/build.sh win64|win32; needs: pip install pywinpty)"""
+usage: python tools/dn-win-smoke.py OUTDIR   (OUTDIR: the result of tools/build.sh win64|win32; needs: pip install pywinpty; DN_SMOKE_UTF8=1: the build with UTF-8 inside, more checks)"""
 import os
 import re
 import shutil
@@ -100,6 +100,10 @@ def main():
         w = os.path.join(d, 'work')
         os.makedirs(w)
         open(os.path.join(w, 'a.txt'), 'w').write('first\n')
+        u8 = os.environ.get('DN_SMOKE_UTF8') == '1'              # the build with UTF-8 inside: names outside the ANSI page (cp1252)
+        if u8:
+            for nm in ('\u041f\u0440\u0438\u0432\u0435\u0442.txt', '\u03b1\u03b2\u03b3.txt'):
+                open(os.path.join(w, nm), 'w', encoding='utf-8').write('\u041f\u0440\u0438\u0432\u0435\u0442\n')
         t = WinTerm(os.path.join(d, 'dn.exe'), w)
         ok = t.wait_for('Utilities', 30)
         check(ok, 'start: the menu bar is drawn', t.text())
@@ -123,6 +127,12 @@ def main():
         t.send('newdir', 0.5)
         t.send('\r', 1.5)
         check(os.path.isdir(os.path.join(w, 'newdir')), 'F7: the directory is made', t.text())
+        if u8:
+            check('\u041f\u0440\u0438\u0432\u0435\u0442' in t.text() and '\u03b1\u03b2\u03b3' in t.text(), 'UTF-8: the names outside the ANSI page are shown', t.text())
+            t.send('\x1b[18~', 1.0)                   # F7: a directory with a Russian name
+            t.send('\u043f\u0430\u043f\u043a\u0430', 0.5)
+            t.send('\r', 1.5)
+            check(os.path.isdir(os.path.join(w, '\u043f\u0430\u043f\u043a\u0430')), 'UTF-8: F7 makes a directory with a Russian name', t.text())
         t.send('\x1bx', 1.0)                          # Alt-X: quit
         t.send('\r', 1.5)
         for _ in range(20):
