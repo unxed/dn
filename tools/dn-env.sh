@@ -36,7 +36,9 @@ case "${DN_TARGET:-}" in
     *) echo "DN_TARGET must be dos, linux, linux64, win64 or win32" >&2; exit 1 ;;
 esac
 tmp=${TMPDIR:-/tmp}
-DN_OBJ=${DN_OBJ:-$tmp/dn-obj-$DN_TARGET}
+# FPC does not rebuild a unit when only a -d option changed: every set of options has its own directory of the objects
+case "${DN_EXTRA:-}" in *-dDNUTF8*) dn_objsfx=-utf8;; *) dn_objsfx=;; esac
+DN_OBJ=${DN_OBJ:-$tmp/dn-obj-$DN_TARGET$dn_objsfx}
 DN_GEN=${DN_GEN:-$tmp/dn-gen}
 DN_OPTS="$DN_FPC_COMMON $DN_OPT ${DN_EXTRA:-}"
 # The sources of a build are put together in one directory of links ($DN_STAGE): dn/src and then the files of the directories of this
