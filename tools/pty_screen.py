@@ -183,6 +183,9 @@ class PtyTerm:
             if cwd:
                 os.chdir(cwd)
             os.environ.update(e)
+            prefix = os.environ.get('PTY_RUN_PREFIX')            # e.g. qemu-aarch64-static: the program is of another CPU
+            if prefix:
+                os.execvpe(prefix, [prefix, exe or cmd[0]] + list(cmd[1:]), e)
             os.execve(exe or cmd[0], cmd, e) if (exe or '/' in cmd[0]) else os.execvpe(cmd[0], cmd, e)
         self.set_size(cols, rows)
 

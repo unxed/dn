@@ -73,6 +73,7 @@
 
    Без сборки: `cd dist/linux && ./dn` (i386, статический ELF; описание — `dist/linux/README.TXT`, экраны — `dist/linux/screenshots/*.txt`).
    i386 из исходников: `tools/build-fpc-i386-linux.sh ПРЕФИКС`, затем `DN_LINUX=ПРЕФИКС tools/build.sh linux`.
+   ARM64 (aarch64) Linux: на ARM-машине обычная сборка (`tools/build.sh linux64`); кросс с x86_64: `tools/build-fpc-aarch64-linux.sh ПРЕФИКС` (нужен `binutils-aarch64-linux-gnu`), затем `DN_AARCH64=ПРЕФИКС tools/build.sh aarch64`; проверка без железа — `PTY_RUN_PREFIX=qemu-aarch64-static python3 tools/dn-linux-ops.py out/aarch64` (пакет `qemu-user-static`), тесты tv — `TV_FPC=ПРЕФИКС/bin/fpc-aarch64-linux TV_RUN=qemu-aarch64-static tools/tv-test.sh`. Готовая сборка: `dist/aarch64/`.
 
 0w. **DN под Windows** (кросс-сборка на Linux; нужны `fpc`, `make`, `git`, `binutils-mingw-w64-x86-64` / `-i686`, `python3`):
 

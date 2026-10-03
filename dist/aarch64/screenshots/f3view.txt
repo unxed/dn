@@ -1,0 +1,30 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                09:04:50
+╔═[■]═══════════════════════════ C:\tmp\dntour-o3eex72k\work\a.txt ════════════════════════════[↕]═╗
+║first file                                                                                        ▲
+║second line                                                                                       ■
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▼
+└═<=>══<·········>══DOS     {00-255}══100% of 23 Bytes════════════════════════════════════════════─┘
+C:\tmp\dntour-o3eex72k\work>
+ F1 Help  F2 (Un)Wrap  F4 Hex/Asc/Dmp  F5 Goto  F6 Filter  F7 Search  F8 KeyMap  F10 Menu

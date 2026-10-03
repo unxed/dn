@@ -1,0 +1,30 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                09:05:02
+╔═[■]════════════════════════ Edit - C:\tmp\dntour-daf332i6\work\a.txt ════════════════════════[↕]═╗
+║  File  Edit  Search  Paragraph  Block  Misc  Options                                             ▲
+║first file                                                                                        ■
+║second line                                                                                       ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▒
+║                                                                                                  ▼
+└─══════1:1════[102·66]═(↔)═══Lf══DOS══<·········>══◄■▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►─┘
+C:\tmp\dntour-daf332i6\work>
+ F1 Help  F2 Save  F3 Open  F5 Block  F6 Fill  F7 Search  F8 KeyMap  F10 Menu

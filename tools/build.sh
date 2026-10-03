@@ -2,9 +2,10 @@
 # ONE COMMAND: builds DOS Navigator from dn/src and tv/src with your FPC: the programs (rcp, the resource compiler, and dn), the resources
 # (*.LNG, *.DLG, made by rcp from dn/src/RESOURCE) and the help (*.HLP, made by tv/tools/tvhc.pas).
 #
-# usage: tools/build.sh TARGET [OUTDIR]          TARGET: linux64 | linux | dos | win64 | win32        (OUTDIR default: out/TARGET)
+# usage: tools/build.sh TARGET [OUTDIR]          TARGET: linux64 | linux | aarch64 | dos | win64 | win32        (OUTDIR default: out/TARGET)
 #   linux64   x86_64 Linux, the fpc of your system (FPC=...)                          needs: fpc 3.2.x, python3
 #   linux     i386 Linux (static; runs on a 64-bit kernel), DN_LINUX=PREFIX            needs: tools/build-fpc-i386-linux.sh PREFIX
+#   aarch64   ARM64 Linux (static), DN_AARCH64=PREFIX                                needs: tools/build-fpc-aarch64-linux.sh PREFIX (+ the fpc of the host for the resources)
 #   win64     Windows x86_64, DN_WIN=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win64 (+ the fpc of the host for the resources)
 #   win32     Windows i386, DN_WIN32=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win32
 #   dos       DOS (go32v2), DN_PREFIX=PREFIX                                           needs: tools/build-fpc-go32v2.sh PREFIX, dosbox-x (rcp runs in it)
@@ -14,7 +15,7 @@ set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 DN_TARGET=${1:?usage: tools/build.sh linux64|linux|dos|win64|win32 [OUTDIR]}; export DN_TARGET
 # UTF-8 inside DN (-dDNUTF8) is the default on Linux and Windows; DN_UTF8=0 builds the old one (the code page inside); DOS: always the code page
-case "$DN_TARGET" in linux*) : "${DN_UTF8:=1}";; win*) : "${DN_UTF8:=1}";; *) DN_UTF8=0;; esac
+case "$DN_TARGET" in linux*|aarch64) : "${DN_UTF8:=1}";; win*) : "${DN_UTF8:=1}";; *) DN_UTF8=0;; esac
 export DN_UTF8
 if [ "$DN_UTF8" != 0 ]; then case "${DN_EXTRA:-}" in *-dDNUTF8*) ;; *) DN_EXTRA="${DN_EXTRA:-} -dDNUTF8";; esac; fi
 export DN_EXTRA
@@ -26,7 +27,7 @@ echo "== shims (generated from tv/src)"
 dn_gen_shims
 echo "== compile ($DN_TARGET)"
 mkdir -p "$DN_OBJ"
-progs="rcp dn"; case "$DN_TARGET" in win*) progs=dn;; esac      # the resources of Windows are made by rcp of the host (they are the same for all the targets)
+progs="rcp dn"; case "$DN_TARGET" in win*|aarch64) progs=dn;; esac      # the resources of Windows are made by rcp of the host (they are the same for all the targets)
 for p in $progs; do
     rm -f "$DN_OBJ/$p$exe"
     dn_compile $p.pas > "$DN_OBJ/$p.log" || true
@@ -34,7 +35,7 @@ for p in $progs; do
     [ -f "$DN_OBJ/$p$exe" ] || { echo "$p was not built (the whole log: $DN_OBJ/$p.log)" >&2; exit 1; }
 done
 case "$DN_TARGET" in
-win*)
+win*|aarch64)
     echo "== resources and help (made by the build for linux64: the same files for all the targets)"
     host=$tmp/dn-res-host
     "$here/tools/build.sh" linux64 "$host" >/dev/null
