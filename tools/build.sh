@@ -2,29 +2,43 @@
 # ONE COMMAND: builds DOS Navigator from dn/src and tv/src with your FPC: the programs (rcp, the resource compiler, and dn), the resources
 # (*.LNG, *.DLG, made by rcp from dn/src/RESOURCE) and the help (*.HLP, made by tv/tools/tvhc.pas).
 #
-# usage: tools/build.sh TARGET [OUTDIR]          TARGET: linux64 | linux | dos        (OUTDIR default: out/TARGET)
+# usage: tools/build.sh TARGET [OUTDIR]          TARGET: linux64 | linux | dos | win64 | win32        (OUTDIR default: out/TARGET)
 #   linux64   x86_64 Linux, the fpc of your system (FPC=...)                          needs: fpc 3.2.x, python3
 #   linux     i386 Linux (static; runs on a 64-bit kernel), DN_LINUX=PREFIX            needs: tools/build-fpc-i386-linux.sh PREFIX
+#   win64     Windows x86_64, DN_WIN=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win64 (+ the fpc of the host for the resources)
+#   win32     Windows i386, DN_WIN32=PREFIX                                           needs: tools/build-fpc-windows.sh PREFIX win32
 #   dos       DOS (go32v2), DN_PREFIX=PREFIX                                           needs: tools/build-fpc-go32v2.sh PREFIX, dosbox-x (rcp runs in it)
 # env: DN_EXTRA=-gl (more options of the compiler); DN_SRC=<a copy of dn/src> (e.g. with the traces of tools/dn-trace-*.py)
 # Run DN (linux): cd OUTDIR && ./dn        (the *.LNG *.DLG *.HLP files are next to it)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
-DN_TARGET=${1:?usage: tools/build.sh linux64|linux|dos [OUTDIR]}; export DN_TARGET
+DN_TARGET=${1:?usage: tools/build.sh linux64|linux|dos|win64|win32 [OUTDIR]}; export DN_TARGET
 out=${2:-$here/out/$DN_TARGET}; mkdir -p "$out"; out=$(cd "$out" && pwd)
 . "$here/tools/dn-env.sh"
 src=${DN_SRC:-$here/dn/src}
-exe=; [ "$DN_TARGET" = dos ] && exe=.exe
+exe=; case "$DN_TARGET" in dos|win*) exe=.exe;; esac
 echo "== shims (generated from tv/src)"
 dn_gen_shims
 echo "== compile ($DN_TARGET)"
 mkdir -p "$DN_OBJ"
-for p in rcp dn; do
+progs="rcp dn"; case "$DN_TARGET" in win*) progs=dn;; esac      # the resources of Windows are made by rcp of the host (they are the same for all the targets)
+for p in $progs; do
     rm -f "$DN_OBJ/$p$exe"
     dn_compile $p.pas > "$DN_OBJ/$p.log" || true
     grep -a -E "Error|Fatal|undefined" "$DN_OBJ/$p.log" | head -20 || true
     [ -f "$DN_OBJ/$p$exe" ] || { echo "$p was not built (the whole log: $DN_OBJ/$p.log)" >&2; exit 1; }
 done
+case "$DN_TARGET" in
+win*)
+    echo "== resources and help (made by the build for linux64: the same files for all the targets)"
+    host=$tmp/dn-res-host
+    "$here/tools/build.sh" linux64 "$host" >/dev/null
+    cp "$host"/*.LNG "$host"/*.DLG "$host"/*.HLP "$out/"
+    cp "$DN_OBJ/dn$exe" "$out/dn$exe"
+    rm -rf "$out/XLT"; cp -r "$here/dn/data/XLT" "$out/XLT"      # the layout tables (ru441.xlt: DN looks for them in XLT next to the program)
+    echo "built: $out/dn$exe   (the resources and the help are next to it)"
+    exit 0 ;;
+esac
 echo "== resources (rcp)"
 w=$out/rcp.work; rm -rf "$w"; mkdir -p "$w/EXE.D32"
 # DN names its files in capitals; the file system may be case sensitive: the names that DN asks for
@@ -48,5 +62,6 @@ for l in ENGLISH RUSSIAN UKRAIN; do
     "$th/tvhc" "$src/RESOURCE/$l/dnhelp.htx" "$out/$l.HLP" /4DN_OSP | sed 's|^|  |'
 done
 cp "$DN_OBJ/dn$exe" "$out/dn$exe"
+rm -rf "$out/XLT"; cp -r "$here/dn/data/XLT" "$out/XLT"      # the layout tables (ru441.xlt: DN looks for them in XLT next to the program)
 [ "$DN_TARGET" != dos ] || [ -f "$out/CWSDPMI.EXE" ] || cp "$w/CWSDPMI.EXE" "$out/" 2>/dev/null || true
 echo "built: $out/dn$exe   (the resources and the help are next to it)"
