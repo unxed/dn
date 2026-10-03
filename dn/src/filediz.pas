@@ -110,7 +110,7 @@ uses
 
   , dnini
 
-  , VPSysLow;
+  , osdep;
 
 var
   NewContainerFile: Text;

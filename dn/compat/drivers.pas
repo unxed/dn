@@ -78,7 +78,7 @@ var
   ScreenWidth: Word absolute TvScreen.ScreenWidth;
   ScreenHeight: Word absolute TvScreen.ScreenHeight;
   { TODO: DN reads and writes the screen as an array of 16-bit cells; the buffer of tv/ has other cells }
-  { the screen of DN: 16-bit cells (character + attribute), a copy of the screen of tv/ that SysTvGetSrcBuf (VPSysLow) makes and
+  { the screen of DN: 16-bit cells (character + attribute), a copy of the screen of tv/ that SysTvGetSrcBuf (osdep) makes and
     mainapp refreshes at every idle; DN reads it (user screen, screen savers) and writes back with SysTvShowBuf. NOT the buffer of
     TvScreen (that one has the cells of tv/) }
   ScreenBuffer: Pointer = nil;

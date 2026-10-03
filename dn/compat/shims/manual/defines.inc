@@ -51,9 +51,9 @@ type
   AsciiZ = array[0..255] of Char;
 
   { VP gives these names to every unit; here they come with Defines, which all the DN units use }
-  TFileSize = VPSysLow.TFileSize;
-  SmallWord = VPSysLow.SmallWord;
-  TQuad = VPSysLow.TQuad;
+  TFileSize = osdep.TFileSize;
+  SmallWord = osdep.SmallWord;
+  TQuad = osdep.TQuad;
   TSize = TFileSize;               { the size of a file }
 
   { A table of a conversion of characters: the index is a character of the source encoding, the element is

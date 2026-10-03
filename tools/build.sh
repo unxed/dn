@@ -41,6 +41,8 @@ export DN_BUILD_DATE DN_BUILD_REV DN_BUILD_TARGET
 exe=; case "$DN_TARGET" in dos|win*) exe=.exe;; esac
 echo "== shims (generated from tv/src)"
 dn_gen_shims
+# the date, the revision and the platform are read by the compiler from the environment: the unit that includes version.inc has to be compiled again (the compiler does not see that)
+rm -f "$DN_OBJ"/basics.o "$DN_OBJ"/basics.ppu
 echo "== compile ($DN_TARGET)"
 mkdir -p "$DN_OBJ"
 progs="rcp dn"; case "$DN_TARGET" in win*|aarch64) progs=dn;; esac      # the resources of Windows are made by rcp of the host (they are the same for all the targets)

@@ -247,7 +247,7 @@ type
 implementation
 
 uses
-  Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, strutil, fileutil, keymap
+  Lfn, Dos, DNUtf8, osdep, Commands, DNHelp, strutil, fileutil, keymap
   , editcore, Macro, linepos, Math, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
    {Cat}

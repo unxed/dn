@@ -73,10 +73,10 @@ uses
   DnIni, iniengine, CopyIni, Archiver,
   apploop, editcore, ArchSet, linepos, RegAll, DnExec, Histries, Menus,
    VideoMan, Events,
-  fnotify, Dpmi32, Dpmi32df, 
+  fnotify, realmode, fat32free, 
   Tree
   , filetype, panelsetup
-  , VPSysLow;
+  , osdep;
 
 {AK155 Мало проверить, что имя временного каталога непусто, надо
 еще проверить, что он существует, и что в нем можно создавать и

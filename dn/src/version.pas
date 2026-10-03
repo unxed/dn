@@ -48,7 +48,7 @@
 
 uses SysUtils,
   Dos, Defines
-  , VPSysLow;
+  , osdep;
 
 //===============================
 

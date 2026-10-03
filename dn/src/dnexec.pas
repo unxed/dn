@@ -76,10 +76,10 @@ implementation
 uses DNRun,
   
   
-   dpmi32, 
+   realmode, 
   DNUtil, basics, mainapp, strutil, Lfn,
   Dos, panelroot, CmdLine, Views, fileutil, Drivers, os2sess,
-  VideoMan, VpSysLow, vpsysext, Events,
+  VideoMan, osdep, osfind, Events,
   
   Startup, UserMenu, Messages, Strings, filetype, TitleSet
    {AK155 для перерисовки иконки}
@@ -99,7 +99,7 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
   Ans1 := ComLine+#0;
 
   SysTVKbdDone;
-  {JO: см. vpsysext ; если этого не делать - при вызове     }
+  {JO: см. osfind ; если этого не делать - при вызове     }
   {    консольных программ вроде архиваторов без командного }
   {    процессора или с "неправильным" командным процессором}
   {    (например, 4OS2) внешние программы не видят ввода с  }

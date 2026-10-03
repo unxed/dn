@@ -107,7 +107,7 @@ uses
   Startup, xTime, Messages, DNUtil
   , editcore, Histries, FViewer, panelroot
   , Idlers 
-  , VpSysLow, Lfn, UserMenu, Menus
+  , osdep, Lfn, UserMenu, Menus
   , DnIni, Math
   ;
 

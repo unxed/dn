@@ -278,7 +278,7 @@ uses
   ColorSel, Eraser,  DiskInfo
   , FileType, panelsetup, keymap
   , Startup, dlgrecs
-  , VPSysLow;
+  , osdep;
 
 { Load and Store Palette routines }
 

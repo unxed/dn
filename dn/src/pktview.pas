@@ -167,7 +167,7 @@ implementation
 uses
   DNHelp, fileutil, keymap, xTime, Commands, mainapp
 
-  , VPSysLow;
+  , osdep;
 
 var
   PktFileName: String;

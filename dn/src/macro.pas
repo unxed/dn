@@ -109,7 +109,7 @@ implementation
 uses
   Messages, Drivers, Dialogs, Commands, DNHelp, mainapp,
   Startup, strutil, fileutil, Math
-  , VPSysLow {JO: for SysBeepEx}
+  , osdep {JO: for SysBeepEx}
   ;
 
 type

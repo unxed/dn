@@ -26,7 +26,7 @@ procedure ShowUserScreenDos;
 implementation
 
 uses
-  SysUtils, Dos{$IFDEF GO32V2}, go32, Drivers{$ENDIF}, VPSysLow, DNErrLog{$IFDEF LINUX}, TvVtRun{$ENDIF};
+  SysUtils, Dos{$IFDEF GO32V2}, go32, Drivers{$ENDIF}, osdep, DNErrLog{$IFDEF LINUX}, TvVtRun{$ENDIF};
 
 {$IFDEF LINUX}
 function CurDir: AnsiString;

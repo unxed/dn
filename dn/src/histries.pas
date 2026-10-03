@@ -180,7 +180,7 @@ implementation
 uses
   Lfn, Dos, Commands, mainapp, Dialogs, HistList,
   Startup, xTime, Messages, DNUtil, DnIni,
-  VpSysLow, editwin, strutil,  fileutil,
+  osdep, editwin, strutil,  fileutil,
   
   Idlers,
   

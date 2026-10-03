@@ -120,7 +120,7 @@ implementation
 uses
   Startup, DNHelp, mainapp, Messages
   , basics, strutil, fileutil
-  , VpSysLow {для Open_Access_ReadOnly}
+  , osdep {для Open_Access_ReadOnly}
   , LFN 
   ;
 
