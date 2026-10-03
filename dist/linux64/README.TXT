@@ -6,7 +6,7 @@ The old build with the code page inside: DN_UTF8=0 tools/build.sh.
 The commands of the command line run in an embedded terminal (the screen of the user: Ctrl-O or Esc on an empty command line; DN_EMBED_TERM=0 gives the terminal to
 the shell as before, DN_RUN_PAUSE=0|1|2 sets what happens when the command ends).
 
-  cd dist/linux && ./dn            (dist/linux: i386, dist/linux64: x86_64; the files of the program, *.LNG *.DLG *.HLP, must be next to it)
+  cd dist/linux && ./dn            (dist/linux: i386, dist/linux64: x86_64, dist/aarch64: ARM64; the files of the program, *.LNG *.DLG *.HLP, must be next to it)
 
 Keys: F10 menu, Tab switches the panel, Enter enters a directory, F1 help, F3 view, F4 edit, F5 copy, F7 make a directory,
 Alt-X quit. DN names the files as DOS does: the disk C: is the root of the file system ("C:\home\you"). The first start
