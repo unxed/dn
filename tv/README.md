@@ -1,37 +1,37 @@
-# tv: Turbo Vision на Free Pascal
+# tv: Turbo Vision in Free Pascal
 
-Перевод на Pascal C++-библиотеки [magiblot/tvision](https://github.com/magiblot/tvision)
-(коммит `b4831e2`) в стиле Pascal Turbo Vision: `object`, `Init`/`Done`, `New(P, Init(...))`,
-`TView.HandleEvent`. Текст внутри — UTF-8; однобайтные строки показываются через кодовую
-страницу (настройка).
+A translation into Pascal of the C++ library [magiblot/tvision](https://github.com/magiblot/tvision)
+(commit `b4831e2`) in the style of Pascal Turbo Vision: `object`, `Init`/`Done`, `New(P, Init(...))`,
+`TView.HandleEvent`. The text inside is UTF-8; single-byte strings are shown through a code
+page (a setting).
 
-## Лицензия
+## License
 
-- Переведённые юниты — производная работа от magiblot/tvision, а значит и от опубликованного
-  Borland выпуска TV 2.0: действуют отказ от гарантий Borland и лицензия MIT magiblot
-  ([`COPYRIGHT.magiblot`](COPYRIGHT.magiblot)). Каждый такой юнит в заголовке называет
-  файлы magiblot, из которых он переведён.
-- Юниты, написанные для этого порта (`TvSys`, `TvMem`, `TvDos`, `TvUtil` в части, не
-  переведённой из magiblot, тесты, демо), — под лицензией MIT ([`LICENSE`](LICENSE)), чтобы
-  пакет в целом имел одну понятную лицензию. В их заголовке написано «Written for this port».
-- DN (каталог `dn/` репозитория) — другая лицензия. Код между `tv/` и `dn/` не копируется;
-  `tv/` не зависит от `dn/`.
+- The translated units are a derivative work of magiblot/tvision, and so of the Turbo Vision 2.0
+  release published by Borland: the Borland disclaimer and the MIT license of magiblot apply
+  ([`COPYRIGHT.magiblot`](COPYRIGHT.magiblot)). The header of each such unit names the magiblot
+  files it was translated from.
+- The units written for this port (`TvSys`, `TvMem`, `TvDos`, `TvUtil` in the part that was not
+  translated from magiblot, the tests, the demos) are under the MIT license ([`LICENSE`](LICENSE)), so
+  that the package as a whole has one clear license. Their header says "Written for this port".
+- DN (the `dn/` directory of the repository) has another license. No code is copied between `tv/` and `dn/`;
+  `tv/` does not depend on `dn/`.
 
-## Состав
+## Contents
 
-`src/` — юниты (список и соответствие файлам magiblot — в [`DESIGN.md`](DESIGN.md)),
-`tests/` — тесты на бэкенде «в памяти» (запускаются и нативно, и под DOS), `dostests/` —
-тесты бэкенда DOS (только в DOSBox-X), `demo/` — демо.
+`src/` holds the units (the list and the correspondence to the magiblot files are in [`DESIGN.md`](DESIGN.md)),
+`tests/` the tests on the "in memory" backend (they run both natively and under DOS), `dostests/` the
+tests of the DOS backend (in DOSBox-X only), `demo/` the demos.
 
-## Сборка и проверка
+## Build and check
 
     cd tv/tests
-    for t in t_*.pas; do fpc -Fu../src -Fu. $t && ./${t%.pas}; done   # каждый печатает «ALL OK»
+    for t in t_*.pas; do fpc -Fu../src -Fu. $t && ./${t%.pas}; done   # each prints "ALL OK"
 
-Под DOS: `tools/build-fpc-go32v2.sh` и `tools/dos-run.sh` (см. `.github/workflows/tv.yml`).
+Under DOS: `tools/build-fpc-go32v2.sh` and `tools/dos-run.sh` (see `.github/workflows/tv.yml`).
 
-## Как подключить к своему проекту
+## How to use it in your project
 
-Добавить `tv/src` в путь юнитов (`-Fu`), в программе использовать `TvApp` (приложение),
-`TvViews`, `TvWindow`, `TvMenus` и бэкенд: `TvDos` под DOS или `TvMem` в тестах.
-Минимальный пример — `demo/tvdemo.pas`.
+Add `tv/src` to the unit path (`-Fu`); in the program use `TvApp` (the application),
+`TvViews`, `TvWindow`, `TvMenus` and a backend: `TvDos` under DOS or `TvMem` in tests.
+The minimal example is `demo/tvdemo.pas`.
