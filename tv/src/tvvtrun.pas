@@ -15,9 +15,8 @@ uses
   TvVt;
 
 { Runs Prog (Args[0] is its name for itself) in the directory Cwd ('' = the current one) on the screen of the application; the text Echo (if not empty) is written to
-  the emulator before the program starts (the command line, like the prompt of a shell). Pause: after the program ended, "Press Enter" is shown and Enter is
-  waited for. Emu is made (the size of the screen) when it is not yet (a zeroed variable: Cols = 0). Result: the exit status of the program, -1 when it could not be started. }
-function VtRunScreen(var Emu: TVtEmu; const Prog: AnsiString; const Args: array of AnsiString; const Cwd, Echo: AnsiString; Pause: Boolean): Integer;
+  the emulator before the program starts (the command line, like the prompt of a shell). Pause: 0 goes back at once, 1 shows "Press Enter" after the program ended and waits for Enter, 2 does it only when the status is not 0. Emu is made (the size of the screen) when it is not yet (a zeroed variable: Cols = 0). Result: the exit status of the program, -1 when it could not be started. }
+function VtRunScreen(var Emu: TVtEmu; const Prog: AnsiString; const Args: array of AnsiString; const Cwd, Echo: AnsiString; Pause: Integer): Integer;
 
 { Shows the screen of Emu until a key is pressed. }
 procedure VtShowScreen(var Emu: TVtEmu);
@@ -65,7 +64,7 @@ begin
     OnSetVideoMode(smUpdate);
 end;
 
-function VtRunScreen(var Emu: TVtEmu; const Prog: AnsiString; const Args: array of AnsiString; const Cwd, Echo: AnsiString; Pause: Boolean): Integer;
+function VtRunScreen(var Emu: TVtEmu; const Prog: AnsiString; const Args: array of AnsiString; const Cwd, Echo: AnsiString; Pause: Integer): Integer;
 var
   Pty: TPty;
   Buf: array[0..8191] of Byte;
@@ -173,10 +172,10 @@ begin
   Pty.Wait(True);
   Result := Pty.ExitStatus;
   Pty.Close;
-  if Pause then
+  if (Pause = 1) or ((Pause = 2) and (Result <> 0)) then
   begin
     Emu.Feed(#13#10#27'[7m [ Process ended (' + Chr(48 + (Result div 100) mod 10) + Chr(48 + (Result div 10) mod 10) + Chr(48 + Result mod 10) +
-      '): press Enter ] '#27'[0m');
+      '): Press Enter ] '#27'[0m');
     Blit(Emu, False);
     repeat
       PollEvent(100, Ev);

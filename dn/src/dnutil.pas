@@ -250,6 +250,9 @@ procedure PutInClipLong(const S: LongString);
 implementation
 
 uses
+{$IFDEF LINUX}
+  DNRun,
+{$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, VPUtils,
   DNHelp, DnIni, DnIni_p, Histries,
   VideoMan, Memory, DblWnd, Messages, HistList, FileFind,
@@ -2714,6 +2717,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmFormatDisk:
       AddFormat;
     cmShowOutput:
+{$IFDEF LINUX}
+      { the screen of the commands that DN ran (TvVtRun): Ctrl-O shows it }
+      if UserScr.Cols > 0 then
+        ShowUserScreen
+      else
+{$ENDIF}
       GetUserScreen;
     cmHistoryList:
       CmdHistory;

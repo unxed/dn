@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet;
+uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF};
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -394,6 +394,14 @@ end;
 
 procedure TApplication.ShowUserScreen;
 begin
+{$IFDEF LINUX}
+  { the screen of the commands that DN ran (TvVtRun); the key leaves it, DN is drawn again }
+  if UserScr.Cols > 0 then
+    begin
+    VtShowScreen(UserScr);
+    Redraw;
+    end;
+{$ENDIF}
   { TODO: the screen of the program that started DN (the shell) }
 end;
 

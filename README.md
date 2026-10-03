@@ -25,6 +25,8 @@
 
 На Linux DN собирается с UTF-8 внутри (имена, редактор, буфер обмена, Alt+кириллица; быстрый поиск в панели — Ctrl-S). Старая сборка с кодовой страницей внутри: `DN_UTF8=0 tools/build.sh linux64`.
 
+Как всё это было сделано и на какие грабли наступили (руководство для того, кто повторяет путь с нуля, по-английски): [`docs/MODERNIZATION-GUIDE.md`](docs/MODERNIZATION-GUIDE.md).
+
 Что дальше: правьте `dn/src` (исходники DN) или `tv/src` (библиотека), снова `tools/build.sh linux64` (несколько секунд); проверки —
 `tools/dn-test.sh` (юнит-тесты DN), `python3 tools/dn-linux-ops.py out/linux64` (F5/F6/F7/F8/F4 и команда на настоящих файлах в pty), `DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/linux64` (то же и проверки UTF-8), `DN_UTF8=0 tools/build.sh linux64 out/old && python3 tools/dn-linux-locale.py out/old` (кодовая страница по локали — только для старой сборки),
 тесты TV — п. 1 ниже. Для i386 Linux и DOS нужны кросс-компиляторы (`tools/build-fpc-i386-linux.sh`, `tools/build-fpc-go32v2.sh`), см. `dn/README.md`.

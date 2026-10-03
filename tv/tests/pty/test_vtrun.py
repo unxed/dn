@@ -27,7 +27,7 @@ check(t.wait_for('hello', 5), 'the command runs on the screen: its output is the
 check('$ mycommand' in t.text().split('\n')[0], 'the command line is the first line of the screen', t.text())
 t.send(b'abc\r', 0.8)
 check('got:abc' in t.text(), 'the keys go to the program', t.text())
-check(t.wait_for('press Enter', 3), 'the program has ended: the pause is shown with its status', t.text())
+check(t.wait_for('Press Enter', 3), 'the program has ended: the pause is shown with its status', t.text())
 check('(005)' in t.text(), 'the exit status 5 is shown', t.text())
 t.send(b'\r', 0.8)
 check('got:abc' in t.text() and 'hello' in t.text(), 'the screen stays for the user (VtShowScreen)', t.text())
