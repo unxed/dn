@@ -38,17 +38,16 @@ procedure UnixFlush;
 
 implementation
 
-{$IFDEF UNIX}
+{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
 
 uses
-  SysUtils, BaseUnix, termio, TvGeom, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvMouse, TvViews, TvTermIO, TvAnsi, TvCodePg;
+  SysUtils, TvTermOs, TvGeom, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvMouse, TvViews, TvTermIO, TvAnsi, TvCodePg;
 
 const
   AutoSliceMs = 20;           { the wait between the checks of the mouse timers while a button is down }
 
 var
   Active: Boolean = False;
-  SavedTios: Termios;
   Cols, Rows: Integer;
   Writer: TAnsiWriter;
   Shown: PScreenCell = nil;   { the cells that the terminal shows }
@@ -58,37 +57,16 @@ var
   MouseOn: Boolean = False;
   InBuf: array[0..1023] of Byte;
   InPos, InLen: Integer;
-  ResizeFlag: LongInt = 0;
   Dirty: Boolean = False;     { cells were written after the last flush: the caret is hidden }
   CaretMoved: Boolean = True;
   CaretShape: Integer = -1;
-  OldWinch: SigActionRec;
-  OldTerm, OldHup: SigActionRec;
   ExitProcSet: Boolean = False;
 
 { --- output ------------------------------------------------------------------------------------------------- }
 
 procedure WriteAll(P: PByte; Len: Integer);
-var
-  N: TSsize;
 begin
-  while Len > 0 do
-  begin
-    N := FpWrite(1, P^, Len);
-    if N < 0 then
-    begin
-      if fpgeterrno = ESysEINTR then
-        Continue;
-      if fpgeterrno = ESysEAGAIN then
-      begin
-        Sleep(1);
-        Continue;
-      end;
-      Exit;
-    end;
-    Inc(P, N);
-    Dec(Len, N);
-  end;
+  OsWrite(P, Len);
 end;
 
 procedure UnixFlush;
@@ -233,28 +211,21 @@ end;
 
 { True if a byte can be read within TimeoutMs. }
 function InputReady(TimeoutMs: Integer): Boolean;
-var
-  P: TPollFd;
-  R: cint;
 begin
   if InPos < InLen then
     Exit(True);
-  P.fd := 0;
-  P.events := POLLIN;
-  P.revents := 0;
-  R := FpPoll(@P, 1, TimeoutMs);
-  Result := (R > 0) and ((P.revents and (POLLIN or POLLHUP)) <> 0);
+  Result := OsInputReady(TimeoutMs);
 end;
 
 function RawRead(TimeoutMs: Integer): Integer;
 var
-  N: TSsize;
+  N: Integer;
 begin
   if InPos >= InLen then
   begin
     if not InputReady(TimeoutMs) then
       Exit(-1);
-    N := FpRead(0, InBuf, SizeOf(InBuf));
+    N := OsRead(InBuf, SizeOf(InBuf));
     if N <= 0 then
       Exit(-1);
     InPos := 0;
@@ -278,9 +249,9 @@ begin
   UnixFlush;
   Start := UnixClock;
   repeat
-    if ResizeFlag <> 0 then
+    if OsResizeFlag <> 0 then
     begin
-      ResizeFlag := 0;
+      OsResizeFlag := 0;
       ClearEvent(Event);
       Event.What := evCommand;
       Event.Command := cmScreenChanged;
@@ -340,21 +311,8 @@ end;
 { --- the screen --------------------------------------------------------------------------------------------- }
 
 procedure ReadSize(out W, H: Integer);
-var
-  Ws: TWinSize;
 begin
-  W := 0;
-  H := 0;
-  FillChar(Ws, SizeOf(Ws), 0);
-  if FpIoctl(1, TIOCGWINSZ, @Ws) = 0 then
-  begin
-    W := Ws.ws_col;
-    H := Ws.ws_row;
-  end;
-  if W <= 0 then
-    W := StrToIntDef(GetEnvironmentVariable('COLUMNS'), 80);
-  if H <= 0 then
-    H := StrToIntDef(GetEnvironmentVariable('LINES'), 25);
+  OsSize(W, H);
   if W < 20 then
     W := 20;
   if H < 5 then
@@ -389,11 +347,6 @@ begin
   NewScreen;
 end;
 
-procedure WinchHandler(Sig: cint); cdecl;
-begin
-  ResizeFlag := 1;
-end;
-
 { the terminal is put back also when the program dies by a signal }
 procedure RestoreTerminal;
 const
@@ -402,16 +355,16 @@ begin
   if not Active then
     Exit;
   if MouseOn then
-    FpWrite(1, SeqMouseOff[1], Length(SeqMouseOff));
-  FpWrite(1, SeqKeyModsOff[1], Length(SeqKeyModsOff));
-  FpWrite(1, Tail[1], Length(Tail));
-  TCSetAttr(0, TCSANOW, SavedTios);
+    OsWrite(@SeqMouseOff[1], Length(SeqMouseOff));
+  OsWrite(@SeqKeyModsOff[1], Length(SeqKeyModsOff));
+  OsWrite(@Tail[1], Length(Tail));
+  OsRawOff;
 end;
 
-procedure DeathHandler(Sig: cint); cdecl;
+{ called when the program is killed (the terminal in order, then the end) }
+procedure DeathHandler;
 begin
   RestoreTerminal;
-  FpExit(128 + Sig);
 end;
 
 procedure AtExitRestore;
@@ -438,17 +391,11 @@ end;
 
 procedure UnixResume;
 var
-  Raw: Termios;
   Seq: string;
 begin
   if not Active then
     Exit;
-  TCGetAttr(0, SavedTios);
-  Raw := SavedTios;
-  CFMakeRaw(Raw);
-  Raw.c_cc[VMIN] := 1;
-  Raw.c_cc[VTIME] := 0;
-  TCSetAttr(0, TCSANOW, Raw);
+  OsRawOn;
   Seq := #27'[?1049h'#27'[?7l';
   WriteAll(@Seq[1], Length(Seq));
   Seq := SeqKeyModsOn;
@@ -469,22 +416,15 @@ end;
 
 function UnixInit: Boolean;
 var
-  Raw: Termios;
-  Act: SigActionRec;
   Seq, Delay: string;
   Ms: Integer;
 begin
   Result := False;
   if Active then
     Exit(True);
-  if (IsATTY(0) = 0) or (IsATTY(1) = 0) then
+  if not OsIsTerminal then
     Exit;
-  TCGetAttr(0, SavedTios);
-  Raw := SavedTios;
-  CFMakeRaw(Raw);
-  Raw.c_cc[VMIN] := 1;
-  Raw.c_cc[VTIME] := 0;
-  TCSetAttr(0, TCSANOW, Raw);
+  OsRawOn;
 
   Writer.Init(TermCapFromEnv);
   InPos := 0;
@@ -495,7 +435,7 @@ begin
   FillChar(InState, SizeOf(InState), 0);
   FillChar(MState, SizeOf(MState), 0);
   MouseQueueReset;
-  ResizeFlag := 0;
+  OsResizeFlag := 0;
 
   { the alternate screen, no wrapping at the end of a row }
   Seq := #27'[?1049h'#27'[?7l';
@@ -509,12 +449,7 @@ begin
     WriteAll(@Seq[1], Length(Seq));
   end;
 
-  FillChar(Act, SizeOf(Act), 0);
-  Act.sa_handler := SigActionHandler(@WinchHandler);
-  FpSigAction(SIGWINCH, @Act, @OldWinch);
-  Act.sa_handler := SigActionHandler(@DeathHandler);
-  FpSigAction(SIGTERM, @Act, @OldTerm);
-  FpSigAction(SIGHUP, @Act, @OldHup);
+  OsHandlersOn(@DeathHandler);
   if not ExitProcSet then
   begin
     AddExitProc(@AtExitRestore);
@@ -543,9 +478,7 @@ begin
   OnPollEvent := nil;
   GetClockMs := nil;
   OnSetVideoMode := nil;
-  FpSigAction(SIGWINCH, @OldWinch, nil);
-  FpSigAction(SIGTERM, @OldTerm, nil);
-  FpSigAction(SIGHUP, @OldHup, nil);
+  OsHandlersOff;
   RestoreTerminal;
   Active := False;
   Writer.Done;
