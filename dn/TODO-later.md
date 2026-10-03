@@ -215,9 +215,14 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   on that runner. Fixed: the names are collected into a `TStringCollection` and shown sorted (`tv/src/tvchdir.pas`). Other places that show directories in the file system order are not searched for.
 
 ## DN for DOS under DOSBox-X master (2026-10-03)
-- The DOS build (`dist/dos/DN.EXE`) does not make the screen dump (no `SCR.DAT`, the harness of `tools/dn-tour.sh`) on DOSBox-X built from `master` (2026.10.01, the base of the patches in
-  `docs/patches/`); it does on the apt package 2024.03.01 that CI uses. The same on `master` **without** the patches (checked: built `e013b8b` by itself), so it is not the AMIS/UTF-8 patches. DN starts
-  (creates `TEM`, `DNERR.TXT`) and then nothing is dumped within `DNDUMPSEC`. Not investigated further: either a change of DOSBox-X (timer/INT 1Ah, DPMI) or a timing assumption of DN. To find out:
-  run `DN.EXE` by hand under `master` and see where it waits (no `DNKEYS`), try `cycles=max`/`fixed`.
+- Symptom: the DOS build (`dist/dos/DN.EXE`) makes no screen dump (the harness of `tools/dn-tour.sh`) on DOSBox-X built from `master` (2026.10.01, the base of the patches in `docs/patches/`); on the apt package
+  2024.03.01 that CI uses it does. The same on `master` **without** the patches, so it is not the AMIS/UTF-8 patches.
+- Found (differential trace of DN, `tools/dn-trace-init.py` + steps by hand, a `gdb` backtrace of the emulator): the **emulator** hangs, not DN: `DOS_FindFirst` -> `DOS_FindDevice` -> `DOS_CheckExtDevice`
+  (src/dos/dos_devices.cpp, new in 2025) walks the chain of device headers in guest memory in `while(1)` that ends only at `FFFF:FFFF`. While DN runs, the CON header at `00F9:0000` (`DOS_CONDRV_SEG`, the
+  private area of DOS of DOSBox-X) is found zeroed (`next=0000:0000 attr=0000`), the walk leaves into the interrupt table and never ends. The raw INT 21h AX=714Eh/71A1h sequences of DN from a small .COM do not hang.
+- Fix for the emulator (a guard of 1024 links): branch `claude/fix-extdevice-loop` of the fork `unxed/dosbox-x` (`docs/patches/dosbox-x-pr-extdevice-loop.md`); with it DN starts and draws the panels under `master`.
+- **Not known:** who zeroes `00F9:0000`. A `gdb` watchpoint (the first dword of the header becoming 0) did not fire in one run. Candidates: DN (a write through its DOS transfer buffer `tb_segment`/`dpmi32`),
+  the stub or CWSDPMI, or the emulator. To find out: a watchpoint set from the start of the run, or a check of what `tb_segment` is in DN; the known odd thing of the same kind is `ShadowCount` (a variable that had a wrong
+  value at the start of the program under DOSBox-X, `dpmi32.pas`). Until it is known a bug of DN cannot be excluded.
 - With the apt package 2024.03.01 and `lfn = true`, DN shows the long names (the column cuts them with the `►` mark; the panel is in the 8.3 width). Files whose names the code page lacks are hidden
-  (no `utf8 file names`, that option is only in the patched DOSBox-X): to be tried with DN when the master problem is understood.
+  (no `utf8 file names`, that option is only in the patched DOSBox-X): to be tried with DN now that it runs under `master`.
