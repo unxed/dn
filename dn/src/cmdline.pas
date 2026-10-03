@@ -103,7 +103,7 @@ const
 implementation
 uses
   Dos, Commands, mainapp, Dialogs, basics, strutil, fileutil,
-  panelwinx, Gauges, 
+  panelwinx, gadgets, 
   Startup, xTime, Messages, DNUtil
   , editcore, Histries, FViewer, panelroot
   , Idlers 

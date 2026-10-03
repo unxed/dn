@@ -3,6 +3,9 @@ apploop.pas u_myapp.pas
 baseobjs.pas objects2.pas
 basics.pas advance.pas
 boot.pas dn1.pas
+bwselect.pas dncolor.pas
+calcline.pas ccalc.pas
+calcwin.pas calc.pas
 copyio.pas fbb.pas
 country.pas country_.pas
 dlgrecs.pas startupp.pas
@@ -11,10 +14,12 @@ editfile.pas microed2.pas
 editundo.pas ed2.pas
 editwin.pas edwin.pas
 envutil.pas advance3.pas
+evaluator.pas calculat.pas
 filepanel.pas flpanel.pas
 fileutil.pas advance2.pas
 findspf.pas u_srchf.pas
 fsinfo.pas fltl.pas
+gadgets.pas gauges.pas
 iniengine.pas dnini_p.pas
 inputfname.pas swe.pas
 keymap.pas u_keymap.pas
@@ -27,6 +32,7 @@ panelroot.pas flpanelx.pas
 panelsetup.pas pdsetup.pas
 panelwin.pas dblwnd.pas
 panelwinx.pas xdblwnd.pas
+progress.pas gauge.pas
 strutil.pas advance1.pas
 topview.pas topview_.pas
 vpsysext.pas vpsyslo2.pas

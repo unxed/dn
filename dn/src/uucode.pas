@@ -91,7 +91,7 @@ uses
   Files, VPUtils, Tree
   , Dos, Lfn {DataCompBoy}
   , basics, strutil, fileutil, Views, Startup, Dialogs,
-  xTime, FilesCol, mainapp, Drivers, Gauge, Messages, Commands,
+  xTime, FilesCol, mainapp, Drivers, progress, Messages, Commands,
   FileCopy, HistList, DNUtil
   , Events
   , use16

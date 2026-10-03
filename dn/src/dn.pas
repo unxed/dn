@@ -60,14 +60,14 @@ uses
   boot, Dos, mainapp,
   Menus, panelroot, filepanel, FileCopy, Filediz, Filelst, Eraser,
   DiskInfo, basics, strutil, fileutil, os2sess, highlite,
-  Startup, Dialogs, Gauges, Memory, panelwin, Messages, HistList,
+  Startup, Dialogs, gadgets, Memory, panelwin, Messages, HistList,
   FileFind, Commands, Tree, FViewer, CmdLine, copyio, DNStdDlg,
   FilesCol, UserMenu, Colors, editcore, Editor, Macro,
   ArcView, HelpFile, Validate, ASCIITab, xTime, Drives, Archiver,
-  ArchSet, ArchDet, Setups, DNUtil, panelwinx, Histries, CCalc,
-  DnIni, Collect, baseobjs, Views, Scroller, Calculat,
+  ArchSet, ArchDet, Setups, DNUtil, panelwinx, Histries, calcline,
+  DnIni, Collect, baseobjs, Views, Scroller, evaluator,
   HelpKern, VideoMan
-  , Calc, CellsCol 
+  , calcwin, CellsCol 
   , DBView, DBWatch 
   
   , Tetris 

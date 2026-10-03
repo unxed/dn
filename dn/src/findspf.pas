@@ -51,7 +51,7 @@ unit findspf;
 interface
 
 uses
-  Gauge;
+  progress;
 
 function FindFileWithSPF(pFileName: String; Info: PWhileView): String;
 

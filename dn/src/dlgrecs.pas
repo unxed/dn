@@ -55,7 +55,7 @@ unit dlgrecs;
 interface
 
 uses
-  Defines, Startup, Collect, CCalc
+  Defines, Startup, Collect, calcline
   ;
 
 type

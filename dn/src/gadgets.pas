@@ -46,7 +46,7 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit Gauges;
+unit gadgets;
 
 { Useful gauges: clock and heap available viewer }
 interface

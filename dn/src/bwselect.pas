@@ -46,7 +46,7 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit DNColor;
+unit bwselect;
 
 { Carved by tools/dn-carve.py from colorsel.pas: the classes T_BWSelector of Dos Navigator. }
 

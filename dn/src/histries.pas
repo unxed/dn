@@ -186,7 +186,7 @@ uses
   
   FViewer, CmdLine, panelsetup, editcore
   , panelroot {для ActivePanel}
-  , Calc 
+  , calcwin 
   ;
 
 procedure FreeLastUnmarked(C: PCollection);

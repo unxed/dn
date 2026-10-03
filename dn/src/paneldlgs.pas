@@ -101,7 +101,7 @@ uses
   Lfn, Files, Collect, xTime, DnIni, HistList,
   basics, strutil, fileutil, Dos, Defines, Dialogs,
   Views, mainapp, Commands, Drivers, filepanel, Drives, FileCopy,
-  Gauge, Gauges, Archiver, Startup, inputfname, Validate, Messages, Menus, DNHelp,
+  progress, gadgets, Archiver, Startup, inputfname, Validate, Messages, Menus, DNHelp,
   FileFind, Tree, copyio, DNUtil, Filediz, Filelst, fsinfo, panelwin,
   ErrMess, baseobjs, VPUtils
   , DNDlgs;

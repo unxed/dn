@@ -63,7 +63,7 @@ uses
   Defines, Files, Filediz,
   Dos, Lfn {DataCompBoy}, FilesCol, Commands, basics, strutil, fileutil,
   Startup, Messages, xTime, Drivers, Tree, Memory,
-  mainapp, Gauge, Views, Dialogs, Drives, FileCopy
+  mainapp, progress, Views, Dialogs, Drives, FileCopy
   , fnotify, Events
   {JO} , fsinfo
 

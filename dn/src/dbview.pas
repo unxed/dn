@@ -206,7 +206,7 @@ const
 implementation
 uses
   basics, strutil, fileutil, Startup, DNHelp, mainapp, Messages,
-  Histries, Gauge, xTime, DnIni
+  Histries, progress, xTime, DnIni
   , Events, lfn, Dos, Memory, keymap
   ;
 

@@ -295,7 +295,7 @@ implementation
 uses
   
   Messages, mainapp, Dos, Lfn, Memory, strutil, fileutil, Startup,
-  Gauge, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
+  progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
   xTime, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
   , Events, VpSysLow, DNStdDlg, Dialogs, DNHelp, VPUtils
   ;
