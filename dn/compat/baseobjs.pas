@@ -12,8 +12,6 @@ uses
   TvObjs;
 
 type
-  PEmptyObject = TvObjs.PObject;
-  TEmptyObject = TvObjs.TObject;
   PObject = TvObjs.PObject;
   TObject = TvObjs.TObject;
 

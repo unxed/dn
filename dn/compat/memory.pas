@@ -9,13 +9,10 @@ interface
 const
   { the sizes of the old model (in paragraphs); DN reads them to size buffers }
   LowMemSize = 4096;
-  MaxBufMem = 65536 div 16;
-  MaxHeapSize = 655360 div 16;
 
 { Memory for a buffer; nil when there is none. The size is a LongInt: in Virtual Pascal Word is 32 bits, DN asks for buffers of megabytes (a Word here made a
   buffer of the size modulo 64K that the copy then overran). }
 function MemAlloc(Size: LongInt): Pointer;
-function MemAllocSeg(Size: LongInt): Pointer;
 function LowMemory: Boolean;
 { A cache buffer: P is nil if there is no memory. }
 procedure DisposeCache(P: Pointer);
@@ -55,11 +52,6 @@ begin
   except
     Result := nil;
   end;
-end;
-
-function MemAllocSeg(Size: LongInt): Pointer;
-begin
-  Result := MemAlloc(Size);
 end;
 
 procedure NewCache(var P: Pointer; Size: LongInt);
