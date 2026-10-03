@@ -41,7 +41,7 @@ Each step must give something you can run before you start the next one.
 | 3 | The UI library `tv/` (translation of magiblot/tvision), screen in memory, tested without a terminal | unit tests |
 | 4 | The terminal backend (Linux): raw input parser, ANSI output, mouse, clipboard | a demo in a pty, a screen emulator for the test |
 | 5 | The DN tree: fetch, cut out the Borland parts, edit mechanically, replace the excluded units with our own | it compiles |
-| 6 | The system layer of DN (`vpsyslow`): files, drives, time, keys, running programs | DN starts and shows panels |
+| 6 | The system layer of DN (`osdep`, was `vpsyslow`): files, drives, time, keys, running programs | DN starts and shows panels |
 | 7 | Resources (dialogs/strings are compiled by DN's own `rcp` tool) and the help (the help compiler `tvhc`) | menus and F1 work |
 | 8 | Regression tests of real work in a pty: F5/F6/F7/F8, editor, viewer | `tools/dn-linux-ops.py` |
 | 9 | Windows (console API), DOS (DOSBox-X in CI) | CI smoke tests |

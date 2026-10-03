@@ -49,7 +49,7 @@ unit VideoMan;
 
 interface
 
-uses VPSysLow;
+uses osdep;
 
 var
   ScreenMirror: Pointer;
@@ -189,7 +189,7 @@ uses
   Dos, Drivers, Defines, mainapp,
   DnIni, iniengine, Startup,
   Commands , Messages
-  ,Dpmi32, Dpmi32df
+  ,realmode, fat32free
   ;
 
 var

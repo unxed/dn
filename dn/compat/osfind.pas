@@ -1,15 +1,15 @@
-{VPSysLow extension unit by Jaroslaw Osadtchiy (JO) <2:5030/1082.53>}
+{osdep extension unit by Jaroslaw Osadtchiy (JO) <2:5030/1082.53>}
 {Modified for compatibility with DPMI32 by Aleksej Kozlov (Cat) <2:5030/1326.13>}
 {Contribution to Dos Navigator /2 OSP project}
 {&OrgName+,Speed+,AlignCode+,AlignRec-,CDecl-,Far16-,Frame+,Delphi+}
 {$X+,W-,I-,J+,H-,Delphi+,R-,S-,Q-,B-,T-,Use32+}
 
-unit vpsysext;
+unit osfind;
 
 interface
 
 uses
-  VpSysLow
+  osdep
   
   
   ;

@@ -54,7 +54,7 @@ procedure LongCopy(Fn1: String);
 
 implementation
 uses
-  Lfn, Dos, Tree, VPSysLow, basics, strutil, fileutil, FileCopy, mainapp,
+  Lfn, Dos, Tree, osdep, basics, strutil, fileutil, FileCopy, mainapp,
   Messages, Views, Defines, Dialogs, Commands, Drivers, HistList,
   progress, Startup, xTime, ErrMess, Math
   , Strings;
@@ -329,7 +329,7 @@ Rep:
         if DiskVerify then
           begin
           
-          VPSysLow.SysDiskReset;
+          osdep.SysDiskReset;
           
           Seek(F2.F, LastPos);
           if PartSize <> 0

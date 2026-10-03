@@ -24,7 +24,7 @@ function QueryABCSort(CP: Word; var ABCSortXlat: TXLat): Boolean;
 implementation
 
 uses
-  dpmi32df, dpmi32, DosLow, VPSysLow,
+  fat32free, realmode, dosbuf, osdep,
   basics, strutil, Strings, keymap;
 
 procedure QueryUpcaseTable;

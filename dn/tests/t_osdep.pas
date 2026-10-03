@@ -1,7 +1,7 @@
-program t_vpsys;
-{ Tests of dn/new/vpsyslow.pas (the system layer of DN on Free Pascal). }
+program t_osdep;
+{ Tests of dn/new/osdep.pas (the system layer of DN on Free Pascal). }
 {$mode objfpc}{$H-}
-uses SysUtils, Strings, {$IFDEF UNIX}BaseUnix, {$ENDIF}VPSysLow, TvScreen, TvCell, TvColors;
+uses SysUtils, Strings, {$IFDEF UNIX}BaseUnix, {$ENDIF}osdep, TvScreen, TvCell, TvColors;
 {$I dntest.inc}
 
 var

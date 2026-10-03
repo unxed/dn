@@ -64,8 +64,8 @@ unit LFN;
 interface
 
 uses
-  VPSysLow, // см. комментарий в конце vpsysos2
-  vpsysext, Dos, Defines
+  osdep, // см. комментарий в конце vpsysos2
+  osfind, Dos, Defines
   ;
 
 type
@@ -258,7 +258,7 @@ uses
   
   Strings, Commands {Cat}
   , strutil, fileutil, Math
-   ,Startup ,Dpmi32 ,Dpmi32df 
+   ,Startup ,realmode ,fat32free 
   , fnotify
   ;
 procedure lResetText(var F: lText);

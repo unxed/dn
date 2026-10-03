@@ -9,11 +9,11 @@
   DN reads and writes it by MemGet/MemPut (dn/edits/30-dpmi32-mem.py replaces the VP style Mem[] and Ptr()
   in the DN sources). }
 {$mode objfpc}{$H-}
-unit Dpmi32;
+unit realmode;
 
 interface
 
-uses VPSysLow;
+uses osdep;
 
 const
   fCarry = 1;                      { the carry flag in flags_ }
@@ -54,7 +54,7 @@ procedure getdosmem(var Seg: SmallWord; Size: LongInt);
 function dosseg_linear(Seg: SmallWord): LongInt;
 
 { The end of the program: restore INT 24h and the exception handlers. Nothing to restore here (the critical error
-  handler is set by VPSysLow.SysDisableHardErrors, the exceptions are those of the FPC runtime). }
+  handler is set by osdep.SysDisableHardErrors, the exceptions are those of the FPC runtime). }
 procedure remove_i24;
 procedure RemoveDpmi32ExceptionHandlers;
 function DosShadow(Seg: SmallWord): Pointer;

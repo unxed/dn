@@ -103,7 +103,7 @@ uses
   mainapp, Startup, Messages, HistList, Commands,
   xTime, Validate, TitleSet, UserMenu, Dos, DnIni,
   
-  VpSysLow, Filediz , ArvidAvt ,
+  osdep, Filediz , ArvidAvt ,
   fnotify, fsinfo, basics, strutil, fileutil,
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
@@ -1331,7 +1331,7 @@ lbStartWrite:
         then
           begin
           
-          VPSysLow.SysDiskReset;
+          osdep.SysDiskReset;
           
 
           BufCrc := GetCrc(MemBuf^[MemBufPos], P^.len);

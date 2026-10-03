@@ -87,7 +87,7 @@ type
 implementation
 uses
   DNUtil, strutil
-  , VPSysLow;
+  , osdep;
 {----------------------------------------------------------------------------}
 const
   TempStreamName = '$MAKERES.TMP';

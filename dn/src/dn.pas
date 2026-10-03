@@ -79,8 +79,8 @@ uses
   
   , SysUtils 
   
-  , VpSysLow
- , dpmi32 
+  , osdep
+ , realmode 
   ;
 
 

@@ -153,7 +153,7 @@ type
 implementation
 
 uses
-  VpSysLow, Eraser,
+  osdep, Eraser,
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
   Arvid, xTime, VideoMan, DnExec, FileFind
   , UserMenu {JO: для скрывания панелей при разархивировании }

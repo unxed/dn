@@ -200,7 +200,7 @@ uses
   
   strutil, Strings,
   Commands, mainapp, DnIni, panelroot, dnHelp
-  , VpSysLow, keymap
+  , osdep, keymap
   ;
 
 var

@@ -156,7 +156,7 @@ implementation
 uses
   Startup, mainapp, Commands, DNHelp, Tree, xTime
   , basics, strutil, fileutil, Math
-  , VpSysLow, Lfn, keymap, Events, baseobjs
+  , osdep, Lfn, keymap, Events, baseobjs
   , fsinfo, panelroot, panelsetup, Dos
   , Strings;
 

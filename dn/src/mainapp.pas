@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
+uses basics, fileutil, langid, Videoman, osdep, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -407,7 +407,7 @@ begin
 end;
 
 { As TApplication.Init / Done of DN: the video manager of DN (videoman.pas) is started and stopped here, the user screen is the
-  screen that was there before DN (vpsyslow grabbed it). The language files and the resources are disposed at the end. }
+  screen that was there before DN (osdep grabbed it). The language files and the resources are disposed at the end. }
 constructor TApplication.Init;
 begin
   Videoman.InitVideo;

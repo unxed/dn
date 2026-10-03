@@ -144,7 +144,7 @@ const
 
 implementation
 uses
-  VPSysLow, Lfn, Files, fsinfo,
+  osdep, Lfn, Files, fsinfo,
   Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
   Dialogs, FileFind, panelroot, Filediz, CmdLine
   , xTime, Messages, Events, fnotify, Dos

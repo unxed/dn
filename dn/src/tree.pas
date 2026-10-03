@@ -223,7 +223,7 @@ uses
   Lfn, Files, Startup, Dos, DnIni, DNHelp,
   basics, strutil, fileutil, envutil,
   panelroot, mainapp, Messages, Commands, Drives, Eraser, Menus,
-  xTime, FileCopy, VPSysLow
+  xTime, FileCopy, osdep
   ;
 
 const

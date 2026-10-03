@@ -307,7 +307,7 @@ implementation
 
 uses
   xTime, Startup, strutil, Math, DNUtf8,
-  VpSysLow, fileutil,
+  osdep, fileutil,
   Commands
   ;
 procedure ClrIO;
@@ -732,7 +732,7 @@ procedure TinySlice;
 {AK155 Под OS/2 int $28 разгрузки процессора не даёт, а
  int $2f (DPMI Idle) - даёт. Вероятно, для DPMI32 int $2f
  неприменимо. Так что оставил безусловно DPMI Idle}
-  VPSysLow.SysCtrlSleep(0);   { the idle of DPMI (INT 2Fh AX=1680h) of VP }
+  osdep.SysCtrlSleep(0);   { the idle of DPMI (INT 2Fh AX=1680h) of VP }
   
   end;
 

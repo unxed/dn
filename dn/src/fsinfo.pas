@@ -10,7 +10,7 @@
 unit fsinfo;
 interface
 
-uses VPSysLow;
+uses osdep;
 
 type
   TDrvTypeNew = ( dtnFloppy, dtnHDD, dtnInvalid,
@@ -43,7 +43,7 @@ function GetErrorText(ErrCode: Integer; var Msg: String): Boolean;
 implementation
 
 uses
-  dpmi32df, dpmi32, Dos, Strings, strutil;
+  fat32free, realmode, Dos, Strings, strutil;
 function GetErrorText(ErrCode: Integer; var Msg: String): Boolean;
   
   begin

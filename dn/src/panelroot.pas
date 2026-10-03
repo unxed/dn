@@ -215,7 +215,7 @@ function OtherFilePanel(P: PFilePanelRoot): PFilePanelRoot;
 implementation
 
 uses
-  Lfn, Files, basics, strutil, fileutil, envutil, VpSysLow,
+  Lfn, Files, basics, strutil, fileutil, envutil, osdep,
   Messages, mainapp, DNHelp, Startup, Commands, Histries, HistList, paneldlgs,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
   DNUtil, fsinfo, Dos, Filediz, Collect, Math,

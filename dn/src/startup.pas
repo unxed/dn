@@ -374,7 +374,7 @@ const
 
 implementation
 uses
-  VpSysLow, strutil, fileutil
+  osdep, strutil, fileutil
   ;
 
 procedure FatalError(const S: String);

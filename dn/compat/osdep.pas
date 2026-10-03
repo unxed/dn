@@ -1,15 +1,15 @@
-{ VPSysLow: the system layer that DN OSP takes from the runtime library of Virtual Pascal, written anew
-  for Free Pascal. It replaces vpsyslow.pas of the archive (code of vpascal.com, see dn/exclude.list).
+{ osdep: the system layer that DN OSP takes from the runtime library of Virtual Pascal, written anew
+  for Free Pascal. It replaces osdep.pas of the archive (code of vpascal.com, see dn/exclude.list).
 
   MIT (see LICENSE). The names and the way they are called
-  come from the call sites in DN (spec/vp-api-vpsyslow.md, tools/vp-api.py).
+  come from the call sites in DN (spec/vp-api-osdep.md, tools/vp-api.py).
 
   Done here: the types, the open mode constants, the file, disk and system functions that DN calls on
   the DOS target (DPMI32), and the screen functions of its videoman.pas (SysTv*, SysSetVideoMode) over
   TvScreen of tv/. The screen of DN is an array of 16-bit cells (character + BIOS attribute); here it is
   a copy that is made from the screen of tv/ when DN asks for it and goes back to it by SysTvShowBuf.
   The keyboard and the mouse are done by tv/ (TvSys): SysTvKbd* do nothing. }
-unit VPSysLow;
+unit osdep;
 
 {$mode objfpc}
 {$H-}
@@ -92,7 +92,7 @@ procedure SysGetDirDos(D: Byte; var S: string);
 
 { --- searching a directory ---------------------------------------------------- }
 type
-  { The record of a search. The first fields are laid out as DN (vpsysext.pas) expects them; the state of
+  { The record of a search. The first fields are laid out as DN (osfind.pas) expects them; the state of
     the search is kept by the unit (Handle is a number of a slot). Name ends with a zero byte after its
     last character, so that it can be taken as a PChar too. }
   POSSearchRec = ^TOSSearchRec;

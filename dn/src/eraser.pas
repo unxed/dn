@@ -67,7 +67,7 @@ uses
   , fnotify, Events
   {JO} , fsinfo
 
-  , VPSysLow;
+  , osdep;
 
 {-DataCompBoy-}
 function ValidErase(Files: PCollection): Boolean;
@@ -557,7 +557,7 @@ DeleteDirDIZ:
   
   if Flush then
     begin
-    VPSysLow.SysDiskReset;
+    osdep.SysDiskReset;
     Dispose(PInfo, Done);
     end;
   

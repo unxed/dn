@@ -1,8 +1,8 @@
-unit DosLow;
+unit dosbuf;
 
 interface
 
-uses VPSysLow;
+uses osdep;
 
 var {Адреса 1024-байтной рабочей области, используемой для связи
   с real mode прерываниями. Эта область предполагается всегда
@@ -16,7 +16,7 @@ var {Адреса 1024-байтной рабочей области, используемой для связи
 implementation
 
 uses
-  dpmi32df, dpmi32;
+  fat32free, realmode;
 
 begin
 getdosmem(DosSeg, 1024);
