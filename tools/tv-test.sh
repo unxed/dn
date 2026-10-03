@@ -4,6 +4,7 @@
 # Another CPU: TV_FPC=/path/fpc-aarch64-linux (the compiler) and TV_RUN=qemu-aarch64-static (what runs the programs); t_pty needs the programs of the host, it fails there.
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
+. "$here/tools/need-tv.sh"
 w=${TV_TEST_WORK:-$here/build/tv-tests}; mkdir -p "$w"
 cd "$here/tv/tests"
 if [ $# -gt 0 ]; then tests=$(for n in "$@"; do echo "${n%.pas}.pas"; done); else tests=$(ls t_*.pas); fi
