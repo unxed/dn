@@ -11,16 +11,20 @@ visibility of the cursor, and ignores the other private modes. It is a test aid,
   print(t.text())           # the screen as 25 lines
   t.close()
 """
-import fcntl
 import os
-import pty
 import re
-import select
-import signal
 import struct
-import termios
 import time
 import unicodedata
+
+try:                      # not on Windows (there only Screen is used: tools/dn-win-smoke.py)
+    import fcntl
+    import pty
+    import select
+    import signal
+    import termios
+except ImportError:
+    pty = None
 
 
 class Screen:
