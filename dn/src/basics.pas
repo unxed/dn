@@ -306,7 +306,7 @@ type
 implementation
 
 uses
-  xTime, Startup, strutil, Math, DNUtf8,
+  timeutil, Startup, strutil, Math, DNUtf8,
   osdep, dnscreen, fileutil,
   Commands
   ;

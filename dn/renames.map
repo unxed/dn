@@ -48,6 +48,7 @@ fmtzoo.pas arc_zoo.pas
 fmtzxz.pas arc_zxz.pas
 fsinfo.pas fltl.pas
 gadgets.pas gauges.pas
+histories.pas histries.pas
 iniengine.pas dnini_p.pas
 inputfname.pas swe.pas
 keymap.pas u_keymap.pas
@@ -56,6 +57,7 @@ linepos.pas advance6.pas
 mainapp.pas dnapp.pas
 os2sess.pas advance4.pas
 osdep.pas vpsyslow.pas
+palettes.pas dnpalet.pas
 paneldlgs.pas fltools.pas
 panelroot.pas flpanelx.pas
 panelsetup.pas pdsetup.pas
@@ -64,5 +66,6 @@ panelwinx.pas xdblwnd.pas
 progress.pas gauge.pas
 realmode.pas dpmi32.pas
 strutil.pas advance1.pas
+timeutil.pas xtime.pas
 topview.pas topview_.pas
 uselfn.pas files.pas

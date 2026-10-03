@@ -79,7 +79,7 @@ uses DNRun,
    realmode, 
   DNUtil, basics, mainapp, strutil, Lfn,
   Dos, panelroot, CmdLine, Views, fileutil, Drivers, os2sess,
-  VideoMan, osdep, dnscreen, xTime,
+  VideoMan, osdep, dnscreen, timeutil,
   
   Startup, UserMenu, Messages, Strings, filetype, TitleSet
    {AK155 для перерисовки иконки}

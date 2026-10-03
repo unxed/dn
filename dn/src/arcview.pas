@@ -155,12 +155,12 @@ implementation
 uses
   osdep, Eraser,
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
-  Arvid, xTime, VideoMan, DnExec, FileFind
+  Arvid, timeutil, VideoMan, DnExec, FileFind
   , UserMenu {JO: для скрывания панелей при разархивировании }
   , fmtzip {JO: для CentralDirRecPresent}
 
   , panelsetup, panelroot, dirwatch, Drivers
-  , Lfn, uselfn, Tree, Dos, Histries, HistList, filepanel
+  , Lfn, uselfn, Tree, Dos, histories, HistList, filepanel
   , basics, strutil, fileutil, ArchDet
   , fmtrar, fmtace
   ;

@@ -53,7 +53,7 @@ interface
 uses
    {Cat}
   DNUtil, Drivers, Views,
-  xTime, Defines, baseobjs
+  timeutil, Defines, baseobjs
   ;
 
 type
@@ -271,11 +271,11 @@ procedure MyApp.Idle;
 
   procedure L_On;
     begin
-    xTime.NewTimer(L_Tmr, 100)
+    timeutil.NewTimer(L_Tmr, 100)
     end;
   procedure NLS;
     begin
-    xTime.NewTimer(LSliceTimer, 150)
+    timeutil.NewTimer(LSliceTimer, 150)
     end;
 
   var
@@ -285,7 +285,7 @@ procedure MyApp.Idle;
   {  Put IdleEvt after IdleClick Expired  }
   with IdleEvt do
     if What <> evNothing then
-      if xTime.TimerExpired(IdleClick) then
+      if timeutil.TimerExpired(IdleClick) then
         begin
         PutEvent(IdleEvt);
         if What = evCommand then
@@ -299,7 +299,7 @@ procedure MyApp.Idle;
   TApplication.Idle;
   {Cat}
   if Startup.AutoRefreshPanels
-    and xTime.TimerExpired(NotifyTmr)
+    and timeutil.TimerExpired(NotifyTmr)
   then
     {JO}
     begin
@@ -310,7 +310,7 @@ procedure MyApp.Idle;
       RereadDirectory(OldNotify);
     
     OldNotify := NewNotify;
-    xTime.NewTimer(NotifyTmr, 1000); {JO}
+    timeutil.NewTimer(NotifyTmr, 1000); {JO}
     end;
   {/Cat}
 

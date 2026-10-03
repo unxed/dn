@@ -50,7 +50,7 @@ unit fmttgz; {TGZ & TAZ & TAR.GZ}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, timeutil,
    fileutil
   ;
 

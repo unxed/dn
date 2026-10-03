@@ -54,7 +54,7 @@ interface
 uses
   SysUtils,
   Defines, Streams, Views, Drivers,
-  basics, highlite, xTime,
+  basics, highlite, timeutil,
   Collect, FilesCol, XCode
   ;
 
@@ -253,7 +253,7 @@ uses
    {Cat}
   fileerrors, {AK155}
   DiskInfo, uselfn,
-  progress, DNStdDlg, Histries, Drives, DNUtil, DnIni
+  progress, DNStdDlg, histories, Drives, DNUtil, DnIni
   , FileDiz
   ;
 

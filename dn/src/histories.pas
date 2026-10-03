@@ -47,7 +47,7 @@
 {$I STDEFINE.INC}
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
-unit Histries;
+unit histories;
 
 interface
 
@@ -179,7 +179,7 @@ var
 implementation
 uses
   Lfn, Dos, Commands, mainapp, Dialogs, HistList,
-  Startup, xTime, Messages, DNUtil, DnIni,
+  Startup, timeutil, Messages, DNUtil, DnIni,
   osdep, editwin, strutil,  fileutil,
   
   Idlers,

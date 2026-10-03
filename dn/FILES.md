@@ -93,7 +93,7 @@ Why two files for the settings: `dn.cfg` is the memory dump of the records of th
 | `editundo.pas` (was `ed2`) | the undo list, the bookmarks, the info line (`TDoCollection`, `TBookmarkLine`) |
 | `highlite.pas` | the syntax highlighting of the editor |
 | `dbview.pas` | the viewer of dBase files |
-| `histries.pas` | the histories of the edited and viewed files |
+| `histories.pas` (was `histries`) | the histories of the edited and viewed files |
 
 ## Archives
 | File | What it holds |
@@ -116,7 +116,7 @@ Why two files for the settings: `dn.cfg` is the memory dump of the records of th
 | `linepos.pas` (was `advance6`) | the line number of an offset in a file and back, the hot letter of a string, the CRC table |
 | `langid.pas` (was `advance7`) | the language of the program and of the help (`LngId`, `HelpLngId`) |
 | `os2sess.pas` (was `advance4`) | running a program in a session of OS/2 (not used on our targets) |
-| `dndlgs.pas`, `dnstrl.pas`, `dncolor.pas`, `dnpalet.pas` | the classes of DN that were carved out of the files that came from Borland (combo box, notepad pages, the string list, the palettes) |
+| `dndlgs.pas`, `dnstrl.pas`, `dncolor.pas`, `palettes.pas` (was `dnpalet`) | the classes of DN that were carved out of the files that came from Borland (combo box, notepad pages, the string list, the palettes) |
 | `compat/drivers.pas` (ours) | the keys, the events, the draw buffers on top of `tv/` (`DNKeyCode`, `GetAltChar`, `LegacyText`) |
 | `dnutf8.pas` (ours) | UTF-8 inside DN: columns, the proxy of a string, the table of a document of the editor |
 | `keymap.pas` (was `u_keymap`) | the code page detector and the key maps of the editor |

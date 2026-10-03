@@ -63,8 +63,8 @@ uses
   Startup, Dialogs, gadgets, panelwin, Messages, HistList,
   FileFind, Commands, Tree, FViewer, CmdLine, copyio, DNStdDlg,
   FilesCol, UserMenu, Colors, editcore, Editor, Macro,
-  ArcView, HelpFile, Validate, ASCIITab, xTime, Drives, Archiver,
-  ArchSet, ArchDet, Setups, DNUtil, panelwinx, Histries, calcline,
+  ArcView, HelpFile, Validate, ASCIITab, timeutil, Drives, Archiver,
+  ArchSet, ArchDet, Setups, DNUtil, panelwinx, histories, calcline,
   DnIni, Collect, baseobjs, Views, Scroller, evaluator,
   HelpKern, VideoMan
   , calcwin, CellsCol 

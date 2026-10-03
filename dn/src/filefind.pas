@@ -222,7 +222,7 @@ implementation
 uses
   Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos, Messages, HistList, Commands, panelroot, filepanel
   , FViewer, editcore,
-  Tree, xTime, DNUtil, keymap, {!!}CmdLine, Histries,
+  Tree, timeutil, DNUtil, keymap, {!!}CmdLine, histories,
   Archiver, ArchDet {JO},
   ArcView {JO: для разархивирования файлов найденных в архивах}
 

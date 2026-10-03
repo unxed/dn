@@ -165,7 +165,7 @@ const
 implementation
 
 uses
-  DNHelp, fileutil, keymap, xTime, Commands, mainapp
+  DNHelp, fileutil, keymap, timeutil, Commands, mainapp
 
   , osdep;
 

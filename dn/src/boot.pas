@@ -71,8 +71,8 @@ uses
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
   DnIni, iniengine, CopyIni, Archiver,
-  apploop, editcore, ArchSet, linepos, RegAll, DnExec, Histries, Menus,
-   VideoMan, xTime,
+  apploop, editcore, ArchSet, linepos, RegAll, DnExec, histories, Menus,
+   VideoMan, timeutil,
   dirwatch, realmode, 
   Tree
   , filetype, panelsetup

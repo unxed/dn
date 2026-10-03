@@ -52,7 +52,7 @@ interface
 
 uses
   Defines, Collect, baseobjs, Streams, Dos, Drives, FilesCol, Views,
-   DiskInfo, Tree, Histries,
+   DiskInfo, Tree, histories,
   Lfn, uselfn
   ;
 

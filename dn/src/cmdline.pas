@@ -104,8 +104,8 @@ implementation
 uses
   Dos, Commands, mainapp, Dialogs, basics, strutil, fileutil,
   panelwinx, gadgets, 
-  Startup, xTime, Messages, DNUtil
-  , editcore, Histries, FViewer, panelroot
+  Startup, timeutil, Messages, DNUtil
+  , editcore, histories, FViewer, panelroot
   , Idlers 
   , osdep, dnscreen, Lfn, UserMenu, Menus
   , DnIni, Math

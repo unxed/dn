@@ -10,7 +10,7 @@ Written by Cat 2:5030/1326.13
 
 interface
 
- uses xTime;
+ uses timeutil;
 
 Var
  NotifyTmr: TEventTimer;       {JO}
