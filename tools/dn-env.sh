@@ -52,22 +52,23 @@ case "${DN_EXTRA:-}" in *-dDNUTF8*) dn_objsfx=-utf8;; *) dn_objsfx=;; esac
 DN_OBJ=${DN_OBJ:-$tmp/dn-obj-$DN_TARGET$dn_objsfx}
 DN_GEN=${DN_GEN:-$tmp/dn-gen}
 DN_OPTS="$DN_FPC_COMMON $DN_OPT ${DN_EXTRA:-}"
-# The sources of a build are put together in one directory of links ($DN_STAGE): dn/src and then the files of the directories of this
-# build (dn/src-linux: our units that replace those of the tree, e.g. country_.pas) over it. (FPC looks for units first in the directory
+# The sources of a build are put together in one directory of links ($DN_STAGE): dn/src, dn/archives (a unit per archive format), dn/compat (the environment that DN
+# expects: the Virtual Pascal / Borland / DPMI layer over tv/) and then the files of the directories of this build (dn/compat/linux: our units that replace those of the
+# tree, e.g. country_.pas) over it. (FPC looks for units first in the directory
 # of the program, so a unit of the build cannot win over a file of dn/src in any other way.)
 DN_STAGE=${DN_STAGE:-$tmp/dn-stage-$DN_TARGET}
 dn_stage() {
     rm -rf "$DN_STAGE"; mkdir -p "$DN_STAGE"
-    for f in "${DN_SRC:-$here/dn/src}"/*.pas "${DN_SRC:-$here/dn/src}"/*.inc; do ln -s "$f" "$DN_STAGE/$(basename "$f")"; done
+    for f in "${DN_SRC:-$here/dn/src}"/*.pas "${DN_SRC:-$here/dn/src}"/*.inc "$here"/dn/archives/*.pas "$here"/dn/compat/*.pas; do ln -s "$f" "$DN_STAGE/$(basename "$f")"; done
     for d in $DN_UNITS_EXTRA; do
         for f in "$here/dn/$d"/*; do ln -sf "$f" "$DN_STAGE/$(basename "$f")"; done
     done
 }
-DN_UPATHS="$DN_FUNITS -Fu$here/tv/src -Fu$DN_GEN -Fi$here/dn/shims -Fu$DN_STAGE -Fi$DN_STAGE"
+DN_UPATHS="$DN_FUNITS -Fu$here/tv/src -Fu$DN_GEN -Fi$here/dn/compat/shims -Fu$DN_STAGE -Fi$DN_STAGE"
 # the shim units (the names of the units of Borland TV that DN uses, made from tv/): generated for the builds, not committed
 dn_gen_shims() {
     mkdir -p "$DN_GEN"; dn_stage
-    python3 "$here/tools/gen-shim.py" "$here/dn/shims/shims.map" "$DN_GEN" "$here/tv/src" >/dev/null
+    python3 "$here/tools/gen-shim.py" "$here/dn/compat/shims/shims.map" "$DN_GEN" "$here/tv/src" >/dev/null
 }
 # dn_compile PROGRAM.pas [NOLINK]: compiles PROGRAM.pas of the stage (dn_gen_shims makes it)
 dn_compile() {

@@ -127,7 +127,7 @@ Decisions that paid off:
   `drivers`, `memory`, `messages`, `dnapp`, `dnstddlg`... with the *same names and procedure signatures* the rest of DN uses. First write a list of what DN actually imports from each
   excluded unit (`bootstrap/tools/dn-reach.py`), implement exactly that, nothing more.
 * **Unit shims:** DN says `uses Views, Objects, App;` — those names are Borland's. We generate small units named like them that `re-export` our `tv/` units (a map
-  file `dn/shims/shims.map`, a generator `tools/gen-shim.py`). **Trap:** name resolution through a shim picks the *first* unit in the `uses` list that has the identifier: a function
+  file `dn/compat/shims/shims.map`, a generator `tools/gen-shim.py`). **Trap:** name resolution through a shim picks the *first* unit in the `uses` list that has the identifier: a function
   that exists in two units (our `GetAltChar` in `TvUtil` and in `Drivers`) silently binds to the wrong one. Qualify (`Drivers.GetAltChar`).
 * **VP vs FPC differences that cost us time:** `Word` is 32 bits in VP and 16 in FPC (everything with `Word` that holds a size or an offset); evaluation order of arguments;
   32-bit inline assembler blocks (rewritten in Pascal, `tools/asm-blocks.py` lists them); `inline` on standalone functions; sets with more than 256 values; `FormatStr` parameter slots

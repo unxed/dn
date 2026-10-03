@@ -25,8 +25,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3
       - name: Fetch the Borland reference
         run: audit/fetch_reference.sh
-      - name: Audit of dn/src (only names and numbers are printed)
-        run: python3 audit/xclone.py --min 3 --ref audit/ref/list.txt dn/src | tee audit.txt | head -40
+      - name: Audit of dn/src, dn/archives, dn/compat (only names and numbers are printed)
+        run: |
+          for d in dn/src dn/archives dn/compat; do python3 audit/xclone.py --min 3 --ref audit/ref/list.txt $d; done > audit.txt
+          head -60 audit.txt
       - name: The gate (raw <= 10 % and maxrun < 48 for every file)
         run: |
           tail -1 audit.txt
