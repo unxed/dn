@@ -29,12 +29,10 @@ jobs:
         run: |
           for d in dn/src dn/archives dn/compat; do python3 audit/xclone.py --min 3 --ref audit/ref/list.txt $d; done > audit.txt
           head -60 audit.txt
-      - name: The gate (raw <= 10 % and maxrun < 48 for every file)
+      - name: The gate (raw <= 10 % and maxrun < 48 for every file; the accepted exceptions are in audit/accepted.txt and are printed)
         run: |
           tail -1 audit.txt
-          n=$(awk 'NR>1 && $1!="TOTAL" { r=$3; sub("%","",r); if (r+0 > 10 || $6+0 >= 48) n++ } END { print n+0 }' audit.txt)
-          echo "$n files over the gate"
-          [ "$n" -eq 0 ]
+          python3 audit/gate.py audit.txt
       - name: Is dn/PROVENANCE.md up to date?
         run: python3 bootstrap/tools/dn-manifest.py --check
 

@@ -1,0 +1,9 @@
+# Files that the gate (raw <= 10 %, maxrun < 48) would stop, and that are accepted on purpose. A line: FILE MAX_RAW% MAX_RUN MAX_TOKENS, then the reason
+# after a "#". The numbers are ceilings: if a file grows over them, or a file not listed here crosses the gate, the CI fails. The CI prints this list on
+# every run (audit/gate.py): nothing is hidden. Decided by the owner on 2026-10-04: the names and the signatures of an API are not under copyright
+# (the same reason why a compatible implementation of an API, like Wine, can exist); what is shared with the Borland reference here is only that.
+# collect.inc: the four virtual overrides of TStringCollection and TStrCollection (Compare/FreeItem/GetItem/PutItem): DN code overrides exactly these methods.
+# dialogs.inc, views.inc: the names of the standard palettes (CButton, CGrayDialog...) with the numeric indexes of the palette; the values are those of tv/.
+shims/manual/collect.inc 60 80 320   # signatures of the Borland collections that DN code overrides
+shims/manual/dialogs.inc 50 40 80    # names and indexes of the standard palettes
+shims/manual/views.inc   20 32 220   # names and indexes of the standard palettes
