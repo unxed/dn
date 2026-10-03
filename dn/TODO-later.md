@@ -188,3 +188,7 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   the width changes, the title stack (CSI 22/23 t), the answers to OSC 10/11 (colors). The answer to DA says "VT220 with color" (`?62;22`), not xterm.
 - The history keeps the rows as they were at the time (no reflow); a row is a reference, not a copy: the memory of 1000 lines x width x 24 bytes per cell.
 - `Resize` does not pull the lines back from the history when the window grows.
+- `TvVtView`: no selection with the mouse and no copy from the history (the terminal gets the mouse only when the program asks for it, else the wheel scrolls); the keys that
+  the owner must keep (hotkeys) are told by `KeyFilter`; the program is read on a timer of 20 ms (the event loop of `tv/` does not wait on the pty): a
+  wait on the descriptor of the pty in `TvUnix` would save the idle wakeups; the redraw of the whole view at each change (the dirty rows are known, the
+  clip of the view is not used); the colors of the terminal are the default colors of the real terminal, not the palette of the window.

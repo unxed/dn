@@ -87,6 +87,10 @@
         python3 tv/tests/pty/test_tvdemo.py out/tvdemo      # меню, окна, мышь, смена размера, выход: «ALL OK»
         out/tvdemo                                          # руками, в настоящем терминале (Alt-X — выход)
 
+    Встроенный терминал (оболочка в окне TV; Linux): `fpc -Futv/src -FUout -FEout tv/demo/tvterm.pas`, затем `out/tvterm [программа]` руками или
+    `python3 tv/tests/pty/test_tvterm.py out/tvterm` (ввод, UTF-8, цвета, история Shift-PgUp, смена размера, выход: «13/13»). Части: `TvVt` (эмулятор,
+    `t_vt`), `TvPty` (pty и программа, `t_pty`), `TvVtKeys` (клавиши и мышь в байты, `t_vtkeys`), `TvVtView` (вид).
+
     Тесты разбора клавиш и вывода (`t_termio`, `t_ansi`) идут в общем цикле пункта 1. Цвета: `TV_COLORS=0|8|16|256|direct`,
     мышь: `TV_MOUSE=0`, задержка Esc: `ESCDELAY=мс`.
 
