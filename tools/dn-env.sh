@@ -3,6 +3,7 @@
 #   dos     DN_PREFIX=PREFIX of tools/build-fpc-go32v2.sh (or DN_CROSS=<dir with lib/fpc/3.2.2/ppcross386> and DN_LINK=<dir with djgpp/bin>)
 #   linux   DN_LINUX=PREFIX of tools/build-fpc-i386-linux.sh (the cross compiler for i386-linux)
 #   linux64 the fpc of the host (FPC=path to use another)
+#   win64   DN_WIN=PREFIX of tools/build-fpc-windows.sh PREFIX win64 (the cross compiler for x86_64-win64); win32: DN_WIN32=PREFIX of the same script with win32
 # DN_EXTRA: more options (e.g. -gl: line numbers).   Result: DN_PPC (the compiler and its target options), DN_PATH (the directories for PATH:
 # binutils), DN_UPATHS (the unit and include directories), DN_OPTS, DN_OBJ (where the objects go), DN_GEN (the generated shim units).
 . "$here/dn/build.env"
@@ -22,7 +23,17 @@ case "${DN_TARGET:-}" in
         DN_OPT=$DN_OPT_linux; DN_UNITS_EXTRA=$DN_UNITS_linux ;;
     linux64)
         DN_PPC="${FPC:-fpc}"; DN_PATH=""; DN_FUNITS=""; DN_OPT=$DN_OPT_linux64; DN_UNITS_EXTRA=$DN_UNITS_linux64 ;;
-    *) echo "DN_TARGET must be dos, linux or linux64" >&2; exit 1 ;;
+    win64)
+        : "${DN_WIN:?win64: set DN_WIN (tools/build-fpc-windows.sh PREFIX win64)}"
+        u=$DN_WIN/lib/fpc/3.2.2/units/x86_64-win64
+        DN_FUNITS="-Fu$u/* -Fu$u/rtl"; DN_PPC="$DN_WIN/lib/fpc/3.2.2/ppcrossx64 -Twin64 -Px86_64 -XPx86_64-w64-mingw32-"; DN_PATH=""
+        DN_OPT=$DN_OPT_win64; DN_UNITS_EXTRA=$DN_UNITS_win64 ;;
+    win32)
+        : "${DN_WIN32:?win32: set DN_WIN32 (tools/build-fpc-windows.sh PREFIX win32)}"
+        u=$DN_WIN32/lib/fpc/3.2.2/units/i386-win32
+        DN_FUNITS="-Fu$u/* -Fu$u/rtl"; DN_PPC="$DN_WIN32/lib/fpc/3.2.2/ppcross386 -Twin32 -Pi386 -XPi686-w64-mingw32-"; DN_PATH=""
+        DN_OPT=$DN_OPT_win32; DN_UNITS_EXTRA=$DN_UNITS_win32 ;;
+    *) echo "DN_TARGET must be dos, linux, linux64, win64 or win32" >&2; exit 1 ;;
 esac
 tmp=${TMPDIR:-/tmp}
 DN_OBJ=${DN_OBJ:-$tmp/dn-obj-$DN_TARGET}

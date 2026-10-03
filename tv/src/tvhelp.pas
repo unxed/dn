@@ -841,6 +841,7 @@ begin
             begin
               Event.What := evCommand;
               Event.Command := cmClose;
+              Event.InfoPtr := nil;      { a window closes for cmClose with InfoPtr nil or itself; the key event left something there (32 bits) }
               PutEvent(Event);
             end;
         else
