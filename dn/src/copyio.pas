@@ -55,7 +55,7 @@ procedure LongCopy(Fn1: String);
 implementation
 uses
   Lfn, Dos, Tree, VPSysLow, basics, strutil, fileutil, FileCopy, mainapp,
-  Messages, Views, Defines, Dialogs, Commands, Drivers, Memory, HistList,
+  Messages, Views, Defines, Dialogs, Commands, Drivers, HistList,
   progress, Startup, xTime, ErrMess, Math
   , Strings;
 
@@ -97,12 +97,12 @@ procedure GetMaxMem;
       Inc(NBf);
       if l > 65000 then
         l := 65000;
-      Bf[NBf].Buf := MemAlloc(l);
+      Bf[NBf].Buf := GetMem(l);
       Bf[NBf].Num := l;
       if Bf[NBf].Buf = nil then
         Dec(NBf);
       end;
-  until (MaxAvail < 16000) or LowMemory or (NBf >= MaxBF);
+  until (MaxAvail < 16000) or (NBf >= MaxBF);
   end;
 
 procedure ClearMem;

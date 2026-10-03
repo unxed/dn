@@ -120,7 +120,7 @@ procedure PrintFiles(Files: PCollection; Own: PView);
 
 implementation
 uses
-  Memory, Tree, Messages, mainapp, basics, strutil, fileutil,
+  Tree, Messages, mainapp, basics, strutil, fileutil,
    {AK155}
   FilesCol, Startup, DnIni, FileCopy, Eraser, Commands
   , Calendar 
@@ -131,7 +131,7 @@ constructor TKeyMacros.Init;
   inherited Init;
   Limit := 10;
   Count := 0;
-  Keys := MemAlloc(Limit*SizeOf(Word));
+  Keys := GetMem(Limit*SizeOf(Word));
   if Keys = nil then
     Fail;
   end;
@@ -146,7 +146,7 @@ destructor TKeyMacros.Done;
 constructor TKeyMacros.Load(var S: TStream);
   begin
   S.Read(Limit, SizeOf(Limit)*2);
-  Keys := MemAlloc(SizeOf(Word)*Limit);
+  Keys := GetMem(SizeOf(Word)*Limit);
   if Keys = nil then
     Fail;
   S.Read(Keys^, SizeOf(Word)*Count);
@@ -165,7 +165,7 @@ procedure TKeyMacros.PutKey(KeyCode: LongInt);
   if Count >= Limit then
     begin
     Inc(Limit, 10);
-    P := MemAlloc(Limit*SizeOf(Word));
+    P := GetMem(Limit*SizeOf(Word));
     if P = nil then
       Exit;
     Move(Keys^, P^, Count*SizeOf(Word));

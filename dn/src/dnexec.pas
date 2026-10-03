@@ -79,7 +79,7 @@ uses DNRun,
    dpmi32, 
   DNUtil, basics, mainapp, strutil, Lfn,
   Dos, panelroot, CmdLine, Views, fileutil, Drivers, os2sess,
-  VideoMan, Memory, VpSysLow, vpsysext, Events,
+  VideoMan, VpSysLow, vpsysext, Events,
   
   Startup, UserMenu, Messages, Strings, filetype, TitleSet
    {AK155 для перерисовки иконки}

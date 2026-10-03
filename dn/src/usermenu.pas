@@ -91,7 +91,7 @@ implementation
 uses
   Lfn, {DataCompBoy}
   mainapp, basics, strutil, fileutil, Startup, Messages, Menus,
-  Commands, editcore, WinClp, DNHelp, Dos, Memory, Dialogs, Tree
+  Commands, editcore, WinClp, DNHelp, Dos, Dialogs, Tree
   , filediz, Collect, Math
   ;
 
@@ -983,7 +983,7 @@ constructor TGrabber.Init;
   R.A := Top;
   R.B := Bot;
   BufSize := Application^.Size.X*2*Application^.Size.Y;
-  Screen := MemAlloc(BufSize);
+  Screen := GetMem(BufSize);
   if Screen = nil then
     Fail;
   HideMouse;

@@ -220,7 +220,7 @@ var
 
 implementation
 uses
-  Lfn, Files, Memory, Startup, Dos, DnIni, DNHelp,
+  Lfn, Files, Startup, Dos, DnIni, DNHelp,
   basics, strutil, fileutil, envutil,
   panelroot, mainapp, Messages, Commands, Drives, Eraser, Menus,
   xTime, FileCopy, VPSysLow
@@ -374,8 +374,6 @@ procedure ReadTree(C: Char; CountLen: Boolean);
     Dispose(DrvTrees[C].C, Done);
   DrvTrees[C].C := nil;
   TreeError := True;
-  if LowMemory then
-    Exit;
   New(DC, Init(10, 10));
   New(P);
   FillChar(P^, SizeOf(P^), 0);
@@ -632,8 +630,6 @@ procedure MakeDirectory;
     W: Word;
   begin
   CreatedDir := '';
-  if LowMemory then
-    Exit;
   S := '';
   W := ExecResource(dlgMkDir, S);
   if W = cmYes then
@@ -1858,11 +1854,6 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
     for iLFN := Low(TUseLFN) to High(TUseLFN) do
       CopyShortString(S, PD^.DirName[iLFN]);
     DC^.Insert(PD);
-    end;
-  if LowMemory then
-    begin
-    Abort := True;
-    Exit
     end;
   if not Abort and (ScrollBar <> nil) and (DC^.Count > 0) then
     begin

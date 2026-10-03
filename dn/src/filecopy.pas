@@ -100,7 +100,7 @@ procedure CloseWriteStream;
 
 implementation
 uses
-  mainapp, Startup, Memory, Messages, HistList, Commands,
+  mainapp, Startup, Messages, HistList, Commands,
   xTime, Validate, TitleSet, UserMenu, Dos, DnIni,
   
   VpSysLow, Filediz , ArvidAvt ,
@@ -286,8 +286,6 @@ function SelectDialog(Select: Boolean; var ST: String; var XORSelect: Boolean): 
     begin
     XorSel := XORSelect;
     SelectDialog := False;
-    if LowMemory then
-      Exit;
     if Select then
       Idx := dlgSelect
     else
@@ -442,7 +440,7 @@ procedure InitMemBuf;
     Limit := Min(Limit, SystemData.CopyLimitBuf);
   while Limit <> 0 do
     begin
-    MemBuf := MemAlloc(Limit*1024);
+    MemBuf := GetMem(Limit*1024);
     if MemBuf <> nil then
       begin
       MemBufSize := Limit*1024;
@@ -2623,8 +2621,6 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
     DT.WW1 := DT.WW1 or cpoMove;
   if  (FMSetup.Options and fmoAlwaysCopyDesc <> 0) then
     DT.WW1 := DT.WW1 or cpoDesc; {JO}
-  if LowMemory then
-    Exit;
   if MoveMode then
     S := GetString(dlFCMove1)
   else

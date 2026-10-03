@@ -62,7 +62,7 @@ implementation
 uses
   Defines, Files, Filediz,
   Dos, Lfn {DataCompBoy}, FilesCol, Commands, basics, strutil, fileutil,
-  Startup, Messages, xTime, Drivers, Tree, Memory,
+  Startup, Messages, xTime, Drivers, Tree,
   mainapp, progress, Views, Dialogs, Drives, FileCopy
   , fnotify, Events
   {JO} , fsinfo

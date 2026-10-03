@@ -220,8 +220,7 @@ var
 
 implementation
 uses
-  Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos,
-  Memory, Messages, HistList, Commands, panelroot, filepanel
+  Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos, Messages, HistList, Commands, panelroot, filepanel
   , FViewer, editcore,
   Tree, xTime, DNUtil, keymap, {!!}CmdLine, Histries,
   Archiver, ArchDet {JO},
@@ -762,7 +761,7 @@ NotArchive:
         goto Skip;
       DosError := 0;
       lFindFirst(Path+x_x, AnyFileDir, SR);
-      while (DosError = 0) and not LowMemory and not CancelSearch do
+      while (DosError = 0) and not CancelSearch do
         begin
         if  {<VolumeId.001>}
              (SR.SR.Name[1] <> '.') and (SR.FullName <> '.')

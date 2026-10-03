@@ -199,7 +199,7 @@ uses
   Drivers, Dos, Lfn, Math, DNUtf8,
   
   strutil, Strings,
-  Commands, mainapp, DnIni, Memory, panelroot, dnHelp
+  Commands, mainapp, DnIni, panelroot, dnHelp
   , VpSysLow, keymap
   ;
 
@@ -1362,10 +1362,10 @@ function CompareFiles(const N1, N2: String): Boolean;
   S2.Init(N2, stOpenRead);
   if  (S2.Status <> stOK) or (S1.GetSize <> S2.GetSize) then
     goto Finish;
-  B1 := MemAlloc(BufSize);
+  B1 := GetMem(BufSize);
   if B1 = nil then
     goto Finish;
-  B2 := MemAlloc(BufSize);
+  B2 := GetMem(BufSize);
   if B2 = nil then
     goto Finish;
   I := BufSize;

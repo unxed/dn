@@ -142,7 +142,7 @@ function GetCellName(X, Y: Integer): String;
 implementation
 
 uses
-  Memory, basics, strutil, fileutil, ObjType
+  basics, strutil, fileutil, ObjType
   ;
 
 const
@@ -203,7 +203,7 @@ function TCellCollection.MakeFormatString(AValue: CReal): String;
 function TCellCollection.NewCellRec
     (ACol, ARow: AInt; const A_S: String): PCellrec;
   begin
-  Result := MemAlloc(LenDataRec+Length(A_S));
+  Result := GetMem(LenDataRec+Length(A_S));
   with Result^ do
     begin
     Row := ARow;
@@ -275,7 +275,7 @@ function TCellCollection.ReplaceItem
       O := Result^.Options;
       D := Result^.Decimals;
       FreeItem(Result);
-      Result := MemAlloc(LenDataRec+Length(A_S));
+      Result := GetMem(LenDataRec+Length(A_S));
       with Result^ do
         begin
         Row := ARow;
@@ -320,7 +320,7 @@ function TCellCollection.GetItem(var S: TStream): Pointer;
   S.Read(R.S[0], 1);
   S.Read(R.S[1], Length(R.S));
   l := LenDataRec+Length(R.S);
-  Result := MemAlloc(l);
+  Result := GetMem(l);
   Move(R, Result^, l);
   end;
 
@@ -434,7 +434,7 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
       Inc(P);
       if P > PoolCount then
         begin
-        NewPool := MemAlloc((PoolCount+PoolUnit)*SizeOf(SucPool^[1]));
+        NewPool := GetMem((PoolCount+PoolUnit)*SizeOf(SucPool^[1]));
         l := PoolCount*SizeOf(SucPool^[1]);
         Move(SucPool^, NewPool^, l);
         FreeMem(SucPool, l);
@@ -455,11 +455,11 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
   P := 0; { инициализация SucPool}
   N := Count;
   QLinkSize := (N+1)*SizeOf(QLink^[0]);
-  QLink := MemAlloc(QLinkSize);
+  QLink := GetMem(QLinkSize);
   TopSize := (N+1)*SizeOf(Top^[1]);
-  Top := MemAlloc(TopSize);
+  Top := GetMem(TopSize);
   PoolCount := PoolUnit;
-  SucPool := MemAlloc(PoolCount*SizeOf(SucPool^[1]));
+  SucPool := GetMem(PoolCount*SizeOf(SucPool^[1]));
   for k := 1 to N do
     begin
     QLink^[k] := 0;
