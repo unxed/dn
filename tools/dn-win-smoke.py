@@ -109,7 +109,7 @@ def main():
         shot(t, 'start')
         t.send('\x1b', 0.5)
         shot(t, 'panels')
-        t.send('\x1b[20~', 1.0)                       # F9: the menu
+        t.send('\x1b[21~', 1.0)                       # F10: the menu
         shot(t, 'menu')
         t.send('\x1b', 0.5)
         t.send('\x1bOP', 1.0)                         # F1: help
