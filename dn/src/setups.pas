@@ -303,6 +303,9 @@ function ApplyCodetables: Integer;
   var
     CP: Word;
     Err: Integer;
+{$IFDEF DNUTF8}
+    C: Integer;
+{$ENDIF}
   begin
   with CountryInfo do
     begin
@@ -337,6 +340,16 @@ function ApplyCodetables: Integer;
       Exit;
       end;
     end;
+{$IFDEF DNUTF8}
+  { UTF-8 inside: the one-byte tables of a code page do not apply to bytes $80 and up (they are the parts of the characters);
+    the case is done by UpStr/LowStr (DNUtf8) }
+  for C := 128 to 255 do
+    begin
+    UpCaseArray[Char(C)] := Char(C);
+    LowCaseArray[Char(C)] := Char(C);
+    ABCSortXlat[Char(C)] := Char(C);
+    end;
+{$ENDIF}
   Result := 0;
   end;
 
