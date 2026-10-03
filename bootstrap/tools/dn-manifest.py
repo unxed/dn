@@ -28,10 +28,13 @@ def head_class(path):
         return 'CONTRIB'
     return 'NONE'
 
+def low_ext(f):
+    return os.path.splitext(f)[1].lower()
+
 classes = {'OURS': [], 'CARVED': [], 'RIT': [], 'CONTRIB': [], 'NONE': []}
 for f in sorted(os.listdir(src), key=str.lower):
     p = os.path.join(src, f)
-    if not os.path.isfile(p):
+    if not os.path.isfile(p) or low_ext(f) in ('.o', '.ppu'):      # the objects of a stray compilation in the tree are not sources
         continue
     low = f.lower()
     c = 'OURS' if low in ours else 'CARVED' if low in carved else head_class(p)
