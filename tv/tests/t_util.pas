@@ -1,6 +1,6 @@
 program t_util;
 {$I ../src/tvdefs.inc}
-uses TvCodePg, TvKeys, TvEvents, TvUtil;
+uses TvCodePg, TvKeys, TvEvents, TvUtil, TvUtf8;
 {$I testlib.inc}
 
 var
@@ -61,5 +61,21 @@ begin
   DisposeStr(P);
   DisposeStr(nil);
   Check(True, 'DisposeStr accepts nil');
+  { hot letters of another alphabet (UTF-8 titles, the byte of the code page from the keyboard) }
+  Utf8Enabled := True;
+  CpSelect(866);
+  Check(HotKey('~О~К') = #$8E, 'HotKey: a Cyrillic letter in UTF-8 is the byte of the page, in upper case');
+  Check(HotKey('~о~к') = #$8E, 'HotKey: ... also from a lower case letter');
+  Check(HotKey('~F~ile') = 'F', 'HotKey: ASCII as before');
+  Check((UpCaseCp(#$AE) = #$8E) and (UpCaseCp('a') = 'A') and (UpCaseCp(#$8E) = #$8E), 'UpCaseCp: o of the page is O, ASCII, upper stays');
+  FillChar(Ev, SizeOf(Ev), 0);
+  Ev.What := evKeyDown;
+  Ev.CharCode := $AE;
+  Ev.KeyCode := $00AE;
+  Ev.ControlKeyState := kbLeftAlt;
+  Check(HotKeyAlt(#$8E, Ev), 'HotKeyAlt: Alt and a Cyrillic letter');
+  Ev.ControlKeyState := 0;
+  Check(not HotKeyAlt(#$8E, Ev), 'HotKeyAlt: the letter without Alt is not');
+  Utf8Enabled := False;
   Finish;
 end.

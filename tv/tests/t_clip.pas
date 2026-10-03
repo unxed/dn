@@ -73,5 +73,10 @@ begin
   Check(ToCrLf('') = '', 'empty text');
   Check(ToLf('a'#13#10'b'#13'c'#10'd') = 'a'#10'b'#10'c'#10'd', 'every break to LF');
   Check(ToLf(ToCrLf('x'#10'y')) = 'x'#10'y', 'round trip of line breaks');
+  Check(Base64Encode('') = '', 'base64: empty');
+  Check(Base64Encode('f') = 'Zg==', 'base64: one byte');
+  Check(Base64Encode('fo') = 'Zm8=', 'base64: two bytes');
+  Check(Base64Encode('foo') = 'Zm9v', 'base64: three bytes');
+  Check(Base64Encode('foobar') = 'Zm9vYmFy', 'base64: six bytes');
   Finish;
 end.

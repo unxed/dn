@@ -353,9 +353,9 @@ begin
         begin
           C := HotKey(PStr(Strings^.At(I))^);
           if (Event.KeyCode <> 0) and
-            ((GetAltCode(C) = Event.KeyCode) or
+            ((GetAltCode(C) = Event.KeyCode) or HotKeyAlt(C, Event) or
              (((Owner <> nil) and (Owner^.Phase = phPostProcess)) or ((State and sfFocused) <> 0)) and
-             (C <> #0) and (C = UpCase(Chr(Event.CharCode)))) then
+             (C <> #0) and (C = UpCaseCp(Chr(Event.CharCode)))) then
           begin
             if ButtonState(I) then
             begin

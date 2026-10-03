@@ -32,6 +32,11 @@ procedure DisposeStr(P: PStr);
 function HotKeyStr(const S: ShortString): ShortString;
 { The upper-cased first byte of HotKeyStr(S), or #0. }
 function HotKey(const S: ShortString): Char;
+{ Upper case of a code page byte by the Unicode case of its character (the page is the current one; without TvUtf8.Utf8Enabled only ASCII). }
+function UpCaseCp(C: Char): Char;
+{ Does the key event mean the hot character Hot (of HotKey): Alt and the character, for a character that is not ASCII (Alt and a letter of
+  another alphabet has no scan code of its own). }
+function HotKeyAlt(Hot: Char; const Event: TEvent): Boolean;
 { Displayed length of S without its '~' characters (in bytes, like the original). }
 function CStrLen(const S: ShortString): Integer;
 
@@ -68,6 +73,21 @@ begin
     FreeMem(P, Length(P^) + 1);
 end;
 
+function Upper(C: LongWord): LongWord;
+begin
+  Result := C;
+  case C of
+    Ord('a')..Ord('z'): Result := C - 32;
+    $E0..$FE: if C <> $F7 then Result := C - 32;
+    $FF: Result := $178;
+    $100..$137, $14A..$177: if (C and 1) = 1 then Result := C - 1;
+    $139..$148, $179..$17E: if (C and 1) = 0 then Result := C - 1;
+    $3B1..$3C9: if C <> $3C2 then Result := C - 32;
+    $430..$44F: Result := C - 32;
+    $450..$45F: Result := C - 80;
+  end;
+end;
+
 function HotKeyStr(const S: ShortString): ShortString;
 var
   I, J: Integer;
@@ -86,12 +106,40 @@ end;
 function HotKey(const S: ShortString): Char;
 var
   P: ShortString;
+  Cp: LongWord;
+  Used: Integer;
 begin
   P := HotKeyStr(S);
   if P = '' then
     Result := #0
+  else if Utf8Enabled and (Byte(P[1]) >= $C0) and Utf8Decode(@P[1], Length(P), Cp, Used) and (Used > 1) then
+  begin
+    { a letter in UTF-8: the byte of the code page, in upper case (the keyboard gives the byte of the page, TvTermIO) }
+    Result := Chr(CpFromUnicode(Upper(Cp)));
+    if Result = #0 then
+      Result := Chr(CpFromUnicode(Cp));
+  end
   else
     Result := UpCase(P[1]);
+end;
+
+function UpCaseCp(C: Char): Char;
+var
+  B: Byte;
+begin
+  if Utf8Enabled and (Byte(C) >= $80) then
+  begin
+    B := CpFromUnicode(Upper(CpToUnicode(Byte(C))));
+    if B <> 0 then
+      Exit(Chr(B));
+    Exit(C);
+  end;
+  Result := UpCase(C);
+end;
+
+function HotKeyAlt(Hot: Char; const Event: TEvent): Boolean;
+begin
+  Result := (Byte(Hot) >= $80) and ((Event.ControlKeyState and kbAltShift) <> 0) and (Hot = UpCaseCp(Chr(Event.CharCode)));
 end;
 
 function CStrLen(const S: ShortString): Integer;

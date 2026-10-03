@@ -9,5 +9,5 @@ build/
 !dist/dos/*.EXE
 out/
 tv/tests/tvhc-o/
-tv/tests/t_tvhc
-tv/tests/t_util
+tv/tests/t_*
+!tv/tests/t_*.pas
