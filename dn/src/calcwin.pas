@@ -154,8 +154,7 @@ implementation
 
 uses
   basics, Lfn, Messages, HistList, Math,
-  Collect, Strings, ErrMess,
-  Memory, Dos, mainapp, DNStdDlg, strutil, fileutil,
+  Collect, Strings, ErrMess, Dos, mainapp, DNStdDlg, strutil, fileutil,
   editfile, Histries
   ;
 
@@ -343,8 +342,6 @@ constructor TCalcWindow.Init(Bounds: TRect; AName: String);
   TWindow.Init(Bounds, Cut(AName, Bounds.B.X-Bounds.A.X-12), 0);
   Options := Options or ofTileable;
   Flags := Flags or wfMaxi;
-  if LowMemory then
-    Exit;
 
   R.A.X := 1;
   R.A.Y := 5;

@@ -248,8 +248,7 @@ implementation
 
 uses
   Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, strutil, fileutil, keymap
-  , editcore, Macro, linepos, Math
-  , Memory, Messages, mainapp, Startup, Dialogs,
+  , editcore, Macro, linepos, Math, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
    {Cat}
   ErrMess, {AK155}
@@ -1820,7 +1819,7 @@ procedure TFileViewer.Seek(APos: TFileSize);
     begin
     FreeMem(Buf, BufSize);
     BufSize := Max(i32(FileSize-FilePos), 0);
-    Buf := MemAlloc(BufSize);
+    Buf := GetMem(BufSize);
     if Buf = nil then
       Exit;
     end;
@@ -2024,7 +2023,7 @@ procedure TFileViewer.SaveToFile(FN: String);
   BreakOnStreamReadError;
   if Xl then
     begin
-    PS := MemAlloc(4096);
+    PS := GetMem(4096);
     if PS = nil then
       goto 2;
     Sz := Fl^.GetSize;
@@ -2315,8 +2314,6 @@ procedure TFileViewer.HandleEvent;
       I: Integer;
 
     begin
-    if LowMemory then
-      Exit;
 
     D := PDialog(LoadResource(dlgViewerFind));
     D^.SetData(SearchString);

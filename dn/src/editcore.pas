@@ -294,7 +294,7 @@ implementation
 
 uses
   
-  Messages, mainapp, Dos, Lfn, Memory, strutil, fileutil, Startup,
+  Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
   xTime, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
   , Events, VpSysLow, DNStdDlg, Dialogs, DNHelp, Math
@@ -1504,7 +1504,7 @@ function TFileEditor.GetSelection: PCollection;
   begin
   GetSelection := nil;
   MemEnough := True;
-  if not (BlockVisible and ValidBlock) or LowMemory then
+  if not (BlockVisible and ValidBlock) then
     Exit;
   P := New(PLineCollection, Init(Mark.B.Y-Mark.A.Y+1, 5, True));
   for I := Mark.A.Y to Mark.B.Y do
@@ -1530,12 +1530,6 @@ function TFileEditor.GetSelection: PCollection;
 бессмысленной проверки ускоряет работу во _много_ раз (более
 20, точно мерять не хватило терпения ). }
 
-    if LowMemory { or not MemOK} then
-      begin
-      Dispose(P, Done);
-      MemEnough := False;
-      Exit;
-      end;
     end;
   GetSelection := P;
   end { TFileEditor.GetSelection };

@@ -29,7 +29,7 @@ procedure InsertUserSaver(ACheck: Boolean);
 implementation
 
 uses
-  Memory, Drivers, DNUtil, Messages, Commands, mainapp
+  Drivers, DNUtil, Messages, Commands, mainapp
   ;
 
 { ------------------------------------------------------------------------- }
@@ -43,7 +43,7 @@ constructor TUserSaver.Init(ACheck: Boolean);
   CheckIO := ACheck;
   SetState(sfVisible, False);
   isValid := True;
-  Screen := MemAlloc(UserScreenSize);
+  Screen := GetMem(UserScreenSize);
   if Screen = nil then
     Fail;
   Move(UserScreen^, Screen^, UserScreenSize);
@@ -70,7 +70,7 @@ constructor TUserSaver.Load(var S: TStream);
     FreeMem(UserScreen, UserScreenSize);
   UserScreenSize := SSize;
   UserScreenWidth := SWidth;
-  UserScreen := MemAlloc(SSize);
+  UserScreen := GetMem(SSize);
   OldCursorShape := CShape;
   OldCursorPos := CPos;
   S.Read(UserScreen^, SSize);

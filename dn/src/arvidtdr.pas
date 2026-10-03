@@ -52,7 +52,7 @@ interface
 uses
   Arvid, baseobjs, Streams, strutil, Messages, mainapp, Commands, Collect,
   Views, Drivers, Startup, keymap, basics, Lfn, Files, Dos, Tree,
-  FilesCol, fileutil, Drives, filepanel, Memory
+  FilesCol, fileutil, Drives, filepanel
   , Defines
   ;
 

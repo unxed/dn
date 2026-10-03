@@ -73,7 +73,7 @@ type
 implementation
 uses
   Messages, Drives, Startup, DnIni, VideoMan, Defines, mainapp,
-  Drivers, Views, Memory, Commands, DNStdDlg, basics, DNHelp, fileutil
+  Drivers, Views, Commands, DNStdDlg, basics, DNHelp, fileutil
   , FileType
   ;
 
@@ -147,7 +147,6 @@ procedure ChangeColors;
   if ExecResource(dlgColors, CurPal) <> cmCancel then
     begin
     SystemColors[appPalette] := CurPal;
-    DoneMemory; { Dispose all group buffers }
     Application^.Redraw; { Redraw application with new palette }
     end;
   if VGASystem then

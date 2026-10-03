@@ -52,7 +52,7 @@ interface
 uses
   Arvid, baseobjs, Streams, Messages, mainapp, Commands, Collect,
   Views, Drivers, Startup, keymap, basics, Lfn, Files, Dos, Tree,
-  FilesCol, fileutil, Drives, filepanel, Memory
+  FilesCol, fileutil, Drives, filepanel
   , Defines
   ;
 
@@ -1726,8 +1726,6 @@ procedure AvtMakeDir(AvtDr: PArvidDrive);
   begin
   with AvtDr^ do
     begin
-    if LowMemory then
-      Exit;
     if filetype <> avdAvt then
       begin
       MessageBox(GetString(dlArvidCanChangeOnlyAVT), nil,

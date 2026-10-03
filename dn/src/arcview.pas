@@ -154,7 +154,7 @@ implementation
 
 uses
   VpSysLow, Eraser,
-  Menus, mainapp, Messages, Dialogs, progress, FileCopy, Memory, Startup,
+  Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
   Arvid, xTime, VideoMan, DnExec, FileFind
   , UserMenu {JO: для скрывания панелей при разархивировании }
   , fmtzip {JO: для CentralDirRecPresent}
@@ -521,7 +521,7 @@ function TArcDrive.ReadArchive: Boolean;
           end;
         end;
       end;
-  until (FileInfo.Last > 0) or LowMemory or CtrlBreakHit;
+  until (FileInfo.Last > 0) or CtrlBreakHit;
   if CtrlBreakHit then
     StdMsg(5);
   CtrlBreakHit := False;
@@ -957,8 +957,6 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
   DoneSysError;
   DoneEvents;
   DoneVideo;
-  DoneDOSMem;
-  DoneMemory;
   {AK155 Под OS/2, во-первых, PATH обычно не умещается
     в 255 символов, во-вторых, нет проблем с памятью,
     в третьих архиватор может оказаться ДОСовым.
@@ -1022,8 +1020,6 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
     SwapVectors;
     EraseFile(SwpDir+'$DN'+ItoS(DNNumber)+'$.LST'); {DataCompBoy}
     end;
-  InitDOSMem;
-  InitMemory;
   InitVideo;
   InitEvents;
   InitSysError;

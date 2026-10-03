@@ -80,7 +80,7 @@ uses
   DNStdDlg, basics, mainapp, Commands, Lfn, fileutil, editundo, strutil, Views,
   Collect, WinClp, Dos, Messages, Startup, DnIni, iniengine, CopyIni, DNUtf8,
   {SBlocks,}keymap, Macro,
-  xTime, Memory, Drivers,
+  xTime, Drivers,
   fsinfo,
   fnotify,
   
@@ -608,12 +608,6 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
     begin
     MIReadBlock := nil;
     Abort := False;
-    if LowMemory then
-      begin
-      FileName := '';
-      isValid := False;
-      Exit;
-      end;
     CodePageDetector.Init;
     KeyMap := ProcessDefCodepage(DefCodePage);
     KeyMapDetecting := (KeyMap = kmNone);
@@ -639,7 +633,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
       isValid := False;
       Exit
       end;
-    B := MemAlloc(FBufSize);
+    B := GetMem(FBufSize);
     if B = nil then
       begin
       Dispose(S, Done);
@@ -686,7 +680,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
         ep := ESC_Pressed;
         end;
       if  (S^.Status <> stOK) or ep or Abort or (MemAvail < $4000) or
-        LowMemory or (Lines^.Count > MaxCollectionSize)
+        (Lines^.Count > MaxCollectionSize)
       then
         begin
         Dispose(Lines, Done);

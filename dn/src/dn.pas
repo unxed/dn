@@ -60,7 +60,7 @@ uses
   boot, Dos, mainapp,
   Menus, panelroot, filepanel, FileCopy, Filediz, Filelst, Eraser,
   DiskInfo, basics, strutil, fileutil, os2sess, highlite,
-  Startup, Dialogs, gadgets, Memory, panelwin, Messages, HistList,
+  Startup, Dialogs, gadgets, panelwin, Messages, HistList,
   FileFind, Commands, Tree, FViewer, CmdLine, copyio, DNStdDlg,
   FilesCol, UserMenu, Colors, editcore, Editor, Macro,
   ArcView, HelpFile, Validate, ASCIITab, xTime, Drives, Archiver,
@@ -99,6 +99,9 @@ SysDisableHardErrors;
 
 {CtrlBreakHandler := TVCtrlBreak;
 SysCtrlSetCBreakHandler;}
+
+{ GetMem returns nil instead of raising an exception when there is no memory (DN asks for big buffers and checks the answer) }
+ReturnNilIfGrowHeapFails := True;
 
 try
   {Init09Handler;}

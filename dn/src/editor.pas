@@ -66,7 +66,7 @@ implementation
 uses
   Lfn, Views, Defines, Streams, keymap, Collect, editundo,
   basics, strutil, fileutil, Dos, Dialogs, mainapp,
-  {SBlocks,}Memory, progress, Startup, WinClp, Messages, Commands, Macro,
+  {SBlocks,}progress, Startup, WinClp, Messages, Commands, Macro,
   editwin, xTime, DnIni, DNUtil, linepos, evaluator, FViewer {AK155}
   
   ;
@@ -806,11 +806,6 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         Exit
         end;
       P^.Insert(PS);
-      if LowMemory then
-        begin
-        Abort := True;
-        Exit
-        end;
       Left := W;
       LS := EdOpt.RightSide-EdOpt.LeftSide;
       end { WriteLeft };
@@ -845,8 +840,6 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     Modified := True;
     Q := 0;
     if not (ValidBlock and BlockVisible) or VertBlock then
-      Exit;
-    if LowMemory then
       Exit;
     ChangeLine;
     {if UndoInfo <> nil then UndoInfo^.FreeAll; Inc(UndoTimes);}

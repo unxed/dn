@@ -241,7 +241,7 @@ var
 implementation
 uses
   basics, fileutil, strutil, filepanel, Commands, Startup, mainapp,
-  Drivers, Messages, Dialogs, Memory, FileFind, DNUtil, FileCopy, keymap,
+  Drivers, Messages, Dialogs, FileFind, DNUtil, FileCopy, keymap,
   ArvidAvt, ArvidTdr
   , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}, Math
   , VPSysLow;
@@ -1280,7 +1280,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     ClrIO;
     FindFirst(MakeNormName(GetPath(Name^), '*.TDR'),
          Archive+Byte(Security)*Hidden+ReadOnly+SysFile, SR);
-    while (DosError = 0) and not Abort and not LowMemory do
+    while (DosError = 0) and not Abort do
       begin
       New(St, Init(MakeNormName(GetPath(Name^), SR.Name), stOpenRead,
            2048));
@@ -1294,7 +1294,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       end;
     FindFirst(MakeNormName(GetPath(Name^), '*.AVT'),
          Archive+Byte(Security)*Hidden+ReadOnly+SysFile, SR);
-    while (DosError = 0) and not Abort and not LowMemory do
+    while (DosError = 0) and not Abort do
       begin
       New(St, Init(MakeNormName(GetPath(Name^), SR.Name), stOpenRead,
            2048));

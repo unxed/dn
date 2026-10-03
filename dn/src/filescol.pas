@@ -217,7 +217,7 @@ uses
   , VpSysLow, Math
   
   , fsinfo, DnIni, Dos, FileType, panelsetup, keymap
-  , DNHelp, basics, strutil, fileutil, Memory, Startup
+  , DNHelp, basics, strutil, fileutil, Startup
   ;
 
 const

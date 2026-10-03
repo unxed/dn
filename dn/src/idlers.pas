@@ -122,7 +122,7 @@ const
 implementation
 
 uses
-  Dos, DnExec, mainapp, basics, strutil, Memory, Startup, Commands,
+  Dos, DnExec, mainapp, basics, strutil, Startup, Commands,
    VideoMan
   ;
 
@@ -522,15 +522,11 @@ procedure CallExternalSaver(const FN: String);
   SM := ScreenMode;
   DoneVideo;
   {/JO}
-  DoneDOSMem;
   SwapVectors;
-  DoneMemory;
   {  DoneSysError;} {X-Man}
   AnsiExec(SourceDir+'SSAVERS\'+FN, '');
   {  InitSysError;} {X-Man}
   SwapVectors;
-  InitDOSMem;
-  InitMemory;
   InitVideo;
   InitEvents;
   HideMouse;

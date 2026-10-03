@@ -13,7 +13,7 @@ directories together (`tools/dn-env.sh`, one flat stage of links), so a unit doe
 |---|---|
 | `src/` | DN itself: the program, the panels, the editor, the viewer, the dialogs, the basics; the texts of the resources (`RESOURCE/`) |
 | `archives/` | one unit per archive format (`fmtzip`, `fmtrar`, `fmt7z`, `fmttar`... 26 of them; were `arc_zip`...; `fmt` = format: `arczip` would clash with the constant `arcZIP`); the common code is `archiver.pas`, `archdet.pas` in `src/` |
-| `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`vpsyslow`, `vpsysext` (was `vpsyslo2`), `use16`, `memory`), the Borland units on `tv/` (`drivers`, `baseobjs` (was `objects2`)), the layer of DPMI32 (`dpmi32`, `dpmi32df`, `doslow`), the country table (`country_`) |
+| `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`vpsyslow`, `vpsysext` (was `vpsyslo2`), `use16`), the Borland units on `tv/` (`drivers`, `baseobjs` (was `objects2`)), the layer of DPMI32 (`dpmi32`, `dpmi32df`, `doslow`), the country table (`country_`) |
 | `compat/linux/` | units that replace those of `compat/` in the builds that are not for DOS (`country_.pas`: the table of CP866 for Linux and Windows) |
 | `compat/shims/` | the map of what DN takes from `tv/` (`shims.map`) and the hand-written parts (`manual/*.inc`); the shim units are generated from it by `tools/gen-shim.py` |
 | `data/`, `tests/` | the data that DN reads, the tests of our units |

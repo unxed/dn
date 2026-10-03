@@ -255,7 +255,7 @@ uses
 {$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
   DNHelp, DnIni, iniengine, Histries,
-  VideoMan, Memory, panelwin, Messages, HistList, FileFind,
+  VideoMan, panelwin, Messages, HistList, FileFind,
   
   Phones, 
   ASCIITab,
@@ -1071,10 +1071,7 @@ procedure TDNApplication.RetrieveDesktop(const FileName: String; LS: PStream; Lo
     S := LS;
   if not Desktop^.Valid(cmClose) then
     Exit;
-  if LowMemory
-  then
-    OutOfMemory
-  else if (S^.Status <> stOK) or (S^.GetSize < SizeOf(DskSign))
+if (S^.Status <> stOK) or (S^.GetSize < SizeOf(DskSign))
   then
 Err:
     ErrMsg(erCantReadDesktop)
@@ -1229,7 +1226,7 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
   begin { TDNApplication.SaveDesktop }
   ClrIO;
   S := New(PBufStream, Init(FileName, stCreate, 2048));
-  if not LowMemory and (S^.Status = stOK) then
+  if (S^.Status = stOK) then
     begin
     S^.Write(DskSign.Sign[1], DskSign.SignLen);
     S^.WriteStr(@DirToChange);
@@ -1772,7 +1769,6 @@ procedure LoadPalFromFile(const FN: String);
 
   if LoadPalette then
     begin
-    DoneMemory;
     Application^.Redraw;
     end;
   end { LoadPalFromFile };

@@ -280,7 +280,7 @@ uses
   Dialogs, FilesCol, FViewer, Startup,
   ArcView, FileCopy, HistList, {FStorage,}Menus, ArchDet,
    {UserSavr,}DnIni, Messages,
-  {JO}Memory, VideoMan, DnExec 
+  {JO}VideoMan, DnExec 
   {/JO:  добавил для функции ArcExec}
   , Eraser {JO: для разархивирования через временный подкаталог}
   , UserMenu {JO: для скрывания панелей при разархивировании }
@@ -1014,8 +1014,6 @@ procedure MakeArchive(S: String; Files: PCollection; MoveMode, AddToExisting: Bo
     DoneSysError;
     DoneEvents;
     DoneVideo;
-    DoneDOSMem;
-    DoneMemory;
     {AK155 Под OS/2, во-первых, PATH обычно не умещается
       в 255 символов, во-вторых, нет проблем с памятью,
       в третьих архиватор может оказаться ДОСовым.
@@ -1079,8 +1077,6 @@ procedure MakeArchive(S: String; Files: PCollection; MoveMode, AddToExisting: Bo
       SwapVectors;
       EraseFile(SwpDir+'$DN'+ItoS(DNNumber)+'$.LST'); {DataCompBoy}
       end;
-    InitDOSMem;
-    InitMemory;
     InitVideo;
     InitEvents;
     InitSysError;
@@ -1454,14 +1450,10 @@ TryAgain:
     DoneSysError;
     DoneEvents;
     DoneVideo;
-    DoneDOSMem;
-    DoneMemory;
     SwapVectors;
     AnsiExec(GetEnv('COMSPEC'), '/c '+S);
     ClrIO;
     SwapVectors;
-    InitDOSMem;
-    InitMemory;
     InitVideo;
     InitEvents;
     InitSysError;
