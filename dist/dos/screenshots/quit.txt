@@ -1,7 +1,7 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            10:45:37p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            12:32:16p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
-║       Name       │       Name        ║║       Name       │       Name        ▲
-║TEM               │                   ║║TEM               │                   ■
+║       Name       │       Name       │║║       Name       │       Name       │▲
+║TEMP              │                   ║║TEMP              │                   ■
 ║ENGLISH       DLG │                   ║║ENGLISH       DLG │                   ▒
 ║RUSSIAN       DLG │                   ║║RUSSIAN       DLG │                   ▒
 ║UKRAIN        DLG │╔═[■]══════════ Confirm ═══════════════╗                   ▒
@@ -19,7 +19,7 @@ x═[■]════════════ C:\ ══════════
 ║OUT           TXT │                   ║║OUT           TXT │                   ▒
 ║                  │                   ║║                  │                   ▼
 ║──────────────────┴───────────────────║║──────────────────┴───────────────────║
-║TEM              4,096 10/02/26 10:45p║║TEM              4,096 10/02/26 10:45p║
+║TEMP             4,096 10/03/26 12:32p║║TEMP             4,096 10/03/26 12:32p║
 └[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
 C:\>                                                                            
  F1 Help                                                                        
