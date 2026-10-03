@@ -38,13 +38,13 @@ try:
     k(0x28)                                                     # Down: on a.txt
     k(0x73, wait=1.5)                                           # F4: the editor
     check('hello world' in t.text(), 'the editor shows the file', t.text())
-    for _ in range(11): k(0x27, cs=SHIFT, wait=0.15)            # Shift+Right x11: the first word and the space are selected
-    k(0x2D, cs=LCTRL, sc=0x52)                                  # Ctrl+Ins: copy (the terminal does not take it, it comes to DN)
-    check(t.clip.decode(errors='replace').strip() == 'hello world', 'Ctrl+Ins: the selection is on the clipboard of the terminal (%r)' % t.clip)
     t.clip = 'ПРИВЕТ из терминала'.encode()
     t.gesture = time.time()                                     # the paste gesture: the terminal lets the clipboard be read
     k(0x2D, cs=SHIFT, sc=0x52, wait=1.0)                        # Shift+Ins: paste
-    check('ПРИВЕТ из терминала' in t.text(), 'Shift+Ins: the clipboard of the terminal is pasted into the editor', 'clip now: %r' % t.clip + chr(10) + t.text())
+    check('ПРИВЕТ из терминала' in t.text(), 'Shift+Ins: the clipboard of the terminal is pasted into the editor (no block selected)', 'clip now: %r' % t.clip + chr(10) + t.text())
+    for _ in range(11): k(0x27, cs=SHIFT, wait=0.15)            # Shift+Right x11: the first word and the space are selected
+    k(0x2D, cs=LCTRL, sc=0x52)                                  # Ctrl+Ins: copy (the terminal does not take it, it comes to DN)
+    check(t.clip.decode(errors='replace').strip() == 'hello world', 'Ctrl+Ins: the selection is on the clipboard of the terminal (%r)' % t.clip)
     k(0x1B, wait=0.8)                                           # Esc: leave the editor (asks about saving)
     t.send(key(True, ord('n'), 0, 0x31, 0x4E)); t.pump(0.8)
     k(0x58, ord('x'), LALT, 0x2D, wait=0.8)                     # Alt-X
