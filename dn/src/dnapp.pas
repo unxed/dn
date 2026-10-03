@@ -219,11 +219,15 @@ end;
   tools/render-dump.py) after DNDUMPSEC seconds (default 3), and the program ends. DNKEYS=1C0D,011B,A2D00,... (hex key codes,
   scan code and character: 1C0D is Enter, 011B Esc, 3B00 F1; the letters S, C, A before the code hold Shift, Ctrl, Alt: A2D00 is
   Alt-X) are put into the keyboard buffer, one a second, starting after the first second: they drive the program
-  before the dump. }
+  before the dump. DNMOUSE=D3:0,U3:0,DD10:5,... mouse events (column:row, 0-based): D down, U up, M move, DD down of a double click
+  (L the left button, a leading R the right: RD3:0), one a second, half a second after the keys; they go into the queue of the application
+  (the driver of the mouse is not used: DOSBox-X without a display has no pointer). }
 var
   DumpStart: QWord = 0;
   Keys: String = '';
   KeysSent: LongInt = 0;
+  MouseEv: String = '';
+  MouseSent: LongInt = 0;
   IdleSeen: Boolean = False;
   IdleCount: LongInt = 0;
 
@@ -241,6 +245,7 @@ var
   V: PView;
   NoShift: Word;
   Entry: String;
+  Ev: TEvent;
 begin
   Name := GetEnvironmentVariable('DNDUMP');
   if Name = '' then
@@ -249,6 +254,45 @@ begin
   begin
     DumpStart := GetTickCount64;
     Keys := GetEnvironmentVariable('DNKEYS');
+    MouseEv := GetEnvironmentVariable('DNMOUSE');
+  end;
+  { the mouse events: the queue of the application holds one event, a second is put in only when the first was taken }
+  while (MouseEv <> '') and (GetTickCount64 - DumpStart > QWord(MouseSent + 1) * 1000 + 500) do
+  begin
+    I := Pos(',', MouseEv);
+    if I = 0 then
+      I := Length(MouseEv) + 1;
+    Entry := UpperCase(Copy(MouseEv, 1, I - 1));
+    Delete(MouseEv, 1, I);
+    Inc(MouseSent);
+    DNTrace('mouse entry ' + Entry);
+    FillChar(Ev, SizeOf(Ev), 0);
+    Ev.Buttons := mbLeftButton;
+    if (Entry <> '') and (Entry[1] = 'R') then
+    begin
+      Ev.Buttons := mbRightButton;
+      Delete(Entry, 1, 1);
+    end;
+    if Copy(Entry, 1, 2) = 'DD' then
+    begin
+      Ev.EventFlags := meDoubleClick;
+      Delete(Entry, 1, 1);
+    end;
+    if Entry = '' then
+      Continue;
+    case Entry[1] of
+      'D': Ev.What := evMouseDown;
+      'U': Ev.What := evMouseUp;
+      'M': Ev.What := evMouseMove;
+    else
+      Continue;
+    end;
+    Delete(Entry, 1, 1);
+    I := Pos(':', Entry);
+    Ev.Where.X := StrToIntDef(Copy(Entry, 1, I - 1), 0);
+    Ev.Where.Y := StrToIntDef(Copy(Entry, I + 1, 9), 0);
+    Application^.PutEvent(Ev);
+    DNTrace('mouse event ' + IntToHex(Ev.What, 2) + ' at ' + IntToStr(Ev.Where.X) + ',' + IntToStr(Ev.Where.Y));
   end;
   { DOSBox-X without a display reports Alt as pressed (bit 3 of the shift flags at 0040:0017): clear the flags, the keys are
     those of a person who holds nothing }
@@ -293,6 +337,7 @@ begin
       ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application^.LockFlag) + ' desktop ' +
       IntToStr(Desktop^.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application^.Buffer = TvScreen.ScreenBuffer, True));
     { the help context decides what the status line shows }
+    DNTrace('mouse driver: ' + BoolToStr(DosMousePresent, True));
     DNTrace('idle calls: ' + IntToStr(IdleCount) + ' shift state ' + IntToHex(ShiftState, 2) + ' ' + IntToHex(ShiftState2, 2) + ' old ' + IntToHex(OldShiftState, 2));
     DNTrace('help ctx: app ' + IntToStr(Application^.GetHelpCtx) + ' desktop ' + IntToStr(Desktop^.GetHelpCtx) + ' status ' +
       IntToStr(StatusLine^.HelpCtx) + ' topview ' + IntToHex(PtrUInt(StatusLine^.TopView), 8) + ' app ' + IntToHex(PtrUInt(Application), 8) +

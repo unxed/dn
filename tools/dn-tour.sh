@@ -6,22 +6,25 @@
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 out=$(cd "$1" && pwd); shift
-SCEN="tab:011B,0F09 f1help:011B,3B00 f2user:011B,3C00 f5copy:011B,3F00 f6ren:011B,4000 f7mkdir:011B,4100 f8del:011B,4200 altf1drive:011B,A6800 altf7find:011B,A6E00 altf10tree:011B,A6900 ctrll:011B,C260C ctrlo:011B,C180F altf5user:011B,A6C00 userscr:011B,1265,2E63,2368,186F,3920,2368,1769,1C0D,C180F insert:011B,5200,5000 plus:011B,4E2B menudisk:011B,4400,4D00,1C0D menuutil:011B,4400,4D00,4D00,1C0D menupanel:011B,4400,4D00,4D00,4D00,1C0D menumgr:011B,4400,4D00,4D00,4D00,4D00,1C0D menuopt:011B,4400,4D00,4D00,4D00,4D00,4D00,1C0D menuwin:011B,4400,4D00,4D00,4D00,4D00,4D00,4D00,1C0D"
+SCEN="tab:011B,0F09 f1help:011B,3B00 f2user:011B,3C00 f5copy:011B,3F00 f6ren:011B,4000 f7mkdir:011B,4100 f8del:011B,4200 altf1drive:011B,A6800 altf7find:011B,A6E00 altf10tree:011B,A6900 ctrll:011B,C260C ctrlo:011B,C180F altf5user:011B,A6C00 mousemenu:011B@D6:0,U6:0 userscr:011B,1265,2E63,2368,186F,3920,2368,1769,1C0D,C180F insert:011B,5200,5000 plus:011B,4E2B menudisk:011B,4400,4D00,1C0D menuutil:011B,4400,4D00,4D00,1C0D menupanel:011B,4400,4D00,4D00,4D00,1C0D menumgr:011B,4400,4D00,4D00,4D00,4D00,1C0D menuopt:011B,4400,4D00,4D00,4D00,4D00,4D00,1C0D menuwin:011B,4400,4D00,4D00,4D00,4D00,4D00,4D00,1C0D"
 [ $# -gt 0 ] && SCEN=$(for n in "$@"; do for s in $SCEN; do case $s in $n:*) printf '%s ' "$s";; esac; done; done)
 for s in $SCEN; do
-    name=${s%%:*}; keys=${s#*:}
+    name=${s%%:*}; keys=${s#*:}; mouse=''
+    case $keys in *@*) mouse=${keys#*@}; keys=${keys%%@*};; esac   # name:keys@mouse (DNMOUSE, see dnapp.pas)
     d=$out/tour-$name; rm -rf "$d"; mkdir -p "$d"
     cp "$out"/[Dd][Nn].[Ee][Xx][Ee] "$d/DN.EXE"; cp "$out"/*.DLG "$out"/*.LNG "$out"/*.HLP "$out/CWSDPMI.EXE" "$d/"
     redir=' > OUT.TXT'; [ "$name" = userscr ] && redir=''   # userscr needs the output of the programs on the screen
     n=$(printf '%s' "$keys" | tr ',' '\n' | wc -l)
     (cd "$d" && SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 5 "${DOS_TIMEOUT:-100}" dosbox-x -silent -nogui -noconsole -defaultconf \
         -set "serial serial1=file file:SER.TXT" -c "mount c $d" -c "c:" -c "set DNDUMP=SCR.DAT" -c "set DNSERIAL=1" \
-        -c "set DNDUMPSEC=$((n + 4))" -c "set DNKEYS=$keys" -c "DN.EXE$redir" -c "exit" >/dev/null 2>&1) || true
+        -c "set DNDUMPSEC=$((n + 4))" -c "set DNKEYS=$keys" ${mouse:+-c "set DNMOUSE=$mouse"} -c "DN.EXE$redir" -c "exit" >/dev/null 2>&1) || true
     if grep -aq '^exception' "$d/SER.TXT" 2>/dev/null; then
         printf '%-12s EXCEPTION %s\n' "$name" "$(grep -a -A3 '^exception' "$d/SER.TXT" | head -4 | tr '\n' '|' | cut -c1-230)"
     elif [ "$name" = userscr ] && ! grep -aq 'UserScreen [0-9]*: hi$' "$d/SER.TXT" 2>/dev/null; then
         # "echo hi" then Ctrl-O: the user screen must hold the output of the command (the trace of DNRun.ShowUserScreenDos)
         printf '%-12s FAIL (no "hi" in the user screen)\n' "$name"
+    elif [ "$name" = mousemenu ] && ! python3 "$here/tools/render-dump.py" "$d/SCR.DAT" 2>/dev/null | grep -q 'Rename/Move'; then
+        printf '%-12s FAIL (a click on File did not open the menu)\n' "$name"
     elif [ -f "$d/SCR.DAT" ]; then
         python3 "$here/tools/render-dump.py" "$d/SCR.DAT" 2>/dev/null | grep -v '^wrote\|^(no Pillow' > "$out/$name.txt" || true
         printf '%-12s ok\n' "$name"
