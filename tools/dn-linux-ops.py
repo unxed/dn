@@ -179,6 +179,10 @@ def main():
             t.send('\u0442\u0435\u0441\u0442\u0032', 0.5)
             t.send('\x1b\u043a', 1.2)                                   # Alt-\u043a: the button "\u041e~\u041a~"
             check(os.path.isdir(os.path.join(ru, 'w', '\u0442\u0435\u0441\u0442\u0032')), 'UTF-8: Alt and a Cyrillic letter presses the button of a dialog', t.text())
+            t.send('\x13', 0.6)                                          # Ctrl-S: the quick search of the panel, Cyrillic letters
+            t.send('\u0442\u0435', 0.8)
+            check('\u041f\u043e\u0438\u0441\u043a: \u0442\u0435' in t.text(), 'UTF-8: Ctrl-S and Cyrillic letters make the mask of the quick search', t.text())
+            t.send(F['ESC'], 0.5)
             t.send(F['ALT-X'], 0.8)
             t.send(F['ENTER'], 1.0)
             t.close(3)
