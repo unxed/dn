@@ -87,7 +87,7 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   a directory (`/proc/self/root` made the scan of `C:\` endless). The panels still enter them (Enter on a link to a directory works);
   how the panels show a link (a mark, the target) is not done. Other scanners of DN (Find files, the size of a directory, the
   copy of a tree) may loop on a link cycle: check when they are used on `/`.
-
+## Names of files and keyboard (Linux, code page build only: DN_UTF8=0), 2026-10-02 — the stop-gap before UTF-8 inside (now the default)
 ## Names of files and keyboard (Linux), 2026-10-02 — stop-gap until DN is UTF-8 inside
 - At the border with the file system (`vpsyslow.pas`: `NameFromOs`, `NameToOs`, `SysOsPath`) a name that is valid UTF-8 and has only
   characters of the current code page (CP866) is turned into the bytes of that page and back; other names (other alphabets, not UTF-8)
