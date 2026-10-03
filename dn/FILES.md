@@ -13,7 +13,7 @@ directories together (`tools/dn-env.sh`, one flat stage of links), so a unit doe
 |---|---|
 | `src/` | DN itself: the program, the panels, the editor, the viewer, the dialogs, the basics; the texts of the resources (`RESOURCE/`) |
 | `archives/` | one unit per archive format (`arc_zip`, `arc_rar`, `arc_7z`, `arc_tar`... 26 of them); the common code is `archiver.pas`, `archdet.pas` in `src/` |
-| `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`vpsyslow`, `vpsyslo2`, `vputils`, `use16`, `memory`), the Borland units on `tv/` (`drivers`, `objects2`), the layer of DPMI32 (`dpmi32`, `dpmi32df`, `doslow`), the country table (`country_`) |
+| `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`vpsyslow`, `vpsysext` (was `vpsyslo2`), `vputils`, `use16`, `memory`), the Borland units on `tv/` (`drivers`, `objects2`), the layer of DPMI32 (`dpmi32`, `dpmi32df`, `doslow`), the country table (`country_`) |
 | `compat/linux/` | units that replace those of `compat/` in the builds that are not for DOS (`country_.pas`: the table of CP866 for Linux and Windows) |
 | `compat/shims/` | the map of what DN takes from `tv/` (`shims.map`) and the hand-written parts (`manual/*.inc`); the shim units are generated from it by `tools/gen-shim.py` |
 | `data/`, `tests/` | the data that DN reads, the tests of our units |
@@ -101,7 +101,7 @@ The question that comes first when a setting "is not kept" or the panels "do not
 | `videoman.pas` | the video modes and the palette (as far as the terminal has them) |
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
-| `compat/`: `vpsyslow.pas`, `vputils.pas`, `use16.pas` (ours); `vpsyslo2.pas` (the extension of the layer written by JO of DN OSP) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
+| `compat/`: `vpsyslow.pas`, `vputils.pas`, `use16.pas` (ours); `vpsysext.pas` (was `vpsyslo2`: the extension of the layer written by JO of DN OSP) | the system layer: files, drives, time, keys, the terminal, running programs (replaces the runtime of Virtual Pascal) |
 | `compat/country_.pas` (DOS), `compat/linux/country_.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `RESOURCE/*` → `*.LNG`, `*.DLG`) |
 

@@ -65,7 +65,7 @@ interface
 
 uses
   VPSysLow, // см. комментарий в конце vpsysos2
-  VPSysLo2, Dos, Defines
+  vpsysext, Dos, Defines
   ;
 
 type

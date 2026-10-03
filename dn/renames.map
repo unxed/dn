@@ -1,3 +1,4 @@
 # new name -> the name in the public archive of DN OSP 2.14 (written by tools/rename-unit.py, read by bootstrap/tools/dn-manifest.py)
 boot.pas dn1.pas
 mainapp.pas dnapp.pas
+vpsysext.pas vpsyslo2.pas

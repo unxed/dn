@@ -94,7 +94,7 @@ procedure SysGetDirDos(D: Byte; var S: string);
 
 { --- searching a directory ---------------------------------------------------- }
 type
-  { The record of a search. The first fields are laid out as DN (vpsyslo2.pas) expects them; the state of
+  { The record of a search. The first fields are laid out as DN (vpsysext.pas) expects them; the state of
     the search is kept by the unit (Handle is a number of a slot). Name ends with a zero byte after its
     last character, so that it can be taken as a PChar too. }
   POSSearchRec = ^TOSSearchRec;
