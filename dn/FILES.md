@@ -75,7 +75,8 @@ The names of the units are words without digits and underscores (a unit has the 
 | Resources: dialogs, menus, strings, help of a language | `<language>.dlg`, `<language>.lng`, `<language>.hlp` (`english`, `russian`, `ukrain`) | the build (`rcp`, `tvhc`) | `mainapp.pas`, `langid.pas` |
 | Tables of the layouts of the keyboard, the palettes | `xlt/*.xlt`, `colors/*.pal` (from `dn/data/`) | people | `xcode.pas`, `dnutil.pas` |
 
-Why two files for the settings: `dn.cfg` is the memory dump of the records of the dialogs (what DN did first); `dn.ini` is the text file that came later and holds the rest. Merging them (everything in `dn.ini`) is in `TODO-refactoring.md`.
+Why two files for the settings: `dn.cfg` is the memory dump of the records of the dialogs (what DN did first); `dn.ini` is the text file that came later and holds the rest. Merging them (everything in `dn.ini`) is a feature, not a rename: `dn.cfg` is a binary dump of the records and would need a text form for each of them (`TODO-later.md`).
+One directory: every file in the table is composed as `SourceDir + name` (`basics.SourceDir`: the directory of the program, or the directory in the environment variable `DN2`, set in `dlgrecs.pas`), so the settings, the histories and the desktop can be moved by `DN2`; the Unix per-user directory (`~/.config/dn`) is not the default yet (`TODO-later.md`).
 
 * The flags of the Startup dialog are `osu*` in `commands.pas` (`osuAutosave = $02`, `osuPreserveDir = $08`...); `StartupData.Load` is for the start, `.Unload` is for the exit. The dialog is in `setups.pas`.
 * What goes into the desktop file is decided by the `Store` of each view: `TDoubleWindow` (`dblwnd.pas`), the panels (`flpanelx.pas`). For example the directory of the **active** disk panel is stored only with "Preserve directory" (`osuPreserveDir`); the passive panel always keeps it.

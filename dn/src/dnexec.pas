@@ -297,12 +297,12 @@ function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
   {Cat:warn закомментировал это в процессе отлова багов, но надо будет проверить, не добавил ли новых}
   SearchExt := False;
   Local := True;
-  f := New(PTextReader, Init('DN.EXT'));
+  f := New(PTextReader, Init('dn.ext'));
   if f = nil then
     begin
 RL:
     Local := False;
-    f := New(PTextReader, Init(SourceDir+'DN.EXT'));
+    f := New(PTextReader, Init(SourceDir+'dn.ext'));
     end;
   if f = nil then
     Exit;

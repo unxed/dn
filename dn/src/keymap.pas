@@ -357,7 +357,7 @@ function ReadXlt(FN: string; var N: Integer): PCodeConv;
   if FN <> '' then
     begin
     if Pos('\', FN) = 0 then
-      FN := SourceDir+'XLT\' + FN;
+      FN := SourceDir+'xlt\' + FN;
     S.Init(FN, stOpenRead);
     if  (S.GetSize >= 2) and (S.GetSize <= 256*4) then
       begin

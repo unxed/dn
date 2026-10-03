@@ -304,3 +304,14 @@ then calls `SaveRealDsk` (writes `DN.DSK`), else `SaveDsk` (the swap file `DNn.S
 Next steps (a tour scenario each): (1) `tools/dn-tour.sh` scenario that switches "Autosave Desktop" on in Options -> Startup, opens a window (F3 on a file), exits with Alt-X and checks that `DN.DSK` exists and a new start brings the window back;
 (2) the same for Options -> "Save setup": change a setting, save, restart, the setting is there (`DN.INI`). Keys: F10, then Right x6 for the menu Options (x5 is Panel), `DNDUMPSEC` must count the keys (n + m + 4). The earlier fix of loading a saved desktop
 (`TGroup.GetSubViewPtr`) is in. Not checked on DOS yet: that the autosave on exit really runs there (the exit path of DN-DOS under DOSBox-X: `Halt` in the dump mode skips `Done`).
+
+## DN in real mode vs DPMI under go2dos (owner, 2026-10-04: the very end, not before the other items)
+
+What remains of the DPMI32 layer (`compat/realmode.pas`, the real-mode calls for LFN, the clipboard, FAT32) can go in two ways: (a) teach `go2dos` (our 486 + DPMI emulator)
+to run DN as it is, or (b) make DN run in real mode (no DPMI host, no `realmode` calls). To compare when the time comes: (a) keeps the 32-bit code and the 4 MB of the
+memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~160 units (not realistic without the Safe Pascal step). The first guess is (a). Not in this session.
+
+## The files of the settings (from the refactoring, 2026-10-04)
+
+- `dn.cfg` (binary dump of the records of the dialogs) into `dn.ini` (text): needs a text form (RegisterVar) for each record (`StartupData`, `SystemData`, the presets of the panels...); then `dn.cfg` is read only for the migration.
+- Unix: the per-user directory (`$XDG_CONFIG_HOME/dn`, else `~/.config/dn`) as the default place of the files that the program writes (now: next to the program, or `DN2`); DOS stays next to the program. A setting (`DN2` or a line in `dn.ini`) decides; the default is to be chosen by the owner.
