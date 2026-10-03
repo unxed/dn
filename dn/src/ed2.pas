@@ -133,7 +133,7 @@ procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
 
 implementation
 uses
-  Advance, Advance1, Advance2
+  basics, strutil, fileutil
   , Messages, Dos, mainapp, Microed, Startup, DnIni, EdWin
   ;
 

@@ -59,7 +59,7 @@ implementation
 
 uses
   Defines, Drivers, Views, Dialogs, Commands, Dos, mainapp, Startup,
-  Advance, Advance1, Advance2, Collect, Messages, VideoMan
+  basics, strutil, fileutil, Collect, Messages, VideoMan
   ;
 
 const

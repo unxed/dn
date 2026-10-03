@@ -93,7 +93,13 @@ The question that comes first when a setting "is not kept" or the panels "do not
 ## Basics that everything uses
 | File | What it holds |
 |---|---|
-| `advance.pas`, `advance1.pas`, `advance2.pas`, `advance7.pas` | the general functions: strings, names of files, dates, small dialogs (the names say nothing: look for the function with the search of the sources) |
+| `basics.pas` (was `advance`) | the basics: `FormatLongName`, the text reader, the memory checks, `ClrIO`, small helpers |
+| `strutil.pas` (was `advance1`) | strings: padding, centering, case, search in a string (Boyer-Moore), counting |
+| `fileutil.pas` (was `advance2`) | files: existence, times, erase, compare, names of temporary files, the quick search of a panel |
+| `envutil.pas` (was `advance3`) | the command line and the environment (`FindParam`, `GetEnv`), the time of the day, CRC32 |
+| `linepos.pas` (was `advance6`) | the line number of an offset in a file and back, the hot letter of a string, the CRC table |
+| `langid.pas` (was `advance7`) | the language of the program and of the help (`LngId`, `HelpLngId`) |
+| `os2sess.pas` (was `advance4`) | running a program in a session of OS/2 (not used on our targets) |
 | `dndlgs.pas`, `dnstrl.pas`, `dncolor.pas`, `dnpalet.pas` | the classes of DN that were carved out of the files that came from Borland (combo box, notepad pages, the string list, the palettes) |
 | `compat/drivers.pas` (ours) | the keys, the events, the draw buffers on top of `tv/` (`DNKeyCode`, `GetAltChar`, `LegacyText`) |
 | `dnutf8.pas` (ours) | UTF-8 inside DN: columns, the proxy of a string, the table of a document of the editor |

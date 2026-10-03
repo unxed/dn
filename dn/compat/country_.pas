@@ -25,7 +25,7 @@ implementation
 
 uses
   dpmi32df, dpmi32, DosLow, VPSysLow,
-  advance, advance1, Strings, U_KeyMap;
+  basics, strutil, Strings, U_KeyMap;
 
 procedure QueryUpcaseTable;
   var
@@ -73,7 +73,7 @@ type
 procedure GetSysCountryInfo;
   begin
   QueryCountryInfo;
-  with advance.CountryInfo, TDosCountryInfo(DosSegFlat^) do
+  with basics.CountryInfo, TDosCountryInfo(DosSegFlat^) do
     begin
     DateFmt := DateFormat;
     TimeFmt := TimeFormat;

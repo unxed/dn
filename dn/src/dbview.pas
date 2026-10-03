@@ -205,7 +205,7 @@ const
 
 implementation
 uses
-  Advance, Advance1, Advance2, Startup, DNHelp, mainapp, Messages,
+  basics, strutil, fileutil, Startup, DNHelp, mainapp, Messages,
   Histries, Gauge, xTime, DnIni
   , Events, lfn, Dos, Memory, U_KeyMap
   ;

@@ -50,8 +50,8 @@ unit arc_TGZ; {TGZ & TAZ & TAR.GZ}
 interface
 
 uses
-  Archiver, Advance, Advance1, Defines, Objects2, Streams, Dos, xTime,
-   Advance2
+  Archiver, basics, strutil, Defines, Objects2, Streams, Dos, xTime,
+   fileutil
   ;
 
 type

@@ -59,7 +59,7 @@ implementation
 
 uses
   Defines, Startup, ArchDet, Dialogs, Views, Menus,
-  mainapp, Advance1, Commands, profile, DnIni
+  mainapp, strutil, Commands, profile, DnIni
   ;
 
 procedure UpdateARH(Arch: PARJArchive);

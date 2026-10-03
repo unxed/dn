@@ -54,7 +54,7 @@ procedure ReadArcList;
 implementation
 
 uses
-  Archiver, FStorage, Dos, ArcView, Advance, Advance1, Advance2, Messages,
+  Archiver, FStorage, Dos, ArcView, basics, strutil, fileutil, Messages,
   mainapp, Commands, Lfn, Views
   ;
 

@@ -50,7 +50,7 @@ unit arc_TAR; {TAR}
 interface
 
 uses
-  Archiver, Advance, Advance1, Defines, Objects2, Streams, Dos, xTime
+  Archiver, basics, strutil, Defines, Objects2, Streams, Dos, xTime
   ;
 
 type

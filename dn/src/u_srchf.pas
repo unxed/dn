@@ -60,7 +60,7 @@ implementation
 uses
   Lfn, Objects2, Collect,
   Commands, mainapp,
-  Dos, Advance, Advance1, Advance2, Messages, DnIni
+  Dos, basics, strutil, fileutil, Messages, DnIni
   ;
 
 {-DataCompBoy-}

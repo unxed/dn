@@ -71,7 +71,7 @@ interface
 
 uses
   Defines, Streams, Drivers, Views,
-  Advance, Menus,
+  basics, Menus,
   Commands, {SBlocks,}ObjType, U_KeyMap, Collect, DNUtf8,
   
   ed2, highlite
@@ -294,7 +294,7 @@ implementation
 
 uses
   
-  Messages, mainapp, Dos, Lfn, Memory, Advance1, Advance2, Startup,
+  Messages, mainapp, Dos, Lfn, Memory, strutil, fileutil, Startup,
   Gauge, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
   xTime, FileCopy, ASCIITab, DnIni, U_SrchF, EdWin, MicroEd2 {-$VIV}
   , Events, VpSysLow, DNStdDlg, Dialogs, DNHelp, VPUtils

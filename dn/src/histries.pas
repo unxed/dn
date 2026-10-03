@@ -53,7 +53,7 @@ interface
 
 uses
   Collect, Drivers, Defines, Objects2, Streams, Views,
-  Drives, Advance, U_KeyMap
+  Drives, basics, U_KeyMap
   , DBView 
   ;
 
@@ -180,7 +180,7 @@ implementation
 uses
   Lfn, Dos, Commands, mainapp, Dialogs, HistList,
   Startup, xTime, Messages, DNUtil, DnIni,
-  VpSysLow, EdWin, Advance1,  Advance2,
+  VpSysLow, EdWin, strutil,  fileutil,
   
   Idlers,
   

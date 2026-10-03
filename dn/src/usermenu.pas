@@ -90,7 +90,7 @@ const
 implementation
 uses
   Lfn, {DataCompBoy}
-  mainapp, Advance, Advance1, Advance2, Startup, Messages, Menus,
+  mainapp, basics, strutil, fileutil, Startup, Messages, Menus,
   Commands, Microed, WinClp, DNHelp, Dos, Memory, Dialogs, Tree
   , filediz, Collect, VPUtils
   ;

@@ -119,7 +119,7 @@ implementation
 
 uses
   Startup, DNHelp, mainapp, Messages
-  , Advance, Advance1, Advance2
+  , basics, strutil, fileutil
   , VpSysLow {для Open_Access_ReadOnly}
   , LFN 
   ;

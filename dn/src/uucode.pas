@@ -90,7 +90,7 @@ implementation
 uses
   Files, VPUtils, Tree
   , Dos, Lfn {DataCompBoy}
-  , Advance, Advance1, Advance2, Views, Startup, Dialogs,
+  , basics, strutil, fileutil, Views, Startup, Dialogs,
   xTime, FilesCol, mainapp, Drivers, Gauge, Messages, Commands,
   FileCopy, HistList, DNUtil
   , Events
@@ -1892,7 +1892,7 @@ procedure Clear64(n:T64);near;external;
       WriteLnT('')
       end;
 
-    {Cat: эта функция есть в advance1.pas}
+    {Cat: эта функция есть в strutil.pas}
     (*
 function ItoS(a:longint):string;
  var s : string[40];

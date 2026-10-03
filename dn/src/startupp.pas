@@ -116,7 +116,7 @@ const
 
 implementation
 uses
-  VpSysLow, Advance, Advance1, Advance2,
+  VpSysLow, basics, strutil, fileutil,
   Lfn
   , Dos;
 

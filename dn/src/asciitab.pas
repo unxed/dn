@@ -54,7 +54,7 @@ var
 implementation
 
 uses
-  SysUtils, Advance, Advance1, mainapp, Commands, DNHelp;
+  SysUtils, basics, strutil, mainapp, Commands, DNHelp;
 
 const
   cmCharacterFocused = 0;

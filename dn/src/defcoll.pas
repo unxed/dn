@@ -82,7 +82,7 @@ type
 
 implementation
 uses
-  Lfn, Advance1, Advance
+  Lfn, strutil, basics
   ;
 
 constructor TDefCollection.Init(ALimit, ADelta: LongInt);

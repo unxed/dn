@@ -91,7 +91,7 @@ type
 
 implementation
 uses
-  advance, advance1, advance2, Defines, Objects2, Streams, Dos, DnExec
+  basics, strutil, fileutil, Defines, Objects2, Streams, Dos, DnExec
   ;
 
 { --- 7-Zip implemented by piwamoto --- }

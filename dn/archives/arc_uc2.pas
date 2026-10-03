@@ -69,7 +69,7 @@ type
 implementation
 
 uses
-  Objects2, Advance2, Advance, mainapp, DnExec, Commands, Advance1, Messages,
+  Objects2, fileutil, basics, mainapp, DnExec, Commands, strutil, Messages,
   Dos, LFN
   ;
 

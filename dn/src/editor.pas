@@ -65,9 +65,9 @@ implementation
 
 uses
   Lfn, Views, Defines, Streams, U_KeyMap, Collect, ed2,
-  Advance, Advance1, Advance2, Dos, Dialogs, mainapp,
+  basics, strutil, fileutil, Dos, Dialogs, mainapp,
   {SBlocks,}Memory, Gauge, Startup, WinClp, Messages, Commands, Macro,
-  EdWin, xTime, DnIni, DNUtil, Advance6, Calculat, FViewer {AK155}
+  EdWin, xTime, DnIni, DNUtil, linepos, Calculat, FViewer {AK155}
   
   ;
 

@@ -66,7 +66,7 @@ uses
   arc_ZXZ, arc_QRK, arc_UFA, arc_IS3, arc_SQZ, arc_HAP, arc_ZOO, arc_CHZ,
   arc_UC2, arc_AIN, arc_7Z,  arc_BZ2,
   
-  profile, Defines, Streams, Advance1, Advance2,
+  profile, Defines, Streams, strutil, fileutil,
   Messages,
   FViewer, U_KeyMap, Commands
   ;

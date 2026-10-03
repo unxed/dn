@@ -47,7 +47,7 @@
 {$I STDEFINE.INC}
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
-unit Advance6;
+unit linepos;
 
 interface
 
@@ -74,7 +74,7 @@ implementation
 uses
   U_KeyMap, Country_,
   VpSysLow,
-  Advance, Advance1, Lfn, VideoMan
+  basics, strutil, Lfn, VideoMan
   ;
 
 function GetLineNumberForOffset(const FName: String; Offset: LongInt)

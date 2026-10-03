@@ -221,7 +221,7 @@ var
 implementation
 uses
   Lfn, Files, Memory, Startup, Dos, DnIni, DNHelp,
-  Advance, Advance1, Advance2, Advance3,
+  basics, strutil, fileutil, envutil,
   FlPanelX, mainapp, Messages, Commands, Drives, Eraser, Menus,
   xTime, FileCopy, VPSysLow
   ;

@@ -50,7 +50,7 @@ unit arc_SQZ; {SQZ}
 interface
 
 uses
-  Archiver, Advance, Advance1, Defines, Objects2, Streams, Dos
+  Archiver, basics, strutil, Defines, Objects2, Streams, Dos
   ;
 
 type

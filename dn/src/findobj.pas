@@ -92,7 +92,7 @@ const
 implementation
 
 uses
-  Advance1, mainapp, Commands, Dos
+  strutil, mainapp, Commands, Dos
   ;
 
 constructor TFindObject.Init(const S: String);

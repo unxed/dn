@@ -64,7 +64,7 @@ type
 
 implementation
 uses
-  Commands, Advance, Advance1, Advance2, mainapp, DNUtil
+  Commands, basics, strutil, fileutil, mainapp, DNUtil
   ;
 
 function TXDoubleWindow.GetPalette: TPalette;

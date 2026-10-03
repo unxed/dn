@@ -46,98 +46,96 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit Advance4; {OS/2 support}
+unit envutil; {Misc stuff}
 
 interface
 
-type
-  SessionType = (stOS2SYS, stOS2FullScreen, stOS2Windowed, stPMSession,
-    stVDMFullScreen, stWinFullScreen, stWinWindow, stVDMWindow);
+function GetSTime: LongInt;
 
-procedure RunSession(Command: String; Bckg: Boolean;
-     Session: SessionType);
+function FindParam(const S: String): Integer;
+  {` Находит среди ParamStr тот параметр, который начинается
+    с '/' или '-' и последующего S. Результат - номер этого параметра. `}
+
+function Chk4Dos: Boolean;
+
+function GetEnv(S: String): String;
+function GetCrc(StartCrc: LongInt; var Buf; BufSize: Word): LongInt;
 
 implementation
 
 uses
-  Advance, Lfn, Advance1, Drivers
-  , Dos, DnExec, Startup
+  basics, Dos,
+  strutil, linepos, Commands {Cat}
   ;
 
-{-DataCompBoy-}
-procedure RunSession(Command: String; Bckg: Boolean; Session: SessionType);
+function GetSTime: LongInt;
   var
-    T: lText;
-    I: Integer;
-    S, M, EX: String;
-    CmdExt1: String[4];
+    H, M, S, SS: Word;
   begin
-  if not (OS2exec or Win32exec) then
-    Exit;
-  I := 1;
-  repeat
-    ClrIO;
-    CmdExt1 := CmdExt;
-   
-    if OS2exec then CmdExt1 := '.CMD';
-   
-    EX := SwpDir+'$DN'+ItoS(I)+'$'+CmdExt1;
-    lAssignText(T, EX);
-    FileMode := $40;
-    lResetText(T);
-    if IOResult <> 0 then
-      Break;
-    Close(T.T);
-    if InOutRes = 0 then
-      Inc(I);
-  until IOResult <> 0;
-  ClrIO;
-  lAssignText(T, EX);
-  lRewriteText(T);
-  lGetDir(0, S);
-  Writeln(T.T, '@'+Copy(S, 1, 2));
-  Writeln(T.T, '@cd "'+S+'"');
-  S := Command;
-  if PosChar(';', S) > 0 then
-    begin
-    Replace(';;', #0, S);
-    while (S <> '') and (PosChar(';', S) <> 0) do
+  GetTime(H, M, S, SS);
+  GetSTime := SS+LongInt(S)*100+LongInt(M)*6000+LongInt(H)*360000;
+  end;
+
+function FindParam(const S: String): Integer;
+  var
+    I: Integer;
+  begin
+  FindParam := 0;
+  for I := 1 to ParamCount do
+    if S = Copy(UpStrg(ParamStr(I)), 1, Length(S)) then
       begin
-      I := PosChar(';', S);
-      M := Copy(S, 1, I-1);
-      Replace(#0, ';', M);
-      Writeln(T.T, M);
-      Delete(S, 1, I);
+      FindParam := I;
+      Exit
       end;
-    Replace(#0, ';', S);
-    Writeln(T.T, S);
-    end
-  else
-    Writeln(T.T, Command);
-  if not Bckg and (ShiftState and $20 = 0) then
-    Writeln(T.T, '@pause');
-  if OS2exec or (opSys and opWNT <> 0) then
-    Write(T.T, '@del "'+EX+'" & exit'^Z)
-  else
-    Write(T.T, '@del "'+EX+'"'^Z);
-  Close(T.T);
- 
-  if (opSys and opWNT <> 0) then
-    M := 'START "'+Command+'" '+EX
-  else
-    
-    if OS2exec then
-      begin
-      if Session = stOS2FullScreen then
-        M := 'HSTART "'+Command+'" /C /FS '+EX
-      else
-        M := 'HSTART "'+Command+'" /C /WIN '+EX;
-      end
-    else
-    
-      M := 'START '+GetEnv('COMSPEC')+' /C '+EX;
- 
-  ExecString(M, '');
-  end { RunSession };
-{DataCompBoy}
+  if S[1] = '/' then
+    FindParam := FindParam('-'+Copy(S, 2, MaxStringLength));
+  end;
+
+
+function Chk4Dos: Boolean;
+  begin
+  Result := False;   { INT 2Fh AX=D44Dh: the loader of DN (DN.COM) is not there }
+  end;
+
+
+function GetEnv(S: String): String;
+  begin
+  S := Dos.GetEnv(S);
+  DelSpace(S);
+  GetEnv := S;
+  end;
+
+{-DataCompBoy-}
+function UpdateCrc32(CurByte: Byte;
+    CurCrc: LongInt): LongInt;
+  {-Returns an updated crc32}
+
+  (* Model for inline code below
+  UpdateCrc32 := Crc_Table^[Byte(CurCrc xor LongInt(CurByte))] xor
+                 ((CurCrc shr 8) and $00FFFFFF);
+  *)
+  inline;
+  begin
+  UpdateCrc32 := Crc_Table^[Byte(CurCrc xor LongInt(CurByte))] xor
+      ( (CurCrc shr 8) and $00FFFFFF);
+  end;
+
+function GetCrc(StartCrc: LongInt; var Buf; BufSize: Word): LongInt;
+  type
+    AA = array[1..$F000] of Byte;
+  var
+    CNT: Word;
+    CRC: LongInt;
+  begin
+  if Crc_Table_Empty then
+    MakeCRCTable;
+  CRC := StartCrc;
+  GetCrc := StartCrc;
+  if BufSize = 0 then
+    Exit;
+  for CNT := 1 to BufSize do
+    CRC := UpdateCrc32(AA(Buf)[CNT], CRC);
+  GetCrc := CRC;
+  end;
+
 end.

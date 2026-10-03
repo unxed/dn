@@ -81,7 +81,7 @@ implementation
   The lines of the clipboard of DN are the lines of the text; the system text has the line breaks of the system, any of them splits the lines. }
 
 uses
-  TvClip, Microed, Advance1
+  TvClip, Microed, strutil
   ;
 
 function ToSys(const S: LongString): AnsiString;

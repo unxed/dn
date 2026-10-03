@@ -51,8 +51,8 @@ interface
 
 uses
   Arvid, Objects2, Streams, Messages, mainapp, Commands, Collect,
-  Views, Drivers, Startup, U_KeyMap, Advance, Lfn, Files, Dos, Tree,
-  FilesCol, Advance2, Drives, FlPanel, Memory
+  Views, Drivers, Startup, U_KeyMap, basics, Lfn, Files, Dos, Tree,
+  FilesCol, fileutil, Drives, FlPanel, Memory
   , Defines
   ;
 
@@ -91,7 +91,7 @@ function AvtInit(AvtDr: PArvidDrive): Boolean;
 
 implementation
 uses
-  PDSetup, Advance1
+  PDSetup, strutil
   ;
 
 var

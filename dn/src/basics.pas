@@ -48,7 +48,7 @@
 {AK155 = Alexey Korop, 2:461/155@fidonet}
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
-unit Advance;
+unit basics;
 
 interface
 
@@ -62,7 +62,7 @@ uses
 
 {$I Version.Inc}
 {DataCompBoy: DO NOT INCLUDE Version.inc IN OTHER UNITS!}
-{simple add in USES Advance}
+{simple add in USES basics}
 
 
 type
@@ -306,8 +306,8 @@ type
 implementation
 
 uses
-  xTime, Startup, Advance1, VPUtils, DNUtf8,
-  VpSysLow, Advance2,
+  xTime, Startup, strutil, VPUtils, DNUtf8,
+  VpSysLow, fileutil,
   Commands
   ;
 procedure ClrIO;

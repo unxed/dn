@@ -141,8 +141,8 @@ const
 
 implementation
 uses
-  Dos, Tree, Drives, Advance, Advance1, Advance2, Messages, DNHelp,
-  Advance6, DnIni, DnIni_p, Country_, U_KeyMap, fnotify
+  Dos, Tree, Drives, basics, strutil, fileutil, Messages, DNHelp,
+  linepos, DnIni, DnIni_p, Country_, U_KeyMap, fnotify
   , lfn, mainapp, Validate
   ;
 

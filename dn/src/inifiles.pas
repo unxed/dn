@@ -95,7 +95,7 @@ type
 implementation
 
 uses
-  Advance, Advance1, Advance2, Commands {Cat}
+  basics, strutil, fileutil, Commands {Cat}
   ;
 
 const
