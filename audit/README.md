@@ -36,6 +36,11 @@ of the Borland Pascal 7.0 sources.
 The last line is the total for the directory. For clean code `raw%` is 0-1 % and `ren%` 5-10 % (the background of Pascal
 syntax). Suspicious: `raw%` above 10 % or `maxrun` of 48 tokens or more. The thresholds are not calibrated yet (see `PLAN.md`).
 In this repository the gate is `raw% <= 10` and `maxrun < 48` for every file of `dn/src` (`bootstrap/README.md`).
+The gate is checked by `audit/gate.py` over `dn/src`, `dn/archives` and `dn/compat`. Three small files of `dn/compat/shims/manual/` (`collect.inc`, `dialogs.inc`,
+`views.inc`, ~550 tokens) are over it on purpose: they hold the names and the signatures of the Borland API that DN code is written against (the overrides
+`Compare/FreeItem/GetItem/PutItem` of the string collections, the names and indexes of the standard palettes), and the names and signatures of an API are not under
+copyright. They are listed in `audit/accepted.txt` with ceilings (a file that grows over its numbers fails the CI) and the CI prints them in every run, so that the
+exception is visible, not hidden. The reasoning and the date are in that file; to take a file out of the list, rewrite it below the gate.
 
 ## How to check another Pascal code base (for example Free Vision)
 
