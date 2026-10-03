@@ -199,7 +199,7 @@ uses
   Drivers, Dos, Lfn, VPUtils, DNUtf8,
   
   strutil, Strings,
-  Commands, mainapp, DnIni, Memory, FlPanelX, dnHelp
+  Commands, mainapp, DnIni, Memory, panelroot, dnHelp
   , VpSysLow, U_KeyMap
   ;
 

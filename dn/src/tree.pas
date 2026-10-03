@@ -222,7 +222,7 @@ implementation
 uses
   Lfn, Files, Memory, Startup, Dos, DnIni, DNHelp,
   basics, strutil, fileutil, envutil,
-  FlPanelX, mainapp, Messages, Commands, Drives, Eraser, Menus,
+  panelroot, mainapp, Messages, Commands, Drives, Eraser, Menus,
   xTime, FileCopy, VPSysLow
   ;
 

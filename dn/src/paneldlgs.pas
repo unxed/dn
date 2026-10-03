@@ -45,11 +45,11 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit FLTools;
+unit paneldlgs;
 
 interface
 uses
-  FilesCol, FlPanelX, PDSetup
+  FilesCol, panelroot, panelsetup
   ;
 
 procedure CM_AdvancedFilter(AFP: Pointer);
@@ -100,9 +100,9 @@ uses
   fnotify,
   Lfn, Files, Collect, xTime, DnIni, HistList,
   basics, strutil, fileutil, Dos, Defines, Dialogs,
-  Views, mainapp, Commands, Drivers, FlPanel, Drives, FileCopy,
+  Views, mainapp, Commands, Drivers, filepanel, Drives, FileCopy,
   Gauge, Gauges, Archiver, Startup, SWE, Validate, Messages, Menus, DNHelp,
-  FileFind, Tree, FBB, DNUtil, Filediz, Filelst, FlTl, DblWnd,
+  FileFind, Tree, FBB, DNUtil, Filediz, Filelst, fsinfo, panelwin,
   ErrMess, Objects2, VPUtils
   , DNDlgs;
 

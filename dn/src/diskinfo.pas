@@ -157,7 +157,7 @@ uses
   Startup, mainapp, Commands, DNHelp, Tree, xTime
   , basics, strutil, fileutil, VPUtils
   , VpSysLow, Lfn, U_KeyMap, Events, Objects2
-  , FlTl, FlPanelX, PDSetup, Dos
+  , fsinfo, panelroot, panelsetup, Dos
   , Strings;
 
 const

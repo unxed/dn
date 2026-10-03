@@ -7,7 +7,7 @@ procedure CopyIniVarsToCfgVars;
 
 implementation
 uses
-  DnIni, Startup, strutil, FlPanelX
+  DnIni, Startup, strutil, panelroot
   , fnotify
   
   , Commands

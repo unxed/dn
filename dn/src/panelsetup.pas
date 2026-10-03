@@ -1,6 +1,6 @@
 {AK155 = Alexey Korop, 2:461/155@fidonet}
 
-unit PDSetup;
+unit panelsetup;
   { типы и переменные, связанные с файловыми панелями и
     вставленными в них дисками }
 

@@ -46,12 +46,12 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit DblWnd;
+unit panelwin;
 
 interface
 
 uses
-  Views, Defines, Streams, Drivers, FlPanelX, FlPanel
+  Views, Defines, Streams, Drivers, panelroot, filepanel
   ;
 
 type

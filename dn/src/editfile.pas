@@ -81,7 +81,7 @@ uses
   Collect, WinClp, Dos, Messages, Startup, DnIni, DnIni_p, CopyIni, DNUtf8,
   {SBlocks,}U_KeyMap, Macro,
   xTime, Memory, Drivers,
-  FlTl,
+  fsinfo,
   fnotify,
   
   ErrMess

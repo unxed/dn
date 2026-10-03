@@ -68,14 +68,14 @@ uses
   
   basics, strutil, fileutil, envutil, os2sess,
   Startup, Startupp, Defines, Streams,
-  Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, FlPanelX,
+  Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
   DnIni, DnIni_p, CopyIni, Archiver,
   U_MyApp, editcore, ArchSet, linepos, RegAll, DnExec, Histries, Menus,
    VideoMan, Events,
   fnotify, Dpmi32, Dpmi32df, 
   Tree
-  , filetype, PDSetup
+  , filetype, panelsetup
   , VPSysLow;
 
 {AK155 Мало проверить, что имя временного каталога непусто, надо

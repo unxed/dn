@@ -209,14 +209,14 @@ function SameFile(P1, P2: PFileRec): Boolean;
 
 implementation
 uses
-  Lfn, DNUtf8, mainapp, Menus, Views, FlPanelX, FlPanel, Drives,
+  Lfn, DNUtf8, mainapp, Menus, Views, panelroot, filepanel, Drives,
   Objects2, Commands, Messages,
   {!!}CmdLine
   
   
   , VpSysLow, VPUtils
   
-  , FlTl, DnIni, Dos, FileType, PDSetup, U_KeyMap
+  , fsinfo, DnIni, Dos, FileType, panelsetup, U_KeyMap
   , DNHelp, basics, strutil, fileutil, Memory, Startup
   ;
 

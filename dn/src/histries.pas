@@ -184,8 +184,8 @@ uses
   
   Idlers,
   
-  FViewer, CmdLine, PDSetup, editcore
-  , FlPanelX {для ActivePanel}
+  FViewer, CmdLine, panelsetup, editcore
+  , panelroot {для ActivePanel}
   , Calc 
   ;
 
