@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                18:00:12
-x═[■]═════ C:\tmp\dntour-rbisnq_b\work ══════════╗x═════════ C:\tmp\dntour-rbisnq_b\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:40:57
+x═[■]═════ C:\tmp\dntour-wby1iual\work ══════════╗x═════════ C:\tmp\dntour-wby1iual\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-rbisnq_b\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-rbisnq_b\work>
+C:\tmp\dntour-wby1iual\work>
  F1 Help

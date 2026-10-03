@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                18:01:15
-x───────── C:\tmp\dntour-okyuvsek\work ──────────┐x───────── C:\tmp\dntour-okyuvsek\work ──────────┐
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:42:07
+x───────── C:\tmp\dntour-qtahdh_k\work ──────────┐x───────── C:\tmp\dntour-qtahdh_k\work ──────────┐
 │       Name       │       Name       │       Nam││       Name       │       Name       │       Nam│
 │..                │                  │          ││..                ││                  ││        │
 │c             dat │                  │          ││c             dat ││                  ││        │
@@ -26,5 +26,5 @@ x───────── C:\tmp\dntour-okyuvsek\work ───────�
 │──────────────────┴──────────────────┴──────────││──────────────────┴┴──────────────────┴┴────────│
 │..            <UP--DIR>  0.00.80 17:17          ││..            <UP--DIR>  0.00.80 17:17          │
 └[ C * ]─────────────────────────────────────────┘└[ C * ]─────────────────────────────────────────┘
-C:\tmp\dntour-okyuvsek\work>
+C:\tmp\dntour-qtahdh_k\work>
  F1 Help

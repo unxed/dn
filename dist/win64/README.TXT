@@ -1,11 +1,11 @@
 DN for Windows (EXPERIMENTAL): the Windows build of the open DN OSP 2.14 on Turbo Vision (this repository: tv/ and dn/).
 It is cross-compiled on Linux and checked on a real Windows console by CI (tools/dn-win-smoke.py).
 
-  DN.EXE             run it in a console window (conhost, Windows Terminal, Wine); the console needs at least 80x25.
-  *.LNG *.DLG *.HLP  the resources and the help, XLT\  the layout tables: they must be next to DN.EXE.
+  dn.exe             run it in a console window (conhost, Windows Terminal, Wine); the console needs at least 80x25.
+  *.lng *.dlg *.hlp  the resources and the help, xlt\  the layout tables: they must be next to dn.exe.
 
 Keys: F10 menu, Tab switches the panel, Enter enters a directory, F1 help, F3 view, F4 edit, F5 copy, F7 make a directory,
-Alt-X quit. Settings and history are written to the directory where DN is started (DN.INI, DN.HIS).
+Alt-X quit. Settings and history are written to the directory where DN is started (dn.ini, dn.his).
 screenshots\*.txt are screens of the Windows build on a real Windows console (ConPTY, from CI: tools/dn-win-smoke.py).
 The program draws with the console API (WriteConsoleOutputW), so it works in Wine and in Windows before 10 too; set the
 environment variable DN_WIN_OUTPUT=vt to use the virtual terminal sequences (Windows 10 1809 or newer, Windows Terminal).

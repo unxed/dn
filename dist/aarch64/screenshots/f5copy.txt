@@ -1,30 +1,30 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                18:01:49
-x═[■]═════ C:\tmp\dntour-rh79dqrz\work ══════════╗x═════════ C:\tmp\dntour-rh79dqrz\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                22:42:41
+x═[■]═════ C:\tmp\dntour-qu1mbbr8\work ══════════╗x═════════ C:\tmp\dntour-qu1mbbr8\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
-║..                │                  │          ║║..                │                  │          ■
-║c             dat │                  │          ║║c             dat │                  │          ▒
-║a             txt │                  │          ║║a             txt │                  │          ▒
-║b             txt │                  │          ║║b             txt │                  │          ▒
-║          ╔═[■]═══════════════════════════════ Copy ═══════════════════════════════════╗          ▒
-║          ║  Copy 3  files  to                                                         ║          ▒
-║          ║                                                                         ▐↓▌║          ▒
-║          ║                                                                            ║          ▒
-║          ║  All files with the same names:                                            ║          ▒
-║          ║  ( ) Overwrite                       [ ] Check free disk space             ║          ▒
-║          ║  ( ) Append                          [ ] Verify disk writes                ║          ▒
-║          ║  ( ) Resume                          [X] Copy descriptions                 ║          ▒
-║          ║  ( ) Skip                            [ ] Remove source files               ║          ▒
-║          ║  ( ) Refresh                                                               ║          ▒
-║          ║  (•) Ask the action                                                        ║          ▒
-║          ║                                                                            ║          ▒
-║          ║                    OK   ▄  Cancel ▄   Tree  ▄   Help  ▄                    ║          ▒
-║          ║                  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀                    ║          ▒
-║          ╚════════════════════════════════════════════════════════════════════════════╝          ▒
-║                  │                  │          ║║                  │                  │          ▒
-║                  │                  │          ║║                  │                  │          ▒
-║                  │                  │          ║║                  │                  │          ▼
-║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
+║..                │                  │          ║║..                ││                  ││        ■
+║c             dat │                  │          ║║c             dat ││                  ││        ▒
+║a             txt │                  │          ║║a             txt ││                  ││        ▒
+║b             txt │                  │          ║║b             txt ││                  ││        ▒
+║          ╔═[■]═══════════════════════════════ Copy ═══════════════════════════════════╗││        ▒
+║          ║  Copy 3  files  to                                                         ║││        ▒
+║          ║                                                                         ▐↓▌║││        ▒
+║          ║                                                                            ║││        ▒
+║          ║  All files with the same names:                                            ║││        ▒
+║          ║  ( ) Overwrite                       [ ] Check free disk space             ║││        ▒
+║          ║  ( ) Append                          [ ] Verify disk writes                ║││        ▒
+║          ║  ( ) Resume                          [X] Copy descriptions                 ║││        ▒
+║          ║  ( ) Skip                            [ ] Remove source files               ║││        ▒
+║          ║  ( ) Refresh                                                               ║││        ▒
+║          ║  (•) Ask the action                                                        ║││        ▒
+║          ║                                                                            ║││        ▒
+║          ║                    OK   ▄  Cancel ▄   Tree  ▄   Help  ▄                    ║││        ▒
+║          ║                  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀                    ║││        ▒
+║          ╚════════════════════════════════════════════════════════════════════════════╝││        ▒
+║                  │                  │          ║║                  ││                  ││        ▒
+║                  │                  │          ║║                  ││                  ││        ▒
+║                  │                  │          ║║                  ││                  ││        ▼
+║──────────────────┴──────────────────┴──────────║║──────────────────┴┴──────────────────┴┴────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-rh79dqrz\work>
+C:\tmp\dntour-qu1mbbr8\work>
  F1 Help  F10 Tree

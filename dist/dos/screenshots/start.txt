@@ -1,4 +1,4 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            05:56:13p
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            10:36:56p
 x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
 ║       Name       │       Name       │║║       Name       │       Name       │▲
 ║TEMP              │                   ║║TEMP              │                   ■
@@ -6,9 +6,9 @@ x═[■]════════════ C:\ ══════════
 ║RUSSIAN       DLG │║                                      ║                   ▒
 ║UKRAIN        DLG │║                                      ║                   ▒
 ║CWSDPMI       EXE │║           DN/2 Open Source           ║                   ▒
-║DN            EXE │║      Version 2.14 beta/DPMI32,       ║                   ▒
-║ENGLISH       HLP │║     Compiled Fri, 12 Jun 2025 at     ║                   ▒
-║RUSSIAN       HLP │║               00:00:00               ║                   ▒
+║DN            EXE │║        Version 2.14 beta/DOS,        ║                   ▒
+║ENGLISH       HLP │║   Compiled 2026-10-03 22:36:27 UTC   ║                   ▒
+║RUSSIAN       HLP │║            (c3c6da9+dirty)           ║                   ▒
 ║UKRAIN        HLP │║         http://www.dnosp.ru/         ║                   ▒
 ║DN            INI │║                                      ║                   ▒
 ║ENGLISH       LNG │║  Based on: Dos Navigator Open Source ║                   ▒
@@ -19,7 +19,7 @@ x═[■]════════════ C:\ ══════════
 ║OUT           TXT │                   ║║OUT           TXT │                   ▒
 ║                  │                   ║║                  │                   ▼
 ║──────────────────┴───────────────────║║──────────────────┴───────────────────║
-║TEMP             4,096 10/03/26  5:56p║║TEMP             4,096 10/03/26  5:56p║
+║TEMP             4,096 10/03/26 10:36p║║TEMP             4,096 10/03/26 10:36p║
 └[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
 C:\>                                                                            
  F1 Help                                                                        
