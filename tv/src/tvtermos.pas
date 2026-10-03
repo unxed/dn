@@ -217,6 +217,7 @@ type
     Carry: array[0..63] of Byte;
     Mouse: Boolean;
     LastButtons: DWORD;
+    DimBg: Boolean;               { the background has no intensity bit (the terminal of Wine draws it unevenly) }
   end;
 
 var
@@ -310,11 +311,24 @@ begin
 end;
 
 function ConAttr: Word;
+var
+  Bg: Byte;
 begin
+  Bg := Con.Bg;
+  if Con.DimBg then
+    Bg := Bg and 7;
   if Con.Rev then
-    Result := Con.Bg or (Word(Con.Fg) shl 4)
+    Result := Bg or (Word(Con.Fg) shl 4)
   else
-    Result := Con.Fg or (Word(Con.Bg) shl 4);
+    Result := Con.Fg or (Word(Bg) shl 4);
+end;
+
+function RunsOnWine: Boolean;
+var
+  H: HMODULE;
+begin
+  H := GetModuleHandle('ntdll.dll');
+  Result := (H <> 0) and (GetProcAddress(H, 'wine_get_version') <> nil);
 end;
 
 procedure ConPutChar(CP: LongWord);
@@ -346,6 +360,31 @@ begin
   ConMark(Con.X, Con.Y);
   ConMark(Con.X + Wd - 1, Con.Y);
   Inc(Con.X, Wd);
+end;
+
+{ for the tests: when the variable TV_CONDUMP names a file, the cells (the character and the attribute in hex) are written there after each flush }
+procedure ConDump;
+var
+  Path: string;
+  F: TextFile;
+  X, Y: Integer;
+begin
+  Path := SysUtils.GetEnvironmentVariable('TV_CONDUMP');
+  if Path = '' then
+    Exit;
+  AssignFile(F, Path);
+  {$I-}
+  Rewrite(F);
+  {$I+}
+  if IOResult <> 0 then
+    Exit;
+  for Y := 0 to Con.Hh - 1 do
+  begin
+    for X := 0 to Con.W - 1 do
+      Write(F, IntToHex(Ord(Con.Cells[Y * Con.W + X].UnicodeChar), 4), ':', IntToHex(Con.Cells[Y * Con.W + X].Attributes, 2), ' ');
+    Writeln(F);
+  end;
+  CloseFile(F);
 end;
 
 procedure ConFlush;
@@ -382,6 +421,7 @@ begin
   Ci.dwSize := Con.CaretSize;
   Ci.bVisible := Con.CaretOn;
   SetConsoleCursorInfo(Con.H, Ci);
+  ConDump;
 end;
 
 procedure ConErase(X0, Y0, X1, Y1: Integer);   { cells of the rectangle become spaces of the current color }
@@ -649,6 +689,7 @@ end;
 procedure ConEnter;
 var
   Sa: SECURITY_ATTRIBUTES;
+  Path: string;
 begin
   Con.On := True;
   Con.Orig := HOut;
@@ -669,6 +710,10 @@ begin
   Con.CarryLen := 0;
   Con.Mouse := False;
   Con.LastButtons := 0;
+  { DN_WIN_BRIGHT_BG=1: backgrounds 8..15 as they are; 0: without the intensity bit; not set: 0 on Wine (the terminal of Wine loses the bright
+    background of some cells: two shades on one panel), 1 on Windows }
+  Path := SysUtils.GetEnvironmentVariable('DN_WIN_BRIGHT_BG');
+  Con.DimBg := (Path = '0') or ((Path = '') and RunsOnWine);
   Con.Cells := nil;
   ConAlloc;
 end;
