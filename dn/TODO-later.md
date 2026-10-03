@@ -218,7 +218,7 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
 - Symptom: the DOS build (`dist/dos/DN.EXE`) makes no screen dump (the harness of `tools/dn-tour.sh`) on DOSBox-X built from `master` (2026.10.01, the base of the patches in `docs/patches/`); on the apt package
   2024.03.01 that CI uses it does. The same on `master` **without** the patches, so it is not the AMIS/UTF-8 patches.
 - Found (differential trace of DN, `tools/dn-trace-init.py` + steps by hand, a `gdb` backtrace of the emulator): the **emulator** hangs, not DN: `DOS_FindFirst` -> `DOS_FindDevice` -> `DOS_CheckExtDevice`
-  (src/dos/dos_devices.cpp, new in 2025) walks the chain of device headers in guest memory in `while(1)` that ends only at `FFFF:FFFF`. While DN runs, the CON header at `00F9:0000` (`DOS_CONDRV_SEG`, the
+  (src/dos/dos_devices.cpp; since when it exists is not checked, the clone is shallow) walks the chain of device headers in guest memory in `while(1)` that ends only at `FFFF:FFFF`. While DN runs, the CON header at `00F9:0000` (`DOS_CONDRV_SEG`, the
   private area of DOS of DOSBox-X) is found zeroed (`next=0000:0000 attr=0000`), the walk leaves into the interrupt table and never ends. The raw INT 21h AX=714Eh/71A1h sequences of DN from a small .COM do not hang.
 - Fix for the emulator (a guard of 1024 links): branch `claude/fix-extdevice-loop` of the fork `unxed/dosbox-x` (`docs/patches/dosbox-x-pr-extdevice-loop.md`); with it DN starts and draws the panels under `master`.
 - **Not known:** who zeroes `00F9:0000`. A `gdb` watchpoint (the first dword of the header becoming 0) did not fire in one run. Candidates: DN (a write through its DOS transfer buffer `tb_segment`/`dpmi32`),
