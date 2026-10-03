@@ -13,7 +13,7 @@ directories together (`tools/dn-env.sh`, one flat stage of links), so a unit doe
 |---|---|
 | `src/` | DN itself: the program, the panels, the editor, the viewer, the dialogs, the basics; the texts of the resources (`RESOURCE/`) |
 | `archives/` | one unit per archive format (`fmtzip`, `fmtrar`, `fmt7z`, `fmttar`... 26 of them; were `arc_zip`...; `fmt` = format: `arczip` would clash with the constant `arcZIP`); the common code is `archiver.pas`, `archdet.pas` in `src/` |
-| `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`osdep` (was `vpsyslow`), `osfind` (was `vpsysext`) (was `vpsyslo2`), `dnscreen` (the screen glue that was in `vpsyslow`)), the Borland units on `tv/` (`drivers`, `baseobjs` (was `objects2`)), the layer of DPMI32 (`realmode` (was `dpmi32`), `fat32free` (was `dpmi32df`), `dosbuf` (was `doslow`)), the country table (`country_`) |
+| `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`osdep` (was `vpsyslow`), `osfind` (was `vpsysext`) (was `vpsyslo2`), `dnscreen` (the screen glue that was in `vpsyslow`)), the Borland units on `tv/` (`drivers`, `baseobjs` (was `objects2`)), the layer of DPMI32 (`realmode`: was `dpmi32`, `dpmi32df` and `doslow`, one unit), the country table (`country_`) |
 | `compat/linux/` | units that replace those of `compat/` in the builds that are not for DOS (`country_.pas`: the table of CP866 for Linux and Windows) |
 | `compat/shims/` | the map of what DN takes from `tv/` (`shims.map`) and the hand-written parts (`manual/*.inc`); the shim units are generated from it by `tools/gen-shim.py` |
 | `data/`, `tests/` | the data that DN reads, the tests of our units |
@@ -129,7 +129,7 @@ Why two files for the settings: `dn.cfg` is the memory dump of the records of th
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
 | `compat/dnscreen.pas` (the 16-bit cell screen and the cursor of DN over `tv/`, was the `SysTv*` part of `vpsyslow`, ours) | the copy of the screen for the code that reads the screen, the cursor shape |
-| `compat/osdep.pas` (was `vpsyslow`, ours), `osfind.pas` (was `vpsyslo2` and `vpsysext`: the extension of the layer written by JO of DN OSP), `realmode.pas` (was `dpmi32`), `fat32free.pas` (was `dpmi32df`), `dosbuf.pas` (was `doslow`) | the system layer: files, drives, time, keys, the terminal, running programs, the search of a directory with the times of a file, the calls of the real mode of DOS (replaces the runtime of Virtual Pascal; named by what it does) |
+| `compat/osdep.pas` (was `vpsyslow`, ours), `osfind.pas` (was `vpsyslo2` and `vpsysext`: the extension of the layer written by JO of DN OSP), `realmode.pas` (was `dpmi32`, `dpmi32df` and `doslow`) | the system layer: files, drives, time, keys, the terminal, running programs, the search of a directory with the times of a file, the calls of the real mode of DOS (replaces the runtime of Virtual Pascal; named by what it does) |
 | `compat/country.pas` (was `country_`; DOS), `compat/linux/country.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `resource/*` → `*.LNG`, `*.DLG`) |
 

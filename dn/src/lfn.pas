@@ -258,7 +258,7 @@ uses
   
   Strings, Commands {Cat}
   , strutil, fileutil, Math
-   ,Startup ,realmode ,fat32free 
+   ,Startup ,realmode 
   , fnotify
   ;
 procedure lResetText(var F: lText);

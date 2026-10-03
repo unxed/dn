@@ -73,7 +73,7 @@ uses
   DnIni, iniengine, CopyIni, Archiver,
   apploop, editcore, ArchSet, linepos, RegAll, DnExec, Histries, Menus,
    VideoMan, Events,
-  fnotify, realmode, fat32free, 
+  fnotify, realmode, 
   Tree
   , filetype, panelsetup
   , osdep;

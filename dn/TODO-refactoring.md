@@ -42,7 +42,7 @@ before and after). Add what you find; do not stop for it outside of the step. Ma
 ## What is left of Virtual Pascal (the review of 2026-10-04: what FPC can do instead)
 
 Done in this step: `vputils` is gone (`Min`/`Max` are `Math`, the hex functions `IntToHex`, the time `GetTickCount64`, the date `Dos.GetDate`, the label `SysGetVolumeLabel`; the rest moved to the unit that uses it or to `compat/drivers.pas`);
-dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `osfind` (the units of the layer were renamed by what they do on 2026-10-04: `vpsyslow` -> `osdep`, `vpsysext` -> `osfind`, `dpmi32` -> `realmode`, `dpmi32df` -> `fat32free`, `doslow` -> `dosbuf`; the `Sys*` names of the routines stay). What is left in `dn/compat/` and what it would take to drop it (the number is the call sites outside of `compat/`):
+dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `osfind` (the units of the layer were renamed by what they do on 2026-10-04: `vpsyslow` -> `osdep`, `vpsysext` -> `osfind`, `dpmi32`, `dpmi32df` and `doslow` -> one `realmode`; the `Sys*` names of the routines stay). What is left in `dn/compat/` and what it would take to drop it (the number is the call sites outside of `compat/`):
 
 | Unit | What it does | Instead | Verdict |
 |---|---|---|---|
@@ -53,7 +53,7 @@ dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `osfind`
 | `osdep` (`SysBeepEx` 6, `SysKeyPressed/ReadKey` 3, `PhysMemAvail` 3) | small things | `SysCtrlSleep`, `SysPlatformId` are gone (`Sleep`, `{$IFDEF GO32V2}`); the three left are real code (the PC speaker through ports, DPMI memory info, the key of the fatal-error screen) | **keep** (decided 2026-10-04: no FPC equivalent; each is one place of use) |
 | `osfind` | the "new" search record (creation time, last access) | `TSearchRec` has them (`FindData` on Windows; `stat` on Unix) | with the search above |
 | `memory` | (deleted 2026-10-04) | `MemAlloc` is `GetMem` (`ReturnNilIfGrowHeapFails := True` in `dn.pas`: nil instead of an exception); `LowMemory` was always False: its 22 conditions are removed; the no-op `InitMemory`... are gone | **done** |
-| `realmode`, `fat32free`, `dosbuf` | real-mode calls of DOS (LFN of Windows 95, the clipboard, FAT32) | `go32` of FPC (DOS only) | **DOS only:** `{$IFDEF GO32V2}` in `lfn.pas`, `fsinfo.pas`, `videoman.pas`, `dnexec.pas`; on Linux and Windows they are stubs that fail |
+| `realmode` (was three units, merged 2026-10-04) | real-mode calls of DOS (LFN of Windows 95, the clipboard, FAT32) | `go32` of FPC (DOS only) | **DOS only:** `{$IFDEF GO32V2}` in `lfn.pas`, `fsinfo.pas`, `videoman.pas`, `dnexec.pas`; on Linux and Windows they are stubs that fail |
 | `use16` | (deleted 2026-10-04) | `SmallInt` in `dbwatch`, `pktview`, `uucode`, `uue2inc` (`Word` is 16 bits in FPC anyway) | **done** |
 | `baseobjs` | `TObject` of DN = `TObject` of `tv/`; `FreeObject`, `ObjChangeType` | `tv/` | with the shims |
 | `country` | the country table | `SysUtils` formats + the table of CP866 (ours) | keep |
