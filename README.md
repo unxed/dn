@@ -69,6 +69,15 @@
    Без сборки: `cd dist/linux && ./dn` (i386, статический ELF; описание — `dist/linux/README.TXT`, экраны — `dist/linux/screenshots/*.txt`).
    i386 из исходников: `tools/build-fpc-i386-linux.sh ПРЕФИКС`, затем `DN_LINUX=ПРЕФИКС tools/build.sh linux`.
 
+0w. **DN под Windows** (кросс-сборка на Linux; нужны `fpc`, `make`, `git`, `binutils-mingw-w64-x86-64` / `-i686`, `python3`):
+
+       tools/build-fpc-windows.sh ПРЕФИКС win64      # кросс-компилятор из исходников FPC (один раз; win32 — так же, с `win32`)
+       DN_WIN=ПРЕФИКС tools/build.sh win64          # результат out/win64/dn.exe, ресурсы, справка и XLT\ рядом (win32: DN_WIN32=...)
+       python tools/dn-win-smoke.py out/win64       # на Windows: настоящая консоль (ConPTY), pip install pywinpty; в CI — workflow dn-windows
+
+   Без сборки: `dist/win64/DN.EXE`, `dist/win32/DN.EXE` (описание — `README.TXT` рядом; нужна консоль Windows 10 1809+ или Windows Terminal).
+   Под wine в pty экран рисуется с искажениями (консоль wine в pty не годится как стенд): проверяет CI на настоящем Windows.
+
 1a. **TV в терминале Linux** (нужны `fpc` и `python3`; терминалом служит `tools/pty_screen.py`):
 
         fpc -Futv/src -FUout -FEout tv/demo/tvdemo.pas

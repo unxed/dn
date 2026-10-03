@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""The Windows build of DN on a real Windows console (ConPTY, via pywinpty), the screen is read with the same emulator as in the
+Linux tests (tools/pty_screen.py): start, the menu bar, no country-setup error, F7 makes a directory, the quit.
+usage: python tools/dn-win-smoke.py OUTDIR   (OUTDIR: the result of tools/build.sh win64|win32; needs: pip install pywinpty)"""
+import os
+import shutil
+import sys
+import tempfile
+import threading
+import time
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pty_screen import Screen
+
+fails = count = 0
+
+
+def check(cond, name, info=''):
+    global fails, count
+    count += 1
+    print(('PASS ' if cond else 'FAIL ') + name, flush=True)
+    if not cond:
+        fails += 1
+        if info:
+            print(info, flush=True)
+
+
+class WinTerm:
+    """the same interface as PtyTerm (pump/send/text/raw/alive/close) on top of winpty"""
+
+    def __init__(self, exe, cwd, cols=100, rows=30):
+        from winpty import PtyProcess
+        self.screen = Screen(cols, rows)
+        self.raw = b''
+        self.lock = threading.Lock()
+        self.p = PtyProcess.spawn([exe], cwd=cwd, dimensions=(rows, cols))
+        threading.Thread(target=self._read, daemon=True).start()
+
+    def _read(self):
+        while True:
+            try:
+                s = self.p.read(65536)
+            except EOFError:
+                break
+            except Exception:
+                break
+            if s:
+                with self.lock:
+                    self.raw += s.encode('utf-8', 'replace')
+                    self.screen.feed(s.encode('utf-8', 'replace'))
+
+    def pump(self, timeout=0.3, limit=8.0):
+        time.sleep(min(timeout, limit))
+
+    def send(self, data, settle=0.5):
+        self.p.write(data)
+        time.sleep(settle)
+
+    def text(self):
+        with self.lock:
+            return '\n'.join(self.screen.lines())
+
+    def wait_for(self, text, timeout=10.0):
+        end = time.time() + timeout
+        while time.time() < end:
+            if text in self.text():
+                return True
+            time.sleep(0.2)
+        return False
+
+    def alive(self):
+        return self.p.isalive()
+
+    def close(self):
+        try:
+            self.p.terminate(force=True)
+        except Exception:
+            pass
+
+
+def main():
+    out = os.path.abspath(sys.argv[1])
+    d = tempfile.mkdtemp(prefix='dnwin-')
+    try:
+        for f in os.listdir(out):
+            src = os.path.join(out, f)
+            if os.path.isdir(src):
+                shutil.copytree(src, os.path.join(d, f))
+            else:
+                shutil.copy(src, d)
+        w = os.path.join(d, 'work')
+        os.makedirs(w)
+        open(os.path.join(w, 'a.txt'), 'w').write('first\n')
+        t = WinTerm(os.path.join(d, 'dn.exe'), w)
+        ok = t.wait_for('Utilities', 30)
+        check(ok, 'start: the menu bar is drawn', t.text())
+        check(b'Error in country' not in t.raw, 'start: no country setup error (XLT next to the program)')
+        check('Name' in t.text() and 'a.txt' in t.text(), 'start: the panel shows the files of the directory', t.text())
+        t.send('\x1b', 0.5)
+        t.send('\x1b[18~', 1.0)                       # F7
+        t.send('newdir', 0.5)
+        t.send('\r', 1.5)
+        check(os.path.isdir(os.path.join(w, 'newdir')), 'F7: the directory is made', t.text())
+        t.send('\x1bx', 1.0)                          # Alt-X: quit
+        t.send('\r', 1.5)
+        for _ in range(20):
+            if not t.alive():
+                break
+            time.sleep(0.3)
+        check(not t.alive(), 'quit: the program ends')
+        t.close()
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+    print('%d/%d' % (count - fails, count))
+    sys.exit(1 if fails else 0)
+
+
+main()
