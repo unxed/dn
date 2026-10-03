@@ -1528,7 +1528,7 @@ procedure TDBIndicator.Draw;
     C := PWindow(Owner)^.Frame^.GetColorW($03);
   {--- finish -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
   MoveStr(B, S, C);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   end { TDBIndicator.Draw };
 
 constructor TDBWindow.Init(FName: String; var FileIsDBF: Boolean);

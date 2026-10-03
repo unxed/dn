@@ -324,7 +324,7 @@ procedure TInfoView.Draw;
   begin
   MoveChar(B, ' ', InfoAttr, Size.X);
   MoveStr(B[Size.X-Length(InfoStr)], InfoStr, InfoAttr);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   end;
 
 {-------------------------      TCalcWindow      -------------------------}
@@ -846,7 +846,7 @@ procedure TCalcView.Draw;
   MoveChar(B, ' ', C1, Size.X);
   BC[6].C := '³';
   MoveChar(B1, 'Ä', C1, Size.X);
-  WordRec(B1[6]).Lo := Byte('Å');
+  SetCellChar(B1[6], Byte('Å'));
   NumC := 0;
   I := 7;
   J := Delta.X;
@@ -863,7 +863,7 @@ procedure TCalcView.Draw;
     S[K] := '³';
     S1 := GetColName(J);
     Move(S1[1], S[K div 2], Length(S1));
-    WordRec(B1[I+K-1]).Lo := Byte('Å');
+    SetCellChar(B1[I+K-1], Byte('Å'));
     MoveStr(B[I], S, C1);
     if J < X1 then
       Inc(StX, K);
@@ -897,8 +897,8 @@ procedure TCalcView.Draw;
     then
       Q^[P^.Col-Delta.X, P^.Row-Delta.Y] := I-1;
     end;
-  WriteBufW(6, 0, Size.X, 1, B[6]);
-  WriteBufW(0, 1, Size.X, 1, B1);
+  WriteBufC(6, 0, Size.X, 1, B[6]);
+  WriteBufC(0, 1, Size.X, 1, B1);
 
   for I := 0 to Size.Y-2 do
     begin
@@ -962,7 +962,7 @@ procedure TCalcView.Draw;
     if  (Delta.Y+I >= Y1) and (Delta.Y+I <= Y2) and (StX < EnX)
     then
       MoveColor(B[StX], EnX-StX-Ord(ShowSeparators), C3);
-    WriteBufW(0, I+2, Size.X, 1, B);
+    WriteBufC(0, I+2, Size.X, 1, B);
     end;
   end { TCalcView.Draw };
 

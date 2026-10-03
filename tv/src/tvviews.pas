@@ -277,6 +277,9 @@ type
       of Word (WriteLineW takes W cells, WriteBufW H rows of them); GetColorW(C) = Lo + 256 * Hi of GetColor(C). }
     procedure WriteBufW(X, Y, W, H: Integer; const B);
     procedure WriteLineW(X, Y, W, H: Integer; const B);
+    { The same for a row of cells of tv/ (an array of TScreenCell, as the draw buffers of DN are): B is the first cell, as for WriteBuf/WriteLine. }
+    procedure WriteBufC(X, Y, W, H: Integer; const B);
+    procedure WriteLineC(X, Y, W, H: Integer; const B);
     function GetColorW(Color: Word): Word;
   end;
 
@@ -1784,6 +1787,16 @@ begin
     Dec(H);
   end;
   FreeMem(Buf);
+end;
+
+procedure TView.WriteBufC(X, Y, W, H: Integer; const B);
+begin
+  WriteBuf(X, Y, W, H, PScreenCell(@B));
+end;
+
+procedure TView.WriteLineC(X, Y, W, H: Integer; const B);
+begin
+  WriteLine(X, Y, W, H, PScreenCell(@B));
 end;
 
 function TView.GetColorW(Color: Word): Word;

@@ -135,7 +135,7 @@ procedure TColorView.Draw;
     I, J, C: Byte;
   begin
   {  MoveChar(B,' ',  Color2Display shl 4, Size.X);
-      WriteLineW(0, 0, Size.X, Size.Y, B);
+      WriteLineC(0, 0, Size.X, Size.Y, B);
      }
   MoveChar(B, ' ', $70, Size.X);
   for I := 0 to Size.Y do
@@ -148,12 +148,12 @@ procedure TColorView.Draw;
         MoveChar(B[J*3+5], #219, C, 3);
         if C = Byte(Color2Display) then
           begin
-          WordRec(B[J*3+1+5]).Lo := 8;
+          SetCellChar(B[J*3+1+5], 8);
           if C = 0 then
-            WordRec(B[J*3+1+5]).Hi := $70;
+            SetCellAttr(B[J*3+1+5], $70);
           end;
         end;
-    WriteLineW(0, I, Size.X, 1, B);
+    WriteLineC(0, I, Size.X, 1, B);
     end;
 
   end { TColorView.Draw };

@@ -843,7 +843,7 @@ procedure TLineViewer.Draw;
         end;
       MoveStr(B, S, Color);
       end;
-    WriteLineW(0, I, Size.X, 1, B);
+    WriteLineC(0, I, Size.X, 1, B);
     end;
   end { TLineViewer.Draw };
 
