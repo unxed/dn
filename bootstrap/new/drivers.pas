@@ -11,7 +11,7 @@ unit Drivers;
 interface
 
 uses
-  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys;
+  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews;
 
 type
   TEvent = TvEvents.TEvent;
@@ -146,7 +146,7 @@ procedure PrintStr(const S: String);
 { Cells of 16 bits: the low byte is the character, the high byte is the attribute (0 = leave as it is). }
 procedure MoveColor(var Buf; Num: Word; Attr: Byte);
 procedure MoveBuf(var Dest; var Source; Attr: Byte; Count: Word);
-procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: LongInt);
+procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: Word);
 procedure MoveCStr(var Dest; const Str: String; Attrs: Word);
 procedure MoveStr(var Dest; const Str: String; Attr: Byte);
 function CStrLen(const S: String): Integer;
@@ -230,20 +230,9 @@ begin
   Event.What := evNothing;
 end;
 
-{ The next key event of the system without waiting (DN: the loops that can be stopped by Esc ask for it); the other events that come
-  before it (the mouse) are dropped. }
 procedure GetKeyEvent(var Event: TEvent);
-var
-  N: Integer;
 begin
   Event.What := evNothing;
-  for N := 1 to 256 do
-  begin
-    PollEvent(0, Event);
-    if (Event.What = evNothing) or ((Event.What and evKeyDown) <> 0) then
-      Exit;
-    Event.What := evNothing;
-  end;
 end;
 
 procedure SetMouseSpeed(XS, YS: Byte);
@@ -385,7 +374,7 @@ begin
       PWordArr(@Dest)^[I] := PByte(@Source)[I] or (Word(Attr) shl 8);
 end;
 
-procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: LongInt);
+procedure MoveChar(var Dest; C: Char; Attr: Byte; Count: Word);
 var
   I: Integer;
   W: PWordArr;

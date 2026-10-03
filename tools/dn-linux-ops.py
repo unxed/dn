@@ -93,8 +93,12 @@ def main():
 
         # the help, several times: the window of the help is kept between the calls and was used after it was freed
         for _ in range(4):
-            key('F1', 0.8); key('ESC', 0.5)
-        check(t.alive() and 'Fatal' not in t.text() and 'Name' in t.text(), 'F1 and Esc four times: no crash', t.text())
+            key('F1', 1.0)
+            for _ in range(6):                       # Esc until the window of the help is gone (a slow machine needs time)
+                if '\u2550 Help \u2550' not in t.text():
+                    break
+                key('ESC', 0.8)
+        check(t.alive() and 'Fatal' not in t.text() and 'Name' in t.text() and '\u2550 Help \u2550' not in t.text(), 'F1 and Esc four times: no crash', t.text())
 
         # Russian names: a directory made by F7 has the name in UTF-8 in the file system and is shown as Russian
         key('F7'); key('\u0442\u0435\u0441\u0442'); key('ENTER', 1.0)
