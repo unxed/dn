@@ -1,0 +1,27 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                03:56:43
+x═[■]C:\Users\RUNNER~1\AppData\Local\Temp\dn►work╗x═C:\Users\RUNNER~1\AppData\Local\Temp\d►work[↕]═╗
+║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
+║..                │                  │          ║║..                │                  │          ■
+║a             txt │                  │          ║║a             txt │                  │          ▒
+║                  │                  │          ║║                  │                  │          ▒
+║                  │          ╔═[■]══════════ Warning ═══════════════╗                  │          ▒
+║                  │          ║                                      ║                  │          ▒
+║                  │          ║                                      ║                  │          ▒
+║                  │          ║           DN/2 Open Source           ║                  │          ▒
+║                  │          ║      Version 2.14 beta/DPMI32,       ║                  │          ▒
+║                  │          ║     Compiled Fri, 12 Jun 2025 at     ║                  │          ▒
+║                  │          ║               00:00:00               ║                  │          ▒
+║                  │          ║         http://www.dnosp.ru/         ║                  │          ▒
+║                  │          ║                                      ║                  │          ▒
+║                  │          ║  Based on: Dos Navigator Open Source ║                  │          ▒
+║                  │          ║                1.51.08               ║                  │          ▒
+║                  │          ║                  OK   ▄              ║                  │          ▒
+║                  │          ║                ▀▀▀▀▀▀▀▀              ║                  │          ▒
+║                  │          ╚══════════════════════════════════════╝                  │          ▒
+║                  │                  │          ║║                  │                  │          ▒
+║                  │                  │          ║║                  │                  │          ▼
+║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
+║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
+└[ C D * ]═══════════════════════════════════════╝╚[ C D * ]══════════════════════════════════════─┘
+C:\Users\RUNNER~1\AppData\Local\Temp\dnwin-r►work>
+ F1 Help
