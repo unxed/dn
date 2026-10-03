@@ -268,6 +268,57 @@ def main():
             t.send(F['ALT-X'], 0.8)
             t.send(F['ENTER'], 1.0)
             t.close(3)
+        # Options -> Startup -> "Autosave Desktop" + "Preserve directory": the desktop is saved at Alt-X (DN.DSK next to the program) and comes back
+        # at the next start (the active panel's directory is stored only with "Preserve directory": that is how TFilePanelRoot.Store is written)
+        dd = os.path.join(d, 'dskrun')
+        os.makedirs(os.path.join(dd, 'work', 'sub'))
+        for f in os.listdir(out):
+            if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
+                shutil.copy(os.path.join(out, f), dd)
+            elif f == 'XLT':
+                shutil.copytree(os.path.join(out, f), os.path.join(dd, 'XLT'))
+        dw = os.path.join(dd, 'work')
+
+        def dsk_start():
+            tt = PtyTerm(['./dn'], 100, 30, cwd=dw, exe=os.path.join(dd, 'dn'))
+            tt.pump(1.5, 6)
+            tt.send(F['ESC'], 0.5)
+            return tt
+
+        def dsk_cwd(tt):                                   # the directory of the active panel: the end of the command line prompt
+            return [l for l in tt.text().split('\n') if l.rstrip().endswith('>')][-1].strip()
+
+        def dsk_quit(tt):
+            tt.send(F['ALT-X'], 0.8)
+            tt.send(F['ENTER'], 1.0)
+            tt.close(3)
+
+        t = dsk_start()
+        t.send(F['F10'], 0.4)
+        for _ in range(6):
+            t.send('\x1b[C', 0.2)                          # ... Panel Manager Options
+        t.send(F['ENTER'], 0.6)                            # Options: Configuration >
+        t.send(F['ENTER'], 0.6)
+        t.send(F['DOWN'], 0.2)                             # Startup...
+        t.send(F['ENTER'], 0.8)
+        t.send(F['TAB'], 0.3)                              # the "Shutdown options" cluster: Inactivity, Autosave Desktop, blinking, Preserve directory
+        t.send(F['DOWN'], 0.3)
+        t.send(' ', 0.3)
+        t.send(F['DOWN'], 0.3)
+        t.send(F['DOWN'], 0.3)
+        t.send(' ', 0.3)
+        scr = t.text()
+        check('[X] Autosave Desktop' in scr and '[X] Preserve directory' in scr, 'Startup dialog: both shutdown options are switched on', scr)
+        t.send(F['ENTER'], 0.8)
+        t.send(F['DOWN'], 0.3)
+        t.send(F['ENTER'], 1.0)                            # into sub
+        check(dsk_cwd(t).endswith('sub>'), 'autosave desktop: the panel is in sub before the exit', t.text())
+        dsk_quit(t)
+        check(os.path.isfile(os.path.join(dd, 'DN.DSK')), 'autosave desktop: DN.DSK is written at Alt-X')
+        check(os.path.isfile(os.path.join(dd, 'DN.CFG')), 'autosave desktop: the option itself is saved (DN.CFG)')
+        t = dsk_start()
+        check(dsk_cwd(t).endswith('sub>'), 'autosave desktop: the next start restores the panel directory (sub)', t.text())
+        dsk_quit(t)
     finally:
         shutil.rmtree(d, ignore_errors=True)
     print('ALL OK (%d checks)' % count if not fails else '%d of %d checks FAILED' % (fails, count))
