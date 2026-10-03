@@ -51,7 +51,7 @@ unit panelwinx;
 interface
 
 uses
-  panelwin, Drivers, Views, Objects2
+  panelwin, Drivers, Views, baseobjs
   ;
 
 type

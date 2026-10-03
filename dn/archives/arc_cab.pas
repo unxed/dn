@@ -50,7 +50,7 @@ unit arc_CAB; {CAB}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, Objects2, Streams, Dos
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
   ;
 
 type

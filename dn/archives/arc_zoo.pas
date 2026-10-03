@@ -52,7 +52,7 @@ unit arc_ZOO; {ZOO}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, Objects2, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type

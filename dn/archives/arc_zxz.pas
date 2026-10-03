@@ -50,7 +50,7 @@ unit arc_ZXZ; {ZXZ}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, Objects2, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type

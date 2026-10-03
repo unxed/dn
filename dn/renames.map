@@ -1,5 +1,6 @@
 # new name -> the name in the public archive of DN OSP 2.14 (written by tools/rename-unit.py, read by bootstrap/tools/dn-manifest.py)
 apploop.pas u_myapp.pas
+baseobjs.pas objects2.pas
 basics.pas advance.pas
 boot.pas dn1.pas
 copyio.pas fbb.pas

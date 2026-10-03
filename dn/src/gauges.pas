@@ -52,7 +52,7 @@ unit Gauges;
 interface
 
 uses
-  Dos, Defines, Objects2, Streams, Views, Drivers,
+  Dos, Defines, baseobjs, Streams, Views, Drivers,
   Collect, xTime
   ;
 

@@ -5,7 +5,7 @@ unit UserSavr;
 interface
 
 uses
-  Views, Objects2
+  Views, baseobjs
   ;
 
 type

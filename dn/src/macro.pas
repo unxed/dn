@@ -51,7 +51,7 @@ unit Macro;
 interface
 
 uses
-  basics, Defines, Objects2, Views, Collect,
+  basics, Defines, baseobjs, Views, Collect,
   editcore, highlite, Strings
   ;
 
