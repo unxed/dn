@@ -33,5 +33,21 @@ begin
   P := Utf8ToProxy('日本語', Tab);
   Check((Length(P) = 3) and (ProxyToUtf8(P, Tab) = '日本語'), 'proxy: 3-byte characters');
 
+  { the case }
+  P := 'Привет, Мир! abc ЁЖ';
+  Utf8UpStr(P);
+  Check(P = 'ПРИВЕТ, МИР! ABC ЁЖ', 'up: Cyrillic and ASCII: ' + P);
+  Utf8LowStr(P);
+  Check(P = 'привет, мир! abc ёж', 'low: Cyrillic, Yo, ASCII: ' + P);
+  P := 'ÄÖÜ äöü Ωω';
+  Utf8UpStr(P);
+  Check(P = 'ÄÖÜ ÄÖÜ ΩΩ', 'up: Latin-1 and Greek: ' + P);
+  P := 'a' + #$FF + 'z';
+  Utf8UpStr(P);
+  Check(P = 'A' + #$FF + 'Z', 'a byte that is not UTF-8 stays');
+  Check((CpUpper($44F) = $42F) and (CpLower($42F) = $44F) and (CpUpper($451) = $401), 'the code points: ya, yo');
+  Check(CpUpper($3C2) = $3A3, 'the final sigma');
+  Check(CpUpper($D7) = $D7, 'the sign of multiplication has no case');
+
   Finish;
 end.

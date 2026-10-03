@@ -609,12 +609,20 @@ function CapLongStrg(const S: LongString; First, Last: Integer): LongString;
 {Cat}
 procedure UpStr(var s: String);
   begin
+{$IFDEF DNUTF8}
+  Utf8UpStr(s);
+{$ELSE}
   XLatBuf(s[1], Length(s), UpCaseArray);
+{$ENDIF}
   end;
 
 procedure LowStr(var s: String);
   begin
+{$IFDEF DNUTF8}
+  Utf8LowStr(s);
+{$ELSE}
   XLatBuf(s[1], Length(s), LowCaseArray);
+{$ENDIF}
   end;
 
 procedure CapStr(var S: String);
