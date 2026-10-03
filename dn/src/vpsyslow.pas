@@ -167,7 +167,8 @@ implementation
 uses
   SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
 {$IFDEF GO32V2}, go32, TvDos{$ENDIF}
-{$IFDEF UNIX}, BaseUnix, Unix, TvUnix{$ENDIF};
+{$IFDEF UNIX}, BaseUnix, Unix{$ENDIF}
+{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
 
 { --- names of files ----------------------------------------------------------- }
 
@@ -376,9 +377,33 @@ begin
 end;
 
 function SysRunShell(const CmdLine: string): LongInt;
+{$IFDEF WINDOWS}
+begin
+  UnixSuspend;
+  Writeln;
+  Writeln('> ', CmdLine);
+  Flush(Output);
+  try
+    Result := ExecuteProcess(GetEnvironmentVariable('COMSPEC'), '/c ' + CmdLine);
+  except
+    Result := -1;
+  end;
+  if UnixActive then
+  begin
+    Writeln;
+    Write('[DN] Press Enter to return...');
+    Flush(Output);
+    Readln;
+  end;
+  UnixResume;
+  if Result > 0 then
+    Result := Result shl 8;        { as the status of waitpid on Unix: the exit code is in the second byte }
+end;
+{$ELSE}
 begin
   Result := -1;
 end;
+{$ENDIF}
 
 procedure SysGetDirDos(D: Byte; var S: string);
 begin
@@ -595,7 +620,7 @@ begin
     Inc(Pos, N);
     Dec(Size, N);
   end;
-{$IFDEF UNIX}
+{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
   UnixFlush;                 { DN writes the screen and goes on working (a long loop): the terminal gets it now }
 {$ENDIF}
 end;
@@ -790,7 +815,7 @@ begin
 end;
 
 function SysGetValidDrives: LongWord;
-{$IFDEF GO32V2}
+{$IF DEFINED(GO32V2) OR DEFINED(WINDOWS)}
 var
   I: Integer;
 begin
@@ -951,16 +976,16 @@ end;
 
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
-{$IFDEF UNIX}
+{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
 var
   R: LongInt;
 {$ENDIF}
 begin
-{$IFDEF UNIX}
+{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
   { through the shell, with the terminal: the program may write to it and read from it }
   R := SysRunShell('"' + StrPas(Path) + '" ' + StrPas(Args));
   Result := 0;
-  if (R < 0) or ((R shr 8) = 127) then
+  if (R < 0) or ((R shr 8) = 127) or (R = 9009) then
     Result := 2;                   { the shell could not run it: DOS "file not found" }
 {$ELSE}
   Dos.DosError := 0;
@@ -1005,10 +1030,12 @@ initialization
 finalization
   DosDone;
 {$ENDIF}
-{$IFDEF UNIX}
+{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
 initialization
+{$IFDEF UNIX}
   OnFileName := @SysOsPath;
   NameConv := GetEnvironmentVariable('DN_NAME_CONV') <> '0';
+{$ENDIF}
   UnixInit;                        { False when the program has no terminal (the resource compiler): no screen then }
 finalization
   UnixDone;
