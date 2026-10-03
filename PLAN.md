@@ -463,6 +463,12 @@ English для `README.md` и `tv/README.md`; Safe Pascal: порядок S0–S
    на DOS без провайдера — конверсия имён на границе.
 7. **Хвост плана:** английский для `PLAN.md`, `bootstrap/README.md`, `dn/README.md`, части `dn/TODO-later.md`; затем комментарии в исходниках; полный перевод `unxed/tv` и `unxed/sp` (см. «Хвост плана» выше).
 
+**История `unxed/sp` и `unxed/tv` переписана (2026-10-03, владелец).** `sp`: во все коммиты добавлен соавтор Ivan Sorokin (хеши изменились);
+`tv`: вместо одной заливки «Initial upload» восстановлена история каталога `tv/` из `dn` (95 коммитов до `dn` b8f2bd1 + коммит с пояснением), содержимое файлов то же.
+Старые состояния сохранены в ветках `backup/before-history-rewrite-2026-10-03` обоих репозиториев. **Если у вас есть старый клон `sp` или `tv`: не делайте `git pull`/merge
+(старая и новая история склеятся с дублями), а `git fetch origin && git reset --hard origin/main`** (неотправленное сначала сохраните отдельно).
+Новые коммиты в этих репозиториях подписывать так же: `Co-Authored-By: Claude ...` и `Co-Authored-By: Ivan Sorokin <ivan.sorokin.tech@gmail.com>`.
+
 **Как продолжить на новой машине:** кросс-компиляторы собираются скриптами `tools/build-fpc-*.sh` (префиксы нужны переменным `DN_PREFIX`, `DN_LINUX`, `DN_AARCH64`, `DN_WIN`, `DN_WIN32`; см. `tools/README.md` и `tools/dn-env.sh`), DOSBox-X для CI берётся из apt
 (2024.03.01: DN-DOS на нём работает; на свежем `master` нужна защита из `claude/fix-extdevice-loop`). Все временные каталоги этой сессии (`/tmp`, scratchpad) эфемерны; ничего нужного в них не осталось.
 
