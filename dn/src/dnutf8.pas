@@ -48,6 +48,13 @@ type
     Over: Boolean;                            { more different characters than the table can have }
   end;
 
+type
+  TCaseTab = array[0..255] of Byte;
+
+procedure TabCase(const T: TDocTab; var Up, Low, Tog: TCaseTab);
+  {` The tables of the case of the internal bytes of a document: Up and Low give the byte of the capital and the small letter (the byte itself when
+  the document has no such letter), Tog the other case. `}
+
 function Utf8CharsL(const S: AnsiString): LongInt;
   {` The number of characters of a long UTF-8 string (the bytes that are not continuation bytes). `}
 procedure TabNatural(var T: TDocTab);
@@ -240,6 +247,45 @@ function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
     begin
     Cp2 := CpToUnicode(Byte(Ch));
     Result := CpUpper(Cp) = CpUpper(Cp2);
+    end;
+  end;
+
+procedure TabCase(const T: TDocTab; var Up, Low, Tog: TCaseTab);
+  var
+    B, X: Integer;
+    function Find(Cp: LongWord): Integer;
+      var
+        K: Integer;
+      begin
+      for K := 128 to 255 do
+        if T.Cp[K] = Cp then
+          Exit(K);
+      Result := -1;
+      end;
+  begin
+  for B := 0 to 255 do
+    begin
+    Up[B] := B;
+    Low[B] := B;
+    Tog[B] := B;
+    end;
+  for B := Ord('a') to Ord('z') do
+    begin
+    Up[B] := B - 32;
+    Low[B - 32] := B;
+    Tog[B] := B - 32;
+    Tog[B - 32] := B;
+    end;
+  for B := 128 to 255 do
+    begin
+    X := Find(CpUpper(T.Cp[B]));
+    if (X >= 0) and (X <> B) then
+      begin
+      Up[B] := X;
+      Low[X] := B;
+      Tog[B] := X;
+      Tog[X] := B;
+      end;
     end;
   end;
 

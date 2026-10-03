@@ -8,6 +8,7 @@ var
   Tab, P: String;
   DT: TDocTab;
   I: Integer;
+  UpT, LowT, TogT: TCaseTab;
 begin
   Check(Utf8Chars('abc') = 3, 'chars: ASCII');
   Check(Utf8Chars('Каталог') = 7, 'chars: 7 Cyrillic letters are 14 bytes');
@@ -76,5 +77,11 @@ begin
   for I := 0 to 99 do
     TabSee(DT, Chr($D7) + Chr($80 + (I and $3F)) + 'x');
   Check(TabBuild(DT) or DT.Over or True, 'table: many characters do not crash');
+  { the case tables of a document }
+  TabNatural(DT);
+  TabCase(DT, UpT, LowT, TogT);
+  Check((UpT[$A0] = $80) and (LowT[$80] = $A0) and (TogT[$A0] = $80) and (TogT[$80] = $A0), 'case table: a and A of the page 866');
+  Check((UpT[Ord('q')] = Ord('Q')) and (LowT[Ord('Q')] = Ord('q')) and (UpT[Ord('1')] = Ord('1')), 'case table: ASCII');
+  Check((UpT[$B0] = $B0) and (LowT[$B0] = $B0), 'case table: a frame cell has no case');
   Finish;
 end.
