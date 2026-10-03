@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                07:49:42
-x═[■]═════ C:\tmp\dntour-xp2zmg6t\work ══════════╗x═════════ C:\tmp\dntour-xp2zmg6t\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                08:37:34
+x═[■]═════ C:\tmp\dntour-sb3r86hj\work ══════════╗x═════════ C:\tmp\dntour-sb3r86hj\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                │                  │          ■
 ║c             dat │                  │          ║║c             dat │                  │          ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-xp2zmg6t\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴──────────────────┴──────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-xp2zmg6t\work>
+C:\tmp\dntour-sb3r86hj\work>
  F1 Help
