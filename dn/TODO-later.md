@@ -120,3 +120,10 @@ Count/Compare (reading the directories of `/` takes ~20 s, Esc stops it), File >
   resources (written in CP866) make it 866. Not done: the page of the multi-byte locales (ja, ko, zh: 437 here), 720, 1258, TIS-620 (TvCodePg has
   no such pages); the page that the resources need is known after the panels are read (a Russian UI on a host of another locale: the names that
   were read before are in the page of the host until the next reading); the DOS build takes the page from DOS (TvDos), not from the locale.
+
+## XLT рядом с программой (найдено при сборке под Windows)
+
+DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладка по умолчанию) рядом с программой (`SourceDir`). Раньше их нигде не клали,
+и при старте печаталось «Error in country setups» (на Linux его скрывал альтернативный экран; таблица смены раскладки не строилась).
+Теперь `tools/build.sh` кладёт `dn/data/XLT` рядом с `dn`/`dn.exe`, dist-скрипты тоже; тест `tools/dn-linux-ops.py` проверяет, что ошибки нет.
+Остальное из `dn/data` (`COLORS`, `DN.FLG`) пока не используется: проверить, нужно ли оно, когда дойдём до настроек цветов.

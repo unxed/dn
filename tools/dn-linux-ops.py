@@ -31,6 +31,8 @@ def main():
         for f in os.listdir(out):
             if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
                 shutil.copy(os.path.join(out, f), d)
+            elif f == 'XLT':
+                shutil.copytree(os.path.join(out, f), os.path.join(d, f))
         w = os.path.join(d, 'work')
         os.makedirs(w)
         open(os.path.join(w, 'a.txt'), 'w').write('first\n')
@@ -40,6 +42,7 @@ def main():
         open(os.path.join(w, 'z.txt'), 'wb').write(payload)
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
         t.pump(1.5, 6)
+        check(b'Error in country' not in t.raw, 'start: no country setup error (XLT next to the program)')
         t.send(F['ESC'], 0.5)
 
         def key(k, settle=0.6):
