@@ -244,7 +244,7 @@ uses
   Drivers, Messages, Dialogs, Memory, FileFind, DNUtil, FileCopy, keymap,
   ArvidAvt, ArvidTdr
   , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}
-  , VPUtils
+  , VPUtils, Math
   , VPSysLow;
 
 constructor TArvidDrive.Init(const AName: String);

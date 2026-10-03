@@ -5,8 +5,6 @@ unit VPUtils;
 
 interface
 
-function Min(A, B: LongInt): LongInt; inline;
-function Max(A, B: LongInt): LongInt; inline;
 
 { The hexadecimal text of Number with at least N digits (zeros in front). }
 function Int2Hex(Number: LongInt; N: Byte): String;
@@ -42,16 +40,6 @@ implementation
 
 uses
   SysUtils, Dos, TvScreen, VPSysLow;
-
-function Min(A, B: LongInt): LongInt;
-begin
-  if A < B then Result := A else Result := B;
-end;
-
-function Max(A, B: LongInt): LongInt;
-begin
-  if A > B then Result := A else Result := B;
-end;
 
 function Int2Hex(Number: LongInt; N: Byte): String;
 begin

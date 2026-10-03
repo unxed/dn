@@ -196,7 +196,7 @@ procedure MakeNoSlash(var S: String);
 
 implementation
 uses
-  Drivers, Dos, Lfn, VPUtils, DNUtf8,
+  Drivers, Dos, Lfn, VPUtils, Math, DNUtf8,
   
   strutil, Strings,
   Commands, mainapp, DnIni, Memory, panelroot, dnHelp

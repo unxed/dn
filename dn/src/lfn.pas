@@ -257,7 +257,7 @@ implementation
 uses
   
   Strings, Commands {Cat}
-  , strutil, fileutil, VPUtils
+  , strutil, fileutil, VPUtils, Math
    ,Startup ,Dpmi32 ,Dpmi32df 
   , fnotify
   ;

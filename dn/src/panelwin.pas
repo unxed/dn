@@ -166,7 +166,7 @@ uses
   DiskInfo, Commands, FileCopy, FilesCol, basics, strutil, fileutil,
   Startup, mainapp, topview, Tree, FViewer
   
-  , Dos, VPUtils
+  , Dos, VPUtils, Math
   ;
 
 constructor TDoubleWindow.Init(Bounds: TRect; ANumber, ADrive: Integer);
