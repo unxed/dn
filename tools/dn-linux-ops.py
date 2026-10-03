@@ -54,6 +54,12 @@ def main():
         key('F7'); key('newdir'); key('ENTER', 1.0)
         check(os.path.isdir(os.path.join(w, 'newdir')), 'F7: the directory is made')
 
+        # the cursor moves: only the two lines of the panel are redrawn, they must be the same as in the other panel (the same directory)
+        key('HOME'); key('DOWN')
+        rows = [l for l in t.text().split('\n') if 'newdir' in l or ' txt' in l]
+        halves = [(l[1:20].strip(), l[51:70].strip()) for l in rows]
+        check(rows and all(a_ == b_ for a_, b_ in halves) and '\u2642' not in t.text(), 'Down: the redrawn lines of the panel are not garbage (the same as in the other panel)', t.text())
+
         # copy a.txt into newdir: the cursor on a.txt (.., newdir, a.txt; DN puts the cursor on the new directory)
         key('HOME'); key('DOWN'); key('DOWN')
         key('F5'); key('newdir'); key('ENTER', 1.2)
