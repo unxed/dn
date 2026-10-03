@@ -2723,7 +2723,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         ShowUserScreen
       else
 {$ENDIF}
-      GetUserScreen;
+{$IFDEF GO32V2}
+      ShowUserScreen   { DOS: the screen of the programs (DNRun) instead of the window of the stored one }
+{$ELSE}
+      GetUserScreen
+{$ENDIF}
+      ;
     cmHistoryList:
       CmdHistory;
     cmLoadDesk:
