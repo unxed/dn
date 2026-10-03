@@ -18,6 +18,8 @@ directories together (`tools/dn-env.sh`, one flat stage of links), so a unit doe
 | `compat/shims/` | the map of what DN takes from `tv/` (`shims.map`) and the hand-written parts (`manual/*.inc`); the shim units are generated from it by `tools/gen-shim.py` |
 | `data/`, `tests/` | the data that DN reads, the tests of our units |
 
+The records of the analysis of the original archive (the old names) are in [`../spec/`](../spec/README.md); the old name -> the new one: [`renames.map`](renames.map).
+
 What is in `compat/` is not DN: it is what makes the code of DN run on a modern runtime. When the code of DN no longer asks for a unit of `compat/`, the unit goes away.
 
 ## The program and its commands
