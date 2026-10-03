@@ -1,6 +1,6 @@
 {/////////////////////////////////////////////////////////////////////////
 //
-//  Dos Navigator Open Source
+//  Dos Navigator Open Source 1.51.08
 //  Based on Dos Navigator (C) 1991-99 RIT Research Labs
 //
 //  This programs is free for commercial and non-commercial use as long as
@@ -43,25 +43,20 @@
 //  cannot simply be copied and put under another distribution licence
 //  (including the GNU Public Licence).
 //
-//////////////////////////////////////////////////////////////////////////
-//
-//  2007.06.15
-//  BZip2 reader for Dos Navigator
-//  Initial version by Max Piwamoto
-//
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_BZ2; {bzip2}
+unit arctgz; {TGZ & TAZ & TAR.GZ}
 
 interface
 
 uses
-  Archiver, basics, strutil, fileutil, baseobjs
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime,
+   fileutil
   ;
 
 type
-  PBZ2Archive = ^TBZ2Archive;
-  TBZ2Archive = object(TARJArchive)
+  PTGZArchive = ^TTGZArchive;
+  TTGZArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -69,9 +64,9 @@ type
     end;
 
 implementation
-{ ----------------------------- BZIP2 ------------------------------------ }
+{ ----------------------------- TAR ------------------------------------}
 
-constructor TBZ2Archive.Init;
+constructor TTGZArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -82,11 +77,11 @@ constructor TBZ2Archive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'bzip2'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'bzip2'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-dk'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-dk'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-k'));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, ''));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'UNTGZOS2'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-d'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-d'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, ''));
   Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
   Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
@@ -102,15 +97,15 @@ constructor TBZ2Archive.Init;
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PStoreCompression, ''));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, '-1'));
+         PFastestCompression, ''));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, '-2'));
+         PFastCompression, ''));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PNormalCompression, ''));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PGoodCompression, ''));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, '-9'));
+         PUltraCompression, ''));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
@@ -129,37 +124,71 @@ constructor TBZ2Archive.Init;
   q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TBZ2Archive.Init };
+  end { TTGZArchive.Init };
 
-function TBZ2Archive.GetID: Byte;
+function TTGZArchive.GetID: Byte;
   begin
-  GetID := arcBZ2;
+  GetID := arcTGZ;
   end;
 
-function TBZ2Archive.GetSign: TStr4;
+function TTGZArchive.GetSign: TStr4;
   begin
-  GetSign := sigBZ2;
+  GetSign := sigTGZ;
   end;
 
-procedure TBZ2Archive.GetFile;
+procedure TTGZArchive.GetFile;
+  type
+    GZipHdr = record
+      Id: AWord;
+      Flag: AWord;
+      Time: LongInt;
+      end;
   var
-    S: String;
+    P: GZipHdr;
+    DT: DateTime;
+    C: Char;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  ArcFile^.Read(P, SizeOf(P));
+  if ArcFile^.Eof then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  S := UpStrg(GetExt(ArcFileName));
-  FileInfo.FName := GetSName(ArcFileName);
-  if (S = '.TBZ') or (S = '.TBZ2') then
-    FileInfo.FName := FileInfo.FName + '.TAR';
+  GetUNIXDate(P.Time, DT.Year, DT.Month, DT.Day, DT.Hour, DT.Min, DT.Sec);
+  PackTime(DT, FileInfo.Date);
+  FileInfo.FName := '';
+  if  (P.Flag and $800 = 0) or (P.Id = $9d1f)
+  then
+    if {(UpStrg(GetExt(ArcFileName)) = '.GZ') or}
+        (UpCase(ArcFileName[Length(ArcFileName)]) = 'Z')
+      {gzip changes last char of extension to 'z' or adds '.gz' extension}
+      then
+      FileInfo.FName := GetSName(ArcFileName)
+    else
+      FileInfo.FName := GetName(ArcFileName)
+  else
+    begin
+    if P.Flag and $400 = 0 then
+      P.Time := 10 {skip 10 bytes}
+    else
+      begin
+      ArcFile^.Read(P.Time, SizeOf(P.Time));
+      P.Time := P.Time shr 16+12;
+      end;
+    ArcFile^.Seek(ArcPos+P.Time);
+    repeat
+      ArcFile^.Read(C, 1);
+      if C <> #0 then
+        FileInfo.FName := FileInfo.FName+C
+      else
+        Break;
+    until ArcFile^.Status <> stOK;
+    end;
   FileInfo.PSize := ArcFile^.GetSize;
-  FileInfo.USize := 0;
-  FileInfo.Date := 0;
+  ArcFile^.Seek(CompToFSize(FileInfo.PSize-4));
+  ArcFile^.Read(FileInfo.USize, SizeOf(FileInfo.USize));
   FileInfo.Attr := 0;
   FileInfo.Last := 0;
-  ArcFile^.Seek(ArcFile^.GetSize);
-  end { TBZ2Archive.GetFile };
+  end { TTGZArchive.GetFile };
 
 end.

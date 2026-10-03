@@ -45,17 +45,17 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_HAP; {HAP}
+unit arczxz; {ZXZ}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type
-  PHAPArchive = ^THAPArchive;
-  THAPArchive = object(TARJArchive)
+  PZXZArchive = ^TZXZArchive;
+  TZXZArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -63,21 +63,22 @@ type
     end;
 
 type
-  HAPHdr = record
-    C: Char;
-    Id: LongInt;
-    PackedSize: LongInt;
-    Reserved: array[1..9] of Byte;
-    Attr: Byte;
-    Date: LongInt;
-    OriginSize: LongInt;
+  ZXZHdr = record
+    Name: array[0..7] of Char;
+    Extension: array[0..2] of Char;
+    OriginSize: AWord;
+    SectorSize: Byte;
+    PackedSize: AWord;
+    CRC32: LongInt;
+    MethodID: Byte;
+    Flags: Byte;
     end;
 
 implementation
 
-{ ----------------------------- HAP ------------------------------------}
+{ ------------------------------ ZXZip aka $Z ----------------------------- }
 
-constructor THAPArchive.Init;
+constructor TZXZArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -87,15 +88,17 @@ constructor THAPArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HAP3'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'PAH3'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'a'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
+  
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ZXZIP386'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ZXUNZIP'));
+  
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, ''));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, ''));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-start8224'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
@@ -135,57 +138,70 @@ constructor THAPArchive.Init;
   q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
   UseLFN := q <> '0';
   
-  end { THAPArchive.Init };
+  end { TZXZArchive.Init };
 
-function THAPArchive.GetID: Byte;
+function TZXZArchive.GetID: Byte;
   begin
-  GetID := arcHAP;
+  GetID := arcZXZ;
   end;
 
-function THAPArchive.GetSign: TStr4;
+function TZXZArchive.GetSign: TStr4;
   begin
-  GetSign := sigHAP;
+  GetSign := sigZXZ;
   end;
 
-procedure THAPArchive.GetFile;
+procedure TZXZArchive.GetFile;
   var
-    P: HAPHdr;
-    C: Char;
+    FP: TFileSize;
+    P: ZXZHdr;
+    Len: AWord;
   begin
-  ArcFile^.Read(P, 1);
-  if  (ArcFile^.GetPos = ArcFile^.GetSize) then
+  ArcFile^.Read(P, SizeOf(P));
+  FP := ArcFile^.GetPos;
+  if  (ArcFile^.Status <> stOK) or (FP > 65280) then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  if  (P.Name[0] < #32) or
+      (P.PackedSize > P.SectorSize*256) or
+      ( (P.PackedSize+FP-SizeOf(P)-17) > ArcFile^.GetSize) or
+      (P.MethodID > 3) or
+      (P.SectorSize = 0)
+  then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P.Id, SizeOf(P)-1);
-  if  (ArcFile^.Status <> stOK) or (P.Id <> $574a688e {#142#104#74#87})
+  FileInfo.FName := P.Name;
+  DelRight(FileInfo.FName);
+  if  (P.Extension[0] <> 'B') and
+      (P.Extension[1] >= #32) and (P.Extension[1] <= #127) and
+      (P.Extension[2] >= #32) and (P.Extension[2] <= #127)
   then
-    begin
-    FileInfo.Last := 2;
-    Exit;
-    end;
-  {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
+    FileInfo.FName := FileInfo.FName+'.'+P.Extension
+  else
+    FileInfo.FName := FileInfo.FName+'.'+P.Extension[0];
+  DelRight(FileInfo.FName);
   FileInfo.Last := 0;
-  FileInfo.Attr := P.Attr and not Hidden;
-  FileInfo.USize := P.OriginSize;
-  FileInfo.PSize := P.PackedSize;
-  FileInfo.Date := P.Date;
-  FileInfo.FName := '';
-  repeat
-    ArcFile^.Read(C, 1);
-    if C <> #0 then
-      FileInfo.FName := FileInfo.FName+C;
-  until (C = #0) or (Length(FileInfo.FName) > 77);
-  repeat
-    ArcFile^.Read(C, 1);
-  until (C in [#$15, #$16]) or (ArcFile^.Status <> stOK);
-  if  (ArcFile^.Status <> stOK) or (Length(FileInfo.FName) > 79) then
+  FileInfo.Attr := 0;
+  if  (P.OriginSize and $ff) = 0 then
+    Len := 0
+  else
+    Len := 256;
+  Len := Trunc((Len+P.OriginSize)/256);
+  if Len <> P.SectorSize then
+    Len := P.SectorSize*256
+  else
     begin
-    FileInfo.Last := 2;
-    Exit;
+    Len := P.OriginSize;
+    if P.Extension[0] = 'B' then
+      Len := 4+Ord(P.Extension[1])+Ord(P.Extension[2])*256;
     end;
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize-1);
-  end { THAPArchive.GetFile };
+  FileInfo.USize := LongInt(Len);
+  FileInfo.PSize := LongInt(P.PackedSize);
+  FileInfo.Date := 0;
+  ArcFile^.Seek(FP+P.PackedSize);
+  end { TZXZArchive.GetFile };
 
 end.

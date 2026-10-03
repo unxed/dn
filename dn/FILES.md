@@ -12,7 +12,7 @@ directories together (`tools/dn-env.sh`, one flat stage of links), so a unit doe
 | Directory | What is in it |
 |---|---|
 | `src/` | DN itself: the program, the panels, the editor, the viewer, the dialogs, the basics; the texts of the resources (`RESOURCE/`) |
-| `archives/` | one unit per archive format (`arc_zip`, `arc_rar`, `arc_7z`, `arc_tar`... 26 of them); the common code is `archiver.pas`, `archdet.pas` in `src/` |
+| `archives/` | one unit per archive format (`arczip`, `arcrar`, `arc7z`, `arctar`... 26 of them; was `arc_zip`...); the common code is `archiver.pas`, `archdet.pas` in `src/` |
 | `compat/` | **the environment that the old code expects, made over `tv/` and the RTL of FPC:** the layer of Virtual Pascal (`vpsyslow`, `vpsysext` (was `vpsyslo2`), `use16`, `memory`), the Borland units on `tv/` (`drivers`, `baseobjs` (was `objects2`)), the layer of DPMI32 (`dpmi32`, `dpmi32df`, `doslow`), the country table (`country_`) |
 | `compat/linux/` | units that replace those of `compat/` in the builds that are not for DOS (`country_.pas`: the table of CP866 for Linux and Windows) |
 | `compat/shims/` | the map of what DN takes from `tv/` (`shims.map`) and the hand-written parts (`manual/*.inc`); the shim units are generated from it by `tools/gen-shim.py` |
@@ -98,7 +98,7 @@ Why two files for the settings: `dn.cfg` is the memory dump of the records of th
 ## Archives
 | File | What it holds |
 |---|---|
-| `archiver.pas` | the work with archivers (the external programs: lists, extraction); `archdet.pas`: the detection of the type of an archive; `arc_*.pas`: one archive format each |
+| `archiver.pas` | the work with archivers (the external programs: lists, extraction); `archdet.pas`: the detection of the type of an archive; `arc*.pas` of `archives/`: one archive format each |
 | `uucode.pas`, `decoder.pas` | uuencode and decoding of mail files |
 
 ## Tools and extras

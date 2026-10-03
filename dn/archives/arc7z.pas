@@ -1,6 +1,6 @@
 {/////////////////////////////////////////////////////////////////////////
 //
-//  Dos Navigator Open Source 1.51.08
+//  Dos Navigator Open Source
 //  Based on Dos Navigator (C) 1991-99 RIT Research Labs
 //
 //  This programs is free for commercial and non-commercial use as long as
@@ -43,48 +43,60 @@
 //  cannot simply be copied and put under another distribution licence
 //  (including the GNU Public Licence).
 //
+//////////////////////////////////////////////////////////////////////////
+//
+//  Version history:
+//
+//  2005.02.07 ported from DN OSP 4.9.0 by Max Piwamoto
+{  15.02.2005 AK155: Мелкие коррекции.
+    * ExecAnsiString приводил к порче экрана DN, заменён на ExecStringRR.
+    * В TS7ZArchive.GetFile в связи с AnsiString выплыло несколько
+      некоректностей вроде S[1] для пустой строки. Исправил.
+    * Приформирование в конце строки '\' для каталогов - это неправильно
+      (надо сначала удалить проблелы) и не нужно (это будет сделано
+      позже по FileInfo.Attr = Directory. Приводило к появлению
+      фантомных каталогов с пробелами в конце (7z 4.11). Убрал.
+    * Сделал переформатирование.
+    - Вижу глюки с поиском извне. Если в filefind снять запрет на поиск в
+      7z-архивах, то поиск почти работает, но из панели поиска переход
+      на любой файл внутри 7z-архива приводит при выходе из архива к
+      Sharing violation (при удалении файла в Done). Если проигнорировать
+      - всё работает нормально.
+      Кроме того, поиск иногда (или всегда?) показывает файл, который
+      на самом деле находится в другом архиве.
+      Источник проблем IMHO в том, что файл списка слишком долго держится
+      открытым.
+}
+//
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_CAB; {CAB}
+unit arc7z; {7-Zip}
 
 interface
-
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
+  Archiver
   ;
 
 type
-  PCABArchive = ^TCABArchive;
-  TCABArchive = object(TARJArchive)
-    FilesNumber: LongInt;
+  PS7ZArchive = ^TS7ZArchive;
+  TS7ZArchive = object(TARJArchive)
+    ListFileName: String;
+    ListFile: System.Text;
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
-    end;
-
-type
-  PCFHEADER = ^TCFHEADER;
-  TCFHEADER = record
-    signature: LongInt;
-    Reserved1: LongInt;
-    cbCabinet: LongInt;
-    Reserved2: LongInt;
-    coffFiles: LongInt;
-    Reserved3: LongInt;
-    VersionMinor: Byte;
-    VersionMajor: Byte;
-    cFolders: AWord;
-    cFiles: AWord;
-    Flags: AWord;
-    setID: AWord;
-    iCabinet: AWord;
+    destructor Done; virtual;
     end;
 
 implementation
-{ ---------------------- CAB (by Neverowsky A.)---------------------------}
+uses
+  basics, strutil, fileutil, Defines, baseobjs, Streams, Dos, DnExec
+  ;
 
-constructor TCABArchive.Init;
+{ --- 7-Zip implemented by piwamoto --- }
+
+constructor TS7ZArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -94,40 +106,40 @@ constructor TCABArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  {-i0 turns on console output}
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'MSCAB -i0'));
-  
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'MSCAB -i0'));
-  
+
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, '7Z'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, '7Z'));
+
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
   ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-dirs -r0 a'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-dirs -r0 m'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
   Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-p'));
   Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
-  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-y'));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract,
+         '-sfx'));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
-  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
-         ''));
+  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PRecurseSubDirs, '-r0'));
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, ''));
+         PStoreCompression, '-mx0'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, ''));
+         PFastestCompression, '-mx1'));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, ''));
+         PFastCompression, '-mx1'));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, ''));
+         PNormalCompression, '-mx5'));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PGoodCompression, ''));
+         PGoodCompression, '-mx7'));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, ''));
+         PUltraCompression, '-mx9'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
          '@'));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
@@ -145,70 +157,73 @@ constructor TCABArchive.Init;
   q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
+  end { TS7ZArchive.Init };
 
-  FilesNumber := -1;
-  end { TCABArchive.Init };
-
-function TCABArchive.GetID: Byte;
+function TS7ZArchive.GetID: Byte;
   begin
-  GetID := arcCAB;
+  GetID := arc7Z;
   end;
 
-function TCABArchive.GetSign: TStr4;
+function TS7ZArchive.GetSign: TStr4;
   begin
-  GetSign := sigCAB;
+  GetSign := sig7Z;
   end;
 
-procedure TCABArchive.GetFile;
+procedure TS7ZArchive.GetFile;
   var
-    C: Char;
-    FH: record
-      cbFile: LongInt;
-      uoffFolderStart: LongInt;
-      iFolder: AWord;
-      {     date:     AWord;
-      time:     AWord; }
-      DateTime: LongInt;
-      attribs: AWord;
-      {     u1  szName[]; }
-      end;
-    CFHEADER: TCFHEADER;
+    DT: DateTime;
+    S: AnsiString;
   begin
-  if  (FilesNumber < 0) then
-    begin
-    ArcFile^.Read(CFHEADER, SizeOf(CFHEADER));
-    FilesNumber := CFHEADER.cFiles;
-    ArcFile^.Seek(ArcPos+CFHEADER.coffFiles);
+  if TextRec(ListFile).Handle = 0 then
+    begin { первый вызов: вызов архиватора для вывода оглавления }
+    FreeObject(ArcFile);
+    {AK155 если архив не закрыть, то архиватор
+      выдаёт sharing violation }
+    ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
+    S := UnPacker^+' l '+SquashesName(ArcFileName)+' >'+ListFileName;
+    ExecStringRR(S, '', False);
+    System.Assign(ListFile, ListFileName);
+    System.Reset(ListFile);
+    repeat
+      if Eof(ListFile) then
+        begin
+        FileInfo.Last := 2;
+        Exit;
+        end;
+      Readln(ListFile, S);
+    until (S <> '') and (S[1] = '-');
     end;
-  if  (FilesNumber = 0) then
+  Readln(ListFile, S);
+  if (Length(S) < 54) or (S[1] = '-') then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  Dec(FilesNumber);
-  ArcFile^.Read(FH, SizeOf(FH));
-  if  (ArcFile^.Status <> 0) then
-    begin
-    FileInfo.Last := 2;
-    Exit;
-    end;
-  FileInfo.FName := '';
-  repeat
-    ArcFile^.Read(C, 1);
-    if C <> #0 then
-      FileInfo.FName := FileInfo.FName+C;
-  until (C = #0) or (Length(FileInfo.FName) > 100);
-  if  (Length(FileInfo.FName) > 100) or (FileInfo.FName = '')
-  then
-    begin
-    FileInfo.Last := 2;
-    Exit;
-    end;
-  FileInfo.Attr := FH.attribs and not Hidden;
-  FileInfo.USize := FH.cbFile;
-  FileInfo.PSize := FH.cbFile;
-  FileInfo.Date := (FH.DateTime shr 16) or (FH.DateTime shl 16);
+  DT.Year := StoI(Copy(S, 1, 4));
+  DT.Month := StoI(Copy(S, 6, 2));
+  DT.Day := StoI(Copy(S, 9, 2));
+  DT.Hour := StoI(Copy(S, 12, 2));
+  DT.Min := StoI(Copy(S, 15, 2));
+  DT.Sec := StoI(Copy(S, 18, 2));
+  PackTime(DT, FileInfo.Date);
+  FileInfo.USize := Str2Comp(fDelLeft(Copy(S, 27, 12)));
+  FileInfo.PSize := Str2Comp(fDelLeft(Copy(S, 40, 12)));
+  if S[21] = 'D' then
+    FileInfo.Attr := Directory
+  else
+    FileInfo.Attr := 0;
+  FileInfo.FName := '\'+fDelRight(Copy(S, 54, 255));
   FileInfo.Last := 0;
-  end { TCABArchive.GetFile };
+  end { TS7ZArchive.GetFile };
+
+destructor TS7ZArchive.Done;
+  begin
+  if TextRec(ListFile).Handle <> 0 then
+    begin
+    System.Close(ListFile);
+    EraseFile(ListFileName);
+    end;
+  inherited Done;
+  end;
 
 end.
