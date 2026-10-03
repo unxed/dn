@@ -5,17 +5,17 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 19 |
+| Our files (MIT, see `LICENSE`) | 20 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 121 |
-| Contributors of DN OSP | 6 |
+| Contributors of DN OSP | 5 |
 | Upstream without a notice | 15 |
 
 ## Our files (MIT, see `LICENSE`)
 
 The replacements of the units that were excluded (their code is of Borland origin or of the Virtual Pascal runtime), the adapters to `tv/`, the system layer. They carry the MIT notice of this project in their head; the audit (`dn/audit`) checks them against the archive.
 
-`asciitab.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `dpmi32.pas`, `dpmi32df.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `memory.pas`, `messages.pas`, `objects2.pas`, `strview.pas`, `use16.pas`, `version.inc`, `vpsyslow.pas`, `vputils.pas`
+`asciitab.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `dpmi32.pas`, `dpmi32df.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `memory.pas`, `messages.pas`, `objects2.pas`, `strview.pas`, `use16.pas`, `version.inc`, `vpsyslow.pas`, `vputils.pas`
 
 ## Carved (the license of DN)
 
@@ -33,7 +33,7 @@ Files of the public DN OSP 2.14 with the notice of RIT Research Labs; changed by
 
 Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155...) and give no license of their own: they came in the same public release as the rest, and are used as part of it. This is the thing to ask the owner of the project about (PLAN.md).
 
-`country.pas`, `dnutf8.pas`, `events.pas`, `fnotify.pas`, `fsinfo.pas`, `uue2inc.pas`
+`dnutf8.pas`, `events.pas`, `fnotify.pas`, `fsinfo.pas`, `uue2inc.pas`
 
 ## Upstream without a notice
 

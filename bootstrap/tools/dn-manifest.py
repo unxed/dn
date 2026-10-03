@@ -43,7 +43,7 @@ for f, p in sorted(((f, os.path.join(d, f)) for d in srcdirs for f in os.listdir
     if not os.path.isfile(p) or low_ext(f) in ('.o', '.ppu'):      # the objects of a stray compilation in the tree are not sources
         continue
     low = renames.get(f.lower(), f.lower())
-    c = 'OURS' if low in ours else 'CARVED' if low in carved else head_class(p)
+    c = 'OURS' if (low in ours or f.lower() in ours) else 'CARVED' if low in carved else head_class(p)
     classes[c].append(f)
 
 TEXT = {
