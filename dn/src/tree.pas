@@ -223,7 +223,7 @@ uses
   Lfn, Files, Startup, Dos, DnIni, DNHelp,
   basics, strutil, fileutil, envutil,
   panelroot, mainapp, Messages, Commands, Drives, Eraser, Menus,
-  xTime, FileCopy, osdep
+  xTime, FileCopy, osdep, dnscreen
   ;
 
 const
@@ -272,15 +272,15 @@ procedure ReadTree(C: Char; CountLen: Boolean);
     if DC = nil then
       Exit;
     Msg := ' Reading directories: '+ItoS(DC^.Count)+'   Esc - stop ';
-    SysTvGetScrMode(@Pt, True);
-    Cells := SysTvGetSrcBuf;
+    GetScreenMode(@Pt, True);
+    Cells := ReadScreenCells;
     if (Cells = nil) or (Pt.X < Length(Msg)+2) then
       Exit;
     X0 := (Pt.X-Length(Msg)) div 2;
     Y0 := Pt.Y div 2;
     for I := 1 to Length(Msg) do
       PWordArray(Cells)^[Y0*Pt.X+X0+I-1] := Byte(Msg[I]) or ($70 shl 8);
-    SysTvShowBuf(Y0*Pt.X+X0, Length(Msg));
+    WriteScreenCells(Y0*Pt.X+X0, Length(Msg));
     end;
 
   procedure ChkESC;

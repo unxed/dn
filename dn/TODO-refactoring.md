@@ -49,8 +49,8 @@ dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `osfind`
 | `osdep` (the files: `SysFileOpen/Create/Seek/Read/Write/Close/SetSize` ~35) | the file API of VP with the names of DN (DOS names, `SysOsPath`, the code page) | `SysUtils.FileOpen...` + the conversion of the name in one place | **candidate:** a rewrite of `lfn.pas` over `TFileStream`/`FileOpen`; the conversion of names (`SysOsPath`, 28) stays: it is not an RTL thing |
 | `osdep` (`SysFindFirst/Next/Close`, 12) | the search of a directory in the record of VP | `SysUtils.FindFirst` (it already lies on it) | **candidate** together with `osfind` (the "new" record) and `lfn.pas` |
 | `osdep` (the disks: `SysDiskFree/SizeLongX`, `SysGetValidDrives`, `SysGetVolumeLabel`, ~20) | free space, drives, label | `DiskFree`, `DiskSize` of FPC (by number of the drive; the Unix mapping of C: is ours) | keep, thin |
-| `osdep` (the screen/keys: `SysTv*`, `SysGetCurPos`, `SysSetVideoMode`, ~35) | glue to `tv/` (`TvSys`, `TvScreen`) | the functions of `tv/` directly | **candidate:** replace the calls by `tv/` (`CaretSize`, `SetCaretSize`...) and drop the glue |
-| `osdep` (`SysCtrlSleep` 4, `SysBeepEx` 6, `SysKeyPressed/ReadKey` 3, `PhysMemAvail` 3, `SysPlatformId` 6) | small things | `Sleep`, the beep of `tv/`, `tv/` events, `GetHeapStatus`, `{$IFDEF}` | **candidates** one by one (each is a few lines) |
+| `dnscreen` (was in `osdep`: `SysTv*`, ~35 call sites) | glue to `tv/`: the copy of the screen in 16-bit cells and the cursor shape in lines | — | **done (moved and renamed 2026-10-04):** the glue stays as its own unit with semantic names (`ReadScreenCells`, `WriteScreenCells`, `GetCursorType`...); dropping it needs DN to read `TvScreen` cells (UTF-8) instead of 16-bit cells: that is the UTF-8 step (task 4) |
+| `osdep` (`SysBeepEx` 6, `SysKeyPressed/ReadKey` 3, `PhysMemAvail` 3) | small things | `SysCtrlSleep`, `SysPlatformId` are gone (`Sleep`, `{$IFDEF GO32V2}`); the three left are real code (the PC speaker through ports, DPMI memory info, the key of the fatal-error screen) | **keep** (decided 2026-10-04: no FPC equivalent; each is one place of use) |
 | `osfind` | the "new" search record (creation time, last access) | `TSearchRec` has them (`FindData` on Windows; `stat` on Unix) | with the search above |
 | `memory` | (deleted 2026-10-04) | `MemAlloc` is `GetMem` (`ReturnNilIfGrowHeapFails := True` in `dn.pas`: nil instead of an exception); `LowMemory` was always False: its 22 conditions are removed; the no-op `InitMemory`... are gone | **done** |
 | `realmode`, `fat32free`, `dosbuf` | real-mode calls of DOS (LFN of Windows 95, the clipboard, FAT32) | `go32` of FPC (DOS only) | **DOS only:** `{$IFDEF GO32V2}` in `lfn.pas`, `fsinfo.pas`, `videoman.pas`, `dnexec.pas`; on Linux and Windows they are stubs that fail |
@@ -59,7 +59,7 @@ dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2` is `osfind`
 | `country` | the country table | `SysUtils` formats + the table of CP866 (ours) | keep |
 | `drivers` | the keys, the events, `DNKeyCode`, `MessageKey`, the cursor | — (it is the adapter to `tv/`) | keep, it is the border |
 
-The order (each is a step with the same proof: the tests, the builds, the binary behaves): 1) (done) `use16` -> `SmallInt`; 2) the small things of `osdep`; 3) (done) `memory`; 4) the screen glue -> `tv/`; 5) DOS-only `dpmi32*`; 6) the files and the search (the biggest).
+The order (each is a step with the same proof: the tests, the builds, the binary behaves): 1) (done) `use16` -> `SmallInt`; 2) (done) the small things of `osdep`; 3) (done) `memory`; 4) (done) the screen glue -> `dnscreen`; 5) DOS-only `dpmi32*`; 6) the files and the search (the biggest).
 
 - osdep: SysCtrlSleep, SysPlatformId and the no-op SysTv* (KbdInit/KbdDone/InitCursor/SetScrMode) are gone; the platform
   checks are `{$IFDEF GO32V2}`, the sleep is `Sleep(1)` (done).

@@ -307,7 +307,7 @@ implementation
 
 uses
   xTime, Startup, strutil, Math, DNUtf8,
-  osdep, fileutil,
+  osdep, dnscreen, fileutil,
   Commands
   ;
 procedure ClrIO;
@@ -721,7 +721,7 @@ procedure FillWord(var B; Count, W: Word);
 
 procedure LocateCursor(X, Y: Byte);
   begin
-  SysTVSetCurPos {GotoXY}(X, Y)
+  MoveCursorTo {GotoXY}(X, Y)
   end;
 
 procedure TinySlice;

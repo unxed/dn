@@ -1,0 +1,159 @@
+{ dnscreen: the screen of DN over tv/. DN keeps its screen as an array of 16-bit cells (character + BIOS attribute) and a
+  cursor given by the lines of the cell; tv/ has cells with UTF-8 text and a caret size in percent. Here is the glue between
+  them: ReadScreenCells makes the copy of the screen of tv/, WriteScreenCells puts cells of the copy back, the cursor
+  routines convert the shape. (It was a part of the layer of Virtual Pascal, SysTv*; split out of osdep, which is the system
+  layer only.) Our own code (MIT, see LICENSE). }
+unit dnscreen;
+
+{$mode objfpc}
+{$H-}
+
+interface
+
+uses
+  osdep;
+
+{ --- the screen (a copy of the screen of tv/ in 16-bit cells) ---------------------- }
+
+{ The size of the screen; the result is the mode of DN: 3 (80x25 and the like) or $0103 (more lines, small
+  font). Size may be nil. }
+function GetScreenMode(Size: PSysPoint; Flag: Boolean): Word;
+function SetScreenSize(Cols, Rows: Word): Boolean;
+{ The screen as an array of 16-bit cells; it is filled from the screen of tv/ at every call. }
+function ReadScreenCells: Pointer;
+{ Writes Size cells from the position Pos (the number of the cell) of that array to the screen of tv/. }
+procedure WriteScreenCells(Pos, Size: LongInt);
+procedure ClearScreenCells;
+procedure GetCursorType(var Y1, Y2: Integer; var Visible: Boolean);
+procedure SetCursorType(Y1, Y2: Integer; Visible: Boolean);
+procedure MoveCursorTo(X, Y: Word);
+procedure GetCursorXY(var X, Y: Word);
+
+implementation
+
+uses
+  TvCell, TvColors, TvScreen{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
+
+{ --- the screen ---------------------------------------------------------------- }
+
+const
+  FontHeight = 16;                 { the lines of a character cell; the caret size of tv/ is in percent }
+
+var
+  CellCopy: array of Word;
+
+function GetScreenMode(Size: PSysPoint; Flag: Boolean): Word;
+begin
+  if Size <> nil then
+  begin
+    Size^.X := ScreenWidth;
+    Size^.Y := ScreenHeight;
+  end;
+  if ScreenHeight > 25 then
+    Result := $0103
+  else
+    Result := 3;
+end;
+
+function SetScreenSize(Cols, Rows: Word): Boolean;
+begin
+  Result := (ScreenWidth = Cols) and (ScreenHeight = Rows);
+end;
+
+function ReadScreenCells: Pointer;
+var
+  I, N: Integer;
+  C: PScreenCell;
+begin
+  N := ScreenWidth * ScreenHeight;
+  if Length(CellCopy) <> N then
+    SetLength(CellCopy, N);
+  C := ScreenBuffer;
+  for I := 0 to N - 1 do
+  begin
+    if (C <> nil) and (ScLength(C^.Character) = 1) then
+      CellCopy[I] := C^.Character.Text[0] or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
+    else if C <> nil then
+      CellCopy[I] := Ord('?') or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
+    else
+      CellCopy[I] := $0720;
+    if C <> nil then
+      Inc(C);
+  end;
+  if N = 0 then
+    Exit(nil);
+  Result := @CellCopy[0];
+end;
+
+procedure WriteScreenCells(Pos, Size: LongInt);
+var
+  Row: array of TScreenCell;
+  X, Y, N, I: Integer;
+begin
+  if (ScreenWidth <= 0) or (Length(CellCopy) = 0) then
+    Exit;
+  SetLength(Row, ScreenWidth);
+  while (Size > 0) and (Pos < Length(CellCopy)) do
+  begin
+    Y := Pos div ScreenWidth;
+    X := Pos mod ScreenWidth;
+    N := ScreenWidth - X;
+    if N > Size then
+      N := Size;
+    for I := 0 to N - 1 do
+      Row[I] := CellFromBIOS(CellCopy[Pos + I]);
+    if ScreenBuffer <> nil then
+      Move(Row[0], (ScreenBuffer + Y * ScreenWidth + X)^, N * SizeOf(TScreenCell));
+    ScreenWrite(X, Y, @Row[0], N);
+    Inc(Pos, N);
+    Dec(Size, N);
+  end;
+{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
+  UnixFlush;                 { DN writes the screen and goes on working (a long loop): the terminal gets it now }
+{$ENDIF}
+end;
+
+procedure ClearScreenCells;
+var
+  I: Integer;
+begin
+  SetLength(CellCopy, ScreenWidth * ScreenHeight);
+  for I := 0 to High(CellCopy) do
+    CellCopy[I] := $0720;
+  WriteScreenCells(0, Length(CellCopy));
+end;
+
+procedure GetCursorType(var Y1, Y2: Integer; var Visible: Boolean);
+var
+  H: Integer;
+begin
+  Visible := CaretSize > 0;
+  H := (CaretSize * FontHeight + 99) div 100;
+  if H < 1 then
+    H := 1;
+  Y2 := FontHeight - 1;
+  Y1 := FontHeight - H;
+end;
+
+procedure SetCursorType(Y1, Y2: Integer; Visible: Boolean);
+begin
+  if not Visible then
+    SetCaretSize(0)
+  else if Y2 >= Y1 then
+    SetCaretSize((Y2 - Y1 + 1) * 100 div FontHeight)
+  else
+    SetCaretSize(CursorLines);
+end;
+
+procedure MoveCursorTo(X, Y: Word);
+begin
+  SetCaretPosition(X, Y);
+end;
+
+procedure GetCursorXY(var X, Y: Word);
+begin
+  X := CaretX;
+  Y := CaretY;
+end;
+
+end.

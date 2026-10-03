@@ -79,7 +79,7 @@ uses
   
   , SysUtils 
   
-  , osdep
+  , osdep, dnscreen
  , realmode 
   ;
 
@@ -126,7 +126,7 @@ except
     DNErrLog.DNTraceException;
     CloseWriteStream;
     ClearScreen;
-    SysTvShowBuf(0, ScreenWidth*ScreenHeight);
+    WriteScreenCells(0, ScreenWidth*ScreenHeight);
     SourceDir := SourceDir+'dn.err';
     Writeln('Fatal Error'^M^J'-----------'^M^J^M^J+
       'Exception 0', Hex2(ExitCode), 'h at address ',

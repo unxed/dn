@@ -49,7 +49,7 @@ unit VideoMan;
 
 interface
 
-uses osdep;
+uses osdep, dnscreen;
 
 var
   ScreenMirror: Pointer;
@@ -278,13 +278,13 @@ procedure SetCrtData;
     Visible: Boolean;
     SrcSize: TSysPoint;
   begin
-  SysTvGetScrMode(@SrcSize, True);
+  GetScreenMode(@SrcSize, True);
 (*
   {AK155 при SrcSize.Y=300 (w2k, wXP) DN падает}
   if  (SrcSize.Y > 100) or (SrcSize.X*SrcSize.Y*2 > 32768) then
     begin
     SysTVSetScrMode(3);
-    SysTvGetScrMode(@SrcSize, True);
+    GetScreenMode(@SrcSize, True);
     end;
   {/AK155}
 *)
@@ -314,18 +314,18 @@ procedure SetCrtData;
   {/JO}
   ShowMouse;
   HiResScreen := True;
-  ScreenBuffer := SysTVGetSrcBuf;
-  SysTVGetCurType(Y1, Y2, Visible);
+  ScreenBuffer := ReadScreenCells;
+  GetCursorType(Y1, Y2, Visible);
   WordRec(CursorLines).Hi := Y1;
   WordRec(CursorLines).Lo := Y2;
-  SysTVSetCurType(Y1, Y2, False); // Hide cursor
+  SetCursorType(Y1, Y2, False); // Hide cursor
   end { SetCrtData };
 
 // Detects video modes
 
 procedure DetectVideo;
   begin
-  ScreenMode := FixCrtMode(SysTvGetScrMode(nil, True));
+  ScreenMode := FixCrtMode(GetScreenMode(nil, True));
   end;
 
 // Sets the video mode. Mode is one of the constants smCO80, smBW80, or smMono,
@@ -366,7 +366,7 @@ function SetVideoMode(Mode: Word): Boolean;
 
 {
 piwamoto: current mode == target mode
-VPSYSD32.SysSetVideoMode всегда чистит экран при смене видеорежима и делает
+VPSYSD32.SetScreenSize всегда чистит экран при смене видеорежима и делает
 кучу проверок, что тормозит и не нужно нам в случае если размер экрана до
 запуска DN и его рабочий размер совпадают
 }
@@ -374,7 +374,7 @@ VPSYSD32.SysSetVideoMode всегда чистит экран при смене видеорежима и делает
     then Exit;
 
   if Rows <> 0 then
-    if SysSetVideoMode(Cols, Rows) then
+    if SetScreenSize(Cols, Rows) then
       begin
       Result := True;
       ScreenHeight := Rows;
@@ -401,8 +401,8 @@ procedure InitVideo;
     X, Y: SmallWord; {KV}
     
   begin { InitVideo }
-  SysTVGetCurType(StrtCurY1, StrtCurY2, StrtCurVisible);
-  SysGetCurPos(X, Y); {KV}
+  GetCursorType(StrtCurY1, StrtCurY2, StrtCurVisible);
+  GetCursorXY(X, Y); {KV}
   WordRec(OldCursorPos).Lo := X; {KV}
   WordRec(OldCursorPos).Hi := Y; {KV}
   {JO}
@@ -444,16 +444,16 @@ procedure DoneVideo;
   UserScreen := nil; {Cat}
   ScreenSaved := False; {Cat}
   
-  SysTvShowBuf(0, UserScreenSize);
-  SysTVSetCurType(StrtCurY1, StrtCurY2, StrtCurVisible);
+  WriteScreenCells(0, UserScreenSize);
+  SetCursorType(StrtCurY1, StrtCurY2, StrtCurVisible);
   if WordRec(OldCursorPos).Hi > ScreenHeight-1 then
     WordRec(OldCursorPos).Hi := ScreenHeight-1; {KV}
   if WordRec(OldCursorPos).Lo > ScreenWidth-1 then
     WordRec(OldCursorPos).Lo := ScreenWidth-1; {KV}
-  {JO: под OS/2 после смены видеорежима SysGetCurPos даёт нулевые координаты}
+  {JO: под OS/2 после смены видеорежима GetCursorXY даёт нулевые координаты}
   {    как с этим бороться - пока не знаю                                   }
   if OldCursorPos <> 0 then
-    SysTVSetCurPos(WordRec(OldCursorPos).Lo, WordRec(OldCursorPos).Hi);
+    MoveCursorTo(WordRec(OldCursorPos).Lo, WordRec(OldCursorPos).Hi);
   {KV}
   
   
@@ -463,7 +463,7 @@ procedure DoneVideo;
 
 procedure ClearScreen;
   begin
-  SysTVClrScr;
+  ClearScreenCells;
   
   end;
 

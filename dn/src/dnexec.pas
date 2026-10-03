@@ -79,7 +79,7 @@ uses DNRun,
    realmode, 
   DNUtil, basics, mainapp, strutil, Lfn,
   Dos, panelroot, CmdLine, Views, fileutil, Drivers, os2sess,
-  VideoMan, osdep, osfind, Events,
+  VideoMan, osdep, dnscreen, osfind, Events,
   
   Startup, UserMenu, Messages, Strings, filetype, TitleSet
    {AK155 для перерисовки иконки}
@@ -227,12 +227,12 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
   
   fExec := False;
   {AK155, Cat: чтобы комстрока и меню не налазили на вывод}
-  SysGetCurPos(X, Y);
+  GetCursorXY(X, Y);
   if InterfaceData.Options and ouiHideStatus = 0 then
     Inc(Y);
   if X <> 0 then
     Writeln;
-  SysTvGetScrMode(@ScreenSize, True);
+  GetScreenMode(@ScreenSize, True);
   if Y >= ScreenSize.Y then
     Writeln;
   {/AK155, Cat}
