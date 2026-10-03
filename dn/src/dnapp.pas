@@ -106,7 +106,7 @@ var
 
 implementation
 
-uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, DNPalet;
+uses Advance, Advance2, Advance7, Videoman, VPSysLow, TvHist, TvUtf8, TvCodePg, TvLocale, DNPalet;
 
 constructor TBackground.Init(var Bounds: TRect; APattern: Char);
 begin
@@ -411,6 +411,29 @@ begin
   Halt(219);
 end;
 
+{ The single-byte code page of the strings of DN (the screen, the typed text, the file names that are converted): DN_CODEPAGE=866 (a number
+  of TvCodePg) if it is set; else 866 for the Russian, Ukrainian and Belarusian resources (they are written in it); else the page that goes with
+  the locale of the host (TvLocale: ru_RU 866, de_DE 850, pl_PL 852...); a locale that is not known (C, POSIX): the default of TvCodePg. }
+procedure ApplyCodePage(WithLanguage: Boolean);
+var
+  Id: Integer;
+  L: String;
+begin
+  Id := StrToIntDef(GetEnvironmentVariable('DN_CODEPAGE'), 0);
+  if Id = 0 then
+  begin
+    L := '';
+    if WithLanguage then
+      L := UpperCase(Copy(LngId, 1, 3));
+    if (L = 'RUS') or (L = 'UKR') or (L = 'BEL') then
+      Id := 866
+    else
+      Id := HostOemCodePage;
+  end;
+  if Id <> 0 then
+    CpSelect(Id);
+end;
+
 { The resource files lie in the directory named by the environment variable DNDLG, else in that of the program (SourceDir),
   else in the startup directory. Names: <language>.DLG (dialogs and menus), <language>.LNG (strings): see rcp. }
 function OpenResourceStream(const Ext: String): PBufStream;
@@ -418,6 +441,7 @@ var
   S: String;
   PS: PBufStream;
 begin
+  ApplyCodePage(True);
   S := GetEnvironmentVariable('DNDLG');
   if S = '' then
     S := SourceDir;
@@ -659,6 +683,7 @@ end;
 {$ENDIF}
 
 initialization
+  ApplyCodePage(False);           { by the locale of the host (the language of the resources is known later: OpenResourceStream calls it again) }
   Utf8Enabled := False;           { the strings of DN are bytes of the code page, never UTF-8 (TvUtf8)}
   InputLineOem := True;           { the lines of DN keep the bytes of its code page: the typed text (UTF-8) is converted }
   CommandHiddenHook := @CommandHidden;

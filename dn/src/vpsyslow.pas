@@ -342,10 +342,13 @@ begin
   Writeln('$ ', NameToOs(CmdLine));
   Flush(Output);
   Result := fpSystem(NameToOs(CmdLine));
-  Writeln;
-  Write('[DN] Press Enter to return...');
-  Flush(Output);
-  Readln;
+  if UnixActive then
+  begin
+    Writeln;
+    Write('[DN] Press Enter to return...');
+    Flush(Output);
+    Readln;
+  end;
   UnixResume;
 end;
 
@@ -948,12 +951,17 @@ end;
 
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
+{$IFDEF UNIX}
+var
+  R: LongInt;
+{$ENDIF}
 begin
 {$IFDEF UNIX}
   { through the shell, with the terminal: the program may write to it and read from it }
+  R := SysRunShell('"' + StrPas(Path) + '" ' + StrPas(Args));
   Result := 0;
-  if SysRunShell('"' + StrPas(Path) + '" ' + StrPas(Args)) < 0 then
-    Result := 2;
+  if (R < 0) or ((R shr 8) = 127) then
+    Result := 2;                   { the shell could not run it: DOS "file not found" }
 {$ELSE}
   Dos.DosError := 0;
   Dos.Exec(StrPas(Path), StrPas(Args));

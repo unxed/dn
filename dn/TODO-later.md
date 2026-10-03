@@ -113,3 +113,10 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
 ## Sweep of the menus (Linux x86_64, 2026-10-02, tools/dn-linux-menus.py)
 126 items opened, no crash. The 8 items that the sweep marks "did not quit" are waits, not errors: Disk > Directory tree and Panel >
 Count/Compare (reading the directories of `/` takes ~20 s, Esc stops it), File > last item (the command line of the shell: waits for Enter).
+
+## The single-byte code page (2026-10-02)
+- DN takes the page of its strings (the screen, typed text, converted file names) by the locale of the host (`tv/src/tvlocale.pas`, the table of
+  github.com/unxed/localecp: ru_RU 866, de_DE 850, pl_PL 852, en_US 437...); `DN_CODEPAGE=NNN` sets it by hand; the Russian, Ukrainian and Belarusian
+  resources (written in CP866) make it 866. Not done: the page of the multi-byte locales (ja, ko, zh: 437 here), 720, 1258, TIS-620 (TvCodePg has
+  no such pages); the page that the resources need is known after the panels are read (a Russian UI on a host of another locale: the names that
+  were read before are in the page of the host until the next reading); the DOS build takes the page from DOS (TvDos), not from the locale.
