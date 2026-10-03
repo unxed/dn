@@ -11,6 +11,7 @@ mkdir -p "$work" "$dist/screenshots"
 DN_EXTRA="-Xs" "$here/tools/build.sh" "$T" "$work" >/dev/null
 cp "$work/dn" "$dist/dn"
 cp "$work"/*.LNG "$work"/*.DLG "$work"/*.HLP "$dist/"
+rm -rf "$dist/XLT"; cp -r "$work/XLT" "$dist/XLT"
 cp "$here/dist/dos/LICENSE-DN.TXT" "$here/dist/dos/LICENSE-TV.TXT" "$here/dist/dos/COPYRIGHT-TV-MAGIBLOT.TXT" "$dist/"
 python3 "$here/tools/dn-linux-tour.py" "$work" start f1help f3view f4edit f7mkdir f5copy menudisk quitask quit
 for n in start f1help f3view f4edit f7mkdir f5copy menudisk; do

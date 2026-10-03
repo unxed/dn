@@ -120,3 +120,22 @@ Count/Compare (reading the directories of `/` takes ~20 s, Esc stops it), File >
   resources (written in CP866) make it 866. Not done: the page of the multi-byte locales (ja, ko, zh: 437 here), 720, 1258, TIS-620 (TvCodePg has
   no such pages); the page that the resources need is known after the panels are read (a Russian UI on a host of another locale: the names that
   were read before are in the page of the host until the next reading); the DOS build takes the page from DOS (TvDos), not from the locale.
+
+## XLT рядом с программой (найдено при сборке под Windows)
+
+DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладка по умолчанию) рядом с программой (`SourceDir`). Раньше их нигде не клали,
+и при старте печаталось «Error in country setups» (на Linux его скрывал альтернативный экран; таблица смены раскладки не строилась).
+Теперь `tools/build.sh` кладёт `dn/data/XLT` рядом с `dn`/`dn.exe`, dist-скрипты тоже; тест `tools/dn-linux-ops.py` проверяет, что ошибки нет.
+Остальное из `dn/data` (`COLORS`, `DN.FLG`) пока не используется: проверить, нужно ли оно, когда дойдём до настроек цветов.
+
+## Windows (win64/win32)
+
+- Сборка: `tools/build-fpc-windows.sh`, `tools/build.sh win64|win32`, `tools/dn-win-dist.sh`; CI: workflow `dn-windows` (кросс-сборка на Linux,
+  запуск на `windows-latest` через ConPTY: `tools/dn-win-smoke.py`). Терминальный слой — `tv/src/tvtermos.pas` (консоль Windows в режиме
+  VT, ввод через ReadConsoleInputW → байты UTF-8 → общий разбор `TvTermIO`), поверх тот же `TvUnix`, что и на Linux.
+- Имена файлов: сейчас — байты системной (ANSI) кодовой страницы как есть; перекодирование ANSI↔OEM (`CharToOemBuff`/`OemToCharBuff`) и
+  `GetOEMCP` → `TvLocale` ещё не сделаны (сделаем вместе с этапом UTF-8: имена целиком в UTF-8 через `...W`-функции API).
+- Wine: консоль в pty искажает вывод (wine пересобирает экран по-своему; минимальная программа из `TvTermOs` под wine в pty вообще ничего не вывела), поэтому
+  стендом служит только настоящий Windows (CI). Запуск в wine без pty (X-сервер, wineconsole) не пробовали.
+- Проверено в CI на настоящей консоли (2026-10-03, win64 и win32): старт, меню, панели, F7 создаёт каталог, выход по Alt-X.
+- Не проверено на Windows: изменение размера окна, мышь, вставка из буфера (bracketed paste), запуск команды (`SysRunShell` через `COMSPEC`).
