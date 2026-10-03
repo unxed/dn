@@ -1,6 +1,6 @@
 {/////////////////////////////////////////////////////////////////////////
 //
-//  Dos Navigator Open Source 1.51.08
+//  Dos Navigator Open Source
 //  Based on Dos Navigator (C) 1991-99 RIT Research Labs
 //
 //  This programs is free for commercial and non-commercial use as long as
@@ -43,61 +43,60 @@
 //  cannot simply be copied and put under another distribution licence
 //  (including the GNU Public Licence).
 //
+//////////////////////////////////////////////////////////////////////////
+//
+//  Version history:
+//
+//  2005.02.07 ported from DN OSP 4.9.0 by Max Piwamoto
+{  15.02.2005 AK155: Мелкие коррекции.
+    * ExecAnsiString приводил к порче экрана DN, заменён на ExecStringRR.
+    * В TS7ZArchive.GetFile в связи с AnsiString выплыло несколько
+      некоректностей вроде S[1] для пустой строки. Исправил.
+    * Приформирование в конце строки '\' для каталогов - это неправильно
+      (надо сначала удалить проблелы) и не нужно (это будет сделано
+      позже по FileInfo.Attr = Directory. Приводило к появлению
+      фантомных каталогов с пробелами в конце (7z 4.11). Убрал.
+    * Сделал переформатирование.
+    - Вижу глюки с поиском извне. Если в filefind снять запрет на поиск в
+      7z-архивах, то поиск почти работает, но из панели поиска переход
+      на любой файл внутри 7z-архива приводит при выходе из архива к
+      Sharing violation (при удалении файла в Done). Если проигнорировать
+      - всё работает нормально.
+      Кроме того, поиск иногда (или всегда?) показывает файл, который
+      на самом деле находится в другом архиве.
+      Источник проблем IMHO в том, что файл списка слишком долго держится
+      открытым.
+}
+//
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_ACE; {ACE}
+unit fmt7z; {7-Zip}
 
 interface
-
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
+  Archiver
   ;
 
 type
-  PACEArchive = ^TACEArchive;
-  TACEArchive = object(TARJArchive)
+  PS7ZArchive = ^TS7ZArchive;
+  TS7ZArchive = object(TARJArchive)
+    ListFileName: String;
+    ListFile: System.Text;
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
+    destructor Done; virtual;
     end;
-
-type
-  ACEFileHdr = record
-    HeadCRC: AWord;
-    HeadSize: AWord;
-    HeadType: Byte;
-    //1 - file
-    //2 - recovery record
-    //3 - large file (4+ gb)
-    HeadFlags: AWord;
-    PackedSize: LongInt; //qword for HeadType = 3
-    OriginSize: LongInt; //qword for HeadType = 3
-    DateTime: LongInt;
-    Attr: LongInt;
-    CRC32: LongInt;
-    TechInfo: LongInt;
-    Reserved: AWord;
-    NameLen: AWord;
-    end;
-  //  HeadFlags:
-  //  bit  description
-  //   0   1 (ADDSIZE field present)
-  //   1   presence of file comment
-  //
-  //   12  file continued from previous volume
-  //   13  file continues on the next volume
-  //   14  file encrypted with password
-  //   15  solid-flag: file compressed using data
-  //       of previous files of the archive
-
-var
-  ACEVerToExtr: Byte;
 
 implementation
-{ ---------------------------------- ACE --------------------------------- }
+uses
+  basics, strutil, fileutil, Defines, baseobjs, Streams, Dos, DnExec
+  ;
 
-constructor TACEArchive.Init;
+{ --- 7-Zip implemented by piwamoto --- }
+
+constructor TS7ZArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -107,42 +106,40 @@ constructor TACEArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ACE'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ACE'));
-  
+
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, '7Z'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, '7Z'));
+
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
   ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
   Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'm'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
   Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-p'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
-  ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths,
-         '-ep'));
-  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
-  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec,
-       '-rr'));
+  ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-y'));
+  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
   SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract,
          '-sfx'));
-  Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, '-s'));
-  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
-         ''));
+  Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
+  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PRecurseSubDirs, '-r0'));
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, '-m0'));
+         PStoreCompression, '-mx0'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, '-m1'));
+         PFastestCompression, '-mx1'));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, '-m2'));
+         PFastCompression, '-mx1'));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, '-m3'));
+         PNormalCompression, '-mx5'));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PGoodCompression, '-m4'));
+         PGoodCompression, '-mx7'));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, '-m5'));
+         PUltraCompression, '-mx9'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
          '@'));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
@@ -150,75 +147,83 @@ constructor TACEArchive.Init;
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
-  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '0');
   PutDirs := q <> '0';
   
-  q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '0');
   SwapWhenExec := q <> '0';
   
   
   q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TACEArchive.Init };
+  end { TS7ZArchive.Init };
 
-function TACEArchive.GetID: Byte;
+function TS7ZArchive.GetID: Byte;
   begin
-  GetID := arcACE;
+  GetID := arc7Z;
   end;
 
-function TACEArchive.GetSign: TStr4;
+function TS7ZArchive.GetSign: TStr4;
   begin
-  GetSign := sigACE;
+  GetSign := sig7Z;
   end;
 
-procedure TACEArchive.GetFile;
-  label 1;
+procedure TS7ZArchive.GetFile;
   var
-    FP: TFileSize;
-    P: ACEFileHdr;
-    C: Char;
+    DT: DateTime;
+    S: AnsiString;
   begin
-1:
-  FP := ArcFile^.GetPos;
-  if  (FP = ArcFile^.GetSize) then
+  if TextRec(ListFile).Handle = 0 then
+    begin { первый вызов: вызов архиватора для вывода оглавления }
+    FreeObject(ArcFile);
+    {AK155 если архив не закрыть, то архиватор
+      выдаёт sharing violation }
+    ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
+    S := UnPacker^+' l '+SquashesName(ArcFileName)+' >'+ListFileName;
+    ExecStringRR(S, '', False);
+    System.Assign(ListFile, ListFileName);
+    System.Reset(ListFile);
+    repeat
+      if Eof(ListFile) then
+        begin
+        FileInfo.Last := 2;
+        Exit;
+        end;
+      Readln(ListFile, S);
+    until (S <> '') and (S[1] = '-');
+    end;
+  Readln(ListFile, S);
+  if (Length(S) < 54) or (S[1] = '-') then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P, 15);{HeadCRC..OriginSize}
-  if  (ArcFile^.Status <> stOK) then
-    begin
-    FileInfo.Last := 2;
-    Exit;
-    end;
-  if (P.HeadType <> 1) and
-     (P.HeadType <> 3) then
-    begin {it's not a file}
-      ArcFile^.Seek(FP + P.HeadSize +
-                    (P.PackedSize)*Byte(P.HeadFlags and 1) + 4);
-      goto 1;
-    end;
-  FileInfo.PSize := P.PackedSize;
-  FileInfo.USize := P.OriginSize;
-  if P.HeadType = 3 then
-    begin
-    CompRec(FileInfo.PSize).Hi := P.OriginSize;
-    ArcFile^.Read(FileInfo.USize, 8);
-    end;
-  ArcFile^.Read(P.DateTime, 20);{DateTime..NameLen}
-  FileInfo.FName := '';
-  repeat
-    ArcFile^.Read(C, 1);
-    Dec(P.NameLen);
-    FileInfo.FName := FileInfo.FName+C;
-  until P.NameLen = 0;
+  DT.Year := StoI(Copy(S, 1, 4));
+  DT.Month := StoI(Copy(S, 6, 2));
+  DT.Day := StoI(Copy(S, 9, 2));
+  DT.Hour := StoI(Copy(S, 12, 2));
+  DT.Min := StoI(Copy(S, 15, 2));
+  DT.Sec := StoI(Copy(S, 18, 2));
+  PackTime(DT, FileInfo.Date);
+  FileInfo.USize := Str2Comp(fDelLeft(Copy(S, 27, 12)));
+  FileInfo.PSize := Str2Comp(fDelLeft(Copy(S, 40, 12)));
+  if S[21] = 'D' then
+    FileInfo.Attr := Directory
+  else
+    FileInfo.Attr := 0;
+  FileInfo.FName := '\'+fDelRight(Copy(S, 54, 255));
   FileInfo.Last := 0;
-  FileInfo.Date := P.DateTime;
-  FileInfo.Attr := Byte(P.Attr and not Hidden);
-  if  (P.HeadFlags and $4000) <> 0 then
-    FileInfo.Attr := FileInfo.Attr or Hidden;
-  ArcFile^.Seek(CompToFSize(FP + P.HeadSize + FileInfo.PSize + 4));
-  end { TACEArchive.GetFile };
+  end { TS7ZArchive.GetFile };
+
+destructor TS7ZArchive.Done;
+  begin
+  if TextRec(ListFile).Handle <> 0 then
+    begin
+    System.Close(ListFile);
+    EraseFile(ListFileName);
+    end;
+  inherited Done;
+  end;
 
 end.

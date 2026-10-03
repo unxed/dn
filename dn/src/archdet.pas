@@ -60,11 +60,11 @@ function GetArchiveByTag(ID: Byte): PARJArchive;
 implementation
 
 uses
-  arc_Zip, arc_LHA, arc_RAR, arc_ACE, arc_HA, arc_CAB,
+  fmtzip, fmtlha, fmtrar, fmtace, fmtha, fmtcab,
   
-  arc_ARC, arc_BSA, arc_BS2, arc_HYP, arc_LIM, arc_HPK, arc_TAR, arc_TGZ,
-  arc_ZXZ, arc_QRK, arc_UFA, arc_IS3, arc_SQZ, arc_HAP, arc_ZOO, arc_CHZ,
-  arc_UC2, arc_AIN, arc_7Z,  arc_BZ2,
+  fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, fmttar, fmttgz,
+  fmtzxz, fmtqrk, fmtufa, fmtis3, fmtsqz, fmthap, fmtzoo, fmtchz,
+  fmtuc2, fmtain, fmt7z,  fmtbz2,
   
   profile, Defines, Streams, strutil, fileutil,
   Messages,

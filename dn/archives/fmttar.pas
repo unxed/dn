@@ -45,40 +45,73 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_ZXZ; {ZXZ}
+unit fmttar; {TAR}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, xTime
   ;
 
 type
-  PZXZArchive = ^TZXZArchive;
-  TZXZArchive = object(TARJArchive)
+  PTARArchive = ^TTARArchive;
+  TTARArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     end;
 
+const
+  MaxTName = 100;
+  Txt_Word = 8;
+  Txt_Long = 12;
+  BlkSize = 512;
+
 type
-  ZXZHdr = record
-    Name: array[0..7] of Char;
-    Extension: array[0..2] of Char;
-    OriginSize: AWord;
-    SectorSize: Byte;
-    PackedSize: AWord;
-    CRC32: LongInt;
-    MethodID: Byte;
-    Flags: Byte;
+  TARHdr = record
+    FName: array[1..MaxTName] of Char;
+    Mode: array[1..Txt_Word] of Char;
+    uid: array[1..Txt_Word] of Char;
+    gid: array[1..Txt_Word] of Char;
+    Size: array[1..Txt_Long] of Char;
+    mtime: array[1..Txt_Long] of Char;
+    chksum: array[1..Txt_Word] of Char;
+    filetype: Char;
+    linkname: array[1..MaxTName] of Char;
+    case Byte of
+      0: (
+        (* old-fashion data & padding *)
+        comment:
+         array[1..BlkSize-MaxTName-8-8-8-12-12-8-1-MaxTName-12-12] of Char;
+        SrcSum: array[1..Txt_Long] of Char;
+        SrcLen: array[1..Txt_Long] of Char;
+        );
+      1: (
+        (* System V extensions *)
+        extent: array[1..4] of Char;
+        AllExt: array[1..4] of Char;
+        Total: array[1..Txt_Long] of Char;
+        );
+      2: (
+        (* P1003 & GNU extensions *)
+        magic: array[1..8] of Char;
+        UName: array[1..32] of Char;
+        gname: array[1..32] of Char;
+        devmajor: array[1..Txt_Word] of Char;
+        devminor: array[1..Txt_Word] of Char;
+        (* the following fields are added gnu and NOT standard *)
+        ATime: array[1..12] of Char;
+        ctime: array[1..12] of Char;
+        Offset: array[1..12] of Char;
+        );
     end;
 
 implementation
 
-{ ------------------------------ ZXZip aka $Z ----------------------------- }
+{ ----------------------------- TAR ------------------------------------}
 
-constructor TZXZArchive.Init;
+constructor TTARArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -89,16 +122,15 @@ constructor TZXZArchive.Init;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
   
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ZXZIP386'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ZXUNZIP'));
-  
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, ''));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, ''));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-start8224'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'TAR'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'TAR'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'xf'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'xf'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'cvf'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'cvf'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'df'));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'tf'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
@@ -106,8 +138,6 @@ constructor TZXZArchive.Init;
   SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
-         ''));
-  SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PStoreCompression, ''));
@@ -125,6 +155,7 @@ constructor TZXZArchive.Init;
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
+  
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
@@ -135,73 +166,62 @@ constructor TZXZArchive.Init;
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TZXZArchive.Init };
+  end { TTARArchive.Init };
 
-function TZXZArchive.GetID: Byte;
+function TTARArchive.GetID: Byte;
   begin
-  GetID := arcZXZ;
+  GetID := arcTAR;
   end;
 
-function TZXZArchive.GetSign: TStr4;
+function TTARArchive.GetSign: TStr4;
   begin
-  GetSign := sigZXZ;
+  GetSign := sigTAR;
   end;
 
-procedure TZXZArchive.GetFile;
+procedure TTARArchive.GetFile;
   var
-    FP: TFileSize;
-    P: ZXZHdr;
-    Len: AWord;
+    Buffer: array[0..BlkSize-1] of Char;
+    Hdr: TARHdr absolute Buffer;
+    DT: DateTime;
+    W: AWord;
   begin
-  ArcFile^.Read(P, SizeOf(P));
-  FP := ArcFile^.GetPos;
-  if  (ArcFile^.Status <> stOK) or (FP > 65280) then
-    begin
-    FileInfo.Last := 2;
-    Exit;
-    end;
-  if  (P.Name[0] < #32) or
-      (P.PackedSize > P.SectorSize*256) or
-      ( (P.PackedSize+FP-SizeOf(P)-17) > ArcFile^.GetSize) or
-      (P.MethodID > 3) or
-      (P.SectorSize = 0)
-  then
+  if ArcFile^.GetPos = ArcFile^.GetSize then
     begin
     FileInfo.Last := 1;
-    Exit;
+    Exit
     end;
-  FileInfo.FName := P.Name;
-  DelRight(FileInfo.FName);
-  if  (P.Extension[0] <> 'B') and
-      (P.Extension[1] >= #32) and (P.Extension[1] <= #127) and
-      (P.Extension[2] >= #32) and (P.Extension[2] <= #127)
-  then
-    FileInfo.FName := FileInfo.FName+'.'+P.Extension
-  else
-    FileInfo.FName := FileInfo.FName+'.'+P.Extension[0];
-  DelRight(FileInfo.FName);
-  FileInfo.Last := 0;
-  FileInfo.Attr := 0;
-  if  (P.OriginSize and $ff) = 0 then
-    Len := 0
-  else
-    Len := 256;
-  Len := Trunc((Len+P.OriginSize)/256);
-  if Len <> P.SectorSize then
-    Len := P.SectorSize*256
-  else
+  ArcFile^.Read(Buffer, BlkSize);
+  if ArcFile^.Status <> stOK then
     begin
-    Len := P.OriginSize;
-    if P.Extension[0] = 'B' then
-      Len := 4+Ord(P.Extension[1])+Ord(P.Extension[2])*256;
+    FileInfo.Last := 2;
+    Exit
     end;
-  FileInfo.USize := LongInt(Len);
-  FileInfo.PSize := LongInt(P.PackedSize);
-  FileInfo.Date := 0;
-  ArcFile^.Seek(FP+P.PackedSize);
-  end { TZXZArchive.GetFile };
+  FileInfo.Last := 0;
+  if Hdr.filetype = '5' {directory}
+    then FileInfo.Attr := Directory
+    else FileInfo.Attr := 0;
+  FileInfo.FName := Hdr.FName+#0;
+  SetLength(FileInfo.FName, PosChar(#0, FileInfo.FName)-1);
+  if FileInfo.FName = '' then
+    begin
+    FileInfo.Last := 1;
+    Exit
+    end;
+  FileInfo.USize := FromOct(Hdr.Size);
+  FileInfo.PSize := FileInfo.USize;
+  GetUNIXDate(i32(FromOct(Hdr.mtime)), DT.Year, DT.Month, DT.Day, DT.Hour,
+     DT.Min, DT.Sec);
+  PackTime(DT, FileInfo.Date);
+(*
+  ArcFile^.Seek(ArcFile^.GetPos+
+     (Trunc((FileInfo.PSize+BlkSize-1) / BlkSize)*BlkSize));
+*)
+  W := Word(CompRec(FileInfo.PSize).Lo) and (BlkSize-1);
+  ArcFile^.Seek(CompToFSize(ArcFile^.GetPos + FileInfo.PSize -
+                            W + BlkSize*Byte(W<>0)));
+  end { TTARArchive.GetFile };
 
 end.

@@ -45,18 +45,17 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_CAB; {CAB}
+unit fmthyp; {HYP}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
+  Archiver, basics, strutil, Defines, baseobjs, Streams
   ;
 
 type
-  PCABArchive = ^TCABArchive;
-  TCABArchive = object(TARJArchive)
-    FilesNumber: LongInt;
+  PHYPArchive = ^THYPArchive;
+  THYPArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -64,27 +63,21 @@ type
     end;
 
 type
-  PCFHEADER = ^TCFHEADER;
-  TCFHEADER = record
-    signature: LongInt;
-    Reserved1: LongInt;
-    cbCabinet: LongInt;
-    Reserved2: LongInt;
-    coffFiles: LongInt;
-    Reserved3: LongInt;
-    VersionMinor: Byte;
-    VersionMajor: Byte;
-    cFolders: AWord;
-    cFiles: AWord;
-    Flags: AWord;
-    setID: AWord;
-    iCabinet: AWord;
+  HYPHdr = record
+    Id: LongInt;
+    PackedSize: LongInt;
+    OriginSize: LongInt;
+    Date: LongInt;
+    Data: LongInt;
+    Attr: Byte;
+    NameLen: Byte;
     end;
 
 implementation
-{ ---------------------- CAB (by Neverowsky A.)---------------------------}
 
-constructor TCABArchive.Init;
+{ ----------------------------- HYP ------------------------------------}
+
+constructor THYPArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -94,26 +87,24 @@ constructor TCABArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  {-i0 turns on console output}
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'MSCAB -i0'));
-  
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'MSCAB -i0'));
-  
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-dirs -r0 a'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-dirs -r0 m'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HYPER'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HYPER'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-x'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-x'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-a'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-m'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, '-d'));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
-  IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, ''));
+  IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths,
+         '-p'));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
   SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
-  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
-         ''));
+  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PRecurseSubDirs, '-r'));
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
@@ -129,9 +120,9 @@ constructor TCABArchive.Init;
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PUltraCompression, ''));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
-         '@'));
+         ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
-       '@'));
+       ' '));
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
@@ -142,73 +133,58 @@ constructor TCABArchive.Init;
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
   UseLFN := q <> '0';
   
+  end { THYPArchive.Init };
 
-  FilesNumber := -1;
-  end { TCABArchive.Init };
-
-function TCABArchive.GetID: Byte;
+function THYPArchive.GetID: Byte;
   begin
-  GetID := arcCAB;
+  GetID := arcHYP;
   end;
 
-function TCABArchive.GetSign: TStr4;
+function THYPArchive.GetSign: TStr4;
   begin
-  GetSign := sigCAB;
+  GetSign := sigHYP;
   end;
 
-procedure TCABArchive.GetFile;
+procedure THYPArchive.GetFile;
   var
-    C: Char;
-    FH: record
-      cbFile: LongInt;
-      uoffFolderStart: LongInt;
-      iFolder: AWord;
-      {     date:     AWord;
-      time:     AWord; }
-      DateTime: LongInt;
-      attribs: AWord;
-      {     u1  szName[]; }
-      end;
-    CFHEADER: TCFHEADER;
+    P: HYPHdr;
   begin
-  if  (FilesNumber < 0) then
-    begin
-    ArcFile^.Read(CFHEADER, SizeOf(CFHEADER));
-    FilesNumber := CFHEADER.cFiles;
-    ArcFile^.Seek(ArcPos+CFHEADER.coffFiles);
-    end;
-  if  (FilesNumber = 0) then
+  if ArcFile^.GetPos = ArcFile^.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  Dec(FilesNumber);
-  ArcFile^.Read(FH, SizeOf(FH));
-  if  (ArcFile^.Status <> 0) then
+  ArcFile^.Read(P, 4);
+  if  (P.Id and $ffff = 0) then
     begin
-    FileInfo.Last := 2;
+    FileInfo.Last := 1;
     Exit;
     end;
-  FileInfo.FName := '';
-  repeat
-    ArcFile^.Read(C, 1);
-    if C <> #0 then
-      FileInfo.FName := FileInfo.FName+C;
-  until (C = #0) or (Length(FileInfo.FName) > 100);
-  if  (Length(FileInfo.FName) > 100) or (FileInfo.FName = '')
+  if  (ArcFile^.Status <> stOK) or
+      ( (P.Id <> $2550481A {^Z'HP%'}) and (P.Id <> $2554531A {^Z'ST%'}))
   then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  FileInfo.Attr := FH.attribs and not Hidden;
-  FileInfo.USize := FH.cbFile;
-  FileInfo.PSize := FH.cbFile;
-  FileInfo.Date := (FH.DateTime shr 16) or (FH.DateTime shl 16);
+  ArcFile^.Read(P.PackedSize, SizeOf(P)-4);
+  if  (ArcFile^.Status <> stOK) then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
   FileInfo.Last := 0;
-  end { TCABArchive.GetFile };
+  FileInfo.Attr := 0;
+  FileInfo.USize := P.OriginSize;
+  FileInfo.PSize := P.PackedSize;
+  FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
+  FileInfo.FName[0] := Char(P.NameLen);
+  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
+  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
+  end { THYPArchive.GetFile };
 
 end.

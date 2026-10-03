@@ -56,11 +56,11 @@ implementation
 uses
   panelwin, topview, dlgrecs, strview,
   
-  arc_Zip, arc_LHA, arc_RAR, arc_ACE, arc_HA, arc_CAB,
+  fmtzip, fmtlha, fmtrar, fmtace, fmtha, fmtcab,
   
-  arc_ARC, arc_BSA, arc_BS2, arc_HYP, arc_LIM, arc_HPK, arc_TAR,
-  arc_ZXZ, arc_QRK, arc_AIN, arc_CHZ, arc_HAP, arc_IS3, arc_SQZ,
-  arc_UC2, arc_UFA, arc_ZOO, arc_TGZ, arc_7Z,  arc_BZ2,
+  fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, fmttar,
+  fmtzxz, fmtqrk, fmtain, fmtchz, fmthap, fmtis3, fmtsqz,
+  fmtuc2, fmtufa, fmtzoo, fmttgz, fmt7z,  fmtbz2,
   
   
   Arvid,
@@ -612,7 +612,7 @@ begin
 end;
 
 type
-  PR_RZIPArchiver = ^arc_Zip.TZIPArchive;
+  PR_RZIPArchiver = ^fmtzip.TZIPArchive;
 
 function Build_RZIPArchiver(var S: TStream): PObject;
 begin
@@ -625,7 +625,7 @@ begin
 end;
 
 type
-  PR_RLHAArchiver = ^arc_LHA.TLHAArchive;
+  PR_RLHAArchiver = ^fmtlha.TLHAArchive;
 
 function Build_RLHAArchiver(var S: TStream): PObject;
 begin
@@ -638,7 +638,7 @@ begin
 end;
 
 type
-  PR_RRARArchiver = ^arc_RAR.TRARArchive;
+  PR_RRARArchiver = ^fmtrar.TRARArchive;
 
 function Build_RRARArchiver(var S: TStream): PObject;
 begin
@@ -651,7 +651,7 @@ begin
 end;
 
 type
-  PR_RCABArchiver = ^arc_CAB.TCABArchive;
+  PR_RCABArchiver = ^fmtcab.TCABArchive;
 
 function Build_RCABArchiver(var S: TStream): PObject;
 begin
@@ -664,7 +664,7 @@ begin
 end;
 
 type
-  PR_RACEArchiver = ^arc_ACE.TACEArchive;
+  PR_RACEArchiver = ^fmtace.TACEArchive;
 
 function Build_RACEArchiver(var S: TStream): PObject;
 begin
@@ -677,7 +677,7 @@ begin
 end;
 
 type
-  PR_RHAArchiver = ^arc_HA.THAArchive;
+  PR_RHAArchiver = ^fmtha.THAArchive;
 
 function Build_RHAArchiver(var S: TStream): PObject;
 begin
@@ -690,7 +690,7 @@ begin
 end;
 
 type
-  PR_RARCArchiver = ^arc_ARC.TARCArchive;
+  PR_RARCArchiver = ^fmtarc.TARCArchive;
 
 function Build_RARCArchiver(var S: TStream): PObject;
 begin
@@ -703,7 +703,7 @@ begin
 end;
 
 type
-  PR_RBSAArchiver = ^arc_BSA.TBSAArchive;
+  PR_RBSAArchiver = ^fmtbsa.TBSAArchive;
 
 function Build_RBSAArchiver(var S: TStream): PObject;
 begin
@@ -716,7 +716,7 @@ begin
 end;
 
 type
-  PR_RBS2Archiver = ^arc_BS2.TBS2Archive;
+  PR_RBS2Archiver = ^fmtbs2.TBS2Archive;
 
 function Build_RBS2Archiver(var S: TStream): PObject;
 begin
@@ -729,7 +729,7 @@ begin
 end;
 
 type
-  PR_RHYPArchiver = ^arc_HYP.THYPArchive;
+  PR_RHYPArchiver = ^fmthyp.THYPArchive;
 
 function Build_RHYPArchiver(var S: TStream): PObject;
 begin
@@ -742,7 +742,7 @@ begin
 end;
 
 type
-  PR_RLIMArchiver = ^arc_LIM.TLIMArchive;
+  PR_RLIMArchiver = ^fmtlim.TLIMArchive;
 
 function Build_RLIMArchiver(var S: TStream): PObject;
 begin
@@ -755,7 +755,7 @@ begin
 end;
 
 type
-  PR_RHPKArchiver = ^arc_HPK.THPKArchive;
+  PR_RHPKArchiver = ^fmthpk.THPKArchive;
 
 function Build_RHPKArchiver(var S: TStream): PObject;
 begin
@@ -768,7 +768,7 @@ begin
 end;
 
 type
-  PR_RTARArchiver = ^arc_TAR.TTARArchive;
+  PR_RTARArchiver = ^fmttar.TTARArchive;
 
 function Build_RTARArchiver(var S: TStream): PObject;
 begin
@@ -781,7 +781,7 @@ begin
 end;
 
 type
-  PR_RTGZArchiver = ^arc_TGZ.TTGZArchive;
+  PR_RTGZArchiver = ^fmttgz.TTGZArchive;
 
 function Build_RTGZArchiver(var S: TStream): PObject;
 begin
@@ -794,7 +794,7 @@ begin
 end;
 
 type
-  PR_RZXZArchiver = ^arc_ZXZ.TZXZArchive;
+  PR_RZXZArchiver = ^fmtzxz.TZXZArchive;
 
 function Build_RZXZArchiver(var S: TStream): PObject;
 begin
@@ -807,7 +807,7 @@ begin
 end;
 
 type
-  PR_RQUARKArchiver = ^arc_QRK.TQuArkArchive;
+  PR_RQUARKArchiver = ^fmtqrk.TQuArkArchive;
 
 function Build_RQUARKArchiver(var S: TStream): PObject;
 begin
@@ -820,7 +820,7 @@ begin
 end;
 
 type
-  PR_RUFAArchiver = ^arc_UFA.TUFAArchive;
+  PR_RUFAArchiver = ^fmtufa.TUFAArchive;
 
 function Build_RUFAArchiver(var S: TStream): PObject;
 begin
@@ -833,7 +833,7 @@ begin
 end;
 
 type
-  PR_RIS3Archiver = ^arc_IS3.TIS3Archive;
+  PR_RIS3Archiver = ^fmtis3.TIS3Archive;
 
 function Build_RIS3Archiver(var S: TStream): PObject;
 begin
@@ -846,7 +846,7 @@ begin
 end;
 
 type
-  PR_RSQZArchiver = ^arc_SQZ.TSQZArchive;
+  PR_RSQZArchiver = ^fmtsqz.TSQZArchive;
 
 function Build_RSQZArchiver(var S: TStream): PObject;
 begin
@@ -859,7 +859,7 @@ begin
 end;
 
 type
-  PR_RHAPArchiver = ^arc_HAP.THAPArchive;
+  PR_RHAPArchiver = ^fmthap.THAPArchive;
 
 function Build_RHAPArchiver(var S: TStream): PObject;
 begin
@@ -872,7 +872,7 @@ begin
 end;
 
 type
-  PR_RZOOArchiver = ^arc_ZOO.TZOOArchive;
+  PR_RZOOArchiver = ^fmtzoo.TZOOArchive;
 
 function Build_RZOOArchiver(var S: TStream): PObject;
 begin
@@ -885,7 +885,7 @@ begin
 end;
 
 type
-  PR_RCHZArchiver = ^arc_CHZ.TCHZArchive;
+  PR_RCHZArchiver = ^fmtchz.TCHZArchive;
 
 function Build_RCHZArchiver(var S: TStream): PObject;
 begin
@@ -898,7 +898,7 @@ begin
 end;
 
 type
-  PR_RUC2Archiver = ^arc_UC2.TUC2Archive;
+  PR_RUC2Archiver = ^fmtuc2.TUC2Archive;
 
 function Build_RUC2Archiver(var S: TStream): PObject;
 begin
@@ -911,7 +911,7 @@ begin
 end;
 
 type
-  PR_RAINArchiver = ^arc_AIN.TAINArchive;
+  PR_RAINArchiver = ^fmtain.TAINArchive;
 
 function Build_RAINArchiver(var S: TStream): PObject;
 begin
@@ -924,7 +924,7 @@ begin
 end;
 
 type
-  PR_RS7ZArchiver = ^arc_7Z.TS7ZArchive;
+  PR_RS7ZArchiver = ^fmt7z.TS7ZArchive;
 
 function Build_RS7ZArchiver(var S: TStream): PObject;
 begin
@@ -937,7 +937,7 @@ begin
 end;
 
 type
-  PR_RBZ2Archiver = ^Arc_BZ2.TBZ2Archive;
+  PR_RBZ2Archiver = ^fmtbz2.TBZ2Archive;
 
 function Build_RBZ2Archiver(var S: TStream): PObject;
 begin
@@ -2659,132 +2659,132 @@ begin
 
   RWindow.Store := @Store_RWindow;
 
-  RZIPArchiver.VmtLink := PtrUInt(TypeOf(arc_Zip.TZIPArchive));
+  RZIPArchiver.VmtLink := PtrUInt(TypeOf(fmtzip.TZIPArchive));
   RZIPArchiver.Load := @Build_RZIPArchiver;
 
   RZIPArchiver.Store := @Store_RZIPArchiver;
 
-  RLHAArchiver.VmtLink := PtrUInt(TypeOf(arc_LHA.TLHAArchive));
+  RLHAArchiver.VmtLink := PtrUInt(TypeOf(fmtlha.TLHAArchive));
   RLHAArchiver.Load := @Build_RLHAArchiver;
 
   RLHAArchiver.Store := @Store_RLHAArchiver;
 
-  RRARArchiver.VmtLink := PtrUInt(TypeOf(arc_RAR.TRARArchive));
+  RRARArchiver.VmtLink := PtrUInt(TypeOf(fmtrar.TRARArchive));
   RRARArchiver.Load := @Build_RRARArchiver;
 
   RRARArchiver.Store := @Store_RRARArchiver;
 
-  RCABArchiver.VmtLink := PtrUInt(TypeOf(arc_CAB.TCABArchive));
+  RCABArchiver.VmtLink := PtrUInt(TypeOf(fmtcab.TCABArchive));
   RCABArchiver.Load := @Build_RCABArchiver;
 
   RCABArchiver.Store := @Store_RCABArchiver;
 
-  RACEArchiver.VmtLink := PtrUInt(TypeOf(arc_ACE.TACEArchive));
+  RACEArchiver.VmtLink := PtrUInt(TypeOf(fmtace.TACEArchive));
   RACEArchiver.Load := @Build_RACEArchiver;
 
   RACEArchiver.Store := @Store_RACEArchiver;
 
-  RHAArchiver.VmtLink := PtrUInt(TypeOf(arc_HA.THAArchive));
+  RHAArchiver.VmtLink := PtrUInt(TypeOf(fmtha.THAArchive));
   RHAArchiver.Load := @Build_RHAArchiver;
 
   RHAArchiver.Store := @Store_RHAArchiver;
 
-  RARCArchiver.VmtLink := PtrUInt(TypeOf(arc_ARC.TARCArchive));
+  RARCArchiver.VmtLink := PtrUInt(TypeOf(fmtarc.TARCArchive));
   RARCArchiver.Load := @Build_RARCArchiver;
 
   RARCArchiver.Store := @Store_RARCArchiver;
 
-  RBSAArchiver.VmtLink := PtrUInt(TypeOf(arc_BSA.TBSAArchive));
+  RBSAArchiver.VmtLink := PtrUInt(TypeOf(fmtbsa.TBSAArchive));
   RBSAArchiver.Load := @Build_RBSAArchiver;
 
   RBSAArchiver.Store := @Store_RBSAArchiver;
 
-  RBS2Archiver.VmtLink := PtrUInt(TypeOf(arc_BS2.TBS2Archive));
+  RBS2Archiver.VmtLink := PtrUInt(TypeOf(fmtbs2.TBS2Archive));
   RBS2Archiver.Load := @Build_RBS2Archiver;
 
   RBS2Archiver.Store := @Store_RBS2Archiver;
 
-  RHYPArchiver.VmtLink := PtrUInt(TypeOf(arc_HYP.THYPArchive));
+  RHYPArchiver.VmtLink := PtrUInt(TypeOf(fmthyp.THYPArchive));
   RHYPArchiver.Load := @Build_RHYPArchiver;
 
   RHYPArchiver.Store := @Store_RHYPArchiver;
 
-  RLIMArchiver.VmtLink := PtrUInt(TypeOf(arc_LIM.TLIMArchive));
+  RLIMArchiver.VmtLink := PtrUInt(TypeOf(fmtlim.TLIMArchive));
   RLIMArchiver.Load := @Build_RLIMArchiver;
 
   RLIMArchiver.Store := @Store_RLIMArchiver;
 
-  RHPKArchiver.VmtLink := PtrUInt(TypeOf(arc_HPK.THPKArchive));
+  RHPKArchiver.VmtLink := PtrUInt(TypeOf(fmthpk.THPKArchive));
   RHPKArchiver.Load := @Build_RHPKArchiver;
 
   RHPKArchiver.Store := @Store_RHPKArchiver;
 
-  RTARArchiver.VmtLink := PtrUInt(TypeOf(arc_TAR.TTARArchive));
+  RTARArchiver.VmtLink := PtrUInt(TypeOf(fmttar.TTARArchive));
   RTARArchiver.Load := @Build_RTARArchiver;
 
   RTARArchiver.Store := @Store_RTARArchiver;
 
-  RTGZArchiver.VmtLink := PtrUInt(TypeOf(arc_TGZ.TTGZArchive));
+  RTGZArchiver.VmtLink := PtrUInt(TypeOf(fmttgz.TTGZArchive));
   RTGZArchiver.Load := @Build_RTGZArchiver;
 
   RTGZArchiver.Store := @Store_RTGZArchiver;
 
-  RZXZArchiver.VmtLink := PtrUInt(TypeOf(arc_ZXZ.TZXZArchive));
+  RZXZArchiver.VmtLink := PtrUInt(TypeOf(fmtzxz.TZXZArchive));
   RZXZArchiver.Load := @Build_RZXZArchiver;
 
   RZXZArchiver.Store := @Store_RZXZArchiver;
 
-  RQUARKArchiver.VmtLink := PtrUInt(TypeOf(arc_QRK.TQuArkArchive));
+  RQUARKArchiver.VmtLink := PtrUInt(TypeOf(fmtqrk.TQuArkArchive));
   RQUARKArchiver.Load := @Build_RQUARKArchiver;
 
   RQUARKArchiver.Store := @Store_RQUARKArchiver;
 
-  RUFAArchiver.VmtLink := PtrUInt(TypeOf(arc_UFA.TUFAArchive));
+  RUFAArchiver.VmtLink := PtrUInt(TypeOf(fmtufa.TUFAArchive));
   RUFAArchiver.Load := @Build_RUFAArchiver;
 
   RUFAArchiver.Store := @Store_RUFAArchiver;
 
-  RIS3Archiver.VmtLink := PtrUInt(TypeOf(arc_IS3.TIS3Archive));
+  RIS3Archiver.VmtLink := PtrUInt(TypeOf(fmtis3.TIS3Archive));
   RIS3Archiver.Load := @Build_RIS3Archiver;
 
   RIS3Archiver.Store := @Store_RIS3Archiver;
 
-  RSQZArchiver.VmtLink := PtrUInt(TypeOf(arc_SQZ.TSQZArchive));
+  RSQZArchiver.VmtLink := PtrUInt(TypeOf(fmtsqz.TSQZArchive));
   RSQZArchiver.Load := @Build_RSQZArchiver;
 
   RSQZArchiver.Store := @Store_RSQZArchiver;
 
-  RHAPArchiver.VmtLink := PtrUInt(TypeOf(arc_HAP.THAPArchive));
+  RHAPArchiver.VmtLink := PtrUInt(TypeOf(fmthap.THAPArchive));
   RHAPArchiver.Load := @Build_RHAPArchiver;
 
   RHAPArchiver.Store := @Store_RHAPArchiver;
 
-  RZOOArchiver.VmtLink := PtrUInt(TypeOf(arc_ZOO.TZOOArchive));
+  RZOOArchiver.VmtLink := PtrUInt(TypeOf(fmtzoo.TZOOArchive));
   RZOOArchiver.Load := @Build_RZOOArchiver;
 
   RZOOArchiver.Store := @Store_RZOOArchiver;
 
-  RCHZArchiver.VmtLink := PtrUInt(TypeOf(arc_CHZ.TCHZArchive));
+  RCHZArchiver.VmtLink := PtrUInt(TypeOf(fmtchz.TCHZArchive));
   RCHZArchiver.Load := @Build_RCHZArchiver;
 
   RCHZArchiver.Store := @Store_RCHZArchiver;
 
-  RUC2Archiver.VmtLink := PtrUInt(TypeOf(arc_UC2.TUC2Archive));
+  RUC2Archiver.VmtLink := PtrUInt(TypeOf(fmtuc2.TUC2Archive));
   RUC2Archiver.Load := @Build_RUC2Archiver;
 
   RUC2Archiver.Store := @Store_RUC2Archiver;
 
-  RAINArchiver.VmtLink := PtrUInt(TypeOf(arc_AIN.TAINArchive));
+  RAINArchiver.VmtLink := PtrUInt(TypeOf(fmtain.TAINArchive));
   RAINArchiver.Load := @Build_RAINArchiver;
 
   RAINArchiver.Store := @Store_RAINArchiver;
 
-  RS7ZArchiver.VmtLink := PtrUInt(TypeOf(arc_7Z.TS7ZArchive));
+  RS7ZArchiver.VmtLink := PtrUInt(TypeOf(fmt7z.TS7ZArchive));
   RS7ZArchiver.Load := @Build_RS7ZArchiver;
 
   RS7ZArchiver.Store := @Store_RS7ZArchiver;
 
-  RBZ2Archiver.VmtLink := PtrUInt(TypeOf(Arc_BZ2.TBZ2Archive));
+  RBZ2Archiver.VmtLink := PtrUInt(TypeOf(fmtbz2.TBZ2Archive));
   RBZ2Archiver.Load := @Build_RBZ2Archiver;
 
   RBZ2Archiver.Store := @Store_RBZ2Archiver;

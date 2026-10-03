@@ -45,17 +45,17 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_BSA; {BSA}
+unit fmtace; {ACE}
 
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams
+  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
   ;
 
 type
-  PBSAArchive = ^TBSAArchive;
-  TBSAArchive = object(TARJArchive)
+  PACEArchive = ^TACEArchive;
+  TACEArchive = object(TARJArchive)
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
@@ -63,20 +63,41 @@ type
     end;
 
 type
-  BSAHdr = record
-    Id: array[1..4] of Char;
-    PackedSize: LongInt;
-    OriginSize: LongInt;
-    Date: LongInt;
-    Data: array[1..6] of Byte;
-    NameLen: Byte;
+  ACEFileHdr = record
+    HeadCRC: AWord;
+    HeadSize: AWord;
+    HeadType: Byte;
+    //1 - file
+    //2 - recovery record
+    //3 - large file (4+ gb)
+    HeadFlags: AWord;
+    PackedSize: LongInt; //qword for HeadType = 3
+    OriginSize: LongInt; //qword for HeadType = 3
+    DateTime: LongInt;
+    Attr: LongInt;
+    CRC32: LongInt;
+    TechInfo: LongInt;
+    Reserved: AWord;
+    NameLen: AWord;
     end;
+  //  HeadFlags:
+  //  bit  description
+  //   0   1 (ADDSIZE field present)
+  //   1   presence of file comment
+  //
+  //   12  file continued from previous volume
+  //   13  file continues on the next volume
+  //   14  file encrypted with password
+  //   15  solid-flag: file compressed using data
+  //       of previous files of the archive
+
+var
+  ACEVerToExtr: Byte;
 
 implementation
+{ ---------------------------------- ACE --------------------------------- }
 
-{ ----------------------------- BSA ------------------------------------}
-
-constructor TBSAArchive.Init;
+constructor TACEArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -86,104 +107,118 @@ constructor TBSAArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'BSARC'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'BSARC'));
-  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-xy'));
-  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, '-xy'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-ar'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-am'));
-  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, '-D'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-xg'));
-  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
+  
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ACE'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ACE'));
+  
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'm'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-p'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
-  ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
+  ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths,
+         '-ep'));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
-  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, '+s'));
-  Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
+  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec,
+       '-rr'));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract,
+         '-sfx'));
+  Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, '-s'));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
          ''));
   SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
          ''));
   StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PStoreCompression, ''));
+         PStoreCompression, '-m0'));
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastestCompression, '+q'));
+         PFastestCompression, '-m1'));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, ''));
+         PFastCompression, '-m2'));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, ''));
+         PNormalCompression, '-m3'));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PGoodCompression, ''));
+         PGoodCompression, '-m4'));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, ''));
+         PUltraCompression, '-m5'));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
-         ' '));
+         '@'));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
-       ' '));
+       '@'));
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
   q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '1');
   PutDirs := q <> '0';
   
-  q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '1');
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TBSAArchive.Init };
+  end { TACEArchive.Init };
 
-function TBSAArchive.GetID: Byte;
+function TACEArchive.GetID: Byte;
   begin
-  GetID := arcBSA;
+  GetID := arcACE;
   end;
 
-function TBSAArchive.GetSign: TStr4;
+function TACEArchive.GetSign: TStr4;
   begin
-  GetSign := sigBSA;
+  GetSign := sigACE;
   end;
 
-procedure TBSAArchive.GetFile;
+procedure TACEArchive.GetFile;
+  label 1;
   var
-    P: BSAHdr;
+    FP: TFileSize;
+    P: ACEFileHdr;
+    C: Char;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+1:
+  FP := ArcFile^.GetPos;
+  if  (FP = ArcFile^.GetSize) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P, 4);
-  if  (Copy(P.Id, 1, 2) = #0#0)
-  then
-    begin
-    FileInfo.Last := 1;
-    Exit;
-    end;
-  if  (ArcFile^.Status <> stOK)
-           or not ((P.Id[4] in [#0, #7]) and (Copy(P.Id, 2, 2) = #0#$AE))
-  then
-    begin
-    FileInfo.Last := 2;
-    Exit;
-    end;
-  ArcFile^.Read(P.PackedSize, SizeOf(P)-4);
+  ArcFile^.Read(P, 15);{HeadCRC..OriginSize}
   if  (ArcFile^.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
-  FileInfo.Last := 0;
-  FileInfo.Attr := 0;
-  FileInfo.USize := P.OriginSize;
+  if (P.HeadType <> 1) and
+     (P.HeadType <> 3) then
+    begin {it's not a file}
+      ArcFile^.Seek(FP + P.HeadSize +
+                    (P.PackedSize)*Byte(P.HeadFlags and 1) + 4);
+      goto 1;
+    end;
   FileInfo.PSize := P.PackedSize;
-  FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
-  FileInfo.FName[0] := Char(P.NameLen);
-  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize+1);
-  end { TBSAArchive.GetFile };
+  FileInfo.USize := P.OriginSize;
+  if P.HeadType = 3 then
+    begin
+    CompRec(FileInfo.PSize).Hi := P.OriginSize;
+    ArcFile^.Read(FileInfo.USize, 8);
+    end;
+  ArcFile^.Read(P.DateTime, 20);{DateTime..NameLen}
+  FileInfo.FName := '';
+  repeat
+    ArcFile^.Read(C, 1);
+    Dec(P.NameLen);
+    FileInfo.FName := FileInfo.FName+C;
+  until P.NameLen = 0;
+  FileInfo.Last := 0;
+  FileInfo.Date := P.DateTime;
+  FileInfo.Attr := Byte(P.Attr and not Hidden);
+  if  (P.HeadFlags and $4000) <> 0 then
+    FileInfo.Attr := FileInfo.Attr or Hidden;
+  ArcFile^.Seek(CompToFSize(FP + P.HeadSize + FileInfo.PSize + 4));
+  end { TACEArchive.GetFile };
 
 end.

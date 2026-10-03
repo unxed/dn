@@ -45,7 +45,7 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-unit arc_QRK; {QuArk}
+unit fmtcab; {CAB}
 
 interface
 
@@ -54,19 +54,37 @@ uses
   ;
 
 type
-  PQuarkArchive = ^TQuArkArchive;
-  TQuArkArchive = object(TARJArchive)
+  PCABArchive = ^TCABArchive;
+  TCABArchive = object(TARJArchive)
+    FilesNumber: LongInt;
     constructor Init;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     end;
 
+type
+  PCFHEADER = ^TCFHEADER;
+  TCFHEADER = record
+    signature: LongInt;
+    Reserved1: LongInt;
+    cbCabinet: LongInt;
+    Reserved2: LongInt;
+    coffFiles: LongInt;
+    Reserved3: LongInt;
+    VersionMinor: Byte;
+    VersionMajor: Byte;
+    cFolders: AWord;
+    cFiles: AWord;
+    Flags: AWord;
+    setID: AWord;
+    iCabinet: AWord;
+    end;
+
 implementation
+{ ---------------------- CAB (by Neverowsky A.)---------------------------}
 
-{ --------------------- Quark (by Luzin Aleksey) -------------------------}
-
-constructor TQuArkArchive.Init;
+constructor TCABArchive.Init;
   var
     Sign: TStr5;
     q: String;
@@ -76,20 +94,23 @@ constructor TQuArkArchive.Init;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
-  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'QuArk'));
-  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'QuArk'));
+  {-i0 turns on console output}
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'MSCAB -i0'));
+  
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'MSCAB -i0'));
+  
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
   ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
-  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
-  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, 'm'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-dirs -r0 a'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-dirs -r0 m'));
   Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, 'd'));
-  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-g'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
   Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 't'));
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
-  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-y'));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
   RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
-  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, '-s'));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
   Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
   RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
          ''));
@@ -100,17 +121,17 @@ constructor TQuArkArchive.Init;
   FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PFastestCompression, ''));
   FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PFastCompression, '-m3'));
+         PFastCompression, ''));
   NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PNormalCompression, '-m1'));
+         PNormalCompression, ''));
   GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PGoodCompression, ''));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
-         PUltraCompression, '-m5'));
+         PUltraCompression, ''));
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
-         ' '));
+         '@'));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
-       ' '));
+       '@'));
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
@@ -121,61 +142,73 @@ constructor TQuArkArchive.Init;
   SwapWhenExec := q <> '0';
   
   
-  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '0');
+  q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
   
-  end { TQuArkArchive.Init };
 
-function TQuArkArchive.GetID: Byte;
+  FilesNumber := -1;
+  end { TCABArchive.Init };
+
+function TCABArchive.GetID: Byte;
   begin
-  GetID := arcQUARK;
+  GetID := arcCAB;
   end;
 
-function TQuArkArchive.GetSign: TStr4;
+function TCABArchive.GetSign: TStr4;
   begin
-  GetSign := sigQUARK;
+  GetSign := sigCAB;
   end;
 
-procedure TQuArkArchive.GetFile;
+procedure TCABArchive.GetFile;
   var
+    C: Char;
     FH: record
-      Tmp: array[1..3] of Char;
-      LengthOfName: Byte;
-      end;
-    FH1: record
-      Attr: AWord;
+      cbFile: LongInt;
+      uoffFolderStart: LongInt;
+      iFolder: AWord;
+      {     date:     AWord;
+      time:     AWord; }
       DateTime: LongInt;
-      RealSize: LongInt;
-      PackSize: LongInt;
-      CRC: AWord;
-      TPC: Byte;
+      attribs: AWord;
+      {     u1  szName[]; }
       end;
+    CFHEADER: TCFHEADER;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if  (FilesNumber < 0) then
+    begin
+    ArcFile^.Read(CFHEADER, SizeOf(CFHEADER));
+    FilesNumber := CFHEADER.cFiles;
+    ArcFile^.Seek(ArcPos+CFHEADER.coffFiles);
+    end;
+  if  (FilesNumber = 0) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
+  Dec(FilesNumber);
   ArcFile^.Read(FH, SizeOf(FH));
   if  (ArcFile^.Status <> 0) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  SetLength(FileInfo.FName, FH.LengthOfName);
-  ArcFile^.Read(FileInfo.FName[1], FH.LengthOfName);
-  if FileInfo.FName = '' then
+  FileInfo.FName := '';
+  repeat
+    ArcFile^.Read(C, 1);
+    if C <> #0 then
+      FileInfo.FName := FileInfo.FName+C;
+  until (C = #0) or (Length(FileInfo.FName) > 100);
+  if  (Length(FileInfo.FName) > 100) or (FileInfo.FName = '')
+  then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Read(FH1, SizeOf(FH1));
+  FileInfo.Attr := FH.attribs and not Hidden;
+  FileInfo.USize := FH.cbFile;
+  FileInfo.PSize := FH.cbFile;
+  FileInfo.Date := (FH.DateTime shr 16) or (FH.DateTime shl 16);
   FileInfo.Last := 0;
-  FileInfo.Date := FH1.DateTime;
-  FileInfo.Attr := FH1.Attr and not Hidden;
-  FileInfo.USize := FH1.RealSize;
-  FileInfo.PSize := FH1.PackSize;
-  ArcFile^.Seek(ArcFile^.GetPos+FH1.PackSize);
-  end { TQuArkArchive.GetFile };
+  end { TCABArchive.GetFile };
 
 end.
