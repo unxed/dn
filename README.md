@@ -58,8 +58,7 @@
 
 1. **Тесты TV** (нужен только `fpc` 3.2.x):
 
-       cd tv/tests
-       for t in t_*.pas; do fpc -Fu../src -Fu. $t && ./${t%.pas}; done     # каждый печатает «ALL OK»
+       tools/tv-test.sh                  # собирает в build/tv-tests и запускает tv/tests/t_*.pas; каждый печатает «ALL OK»
 
 0. **DN под Linux:** собрать одной командой (нужны `fpc` 3.2.x и `python3`):
 

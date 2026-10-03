@@ -18,16 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl
-      - name: Build and run the tests
-        run: |
-          mkdir -p out
-          cd tv/tests
-          for t in t_*.pas; do
-            fpc -Fu../src -Fu. -FE../../out "$t" | grep -E 'Error|Fatal' && exit 1
-            echo "=== ${t%.pas}"
-            ../../out/${t%.pas} | tee ../../out/${t%.pas}.txt
-            grep -q '^ALL OK' ../../out/${t%.pas}.txt
-          done
+      - name: Build and run the tests (tools/tv-test.sh)
+        run: tools/tv-test.sh
 
   unix:
     # the terminal backend (TvUnix) in a pty: tools/pty_screen.py is the terminal that checks the screen
