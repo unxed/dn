@@ -402,7 +402,6 @@ procedure InitVideo;
     
   begin { InitVideo }
   SysTVGetCurType(StrtCurY1, StrtCurY2, StrtCurVisible);
-  SysTVInitCursor; {KV}
   SysGetCurPos(X, Y); {KV}
   WordRec(OldCursorPos).Lo := X; {KV}
   WordRec(OldCursorPos).Hi := Y; {KV}

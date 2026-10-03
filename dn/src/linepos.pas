@@ -149,7 +149,6 @@ procedure ResourceAccessError;
     ;
   ClearScreen;
   Writeln('Resource access error');
-  SysTVInitCursor;
   Halt(219);
   {/Cat}
   {RunError(219);}
