@@ -17,7 +17,7 @@ from a name and not checked: fix it when you know. The class of every file by or
 | `menus.pas` | menus, the menu bar, the status line (the hot letters) |
 | `setups.pas`, `fltools.pas` | the dialogs of the settings; the dialogs of the panel (select group, filter) |
 | `dnini.pas`, `dnini_p.pas` | `DN.INI`: reading and writing the settings |
-| `dn1.pas` (?) | the startup and shutdown of the program, the state of the desktop |
+| `dn1.pas` | reading `DN.CFG` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
 | `macro.pas` | the macros of the editor (record, play) |
 
 ## Panels and files
@@ -34,6 +34,22 @@ from a name and not checked: fix it when you know. The class of every file by or
 | `filediz.pas` | the descriptions of files (`descript.ion`, `files.bbs`) (?) |
 | `fstorage.pas` | the storage of directories (a hash of the names of directories) |
 | `diskinfo.pas`, `diskimg.pas` | the information about a disk; disk images (?) |
+
+## Settings and the desktop: who writes what, and when
+The question that comes first when a setting "is not kept" or the panels "do not come back". Checked in the sources and in a run on Linux (2026-10-03).
+
+| What | File on disk (next to the program) | Written by | Read by |
+|---|---|---|---|
+| Settings of the dialogs (`StartupData`, `SystemData`, panel presets...) | `DN.CFG` (blocks `cfg*` in `dnutil.pas`) | `WriteConfig` (`dnutil.pas`): at the exit **only if** `ConfigModified` (`startup.pas`; the dialogs set it) and right after some dialogs (colors, `UpdateConfig`) | `ReadConfig` (`dn1.pas`) |
+| Settings in text form | `DN.INI` (and the cache `DNINI.IN_`) | the ini engine: `dnini.pas` (the variables), `dnini_p.pas` (`RegisterVar`: what is in the file); `copyini.pas` carries values over to `StartupData` | at the start |
+| Desktop saved by the user or by autosave | `DN.DSK` | `SaveRealDsk` (`dnutil.pas`): Options -> Save desktop (`cmSaveDesk`) and at the exit when `StartupData.Unload and osuAutosave` (Options -> Startup, "Autosave Desktop") | `Init` of `TDNApplication` (if there is no `DN<n>.SWP`), Options -> Load desktop (`cmLoadDesk`, `RetrieveDesktop`) |
+| Desktop for the return from an external program | `DN<n>.SWP` (in `SwpDir`) | `SaveDsk` (`dnutil.pas`) at the exit, except the total exit | `Init`, then the file is erased |
+| Histories | `DN.HIS` | `SaveHistories` at a normal exit | at the start |
+
+* The flags of the Startup dialog are `osu*` in `commands.pas` (`osuAutosave = $02`, `osuPreserveDir = $08`...); `StartupData.Load` is for the start, `.Unload` is for the exit. The dialog is in `setups.pas`.
+* What goes into the desktop file is decided by the `Store` of each view: `TDoubleWindow` (`dblwnd.pas`), the panels (`flpanelx.pas`). For example the directory of the **active** disk panel is stored only with "Preserve directory" (`osuPreserveDir`); the passive panel always keeps it.
+* The button "Save setup" of the panel setup dialogs is `TSaveSetupButton` in `fltools.pas`: it writes the panel settings into the presets 1..10 (and sets `ConfigModified`) or into the active/passive panel (they are kept in the desktop only).
+* A setting is not kept → is `ConfigModified` set for it? does the exit reach `Done` (Alt-X, exit code 0)? is it in `WriteConfig` or in `DN.INI`? A panel is not restored → is it in `Store`?
 
 ## The viewer and the editor
 | File | What it holds |
