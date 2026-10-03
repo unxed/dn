@@ -270,3 +270,11 @@ line, the viewer, the panels, the history, macros, the gauges...) did nothing, b
 Now `Drivers.MessageKey(Receiver, Code)` (the code in the form of DN with the shift bits, `kbCtrlPgDn = $047600`: `SetDNKeyCode`) does it, and the calls use it. Test: the tour scenario `mousedir` (DOS) and `DNKEYS=011B,C7600`.
 Not checked: the Linux and Windows builds with this change (the same code), the callers that give the key as a plain Word (macros: a character, gauges: the table `Keys`).
 **Tv is separate:** the repository `unxed/tv` is developed on its own (the owner's decision: "split, not copy"); `dn` only moves the submodule pointer.
+
+## Terminal protocols, step 1: the win32 input mode (2026-10-03)
+
+`tv` (`TvTermIO.ParseWin32Key`, `TvUnix`): DN asks the terminal for the mode (`ESC[?9001h`) and understands `ESC[Vk;Sc;Uc;Kd;Cs;Rc_`: every key and combination (Ctrl/Alt/Shift with
+letters, digits, the functional keys, AltGr, Alt+numpad, characters above U+FFFF from the two UTF-16 halves); the releases and the modifier keys alone are not events. `TV_WIN32_INPUT=1|0` forces it;
+by default it is asked for only in Windows Terminal (`WT_SESSION`). Tests: `t_termio` (19 checks), `tv/tests/pty/test_win32input.py` (tvdemo), `tools/dn-linux-win32.py` (DN: F7, Esc, Alt-X + Enter).
+Open: ask the terminal (DECRQM `ESC[?9001$p`) instead of guessing by `WT_SESSION` (WezTerm, conhost, far2l have the mode too); the repeat count and the key releases are dropped; Ctrl+digit and the
+OEM keys with Ctrl give nothing without a character; Windows (the console API of `TvTermOs`) does not use it; the next steps: OSC 52, the kitty keyboard flags as a setting, far2l extensions.

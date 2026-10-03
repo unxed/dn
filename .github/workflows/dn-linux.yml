@@ -34,6 +34,8 @@ jobs:
           ! grep -v ' ok$' tour.txt
       - name: File operations in a pty
         run: python3 tools/dn-linux-ops.py out/dn
+      - name: The win32 input mode (keys as ESC [ Vk;Sc;Uc;Kd;Cs;Rc _) in a pty
+        run: python3 tools/dn-linux-win32.py out/dn
       - name: The code page by the locale
         run: python3 tools/dn-linux-locale.py out/dn
       - uses: actions/upload-artifact@v4
