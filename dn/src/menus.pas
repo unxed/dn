@@ -1259,7 +1259,7 @@ procedure TMenuBar.Draw;
       P := P^.Next;
       end;
     end;
-  WriteBufW(0, 0, Size.X, 1, B);
+  WriteBufC(0, 0, Size.X, 1, B);
   end { TMenuBar.Draw };
 
 procedure TMenuBar.GetItemRect(Item: PMenuItem; var R: TRect);
@@ -1345,7 +1345,7 @@ procedure TMenuBox.Draw;
 
   procedure DrawLine;
     begin
-    WriteBufW(0, Y, Size.X, 1, B);
+    WriteBufC(0, Y, Size.X, 1, B);
     Inc(Y);
     end;
 
@@ -1742,7 +1742,7 @@ procedure TStatusLine.DrawSelect(Selected: PStatusItem);
       MoveStr(B[I], HintBuf, Byte(CNormal));
       end;
     end;
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   end { TStatusLine.DrawSelect };
 
 procedure TStatusLine.FindItems;

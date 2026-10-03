@@ -164,7 +164,7 @@ procedure TSSaver.Draw;
     B: TDrawBuffer;
   begin
   MoveChar(B, ' ', 07, Size.X);
-  WriteLineW(0, 0, Size.X, Size.Y, B);
+  WriteLineC(0, 0, Size.X, Size.Y, B);
   end;
 
 constructor TSSaver.Init(var Bounds: TRect);
@@ -228,7 +228,7 @@ procedure TStarSkySaver.Draw;
     W: Word;
   begin
   MoveChar(B, ' ', $07, Size.X);
-  WriteLineW(0, 0, Size.X, Size.Y, B);
+  WriteLineC(0, 0, Size.X, Size.Y, B);
   if ScreenHeight*2 > ScreenWidth then
     K := 1
   else
@@ -438,15 +438,15 @@ procedure TClockSaver.Draw;
   for I := 0 to Size.Y-1 do
     if I <> Y
     then
-      WriteLineW(0, I, Size.X, 1, BB)
+      WriteLineC(0, I, Size.X, 1, BB)
     else
       begin
-      Move(BB, B, Size.X*2);
+      Move(BB, B, Size.X*SizeOf(TScreenCell));
       MoveStr(B[X], Dec2(dH)+':'+Dec2(dM), Clr); {JO}
       
-      WordRec(B[X+2]).Hi := Clr+$80; {JO}
+      SetCellAttr(B[X+2], Byte(Clr+$80)); {JO}
       
-      WriteLineW(0, I, Size.X, 1, B);
+      WriteLineC(0, I, Size.X, 1, B);
       end
   end;
 
@@ -468,7 +468,7 @@ procedure TClockSaver.Update;
     dS := S;
     dSS := SS;
     MoveChar(B, ' ', $07, 5);
-    WriteLineW(X, Y, 5, 1, B);
+    WriteLineC(X, Y, 5, 1, B);
     Inc(X, DX);
     Inc(Y, DY);
     if X < 0 then
@@ -492,9 +492,9 @@ procedure TClockSaver.Update;
       end;
     MoveStr(B[0], Dec2(dH)+':'+Dec2(dM), Clr); {JO}
     
-    WordRec(B[2]).Hi := Clr+$80; {JO}
+    SetCellAttr(B[2], Byte(Clr+$80)); {JO}
     
-    WriteLineW(X, Y, 5, 1, B);
+    WriteLineC(X, Y, 5, 1, B);
     end;
   if not MouseVisible then
     HideMouse;
