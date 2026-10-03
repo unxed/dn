@@ -1,7 +1,7 @@
 { Tests of dn/new/vputils.pas and use16.pas }
 {$mode objfpc}{$H-}
 program t_vputil;
-uses VPUtils, Use16;
+uses VPUtils, Math, Use16;
 {$I dntest.inc}
 var
   I: Integer;

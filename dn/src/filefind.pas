@@ -229,7 +229,7 @@ uses
   , Events {AK155 для LongWorkBegin - LongWorkEnd}
   , fsinfo {JO: для GetDriveTypeNew}
   , filetype, Eraser, basics, Files, DnIni, Menus, FileCopy
-  , panelsetup, VPUtils
+  , panelsetup, VPUtils, Math
   ;
 
 const

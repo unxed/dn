@@ -253,7 +253,7 @@ uses
 {$IFDEF LINUX}
   DNRun,
 {$ENDIF}
-  Dos, Lfn, HelpKern, Menus, FileCopy, VPUtils,
+  Dos, Lfn, HelpKern, Menus, FileCopy, VPUtils, Math,
   DNHelp, DnIni, iniengine, Histries,
   VideoMan, Memory, panelwin, Messages, HistList, FileFind,
   

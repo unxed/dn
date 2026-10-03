@@ -218,7 +218,7 @@ uses
   Lfn, Files, basics, strutil, fileutil, envutil, VpSysLow,
   Messages, mainapp, DNHelp, Startup, Commands, Histries, HistList, paneldlgs,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
-  DNUtil, fsinfo, Dos, Filediz, Collect, VPUtils,
+  DNUtil, fsinfo, Dos, Filediz, Collect, VPUtils, Math,
   iniengine, DnIni {-$VIV}
   
   , UUCode 

@@ -61,7 +61,7 @@ implementation
 uses
   Dos, Lfn, Messages, Views, Commands, Defines, Streams, mainapp, Drivers,
   strutil, fileutil, FileCopy, progress, xTime
-  , Files, Tree, VPUtils
+  , Files, Tree, VPUtils, Math
   ;
 
 {Cat: добавил сюда эти типы, вместо того, чтобы подключать модуль DiskTool}

@@ -105,7 +105,7 @@ uses
   
   VpSysLow, Filediz , ArvidAvt ,
   fnotify, fsinfo, basics, strutil, fileutil,
-  progress, FileFind, VPUtils,
+  progress, FileFind, VPUtils, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
   , ErrMess
   , panelroot {JO: PFilePanelRoot нужен чтобы делать недоступным }

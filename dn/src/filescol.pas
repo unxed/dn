@@ -214,7 +214,7 @@ uses
   {!!}CmdLine
   
   
-  , VpSysLow, VPUtils
+  , VpSysLow, VPUtils, Math
   
   , fsinfo, DnIni, Dos, FileType, panelsetup, keymap
   , DNHelp, basics, strutil, fileutil, Memory, Startup

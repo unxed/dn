@@ -108,7 +108,7 @@ uses
   , editcore, Histries, FViewer, panelroot
   , Idlers 
   , VpSysLow, Lfn, UserMenu, Menus
-  , DnIni, VPUtils
+  , DnIni, VPUtils, Math
   ;
 
 const
