@@ -242,7 +242,9 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   Other classes of DN that call `GetSubViewPtr` after `inherited Load`: `calc`, `dbview`, `dndlgs`, `edwin` (the same fix helps them).
 - **Verified after the fix (DOS, DOSBox-X master with the guard):** panel sort by size (Alt-B), Options -> Save desktop (`DN.DSK`, 6628 bytes), restart, Options -> Load desktop: no error, the panel comes back in the size
   order (the base start shows the extension order). The same code is in the Linux/Windows/aarch64 builds, where the bug was the same; their `dist/` are not rebuilt yet (a refresh of all `dist/` is due after the next fixes).
-- **Not checked yet:** the option "save the desktop on exit" switched on in Options -> Startup (the automatic version of the same), "Save setup", and the user screen after an external
+- **Checked (2026-10-03, Linux build, pty; `tools/dn-linux-ops.py`):** Options -> Startup -> "Autosave Desktop": `DN.DSK` is written at Alt-X, the option is kept in `DN.CFG`, the next start restores the desktop.
+  The directory of the **active** disk panel is restored only together with "Preserve directory" (`TFilePanelRoot.Store`, `osuPreserveDir`): by design of DN, not a defect; the passive panel always keeps it. Not checked on DOS.
+- **Not checked yet:** "Save setup" (the button of the panel setup dialogs, `TSaveSetupButton.Press` in `fltools.pas`: only the presets 1..10 set `ConfigModified`, the active/passive targets live in the desktop), and the user screen after an external
   program. The keys of the harness (`DNKEYS`) drive the menus well but each step needs a look at the screen (the first guesses of a hotkey, Ctrl-F3, opened the drive menu instead of a sort).
 
 ## DOS: the user screen after an external program (2026-10-03)
