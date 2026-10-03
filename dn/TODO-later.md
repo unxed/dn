@@ -228,3 +228,12 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   `{U+0434}{U+043E}{U+043C} {U+4E16}{U+754C}.txt` (cut by the column with the `►` mark; without the option it is hidden). Not yet tried on it: copy, view, rename, delete in DN.
 - With the apt package 2024.03.01 and `lfn = true`, DN shows the long names (the column cuts them with the `►` mark; the panel is in the 8.3 width). Files whose names the code page lacks are hidden
   (no `utf8 file names`, that option is only in the patched DOSBox-X): to be tried with DN now that it runs under `master`.
+
+## DN for DOS: saving the state (2026-10-03, under DOSBox-X master + the guard, `dist/dos`)
+- Written by DN: `DN.INI` at the first start (and the ini cache `DNINI.IN_`), `DN.HIS` (histories) at every normal exit (Alt-X, exit code 0), `DN.CFG` (16 KB) only when the configuration was changed
+  (`ConfigModified` in `TDNApplication.Done`). The desktop: `TDNApplication.Done` calls `SaveDsk` (the `DN<n>.SWP` file, for the return from an external program; nothing at the total exit) or `SaveRealDsk` when
+  `StartupData.Unload and osuAutosave` (the startup option "save the desktop on exit", off by default): no `.DSK` file was written in my runs, because that option was not on.
+- Checked: the panel sort by size (Alt-B, Down, Down, Enter) works inside a run (the order of the files changes). After Alt-X and a new start the sort is the default again: **expected** with the defaults (nothing
+  saves a panel sort unless the setup is saved or the autosave of the desktop is on); not a defect of the port as far as I can tell.
+- **Not checked yet:** the option "save the desktop on exit" switched on in Options -> Startup (then the sort and the directories of the panels must come back after a restart), "Save setup", and the user screen after an external
+  program. The keys of the harness (`DNKEYS`) drive the menus well but each step needs a look at the screen (the first guesses of a hotkey, Ctrl-F3, opened the drive menu instead of a sort).
