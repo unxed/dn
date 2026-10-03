@@ -247,7 +247,7 @@ type
 implementation
 
 uses
-  Lfn, Dos, VPSysLow, Commands, DNHelp, Advance1, Advance2, U_KeyMap
+  Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, Advance1, Advance2, U_KeyMap
   , Microed, Macro, Advance6, VPUtils
   , Memory, Messages, DNApp, Startup, Dialogs,
   Decoder,  {piwamoto}
@@ -1367,6 +1367,7 @@ procedure TFileViewer.Draw;
             else
               SZ[IZ] := #0;
           XLatBuf(S[W2+1], Length(S)-W2, XCoder.XLatCP[ToAscii]);
+          CpBytesToUtf8(S, W2+1); { UTF-8 inside: every byte is one character of the page }
           {-DataCompBoy & Axel: apply filter-}
           case Filter of
             0:
@@ -1458,6 +1459,7 @@ procedure TFileViewer.Draw;
           begin
           XDumpStr(S, Buf^[W], L, J, Filter); //!!s
           XLatBuf(S[10], Length(S)-9, XCoder.XLatCP[ToAscii]);
+          CpBytesToUtf8(S, 10);
           Drivers.MoveStr(B, S, C);
           if SearchActive then
             begin
@@ -1595,6 +1597,8 @@ procedure TFileViewer.Draw;
             begin
             SetLength(S, W-XDelta);
             XLatBuf(S[1], Length(S), XCoder.XLatCP[ToAscii]);
+            if XCoder.KeyMap <> kmAscii then
+              CpBytesToUtf8(S, 1); { UTF-8 inside: the text that went through a table is of the code page; the text with no table is shown as UTF-8 }
             {Cat: фильтр перенесён сюда - он должен быть использован
       уже после применения таблицы перекодировки}
             case Filter of
