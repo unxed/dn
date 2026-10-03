@@ -37,6 +37,10 @@ jobs:
           mkdir -p out
           fpc -Futv/src -FUout -FEout tv/demo/tvterm.pas | grep -E 'Error|Fatal' && exit 1
           python3 tv/tests/pty/test_tvterm.py out/tvterm
+      - name: A program on the whole screen (VtRunScreen) in a pty
+        run: |
+          fpc -Futv/src -FUout -FEout tv/tests/pty/rundemo.pas | grep -E 'Error|Fatal' && exit 1
+          python3 tv/tests/pty/test_vtrun.py out/rundemo
       - name: The clipboard (OSC 52) in a pty
         run: |
           fpc -Futv/src -FUout -FEout tv/tests/pty/clipdemo.pas | grep -E 'Error|Fatal' && exit 1
