@@ -383,7 +383,7 @@ procedure THexLine.Draw;
   MoveChar(B[Size.X-1], #32, InputLine^.GetColorW(4), 1);
   MoveChar(B[0], #32, InputLine^.GetColorW(4), 1);
   {-DataCompBoy}
-  WriteLineW(0, 0, Size.X, Size.Y, B);
+  WriteLineC(0, 0, Size.X, Size.Y, B);
   end { THexLine.Draw };
 
 { /------------------ TComboBox ----------------\ }
@@ -453,7 +453,7 @@ procedure TComboBox.Draw;
   MoveChar(B[1], ' ', C, Size.x-2);
   MoveStr(B[1], Items[Selected]^.Name^, C);
   MoveChar(B[Size.x-1], ']', C, Size.x);
-  WriteLineW(0, 0, Size.X, Size.Y, B);
+  WriteLineC(0, 0, Size.X, Size.Y, B);
   end;
 
 
@@ -823,12 +823,12 @@ procedure TBookmark.Draw;
     MoveChar(B[0], C0[1], LineColor, 1);
     MoveChar(B[1], H, LineColor, Size.X-2);
     MoveChar(B[Size.X-1], C, LineColor, 1);
-    WriteLineW(0, 0, Size.X, 1, B);
+    WriteLineC(0, 0, Size.X, 1, B);
 
     MoveChar(B[0], C2[1], LineColor, 1);
     MoveChar(B[1], H, LineColor, Size.X-2);
     MoveChar(B[Size.X-1], C2[2], LineColor, 1);
-    WriteLineW(0, Size.Y-1, Size.X, 1, B);
+    WriteLineC(0, Size.Y-1, Size.X, 1, B);
 
     MoveChar(B[1], ' ', TextColor, Size.X-2);
     MoveChar(B[Size.X-1], C1[2], LineColor, 1);
@@ -836,7 +836,7 @@ procedure TBookmark.Draw;
       TextColor := GetColorW($0402);
     MoveChar(B[0], C1[1], LineColor, 1);
     MoveCStr(B[1], Text^, TextColor);
-    WriteLineW(0, 1, Size.X, 1, B);
+    WriteLineC(0, 1, Size.X, 1, B);
     end;
   end;
 
@@ -852,7 +852,7 @@ procedure TPageFrame.Draw;
   begin
   MoveChar(B[0], ' ', GetColorW(1), Size.X);
   for i := 0 to Size.Y-1 do
-    WriteLineW(0, i, Size.X, 1, B);
+    WriteLineC(0, i, Size.X, 1, B);
   end;
 
 { \------------------ TNotepad -----------------/ }

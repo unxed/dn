@@ -27,10 +27,12 @@ const
 
 type
   TPhase = TPhaseType;
-  { A row of 16-bit cells (low byte: the character, high byte: the BIOS attribute): the buffer of Turbo Vision
-    for Borland Pascal. It is written to the screen by WriteBufW/WriteLineW of TView (tv/DESIGN.md, 11c). }
+  { A row of cells of tv/ (as TDrawBuffer of tv/, but an array: DN addresses the cells by number): the buffer of Turbo Vision for Borland Pascal
+    made of the cells of tv/, so that a cell holds any text (UTF-8, wide characters). The procedures Move* of Drivers fill it (they use the text
+    functions of tv/, TvText); it is written to the screen by WriteBufC/WriteLineC of TView. A buffer of 16-bit words (low byte: the
+    character, high byte: the BIOS attribute) goes with WriteBufW/WriteLineW. }
   PDrawBuffer = ^TDrawBuffer;
-  TDrawBuffer = array[0..MaxViewWidth - 1] of Word;
+  TDrawBuffer = array[0..MaxViewWidth - 1] of TScreenCell;
 
 type
   { the title of a window (Borland TV: String[80]) }

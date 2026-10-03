@@ -271,7 +271,7 @@ function Str2Comp(const s: String): Int64;
 implementation
 
 uses
-  DnIni, Startup, Commands, Advance, U_KeyMap
+  DnIni, Startup, Commands, Advance, U_KeyMap, DNUtf8
   ;
 procedure AddStr(var S: String; C: Char);
   
@@ -361,16 +361,29 @@ begin
 end;
 *)
 
-function CenterStr(const s: String; n: Byte): String;
+function CenterStrB(const s: String; n: Byte): String;
   begin
   if Length(s) >= n then
-    CenterStr := Copy(s, 1, n)
+    CenterStrB := Copy(s, 1, n)
   else
-    CenterStr := Copy(Strg(#32, (n-Length(s)) div 2)+s+Strg(#32,
+    CenterStrB := Copy(Strg(#32, (n-Length(s)) div 2)+s+Strg(#32,
                (n-Length(s)) div 2+1), 1, n);
   end;
 
-function AddSpace(const s: String; n: Byte): String;
+function CenterStr(const s: String; n: Byte): String;
+{$IFDEF DNUTF8}
+  var
+    Tab: String;
+  begin
+  Result := ProxyToUtf8(CenterStrB(Utf8ToProxy(s, Tab), n), Tab);
+  end;
+{$ELSE}
+  begin
+  Result := CenterStrB(s, n);
+  end;
+{$ENDIF}
+
+function AddSpaceB(const s: String; n: Byte): String;
   
   var
     s2: String;
@@ -381,8 +394,21 @@ function AddSpace(const s: String; n: Byte): String;
     FillChar(s2[Length(s2)+1], n-Length(s2), ' ');
     s2[0] := Char(n);
     end;
-  AddSpace := s2;
+  AddSpaceB := s2;
   end { AddSpace };
+
+function AddSpace(const s: String; n: Byte): String;
+{$IFDEF DNUTF8}
+  var
+    Tab: String;
+  begin
+  Result := ProxyToUtf8(AddSpaceB(Utf8ToProxy(s, Tab), n), Tab);
+  end;
+{$ELSE}
+  begin
+  Result := AddSpaceB(s, n);
+  end;
+{$ENDIF}
 
 
 {Cat}
@@ -583,12 +609,20 @@ function CapLongStrg(const S: LongString; First, Last: Integer): LongString;
 {Cat}
 procedure UpStr(var s: String);
   begin
+{$IFDEF DNUTF8}
+  Utf8UpStr(s);
+{$ELSE}
   XLatBuf(s[1], Length(s), UpCaseArray);
+{$ENDIF}
   end;
 
 procedure LowStr(var s: String);
   begin
+{$IFDEF DNUTF8}
+  Utf8LowStr(s);
+{$ELSE}
   XLatBuf(s[1], Length(s), LowCaseArray);
+{$ENDIF}
   end;
 
 procedure CapStr(var S: String);

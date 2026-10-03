@@ -182,12 +182,12 @@ procedure TUserView.Draw;
   begin
   for I := 0 to Size.Y-1 do
     begin
-    MoveChar(B, ' ', 07, SizeOf(B) div 2);
+    MoveChar(B, ' ', 07, MaxViewWidth);
     if I+Delta.Y < UserScreenSize div (UserScreenWidth*2)
     then
-      Move(PAWordArray(UserScreen)^[(I+Delta.Y)*UserScreenWidth], B,
-         UserScreenWidth*2);
-    WriteLineW(0, I, Size.X, 1, B[Delta.X]);
+      WordsToCells(B[0], PAWordArray(UserScreen)^[(I+Delta.Y)*UserScreenWidth],
+         UserScreenWidth);
+    WriteLineC(0, I, Size.X, 1, B[Delta.X]);
     end;
   end;
 
@@ -1015,7 +1015,7 @@ procedure TGrabber.Draw;
     begin
     for I := K1 to K1+K2-1 do
       begin
-      B[I] := ((B[I] xor $7F00) and $7F00) or Lo(B[I]);
+      SetCellAttr(B[I], (CellAttr(B[I]) xor $7F) and $7F);
       end
     end;
   
@@ -1039,12 +1039,12 @@ procedure TGrabber.Draw;
   Bot := R.B;
   for I := 0 to Size.Y-1 do
     begin
-    Move(Screen^[Size.X*I], B, Size.X*2);
+    WordsToCells(B[0], Screen^[Size.X*I], Size.X);
     if  (I >= R.A.Y) and (I < R.B.Y) and (R.A.X < R.B.X) then
       
       Invert(R.A.X, R.B.X-R.A.X);
     
-    WriteLineW(0, I, Size.X, 1, B);
+    WriteLineC(0, I, Size.X, 1, B);
     end;
   end { TGrabber.Draw };
 

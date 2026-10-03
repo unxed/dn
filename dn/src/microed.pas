@@ -169,7 +169,7 @@ type
     destructor Done; virtual;
     procedure Store(var S: TStream);
     procedure Awaken; virtual;
-    procedure DoHighlite(var B; const S: LongString; const Attr: String);
+    procedure DoHighlite(var B: TScreenCell; const S: LongString; const Attr: String);
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Draw; virtual;
     function Valid(Command: Word): Boolean; virtual;
@@ -2157,7 +2157,7 @@ procedure TFileEditor.Draw;
           { Keywords 1 }
           HP[Ord(hhKeyword2)] := Chr(C1 or (CC[12] and 15));
           { Keywords 2 }
-          DoHighlite(B, S, HP);
+          DoHighlite(B[0], S, HP);
           end;
         end;
       if RulerVisible and (A = Delta.Y)
@@ -2196,9 +2196,9 @@ procedure TFileEditor.Draw;
       SearchOnDisplay := True;
       end;
     if EdOpt.HiliteColumn then
-      WordRec(B[Delta.X-Pos.X]).Hi := CC[7];
+      SetCellAttr(B[Delta.X-Pos.X], CC[7]);
     
-    WriteLineW(0, I, Size.X, 1, B);
+    WriteLineC(0, I, Size.X, 1, B);
     end;
   SetCursor(Delta.X-Pos.X, Delta.Y-Pos.Y);
   if InsertMode xor (InterfaceData.Options and ouiBlockInsertCursor <> 0)
@@ -4841,7 +4841,7 @@ Ex:
   end { TFileEditor.HandleEvent };
 
 procedure TFileEditor.DoHighlite
-    (var B; const S: LongString; const Attr: String);
+    (var B: TScreenCell; const S: LongString; const Attr: String);
   var
     i: Integer;
     j: Integer;
@@ -4859,7 +4859,7 @@ procedure TFileEditor.DoHighlite
     while (k <= l) and (S[k] = c) do
       Inc(k);
     if  (c <> #0) and (Ord(c) <= Length(Attr)) then
-      MoveColor(TAWordArray(B)[j], k-i, Ord(Attr[Ord(c)]));
+      MoveColor(PCellArray(@B)^[j], k-i, Ord(Attr[Ord(c)]));
     Inc(j, k-i);
     i := k;
     end;

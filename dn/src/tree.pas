@@ -775,10 +775,10 @@ procedure TTreeInfoView.Draw;
   Loaded := False;
   MoveChar(B, ' ', C, Size.X);
   MoveStr(B[1], Cut(Tree^.CurPath, Size.X), C);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveStr(B[1], Down, C);
-  WriteLineW(0, 1, Size.X, 1, B);
+  WriteLineC(0, 1, Size.X, 1, B);
   end;
 
 procedure TTreeInfoView.MakeDown;
@@ -1787,7 +1787,7 @@ procedure TTreeView.Draw;
         end;
       {-DataCompBoy-}
       end;
-    WriteLineW(0, I-1, Size.X, 1, B[Delta.X]);
+    WriteLineC(0, I-1, Size.X, 1, B[Delta.X]);
     end;
   end { TTreeView.Draw };
 

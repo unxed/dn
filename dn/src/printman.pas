@@ -201,10 +201,10 @@ procedure TPrintStatus.Draw;
         ' ~' + Percent(Print^.FilePos+1, Print^.FileLen+1);
     end;
   MoveCStr(B, '~'+S+'~', C);
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B, S1, C);
-  WriteLineW(0, 1, Size.X, 1, B);
+  WriteLineC(0, 1, Size.X, 1, B);
   end { TPrintStatus.Draw };
 
 constructor TPrintManager.Init(var Bounds: TRect; AStatus: PView; AScrollBar: PScrollBar);

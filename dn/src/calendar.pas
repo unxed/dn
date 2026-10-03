@@ -74,7 +74,7 @@ implementation
 
 uses
   Commands, DNApp, Dos, Dialogs, advance1, DNHelp, DnIni, advance, xTime,
-  advance7, dnutil
+  advance7, dnutil, DNUtf8
   ;
 
 var
@@ -658,6 +658,9 @@ procedure TCalendarView.Draw;
     c: Byte;
     DayOf: Byte;
     Width: integer;
+{$IFDEF DNUTF8}
+    Tab: String; { the days of the week as one byte per character: Copy cuts them by columns }
+{$ENDIF}
   begin
   {0123456789012345678901234567}
   { July          2000 <  >  = }
@@ -682,9 +685,15 @@ procedure TCalendarView.Draw;
   c := Colors[7];
   MoveChar(B[0], ' ', 2, Width);
   S1 := DaysOfWeek;
+{$IFDEF DNUTF8}
+  S1 := Utf8ToProxy(S1, Tab);
+{$ENDIF}
   if  (Length(S1) <> 14) and (Length(S1) <> 21) then
     begin
     S1 := GetString(stDaysWeek);
+{$IFDEF DNUTF8}
+    S1 := Utf8ToProxy(S1, Tab);
+{$ENDIF}
     end;
   if Length(S1) = 14 then
     begin
@@ -698,7 +707,11 @@ procedure TCalendarView.Draw;
   for i := 0 to 6 do
     begin
     j := (i+w) mod 7;
+{$IFDEF DNUTF8}
+    MoveStr(B[i*4], ProxyToUtf8(Copy(S1, j*3+1, 3), Tab)+' ', c);
+{$ELSE}
     MoveStr(B[i*4], Copy(S1, j*3+1, 3)+' ', c);
+{$ENDIF}
     end;
   WriteLineW(0, 1, Width, 1, B);
 

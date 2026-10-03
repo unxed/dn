@@ -205,7 +205,7 @@ procedure THeapView.Draw;
   Str(OldMem, Text);
   MoveChar(Row, ' ', Attr, Size.X);
   MoveStr(Row, Text, Attr);
-  WriteLineW(0, 0, Size.X, 1, Row);
+  WriteLineC(0, 0, Size.X, 1, Row);
   end;
 procedure THeapView.Update;
   begin
@@ -267,7 +267,7 @@ procedure TClockView.Draw;
       end;
     MoveStr(B, TimeStr, C);
     end;
-  WriteLineW(0, 0, Size.X, 1, B);
+  WriteLineC(0, 0, Size.X, 1, B);
   end { TClockView.Draw };
 
 procedure TClockView.HandleEvent(var Event: TEvent);
@@ -444,11 +444,11 @@ procedure TTrashCan.Draw;
     Index := 1;
   Attr := GetColorW(Index);
   MoveStr(Row, #209#209#216#209#209, Attr);
-  WriteLineW(0, 0, Size.X, 1, Row);
+  WriteLineC(0, 0, Size.X, 1, Row);
   MoveStr(Row, GetString(dlTrashCaption), Attr);
-  WriteLineW(0, 1, Size.X, 1, Row);
+  WriteLineC(0, 1, Size.X, 1, Row);
   MoveStr(Row, #192#193#193#193#217, Attr);
-  WriteLineW(0, 2, Size.X, 1, Row);
+  WriteLineC(0, 2, Size.X, 1, Row);
   end;
 
 procedure TTrashCan.HandleEvent(var Event: TEvent);
