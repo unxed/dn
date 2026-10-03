@@ -5,17 +5,17 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 17 |
+| Our files (MIT, see `LICENSE`) | 16 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 120 |
 | Contributors of DN OSP | 6 |
-| Upstream without a notice | 15 |
+| Upstream without a notice | 14 |
 
 ## Our files (MIT, see `LICENSE`)
 
 Written by us: the replacements of the units that were excluded (their code is of Borland origin or of the Virtual Pascal runtime), the adapters to `tv/`, the system layer. They carry no notice of RIT Labs and are not derived from the files of the archive.
 
-`asciitab.pas`, `baseobjs.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `drivers.pas`, `fat32free.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `osdep.pas`, `realmode.pas`, `strview.pas`, `version.inc`
+`asciitab.pas`, `baseobjs.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `osdep.pas`, `realmode.pas`, `strview.pas`, `version.inc`
 
 ## Carved (the license of DN)
 
@@ -39,4 +39,4 @@ Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155.
 
 Files of the public DN OSP 2.14 with no notice in the head (small adapters, tables, include files). Part of the same release.
 
-`copyini.pas`, `dosbuf.pas`, `errmess.pas`, `Events.inc`, `files.pas`, `filetype.pas`, `hash.pas`, `panelsetup.pas`, `rcpvpd.ini`, `read.me`, `stdefine.inc`, `sysutils.inc`, `topview.pas`, `usersavr.pas`, `xcode.pas`
+`copyini.pas`, `errmess.pas`, `Events.inc`, `files.pas`, `filetype.pas`, `hash.pas`, `panelsetup.pas`, `rcpvpd.ini`, `read.me`, `stdefine.inc`, `sysutils.inc`, `topview.pas`, `usersavr.pas`, `xcode.pas`

@@ -59,6 +59,29 @@ procedure remove_i24;
 procedure RemoveDpmi32ExceptionHandlers;
 function DosShadow(Seg: SmallWord): Pointer;
 
+type
+  { the answer of INT 21h AX=7303h (Get Extended Free Space): RecSize is the first field (was the unit fat32free) }
+  TDriveData = packed record
+    RecSize: SmallWord;
+    Version: SmallWord;
+    SectorsPerCluster: LongInt;
+    BytesPerSector: LongInt;
+    AvailClusters: LongInt;
+    TotalClusters: LongInt;
+    AvailSectors: LongInt;
+    TotalSectors: LongInt;
+    AvailUnits: LongInt;
+    TotalUnits: LongInt;
+    Reserved: array[0..7] of Byte;
+  end;
+
+var
+  DriveData: TDriveData;
+  { the 1024-byte work area for the calls of the real mode (was the unit dosbuf): DosSeg is its real-mode segment (the
+    address is DosSeg:0), DosSegFlat its copy in the memory of the program. The area is always free: no data is kept in it. }
+  DosSeg: SmallWord;
+  DosSegFlat: Pointer;
+
 implementation
 
 uses
@@ -224,4 +247,6 @@ initialization
   { the initialized variable had a wrong value at the start of the program under DOSBox-X (8): set here, see
     dn/TODO-later.md }
   ShadowCount := 0;
+  getdosmem(DosSeg, 1024);
+  DosSegFlat := DosShadow(DosSeg);
 end.

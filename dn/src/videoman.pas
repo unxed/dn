@@ -189,7 +189,7 @@ uses
   Dos, Drivers, Defines, mainapp,
   DnIni, iniengine, Startup,
   Commands , Messages
-  ,realmode, fat32free
+  ,realmode
   ;
 
 var

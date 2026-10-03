@@ -9,14 +9,12 @@ calcwin.pas calc.pas
 copyio.pas fbb.pas
 country.pas country_.pas
 dlgrecs.pas startupp.pas
-dosbuf.pas doslow.pas
 editcore.pas microed.pas
 editfile.pas microed2.pas
 editundo.pas ed2.pas
 editwin.pas edwin.pas
 envutil.pas advance3.pas
 evaluator.pas calculat.pas
-fat32free.pas dpmi32df.pas
 filepanel.pas flpanel.pas
 fileutil.pas advance2.pas
 findspf.pas u_srchf.pas

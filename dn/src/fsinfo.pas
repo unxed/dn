@@ -43,7 +43,7 @@ function GetErrorText(ErrCode: Integer; var Msg: String): Boolean;
 implementation
 
 uses
-  fat32free, realmode, Dos, Strings, strutil;
+  realmode, Dos, Strings, strutil;
 function GetErrorText(ErrCode: Integer; var Msg: String): Boolean;
   
   begin
