@@ -253,5 +253,8 @@ after it; Ctrl-O (`TApplication.ShowUserScreen`, DOS branch: `DNRun.ShowUserScre
 (`echo hi`, then Ctrl-O; with DNDUMP the lines of the user screen go to the trace and the scenario checks for `hi`).
 Doubts: the text modes other than the width of `UserScreen` are skipped silently (no restore); the graphics modes of the programs are not saved;
 the old window of the stored screen (`PUserWindow`, `GetUserScreen` in `dnutil.pas`) is no longer reachable on DOS. Mouse on DOS: not checked yet (next).
-**tv/ moved (2026-10-03, owner, a22fa0e):** `tv/` is now the repository `unxed/tv` (its root = our former `tv/`); `tools/build.sh` still wants `tv/src` in this tree:
-for now `ln -s /path/to/unxed-tv tv` (not committed). How `dn` should reference it (submodule / checkout in CI / a path setting) is the owner's decision.
+**tv/ moved (2026-10-03, owner, a22fa0e):** `tv/` is now the repository `unxed/tv` (its root = our former `tv/`, checked identical). Decision (Claude, "invent an elegant way"):
+**git submodule at the same path `tv/`**, so no path in the scripts and CI changes; the commit recorded in `dn` pins the version of tv that DN builds with (update: `git -C tv pull && git add tv`).
+`tools/need-tv.sh` (sourced by `build.sh`, `tv-test.sh`, `dn-test.sh`, `check-layout.sh`) fetches the submodule if the clone was made without `--recurse-submodules`;
+`DN_TV=/path` uses another checkout (a link). The workflows have `submodules: true`. Open: the workflow `tv.yml` of `dn` duplicates what `unxed/tv` should test itself (it now also checks the pin); the `tv/` text in
+`dn/README.md` and `PLAN.md` (history, "tv/ and dn/ code is not mixed") is left as it is.

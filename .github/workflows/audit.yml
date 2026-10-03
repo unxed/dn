@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3
       - name: Fetch the Borland reference

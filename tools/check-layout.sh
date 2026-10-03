@@ -8,6 +8,8 @@
 #  - dn/PROVENANCE.md (the origin of the files of dn/src) is up to date.
 # usage: tools/check-layout.sh      (from the root of the repository)
 set -u
+here=$(cd "$(dirname "$0")/.." && pwd)
+. "$here/tools/need-tv.sh"
 fail=0
 err() { echo "layout: $*" >&2; fail=1; }
 

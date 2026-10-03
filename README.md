@@ -8,7 +8,7 @@ The repository holds two independent projects with different licenses and one sh
 
 | Directory | What it is | License | Where the code comes from |
 |---|---|---|---|
-| [`tv/`](tv/README.md) | **TV**: a Pascal translation of the [magiblot/tvision](https://github.com/magiblot/tvision) library, its own backends (memory, DOS), tests, demos | Borland disclaimer + MIT (`tv/COPYRIGHT.magiblot`, `tv/LICENSE`) | magiblot/tvision (its code comes from the TV 2.0 release published by Borland and the MIT contribution of magiblot) and our new code |
+| [`tv/`](tv/README.md) | a git submodule: the repository **[unxed/tv](https://github.com/unxed/tv)** (it was a directory of this repository until 2026-10-03). **TV**: a Pascal translation of the [magiblot/tvision](https://github.com/magiblot/tvision) library, its own backends (memory, DOS), tests, demos | Borland disclaimer + MIT (`tv/COPYRIGHT.magiblot`, `tv/LICENSE`) | magiblot/tvision (its code comes from the TV 2.0 release published by Borland and the MIT contribution of magiblot) and our new code |
 | [`dn/`](dn/README.md) | **DN**: the file manager itself, sources in git | DN files: the DN license (not relicensed); our files: MIT ([`dn/LICENSE.md`](dn/LICENSE.md)) | the public release of DN OSP 2.14 (the path: `bootstrap/`) and our new code |
 | [`bootstrap/`](bootstrap/README.md) | a record of how the first commit of `dn/src` was made from the public archive, and a way to reproduce it | MIT | our code |
 | `audit/`, `tools/`, `research/`, `.github/` | the detector of Borland code, build and checks, research | n/a | our code |
@@ -19,7 +19,7 @@ Our new code, which is not part of the RIT Labs source files and their descendan
 
 You need: `fpc` 3.2.x (check with `fpc -iV`; on Debian/Ubuntu `sudo apt install fp-compiler fp-units-rtl`), `python3`, `git`. Nothing else (no Lazarus, no libraries).
 
-    git clone https://github.com/unxed/dn && cd dn
+    git clone --recurse-submodules https://github.com/unxed/dn && cd dn     # tv/ is the submodule unxed/tv; the scripts fetch it themselves if you forgot
     tools/build.sh linux64            # x86_64 Linux: builds DN, the resources and the help, the result is in out/linux64/
     cd out/linux64 && ./dn            # needs a terminal of at least 80x25; exit with Alt-X
 
@@ -36,7 +36,7 @@ Before a PR: `tools/check-layout.sh` and the audit gate (`dn/README.md`, section
 
 The separation rules (checked by `tools/check-layout.sh` in CI):
 
-1. `tv/` knows nothing about `dn/`: its units use only each other and the FPC RTL.
+1. `tv/` (the submodule: the version is the commit recorded in `dn`; update: `git -C tv pull && git add tv`; `DN_TV=/path` uses another checkout) knows nothing about `dn/`: its units use only each other and the FPC RTL.
 2. `dn/` uses TV only as a package, through its units; TV files are not copied into `dn/` and vice versa.
 3. Code from `tv/` and `dn/` is not mixed: they have different licenses.
 4. DN code comes only from **publicly available sources**. The first commit of `dn/src` was made from the

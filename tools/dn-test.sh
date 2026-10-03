@@ -2,6 +2,7 @@
 # Unit tests of DN (dn/tests/t_*.pas), native: tools/dn-test.sh   (needs fpc on PATH; the DN units are compiled as for linux)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
+. "$here/tools/need-tv.sh"
 w=${DN_TEST_WORK:-$here/build/dn-tests}; mkdir -p "$w/shims" "$w/obj"
 python3 "$here/tools/gen-shim.py" "$here/dn/shims/shims.map" "$w/shims" "$here/tv/src" >/dev/null
 fail=0

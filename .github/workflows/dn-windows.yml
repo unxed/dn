@@ -26,6 +26,8 @@ jobs:
         utf8: ['1', '0']        # 1: UTF-8 inside DN (the default; the names through the wide API of Windows), 0: the code page
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl make git binutils binutils-mingw-w64-x86-64 binutils-mingw-w64-i686 python3
       - name: Cross compiler cache
@@ -56,6 +58,8 @@ jobs:
         utf8: ['0', '1']
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/download-artifact@v4
         with:
           name: dn-${{ matrix.target }}-u${{ matrix.utf8 }}
