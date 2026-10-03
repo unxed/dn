@@ -3,6 +3,7 @@
 #   dos     DN_PREFIX=PREFIX of tools/build-fpc-go32v2.sh (or DN_CROSS=<dir with lib/fpc/3.2.2/ppcross386> and DN_LINK=<dir with djgpp/bin>)
 #   linux   DN_LINUX=PREFIX of tools/build-fpc-i386-linux.sh (the cross compiler for i386-linux)
 #   linux64 the fpc of the host (FPC=path to use another)
+#   aarch64 DN_AARCH64=PREFIX of tools/build-fpc-aarch64-linux.sh (the cross compiler for aarch64-linux)
 #   win64   DN_WIN=PREFIX of tools/build-fpc-windows.sh PREFIX win64 (the cross compiler for x86_64-win64); win32: DN_WIN32=PREFIX of the same script with win32
 # DN_EXTRA: more options (e.g. -gl: line numbers).   Result: DN_PPC (the compiler and its target options), DN_PATH (the directories for PATH:
 # binutils), DN_UPATHS (the unit and include directories), DN_OPTS, DN_OBJ (where the objects go), DN_GEN (the generated shim units).
@@ -23,6 +24,11 @@ case "${DN_TARGET:-}" in
         DN_OPT=$DN_OPT_linux; DN_UNITS_EXTRA=$DN_UNITS_linux ;;
     linux64)
         DN_PPC="${FPC:-fpc}"; DN_PATH=""; DN_FUNITS=""; DN_OPT=$DN_OPT_linux64; DN_UNITS_EXTRA=$DN_UNITS_linux64 ;;
+    aarch64)
+        : "${DN_AARCH64:?aarch64: set DN_AARCH64 (tools/build-fpc-aarch64-linux.sh PREFIX)}"
+        u=$DN_AARCH64/lib/fpc/3.2.2/units/aarch64-linux
+        DN_FUNITS="-Fu$u/* -Fu$u/rtl"; DN_PPC="$DN_AARCH64/lib/fpc/3.2.2/ppcrossa64 -Tlinux -Paarch64 -XPaarch64-linux-gnu-"; DN_PATH=""
+        DN_OPT=$DN_OPT_aarch64; DN_UNITS_EXTRA=$DN_UNITS_aarch64 ;;
     win64)
         : "${DN_WIN:?win64: set DN_WIN (tools/build-fpc-windows.sh PREFIX win64)}"
         u=$DN_WIN/lib/fpc/3.2.2/units/x86_64-win64
@@ -33,7 +39,12 @@ case "${DN_TARGET:-}" in
         u=$DN_WIN32/lib/fpc/3.2.2/units/i386-win32
         DN_FUNITS="-Fu$u/* -Fu$u/rtl"; DN_PPC="$DN_WIN32/lib/fpc/3.2.2/ppcross386 -Twin32 -Pi386 -XPi686-w64-mingw32-"; DN_PATH=""
         DN_OPT=$DN_OPT_win32; DN_UNITS_EXTRA=$DN_UNITS_win32 ;;
-    *) echo "DN_TARGET must be dos, linux, linux64, win64 or win32" >&2; exit 1 ;;
+    *) echo "DN_TARGET must be dos, linux, linux64, aarch64, win64 or win32" >&2; exit 1 ;;
+esac
+# no Intel assembler reader on other CPUs (the tree has no assembler left): aarch64 cross, or a native fpc on an ARM machine
+case "$DN_TARGET" in
+    aarch64) DN_FPC_COMMON=$(echo "$DN_FPC_COMMON" | sed 's/ -Rintel//') ;;
+    linux64) case "$($DN_PPC -iTP 2>/dev/null)" in x86_64|i386) ;; *) DN_FPC_COMMON=$(echo "$DN_FPC_COMMON" | sed 's/ -Rintel//') ;; esac ;;
 esac
 tmp=${TMPDIR:-/tmp}
 # FPC does not rebuild a unit when only a -d option changed: every set of options has its own directory of the objects

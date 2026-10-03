@@ -12,6 +12,7 @@ on:
       - tools/dn-linux-*.py
       - tools/pty_screen.py
       - tools/build-fpc-i386-linux.sh
+      - tools/build-fpc-aarch64-linux.sh
       - tools/gen-shim.py
       - .github/workflows/dn-linux.yml
   pull_request:
@@ -52,6 +53,22 @@ jobs:
       - name: Build DN (one command; UTF-8 inside is the default)
         run: tools/build.sh linux64 out/dn
       - name: File operations in a pty (and the UTF-8 checks)
+        run: DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
+
+  linux-aarch64:
+    # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+      - name: Build DN (one command, native)
+        run: tools/build.sh linux64 out/dn
+      - name: Tour in a pty
+        run: |
+          python3 tools/dn-linux-tour.py out/dn | tee tour.txt
+          ! grep -v ' ok$' tour.txt
+      - name: File operations in a pty and the UTF-8 checks
         run: DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
 
   linux32:
