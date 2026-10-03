@@ -108,7 +108,6 @@ begin
   E.Feed(#27'[2;4H'#27'[K');
   Check(ScreenText = 'abcdefgh|ijk|qrstuvwx', 'EL 0: to the end of the line');
   E.Feed(#27'[1;4H'#27'[1K');
-  Check(RightStr(ScreenText, 0) = '', 'EL 1 runs');
   Check(E.RowText(0) = '    efgh', 'EL 1: to the cursor');
   E.Feed(#27'[3;3H'#27'[2X');
   Check(E.RowText(2) = 'qr  uvwx', 'ECH: two cells');
@@ -118,7 +117,7 @@ begin
   E.Feed('aaaaaa'#13#10'bbbbbb'#13#10'cccccc'#27'[2;3H'#27'[J');
   Check(ScreenText = 'aaaaaa|bb|', 'ED 0: from the cursor to the end');
   E.Feed(#27'[2;2H'#27'[1J');
-  Check(E.RowText(0) = '' and (E.RowText(1) = '  ') or (E.RowText(1) = ''), 'ED 1: from the start to the cursor');
+  Check((E.RowText(0) = '') and (E.RowText(1) = ''), 'ED 1: from the start to the cursor');
 
   { insert and delete }
   Fresh(8, 3);
@@ -140,7 +139,6 @@ begin
   E.Feed(#27'[4;1H'#10'x');
   Check((ScreenText = '1|3|4|x|5') and (E.HistoryCount = 0), 'region: LF at its bottom scrolls only the region, not the history');
   E.Feed(#27'[2;1H'#27'M'#27'M');
-  Check(ScreenText = '1||3|4|5' or True, 'region: RI at its top (runs)');
   Check(E.RowText(0) = '1', 'region: the line above is the same');
   E.Feed(#27'[r');
   Check(E.CursorY = 0, 'DECSTBM without parameters: the whole screen');
@@ -167,7 +165,6 @@ begin
   E.Feed('п' + 'р' + 'и');
   Check((Ch(0, 0) = 'п') and (Ch(2, 0) = 'и') and (E.CursorX = 3), 'UTF-8: Cyrillic, one column each');
   E.Feed(#13#10'日本');
-  Check(ScIsWide(Cell(0, 1).Character) and ScIsWideTrail(Cell(1, 1).Character) and (Ch(2, 1) = '日'[1] + '日'[2] + '日'[3]) = False, 'wide: runs');
   Check(ScIsWide(Cell(0, 1).Character) and ScIsWideTrail(Cell(1, 1).Character) and ScIsWide(Cell(2, 1).Character) and (E.CursorX = 4),
     'wide: a wide character takes a cell and a trail');
   Check(E.RowText(1) = '日本', 'wide: the text of the row has no trails');
@@ -190,7 +187,7 @@ begin
   E.Feed(#8#8'X'#7);
   Check((Ch(15, 0) = 'X') and (Bells = 1), 'BS and BEL');
   E.Feed(#13#27'[3I'+'t');
-  Check(Ch(16, 0) = 't', 'CHT: three tabs');
+  Check(Ch(19, 0) = 't', 'CHT: three tabs (stops at the last column)');
   E.Feed(#13#27'[Z'+'u');
   Check(Ch(0, 0) = 'u', 'CBT at the start stays at the first column');
 
@@ -213,7 +210,7 @@ begin
   Fresh(6, 2);
   E.Feed('main'#27'[?1049h');
   Check((E.IsAlt) and (ScreenText = '|'), 'alt screen: it is clean');
-  E.Feed('alt');
+  E.Feed(#27'[Halt');
   Check(ScreenText = 'alt|', 'alt screen: text');
   E.Feed(#27'[?1049l');
   Check((not E.IsAlt) and (ScreenText = 'main|') and (E.CursorX = 4), 'alt screen: back to the main screen, the cursor is restored');
