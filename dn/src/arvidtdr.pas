@@ -50,7 +50,7 @@ unit ArvidTdr;
 interface
 
 uses
-  Arvid, Objects2, Streams, Advance1, Messages, DNApp, Commands, Collect,
+  Arvid, Objects2, Streams, Advance1, Messages, mainapp, Commands, Collect,
   Views, Drivers, Startup, U_KeyMap, Advance, Lfn, Files, Dos, Tree,
   FilesCol, Advance2, Drives, FlPanel, Memory
   , Defines

@@ -77,7 +77,7 @@ type
 implementation
 
 uses
-  Advance, Commands, DNApp
+  Advance, Commands, mainapp
   ;
 
 function TInputFName.Execute: Word;

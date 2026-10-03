@@ -77,7 +77,7 @@ uses DNRun,
   
   
    dpmi32, 
-  DNUtil, Advance, DNApp, Advance1, Lfn,
+  DNUtil, Advance, mainapp, Advance1, Lfn,
   Dos, FlPanelX, CmdLine, Views, Advance2, Drivers, Advance4,
   VideoMan, Memory, VpSysLow, VPSysLo2, Events,
   

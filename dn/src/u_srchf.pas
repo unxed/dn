@@ -59,7 +59,7 @@ implementation
 
 uses
   Lfn, Objects2, Collect,
-  Commands, DNApp,
+  Commands, mainapp,
   Dos, Advance, Advance1, Advance2, Messages, DnIni
   ;
 

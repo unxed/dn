@@ -1,11 +1,11 @@
-{ DNApp: the application of DN (our unit; it replaces DNAPP.PAS of the archive, which repeated the App of
+{ DNApp: the application of DN (our unit; it replaces mainapp.PAS of the archive, which repeated the App of
   Borland TV). The classes lie on TvApp (tv/), what DN adds is added here. The names are those that the
   sources of DN use (spec/dn-boundary-dnosp214.md).
 
   Not done yet (marked TODO): the resources of dialogs and strings (tv/ has no Load/Store of views), the
   window of messages (WriteMsg), the command line. They return nil / '' / cmCancel. }
 {$mode objfpc}{$H-}{$POINTERMATH ON}
-unit DNApp;
+unit mainapp;
 
 interface
 

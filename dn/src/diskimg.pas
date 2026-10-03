@@ -59,7 +59,7 @@ procedure UnpackDiskImages(AOwner: Pointer; Files: PFilesCollection);
 implementation
 
 uses
-  Dos, Lfn, Messages, Views, Commands, Defines, Streams, DNApp, Drivers,
+  Dos, Lfn, Messages, Views, Commands, Defines, Streams, mainapp, Drivers,
   Advance1, Advance2, FileCopy, Gauge, xTime
   , Files, Tree, VPUtils
   ;

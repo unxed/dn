@@ -106,7 +106,7 @@ procedure ReadFileList(ProcessDizName: TDizNameProc;
 implementation
 uses
   files, Startup, Advance1, Advance2, Advance,
-  Lfn, Dos, Messages, DNApp, Drives
+  Lfn, Dos, Messages, mainapp, Drives
 
   , dnini
 

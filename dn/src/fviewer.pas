@@ -249,7 +249,7 @@ implementation
 uses
   Lfn, Dos, DNUtf8, VPSysLow, Commands, DNHelp, Advance1, Advance2, U_KeyMap
   , Microed, Macro, Advance6, VPUtils
-  , Memory, Messages, DNApp, Startup, Dialogs,
+  , Memory, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
    {Cat}
   ErrMess, {AK155}

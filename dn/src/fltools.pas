@@ -100,7 +100,7 @@ uses
   fnotify,
   Lfn, Files, Collect, xTime, DnIni, HistList,
   Advance, Advance1, Advance2, Dos, Defines, Dialogs,
-  Views, DNApp, Commands, Drivers, FlPanel, Drives, FileCopy,
+  Views, mainapp, Commands, Drivers, FlPanel, Drives, FileCopy,
   Gauge, Gauges, Archiver, Startup, SWE, Validate, Messages, Menus, DNHelp,
   FileFind, Tree, FBB, DNUtil, Filediz, Filelst, FlTl, DblWnd,
   ErrMess, Objects2, VPUtils

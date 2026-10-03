@@ -73,7 +73,7 @@ procedure InsertCalendar;
 implementation
 
 uses
-  Commands, DNApp, Dos, Dialogs, advance1, DNHelp, DnIni, advance, xTime,
+  Commands, mainapp, Dos, Dialogs, advance1, DNHelp, DnIni, advance, xTime,
   advance7, dnutil, DNUtf8
   ;
 

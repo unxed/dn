@@ -58,7 +58,7 @@ interface
 uses
   Defines, Objects2,
    {SBlocks,}Drivers, Streams,
-  Views, Scroller, DNApp,
+  Views, Scroller, mainapp,
   Dialogs, Gauges,
   Commands, Tree,
   FilesCol, UserMenu,

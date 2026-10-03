@@ -81,7 +81,7 @@ type
 
 implementation
 uses
-  MicroEd2, DNApp, Commands, DNHelp, Views,
+  MicroEd2, mainapp, Commands, DNHelp, Views,
   Startup, Advance1, FViewer, Drivers, Editor, Advance
   
   ;

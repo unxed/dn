@@ -216,7 +216,7 @@ implementation
 
 uses
   Lfn, Files, Advance, Advance1, Advance2, Advance3, VpSysLow,
-  Messages, DNApp, DNHelp, Startup, Commands, Histries, HistList, FLTools,
+  Messages, mainapp, DNHelp, Startup, Commands, Histries, HistList, FLTools,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
   DNUtil, FlTl, Dos, Filediz, Collect, VPUtils,
   DnIni_p, DnIni {-$VIV}

@@ -220,7 +220,7 @@ var
 
 implementation
 uses
-  Lfn {DataCompBoy}, DNApp, Advance1, Advance2, Startup, Dos,
+  Lfn {DataCompBoy}, mainapp, Advance1, Advance2, Startup, Dos,
   Memory, Messages, HistList, Commands, FlPanelX, FlPanel
   , FViewer, Microed,
   Tree, xTime, DNUtil, U_KeyMap, {!!}CmdLine, Histries,

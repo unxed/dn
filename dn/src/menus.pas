@@ -301,7 +301,7 @@ var
 
 implementation
 uses
-  Advance, Advance1, Advance2, Commands, DNHelp, DNApp, DNUtf8
+  Advance, Advance1, Advance2, Commands, DNHelp, mainapp, DNUtf8
   , U_KeyMap
   ;
 

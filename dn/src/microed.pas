@@ -294,7 +294,7 @@ implementation
 
 uses
   
-  Messages, DNApp, Dos, Lfn, Memory, Advance1, Advance2, Startup,
+  Messages, mainapp, Dos, Lfn, Memory, Advance1, Advance2, Startup,
   Gauge, FViewer, HistList, Macro, Editor, WinClp, DNUtil, Histries,
   xTime, FileCopy, ASCIITab, DnIni, U_SrchF, EdWin, MicroEd2 {-$VIV}
   , Events, VpSysLow, DNStdDlg, Dialogs, DNHelp, VPUtils
@@ -4008,7 +4008,7 @@ Ex:
       case Event.Command of
         cmMainMenu:
           begin
-          Message(DNApp.MenuBar, evCommand, cmMenu, nil);
+          Message(mainapp.MenuBar, evCommand, cmMenu, nil);
           CE;
           end;
         cmDuplicateLine:

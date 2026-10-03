@@ -145,7 +145,7 @@ const
 implementation
 uses
   VPSysLow, Lfn, Files, FlTl,
-  Startup, Tree, DNApp, FileCopy, Eraser, FlPanel, Commands,
+  Startup, Tree, mainapp, FileCopy, Eraser, FlPanel, Commands,
   Dialogs, FileFind, FlPanelX, Filediz, CmdLine
   , xTime, Messages, Events, fnotify, Dos
   , Gauge {для PWhileView}, DnIni, Advance, Advance1, Advance2

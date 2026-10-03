@@ -58,7 +58,7 @@ const
 implementation
 
 uses
-  Defines, Drivers, Views, Dialogs, Commands, Dos, DNApp, Startup,
+  Defines, Drivers, Views, Dialogs, Commands, Dos, mainapp, Startup,
   Advance, Advance1, Advance2, Collect, Messages, VideoMan
   ;
 

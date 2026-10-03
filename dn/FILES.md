@@ -23,8 +23,8 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 ## The program and its commands
 | File | What it holds |
 |---|---|
-| `dn.pas` | the main program (starts the application, the loop) |
-| `dnapp.pas` (ours) | the application class on top of `tv/` (`TApplication`, the background, the user screen) |
+| `dn.pas` | the main program (starts the application, the loop): `uses boot, mainapp, ...` |
+| `mainapp.pas` (ours; was `dnapp.pas`) | the application class on top of `tv/` (`TApplication`, the background, the user screen) |
 | `commands.pas` | all constants: commands `cm*`, key codes `kb*` (DN's codes include the scan code: `kbCtrlS = $041F13`), help contexts |
 | `dnutil.pas` | the central dispatcher of the commands of the application (`TDNApplication`: menu items, windows, Ctrl-O...) |
 | `u_myapp.pas` | the event loop of the application (keys before the dispatch, macros, the idle work) |
@@ -33,7 +33,7 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `menus.pas` | menus, the menu bar, the status line (the hot letters) |
 | `setups.pas`, `fltools.pas` | the dialogs of the settings; the dialogs of the panel (select group, filter) |
 | `dnini.pas`, `dnini_p.pas` | `DN.INI`: reading and writing the settings |
-| `dn1.pas` | reading `DN.CFG` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
+| `boot.pas` (was `dn1.pas`) | reading `DN.CFG` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
 | `macro.pas` | the macros of the editor (record, play) |
 
 ## Panels and files

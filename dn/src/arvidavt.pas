@@ -50,7 +50,7 @@ unit ArvidAvt;
 interface
 
 uses
-  Arvid, Objects2, Streams, Messages, DNApp, Commands, Collect,
+  Arvid, Objects2, Streams, Messages, mainapp, Commands, Collect,
   Views, Drivers, Startup, U_KeyMap, Advance, Lfn, Files, Dos, Tree,
   FilesCol, Advance2, Drives, FlPanel, Memory
   , Defines

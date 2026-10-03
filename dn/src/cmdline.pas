@@ -102,7 +102,7 @@ const
 
 implementation
 uses
-  Dos, Commands, DNApp, Dialogs, Advance, Advance1, Advance2,
+  Dos, Commands, mainapp, Dialogs, Advance, Advance1, Advance2,
   XDblWnd, Gauges, 
   Startup, xTime, Messages, DNUtil
   , Microed, Histries, FViewer, FlPanelX

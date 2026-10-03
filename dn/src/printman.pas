@@ -118,7 +118,7 @@ implementation
 
 
 uses
-  Startup, DNHelp, DNApp, Messages
+  Startup, DNHelp, mainapp, Messages
   , Advance, Advance1, Advance2
   , VpSysLow {для Open_Access_ReadOnly}
   , LFN 

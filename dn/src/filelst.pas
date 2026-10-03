@@ -60,7 +60,7 @@ function ParseAddress(Address: String; var Zone, Net, Node, Point: Word)
 implementation
 uses
   Startup, Lfn, Messages, Defines, FilesCol, Advance2, Advance1, UserMenu,
-  Advance, HistList, Commands, DNApp, DNUtil, Tree, Views, Drivers, Drives
+  Advance, HistList, Commands, mainapp, DNUtil, Tree, Views, Drivers, Drives
   {, dnfuncs} {надо вставлять до Dos}
   , Dos, Dialogs, Objects2
   , ErrMess, FlPanelX

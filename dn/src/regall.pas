@@ -65,7 +65,7 @@ uses
   
   Arvid,
   
-  Archiver, ArcView, ASCIITab, CCalc, Collect, DiskInfo, DNApp,
+  Archiver, ArcView, ASCIITab, CCalc, Collect, DiskInfo, mainapp,
   DNStdDlg, DNUtil, Drives, ed2, Editor, FileFind, FilesCol,
   FlPanel, FStorage, FViewer, Gauges, Histries, Microed, Startup,
   Tree, UniWin, UserMenu, XDblWnd, HelpKern,
@@ -1647,7 +1647,7 @@ begin
 end;
 
 type
-  PR_RBackground = ^DNApp.TBackground;
+  PR_RBackground = ^mainapp.TBackground;
 
 function Build_RBackground(var S: TStream): PObject;
 begin
@@ -1660,7 +1660,7 @@ begin
 end;
 
 type
-  PR_RDesktop = ^DNApp.TDesktop;
+  PR_RDesktop = ^mainapp.TDesktop;
 
 function Build_RDesktop(var S: TStream): PObject;
 begin
@@ -3057,12 +3057,12 @@ begin
 
   RDriveView.Store := @Store_RDriveView;
 
-  RBackground.VmtLink := PtrUInt(TypeOf(DNApp.TBackground));
+  RBackground.VmtLink := PtrUInt(TypeOf(mainapp.TBackground));
   RBackground.Load := @Build_RBackground;
 
   RBackground.Store := @Store_RBackground;
 
-  RDesktop.VmtLink := PtrUInt(TypeOf(DNApp.TDesktop));
+  RDesktop.VmtLink := PtrUInt(TypeOf(mainapp.TDesktop));
   RDesktop.Load := @Build_RDesktop;
 
   RDesktop.Store := @Store_RDesktop;
