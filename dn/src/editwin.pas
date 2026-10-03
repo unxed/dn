@@ -46,12 +46,12 @@
 //////////////////////////////////////////////////////////////////////////}
 
 {$I STDEFINE.INC}
-unit EdWin;
+unit editwin;
 
 interface
 
 uses
-  Defines, Streams, Objects2, Microed, Menus, ed2, UniWin
+  Defines, Streams, Objects2, editcore, Menus, editundo, UniWin
   ;
 
 type
@@ -81,7 +81,7 @@ type
 
 implementation
 uses
-  MicroEd2, mainapp, Commands, DNHelp, Views,
+  editfile, mainapp, Commands, DNHelp, Views,
   Startup, strutil, FViewer, Drivers, Editor, basics
   
   ;

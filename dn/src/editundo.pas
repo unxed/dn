@@ -46,7 +46,7 @@
 //////////////////////////////////////////////////////////////////////////}
 
 {$I STDEFINE.INC}
-unit ed2;
+unit editundo;
 
 interface
 
@@ -134,7 +134,7 @@ procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
 implementation
 uses
   basics, strutil, fileutil
-  , Messages, Dos, mainapp, Microed, Startup, DnIni, EdWin
+  , Messages, Dos, mainapp, editcore, Startup, DnIni, editwin
   ;
 
 { TDoCollection }

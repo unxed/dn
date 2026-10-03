@@ -52,7 +52,7 @@ interface
 
 uses
   basics, Defines, Objects2, Views, Collect,
-  Microed, highlite, Strings
+  editcore, highlite, Strings
   ;
 
 type

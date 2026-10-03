@@ -156,7 +156,7 @@ uses
   basics, Lfn, Messages, HistList, VPUtils,
   Collect, Strings, ErrMess,
   Memory, Dos, mainapp, DNStdDlg, strutil, fileutil,
-  MicroEd2, Histries
+  editfile, Histries
   ;
 
 type

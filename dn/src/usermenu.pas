@@ -91,7 +91,7 @@ implementation
 uses
   Lfn, {DataCompBoy}
   mainapp, basics, strutil, fileutil, Startup, Messages, Menus,
-  Commands, Microed, WinClp, DNHelp, Dos, Memory, Dialogs, Tree
+  Commands, editcore, WinClp, DNHelp, Dos, Memory, Dialogs, Tree
   , filediz, Collect, VPUtils
   ;
 

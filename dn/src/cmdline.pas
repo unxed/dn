@@ -105,7 +105,7 @@ uses
   Dos, Commands, mainapp, Dialogs, basics, strutil, fileutil,
   XDblWnd, Gauges, 
   Startup, xTime, Messages, DNUtil
-  , Microed, Histries, FViewer, FlPanelX
+  , editcore, Histries, FViewer, FlPanelX
   , Idlers 
   , VpSysLow, Lfn, UserMenu, Menus
   , DnIni, VPUtils

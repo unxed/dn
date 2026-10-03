@@ -1,6 +1,10 @@
 # new name -> the name in the public archive of DN OSP 2.14 (written by tools/rename-unit.py, read by bootstrap/tools/dn-manifest.py)
 basics.pas advance.pas
 boot.pas dn1.pas
+editcore.pas microed.pas
+editfile.pas microed2.pas
+editundo.pas ed2.pas
+editwin.pas edwin.pas
 envutil.pas advance3.pas
 fileutil.pas advance2.pas
 langid.pas advance7.pas

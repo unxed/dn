@@ -273,7 +273,7 @@ uses
   Idlers, FlPanelX, WinClp,
   Drives, Archiver, ArchSet,
   ArcView, FViewer, CmdLine, FBB, DNStdDlg,
-  Colors, Microed, ed2, Editor, EdWin,
+  Colors, editcore, editundo, Editor, editwin,
   basics, strutil, fileutil, envutil, os2sess, langid,
   ColorSel, Eraser,  DiskInfo
   , FileType, PDSetup, U_KeyMap
@@ -356,7 +356,7 @@ constructor TDataSaver.Load(var S: TStream);
       dskViewerFind:
         S.Read(FViewer.SearchString, L);
       dskEditorFind:
-        S.Read(Microed.SearchData, L);
+        S.Read(editcore.SearchData, L);
       dskHideCmdLine:
         begin
         S.Read(HideCommandLine, L);
@@ -424,8 +424,8 @@ procedure TDataSaver.Store(var S: TStream);
        and not CommandLine^.GetState(sfVisible);
   StoreBlock(dskViewerFind, FViewer.SearchString,
        SizeOf(FViewer.SearchString));
-  StoreBlock(dskEditorFind, Microed.SearchData,
-     SizeOf(Microed.SearchData));
+  StoreBlock(dskEditorFind, editcore.SearchData,
+     SizeOf(editcore.SearchData));
   StoreBlock(dskViewerBounds, LastViewerBounds,
      SizeOf(LastViewerBounds)+SizeOf(TPoint)*2);
   StoreBlock(dskHideCmdLine, HideCommandLine, SizeOf(HideCommandLine));
@@ -2979,48 +2979,48 @@ procedure GetFromClip(var S: String);
   begin
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipOut {(true)};
-  if  (Microed.ClipBoard = nil) or (Microed.ClipBoard^.At(0) = nil)
+  if  (editcore.ClipBoard = nil) or (editcore.ClipBoard^.At(0) = nil)
   then
     S := ''
   else
-    S := PLongString(Microed.ClipBoard^.At(0))^;
+    S := PLongString(editcore.ClipBoard^.At(0))^;
   end;
 
 procedure GetFromClipLong(var S: LongString);
   begin
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipOut {(true)};
-  if  (Microed.ClipBoard = nil) or (Microed.ClipBoard^.At(0) = nil)
+  if  (editcore.ClipBoard = nil) or (editcore.ClipBoard^.At(0) = nil)
   then
     S := ''
   else
-    S := PLongString(Microed.ClipBoard^.At(0))^;
+    S := PLongString(editcore.ClipBoard^.At(0))^;
   end;
 
 procedure PutInClip(const S: String);
   begin
-  if Microed.ClipBoard <> nil then
-    Dispose(Microed.ClipBoard, Done);
-  Microed.ClipBoard := New(PLineCollection, Init(1, 1, True));
-  Microed.ClipBoard^.Insert(NewLongStr(S));
+  if editcore.ClipBoard <> nil then
+    Dispose(editcore.ClipBoard, Done);
+  editcore.ClipBoard := New(PLineCollection, Init(1, 1, True));
+  editcore.ClipBoard^.Insert(NewLongStr(S));
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipIn;
   if ClipBoardStream <> nil then
     ClipBoardStream^.Seek(Positive(ClipBoardStream^.GetPos-4));
-  CopyLines2Stream(Microed.ClipBoard, ClipBoardStream);
+  CopyLines2Stream(editcore.ClipBoard, ClipBoardStream);
   end;
 
 procedure PutInClipLong(const S: LongString);
   begin
-  if Microed.ClipBoard <> nil then
-    Dispose(Microed.ClipBoard, Done);
-  Microed.ClipBoard := New(PLineCollection, Init(1, 1, True));
-  Microed.ClipBoard^.Insert(NewLongStr(S));
+  if editcore.ClipBoard <> nil then
+    Dispose(editcore.ClipBoard, Done);
+  editcore.ClipBoard := New(PLineCollection, Init(1, 1, True));
+  editcore.ClipBoard^.Insert(NewLongStr(S));
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipIn;
   if ClipBoardStream <> nil then
     ClipBoardStream^.Seek(Positive(ClipBoardStream^.GetPos-4));
-  CopyLines2Stream(Microed.ClipBoard, ClipBoardStream);
+  CopyLines2Stream(editcore.ClipBoard, ClipBoardStream);
   end;
 {/Cat}
 

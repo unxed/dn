@@ -71,10 +71,11 @@ The question that comes first when a setting "is not kept" or the panels "do not
 | File | What it holds |
 |---|---|
 | `fviewer.pas` | the viewer (F3): text, hex, the other modes (`TFileViewer` and its variants) |
-| `microed.pas` | the core of the editor (`TFileEditor`): the text as lines, the cursor, the block, search, undo |
-| `microed2.pas` | the support of the editor: load and save of files, the scan of a document (`ScanDocU8`) |
+| `editcore.pas` (was `microed`) | the core of the editor (`TFileEditor`): the text as lines, the cursor, the block, search, undo |
+| `editfile.pas` (was `microed2`) | the support of the editor: load and save of files, the scan of a document (`ScanDocU8`) |
 | `editor.pas` | the editor windows and the entry points (`TXFileEditor`, `EditFile`) |
-| `ed2.pas` | the undo list, the bookmarks, the info line (`TDoCollection`, `TBookmarkLine`) |
+| `editwin.pas` (was `edwin`) | the window of the editor (`TEditWindow`) and its saver of the state (`TEditSaver`) |
+| `editundo.pas` (was `ed2`) | the undo list, the bookmarks, the info line (`TDoCollection`, `TBookmarkLine`) |
 | `highlite.pas` | the syntax highlighting of the editor |
 | `dbview.pas` | the viewer of dBase files |
 | `histries.pas` | the histories of the edited and viewed files |

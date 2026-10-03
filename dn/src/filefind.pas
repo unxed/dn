@@ -222,7 +222,7 @@ implementation
 uses
   Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos,
   Memory, Messages, HistList, Commands, FlPanelX, FlPanel
-  , FViewer, Microed,
+  , FViewer, editcore,
   Tree, xTime, DNUtil, U_KeyMap, {!!}CmdLine, Histries,
   Archiver, ArchDet {JO},
   ArcView {JO: для разархивирования файлов найденных в архивах}
@@ -1024,10 +1024,10 @@ Skip:
   FFResult := ffSeFnd;
   SearchString.What := FindRec.What;
   SearchString.Opts := FindRec.Options shr 4; //пpопускаем пеpвые 4 чекбокса
-  Microed.SearchData.Line := FindRec.What;
-  Microed.SearchData.What := #0;
-  Microed.SearchData.Options := SearchString.Opts;
-  Microed.SearchData.Scope := 0;
+  editcore.SearchData.Line := FindRec.What;
+  editcore.SearchData.What := #0;
+  editcore.SearchData.Options := SearchString.Opts;
+  editcore.SearchData.Scope := 0;
 
 //используем '<>' в качестве пpизнака панели поиска
   New(Drv, Init('<>'+FindRec.Mask, Directories, Files));
