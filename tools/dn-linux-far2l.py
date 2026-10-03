@@ -38,7 +38,7 @@ try:
     k(0x28)                                                     # Down: on a.txt
     k(0x73, wait=1.5)                                           # F4: the editor
     check('hello world' in t.text(), 'the editor shows the file', t.text())
-    k(0x23, cs=SHIFT)                                           # Shift+End: the line is selected
+    for _ in range(11): k(0x27, cs=SHIFT, wait=0.15)            # Shift+Right x11: the first word and the space are selected
     k(0x2D, cs=LCTRL, sc=0x52)                                  # Ctrl+Ins: copy (the terminal does not take it, it comes to DN)
     check(t.clip.decode(errors='replace').strip() == 'hello world', 'Ctrl+Ins: the selection is on the clipboard of the terminal (%r)' % t.clip)
     t.clip = 'ПРИВЕТ из терминала'.encode()

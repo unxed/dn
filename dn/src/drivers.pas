@@ -209,6 +209,14 @@ begin
     Shift := 3;
   Shift := Shift or (Event.ControlKeyState and 12);
   Key := Event.KeyCode;
+  { tv/ has its own codes for these four (magiblot: kbCtrlIns $0400, kbShiftIns $0500, kbCtrlDel $0600, kbShiftDel $0700); DN knows the scan codes of the BIOS:
+    without this Ctrl+Ins (copy), Shift+Ins (paste), Ctrl+Del and Shift+Del were not the keys DN looks for (the menu hotkeys, the editor) }
+  case Key of
+    $0400: Key := $9200;
+    $0500: Key := $5200;
+    $0600: Key := $9300;
+    $0700: Key := $5300;
+  end;
   if  ((Event.ControlKeyState and 4) <> 0) and ((Event.ControlKeyState and 8) = 0) and (Key >= 1) and (Key <= 26)
       and not (Key in [8, 9, 13]) then
     Key := Key or (LongInt(CtrlScan[Key]) shl 8);
