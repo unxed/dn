@@ -121,7 +121,7 @@ function TIdxResource.Get(Key: TDlgIdx): TStreamable;
   Chk;
   Stream.Seek(Index^[Integer(Key)]);
   Chk;
-  Get := Stream^.Get;
+  Get := Stream.Get;
   Chk;
   end;
 
