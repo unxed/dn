@@ -64,7 +64,7 @@ type
   { Of course, these lines must not contain      }
   { strings with "=" or starting with "[".       }
   PIniSection = ^TIniSection;
-  TIniSection = object(TCollection)
+  TIniSection = class(TCollection)
     TheName: PString;
     constructor Init(const AName: String);
     destructor Done; virtual;
@@ -82,7 +82,7 @@ type
 
   { Collection of TIniSections }
   PIniFile = ^TIniFile;
-  TIniFile = object(TCollection)
+  TIniFile = class(TCollection)
     Modified: Boolean;
     Name: PString;
     constructor Init(FileName: String; var AStatus: Integer);

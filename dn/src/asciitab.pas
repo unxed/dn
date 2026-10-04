@@ -18,7 +18,7 @@ const
 type
   { the table: the characters 0..255 in 8 rows of 32; the cursor is the current character (Data = its code) }
   PTable = ^TTable;
-  TTable = object(TView)
+  TTable = class(TView)
     procedure Draw; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function DataSize: Integer; virtual;
@@ -28,7 +28,7 @@ type
 
   { the line with the character, its decimal and hexadecimal code }
   PReport = ^TReport;
-  TReport = object(TView)
+  TReport = class(TView)
     ASCIIChar: LongInt;
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Store(var S: TStream);
@@ -37,7 +37,7 @@ type
   end;
 
   PASCIIChart = ^TASCIIChart;
-  TASCIIChart = object(TWindow)
+  TASCIIChart = class(TWindow)
     destructor Done; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     constructor Init(var R: TRect);

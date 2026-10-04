@@ -78,12 +78,12 @@ type
 
   (*
      PCmdLine = ^TCmdLine;
-     TCmdLine = object(TView)
+     TCmdLine = class(TView)
       procedure Draw; virtual;
      end;
 
      PCmdWindow = ^TCmdWindow;
-     TCmdWindow = object(TWindow)
+     TCmdWindow = class(TWindow)
       constructor Create(const R: TRect);
      end;
 *)

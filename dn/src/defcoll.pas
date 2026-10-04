@@ -55,7 +55,7 @@ uses
 
 type
   PDefCollection = ^TDefCollection;
-  TDefCollection = object(TStringCollection)
+  TDefCollection = class(TStringCollection)
     constructor Init(ALimit, ADelta: LongInt); {Initialization }
     procedure ProceedFile(FName: String); {Read defines   }
     {from pascal-   }

@@ -61,12 +61,12 @@ procedure SetHighlightGroups;
 type
 
   PWindowList = ^TWindowList;
-  TWindowList = object(TListBox)
+  TWindowList = class(TListBox)
     function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
     end;
 
   PWindowCol = ^TWindowCol;
-  TWindowCol = object(TCollection)
+  TWindowCol = class(TCollection)
     procedure FreeItem(Item: Pointer); virtual;
     end;
 

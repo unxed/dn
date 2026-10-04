@@ -74,13 +74,13 @@ var
 
 type
   PGameWindow = ^TGameWindow;
-  TGameWindow = object(TDialog)
+  TGameWindow = class(TDialog)
     constructor Init;
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
   PGameView = ^TGameView;
-  TGameView = object(TView)
+  TGameView = class(TView)
     Info: PView;
     {Hi  : PView;}
 
@@ -127,7 +127,7 @@ type
     end;
 
   PGameInfo = ^TGameInfo;
-  TGameInfo = object(TView)
+  TGameInfo = class(TView)
     Hc, Gm: PGameView;
     function GetPalette: TPalette; virtual;
     procedure Draw; virtual;

@@ -58,7 +58,7 @@ uses
 
 type
   PPhoneCollection = ^TPhoneCollection;
-  TPhoneCollection = object(TSortedCollection)
+  TPhoneCollection = class(TSortedCollection)
     constructor Init(ALimit, ADelta: LongInt);
     constructor Load(var S: TStream);
     constructor ShortLoad(var S: TStream);
@@ -68,7 +68,7 @@ type
     end;
 
   PPhoneDir = ^TPhoneDir;
-  TPhoneDir = object(TObject)
+  TPhoneDir = class(TObject)
     Name: String[30];
     Memo1: PString;
     Memo2: PString;
@@ -82,7 +82,7 @@ type
     end;
 
   PPhone = ^TPhone;
-  TPhone = object(TObject)
+  TPhone = class(TObject)
     Name: String[30];
     Memo1: PString;
     Memo2: PString;
@@ -94,7 +94,7 @@ type
     end;
 
   PPhoneBox = ^TPhoneBox;
-  TPhoneBox = object(TSortedListBox)
+  TPhoneBox = class(TSortedListBox)
     GroupLabel, ItemLabel: PLabel;
     AlphaMode, SearchMode: Boolean;
     Phones: PCollection;

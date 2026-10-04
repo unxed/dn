@@ -58,14 +58,14 @@ uses
 
 type
   PStringCol = ^TStringCol;
-  TStringCol = object(TCollection)
+  TStringCol = class(TCollection)
     procedure FreeItem(P: Pointer); virtual;
     procedure PutItem(var S: TStream; P: Pointer); virtual;
     function GetItem(var S: TStream): Pointer; virtual;
     end;
 
   PPrintManager = ^TPrintManager;
-  TPrintManager = object(TListBox)
+  TPrintManager = class(TListBox)
     isValid: Boolean;
     OutName: PString;
     LockUpdate: Byte;
@@ -94,7 +94,7 @@ type
     end;
 
   PPrintStatus = ^TPrintStatus;
-  TPrintStatus = object(TView)
+  TPrintStatus = class(TView)
     Print: PPrintManager;
     procedure Draw; virtual;
     constructor Load(var S: TStream);
@@ -102,7 +102,7 @@ type
     end;
 
   PPMWindow = ^TPMWindow;
-  TPMWindow = object(TDialog)
+  TPMWindow = class(TDialog)
     constructor Init(R: TRect);
     end;
 

@@ -398,7 +398,7 @@ var
   EditCommands: array[1..MaxCommands] of TEditCommand;
 
 type
-  TEditSaver = object(TObject)
+  TEditSaver = class(TObject)
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;

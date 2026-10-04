@@ -58,7 +58,7 @@ type
   { TEditWindow }
 
   PEditWindow = ^TEditWindow;
-  TEditWindow = object(TUniWindow)
+  TEditWindow = class(TUniWindow)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     AInfo: PInfoLine;
     ABookLine: PBookmarkLine;
@@ -88,7 +88,7 @@ uses
 
 type
   PEditSaver = ^TEditSaver;
-  TEditSaver = object(TObject)
+  TEditSaver = class(TObject)
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;

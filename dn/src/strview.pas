@@ -11,7 +11,7 @@ uses
 
 type
   PDStringView = ^TDStringView;
-  TDStringView = object(TView)
+  TDStringView = class(TView)
     S1, S2: String[50];
     function GetPalette: TPalette; virtual;
     procedure Draw; virtual;

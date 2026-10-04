@@ -93,7 +93,7 @@ uses
 }
 type
   PModBufStream = ^TModBufStream;
-  TModBufStream = object(TBufStream)
+  TModBufStream = class(TBufStream)
     procedure SeekRel(Delta: Integer);
     end;
 

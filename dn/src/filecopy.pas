@@ -173,12 +173,12 @@ type
     end;
 
   PCopyCollection = ^TCopyCollection;
-  TCopyCollection = object(TCollection)
+  TCopyCollection = class(TCollection)
     procedure FreeItem(P: Pointer); virtual;
     end;
 
   PDirCollection = ^TDirCollection;
-  TDirCollection = object(TSortedCollection)
+  TDirCollection = class(TSortedCollection)
     procedure FreeItem(P: Pointer); virtual;
     function Compare(P1, P2: Pointer): Integer; virtual;
     end;
@@ -323,7 +323,7 @@ var
 
 type
   pLine = ^TLine;
-  TLine = object(TObject)
+  TLine = class(TObject)
     { Элемент CopyQueue}
     Owner: PFileRec;
     OldName: PString;
@@ -341,7 +341,7 @@ type
     end;
 
   PDirName = ^TDirName;
-  TDirName = object(TObject)
+  TDirName = class(TObject)
     OldName, NewName: PString;
     Check: Boolean;
     CopyIt: Boolean;
@@ -485,7 +485,7 @@ var
 
 type
   POverriteDialog = ^TOverriteDialog;
-  TOverriteDialog = object(TDialog)
+  TOverriteDialog = class(TDialog)
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 

@@ -59,14 +59,14 @@ type
    в менедждере, без объемлющего диалога, поэтому имеет свой метод
    Execute. Цвета палитры (C) заносятся в CM_RenameSingleL}
   PInputFName = ^TInputFName;
-  TInputFName = object(TInputLine)
+  TInputFName = class(TInputLine)
     EndView: Word;
     function Execute: Word; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
   PColorPoint = ^TColorPoint;
-  TColorPoint = object(TView)
+  TColorPoint = class(TView)
     Color: Byte;
     constructor Init(var ABounds: TRect; AColor: Byte);
     constructor Load(var S: TStream);

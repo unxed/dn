@@ -13,7 +13,7 @@ uses
 
 type
   PStrListMaker = ^TStrListMaker;
-  TStrListMaker = object(TObject)
+  TStrListMaker = class(TObject)
     constructor Init(AStrSize, AIndexSize: AWord);
     destructor Done; virtual;
     procedure Put(Key: AWord; S: String);

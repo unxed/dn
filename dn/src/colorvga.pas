@@ -68,20 +68,20 @@ const
 type
 
   PRegLabel = ^TRegLabel;
-  TRegLabel = object(TLabel)
+  TRegLabel = class(TLabel)
     Value: Word;
     procedure Draw; virtual;
     end;
 
   PColorView = ^TColorView;
-  TColorView = object(TView)
+  TColorView = class(TView)
     Color2Display: Byte;
     procedure Draw; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
   PColorVGADialog = ^TColorVGADialog;
-  TColorVGADialog = object(TDialog)
+  TColorVGADialog = class(TDialog)
     ThisProcedureExecuteFirstTime: Boolean;
     TL: array[1..3] of PRegLabel;
     TS: array[1..3] of PScrollBar;

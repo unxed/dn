@@ -68,7 +68,7 @@ const
 
 type
   PComboBox = ^TComboBox;
-  TComboBox = object(TView)
+  TComboBox = class(TView)
     Selected: Word; // текущий номер варианта (нумерация от 1)
     Count: Word; { не отрывать от Selected! См. Load,Store}
     Menu: PMenu;
@@ -88,7 +88,7 @@ type
     end;
 
   PHexLine = ^THexLine;
-  THexLine = object(TView)
+  THexLine = class(TView)
     InputLine: PInputline;
     DeltaX, CurX: Integer;
     Sec: Boolean;
@@ -100,7 +100,7 @@ type
     end;
 
   PParamText = ^TParamText;
-  TParamText = object(TStaticText)
+  TParamText = class(TStaticText)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     ParamCount: AInt;
     ParamList: Pointer;
@@ -114,7 +114,7 @@ type
     end;
 
   PBookmark = ^TBookmark;
-  TBookmark = Object(TLabel)
+  TBookmark = class(TLabel)
     {` Закладка страницы блокнота со страницами TNotepas }
     constructor Init(var Bounds: TRect; AText: String; ALink: PView);
     procedure Draw; virtual;
@@ -122,7 +122,7 @@ type
     end;
 
   PPage = ^TPage;
-  TPage = object(TDialog)
+  TPage = class(TDialog)
     Bookmark: PBookmark;
     PrevPage: PPage;
       { циклический список }
@@ -134,13 +134,13 @@ type
     end;
 
   PPageFrame = ^TPageFrame;
-  TPageFrame = object(TView)
+  TPageFrame = class(TView)
     function GetPalette: TPalette; virtual;
     procedure Draw; virtual;
     end;
 
   PNotepad = ^TNotepad;  {<dialogs.001>}
-  TNotepad = object(TDialog)
+  TNotepad = class(TDialog)
     Page: array[0..9] of PPage;
     BookmarkStart: integer; { X-коррдината левой линии закладок }
     ActivePage: Integer;
@@ -156,7 +156,7 @@ type
     end;
 
   PNotepadFrame = ^TNotepadFrame;
-  TNotepadFrame = object(TFrame)
+  TNotepadFrame = class(TFrame)
     procedure FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Integer; Color: TColorAttr); virtual;
     function GetTitleWidth: integer; virtual;
     end;

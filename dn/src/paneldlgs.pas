@@ -108,7 +108,7 @@ uses
 
 type
   PSelectList = ^TSelectList;
-  TSelectList = object(TListBox)
+  TSelectList = class(TListBox)
     function IsSelected(I: LongInt): Boolean; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
@@ -236,7 +236,7 @@ type
 { Диалог установок вида панелей. Является также базовым типом
   для диалогов установок сортировки и фильтра. }
   PShowDialog = ^TShowDialog;
-  TShowDialog = object(TDialog)
+  TShowDialog = class(TDialog)
     function OwnDataAddress(P: PPanelSetup): Pointer; virtual;
       { Адрес того блока данных внутри P^, с которым работает
       данный диалог, то есть, в данном случае, адрес P^.Show.
@@ -251,7 +251,7 @@ type
 { Радиокнопки класса панели в диалоге "Записать".
   Для реакции на смену выбора в блоке радиокнопок "Тип панели" }
   PPanelClassRB = ^TPanelClassRB;
-  TPanelClassRB = object(TRadioButtons)
+  TPanelClassRB = class(TRadioButtons)
     procedure MovedTo(Item: Integer); virtual;
     procedure Press(Item: Integer); virtual;
       { Приходится перекрываь и MoveTo, и Press, так как ни одна из
@@ -261,11 +261,11 @@ type
     procedure ChangeClass(Item: Integer);
     end;
 
-  TSaveSetupButton = object(TButton)
+  TSaveSetupButton = class(TButton)
     procedure Press; virtual;
     end;
 
-  TSaveSetupDialg = object(TDialog)
+  TSaveSetupDialg = class(TDialog)
     procedure HandleEvent(var Event: TEvent); virtual;
       { Для реакции на кнопку "Все" }
     end;
@@ -490,13 +490,13 @@ var
 type
 
   PFilterDialog = ^TFilterDialog; { Диалог фильтра }
-  TFilterDialog = object(TShowDialog)
+  TFilterDialog = class(TShowDialog)
     function OwnDataAddress(P: PPanelSetup): Pointer; virtual;
     destructor Done; virtual;
     end;
 
   PExtSelList = ^TExtSelList; { Список расширений }
-  TExtSelList = object(TSelectList)
+  TExtSelList = class(TSelectList)
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     function DataSize: Integer; virtual;
     procedure GetData(var Rec); virtual;
@@ -504,7 +504,7 @@ type
     end;
 
   PFilterLine = ^TFilterLine; { Строка ввода фильтра }
-  TFilterLine = object(TInputLine)
+  TFilterLine = class(TInputLine)
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     end;
 
@@ -1786,7 +1786,7 @@ procedure CM_ToggleShowMode(AFP: Pointer);
 
 type
   PDragger = ^TDragger;
-  TDragger = object(TView)
+  TDragger = class(TView)
     Text: PString;
     constructor Init(R: TRect; AText: String);
     procedure Draw; virtual;
@@ -2346,7 +2346,7 @@ procedure CM_SortBy(AFP: Pointer);
 
 type
   PSortDialog = ^TSortDialog;
-  TSortDialog = object(TShowDialog)
+  TSortDialog = class(TShowDialog)
     function OwnDataAddress(P: PPanelSetup): Pointer; virtual;
     end;
 

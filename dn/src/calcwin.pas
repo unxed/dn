@@ -72,7 +72,7 @@ type
   PInfoView = ^TInfoView;
 
   PCalcWindow = ^TCalcWindow;
-  TCalcWindow = object(TUniWindow)
+  TCalcWindow = class(TUniWindow)
     CalcView: PCalcView;
     constructor Init(Bounds: TRect; AName: String); {DataCompBoy}
     constructor Load(var S: TStream);
@@ -81,7 +81,7 @@ type
     destructor Done; virtual;
     end;
 
-  TCalcView = object(TView)
+  TCalcView = class(TView)
 
     FocusEvent: TEvent;
     CalcInput: PCalcInput;
@@ -132,7 +132,7 @@ type
     procedure RewriteFormula(var P: PCellrec; LX, LY, DX, DY: Integer);
     end;
 
-  TCalcInput = object(TInputLine)
+  TCalcInput = class(TInputLine)
     CalcView: PCalcView;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -140,7 +140,7 @@ type
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
-  TInfoView = object(TView)
+  TInfoView = class(TView)
     InfoStr: String;
     InfoAttr: Byte;
     procedure SetInfo(S: String; Attr: Byte);
@@ -199,12 +199,12 @@ type
     end;
 
   PDbfFieldCollection = ^TDbfFieldCollection;
-  TDbfFieldCollection = object(TCollection)
+  TDbfFieldCollection = class(TCollection)
     {KV}
     procedure FreeItem(Item: Pointer); virtual;
     end;
 
-  TDbaseWriter = object(TBufStream)
+  TDbaseWriter = class(TBufStream)
     {KV}
     Header: THeaderDBF;
     Fields: PDbfFieldCollection;
@@ -243,7 +243,7 @@ type
     procedure WriteEndOfFile;
     end;
 
-  TExcelWriter = object(TBufStream)
+  TExcelWriter = class(TBufStream)
     {KV}
     procedure WriteBOF;
     procedure WriteEOF;

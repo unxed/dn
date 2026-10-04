@@ -63,7 +63,7 @@ type
   {Cat: выкинул, т.к. TTextCollection = TLineCollection}
   (*
   PTextCollection =^TTextCollection;
-  TTextCollection = Object( TCollection )
+  TTextCollection = class( TCollection )
     procedure FreeItem( Item: Pointer ); virtual;
     procedure PutItem(var S: TStream; Item: Pointer); virtual;
     function GetItem(var S: TStream): Pointer; virtual;
