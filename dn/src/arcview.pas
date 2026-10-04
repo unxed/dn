@@ -407,7 +407,7 @@ destructor TArcDrive.Destroy;
     Files.Free;
   Files := nil;
   if AType <> nil then
-    Dispose(AType, Done);
+    AType.Free;
   AType := nil;
   inherited Destroy;
   end;
@@ -453,7 +453,7 @@ function TArcDrive.ReadArchive: Boolean;
   Files := nil;
   SkipSFX;
   if AType <> nil then
-    Dispose(AType, Done);
+    AType.Free;
   AType := nil; {DataCompBoy}
   AType := DetectArchive;
   if AType = nil then
@@ -491,7 +491,7 @@ function TArcDrive.ReadArchive: Boolean;
       P^.Write(3, ItoS(Files.Files)+GetString(dlFilesFound));
       NewTimer(T, 300);
       end;
-    AType^.GetFile;
+    AType.GetFile;
     if FileInfo.Last = 0 then
       begin
       Replace('/', '\', FileInfo.FName);
@@ -531,7 +531,7 @@ function TArcDrive.ReadArchive: Boolean;
   FreeObject(ArcFile);
   CDir := '';
   if  (FileInfo.Last = 2) or
-      ( (AType^.GetID = arcZIP) and not CentralDirRecPresent)
+      ( (AType.GetID = arcZIP) and not CentralDirRecPresent)
   then
     StdMsg(6);
   ReadArchive := True;
@@ -600,7 +600,7 @@ function TArcDrive.GetDir: String;
     lFSplit(VArcName, Dr, Nm, Xt) {JO}
   else
     lFSplit(ArcName, Dr, Nm, Xt);
-  GetDir := AType^.GetSign+Nm+Xt+CurDir;
+  GetDir := AType.GetSign+Nm+Xt+CurDir;
   end;
 {-DataCompBoy-}
 
@@ -778,12 +778,12 @@ TryAgain:
       Exit;
     { Flash >>> }
     if CheckForSpaces(S) then
-      S := ' '+CnvString(AType^.Garble)+S+' '
+      S := ' '+CnvString(AType.Garble)+S+' '
     else
       
-     if AType^.UseLFN then
+     if AType.UseLFN then
       
-      S := ' '+CnvString(AType^.Garble)+'"'+S+'"'+' '
+      S := ' '+CnvString(AType.Garble)+'"'+S+'"'+' '
         
     else
       begin
@@ -798,14 +798,14 @@ TryAgain:
   if SS[1] = '\' then
     Delete(SS, 1, 1); {DelFC(SS);}
   
-  if AType^.UseLFN then
+  if AType.UseLFN then
     S2 := ArcName
   else
     S2 := lfGetShortFileName(ArcName);
   if ArcName[Length(ArcName)] = '.' then
     S2 := S2+'.';
-  S := CnvString(AType^.Extract)+' '+S+
-    CnvString(AType^.ForceMode)+' '+
+  S := CnvString(AType.Extract)+' '+S+
+    CnvString(AType.ForceMode)+' '+
     SquashesName(S2)+' '+SquashesName(SS)+' ';
   
   {   DelDoubles('  ',S);} {piwamoto: files can have 2 spaces in names}
@@ -822,10 +822,10 @@ TryAgain:
                 or (P^.Size <> ASize);
   if RunUnp then
     begin
-    Unp := CnvString(AType^.UnPacker);
-    if  (AType^.GetID = arcRAR) and (PosChar(';', Unp) > 0) then
+    Unp := CnvString(AType.UnPacker);
+    if  (AType.GetID = arcRAR) and (PosChar(';', Unp) > 0) then
       begin
-      if PRARArchive(AType)^.VersionToExtr > 20 then
+      if PRARArchive(AType).VersionToExtr > 20 then
         Unp := Copy(Unp, PosChar(';', Unp)+1, 255)
       else
         Unp := Copy(Unp, 1, PosChar(';', Unp)-1);
@@ -842,7 +842,7 @@ TryAgain:
     DirToChange := '';
     end;
   
-  if not (AType^.SwapWhenExec and RunUnp) then
+  if not (AType.SwapWhenExec and RunUnp) then
     begin
   
     TempFileSWP := (TempFile);
@@ -893,7 +893,7 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
   Exec := True;
   S := Prg+' '+Cmd;
   
-  if AType^.SwapWhenExec then
+  if AType.SwapWhenExec then
     begin
     if B then
       begin
@@ -950,7 +950,7 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
         end;
     Message(Application, evCommand, cmExecString, @S);
     end
-  else {if AType^.SwapWhenExec}
+  else {if AType.SwapWhenExec}
   begin
   
   DoneSysError;
@@ -1035,7 +1035,7 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
   { GlobalMessage(evCommand, cmPanelReread, nil);
   GlobalMessage(evCommand, cmRereadInfo, nil);}
   
-  end; {if AType^.SwapWhenExec}
+  end; {if AType.SwapWhenExec}
   
   end { TArcDrive.Exec };
 
@@ -1143,11 +1143,11 @@ function TArcDrive.MakeListFile(PC: PCollection; UseUnp: Boolean; var B: Boolean
 
   begin { TArcDrive.MakeListFile }
   if UseUnp then
-    B := (CnvString(AType^.ExtrListChar) = ' ')
-           or (CnvString(AType^.ExtrListChar) = '')
+    B := (CnvString(AType.ExtrListChar) = ' ')
+           or (CnvString(AType.ExtrListChar) = '')
   else
-    B := (CnvString(AType^.ComprListChar) = ' ')
-           or (CnvString(AType^.ComprListChar) = '');
+    B := (CnvString(AType.ComprListChar) = ' ')
+           or (CnvString(AType.ComprListChar) = '');
   if B then
     S := ''
   else
@@ -1162,9 +1162,9 @@ function TArcDrive.MakeListFile(PC: PCollection; UseUnp: Boolean; var B: Boolean
     else
       begin
       if UseUnp then
-        S := CnvString(AType^.ExtrListChar)+S
+        S := CnvString(AType.ExtrListChar)+S
       else
-        S := CnvString(AType^.ComprListChar)+S;
+        S := CnvString(AType.ComprListChar)+S;
       end;
     end;
   for I := 0 to PC^.Count-1 do
@@ -1239,7 +1239,7 @@ procedure TArcDrive.ExtractFiles(AFiles: PCollection; ExtrDir: String;
     SetLength(ExtrDir, Length(ExtrDir)-1);
   if  (ExtrDir = '') or (ExtrDir = '..') then
     
-    if AType^.UseLFN then
+    if AType.UseLFN then
       
       lFSplit(VArcName, ExtrDir, Nm, Xt)
       {JO: для распаковки по F4 архивов, просмотренных через фильтр}
@@ -1261,9 +1261,9 @@ procedure TArcDrive.ExtractFiles(AFiles: PCollection; ExtrDir: String;
     while (SCurDir <> '') and (SCurDir[1] = '\') do
       Delete(SCurDir, 1, 1);
     MakeSlash(SCurDir);
-    if  (CnvString(AType^.SetPathInside) <> '') then
+    if  (CnvString(AType.SetPathInside) <> '') then
       begin
-      SCr := ' '+ CnvString(AType^.SetPathInside)+
+      SCr := ' '+ CnvString(AType.SetPathInside)+
         SquashesName(Copy(SCurDir, 1, Length(SCurDir)-1))+' ';
       SCurDir := '';
       end;
@@ -1315,11 +1315,11 @@ procedure TArcDrive.ExtractFiles(AFiles: PCollection; ExtrDir: String;
   S := ' ';
   Pswd := False;
   AFiles.ForEach(Unselect);
-  ExtrChar := CnvString(AType^.ExtractWP);
+  ExtrChar := CnvString(AType.ExtractWP);
   if Options and 1 = 0 then
-    ExtrChar := CnvString(AType^.Extract);
+    ExtrChar := CnvString(AType.Extract);
   if Options and 2 <> 0 then
-    ExtrChar := CnvString(AType^.Test);
+    ExtrChar := CnvString(AType.Test);
   if Pswd then
     begin
     if Password = '' then
@@ -1330,12 +1330,12 @@ TryAgain:
         Exit;
     { Flash >>> } {JO: взял код Flash из Arcview.TArcDrive.UseFile }
     if CheckForSpaces(Password) then
-      S := ' '+CnvString(AType^.Garble)+Password+' '
+      S := ' '+CnvString(AType.Garble)+Password+' '
     else
       
-     if AType^.UseLFN then
+     if AType.UseLFN then
       
-      S := ' '+CnvString(AType^.Garble)+'"'+Password+'"'+' '
+      S := ' '+CnvString(AType.Garble)+'"'+Password+'"'+' '
         
     else
       begin
@@ -1348,7 +1348,7 @@ TryAgain:
     { Flash <<< }
     end;
   
-  if AType^.UseLFN then
+  if AType.UseLFN then
     
     ArchiveName := SquashesName(ArcName)
       
@@ -1357,15 +1357,15 @@ TryAgain:
       
       ;
   if  ( (Options and 4 <> 0) or TempDirUsed) and
-      (CnvString(AType^.ForceMode) <> '')
+      (CnvString(AType.ForceMode) <> '')
   then
-    S := S+CnvString(AType^.ForceMode)+' ';
+    S := S+CnvString(AType.ForceMode)+' ';
   S := S+SCr; {установка пути внутpи аpхива}
   S := ExtrChar+' '+S+ArchiveName;
-  Unp := CnvString(AType^.UnPacker);
-  if  (AType^.GetID = arcRAR) and (PosChar(';', Unp) > 0) then
+  Unp := CnvString(AType.UnPacker);
+  if  (AType.GetID = arcRAR) and (PosChar(';', Unp) > 0) then
     begin
-    if PRARArchive(AType)^.VersionToExtr > 20 then
+    if PRARArchive(AType).VersionToExtr > 20 then
       Unp := Copy(Unp, PosChar(';', Unp)+1, 255)
     else
       Unp := Copy(Unp, 1, PosChar(';', Unp)-1);
@@ -1384,7 +1384,7 @@ TryAgain:
   lGetDir(0, DirToChange);
   LFN.lChDir(TempExtrDir);
  
-  if AType^.SwapWhenExec and TempDirUsed then
+  if AType.SwapWhenExec and TempDirUsed then
     begin
     DirToMoveContent := TempExtrDir + '|' + SCurDir;
     if Options and 4 <> 0 then
@@ -1554,17 +1554,17 @@ procedure TArcDrive.EraseFiles(AFiles: PCollection);
     end;
   SS := MakeListFile(AFiles, False, B);
   
-  if AType^.UseLFN then
+  if AType.UseLFN then
     
-    S := CnvString(AType^.Delete)+' '+SquashesName(ArcName)
+    S := CnvString(AType.Delete)+' '+SquashesName(ArcName)
       
   else
-    S := CnvString(AType^.Delete)+' '+lfGetShortFileName(ArcName)
+    S := CnvString(AType.Delete)+' '+lfGetShortFileName(ArcName)
       
       ;
 
   ForceRescan := True;
-  Exec(CnvString(AType^.Packer), S, SS, B);
+  Exec(CnvString(AType.Packer), S, SS, B);
   ForceRescan := False;
   O := Panel;
   if not ReadArchive then
@@ -1662,9 +1662,9 @@ procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
         begin
         ForceRescan := False;
         
-        if (AType^.GetID = arcUC2) or
-           (AType^.GetID = arcAIN) or
-           (AType^.GetID = arc7Z) then
+        if (AType.GetID = arcUC2) or
+           (AType.GetID = arcAIN) or
+           (AType.GetID = arc7Z) then
           begin
           PFilePanel(Panel)^.ForceReading := True;
           end;
@@ -1798,11 +1798,11 @@ procedure TArcDrive.GetDirInfo(var B: TDiskInfoRec);
   B.Total := NewStr(GetString(dlDIPackedSize)+FStr(PSz)+'~');
   B.Free := NewStr(GetString(dlDIUnpackedSize)+FStr(USz)+'~');
 
-  if AType^.GetID = arcRAR then
+  if AType.GetID = arcRAR then
     B.VolumeID := NewStr
-            (GetString(dlDIVersionToExtract)+RtoS(PRARArchive(AType)^.
+            (GetString(dlDIVersionToExtract)+RtoS(PRARArchive(AType).
           VersionToExtr/10, 4, 2)+'~');
-  if AType^.GetID = arcACE then
+  if AType.GetID = arcACE then
     B.VolumeID := NewStr
           (GetString(dlDIVersionToExtract)+RtoS(ACEVerToExtr/10, 4,
          2)+'~');
