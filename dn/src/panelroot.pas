@@ -243,10 +243,10 @@ procedure TFilePanelRoot.DecDrawDisabled;
 
 procedure TFilePanelRoot.ChkNoMem;
   begin
-  if Drive^.NoMemory and (DrawDisableLvl = 0) then
+  if Drive.NoMemory and (DrawDisableLvl = 0) then
     begin
     Application.OutOfMemory;
-    Drive^.NoMemory := False;
+    Drive.NoMemory := False;
     end;
   end;
 
@@ -301,9 +301,9 @@ constructor TFilePanelRoot.Load(S: TStream);
   GetPeerViewPtr(S, SortView);
   Drive := TDrive(S.Get);
   if Drive = nil then
-    New(Drive, Init(0, Self))
+    Drive := TDrive.Create(0, Self)
   else
-    Drive^.Panel := Self;
+    Drive.Panel := Self;
   SetupPanelFromDrive;
   S.Read(PresetNum, SizeOf(PresetNum));
   S.Read(PanelSetupSet, SizeOf(PanelSetupSet));
