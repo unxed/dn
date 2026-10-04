@@ -52,7 +52,7 @@ interface
 
 uses
    {Cat}
-  DNUtil, Drivers, Views,
+  DNUtil, Drivers, Views, Collect,
   timeutil, Defines, objutil
   ;
 
@@ -178,7 +178,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
           begin
           if KeyMacroses = nil then
             begin
-            New(KeyMacroses, Init(10, 10));
+            KeyMacroses := TCollection.Create(10, 10);
             for W := 1 to 10 do
               KeyMacroses.Insert(nil);
             end;
@@ -202,7 +202,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
             ClearEvent(Event);
             Exit;
             end;
-          CurrentMacro := KeyMacroses^.At(WW);
+          CurrentMacro := KeyMacroses.At(WW);
           MacroPlaying := CurrentMacro <> nil;
           MacroKey := 0;
           end;
@@ -296,7 +296,7 @@ procedure MyApp.Idle;
         ClearEvent(IdleEvt);
         end;
 
-  TApplication.Idle;
+  inherited Idle;
   {Cat}
   if Startup.AutoRefreshPanels
     and timeutil.TimerExpired(NotifyTmr)

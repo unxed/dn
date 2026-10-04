@@ -100,7 +100,7 @@ procedure TColorView.HandleEvent(var Event: TEvent);
     OldColor: Byte;
 
   begin
-  TView.HandleEvent(Event);
+  inherited HandleEvent(Event);
   if Event.What = evMouseDown then
     begin
     OldColor := Color2Display;
@@ -259,13 +259,13 @@ constructor TColorVGADialog.Create;
 
   R.Assign(28, 19, 38, 21);
   Control := TButton.Create(R, GetString(dlCancelButton), cmCancel,
-         bfNormal));
+         bfNormal);
   Control.HelpCtx := cmCancel;
   Insert(Control);
 
   R.Assign(38, 19, 48, 21);
   Control := TButton.Create(R, GetString(dlHelpButton), cmHelp,
-         bfNormal));
+         bfNormal);
   Insert(Control);
 
   SelectNext(False);

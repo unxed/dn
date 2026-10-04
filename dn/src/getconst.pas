@@ -57,6 +57,7 @@ uses
 
 type
   TTypeMode = (tmConst, tmEnum);
+  TTypeHolder = class;
 
   { Collection of PTypeHolders }
   TValuesHolder = class(TCollection)

@@ -139,7 +139,7 @@ procedure InvalidateTempDir;
   if not BadTemp(TempDir) then
     begin
     TempDir := TempDir+'TEMP';
-    MkDir(SysOsPath(TempDir);          { it was Copy(TempDir, 1, Length(TempDir)-1): the directory TEM was made (the name has no \ at its end) }
+    MkDir(SysOsPath(TempDir));         { it was Copy(TempDir, 1, Length(TempDir)-1): the directory TEM was made (the name has no \ at its end) }
     MakeSlash(TempDir);
     ClrIO;
     if not BadTemp(TempDir) then
@@ -241,7 +241,7 @@ procedure DoStartup;
         ImgSize: LongInt;
         Old: TBufStream;
       begin
-      S.Init(0, 4096);
+      S := TMemoryStream.Create(0, 4096);
       if LoadState(DnIniFileName, GetEnv('DNCFG'), Img, ImgSize) then
         begin
         S.Write(Img^, ImgSize);
@@ -249,10 +249,10 @@ procedure DoStartup;
         end
       else
         begin
-        Old.Init(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stOpenRead, 16384);
+        Old := TBufStream.Create(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stOpenRead, 16384);
         if (Old.Status = stOK) and (Old.GetSize <> 0) then
           S.CopyFrom(Old, Old.GetSize);
-        Old.Done;
+        Old.Free;
         end;
       S.Seek(0);
       end;
@@ -300,7 +300,7 @@ procedure DoStartup;
       GetVer;
     if  (CFGVer  = 0) or (CFGVer > VersionWord) then
       begin
-      S.Done;
+      S.Free;
       Virgin := True;
       Exit;
       end;
@@ -534,7 +534,7 @@ procedure DoStartup;
           S.Seek(S.GetPos+L);
       end {case};
       end;
-    S.Done;
+    S.Free;
     { the default of the builds before 2026-10-04 (the table of the OSP source: red and magenta buttons) was saved with the config: it is replaced by the colors of DN if the user did not change it }
     if SystemColors[apColor] = palettes.CColorOsp then
       SystemColors[apColor] := palettes.CColor;
@@ -634,7 +634,7 @@ procedure DoStartup;
   ReadIni;
   if ApplyCodetables <> 0 then
     writeln(GetString(dlCoutrySetupErr));
-  Val(SaversData.Time, SkyDelay, Integer(SPos1); 
+  Val(SaversData.Time, SkyDelay, Integer(SPos1)); 
   if SkyDelay = 0 then
     SkyDelay := 255; { X-Man }
   {ExecDNAutoexec;}
@@ -727,7 +727,7 @@ procedure RUN_IT;
   SetBlink(CurrentBlink);
 
   (* InitLFNCol; *)
-  MyApplication.Init;
+  MyApplication := MyApp.Create;
 
   if RunFirst then
     ShowIniErrors;
@@ -785,7 +785,7 @@ procedure RUN_IT;
   ClearIniErrors;
   GlobalMessage(evCommand, cmKillUsed, nil);
   TottalExit := True;
-  MyApplication.Done;
+  MyApplication.Free;
   {Cat}
   DoneHistories;
   if ColorIndexes <> nil then
