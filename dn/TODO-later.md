@@ -207,8 +207,11 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
   Both ran in a build (SDL2, Linux, headless). The PRs to `joncampbell123/dosbox-x` are to be opened by the owner (the session cannot open a PR in a foreign repository): compare links are in the PR texts.
   Doubts: the escape is also used by the other users of the conversion (mount paths, CD-ROM); short names with non-ASCII source are ordinary mangled names (no uniqueness guarantee beyond
   DOSBox-X); the Windows host branch and DBCS code pages are not tested; the cache is still in the guest code page (a design with host names in the cache would be a larger change).
-- DN for DOS in the UTF-8 mode is not done: the DOS build keeps the code page inside (`DN_UTF8=0` for `dos`); it needs the border conversion of names when the provider is absent and the use of the two
-  providers when it is there; `winclp.pas` would ask `CLIPBRD` for UTF-8.
+- DN for DOS in the UTF-8 mode (2026-10-04, first step): `DN_UTF8=1 tools/build.sh dos` builds DN with UTF-8 inside (`dist/dos-utf8`, `tools/dn-dist.sh` with `DN_DIST_SUFFIX=-utf8`); the plain DOS build
+  (code page inside, any DOS) stays the default. At the start `osdep` finds the provider `DOS-UTF8/NAMES` (AMIS, `TvDos.AmisFind`) and switches the UTF-8 names on for the process (`DN_DOS_UTF8_NAMES=0` does not ask);
+  `TvDos` does the same for `DOS-UTF8/CLIPBRD` (`TV_DOS_UTF8_CLIP=0` does not): the clipboard text is UTF-8 on the wire, in both builds. **Not done / not tried** (no patched emulator in the session): the run with the provider;
+  without it the UTF-8 build shows the names as the code page bytes (invalid UTF-8 is taken as the code page) and a typed name with non-ASCII characters is wrong (a border conversion at every name entry of `lfn.pas` is the way
+  if the UTF-8 build is to run on any DOS); the names passed to a child program (`dnexec`) should be the short ones (UTF8NAMES.md, client checklist 3).
 
 ## aarch64 CI: t_chdir (2026-10-03)
 - The first ARM run of `tv` failed in `t_chdir` (4 checks): `TDirListBox.ShowDirs` listed the subdirectories in the order of `FindFirst`, i.e. of the file system (a hash on ext4), so "one"/"two" were not in the order that the test expects
