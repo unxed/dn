@@ -1,11 +1,34 @@
 # Migration status: objects to classes
 
-Updated: 2026-10-05
+Updated: 2026-10-05 (local continuation)
 
 This file is the handoff point for the next development session. Start by
 opening this file from the repository, then inspect the branch and the
 uncommitted files listed below. Do not assume that the class migration is
 complete.
+
+## Continuation checkpoint
+
+The local continuation branch has these additional commits after the original
+handoff:
+
+- `a530c51` removes the class aliases and legacy construction syntax in
+  `colorvga.pas`, and pins the `tv` submodule to tv3 commit `ce0276f`.
+- `faff106` removes the remaining lexer-identified class-reference aliases
+  from 54 DN source files.
+- `bd33191` removes the remaining lexer-identified `^` operators on class
+  fields.
+
+The alias and class-field scans now report zero planned changes. Record
+pointers remain intentionally unchanged. Remaining migration work includes
+legacy `New`/`Init`/`Done` construction and destruction paths, especially
+resource registration/loading in `regall.pas` and the resource compiler in
+`rcp.pas`.
+
+The local machine does not currently have `fpc`, so the full build cannot be
+run here; the migration-tool unit tests pass. A push attempt for the DN branch
+was rejected by GitHub with HTTP 403 (`Permission to unxed/dn.git denied`).
+The local commits are preserved and must be pushed before merging.
 
 ## Repository and branches
 
