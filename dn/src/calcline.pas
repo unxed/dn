@@ -55,18 +55,16 @@ uses
   ;
 
 type
-  PCalcLine = ^TCalcLine;
   TCalcLine = class(TInputLine)
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure SetData(var B); virtual;
     procedure SetValues(SetSelf: Boolean);
     procedure Awaken; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
-  PIndicator = ^TIndicator;
   TIndicator = class(TView)
-    CalcLine: PCalcLine;
+    CalcLine: TCalcLine;
     Radio: TRadioButtons;
     Value: CReal;
     SResult: array[0..5] of String[40];
@@ -371,10 +369,10 @@ procedure TCalcLine.Awaken;
   Calc := Owner;
   end;
 
-destructor TCalcLine.Done;
+destructor TCalcLine.Destroy;
   begin
   Calc := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TCalcLine.SetValues(SetSelf: Boolean);
@@ -411,7 +409,7 @@ procedure TCalcLine.SetValues(SetSelf: Boolean);
       begin
       GetData(S);
       HistoryAdd(hsCalcLine, S);
-      with PIndicator(TDialog(Owner).DirectLink[3])^ do
+      with TIndicator(TDialog(Owner).DirectLink[3]) do
         begin
         Radio.GetData(SelectedForm);
         S := SResult[SelectedForm];
@@ -427,21 +425,21 @@ procedure InsertCalc;
     var
       Dlg: TDialog;
       R: TRect;
-      Indicator: PIndicator;
+      Indicator: TIndicator;
     begin
     Dlg := TDialog(LoadResource(dlgCalculator));
     R.Move(10, 5);
-    Dlg^.Number := GetNum;
+    Dlg.Number := GetNum;
 
-    ObjChangeType(Dlg^.DirectLink[1], TypeOf(TCalcLine));
+    ObjChangeType(Dlg.DirectLink[1], Pointer(System.TClass(TCalcLine)));
 
-    R.Assign(12, 6, Dlg^.Size.X-2, 12);
-    New(Indicator, Init(R));
-    Indicator^.Options := Indicator^.Options or ofFramed;
-    Indicator^.CalcLine := PCalcLine(Dlg^.DirectLink[1]);
-    Indicator^.Radio := TRadioButtons(Dlg^.DirectLink[2]);
+    R.Assign(12, 6, Dlg.Size.X-2, 12);
+    Indicator := TIndicator.Create(R);
+    Indicator.Options := Indicator.Options or ofFramed;
+    Indicator.CalcLine := TCalcLine(Dlg.DirectLink[1]);
+    Indicator.Radio := TRadioButtons(Dlg.DirectLink[2]);
     Dlg.Insert(Indicator);
-    Dlg^.DirectLink[3] := Indicator;
+    Dlg.DirectLink[3] := Indicator;
 
     MakeDialog := Dlg;
     end { MakeDialog: };
