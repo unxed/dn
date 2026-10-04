@@ -513,9 +513,9 @@ function TFileEditor.BlockToClip(P: TCollection): TCollection;
   begin
 {$IFDEF DNUTF8}
   if P <> nil then
-    for I := 0 to P^.Count-1 do
+    for I := 0 to P.Count-1 do
       begin
-      L := P^.At(I);
+      L := P.At(I);
       if L <> nil then
         L^ := TabToUtf8(DocTab, L^);
       end;
@@ -533,10 +533,10 @@ function TFileEditor.BlockFromClip(P: TCollection): TCollection;
   Result := P;
   if P = nil then
     Exit;
-  R := TLineCollection.Create(P^.Count+1, 10, True);
-  for I := 0 to P^.Count-1 do
+  R := TLineCollection.Create(P.Count+1, 10, True);
+  for I := 0 to P.Count-1 do
     begin
-    L := P^.At(I);
+    L := P.At(I);
     if L = nil then
       R.Insert(nil)
     else
@@ -572,7 +572,7 @@ procedure TFileEditor.KeyMapAtReplace(N: LongInt; P: PLongString);
   begin
   if  (P <> nil) then
     StrFromAscii(P^);
-  FileLines^.AtReplace(N, P);
+  FileLines.AtReplace(N, P);
   end; {-$VIV}
 
 procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
@@ -589,7 +589,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
     dkUndo:
       begin
       if UndoInfo = nil then
-        UndoInfo := PDoCollection.Create(dkUndo);
+        UndoInfo := TDoCollection.Create(dkUndo);
       with iP^ do
         case What of
           udDelChar:
@@ -625,14 +625,14 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
           udDelBlock:
             begin
             P^.Lines := TLineCollection.Create(10, 10, True);
-            if Lines^.Count > 0 then
-              S := CnvString(Lines^.At(0))
+            if Lines.Count > 0 then
+              S := CnvString(Lines.At(0))
             else
               S := '';
             J := Length(S);
             if Vertical then
               begin
-              for I := 0 to Lines^.Count-1 do
+              for I := 0 to Lines.Count-1 do
                 begin
                 S := Copy(GetLine(Where.Y+I), Where.X+1, J);
                 P^.Lines.Insert(NewLongStr(S));
@@ -640,12 +640,12 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
               end
             else
               begin
-              for I := 0 to Lines^.Count-1 do
+              for I := 0 to Lines.Count-1 do
                 begin
                 S := GetLine(Where.Y+I);
                 if I = 0 then
                   S := Copy(S, Where.X+1, MaxLongStringLength)
-                else if I = Lines^.Count-1 then
+                else if I = Lines.Count-1 then
                   S := Copy(S, 1, Length(S)-(J-Where.X));
                 P^.Lines.Insert(NewLongStr(S));
                 end;
@@ -654,7 +654,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsBlock, udFormatBlock:
             begin
-            I := Lines^.Count;
+            I := Lines.Count;
             P^.Str := NewLongStr(Char(Lo(I))+Char(Hi(I))+GetLine(Delta.Y));
             UndoInfo.Insert(P);
             end;
@@ -683,15 +683,15 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsVertBlock:
             begin
-            P^.Count := Lines^.Count;
+            P^.Count := Lines.Count;
             if P^.Count > 0 then
-              S := CnvLongString(Lines^.At(0))
+              S := CnvLongString(Lines.At(0))
             else
               S := '';
             P^.Width := Length(S);
             for I := 1 to P^.Count do
               begin
-              J := Length(CnvLongString(Lines^.At(I-1)));
+              J := Length(CnvLongString(Lines.At(I-1)));
               if J > P^.Width then
                 P^.Width := J;
               end;
@@ -714,10 +714,10 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
           udReplaceBlock, udClearBlock:
             begin
             P^.Lines := TLineCollection.Create(10, 10, True);
-            for I := Where.Y to Lines^.Count+Where.Y-1 do
+            for I := Where.Y to Lines.Count+Where.Y-1 do
               begin
               S := GetLine(I);
-              J := Length(CnvLongString(Lines^.At(I-Where.Y)));
+              J := Length(CnvLongString(Lines.At(I-Where.Y)));
               P^.Lines.Insert(NewLongStr(Copy(S, Where.X+1, J)));
               end;
             UndoInfo.Insert(P);
@@ -736,7 +736,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
     dkRedo:
       begin
       if RedoInfo = nil then
-        RedoInfo := PDoCollection.Create(dkRedo);
+        RedoInfo := TDoCollection.Create(dkRedo);
       with iP^ do
         case What of
           udDelChar:
@@ -754,7 +754,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udDelLine:
             begin
-            P^.Count := Lines^.Count;
+            P^.Count := Lines.Count;
             RedoInfo.Insert(P);
             end;
           udInsLine:
@@ -767,20 +767,20 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
           udDelBlock:
             begin
             P^.Lines := TLineCollection.Create(10, 10, True);
-            if Lines^.Count > 0 then
-              S := CnvLongString(Lines^.At(0))
+            if Lines.Count > 0 then
+              S := CnvLongString(Lines.At(0))
             else
               S := '';
             J := Length(S);
             if Vertical then
               if InsM then
                 begin
-                for I := 0 to Lines^.Count-1 do
+                for I := 0 to Lines.Count-1 do
                   P^.Lines.Insert(NewLongStr(S));
                 end
               else
                 begin
-                for I := 0 to Lines^.Count-1 do
+                for I := 0 to Lines.Count-1 do
                   begin
                   S := Copy(GetLine(Where.Y+I), Where.X+1, J);
                   P^.Lines.Insert(NewLongStr(S));
@@ -789,7 +789,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             else
               begin
               S := GetLine(P^.Where.Y);
-              for I := 0 to Lines^.Count-1 do
+              for I := 0 to Lines.Count-1 do
                 P^.Lines.Insert(NewLongStr(S));
               end;
             RedoInfo.Insert(P);
@@ -854,10 +854,10 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
           udReplaceBlock, udClearBlock:
             begin
             P^.Lines := TLineCollection.Create(10, 10, True);
-            for I := Where.Y to Lines^.Count+Where.Y-1 do
+            for I := Where.Y to Lines.Count+Where.Y-1 do
               begin
               S := GetLine(I);
-              J := Length(CnvLongString(Lines^.At(I-Where.Y)));
+              J := Length(CnvLongString(Lines.At(I-Where.Y)));
               P^.Lines.Insert(NewLongStr(Copy(S, Where.X+1, J)));
               end;
             RedoInfo.Insert(P);
@@ -1035,12 +1035,12 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
     UndoInfo := nil
     end;
   if UndoInfo = nil then
-    UndoInfo := PDoCollection.Create(dkUndo);
+    UndoInfo := TDoCollection.Create(dkUndo);
   if RedoInfo <> nil then
     RedoInfo.FreeAll;
-  if UndoInfo^.Count > 0
+  if UndoInfo.Count > 0
   then
-    P1 := UndoInfo^.At(UndoInfo^.Count-1)
+    P1 := UndoInfo.At(UndoInfo.Count-1)
   else
     P1 := nil;
   if ValidBlock then
@@ -1342,19 +1342,19 @@ procedure TFileEditor.CalcMenu;
     EnableCommands(BlkC)
   else
     DisableCommands(BlkC);
-  if  (UndoInfo <> nil) and (UndoInfo^.Count > 0)
+  if  (UndoInfo <> nil) and (UndoInfo.Count > 0)
   then
     EnableCommands([cmUndo])
   else
     DisableCommands([cmUndo]);
   {-$VOL begin}
-  if  (RedoInfo <> nil) and (RedoInfo^.Count > 0)
+  if  (RedoInfo <> nil) and (RedoInfo.Count > 0)
   then
     EnableCommands([cmRedo])
   else
     DisableCommands([cmRedo]);
   {-$VOL end}
-  if  (ClipBoard <> nil) and (ClipBoard^.Count > 0) or
+  if  (ClipBoard <> nil) and (ClipBoard.Count > 0) or
       ( (SystemData.Options and ossUseSysClip <> 0) and GetWinClipSize)
   then
     EnableCommands([cmPaste])
@@ -1424,7 +1424,7 @@ procedure TFileEditor.ScrollTo(DeltaX, DeltaY: LongInt);
 function TFileEditor.LimitX: LongInt;
   begin
   if HScroll <> nil then
-    LimitX := HScroll^.MaxVal
+    LimitX := HScroll.MaxVal
   else
     LimitX := 0;
   end;
@@ -1432,7 +1432,7 @@ function TFileEditor.LimitX: LongInt;
 function TFileEditor.LimitY: LongInt;
   begin
   if VScroll <> nil then
-    LimitY := VScroll^.MaxVal
+    LimitY := VScroll.MaxVal
   else
     LimitY := 0;
   end;
@@ -1494,7 +1494,7 @@ procedure TFileEditor.SetLimits;
   if HScroll <> nil then
     HScroll.SetParams(Delta.X, 0, MaxLongStringLength, 1, 1);
   if VScroll <> nil then
-    VScroll.SetParams(Delta.Y, 0, FileLines^.Count-1, Size.Y, 1);
+    VScroll.SetParams(Delta.Y, 0, FileLines.Count-1, Size.Y, 1);
   end;
 
 function TFileEditor.GetSelection: TCollection;
@@ -1522,8 +1522,7 @@ function TFileEditor.GetSelection: TCollection;
     else if I = Mark.B.Y then
       S := Copy(S, 1, Mark.B.X);
     { P.Insert(NewLongStr(S)); }
-    with P^ do
-      AtInsert(Count, NewLongStr(S)); {AK155}
+    P.AtInsert(P.Count, NewLongStr(S)); {AK155}
 
     {AK155: MemOK - это нечто странное. Там, в конечном итоге,
 проверяется на nil некий Linker, которому нигде ничего не
@@ -1693,7 +1692,7 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
 {$ELSE}
   XLat := @KeyMapDescr[KeyMap].XlatCP^[Ord(CaseSensitive)];
 {$ENDIF}
-  while (Dir > 0) and (D.Y < FileLines^.Count) or
+  while (Dir > 0) and (D.Y < FileLines.Count) or
       (Dir < 0) and (D.Y >= 0)
   do
     begin
@@ -1802,8 +1801,8 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
         
           Inc(D.X, Length(W));
       Delta := D;
-      HScroll^.Value := D.X;
-      VScroll^.Value := D.Y;
+      HScroll.Value := D.X;
+      VScroll.Value := D.Y;
       if TimerExpired(Tmr) then
         begin
         VScroll.DrawView;
@@ -1960,7 +1959,7 @@ procedure TFileEditor.InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
     L, J: LongInt;
     LL: TCollection;
   begin
-  if  (ABlock = nil) or (ABlock^.Count = 0) then
+  if  (ABlock = nil) or (ABlock.Count = 0) then
     Exit;
   Modified := True;
   if SaveUndo then
@@ -1968,52 +1967,52 @@ procedure TFileEditor.InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
     Mark.B := Delta;
     Mark.A := Delta;
     BlockVisible := True;
-    Inc(Mark.B.Y, Max(0, ABlock^.Count-1));
+    Inc(Mark.B.Y, Max(0, ABlock.Count-1));
     end;
   if VertBlock then
     begin
-    P := ABlock^.At(0);
+    P := ABlock.At(0);
     if P <> nil then
       S := P^
     else
       S := '';
     I := Length(S);
-    for J := 1 to ABlock^.Count do
+    for J := 1 to ABlock.Count do
       begin
-      Q := Length(CnvLongString(ABlock^.At(J-1)));
+      Q := Length(CnvLongString(ABlock.At(J-1)));
       if Q > I then
         I := Q;
       end;
     Q := I;
     L := LongInt(I);
     L := L shl 16;
-    L := L or ABlock^.Count;
+    L := L or ABlock.Count;
     if SaveUndo then
       if InsertMode then
         StoreUndoInfo(udInsVertBlock, Delta, L)
       else
         begin
-        P := ABlock^.At(0);
+        P := ABlock.At(0);
         if P = nil then
           S := ''
         else
           S := P^;
-        LL := TLineCollection.Create(ABlock^.Count, 10, True);
+        LL := TLineCollection.Create(ABlock.Count, 10, True);
         if LL <> nil then
           begin
-          for I := 0 to ABlock^.Count do
+          for I := 0 to ABlock.Count do
             LL.Insert(NewLongStr(LongAddSpace(Copy(GetLine(I+Delta.Y),
                      Delta.X+1, Length(S)), I)));
           StoreUndoInfo(udReplaceBlock, Delta, LL)
           end;
         end;
-    for I := 1 to ABlock^.Count do
+    for I := 1 to ABlock.Count do
       begin
-      P := ABlock^.At(I-1);
+      P := ABlock.At(I-1);
       S1 := LongAddSpace(CnvLongString(P), Q);
       if SaveUndo then
         Mark.B.X := Mark.A.X+Length(S1);
-      if I+Delta.Y-1 = FileLines^.Count then
+      if I+Delta.Y-1 = FileLines.Count then
         FileLines.Insert(NewLongStr(LongAddSpace('', Q)));
       S2 := GetLine(I+Delta.Y-1);
       if not InsertMode then
@@ -2026,7 +2025,7 @@ procedure TFileEditor.InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
     end
   else
     begin
-    I := ABlock^.Count;
+    I := ABlock.Count;
     S := Char(Lo(I))+Char(Hi(I))+GetLine(Delta.Y);
     if SaveUndo then
       StoreUndoInfo(udInsBlock, Delta, S);
@@ -2036,16 +2035,16 @@ procedure TFileEditor.InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
     S1 := Copy(S, 1, Delta.X);
     S2 := Copy(S, Delta.X+1, MaxLongStringLength);
     FileLines.AtFree(Delta.Y);
-    for I := 1 to ABlock^.Count do
+    for I := 1 to ABlock.Count do
       begin
-      P := ABlock^.At(I-1);
+      P := ABlock.At(I-1);
       if P <> nil then
         S := P^
       else
         S := '';
       if I = 1 then
         S := S1+S;
-      if I = ABlock^.Count then
+      if I = ABlock.Count then
         begin
         if SaveUndo then
           Mark.B.X := Length(S);
@@ -2053,7 +2052,7 @@ procedure TFileEditor.InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
         end;
       KeyMapAtInsert(Delta.Y+I-1, NewLongStr(S)); {-$VIV}
       end;
-    J := ABlock^.Count-1;
+    J := ABlock.Count-1;
     if J > 0 then
       for L := 1 to 9 do
         if MarkPos[L].Y >= Delta.Y then
@@ -2140,8 +2139,8 @@ procedure TFileEditor.Draw;
     Delta.X := 0;
   if Delta.X > MaxLongStringLength then
     Delta.X := MaxLongStringLength;
-  if Delta.Y >= FileLines^.Count then
-    Delta.Y := FileLines^.Count-1;
+  if Delta.Y >= FileLines.Count then
+    Delta.Y := FileLines.Count-1;
   if Delta.Y < 0 then
     Delta.Y := 0;
   if Pos.X > Delta.X then
@@ -2159,7 +2158,7 @@ procedure TFileEditor.Draw;
     ChPosition := False;
     Sel.B.X := Delta.X;
     Sel.B.Y := Delta.Y;
-    if LineMarking and (Sel.B.Y < FileLines^.Count-1) then
+    if LineMarking and (Sel.B.Y < FileLines.Count-1) then
       begin
       if Sel.B.Y >= Sel.A.Y then
         Inc(Sel.B.Y);
@@ -2236,7 +2235,7 @@ procedure TFileEditor.Draw;
         BC := CC[2];
         end;
     MoveChar(B, ' ', C, Size.X);
-    if A < FileLines^.Count then
+    if A < FileLines.Count then
       begin
       if WM or (A <> Delta.Y) then
         S := GetLine(A)
@@ -2332,19 +2331,19 @@ procedure TFileEditor.Draw;
   LastPos.Y := Delta.Y;
   ChPosition := False;
   if  (InfoL <> nil) then
-    InfoL^.Draw;
+    InfoL.Draw;
   if  (BMrk <> nil) then
-    BMrk^.Draw;
+    BMrk.Draw;
   end { TFileEditor.Draw };
 
 function TFileEditor.GetLineAsIs(Index: LongInt): LongString;
   var
     p: PLongString;
   begin
-  if  (FileLines <> nil) and (Index < FileLines^.Count) and (Index >= 0)
+  if  (FileLines <> nil) and (Index < FileLines.Count) and (Index >= 0)
   then
     begin
-    p := FileLines^.At(Index);
+    p := FileLines.At(Index);
     Result := CnvLongString(p);
     end
   else
@@ -2360,7 +2359,7 @@ function TFileEditor.GetLine(Index: LongInt): LongString;
 procedure TFileEditor.ModifyLine(Index: LongInt; S: LongString;
      DelSpaces: Boolean);
   begin
-  if  (Index < 0) or (Index >= FileLines^.Count) then
+  if  (Index < 0) or (Index >= FileLines.Count) then
     Exit;
   if DelSpaces then
     LongDelRight(S);
@@ -2434,7 +2433,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
     if not InsertMode then
       begin
       ChangeLine;
-      if Delta.Y = FileLines^.Count-1 then
+      if Delta.Y = FileLines.Count-1 then
         begin
         FileLines.Insert(nil);
         SetLimits;
@@ -2747,13 +2746,13 @@ L1:
       Delete(WorkString, LastX+1, 1);
       Exit
       end;
-    if LastY+1 >= FileLines^.Count then
+    if LastY+1 >= FileLines.Count then
       Exit;
     WorkModify;
     P.X := LastX;
     P.Y := LastY;
     S := GetLine(LastY+1);
-    if LastY < FileLines^.Count then
+    if LastY < FileLines.Count then
       StoreUndoInfo(udSubDelLine, P, S);
     WorkString := WorkString+LongStrg(' ', LastX-Length(WorkString))+S;
     ChangeLine;
@@ -2788,12 +2787,12 @@ L1:
         begin { Если блок и буфер идентичны, то блок НЕ удаляем }
         if ClipBoard = nil then
           goto DelBlk;
-        if Block^.Count <> ClipBoard^.Count then
+        if Block.Count <> ClipBoard.Count then
           goto DelBlk;
-        for i := 0 to Block^.Count-1 do
+        for i := 0 to Block.Count-1 do
           begin
-          P1 := Block^.Items^[i];
-          P2 := CB^.Items^[i];
+          P1 := Block.At(i);
+          P2 := CB.At(i);
           if P1 = P2 then { в частности, оба nil }
             Continue;
           if (P1 = nil) or (P2 = nil) or (P1^ <> P2^) then
@@ -2835,9 +2834,9 @@ EndDel:
 при отключенном Use system clipboard для очень больших фрагментов
 работать временно не будет }
     if  (ClipBoardStream <> nil)
-      {AK155} and (ClipBoard^.Count < 1000) {/AK155}
+      {AK155} and (ClipBoard.Count < 1000) {/AK155}
       then
-      ClipBoardStream^.Seek(Positive(ClipBoardStream^.GetPos-4));
+      ClipBoardStream.Seek(Positive(ClipBoardStream.GetPos-4));
     CopyLines2Stream(ClipBoard, ClipBoardStream);
     end { CopyBlock };
 
@@ -2855,7 +2854,7 @@ EndDel:
     Modified := True;
     T.Y := LastY;
     T.X := LastX;
-    if Delta.Y+1 = FileLines^.Count then
+    if Delta.Y+1 = FileLines.Count then
       begin
       StoreUndoInfo(udSubDel, T, WorkString);
       ModifyLine(Delta.Y, '', True);
@@ -2901,7 +2900,7 @@ EndDel:
   while (LastX < Length(WorkString)) and not (WorkString[LastX+1] in BreakChars) do Inc(LastX);
   while (LastX < Length(WorkString)) and (WorkString[LastX+1] in BreakChars) do Inc(LastX);
   if (LastX < Length(WorkString)) or B and (LastX = Length(WorkString)) then Exit;
-  if LastY + 1 >= FileLines^.Count then begin LastX := Length(WorkString); Exit end;
+  if LastY + 1 >= FileLines.Count then begin LastX := Length(WorkString); Exit end;
   Inc(Delta.Y); Inc(LastY); LastX := 0; Delta.X := 0; ChangeLine;
   if (Length(WorkString) > 0) and not (WorkString[1] in BreakChars) then Exit;
   WordRight;
@@ -2957,7 +2956,7 @@ EndDel:
       end;
 
     begin
-    if  (LastY = FileLines^.Count-1)
+    if  (LastY = FileLines.Count-1)
          and (LastX >= Length(GetLine(LastY)))
     then
       Exit;
@@ -2970,7 +2969,7 @@ EndDel:
     do
       Inc(LastX);
 
-    while LastY < FileLines^.Count do
+    while LastY < FileLines.Count do
       if WorkString = '' then
         JumpDown
       else
@@ -2982,9 +2981,9 @@ EndDel:
         Break;
         end;
 
-    if LastY >= FileLines^.Count then
+    if LastY >= FileLines.Count then
       begin
-      LastY := FileLines^.Count-1;
+      LastY := FileLines.Count-1;
       LastX := Length(GetLine(LastY));
       end;
     end { WordRight };
@@ -3065,7 +3064,7 @@ EndDel:
     if P <> nil then
       begin
       InsertBlock(P, True);
-      Dispose(P, Done)
+      P.Free
       end;
     end { BlockRead };
   {-DataCompBoy-}
@@ -3243,10 +3242,10 @@ EndDel:
         SST := GetLine(I);
       if OptimalFill then
         CompressString(SST);
-      R^.Write(SST[1], Length(SST));
+      R.Write(SST[1], Length(SST));
       if  (I <> Mark.B.Y)
       then
-        R^.Write(CRLF[1], Length(CRLF));
+        R.Write(CRLF[1], Length(CRLF));
       end;
 
     if PI <> nil then
@@ -3302,7 +3301,7 @@ EndDel:
       OldX := 1;
     if Length(WorkString) > EdOpt.RightSide then
       begin
-      New(P, Init(1, 1, True));
+      P := TLineCollection.Create(1, 1, True);
       P.Insert(NewLongStr(WorkString));
       TP.Y := Delta.Y;
       TP.X := 0;
@@ -3365,14 +3364,14 @@ EndDel:
     StoreUndoInfo(udFormatBlock, TP, S);
     if Delta.X >= Length(WorkString) then
       begin
-      VScroll.SetParams(LastY+1, 0, FileLines^.Count-1, Size.Y, 1);
+      VScroll.SetParams(LastY+1, 0, FileLines.Count-1, Size.Y, 1);
       if OldX > 0 then
         HScroll.SetValue(EdOpt.LeftSide);
       HScroll.SetValue(EdOpt.LeftSide+OldX);
       end
     else
       begin
-      VScroll^.SetRange(0, FileLines^.Count-1);
+      VScroll.SetRange(0, FileLines.Count-1);
       HScroll.SetValue(Delta.X);
       end;
     DrawView;
@@ -3722,7 +3721,7 @@ EndDel:
         ScrollTo(LastX, LastY-1);
       2:
         begin
-        if LastY = FileLines^.Count-1 then
+        if LastY = FileLines.Count-1 then
           begin
           FileLines.Insert(nil);
           SetLimits;
@@ -3829,8 +3828,8 @@ EndDel:
     Res := '';
     S := '';
     R.Assign(0, 0, 20, 7);
-    New(Info, Init(R));
-    Info^.Write(1, Copy(GetString(dlPleaseStandBy), 4, 255));
+    Info := TWhileView.Create(R);
+    Info.Write(1, Copy(GetString(dlPleaseStandBy), 4, 255));
     Desktop.Insert(Info); (* X-Man *)
     Abort := False;
 
@@ -3923,7 +3922,7 @@ Ex:
 
   procedure SelectAll;
     begin {AK155 выделить весь текст}
-    with Sel, FileLines^ do
+    with Sel, FileLines do
       begin
       A.X := 0;
       A.Y := 0;
@@ -3994,7 +3993,7 @@ Ex:
 1:
   LastY := Delta.Y;
   LastX := Delta.X;
-  i := FileLines^.Count;
+  i := FileLines.Count;
   ChPos := False;
   case Event.What of
     evCommand:
@@ -4084,7 +4083,7 @@ Ex:
           begin
           Mark.A.X := 0;
           Mark.A.Y := Delta.Y;
-          if Delta.Y >= FileLines^.Count-1 then
+          if Delta.Y >= FileLines.Count-1 then
             begin
             Mark.B.Y := Delta.Y;
             Mark.B.X := Length(WorkString)
@@ -4520,18 +4519,18 @@ Ex:
               Dec(Delta.Y);
             Dec(Pos.Y);
             ScrollTo(Delta.X, Delta.Y);
-            Delta.Y := VScroll^.Value;
+            Delta.Y := VScroll.Value;
             DrawView;
             end;
         cmScrollDn:
-          if Pos.Y < FileLines^.Count-1 then
+          if Pos.Y < FileLines.Count-1 then
             begin
             UnMark := True;
             if not (Delta.Y > Pos.Y) then
               Inc(Delta.Y);
             Inc(Pos.Y);
             ScrollTo(Delta.X, Delta.Y);
-            Delta.Y := VScroll^.Value;
+            Delta.Y := VScroll.Value;
             DrawView;
             end;
         cmBlockStart:
@@ -4592,7 +4591,7 @@ Ex:
             begin
             MakeDel;
             while (LastX >= Length(WorkString))
-                 and (LastY+1 < FileLines^.Count)
+                 and (LastY+1 < FileLines.Count)
               or (LastX < Length(WorkString))
                  and (WorkString[LastX+1] = ' ')
             do
@@ -4872,11 +4871,11 @@ Ex:
         cmScrollBarChanged:
           begin
           if HScroll <> nil then
-            Delta.X := HScroll^.Value;
+            Delta.X := HScroll.Value;
           if VScroll <> nil then
             begin
-            Delta.Y := VScroll^.Value;
-            if VScroll^.ForceScroll then
+            Delta.Y := VScroll.Value;
+            if VScroll.ForceScroll then
               Inc(Pos.Y, Delta.Y-LastY);
             end;
           if LastY <> Delta.Y then
@@ -4974,7 +4973,7 @@ Ex:
       ChangeLine;
       if LineMarking then
         begin
-        if  (Mark.B.X > 0) and (Mark.B.Y < FileLines^.Count-1)
+        if  (Mark.B.X > 0) and (Mark.B.Y < FileLines.Count-1)
         then
           begin
           Inc(Mark.B.Y);
@@ -5027,7 +5026,7 @@ procedure OpenSmartpad;
       Str: LongString;
       Idx: Integer;
     begin
-    with SmartWindow^.Intern^ do
+    with SmartWindow.Intern do
       begin
       if SPInsertDate then
         begin
@@ -5038,22 +5037,22 @@ procedure OpenSmartpad;
         for Idx := 0 to 35 do
           Str := Str+Char(SPLineChar);
         { Flash >>> }
-        if  (Copy(GetLine(FileLines^.Count-2), 1, 7) = Copy(Str, 1, 7)) and
-            (Copy(GetLine(FileLines^.Count-2), 29, 37) = Copy(Str, 29,
+        if  (Copy(GetLine(FileLines.Count-2), 1, 7) = Copy(Str, 1, 7)) and
+            (Copy(GetLine(FileLines.Count-2), 29, 37) = Copy(Str, 29,
              37)) and
-            ( ( ( ( (Delta.Y > FileLines^.Count-2) and (WorkString = '')) or
-                  (Delta.Y = FileLines^.Count-2)) or
-                (Delta.Y < FileLines^.Count-2))) and
-            (GetLine(FileLines^.Count-1) = '')
+            ( ( ( ( (Delta.Y > FileLines.Count-2) and (WorkString = '')) or
+                  (Delta.Y = FileLines.Count-2)) or
+                (Delta.Y < FileLines.Count-2))) and
+            (GetLine(FileLines.Count-1) = '')
         then
           begin
-          FileLines.AtDelete(FileLines^.Count-2);
-          FileLines.AtDelete(FileLines^.Count-1);
+          FileLines.AtDelete(FileLines.Count-2);
+          FileLines.AtDelete(FileLines.Count-1);
           end;
-        if  ( (Delta.Y > FileLines^.Count-2) and (WorkString <> '')) and not
+        if  ( (Delta.Y > FileLines.Count-2) and (WorkString <> '')) and not
             ( (Copy(WorkString, 1, 7) = Copy(Str, 1, 7)) and
               (Copy(WorkString, 29, 37) = Copy(Str, 29, 37))) or
-            (GetLine(FileLines^.Count-1) <> '')
+            (GetLine(FileLines.Count-1) <> '')
         then
           FileLines.Insert(nil);
         { Flash <<< }
@@ -5061,7 +5060,7 @@ procedure OpenSmartpad;
         end;
       FileLines.Insert(nil);
       SetLimits;
-      ScrollTo(0, FileLines^.Count-1);
+      ScrollTo(0, FileLines.Count-1);
       Pos.X := Delta.X-Size.X div 2;
       Pos.Y := Delta.Y-Size.Y div 2;
       SmartWindow.Redraw;
@@ -5078,7 +5077,7 @@ procedure OpenSmartpad;
   begin { OpenSmartpad }
   SmartWindow := SmartWindowPtr^; {Cat}
 
-  if  (SmartWindow <> nil) and SmartWindow^.GetState(sfModal) then
+  if  (SmartWindow <> nil) and SmartWindow.GetState(sfModal) then
     Exit;
   PV := Application.TopView;
   Desktop.GetExtent(R);
@@ -5092,35 +5091,35 @@ procedure OpenSmartpad;
       Desktop.Delete(SmartWindow);
       Desktop.ExecView(SmartWindow);
       Desktop.InsertBefore(SmartWindow, Desktop.Last);
-      Desktop.SetCurrent(PV, EnterSelect);
+      Desktop.Current := PV;
       {if TView(PV).Owner = Pointer(Desktop) then TView(PV).MakeFirst;}
       end
     else
       SmartWindow.Select;
     Exit;
     end;
-  New(SmartWindow, Init(R, 'SmartPad'));
+  SmartWindow := TEditWindow.Create(R, 'SmartPad');
   {--- start -------- Eugeny Zvyagintzev ---------}
   {Now DN will save and load SmartPad edit history}
-  V := SmartWindow^.Intern;
-  FreeStr := V^.EditName;
+  V := SmartWindow.Intern;
+  FreeStr := V.EditName;
   System.Insert(' ', FreeStr, 1);
   UpStr(FreeStr);
   PS := @FreeStr;
   if  (InterfaceData.Options and ouiTrackEditors <> 0)
        and (EditHistory <> nil)
   then
-    I := EditHistory^.IndexOf(@PS)
+    I := EditHistory.IndexOf(@PS)
   else
     I := -1;
   if I >= 0 then
     begin
-    P := EditHistory^.At(I);
+    P := EditHistory.At(I);
     R.Assign(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X,
        P^.fOrigin.Y+P^.fSize.Y);
     AdjustToDesktopSize(R, P^.fDeskSize);
     SmartWindow.Locate(R);
-    with V^, P^ do
+    with V, P^ do
       begin
       MarkPos := fMarks;
       Mark.A := fBlockStart;
@@ -5174,7 +5173,7 @@ procedure OpenClipBoard; {-$VOL begin}
 
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipOut {(true)};
-  if  (ClipboardWindow <> nil) and ClipboardWindow^.GetState(sfModal)
+  if  (ClipboardWindow <> nil) and ClipboardWindow.GetState(sfModal)
   then
     Exit;
   PV := Application.TopView;
@@ -5186,13 +5185,13 @@ procedure OpenClipBoard; {-$VOL begin}
       Desktop.Delete(ClipboardWindow);
       Desktop.ExecView(ClipboardWindow);
       Desktop.InsertBefore(ClipboardWindow, Desktop.Last);
-      Desktop.SetCurrent(PV, EnterSelect);
+      Desktop.Current := TView(PV);
       end
     else
       ClipboardWindow.Select;
     Exit;
     end;
-  New(ClipboardWindow, Init(R, 'Clipboard'));
+  ClipboardWindow := TEditWindow.Create(R, 'Clipboard');
   if  (PV <> Application) then
     begin
     Desktop.ExecView(ClipboardWindow);
