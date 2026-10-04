@@ -1355,7 +1355,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     D.Free;
 
     if R.A.X = cmNo then
-      FreeObject(FindList);
+      FreeAndNil(FindList);
 
     if  (R.A.X = cmOK) and (FindList <> nil) and (FindList.Count > 0)
     then
@@ -1376,7 +1376,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         end;
       if UpStrg(F.Text^) <> UpStrg(GetName(Name^)) then
         begin
-        FreeObject(Stream);
+        FreeAndNil(Stream);
         CurDir := FreeStr;
         FreeStr := MakeNormName(GetPath(Name^), F.Text^);
         DisposeStr(Name);
