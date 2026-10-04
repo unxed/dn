@@ -69,7 +69,7 @@ procedure UpdateARH(Arch: PARJArchive);
     P: TView;
   begin
   if Arch <> nil then
-    Arch^.Save
+    Arch.Save
   else
     begin
     P := WriteMsg(GetString(dlPleaseStandBy));
@@ -78,7 +78,7 @@ procedure UpdateARH(Arch: PARJArchive);
       A := GetArchiveByTag(J);
       if A <> nil then
         begin
-        A^.Save;
+        A.Save;
         A.Free;
         A := nil;
         end;
@@ -154,9 +154,9 @@ procedure SetupArchive(ArchCommand: Word);
       s: String;
     begin
     s := ArcName(ArchCommand+cmLoConfigArchiver);
-    if Length(s)+Length(D^.Title^)+10 < D^.Size.X then
-      s := D^.Title^+' - '+s;
-    ReplaceP(D^.Title, s);
+    if Length(s)+Length(D.Title^)+10 < D.Size.X then
+      s := D.Title^+' - '+s;
+    ReplaceP(D.Title, s);
     end;
 
   label Ex;
@@ -166,7 +166,7 @@ procedure SetupArchive(ArchCommand: Word);
   Arch := GetArchiveByTag(ArchCommand);
   if Arch = nil then
     Exit;
-  with Arch^ do
+  with Arch do
     begin
     DT.Pack := CnvString(Packer);
     DT.Unpack := CnvString(UnPacker);
@@ -215,9 +215,9 @@ procedure SetupArchive(ArchCommand: Word);
     goto Ex;
   if SystemData.ForceDefArch = '' then
     DefaultArchiver := ArchCommand;
-  with Arch^ do
+  with Arch do
     begin
-    Done;
+    Free;
     Packer := NewStr(DT.Pack);
     UnPacker := NewStr(DT.Unpack);
     Extract := NewStr(DT.Extract);
