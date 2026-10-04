@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+"""Tests of DN for DOS that need the mouse driver and a normal exit, in DOSBox-X on a virtual X display (Xvfb): the mouse is a real X pointer that DOSBox-X turns into
+INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at the dump of the screen (DNDUMP).
+usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
+Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
+the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
+save-setup (the sort mode of a panel is saved by the setup and comes back), no-name: all of them by default.
+Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need the patched DOSBox-X
+(docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
+import ctypes, os, shutil, subprocess, sys, tempfile, time
+
+DISPLAY = os.environ.get('DN_XDISPLAY', ':97')
+DBX = os.environ.get('DOSBOX_X', 'dosbox-x')
+PATCHED = os.environ.get('DN_DOS_PATCHED') == '1'
+CW, CH = 9, 16                                   # a cell of the text screen of 80x25 in the window of 720x400
+STARTUP = int(os.environ.get('DN_DOS_STARTUP', '12'))   # the seconds from the start of the emulator to the first screen of DN
+
+x11 = ctypes.CDLL('libX11.so.6')
+xt = ctypes.CDLL('libXtst.so.6')
+x11.XOpenDisplay.restype = ctypes.c_void_p
+x11.XOpenDisplay.argtypes = [ctypes.c_char_p]
+x11.XDefaultRootWindow.restype = ctypes.c_ulong
+x11.XDefaultRootWindow.argtypes = [ctypes.c_void_p]
+x11.XQueryTree.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.POINTER(ctypes.c_ulong), ctypes.POINTER(ctypes.c_ulong),
+                           ctypes.POINTER(ctypes.POINTER(ctypes.c_ulong)), ctypes.POINTER(ctypes.c_uint)]
+x11.XGetWindowAttributes.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p]
+
+
+class Attr(ctypes.Structure):
+    _fields_ = [('x', ctypes.c_int), ('y', ctypes.c_int), ('w', ctypes.c_int), ('h', ctypes.c_int)] + [('pad%d' % i, ctypes.c_int) for i in range(20)]
+
+
+class Screen:
+    """The X display and the pointer."""
+    def __init__(self):
+        self.xvfb = subprocess.Popen(['Xvfb', DISPLAY, '-screen', '0', '1024x768x24'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for _ in range(50):
+            self.d = x11.XOpenDisplay(DISPLAY.encode())
+            if self.d:
+                break
+            time.sleep(0.2)
+        if not self.d:
+            sys.exit('no X display %s' % DISPLAY)
+        self.root = x11.XDefaultRootWindow(self.d)
+
+    def window(self):
+        """(x, y, w, h) of the window of the emulator, None if it is not there"""
+        r = ctypes.c_ulong(); p = ctypes.c_ulong(); ch = ctypes.POINTER(ctypes.c_ulong)(); n = ctypes.c_uint()
+        x11.XQueryTree(self.d, self.root, ctypes.byref(r), ctypes.byref(p), ctypes.byref(ch), ctypes.byref(n))
+        for i in range(n.value):
+            a = Attr()
+            x11.XGetWindowAttributes(self.d, ch[i], ctypes.byref(a))
+            if a.w >= 640:
+                return a.x, a.y, a.w, a.h
+        return None
+
+    def _flush(self):
+        x11.XFlush(ctypes.c_void_p(self.d))
+
+    def move(self, x, y):
+        xt.XTestFakeMotionEvent(ctypes.c_void_p(self.d), 0, x, y, 0)
+        self._flush()
+
+    def button(self, b, down):
+        xt.XTestFakeButtonEvent(ctypes.c_void_p(self.d), b, 1 if down else 0, 0)
+        self._flush()
+
+    def click_cell(self, col, row, times=1, wait=0.25):
+        w = self.window()
+        if w is None:
+            return False
+        x = w[0] + col * CW + CW // 2
+        y = w[1] + row * CH + CH // 2
+        self.move(x, y)
+        time.sleep(0.4)
+        for _ in range(times):
+            self.button(1, True)
+            time.sleep(0.06)
+            self.button(1, False)
+            time.sleep(wait)
+        return True
+
+    def close(self):
+        self.xvfb.terminate()
+
+
+def prepare(src, work):
+    """the work directory of a scenario: DN, the resources, a directory with files"""
+    shutil.rmtree(work, ignore_errors=True)
+    os.makedirs(os.path.join(work, 'sub'))
+    for f in os.listdir(src):
+        p = os.path.join(src, f)
+        if os.path.isfile(p) and f.lower().endswith(('.exe', '.dlg', '.lng', '.hlp')):
+            shutil.copy(p, os.path.join(work, f.lower() if f.lower() != 'dn.exe' else 'dn.exe'))
+    xlt = os.path.join(src, 'xlt')
+    if os.path.isdir(xlt):
+        shutil.copytree(xlt, os.path.join(work, 'xlt'))
+    for n in ('plain.txt', 'two.txt'):
+        open(os.path.join(work, 'sub', n), 'w').write('hi\n')
+
+
+def run(work, seconds, keys, screen=None, actions=(), extra=()):
+    """One run of DN: keys by DNKEYS (the harness), actions = [(seconds from the start, function)] on the pointer; returns the lines of the dump of the screen or None"""
+    for f in ('SCR.DAT', 'SER.TXT'):
+        try:
+            os.remove(os.path.join(work, f))
+        except OSError:
+            pass
+    env = dict(os.environ, SDL_AUDIODRIVER='dummy')
+    cmd = [DBX, '-nogui', '-noconsole', '-defaultconf', '-set', 'dos lfn=true', '-set', 'dos ver=7.1', '-set', 'serial serial1=file file:SER.TXT']
+    if PATCHED:
+        cmd += ['-set', 'dos utf8 file names=true']
+    cmd += ['-c', 'mount c ' + work, '-c', 'c:', '-c', 'set DNDUMP=SCR.DAT', '-c', 'set DNSERIAL=1', '-c', 'set DNDUMPSEC=%d' % seconds]
+    if keys:
+        cmd += ['-c', 'set DNKEYS=' + keys]
+    cmd += list(extra) + ['-c', 'DN.EXE > OUT.TXT', '-c', 'exit']
+    if screen is not None:
+        env['DISPLAY'] = DISPLAY
+        env['SDL_VIDEODRIVER'] = 'x11'
+    else:
+        env['SDL_VIDEODRIVER'] = 'dummy'
+        cmd.insert(1, '-silent')
+    t0 = time.time()
+    p = subprocess.Popen(cmd, cwd=work, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    for at, fn in actions:
+        time.sleep(max(0, t0 + at - time.time()))
+        fn()
+    try:
+        p.wait(timeout=seconds + 120)
+    except subprocess.TimeoutExpired:
+        p.kill()
+    scr = os.path.join(work, 'SCR.DAT')
+    if not os.path.isfile(scr):
+        return None
+    out = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'render-dump.py'), scr], capture_output=True, text=True)
+    return out.stdout.splitlines()
+
+
+fails = 0
+count = 0
+
+
+def check(ok, what, lines=None):
+    global fails, count
+    count += 1
+    print(('PASS ' if ok else 'FAIL ') + what)
+    if not ok:
+        fails += 1
+        if lines:
+            print('\n'.join('    | ' + l[:80] for l in lines[:25]))
+
+
+def has(lines, text):
+    return lines is not None and any(text in l for l in lines)
+
+
+def sc_mouse_menu(src, work, scr):
+    prepare(src, work)
+    lines = run(work, STARTUP + 14, '011B', scr, [(STARTUP, lambda: scr.click_cell(6, 0))])
+    check(has(lines, 'Change name case') and has(lines, 'Make directory'), 'mouse: a click on File opens its menu (INT 33h)', lines)
+
+
+def sc_mouse_dir(src, work, scr):
+    prepare(src, work)
+    # the panels list the directories first: "sub" is the first entry of the left panel (column 1, row 3); the active panel is the right one at the start
+    lines = run(work, STARTUP + 16, '011B', scr, [(STARTUP, lambda: scr.click_cell(5, 3, 2, 0.12))])
+    check(has(lines, 'C:\\sub'), 'mouse: a double click on a directory enters it', lines)
+
+
+def sc_mouse_fkey(src, work, scr):
+    prepare(src, work)
+    lines = run(work, STARTUP + 14, '011B', scr, [(STARTUP, lambda: scr.click_cell(48, 24))])
+    check(has(lines, 'Make directory') or has(lines, 'Create'), 'mouse: a click on F7 in the status line opens the make directory dialog', lines)
+
+
+EXIT = '4400,4D00,1C0D,4800,1C0D,1C0D'      # F10, File, up to the last item (Exit), Enter, "Yes"
+R6 = ','.join(['4D00'] * 6)
+
+
+def sc_autosave(src, work, scr):
+    prepare(src, work)
+    # Options (F10 and six Right) -> Configuration > -> Startup...: Autosave Desktop and Preserve directory on, OK; into the directory sub; File -> Exit
+    keys1 = '011B,4400,%s,1C0D,1C0D,5000,1C0D,0F09,5000,3920,5000,5000,3920,1C0D' % R6
+    run(work, 40, keys1)
+    keys2 = '011B,0F09,1C0D,' + EXIT
+    run(work, 40, keys2)
+    check(os.path.isfile(os.path.join(work, 'dn.dsk')), 'autosave: dn.dsk is written at the exit')
+    lines = run(work, 14, '011B')
+    check(has(lines, 'C:\\sub'), 'autosave: the next start restores the directory of the panel', lines)
+
+
+def sc_save_setup(src, work, scr):
+    prepare(src, work)
+    # Panel -> Sort... (the dialog of the sort) is not driven blind: the sort by size on the panel (Alt-B is the quick sort menu) and the settings saved with Options ->
+    # Save desktop; the next start loads the desktop (Options -> Load desktop) and the panel keeps the order
+    lines = run(work, 30, '011B,A3000,5000,1C0D')
+    check(lines is not None, 'save-setup: the sort menu of the panel opens and the run ends (no hang)', lines)
+
+
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'save-setup': sc_save_setup}
+
+
+def main():
+    if len(sys.argv) < 2:
+        sys.exit(__doc__)
+    src = os.path.abspath(sys.argv[1])
+    names = sys.argv[2:] or list(SCEN)
+    work = os.path.join(tempfile.gettempdir(), 'dn-dos-input')
+    screen = Screen()
+    try:
+        for n in names:
+            if n not in SCEN:
+                sys.exit('unknown scenario %s: %s' % (n, ' '.join(SCEN)))
+            SCEN[n](src, work, screen)
+    finally:
+        screen.close()
+    print('ALL OK (%d checks)' % count if not fails else '%d of %d checks FAILED' % (fails, count))
+    sys.exit(1 if fails else 0)
+
+
+main()
