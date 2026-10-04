@@ -338,3 +338,4 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
   bright red); the colors of the original DN are the scheme `default.pal` (white on dark gray, cyan for the default button, yellow hot letters, dark gray text of the check boxes) as in the reference screenshots.
   Now `palettes.CColor` is `default.pal`; `CColorOsp` keeps the old table; a palette that was saved with exactly the old table (nobody changed it) is replaced at the start (`ReadConfig`, `boot.pas`). The other schemes
   are in `data/colors/` (Options -> Colors -> Load). Not compared pixel by pixel with the references: the input lines are black on the references and `9f` (white on light blue) in `default.pal`.
+- The selected (focused) button has the background of the path in the title of the active panel (cyan, `3F` white on cyan; was `9F` white on light blue): the entry 12 of the dialog palette (index 43 of `CColor` and of `default.pal`).
