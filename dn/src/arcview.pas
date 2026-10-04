@@ -478,11 +478,11 @@ function TArcDrive.ReadArchive: Boolean;
       begin
       if P = nil then
         begin
-        New(P, Init(R));
+        P := PWhileView.Create(R);
         PReader := P;
-        P^.Top := GetString(dlArcReadArc);
-        P^.Write(1, GetString(dlPercentComplete));
-        Desktop^.Insert(P);
+        P.Top := GetString(dlArcReadArc);
+        P.Write(1, GetString(dlPercentComplete));
+        Desktop.Insert(P);
         end;
       P^.Write(2,
          Copy(Strg(#219, 25 div Trunc(Ln / (ArcFile.GetPos+1))) +
@@ -527,7 +527,7 @@ function TArcDrive.ReadArchive: Boolean;
   CtrlBreakHit := False;
   Dec(SkyEnabled);
   if P <> nil then
-    P^.Free;
+    P.Free;
   ArcFile.Free;
   CDir := '';
   if  (FileInfo.Last = 2) or
@@ -622,7 +622,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
   ReadArchive; {AK155 26-11-2002}
   AFiles := New(PFilesCollection, Init($10, $10));
   {FD := New(PFilesCollection, Init($40, $10));}
-  PFilesCollection(AFiles)^.Panel := Panel;
+  PFilesCollection(AFiles).Panel := Panel;
   GetDirectory := AFiles;
   CheckSlashDot(CurDir);
   FD := New(PFilesCollection, Init($40, $10));
@@ -630,7 +630,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
   TPL := 0;
   {GetDirectory := AFiles;}AllFiles := (FileMask = x_x)
        or (FileMask = '*');
-  FD^.SortMode := psmLongName; {<sort141.001>}
+  FD.SortMode := psmLongName; {<sort141.001>}
   Files.ResetPointer('');
   {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
   {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
@@ -674,9 +674,9 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
       FillChar(FR, SizeOf(FR), 0);
       CopyShortString(Dr, FR.FlName[True]);
       FR.Attr := Directory;
-      I := FD^.IndexOf(@FR);
+      I := FD.IndexOf(@FR);
       if I >= 0 then
-        with PFileRec(FD^.At(I))^ do
+        with PFileRec(FD.At(I))^ do
           begin
           Size := Size+_USize;
           PSize := PSize+_PSize;
@@ -691,14 +691,14 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
       F^.PSize := _PSize;
       TTL := TTL+_USize;
       TPL := TPL+_PSize;
-      if FD^.Search(F, si) then
+      if FD.Search(F, si) then
         begin
         DelFileRec(F);
         Continue;
         end
-        {else FD^.Insert(F);}
+        {else FD.Insert(F);}
       else
-        FD^.AtInsert(si, F);
+        FD.AtInsert(si, F);
       end
     else
       Continue;
@@ -728,8 +728,8 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
   F^.Attr := $8000 or F^.Attr;
   F^.PSize := {Round}(TPL);
   AFiles.AtInsert(0, F);
-  FD^.DeleteAll;
-  Dispose(FD, Done);
+  FD.DeleteAll;
+  FD.Free;
   end { TArcDrive.GetDirectory };
 {-DataCompBoy-}
 
@@ -1406,7 +1406,7 @@ TryAgain:
     begin
     { перекидываем файлы из временного подкаталога в каталог назначения}
     PV := New(PUserWindow, Init);
-    Desktop^.Insert(PV);
+    Desktop.Insert(PV);
     CopyDirContent(TempExtrDir+SCurDir, ExtrDir, True,
        (Options and 4 <> 0));
     PV^.Free;
@@ -1731,7 +1731,7 @@ function ArcViewer(AName, VAName: String): Boolean;
   E.What := evCommand;
   E.Command := cmInsertDrive;
   E.InfoPtr := P;
-  Desktop^.HandleEvent(E);
+  Desktop.HandleEvent(E);
   if E.What <> evNothing then
     begin
     Dispose(P, Done);
@@ -1844,7 +1844,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
   Dirs := New(PStringCollection, Init($10, $10, False));
   PI := WriteMsg(GetString(dlReadingList));
   New(Fils, Init($10, $10));
-  Fils^.SortMode := psmLongName;
+  Fils.SortMode := psmLongName;
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
   l := Length(Root);
@@ -1873,7 +1873,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
         end;
       if Dirs^.IndexOf(PDir) = -1 then
         Dirs^.Insert(PDir);
-      Fils^.AtInsert(Fils^.Count, FR);
+      Fils.AtInsert(Fils.Count, FR);
       {JO: добавляем каталоги}
       if PutDirs and (Length(Files.LastDir) > L) then
         begin
@@ -1896,10 +1896,10 @@ function TArcDrive.OpenDirectory(const Dir: String;
             Inc(MemReq, Length(PDir^+DrName)+2);
             if Dirs^.IndexOf(PDir) = -1 then
               Dirs^.Insert(PDir);
-            if Fils^.Search(FR, I) then
+            if Fils.Search(FR, I) then
               DelFileRec(FR)
             else
-              Fils^.AtInsert(I, FR);
+              Fils.AtInsert(I, FR);
             end;
         until Length(LDir) <= L;
         end; {конец добавления каталогов}
@@ -1911,10 +1911,10 @@ function TArcDrive.OpenDirectory(const Dir: String;
         end;
       end;
     end;
-  PI^.Free;
+  PI.Free;
 //используем '><' в качестве пpизнака ветви
   PDrv := New(PFindDrive, Init('><'+Dir, Dirs, Fils));
-  PDrv^.NoMemory := MAvail <= MemReq;
+  PDrv.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
   end { TArcDrive.OpenDirectory };
 
@@ -1983,7 +1983,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
   Dirs := New(PStringCollection, Init($10, $10, False));
   PI := WriteMsg(^M^M^C+GetString(dlSearching)+'...');
   New(Fils, Init($10, $10));
-  Fils^.SortMode := psmLongName;
+  Fils.SortMode := psmLongName;
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
   L := Length(Root);
@@ -2019,7 +2019,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
           Inc(MemReq, Length(PDir^+Name)+2);
           if Dirs^.IndexOf(PDir) = -1 then
             Dirs^.Insert(PDir);
-          Fils^.AtInsert(Fils^.Count, FR);
+          Fils.AtInsert(Fils.Count, FR);
           end;
         {JO: добавляем каталоги}
         if Length(Files.LastDir) > L then
@@ -2051,10 +2051,10 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
               Inc(MemReq, Length(PDir^+DrName)+2);
               if Dirs^.IndexOf(PDir) = -1 then
                 Dirs^.Insert(PDir);
-              if Fils^.Search(FR, I) then
+              if Fils.Search(FR, I) then
                 DelFileRec(FR)
               else
-                Fils^.AtInsert(I, FR);
+                Fils.AtInsert(I, FR);
               end;
           until Length(LDir) <= L;
           end; {конец добавления каталогов}
@@ -2067,14 +2067,14 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
         end;
       end;
     end;
-  PI^.Free;
-  if Fils^.Count > 0 then
+  PI.Free;
+  if Fils.Count > 0 then
     begin
 //используем '<>' в качестве пpизнака панели поиска
     PDrv := New(PFindDrive, Init('<>'+FindRec.Mask,
           Dirs, Fils));
-    PDrv^.AMask := NewStr(FindRec.Mask);
-    PDrv^.NoMemory := MAvail <= MemReq;
+    PDrv.AMask := NewStr(FindRec.Mask);
+    PDrv.NoMemory := MAvail <= MemReq;
     if (FindRec.Options and ffoNoSort) <> 0 then
       RereadNoSort := True;
     Message(Panel, evCommand, cmInsertDrive, PDrv);
