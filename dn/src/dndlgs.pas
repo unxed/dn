@@ -67,7 +67,6 @@ const
            #31#32#33#34#35#36#37;
 
 type
-  PComboBox = ^TComboBox;
   TComboBox = class(TView)
     Selected: Word; // текущий номер варианта (нумерация от 1)
     Count: Word; { не отрывать от Selected! См. Load,Store}
@@ -87,12 +86,11 @@ type
     procedure Store(var S: TStream);
     end;
 
-  PHexLine = ^THexLine;
   THexLine = class(TView)
-    InputLine: PInputline;
+    InputLine: TInputLine;
     DeltaX, CurX: Integer;
     Sec: Boolean;
-    constructor Create(R: TRect; AInputLine: PInputline);
+    constructor Create(R: TRect; AInputLine: TInputLine);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -113,7 +111,6 @@ type
     procedure Store(var S: TStream);
     end;
 
-  PBookmark = ^TBookmark;
   TBookmark = class(TLabel)
     {` Закладка страницы блокнота со страницами TNotepas }
     constructor Create(var Bounds: TRect; AText: String; ALink: TView);
@@ -121,10 +118,9 @@ type
     procedure FocusLink; virtual;
     end;
 
-  PPage = ^TPage;
   TPage = class(TDialog)
-    Bookmark: PBookmark;
-    PrevPage: PPage;
+    Bookmark: TBookmark;
+    PrevPage: TPage;
       { циклический список }
     procedure InitFrame; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -133,21 +129,20 @@ type
     procedure Store(var S: TStream);
     end;
 
-  PPageFrame = ^TPageFrame;
   TPageFrame = class(TView)
     function GetPalette: TPalette; virtual;
     procedure Draw; virtual;
     end;
 
-  PNotepad = ^TNotepad;  {<dialogs.001>}
+    {<dialogs.001>}
   TNotepad = class(TDialog)
-    Page: array[0..9] of PPage;
+    Page: array[0..9] of TPage;
     BookmarkStart: integer; { X-коррдината левой линии закладок }
     ActivePage: Integer;
     NumPages: Integer;
     constructor Create(var Bounds: TRect; ATitle: TTitleStr;
       ABookmarkStart: integer);
-    function NewPage(const ATitle: String): PPage;
+    function NewPage(const ATitle: String): TPage;
     procedure InitFrame; virtual;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -155,7 +150,6 @@ type
     procedure SetData(var Rec); virtual;
     end;
 
-  PNotepadFrame = ^TNotepadFrame;
   TNotepadFrame = class(TFrame)
     procedure FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Integer; Color: TColorAttr); virtual;
     function GetTitleWidth: integer; virtual;
@@ -172,7 +166,7 @@ constructor TParamText.Create(var Bounds: TRect; const AText: String;
 
 constructor TParamText.Load(var S: TStream);
   begin
-  TStaticText.Load(S);
+  inherited Load(S);
   S.Read(ParamCount, SizeOf(AInt));
   end;
 
@@ -196,13 +190,13 @@ procedure TParamText.SetData(var Rec);
 
 procedure TParamText.Store(var S: TStream);
   begin
-  TStaticText.Store(S);
+  inherited Store(S);
   S.Write(ParamCount, SizeOf(AInt));
   end;
 
 { TLabel }
 
-constructor THexLine.Create(R: TRect; AInputLine: PInputline);
+constructor THexLine.Create(R: TRect; AInputLine: TInputLine);
   begin
   if AInputLine = nil then
     Exit;
@@ -255,12 +249,12 @@ procedure THexLine.HandleEvent(var Event: TEvent);
             if Sec
             then
               begin
-              Delete(InputLine^.Data^, CurX+1, 1);
+              Delete(InputLine.Data^, CurX+1, 1);
               Sec := False;
               end
             else
               begin
-              Delete(InputLine^.Data^, CurX, 1);
+              Delete(InputLine.Data^, CurX, 1);
               Dec(CurX);
               Sec := False;
               end;
@@ -268,9 +262,9 @@ procedure THexLine.HandleEvent(var Event: TEvent);
           end;
         kbDel:
           begin
-          if CurX < Length(InputLine^.Data^) then
+          if CurX < Length(InputLine.Data^) then
             begin
-            Delete(InputLine^.Data^, CurX+1, 1);
+            Delete(InputLine.Data^, CurX+1, 1);
             Sec := False;
             end;
           CED
@@ -289,7 +283,7 @@ procedure THexLine.HandleEvent(var Event: TEvent);
           end;
         kbRight:
           begin
-          if Sec and (CurX < Length(InputLine^.Data^)) then
+          if Sec and (CurX < Length(InputLine.Data^)) then
             begin
             Inc(CurX);
             Sec := False
@@ -306,12 +300,12 @@ procedure THexLine.HandleEvent(var Event: TEvent);
           case UpCase(Char(Event.CharCode)) of
             '0'..'9', 'A'..'F':
               begin
-              if  (CurX = InputLine^.MaxLen-1) and Sec then
+              if  (CurX = InputLine.MaxLen-1) and Sec then
                 begin
                 CE;
                 Exit
                 end;
-              S := InputLine^.Data^;
+              S := InputLine.Data^;
               if CurX+1 > Length(S) then
                 S := S+#0;
               if Sec then
@@ -322,7 +316,7 @@ procedure THexLine.HandleEvent(var Event: TEvent);
                 S[CurX+1] := Char((Byte(S[CurX+1]) and $F) or
                            (Pos(UpCase(Char(Event.CharCode)),
                         HexStr)-1) shl 4);
-              InputLine^.Data^:= Copy(S, 1, InputLine^.MaxLen);
+              InputLine.Data^:= Copy(S, 1, InputLine.MaxLen);
               InputLine.DrawView;
               if Sec then
                 begin
@@ -347,41 +341,41 @@ procedure THexLine.Draw;
     S: String;
     C: Word;
   begin
-  if CurX > Length(InputLine^.Data^) then
-    CurX := Length(InputLine^.Data^);
+  if CurX > Length(InputLine.Data^) then
+    CurX := Length(InputLine.Data^);
   if CurX < 0 then
     CurX := 0;
-  if CurX <> InputLine^.CurPos then
-    if InputLine^.GetState(sfSelected) then
+  if CurX <> InputLine.CurPos then
+    if InputLine.GetState(sfSelected) then
       begin
-      CurX := InputLine^.CurPos;
+      CurX := InputLine.CurPos;
       Sec := False
       end;
-  if DeltaX >= Length(InputLine^.Data^) then
-    DeltaX := Integer(Length(InputLine^.Data^))-1;
+  if DeltaX >= Length(InputLine.Data^) then
+    DeltaX := Integer(Length(InputLine.Data^))-1;
   if DeltaX < 0 then
     DeltaX := 0;
   if CurX < DeltaX then
     DeltaX := CurX;
   if 3*(CurX-DeltaX) > Size.X-2 then
     DeltaX := CurX-(Size.X-2) div 3;
-  if CurX <> InputLine^.CurPos then
-    if not InputLine^.GetState(sfSelected) then
+  if CurX <> InputLine.CurPos then
+    if not InputLine.GetState(sfSelected) then
       begin
-      InputLine^.CurPos := CurX;
-      InputLine^.FirstPos := DeltaX;
+      InputLine.CurPos := CurX;
+      InputLine.FirstPos := DeltaX;
       InputLine.DrawView
       end;
-  C := InputLine^.GetColorW(1);
+  C := InputLine.GetColorW(1);
   MoveChar(B, ' ', C, Size.X);
-  S := Copy(InputLine^.Data^, DeltaX+1, MaxStringLength);
+  S := Copy(InputLine.Data^, DeltaX+1, MaxStringLength);
   S := Copy(DumpStr(S[1], 0, 16, 0), 12, Length(S)*3);
   SetCursor(1+3*(CurX-DeltaX)+Byte(Sec), 0);
   ShowCursor;
   MoveStr(B[1], Copy(S, 1, Size.X-2), C);
   {-DataCompBoy: This is a temporary code!}
-  MoveChar(B[Size.X-1], #32, InputLine^.GetColorW(4), 1);
-  MoveChar(B[0], #32, InputLine^.GetColorW(4), 1);
+  MoveChar(B[Size.X-1], #32, InputLine.GetColorW(4), 1);
+  MoveChar(B[0], #32, InputLine.GetColorW(4), 1);
   {-DataCompBoy}
   WriteLineC(0, 0, Size.X, Size.Y, B);
   end { THexLine.Draw };
@@ -430,7 +424,7 @@ destructor TComboBox.Done;
 
 procedure TComboBox.SetState(AState: Word; Enable: Boolean);
   begin
-  TView.SetState(AState, Enable);
+  inherited SetState(AState, Enable);
   DrawView;
   end;
 
@@ -477,9 +471,9 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
       Dec(R.B.Y, R.A.Y);
       R.A.Y := 0;
       end;
-    New(MB, Init(R, Menu, nil));
-    MB^.Menu^.Default := Items[Selected];
-    MB^.ComboBoxPal := True;
+    MB := TMenuBox.Create(R, Menu, nil);
+    MB.Menu^.Default := Items[Selected];
+    MB.ComboBoxPal := True;
     C := Application.ExecView(MB);
     if C <> 0 then
       begin
@@ -559,7 +553,7 @@ constructor TComboBox.Load(var S: TStream);
     LastItem: PMenuItem;
     P: PString;
   begin
-  TView.Load(S);
+  inherited Load(S);
   S.Read(Selected, 2*SizeOf(Word)); // включая Count
   Menu := NewMenu(nil);
   PLastItem := @Menu^.Items;
@@ -580,7 +574,7 @@ procedure TComboBox.Store(var S: TStream);
   var
     i: Integer;
   begin
-  TView.Store(S);
+  inherited Store(S);
   S.Write(Selected, 2*SizeOf(Selected)); // включая Count
   for i := 1 to Count do
     S.WriteStr(Items[i]^.Name);
@@ -595,7 +589,7 @@ procedure TPage.InitFrame;
     R: TRect;
   begin
   GetExtent(R);
-  Frame := TFrame(PPageFrame.Create(R));
+  Frame := TFrame(TPageFrame.Create(R));
   end;
 
 function TPage.GetPalette: TPalette;
@@ -614,20 +608,20 @@ procedure TPage.HandleEvent(var Event: TEvent);
     case DNKeyCode(Event) of
       kbCtrlShiftTab:
        begin
-       with PNotepad(Owner)^ do
+       with TNotepad(Owner) do
          i := ActivePage + NumPages - 1;
        goto SelectPage;
        end;
       kbCtrlTab:
        begin
-       with PNotepad(Owner)^ do
+       with TNotepad(Owner) do
          i := ActivePage + 1;
 SelectPage:
-       with PNotepad(Owner)^ do
+       with TNotepad(Owner) do
          begin
          i := i mod NumPages;
          ActivePage := i;
-         with Page[i]^ do
+         with Page[i] do
            begin
            Bookmark.MakeFirst;
            Show;
@@ -659,18 +653,18 @@ procedure TPage.Store(var S: TStream);
 constructor TBookmark.Create(var Bounds: TRect; AText: String; ALink: TView);
   begin
   inherited Create(Bounds, AText, ALink);
-  PPage(ALink)^.Bookmark := Self;
+  TPage(ALink).Bookmark := Self;
   end;
 
 procedure TBookmark.FocusLink;
   var
    i: integer;
-   P: PPage;
+   P: TPage;
   begin
   Owner.Lock;
-  Link^.Focus;
+  Link.Focus;
   MakeFirst;
-  with PNotepad(Owner)^ do
+  with TNotepad(Owner) do
     begin
     ActivePage := 0;
     while Pointer(Page[ActivePage]) <> Pointer(Link) do
@@ -691,17 +685,17 @@ procedure TNotepad.InitFrame;
     R: TRect;
   begin
   GetExtent(R);
-  Frame := TFrame(PNotepadFrame.Create(R));
+  Frame := TFrame(TNotepadFrame.Create(R));
   end;
 
-function TNotepad.NewPage(const ATitle: String): PPage;
+function TNotepad.NewPage(const ATitle: String): TPage;
   var
     R: TRect;
   begin
   GetExtent(R);
   R.Grow(-1, -1);
   R.B.X := BookmarkStart;
-  New(Result, Init(R, ''));
+  Result := TPage.Create(R, '');
   Result.Flags := 0;
   Result.State := Result.State and not sfShadow;
   Page[NumPages] := Result;
@@ -711,7 +705,7 @@ function TNotepad.NewPage(const ATitle: String): PPage;
   R.B.X := Size.X-1;
   R.A.Y := 2*NumPages - 1;
   R.B.Y := R.A.Y + 3;
-  Insert(PBookmark.Create(R, ATitle, Result));
+  Insert(TBookmark.Create(R, ATitle, Result));
   end {TNotepad.NewPage};
 
 constructor TNotepad.Load(var S: TStream);
@@ -724,7 +718,7 @@ constructor TNotepad.Load(var S: TStream);
   S.Read(BookmarkStart, L);
   for i := 0 to NumPages-1 do
     GetSubViewPtr(S, Page[i]);
-  Page[0]^.Bookmark^.FocusLink;
+  Page[0].Bookmark.FocusLink;
   end;
 
 procedure TNotepad.Store(var S: TStream);
@@ -750,7 +744,7 @@ procedure TNotepad.GetData(var Rec);
   for i := 0 to NumPages-1 do
     begin
     Page[i].GetData(Bytes(Rec)[l]);
-    Inc(l, Page[i]^.DataSize);
+    Inc(l, Page[i].DataSize);
     end;
   end;
 
@@ -764,13 +758,13 @@ procedure TNotepad.SetData(var Rec);
   for i := 0 to NumPages-1 do
     begin
     Page[i].SetData(Bytes(Rec)[l]);
-    Inc(l, Page[i]^.DataSize);
+    Inc(l, Page[i].DataSize);
     end;
   end;
 
 function TNotepadFrame.GetTitleWidth: integer;
   begin
-  Result := PNotepad(Owner)^.BookmarkStart;
+  Result := TNotepad(Owner).BookmarkStart;
   end;
 
 procedure TNotepadFrame.FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Integer; Color: TColorAttr);
@@ -779,7 +773,7 @@ procedure TNotepadFrame.FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Int
     C: Byte;
   begin
   inherited FrameLine(FrameBuf, Y, N, Color);
-  BMStart := PNotepad(Owner)^.BookmarkStart;
+  BMStart := TNotepad(Owner).BookmarkStart;
   if Y = 0 then
     C := 187
   else if Y = Size.Y-1 then
