@@ -79,7 +79,7 @@ uses
   
   , SysUtils 
   
-  , osdep, dnscreen
+  , osdep, dnscreen, fatalerr
  , realmode 
   ;
 
@@ -95,7 +95,6 @@ var
   
 
 begin
-SysDisableHardErrors;
 
 {CtrlBreakHandler := TVCtrlBreak;
 SysCtrlSetCBreakHandler;}
@@ -151,12 +150,7 @@ except
     else
       Writeln(DNErrFile, 'Exception at addr '+IntToHex(PtrUInt(ExceptAddr), 8));
     Close(DNErrFile);
-    repeat
-      Sleep(1); {JO}
-
-    until SysKeyPressed;
-    while SysKeyPressed do
-      SysReadKey;
+    WaitForKey;
     end;
 end;
  {LINEPOSIT}

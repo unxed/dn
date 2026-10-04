@@ -44,8 +44,6 @@ function SysFileOpen(FileName: PChar; Mode: LongInt; var Handle: LongInt): LongI
 function SysFileCreate(FileName: PChar; Mode, Attr: LongInt; var Handle: LongInt): LongInt;
 { Method: 0 from the beginning, 1 from the current position, 2 from the end. }
 function SysFileSeek(Handle: THandle; Distance, Method: LongInt; var Actual: LongInt): LongInt;
-function SysFileRead(Handle: THandle; var Buffer; Count: LongInt; var Actual: LongInt): LongInt;
-function SysFileWrite(Handle: THandle; const Buffer; Count: LongInt; var Actual: LongInt): LongInt;
 function SysFileClose(Handle: THandle): LongInt;
 function SysFileSetSize(Handle: THandle; Size: TFileSize): LongInt;
 { nonzero (the low byte) when the handle is a device (a terminal, a printer...), 0 for a file }
@@ -104,12 +102,6 @@ function SysGetValidDrives: LongWord;
 { --- the system --------------------------------------------------------------- }
 { The disk buffers go to the disks (DOS INT 21h AH=0Dh); elsewhere: nothing. }
 procedure SysDiskReset;
-{ The keyboard of the plain console: is a key waiting, and the character of the key (SysReadKey waits for one). }
-function SysKeyPressed: Boolean;
-function SysReadKey: Char;
-{ The place in the source of an address (VP: from the debug information); here the line information of FPC (the units are
-  compiled with -gl): the file with the routine, the line; nil if there is none. }
-function GetLocationInfo(Addr: Pointer; var FileName: ShortString; var LineNo: LongInt): Pointer;
 procedure SysBeepEx(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
 function PhysMemAvail: LongInt;
@@ -123,10 +115,6 @@ var
 
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
-{ In DOS: the critical error handler does not stop the program (INT 24h answers "fail"). }
-procedure SysDisableHardErrors;
-{ A place for the Ctrl-Break handler of the program; here it only remembers that it was set. }
-procedure SysCtrlSetCBreakHandler;
 
 var
   { the text screen of the program that started DN (16-bit cells: character + attribute), copied before the application takes
@@ -456,30 +444,6 @@ begin
   end;
 end;
 
-function SysFileRead(Handle: THandle; var Buffer; Count: LongInt; var Actual: LongInt): LongInt;
-begin
-  Actual := FileRead(Handle, Buffer, Count);
-  if Actual < 0 then
-  begin
-    Actual := 0;
-    Result := ErrorOfFile;
-  end
-  else
-    Result := 0;
-end;
-
-function SysFileWrite(Handle: THandle; const Buffer; Count: LongInt; var Actual: LongInt): LongInt;
-begin
-  Actual := FileWrite(Handle, Buffer, Count);
-  if Actual < 0 then
-  begin
-    Actual := 0;
-    Result := ErrorOfFile;
-  end
-  else
-    Result := 0;
-end;
-
 function SysFileClose(Handle: THandle): LongInt;
 begin
   FileClose(Handle);
@@ -673,69 +637,6 @@ begin
 end;
 {$ENDIF}
 
-var
-  KeyIsPending: Boolean = False;
-  PendingKey: TEvent;
-
-var
-  AutoKeyStart: QWord = 0;
-  AutoKeyDone: Boolean = False;
-
-function SysKeyPressed: Boolean;
-var
-  E: TEvent;
-begin
-  { a test aid: with DNDUMP set the "press any key" of the fatal error screen of DN is answered after 3 seconds, so that the
-    program ends and its files are closed (DOS keeps the data of a file that is not closed only in memory) }
-  if (not KeyIsPending) and (not AutoKeyDone) and (GetEnvironmentVariable('DNDUMP') <> '') then
-  begin
-    if AutoKeyStart = 0 then
-      AutoKeyStart := GetTickCount64;
-    if GetTickCount64 - AutoKeyStart > 3000 then
-    begin
-      FillChar(PendingKey, SizeOf(PendingKey), 0);
-      PendingKey.What := evKeyDown;
-      PendingKey.CharCode := 13;
-      KeyIsPending := True;
-      AutoKeyDone := True;
-    end;
-  end;
-  if not KeyIsPending then
-  begin
-    TvSys.PollEvent(0, E);
-    if E.What = evKeyDown then
-    begin
-      PendingKey := E;
-      KeyIsPending := True;
-    end;
-  end;
-  Result := KeyIsPending;
-end;
-
-function SysReadKey: Char;
-begin
-  while not SysKeyPressed do
-    Sleep(20);
-  KeyIsPending := False;
-  Result := Chr(PendingKey.CharCode);
-end;
-
-function GetLocationInfo(Addr: Pointer; var FileName: ShortString; var LineNo: LongInt): Pointer;
-var
-  Func: ShortString;
-begin
-  FileName := '';
-  LineNo := 0;
-  Result := nil;
-  Func := ShortString(BackTraceStrFunc(Addr));       { '  $0001FF3  ROUTINE,  line 12 of file.pas' }
-  if (Func <> '') and (Pos('line', Func) > 0) then
-  begin
-    FileName := Func;
-    LineNo := 0;
-    Result := Addr;
-  end;
-end;
-
 procedure SysBeepEx(Frequency, Duration: LongInt);
 {$IFDEF GO32V2}
 var
@@ -799,18 +700,6 @@ begin
   Dos.Exec(StrPas(Path), StrPas(Args));
   Result := Dos.DosError;          { 0 = the program was run; its exit code is Dos.DosExitCode }
 {$ENDIF}
-end;
-
-procedure SysDisableHardErrors;
-begin
-end;
-
-var
-  CBreakHandlerSet: Boolean = False;
-
-procedure SysCtrlSetCBreakHandler;
-begin
-  CBreakHandlerSet := True;
 end;
 
 { The program takes over the screen at the start (DN reads the size of the screen before it creates the application; the
