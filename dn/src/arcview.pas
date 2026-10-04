@@ -1167,9 +1167,9 @@ function TArcDrive.MakeListFile(PC: PCollection; UseUnp: Boolean; var B: Boolean
         S := CnvString(AType.ComprListChar)+S;
       end;
     end;
-  for I := 0 to PC^.Count-1 do
+  for I := 0 to PC.Count-1 do
     begin
-    PF := PC^.At(I);
+    PF := PC.At(I);
     {JO: проверка для разархивирования из панели поиска в архивах}
     if PathFoundInArc(PF^.Owner^) then
       S1 := MakeNormName(GetArcOwn(PF^.Owner^), PF^.FlName[True])
