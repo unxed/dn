@@ -28,9 +28,9 @@ begin
   ClearEvent(E);
   Check(E.What = evNothing, 'ClearEvent clears');
   { an object of the shim can be created and is a descendant of the original }
-  New(V, Init(R));
+  V := PView.Create(R);
   Check(V <> nil, 'New(V, Init(R))');
-  Check((V^.Size.X = 10) and (V^.Size.Y = 3), 'TView of the shim');
-  Dispose(V, Done);
+  Check((V.Size.X = 10) and (V.Size.Y = 3), 'TView of the shim');
+  V.Free;
   Finish;
 end.
