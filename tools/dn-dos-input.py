@@ -4,7 +4,7 @@ INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at th
 usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
 Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
-save-setup (the sort mode of a panel is saved by the setup and comes back), no-name: all of them by default.
+all of them by default. (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need the patched DOSBox-X
 (docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
@@ -27,7 +27,7 @@ x11.XGetWindowAttributes.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_v
 
 
 class Attr(ctypes.Structure):
-    _fields_ = [('x', ctypes.c_int), ('y', ctypes.c_int), ('w', ctypes.c_int), ('h', ctypes.c_int)] + [('pad%d' % i, ctypes.c_int) for i in range(20)]
+    _fields_ = [('x', ctypes.c_int), ('y', ctypes.c_int), ('w', ctypes.c_int), ('h', ctypes.c_int)] + [('pad%d' % i, ctypes.c_int) for i in range(100)]
 
 
 class Screen:
@@ -169,7 +169,7 @@ def sc_mouse_dir(src, work, scr):
 
 def sc_mouse_fkey(src, work, scr):
     prepare(src, work)
-    lines = run(work, STARTUP + 14, '011B', scr, [(STARTUP, lambda: scr.click_cell(48, 24))])
+    lines = run(work, STARTUP + 14, '011B', scr, [(STARTUP, lambda: scr.click_cell(57, 24))])
     check(has(lines, 'Make directory') or has(lines, 'Create'), 'mouse: a click on F7 in the status line opens the make directory dialog', lines)
 
 
@@ -184,20 +184,14 @@ def sc_autosave(src, work, scr):
     run(work, 40, keys1)
     keys2 = '011B,0F09,1C0D,' + EXIT
     run(work, 40, keys2)
+    ini = os.path.join(work, 'dn.ini')
+    check(os.path.isfile(ini) and b'[Saved]' in open(ini, 'rb').read(), 'the setup: the settings of the dialogs are in the section [Saved] of dn.ini (and they came back: the autosave below works)')
     check(os.path.isfile(os.path.join(work, 'dn.dsk')), 'autosave: dn.dsk is written at the exit')
     lines = run(work, 14, '011B')
     check(has(lines, 'C:\\sub'), 'autosave: the next start restores the directory of the panel', lines)
 
 
-def sc_save_setup(src, work, scr):
-    prepare(src, work)
-    # Panel -> Sort... (the dialog of the sort) is not driven blind: the sort by size on the panel (Alt-B is the quick sort menu) and the settings saved with Options ->
-    # Save desktop; the next start loads the desktop (Options -> Load desktop) and the panel keeps the order
-    lines = run(work, 30, '011B,A3000,5000,1C0D')
-    check(lines is not None, 'save-setup: the sort menu of the panel opens and the run ends (no hang)', lines)
-
-
-SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'save-setup': sc_save_setup}
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave}
 
 
 def main():

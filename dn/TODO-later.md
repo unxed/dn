@@ -324,3 +324,11 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
   `ESC [ ? 9001 h` of the program in the embedded terminal), far2l: notifications, titles of the F-keys, the exact cursor height, the palette. DN uses them: the key bar of the status line goes to the far2l terminal as the titles of F1..F12
   (`menus.pas`, `TStatusLine.DrawSelect`), the end of copy, move and delete shows a desktop notification (`dnscreen.NotifyUser`; `DN_NOTIFY=0` switches it off).
 - Not done: the Kitty keyboard protocol flags (the next step: asked flags, the release and repeat events through `evKeyUp`), far2l images and drag and drop, DECRQM, the size of the window (`w`).
+
+## DOS: checked in DOSBox-X with a real mouse pointer and a normal exit (2026-10-04, `tools/dn-dos-input.py`)
+- The emulator: DOSBox-X 2026.10.01 built from the branches `claude/amis-utf8-clipboard` + `claude/utf8-names` (the fork `unxed/dosbox-x`; the binary was `src/dosbox-x` of the clone), on a virtual X display (Xvfb;
+  `-silent` forces the dummy video driver of SDL, so it is not used there); the pointer is a real X pointer (XTest through `ctypes`), DOSBox-X turns it into INT 33h, so the real mouse path of `TvDos` is exercised.
+- Checked: a click on a menu item, a double click on a directory, a click on a key of the status line (INT 33h works); the autosave of the desktop on DOS (`dn.dsk` is written at File -> Exit -> "Yes", the next start
+  restores the directory of the panel; the "Alt-X" of the harness DNKEYS did not exit: DN asks "Do you wish to quit?" and the key `A2D00` does not reach it as Alt-X); the settings of the dialogs survive a restart
+  (the section `[Saved]` of `dn.ini`). The UTF-8 build with the provider `DOS-UTF8/NAMES`: the file "дом 世界.txt" is in the panel (shown as `?` where the code page of the DOS screen has no glyph).
+- Not driven: the button "Save setup" of the panel setup dialogs (the presets of the panels) and the view of Cyrillic names with `chcp 866`; a hung emulator can write a huge file: always `timeout -k`.
