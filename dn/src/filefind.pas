@@ -1435,7 +1435,7 @@ function TFindDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize):
   AFiles := PFilesCollection.Create($10, $10);
   PFilesCollection(AFiles).Panel := Panel;
   AFiles.Duplicates := Self.ClassType = TFindDrive;
-//  PFilesCollection(AFiles)^.SortMode := SortMode;
+//  PFilesCollection(AFiles).SortMode := SortMode;
   S := '';
   PD := nil;
   ClrIO;
@@ -1515,7 +1515,7 @@ procedure TFindDrive.ChangeUp(var S: String);
 не в активной панели не может возникнуть ChangeUp. А даже если бы
 и могла, то с какой стати нужно было бы эту панель активизировать?
   if  (Prev.DriveType = dtDisk) and
-      (PView(Panel)^.GetState(sfSelected+sfActive))
+      (PView(Panel).GetState(sfSelected+sfActive))
   then
     ActivePanel := Panel;
 /AK155}
@@ -1556,7 +1556,7 @@ InsertDrive, а в нём FindDrive обязательно получит Prev <> nil.
   {Prev^.Owner := Owner;}
   PDrive(PFilePanel(Panel).Drive) := PDrive(Prev);
   Prev.ChangeRoot;
-  if  (PView(Panel)^.GetState(sfSelected+sfActive)) then
+  if  (PView(Panel).GetState(sfSelected+sfActive)) then
     ActivePanel := Panel;
   GlobalMessage(evCommand, cmRereadInfo, nil);
   Prev := nil;

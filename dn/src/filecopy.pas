@@ -465,7 +465,7 @@ function AppendQuery(const S: String): Word;
   D^.Options := D^.Options or ofCentered;
   R.Assign(2, 4, D^.Size.X-2, 5);
   P := PStaticText.Create(R, ^C+S);
-  D^.Insert(P);
+  D.Insert(P);
   AppendQuery := Desktop.ExecView(D);
   end;
 
@@ -617,7 +617,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     I := 0;
     if  (P <> nil) and (TempFiles <> nil) and TempFiles^.Search(P, I)
     then
-      TempFiles^.AtFree(I);
+      TempFiles.AtFree(I);
     end;
 
   function Overwrite(const NName: String; OldS, NewS: TSize;
@@ -672,7 +672,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
         Inc(R.B.Y);
     P := New(PStaticText, Init(R, ^C+GetString(dlFile)+' '+Cut(NName,
            40)+S));
-    D^.Insert(P);
+    D.Insert(P);
 
     MsgActive := True;
     D.SetData(AcceptAll);
@@ -1419,7 +1419,7 @@ lbStartWrite:
           end;
         end;
     FreeDisk := -1;
-    CopyQueue^.FreeAll;
+    CopyQueue.FreeAll;
     MemBufPos := 0;
     end { MaxWrite };
 
@@ -1655,7 +1655,7 @@ lbStartWrite:
       D^.Options := D^.Options or ofCentered;
       S:=Cut(FName,52);
       R.A.X:=1; R.A.Y:=3; R.B.X:=53; R.B.Y:=4;
-      D^.Insert(PStaticText.Create(R,^C+S));
+      D.Insert(PStaticText.Create(R,^C+S));
       Case Desktop.ExecView(D) Of
        cmOK: Goto 1;
        cmYes: begin SkipAllBad := True; Exit; end;
@@ -1875,7 +1875,7 @@ FileRead:
 
       if Abort or CopyCancel then
         Break;
-      CopyQueue^.Insert(P);
+      CopyQueue.Insert(P);
       P := nil;
       EOF := EOF and not eoStart;
       Rd := Rd+WW;
@@ -1927,7 +1927,7 @@ FileRead:
     P := New(pLine, Init(L, Own, DirName, '', 0, 0, Directory,
            eoStart+eoDir));
     if P <> nil then
-      CopyQueue^.Insert(P);
+      CopyQueue.Insert(P);
     end { CopyDirectory };
 
   procedure MaxRead;
@@ -1965,7 +1965,7 @@ FileRead:
     if Abort or CopyCancel then
       Exit;
     if Dirs <> nil then
-      Dirs^.ForEach(DoCopyDirectory);
+      Dirs.ForEach(DoCopyDirectory);
     MaxWrite;
     end { MaxRead };
 
@@ -2133,8 +2133,8 @@ TrueCopy:
       else
         SSS := q;
       
-      {MessageBox('Dirs^.AtInsert: ' + SSS + ' '+ Source, nil, mfOKButton);}
-      Dirs^.AtInsert(FrPos, New(PDirName, Init(Source, SSS, CopyIt, o,
+      {MessageBox('Dirs.AtInsert: ' + SSS + ' '+ Source, nil, mfOKButton);}
+      Dirs.AtInsert(FrPos, New(PDirName, Init(Source, SSS, CopyIt, o,
              Attr)));
       Inc(FrPos);
 2:
@@ -2346,10 +2346,10 @@ TryGetInfo:
           SetLength(SSS, Length(SSS)-1);
         if Copy(CopyDir, 1, Length(SSS)) = SSS then
           Inhr := 0;
-        RRC^.Insert(NewStr(SSS));
+        RRC.Insert(NewStr(SSS));
         if P^.Attr and Directory <> 0 then
           Red := Red+[UpCase(SSS[1])];
-        Files^.ForEach(MakeMark);
+        Files.ForEach(MakeMark);
         end;
       end { DoRemove };
 
@@ -2361,8 +2361,8 @@ TryGetInfo:
 
     begin { __Remove }
     RRC := PStringCollection.Create($10, $8, False);
-    Files^.ForEach(DoRemove);
-    RRC^.ForEach(DoReread);
+    Files.ForEach(DoRemove);
+    RRC.ForEach(DoReread);
     RRC.Free;
     end { __Remove };
 
@@ -2425,7 +2425,7 @@ qqqq:
   else
     Info^.Top := GetString(dlFCCopy);
   Desktop.Insert(Info);
-  Files^.ForEach(DoReset);
+  Files.ForEach(DoReset);
   if  ( (SystemData.Options shl 3) and ossRemoveCD_RO <> 0)
   then
     begin
@@ -2651,7 +2651,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
     begin
     IDDQD.dr := 0;
     IDDQD.Fl := 0;
-    Files^.ForEach(DoCalc);
+    Files.ForEach(DoCalc);
     if IDDQD.dr = 0 then
       S1 := ItoS(IDDQD.Fl)+' '+#0+GetString(dlDIFiles)+#0
     else if IDDQD.Fl = 0 then
@@ -2906,7 +2906,7 @@ procedure CopyFiles(Files: PCollection; SourcePanel: PView; MoveMode: Boolean; F
     
   begin
   CtrlBreakHit := False;
-  Files^.Pack;
+  Files.Pack;
   if Files^.Count <= 0 then
     Exit;
   if not CopyDialog(CopyDir, Mask, CopyOpt, CopyMode, CopyPrn,
@@ -2946,7 +2946,7 @@ procedure CopyDirContent(Source, Destination: String;
   while (DosError = 0) and not Abort do
     begin
     if not IsDummyDir(SR.FullName) then
-      FC^.AtInsert(FC^.Count, NewFileRec(SR.FullName,
+      FC.AtInsert(FC^.Count, NewFileRec(SR.FullName,
           
           SR.SR.Name,
           
@@ -2960,7 +2960,7 @@ procedure CopyDirContent(Source, Destination: String;
     end;
   lFindClose(SR);
   ClrIO;
-  FC^.Pack;
+  FC.Pack;
   if FC^.Count <= 0 then
     begin
     FC.Free;
@@ -2974,7 +2974,7 @@ procedure CopyDirContent(Source, Destination: String;
     cpoMove*Byte(MoveMode), False, False);
   NotifyResume;
   Dec(SkyEnabled);
-  FC^.DeleteAll;
+  FC.DeleteAll;
   FC.Free;
   end { CopyDirContent };
 {/JO}

@@ -165,9 +165,9 @@ function TWindowList.GetText(Item: LongInt; MaxLen: Integer): String;
   P := List^.At(Item);
   S := GetString(dlUnknownWindowType);
   Message(P, evCommand, cmGetName, @S);
-  if PWindow(P)^.Number in [1..9]
+  if PWindow(P).Number in [1..9]
   then
-    GetText := Char($30+PWindow(P)^.Number)+' '+S
+    GetText := Char($30+PWindow(P).Number)+' '+S
   else
     GetText := '  '+S;
   end;
@@ -196,7 +196,7 @@ procedure WindowManager;
       begin
       Message(P, evCommand, cmGetName, @S);
       if  (S <> '') then
-        PC^.Insert(P);
+        PC.Insert(P);
       end;
     end;
 
@@ -216,7 +216,7 @@ cmWindowManager задизейблена.
   R.Assign(D^.Size.X-13, 3, D^.Size.X-12, D^.Size.Y-2);
   PV := PScrollBar.Create(R);
   PV^.Options := PV^.Options or ofPostProcess or ofSecurity;
-  D^.Insert(PV);
+  D.Insert(PV);
 
   R.Assign(2, 3, D^.Size.X-13, D^.Size.Y-2);
   PV := New(PWindowList, Init(R, 1, PScrollBar(PV)));
@@ -240,11 +240,11 @@ cmWindowManager задизейблена.
   if  (WinManagerSelectNext) and (Num = 0) and (PC^.Count > 1) then
     Num := 1;
   PListBox(PV)^.Focused := Num; {-$VIV--}
-  D^.Insert(PV);
+  D.Insert(PV);
 
   R.Assign(2, 2, 45, 3);
   PV := New(PLabel, Init(R, GetString(dlWindowsLabel), PV));
-  D^.Insert(PV);
+  D.Insert(PV);
 
 while true do
   begin

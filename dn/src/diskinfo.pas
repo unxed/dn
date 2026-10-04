@@ -346,7 +346,7 @@ procedure TDiskInfo.InsertDriveView;
     { По Y - на рамку, а с X DriveView^.Draw разбирается каждый раз }
   New(DriveView, Init(R));
   DriveView^.Panel := @Self;
-  Owner^.Insert(DriveView);
+  Owner.Insert(DriveView);
   DriveView^.Panel := @Self;
   end;
 
@@ -647,12 +647,12 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
   NumDirs := 0;
 
   New(DC, Init($10, $10, False));
-  DC^.Insert(NewStr(Dir));
+  DC.Insert(NewStr(Dir));
   Abort := False;
   while DC^.Count > 0 do
     begin
     FreeStr := PString(DC^.At(0))^;
-    DC^.AtFree(0);
+    DC.AtFree(0);
     if Abort then
       Break;
 
@@ -700,7 +700,7 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
               L := 0;
               Break
               end;
-            DC^.Insert(NewStr(MakeNormName(FreeStr, SR.FullName)));
+            DC.Insert(NewStr(MakeNormName(FreeStr, SR.FullName)));
             end;
           end
         else
@@ -723,7 +723,7 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
       end;
     lFindClose(SR);
     end;
-  DC^.FreeAll;
+  DC.FreeAll;
   DC.Free;
   CountDirLen := L;
   end { CountDirLen };
@@ -821,7 +821,7 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
       S := F^.GetStr;
       if Length(S) > B.Limit.X then
         B.Limit.X := Length(S);
-      B.DirInfo^.AtInsert(B.DirInfo^.Count, NewStr(S));
+      B.DirInfo.AtInsert(B.DirInfo^.Count, NewStr(S));
       Inc(B.Limit.Y);
       end;
     F.Free;

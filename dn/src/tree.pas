@@ -350,7 +350,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
           P^.Size := -1;
           P^.Level := PD^.Level+1;
           Inc(I);
-          DC^.AtInsert(I, P);
+          DC.AtInsert(I, P);
           end
         else
           begin
@@ -390,7 +390,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
   P^.Level := 0;
   P^.Size := -1;
   P^.Attr := 0;
-  DC^.Insert(P);
+  DC.Insert(P);
   Abort := False;
   RemoteDrive := False;
   begin
@@ -976,7 +976,7 @@ destructor TTreeView.Destroy;
   begin
   if DC <> nil then
     begin
-    DC^.DeleteAll;
+    DC.DeleteAll;
     DC.Free;
     DC := nil;
     end;
@@ -1110,7 +1110,7 @@ procedure TTreeView.CollapseBranch(N: Integer);
     begin
     while (I < DC^.Count-1) and (P^.Level < PDirRec(DC^.At(I+1))^.Level)
     do
-      DC^.AtDelete(I+1);
+      DC.AtDelete(I+1);
     end
   else
     begin
@@ -1120,7 +1120,7 @@ procedure TTreeView.CollapseBranch(N: Integer);
       begin
       if PDirRec(Dirs^.At(L))^.Level = P^.Level+1 then
         begin
-        DC^.AtInsert(I+1, Dirs^.At(L));
+        DC.AtInsert(I+1, Dirs^.At(L));
         Inc(I);
         end;
       Inc(L);
@@ -1161,7 +1161,7 @@ function MkFcFromDirRec(D: PDirRec; var FullName: String)
     Owner := @FullName;
     DIZ := nil;
     end;
-  Result^.Insert(fr);
+  Result.Insert(fr);
   end;
 
 procedure TTreeView.HandleCommand(var Event: TEvent);
@@ -1275,9 +1275,9 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       end;
     if not B then
       begin
-      DC^.DeleteAll;
+      DC.DeleteAll;
       for I := 1 to Dirs^.Count do
-        DC^.Insert(Dirs^.At(I-1));
+        DC.Insert(Dirs^.At(I-1));
       end
     else
       Reread(False);
@@ -1840,7 +1840,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
   Abort := False;
   if DC <> nil then
     begin
-    DC^.DeleteAll;
+    DC.DeleteAll;
     DC.Free;
     end;
   DC := GetDirCollection(CurPath[1], CountLen);
@@ -1861,7 +1861,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
     S := Copy(CurPath, 1, 3);
     for iLFN := Low(TUseLFN) to High(TUseLFN) do
       CopyShortString(S, PD^.DirName[iLFN]);
-    DC^.Insert(PD);
+    DC.Insert(PD);
     end;
   if not Abort and (ScrollBar <> nil) and (DC^.Count > 0) then
     begin
@@ -1873,7 +1873,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
     Dirs := DC;
     DC := PDirCollection.Create(Dirs^.Count, 10);
     for I := 1 to Dirs^.Count do
-      DC^.Insert(Dirs^.At(I-1));
+      DC.Insert(Dirs^.At(I-1));
     DrawDisabled := True;
     if Parital then
       begin
@@ -1987,7 +1987,7 @@ procedure TTreeView.Reread(CountLen: Boolean);
     I, M: Integer;
   begin
   DrawDisabled := True;
-  DC^.DeleteAll;
+  DC.DeleteAll;
   DC.Free;
   DC := nil;
   M := ScrollBar^.Value;

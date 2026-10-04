@@ -546,7 +546,7 @@ procedure UnpackDiskImages(AOwner: Pointer; Files: PFilesCollection);
     = cmOK
   then
     DoIt(AOwner, Files, DestPath);
-  Files^.DeleteAll;
+  Files.DeleteAll;
   Files.Free;
   Files := nil;
   end;

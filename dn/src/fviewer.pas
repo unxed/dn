@@ -474,7 +474,7 @@ procedure TViewInfo.Draw;
   begin
   if  (Viewer = nil) or
       (Owner = nil) or
-      (PWindow(Owner)^.Frame = nil)
+      (PWindow(Owner).Frame = nil)
   then
     begin
     inherited Draw;
@@ -482,18 +482,18 @@ procedure TViewInfo.Draw;
     end;
   with Viewer^, Self do
     begin
-    Color := PWindow(Owner)^.Frame^.GetColorW(3);
+    Color := PWindow(Owner).Frame^.GetColorW(3);
     Ch2 := #205;
     if not Owner^.GetState(sfActive) then
       begin
-      Color := PWindow(Owner)^.Frame^.GetColorW(1);
+      Color := PWindow(Owner).Frame^.GetColorW(1);
       MoveChar(B, #196, Color, Size.X);
       WriteLineC(0, 0, Size.X, 1, B);
       Exit;
       end
     else if Owner^.GetState(sfDragging) then
       begin
-      Color := PWindow(Owner)^.Frame^.GetColorW(5);
+      Color := PWindow(Owner).Frame^.GetColorW(5);
       Ch2 := #196;
       end;
     if ViewMode = vmHex then
@@ -3068,8 +3068,8 @@ NotKb:
                           begin
                           Filtr := False;
                           VFileName := '';
-                          DisposeStr(PWindow(Owner)^.Title);
-                          PWindow(Owner)^.Title := NewStr
+                          DisposeStr(PWindow(Owner).Title);
+                          PWindow(Owner).Title := NewStr
                                 (GetString(dlViewFile));
                           PWindow(Owner).Redraw;
                           end;

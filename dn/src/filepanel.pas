@@ -948,7 +948,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
         Exit;
       end;
     New(FC, Init(1, 100));
-    FC^.Insert(CopyFileRec(Panel^.Files^.At(Panel^.ScrollBar^.Value)));
+    FC.Insert(CopyFileRec(Panel^.Files^.At(Panel^.ScrollBar^.Value)));
     if P.X < Length(S) then
       Dec(P.X);
     MakeGlobal(P, P);
@@ -968,7 +968,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
       begin
       PF := Panel^.Files^.At(I-1); {DataCompBoy}
       if PF^.Selected then
-        FC^.Insert(CopyFileRec(PF)); {DataCompBoy}
+        FC.Insert(CopyFileRec(PF)); {DataCompBoy}
       end;
     MakeGlobal(P, P);
     DragMover(@P, ItoS(Panel^.SelNum)+GetString(dlSelectedFiles), FC, @C);
@@ -985,7 +985,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
       N := Count-Start;
       New(FC, Init(N, 100));
       for I := Start to N+Start-1 do
-        FC^.AtInsert(FC^.Count, CopyFileRec(PFileRec(At(I))));
+        FC.AtInsert(FC^.Count, CopyFileRec(PFileRec(At(I))));
       end;
     MakeGlobal(P, P);
     DragMover(@P, ItoS(N)+' '+GetString(dlDIFiles), FC, @C);
@@ -1788,15 +1788,15 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     begin
     if  (Files^.Count = 0) or (Event.InfoPtr = nil) then
       Exit;
-    OSM := PFilesCollection(Files)^.SortMode;
-    PFilesCollection(Files)^.SortMode := fcmPreciseCompare;
+    OSM := PFilesCollection(Files).SortMode;
+    PFilesCollection(Files).SortMode := fcmPreciseCompare;
     for I := 0 to Files^.Count-1 do
       if Files^.FileCompare(Files^.At(I), Event.InfoPtr) = 0 then
         goto 1; {-$VOL}
-    PFilesCollection(Files)^.SortMode := OSM;
+    PFilesCollection(Files).SortMode := OSM;
     Exit;
 1:
-    PFilesCollection(Files)^.SortMode := OSM;
+    PFilesCollection(Files).SortMode := OSM;
     PF := {Event.InfoPtr}Files^.At(I);
     with PF^ do
       if Selected then

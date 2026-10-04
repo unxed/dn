@@ -736,7 +736,7 @@ function DizNameProc(const N: string; TextStart: Integer): Boolean;
     New(PD);
     PD^.Name := N;
     PD^.DizText := Copy(LastDizLine, TextStart, MaxLongStringLength);
-    Descriptions^.AtInsert(I, PD);
+    Descriptions.AtInsert(I, PD);
     end;
   end;
 
@@ -894,7 +894,7 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFi
   NoMemory := (MAvail <= MemReq);
   if  (Length(CurDir) > GetRootStart(CurDir)) then
     begin
-    Files^.AtInsert(0, NewFileRec('..',
+    Files.AtInsert(0, NewFileRec('..',
        '..', 
       -1, 0, 0, 0, Directory, @CurDir));
     end;
@@ -1136,7 +1136,7 @@ function TDrive.OpenDirectory(const Dir: String;
     if MAvail <= MemReq then
       Exit;
     MakeSlash(S);
-    DirsToProcess^.Insert(NewStr(S));
+    DirsToProcess.Insert(NewStr(S));
     Inc(MemReq, SizeOf(ShortString)); //почему 255, а не что-то+length(S)?
     end;
 
@@ -1153,7 +1153,7 @@ function TDrive.OpenDirectory(const Dir: String;
       if  (SR.SR.Attr and Hidden = 0) or (not Security) then
         if SR.SR.Attr and Directory = 0 then
           begin
-          Files^.AtInsert(Files^.Count, NewFileRec(SR.FullName,
+          Files.AtInsert(Files^.Count, NewFileRec(SR.FullName,
               
               SR.SR.Name,
               
@@ -1172,7 +1172,7 @@ function TDrive.OpenDirectory(const Dir: String;
           AddDirectory(Dr^+SR.FullName);
           if PutDirs then
             begin
-            Files^.AtInsert(Files^.Count, NewFileRec(SR.FullName,
+            Files.AtInsert(Files^.Count, NewFileRec(SR.FullName,
                 
                 SR.SR.Name,
                 
@@ -1210,8 +1210,8 @@ function TDrive.OpenDirectory(const Dir: String;
   while (I >= 0) and (not Abort) and (MAvail > MemReq) do
     begin
     P := DirsToProcess^.At(I);
-    DirsToProcess^.AtDelete(I);
-    Dirs^.Insert(P);
+    DirsToProcess.AtDelete(I);
+    Dirs.Insert(P);
     ReadDir(P);
     if TimerExpired(tmr) then
       begin

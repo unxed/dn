@@ -180,7 +180,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
             begin
             New(KeyMacroses, Init(10, 10));
             for W := 1 to 10 do
-              KeyMacroses^.Insert(nil);
+              KeyMacroses.Insert(nil);
             end;
           if MacroRecord then
             begin
@@ -189,9 +189,9 @@ procedure MyApp.GetEvent(var Event: TEvent);
             Exit;
             end;
           MacroRecord := True;
-          KeyMacroses^.AtFree(WW);
+          KeyMacroses.AtFree(WW);
           PM.Create;
-          KeyMacroses^.AtInsert(WW, PM);
+          KeyMacroses.AtInsert(WW, PM);
           CurrentMacro := PM;
           end
         else if KeyMacroses <> nil then

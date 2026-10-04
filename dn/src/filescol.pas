@@ -638,12 +638,12 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
   NameDirsSortEnabled := False;
   if Panel <> nil then
     begin
-    SortFlags := PFilePanel(Panel)^.PanSetup^.Sort.SortFlags;
-    Move(PFilePanel(Panel)^.PanSetup^.Sort.Ups, Ups, SizeOf(Ups));
-    CmpMethod := PFilePanel(Panel)^.PanSetup^.Sort.CompareMethod;
-    if PFilePanel(Panel)^.Drive <> nil then
+    SortFlags := PFilePanel(Panel).PanSetup^.Sort.SortFlags;
+    Move(PFilePanel(Panel).PanSetup^.Sort.Ups, Ups, SizeOf(Ups));
+    CmpMethod := PFilePanel(Panel).PanSetup^.Sort.CompareMethod;
+    if PFilePanel(Panel).Drive <> nil then
       {JO: все типы панели, представляющие собой раскрытую ветвь}
-      Branched := PFilePanel(Panel)^.Drive^.DriveType
+      Branched := PFilePanel(Panel).Drive^.DriveType
         in [dtFind, dtTemp, dtList, dtArcFind]
     else
       Branched := False;
@@ -1121,7 +1121,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
         begin
         IDDQD.dr := 0;
         IDDQD.Fl := 0;
-        TempFiles^.ForEach(GetInfo);
+        TempFiles.ForEach(GetInfo);
         if IDDQD.dr+IDDQD.Fl = 0 then
           FreeStr := GetString(dlEmpty)
         else if IDDQD.dr = 0 then

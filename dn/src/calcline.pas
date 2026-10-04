@@ -411,7 +411,7 @@ procedure TCalcLine.SetValues(SetSelf: Boolean);
       begin
       GetData(S);
       HistoryAdd(hsCalcLine, S);
-      with PIndicator(PDialog(Owner)^.DirectLink[3])^ do
+      with PIndicator(PDialog(Owner).DirectLink[3])^ do
         begin
         Radio.GetData(SelectedForm);
         S := SResult[SelectedForm];
@@ -440,7 +440,7 @@ procedure InsertCalc;
     Indicator^.Options := Indicator^.Options or ofFramed;
     Indicator^.CalcLine := PCalcLine(Dlg^.DirectLink[1]);
     Indicator^.Radio := PRadioButtons(Dlg^.DirectLink[2]);
-    Dlg^.Insert(Indicator);
+    Dlg.Insert(Indicator);
     Dlg^.DirectLink[3] := Indicator;
 
     MakeDialog := Dlg;

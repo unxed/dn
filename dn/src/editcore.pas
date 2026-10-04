@@ -538,9 +538,9 @@ function TFileEditor.BlockFromClip(P: PCollection): PCollection;
     begin
     L := P^.At(I);
     if L = nil then
-      R^.Insert(nil)
+      R.Insert(nil)
     else
-      R^.Insert(NewLongStr(TabToInternal(DocTab, L^, DocU8)));
+      R.Insert(NewLongStr(TabToInternal(DocTab, L^, DocU8)));
     end;
   Result := R;
   end;
@@ -564,7 +564,7 @@ procedure TFileEditor.KeyMapAtInsert(N: LongInt; P: PLongString);
   begin
   if  (P <> nil) then
     StrFromAscii(P^);
-  FileLines^.AtInsert(N, P);
+  FileLines.AtInsert(N, P);
   end; {-$VIV}
 
 procedure TFileEditor.KeyMapAtReplace(N: LongInt; P: PLongString);
@@ -597,7 +597,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             Dec(P^.Where.X, Count);
             P^.Str := NewLongStr(Copy(GetLine(Where.Y), P^.Where.X+1,
                    Count));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udInsChar:
             begin
@@ -605,7 +605,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
               begin
               P^.Count := Length(Str^);
               Inc(P^.Where.X, P^.Count);
-              UndoInfo^.Insert(P);
+              UndoInfo.Insert(P);
               end
             else
               Dispose(P);
@@ -614,13 +614,13 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             begin
             P^.Lines := PLineCollection.Create(10, 10, True);
             for I := 0 to Count-1 do
-              P^.Lines^.Insert(NewLongStr(GetLine(P^.Where.Y+I)));
-            UndoInfo^.Insert(P);
+              P^.Lines.Insert(NewLongStr(GetLine(P^.Where.Y+I)));
+            UndoInfo.Insert(P);
             end;
           udInsLine:
             begin
             P^.Str := NewLongStr(GetLine(Where.Y));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udDelBlock:
             begin
@@ -635,7 +635,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
               for I := 0 to Lines^.Count-1 do
                 begin
                 S := Copy(GetLine(Where.Y+I), Where.X+1, J);
-                P^.Lines^.Insert(NewLongStr(S));
+                P^.Lines.Insert(NewLongStr(S));
                 end;
               end
             else
@@ -647,39 +647,39 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
                   S := Copy(S, Where.X+1, MaxLongStringLength)
                 else if I = Lines^.Count-1 then
                   S := Copy(S, 1, Length(S)-(J-Where.X));
-                P^.Lines^.Insert(NewLongStr(S));
+                P^.Lines.Insert(NewLongStr(S));
                 end;
               end;
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udInsBlock, udFormatBlock:
             begin
             I := Lines^.Count;
             P^.Str := NewLongStr(Char(Lo(I))+Char(Hi(I))+GetLine(Delta.Y));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udBackDel:
             begin
             P^.Str := NewLongStr(Copy(GetLine(Where.Y), Where.X+1, Count));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udSubDel:
             begin
             P^.Str := NewLongStr(GetLine(Where.Y));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udSubDelLine:
             begin
             P^.Str := NewLongStr(GetLine(Where.Y+1));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udIndentBlock:
             begin
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udUnindentBlock:
             begin
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udInsVertBlock:
             begin
@@ -695,21 +695,21 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
               if J > P^.Width then
                 P^.Width := J;
               end;
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udReplace, udReplaceAll:
             begin
             S := GetLine(Where.Y);
             P^.Str := NewLongStr(Char(Length(Str^)-1)+Copy(S, Where.X+1,
                    Byte(Str^[1])));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udReplaceChar:
             begin
             S := GetLine(Where.Y);
             Inc(P^.Where.X, Length(Str^));
             P^.Str := NewLongStr(Copy(S, Where.X+1, Length(Str^)));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udReplaceBlock, udClearBlock:
             begin
@@ -718,18 +718,18 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
               begin
               S := GetLine(I);
               J := Length(CnvLongString(Lines^.At(I-Where.Y)));
-              P^.Lines^.Insert(NewLongStr(Copy(S, Where.X+1, J)));
+              P^.Lines.Insert(NewLongStr(Copy(S, Where.X+1, J)));
               end;
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udStrModified:
             begin
             P^.Str := NewLongStr(GetLine(Where.Y));
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
           udDupeLine:
             begin
-            UndoInfo^.Insert(P);
+            UndoInfo.Insert(P);
             end;
         end {case}; {case of iP^.What/dkUndo}
       end;
@@ -743,26 +743,26 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             begin
             P^.Count := Length(Str^);
             Inc(P^.Where.X, P^.Count);
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udInsChar:
             begin
             Dec(P^.Where.X, Count);
             P^.Str := NewLongStr(Copy(GetLine(Where.Y), P^.Where.X+1,
                    Count));
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udDelLine:
             begin
             P^.Count := Lines^.Count;
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udInsLine:
             begin
             P^.Lines := PLineCollection.Create(10, 10, True);
-            P^.Lines^.Insert(NewLongStr(GetLine(P^.Where.Y)));
-            P^.Lines^.Insert(NewLongStr(GetLine(P^.Where.Y+1)));
-            RedoInfo^.Insert(P);
+            P^.Lines.Insert(NewLongStr(GetLine(P^.Where.Y)));
+            P^.Lines.Insert(NewLongStr(GetLine(P^.Where.Y+1)));
+            RedoInfo.Insert(P);
             end;
           udDelBlock:
             begin
@@ -776,54 +776,54 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
               if InsM then
                 begin
                 for I := 0 to Lines^.Count-1 do
-                  P^.Lines^.Insert(NewLongStr(S));
+                  P^.Lines.Insert(NewLongStr(S));
                 end
               else
                 begin
                 for I := 0 to Lines^.Count-1 do
                   begin
                   S := Copy(GetLine(Where.Y+I), Where.X+1, J);
-                  P^.Lines^.Insert(NewLongStr(S));
+                  P^.Lines.Insert(NewLongStr(S));
                   end;
                 end
             else
               begin
               S := GetLine(P^.Where.Y);
               for I := 0 to Lines^.Count-1 do
-                P^.Lines^.Insert(NewLongStr(S));
+                P^.Lines.Insert(NewLongStr(S));
               end;
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udInsBlock, udFormatBlock:
             begin
             P^.Lines := PLineCollection.Create(10, 10, True);
             for I := 1 to Byte(Str^[2])*256+Byte(Str^[1]) do
-              P^.Lines^.Insert(NewLongStr(GetLine(Delta.Y+I-1)));
-            RedoInfo^.Insert(P);
+              P^.Lines.Insert(NewLongStr(GetLine(Delta.Y+I-1)));
+            RedoInfo.Insert(P);
             end;
           udBackDel:
             begin
             P^.Count := Length(Str^);
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udSubDel:
             begin
             P^.Str := NewLongStr(GetLine(P^.Where.Y));
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udSubDelLine:
             begin
             S := GetLine(Where.Y);
             P^.Str := NewLongStr(S);
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udIndentBlock:
             begin
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udUnindentBlock:
             begin
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udInsVertBlock:
             begin
@@ -831,25 +831,25 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             for I := 1 to Count do
               begin
               S := Copy(GetLine(I+Where.Y-1), Where.X+1, Width);
-              P^.Lines^.Insert(NewLongStr(S));
+              P^.Lines.Insert(NewLongStr(S));
               end;
             P^.Vertical := True;
             P^.InsM := True;
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udReplace, udReplaceAll:
             begin
             S := GetLine(Where.Y);
             P^.Str := NewLongStr(Char(Length(Str^)-1)+Copy(S, Where.X+1,
                    Byte(Str^[1])));
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udReplaceChar:
             begin
             S := GetLine(Where.Y);
             Dec(P^.Where.X, Length(Str^));
             P^.Str := NewLongStr(Copy(S, P^.Where.X+1, Length(Str^)));
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udReplaceBlock, udClearBlock:
             begin
@@ -858,18 +858,18 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
               begin
               S := GetLine(I);
               J := Length(CnvLongString(Lines^.At(I-Where.Y)));
-              P^.Lines^.Insert(NewLongStr(Copy(S, Where.X+1, J)));
+              P^.Lines.Insert(NewLongStr(Copy(S, Where.X+1, J)));
               end;
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udStrModified:
             begin
             P^.Str := NewLongStr(GetLine(Where.Y));
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
           udDupeLine:
             begin
-            RedoInfo^.Insert(P);
+            RedoInfo.Insert(P);
             end;
         end {case}; {case of iP^.What/dkRedo}
       end;
@@ -1037,7 +1037,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
   if UndoInfo = nil then
     UndoInfo := PDoCollection.Create(dkUndo);
   if RedoInfo <> nil then
-    RedoInfo^.FreeAll;
+    RedoInfo.FreeAll;
   if UndoInfo^.Count > 0
   then
     P1 := UndoInfo^.At(UndoInfo^.Count-1)
@@ -1136,7 +1136,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
         P^.Where := Where;
         P^.Str := NewLongStr(S);
         P^.KeyMap := KeyMap; {-$VIV}
-        UndoInfo^.Insert(P);
+        UndoInfo.Insert(P);
         Inc(UndoTimes);
         end;
     udReplaceChar:
@@ -1158,7 +1158,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
         P^.Str := NewLongStr(S);
         Inc(P^.Where.X);
         P^.KeyMap := KeyMap; {-$VIV}
-        UndoInfo^.Insert(P);
+        UndoInfo.Insert(P);
         Inc(UndoTimes);
         end;
     udBackDel:
@@ -1180,7 +1180,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
         P^.Str := NewLongStr(S);
         Dec(P^.Where.X);
         P^.KeyMap := KeyMap; {-$VIV}
-        UndoInfo^.Insert(P);
+        UndoInfo.Insert(P);
         Inc(UndoTimes);
         end;
     udInsChar:
@@ -1199,7 +1199,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
         Inc(P^.Where.X);
         P^.Count := 1;
         P^.KeyMap := KeyMap; {-$VIV}
-        UndoInfo^.Insert(P);
+        UndoInfo.Insert(P);
         Inc(UndoTimes);
         end;
     udDupeLine:
@@ -1209,22 +1209,22 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       P^.Where := Where;
       P^.Count := 1;
       P^.KeyMap := KeyMap; {-$VIV}
-      UndoInfo^.Insert(P);
+      UndoInfo.Insert(P);
       Inc(UndoTimes);
       end;
     udDelLine:
       if  (P1 <> nil) and (P1^.What = What) and (P1^.Where.Y = Where.Y)
       then
-        P1^.Lines^.Insert(NewLongStr(LongString(Info)))
+        P1^.Lines.Insert(NewLongStr(LongString(Info)))
       else
         begin
         New(P);
         P^.What := What;
         P^.Where := Where;
         P^.Lines := PLineCollection.Create(10, 10, True);
-        P^.Lines^.Insert(NewLongStr(LongString(Info)));
+        P^.Lines.Insert(NewLongStr(LongString(Info)));
         P^.KeyMap := KeyMap; {-$VIV}
-        UndoInfo^.Insert(P);
+        UndoInfo.Insert(P);
         Inc(UndoTimes);
         end;
     udInsLine, udSubDel, udSubDelLine, udInsBlock, udReplace,
@@ -1235,7 +1235,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       P^.Where := Where;
       P^.Str := NewLongStr(LongString(Info));
       P^.KeyMap := KeyMap; {-$VIV}
-      UndoInfo^.Insert(P);
+      UndoInfo.Insert(P);
       Inc(UndoTimes);
       end;
     udReplaceBlock, udClearBlock:
@@ -1245,7 +1245,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       P^.Where := Where;
       P^.Lines := PCollection(Info);
       P^.KeyMap := KeyMap; {-$VIV}
-      UndoInfo^.Insert(P);
+      UndoInfo.Insert(P);
       Inc(UndoTimes);
       end;
     udInsVertBlock:
@@ -1256,7 +1256,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       P^.Count := LongInt(Info) and $FFFF;
       P^.Width := LongInt(Info) shr 16;
       P^.KeyMap := KeyMap; {-$VIV}
-      UndoInfo^.Insert(P);
+      UndoInfo.Insert(P);
       Inc(UndoTimes);
       end;
     udDelBlock:
@@ -1268,7 +1268,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       P^.InsM := InsertMode; {-$VOL}
       P^.Lines := PCollection(Info);
       P^.KeyMap := KeyMap; {-$VIV}
-      UndoInfo^.Insert(P);
+      UndoInfo.Insert(P);
       Inc(UndoTimes);
       end;
     udIndentBlock, udUnindentBlock
@@ -1288,7 +1288,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
         P^.Block := TRect(Info);
         P^.Count := 1;
         P^.KeyMap := KeyMap; {-$VIV}
-        UndoInfo^.Insert(P);
+        UndoInfo.Insert(P);
         Inc(UndoTimes);
         end;
     udStrModified:
@@ -1300,7 +1300,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       P^.Count := 1;
       P^.Str := NewLongStr(LongString(Info));
       P^.KeyMap := KeyMap; {-$VIV}
-      UndoInfo^.Insert(P);
+      UndoInfo.Insert(P);
       Inc(UndoTimes);
       end;
   end {case};
@@ -1521,7 +1521,7 @@ function TFileEditor.GetSelection: PCollection;
       S := Copy(S, Mark.A.X+1, MaxLongStringLength)
     else if I = Mark.B.Y then
       S := Copy(S, 1, Mark.B.X);
-    { P^.Insert(NewLongStr(S)); }
+    { P.Insert(NewLongStr(S)); }
     with P^ do
       AtInsert(Count, NewLongStr(S)); {AK155}
 
@@ -2002,7 +2002,7 @@ procedure TFileEditor.InsertBlock(ABlock: PCollection; SaveUndo: Boolean);
         if LL <> nil then
           begin
           for I := 0 to ABlock^.Count do
-            LL^.Insert(NewLongStr(LongAddSpace(Copy(GetLine(I+Delta.Y),
+            LL.Insert(NewLongStr(LongAddSpace(Copy(GetLine(I+Delta.Y),
                      Delta.X+1, Length(S)), I)));
           StoreUndoInfo(udReplaceBlock, Delta, LL)
           end;
@@ -2014,7 +2014,7 @@ procedure TFileEditor.InsertBlock(ABlock: PCollection; SaveUndo: Boolean);
       if SaveUndo then
         Mark.B.X := Mark.A.X+Length(S1);
       if I+Delta.Y-1 = FileLines^.Count then
-        FileLines^.Insert(NewLongStr(LongAddSpace('', Q)));
+        FileLines.Insert(NewLongStr(LongAddSpace('', Q)));
       S2 := GetLine(I+Delta.Y-1);
       if not InsertMode then
         Delete(S2, Delta.X+1, Length(S1));
@@ -2035,7 +2035,7 @@ procedure TFileEditor.InsertBlock(ABlock: PCollection; SaveUndo: Boolean);
       S := S+LongStrg(' ', Delta.X-Length(S));
     S1 := Copy(S, 1, Delta.X);
     S2 := Copy(S, Delta.X+1, MaxLongStringLength);
-    FileLines^.AtFree(Delta.Y);
+    FileLines.AtFree(Delta.Y);
     for I := 1 to ABlock^.Count do
       begin
       P := ABlock^.At(I-1);
@@ -2436,7 +2436,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
       ChangeLine;
       if Delta.Y = FileLines^.Count-1 then
         begin
-        FileLines^.Insert(nil);
+        FileLines.Insert(nil);
         SetLimits;
         end;
       ScrollTo(0, Delta.Y+1);
@@ -2512,7 +2512,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
       if  (LastY = 0) or not InsertMode then
         Exit;
       EnableMarking := False;
-      FileLines^.AtFree(LastY);
+      FileLines.AtFree(LastY);
       S := GetLine(LastY-1);
       P.X := Length(S);
       P.Y := Delta.Y-1;
@@ -2637,7 +2637,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
       ModifyLine(Mark.A.Y, Copy(GetLine(Mark.A.Y), 1, Mark.A.X)+
         Copy(GetLine(Mark.B.Y), Mark.B.X+1, MaxLongStringLength), True);
       for I := Mark.A.Y to Mark.B.Y-1 do
-        FileLines^.AtFree(Mark.A.Y+1);
+        FileLines.AtFree(Mark.A.Y+1);
       K := Mark.B.Y-Mark.A.Y-1;
       if K > 0 then
         for L := 1 to 9 do
@@ -2675,7 +2675,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
       if MemEnough then
         Exit;
       if UndoInfo <> nil then
-        UndoInfo^.FreeAll;
+        UndoInfo.FreeAll;
       L := GetSelection;
       if  (L = nil) and (not MemEnough) then
         goto L1;
@@ -2757,7 +2757,7 @@ L1:
       StoreUndoInfo(udSubDelLine, P, S);
     WorkString := WorkString+LongStrg(' ', LastX-Length(WorkString))+S;
     ChangeLine;
-    FileLines^.AtFree(LastY+1);
+    FileLines.AtFree(LastY+1);
     for L := 1 to 9 do
       if MarkPos[L].Y >= LastY then
         Dec(MarkPos[L].Y);
@@ -2866,7 +2866,7 @@ EndDel:
       begin
       StoreUndoInfo(udDelLine, T, WorkString);
       WorkModified := False;
-      FileLines^.AtFree(Delta.Y);
+      FileLines.AtFree(Delta.Y);
       ChangeLine
       end;
     for L := 1 to 9 do
@@ -3303,7 +3303,7 @@ EndDel:
     if Length(WorkString) > EdOpt.RightSide then
       begin
       New(P, Init(1, 1, True));
-      P^.Insert(NewLongStr(WorkString));
+      P.Insert(NewLongStr(WorkString));
       TP.Y := Delta.Y;
       TP.X := 0;
       StoreUndoInfo(udDelBlock, TP, P);
@@ -3444,7 +3444,7 @@ EndDel:
       else
         begin
         ChangeLine;
-        FileLines^.AtInsert(LastY+1, nil);
+        FileLines.AtInsert(LastY+1, nil);
         SetLimits;
         ScrollTo(0, LastY+1);
         DrawView;
@@ -3724,7 +3724,7 @@ EndDel:
         begin
         if LastY = FileLines^.Count-1 then
           begin
-          FileLines^.Insert(nil);
+          FileLines.Insert(nil);
           SetLimits;
           end;
         ScrollTo(LastX, LastY+1);
@@ -4190,7 +4190,7 @@ Ex:
           CE
           end;
         cmGetName:
-          PString(Event.InfoPtr)^:= PWindow(Owner)^.Title^;
+          PString(Event.InfoPtr)^:= PWindow(Owner).Title^;
         cmCtrlHome:
           begin
           ScrollTo(Delta.X, Pos.Y);
@@ -5047,19 +5047,19 @@ procedure OpenSmartpad;
             (GetLine(FileLines^.Count-1) = '')
         then
           begin
-          FileLines^.AtDelete(FileLines^.Count-2);
-          FileLines^.AtDelete(FileLines^.Count-1);
+          FileLines.AtDelete(FileLines^.Count-2);
+          FileLines.AtDelete(FileLines^.Count-1);
           end;
         if  ( (Delta.Y > FileLines^.Count-2) and (WorkString <> '')) and not
             ( (Copy(WorkString, 1, 7) = Copy(Str, 1, 7)) and
               (Copy(WorkString, 29, 37) = Copy(Str, 29, 37))) or
             (GetLine(FileLines^.Count-1) <> '')
         then
-          FileLines^.Insert(nil);
+          FileLines.Insert(nil);
         { Flash <<< }
-        FileLines^.Insert(NewLongStr(Str));
+        FileLines.Insert(NewLongStr(Str));
         end;
-      FileLines^.Insert(nil);
+      FileLines.Insert(nil);
       SetLimits;
       ScrollTo(0, FileLines^.Count-1);
       Pos.X := Delta.X-Size.X div 2;
@@ -5088,12 +5088,12 @@ procedure OpenSmartpad;
     InsertInfo;
     if  (PV <> Application) then
       begin
-      {if PView(PV)^.Owner = Pointer(Desktop) then SmartWindow^.MakeFirst;}
+      {if PView(PV).Owner = Pointer(Desktop) then SmartWindow^.MakeFirst;}
       Desktop.Delete(SmartWindow);
       Desktop.ExecView(SmartWindow);
       Desktop.InsertBefore(SmartWindow, Desktop.Last);
       Desktop.SetCurrent(PV, EnterSelect);
-      {if PView(PV)^.Owner = Pointer(Desktop) then PView(PV)^.MakeFirst;}
+      {if PView(PV).Owner = Pointer(Desktop) then PView(PV).MakeFirst;}
       end
     else
       SmartWindow.Select;

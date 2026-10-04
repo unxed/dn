@@ -187,7 +187,7 @@ procedure TSelectList.HandleEvent(var Event: TEvent);
         '+', '*', '-':
           if List <> nil then
             begin
-            List^.ForEach(DoSelect);
+            List.ForEach(DoSelect);
             CE
             end;
         else {case}
@@ -328,8 +328,8 @@ procedure TPanelClassRB.ChangeClass(Item: Integer);
     S: String;
   begin
   PanelClass := Item;
-//  T := PRadioButtons(PDialog(Owner)^.DirectLink[2]);
-  T := PCheckBoxes(PDialog(Owner)^.DirectLink[2]);
+//  T := PRadioButtons(PDialog(Owner).DirectLink[2]);
+  T := PCheckBoxes(PDialog(Owner).DirectLink[2]);
   with T^.Strings^ do
     begin
     { Освобождение обозначений десяти пресетов, если они есть.
@@ -593,10 +593,10 @@ procedure CM_AdvancedFilter(AFP: Pointer);
         S := FlName[uLFN];
         S := Copy(S, PosLastDot(S)+1, 255);
         UpStr(S);
-        PC^.Insert(NewStr(' *.' + S));
+        PC.Insert(NewStr(' *.' + S));
         end;
     fc.Free;
-    PC^.AtInsert(0, NewStr(' *.*'));
+    PC.AtInsert(0, NewStr(' *.*'));
     end;
 
   function GetMaskSelection: String;
@@ -669,7 +669,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
       SelectFilterLine := False;
       FItem := PL^.Focused;
       FreeStr := '';
-      PC^.ForEach(DoMake);
+      PC.ForEach(DoMake);
       if FreeStr = '' then
         begin
         CurrentExt := PC^.At(FItem);
@@ -700,7 +700,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
         (C^.IndexOf(@AAS) <> -1)
     then
       Exit;
-    C^.Insert(NewStr(AAS));
+    C.Insert(NewStr(AAS));
     end;
 
   procedure MakeMask(P_: Pointer);
@@ -762,7 +762,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
           Delete(S, 1, i);
         until False;
         FileMask := '';
-        C^.ForEach(MakeMask);
+        C.ForEach(MakeMask);
         C.Free;
         if FileMask <> '' then
           FileMask := ';'+FileMask;
@@ -829,7 +829,7 @@ function GetSelection(P: PFilePanelRoot; Single: Boolean):
     else
       begin
       New(FC, Init(1, 1));
-      FC^.Insert(CurFile);
+      FC.Insert(CurFile);
       end;
     end
   else
@@ -839,7 +839,7 @@ function GetSelection(P: PFilePanelRoot; Single: Boolean):
       begin
       FileI := SourceFiles^.At(I);
       if FileI^.Selected then
-        FC^.AtInsert(FC^.Count, FileI);
+        FC.AtInsert(FC^.Count, FileI);
       end;
     end;
   end { GetSelection };
@@ -934,7 +934,7 @@ procedure CM_CopyFiles(AFP: Pointer; MoveMode, Single: Boolean);
   if FC = nil then
     Exit;
   P^.Drive^.CopyFiles(FC, P, MoveMode);
-  FC^.DeleteAll;
+  FC.DeleteAll;
   FC.Free;
   end;
 
@@ -1060,7 +1060,7 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
     Exit;
   {JO: левое условие означает, что показ коротких имён включен в активной }
   {    панели, правое (закомментированное) - в пассивной                  }
-  if  (not PFilesCollection(IP)^.LFNActive)
+  if  (not PFilesCollection(IP).LFNActive)
     {or ((P^.Drive^.Flags and psShowLongName) = 0)}
   then
     begin {JO: делаем недоступным чекбокс регистрочувствительности}
@@ -1093,9 +1093,9 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
     DT.FMask := x_x;
 
   DD := IP;
-  OSM1 := PFilesCollection(P^.Files)^.SortMode;
+  OSM1 := PFilesCollection(P^.Files).SortMode;
   OSM2 := DD^.SortMode;
-  PFilesCollection(P^.Files)^.SortMode := DT.o;
+  PFilesCollection(P^.Files).SortMode := DT.o;
   DD^.SortMode := DT.o;
 
   Info := nil;
@@ -1105,11 +1105,11 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
     end;
 
   InThat := DD;
-  P^.Files^.ForEach(Cmp1);
+  P^.Files.ForEach(Cmp1);
   InThat := P^.Files;
-  DD^.ForEach(Cmp1);
+  DD.ForEach(Cmp1);
 
-  PFilesCollection(P^.Files)^.SortMode := OSM1;
+  PFilesCollection(P^.Files).SortMode := OSM1;
   DD^.SortMode := OSM2;
   Info.Free;
   end { CM_CompareDirs };
@@ -1124,7 +1124,7 @@ procedure CM_EraseFiles(AFP: Pointer; Single: Boolean);
   if  (FC = nil) or (P^.Drive = nil) then
     Exit;
   P^.Drive^.EraseFiles(FC);
-  FC^.DeleteAll;
+  FC.DeleteAll;
   FC.Free;
   P^.RedrawPanelInfoDir;
   P^.SendLocated;
@@ -1149,7 +1149,7 @@ procedure CM_MakeList(AFP: Pointer);
   if FC = nil then
     Exit;
   MakeListFile(P, FC);
-  FC^.DeleteAll;
+  FC.DeleteAll;
   FC.Free;
   P^.RedrawPanelInfoDir;
   end { CM_MakeList };
@@ -1667,7 +1667,7 @@ procedure CM_CopyTemp(AFP: Pointer);
   if FC = nil then
     Exit;
   GlobalEvent(evBroadcast, cmCopyToTemp, @C);
-  FC^.DeleteAll;
+  FC.DeleteAll;
   FC.Free;
   end;
 
@@ -1696,7 +1696,7 @@ procedure CM_ArchiveFiles(AFP: Pointer);
   FSplit(S, Dir, Name, Ext); {AK155: не уверен, что это нужно }
   MakeArchive(Name, PC, False, False, P);
   {/Cat}
-  PC^.DeleteAll;
+  PC.DeleteAll;
   end { CM_ArchiveFiles };
 {-DataCompBoy-}
 
@@ -1880,7 +1880,7 @@ procedure CM_DragDropper(AFP: Pointer; CurPos: Integer; EV: Pointer);
   then
     begin
     New(FC, Init(1, 1)); {AK155: заменил 10,10 на 1,1}
-    FC^.Insert(P^.Files^.Items^[CurPos]);
+    FC.Insert(P^.Files^.Items^[CurPos]);
     end
   else
     Exit;
@@ -2620,7 +2620,7 @@ procedure CM_ChangeCase(AFP: Pointer);
 
   if ExecResource(dlgNameCase, ChangeNamesCaseOptions) = cmCancel then
     begin
-    FC^.DeleteAll;
+    FC.DeleteAll;
     FC.Free;
     Exit;
     end;
@@ -2634,7 +2634,7 @@ procedure CM_ChangeCase(AFP: Pointer);
        and (ChangeNamesCaseOptions.ext = 0)
   then
     begin
-    FC^.DeleteAll;
+    FC.DeleteAll;
     FC.Free;
     Exit;
     end;
@@ -2679,7 +2679,7 @@ procedure CM_ChangeCase(AFP: Pointer);
   Abort := False;
   MessageL(P, evCommand, cmPanelReread, 0);
   Info.Free;
-  FC^.DeleteAll;
+  FC.DeleteAll;
   FC.Free;
   end { CM_ChangeCase };
 

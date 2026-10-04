@@ -382,7 +382,7 @@ constructor TDataSaver.Load(S: TStream);
             TempFiles^.Duplicates := False;
             {TempFiles^.Owner := Self;}
             for Q2 := 0 to Q do
-              TempFiles^.AtInsert(Q2, LoadFileRecOwn(S, TempDirs));
+              TempFiles.AtInsert(Q2, LoadFileRecOwn(S, TempDirs));
             end;
           end
         else
@@ -1133,7 +1133,7 @@ Err:
         0, 0, 0, 0, Directory,
         @Str1);
       New(FCT, Init(1, 1));
-      FCT^.AtInsert(0, FRT);
+      FCT.AtInsert(0, FRT);
       OldConfirms := Confirms;
       Confirms := 0;
       lGetDir(0, DirToChange);
@@ -1144,7 +1144,7 @@ Err:
       LFN.lChDir(DirToChange);
       DirToChange := '';
       Confirms := OldConfirms;
-      FCT^.DeleteAll;
+      FCT.DeleteAll;
       FCT.Free;
       end;
     DisposeStr(PJ);
@@ -2821,7 +2821,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         R.Grow(-1, -2);
         Dec(R.B.Y, 2);
         TeamView.Create(R);
-        PGroup(Desktop.TopView)^.Insert(TeamView);
+        PGroup(Desktop.TopView).Insert(TeamView);
         Desktop.TopView^.HelpCtx := hcTeam;
         end;
     cmQuit:
@@ -2914,7 +2914,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmClearData:
       begin
       FillChar(FreeStr, SizeOf(FreeStr), 0);
-      PView(Event.InfoPtr)^.Owner.SetData(FreeStr);
+      PView(Event.InfoPtr).Owner.SetData(FreeStr);
       ClearEvent(Event);
       end;
     cmChLngId:
@@ -2978,7 +2978,7 @@ procedure ClearSelection(AFP: Pointer; FC: Pointer);
     end;
 
   begin
-  PFilesCollection(FC)^.ForEach(UnSelect);
+  PFilesCollection(FC).ForEach(UnSelect);
   with PFilePanelRoot(AFP)^ do
     begin
     DrawView;
@@ -3015,7 +3015,7 @@ procedure PutInClip(const S: String);
   if editcore.ClipBoard <> nil then
     editcore.ClipBoard.Free;
   editcore.ClipBoard := PLineCollection.Create(1, 1, True);
-  editcore.ClipBoard^.Insert(NewLongStr(S));
+  editcore.ClipBoard.Insert(NewLongStr(S));
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipIn;
   if ClipBoardStream <> nil then
@@ -3028,7 +3028,7 @@ procedure PutInClipLong(const S: LongString);
   if editcore.ClipBoard <> nil then
     editcore.ClipBoard.Free;
   editcore.ClipBoard := PLineCollection.Create(1, 1, True);
-  editcore.ClipBoard^.Insert(NewLongStr(S));
+  editcore.ClipBoard.Insert(NewLongStr(S));
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipIn;
   if ClipBoardStream <> nil then
