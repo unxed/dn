@@ -293,7 +293,7 @@ constructor TArvidDrive.Create(const AName: String);
       if  (IOResult <> 0) then
         begin
 1:
-        Dispose(Stream, Done);
+        Stream.Free;
         Stream := nil;
         Fail;
         end;
@@ -346,7 +346,7 @@ procedure TArvidDrive.Kill;
   if not KillAfterUse then
     Exit;
   if Stream <> nil then
-    Dispose(Stream, Done);
+    Stream.Free;
   Stream := nil;
   EraseTempFile(Name^);
   end;
@@ -393,7 +393,7 @@ destructor TArvidDrive.Destroy;
     ArvidDrives := nil;
     end;
   if Stream <> nil then
-    Dispose(Stream, Done);
+    Stream.Free;
   Stream := nil;
   DisposeStr(Name);
   inherited Destroy;
@@ -487,7 +487,7 @@ procedure TArvidDrive.RereadDirectory(S: String);
     Prev^.RereadDirectory(S);
   if filetype = avdAvt then
     begin
-    Dispose(Stream, Done);
+    Stream.Free;
     Stream := PBufStream.Create(Name^, stOpen, 2048);
     Stream.Seek(0);
     Stream.Read(AVT, SizeOf(AVT));
@@ -662,7 +662,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
     P^.Free;
     Stream.Seek(0);
     Stream.Write(AVT, SizeOf(AVT));
-    Dispose(Stream, Done);
+    Stream.Free;
     Stream := PBufStream.Create(Name^, stOpen, 2048);
     GlobalMessage(evCommand, cmPanelReread, nil);
     Exit;
@@ -979,7 +979,7 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
        255, hsEditDesc) <> cmOK
   then
     Exit;
-  Dispose(Stream, Done);
+  Stream.Free;
   Stream := nil;
   RealAttr := $FFFF;
   ClrIO;
@@ -1014,7 +1014,7 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
     Stream.Write(AVT, SizeOf(AVT))
   else
     Stream.Write(D, SizeOf(D));
-  Dispose(Stream, Done);
+  Stream.Free;
   if RealAttr <> $FFFF then
     SetAttr(RealAttr);
   Stream := PBufStream.Create(Name^, stOpen, 2048);
