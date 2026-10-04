@@ -770,7 +770,7 @@ procedure TArvidDrive.ChangeUp(var S: String);
     Exit;
   if Prev = nil then
     begin
-    New(Prev, Init(0, Panel));
+    Prev := PDrive.Create(0, Panel);
     if Prev = nil then
       Exit;
     end;
@@ -786,7 +786,7 @@ procedure TArvidDrive.ChangeUp(var S: String);
   Prev := nil;
   S := GetName(Name^);
   Kill;
-  Dispose(PDrive(@Self), Done);
+  Self.Free;
   end { TArvidDrive.ChangeUp };
 
 procedure TArvidDrive.ChangeRoot;
