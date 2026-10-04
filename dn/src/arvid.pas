@@ -1288,7 +1288,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         begin
         SearchInStream(St, SR.Name);
         end;
-      Dispose(St, Done);
+      St.Free;
       ClrIO;
       FindNext(SR);
       end;
@@ -1301,7 +1301,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         begin
         SearchInStream(St, SR.Name);
         end;
-      Dispose(St, Done);
+      St.Free;
       ClrIO;
       FindNext(SR);
       end;
