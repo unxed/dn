@@ -29,10 +29,13 @@ procedure SetCursorType(Y1, Y2: Integer; Visible: Boolean);
 procedure MoveCursorTo(X, Y: Word);
 procedure GetCursorXY(var X, Y: Word);
 
+{ A desktop notification that a long operation is done (the far2l terminal shows it when the window is not the active one; elsewhere nothing happens). DN_NOTIFY=0 switches it off. }
+procedure NotifyUser(const Text: String);
+
 implementation
 
 uses
-  TvCell, TvColors, TvScreen{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
+  SysUtils, TvSys, TvCell, TvColors, TvScreen{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
 
 { --- the screen ---------------------------------------------------------------- }
 
@@ -154,6 +157,13 @@ procedure GetCursorXY(var X, Y: Word);
 begin
   X := CaretX;
   Y := CaretY;
+end;
+
+procedure NotifyUser(const Text: String);
+begin
+  if GetEnvironmentVariable('DN_NOTIFY') = '0' then
+    Exit;
+  TvSys.Notify('DN', Text);
 end;
 
 end.

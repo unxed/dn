@@ -103,7 +103,7 @@ uses
   mainapp, Startup, Messages, HistList, Commands,
   timeutil, Validate, TitleSet, UserMenu, Dos, DnIni,
   
-  osdep, Filediz , ArvidAvt ,
+  osdep, dnscreen, Filediz , ArvidAvt ,
   dirwatch, fsinfo, basics, strutil, fileutil,
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
@@ -2924,6 +2924,10 @@ procedure CopyFiles(Files: PCollection; SourcePanel: PView; MoveMode: Boolean; F
             CopyPrn, True);
   NotifyResume; {Cat}
   Dec(SkyEnabled);
+  if MoveMode then
+    NotifyUser('Move finished')
+  else
+    NotifyUser('Copy finished');
   
   end { CopyFiles };
 

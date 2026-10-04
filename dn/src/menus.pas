@@ -301,6 +301,7 @@ var
 
 implementation
 uses
+  TvSys, TvClip,
   basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8
   , keymap
   ;
@@ -1677,9 +1678,30 @@ procedure TStatusLine.Draw;
   DrawSelect(nil);
   end;
 
+{ The number of the F-key (0..11) of a key code of the status line (the scan code of F1..F12 or of its Shift, Ctrl, Alt variants), -1 for another key }
+function FKeyIndex(Code: LongInt): Integer;
+  var
+    Scan: Integer;
+  begin
+  Scan := (Code shr 8) and $FF;
+  case Scan of
+    $3B..$44: FKeyIndex := Scan-$3B;
+    $54..$5D: FKeyIndex := Scan-$54;
+    $5E..$67: FKeyIndex := Scan-$5E;
+    $68..$71: FKeyIndex := Scan-$68;
+    $85, $87, $89, $8B: FKeyIndex := 10;
+    $86, $88, $8A, $8C: FKeyIndex := 11;
+  else
+    FKeyIndex := -1;
+  end;
+  end;
+
 procedure TStatusLine.DrawSelect(Selected: PStatusItem);
   var
     B: TDrawBuffer;
+    FTitles: array[0..11] of AnsiString;
+    FIdx, FJ: Integer;
+    FText: AnsiString;
     T: PStatusItem;
     I, L: Integer;
     CSelect, CNormal, CSelDisabled, CNormDisabled: Word;
@@ -1692,6 +1714,8 @@ procedure TStatusLine.DrawSelect(Selected: PStatusItem);
   CNormDisabled := GetColorW($0202);
   CSelDisabled := GetColorW($0505);
   MoveChar(B, ' ', Byte(CNormal), Size.X);
+  for FJ := 0 to 11 do
+    FTitles[FJ] := '';
   T := Items;
   I := 0;
   if OldKbdState and 12 = 12 then
@@ -1714,6 +1738,20 @@ procedure TStatusLine.DrawSelect(Selected: PStatusItem);
     then
       begin
       L := CStrLen(T^.Text^)-Byte(FirstChar <> ' ');
+      FIdx := FKeyIndex(T^.KeyCode);
+      if FIdx >= 0 then
+        begin
+        { the title for a terminal that shows the F-keys (the far2l extensions): the text without the ~ marks and without the number of the key }
+        FText := Copy(T^.Text^, 1+Byte(FirstChar <> ' '), MaxStringLength);
+        while Pos('~', FText) > 0 do
+          Delete(FText, Pos('~', FText), 1);
+        while (FText <> '') and (FText[1] in ['0'..'9']) do
+          Delete(FText, 1, 1);
+{$IFNDEF DNUTF8}
+        FText := OemToUtf8(FText);
+{$ENDIF}
+        FTitles[FIdx] := FText;
+        end;
       if I+L < Size.X then
         begin
         if CommandEnabled(T^.Command) then
@@ -1747,6 +1785,8 @@ procedure TStatusLine.DrawSelect(Selected: PStatusItem);
       end;
     end;
   WriteLineC(0, 0, Size.X, 1, B);
+  if Selected = nil then
+    TvSys.SetFKeyTitles(FTitles);
   end { TStatusLine.DrawSelect };
 
 procedure TStatusLine.FindItems;

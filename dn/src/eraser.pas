@@ -59,7 +59,7 @@ procedure SetVLabel;
 function ValidErase(Files: PCollection): Boolean;
 
 implementation
-uses
+uses dnscreen,
   Defines, uselfn, Filediz,
   Dos, Lfn {DataCompBoy}, FilesCol, Commands, basics, strutil, fileutil,
   Startup, Messages, timeutil, Drivers, Tree,
@@ -561,6 +561,7 @@ DeleteDirDIZ:
   
   Dec(SkyEnabled);
   NotifyResume; {Cat}
+  NotifyUser('Delete finished');
   end { EraseFiles };
 {-DataCompBoy-}
 
