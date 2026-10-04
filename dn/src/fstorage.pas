@@ -81,7 +81,7 @@ type
 
   TDirStorage = class;
   PDirStorage = TDirStorage;
-  TDirStorage = class(TObject)
+  TDirStorage = class(TStreamable)
     SwapLevel: TSwapLevel;
     Dirs: LongInt;
     Files: LongInt;
