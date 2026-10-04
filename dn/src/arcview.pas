@@ -183,7 +183,7 @@ function MaxAvail: LongInt;
 
 procedure StdMsg(MsgNo: Byte);
   begin
-  Application^.Redraw;
+  Application.Redraw;
   case MsgNo of
     1:
       ErrMsg(dlArcMsg1);
@@ -298,7 +298,7 @@ constructor TArcDrive.Create(PC: PDirStorage; const AName, VAName: String);
     ArcFile := nil;
   ArcFileName := ArcName;
   VArcFileName := VArcName;
-  if  (ArcFile = nil) or (ArcFile^.Status <> stOK) then
+  if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
     begin
     StdMsg(4);
     Dispose(ArcFile, Done);
@@ -356,7 +356,7 @@ constructor TArcDrive.Load(S: TStream);
   else
     begin
     New(ArcFile, Init(ArcName, stOpenRead, ArcBufSize));
-    if  (ArcFile = nil) or (ArcFile^.Status <> stOK) then
+    if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
       begin
       Dispose(ArcFile, Done);
       ArcFile := nil;
@@ -440,7 +440,7 @@ function TArcDrive.ReadArchive: Boolean;
   New(ArcFile, Init(ArcName, stOpenRead, ArcBufSize));
   ArcFileName := ArcName;
   VArcFileName := VArcName;
-  if  (ArcFile = nil) or (ArcFile^.Status <> stOK) then
+  if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
     begin
     Dispose(ArcFile, Done);
     ArcFile := nil;
@@ -467,7 +467,7 @@ function TArcDrive.ReadArchive: Boolean;
   P := nil;
   R.Assign(1, 1, 30, 10);
   {P := WriteMsg(GetString(dlArcReadArc));}
-  Ln := ArcFile^.GetSize+1;
+  Ln := ArcFile.GetSize+1;
   Cancel := False;
   PReader := nil;
   Inc(SkyEnabled);
@@ -485,7 +485,7 @@ function TArcDrive.ReadArchive: Boolean;
         Desktop^.Insert(P);
         end;
       P^.Write(2,
-         Copy(Strg(#219, 25 div Trunc(Ln / (ArcFile^.GetPos+1))) +
+         Copy(Strg(#219, 25 div Trunc(Ln / (ArcFile.GetPos+1))) +
            Strg(#177, 25),
          1, 25));
       P^.Write(3, ItoS(Files^.Files)+GetString(dlFilesFound));
@@ -876,7 +876,7 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
       L: array[0..1] of PtrInt;
       ST: String;
     begin
-    Application^.Redraw;
+    Application.Redraw;
     ST := S;
     Pointer(L[0]) := @ST;
     L[1] := DE;
@@ -1024,7 +1024,7 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
   InitSysError;
   case DE of
     0:
-      Application^.Redraw;
+      Application.Redraw;
     8:
       StdMsg(1);
     else {case}
@@ -1817,7 +1817,7 @@ function ESC_Pressed: Boolean;
   var
     E: TEvent;
   begin
-  Application^.Idle;
+  Application.Idle;
   GetKeyEvent(E);
   ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
   end;
