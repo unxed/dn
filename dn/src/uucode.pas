@@ -281,7 +281,7 @@ function UU_Decode(
 
   procedure FReadLn;
     begin
-    OrgT := InputStream^.GetStr;
+    OrgT := InputStream.GetStr;
     end;
 
   procedure PrepareWrite;
@@ -457,7 +457,7 @@ procedure CalcBufCRC(var Buf; Size: LongInt; var PrevSum: Word);
       EndOfFile := True;
       Exit
       end;
-    EndOfFile := InputStream^.Eof;
+    EndOfFile := InputStream.Eof;
     end;
 
 function UUString(var s: String; var CRC: Word): Boolean;
@@ -595,7 +595,7 @@ function MemEqu(var A, B; Size: LongInt): Boolean;
       MB(s);
     Inc(ErrorNumber);
     if PI <> nil then
-      PI^.Write(6, GetString(dlUUDecodeErrors)+SSStr(ErrorNumber, 3, ' '));
+      PI.Write(6, GetString(dlUUDecodeErrors)+SSStr(ErrorNumber, 3, ' '));
     if  (Severe) and (CurPFile <> nil) then
       with CurPFile^ do
         begin
@@ -1615,19 +1615,19 @@ procedure DecodeStr(var Src, Dst);
       if not EndOfFile then
         begin
         R.Assign(0, 0, 40, 12);
-        New(PI, Init(R));
-        PI^.Top := GetString(dlUUDecode);
-        PI^.Write(1, GetString(dlUUDecodingTo)+Cut(InputFileName, 40));
-        PI^.Write(2, GetString(dlFC_To)+' '+OutputDir);
-        Desktop^.Insert(PI);
+        PI := PWhileView.Create(R);
+        PI.Top := GetString(dlUUDecode);
+        PI.Write(1, GetString(dlUUDecodingTo)+Cut(InputFileName, 40));
+        PI.Write(2, GetString(dlFC_To)+' '+OutputDir);
+        Desktop.Insert(PI);
         end;
       NewTimer(IdleTimer, 0);
       while not EndOfFile do
         begin
         UUfound := True;
-        PI^.Write(3, CurFileName);
-        PI^.Write(5, GetString(dlUUDecodeFiles)+SSStr(GoodNumber, 3, ' '));
-        PI^.Write(6, GetString(dlUUDecodeErrors)+SSStr(ErrorNumber, 3,
+        PI.Write(3, CurFileName);
+        PI.Write(5, GetString(dlUUDecodeFiles)+SSStr(GoodNumber, 3, ' '));
+        PI.Write(6, GetString(dlUUDecodeErrors)+SSStr(ErrorNumber, 3,
              ' '));
         BadSection := False;
         KickBack := False;
@@ -1651,9 +1651,9 @@ procedure DecodeStr(var Src, Dst);
       if SectionGo then
         TerminateSection;
       if PI <> nil then
-        Dispose(PI, Done);
+        PI.Free;
       PI := nil;
-      Dispose(InputStream, Done);
+      InputStream.Free;
       InputStream := nil;
       Message(Application, evCommand, cmCopyUnselect, PF);
       end { DoUuDecode };
@@ -1676,7 +1676,7 @@ procedure DecodeStr(var Src, Dst);
     PI := nil;
     ClearEX;
     ClearCRC;
-    AFileCollection^.ForEach(DoUuDecode);
+    AFileCollection.ForEach(DoUuDecode);
     if NFileArr > 0 then
       FlushLeftSections;
     if not UUfound then
@@ -2074,7 +2074,7 @@ function GetDecimal(Number: Word): String;
         Sec64Pn := 0
         end;
 
-      PI^.Write(3, Cut(OutName, 40));
+      PI.Write(3, Cut(OutName, 40));
 
       if NumSect > 0 then
         o := ' of '+ItoS(NumSect+1)
@@ -2484,18 +2484,18 @@ beg:
       GetMem(SouBuf, sss);
 
       R.Assign(0, 0, 40, 9);
-      New(PI, Init(R));
-      PI^.Top := GetString(dlUUEncode);
-      PI^.Write(1, GetString(dlUUEncoding)+Cut(FName, 40));
-      PI^.Write(2, GetString(dlFC_To));
-      Desktop^.Insert(PI);
+      PI := PWhileView.Create(R);
+      PI.Top := GetString(dlUUEncode);
+      PI.Write(1, GetString(dlUUEncoding)+Cut(FName, 40));
+      PI.Write(2, GetString(dlFC_To));
+      Desktop.Insert(PI);
       NewTimer(Timer, 0);
 
       EncodeSections;
       FreeMem(SouBuf, sss);
       FreeMem(DskBuf, OutBufSize);
       Close(ST.F);
-      PI^.Free;
+      PI.Free;
       if WriteERROR then
         begin
         P := @OutName;
