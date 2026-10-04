@@ -202,7 +202,7 @@ procedure SetupArchive(ArchCommand: Word);
     DT.UseLFN := Word(UseLFN);
     
     end;
-  D := PDialog(Application^.ValidView(PDialog(LoadResource(dlgSetupArc))));
+  D := PDialog(Application.ValidView(PDialog(LoadResource(dlgSetupArc))));
   if D = nil then
     goto Ex;
   D^.SetData(DT);

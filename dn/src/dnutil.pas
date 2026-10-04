@@ -1782,7 +1782,7 @@ procedure LoadPalFromFile(const FN: String);
 
   if LoadPalette then
     begin
-    Application^.Redraw;
+    Application.Redraw;
     end;
   end { LoadPalFromFile };
 {-DataCompBoy-}
@@ -1912,7 +1912,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     R.Rows := ItoS(ScreenHeight);
 
     D := PDialog(LoadResource(dlgChScreenMode));
-    D := PDialog(Application^.ValidView(D));
+    D := PDialog(Application.ValidView(D));
     if D = nil then
       Exit;
     D^.SetData(R);
@@ -2297,16 +2297,16 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       Msg(erNoQuickDirs, nil, mfWarning+mfCancelButton);
       Exit;
       end;
-    R.Assign(Application^.Size.X div 2-J div 2,
-      Application^.Size.Y div 2-Q div 2,
-      Application^.Size.X div 2+J div 2+J mod 2,
-      Application^.Size.Y div 2+Q div 2+Q mod 2);
+    R.Assign(Application.Size.X div 2-J div 2,
+      Application.Size.Y div 2-Q div 2,
+      Application.Size.X div 2+J div 2+J mod 2,
+      Application.Size.Y div 2+Q div 2+Q mod 2);
     Menu := NewMenu(Items);
     P := New(PMenuBox, Init(R, Menu, nil));
     P^.Options := P^.Options or ofCentered;
     P^.HelpCtx := hcQuickDirs;
 
-    N := Application^.ExecView(P);
+    N := Application.ExecView(P);
     Dispose(P, Done);
     DisposeMenu(Menu);
     if N >= cmQuickChange1 then
@@ -2507,7 +2507,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         DoneIniEngine;
        
         RestartPending := True;
-        Application^.EndModal(cmQuit);
+        Application.EndModal(cmQuit);
         end;
       end;
     L.FreeAll;
@@ -2718,7 +2718,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       else
         begin
         RestartPending := True;
-        Application^.EndModal(cmQuit);
+        Application.EndModal(cmQuit);
         end;
     {-DataCompBoy-}
     

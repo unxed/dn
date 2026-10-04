@@ -143,7 +143,7 @@ procedure TColorPoint.Draw;
   var
     B: Word;
   begin
-  B := Application^.GetColorW(Color) shl 8+$00FE {*};
+  B := Application.GetColorW(Color) shl 8+$00FE {*};
   WriteLineW(0, 0, 1, 1, B);
   end;
 

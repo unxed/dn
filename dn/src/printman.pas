@@ -673,7 +673,7 @@ procedure PrintFile(const S: String);
   R.Assign(0, 0, 50, 9);
   if Printer = nil then
     begin
-    W := Application^.ValidView(New(PPMWindow, Init(R)));
+    W := Application.ValidView(New(PPMWindow, Init(R)));
     if W <> nil then
       begin
       W^.Hide;

@@ -1809,7 +1809,7 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
     end;
 
   begin
-  {Application^.BFSpeed;}
+  {Application.BFSpeed;}
   Desktop^.MakeLocal(P^, R.A);
   Mover := New(PDragger, Init(R, Text));
   Desktop^.Insert(Mover);

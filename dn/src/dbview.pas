@@ -567,7 +567,7 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
 
   D^.SelectNext(False);
 
-  D := PDialog(Application^.ValidView(D));
+  D := PDialog(Application.ValidView(D));
   if D = nil then
     Exit;
 
@@ -749,7 +749,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
 
     D^.SelectNext(False);
 
-    D := PDialog(Application^.ValidView(D));
+    D := PDialog(Application.ValidView(D));
     if D = nil then
       Exit;
     Desktop^.ExecView(D);

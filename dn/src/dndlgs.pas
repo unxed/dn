@@ -480,7 +480,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
     New(MB, Init(R, Menu, nil));
     MB^.Menu^.Default := Items[Selected];
     MB^.ComboBoxPal := True;
-    C := Application^.ExecView(MB);
+    C := Application.ExecView(MB);
     if C <> 0 then
       begin
       Selected := C-1600;

@@ -147,7 +147,7 @@ procedure ChangeColors;
   if ExecResource(dlgColors, CurPal) <> cmCancel then
     begin
     SystemColors[appPalette] := CurPal;
-    Application^.Redraw; { Redraw application with new palette }
+    Application.Redraw; { Redraw application with new palette }
     end;
   if VGASystem then
     GetPalette(VGA_palette);

@@ -97,7 +97,7 @@ function ESC_Pressed: Boolean;
   var
     E: TEvent;
   begin
-  Application^.Idle;
+  Application.Idle;
   GetKeyEvent(E);
   ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
   end;
@@ -625,7 +625,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
     if  (S^.GetSize > MemAvail-$4000)
     then
       begin
-      Application^.OutOfMemory;
+      Application.OutOfMemory;
       Dispose(S, Done);
       FileName := '';
       isValid := False;
@@ -687,7 +687,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
         FreeMem(B, FBufSize);
         Dispose(S, Done);
         Info^.Free;
-        Application^.OutOfMemory;
+        Application.OutOfMemory;
         isValid := False;
         Exit
         end;

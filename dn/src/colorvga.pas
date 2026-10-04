@@ -438,7 +438,7 @@ procedure VGAColorRegister;
 
     { oldPalette := VGA_palette;}
 
-    if Application^.ExecuteDialog(
+    if Application.ExecuteDialog(
         New(PColorVGADialog, Init),
         @DataRec) = cmCancel
     then

@@ -181,7 +181,7 @@ procedure SystemSetup;
   if Resource = nil then
     Exit;
   D := PDialog
-            (Application^.ValidView(PDialog(Resource^.Get(dlgSystemSetup))
+            (Application.ValidView(PDialog(Resource^.Get(dlgSystemSetup))
         ));
   if D = nil then
     Exit;
@@ -285,7 +285,7 @@ procedure SaversSetup;
   if Resource = nil then
     Exit;
   D := PDialog
-            (Application^.ValidView(PDialog(Resource^.Get(dlgSaversSetup))
+            (Application.ValidView(PDialog(Resource^.Get(dlgSaversSetup))
         ));
   if D = nil then
     Exit;
@@ -704,7 +704,7 @@ procedure TSaversDialog.HandleEvent(var Event: TEvent);
           begin
           ClearEvent(Event);
           GetData(Data);
-          Application^.InsertAvIdlerN(Data, Data.Available.Focus);
+          Application.InsertAvIdlerN(Data, Data.Available.Focus);
           end;
       end {case};
   end {case};

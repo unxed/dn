@@ -829,13 +829,13 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       if SItems = nil then
         Break;
       Menu := NewMenu(SItems);
-      Application^.GetExtent(R);
+      Application.GetExtent(R);
       R.A.X := 0;
       R.B.X := NW;
       R.B.Y := Min(R.B.Y, NI);
       PV := New(PMenuBox, Init(R, Menu, nil));
       PV^.Options := PV^.Options or ofCentered;
-      I := Application^.ExecView(PV);
+      I := Application.ExecView(PV);
       Dispose(PV, Done);
       DisposeMenu(Menu);
       if I < 1000 then
@@ -850,7 +850,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
           Event.Command := Byte(not DoGlobal)*cmLocalMenuFileEdit+
             Byte(DoGlobal)*cmMenuFileEdit;
           Event.InfoPtr := nil;
-          Application^.PutEvent(Event);
+          Application.PutEvent(Event);
           end;
         Break;
         end;
@@ -972,7 +972,7 @@ procedure ScreenGrabber(ShowMessage: Boolean);
   B := MsgActive;
   MsgActive := False;
   P := New(PGrabber, Init);
-  Application^.ExecView(P);
+  Application.ExecView(P);
   Dispose(P, Done);
   Here := False;
   MsgActive := B;
@@ -982,11 +982,11 @@ constructor TGrabber.Create;
   var
     BB: TRect;
   begin
-  Application^.GetExtent(BB);
+  Application.GetExtent(BB);
   inherited Create(BB);
   R.A := Top;
   R.B := Bot;
-  BufSize := Application^.Size.X*2*Application^.Size.Y;
+  BufSize := Application.Size.X*2*Application.Size.Y;
   Screen := GetMem(BufSize);
   if Screen = nil then
     Fail;

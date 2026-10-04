@@ -303,7 +303,7 @@ var
     E.What := evKeyDown;
     SetDNKeyCode(E, Byte(CharASCII));
     if W in [cmOK, cmYes] then
-      Application^.HandleEvent(E);
+      Application.HandleEvent(E);
     GetCH := W = cmYes;
   end;
 

@@ -182,7 +182,7 @@ function ESC_Pressed: Boolean;
   var
     E: TEvent;
   begin
-  Application^.Idle;
+  Application.Idle;
   GetKeyEvent(E);
   ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
   end;
@@ -1024,7 +1024,7 @@ function TDrive.GetRealDir: String;
             if D <> nil then
               begin
               D^.SetData(MM);
-              Application^.ExecView(D);
+              Application.ExecView(D);
               D^.GetData(MM);
               Dispose(D, Done);
               end;
@@ -1057,7 +1057,7 @@ function TDrive.GetRealDir: String;
               if D <> nil then
                 begin
                 D^.SetData(MM);
-                Application^.ExecView(D);
+                Application.ExecView(D);
                 D^.GetData(MM);
                 Dispose(D, Done);
                 end;

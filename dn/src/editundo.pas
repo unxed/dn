@@ -721,7 +721,7 @@ procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
     S^.Write(SST[1], Length(SST));
     Inc(I);
     end;
-  {HintString := '';}Application^.Idle;
+  {HintString := '';}Application.Idle;
   P := C^.At(I-1);
   if P <> nil then
     SST := P^
