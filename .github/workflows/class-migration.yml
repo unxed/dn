@@ -31,7 +31,7 @@ jobs:
       - name: tv3 prerequisite gate
         run: tv/tools/class-gate.sh
       - name: Pascal class-name conversion checks
-        run: python3 -B -m unittest discover -s tools/tests -p test_class_names.py
+        run: python3 -B -m unittest discover -s tools/tests -p 'test_class_*.py'
       - name: Class release and profile persistence
         shell: bash
         run: |
