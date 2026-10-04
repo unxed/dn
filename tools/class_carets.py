@@ -4,6 +4,10 @@
 Discover class types with --types, then plan caret removals under --rewrite.
 --apply requires clean committed worktrees on non-main branches.
 Strings and comments are preserved; record/pointer dereferences keep ^.
+
+Global names come only from fields declared inside class types. Locals and
+parameters of the rewritten file are considered too. Comma lists like
+`A, B: TView` are supported.
 """
 import argparse
 
@@ -44,7 +48,6 @@ def is_ident(tok):
 
 
 def type_name_before(ts, index, class_names):
-    """If ts[index-1] ends a class type name, return True."""
     if index <= 0 or not is_ident(ts[index - 1]):
         return False
     j = index - 1
@@ -62,29 +65,82 @@ def type_token_after_colon(ts, colon_index):
     return j
 
 
-def collect_class_vars(sources, class_names):
-    """Names of fields/vars/params whose declared type is a class reference."""
-    result = set()
+def class_type_end(ts, type_index, class_names):
+    if type_index >= len(ts) or not is_ident(ts[type_index]):
+        return None
+    end = type_index + 1
+    while end + 1 < len(ts) and ts[end].text == b"." and is_ident(ts[end + 1]):
+        end += 2
+    if ts[end - 1].text.lower() in class_names:
+        return end
+    return None
+
+
+def names_before_colon(ts, colon_index):
+    """Return identifiers in `A, B, C:` ending at colon_index."""
+    if colon_index <= 0 or not is_ident(ts[colon_index - 1]):
+        return []
+    names = [ts[colon_index - 1].text.lower()]
+    j = colon_index - 1
+    while j >= 2 and ts[j - 1].text == b"," and is_ident(ts[j - 2]):
+        names.append(ts[j - 2].text.lower())
+        j -= 2
+    return names
+
+
+def collect_typed_names(sources, class_names, fields_only=False):
+    """Return (class_typed_names, non_class_typed_names).
+
+    fields_only: only fields inside `class ... end` (safe for global use).
+    otherwise: fields, vars and parameters (for the rewritten file).
+    Local non-class declarations shadow class field names of the same spelling.
+    """
+    class_typed = set()
+    other_typed = set()
+    skip_before = {
+        b"function", b"constructor", b"destructor", b"property", b"procedure",
+    }
     for data in sources:
         ts = tokens(data)
+        class_depth = 0
         i = 0
         while i < len(ts):
-            if ts[i].text == b":" and i > 0 and is_ident(ts[i - 1]):
-                if i >= 2 and ts[i - 2].text.lower() in (
-                    b"function", b"constructor", b"destructor", b"property",
-                    b"procedure",
-                ):
+            word = ts[i].text.lower()
+            if word == b"class" and i + 1 < len(ts):
+                following = ts[i + 1].text.lower()
+                if following not in (b"of", b";"):
+                    class_depth += 1
+            elif word == b"end" and class_depth:
+                class_depth -= 1
+
+            if ts[i].text == b":":
+                # `:=` is assignment, not a declaration.
+                if i + 1 < len(ts) and ts[i + 1].text == b"=":
+                    i += 1
+                    continue
+                if fields_only and class_depth == 0:
+                    i += 1
+                    continue
+                if i >= 2 and ts[i - 2].text.lower() in skip_before:
+                    i += 1
+                    continue
+                names = names_before_colon(ts, i)
+                if not names:
                     i += 1
                     continue
                 j = type_token_after_colon(ts, i)
-                if j < len(ts) and is_ident(ts[j]):
-                    end = j + 1
-                    while end + 1 < len(ts) and ts[end].text == b"." and is_ident(ts[end + 1]):
-                        end += 2
-                    if ts[end - 1].text.lower() in class_names:
-                        result.add(ts[i - 1].text.lower())
+                if class_type_end(ts, j, class_names) is not None:
+                    class_typed.update(names)
+                else:
+                    # Pointer/record/other locals shadow class field names.
+                    if j < len(ts) and (is_ident(ts[j]) or ts[j].text == b"^"):
+                        other_typed.update(names)
             i += 1
-    return result
+    return class_typed, other_typed
+
+
+def collect_class_vars(sources, class_names, fields_only=False):
+    return collect_typed_names(sources, class_names, fields_only=fields_only)[0]
 
 
 def find_open_paren(ts, close_index):
@@ -122,9 +178,10 @@ def caret_is_class_deref(ts, caret_index, class_names, class_vars):
     return False
 
 
-def caret_removals(data, class_names, class_vars):
+def caret_removals(data, class_names, field_vars):
     ts = tokens(data)
-    names = class_vars | collect_class_vars([data], class_names)
+    local_class, local_other = collect_typed_names([data], class_names, fields_only=False)
+    names = (field_vars | local_class) - local_other
     return [
         (tok.start, tok.end, b"")
         for i, tok in enumerate(ts)
@@ -132,8 +189,8 @@ def caret_removals(data, class_names, class_vars):
     ]
 
 
-def rewrite(data, class_names, class_vars):
-    edits = caret_removals(data, class_names, class_vars)
+def rewrite(data, class_names, field_vars):
+    edits = caret_removals(data, class_names, field_vars)
     result = bytearray()
     position = 0
     for start, end, replacement in edits:
@@ -150,8 +207,8 @@ def prepare(types_paths):
     sources = files(types_paths)
     source_bytes = [path.read_bytes() for path in sources]
     class_names = library_classes(source_bytes)
-    class_vars = collect_class_vars(source_bytes, class_names)
-    return class_names, class_vars
+    field_vars = collect_class_vars(source_bytes, class_names, fields_only=True)
+    return class_names, field_vars
 
 
 def main():
@@ -163,11 +220,11 @@ def main():
     targets = files(args.rewrite)
     if args.apply:
         checkpoints(targets)
-    class_names, class_vars = prepare(args.types)
+    class_names, field_vars = prepare(args.types)
     plans = []
     for path in targets:
         original = path.read_bytes()
-        converted, count = rewrite(original, class_names, class_vars)
+        converted, count = rewrite(original, class_names, field_vars)
         if original != converted:
             plans.append((path, original, converted, count))
             print(f"{path}: {count} carets removed")
@@ -178,7 +235,7 @@ def main():
         for path, original, converted, _count in plans:
             path.write_bytes(converted)
     print(
-        f"{len(class_names)} class names, {len(class_vars)} class-typed names; "
+        f"{len(class_names)} class names, {len(field_vars)} class fields; "
         f"{len(plans)} files {'changed' if args.apply else 'planned'}"
     )
 
