@@ -149,12 +149,12 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
       if fPos = Pos then
         Exit;
       fPos := Pos;
-      F^.Seek(Pos);
+      F.Seek(Pos);
       end;
 
     procedure fRead(var Buf; Count: LongInt);
       begin
-      F^.Read(Buf, Count);
+      F.Read(Buf, Count);
       Inc(fPos, Count);
       end;
 
@@ -190,7 +190,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
       procedure TryInit;
         begin
         B := TBufStream.Create(FName, stCreate, $8000);
-        if B^.Status <> stOK then
+        if B.Status <> stOK then
           begin
           B.Free;
           B := nil;
@@ -213,18 +213,18 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
           CheckCancel;
           if Cancel then
             Break;
-          if F^.Status <> stOK then
+          if F.Status <> stOK then
             Exit;
           fSeek(Fat2Sec(Clus)*SectLen+DskOffset);
-          if F^.Status <> stOK then
+          if F.Status <> stOK then
             Exit;
           A := Min(len, BytesPerClu);
           Dec(len, A);
           fRead(CpyBuf^, A);
-          if F^.Status <> stOK then
+          if F.Status <> stOK then
             Exit;
-          B^.Write(CpyBuf^, A);
-          if B^.Status <> stOK then
+          B.Write(CpyBuf^, A);
+          if B.Status <> stOK then
             Exit;
           if len = 0 then
             begin
@@ -254,7 +254,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
         Exit;
       Dir := FmtStr(ADir, VolumeLabel);
       FName := MakeNormName(Dir, ANm);
-      PInfo^.Write(3, LowStrg(GetName(FName)));
+      PInfo.Write(3, LowStrg(GetName(FName)));
       TryInit;
       if B = nil then
         begin
@@ -301,7 +301,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
         repeat
           fSeek(Fat2Sec(Ofst)*SectLen+DskOffset);
           fRead(_Dir^[I], BytesPerClu);
-          if F^.Status <> stOK then
+          if F.Status <> stOK then
             Exit;
           I := I+BytesPerClu;
           Ofst := NextFAT(Ofst);
@@ -314,7 +314,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
         MemSize := RootEntries*32;
         GetMem(_Dir, MemSize);
         fRead(_Dir^, MemSize);
-        if F^.Status <> stOK then
+        if F.Status <> stOK then
           Exit;
         FileCount := RootEntries;
         end;
@@ -401,7 +401,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
     fPos := 0;
     SearchVolume := True;
     DSKoffset := 0;
-    if F^.Status <> stOK then
+    if F.Status <> stOK then
       Exit;
     GetMem(BRec, 4096);
     fRead(BRec^, 4096);
@@ -441,7 +441,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
       NumSectors := BRec^.TotalSc;
     FreeMem(BRec, 4096);
     BRec := nil;
-    if F^.Status <> stOK then
+    if F.Status <> stOK then
       Exit;
 
     ChkValid;
@@ -459,12 +459,12 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
       Exit;
 
     fSeek(Reserved*SectLen+DSKoffset);
-    if F^.Status <> stOK then
+    if F.Status <> stOK then
       Exit;
 
     GetMem(FAT, FATSize);
     fRead(FAT^, FATSize);
-    if F^.Status = stOK then
+    if F.Status = stOK then
       begin {piwamoto}
       ProcessDir(DestDir+'%s', SectPerFAT*FatCopies+Reserved, False);
       SearchVolume := False;
@@ -475,13 +475,13 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
     end { DoIt };
 
   begin { UnpackImage }
-  PInfo^.Write(1, GetName(FName));
+  PInfo.Write(1, GetName(FName));
   Error := False;
   Cancel := False;
   NewTimer(Tmr, 0);
   F := TBufStream.Create(FName, stOpenRead, $8000);
   DoIt;
-  Error := Error or (F^.Status <> stOK);
+  Error := Error or (F.Status <> stOK);
   F.Free;
   F := nil;
   if Error then
@@ -512,14 +512,14 @@ procedure DoIt(AOwner: Pointer; AFiles: PFilesCollection;
   ADestPath := MakeNormName(ADestPath, '');
 
   R.Assign(1, 1, 26, 10);
-  PInfo.Create(R);
-  PInfo^.Top := GetString(dlImage);
+  PInfo := TWhileView.Create(R);
+  PInfo.Top := GetString(dlImage);
   Desktop.Insert(PInfo);
 
   CreateDirInheritance(ADestPath, False);
-  for I := 0 to AFiles^.Count-1 do
+  for I := 0 to AFiles.Count-1 do
     begin
-    PF := AFiles^.At(I);
+    PF := AFiles.At(I);
     if not UnpackImage(MakeNormName(CnvString(PF^.Owner),
            PF^.FlName[True]), ADestPath, PInfo)
     then
@@ -537,7 +537,7 @@ procedure UnpackDiskImages(AOwner: Pointer; Files: PFilesCollection);
   var
     DestPath: String;
   begin
-  if  (Files = nil) or (Files^.Count = 0) then
+  if  (Files = nil) or (Files.Count = 0) then
     Exit;
   DestPath := '';
   Message(Application, evCommand, cmPushFullName, @DestPath);
