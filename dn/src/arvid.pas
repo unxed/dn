@@ -1159,8 +1159,8 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
                   ( (Attr = 0) or (FF.Attr and Attr <> 0)))
             then
               begin
-              Add(New(PFindFile, Init(TdrMakeFileName(SS), FF.Size,
-                     FF.Time)), Name);
+              Add(PFindFile.Create(TdrMakeFileName(SS), FF.Size,
+                     FF.Time), Name);
               end;
             end;
           end;
@@ -1168,7 +1168,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       Inc(LP, SizeOf(DD));
     until (LP > D.DirTableOfs+D.DirTableLen) or OOM;
     if OOM then
-      Application^.OutOfMemory;
+      Application.OutOfMemory;
     end { TdrSearchInStream };
 
   procedure AvtSearchInStream(L: LongInt);
