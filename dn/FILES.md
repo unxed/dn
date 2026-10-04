@@ -62,7 +62,7 @@ The names of the units are words without digits and underscores (a unit has the 
 |---|---|---|---|
 | Settings of the dialogs (`StartupData`, `SystemData`, panel presets...): a **binary** image of the records (the old format of `dn.cfg`), now **inside `dn.ini`**, in the section `[Saved]` as hex pieces (`[Saved<suffix>]` for `DNCFG=<suffix>`) | `dn.ini`, section `[Saved]` (`cfgstate.pas`; the blocks `cfg*` of the image are in `dnutil.pas`). The old `dn.cfg` is read once if the section is not there and is renamed to `dn.old` | `WriteConfig` (`dnutil.pas`): at the exit **only if** `ConfigModified` (`startup.pas`; the dialogs set it) and at some other places | `ReadConfig` (`boot.pas`) at the start |
 | Settings in **text** form (the new way, a person may edit it: Options -> edit `dn.ini`) | `dn.ini` | the ini engine: `iniengine.pas` (`RegisterVar`: what is in the file), the variables are in `dnini.pas`; `copyini.pas` carries values over to `StartupData` | at the start |
-| The cache of the parsed `dn.ini` (the start is faster; safe to delete; was `dnini.in_`) | `dn.cac` | `iniengine.pas` | `iniengine.pas` |
+| The cache of the parsed `dn.ini` (the start is faster; safe to delete; was `dnini.in_`) | `dn.cbc` | `iniengine.pas` | `iniengine.pas` |
 | Desktop saved by the user or by autosave | `dn.dsk` | `SaveRealDsk` (`dnutil.pas`): Options -> Save desktop (`cmSaveDesk`) and at the exit when `StartupData.Unload and osuAutosave` (Options -> Startup, "Autosave Desktop") | `Init` of the application |
 | Desktop for the return from an external program | `dn<n>.swp` (in `SwpDir`) | `SaveDsk` (`dnutil.pas`) at the exit, except the total exit | `Init`, then the file is erased |
 | Histories | `dn.his` | `SaveHistories` at a normal exit | at the start |
