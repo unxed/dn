@@ -231,6 +231,6 @@ Done in four independent units, each with its own tests (a plan from reading `ma
 
 * Small atomic steps, each with tests and a note in the docs (so that another person can continue from the repository alone), each pushed. Iterations in the style of RUP: a usable result early, then
   improve. After each big step, **one step of refactoring** of the most burning thing (names of files, `IFDEF` sprawl, buffer models), without changing behavior.
-* Doubtful choices become **settings** (`DN_UTF8`, `DN_EMBED_TERM`, `DN_RUN_PAUSE`, `DN_WIN_OUTPUT`, `TV_COLORS`, `TV_MOUSE`, `DN_CODEPAGE`) instead of arguments; a note in the TODO file records what is known to be wrong.
+* Doubtful choices become **settings** (`DN_UTF8`, `DN_EMBED_TERM`, `DN_RUN_PAUSE`, `DN_WIN_OUTPUT`, `TV_COLORS`, `TV_MOUSE`, `DN_CODEPAGE`, `TV_FAR2L`, `TV_WIN32_INPUT`, `TV_CLIPBOARD`, `TV_OSC52_READ`, `TV_OSC52_WAIT`, `DN_NOTIFY`, `DN_DOS_UTF8_NAMES`, `TV_DOS_UTF8_CLIP`, `DN2` (the directory of the files that DN writes)) instead of arguments; a note in the TODO file records what is known to be wrong.
 * No perfectionism: when you find an unrelated defect, write it in the TODO file and go back to the task.
 * When information is missing (a file, a log, a sample of data), stop and ask for it with a patch or an instruction for collecting it; do not guess.
