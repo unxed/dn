@@ -61,7 +61,7 @@ type
   TUniWindow = class(TWindow)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     function GetPalette: TPalette; virtual;
-    function MakeScrollBar(AOptions: Word): PScrollBar;
+    function MakeScrollBar(AOptions: Word): TScrollBar;
     procedure InitFrame; virtual;
     function ReactOnCmd: Boolean; virtual;
     end;
@@ -117,7 +117,7 @@ procedure TUniWindow.InitFrame;
   Frame := PEditFrame.Create(R);
   end;
 
-function TUniWindow.MakeScrollBar(AOptions: Word): PScrollBar;
+function TUniWindow.MakeScrollBar(AOptions: Word): TScrollBar;
   var
     P: PEditScrollBar;
     R: TRect;

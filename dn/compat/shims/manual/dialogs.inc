@@ -16,13 +16,13 @@ const
   CInfoPane = #30;
 
 type
-  PDialog = TDialog;
-  PButton = TButton;
-  PLabel = TLabel;
+
+
+
 
   { an input line for long text (DN: strings of more than 255 characters). TODO: it is an ordinary input
     line for now. }
   TLongInputLine = class;
-  PLongInputLine = TLongInputLine;
+
   TLongInputLine = class(TInputLine)
   end;

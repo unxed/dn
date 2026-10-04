@@ -1,13 +1,13 @@
 type
   TBackgroundItem = record
-    View: PView;
+    View: TView;
     Last: QWord;
   end;
 
 var
   Background: array of TBackgroundItem;
 
-procedure UnregisterFromBackground(P: PView);
+procedure UnregisterFromBackground(P: TView);
 var
   I: Integer;
 begin
@@ -19,7 +19,7 @@ begin
     end;
 end;
 
-procedure RegisterToBackground(P: PView);
+procedure RegisterToBackground(P: TView);
 var
   I: Integer;
 begin
@@ -36,7 +36,7 @@ procedure RunBackground;
 var
   I: Integer;
   Now: QWord;
-  P: PView;
+  P: TView;
 begin
   Now := GetTickCount64;
   I := 0;
@@ -57,7 +57,7 @@ begin
   inherited Draw;
 end;
 
-function MessageL(Receiver: PView; What, Command: Word; InfoLng: LongInt): Pointer;
+function MessageL(Receiver: TView; What, Command: Word; InfoLng: LongInt): Pointer;
 var
   Event: TEvent;
 begin

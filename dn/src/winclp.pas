@@ -64,15 +64,15 @@ uses
   Defines, Streams, Collect
   ;
 
-function SetWinClip(PC: PLineCollection): Boolean; 
-function GetWinClip(var PCL: PLineCollection {; NeedStream: boolean})
+function SetWinClip(PC: TLineCollection): Boolean; 
+function GetWinClip(var PCL: TLineCollection {; NeedStream: boolean})
   : Boolean; 
 function GetWinClipSize: Boolean; 
 procedure SyncClipIn; 
 procedure SyncClipOut {(NeedStream: boolean)}; 
 
-procedure CopyLines2Stream(PC: PCollection; var PCS: PStream);
-procedure CopyStream2Lines(PCS: PStream; var PC: PCollection);
+procedure CopyLines2Stream(PC: TCollection; var PCS: TStream);
+procedure CopyStream2Lines(PCS: TStream; var PC: TCollection);
 
 implementation
 
@@ -102,7 +102,7 @@ function FromSys(const S: AnsiString): LongString;
 {$ENDIF}
   end;
 
-function LinesText(PC: PLineCollection): AnsiString;
+function LinesText(PC: TLineCollection): AnsiString;
   var
     I: LongInt;
     L: AnsiString;
@@ -123,12 +123,12 @@ function LinesText(PC: PLineCollection): AnsiString;
   end;
 
 { the text of the system into the lines (a new collection) }
-function TextLines(const T: AnsiString): PLineCollection;
+function TextLines(const T: AnsiString): TLineCollection;
   var
     P, Q: LongInt;
     S: AnsiString;
   begin
-  Result := PLineCollection.Create(10, 10, True);
+  Result := TLineCollection.Create(10, 10, True);
   P := 1;
   while P <= Length(T) do
     begin
@@ -145,7 +145,7 @@ function TextLines(const T: AnsiString): PLineCollection;
     Result.Insert(NewLongStr(''));
   end;
 
-function SetWinClip(PC: PLineCollection): Boolean;
+function SetWinClip(PC: TLineCollection): Boolean;
   begin
   Result := False;
   if PC = nil then
@@ -154,7 +154,7 @@ function SetWinClip(PC: PLineCollection): Boolean;
   Result := True;
   end;
 
-function GetWinClip(var PCL: PLineCollection {; NeedStream: boolean})
+function GetWinClip(var PCL: TLineCollection {; NeedStream: boolean})
   : Boolean;
   var
     T: AnsiString;
@@ -177,7 +177,7 @@ function GetWinClipSize: Boolean;
 procedure SyncClipIn;
   begin
   if editcore.ClipBoard <> nil then
-    SetWinClip(PLineCollection(editcore.ClipBoard));
+    SetWinClip(TLineCollection(editcore.ClipBoard));
   end;
 
 procedure SyncClipOut {(NeedStream: boolean)};
@@ -185,19 +185,19 @@ procedure SyncClipOut {(NeedStream: boolean)};
     T: AnsiString;
   begin
   T := ClipboardGetText;
-  if (T = '') or (T = LinesText(PLineCollection(editcore.ClipBoard))) then
+  if (T = '') or (T = LinesText(TLineCollection(editcore.ClipBoard))) then
     Exit;
   if editcore.ClipBoard <> nil then
     editcore.ClipBoard.Free;
   editcore.ClipBoard := TextLines(T);
   end;
 
-procedure CopyLines2Stream(PC: PCollection; var PCS: PStream);
+procedure CopyLines2Stream(PC: TCollection; var PCS: TStream);
 
   begin {Cat:todo DPMI32}
   end;
 
-procedure CopyStream2Lines(PCS: PStream; var PC: PCollection);
+procedure CopyStream2Lines(PCS: TStream; var PC: TCollection);
 
   begin {Cat:todo DPMI32}
   end;

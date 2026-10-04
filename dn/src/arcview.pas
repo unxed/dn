@@ -60,7 +60,7 @@ uses
 
 type
   TArcDrive = class;
-  PArcDrive = TArcDrive;
+
   TArcDrive = class(TDrive)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     ArcName: String; {DataCompBoy}
@@ -94,18 +94,18 @@ type
 
     procedure UseFile(P: PFileRec; Command: Word); virtual;
     {DataCompBoy}
-    function MakeListFile(PC: PCollection; UseUnp: Boolean;
+    function MakeListFile(PC: TCollection; UseUnp: Boolean;
          var B: Boolean): AnsiString;
     {JO:  параметр UseUnp указывает, будем использовать полученный      }
     {     список файлов для распаковщика (True), или паковщика (False); }
     {     переменная В возвращает, был ли создан фписок в               }
     {     командной строке (True) или в файле-списке (False)            }
 
-    procedure CopyFiles(AFiles: PCollection; Own: PView;
+    procedure CopyFiles(AFiles: TCollection; Own: TView;
          MoveMode: Boolean); virtual;
-    procedure CopyFilesInto(AFiles: PCollection; Own: PView;
+    procedure CopyFilesInto(AFiles: TCollection; Own: TView;
          MoveMode: Boolean); virtual;
-    procedure EraseFiles(AFiles: PCollection); virtual;
+    procedure EraseFiles(AFiles: TCollection); virtual;
     {procedure  GetDown(var B; C: Word; P: PFileRec); virtual;}
     {DataCompBoy}
     function GetRealName: String; virtual;
@@ -115,8 +115,8 @@ type
     function isUp: Boolean; virtual;
     procedure ChangeUp(var S: String); virtual;
     procedure ChangeRoot; virtual;
-    procedure ExtractFiles(AFiles: PCollection; ExtrDir: String;
-         Own: PView; Options: Byte); {DataCompBoy}
+    procedure ExtractFiles(AFiles: TCollection; ExtrDir: String;
+         Own: TView; Options: Byte); {DataCompBoy}
     procedure GetFreeSpace(var S: String); virtual;
     procedure GetDirInfo(var B: TDiskInfoRec); virtual;
     function GetFullFlags: Word; virtual;
@@ -124,7 +124,7 @@ type
     destructor Destroy; override;
     procedure StdMsg4;
     function OpenDirectory(const Dir: String;
-                                 PutDirs: Boolean): PDrive; virtual;
+                                 PutDirs: Boolean): TDrive; virtual;
     procedure DrvFindFile(FC: PFilesCollection); virtual;
     procedure ReadDescrptions(FilesC: PFilesCollection); virtual;
     function GetDriveLetter: Char; virtual;
@@ -293,7 +293,7 @@ constructor TArcDrive.Create(PC: PDirStorage; const AName, VAName: String);
   TempFile := '';
   Password := '';
   if ExistFile(ArcName) then
-    ArcFile := PBufStream.Create(ArcName, stOpenRead, ArcBufSize)
+    ArcFile := TBufStream.Create(ArcName, stOpenRead, ArcBufSize)
   else
     ArcFile := nil;
   ArcFileName := ArcName;
@@ -355,7 +355,7 @@ constructor TArcDrive.Load(S: TStream);
     end
   else
     begin
-    ArcFile := PBufStream.Create(ArcName, stOpenRead, ArcBufSize);
+    ArcFile := TBufStream.Create(ArcName, stOpenRead, ArcBufSize);
     if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
       begin
       ArcFile.Free;
@@ -416,7 +416,7 @@ destructor TArcDrive.Destroy;
 function TArcDrive.ReadArchive: Boolean;
   var
     PF: PArcFile;
-    P: PWhileView;
+    P: TWhileView;
     R: TRect;
     Ln: TFileSize;
     Cancel: Boolean;
@@ -437,7 +437,7 @@ function TArcDrive.ReadArchive: Boolean;
   {/AK155}
   CtrlBreakHit := False;
   ReadArchive := False;
-  ArcFile := PBufStream.Create(ArcName, stOpenRead, ArcBufSize);
+  ArcFile := TBufStream.Create(ArcName, stOpenRead, ArcBufSize);
   ArcFileName := ArcName;
   VArcFileName := VArcName;
   if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
@@ -478,7 +478,7 @@ function TArcDrive.ReadArchive: Boolean;
       begin
       if P = nil then
         begin
-        P := PWhileView.Create(R);
+        P := TWhileView.Create(R);
         PReader := P;
         P.Top := GetString(dlArcReadArc);
         P.Write(1, GetString(dlPercentComplete));
@@ -1056,17 +1056,17 @@ procedure TArcDrive.ChangeUp(var S: String);
     Exit;
   if Prev = nil then
     begin
-    Prev := PDrive.Create(0, Panel);
+    Prev := TDrive.Create(0, Panel);
     if Prev = nil then
       Exit;
     {Prev.Owner := Owner;}
     end;
-  PFilePanel(Panel).Drive := Prev;
+  TFilePanel(Panel).Drive := Prev;
   if Prev is TDrive then
     Prev.lChDir(GetPath(VArcName));
   {piwamoto: VArcName is a feature, not a bug :-)}
   if  (Prev.DriveType = dtDisk) and
-      (PView(Panel).GetState(sfSelected+sfActive))
+      (TView(Panel).GetState(sfSelected+sfActive))
   then
     ActivePanel := Panel;
   GlobalMessage(evCommand, cmRereadInfo, nil);
@@ -1086,7 +1086,7 @@ procedure TArcDrive.ChangeRoot;
   end;
 
 {-DataCompBoy-}
-function TArcDrive.MakeListFile(PC: PCollection; UseUnp: Boolean; var B: Boolean): AnsiString;
+function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean): AnsiString;
   var
     F: lText;
     PF: PFileRec;
@@ -1196,8 +1196,8 @@ function TArcDrive.MakeListFile(PC: PCollection; UseUnp: Boolean; var B: Boolean
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TArcDrive.ExtractFiles(AFiles: PCollection; ExtrDir: String;
-    Own: PView; Options: Byte);
+procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
+    Own: TView; Options: Byte);
   var
     SS, ArchiveName: AnsiString;
     S, SCr: String;
@@ -1219,7 +1219,7 @@ procedure TArcDrive.ExtractFiles(AFiles: PCollection; ExtrDir: String;
     FCT: PFilesCollection;
     FRT: PFileRec;
     OldConfirms: Word;
-    PV: PView;
+    PV: TView;
     Inhr: Byte;
     SR: lSearchRec;
 
@@ -1405,7 +1405,7 @@ TryAgain:
   else
     begin
     { перекидываем файлы из временного подкаталога в каталог назначения}
-    PV := PUserWindow.Create;
+    PV := TUserWindow.Create;
     Desktop.Insert(PV);
     CopyDirContent(TempExtrDir+SCurDir, ExtrDir, True,
        (Options and 4 <> 0));
@@ -1442,7 +1442,7 @@ TryAgain:
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TArcDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boolean);
+procedure TArcDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean);
   var
     DT: record
       S: String;
@@ -1522,12 +1522,12 @@ procedure TArcDrive.MakeDir;
   end;
 
 {-DataCompBoy-}
-procedure TArcDrive.EraseFiles(AFiles: PCollection);
+procedure TArcDrive.EraseFiles(AFiles: TCollection);
   var
     SS, S: AnsiString;
     PF: PFileRec;
     J, I: Word;
-    O: PView;
+    O: TView;
     P: PString;
     B: Boolean;
   begin
@@ -1573,10 +1573,10 @@ procedure TArcDrive.EraseFiles(AFiles: PCollection);
     S := Cut(ArcName, 40);
     MessageBox(GetString(dlArcMsg4)+S, nil, mfError+mfOKButton);
     ChangeUp(CurDir);
-    PFilePanel(O).ReadDirectory;
+    TFilePanel(O).ReadDirectory;
     end
   else
-    PFilePanel(O).RereadDir;
+    TFilePanel(O).RereadDir;
   end { TArcDrive.EraseFiles };
 {-DataCompBoy-}
 
@@ -1599,7 +1599,7 @@ function TArcDrive.GetInternalName: String;
     GetInternalName := '';
   end;
 
-procedure TArcDrive.CopyFilesInto(AFiles: PCollection; Own: PView; MoveMode: Boolean);
+procedure TArcDrive.CopyFilesInto(AFiles: TCollection; Own: TView; MoveMode: Boolean);
   begin
   ForceRescan := True;
   ArchiveFiles(GetRealName, AFiles, MoveMode, nil);
@@ -1608,7 +1608,7 @@ procedure TArcDrive.CopyFilesInto(AFiles: PCollection; Own: PView; MoveMode: Boo
 
 procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
   var
-    C: PCollection absolute InfoPtr;
+    C: TCollection absolute InfoPtr;
 
   procedure SetPassword;
     var
@@ -1643,9 +1643,9 @@ procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
     end;
 
   var
-    PDr: PDrive;
+    PDr: TDrive;
     S: String;
-    O: PView;
+    O: TView;
 
   begin { TArcDrive.HandleCommand }
   case Command of
@@ -1666,7 +1666,7 @@ procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
            (AType.GetID = arcAIN) or
            (AType.GetID = arc7Z) then
           begin
-          PFilePanel(Panel).ForceReading := True;
+          TFilePanel(Panel).ForceReading := True;
           end;
         
         O := Panel;
@@ -1675,7 +1675,7 @@ procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
           CurDir := '';
           ChangeUp(CurDir);
           end;
-        PFilePanel(O).RereadDir;
+        TFilePanel(O).RereadDir;
         end;
   end {case};
   end { TArcDrive.HandleCommand };
@@ -1687,7 +1687,7 @@ procedure TArcDrive.GetFreeSpace(var S: String);
 
 function ArcViewer(AName, VAName: String): Boolean;
   var
-    P: PDrive;
+    P: TDrive;
     E: TEvent;
     Xt: String;
     I: Byte;
@@ -1707,7 +1707,7 @@ function ArcViewer(AName, VAName: String): Boolean;
     PathInside := '';
   {/JO}
   ArcViewer := False;
-  P := PArcDrive.Create(AName, VAName);
+  P := TArcDrive.Create(AName, VAName);
   if Abort then
     begin
     ArcViewer := True;
@@ -1723,7 +1723,7 @@ function ArcViewer(AName, VAName: String): Boolean;
     Xt := UpStrg(GetExt(AName));
     if  (Xt = '.TDR') or (Xt = '.AVT')
     then
-      P := PArvidDrive.Create(AName);
+      P := TArvidDrive.Create(AName);
     if P = nil then
       
       Exit;
@@ -1823,10 +1823,10 @@ function ESC_Pressed: Boolean;
   end;
 
 function TArcDrive.OpenDirectory(const Dir: String;
-                                       PutDirs: Boolean): PDrive;
+                                       PutDirs: Boolean): TDrive;
   var
-    PDrv: PDrive;
-    Dirs: PStringCollection;
+    PDrv: TDrive;
+    Dirs: TStringCollection;
     Fils: PFilesCollection;
     FR: PFileRec;
     tmr: TEventTimer;
@@ -1836,12 +1836,12 @@ function TArcDrive.OpenDirectory(const Dir: String;
     PDir: PString;
     LDir, DrName: String;
     I: LongInt;
-    PI: PView;
+    PI: TView;
     MemReq: LongInt;
     MAvail: LongInt;
   begin
   NewTimer(tmr, 0);
-  Dirs := PStringCollection.Create($10, $10, False);
+  Dirs := TStringCollection.Create($10, $10, False);
   PI := WriteMsg(GetString(dlReadingList));
   Fils := PFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
@@ -1913,7 +1913,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
     end;
   PI.Free;
 //используем '><' в качестве пpизнака ветви
-  PDrv := PFindDrive.Create('><'+Dir, Dirs, Fils);
+  PDrv := TFindDrive.Create('><'+Dir, Dirs, Fils);
   PDrv.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
   end { TArcDrive.OpenDirectory };
@@ -1921,8 +1921,8 @@ function TArcDrive.OpenDirectory(const Dir: String;
 procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
   var
     I: LongInt;
-    PDrv: PFindDrive;
-    Dirs: PStringCollection;
+    PDrv: TFindDrive;
+    Dirs: TStringCollection;
     Fils: PFilesCollection;
     FR: PFileRec;
     tmr: TEventTimer;
@@ -1934,7 +1934,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
     DateAfter, DateBefore,
     SizeGreat, SizeLess: LongInt;
     Attr: Byte;
-    PI: PView;
+    PI: TView;
     MemReq: LongInt;
     MAvail: LongInt;
 
@@ -1980,7 +1980,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
       Attr := Attr or ReadOnly;
     end;
 
-  Dirs := PStringCollection.Create($10, $10, False);
+  Dirs := TStringCollection.Create($10, $10, False);
   PI := WriteMsg(^M^M^C+GetString(dlSearching)+'...');
   Fils := PFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
@@ -2071,7 +2071,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
   if Fils.Count > 0 then
     begin
 //используем '<>' в качестве пpизнака панели поиска
-    PDrv := PFindDrive.Create('<>'+FindRec.Mask,
+    PDrv := TFindDrive.Create('<>'+FindRec.Mask,
           Dirs, Fils);
     PDrv.AMask := NewStr(FindRec.Mask);
     PDrv.NoMemory := MAvail <= MemReq;

@@ -61,13 +61,13 @@ function AvtCellText(Offset: LongInt; var S: TStream): String;
 function AvtCellName(const C: TAvtFileCell; var AStream: TStream): String;
 function AvtCellDesc(const C: TAvtFileCell; var AStream: TStream): String;
 
-function AvtGetCell(AvtDr: PArvidDrive): LongInt;
-procedure AvtFreeCell(AvtDr: PArvidDrive; const l: LongInt);
-function AvtCellRotateLeft(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
-function AvtCellRotateRight(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
-{procedure AvtCheckTree(AvtDr:PArvidDrive);}
-function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
-function AvtNewFile(AvtDr: PArvidDrive;
+function AvtGetCell(AvtDr: TArvidDrive): LongInt;
+procedure AvtFreeCell(AvtDr: TArvidDrive; const l: LongInt);
+function AvtCellRotateLeft(AvtDr: TArvidDrive; Loc: LongInt): LongInt;
+function AvtCellRotateRight(AvtDr: TArvidDrive; Loc: LongInt): LongInt;
+{procedure AvtCheckTree(AvtDr:TArvidDrive);}
+function AvtDelFile(AvtDr: TArvidDrive; AName: String): Boolean;
+function AvtNewFile(AvtDr: TArvidDrive;
     AName: String;
     ADescription: String;
     AIsDir: Boolean;
@@ -75,19 +75,19 @@ function AvtNewFile(AvtDr: PArvidDrive;
     ATime: LongInt;
     AStartSector: LongInt;
     AAttr: Word): Word;
-procedure AvtSeekDirectory(AvtDr: PArvidDrive);
-procedure AvtGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
+procedure AvtSeekDirectory(AvtDr: TArvidDrive);
+procedure AvtGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
     var FC: PFilesCollection; const FileMask: String);
-function CopyFilesToArvid(const S: String; Files: PCollection;
+function CopyFilesToArvid(const S: String; Files: TCollection;
      MoveMode: Boolean; Owner: Pointer): Boolean;
-procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
-    Own: PView; MoveMode: Boolean);
-procedure AvtEraseFiles(AvtDr: PArvidDrive; AFiles: PCollection);
-procedure AvtMakeDir(AvtDr: PArvidDrive);
-procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
-procedure AvtCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt;
+procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
+    Own: TView; MoveMode: Boolean);
+procedure AvtEraseFiles(AvtDr: TArvidDrive; AFiles: TCollection);
+procedure AvtMakeDir(AvtDr: TArvidDrive);
+procedure AvtEditDescription(AvtDr: TArvidDrive; var S, Nam: String);
+procedure AvtCalcTotal(AvtDr: TArvidDrive; const Offset: LongInt;
      var LL: TSize);
-function AvtInit(AvtDr: PArvidDrive): Boolean;
+function AvtInit(AvtDr: TArvidDrive): Boolean;
 
 implementation
 uses
@@ -164,7 +164,7 @@ function AvtCellDesc(const C: TAvtFileCell; var AStream: TStream): String;
   AvtCellDesc := S;
   end;
 
-function AvtGetCell(AvtDr: PArvidDrive): LongInt;
+function AvtGetCell(AvtDr: TArvidDrive): LongInt;
   var
     T: TAvtTextCell;
     M: TAvtMediaCell;
@@ -202,7 +202,7 @@ function AvtGetCell(AvtDr: PArvidDrive): LongInt;
     end
   end { AvtGetCell };
 
-procedure AvtFreeCell(AvtDr: PArvidDrive; const l: LongInt);
+procedure AvtFreeCell(AvtDr: TArvidDrive; const l: LongInt);
   var
     T: TAvtTextCell;
   begin
@@ -217,7 +217,7 @@ procedure AvtFreeCell(AvtDr: PArvidDrive; const l: LongInt);
     end
   end;
 
-function AvtCellRotateLeft(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
+function AvtCellRotateLeft(AvtDr: TArvidDrive; Loc: LongInt): LongInt;
   var
     Right: LongInt;
   begin
@@ -254,7 +254,7 @@ function AvtCellRotateLeft(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
     end
   end { AvtCellRotateLeft };
 
-function AvtCellRotateRight(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
+function AvtCellRotateRight(AvtDr: TArvidDrive; Loc: LongInt): LongInt;
   var
     Left: LongInt;
   begin
@@ -292,7 +292,7 @@ function AvtCellRotateRight(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
   end { AvtCellRotateRight };
 
 {
-procedure AvtCheckTree(AvtDr: PArvidDrive);
+procedure AvtCheckTree(AvtDr: TArvidDrive);
   function AvtNodeHight(const Loc: LongInt): LongInt;
   var
     LeftHight:  LongInt;
@@ -347,7 +347,7 @@ begin
 end;
 }
 
-function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
+function AvtDelFile(AvtDr: TArvidDrive; AName: String): Boolean;
   var
     SaveCurDir: String;
     CurDir2: String;
@@ -813,7 +813,7 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
   end { AvtDelFile };
 
 function AvtNewFile(
-    AvtDr: PArvidDrive;
+    AvtDr: TArvidDrive;
     AName: String;
     ADescription: String;
     AIsDir: Boolean;
@@ -1275,7 +1275,7 @@ function AvtNewFile(
     end
   end { AvtNewFile };
 
-procedure AvtSeekDirectory(AvtDr: PArvidDrive);
+procedure AvtSeekDirectory(AvtDr: TArvidDrive);
   var
     I, J: LongInt;
     Lv: Integer;
@@ -1365,7 +1365,7 @@ procedure AvtSeekDirectory(AvtDr: PArvidDrive);
     end
   end { AvtSeekDirectory };
 
-procedure AvtGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
+procedure AvtGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
     var FC: PFilesCollection; const FileMask: String);
   var
     TAttr: Word;
@@ -1419,19 +1419,19 @@ procedure AvtGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
     end
   end { AvtGetDirectory };
 
-function CopyFilesToArvid(const S: String; Files: PCollection;
+function CopyFilesToArvid(const S: String; Files: TCollection;
      MoveMode: Boolean; Owner: Pointer): Boolean;
   var
     I, J: Integer;
     PF: PFileRec;
-    PD: PDrive;
-    PAD: PArvidDrive;
+    PD: TDrive;
+    PAD: TArvidDrive;
     S2: String;
     ToStr: String;
     OldDir: String;
 
   function FindDrive(P_: Pointer): Boolean;
-  var P: PArvidDrive absolute P_;
+  var P: TArvidDrive absolute P_;
     begin
     FindDrive := P.Name^ = S2;
     end;
@@ -1440,7 +1440,7 @@ function CopyFilesToArvid(const S: String; Files: PCollection;
   CopyFilesToArvid := False;
   if Owner = nil then
     Exit;
-  PD := PFilePanel(Owner).Drive;
+  PD := TFilePanel(Owner).Drive;
   if PD.DriveType = dtArvid then
     Exit;
   if ArvidDrives = nil then
@@ -1479,15 +1479,15 @@ function CopyFilesToArvid(const S: String; Files: PCollection;
   PAD.SeekDirectory;
   end { CopyFilesToArvid };
 
-procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
-    Own: PView; MoveMode: Boolean);
+procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
+    Own: TView; MoveMode: Boolean);
   var
-    PD: PDrive;
+    PD: TDrive;
     I, J: Integer;
     PF: PFileRec;
     T: lText;
     CmdFileCreated: Boolean;
-    P: PView;
+    P: TView;
     Dr: String;
     Nm: String;
     Xt: String;
@@ -1551,7 +1551,7 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
     begin
     if Own = nil then
       Exit;
-    PD := PFilePanel(Own).Drive;
+    PD := TFilePanel(Own).Drive;
     if PD.DriveType = dtArvid then
       Exit;
     From := PD.GetRealName;
@@ -1653,17 +1653,17 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
       Stream.Seek(0);
       Stream.Write(AVT, SizeOf(AVT));
       Stream.Free;
-      Stream := PBufStream.Create(Name^, stOpen, 2048);
+      Stream := TBufStream.Create(Name^, stOpen, 2048);
       end;
     GlobalMessage(evCommand, cmPanelReread, nil);
     end
   end { AvtCopyFilesInto };
 
-procedure AvtEraseFiles(AvtDr: PArvidDrive; AFiles: PCollection);
+procedure AvtEraseFiles(AvtDr: TArvidDrive; AFiles: TCollection);
   var
     PF: PFileRec;
     I: Word;
-    P: PView;
+    P: TView;
     R: Boolean;
     S: String;
   begin
@@ -1715,12 +1715,12 @@ procedure AvtEraseFiles(AvtDr: PArvidDrive; AFiles: PCollection);
     Stream.Seek(0);
     Stream.Write(AVT, SizeOf(AVT));
     Stream.Free;
-    Stream := PBufStream.Create(Name^, stOpen, 2048);
+    Stream := TBufStream.Create(Name^, stOpen, 2048);
     GlobalMessage(evCommand, cmPanelReread, nil);
     end
   end { AvtEraseFiles };
 
-procedure AvtMakeDir(AvtDr: PArvidDrive);
+procedure AvtMakeDir(AvtDr: TArvidDrive);
   var
     S: String;
   begin
@@ -1745,12 +1745,12 @@ procedure AvtMakeDir(AvtDr: PArvidDrive);
     Stream.Seek(0);
     Stream.Write(AVT, SizeOf(AVT));
     Stream.Free;
-    Stream := PBufStream.Create(Name^, stOpen, 2048);
+    Stream := TBufStream.Create(Name^, stOpen, 2048);
     GlobalMessage(evCommand, cmPanelReread, nil);
     end
   end { AvtMakeDir };
 
-procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
+procedure AvtEditDescription(AvtDr: TArvidDrive; var S, Nam: String);
   var
     C: TAvtFileCell;
     T: TAvtTextCell;
@@ -1895,7 +1895,7 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
     end
   end { AvtEditDescription };
 
-procedure AvtCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt;
+procedure AvtCalcTotal(AvtDr: TArvidDrive; const Offset: LongInt;
      var LL: TSize);
   var
     AA: TAvtFileCell;
@@ -1918,7 +1918,7 @@ procedure AvtCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt;
     end
   end;
 
-function AvtInit(AvtDr: PArvidDrive): Boolean;
+function AvtInit(AvtDr: TArvidDrive): Boolean;
   var
     A: TAvtMediaCell;
     I: LongInt;

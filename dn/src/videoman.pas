@@ -548,7 +548,7 @@ procedure SetScrMode(Mode: Word);
     R, R1, A: TRect;
   label Ex;
   begin
-  with PApplication(Application)^ do
+  with TApplication(Application)^ do
     begin
     if Mode = ScreenMode then
       goto Ex;

@@ -8,7 +8,6 @@ uses
   TvHelp, HelpKern;
 
 type
-  PHelpWindow = TvHelp.PHelpWindow;
   THelpWindow = TvHelp.THelpWindow;
 
 implementation

@@ -64,15 +64,15 @@ const
 
 type
   TDrive = class;
-  PDrive = TDrive;
+
 {`2 Вспомогательный объект, вставляемый в файловую панель.
   Содержит особенности, специфические для типа панели (диск,
   архив и т.п. Используется, в частности, для отрисовки строк
   файловой панели.`}
   TDrive = class(TObject)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
-    Panel: Pointer{PFilePanelRoot};
-    Prev: PDrive;
+    Panel: Pointer{TFilePanelRoot};
+    Prev: TDrive;
     DriveType: TDriveType;
     CurDir: String; {DataCompBoy}
     DizOwner: String; {DataCompBoy}
@@ -91,11 +91,11 @@ type
     function GetDirectory(
          const FileMask: String;
         var TotalInfo: TSize): PFilesCollection; virtual;
-    procedure CopyFiles(Files: PCollection; Own: PView; MoveMode: Boolean)
+    procedure CopyFiles(Files: TCollection; Own: TView; MoveMode: Boolean)
       ; virtual;
-    procedure CopyFilesInto(Files: PCollection; Own: PView;
+    procedure CopyFilesInto(Files: TCollection; Own: TView;
          MoveMode: Boolean); virtual;
-    procedure EraseFiles(Files: PCollection); virtual;
+    procedure EraseFiles(Files: TCollection); virtual;
     procedure UseFile(P: PFileRec; Command: Word); virtual;
     {DataCompBoy}
     procedure GetFreeSpace(var S: String); virtual;
@@ -130,7 +130,7 @@ type
     procedure GetDirLength(PF: PFileRec); virtual; {DataCompBoy}
     destructor Destroy; override;
     function OpenDirectory(const Dir: String;
-                                 PutDirs: Boolean): PDrive; virtual;
+                                 PutDirs: Boolean): TDrive; virtual;
     procedure DrvFindFile(FC: PFilesCollection); virtual;
     procedure ReadDescrptions(FilesC: PFilesCollection); virtual;
     function GetDriveLetter: Char; virtual;
@@ -140,7 +140,7 @@ type
 procedure RereadDirectory(Dir: String);
 
 const
-  TempDirs: PSortedCollection = nil;
+  TempDirs: TSortedCollection = nil;
   TempFiles: PFilesCollection = nil;
 
 implementation
@@ -149,7 +149,7 @@ uses
   Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
   Dialogs, FileFind, panelroot, Filediz, CmdLine
   , timeutil, Messages, dirwatch, Dos
-  , progress {для PWhileView}, DnIni, basics, strutil, fileutil
+  , progress {для TWhileView}, DnIni, basics, strutil, fileutil
   ;
 
 const
@@ -240,7 +240,7 @@ constructor TDrive.Create(ADrive: Byte; AOwner: Pointer);
 constructor TDrive.Load(S: TStream);
   begin
   inherited Create;
-  Prev := PDrive(S.Get);
+  Prev := TDrive(S.Get);
   S.ReadStrV(CurDir);
   {S.Read(CurDir[0], 1); S.Read(CurDir[1], Length(CurDir));}
   
@@ -348,15 +348,15 @@ procedure TDrive.MakeTop(var S: String);
     i: TFileColNumber;
     LFNLen: Word;
   begin
-  Flags := PFilePanelRoot(Panel)^.PanSetup.Show.ColumnsMask;
+  Flags := TFilePanelRoot(Panel).PanSetup.Show.ColumnsMask;
   for i := Low(TFileColAllowed) to High(TFileColAllowed) do
     begin
     if not ColAllowed[i] then
       Flags := Flags and not (1 shl Ord(i));
     end;
   { Теперь Flags содержит только допустимые для данного типа панели биты }
-  LFNLen := PFilePanelRoot(Panel)^.CalcNameLength;
-  if not PFilePanelRoot(Panel)^.LFNLonger250 then
+  LFNLen := TFilePanelRoot(Panel).CalcNameLength;
+  if not TFilePanelRoot(Panel).LFNLonger250 then
     begin
     
     if uLFN then
@@ -393,7 +393,7 @@ procedure TDrive.MakeTop(var S: String);
     S := S+GetString(dlTopLADate);
   if Flags and psShowLATime <> 0 then
     S := S+Copy(GetString(dlTopLATime), 1+CountryInfo.TimeFmt, 255);
-  if PFilePanelRoot(Panel)^.LFNLonger250 then
+  if TFilePanelRoot(Panel).LFNLonger250 then
     begin
     S := S+AddSpace(CenterStr(GetString(dlTopLFN), SizeX-Length(S)),
          LFNLen);
@@ -451,7 +451,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     D: Word;
     i: TFileColNumber;
   begin {TDrive.GetFull}
-  Flags := PFilePanelRoot(Panel)^.PanSetup.Show.ColumnsMask;
+  Flags := TFilePanelRoot(Panel).PanSetup.Show.ColumnsMask;
   for i := Low(TFileColAllowed) to High(TFileColAllowed) do
     begin
     if not ColAllowed[i] then
@@ -459,14 +459,14 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     end;
   { Теперь Flags содержит только допустимые для данного типа панели биты }
 
-  PFilePanelRoot(Panel)^.FormatName(P, NameString, NameLen);
+  TFilePanelRoot(Panel).FormatName(P, NameString, NameLen);
   if P^.Selected then
     begin
     Sc := Sc and $00FF + C and $FF00;
     C := Swap(C);
     end;
   X := 0;
-  if not PFilePanelRoot(Panel)^.LFNLonger250 then
+  if not TFilePanelRoot(Panel).LFNLonger250 then
     begin
     MoveCStr(PCellArray(@B)^[0], NameString, C);
     X := NameLen;
@@ -517,7 +517,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
   FormatDateTime(psShowCrDate, psShowCrTime, P^.FDateCreat, P^.YrCreat);
   FormatDateTime(psShowLADate, psShowLATime, P^.FDateLAcc, P^.YrLAcc);
 
-  if PFilePanelRoot(Panel)^.LFNLonger250 then
+  if TFilePanelRoot(Panel).LFNLonger250 then
     begin { длинное имя в конце подавляет вывод комментария и пути }
     MoveCStr(PCellArray(@B)^[X], NameString, C);
     Exit;
@@ -540,7 +540,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     end;
 end;
 
-procedure TDrive.EraseFiles(Files: PCollection);
+procedure TDrive.EraseFiles(Files: TCollection);
   begin
   if Disposable then
     Eraser.EraseFiles(Files);
@@ -551,7 +551,7 @@ procedure TDrive.MakeDir;
   MakeDirectory;
   end;
 
-procedure TDrive.CopyFiles(Files: PCollection; Own: PView; MoveMode: Boolean);
+procedure TDrive.CopyFiles(Files: TCollection; Own: TView; MoveMode: Boolean);
   var
     B: Boolean;
   begin
@@ -565,7 +565,7 @@ procedure TDrive.CopyFiles(Files: PCollection; Own: PView; MoveMode: Boolean);
            TypeOf(TFindDrive)));
   end;
 
-procedure TDrive.CopyFilesInto(Files: PCollection; Own: PView; MoveMode: Boolean);
+procedure TDrive.CopyFilesInto(Files: TCollection; Own: TView; MoveMode: Boolean);
   var
     B: Boolean;
   begin
@@ -841,7 +841,7 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFi
   PName := @SR.FullName;
   
   if (Panel <> nil) and
-     ((PFilePanelRoot(Panel)^.PanSetup.Show.ColumnsMask
+     ((TFilePanelRoot(Panel).PanSetup.Show.ColumnsMask
        and psLFN_InColumns) = 0)
   then // в панели короткие имена
     PName := @SR.SR.Name;
@@ -916,7 +916,7 @@ procedure TDrive.RereadDirectory(S: String);
 procedure TDrive.GetDirInfo(var B: TDiskInfoRec);
   begin
   ReadDiskInfo(CurDir, B);
-  B.Free := NewStr(PFilePanelRoot(Panel)^.FreeSpace);
+  B.Free := NewStr(TFilePanelRoot(Panel).FreeSpace);
   end;
 
 procedure TDrive.KillUse;
@@ -932,14 +932,14 @@ procedure TDrive.GetDown(var B: TScreenCell; C: Word; P: PFileRec; var LFN_inCur
   begin
   if P = nil then
     Exit;
-  w := PFilePanelRoot(Panel)^.PanSetup.Show.CurFileNameType;
+  w := TFilePanelRoot(Panel).PanSetup.Show.CurFileNameType;
   if w = cfnHide then
     S2 := ''
   else
     begin
     NameWidht := 13 + CountryInfo.TimeFmt; // уместить 12-часовое время
     
-    uLfn := PFilePanelRoot(Panel)^.PanSetup.Show.
+    uLfn := TFilePanelRoot(Panel).PanSetup.Show.
       ColumnsMask and psLFN_InColumns <> 0;
     if w = cfnTypeOther then
       S2 := P^.FlName[uLfn xor InvLFN]
@@ -990,7 +990,7 @@ function TDrive.GetRealDir: String;
   var
     S: String;
     C: Char;
-    D: PDialog;
+    D: TDialog;
   var
     MM: record
       case Byte of
@@ -1020,7 +1020,7 @@ function TDrive.GetRealDir: String;
             MM.l := 0;
             MM.C := GetCurDrive;
             MM.S := MM.C;
-            D := PDialog(LoadResource(dlgDiskError));
+            D := TDialog(LoadResource(dlgDiskError));
             if D <> nil then
               begin
               D.SetData(MM);
@@ -1053,7 +1053,7 @@ function TDrive.GetRealDir: String;
               MM.l := 0;
               MM.C := GetCurDrive;
               MM.S := MM.C;
-              D := PDialog(LoadResource(dlgDiskError));
+              D := TDialog(LoadResource(dlgDiskError));
               if D <> nil then
                 begin
                 D.SetData(MM);
@@ -1115,15 +1115,15 @@ procedure TDrive.GetDirLength(PF: PFileRec);
 {-DataCompBoy-}
 
 function TDrive.OpenDirectory(const Dir: String;
-                                    PutDirs: Boolean): PDrive;
+                                    PutDirs: Boolean): TDrive;
   var
     I: LongInt;
-    PI: PView;
-    PDrv: PDrive;
-    DirsToProcess: PCollection;
+    PI: TView;
+    PDrv: TDrive;
+    DirsToProcess: TCollection;
       { несортированная коллекция, элементы которой создаются при помощи
       NewStr и после использования переносятся в Dirs }
-    Dirs: PStringCollection;
+    Dirs: TStringCollection;
     Files: PFilesCollection;
     P: PString;
     tmr: TEventTimer;
@@ -1194,8 +1194,8 @@ function TDrive.OpenDirectory(const Dir: String;
 
   begin { TDrive.OpenDirectory }
   NewTimer(tmr, 0);
-  Dirs := PStringCollection.Create($10, $10, False);
-  DirsToProcess := PStringCollection.Create($10, $10, False);
+  Dirs := TStringCollection.Create($10, $10, False);
+  DirsToProcess := TStringCollection.Create($10, $10, False);
 
   PI := WriteMsg(GetString(dlReadingList));
   New(Files, Init($10, $10));
@@ -1226,7 +1226,7 @@ function TDrive.OpenDirectory(const Dir: String;
   //     и в результате мы получаем сортировку дважды
   {Files^.Sort;}
 //используем '><' в качестве пpизнака ветви
-  PDrv := PFindDrive.Create('><'+Dir, Dirs, Files);
+  PDrv := TFindDrive.Create('><'+Dir, Dirs, Files);
   PDrv^.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
   end { TDrive.OpenDirectory };
@@ -1234,9 +1234,9 @@ function TDrive.OpenDirectory(const Dir: String;
 {-DataCompBoy-} {JO - 31-03-2006 - сделал виртуальным методом TDrive}
 procedure TDrive.DrvFindFile(FC: PFilesCollection);
   var
-    PInfo: PWhileView;
+    PInfo: TWhileView;
     Files: PFilesCollection;
-    Directories: PCollection;
+    Directories: TCollection;
     BB: Byte; {-$VOL}
     R: TRect;
   begin
@@ -1259,7 +1259,7 @@ procedure TDrive.DrvFindFile(FC: PFilesCollection);
     FindRec.AddChar := '';
   New(Files, Init($10, $10));
   Files^.SortMode := psmLongName;
-  Directories := PStringCollection.Create(30, 30, False);
+  Directories := TStringCollection.Create(30, 30, False);
   R.Assign(1, 1, 40, 10);
   Inc(SkyEnabled);
   PInfo.Create(R);
@@ -1289,7 +1289,7 @@ procedure RereadDirectory(Dir: String);
   var
     Event: TEvent;
 
-  procedure Action(View: PView);
+  procedure Action(View: TView);
     begin
     Event.What := evCommand;
     Event.Command := cmRereadDir;

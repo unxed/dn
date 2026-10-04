@@ -9,11 +9,8 @@ uses
   TvHelp;
 
 type
-  PHelpTopic = TvHelp.PHelpTopic;
   THelpTopic = TvHelp.THelpTopic;
-  PHelpIndex = TvHelp.PHelpIndex;
   THelpIndex = TvHelp.THelpIndex;
-  PHelpFile = TvHelp.PHelpFile;
   THelpFile = TvHelp.THelpFile;
   TCrossRefHandler = TvHelp.TCrossRefHandler;
 

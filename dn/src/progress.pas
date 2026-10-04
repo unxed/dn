@@ -84,11 +84,11 @@ type
     procedure Draw; override;
     end;
   TWhileView = class;
-  PWhileView = TWhileView;
+
   TWhileView = class(TGroup)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
-    Lines: PCollection;
-    But: PButton;
+    Lines: TCollection;
+    But: TButton;
     QuitNormal: Boolean;
     Top, Bottom: String[SizeOf(String)-1];
     constructor Create(const Bounds: TRect);
@@ -105,7 +105,7 @@ type
     procedure InsBut;
     end;
 
-procedure DispatchEvents(InfoView: PWhileView; var CancelParam: Boolean);
+procedure DispatchEvents(InfoView: TWhileView; var CancelParam: Boolean);
 
 implementation
 uses
@@ -196,7 +196,7 @@ procedure TWhileView.InsBut;
     R: TRect;
   begin
   R.Assign(1, Size.Y-3, 13, Size.Y-1);
-  But := PButton.Create(R, GetString(dlStop), cmCancel, bfDefault);
+  But := TButton.Create(R, GetString(dlStop), cmCancel, bfDefault);
   But.Options := But.Options or ofCenterX;
   Insert(But);
   end;
@@ -208,7 +208,7 @@ constructor TWhileView.Create(const Bounds: TRect);
   inherited Create(Bounds);
   QuitNormal := False;
   Options := (Options or ofCentered or ofTopSelect) and not ofSelectable;
-  Lines := PLineCollection.Create(Bounds.B.Y-Bounds.A.Y, 10, False);
+  Lines := TLineCollection.Create(Bounds.B.Y-Bounds.A.Y, 10, False);
   for I := 0 to Bounds.B.Y-Bounds.A.Y-2 do
     Lines.Insert(NewStr(''));
   SetState(sfShadow, True);
@@ -477,7 +477,7 @@ destructor TWhileView.Destroy;
   inherited Destroy;
   end;
 
-procedure DispatchEvents(InfoView: PWhileView; var CancelParam: Boolean);
+procedure DispatchEvents(InfoView: TWhileView; var CancelParam: Boolean);
   var
     Event: TEvent;
   begin

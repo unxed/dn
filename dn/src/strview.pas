@@ -9,7 +9,7 @@ uses
   TvViews, Drivers, Views;
 
 type
-  PDStringView = ^TDStringView;
+
   TDStringView = class(TView)
     S1, S2: String[50];
     function GetPalette: TPalette; virtual;

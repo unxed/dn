@@ -86,7 +86,7 @@ type
     Dirs: LongInt;
     Files: LongInt;
     Items: LongInt;
-    Stream: PStream;
+    Stream: TStream;
     FilePtr: LongInt;
     CurFile: TStoredFile;
     Last: Boolean;
@@ -160,7 +160,7 @@ procedure TDirStorage.FixError;
   const
     BufSize = 512;
   var
-    OldStream: PStream;
+    OldStream: TStream;
     SavePos, Count: LongInt;
     Buffer: array[0..BufSize-1] of Byte;
     N: Word;
@@ -204,7 +204,7 @@ procedure TDirStorage.InitStream(X, E, M: LongInt);
   case SwapLevel of
     slCnv:
       begin
-      Stream := PMemoryStream.Create(M, 2048);
+      Stream := TMemoryStream.Create(M, 2048);
       if Stream.Status <> stOK then
         begin
         Stream.Free;

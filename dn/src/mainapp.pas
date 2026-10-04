@@ -27,24 +27,24 @@ var
 
 type
   TBackground = class;
-  PBackground = TBackground;
+
   TBackground = class(TvApp.TBackground)
     constructor Create(const Bounds: TRect; APattern: Byte);
   end;
 
   TDesktop = class;
-  PDesktop = TDesktop;
+
   TDesktop = class(TvApp.TDeskTop)
     procedure Clear;
   end;
 
   TProgram = class;
-  PProgram = TProgram;
+
   TProgram = class(TvApp.TApplication)
     IdleSecs: TEventTimer;
     constructor Create;
     destructor Destroy; override;
-    procedure ActivateView(P: PView);
+    procedure ActivateView(P: TView);
     { the screen savers of DN (the list of the available ones, the choice of one): TODO, nothing is done; Data is a TSaversData }
     procedure InsertAvIdlerN(const Data; N: Integer);
     { the idler views (the screen saver, the clock...): TODO, nothing is done }
@@ -57,9 +57,9 @@ type
   end;
 
   TApplication = class;
-  PApplication = TApplication;
+
   TApplication = class(TProgram)
-    Clock: PView;
+    Clock: TView;
     constructor Create;
     destructor Destroy; override;
     procedure ShowUserScreen;
@@ -76,14 +76,14 @@ type
 procedure UpdateWriteView(P: Pointer);
 procedure OpenResource;
 function ExecResource(Key: TDlgIdx; var Data): Word;
-function ExecDialog(D: PDialog; var Data): Word;
+function ExecDialog(D: TDialog; var Data): Word;
 function LoadResource(Key: TDlgIdx): TStreamable;
 function GlobalMessage(What, Command: Word; InfoPtr: Pointer): Pointer;
 function GlobalMessageL(What, Command: Word; InfoLng: LongInt): Pointer;
 procedure GlobalEvent(What, Command: Word; InfoPtr: Pointer);
-function ViewPresent(Command: Word; InfoPtr: Pointer): PView;
-function WriteMsg(Text: String): PView;
-function _WriteMsg(const Text: String): PView;
+function ViewPresent(Command: Word; InfoPtr: Pointer): TView;
+function WriteMsg(Text: String): TView;
+function _WriteMsg(const Text: String): TView;
 procedure ForceWriteShow(P: Pointer);
 function GetString(Index: TStrIdx): String;
 procedure ToggleCommandLine(OnOff: Boolean);
@@ -91,15 +91,15 @@ procedure AdjustToDesktopSize(var R: TRect; OldDeskSize: TPoint);
 
 var
   { the same variables as in TvApp (the objects there are the same) }
-  Application: PProgram absolute TvApp.Application;
-  Desktop: PDesktop absolute TvApp.DeskTop;
+  Application: TProgram absolute TvApp.Application;
+  Desktop: TDesktop absolute TvApp.DeskTop;
   { the menu bar and the status line of DN (the unit Menus of DN, not those of tv/); set by InitMenuBar and InitStatusLine
     of TDNApplication, put into the program by TProgram.Init }
-  StatusLine: Menus.PStatusLine = nil;
-  MenuBar: Menus.PMenuView = nil;
-  CommandLine: PView = nil;
-  ResourceStream: PStream = nil;
-  LngStream: PStream = nil;
+  StatusLine: Menus.TStatusLine = nil;
+  MenuBar: Menus.TMenuView = nil;
+  CommandLine: TView = nil;
+  ResourceStream: TStream = nil;
+  LngStream: TStream = nil;
   LStringList: PStringList = nil;
   Resource: PIdxResource = nil;
   { the palettes of the program (the strings of attributes): those of DN (DNPalet), set in the initialization }
@@ -107,7 +107,7 @@ var
   appPalette: Integer absolute TvApp.AppPalette;
   SystemColors: array[0..2] of ShortString absolute TvApp.SystemColors;
   { a procedure that prepares a dialog for ExecResource; ExecResource clears it }
-  PreExecuteDialog: procedure(D: PView) = nil;
+  PreExecuteDialog: procedure(D: TView) = nil;
 
 implementation
 
@@ -120,10 +120,10 @@ end;
 
 procedure TDesktop.Clear;
 var
-  P: PView;
+  P: TView;
 begin
   Lock;
-  while (Last <> nil) and (Last <> PView(Background)) do
+  while (Last <> nil) and (Last <> TView(Background)) do
   begin
     P := Last;
     Delete(P);
@@ -183,7 +183,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TProgram.ActivateView(P: PView);
+procedure TProgram.ActivateView(P: TView);
 begin
   if P <> nil then
     P.Select;
@@ -236,7 +236,7 @@ var
   IdleSeen: Boolean = False;
   IdleCount: LongInt = 0;
 
-procedure TraceView(P: PView);
+procedure TraceView(P: TView);
 begin
   DNTrace('view ' + IntToHex(PtrUInt(P), 8) + ' origin ' + IntToStr(P.Origin.X) + ',' + IntToStr(P.Origin.Y) + ' size ' +
     IntToStr(P.Size.X) + 'x' + IntToStr(P.Size.Y) + ' state ' + IntToHex(P.State, 4) + ' options ' + IntToHex(P.Options, 4));
@@ -247,7 +247,7 @@ procedure CheckScreenDump;
 var
   Name: String;
   Sec, N, I: LongInt;
-  V: PView;
+  V: TView;
   NoShift: Word;
   Entry: String;
   Ev: TEvent;
@@ -354,7 +354,7 @@ begin
         begin
           TraceView(PGroup(Desktop.Current).Current);
           if PGroup(Desktop.Current).Current.Size.Y = 1 then
-            DNTrace('as input line: maxlen ' + IntToStr(PInputLine(PGroup(Desktop.Current).Current)^.MaxLen) + ' curpos ' + IntToStr(PInputLine(PGroup(Desktop.Current).Current)^.CurPos) + ' data [' + PInputLine(PGroup(Desktop.Current).Current)^.Data^ + ']');
+            DNTrace('as input line: maxlen ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current)^.MaxLen) + ' curpos ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current)^.CurPos) + ' data [' + TInputLine(PGroup(Desktop.Current).Current)^.Data^ + ']');
         end;
     except
       DNTrace('(the top view of the desktop is not a window)');
@@ -498,21 +498,21 @@ end;
 
 { The resource files lie in the directory named by the environment variable DNDLG, else in that of the program (SourceDir),
   else in the startup directory. Names: <language>.DLG (dialogs and menus), <language>.LNG (strings): see rcp. }
-function OpenResourceStream(const Ext: String): PBufStream;
+function OpenResourceStream(const Ext: String): TBufStream;
 var
   S: String;
-  PS: PBufStream;
+  PS: TBufStream;
 begin
   ApplyCodePage(True);
   S := GetEnvironmentVariable('DNDLG');
   if S = '' then
     S := SourceDir;
   MakeSlash(S);
-  PS := PBufStream.Create(S + LngId + Ext, stOpenRead, 1024);
+  PS := TBufStream.Create(S + LngId + Ext, stOpenRead, 1024);
   if PS.Status <> stOK then
   begin
     PS.Free;
-    PS := PBufStream.Create(StartupDir + LngId + Ext, stOpenRead, 1024);
+    PS := TBufStream.Create(StartupDir + LngId + Ext, stOpenRead, 1024);
     if PS.Status <> stOK then
       ResourceFail(LngId + Ext);
   end;
@@ -527,17 +527,17 @@ begin
   Resource := PIdxResource.Create(ResourceStream);
 end;
 
-function LoadDialog(Key: TDlgIdx): PDialog;
+function LoadDialog(Key: TDlgIdx): TDialog;
 begin
   Result := nil;
   OpenResource;
   if Resource = nil then
     Exit;
-  Result := PDialog(Resource.Get(Key));
-  Result := PDialog(Application.ValidView(Result));
+  Result := TDialog(Resource.Get(Key));
+  Result := TDialog(Application.ValidView(Result));
 end;
 
-function ExecDialog(D: PDialog; var Data): Word;
+function ExecDialog(D: TDialog; var Data): Word;
 begin
   D.SetData(Data);
   Result := Desktop.ExecView(D);
@@ -548,7 +548,7 @@ end;
 { TODO: PreExecuteDialog may be a procedure local to the caller (the original ExecResource had no stack frame for that: VP asm) }
 function ExecResource(Key: TDlgIdx; var Data): Word;
 var
-  D: PDialog;
+  D: TDialog;
 begin
   Result := cmCancel;
   DNTrace('ExecResource ' + IntToStr(Ord(Key)));
@@ -595,18 +595,18 @@ begin
   Application.PutEvent(E);
 end;
 
-function ViewPresent(Command: Word; InfoPtr: Pointer): PView;
+function ViewPresent(Command: Word; InfoPtr: Pointer): TView;
 begin
-  Result := PView(Message(Application, evBroadcast, Command, InfoPtr));
+  Result := TView(Message(Application, evBroadcast, Command, InfoPtr));
 end;
 
 { A window with a text (the program shows it while it does something long: "Reading the file..."); the caller disposes it
   (Info.Free). It is made at once: DN shows it only if the work takes time (TWriteWin.Tmr), TODO. }
-function WriteMsg(Text: String): PView;
+function WriteMsg(Text: String): TView;
 var
   R: TRect;
   W: PWriteWin;
-  T: PStaticText;
+  T: TStaticText;
   I, Lines, Wd, Cur: Integer;
 begin
   Lines := 1;
@@ -635,14 +635,14 @@ begin
   W := PWriteWin.Create(R, '', wnNoNumber);
   W.Flags := 0;
   R.Assign(2, 1, Wd + 4, Lines + 3);
-  T := PStaticText.Create(R, Text);
+  T := TStaticText.Create(R, Text);
   W.Insert(T);
   if Desktop <> nil then
     Desktop.Insert(W);
   Result := W;
 end;
 
-function _WriteMsg(const Text: String): PView;
+function _WriteMsg(const Text: String): TView;
 begin
   Result := WriteMsg(Text);
 end;
@@ -653,11 +653,11 @@ end;
 
 procedure InitLngStream;
 var
-  PS, XS: PStream;
+  PS, XS: TStream;
 begin
   PS := OpenResourceStream('.lng');
   { the strings are read from memory: the file is copied (as the original does) }
-  XS := PMemoryStream.Create(PS.GetSize, PS.GetSize);
+  XS := TMemoryStream.Create(PS.GetSize, PS.GetSize);
   if XS.Status <> stOK then
   begin
     XS.Free;

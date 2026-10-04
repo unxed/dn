@@ -91,7 +91,7 @@ type
     case Word of
       udDelChar: (Str: PLongString);
       udInsChar: (Count, Width: Integer; Block: TRect);
-      udDelLine: (Lines: PCollection; Vertical, InsM: Boolean);
+      udDelLine: (Lines: TCollection; Vertical, InsM: Boolean);
     end;
 
   TDoCollection = class;
@@ -127,8 +127,8 @@ type
     destructor Destroy; override;
     end;
 
-function CheckForOver(Name: String): PStream;
-procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
+function CheckForOver(Name: String): TStream;
+procedure WriteBlock(Hint: String; S: TStream; C: TLineCollection
     {PCollector}; ForcedCRLF: TCRLF; AOptimalFill: Boolean); {-SBlocks}
 
 implementation
@@ -201,7 +201,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
   var
     T: TPoint;
     { lS: byte; }
-    P: PFileEditor;
+    P: TFileEditor;
     Ev: TEvent;
     BookMark: Byte;
   begin
@@ -211,7 +211,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     Owner.MakeLocal(Event.Where, T);
     if T.X >= Owner.Size.X-2 then
       begin
-      PWindow(Owner).Frame.HandleEvent(Event);
+      TWindow(Owner).Frame.HandleEvent(Event);
       Exit;
       end;
     MakeLocal(Event.Where, T);
@@ -219,7 +219,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     {==0000000:000=[000 00]=(-)==CrLf=DOS==<1........>}
     {00000000001111111111222222222233333333334444444444}
     {01234567890123456789012345678901234567890123456789}
-    P := PFileEditor(PEditWindow(Owner)^.Intern);
+    P := TFileEditor(TEditWindow(Owner).Intern);
     if  (T.X > 1) and (T.X < 12) then
       Event.Command := cmGotoLineNumber
     else if (T.X > 12) and (T.X < 21) then
@@ -240,7 +240,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     else if (T.X > 31) and (T.X < 35) then
       Event.Command := cmSwitchKeyMapping
     else if (T.X = 37) then
-      PFileEditor(Owner.Current).ScrollTo(0, 0) {AK155}
+      TFileEditor(Owner.Current).ScrollTo(0, 0) {AK155}
     else if FastBookmark and ((T.X > 37) and (T.X < 47)) then
       begin
       BookMark := T.X-38;
@@ -260,7 +260,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
         Event.What := evNothing;
       end
     else if (T.X = 47) then
-      with PFileEditor(Owner.Current)^ do
+      with TFileEditor(Owner.Current)^ do
         ScrollTo(0, FileLines^.Count) {AK155}
     else
       Event.What := evNothing;
@@ -272,7 +272,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
 
 procedure TInfoLine.Draw;
   var
-    P: PFileEditor;
+    P: TFileEditor;
     X, Y: LongInt;
     C: Char;
     S: String;
@@ -283,19 +283,19 @@ procedure TInfoLine.Draw;
     qwe: Byte;
     B: TDrawBuffer;
   begin
-  P := PFileEditor(PEditWindow(Owner)^.Intern);
+  P := TFileEditor(TEditWindow(Owner).Intern);
   if Owner.GetState(sfDragging) or not Owner.GetState(sfActive) then
     begin
     if Owner.GetState(sfDragging)
     then
-      Color := PWindow(Owner).Frame^.GetColorW(5)
+      Color := TWindow(Owner).Frame^.GetColorW(5)
     else
-      Color := PWindow(Owner).Frame^.GetColorW(2);
+      Color := TWindow(Owner).Frame^.GetColorW(2);
     Ch2 := #196;
     end
   else
     begin
-    Color := PWindow(Owner).Frame^.GetColorW(3);
+    Color := TWindow(Owner).Frame^.GetColorW(3);
     Ch2 := #205;
     end;
   if not Owner.GetState(sfActive) then
@@ -372,7 +372,7 @@ procedure TInfoLine.Draw;
 {TBookmarkLine}
 procedure TBookmarkLine.Draw;
   var
-    P: PFileEditor;
+    P: TFileEditor;
     Col: Byte;
     I: Integer;
     Mrk: Char;
@@ -398,19 +398,19 @@ procedure TBookmarkLine.Draw;
     end;
 
   begin { TBookmarkLine.Draw }
-  P := PFileEditor(PEditWindow(Owner)^.Intern);
+  P := TFileEditor(TEditWindow(Owner).Intern);
   if Owner.GetState(sfDragging) or not Owner.GetState(sfActive) then
     begin
     if Owner.GetState(sfDragging)
     then
-      Col := PWindow(Owner).Frame^.GetColorW(5)
+      Col := TWindow(Owner).Frame^.GetColorW(5)
     else
-      Col := PWindow(Owner).Frame^.GetColorW(2);
+      Col := TWindow(Owner).Frame^.GetColorW(2);
     Ch := #179;
     end
   else
     begin
-    Col := PWindow(Owner).Frame^.GetColorW(3);
+    Col := TWindow(Owner).Frame^.GetColorW(3);
     Ch := #186;
     end;
   if not ShowBookmarks then
@@ -444,7 +444,7 @@ destructor TAttrBufStream.Destroy;
   end;
 
 {-DataCompBoy-}
-function CheckForOver(Name: String): PStream; {<editfile.001>}
+function CheckForOver(Name: String): TStream; {<editfile.001>}
   var
     S: PAttrBufStream;
     F: lFile;
@@ -569,7 +569,7 @@ function CheckForOver(Name: String): PStream; {<editfile.001>}
   end { CheckForOver };
 {-DataCompBoy-}
 
-procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
+procedure WriteBlock(Hint: String; S: TStream; C: TLineCollection
     {PCollector}; ForcedCRLF: TCRLF; AOptimalFill: Boolean); {-SBlocks}
   var
     I: LongInt;
@@ -684,7 +684,7 @@ procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
 *)
 
   var
-    PP: PView;
+    PP: TView;
     CrLf: String[2];
     qwe: Byte;
   begin { WriteBlock }

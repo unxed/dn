@@ -55,7 +55,7 @@ uses
   ;
 
 type
-  PXFileEditor = ^TXFileEditor;
+
   TXFileEditor = class(TFileEditor)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     function HandleCommand(var Event: TEvent): Boolean; virtual;
@@ -396,10 +396,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       if not JustSaved and (UndoTimes = LastSaveUndoTimes) then
         begin
         Modified := False;
-        if PEditWindow(Owner)^.AInfo <> nil then
-          PEditWindow(Owner)^.AInfo.DrawView;
-        if PEditWindow(Owner)^.ABookLine <> nil then
-          PEditWindow(Owner)^.ABookLine.DrawView; {-$VIV}
+        if TEditWindow(Owner).AInfo <> nil then
+          TEditWindow(Owner).AInfo.DrawView;
+        if TEditWindow(Owner).ABookLine <> nil then
+          TEditWindow(Owner).ABookLine.DrawView; {-$VIV}
         end;
       JustSaved := False;
     until RPT;
@@ -635,10 +635,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       if not JustSaved and (UndoTimes = LastSaveUndoTimes) then
         begin
         Modified := False;
-        if PEditWindow(Owner)^.AInfo <> nil then
-          PEditWindow(Owner)^.AInfo.DrawView;
-        if PEditWindow(Owner)^.ABookLine <> nil then
-          PEditWindow(Owner)^.ABookLine.DrawView; {-$VIV}
+        if TEditWindow(Owner).AInfo <> nil then
+          TEditWindow(Owner).AInfo.DrawView;
+        if TEditWindow(Owner).ABookLine <> nil then
+          TEditWindow(Owner).ABookLine.DrawView; {-$VIV}
         end;
       JustSaved := False;
     until RPT;
@@ -743,7 +743,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
   procedure FormatBlock(Command: Word);
     var
       S, Left, W: LongString;
-      P: PLineCollection;
+      P: TLineCollection;
       PS: PLongString;
       LS, I, J, LG: LongInt;
       Abort, LastLine: Boolean;
@@ -932,10 +932,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
   procedure Print(Block: Boolean);
     var
       S: TDOSStream;
-      L: PLineCollection {PCollector}; {-SBlocks}
-      {PC: PCollection;}
+      L: TLineCollection {PCollector}; {-SBlocks}
+      {PC: TCollection;}
       M: String;
-      P: PWhileView;
+      P: TWhileView;
       I: LongInt;
       R: TRect;
       E: TEvent;
@@ -955,7 +955,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       {Dispose(PStdCollector(L)^.Collection, Done);}
       {PStdCollector(L)^.Collection := PC;}
       {PStdCollector(L)^.Count := PC^.Count;}
-      L := PLineCollection(GetSelection); {-SBlocks}
+      L := TLineCollection(GetSelection); {-SBlocks}
       end
     else
       L := FileLines;
@@ -1080,7 +1080,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       {I, J, K: Integer;
         B: Boolean;}
       S: LongString;
-      Info: PView;
+      Info: TView;
       Tmr: TEventTimer;
       Cmpr: function (const l, R: LongString): Boolean;
 
@@ -1391,7 +1391,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     if  (ClipBoard <> nil) then
       ClipBoard.Free;
     ClipBoard := BlockToClip(GetSelection);
-    SetWinClip(PLineCollection(ClipBoard));
+    SetWinClip(TLineCollection(ClipBoard));
     end;
 
   {-$VIV 20.05.99--}
@@ -1743,7 +1743,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           Desktop.Lock;
         if Application <> nil then
           begin
-          {AK155}Application.InsertWindow(New(PFileWindow,
+          {AK155}Application.InsertWindow(New(TFileWindow,
               Init(EditName, EditName, False)));
           Message(Application, evCommand, cmViewText,
             @EditName);

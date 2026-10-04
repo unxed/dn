@@ -121,9 +121,9 @@ type
   { 6 = Shortcut selection }
 
   TMenuView = class;
-  PMenuView = TMenuView;
+
   TMenuView = class(TView)
-    ParentMenu: PMenuView;
+    ParentMenu: TMenuView;
     Menu: PMenu;
     Current: PMenuItem;
     HaveSubmenu: Boolean;
@@ -149,7 +149,7 @@ type
     procedure HandleEvent(var Event: TEvent); override;
     function HotKey(KeyCode: LongInt): PMenuItem;
     function NewSubView(var Bounds: TRect; AMenu: PMenu;
-        AParentMenu: PMenuView): PMenuView; virtual;
+        AParentMenu: TMenuView): TMenuView; virtual;
     procedure Store(S: TStream);
     function RightExpand: Boolean; virtual;
       { по kbRight раскрывать подменю }
@@ -168,7 +168,7 @@ type
   { 6 = Shortcut selection }
 
   TMenuBar = class;
-  PMenuBar = TMenuBar;
+
   TMenuBar = class(TMenuView)
     constructor Create(var Bounds: TRect; AMenu: PMenu);
     destructor Destroy; override;
@@ -188,12 +188,12 @@ type
   { 6 = Shortcut selection }
 
   TMenuBox = class;
-  PMenuBox = TMenuBox;
+
   TMenuBox = class(TMenuView)
     TopItem: PMenuItem;
     ComboBoxPal: Boolean;
     constructor Create(var Bounds: TRect; AMenu: PMenu;
-        AParentMenu: PMenuView);
+        AParentMenu: TMenuView);
     procedure Draw; override;
     procedure GetItemRect(Item: PMenuItem; var R: TRect); virtual;
     function Execute: Word; override;
@@ -212,7 +212,7 @@ type
   { 6 = Shortcut selection }
 
   TMenuPopup = class;
-  PMenuPopup = TMenuPopup;
+
   TMenuPopup = class(TMenuBox)
     constructor Create(var Bounds: TRect; AMenu: PMenu);
     procedure HandleEvent(var Event: TEvent); override;
@@ -248,7 +248,7 @@ type
   { 6 = Shortcut selection }
 
   TStatusLine = class;
-  PStatusLine = TStatusLine;
+
   TStatusLine = class(TView)
     Items: PStatusItem;
     Defs: PStatusDef;
@@ -319,7 +319,7 @@ const
 function NewItem(Name, Param: TMenuStr; KeyCode: LongInt; Command: Word;
     AHelpCtx: Word; Next: PMenuItem): PMenuItem;
   const
-    T: PView = nil;
+    T: TView = nil;
   var
     P: PMenuItem;
   begin
@@ -477,7 +477,7 @@ function TMenuView.Execute: Word;
     Action: MenuAction;
     Ch: Char;
     ItemShown, P: PMenuItem;
-    Target: PMenuView;
+    Target: TMenuView;
     R: TRect;
     E: TEvent;
     MouseActive: Boolean;
@@ -594,7 +594,7 @@ q:
 
   function MouseInMenus: Boolean;
     var
-      P: PMenuView;
+      P: TMenuView;
     begin
     P := ParentMenu;
     while (P <> nil) and not P^.MouseInView(E.Where) do
@@ -602,9 +602,9 @@ q:
     MouseInMenus := P <> nil;
     end;
 
-  function TopMenu: PMenuView;
+  function TopMenu: TMenuView;
     var
-      P: PMenuView;
+      P: TMenuView;
     begin
     P := Self;
     while P^.ParentMenu <> nil do
@@ -1009,7 +1009,7 @@ procedure TMenuView.GetItemRect(Item: PMenuItem; var R: TRect);
 
 function TMenuView.GetHelpCtx: Word;
   var
-    C: PMenuView;
+    C: TMenuView;
   label
     Loop;
   begin
@@ -1157,7 +1157,7 @@ function TMenuView.HotKey(KeyCode: LongInt): PMenuItem;
   end { TMenuView.HotKey };
 
 function TMenuView.NewSubView(var Bounds: TRect; AMenu: PMenu;
-    AParentMenu: PMenuView): PMenuView;
+    AParentMenu: TMenuView): TMenuView;
   begin
   NewSubView := TMenuBox.Create(Bounds, AMenu, AParentMenu);
   end;
@@ -1300,7 +1300,7 @@ function TMenuBar.Execute: Word;
 { TMenuBox }
 
 constructor TMenuBox.Create(var Bounds: TRect; AMenu: PMenu;
-    AParentMenu: PMenuView);
+    AParentMenu: TMenuView);
   begin
   inherited Create(Bounds);
   State := State or sfShadow;
@@ -1985,7 +1985,7 @@ procedure TStatusLine.Store(S: TStream);
 procedure TStatusLine.Update;
   var
     H: Word;
-    P: PView;
+    P: TView;
   begin
   P := TopView;
   if P <> nil then

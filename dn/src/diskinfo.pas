@@ -65,7 +65,7 @@ type
     VolumeID: PString;
     SerialNo: PString; { Rainbow }
     FileSys: PString; { Rainbow }
-    DirInfo: PCollection;
+    DirInfo: TCollection;
     Limit: TPoint;
     InfoFile: Byte;
     ClusterSize: PString;
@@ -79,11 +79,11 @@ type
   TDiskInfo = class(TView)
     Info: TDiskInfoRec;
     Delta: TPoint;
-    OtherPanel: PView{PFilePanelRoot};
+    OtherPanel: TView{TFilePanelRoot};
       { Файловая панель, с которой связана данная панель информации }
     DriveView: PDriveView;
       { Диск/шара в верхней рамке. См. InsertDriveView и Done }
-    constructor Create(R: TRect; Panel: PView{PFilePanelRoot});
+    constructor Create(R: TRect; Panel: TView{TFilePanelRoot});
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure InsertDriveView;
@@ -253,9 +253,9 @@ function TDriveView.GetText(MaxWidth: Integer): String;
   var
     L: Word;
     Share: String;
-    P: PFilePanelRoot;
+    P: TFilePanelRoot;
   begin
-  P := PFilePanelRoot(PDiskInfo(Panel)^.OtherPanel);
+  P := TFilePanelRoot(PDiskInfo(Panel)^.OtherPanel);
   if P = nil then
     Exit;
   Result := P^.DirectoryName;
@@ -324,7 +324,7 @@ procedure TDiskInfo.Store(S: TStream);
   PutPeerViewPtr(S, DriveView);
   end;
 
-constructor TDiskInfo.Create(R: TRect; Panel: PView);
+constructor TDiskInfo.Create(R: TRect; Panel: TView);
   begin
   inherited Create(R);
   OtherPanel := Panel;
@@ -337,7 +337,7 @@ procedure TDiskInfo.InsertDriveView;
   var
     R: TRect;
   begin
-  if PFilePanelRoot(OtherPanel)^.Drive^.DriveType <> dtDisk then
+  if TFilePanelRoot(OtherPanel).Drive^.DriveType <> dtDisk then
     Exit;
     { Такой анализ очень некрасив, лучше было бы виртуализировать
     заголовок инфо-панели, как виртуализировано её содержимое }
@@ -392,7 +392,7 @@ procedure TDiskInfo.ReadData;
   begin
   DispInfo(Info);
   Abort := False;
-  with PFilePanelRoot(OtherPanel)^ do
+  with TFilePanelRoot(OtherPanel)^ do
     Drive^.GetDirInfo(Info);
   Delta.Assign(0, 0);
   end;
@@ -464,7 +464,7 @@ procedure TDiskInfo.HandleEvent(var Event: TEvent);
           else {case}
             Exit;
         end {case};
-        S := MakeNormName(PFilePanelRoot(OtherPanel)^.DirectoryName, S);
+        S := MakeNormName(TFilePanelRoot(OtherPanel).DirectoryName, S);
         Message(Application, evCommand, cmFileEdit, @S);
         end;
       cmInfoPresent:
@@ -751,7 +751,7 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
     FileSys: String; { Rainbow }
     S: String;
     S1, S2: String[30];
-    F: PTextReader;
+    F: TTextReader;
     DirLen: TSize;
     NumFiles, NumDirs: Integer;
     PathBuffer: array[0..255] of Char;
@@ -788,27 +788,27 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
     end;
 
   B.InfoFile := ifDirInfo;
-  B.DirInfo := PStringCollection.Create($10, $10, False);
-  F := PTextReader.Create(MakeNormName(Dr, sDirinfo));
+  B.DirInfo := TStringCollection.Create($10, $10, False);
+  F := TTextReader.Create(MakeNormName(Dr, sDirinfo));
   if F = nil then
     begin
     B.InfoFile := ifFileID;
-    F := PTextReader.Create(MakeNormName(Dr, sFileID));
+    F := TTextReader.Create(MakeNormName(Dr, sFileID));
     end;
   if F = nil then
     begin
     B.InfoFile := ifReadMe;
-    F := PTextReader.Create(MakeNormName(Dr, sReadMe));
+    F := TTextReader.Create(MakeNormName(Dr, sReadMe));
     end;
   if F = nil then
     begin
     B.InfoFile := ifReadTxt;
-    F := PTextReader.Create(MakeNormName(Dr, sReadTxt));
+    F := TTextReader.Create(MakeNormName(Dr, sReadTxt));
     end;
   if F = nil then
     begin
     B.InfoFile := ifReadMeTxt;
-    F := PTextReader.Create(MakeNormName(Dr, sReadMeTxt));
+    F := TTextReader.Create(MakeNormName(Dr, sReadMeTxt));
     end;
   if F = nil then
     B.InfoFile := ifFileID; {JO}

@@ -66,7 +66,7 @@ procedure UpdateARH(Arch: PARJArchive);
   var
     J: Word;
     A: PARJArchive;
-    P: PView;
+    P: TView;
   begin
   if Arch <> nil then
     Arch^.Save
@@ -90,8 +90,8 @@ procedure UpdateARH(Arch: PARJArchive);
 
 procedure SetupArchive(ArchCommand: Word);
   var
-    D: PDialog;
-    P: PView;
+    D: TDialog;
+    P: TView;
     R: TRect;
     Arch: PARJArchive;
     W: Word;
@@ -202,7 +202,7 @@ procedure SetupArchive(ArchCommand: Word);
     DT.UseLFN := Word(UseLFN);
     
     end;
-  D := PDialog(Application.ValidView(PDialog(LoadResource(dlgSetupArc))));
+  D := TDialog(Application.ValidView(TDialog(LoadResource(dlgSetupArc))));
   if D = nil then
     goto Ex;
   D.SetData(DT);

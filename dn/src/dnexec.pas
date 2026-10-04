@@ -278,7 +278,7 @@ procedure ExecString(const S: AnsiString; const WS: String);
 function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
   var
     AllRight: Boolean;
-    f: PTextReader;
+    f: TTextReader;
     F1: lText;
     s, s1: String;
     BgCh, EnCh: Char;
@@ -299,12 +299,12 @@ function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
   {Cat:warn закомментировал это в процессе отлова багов, но надо будет проверить, не добавил ли новых}
   SearchExt := False;
   Local := True;
-  f := PTextReader.Create('dn.ext');
+  f := TTextReader.Create('dn.ext');
   if f = nil then
     begin
 RL:
     Local := False;
-    f := PTextReader.Create(SourceDir+'dn.ext');
+    f := TTextReader.Create(SourceDir+'dn.ext');
     end;
   if f = nil then
     Exit;
@@ -416,7 +416,7 @@ RL:
 function ExecExtFile(const ExtFName: String; UserParams: PUserParams;
      SIdx: TStrIdx): Boolean;
   var
-    F: PTextReader;
+    F: TTextReader;
     S, S1: String;
     FName: String;
     Event: TEvent;
@@ -431,13 +431,13 @@ function ExecExtFile(const ExtFName: String; UserParams: PUserParams;
   Local := True;
   FName := UserParams^.Active^.FlName[True];
 
-  F := PTextReader.Create(ExtFName);
+  F := TTextReader.Create(ExtFName);
 
   if F = nil then
     begin
 RepeatLocal:
     Local := False;
-    F := PTextReader.Create(SourceDir+ExtFName);
+    F := TTextReader.Create(SourceDir+ExtFName);
     end;
   if F = nil then
     Exit;

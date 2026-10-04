@@ -54,9 +54,9 @@ uses
   Collect
   ;
 
-procedure EraseFiles(Files: PCollection);
+procedure EraseFiles(Files: TCollection);
 procedure SetVLabel;
-function ValidErase(Files: PCollection): Boolean;
+function ValidErase(Files: TCollection): Boolean;
 
 implementation
 uses dnscreen,
@@ -70,7 +70,7 @@ uses dnscreen,
   , osdep;
 
 {-DataCompBoy-}
-function ValidErase(Files: PCollection): Boolean;
+function ValidErase(Files: TCollection): Boolean;
   var
     PF: PFileRec;
     S: String;
@@ -114,9 +114,9 @@ function ValidErase(Files: PCollection): Boolean;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure EraseFiles(Files: PCollection);
+procedure EraseFiles(Files: TCollection);
   var
-    PInfo: PWhileView;
+    PInfo: TWhileView;
     R: TRect;
     EraseCancel: Boolean;
     Tmr: TEventTimer;
@@ -127,7 +127,7 @@ procedure EraseFiles(Files: PCollection);
     DOSMode, DirEnd, DirModified: Boolean;
     PF: PFileRec;
     //    DrivesSet: Set of Char;
-    RereadCollection: PStringCollection; {Cat}
+    RereadCollection: TStringCollection; {Cat}
     PS: PString; {Cat}
     DeleteAllFiles: Boolean;
     Params: record
@@ -365,14 +365,14 @@ TryDel:
     end { DeleteDirectory };
 
   var
-    Fls: PCollection;
+    Fls: TCollection;
     
     Flush: Boolean;
     
     Ask: Integer;
     iLfn: TUseLFN;
     SkipAll: Boolean;
-    D: PDialog;
+    D: TDialog;
     PStr1: PString;
   label LLL, DeleteDirDIZ;
 
@@ -389,7 +389,7 @@ TryDel:
   ClrIO;
   CtrlBreakHit := False; {JO}
   R.Assign(1, 1, 26, 9);
-  PInfo := PWhileView.Create(R);
+  PInfo := TWhileView.Create(R);
   PInfo.Top := GetString(dlErase);
   DOSMode := True;
 
@@ -464,7 +464,7 @@ LLL:
             end
           else
             if not SkipAll then begin
-              D := PDialog(LoadResource(dlgSkipBadFile));
+              D := TDialog(LoadResource(dlgSkipBadFile));
               D.Options := D.Options or ofCentered;
               R.A.X := 1; R.A.Y := 2; R.B.X := 53; R.B.Y := 3;
               D.Insert(TStaticText.Create(R, GetString(dlErasingNoFile)));
@@ -523,7 +523,7 @@ DeleteDirDIZ:
         RereadDirectory(S);
       end;
 *)
-  RereadCollection := PStringCollection.Create(32, 32, False);
+  RereadCollection := TStringCollection.Create(32, 32, False);
   {сортированная, без повторов}
   for I := 0 to Files.Count-1 do
     begin

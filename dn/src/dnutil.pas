@@ -67,8 +67,8 @@ uses
 
 const
  
-  TrashCan: PTrashCan = nil; 
-  HelpWnd: PHelpWindow = nil;
+  TrashCan: TTrashCan = nil; 
+  HelpWnd: THelpWindow = nil;
   HelpInUse: Boolean = False;
   RunMenu: Boolean = False;
     {`Признак автовыпадения меню ([X] Auto run User Menu)`}
@@ -88,14 +88,14 @@ const
 
 type
   TDNApplication = class;
-  PDNApplication = TDNApplication;
+
   TDNApplication = class(TApplication)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     IdleClick: TEventTimer;
     IdleEvt: TEvent;
-    TreeReader: PTreeReader;
+    TreeReader: TTreeReader;
 
-    Pk1, Pk2, Pk3, Pk4: PView;
+    Pk1, Pk2, Pk3, Pk4: TView;
 
     constructor Create;
     destructor Destroy; override;
@@ -109,7 +109,7 @@ type
     procedure EditFile(Intern: Boolean; FileName: String);
     {DataCompBoy}
     procedure OutOfMemory; override;
-    procedure RetrieveDesktop(const FileName: String; LS: PStream;
+    procedure RetrieveDesktop(const FileName: String; LS: TStream;
          LoadColors: Boolean); {DataCompBoy}
     procedure SaveDesktop(const FileName: String); {DataCompBoy}
     procedure LoadDesktop(var S: TStream);
@@ -122,7 +122,7 @@ type
     end;
 
 function CheckExit: Boolean;
-function PresentFile(Name: String): PStream; {DataCompBoy}
+function PresentFile(Name: String): TStream; {DataCompBoy}
 procedure WriteConfig;
 procedure ShowTimeInfo;
 procedure LoadPalFromFile(const FN: String); {DataCompBoy}
@@ -131,7 +131,7 @@ procedure w95QuitInit; {Gimly}
 function w95QuitCheck: Boolean; {Gimly}
 procedure w95QuitCancel;
 
-procedure ClearSelection(AFP: Pointer {PFilePanelRoot};
+procedure ClearSelection(AFP: Pointer {TFilePanelRoot};
     FC: Pointer {PFilesCollection - файлы к разотметке });
 
 const
@@ -226,7 +226,7 @@ const
 
 type
   TDataSaver = class;
-  PDataSaver = TDataSaver;
+
   TDataSaver = class(TView)
     constructor Create;
     constructor Load(S: TStream);
@@ -235,7 +235,7 @@ type
     end;
 
 const
-  DataSaver: PDataSaver = nil;
+  DataSaver: TDataSaver = nil;
 
 procedure ExecDNAutoexec;
 
@@ -371,7 +371,7 @@ constructor TDataSaver.Load(S: TStream);
       dskTempContents2:
         if TempFiles = nil then
           begin
-          TempDirs := PStringCollection(S.Get);
+          TempDirs := TStringCollection(S.Get);
           if TempDirs = nil then
             Continue;
           S.Read(Q, SizeOf(Q));
@@ -456,13 +456,13 @@ destructor TDataSaver.Destroy;
   end;
 
 {-DataCompBoy-}
-function PresentFile(Name: String): PStream;
+function PresentFile(Name: String): TStream;
   var
-    S: PStream;
+    S: TStream;
   begin
   if ExistFile(Name) then
     begin
-    S := PBufStream.Create(Name, stOpenRead, 2048);
+    S := TBufStream.Create(Name, stOpenRead, 2048);
     if S^.Status <> stOK then
       begin
       S.Free;
@@ -478,7 +478,7 @@ function PresentFile(Name: String): PStream;
 function CheckExit: Boolean;
   var
     Event: TEvent;
-  function FindQuit(P: PView): Boolean;
+  function FindQuit(P: TView): Boolean;
     begin
     P.HandleEvent(Event);
     FindQuit := (Event.What = evNothing) or not P.Valid(cmQuit);
@@ -532,7 +532,7 @@ constructor TDNApplication.Create;
     I: Integer;
     C: Char absolute I { let's so };
     FileName: String;
-    LoadStream: PStream;
+    LoadStream: TStream;
     Event: TEvent;
 
   var
@@ -566,7 +566,7 @@ constructor TDNApplication.Create;
   R.A.Y := R.B.Y-3;
   R.A.X := R.B.X-5;
   
-  TrashCan := PTrashCan.Create(R);
+  TrashCan := TTrashCan.Create(R);
   TrashCan^.ImVisible := False;
   TrashCan.Hide;
   Desktop.Insert(TrashCan);
@@ -640,7 +640,7 @@ procedure TDNApplication.InitCommandLine;
      or HideCommandLine;
 
   R.Assign(0, 0, 0, 0);
-  TreeReader := PTreeReader.Create(R);
+  TreeReader := TTreeReader.Create(R);
   Insert(TreeReader);
   TreeReader.Hide;
 
@@ -657,7 +657,7 @@ procedure TDNApplication.InitCommandLine;
 {-DataCompBoy-}
 procedure SaveRealDsk;
   begin
-  PDNApplication(Application).SaveDesktop
+  TDNApplication(Application).SaveDesktop
     (SourceDir+'dn'+GetEnv('DNDSK')+'.dsk');
   end;
 {-DataCompBoy-}
@@ -672,7 +672,7 @@ procedure SaveDsk;
     if StartDir <> '' then
       StartDir := '<' + StartDir; {помечаем, что StartDir нужно сохpанить}
    
-    PDNApplication(Application).SaveDesktop
+    TDNApplication(Application).SaveDesktop
       (SwpDir+'dn'+ItoS(DNNumber)+'.swp');
     end;
   end;
@@ -681,13 +681,13 @@ procedure SaveDsk;
 destructor TDNApplication.Destroy;
   var
     B: Word;
-    SaveStream: PStream;
+    SaveStream: TStream;
     INItime, INIsize: LongInt;
   begin
   {-$VOL begin} {if CBAutoSave added by piwamoto}
   if cbAutoSave then
     begin
-    SaveStream := New(PBufStream, Init(SourceDir+'dn'+'.clp',
+    SaveStream := New(TBufStream, Init(SourceDir+'dn'+'.clp',
            stCreate, 2048));
     if  (SaveStream <> nil) and (SaveStream^.Status = stOK)
          and (ClipBoardStream <> nil)
@@ -882,8 +882,8 @@ procedure WriteConfig;
 {-DataCompBoy-}
 procedure TDNApplication.LoadDesktop(var S: TStream);
   var
-    P: PView;
-    PP: PView;
+    P: TView;
+    PP: TView;
     Pal: PString;
     SaveState: AWord;
   begin
@@ -891,7 +891,7 @@ procedure TDNApplication.LoadDesktop(var S: TStream);
     begin
     Desktop.Clear;
     repeat
-      P := PView(S.Get);
+      P := TView(S.Get);
 
       {Cat}
       if S.Status <> stOK then
@@ -932,7 +932,7 @@ procedure TDNApplication.StoreDesktop(var S: TStream);
   var
     Pal: PString;
 
-  procedure WriteView(P: PView);
+  procedure WriteView(P: TView);
     type
       TLongInt = array[0..10] of LongInt;
       PLongInt = ^TLongInt;
@@ -940,8 +940,8 @@ procedure TDNApplication.StoreDesktop(var S: TStream);
       l: array[0..5] of PtrInt;
     begin
     if  (P <> Desktop.Last)
-       and (P <> PView(TrashCan)) 
-      and (P <> PView(Desktop.Background))
+       and (P <> TView(TrashCan)) 
+      and (P <> TView(Desktop.Background))
       and (TypeOf(P^) <> TypeOf(TWriteWin))
       and (TypeOf(P^) <> TypeOf(THelpWindow))
     then
@@ -1051,9 +1051,9 @@ procedure TDNApplication.ProcessTempFile(TFStr: String);
   end;
 
 {-DataCompBoy-}
-procedure TDNApplication.RetrieveDesktop(const FileName: String; LS: PStream; LoadColors: Boolean);
+procedure TDNApplication.RetrieveDesktop(const FileName: String; LS: TStream; LoadColors: Boolean);
   var
-    S: PStream;
+    S: TStream;
     Sign: String[MaxSignLen];
     B, BB: Boolean;
     SM: Word;
@@ -1066,7 +1066,7 @@ procedure TDNApplication.RetrieveDesktop(const FileName: String; LS: PStream; Lo
     FCT: PFilesCollection;
     FRT: PFileRec;
     OldConfirms: Word;
-    PV: PView;
+    PV: TView;
     TempExtrDir, SCurDir, Str1: String;
     ForceMod: Boolean;
    
@@ -1079,7 +1079,7 @@ procedure TDNApplication.RetrieveDesktop(const FileName: String; LS: PStream; Lo
   SetState(sfActive, True);
   if LS = nil
   then
-    S := PBufStream.Create(FileName, stOpenRead, 4096)
+    S := TBufStream.Create(FileName, stOpenRead, 4096)
   else
     S := LS;
   if not Desktop.Valid(cmClose) then
@@ -1121,7 +1121,7 @@ Err:
                       MaxStringLength);
       TempExtrDir := Copy(TempExtrDir, 1, Pos('|', TempExtrDir)-1);
     { перекидываем файлы из временного подкаталога в каталог назначения}
-      PV := PUserWindow.Create;
+      PV := TUserWindow.Create;
       Desktop.Insert(PV);
       SetLength(TempExtrDir, Length(TempExtrDir)-1);
       Str1 := GetPath(TempExtrDir);
@@ -1177,7 +1177,7 @@ Err:
     S^.Read(TempBounds, SizeOf(TempBounds));
     {S^.Read(ArcBounds, SizeOf(TempBounds));}
     S^.Read(TrashCan^.ImVisible, 1); 
-    KeyMacroses := PCollection(S^.Get);
+    KeyMacroses := TCollection(S^.Get);
     S^.Read(R, SizeOf(R));
     if not ShowSeconds then
       if R.A.X > (ScreenWidth shr 1) then
@@ -1230,7 +1230,7 @@ Err:
 {-DataCompBoy-}
 procedure TDNApplication.SaveDesktop(const FileName: String);
   var
-    S: PStream;
+    S: TStream;
     F: lFile;
     B: Boolean;
     PP: Pointer;
@@ -1238,7 +1238,7 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
 
   begin { TDNApplication.SaveDesktop }
   ClrIO;
-  S := PBufStream.Create(FileName, stCreate, 2048);
+  S := TBufStream.Create(FileName, stCreate, 2048);
   DNTrace('SaveDesktop ' + FileName + ' status ' + ItoS(S^.Status));
   if (S^.Status = stOK) then
     begin
@@ -1307,7 +1307,7 @@ const
 procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
      FileName: String); {AK155}
   var
-    W: PWindow;
+    W: TWindow;
     R: TRect;
     fr: PFileRec;
     up: tUserParams;
@@ -1391,7 +1391,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
     
     if  (XT = '.WKZ') or (Q = vmSpread) or (Q = vmSpreadSL) then
       begin
-      W := PCalcWindow.Create(R, FileName);
+      W := TCalcWindow.Create(R, FileName);
       if  ( (Q = vmSpread) or (Q = vmSpreadSL)) and (W <> nil) then
         with P^, W^ do
           begin
@@ -1399,7 +1399,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
              fOrigin.Y+fSize.Y);
           AdjustToDesktopSize(R, fDeskSize);
           Locate(R);
-          with PCalcWindow(W)^.CalcView^ do
+          with TCalcWindow(W).CalcView^ do
             begin
             Delta := fsDelta;
             Cur := fsCur;
@@ -1434,9 +1434,9 @@ db:
   procedure TextView;
     var
       S: String;
-      V: PFileViewer;
+      V: TFileViewer;
     begin
-    W := New(PFileWindow, Init(FileName, RN, EditorDefaults.ViOpt and 1 <>
+    W := New(TFileWindow, Init(FileName, RN, EditorDefaults.ViOpt and 1 <>
            0));
     if W = nil then
       Exit;
@@ -1444,7 +1444,7 @@ db:
       W.Free
     else
       begin
-      V := PFileViewer(W^.Current);
+      V := TFileViewer(W^.Current);
       S := V^.VFileName;
       System.Insert(' ', S, 1);
       UpStr(S);
@@ -1502,7 +1502,7 @@ db:
     RN := Copy(FileName, I+1, MaxStringLength);
     SetLength(FileName, I-1);
     if  (ActivePanel <> nil)
-           and (Copy(PFilePanelRoot(ActivePanel)^.DirectoryName, 1, 4) =
+           and (Copy(TFilePanelRoot(ActivePanel).DirectoryName, 1, 4) =
          'UC2:')
     then
       begin
@@ -1556,10 +1556,10 @@ db:
 {-DataCompBoy-}
 procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
   var
-    W: PWindow;
+    W: TWindow;
     R: TRect;
     PS: PString;
-    V: PFileEditor;
+    V: TFileEditor;
     I: Integer;
     P: PEditRecord;
     fr: PFileRec;
@@ -1613,10 +1613,10 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
       end
     else
       Desktop.GetExtent(R);
-    W := PEditWindow.Create(R, FileName);
+    W := TEditWindow.Create(R, FileName);
     if  (W <> nil) and (W.Valid(cmValid)) then
       begin
-      V := PEditWindow(W)^.Intern;
+      V := TEditWindow(W).Intern;
       FreeStr := V^.EditName;
       System.Insert(' ', FreeStr, 1);
       UpStr(FreeStr);
@@ -1691,7 +1691,7 @@ procedure TDNApplication.InitMenuBar;
   begin
   GetExtent(R);
   R.B.Y := R.A.Y;
-  MenuBar := PMenuBar(LoadResource(dlgMainMenu));
+  MenuBar := TMenuBar(LoadResource(dlgMainMenu));
   if MenuBar = nil then
     FatalError('Invalid resource file.');
   MenuBar.Menu^.Items^.Name^:= '~'+Char(SystemMenuChar)+'~';
@@ -1707,7 +1707,7 @@ procedure TDNApplication.InitStatusLine;
   GetExtent(R);
   R.A.Y := R.B.Y;
   R.Move(0, -1);
-  StatusLine := PStatusLine(LoadResource(dlgStatusLine));
+  StatusLine := TStatusLine(LoadResource(dlgStatusLine));
   StatusLine.Locate(R);
   end;
 
@@ -1791,9 +1791,9 @@ procedure LoadPalFromFile(const FN: String);
 {-DataCompBoy-}
 { A view is in the group (by the pointers only: it may be a freed one). The help window is kept between the calls of F1 (HelpWnd),
   but the window of TV is destroyed when it is closed, and the pointer stayed: the next F1 used a freed window. }
-function IsOnDesktop(P: PView): Boolean;
+function IsOnDesktop(P: TView): Boolean;
   var
-    V: PView;
+    V: TView;
   begin
   IsOnDesktop := False;
   V := Desktop.Last;
@@ -1813,11 +1813,11 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   var
     R: TRect;
-    P, P1: PView;
+    P, P1: TView;
     ST: String;
     FileIsDBF: Boolean;
-    HFile: PHelpFile;
-    HelpStrm: PDosStream;
+    HFile: THelpFile;
+    HelpStrm: TDosStream;
   procedure OpenWindow(ChDrive: Boolean);
     var
       S: String;
@@ -1840,7 +1840,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     if Abort then
       Dispose(P, Done)
     else
-      InsertWindow(PWindow(P));
+      InsertWindow(TWindow(P));
     
     if TrashCan^.ImVisible then
       Desktop.Insert(TrashCan);
@@ -1864,7 +1864,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     if Abort then
       Dispose(P, Done)
     else
-      InsertWindow(PWindow(P));
+      InsertWindow(TWindow(P));
     end;
 
   function NewVideoMenu(Items: PMenuItem): PMenu;
@@ -1891,7 +1891,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         Cols, Rows: String[3];
         end;
       W: Word;
-      D: PDialog;
+      D: TDialog;
     begin
     case ScreenMode of
       sm80x30:
@@ -1912,13 +1912,13 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     R.Cols := ItoS(ScreenWidth);
     R.Rows := ItoS(ScreenHeight);
 
-    D := PDialog(LoadResource(dlgChScreenMode));
-    D := PDialog(Application.ValidView(D));
+    D := TDialog(LoadResource(dlgChScreenMode));
+    D := TDialog(Application.ValidView(D));
     if D = nil then
       Exit;
     D.SetData(R);
     if opSys = opWin then
-      PRadioButtons(D^.Last^.Prev)^.EnableMask := $19;
+      TRadioButtons(D^.Last^.Prev).EnableMask := $19;
     W := Desktop.ExecView(D);
     if W <> cmCancel then
       D.GetData(R);
@@ -1982,7 +1982,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
   procedure LoadSheet(const SheetName: String);
     begin
     Desktop.GetExtent(R);
-    Desktop.Insert(ValidView(PCalcWindow.Create(R, SheetName)));
+    Desktop.Insert(ValidView(TCalcWindow.Create(R, SheetName)));
     end;
   {-DataCompBoy-}
 
@@ -2006,7 +2006,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     Pal: PString;
     W: Word;
     {WW: Word;
-     PW: PWindow;}
+     PW: TWindow;}
     vId: LongInt;
 
   procedure StoreColors;
@@ -2235,15 +2235,15 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   procedure GetUserScreen;
     var
-      P: PView;
-      PP: PView;
+      P: TView;
+      PP: TView;
     begin
     PP := nil;
     P := ViewPresent(cmShowOutput, @PP);
     if PP <> nil then
       PP.Select
     else
-      Desktop.Insert(PUserWindow.Create);
+      Desktop.Insert(TUserWindow.Create);
     end;
 
   procedure Rebound;
@@ -2264,9 +2264,9 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     begin
     if ExecResource(dlgAdvanceSearch, AdvanceSearchData) = cmOK then
       begin
-      PView(Desktop.Current {Event.InfoPtr}).GetData(FindRec);
+      TView(Desktop.Current {Event.InfoPtr}).GetData(FindRec);
       FindRec.Options := FindRec.Options or ffoAdvanced;
-      PView(Desktop.Current {Event.InfoPtr}).SetData(FindRec);
+      TView(Desktop.Current {Event.InfoPtr}).SetData(FindRec);
       end;
     ClearEvent(Event);
     end;
@@ -2274,7 +2274,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
   procedure DoQuickChange;
     var
       R: TRect;
-      P: PMenuBox;
+      P: TMenuBox;
       Menu: PMenu;
       Items: PMenuItem;
       C: Char;
@@ -2303,7 +2303,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       Application.Size.X div 2+J div 2+J mod 2,
       Application.Size.Y div 2+Q div 2+Q mod 2);
     Menu := NewMenu(Items);
-    P := PMenuBox.Create(R, Menu, nil);
+    P := TMenuBox.Create(R, Menu, nil);
     P^.Options := P^.Options or ofCentered;
     P^.HelpCtx := hcQuickDirs;
 
@@ -2395,9 +2395,9 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       Current, Default: PMenuItem;
       Menu: PMenu;
       CurIdx, i: Integer;
-      HMB: PMenuBox;
+      HMB: TMenuBox;
       R: TRect;
-      V: PView;
+      V: TView;
     function LngMixCase(P: String): String;
       var
         i: Integer;
@@ -2558,7 +2558,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmWKZView:
       begin
       Desktop.GetExtent(R);
-      InsertWindow(New(PCalcWindow, Init(R, CnvString(Event.InfoPtr))));
+      InsertWindow(New(TCalcWindow, Init(R, CnvString(Event.InfoPtr))));
       end;
     
     
@@ -2572,12 +2572,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       W := PosChar('|', ST);
       if W > 0
       then
-        InsertWindow(New(PFileWindow,
+        InsertWindow(New(TFileWindow,
             Init(Copy(ST, 1, W-1),
               Copy(ST, W+1, MaxStringLength),
               Event.Command = cmHexView)))
       else
-        InsertWindow(New(PFileWindow,
+        InsertWindow(New(TFileWindow,
             Init(ST, ST,
               Event.Command = cmHexView)))
       end;
@@ -2805,7 +2805,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     
     cmGame:
       if Game = nil then
-        InsertWindow(PGameWindow.Create)
+        InsertWindow(TGameWindow.Create)
       else
         Game^.Owner.Select;
     
@@ -2847,13 +2847,13 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmNewStrColl:
       begin
       ClearEvent(Event);
-      Event.InfoPtr := PStringCollection.Create($80, $40, False);
+      Event.InfoPtr := TStringCollection.Create($80, $40, False);
       end;
     cmHelp:
       begin
       ClearEvent(Event);
       P1:=Desktop.Current;
-      if P1 = PView(HelpWnd) then
+      if P1 = TView(HelpWnd) then
         Exit;
         { Такое может быть только при работе граббера на окне хелпа,
          так как иначе окно хелпа (если оно есть, и Current)
@@ -2861,14 +2861,14 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
          просто не попадёт }
       if  (not HelpInUse) or (HelpWnd = nil) or not IsOnDesktop(HelpWnd) then
         begin { создаём окно хелпа }
-        HelpStrm := New(PDosStream,
+        HelpStrm := New(TDosStream,
             Init(SourceDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked})
             );
         if (HelpStrm^.Status <> stOK) and (SourceDir<> StartupDir)
         then
           begin
           HelpStrm.Free;
-          HelpStrm := New(PDosStream,
+          HelpStrm := New(TDosStream,
               Init(StartupDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked})
               );
           end;
@@ -2878,8 +2878,8 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
           Msg(erCantOpenHelp, nil, mfError+mfOKButton);
           Exit;
           end;
-        HFile := PHelpFile.Create(HelpStrm);
-        HelpWnd := PHelpWindow(ValidView(New(PHelpWindow,
+        HFile := THelpFile.Create(HelpStrm);
+        HelpWnd := THelpWindow(ValidView(New(THelpWindow,
                      Init(HFile, GetHelpCtx))));
         if HelpWnd = nil then
           begin
@@ -2914,7 +2914,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmClearData:
       begin
       FillChar(FreeStr, SizeOf(FreeStr), 0);
-      PView(Event.InfoPtr).Owner.SetData(FreeStr);
+      TView(Event.InfoPtr).Owner.SetData(FreeStr);
       ClearEvent(Event);
       end;
     cmChLngId:
@@ -2973,13 +2973,13 @@ procedure ClearSelection(AFP: Pointer; FC: Pointer);
   var P: PFileRec absolute P_;
     begin
     if P^.Selected then
-      Dec(PFilePanelRoot(AFP)^.SelNum);
+      Dec(TFilePanelRoot(AFP).SelNum);
     P^.Selected := False;
     end;
 
   begin
   PFilesCollection(FC).ForEach(UnSelect);
-  with PFilePanelRoot(AFP)^ do
+  with TFilePanelRoot(AFP)^ do
     begin
     DrawView;
     if InfoView <> nil then
@@ -3014,7 +3014,7 @@ procedure PutInClip(const S: String);
   begin
   if editcore.ClipBoard <> nil then
     editcore.ClipBoard.Free;
-  editcore.ClipBoard := PLineCollection.Create(1, 1, True);
+  editcore.ClipBoard := TLineCollection.Create(1, 1, True);
   editcore.ClipBoard.Insert(NewLongStr(S));
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipIn;
@@ -3027,7 +3027,7 @@ procedure PutInClipLong(const S: LongString);
   begin
   if editcore.ClipBoard <> nil then
     editcore.ClipBoard.Free;
-  editcore.ClipBoard := PLineCollection.Create(1, 1, True);
+  editcore.ClipBoard := TLineCollection.Create(1, 1, True);
   editcore.ClipBoard.Insert(NewLongStr(S));
   if SystemData.Options and ossUseSysClip <> 0 then
     SyncClipIn;

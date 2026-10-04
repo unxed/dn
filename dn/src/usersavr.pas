@@ -10,7 +10,7 @@ uses
 
 type
 
-  PUserSaver = ^TUserSaver;
+
   TUserSaver = class(TView)
     Screen: Pointer;
     SSize, SWidth: AInt;
@@ -97,7 +97,7 @@ procedure TUserSaver.Store(var S: TStream);
 
 procedure InsertUserSaver(ACheck: Boolean);
   begin
-  Desktop.Insert(PUserSaver.Create(ACheck));
+  Desktop.Insert(TUserSaver.Create(ACheck));
   FreeMem(UserScreen, UserScreenSize);
   UserScreenSize := ScreenWidth*ScreenHeight*2;
   UserScreenWidth := ScreenWidth;

@@ -99,7 +99,7 @@ type
     procedure Draw; virtual;
     end;
 
-  PParamText = ^TParamText;
+
   TParamText = class(TStaticText)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     ParamCount: AInt;
@@ -116,7 +116,7 @@ type
   PBookmark = ^TBookmark;
   TBookmark = class(TLabel)
     {` Закладка страницы блокнота со страницами TNotepas }
-    constructor Create(var Bounds: TRect; AText: String; ALink: PView);
+    constructor Create(var Bounds: TRect; AText: String; ALink: TView);
     procedure Draw; virtual;
     procedure FocusLink; virtual;
     end;
@@ -462,7 +462,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
   procedure OpenList;
     var
       R: TRect;
-      MB: PMenuBox;
+      MB: TMenuBox;
       C: Word;
     begin
 { Меню-список открываем поверх строки, совмещая строку
@@ -595,7 +595,7 @@ procedure TPage.InitFrame;
     R: TRect;
   begin
   GetExtent(R);
-  Frame := PFrame(PPageFrame.Create(R));
+  Frame := TFrame(PPageFrame.Create(R));
   end;
 
 function TPage.GetPalette: TPalette;
@@ -656,7 +656,7 @@ procedure TPage.Store(var S: TStream);
   PutPeerViewPtr(S, PrevPage);
   end;
 
-constructor TBookmark.Create(var Bounds: TRect; AText: String; ALink: PView);
+constructor TBookmark.Create(var Bounds: TRect; AText: String; ALink: TView);
   begin
   inherited Create(Bounds, AText, ALink);
   PPage(ALink)^.Bookmark := Self;
@@ -691,7 +691,7 @@ procedure TNotepad.InitFrame;
     R: TRect;
   begin
   GetExtent(R);
-  Frame := PFrame(PNotepadFrame.Create(R));
+  Frame := TFrame(PNotepadFrame.Create(R));
   end;
 
 function TNotepad.NewPage(const ATitle: String): PPage;

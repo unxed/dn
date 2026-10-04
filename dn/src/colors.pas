@@ -160,14 +160,14 @@ procedure TWindowCol.FreeItem(Item: Pointer);
 function TWindowList.GetText(Item: LongInt; MaxLen: Integer): String;
   var
     S: String;
-    P: PView;
+    P: TView;
   begin
   P := List^.At(Item);
   S := GetString(dlUnknownWindowType);
   Message(P, evCommand, cmGetName, @S);
-  if PWindow(P).Number in [1..9]
+  if TWindow(P).Number in [1..9]
   then
-    GetText := Char($30+PWindow(P).Number)+' '+S
+    GetText := Char($30+TWindow(P).Number)+' '+S
   else
     GetText := '  '+S;
   end;
@@ -175,19 +175,19 @@ function TWindowList.GetText(Item: LongInt; MaxLen: Integer): String;
 procedure WindowManager;
   label 1;
   var
-    D: PDialog;
+    D: TDialog;
     R: TRect;
     PC: PWindowCol;
-    PV: PView;
+    PV: TView;
     S: String;
     DT: record
-      P: PCollection;
+      P: TCollection;
       n: Word;
       end;
     I, Num: Integer;
     Cmd: Word;
 
-  procedure InsView(P: PView);
+  procedure InsView(P: TView);
     begin
     if P = nil then
       Exit;
@@ -211,19 +211,19 @@ cmWindowManager задизейблена.
     Exit
     end;
 *)
-  D := PDialog(LoadResource(dlgWindowManager));
+  D := TDialog(LoadResource(dlgWindowManager));
 
   R.Assign(D^.Size.X-13, 3, D^.Size.X-12, D^.Size.Y-2);
-  PV := PScrollBar.Create(R);
+  PV := TScrollBar.Create(R);
   PV^.Options := PV^.Options or ofPostProcess or ofSecurity;
   D.Insert(PV);
 
   R.Assign(2, 3, D^.Size.X-13, D^.Size.Y-2);
-  PV := New(PWindowList, Init(R, 1, PScrollBar(PV)));
+  PV := New(PWindowList, Init(R, 1, TScrollBar(PV)));
   PV^.Options := PV^.Options or ofPostProcess or ofSecurity;
-  PListBox(PV)^.NewLisT(PC);
+  TListBox(PV).NewLisT(PC);
   if PC^.Count > 1 then
-    PListBox(PV)^.Focused := 1;
+    TListBox(PV).Focused := 1;
   Num := 0; {-$VIV 28.05.99--}
   if  (WinManagerPosToEdit) and (PC^.Count > 0) and
       (Pos(GetString(dlEditTitle)+' -', PWindowList(PV)^.GetText(0, 255))
@@ -239,18 +239,18 @@ cmWindowManager задизейблена.
         end;
   if  (WinManagerSelectNext) and (Num = 0) and (PC^.Count > 1) then
     Num := 1;
-  PListBox(PV)^.Focused := Num; {-$VIV--}
+  TListBox(PV).Focused := Num; {-$VIV--}
   D.Insert(PV);
 
   R.Assign(2, 2, 45, 3);
-  PV := New(PLabel, Init(R, GetString(dlWindowsLabel), PV));
+  PV := New(TLabel, Init(R, GetString(dlWindowsLabel), PV));
   D.Insert(PV);
 
 while true do
   begin
   Cmd := Desktop.ExecView(D);
   D.GetData(DT); { Теперь DT.P = PC }
-  PV := PView(DT.P^.At(DT.n));
+  PV := TView(DT.P^.At(DT.n));
   if Cmd = cmCancel then
     Break;
   if Cmd = cmOK then { "Select" }

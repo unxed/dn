@@ -168,10 +168,10 @@ const
   MaxDirHistorySize = 40;
   MaxEditHistorySize = 20;
 
-  CmdStrings: PCollection = nil;
-  DirHistory: PCollection = nil;
-  EditHistory: PCollection = nil;
-  ViewHistory: PCollection = nil;
+  CmdStrings: TCollection = nil;
+  DirHistory: TCollection = nil;
+  EditHistory: TCollection = nil;
+  ViewHistory: TCollection = nil;
 
 var
   HistNameSuffix: string;
@@ -191,7 +191,7 @@ uses
   , calcwin 
   ;
 
-procedure FreeLastUnmarked(C: PCollection);
+procedure FreeLastUnmarked(C: TCollection);
 
   var
     I: Integer;
@@ -286,12 +286,12 @@ procedure TViewHistoryCol.FreeItem(P: Pointer);
 
 procedure StoreViewInfo(P: Pointer);
   var
-    Viewer: PFileWindow absolute P;
+    Viewer: TFileWindow absolute P;
     
     DBView: PDBWindow absolute P;
     
     
-    SSView: PCalcWindow absolute P;
+    SSView: TCalcWindow absolute P;
     
     R: PViewRecord;
     I: Integer;
@@ -304,7 +304,7 @@ procedure StoreViewInfo(P: Pointer);
   New(R);
 
   if TypeOf((TStreamable(P)^)) = TypeOf(TFileWindow) then
-    with PFileViewer(Viewer^.Current)^, R^ do
+    with TFileViewer(Viewer^.Current)^, R^ do
       begin
       if VFileName = '' then
         goto Q;
@@ -439,20 +439,20 @@ procedure StoreExtViewer(const FileName: String);
 
 procedure StoreEditInfo(P: Pointer);
   var
-    E: PEditWindow absolute P;
+    E: TEditWindow absolute P;
     I: Integer;
     R: PEditRecord;
     PP: PEditRecord;
 
   begin
   if  (InterfaceData.Options and ouiTrackEditors = 0) or
-      (PFileEditor(E^.Intern).EditName = '')
+      (TFileEditor(E^.Intern).EditName = '')
   then
     Exit;
   if EditHistory = nil then
     EditHistory := PEditHistoryCol.Create(30, 30);
   New(R);
-  with PFileEditor(E^.Intern)^, R^ do
+  with TFileEditor(E^.Intern)^, R^ do
     begin
     
     FName := NewStr(' '+lfGetLongFileName(EditName)); {DataCompBoy}
@@ -507,7 +507,7 @@ procedure AddCommand(const LastCommand: String);
   if LastCommand <> '' then
     begin
     if CmdStrings = nil then
-      CmdStrings := PLineCollection.Create(40, 40, False);
+      CmdStrings := TLineCollection.Create(40, 40, False);
     for I := 0 to CmdStrings^.Count-1 do
       begin
       P := CmdStrings^.At(I);
@@ -541,7 +541,7 @@ procedure AddCommand(const LastCommand: String);
 procedure InitCommands;
 begin
  if CmdStrings <> nil then CmdStrings.Free;
- CmdStrings := PLineCollection.Create(40, 10);
+ CmdStrings := TLineCollection.Create(40, 10);
  StrModified := False;
  CurString := 0;
 end;
@@ -550,7 +550,7 @@ procedure SaveCommands(var S: TStream);
   var
     I, J: Integer;
     S1, S2: String;
-    M: PCollection;
+    M: TCollection;
   begin
   {AK155 зачем это Message - непонятно. Выполнение пустой команды
 делает ровно ничего (см. cmdline.pas, поиск по cmExecCommandLine)
@@ -558,7 +558,7 @@ Message(CommandLine, evCommand, cmExecCommandLine, nil);
 /AK155}
   if  (CmdStrings <> nil) and (CmdStrings^.Count >= 50) then
     begin
-    M := PLineCollection.Create(50, 10, False);
+    M := TLineCollection.Create(50, 10, False);
     for I := 1 to 40 do
       begin
       if CmdStrings^.Count <= 0 then
@@ -588,10 +588,10 @@ procedure LoadCommands(var S: TStream);
   var
     I: Integer;
   begin
-  CmdStrings := PCollection(S.Get);
-  DirHistory := PCollection(S.Get);
-  EditHistory := PCollection(S.Get);
-  ViewHistory := PCollection(S.Get);
+  CmdStrings := TCollection(S.Get);
+  DirHistory := TCollection(S.Get);
+  EditHistory := TCollection(S.Get);
+  ViewHistory := TCollection(S.Get);
 
   if CmdStrings <> nil then
     CurString := CmdStrings^.Count
@@ -869,7 +869,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   S := lfGetLongFileName(S);
   
   if DirHistory = nil then
-    DirHistory := PLineCollection.Create(40, 40, False);
+    DirHistory := TLineCollection.Create(40, 40, False);
   if  (DriveType <> Integer(dtList)) and
       (DriveType <> Integer(dtFind)) and
       (DriveType <> Integer(dtArcFind)) and
@@ -902,21 +902,21 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   SaveHistories; {AK155}
   end { AddToDirectoryHistory };
 
-function GetDialog(Dlg: TDlgIdx; var List: Pointer): PDialog;
+function GetDialog(Dlg: TDlgIdx; var List: Pointer): TDialog;
   var
-    D: PDialog;
+    D: TDialog;
     L: PTHistList; {AK155}
-    P: PView;
+    P: TView;
     R: TRect;
   begin
-  D := PDialog(LoadResource(Dlg));
+  D := TDialog(LoadResource(Dlg));
 
   R.Assign(D^.Size.X-3, 2, D^.Size.X-2, 13);
-  P := PScrollBar.Create(R);
+  P := TScrollBar.Create(R);
   D.Insert(P);
 
   R.Assign(2, 2, D^.Size.X-3, 13);
-  L := New(PTHistList, Init(R, 1, PScrollBar(P)));
+  L := New(PTHistList, Init(R, 1, TScrollBar(P)));
   L^.Dlg := Dlg; {AK155: см. TTHistList.HandleEvent, cmYes }
   D.Insert(L);
   List := L;
@@ -926,7 +926,7 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): PDialog;
 
 procedure EditHistoryMenu;
   var
-    D: PDialog;
+    D: TDialog;
     P: PTHistList;
     I: Integer;
   begin
@@ -955,7 +955,7 @@ procedure EditHistoryMenu;
     if  (PViewRecord(EditHistory^.At(I))^.FName = nil) then
       Exit;
     {A eto tak, na vsyakiy sluchay proverka, esli eto ne DPMI :}
-    PDNApplication(Application)^.EditFile(
+    TDNApplication(Application).EditFile(
       SystemData.Options and ossEditor <> 0,
       {AK155 28.09.2002:
              это чтобы через историю всегда вызывался внутренний
@@ -966,7 +966,7 @@ procedure EditHistoryMenu;
 
 procedure ViewHistoryMenu;
   var
-    D: PDialog;
+    D: TDialog;
     P: PTHistList;
     I: Integer;
   begin
@@ -994,20 +994,20 @@ procedure ViewHistoryMenu;
     begin
     if  (PViewRecord(ViewHistory^.At(I))^.FName = nil) then
       Exit; {Ku :}
-    PDNApplication(Application)^.ViewFile(False, True, {AK155}
+    TDNApplication(Application).ViewFile(False, True, {AK155}
       Copy(PViewRecord(ViewHistory^.At(I))^.FName^, 2, MaxStringLength));
     end;
   end { ViewHistoryMenu };
 
 function DirHistoryMenu: String;
   var
-    PC: PLineCollection;
-    D: PDialog;
-    P: PView;
+    PC: TLineCollection;
+    D: TDialog;
+    P: TView;
     R: TRect;
     I: Integer;
     DT: record
-      PC: PCollection;
+      PC: TCollection;
       I: Integer;
       end;
   begin
@@ -1022,18 +1022,18 @@ function DirHistoryMenu: String;
     end;
 
   if DirHistory = nil then
-    DirHistory := PLineCollection.Create(40, 40, False);
+    DirHistory := TLineCollection.Create(40, 40, False);
   {  if DirHistory^.Count = 0 then Exit;}
 
   D := GetDialog(dlgDirectoryHistory, Pointer(P));
 
-  PListBox(P)^.NewLisT(DirHistory);
+  TListBox(P).NewLisT(DirHistory);
   if DirHistory^.Count > 1 then
-    PListBox(P)^.Focused := 1;
+    TListBox(P).Focused := 1;
 
   I := Desktop.ExecView(D);
 
-  DT.I := PListBox(P)^.Focused;
+  DT.I := TListBox(P).Focused;
   D.Free;
   if I = cmOK then
     DirHistoryMenu := Copy(CnvString(DirHistory^.At(DT.I)), 2,
@@ -1042,32 +1042,32 @@ function DirHistoryMenu: String;
 
 procedure CmdHistory;
   var
-    PC: PLineCollection;
-    D: PDialog;
-    P: PView;
+    PC: TLineCollection;
+    D: TDialog;
+    P: TView;
     R: TRect;
     I: Integer;
     DT: record
-      PC: PCollection;
+      PC: TCollection;
       I: Integer;
       end;
   begin
   ClearHistories;
   LoadHistories; {AK155}
   if CmdStrings = nil then
-    CmdStrings := PLineCollection.Create(40, 40, False);
+    CmdStrings := TLineCollection.Create(40, 40, False);
 
   D := GetDialog(dlgCommandsHistory, Pointer(P));
 
-  PListBox(P)^.NewLisT(CmdStrings);
-  PListBox(P)^.FocusItem(CmdStrings^.Count-1);
+  TListBox(P).NewLisT(CmdStrings);
+  TListBox(P).FocusItem(CmdStrings^.Count-1);
   PTHistList(P)^.CommandHistory := True;
   if CmdStrings^.Count > 0 then
-    PListBox(P)^.FocusItem(CmdStrings^.Count-1);
+    TListBox(P).FocusItem(CmdStrings^.Count-1);
 
   I := Desktop.ExecView(D);
 
-  DT.I := PListBox(P)^.Focused;
+  DT.I := TListBox(P).Focused;
   D.Free;
 
   if I = cmCancel then
@@ -1131,7 +1131,7 @@ procedure ClearHistories;
     I, J, K: Integer;
     B: PChar;
 
-  procedure ClearStrCollection(C: PCollection);
+  procedure ClearStrCollection(C: TCollection);
     begin
     if C = nil then
       Exit;
@@ -1147,7 +1147,7 @@ procedure ClearHistories;
       end;
     end;
 
-  procedure ClearCollection(C: PCollection);
+  procedure ClearCollection(C: TCollection);
     begin
     if C = nil then
       Exit;

@@ -40,7 +40,7 @@ type
 
 function Evalue(const s: String; CCV: Pointer): CReal;
 {Параметр CCV равен nil для простого вычислителя. При вызове
-из электронной таблицы - это PCalcView. В этом случае
+из электронной таблицы - это TCalcView. В этом случае
 к функциям добавлятся SUM и MUL, а к операндам
 добавляются имена ячеек }
 
@@ -79,7 +79,7 @@ uses
 var
   Expression: String;
 
-  CurCalcView: PCalcView;
+  CurCalcView: TCalcView;
 
 
   { Число в указанной системе счичления }
@@ -562,7 +562,7 @@ procedure ScanSym;
 
 
     if CurCalcView <> nil then
-      with PCalcView(CurCalcView)^ do
+      with TCalcView(CurCalcView)^ do
         begin
         if Expression[T] = '(' then
           begin { что-то вроде sum(a1:a30) в wkz}

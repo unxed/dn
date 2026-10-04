@@ -60,13 +60,13 @@ uses
 
 type
   TFilePanelRoot = class;
-  PFilePanelRoot = TFilePanelRoot;
+
   {` Базовый тип файловой панели }
   TFilePanelRoot = class(TView)
     isValid, MSelect, SelectFlag, Loaded, ChangeLocked: Boolean;
     SelfNum: Boolean; // Фактически - TPanelNum;
       {` Какая это панель: правая или левая `}
-    InfoView, DirView, DriveLine, SortView: PView;
+    InfoView, DirView, DriveLine, SortView: TView;
     Delta, OldDelta, OldPos, DeltaX: LongInt;
     Files: PFilesCollection;
     DirectoryName, OldDirectory: String;
@@ -95,7 +95,7 @@ type
     PrevPresetNum: Byte;
     PrevPanelSetupSet: TPanelSetupSet;
 
-    Drive: PDrive;
+    Drive: TDrive;
     ForceReading: Boolean;
     DriveState: Word;
     LastCurPos: TPoint;
@@ -178,11 +178,11 @@ type
     Я этот фокус выкинул, вроде, хуже не стало. Так что отбой.}
 
 const
-  ActivePanel: PFilePanelRoot = nil;
+  ActivePanel: TFilePanelRoot = nil;
     {` Указатель на активную файловую панель активного менеджера.
      Устанавливается в TFilePanel.SetState, так что вне этого метода
      значение этой переменной всегда корректно.`}
-  PassivePanel: PFilePanelRoot = nil;
+  PassivePanel: TFilePanelRoot = nil;
     {` Указатель на пассивную файловую панель активного менеджера.
     см. ActivePanel. `}
   CtrlWas: Boolean = False;
@@ -211,7 +211,7 @@ var
   CurrentDirectory: String;
   PShootState: Word;
 
-function OtherFilePanel(P: PFilePanelRoot): PFilePanelRoot;
+function OtherFilePanel(P: TFilePanelRoot): TFilePanelRoot;
 
 implementation
 
@@ -268,7 +268,7 @@ constructor TFilePanelRoot.Create(const Bounds: TRect; ADrive: Integer; AScrBar:
 
   if  (ADrive <= 0) or not ValidDrive(Char(ADrive+64)) then
     ADrive := 0;
-  Drive := PDrive.Create(ADrive, Self);
+  Drive := TDrive.Create(ADrive, Self);
 
   if Abort then
     Exit;
@@ -299,7 +299,7 @@ constructor TFilePanelRoot.Load(S: TStream);
   GetPeerViewPtr(S, InfoView);
   GetPeerViewPtr(S, DriveLine);
   GetPeerViewPtr(S, SortView);
-  Drive := PDrive(S.Get);
+  Drive := TDrive(S.Get);
   if Drive = nil then
     New(Drive, Init(0, Self))
   else
@@ -393,7 +393,7 @@ function TFilePanelRoot.Valid(Command: Word): Boolean;
 
 destructor TFilePanelRoot.Destroy;
   var
-    P: PDrive;
+    P: TDrive;
   begin
   if Files <> nil then
     Files.Free;
@@ -899,7 +899,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
 
   function ReplaceDrive(C: Char): Boolean;
     var
-      PDr: PDrive;
+      PDr: TDrive;
     begin
     ReplaceDrive := False;
     New(PDr, Init(Byte(C)-64, Self));
@@ -931,7 +931,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
       A: LongInt;
       I: Byte;
       PathInside: String; {JO}
-      Drv: PDrive; {JO}
+      Drv: TDrive; {JO}
     label WrongArc;
     begin
     if ChangeLocked then
@@ -999,7 +999,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if  (PathInside <> '') then
       begin
       Drv := nil;
-      Drv := PArcDrive.Create(FileName, FileName);
+      Drv := TArcDrive.Create(FileName, FileName);
       if Drv = nil then
         goto WrongArc;
       if Drive^.DriveType <> dtDisk then
@@ -1127,20 +1127,20 @@ WrongArc:
     if ChangeLocked or (Event.InfoPtr = nil) then
       Exit;
     DriveLetter := Drive^.GetDriveLetter;
-    if  (PDrive(Event.InfoPtr)^.DriveType = dtTemp) and
+    if  (TDrive(Event.InfoPtr).DriveType = dtTemp) and
         (Drive^.DriveType = dtTemp)
     then
       begin
       CE;
       Exit
       end;
-    if PDrive(Event.InfoPtr)^.DriveType in [dtDisk, dtNet, dtLink] then
+    if TDrive(Event.InfoPtr).DriveType in [dtDisk, dtNet, dtLink] then
       begin
       if Drive <> nil then
         Drive.Free;
       Drive := nil
       end;
-    PDrive(Event.InfoPtr)^.Prev := Drive;
+    TDrive(Event.InfoPtr).Prev := Drive;
     Drive := Event.InfoPtr;
     Drive.Panel := Self;
     SetupPanelFromDrive;
@@ -1149,14 +1149,14 @@ WrongArc:
         (Drive^.Prev <> nil) and (Drive^.Prev^.DriveType = dtArc)
     then
       begin
-      with PArcDrive(Drive^.Prev)^ do
+      with TArcDrive(Drive^.Prev)^ do
         begin
         if CurDir = '' then
           PDir := NewStr(ArcName+':\')
         else
           PDir := NewStr(ArcName+':'+CurDir)
         end;
-      with PFindDrive(Drive)^ do
+      with TFindDrive(Drive)^ do
         begin
         DriveType := dtArcFind;
         UpFile^.Owner := PDir;
@@ -1166,10 +1166,10 @@ WrongArc:
     if  (Drive^.DriveType = dtFind) and
         (Drive^.Prev <> nil) and (Drive^.Prev^.DriveType = dtArcFind)
     then
-      with PFindDrive(Drive)^ do
+      with TFindDrive(Drive)^ do
         begin
         DriveType := dtArcFind;
-        PDir := NewStr(PFindDrive(Drive^.Prev)^.UpFile^.Owner^);
+        PDir := NewStr(TFindDrive(Drive^.Prev).UpFile^.Owner^);
         UpFile^.Owner := PDir;
         Dirs.Insert(PDir);
         end;
@@ -1262,7 +1262,7 @@ WrongArc:
 
   procedure HandleCommand;
     var
-      FC: PCollection;
+      FC: TCollection;
       W: Word;
     begin
     W := Event.Command;
@@ -1447,7 +1447,7 @@ WrongArc:
     S := SelectDrive(MPos.X, MPos.Y, DriveLetter, True);
     if S = cTEMP_ then
       begin
-      Event.InfoPtr := PTempDrive.Create;
+      Event.InfoPtr := TTempDrive.Create;
       InsertDrive;
       Exit;
       end
@@ -1499,7 +1499,7 @@ WrongArc:
     CE;
     if S = cTEMP_ then
       begin
-      Event.InfoPtr := PTempDrive.Create;
+      Event.InfoPtr := TTempDrive.Create;
       InsertDrive;
       Exit;
       end
@@ -1517,7 +1517,7 @@ WrongArc:
     var
       S: String;
       {Q: string;}
-      Dr: PDrive;
+      Dr: TDrive;
       FreeByte: Byte;
     begin
     CE;
@@ -1528,10 +1528,10 @@ WrongArc:
       if FreeByte > 2 then
         begin
         Dr := nil;
-        Dr := PArcDrive.Create(S, S);
+        Dr := TArcDrive.Create(S, S);
         
         if Dr = nil then
-          Dr := PArvidDrive.Create(S);
+          Dr := TArvidDrive.Create(S);
         
         if Dr = nil then
           Exit;
@@ -1569,7 +1569,7 @@ WrongArc:
         {    нижележащая строка                                        }
         Drive^.lChDir(GetPath(S));
 
-        Message(Self, evCommand, cmInsertDrive, New(PFindDrive,
+        Message(Self, evCommand, cmInsertDrive, New(TFindDrive,
                InitList(S)))
         end;
       end;
@@ -1805,8 +1805,8 @@ WrongArc:
 //    Owner'а UpFile (т.е. точечек '..') панели найденного в архиве и
 //    присоединить к нему путь к файлу внутри данного архива
         S := MakeNormName(
-          Copy(PFindDrive(Drive)^.UpFile^.Owner^, 1, Pos(':',
-           Copy(PFindDrive(Drive)^.UpFile^.Owner^, 3, MaxStringLength))+2)
+          Copy(TFindDrive(Drive).UpFile^.Owner^, 1, Pos(':',
+           Copy(TFindDrive(Drive).UpFile^.Owner^, 3, MaxStringLength))+2)
           +':'+ PF^.Owner^, PF^.FlName[True])
       else
         S := MakeNormName(PF^.Owner^, PF^.FlName[uLfn]);
@@ -2331,11 +2331,11 @@ WrongArc:
 
   procedure _ForceRescan;
     var
-      PDr: PDrive;
+      PDr: TDrive;
     begin
     if Drive^.DriveType = dtArc then
       begin
-      if PArcDrive(Drive)^.ReadArchive then
+      if TArcDrive(Drive).ReadArchive then
         RereadDir
       else
         begin
@@ -2362,7 +2362,7 @@ WrongArc:
 
   procedure _FindForced;
     var
-      PDr: PDrive;
+      PDr: TDrive;
     begin
     ForceReading := False;
     DeltaX := 0;
@@ -2378,7 +2378,7 @@ WrongArc:
   
   procedure CallUuDecode;
     var
-      FC: PCollection;
+      FC: TCollection;
     begin
     FC := GetSelection(Self, False);
     if FC = nil then
@@ -2472,7 +2472,7 @@ WrongArc:
         cmPanelMakeList:
           begin
           Message(Self, evCommand, cmInsertDrive,
-            New(PFindDrive, InitList(MakeNormName(PF^.Owner^,
+            New(TFindDrive, InitList(MakeNormName(PF^.Owner^,
                    PF^.FlName[uLfn]))));
           CE;
           end;
@@ -3331,7 +3331,7 @@ procedure TFilePanelRoot.GetParam(i: Integer);
     c: TPanelClass;
     NewPresetNum: Integer;
     NewSetupSet: TPanelSetupSet;
-    P: PFilePanelRoot;
+    P: TFilePanelRoot;
     PC: TPanelClass;
     ShowOnly: Boolean;
   begin
@@ -3406,7 +3406,7 @@ procedure TFilePanelRoot.Rebound;
   Owner.Redraw;
   end;
 
-function OtherFilePanel(P: PFilePanelRoot): PFilePanelRoot;
+function OtherFilePanel(P: TFilePanelRoot): TFilePanelRoot;
   begin
   Result := PDoubleWindow(P^.Owner)^.Panel[not P^.SelfNum].FilePanel;
   end;

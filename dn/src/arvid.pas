@@ -172,11 +172,11 @@ type
   TAvdType = (avdTdr, avdAvt);
 
   TArvidDrive = class;
-  PArvidDrive = TArvidDrive;
+
   TArvidDrive = class(TDrive)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     Name: PString;
-    Stream: PStream;
+    Stream: TStream;
     CurFile: LongInt;
     CurDirPos: LongInt{!!s};
     PosTableOfs: LongInt;
@@ -207,11 +207,11 @@ type
     procedure RereadDirectory(S: String); virtual;
     procedure KillUse; virtual;
     procedure UseFile(P: PFileRec; Command: Word); virtual;
-    procedure CopyFiles(AFiles: PCollection; Own: PView;
+    procedure CopyFiles(AFiles: TCollection; Own: TView;
          MoveMode: Boolean); virtual;
-    procedure CopyFilesInto(AFiles: PCollection; Own: PView;
+    procedure CopyFilesInto(AFiles: TCollection; Own: TView;
          MoveMode: Boolean); virtual;
-    procedure EraseFiles(AFiles: PCollection); virtual;
+    procedure EraseFiles(AFiles: TCollection); virtual;
     function GetRealName: String; virtual;
     function GetInternalName: String; virtual;
     procedure MakeDir; virtual;
@@ -225,7 +225,7 @@ type
     destructor Destroy; override;
     procedure SeekDirectory;
     function OpenDirectory(const Dir: String;
-                                 PutDirs: Boolean): PDrive; virtual;
+                                 PutDirs: Boolean): TDrive; virtual;
     procedure DrvFindFile(FC: PFilesCollection); virtual;
     procedure ReadDescrptions(FilesC: PFilesCollection); virtual;
   private
@@ -233,7 +233,7 @@ type
     end;
 
 const
-  ArvidDrives: PCollection = nil;
+  ArvidDrives: TCollection = nil;
   ArvidWithDN: Boolean = True;
 
 var
@@ -247,6 +247,10 @@ uses
   ArvidAvt, ArvidTdr
   , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}, Math
   , osdep;
+
+type
+  PString = Defines.PString;
+
 
 constructor TArvidDrive.Create(const AName: String);
   var
@@ -280,10 +284,10 @@ constructor TArvidDrive.Create(const AName: String);
     q := Copy(AName, i+1, MaxStringLength);
     if q[Length(q)] in ['\', '/'] then
       SetLength(q, Length(q)-1);
-    Stream := PBufStream.Create(Copy(AName, 1, i-1), stOpen, 2048);
+    Stream := TBufStream.Create(Copy(AName, 1, i-1), stOpen, 2048);
     end
   else
-    Stream := PBufStream.Create(AName, stOpen, 2048);
+    Stream := TBufStream.Create(AName, stOpen, 2048);
 
   if Stream.Status <> stOK then
     begin
@@ -301,9 +305,9 @@ constructor TArvidDrive.Create(const AName: String);
       end;
     if i > 0
     then
-      Stream := PBufStream.Create(Copy(AName, 1, i-1), stOpen, 2048)
+      Stream := TBufStream.Create(Copy(AName, 1, i-1), stOpen, 2048)
     else
-      Stream := PBufStream.Create(AName, stOpen, 2048);
+      Stream := TBufStream.Create(AName, stOpen, 2048);
     if Stream.Status <> stOK then
       goto 1;
     end;
@@ -329,7 +333,7 @@ constructor TArvidDrive.Create(const AName: String);
     CurDir := '\';
   SeekDirectory;
   if ArvidDrives = nil then
-    ArvidDrives := PCollection.Create($100, $100);
+    ArvidDrives := TCollection.Create($100, $100);
   ArvidDrives.Insert(Self);
   AddToDirectoryHistory(Name^+':'+CurDir, Integer(DriveType));
   end { TArvidDrive.Init };
@@ -451,7 +455,7 @@ constructor TArvidDrive.Load(S: TStream);
   DriveType := dtArvid;
   S.Read(KillAfterUse, 1);
   Name := S.ReadStr;
-  Stream := PBufStream.Create(Name^, stOpen, 2048);
+  Stream := TBufStream.Create(Name^, stOpen, 2048);
   if Stream.Status <> stOK then
     begin
 1:
@@ -471,7 +475,7 @@ constructor TArvidDrive.Load(S: TStream);
     goto 1;
   SeekDirectory;
   if ArvidDrives = nil then
-    ArvidDrives := PCollection.Create($100, $100);
+    ArvidDrives := TCollection.Create($100, $100);
   ArvidDrives.Insert(Self);
   end { TArvidDrive.Load };
 
@@ -489,7 +493,7 @@ procedure TArvidDrive.RereadDirectory(S: String);
   if filetype = avdAvt then
     begin
     Stream.Free;
-    Stream := PBufStream.Create(Name^, stOpen, 2048);
+    Stream := TBufStream.Create(Name^, stOpen, 2048);
     Stream.Seek(0);
     Stream.Read(AVT, SizeOf(AVT));
     SeekDirectory;
@@ -508,16 +512,16 @@ procedure TArvidDrive.UseFile(P: PFileRec; Command: Word);
   {  MessageBox('TArvidDrive.UseFile', nil, mfError + mfOKButton);}
   end;
 
-{ CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boolean); virtual; }
-procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boolean);
+{ CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean); virtual; }
+procedure TArvidDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean);
   var
     I, J: Integer;
     CopyOpt: Word;
     CopyMode: Word;
     CopyPrn: Boolean;
     CmdFileCreated: Boolean;
-    OwnerPtr: PView;
-    P: PView;
+    OwnerPtr: TView;
+    P: TView;
     T: lText;
     PF: PFileRec;
     FC, FC2: TAvtFileCell;
@@ -576,7 +580,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
       end;
     end { CopyTree };
 
-  { CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boolean); virtual; }
+  { CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean); virtual; }
   begin { TArvidDrive.CopyFiles }
   CtrlBreakHit := False;
   AFiles.Pack;
@@ -664,7 +668,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
     Stream.Seek(0);
     Stream.Write(AVT, SizeOf(AVT));
     Stream.Free;
-    Stream := PBufStream.Create(Name^, stOpen, 2048);
+    Stream := TBufStream.Create(Name^, stOpen, 2048);
     GlobalMessage(evCommand, cmPanelReread, nil);
     Exit;
     end
@@ -738,13 +742,13 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
     end;
   end { TArvidDrive.CopyFiles };
 
-{ CopyFilesInto(AFiles: PCollection; Own: PView; MoveMode: Boolean); virtual;}
-procedure TArvidDrive.CopyFilesInto(AFiles: PCollection; Own: PView; MoveMode: Boolean);
+{ CopyFilesInto(AFiles: TCollection; Own: TView; MoveMode: Boolean); virtual;}
+procedure TArvidDrive.CopyFilesInto(AFiles: TCollection; Own: TView; MoveMode: Boolean);
   begin
   AvtCopyFilesInto(Self, AFiles, Own, MoveMode);
   end;
 
-procedure TArvidDrive.EraseFiles(AFiles: PCollection);
+procedure TArvidDrive.EraseFiles(AFiles: TCollection);
   begin
   AvtEraseFiles(Self, AFiles);
   end;
@@ -771,15 +775,15 @@ procedure TArvidDrive.ChangeUp(var S: String);
     Exit;
   if Prev = nil then
     begin
-    Prev := PDrive.Create(0, Panel);
+    Prev := TDrive.Create(0, Panel);
     if Prev = nil then
       Exit;
     end;
-  PFilePanel(Panel).Drive := Prev;
+  TFilePanel(Panel).Drive := Prev;
   Prev.lChDir(Prev.CurDir);
 {AK155 Если GetState(sfSelected+sfActive), то и так ActivePanel = Panel
   if  (Prev.DriveType = dtDisk) and
-      (PView(Panel).GetState(sfSelected+sfActive))
+      (TView(Panel).GetState(sfSelected+sfActive))
   then
     ActivePanel := Panel;
 /AK155}
@@ -996,7 +1000,7 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
       end;
     RealAttr := Attrb or Archive;
     end;
-  Stream := PBufStream.Create(Name^, stOpen, 2048);
+  Stream := TBufStream.Create(Name^, stOpen, 2048);
   if Abort or (Stream.Status <> stOK) then
     begin
     Err;
@@ -1018,7 +1022,7 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
   Stream.Free;
   if RealAttr <> $FFFF then
     SetAttr(RealAttr);
-  Stream := PBufStream.Create(Name^, stOpen, 2048);
+  Stream := TBufStream.Create(Name^, stOpen, 2048);
   GlobalMessage(evCommand, cmPanelReread, nil);
   end { TArvidDrive.EditDescription };
 
@@ -1030,7 +1034,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       o: Word;
       end;
     SDesc: Boolean;
-    P: PView;
+    P: TView;
     DateAfter,
     DateBefore,
     SizeGreat,
@@ -1041,7 +1045,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     WasDir: Boolean;
     Dr: String;
     LP: LongInt;
-    St0: PStream;
+    St0: TStream;
     NName: String;
     AA0: TAvtFileCell;
     S0: String;
@@ -1051,7 +1055,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
   procedure Add(P: Pointer; const Name: String);
     begin
     if FindList = nil then
-      FindList := PCollection.Create($100, $100);
+      FindList := TCollection.Create($100, $100);
     if OOM or (not MemOK) or (MaxAvail < (FindList.Count+$200)*4) then
       begin
       TStreamable(P).Free;
@@ -1067,7 +1071,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     FindList.Insert(P);
     end;
 
-  procedure TdrSearchInStream(St: PStream; var D: TTdrHeader;
+  procedure TdrSearchInStream(St: TStream; var D: TTdrHeader;
        const Name: String);
     var
       DD: TTdrDirCell;
@@ -1232,7 +1236,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     AvtSearchInStream(AA0.RightFileCell);
     end { AvtSearchInStream };
 
-  procedure SearchInStream(St: PStream; const Name: String);
+  procedure SearchInStream(St: TStream; const Name: String);
     var
       DD: TTdrHeader;
       AA: TAvtHeader;
@@ -1275,45 +1279,45 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
 
   procedure SearchInAllFiles;
     var
-      SR: SearchRec;
-      St: PBufStream;
+      SR: Dos.SearchRec;
+      St: TBufStream;
       D: TTdrHeader;
     begin
     ClrIO;
-    FindFirst(MakeNormName(GetPath(Name^), '*.TDR'),
+    Dos.FindFirst(MakeNormName(GetPath(Name^), '*.TDR'),
          Archive+Byte(Security)*Hidden+ReadOnly+SysFile, SR);
     while (DosError = 0) and not Abort do
       begin
-      St := PBufStream.Create(MakeNormName(GetPath(Name^), SR.Name), stOpenRead, 2048);
+      St := TBufStream.Create(MakeNormName(GetPath(Name^), SR.Name), stOpenRead, 2048);
       if St.Status = stOK then
         begin
         SearchInStream(St, SR.Name);
         end;
       St.Free;
       ClrIO;
-      FindNext(SR);
+      Dos.FindNext(SR);
       end;
-    FindFirst(MakeNormName(GetPath(Name^), '*.AVT'),
+    Dos.FindFirst(MakeNormName(GetPath(Name^), '*.AVT'),
          Archive+Byte(Security)*Hidden+ReadOnly+SysFile, SR);
     while (DosError = 0) and not Abort do
       begin
-      St := PBufStream.Create(MakeNormName(GetPath(Name^), SR.Name), stOpenRead, 2048);
+      St := TBufStream.Create(MakeNormName(GetPath(Name^), SR.Name), stOpenRead, 2048);
         begin
         SearchInStream(St, SR.Name);
         end;
       St.Free;
       ClrIO;
-      FindNext(SR);
+      Dos.FindNext(SR);
       end;
     end { SearchInAllFiles };
 
   procedure ExecuteFindDialog;
     label 1;
     var
-      D: PDialog;
+      D: TDialog;
       R: TRect;
       PL: PFindBox;
-      P: PView;
+      P: TView;
       F: PFindObject;
 
     procedure DoCount(P_: Pointer);
@@ -1324,16 +1328,16 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
 
     begin
 
-    D := PDialog(LoadResource(dlgArvidFindResults));
+    D := TDialog(LoadResource(dlgArvidFindResults));
     if D = nil then
       Exit;
 
     R.Assign(58, 1, 59, 13);
-    P := PScrollBar.Create(R);
+    P := TScrollBar.Create(R);
     D.Insert(P);
 
     R.Assign(2, 1, 58, 13);
-    PL := PFindBox.Create(R, 1, PScrollBar(P));
+    PL := PFindBox.Create(R, 1, TScrollBar(P));
     PL.NewLisT(FindList);
     D.Insert(PL);
 
@@ -1382,7 +1386,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         FreeStr := MakeNormName(GetPath(Name^), F.Text^);
         DisposeStr(Name);
         Name := NewStr(FreeStr);
-        Stream := PBufStream.Create(FreeStr, stOpenRead, 2048);
+        Stream := TBufStream.Create(FreeStr, stOpenRead, 2048);
         FreeStr := CurDir;
         CurDir := '';
         if Stream.Status <> stOK then
@@ -1465,7 +1469,7 @@ procedure TArvidDrive.GetDirLength(PF: PFileRec);
   var
     SaveDir: String;
     LL: TSize;
-    P: PView;
+    P: TView;
   begin
   if  (PF^.Attr and $80 <> 0) or (PF^.Attr and Directory = 0) then
     Exit;
@@ -1486,7 +1490,7 @@ procedure TArvidDrive.GetDirLength(PF: PFileRec);
   end { TArvidDrive.GetDirLength };
 
 function TArvidDrive.OpenDirectory(const Dir: String;
-                                         PutDirs: Boolean): PDrive;
+                                         PutDirs: Boolean): TDrive;
   begin
   OpenDirectory := nil;
   end;

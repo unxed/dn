@@ -57,7 +57,7 @@ uses
 
 type
   TTreeWindow = class;
-  PTreeWindow = TTreeWindow;
+
   TTreeWindow = class(TWindow)
     constructor Create(const Bounds: TRect);
     function GetPalette: TPalette; override;
@@ -67,7 +67,7 @@ type
     end;
 
   TTreeReader = class;
-  PTreeReader = TTreeReader;
+
   TTreeReader = class(TView)
     procedure HandleEvent(var Event: TEvent); override;
     end;
@@ -75,7 +75,7 @@ type
   TTreeDialog = class;
   PTreeDialog = TTreeDialog;
   TTreeDialog = class(TDialog)
-    Tree: PView;
+    Tree: TView;
     isValid: Boolean;
     constructor Create(R: TRect; const ATitle: String; ADrive: Byte);
     {procedure HandleEvent(var Event: TEvent); override;}
@@ -98,21 +98,21 @@ type
     end;
 
   TTreeView = class;
-  PTreeView = TTreeView;
+
   TTreeView = class(TView)
-    ScrollBar: PScrollBar;
+    ScrollBar: TScrollBar;
     CurPtr: PDirRec;
     isValid {, QuickSearch}: Boolean;
     Drive, SearchPos: Byte;
     CurPath, LastPath: String; {DataCompBoy}
-    DC, Dirs: PCollection;
+    DC, Dirs: TCollection;
     Delta: TPoint;
     CurNum: Integer;
     Parital, DrawDisabled,
     LocateEnabled, MouseTracking, WasChanged: Boolean;
-    InfoView: PView;
+    InfoView: TView;
     constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
-        ScrBar: PScrollBar);
+        ScrBar: TScrollBar);
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     function Valid(Command: Word): Boolean; override;
@@ -135,18 +135,18 @@ type
     end;
 
   TTreePanel = class;
-  PTreePanel = TTreePanel;
+
   TTreePanel = class(TTreeView)
     procedure HandleEvent(var Event: TEvent); override;
     end;
 
   TTreeInfoView = class;
-  PTreeInfoView = TTreeInfoView;
+
   TTreeInfoView = class(TView)
-    Tree: PTreeView;
+    Tree: TTreeView;
     Down: String;
     Loaded: Boolean;
-    constructor Create(R: TRect; ATree: PTreeView);
+    constructor Create(R: TRect; ATree: TTreeView);
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure MakeDown;
@@ -162,12 +162,12 @@ type
     end;
 
   THTreeView = class;
-  PHTreeView = THTreeView;
+
    {`2 панель дерева с подвалом `}
   THTreeView = class(TTreePanel)
-    Info: PView;
+    Info: TView;
     constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
-        ScrBar: PScrollBar);
+        ScrBar: TScrollBar);
     procedure ChangeBounds(const Bounds: TRect); override;
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
@@ -222,7 +222,7 @@ const
 
 var
   DrvTrees: array['A'..'Z'] of record
-    C: PCollection;
+    C: TCollection;
     len: Boolean;
     end;
 
@@ -369,7 +369,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
   var
     PD: PDirRec;
     RemoteDrive: Boolean;
-    Info: PView;
+    Info: TView;
 
     {-DataCompBoy-}
   begin { ReadTree }
@@ -447,7 +447,7 @@ DRep:
   end { ReadTree };
 {-DataCompBoy-}
 
-function GetDirCollection(C: Char; CountLen: Boolean): PCollection;
+function GetDirCollection(C: Char; CountLen: Boolean): TCollection;
   begin
   GetDirCollection := nil;
   C := UpCase(C);
@@ -460,7 +460,7 @@ function GetDirCollection(C: Char; CountLen: Boolean): PCollection;
   end;
 
 {-DataCompBoy-}
-function FindDir(DC: PCollection; const Dir: String): Integer;
+function FindDir(DC: TCollection; const Dir: String): Integer;
   var
     I, Lv: Integer;
     S, D: String;
@@ -526,11 +526,11 @@ function FindDir(DC: PCollection; const Dir: String): Integer;
 
 function GetDirLen(Dir: String): TSize; {DataCompBoy}
   var
-    DC: PCollection;
+    DC: TCollection;
     I: Integer;
     R: Boolean;
 
-  procedure MakeReread(P: PView);
+  procedure MakeReread(P: TView);
     var
       Event: TEvent;
     begin
@@ -716,11 +716,11 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
 
 destructor TTreeInfoView.Destroy;
   begin
-  PHTreeView(Tree).Info := nil;
+  THTreeView(Tree).Info := nil;
   inherited Destroy;
   end;
 
-constructor TTreeInfoView.Create(R: TRect; ATree: PTreeView);
+constructor TTreeInfoView.Create(R: TRect; ATree: TTreeView);
   begin
   inherited Create(R);
   Tree := ATree;
@@ -811,7 +811,7 @@ procedure TTreeInfoView.MakeDown;
 constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
   var
     R1, R2: TRect;
-    P: PView;
+    P: TView;
   begin
   inherited Create(R, ATitle);
   HelpCtx := hcTreeDialog;
@@ -827,7 +827,7 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
   P := StandardScrollBar(sbVertical+sbHandleKeyboard);
   Dec(P^.Origin.X, 14);
   Dec(R1.B.Y);
-  Tree := New(PTreeView, Init(R1, ADrive, False, PScrollBar(P)));
+  Tree := New(TTreeView, Init(R1, ADrive, False, TScrollBar(P)));
   if Tree.Valid(0) then
     Insert(Tree)
   else
@@ -840,27 +840,27 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
 
   R1.A.Y := R1.B.Y;
   Inc(R1.B.Y);
-  P := New(PDTreeInfoView, Init(R1, PTreeView(Tree)));
+  P := New(TDTreeInfoView, Init(R1, TTreeView(Tree)));
   Insert(P);
 
   R1.Assign(R.B.X-13, R.A.Y+1, R.B.X-1, R.A.Y+3);
-  P := New(PButton, Init(R1, GetString(dlOKButton), cmOK, bfDefault));
+  P := New(TButton, Init(R1, GetString(dlOKButton), cmOK, bfDefault));
   Insert(P);
   R1.Assign(R.B.X-13, R.A.Y+4, R.B.X-1, R.A.Y+6);
-  P := New(PButton, Init(R1, GetString(dlDriveButton), cmChangeDrive,
+  P := New(TButton, Init(R1, GetString(dlDriveButton), cmChangeDrive,
          bfBroadcast));
   {P^.Options := P^.Options and not ofSelectable;}
   Insert(P);
   R1.Assign(R.B.X-13, R.A.Y+7, R.B.X-1, R.A.Y+9);
-  P := New(PButton, Init(R1, GetString(dlRereadButton), cmPanelReread,
+  P := New(TButton, Init(R1, GetString(dlRereadButton), cmPanelReread,
          bfBroadcast));
   Insert(P);
   R1.Assign(R.B.X-13, R.A.Y+10, R.B.X-1, R.A.Y+12);
-  P := New(PButton, Init(R1, GetString(dlMkDirButton), cmPanelMkDir,
+  P := New(TButton, Init(R1, GetString(dlMkDirButton), cmPanelMkDir,
          bfBroadcast));
   Insert(P);
   R1.Assign(R.B.X-13, R.A.Y+13, R.B.X-1, R.A.Y+15);
-  P := New(PButton, Init(R1, GetString(dlCancelButton), cmCancel, 0));
+  P := New(TButton, Init(R1, GetString(dlCancelButton), cmCancel, 0));
   Insert(P);
   SelectNext(False);
   Options := Options or ofTopSelect;
@@ -887,8 +887,8 @@ end;*)
 constructor TTreeWindow.Create(const Bounds: TRect);
   var
     R: TRect;
-    P: PView;
-    S: PScrollBar;
+    P: TView;
+    S: TScrollBar;
   begin
   inherited Create(Bounds, GetString(dlTreeTitle), 0);
   GetExtent(R);
@@ -899,20 +899,20 @@ constructor TTreeWindow.Create(const Bounds: TRect);
   GetExtent(R);
   R.Grow(-1, -1);
   Dec(R.B.Y, 2);
-  P := PTreePanel.Create(R, 0, True, S);
+  P := TTreePanel.Create(R, 0, True, S);
   Insert(P);
 
   GetExtent(R);
   R.Grow(-1, -1);
   R.A.Y := R.B.Y-2;
-  P := New(PTreeInfoView, Init(R, PTreeView(P)));
+  P := New(TTreeInfoView, Init(R, TTreeView(P)));
   Insert(P);
   end { TTreeWindow.Init };
 
 constructor TTreeWindow.Load(S: TStream);
   begin
   inherited Load(S);
-  PTreeView(Current)^.ReadAfterLoad;
+  TTreeView(Current).ReadAfterLoad;
   end;
 
 procedure TTreeWindow.Store(S: TStream);
@@ -940,7 +940,7 @@ procedure TTreeWindow.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end;
 
-constructor TTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: PScrollBar);
+constructor TTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: TScrollBar);
   var
     I, Lv: Integer;
     S, D: String;
@@ -2053,7 +2053,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
   end {case};
   end { TTreePanel.HandleEvent };
 
-constructor THTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: PScrollBar);
+constructor THTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: TScrollBar);
   begin
   inherited Create(R, ADrive, True, ScrBar);
   Info := nil;

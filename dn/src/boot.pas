@@ -192,10 +192,10 @@ procedure DoStartup;
     {JO}
   procedure ReadHighlite;
     var
-      F: PTextReader;
+      F: TTextReader;
     begin
     FileMode := $40;
-    F := PTextReader.Create(SourceDir+'dnhgl.grp');
+    F := TTextReader.Create(SourceDir+'dnhgl.grp');
     if F = nil then
       Exit;
     if not F^.Eof then

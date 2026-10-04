@@ -57,13 +57,13 @@ uses
 type
   { TEditWindow }
 
-  PEditWindow = ^TEditWindow;
+
   TEditWindow = class(TUniWindow)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
-    AInfo: PInfoLine;
-    ABookLine: PBookmarkLine;
-    Intern: PFileEditor;
-    MenuBar: PMenuBar;
+    AInfo: TInfoLine;
+    ABookLine: TBookmarkLine;
+    Intern: TFileEditor;
+    MenuBar: TMenuBar;
     UpMenu: PMenu;
     ModalEnd: Boolean;
     constructor Create(R: TRect; FileName: String);
@@ -138,7 +138,7 @@ constructor TEditWindow.Load(var S: TStream);
     {Cat}
     Fail;
 R.Assign(1, 1, Size.X - 1, 2);
-  MenuBar := PMenuBar(LoadResource(dlgEditorMenu));
+  MenuBar := TMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
     MenuBar.Locate(R);
   Insert(MenuBar);
@@ -149,20 +149,20 @@ R.Assign(1, 1, Size.X - 1, 2);
     PI := PI^.Next;
   if  (PI <> nil) then
     PI := Pointer(PI^.SubMenu);
-  PFileEditor(Intern).OptMenu := Pointer(PI);
+  TFileEditor(Intern).OptMenu := Pointer(PI);
   if Title <> nil then
     DisposeStr(Title);
-  if PFileEditor(Intern).SmartPad then
+  if TFileEditor(Intern).SmartPad then
     begin
-    Title := NewStr('SmartPad(TM) - '+PFileEditor(Intern).EditName);
+    Title := NewStr('SmartPad(TM) - '+TFileEditor(Intern).EditName);
     end
-  else if PFileEditor(Intern).ClipBrd then
+  else if TFileEditor(Intern).ClipBrd then
     begin
     Title := NewStr('Clipboard');
     end
   else
     Title := NewStr(GetString(dlEditTitle)+' - '+
-        (PFileEditor(Intern).EditName));
+        (TFileEditor(Intern).EditName));
   LoadCommands;
   end { TEditWindow.Load };
 
@@ -196,7 +196,7 @@ function TEditWindow.Execute: Word;
 *)
 procedure TEditWindow.Store(var S: TStream);
   var
-    Parts: array[0..2] of PView;
+    Parts: array[0..2] of TView;
     I: Integer;
   begin
   inherited Store(S);
@@ -219,7 +219,7 @@ constructor TEditWindow.Create(R: TRect; FileName: String);
   Flags := Flags or wfMaxi;
 
 R.Assign(1, 1, Size.X - 1, 2);
-  MenuBar := PMenuBar(LoadResource(dlgEditorMenu));
+  MenuBar := TMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
     MenuBar.Locate(R);
   Insert(MenuBar);
@@ -227,7 +227,7 @@ R.Assign(1, 1, Size.X - 1, 2);
   {MenuBar.Options := MenuBar.Options or ofPostProcess;}
 R.Assign(1, 2, Size.X - 1, Size.Y - 1);
 
-  Intern := New(PXFileEditor, Init(R,
+  Intern := New(TXFileEditor, Init(R,
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
         MakeScrollBar(sbVertical+sbHandleKeyboard), FileName));
 
@@ -238,7 +238,7 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
     Pi := Pi^.Next;
   if  (Pi <> nil) then
     Pi := Pointer(Pi^.SubMenu);
-  PFileEditor(Intern).OptMenu := Pointer(Pi);
+  TFileEditor(Intern).OptMenu := Pointer(Pi);
 
   Insert(Intern);
   MILoadFile(Intern, FileName);
@@ -248,13 +248,13 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
     Fail;
     end;
 R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
-  AInfo := PInfoLine.Create(R);
+  AInfo := TInfoLine.Create(R);
   InsertBefore(AInfo, First);
   GetExtent(R);
   R.B.X := R.A.X+1;
   Inc(R.A.Y, 2);
   Dec(R.B.Y);
-  ABookLine := PBookmarkLine.Create(R);
+  ABookLine := TBookmarkLine.Create(R);
   ABookLine^.GrowMode := gfGrowHiY;
   Insert(ABookLine);
 

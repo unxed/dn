@@ -69,12 +69,12 @@ type
     function GetItem(var S: TStream): Pointer; virtual;
   end;
 *)
-  PTextCollection = PLineCollection;
+  PTextCollection = TLineCollection;
   TTextCollection = TLineCollection;
   {/Cat}
 
   TListBoxRec = record
-    List: PCollection;
+    List: TCollection;
     Focus: Integer
     end;
   TTextListboxRec = record

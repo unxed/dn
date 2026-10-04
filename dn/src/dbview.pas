@@ -153,8 +153,8 @@ type
   TMemoStream = class(TStream)
     StartPos: LongInt;
     Length: LongInt;
-    BaseStream: PStream;
-    constructor Create(AStream: PStream; Start, len: LongInt);
+    BaseStream: TStream;
+    constructor Create(AStream: TStream; Start, len: LongInt);
     destructor Destroy; override;
     function GetPos: TFileSize; override;
     function GetSize: TFileSize; override;
@@ -291,7 +291,7 @@ procedure TDBScrollBar.HandleEvent(var Event: TEvent);
   end;
 { -------- Eugeny Zvyagintzev ---------}
 
-constructor TMemoStream.Create(AStream: PStream; Start, len: LongInt);
+constructor TMemoStream.Create(AStream: TStream; Start, len: LongInt);
   begin
   inherited Create;
   StartPos := Start;
@@ -536,38 +536,38 @@ function TDBViewer.Valid(Command: Word): Boolean;
 procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
   var
     R: TRect;
-    D: PDialog;
-    P: PView;
+    D: TDialog;
+    P: TView;
     Data: record
-      List: Pointer {PCollection};
+      List: Pointer {TCollection};
       Focused: Integer;
       end;
   begin
   R.Assign(1, 1, 50, 18);
-  D := New(PDialog, Init(R, GetString(StrIdx)+Cut(FileName^, 20)));
+  D := New(TDialog, Init(R, GetString(StrIdx)+Cut(FileName^, 20)));
   D^.Options := D^.Options or ofCentered;
 
   R.Assign(2, 2, 48, 3);
-  P := New(PStaticText, Init(R, GetString(dlDBViewInfoString)));
+  P := New(TStaticText, Init(R, GetString(dlDBViewInfoString)));
   D.Insert(P);
 
   R.Assign(46, 3, 47, 13);
-  P := PScrollBar.Create(R);
+  P := TScrollBar.Create(R);
   P^.Options := P^.Options or ofPostProcess;
   D.Insert(P);
 
   R.Assign(2, 3, 46, 13);
-  P := New(PFieldListBox, Init(R, 1, PScrollBar(P)));
+  P := New(PFieldListBox, Init(R, 1, TScrollBar(P)));
   D.Insert(P);
 
   R.Assign(30, 14, 40, 16);
-  P := New(PButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
+  P := New(TButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
   P^.Options := P^.Options or ofCenterX;
   D.Insert(P);
 
   D.SelectNext(False);
 
-  D := PDialog(Application.ValidView(D));
+  D := TDialog(Application.ValidView(D));
   if D = nil then
     Exit;
 
@@ -640,10 +640,10 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       L: LongInt;
       ML: LongInt;{!!s}
       I: Integer;
-      D: PDialog;
+      D: TDialog;
       R: TRect;
-      PV: PView;
-      MemoStream: PStream;
+      PV: TView;
+      MemoStream: TStream;
       Dr: String;
       Nm: String;
       Xt: String;
@@ -665,12 +665,12 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       Xt[4] := 'T'
     else
       Xt := '.FPT';
-    MemoStream := PDosStream.Create(Dr+Nm+Xt, stOpenRead);
+    MemoStream := TDosStream.Create(Dr+Nm+Xt, stOpenRead);
     if  (MemoStream = nil) or (MemoStream^.Status <> stOK) then
       begin
       if MemoStream <> nil then
         MemoStream.Free;
-      MemoStream := PBufStream.Create(Dr+Nm+'.dbt', stOpenRead, 512);
+      MemoStream := TBufStream.Create(Dr+Nm+'.dbt', stOpenRead, 512);
       if  (MemoStream = nil) or (MemoStream^.Status <> stOK) then
         begin
         if MemoStream <> nil then
@@ -729,7 +729,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     Desktop.GetExtent(R);
     R.Grow(-2, -2);
     R.Assign(1, 1, 70, 20);
-    D := New(PDialog, Init(R, GetString(dlDBViewViewMemo)));
+    D := New(TDialog, Init(R, GetString(dlDBViewViewMemo)));
     D^.Options := D^.Options or ofCentered;
 
     R.Assign(D^.Size.X-2, 2, D^.Size.X-1, D^.Size.Y-4);
@@ -738,18 +738,18 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     { TODO: palette CScrollBar of PV^. }
 
     R.Assign(2, 2, D^.Size.X-2, D^.Size.Y-4);
-    PV := PNFileViewer.Create(R, MemoStream, '', '', PV, False, False);
+    PV := TNFileViewer.Create(R, MemoStream, '', '', PV, False, False);
 
     D.Insert(PV);
 
     R.Assign(30, D^.Size.Y-3, 40, D^.Size.Y-1);
-    PV := New(PButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
+    PV := New(TButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
     PV^.Options := PV^.Options or ofCenterX;
     D.Insert(PV);
 
     D.SelectNext(False);
 
-    D := PDialog(Application.ValidView(D));
+    D := TDialog(Application.ValidView(D));
     if D = nil then
       Exit;
     Desktop.ExecView(D);
@@ -763,7 +763,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       PFR: PFieldRec;
       S, SS: String;
       P: PByteArray;
-      V: PWhileView;
+      V: TWhileView;
       R: TRect;
       T: TEventTimer;
     begin
@@ -1524,11 +1524,11 @@ procedure TDBIndicator.Draw;
     end;
   {--- start -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
   if State and sfDragging <> 0 then
-    C := PWindow(Owner).Frame^.GetColorW($05)
+    C := TWindow(Owner).Frame^.GetColorW($05)
   else if State and sfActive = 0 then
-    C := PWindow(Owner).Frame^.GetColorW($01)
+    C := TWindow(Owner).Frame^.GetColorW($01)
   else
-    C := PWindow(Owner).Frame^.GetColorW($03);
+    C := TWindow(Owner).Frame^.GetColorW($03);
   {--- finish -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
   MoveStr(B, S, C);
   WriteLineC(0, 0, Size.X, 1, B);

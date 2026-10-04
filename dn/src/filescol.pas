@@ -140,7 +140,7 @@ type
 
   {Cat: выкинул, теперь используется Collect.TLineCollection}
   (*
-    PLineCollection = PTextCollection;
+    TLineCollection = PTextCollection;
     TLineCollection = TTextCollection;
 *)
 
@@ -150,7 +150,7 @@ type
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     SortMode: Byte;
     Selected: LongInt;
-    Panel: Pointer; {PFilePanel}
+    Panel: Pointer; {TFilePanel}
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure FreeItem(Item: Pointer); override;
@@ -195,9 +195,9 @@ function NewFileRec(const LFN, Name: String; Size: TSize;
 procedure DelFileRec(var FR: PFileRec); {DataCompBoy}
 function LoadFileRec(var s: TStream): PFileRec; {DataCompBoy}
 procedure StoreFileRec(var s: TStream; fr: PFileRec); {DataCompBoy}
-function LoadFileRecOwn(var s: TStream; Dirs: PCollection): PFileRec;
+function LoadFileRecOwn(var s: TStream; Dirs: TCollection): PFileRec;
   {` Прочитать запись, затем индекс в Dirs и заполнить Owner`}
-procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: PCollection);
+procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: TCollection);
   {` Записать запись и затем индекс owner в Dirs`}
 function PackedDate(P: PFileRec): LongInt; {DataCompBoy}
 function PackedCreationDate(P: PFileRec): LongInt; {JO}
@@ -429,7 +429,7 @@ procedure StoreFileRec(var s: TStream; fr: PFileRec);
   end { StoreFileRec };
 {-DataCompBoy-}
 
-function LoadFileRecOwn(var s: TStream; Dirs: PCollection): PFileRec;
+function LoadFileRecOwn(var s: TStream; Dirs: TCollection): PFileRec;
   var
     w: LongInt;
   begin
@@ -441,7 +441,7 @@ function LoadFileRecOwn(var s: TStream; Dirs: PCollection): PFileRec;
     end;
   end;
 
-procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: PCollection)
+procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: TCollection)
   ; {DataCompBoy}
   var
     w: LongInt;
@@ -638,12 +638,12 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
   NameDirsSortEnabled := False;
   if Panel <> nil then
     begin
-    SortFlags := PFilePanel(Panel).PanSetup^.Sort.SortFlags;
-    Move(PFilePanel(Panel).PanSetup^.Sort.Ups, Ups, SizeOf(Ups));
-    CmpMethod := PFilePanel(Panel).PanSetup^.Sort.CompareMethod;
-    if PFilePanel(Panel).Drive <> nil then
+    SortFlags := TFilePanel(Panel).PanSetup^.Sort.SortFlags;
+    Move(TFilePanel(Panel).PanSetup^.Sort.Ups, Ups, SizeOf(Ups));
+    CmpMethod := TFilePanel(Panel).PanSetup^.Sort.CompareMethod;
+    if TFilePanel(Panel).Drive <> nil then
       {JO: все типы панели, представляющие собой раскрытую ветвь}
-      Branched := PFilePanel(Panel).Drive^.DriveType
+      Branched := TFilePanel(Panel).Drive^.DriveType
         in [dtFind, dtTemp, dtList, dtArcFind]
     else
       Branched := False;
@@ -1016,7 +1016,7 @@ function TFilesCollection.FileCompare(Key1, Key2: Pointer): Integer;
 function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : String; {-$VIV, JO}
   var
     R: TRect;
-    P: PMenuBox;
+    P: TMenuBox;
     Menu: PMenu;
     Items, Lnk: PMenuItem;
     C: Char;
@@ -1340,7 +1340,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   if  (R.B.Y > MaxRY) then
     R.B.Y := MaxRY;
   {-$VIV end}
-  P := PMenuBox.Create(R, Menu, nil); {-$VIV}
+  P := TMenuBox.Create(R, Menu, nil); {-$VIV}
   if  (C = '+') then
     Items := Lnk
   else

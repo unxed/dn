@@ -11,7 +11,7 @@ type
   PTopView = TTopView;
   {`2 Базовый тип для текста, выводимого в заголовке панели. }
   TTopView = class(TView)
-    Panel: PView; //фактически -  PFilePanel
+    Panel: TView; //фактически -  TFilePanel
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure Draw; override;
@@ -27,7 +27,7 @@ type
   PSortView = TSortView;
     {`2 Индикация текущей сортировки панели буковкой в левом верхнем углу `}
   TSortView = class(TView)
-    Panel: PView; //фактически -  PFilePanel;
+    Panel: TView; //фактически -  TFilePanel;
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure Draw; override;
@@ -141,7 +141,7 @@ procedure TSortView.Draw;
     Locate(R); // тут будет рекурсия, которая и нарисует
     Exit;
     end;
-  SortSetup := @PFilePanelRoot(Panel)^.PanSetup^.Sort;
+  SortSetup := @TFilePanelRoot(Panel).PanSetup^.Sort;
   C := GetString(dlSortTag)[SortSetup^.SortMode + 1];
   if (SortSetup^.SortFlags and psfInverted) <> 0  then
     C := Upcase(C);

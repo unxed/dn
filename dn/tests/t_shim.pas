@@ -7,7 +7,7 @@ uses Views, TvGeom, TvViews;      { the originals, to compare with }
 var
   R: TRect;
   E: TEvent;
-  V: PView;
+  V: TView;
   Ph: TPhaseType;
 
 begin
@@ -28,7 +28,7 @@ begin
   ClearEvent(E);
   Check(E.What = evNothing, 'ClearEvent clears');
   { an object of the shim can be created and is a descendant of the original }
-  V := PView.Create(R);
+  V := TView.Create(R);
   Check(V <> nil, 'New(V, Init(R))');
   Check((V.Size.X = 10) and (V.Size.Y = 3), 'TView of the shim');
   V.Free;

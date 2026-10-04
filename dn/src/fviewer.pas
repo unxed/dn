@@ -85,7 +85,7 @@ type
   { TFileViewer }
 
   TFileViewer = class;
-  PFileViewer = TFileViewer;
+
   TFileViewer = class(TView)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     Filtr: Boolean;
@@ -93,7 +93,7 @@ type
     FileName: String; {DataCompBoy}
     VFileName: String; {DataCompBoy}
     Buf: PByteArray;
-    Fl: PStream;
+    Fl: TStream;
     UpdateViewTmr: TEventTimer;
     XDelta, ViewMode, HexPos: AInt;
     SearchActive: Boolean;
@@ -101,7 +101,7 @@ type
     PrevSearchDir: Boolean; {Эта переменная принимается во внимание
       только при SearchResultVisible }
     SearchX: TFileSize;
-    SB: PView;
+    SB: TView;
     Wrap: Byte; {DataCompBoy}
     Lines: array[0..MaxILines] of record
       Pos: LongInt;
@@ -111,7 +111,7 @@ type
     NumLines: LongInt;
     ExposedPos, ExposedLine: LongInt; {AK155}
     Cur: TPoint;
-    Info: PView;
+    Info: TView;
     BufPos: LongInt;
     BufSize, MaxLines: LongInt;
     BufLines: AInt;
@@ -126,9 +126,9 @@ type
     HiLite: Boolean; {PZ 2000.06.09}
     ScrollEOF: Boolean; {AK155}
     HiLitePar: THighliteParams;
-    constructor Create(const Bounds: TRect; AStream: PStream;
+    constructor Create(const Bounds: TRect; AStream: TStream;
         const AFileName, AVFileName: String;
-        ASB: PView; Quick, Hex: Boolean); {DataCompBoy}
+        ASB: TView; Quick, Hex: Boolean); {DataCompBoy}
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     destructor Destroy; override;
@@ -157,7 +157,7 @@ type
     end;
 
   THFileViewer = class;
-  PHFileViewer = THFileViewer;
+
     {`2 Просмотр, который вставляется не в окно, а в панель менеджера`}
   THFileViewer = class(TFileViewer)
     procedure ChangeBounds(const Bounds: TRect); override;
@@ -165,14 +165,14 @@ type
     end;
 
   TQFileViewer = class;
-  PQFileViewer = TQFileViewer;
+
     {`2 Quick View`}
   TQFileViewer = class(THFileViewer)
     procedure ChangeFile(FR: PFileRec); virtual;
     end;
 
   TDFileViewer = class;
-  PDFileViewer = TDFileViewer;
+
     {`2 Description View`}
   TDFileViewer = class(THFileViewer)
     procedure HandleEvent(var Event: TEvent); override;
@@ -180,7 +180,7 @@ type
     end;
 
   TNFileViewer = class;
-  PNFileViewer = TNFileViewer;
+
     {`IMHO просмотр memo в dbf`}
   TNFileViewer = class(TFileViewer)
     function GetPalette: TPalette; override;
@@ -189,8 +189,8 @@ type
   TViewInfo = class;
   PViewInfo = TViewInfo;
   TViewInfo = class(TView)
-    Viewer: PFileViewer;
-    constructor Create(const R: TRect; AViewer: PFileViewer);
+    Viewer: TFileViewer;
+    constructor Create(const R: TRect; AViewer: TFileViewer);
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure Draw; override;
@@ -198,7 +198,7 @@ type
     end;
 
   TFileWindow = class;
-  PFileWindow = TFileWindow;
+
   TFileWindow = class(TWindow)
     constructor Create(const FileName, VFileName: String; Hex: Boolean);
     {DataCompBoy}
@@ -232,7 +232,7 @@ var
 
 function SearchFileStr(
  {` Поиск строки в уже открытом файле }
-    F: PStream; // Собственно файл
+    F: TStream; // Собственно файл
     var XLAT: TXlat;
       { перекодировка из кодировки файла в ASCII. Если
       not CaseSensitive - то одновременно и перевод на верхний регистр}
@@ -273,7 +273,7 @@ function MaxAvail: LongInt;
 const
   ViewerBufSize = (1+MaxILines)*(MaxWrapW+2);
 
-function SearchFileStr( F: PStream; var XLAT: TXlat; const What: String; Pos: TFileSize; CaseSensitive, Display, WholeWords, Back, AllCP, IsRegExp: Boolean): TFileSize;
+function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TFileSize; CaseSensitive, Display, WholeWords, Back, AllCP, IsRegExp: Boolean): TFileSize;
   label 1, LExit;
   var
     Buf: PByteArray;
@@ -282,7 +282,7 @@ function SearchFileStr( F: PStream; var XLAT: TXlat; const What: String; Pos: TF
     J: LongInt;
     I, L, OldPos, NextPos: TFileSize;
     CancelSearch: Boolean;
-    Info: PWhileView;
+    Info: TWhileView;
     R: TRect;
     Tmr: TEventTimer;
     Inserted: Boolean;
@@ -444,7 +444,7 @@ LExit:
   Info := nil;
   end { SearchFileStr };
 
-constructor TViewInfo.Create(const R: TRect; AViewer: PFileViewer);
+constructor TViewInfo.Create(const R: TRect; AViewer: TFileViewer);
   begin
   inherited Create(R);
   Viewer := AViewer;
@@ -474,7 +474,7 @@ procedure TViewInfo.Draw;
   begin
   if  (Viewer = nil) or
       (Owner = nil) or
-      (PWindow(Owner).Frame = nil)
+      (TWindow(Owner).Frame = nil)
   then
     begin
     inherited Draw;
@@ -482,18 +482,18 @@ procedure TViewInfo.Draw;
     end;
   with Viewer^, Self do
     begin
-    Color := PWindow(Owner).Frame^.GetColorW(3);
+    Color := TWindow(Owner).Frame^.GetColorW(3);
     Ch2 := #205;
     if not Owner.GetState(sfActive) then
       begin
-      Color := PWindow(Owner).Frame^.GetColorW(1);
+      Color := TWindow(Owner).Frame^.GetColorW(1);
       MoveChar(B, #196, Color, Size.X);
       WriteLineC(0, 0, Size.X, 1, B);
       Exit;
       end
     else if Owner.GetState(sfDragging) then
       begin
-      Color := PWindow(Owner).Frame^.GetColorW(5);
+      Color := TWindow(Owner).Frame^.GetColorW(5);
       Ch2 := #196;
       end;
     if ViewMode = vmHex then
@@ -695,18 +695,18 @@ function TFileViewer.WriteModify;
     ClrIO;
     NeedAbort := True;
     A := 0;
-    Fl := PDosStream.Create(FileName, stOpen);
+    Fl := TDosStream.Create(FileName, stOpen);
     if not Abort and (Fl.Status <> stOK) then
       begin
       Fl.Free;
       A := GetFileAttr(FileName);
       SetFileAttr(FileName, A and not ReadOnly);
-      Fl := PDosStream.Create(FileName, stOpen);
+      Fl := TDosStream.Create(FileName, stOpen);
       end;
     if  (Fl.Status <> stOK) or (Abort) then
       begin
       Fl.Free;
-      Fl := PDosStream.Create(FileName, stOpenRead);
+      Fl := TDosStream.Create(FileName, stOpenRead);
       MessageBox(GetString(dlFBBNoWrite)+FileName, nil,
          mfError+mfOKButton);
       end
@@ -719,7 +719,7 @@ function TFileViewer.WriteModify;
       begin
       Fl.Free;
       SetFileAttr(FileName, A);
-      Fl := PDosStream.Create(FileName, stOpenRead);
+      Fl := TDosStream.Create(FileName, stOpenRead);
       end;
     end
   else
@@ -971,7 +971,7 @@ procedure TDFileViewer.ChangeFile(FR: PFileRec);
     begin
     if Fl = nil then
       begin
-      Fl := PMemoryStream.Create(1, 1024);
+      Fl := TMemoryStream.Create(1, 1024);
       Wrap := wmWords;
       end;
     with Fl^ do
@@ -1663,7 +1663,7 @@ function TFileViewer.ReadFile;
     CodePageDetector: TCodePageDetector;
     I, J: Integer;
     P: Pointer;
-    Macros: PCollection;
+    Macros: TCollection;
     ClusterLen: TSize;
     NumFiles, NumDirs: Integer;
     DirLen: TSize;
@@ -1688,7 +1688,7 @@ function TFileViewer.ReadFile;
     Fl := nil;
     if FName = '' then
       Exit;
-    Fl := PDosStream.Create(FName, stOpenRead);
+    Fl := TDosStream.Create(FName, stOpenRead);
     end;
 
   { Если FName - имя каталога, то формируем буфер (без Stream) с
@@ -1975,7 +1975,7 @@ LineBegin:
 procedure TFileViewer.SaveToFile(FN: String);
   var
     S: TDOSStream;
-    P: PView;
+    P: TView;
     W, L: Word;
     PS: Pointer;
     Xl: Boolean;
@@ -2136,7 +2136,7 @@ procedure TFileViewer.SeekEof;
   {AK155}
   if TypeOf(Fl^) = TypeOf(TDOSStream) then
     begin
-    with PDosStream(Fl)^ do
+    with TDosStream(Fl)^ do
       begin
       if  (Status <> stOK) then
         goto EndProc;
@@ -2314,16 +2314,16 @@ procedure TFileViewer.HandleEvent;
 
   procedure StartSearch;
     var
-      D: PDialog;
+      D: TDialog;
       SR: TViewSearch;
       R: TRect;
-      P: PView;
+      P: TView;
       PP: PInputline;
       I: Integer;
 
     begin
 
-    D := PDialog(LoadResource(dlgViewerFind));
+    D := TDialog(LoadResource(dlgViewerFind));
     D.SetData(SearchString);
     I := Desktop.ExecView(D);
     D.GetData(SR);
@@ -2433,7 +2433,7 @@ DoSave:
                 begin
                 if FileName <> VFileName then
                   TempFile := '*^&'+FileName;
-                PDNApplication(Application)^.EditFile(True, FileName);
+                TDNApplication(Application).EditFile(True, FileName);
                 MessageL(Application, evCommand, cmGotoLineNumber2,
                   GetLineNumberForOffset(FileName, i32(FilePos+BufPos))
                   );
@@ -3068,10 +3068,10 @@ NotKb:
                           begin
                           Filtr := False;
                           VFileName := '';
-                          DisposeStr(PWindow(Owner).Title);
-                          PWindow(Owner).Title := NewStr
+                          DisposeStr(TWindow(Owner).Title);
+                          TWindow(Owner).Title := NewStr
                                 (GetString(dlViewFile));
-                          PWindow(Owner).Redraw;
+                          TWindow(Owner).Redraw;
                           end;
                         else {case}
                           begin
@@ -3548,8 +3548,8 @@ function TFileViewer.Valid;
 constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   var
     R: TRect;
-    P: PView;
-    PV: PFileViewer;
+    P: TView;
+    PV: TFileViewer;
   begin
   if LastViewerBounds.Empty or (InterfaceData.Options and
        ouiStoreViewerPosition = 0)
@@ -3573,7 +3573,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   Insert(P);
   GetExtent(R);
   R.Grow(-1, -1);
-  PV := PFileViewer.Create(R, nil, FileName, VFileName, P, False, Hex);
+  PV := TFileViewer.Create(R, nil, FileName, VFileName, P, False, Hex);
   Insert(PV); {Вставить надо даже при ошибке для последующего контроля }
   if not PV^.isValid then
     {AK155}
