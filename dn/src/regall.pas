@@ -2624,810 +2624,810 @@ end;
 procedure SetStreamRecs_regall;
 begin
 
-  RFilterValidator.VmtLink := PtrUInt(TypeOf(Validate.TFilterValidator));
+  RFilterValidator.VmtLink := PtrUInt(System.TClass(Validate.TFilterValidator));
   RFilterValidator.Load := @Build_RFilterValidator;
 
   RFilterValidator.Store := @Store_RFilterValidator;
 
-  RRangeValidator.VmtLink := PtrUInt(TypeOf(Validate.TRangeValidator));
+  RRangeValidator.VmtLink := PtrUInt(System.TClass(Validate.TRangeValidator));
   RRangeValidator.Load := @Build_RRangeValidator;
 
   RRangeValidator.Store := @Store_RRangeValidator;
 
-  RView.VmtLink := PtrUInt(TypeOf(Views.TView));
+  RView.VmtLink := PtrUInt(System.TClass(Views.TView));
   RView.Load := @Build_RView;
 
   RView.Store := @Store_RView;
 
-  RFrame.VmtLink := PtrUInt(TypeOf(Views.TFrame));
+  RFrame.VmtLink := PtrUInt(System.TClass(Views.TFrame));
   RFrame.Load := @Build_RFrame;
 
   RFrame.Store := @Store_RFrame;
 
-  RScrollBar.VmtLink := PtrUInt(TypeOf(Views.TScrollBar));
+  RScrollBar.VmtLink := PtrUInt(System.TClass(Views.TScrollBar));
   RScrollBar.Load := @Build_RScrollBar;
 
   RScrollBar.Store := @Store_RScrollBar;
 
-  RGroup.VmtLink := PtrUInt(TypeOf(Views.TGroup));
+  RGroup.VmtLink := PtrUInt(System.TClass(Views.TGroup));
   RGroup.Load := @Build_RGroup;
 
   RGroup.Store := @Store_RGroup;
 
-  RWindow.VmtLink := PtrUInt(TypeOf(Views.TWindow));
+  RWindow.VmtLink := PtrUInt(System.TClass(Views.TWindow));
   RWindow.Load := @Build_RWindow;
 
   RWindow.Store := @Store_RWindow;
 
-  RZIPArchiver.VmtLink := PtrUInt(TypeOf(fmtzip.TZIPArchive));
+  RZIPArchiver.VmtLink := PtrUInt(System.TClass(fmtzip.TZIPArchive));
   RZIPArchiver.Load := @Build_RZIPArchiver;
 
   RZIPArchiver.Store := @Store_RZIPArchiver;
 
-  RLHAArchiver.VmtLink := PtrUInt(TypeOf(fmtlha.TLHAArchive));
+  RLHAArchiver.VmtLink := PtrUInt(System.TClass(fmtlha.TLHAArchive));
   RLHAArchiver.Load := @Build_RLHAArchiver;
 
   RLHAArchiver.Store := @Store_RLHAArchiver;
 
-  RRARArchiver.VmtLink := PtrUInt(TypeOf(fmtrar.TRARArchive));
+  RRARArchiver.VmtLink := PtrUInt(System.TClass(fmtrar.TRARArchive));
   RRARArchiver.Load := @Build_RRARArchiver;
 
   RRARArchiver.Store := @Store_RRARArchiver;
 
-  RCABArchiver.VmtLink := PtrUInt(TypeOf(fmtcab.TCABArchive));
+  RCABArchiver.VmtLink := PtrUInt(System.TClass(fmtcab.TCABArchive));
   RCABArchiver.Load := @Build_RCABArchiver;
 
   RCABArchiver.Store := @Store_RCABArchiver;
 
-  RACEArchiver.VmtLink := PtrUInt(TypeOf(fmtace.TACEArchive));
+  RACEArchiver.VmtLink := PtrUInt(System.TClass(fmtace.TACEArchive));
   RACEArchiver.Load := @Build_RACEArchiver;
 
   RACEArchiver.Store := @Store_RACEArchiver;
 
-  RHAArchiver.VmtLink := PtrUInt(TypeOf(fmtha.THAArchive));
+  RHAArchiver.VmtLink := PtrUInt(System.TClass(fmtha.THAArchive));
   RHAArchiver.Load := @Build_RHAArchiver;
 
   RHAArchiver.Store := @Store_RHAArchiver;
 
-  RARCArchiver.VmtLink := PtrUInt(TypeOf(fmtarc.TARCArchive));
+  RARCArchiver.VmtLink := PtrUInt(System.TClass(fmtarc.TARCArchive));
   RARCArchiver.Load := @Build_RARCArchiver;
 
   RARCArchiver.Store := @Store_RARCArchiver;
 
-  RBSAArchiver.VmtLink := PtrUInt(TypeOf(fmtbsa.TBSAArchive));
+  RBSAArchiver.VmtLink := PtrUInt(System.TClass(fmtbsa.TBSAArchive));
   RBSAArchiver.Load := @Build_RBSAArchiver;
 
   RBSAArchiver.Store := @Store_RBSAArchiver;
 
-  RBS2Archiver.VmtLink := PtrUInt(TypeOf(fmtbs2.TBS2Archive));
+  RBS2Archiver.VmtLink := PtrUInt(System.TClass(fmtbs2.TBS2Archive));
   RBS2Archiver.Load := @Build_RBS2Archiver;
 
   RBS2Archiver.Store := @Store_RBS2Archiver;
 
-  RHYPArchiver.VmtLink := PtrUInt(TypeOf(fmthyp.THYPArchive));
+  RHYPArchiver.VmtLink := PtrUInt(System.TClass(fmthyp.THYPArchive));
   RHYPArchiver.Load := @Build_RHYPArchiver;
 
   RHYPArchiver.Store := @Store_RHYPArchiver;
 
-  RLIMArchiver.VmtLink := PtrUInt(TypeOf(fmtlim.TLIMArchive));
+  RLIMArchiver.VmtLink := PtrUInt(System.TClass(fmtlim.TLIMArchive));
   RLIMArchiver.Load := @Build_RLIMArchiver;
 
   RLIMArchiver.Store := @Store_RLIMArchiver;
 
-  RHPKArchiver.VmtLink := PtrUInt(TypeOf(fmthpk.THPKArchive));
+  RHPKArchiver.VmtLink := PtrUInt(System.TClass(fmthpk.THPKArchive));
   RHPKArchiver.Load := @Build_RHPKArchiver;
 
   RHPKArchiver.Store := @Store_RHPKArchiver;
 
-  RTARArchiver.VmtLink := PtrUInt(TypeOf(fmttar.TTARArchive));
+  RTARArchiver.VmtLink := PtrUInt(System.TClass(fmttar.TTARArchive));
   RTARArchiver.Load := @Build_RTARArchiver;
 
   RTARArchiver.Store := @Store_RTARArchiver;
 
-  RTGZArchiver.VmtLink := PtrUInt(TypeOf(fmttgz.TTGZArchive));
+  RTGZArchiver.VmtLink := PtrUInt(System.TClass(fmttgz.TTGZArchive));
   RTGZArchiver.Load := @Build_RTGZArchiver;
 
   RTGZArchiver.Store := @Store_RTGZArchiver;
 
-  RZXZArchiver.VmtLink := PtrUInt(TypeOf(fmtzxz.TZXZArchive));
+  RZXZArchiver.VmtLink := PtrUInt(System.TClass(fmtzxz.TZXZArchive));
   RZXZArchiver.Load := @Build_RZXZArchiver;
 
   RZXZArchiver.Store := @Store_RZXZArchiver;
 
-  RQUARKArchiver.VmtLink := PtrUInt(TypeOf(fmtqrk.TQuArkArchive));
+  RQUARKArchiver.VmtLink := PtrUInt(System.TClass(fmtqrk.TQuArkArchive));
   RQUARKArchiver.Load := @Build_RQUARKArchiver;
 
   RQUARKArchiver.Store := @Store_RQUARKArchiver;
 
-  RUFAArchiver.VmtLink := PtrUInt(TypeOf(fmtufa.TUFAArchive));
+  RUFAArchiver.VmtLink := PtrUInt(System.TClass(fmtufa.TUFAArchive));
   RUFAArchiver.Load := @Build_RUFAArchiver;
 
   RUFAArchiver.Store := @Store_RUFAArchiver;
 
-  RIS3Archiver.VmtLink := PtrUInt(TypeOf(fmtis3.TIS3Archive));
+  RIS3Archiver.VmtLink := PtrUInt(System.TClass(fmtis3.TIS3Archive));
   RIS3Archiver.Load := @Build_RIS3Archiver;
 
   RIS3Archiver.Store := @Store_RIS3Archiver;
 
-  RSQZArchiver.VmtLink := PtrUInt(TypeOf(fmtsqz.TSQZArchive));
+  RSQZArchiver.VmtLink := PtrUInt(System.TClass(fmtsqz.TSQZArchive));
   RSQZArchiver.Load := @Build_RSQZArchiver;
 
   RSQZArchiver.Store := @Store_RSQZArchiver;
 
-  RHAPArchiver.VmtLink := PtrUInt(TypeOf(fmthap.THAPArchive));
+  RHAPArchiver.VmtLink := PtrUInt(System.TClass(fmthap.THAPArchive));
   RHAPArchiver.Load := @Build_RHAPArchiver;
 
   RHAPArchiver.Store := @Store_RHAPArchiver;
 
-  RZOOArchiver.VmtLink := PtrUInt(TypeOf(fmtzoo.TZOOArchive));
+  RZOOArchiver.VmtLink := PtrUInt(System.TClass(fmtzoo.TZOOArchive));
   RZOOArchiver.Load := @Build_RZOOArchiver;
 
   RZOOArchiver.Store := @Store_RZOOArchiver;
 
-  RCHZArchiver.VmtLink := PtrUInt(TypeOf(fmtchz.TCHZArchive));
+  RCHZArchiver.VmtLink := PtrUInt(System.TClass(fmtchz.TCHZArchive));
   RCHZArchiver.Load := @Build_RCHZArchiver;
 
   RCHZArchiver.Store := @Store_RCHZArchiver;
 
-  RUC2Archiver.VmtLink := PtrUInt(TypeOf(fmtuc2.TUC2Archive));
+  RUC2Archiver.VmtLink := PtrUInt(System.TClass(fmtuc2.TUC2Archive));
   RUC2Archiver.Load := @Build_RUC2Archiver;
 
   RUC2Archiver.Store := @Store_RUC2Archiver;
 
-  RAINArchiver.VmtLink := PtrUInt(TypeOf(fmtain.TAINArchive));
+  RAINArchiver.VmtLink := PtrUInt(System.TClass(fmtain.TAINArchive));
   RAINArchiver.Load := @Build_RAINArchiver;
 
   RAINArchiver.Store := @Store_RAINArchiver;
 
-  RS7ZArchiver.VmtLink := PtrUInt(TypeOf(fmt7z.TS7ZArchive));
+  RS7ZArchiver.VmtLink := PtrUInt(System.TClass(fmt7z.TS7ZArchive));
   RS7ZArchiver.Load := @Build_RS7ZArchiver;
 
   RS7ZArchiver.Store := @Store_RS7ZArchiver;
 
-  RBZ2Archiver.VmtLink := PtrUInt(TypeOf(fmtbz2.TBZ2Archive));
+  RBZ2Archiver.VmtLink := PtrUInt(System.TClass(fmtbz2.TBZ2Archive));
   RBZ2Archiver.Load := @Build_RBZ2Archiver;
 
   RBZ2Archiver.Store := @Store_RBZ2Archiver;
 
-  RARJArchiver.VmtLink := PtrUInt(TypeOf(Archiver.TARJArchive));
+  RARJArchiver.VmtLink := PtrUInt(System.TClass(Archiver.TARJArchive));
   RARJArchiver.Load := @Build_RARJArchiver;
 
   RARJArchiver.Store := @Store_RARJArchiver;
 
-  RFileInfo.VmtLink := PtrUInt(TypeOf(Archiver.TFileInfo));
+  RFileInfo.VmtLink := PtrUInt(System.TClass(Archiver.TFileInfo));
   RFileInfo.Load := @Build_RFileInfo;
 
   RFileInfo.Store := @Store_RFileInfo;
 
-  RArcDrive.VmtLink := PtrUInt(TypeOf(ArcView.TArcDrive));
+  RArcDrive.VmtLink := PtrUInt(System.TClass(ArcView.TArcDrive));
   RArcDrive.Load := @Build_RArcDrive;
 
   RArcDrive.Store := @Store_RArcDrive;
 
-  RArvidDrive.VmtLink := PtrUInt(TypeOf(Arvid.TArvidDrive));
+  RArvidDrive.VmtLink := PtrUInt(System.TClass(Arvid.TArvidDrive));
   RArvidDrive.Load := @Build_RArvidDrive;
 
   RArvidDrive.Store := @Store_RArvidDrive;
 
-  RTable.VmtLink := PtrUInt(TypeOf(ASCIITab.TTable));
+  RTable.VmtLink := PtrUInt(System.TClass(ASCIITab.TTable));
   RTable.Load := @Build_RTable;
 
   RTable.Store := @Store_RTable;
 
-  RReport.VmtLink := PtrUInt(TypeOf(ASCIITab.TReport));
+  RReport.VmtLink := PtrUInt(System.TClass(ASCIITab.TReport));
   RReport.Load := @Build_RReport;
 
   RReport.Store := @Store_RReport;
 
-  RASCIIChart.VmtLink := PtrUInt(TypeOf(ASCIITab.TASCIIChart));
+  RASCIIChart.VmtLink := PtrUInt(System.TClass(ASCIITab.TASCIIChart));
   RASCIIChart.Load := @Build_RASCIIChart;
 
   RASCIIChart.Store := @Store_RASCIIChart;
 
-  RCalcWindow.VmtLink := PtrUInt(TypeOf(calcwin.TCalcWindow));
+  RCalcWindow.VmtLink := PtrUInt(System.TClass(calcwin.TCalcWindow));
   RCalcWindow.Load := @Build_RCalcWindow;
 
   RCalcWindow.Store := @Store_RCalcWindow;
 
-  RCalcView.VmtLink := PtrUInt(TypeOf(calcwin.TCalcView));
+  RCalcView.VmtLink := PtrUInt(System.TClass(calcwin.TCalcView));
   RCalcView.Load := @Build_RCalcView;
 
   RCalcView.Store := @Store_RCalcView;
 
-  RCalcInfo.VmtLink := PtrUInt(TypeOf(calcwin.TCalcInput));
+  RCalcInfo.VmtLink := PtrUInt(System.TClass(calcwin.TCalcInput));
   RCalcInfo.Load := @Build_RCalcInfo;
 
   RCalcInfo.Store := @Store_RCalcInfo;
 
-  RInfoView.VmtLink := PtrUInt(TypeOf(calcwin.TInfoView));
+  RInfoView.VmtLink := PtrUInt(System.TClass(calcwin.TInfoView));
   RInfoView.Load := @Build_RInfoView;
 
   RInfoView.Store := @Store_RInfoView;
 
-  RCellCollection.VmtLink := PtrUInt(TypeOf(CellsCol.TCellCollection));
+  RCellCollection.VmtLink := PtrUInt(System.TClass(CellsCol.TCellCollection));
   RCellCollection.Load := @Build_RCellCollection;
 
   RCellCollection.Store := @Store_RCellCollection;
 
-  RCalendarView.VmtLink := PtrUInt(TypeOf(Calendar.TCalendarView));
+  RCalendarView.VmtLink := PtrUInt(System.TClass(Calendar.TCalendarView));
   RCalendarView.Load := @Build_RCalendarView;
 
   RCalendarView.Store := @Store_RCalendarView;
 
-  RCalendarWindow.VmtLink := PtrUInt(TypeOf(Calendar.TCalendarWindow));
+  RCalendarWindow.VmtLink := PtrUInt(System.TClass(Calendar.TCalendarWindow));
   RCalendarWindow.Load := @Build_RCalendarWindow;
 
   RCalendarWindow.Store := @Store_RCalendarWindow;
 
-  RCalcLine.VmtLink := PtrUInt(TypeOf(calcline.TCalcLine));
+  RCalcLine.VmtLink := PtrUInt(System.TClass(calcline.TCalcLine));
   RCalcLine.Load := @Build_RCalcLine;
 
   RCalcLine.Store := @Store_RCalcLine;
 
-  RIndicator.VmtLink := PtrUInt(TypeOf(calcline.TIndicator));
+  RIndicator.VmtLink := PtrUInt(System.TClass(calcline.TIndicator));
   RIndicator.Load := @Build_RIndicator;
 
   RIndicator.Store := @Store_RIndicator;
 
-  RCollection.VmtLink := PtrUInt(TypeOf(Collect.TCollection));
+  RCollection.VmtLink := PtrUInt(System.TClass(Collect.TCollection));
   RCollection.Load := @Build_RCollection;
 
   RCollection.Store := @Store_RCollection;
 
-  RLineCollection.VmtLink := PtrUInt(TypeOf(Collect.TLineCollection));
+  RLineCollection.VmtLink := PtrUInt(System.TClass(Collect.TLineCollection));
   RLineCollection.Load := @Build_RLineCollection;
 
   RLineCollection.Store := @Store_RLineCollection;
 
-  RStringCollection.VmtLink := PtrUInt(TypeOf(Collect.TStringCollection));
+  RStringCollection.VmtLink := PtrUInt(System.TClass(Collect.TStringCollection));
   RStringCollection.Load := @Build_RStringCollection;
 
   RStringCollection.Store := @Store_RStringCollection;
 
-  RStrCollection.VmtLink := PtrUInt(TypeOf(Collect.TStrCollection));
+  RStrCollection.VmtLink := PtrUInt(System.TClass(Collect.TStrCollection));
   RStrCollection.Load := @Build_RStrCollection;
 
   RStrCollection.Store := @Store_RStrCollection;
 
-  RStringList.VmtLink := PtrUInt(TypeOf(DNStrL.TStringList));
+  RStringList.VmtLink := PtrUInt(System.TClass(DNStrL.TStringList));
   RStringList.Load := @Build_RStringList;
 
-  RColorSelector.VmtLink := PtrUInt(TypeOf(ColorSel.TColorSelector));
+  RColorSelector.VmtLink := PtrUInt(System.TClass(ColorSel.TColorSelector));
   RColorSelector.Load := @Build_RColorSelector;
 
   RColorSelector.Store := @Store_RColorSelector;
 
-  RMonoSelector.VmtLink := PtrUInt(TypeOf(ColorSel.TMonoSelector));
+  RMonoSelector.VmtLink := PtrUInt(System.TClass(ColorSel.TMonoSelector));
   RMonoSelector.Load := @Build_RMonoSelector;
 
   RMonoSelector.Store := @Store_RMonoSelector;
 
-  RColorDisplay.VmtLink := PtrUInt(TypeOf(ColorSel.TColorDisplay));
+  RColorDisplay.VmtLink := PtrUInt(System.TClass(ColorSel.TColorDisplay));
   RColorDisplay.Load := @Build_RColorDisplay;
 
   RColorDisplay.Store := @Store_RColorDisplay;
 
-  RColorGroupList.VmtLink := PtrUInt(TypeOf(ColorSel.TColorGroupList));
+  RColorGroupList.VmtLink := PtrUInt(System.TClass(ColorSel.TColorGroupList));
   RColorGroupList.Load := @Build_RColorGroupList;
 
   RColorGroupList.Store := @Store_RColorGroupList;
 
-  RColorItemList.VmtLink := PtrUInt(TypeOf(ColorSel.TColorItemList));
+  RColorItemList.VmtLink := PtrUInt(System.TClass(ColorSel.TColorItemList));
   RColorItemList.Load := @Build_RColorItemList;
 
   RColorItemList.Store := @Store_RColorItemList;
 
-  RColorDialog.VmtLink := PtrUInt(TypeOf(ColorSel.TColorDialog));
+  RColorDialog.VmtLink := PtrUInt(System.TClass(ColorSel.TColorDialog));
   RColorDialog.Load := @Build_RColorDialog;
 
   RColorDialog.Store := @Store_RColorDialog;
 
-  RR_BWSelector.VmtLink := PtrUInt(TypeOf(bwselect.T_BWSelector));
+  RR_BWSelector.VmtLink := PtrUInt(System.TClass(bwselect.T_BWSelector));
   RR_BWSelector.Load := @Build_RR_BWSelector;
 
   RR_BWSelector.Store := @Store_RR_BWSelector;
 
-  RDBWindow.VmtLink := PtrUInt(TypeOf(DBView.TDBWindow));
+  RDBWindow.VmtLink := PtrUInt(System.TClass(DBView.TDBWindow));
   RDBWindow.Load := @Build_RDBWindow;
 
   RDBWindow.Store := @Store_RDBWindow;
 
-  RDBViewer.VmtLink := PtrUInt(TypeOf(DBView.TDBViewer));
+  RDBViewer.VmtLink := PtrUInt(System.TClass(DBView.TDBViewer));
   RDBViewer.Load := @Build_RDBViewer;
 
   RDBViewer.Store := @Store_RDBViewer;
 
-  RDBIndicator.VmtLink := PtrUInt(TypeOf(DBView.TDBIndicator));
+  RDBIndicator.VmtLink := PtrUInt(System.TClass(DBView.TDBIndicator));
   RDBIndicator.Load := @Build_RDBIndicator;
 
   RDBIndicator.Store := @Store_RDBIndicator;
 
-  RFieldListBox.VmtLink := PtrUInt(TypeOf(DBView.TFieldListBox));
+  RFieldListBox.VmtLink := PtrUInt(System.TClass(DBView.TFieldListBox));
   RFieldListBox.Load := @Build_RFieldListBox;
 
   RFieldListBox.Store := @Store_RFieldListBox;
 
-  RDialog.VmtLink := PtrUInt(TypeOf(Dialogs.TDialog));
+  RDialog.VmtLink := PtrUInt(System.TClass(Dialogs.TDialog));
   RDialog.Load := @Build_RDialog;
 
   RDialog.Store := @Store_RDialog;
 
-  RInputLine.VmtLink := PtrUInt(TypeOf(Dialogs.TInputLine));
+  RInputLine.VmtLink := PtrUInt(System.TClass(Dialogs.TInputLine));
   RInputLine.Load := @Build_RInputLine;
 
   RInputLine.Store := @Store_RInputLine;
 
-  RHexLine.VmtLink := PtrUInt(TypeOf(DNDlgs.THexLine));
+  RHexLine.VmtLink := PtrUInt(System.TClass(DNDlgs.THexLine));
   RHexLine.Load := @Build_RHexLine;
 
   RHexLine.Store := @Store_RHexLine;
 
-  RLongInputLine.VmtLink := PtrUInt(TypeOf(Dialogs.TLongInputLine));
+  RLongInputLine.VmtLink := PtrUInt(System.TClass(Dialogs.TLongInputLine));
   RLongInputLine.Load := @Build_RLongInputLine;
 
   RLongInputLine.Store := @Store_RLongInputLine;
 
-  RButton.VmtLink := PtrUInt(TypeOf(Dialogs.TButton));
+  RButton.VmtLink := PtrUInt(System.TClass(Dialogs.TButton));
   RButton.Load := @Build_RButton;
 
   RButton.Store := @Store_RButton;
 
-  RCluster.VmtLink := PtrUInt(TypeOf(Dialogs.TCluster));
+  RCluster.VmtLink := PtrUInt(System.TClass(Dialogs.TCluster));
   RCluster.Load := @Build_RCluster;
 
   RCluster.Store := @Store_RCluster;
 
-  RRadioButtons.VmtLink := PtrUInt(TypeOf(Dialogs.TRadioButtons));
+  RRadioButtons.VmtLink := PtrUInt(System.TClass(Dialogs.TRadioButtons));
   RRadioButtons.Load := @Build_RRadioButtons;
 
   RRadioButtons.Store := @Store_RRadioButtons;
 
-  RComboBox.VmtLink := PtrUInt(TypeOf(DNDlgs.TComboBox));
+  RComboBox.VmtLink := PtrUInt(System.TClass(DNDlgs.TComboBox));
   RComboBox.Load := @Build_RComboBox;
 
   RComboBox.Store := @Store_RComboBox;
 
-  RCheckBoxes.VmtLink := PtrUInt(TypeOf(Dialogs.TCheckBoxes));
+  RCheckBoxes.VmtLink := PtrUInt(System.TClass(Dialogs.TCheckBoxes));
   RCheckBoxes.Load := @Build_RCheckBoxes;
 
   RCheckBoxes.Store := @Store_RCheckBoxes;
 
-  RMultiCheckBoxes.VmtLink := PtrUInt(TypeOf(Dialogs.TMultiCheckBoxes));
+  RMultiCheckBoxes.VmtLink := PtrUInt(System.TClass(Dialogs.TMultiCheckBoxes));
   RMultiCheckBoxes.Load := @Build_RMultiCheckBoxes;
 
   RMultiCheckBoxes.Store := @Store_RMultiCheckBoxes;
 
-  RListBox.VmtLink := PtrUInt(TypeOf(Dialogs.TListBox));
+  RListBox.VmtLink := PtrUInt(System.TClass(Dialogs.TListBox));
   RListBox.Load := @Build_RListBox;
 
   RListBox.Store := @Store_RListBox;
 
-  RStaticText.VmtLink := PtrUInt(TypeOf(Dialogs.TStaticText));
+  RStaticText.VmtLink := PtrUInt(System.TClass(Dialogs.TStaticText));
   RStaticText.Load := @Build_RStaticText;
 
   RStaticText.Store := @Store_RStaticText;
 
-  RLabel.VmtLink := PtrUInt(TypeOf(Dialogs.TLabel));
+  RLabel.VmtLink := PtrUInt(System.TClass(Dialogs.TLabel));
   RLabel.Load := @Build_RLabel;
 
   RLabel.Store := @Store_RLabel;
 
-  RHistory.VmtLink := PtrUInt(TypeOf(Dialogs.THistory));
+  RHistory.VmtLink := PtrUInt(System.TClass(Dialogs.THistory));
   RHistory.Load := @Build_RHistory;
 
   RHistory.Store := @Store_RHistory;
 
-  RParamText.VmtLink := PtrUInt(TypeOf(DNDlgs.TParamText));
+  RParamText.VmtLink := PtrUInt(System.TClass(DNDlgs.TParamText));
   RParamText.Load := @Build_RParamText;
 
   RParamText.Store := @Store_RParamText;
 
-  RNotepad.VmtLink := PtrUInt(TypeOf(DNDlgs.TNotepad));
+  RNotepad.VmtLink := PtrUInt(System.TClass(DNDlgs.TNotepad));
   RNotepad.Load := @Build_RNotepad;
 
   RNotepad.Store := @Store_RNotepad;
 
-  RPage.VmtLink := PtrUInt(TypeOf(DNDlgs.TPage));
+  RPage.VmtLink := PtrUInt(System.TClass(DNDlgs.TPage));
   RPage.Load := @Build_RPage;
 
   RPage.Store := @Store_RPage;
 
-  RBookmark.VmtLink := PtrUInt(TypeOf(DNDlgs.TBookmark));
+  RBookmark.VmtLink := PtrUInt(System.TClass(DNDlgs.TBookmark));
   RBookmark.Load := @Build_RBookmark;
 
   RBookmark.Store := @Store_RBookmark;
 
-  RPageFrame.VmtLink := PtrUInt(TypeOf(DNDlgs.TPageFrame));
+  RPageFrame.VmtLink := PtrUInt(System.TClass(DNDlgs.TPageFrame));
   RPageFrame.Load := @Build_RPageFrame;
 
   RPageFrame.Store := @Store_RPageFrame;
 
-  RNotepadFrame.VmtLink := PtrUInt(TypeOf(DNDlgs.TNotepadFrame));
+  RNotepadFrame.VmtLink := PtrUInt(System.TClass(DNDlgs.TNotepadFrame));
   RNotepadFrame.Load := @Build_RNotepadFrame;
 
   RNotepadFrame.Store := @Store_RNotepadFrame;
 
-  RDiskInfo.VmtLink := PtrUInt(TypeOf(DiskInfo.TDiskInfo));
+  RDiskInfo.VmtLink := PtrUInt(System.TClass(DiskInfo.TDiskInfo));
   RDiskInfo.Load := @Build_RDiskInfo;
 
   RDiskInfo.Store := @Store_RDiskInfo;
 
-  RDriveView.VmtLink := PtrUInt(TypeOf(DiskInfo.TDriveView));
+  RDriveView.VmtLink := PtrUInt(System.TClass(DiskInfo.TDriveView));
   RDriveView.Load := @Build_RDriveView;
 
   RDriveView.Store := @Store_RDriveView;
 
-  RBackground.VmtLink := PtrUInt(TypeOf(mainapp.TBackground));
+  RBackground.VmtLink := PtrUInt(System.TClass(mainapp.TBackground));
   RBackground.Load := @Build_RBackground;
 
   RBackground.Store := @Store_RBackground;
 
-  RDesktop.VmtLink := PtrUInt(TypeOf(mainapp.TDesktop));
+  RDesktop.VmtLink := PtrUInt(System.TClass(mainapp.TDesktop));
   RDesktop.Load := @Build_RDesktop;
 
   RDesktop.Store := @Store_RDesktop;
 
-  RFileInputLine.VmtLink := PtrUInt(TypeOf(DNStdDlg.TFileInputLine));
+  RFileInputLine.VmtLink := PtrUInt(System.TClass(DNStdDlg.TFileInputLine));
   RFileInputLine.Load := @Build_RFileInputLine;
 
   RFileInputLine.Store := @Store_RFileInputLine;
 
-  RFileCollection.VmtLink := PtrUInt(TypeOf(DNStdDlg.TFileCollection));
+  RFileCollection.VmtLink := PtrUInt(System.TClass(DNStdDlg.TFileCollection));
   RFileCollection.Load := @Build_RFileCollection;
 
   RFileCollection.Store := @Store_RFileCollection;
 
-  RFileList.VmtLink := PtrUInt(TypeOf(DNStdDlg.TFileList));
+  RFileList.VmtLink := PtrUInt(System.TClass(DNStdDlg.TFileList));
   RFileList.Load := @Build_RFileList;
 
   RFileList.Store := @Store_RFileList;
 
-  RFileInfoPane.VmtLink := PtrUInt(TypeOf(DNStdDlg.TFileInfoPane));
+  RFileInfoPane.VmtLink := PtrUInt(System.TClass(DNStdDlg.TFileInfoPane));
   RFileInfoPane.Load := @Build_RFileInfoPane;
 
   RFileInfoPane.Store := @Store_RFileInfoPane;
 
-  RFileDialog.VmtLink := PtrUInt(TypeOf(DNStdDlg.TFileDialog));
+  RFileDialog.VmtLink := PtrUInt(System.TClass(DNStdDlg.TFileDialog));
   RFileDialog.Load := @Build_RFileDialog;
 
   RFileDialog.Store := @Store_RFileDialog;
 
-  RSortedListBox.VmtLink := PtrUInt(TypeOf(DNStdDlg.TSortedListBox));
+  RSortedListBox.VmtLink := PtrUInt(System.TClass(DNStdDlg.TSortedListBox));
   RSortedListBox.Load := @Build_RSortedListBox;
 
   RSortedListBox.Store := @Store_RSortedListBox;
 
-  RDataSaver.VmtLink := PtrUInt(TypeOf(DNUtil.TDataSaver));
+  RDataSaver.VmtLink := PtrUInt(System.TClass(DNUtil.TDataSaver));
   RDataSaver.Load := @Build_RDataSaver;
 
   RDataSaver.Store := @Store_RDataSaver;
 
-  RDrive.VmtLink := PtrUInt(TypeOf(Drives.TDrive));
+  RDrive.VmtLink := PtrUInt(System.TClass(Drives.TDrive));
   RDrive.Load := @Build_RDrive;
 
   RDrive.Store := @Store_RDrive;
 
-  RInfoLine.VmtLink := PtrUInt(TypeOf(editundo.TInfoLine));
+  RInfoLine.VmtLink := PtrUInt(System.TClass(editundo.TInfoLine));
   RInfoLine.Load := @Build_RInfoLine;
 
   RInfoLine.Store := @Store_RInfoLine;
 
-  RBookLine.VmtLink := PtrUInt(TypeOf(editundo.TBookmarkLine));
+  RBookLine.VmtLink := PtrUInt(System.TClass(editundo.TBookmarkLine));
   RBookLine.Load := @Build_RBookLine;
 
   RBookLine.Store := @Store_RBookLine;
 
-  RXFileEditor.VmtLink := PtrUInt(TypeOf(Editor.TXFileEditor));
+  RXFileEditor.VmtLink := PtrUInt(System.TClass(Editor.TXFileEditor));
   RXFileEditor.Load := @Build_RXFileEditor;
 
   RXFileEditor.Store := @Store_RXFileEditor;
 
-  RFindDrive.VmtLink := PtrUInt(TypeOf(FileFind.TFindDrive));
+  RFindDrive.VmtLink := PtrUInt(System.TClass(FileFind.TFindDrive));
   RFindDrive.Load := @Build_RFindDrive;
 
   RFindDrive.Store := @Store_RFindDrive;
 
-  RTempDrive.VmtLink := PtrUInt(TypeOf(FileFind.TTempDrive));
+  RTempDrive.VmtLink := PtrUInt(System.TClass(FileFind.TTempDrive));
   RTempDrive.Load := @Build_RTempDrive;
 
   RTempDrive.Store := @Store_RTempDrive;
 
-  RFilesCollection.VmtLink := PtrUInt(TypeOf(FilesCol.TFilesCollection));
+  RFilesCollection.VmtLink := PtrUInt(System.TClass(FilesCol.TFilesCollection));
   RFilesCollection.Load := @Build_RFilesCollection;
 
   RFilesCollection.Store := @Store_RFilesCollection;
 
-  RFilePanel.VmtLink := PtrUInt(TypeOf(filepanel.TFilePanel));
+  RFilePanel.VmtLink := PtrUInt(System.TClass(filepanel.TFilePanel));
   RFilePanel.Load := @Build_RFilePanel;
 
   RFilePanel.Store := @Store_RFilePanel;
 
-  RFlPInfoView.VmtLink := PtrUInt(TypeOf(filepanel.TInfoView));
+  RFlPInfoView.VmtLink := PtrUInt(System.TClass(filepanel.TInfoView));
   RFlPInfoView.Load := @Build_RFlPInfoView;
 
   RFlPInfoView.Store := @Store_RFlPInfoView;
 
-  RDirView.VmtLink := PtrUInt(TypeOf(filepanel.TDirView));
+  RDirView.VmtLink := PtrUInt(System.TClass(filepanel.TDirView));
   RDirView.Load := @Build_RDirView;
 
   RDirView.Store := @Store_RDirView;
 
-  RSortView.VmtLink := PtrUInt(TypeOf(topview.TSortView));
+  RSortView.VmtLink := PtrUInt(System.TClass(topview.TSortView));
   RSortView.Load := @Build_RSortView;
 
   RSortView.Store := @Store_RSortView;
 
-  RSeparator.VmtLink := PtrUInt(TypeOf(panelwin.TSeparator));
+  RSeparator.VmtLink := PtrUInt(System.TClass(panelwin.TSeparator));
   RSeparator.Load := @Build_RSeparator;
 
   RSeparator.Store := @Store_RSeparator;
 
-  RDriveLine.VmtLink := PtrUInt(TypeOf(filepanel.TDriveLine));
+  RDriveLine.VmtLink := PtrUInt(System.TClass(filepanel.TDriveLine));
   RDriveLine.Load := @Build_RDriveLine;
 
   RDriveLine.Store := @Store_RDriveLine;
 
-  RDirStorage.VmtLink := PtrUInt(TypeOf(FStorage.TDirStorage));
+  RDirStorage.VmtLink := PtrUInt(System.TClass(FStorage.TDirStorage));
   RDirStorage.Load := @Build_RDirStorage;
 
   RDirStorage.Store := @Store_RDirStorage;
 
-  RFileViewer.VmtLink := PtrUInt(TypeOf(FViewer.TFileViewer));
+  RFileViewer.VmtLink := PtrUInt(System.TClass(FViewer.TFileViewer));
   RFileViewer.Load := @Build_RFileViewer;
 
   RFileViewer.Store := @Store_RFileViewer;
 
-  RFileWindow.VmtLink := PtrUInt(TypeOf(FViewer.TFileWindow));
+  RFileWindow.VmtLink := PtrUInt(System.TClass(FViewer.TFileWindow));
   RFileWindow.Load := @Build_RFileWindow;
 
   RFileWindow.Store := @Store_RFileWindow;
 
-  RViewScroll.VmtLink := PtrUInt(TypeOf(FViewer.TViewScroll));
+  RViewScroll.VmtLink := PtrUInt(System.TClass(FViewer.TViewScroll));
   RViewScroll.Load := @Build_RViewScroll;
 
   RViewScroll.Store := @Store_RViewScroll;
 
-  RQFileViewer.VmtLink := PtrUInt(TypeOf(FViewer.TQFileViewer));
+  RQFileViewer.VmtLink := PtrUInt(System.TClass(FViewer.TQFileViewer));
   RQFileViewer.Load := @Build_RQFileViewer;
 
   RQFileViewer.Store := @Store_RQFileViewer;
 
-  RDFileViewer.VmtLink := PtrUInt(TypeOf(FViewer.TDFileViewer));
+  RDFileViewer.VmtLink := PtrUInt(System.TClass(FViewer.TDFileViewer));
   RDFileViewer.Load := @Build_RDFileViewer;
 
   RDFileViewer.Store := @Store_RDFileViewer;
 
-  RViewInfo.VmtLink := PtrUInt(TypeOf(FViewer.TViewInfo));
+  RViewInfo.VmtLink := PtrUInt(System.TClass(FViewer.TViewInfo));
   RViewInfo.Load := @Build_RViewInfo;
 
   RViewInfo.Store := @Store_RViewInfo;
 
-  RTrashCan.VmtLink := PtrUInt(TypeOf(gadgets.TTrashCan));
+  RTrashCan.VmtLink := PtrUInt(System.TClass(gadgets.TTrashCan));
   RTrashCan.Load := @Build_RTrashCan;
 
   RTrashCan.Store := @Store_RTrashCan;
 
-  RKeyMacros.VmtLink := PtrUInt(TypeOf(gadgets.TKeyMacros));
+  RKeyMacros.VmtLink := PtrUInt(System.TClass(gadgets.TKeyMacros));
   RKeyMacros.Load := @Build_RKeyMacros;
 
   RKeyMacros.Store := @Store_RKeyMacros;
 
-  RHelpTopic.VmtLink := PtrUInt(TypeOf(HelpKern.THelpTopic));
+  RHelpTopic.VmtLink := PtrUInt(System.TClass(HelpKern.THelpTopic));
   RHelpTopic.Load := @Build_RHelpTopic;
 
   RHelpTopic.Store := @Store_RHelpTopic;
 
-  RHelpIndex.VmtLink := PtrUInt(TypeOf(HelpKern.THelpIndex));
+  RHelpIndex.VmtLink := PtrUInt(System.TClass(HelpKern.THelpIndex));
   RHelpIndex.Load := @Build_RHelpIndex;
 
   RHelpIndex.Store := @Store_RHelpIndex;
 
-  REditHistoryCol.VmtLink := PtrUInt(TypeOf(histories.TEditHistoryCol));
+  REditHistoryCol.VmtLink := PtrUInt(System.TClass(histories.TEditHistoryCol));
   REditHistoryCol.Load := @Build_REditHistoryCol;
 
   REditHistoryCol.Store := @Store_REditHistoryCol;
 
-  RViewHistoryCol.VmtLink := PtrUInt(TypeOf(histories.TViewHistoryCol));
+  RViewHistoryCol.VmtLink := PtrUInt(System.TClass(histories.TViewHistoryCol));
   RViewHistoryCol.Load := @Build_RViewHistoryCol;
 
   RViewHistoryCol.Store := @Store_RViewHistoryCol;
 
-  RMenuBar.VmtLink := PtrUInt(TypeOf(Menus.TMenuBar));
+  RMenuBar.VmtLink := PtrUInt(System.TClass(Menus.TMenuBar));
   RMenuBar.Load := @Build_RMenuBar;
 
   RMenuBar.Store := @Store_RMenuBar;
 
-  RMenuBox.VmtLink := PtrUInt(TypeOf(Menus.TMenuBox));
+  RMenuBox.VmtLink := PtrUInt(System.TClass(Menus.TMenuBox));
   RMenuBox.Load := @Build_RMenuBox;
 
   RMenuBox.Store := @Store_RMenuBox;
 
-  RStatusLine.VmtLink := PtrUInt(TypeOf(Menus.TStatusLine));
+  RStatusLine.VmtLink := PtrUInt(System.TClass(Menus.TStatusLine));
   RStatusLine.Load := @Build_RStatusLine;
 
   RStatusLine.Store := @Store_RStatusLine;
 
-  RMenuPopup.VmtLink := PtrUInt(TypeOf(Menus.TMenuPopup));
+  RMenuPopup.VmtLink := PtrUInt(System.TClass(Menus.TMenuPopup));
   RMenuPopup.Load := @Build_RMenuPopup;
 
   RMenuPopup.Store := @Store_RMenuPopup;
 
-  RFileEditor.VmtLink := PtrUInt(TypeOf(editcore.TFileEditor));
+  RFileEditor.VmtLink := PtrUInt(System.TClass(editcore.TFileEditor));
   RFileEditor.Load := @Build_RFileEditor;
 
   RFileEditor.Store := @Store_RFileEditor;
 
-  REditWindow.VmtLink := PtrUInt(TypeOf(editwin.TEditWindow));
+  REditWindow.VmtLink := PtrUInt(System.TClass(editwin.TEditWindow));
   REditWindow.Load := @Build_REditWindow;
 
   REditWindow.Store := @Store_REditWindow;
 
-  RDStringView.VmtLink := PtrUInt(TypeOf(StrView.TDStringView));
+  RDStringView.VmtLink := PtrUInt(System.TClass(StrView.TDStringView));
   RDStringView.Load := @Build_RDStringView;
 
   RDStringView.Store := @Store_RDStringView;
 
-  RPhone.VmtLink := PtrUInt(TypeOf(Phones.TPhone));
+  RPhone.VmtLink := PtrUInt(System.TClass(Phones.TPhone));
   RPhone.Load := @Build_RPhone;
 
   RPhone.Store := @Store_RPhone;
 
-  RPhoneDir.VmtLink := PtrUInt(TypeOf(Phones.TPhoneDir));
+  RPhoneDir.VmtLink := PtrUInt(System.TClass(Phones.TPhoneDir));
   RPhoneDir.Load := @Build_RPhoneDir;
 
   RPhoneDir.Store := @Store_RPhoneDir;
 
-  RPhoneCollection.VmtLink := PtrUInt(TypeOf(Phones.TPhoneCollection));
+  RPhoneCollection.VmtLink := PtrUInt(System.TClass(Phones.TPhoneCollection));
   RPhoneCollection.Load := @Build_RPhoneCollection;
 
   RPhoneCollection.Store := @Store_RPhoneCollection;
 
-  RStringCol.VmtLink := PtrUInt(TypeOf(PrintMan.TStringCol));
+  RStringCol.VmtLink := PtrUInt(System.TClass(PrintMan.TStringCol));
   RStringCol.Load := @Build_RStringCol;
 
   RStringCol.Store := @Store_RStringCol;
 
-  RPrintManager.VmtLink := PtrUInt(TypeOf(PrintMan.TPrintManager));
+  RPrintManager.VmtLink := PtrUInt(System.TClass(PrintMan.TPrintManager));
   RPrintManager.Load := @Build_RPrintManager;
 
   RPrintManager.Store := @Store_RPrintManager;
 
-  RPrintStatus.VmtLink := PtrUInt(TypeOf(PrintMan.TPrintStatus));
+  RPrintStatus.VmtLink := PtrUInt(System.TClass(PrintMan.TPrintStatus));
   RPrintStatus.Load := @Build_RPrintStatus;
 
   RPrintStatus.Store := @Store_RPrintStatus;
 
-  RPMWindow.VmtLink := PtrUInt(TypeOf(PrintMan.TPMWindow));
+  RPMWindow.VmtLink := PtrUInt(System.TClass(PrintMan.TPMWindow));
   RPMWindow.Load := @Build_RPMWindow;
 
   RPMWindow.Store := @Store_RPMWindow;
 
-  RScroller.VmtLink := PtrUInt(TypeOf(Scroller.TScroller));
+  RScroller.VmtLink := PtrUInt(System.TClass(Scroller.TScroller));
   RScroller.Load := @Build_RScroller;
 
   RScroller.Store := @Store_RScroller;
 
-  RListViewer.VmtLink := PtrUInt(TypeOf(Scroller.TListViewer));
+  RListViewer.VmtLink := PtrUInt(System.TClass(Scroller.TListViewer));
   RListViewer.Load := @Build_RListViewer;
 
   RListViewer.Store := @Store_RListViewer;
 
-  RSysDialog.VmtLink := PtrUInt(TypeOf(Setups.TSysDialog));
+  RSysDialog.VmtLink := PtrUInt(System.TClass(Setups.TSysDialog));
   RSysDialog.Load := @Build_RSysDialog;
 
   RSysDialog.Store := @Store_RSysDialog;
 
-  RCurrDriveInfo.VmtLink := PtrUInt(TypeOf(Setups.TCurrDriveInfo));
+  RCurrDriveInfo.VmtLink := PtrUInt(System.TClass(Setups.TCurrDriveInfo));
   RCurrDriveInfo.Load := @Build_RCurrDriveInfo;
 
   RCurrDriveInfo.Store := @Store_RCurrDriveInfo;
 
-  RMouseBar.VmtLink := PtrUInt(TypeOf(Setups.TMouseBar));
+  RMouseBar.VmtLink := PtrUInt(System.TClass(Setups.TMouseBar));
   RMouseBar.Load := @Build_RMouseBar;
 
   RMouseBar.Store := @Store_RMouseBar;
 
-  RSaversDialog.VmtLink := PtrUInt(TypeOf(Setups.TSaversDialog));
+  RSaversDialog.VmtLink := PtrUInt(System.TClass(Setups.TSaversDialog));
   RSaversDialog.Load := @Build_RSaversDialog;
 
   RSaversDialog.Store := @Store_RSaversDialog;
 
-  RSaversListBox.VmtLink := PtrUInt(TypeOf(Setups.TSaversListBox));
+  RSaversListBox.VmtLink := PtrUInt(System.TClass(Setups.TSaversListBox));
   RSaversListBox.Load := @Build_RSaversListBox;
 
   RSaversListBox.Store := @Store_RSaversListBox;
 
-  RTextCollection.VmtLink := PtrUInt(TypeOf(dlgrecs.TTextCollection));
+  RTextCollection.VmtLink := PtrUInt(System.TClass(dlgrecs.TTextCollection));
   RTextCollection.Load := @Build_RTextCollection;
 
   RTextCollection.Store := @Store_RTextCollection;
 
-  RGameWindow.VmtLink := PtrUInt(TypeOf(Tetris.TGameWindow));
+  RGameWindow.VmtLink := PtrUInt(System.TClass(Tetris.TGameWindow));
   RGameWindow.Load := @Build_RGameWindow;
 
   RGameWindow.Store := @Store_RGameWindow;
 
-  RGameView.VmtLink := PtrUInt(TypeOf(Tetris.TGameView));
+  RGameView.VmtLink := PtrUInt(System.TClass(Tetris.TGameView));
   RGameView.Load := @Build_RGameView;
 
   RGameView.Store := @Store_RGameView;
 
-  RGameInfo.VmtLink := PtrUInt(TypeOf(Tetris.TGameInfo));
+  RGameInfo.VmtLink := PtrUInt(System.TClass(Tetris.TGameInfo));
   RGameInfo.Load := @Build_RGameInfo;
 
   RGameInfo.Store := @Store_RGameInfo;
 
-  RTreeView.VmtLink := PtrUInt(TypeOf(Tree.TTreeView));
+  RTreeView.VmtLink := PtrUInt(System.TClass(Tree.TTreeView));
   RTreeView.Load := @Build_RTreeView;
 
   RTreeView.Store := @Store_RTreeView;
 
-  RTreeReader.VmtLink := PtrUInt(TypeOf(Tree.TTreeReader));
+  RTreeReader.VmtLink := PtrUInt(System.TClass(Tree.TTreeReader));
   RTreeReader.Load := @Build_RTreeReader;
 
   RTreeReader.Store := @Store_RTreeReader;
 
-  RTreeWindow.VmtLink := PtrUInt(TypeOf(Tree.TTreeWindow));
+  RTreeWindow.VmtLink := PtrUInt(System.TClass(Tree.TTreeWindow));
   RTreeWindow.Load := @Build_RTreeWindow;
 
   RTreeWindow.Store := @Store_RTreeWindow;
 
-  RTreePanel.VmtLink := PtrUInt(TypeOf(Tree.TTreePanel));
+  RTreePanel.VmtLink := PtrUInt(System.TClass(Tree.TTreePanel));
   RTreePanel.Load := @Build_RTreePanel;
 
   RTreePanel.Store := @Store_RTreePanel;
 
-  RTreeDialog.VmtLink := PtrUInt(TypeOf(Tree.TTreeDialog));
+  RTreeDialog.VmtLink := PtrUInt(System.TClass(Tree.TTreeDialog));
   RTreeDialog.Load := @Build_RTreeDialog;
 
   RTreeDialog.Store := @Store_RTreeDialog;
 
-  RTreeInfoView.VmtLink := PtrUInt(TypeOf(Tree.TTreeInfoView));
+  RTreeInfoView.VmtLink := PtrUInt(System.TClass(Tree.TTreeInfoView));
   RTreeInfoView.Load := @Build_RTreeInfoView;
 
   RTreeInfoView.Store := @Store_RTreeInfoView;
 
-  RHTreeView.VmtLink := PtrUInt(TypeOf(Tree.THTreeView));
+  RHTreeView.VmtLink := PtrUInt(System.TClass(Tree.THTreeView));
   RHTreeView.Load := @Build_RHTreeView;
 
   RHTreeView.Store := @Store_RHTreeView;
 
-  RDirCollection.VmtLink := PtrUInt(TypeOf(Tree.TDirCollection));
+  RDirCollection.VmtLink := PtrUInt(System.TClass(Tree.TDirCollection));
   RDirCollection.Load := @Build_RDirCollection;
 
   RDirCollection.Store := @Store_RDirCollection;
 
-  REditScrollBar.VmtLink := PtrUInt(TypeOf(UniWin.TEditScrollBar));
+  REditScrollBar.VmtLink := PtrUInt(System.TClass(UniWin.TEditScrollBar));
   REditScrollBar.Load := @Build_REditScrollBar;
 
   REditScrollBar.Store := @Store_REditScrollBar;
 
-  REditFrame.VmtLink := PtrUInt(TypeOf(UniWin.TEditFrame));
+  REditFrame.VmtLink := PtrUInt(System.TClass(UniWin.TEditFrame));
   REditFrame.Load := @Build_REditFrame;
 
   REditFrame.Store := @Store_REditFrame;
 
-  RUserWindow.VmtLink := PtrUInt(TypeOf(UserMenu.TUserWindow));
+  RUserWindow.VmtLink := PtrUInt(System.TClass(UserMenu.TUserWindow));
   RUserWindow.Load := @Build_RUserWindow;
 
   RUserWindow.Store := @Store_RUserWindow;
 
-  RUserView.VmtLink := PtrUInt(TypeOf(UserMenu.TUserView));
+  RUserView.VmtLink := PtrUInt(System.TClass(UserMenu.TUserView));
   RUserView.Load := @Build_RUserView;
 
   RUserView.Store := @Store_RUserView;
 
-  RMyScrollBar.VmtLink := PtrUInt(TypeOf(Views.TMyScrollBar));
+  RMyScrollBar.VmtLink := PtrUInt(System.TClass(Views.TMyScrollBar));
   RMyScrollBar.Load := @Build_RMyScrollBar;
 
   RMyScrollBar.Store := @Store_RMyScrollBar;
 
-  RDoubleWindow.VmtLink := PtrUInt(TypeOf(panelwinx.TXDoubleWindow));
+  RDoubleWindow.VmtLink := PtrUInt(System.TClass(panelwinx.TXDoubleWindow));
   RDoubleWindow.Load := @Build_RDoubleWindow;
 
   RDoubleWindow.Store := @Store_RDoubleWindow;
 
-  RColorPoint.VmtLink := PtrUInt(TypeOf(inputfname.TColorPoint));
+  RColorPoint.VmtLink := PtrUInt(System.TClass(inputfname.TColorPoint));
   RColorPoint.Load := @Build_RColorPoint;
 
   RColorPoint.Store := @Store_RColorPoint;
