@@ -60,12 +60,10 @@ procedure SetHighlightGroups;
 
 type
 
-  PWindowList = ^TWindowList;
   TWindowList = class(TListBox)
     function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
     end;
 
-  PWindowCol = ^TWindowCol;
   TWindowCol = class(TCollection)
     procedure FreeItem(Item: Pointer); virtual;
     end;
@@ -162,7 +160,7 @@ function TWindowList.GetText(Item: LongInt; MaxLen: Integer): String;
     S: String;
     P: TView;
   begin
-  P := List^.At(Item);
+  P := List.At(Item);
   S := GetString(dlUnknownWindowType);
   Message(P, evCommand, cmGetName, @S);
   if TWindow(P).Number in [1..9]
@@ -177,7 +175,7 @@ procedure WindowManager;
   var
     D: TDialog;
     R: TRect;
-    PC: PWindowCol;
+    PC: TWindowCol;
     PV: TView;
     S: String;
     DT: record
@@ -192,7 +190,7 @@ procedure WindowManager;
     if P = nil then
       Exit;
     S := '';
-    if  (P^.GetState(sfVisible)) then
+    if  (P.GetState(sfVisible)) then
       begin
       Message(P, evCommand, cmGetName, @S);
       if  (S <> '') then
@@ -201,11 +199,11 @@ procedure WindowManager;
     end;
 
   begin { WindowManager }
-  PC.Create(10, 10);
+  PC := TWindowCol.Create(10, 10);
   Desktop.ForEach(InsView);
 (* AK155 Контроль на Count = 0 не нужен, так как если окон нет, то
 cmWindowManager задизейблена.
-  if PC^.Count = 0 then
+  if PC.Count = 0 then
     begin
     PC.Free;
     Exit
@@ -213,44 +211,44 @@ cmWindowManager задизейблена.
 *)
   D := TDialog(LoadResource(dlgWindowManager));
 
-  R.Assign(D^.Size.X-13, 3, D^.Size.X-12, D^.Size.Y-2);
+  R.Assign(D.Size.X-13, 3, D.Size.X-12, D.Size.Y-2);
   PV := TScrollBar.Create(R);
-  PV^.Options := PV^.Options or ofPostProcess or ofSecurity;
+  PV.Options := PV.Options or ofPostProcess or ofSecurity;
   D.Insert(PV);
 
-  R.Assign(2, 3, D^.Size.X-13, D^.Size.Y-2);
-  PV := New(PWindowList, Init(R, 1, TScrollBar(PV)));
-  PV^.Options := PV^.Options or ofPostProcess or ofSecurity;
+  R.Assign(2, 3, D.Size.X-13, D.Size.Y-2);
+  PV := TWindowList.Create(R, 1, TScrollBar(PV));
+  PV.Options := PV.Options or ofPostProcess or ofSecurity;
   TListBox(PV).NewLisT(PC);
-  if PC^.Count > 1 then
+  if PC.Count > 1 then
     TListBox(PV).Focused := 1;
   Num := 0; {-$VIV 28.05.99--}
-  if  (WinManagerPosToEdit) and (PC^.Count > 0) and
-      (Pos(GetString(dlEditTitle)+' -', PWindowList(PV)^.GetText(0, 255))
+  if  (WinManagerPosToEdit) and (PC.Count > 0) and
+      (Pos(GetString(dlEditTitle)+' -', TWindowList(PV).GetText(0, 255))
        > 0)
   then
-    for I := 1 to PC^.Count-1 do
-      if  (Pos(GetString(dlEditTitle)+' -', PWindowList(PV)^.GetText(I,
+    for I := 1 to PC.Count-1 do
+      if  (Pos(GetString(dlEditTitle)+' -', TWindowList(PV).GetText(I,
                255)) > 0)
       then
         begin
         Num := I;
         Break;
         end;
-  if  (WinManagerSelectNext) and (Num = 0) and (PC^.Count > 1) then
+  if  (WinManagerSelectNext) and (Num = 0) and (PC.Count > 1) then
     Num := 1;
   TListBox(PV).Focused := Num; {-$VIV--}
   D.Insert(PV);
 
   R.Assign(2, 2, 45, 3);
-  PV := New(TLabel, Init(R, GetString(dlWindowsLabel), PV));
+  PV := TLabel.Create(R, GetString(dlWindowsLabel), PV);
   D.Insert(PV);
 
 while true do
   begin
   Cmd := Desktop.ExecView(D);
   D.GetData(DT); { Теперь DT.P = PC }
-  PV := TView(DT.P^.At(DT.n));
+  PV := TView(DT.P.At(DT.n));
   if Cmd = cmCancel then
     Break;
   if Cmd = cmOK then { "Select" }
@@ -267,9 +265,9 @@ while true do
       D.SetData(DT); {при этом NewList освободит PC }
       PC.Create(10, 10);
       Desktop.ForEach(InsView);
-      if PC^.Count = 0 then
+      if PC.Count = 0 then
         Break;
-      if DT.n >= PC^.Count then
+      if DT.n >= PC.Count then
         Dec(DT.n);
       DT.P := PC;
       D.SetData(DT);
