@@ -4,14 +4,14 @@ program t_objutil;
 uses objutil;
 {$I dntest.inc}
 type
-  PA = ^TA;
-  TA = object(TObject)
+  TA = class;
+  PA = TA;
+  TA = class(TObject)
     N: Integer;
     function Name: Integer; virtual;
   end;
-  PB = ^TB;
-  TB = object(TA)
-    function Name: Integer; virtual;
+  TB = class(TA)
+    function Name: Integer; override;
   end;
 
 function TA.Name: Integer; begin Result := 1; end;
@@ -21,12 +21,12 @@ var
   P: PA;
   Q: PObject;
 begin
-  New(P, Init);
-  P^.N := 7;
-  Check(P^.Name = 1, 'the base type answers');
-  ObjChangeType(P, TypeOf(TB));
-  Check((P^.Name = 2) and (P^.N = 7), 'ObjChangeType: the virtual method is the one of the new type, the fields stay');
-  Check(TypeOf(P^) = TypeOf(TB), 'TypeOf shows the new type');
+  P := TA.Create;
+  P.N := 7;
+  Check(P.Name = 1, 'the base type answers');
+  ObjChangeType(P, System.TClass(TB));
+  Check((P.Name = 2) and (P.N = 7), 'ObjChangeType: the virtual method is the one of the new type, the fields stay');
+  Check(P.ClassType = TB, 'ClassType shows the new type');
   FreeObject(P);
   Check(P = nil, 'FreeObject sets the pointer to nil');
   FreeObject(P);
