@@ -5,6 +5,7 @@
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 . "$here/tools/need-tv.sh"
+"$here/tv/tools/class-gate.sh"
 w=${TV_TEST_WORK:-$here/build/tv-tests}; mkdir -p "$w"
 cd "$here/tv/tests"
 if [ $# -gt 0 ]; then tests=$(for n in "$@"; do echo "${n%.pas}.pas"; done); else tests=$(ls t_*.pas); fi
