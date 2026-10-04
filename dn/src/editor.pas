@@ -56,7 +56,7 @@ uses
 
 type
   PXFileEditor = ^TXFileEditor;
-  TXFileEditor = object(TFileEditor)
+  TXFileEditor = class(TFileEditor)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     function HandleCommand(var Event: TEvent): Boolean; virtual;
     end;
@@ -73,7 +73,7 @@ uses
 
 type
   PSortCollection = ^TSortCollection;
-  TSortCollection = object(TSortedCollection)
+  TSortCollection = class(TSortedCollection)
     function Compare(Key1, Key2: Pointer): Integer; virtual;
     end;
 

@@ -62,14 +62,14 @@ type
   TTypeMode = (tmConst, tmEnum);
 
   { Collection of PTypeHolders }
-  TValuesHolder = object(TCollection)
+  TValuesHolder = class(TCollection)
     function GetType(ID: String): PTypeHolder;
     function GetValue(S: String; var Complete: Boolean): LongInt;
     procedure Show;
     end;
 
   { Collection of PLngWords }
-  TTypeHolder = object(TSortedCollection)
+  TTypeHolder = class(TSortedCollection)
     TypeID: String[10];
     Mode: TTypeMode;
     constructor Init(ID: String; AMode: TTypeMode);
@@ -77,7 +77,7 @@ type
     procedure Show;
     end;
 
-  TLngWord = object(TObject)
+  TLngWord = class(TObject)
     Name: String[30];
     l: LongInt;
     Mark: Byte;

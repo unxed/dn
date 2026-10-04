@@ -70,7 +70,7 @@ type
     end;
 
   PSysDialog = ^TSysDialog;
-  TSysDialog = object(TDialog)
+  TSysDialog = class(TDialog)
     LocalData: TSystemData;
     SysData: TSysData;
     {constructor Init;}
@@ -80,13 +80,13 @@ type
     end;
 
   PCurrDriveInfo = ^TCurrDriveInfo;
-  TCurrDriveInfo = object(TCheckBoxes)
+  TCurrDriveInfo = class(TCheckBoxes)
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Press(Item: Integer); virtual;
     end;
 
   PMouseBar = ^TMouseBar;
-  TMouseBar = object(TScrollBar)
+  TMouseBar = class(TScrollBar)
     constructor Init(var Bounds: TRect);
     procedure SetData(var Rec); virtual;
     procedure GetData(var Rec); virtual;
@@ -96,7 +96,7 @@ type
 
   
   PSaversDialog = ^TSaversDialog;
-  TSaversDialog = object(TDialog)
+  TSaversDialog = class(TDialog)
     constructor Init;
     procedure HandleEvent(var Event: TEvent); virtual;
     destructor Done; virtual;
@@ -104,7 +104,7 @@ type
     end;
 
   PSaversListBox = ^TSaversListBox;
-  TSaversListBox = object(TListBox)
+  TSaversListBox = class(TListBox)
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
   

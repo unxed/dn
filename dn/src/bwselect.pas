@@ -57,7 +57,7 @@ uses
 
 type
   P_BWSelector = ^T_BWSelector;
-  T_BWSelector = object(TMonoSelector)
+  T_BWSelector = class(TMonoSelector)
     SelType: TColorSel; {Is't a selector of Foreground color ? }
     constructor Init(var Bounds: TRect; ASelType: TColorSel;
          AStrings: PSItem);

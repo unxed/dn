@@ -66,7 +66,7 @@ type
   TCharArray = array[0..65500] of Char;
 
   PPktObj = ^TPktObj;
-  TPktObj = object(TObject)
+  TPktObj = class(TObject)
     FOfs: LongInt;
     Fu, Tu, Su, DT: PString;
     FA, TA: TNetAddr;
@@ -79,19 +79,19 @@ type
     end;
 
   PPktCol = ^TPktCol;
-  TPktCol = object(TCollection)
+  TPktCol = class(TCollection)
     FName: PString;
     constructor Init(PktFile: String);
     destructor Done; virtual;
     end;
 
   PPktList = ^TPktList;
-  TPktList = object(TListBox)
+  TPktList = class(TListBox)
     function GetText(Item: LongInt; MaxLen: LongInt): String; virtual;
     end;
 
   PPktListDialog = ^TPktListDialog;
-  TPktListDialog = object(TDialog)
+  TPktListDialog = class(TDialog)
     lb: PPktList;
     constructor Init(FName: String; C: PPktCol);
     destructor Done; virtual;
@@ -100,7 +100,7 @@ type
     end;
 
   PLineViewer = ^TLineViewer;
-  TLineViewer = object(TScroller)
+  TLineViewer = class(TScroller)
     FileLines: PLineCollection;
     isValid: Boolean;
     constructor Init(var Bounds: TRect;
@@ -113,7 +113,7 @@ type
     end;
 
   PMsgViewer = ^TMsgViewer;
-  TMsgViewer = object(TLineViewer)
+  TMsgViewer = class(TLineViewer)
     FromUser, ToUser, Date, Subj: PString;
     constructor Init(var Bounds: TRect;
          AHScrollBar, AVScrollBar: PScrollBar; FName: String);
@@ -121,7 +121,7 @@ type
     end;
 
   PPktMsgViewer = ^TPktMsgViewer;
-  TPktMsgViewer = object(TDialog)
+  TPktMsgViewer = class(TDialog)
     FV: PLineViewer;
     PS1, Ps2, Ps3, Ps4: PString;
     constructor Init(Buf: PCharArray; S1, S2, S3, S4: String;
@@ -134,7 +134,7 @@ type
     end;
 
   PMsgViewerDlg = ^TMsgViewerDlg;
-  TMsgViewerDlg = object(TDialog)
+  TMsgViewerDlg = class(TDialog)
     Lb1, Lb2, Lb3, Lb4: PLabel;
     CurMsg: PString;
     FV: PMsgViewer;
@@ -1430,7 +1430,7 @@ procedure ViewPktFile(FName: String);
 
 type
   PLimitStream = ^TLimitStream;
-  TLimitStream = object(TDOSStream)
+  TLimitStream = class(TDOSStream)
     constructor Init(FileName: FNameStr; Mode: Word; Limit: LongInt);
     end;
 

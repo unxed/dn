@@ -56,7 +56,7 @@ uses
 
 type
   PCalcLine = ^TCalcLine;
-  TCalcLine = object(TInputLine)
+  TCalcLine = class(TInputLine)
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure SetData(var B); virtual;
     procedure SetValues(SetSelf: Boolean);
@@ -65,7 +65,7 @@ type
     end;
 
   PIndicator = ^TIndicator;
-  TIndicator = object(TView)
+  TIndicator = class(TView)
     CalcLine: PCalcLine;
     Radio: PRadioButtons;
     Value: CReal;

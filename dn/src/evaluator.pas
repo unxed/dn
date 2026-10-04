@@ -237,7 +237,7 @@ type
   FnEval2 = procedure (var D: CReal; d2: CReal);
   FnEval3 = procedure (var D: CReal; d2, d3: CReal);
   PFnDesc = ^TFnDesc;
-  TFnDesc = object
+  TFnDesc = class
     n {ame}: String[8];
     E {val}: Pointer {FnEval};
     A {rguments}: Integer;

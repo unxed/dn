@@ -11,7 +11,7 @@ uses
 type
 
   PUserSaver = ^TUserSaver;
-  TUserSaver = object(TView)
+  TUserSaver = class(TView)
     Screen: Pointer;
     SSize, SWidth: AInt;
     CShape, CPos: AWord;

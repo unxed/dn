@@ -73,7 +73,7 @@ type
     Row: AInt;
     end;
   PCellCollection = ^TCellCollection;
-  TCellCollection = object(TSortedCollection)
+  TCellCollection = class(TSortedCollection)
     constructor ShortLoad(var S: TStream);
     procedure ShortStore(var S: TStream);
     procedure FreeItem(Item: Pointer); virtual;

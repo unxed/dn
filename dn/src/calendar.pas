@@ -24,7 +24,7 @@ uses
 type
 
   PCalendarView = ^TCalendarView;
-  TCalendarView = object(TView)
+  TCalendarView = class(TView)
     Year: AWord;
     Month: Byte;
     Days: Byte;
@@ -58,7 +58,7 @@ type
     end;
 
   PCalendarWindow = ^TCalendarWindow;
-  TCalendarWindow = object(TWindow)
+  TCalendarWindow = class(TWindow)
     CalendarView: PCalendarView;
     constructor Init;
     procedure HandleEvent(var Event: TEvent); virtual;

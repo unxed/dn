@@ -58,7 +58,7 @@ type
   { TUniWindow }
 
   PUniWindow = ^TUniWindow;
-  TUniWindow = object(TWindow)
+  TUniWindow = class(TWindow)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     function GetPalette: TPalette; virtual;
     function MakeScrollBar(AOptions: Word): PScrollBar;
@@ -69,14 +69,14 @@ type
   { TEditScrollBar }
 
   PEditScrollBar = ^TEditScrollBar;
-  TEditScrollBar = object(TScrollBar)
+  TEditScrollBar = class(TScrollBar)
     function GetPalette: TPalette; virtual;
     end;
 
   { TEditFrame }
 
   PEditFrame = ^TEditFrame;
-  TEditFrame = object(TFrame)
+  TEditFrame = class(TFrame)
     function GetPalette: TPalette; virtual;
     end;
 

@@ -57,7 +57,7 @@ uses
   ;
 
 type
-  MyApp = object(TDNApplication)
+  MyApp = class(TDNApplication)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure GetEvent(var Event: TEvent); virtual;

@@ -70,7 +70,7 @@ type
   DirectLink на строку ввода имени файла (1) и строку ввода
   шаблона строки файла (2) }
   PMakeListDlg = ^TMakeListDlg;
-  TMakeListDlg = object(TDialog)
+  TMakeListDlg = class(TDialog)
     procedure HandleEvent(var Event: TEvent); virtual;
       { Для реакции на кнопки }
     end;
