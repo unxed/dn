@@ -7,12 +7,16 @@ on:
       - dn/**
       - tv
       - tools/gen-shim.py
+      - tools/class_names.py
+      - tools/tests/**
       - .github/workflows/class-migration.yml
   pull_request:
     paths:
       - dn/**
       - tv
       - tools/gen-shim.py
+      - tools/class_names.py
+      - tools/tests/**
       - .github/workflows/class-migration.yml
 
 jobs:
@@ -26,6 +30,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
       - name: tv3 prerequisite gate
         run: tv/tools/class-gate.sh
+      - name: Pascal class-name conversion checks
+        run: python3 -B -m unittest discover -s tools/tests -p test_class_names.py
       - name: Class release and profile persistence
         shell: bash
         run: |
