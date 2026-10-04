@@ -358,7 +358,7 @@ function TArvidDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize)
     DT: DateTime;
     TAttr: Word;
   begin
-  New(FC, Init($80, $40));
+  FC := PFilesCollection.Create($80, $40);
 {  if ArvidWithDN then
     GetFreeSpace(FreeSpace);}
   TotFiles := 0;
@@ -379,7 +379,7 @@ function TArvidDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize)
 
   TotalInfo := TotLen;
   
-  FC^.AtInsert(0, NewFileRec('..', '..', 0, CurDate, 0, 0, Directory, P));
+  FC.AtInsert(0, NewFileRec('..', '..', 0, CurDate, 0, 0, Directory, P));
   
   end { TArvidDrive.GetDirectory };
 
