@@ -261,7 +261,7 @@ constructor TArcDrive.Create(const AName, VAName: String);
   ColAllowed := PanelFileColAllowed[pcArc];
   if not ReadArchive or (Files = nil) then
     begin
-    Done;
+    Destroy;
     Fail;
     end;
   KillAfterUse := TempFile <> '';
@@ -293,7 +293,7 @@ constructor TArcDrive.Create(PC: PDirStorage; const AName, VAName: String);
   TempFile := '';
   Password := '';
   if ExistFile(ArcName) then
-    New(ArcFile, Init(ArcName, stOpenRead, ArcBufSize))
+    ArcFile := PBufStream.Create(ArcName, stOpenRead, ArcBufSize)
   else
     ArcFile := nil;
   ArcFileName := ArcName;
@@ -355,7 +355,7 @@ constructor TArcDrive.Load(S: TStream);
     end
   else
     begin
-    New(ArcFile, Init(ArcName, stOpenRead, ArcBufSize));
+    ArcFile := PBufStream.Create(ArcName, stOpenRead, ArcBufSize);
     if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
       begin
       Dispose(ArcFile, Done);
@@ -437,7 +437,7 @@ function TArcDrive.ReadArchive: Boolean;
   {/AK155}
   CtrlBreakHit := False;
   ReadArchive := False;
-  New(ArcFile, Init(ArcName, stOpenRead, ArcBufSize));
+  ArcFile := PBufStream.Create(ArcName, stOpenRead, ArcBufSize);
   ArcFileName := ArcName;
   VArcFileName := VArcName;
   if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
