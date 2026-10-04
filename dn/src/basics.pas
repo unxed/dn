@@ -683,11 +683,11 @@ function GetMeMemoStream: TStream; {-$VOL begin}
   {Cat: а теперь запишем туда единичку, чтобы другие глупые процедуры,     }
   {     которые читают из потока то, что они туда не записывали, считали,  }
   {     что наш поток содержит длинные строки                              }
-  S^.Seek(0);
-  S^.Write(_1, 1);
-  S^.Seek(0);
+  S.Seek(0);
+  S.Write(_1, 1);
+  S.Seek(0);
   {/Cat}
-  if S^.Status <> stOK then
+  if S.Status <> stOK then
     begin
     S.Free;
     S := nil
