@@ -58,7 +58,7 @@ type
   { TUniWindow }
 
   TUniWindow = class(TWindow)
-    {Cat: Ì‚Æ‚ Æ°Í•™‚ ¢Î≠•·•≠ ¢ Ø´†£®≠≠„Ó ¨Æ§•´Ï; ®ß¨•≠Ô‚Ï ™‡†©≠• Æ·‚Æ‡Æ¶≠Æ!}
+    {Cat: —ç—Ç–æ—Ç –æ–±—ä–µ–∫—Ç –≤—ã–Ω–µ—Å–µ–Ω –≤ –ø–ª–∞–≥–∏–Ω–Ω—É—é –º–æ–¥–µ–ª—å; –∏–∑–º–µ–Ω—è—Ç—å –∫—Ä–∞–π–Ω–µ –æ—Å—Ç–æ—Ä–æ–∂–Ω–æ!}
     function GetPalette: TPalette; virtual;
     function MakeScrollBar(AOptions: Word): TScrollBar;
     procedure InitFrame; virtual;

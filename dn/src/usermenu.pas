@@ -59,7 +59,7 @@ var
   QuickExecExternalStr: String;
 
 function QuickExecExternal(N: Integer): Boolean;
-  {` Исполнитель программ быстрого запуска (типа Ctr-F1).
+  {` ╨Ш╤Б╨┐╨╛╨╗╨╜╨╕╤В╨╡╨╗╤М ╨┐╤А╨╛╨│╤А╨░╨╝╨╝ ╨▒╤Л╤Б╤В╤А╨╛╨│╨╛ ╨╖╨░╨┐╤Г╤Б╨║╨░ (╤В╨╕╨┐╨░ Ctr-F1).
     N=ScanCode-Hi(kbCtrlF1)+1`}
 function ExecUserMenu(DoGlobal: Boolean): Boolean;
 procedure ScreenGrabber(ShowMessage: Boolean);
@@ -126,7 +126,7 @@ constructor TUserWindow.Create;
            StandardScrollBar(sbHorizontal+sbHandleKeyboard),
         StandardScrollBar(sbVertical+sbHandleKeyboard))));
   ClearPositionalEvents := False;
-    { пусть единообразно обработается в mainapp }
+    { ╨┐╤Г╤Б╤В╤М ╨╡╨┤╨╕╨╜╨╛╨╛╨▒╤А╨░╨╖╨╜╨╛ ╨╛╨▒╤А╨░╨▒╨╛╤В╨░╨╡╤В╤Б╤П ╨▓ mainapp }
   end;
 
 procedure TUserWindow.CalcBounds(var Bounds: TRect; Delta: TPoint);
@@ -258,17 +258,17 @@ procedure NameAndExt(HandleTildes: Boolean;
   end;
 
 {-DataCompBoy-}
-{AK155 Тут была куча обкладываний строк символом #0,
-непонятно зачем нужными. В ритлабовском DN этого не было,
-так что я убрал, а вставил замену в именах файлов '~' на #0'~'
-(см. MoveCStr в drivers._vp)}
+{AK155 ╨в╤Г╤В ╨▒╤Л╨╗╨░ ╨║╤Г╤З╨░ ╨╛╨▒╨║╨╗╨░╨┤╤Л╨▓╨░╨╜╨╕╨╣ ╤Б╤В╤А╨╛╨║ ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨╝ #0,
+╨╜╨╡╨┐╨╛╨╜╤П╤В╨╜╨╛ ╨╖╨░╤З╨╡╨╝ ╨╜╤Г╨╢╨╜╤Л╨╝╨╕. ╨Т ╤А╨╕╤В╨╗╨░╨▒╨╛╨▓╤Б╨║╨╛╨╝ DN ╤Н╤В╨╛╨│╨╛ ╨╜╨╡ ╨▒╤Л╨╗╨╛,
+╤В╨░╨║ ╤З╤В╨╛ ╤П ╤Г╨▒╤А╨░╨╗, ╨░ ╨▓╤Б╤В╨░╨▓╨╕╨╗ ╨╖╨░╨╝╨╡╨╜╤Г ╨▓ ╨╕╨╝╨╡╨╜╨░╤Е ╤Д╨░╨╣╨╗╨╛╨▓ '~' ╨╜╨░ #0'~'
+(╤Б╨╝. MoveCStr ╨▓ drivers._vp)}
 
 function MakeString(S: String; UserParams: PUserParams;
      HandleTildes: Boolean; TM: PString): String;
   var
     ts: String;
     tz: String;
-    DA, DP: TDate4; { дата файла в активной и пассивной панели }
+    DA, DP: TDate4; { ╨┤╨░╤В╨░ ╤Д╨░╨╣╨╗╨░ ╨▓ ╨░╨║╤В╨╕╨▓╨╜╨╛╨╣ ╨╕ ╨┐╨░╤Б╤Б╨╕╨▓╨╜╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕ }
   begin
   {  if HandleTildes then zs:=#0 else zs:='';}
   Replace('!!', #1, S);

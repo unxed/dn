@@ -120,7 +120,7 @@ implementation
 uses
   Startup, DNHelp, mainapp, Messages
   , basics, strutil, fileutil
-  , osdep {для Open_Access_ReadOnly}
+  , osdep {╨┤╨╗╤П Open_Access_ReadOnly}
   , LFN 
   ;
 
@@ -277,15 +277,15 @@ function TPrintManager.SetDestination: Boolean;
 
   S1 := S + #0;
 
-  //JO: чтобы не нагадить в какой-либо файл на диске
+  //JO: ╤З╤В╨╛╨▒╤Л ╨╜╨╡ ╨╜╨░╨│╨░╨┤╨╕╤В╤М ╨▓ ╨║╨░╨║╨╛╨╣-╨╗╨╕╨▒╨╛ ╤Д╨░╨╣╨╗ ╨╜╨░ ╨┤╨╕╤Б╨║╨╡
   if RPrinterSetup.Device in [10,11] then
     if LFN.SysFileOpen(@S1[1],
        Open_Access_ReadOnly or open_share_DenyNone, hFile) = 0
     then
       begin
       if SysFileIsDevice(hFile) and $FF = 0 then
-        //AK155: 'and $FF' необходимо, так как хелп к SysFileIsDevice
-        //       неправдивый; см. хелп к DosQueryHType
+        //AK155: 'and $FF' ╨╜╨╡╨╛╨▒╤Е╨╛╨┤╨╕╨╝╨╛, ╤В╨░╨║ ╨║╨░╨║ ╤Е╨╡╨╗╨┐ ╨║ SysFileIsDevice
+        //       ╨╜╨╡╨┐╤А╨░╨▓╨┤╨╕╨▓╤Л╨╣; ╤Б╨╝. ╤Е╨╡╨╗╨┐ ╨║ DosQueryHType
         NotDev := True;
       SysFileClose(hFile);
       end;
@@ -301,10 +301,10 @@ function TPrintManager.SetDestination: Boolean;
   OldP := PrintDevice;
   PrintDevice := TDosStream.Create(S, stCreate);
 
-//JO: для расшаренных сетевых принтеров статус не будет stOK, т.к.
-//    для них не работает SysFileSeek, вызываемая в TDOSStream.Init,
-//    что тем не менее не мешает производить на них запись. Ситуацию
-//    можно отловить по коду ошибки 87 (проверено по крайней мере под Win XP)
+//JO: ╨┤╨╗╤П ╤А╨░╤Б╤И╨░╤А╨╡╨╜╨╜╤Л╤Е ╤Б╨╡╤В╨╡╨▓╤Л╤Е ╨┐╤А╨╕╨╜╤В╨╡╤А╨╛╨▓ ╤Б╤В╨░╤В╤Г╤Б ╨╜╨╡ ╨▒╤Г╨┤╨╡╤В stOK, ╤В.╨║.
+//    ╨┤╨╗╤П ╨╜╨╕╤Е ╨╜╨╡ ╤А╨░╨▒╨╛╤В╨░╨╡╤В SysFileSeek, ╨▓╤Л╨╖╤Л╨▓╨░╨╡╨╝╨░╤П ╨▓ TDOSStream.Init,
+//    ╤З╤В╨╛ ╤В╨╡╨╝ ╨╜╨╡ ╨╝╨╡╨╜╨╡╨╡ ╨╜╨╡ ╨╝╨╡╤И╨░╨╡╤В ╨┐╤А╨╛╨╕╨╖╨▓╨╛╨┤╨╕╤В╤М ╨╜╨░ ╨╜╨╕╤Е ╨╖╨░╨┐╨╕╤Б╤М. ╨б╨╕╤В╤Г╨░╤Ж╨╕╤О
+//    ╨╝╨╛╨╢╨╜╨╛ ╨╛╤В╨╗╨╛╨▓╨╕╤В╤М ╨┐╨╛ ╨║╨╛╨┤╤Г ╨╛╤И╨╕╨▒╨║╨╕ 87 (╨┐╤А╨╛╨▓╨╡╤А╨╡╨╜╨╛ ╨┐╨╛ ╨║╤А╨░╨╣╨╜╨╡╨╣ ╨╝╨╡╤А╨╡ ╨┐╨╛╨┤ Win XP)
   if (PrintDevice^.Status <> stOK)
       and (PrintDevice^.ErrorInfo = 87) then
     PrintDevice^.Status := stOK;
@@ -353,7 +353,7 @@ constructor TPrintManager.Load(var S: TStream);
   GetMem(Buffer, BufSize);
   isValid := True;
 
-//JO: см. комментарий к TPrintManager.SetDestination;
+//JO: ╤Б╨╝. ╨║╨╛╨╝╨╝╨╡╨╜╤В╨░╤А╨╕╨╣ ╨║ TPrintManager.SetDestination;
   if (PrintDevice^.Status <> stOK)
       and (PrintDevice^.ErrorInfo = 87) then
     PrintDevice^.Status := stOK;
@@ -483,8 +483,8 @@ procedure TPrintManager.PrintFile(const FileName: String);
   end;
 
 procedure TPrintManager.InitPrinter;
-//JO: под многозадачками принтер инициализировать не надо;
-//    нужно будет переписать эту процедуру для DPMI32
+//JO: ╨┐╨╛╨┤ ╨╝╨╜╨╛╨│╨╛╨╖╨░╨┤╨░╤З╨║╨░╨╝╨╕ ╨┐╤А╨╕╨╜╤В╨╡╤А ╨╕╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨╕╤А╨╛╨▓╨░╤В╤М ╨╜╨╡ ╨╜╨░╨┤╨╛;
+//    ╨╜╤Г╨╢╨╜╨╛ ╨▒╤Г╨┤╨╡╤В ╨┐╨╡╤А╨╡╨┐╨╕╤Б╨░╤В╤М ╤Н╤В╤Г ╨┐╤А╨╛╤Ж╨╡╨┤╤Г╤А╤Г ╨┤╨╗╤П DPMI32
  {var
     Hndl: Word;}
   begin
@@ -518,7 +518,7 @@ asm
     mov al, ah
    @@1: }
 begin
-  Result := $90; //временно! Доделать!
+  Result := $90; //╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛! ╨Ф╨╛╨┤╨╡╨╗╨░╤В╤М!
 end;
 
 function TPrintManager.PrintBuffer(Num: Word): Boolean;

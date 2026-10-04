@@ -4,7 +4,7 @@
 {$I STDEFINE.INC}
 
 {Cat
-   04/12/2001 - ¢ WinNT ØÆ§§•‡¶®¢†•‚·Ô ™ÆØ®‡Æ¢†≠®• Security Attributes
+   04/12/2001 - –≤ WinNT –ø–æ–¥–¥–µ—Ä–∂–∏–≤–∞–µ—Ç—Å—è –∫–æ–ø–∏—Ä–æ–≤–∞–Ω–∏–µ Security Attributes
 }
 
 unit fsinfo;
@@ -21,14 +21,14 @@ function GetBytesPerCluster(Path: PChar): LongInt;
 
 function GetFileAges(S: String; var Age_LWr, Age_Cr, Age_LAc: LongInt)
   : LongInt;
-  {JO: ¢Æß¢‡†È†•‚ ¢‡•¨Ô ® §†‚„ ØÆ·´•§≠•© ¨Æ§®‰®™†Ê®® (Age_LWr),                   }
-  {    ¢‡•¨Ô ® §†‚„ ·Æß§†≠®Ô (Age_Cr) ® ¢‡•¨Ô ® §†‚„ ØÆ·´•§≠•£Æ §Æ·‚„Ø† (Age_LAc) }
-  {    ‰†©´† ØÆ ÂÌ≠§´„ ‰†©´† (Handle), Ø‡®≠®¨†•‚ ß≠†Á•≠®• ™Æ§† ÆË®°™®             }
+  {JO: –≤–æ–∑–≤—Ä–∞—â–∞–µ—Ç –≤—Ä–µ–º—è –∏ –¥–∞—Ç—É –ø–æ—Å–ª–µ–¥–Ω–µ–π –º–æ–¥–∏—Ñ–∏–∫–∞—Ü–∏–∏ (Age_LWr),                   }
+  {    –≤—Ä–µ–º—è –∏ –¥–∞—Ç—É —Å–æ–∑–¥–∞–Ω–∏—è (Age_Cr) –∏ –≤—Ä–µ–º—è –∏ –¥–∞—Ç—É –ø–æ—Å–ª–µ–¥–Ω–µ–≥–æ –¥–æ—Å—Ç—É–ø–∞ (Age_LAc) }
+  {    —Ñ–∞–π–ª–∞ –ø–æ —Ö—ç–Ω–¥–ª—É —Ñ–∞–π–ª–∞ (Handle), –ø—Ä–∏–Ω–∏–º–∞–µ—Ç –∑–Ω–∞—á–µ–Ω–∏–µ –∫–æ–¥–∞ –æ—à–∏–±–∫–∏             }
 function SetFileAges(S: String; Age_LWr, Age_Cr, Age_LAc: LongInt)
   : LongInt;
-  {JO: „·‚†≠†¢´®¢†•‚ ¢‡•¨Ô ® §†‚„ ØÆ·´•§≠•© ¨Æ§®‰®™†Ê®® (Age_LWr),                }
-  {    ¢‡•¨Ô ® §†‚„ ·Æß§†≠®Ô (Age_Cr) ® ¢‡•¨Ô ® §†‚„ ØÆ·´•§≠•£Æ §Æ·‚„Ø† (Age_LAc) }
-  {    ‰†©´† ØÆ ÂÌ≠§´„ ‰†©´† (Handle), Ø‡®≠®¨†•‚ ß≠†Á•≠®• ™Æ§† ÆË®°™®             }
+  {JO: —É—Å—Ç–∞–Ω–∞–≤–ª–∏–≤–∞–µ—Ç –≤—Ä–µ–º—è –∏ –¥–∞—Ç—É –ø–æ—Å–ª–µ–¥–Ω–µ–π –º–æ–¥–∏—Ñ–∏–∫–∞—Ü–∏–∏ (Age_LWr),                }
+  {    –≤—Ä–µ–º—è –∏ –¥–∞—Ç—É —Å–æ–∑–¥–∞–Ω–∏—è (Age_Cr) –∏ –≤—Ä–µ–º—è –∏ –¥–∞—Ç—É –ø–æ—Å–ª–µ–¥–Ω–µ–≥–æ –¥–æ—Å—Ç—É–ø–∞ (Age_LAc) }
+  {    —Ñ–∞–π–ª–∞ –ø–æ —Ö—ç–Ω–¥–ª—É —Ñ–∞–π–ª–∞ (Handle), –ø—Ä–∏–Ω–∏–º–∞–µ—Ç –∑–Ω–∞—á–µ–Ω–∏–µ –∫–æ–¥–∞ –æ—à–∏–±–∫–∏             }
 
 procedure GetSerFileSys(Drive: Char; var SerialNo: Longint;
   var VolLab, FileSys: String);
@@ -112,7 +112,7 @@ function GetFileAges(S: String; var Age_LWr, Age_Cr, Age_LAc: LongInt)
   Assign(f, SysOsPath(S));
   Reset(f, 1);
   GetFTime(f, Age_LWr);
-{ í„‚ ≠•Ø´ÆÂÆ °Î ¢·‚†¢®‚Ï Á‚•≠®• Age_Cr ® Age_LAc Á•‡•ß Win95 LFN API}
+{ –¢—É—Ç –Ω–µ–ø–ª–æ—Ö–æ –±—ã –≤—Å—Ç–∞–≤–∏—Ç—å —á—Ç–µ–Ω–∏–µ Age_Cr –∏ Age_LAc —á–µ—Ä–µ–∑ Win95 LFN API}
   Age_Cr := 0;
   Age_LAc := 0;
   Close(f);
@@ -132,7 +132,7 @@ function SetFileAges(S: String; Age_LWr, Age_Cr, Age_LAc: LongInt)
   Assign(f, SysOsPath(S));
   Reset(f, 1);
   SetFTime(f, Age_LWr);
-{ í„‚ ≠•Ø´ÆÂÆ °Î ¢·‚†¢®‚Ï ß†Ø®·Ï Age_Cr ® Age_LAc Á•‡•ß Win95 LFN API}
+{ –¢—É—Ç –Ω–µ–ø–ª–æ—Ö–æ –±—ã –≤—Å—Ç–∞–≤–∏—Ç—å –∑–∞–ø–∏—Å—å Age_Cr –∏ Age_LAc —á–µ—Ä–µ–∑ Win95 LFN API}
   Close(f);
   FileMode := SaveMode;
   Result := 0;
@@ -167,8 +167,8 @@ function GetFSString(Drive: Char): String; {AK155}
   //we don't check errors for Novell compatibility
   //Mem[segdossyslow32] filled with zeros for catching errors
   MemGet(segdossyslow32, DiskInfo.InfoLevel, SizeOf(DiskInfo));
-  {Ç Ñéë-·•··®ÔÂ OS/2 ® WinNT ØÆ´• FS §ÆØÆ´≠Ô•‚·Ô #0, † ¢ £Æ´Æ¨ Ñéë
-  (PC DOS 7, MS DOS 7.*) - Ø‡Æ°•´†¨®. }
+  {–í –î–û–°-—Å–µ—Å—Å–∏—è—Ö OS/2 –∏ WinNT –ø–æ–ª–µ FS –¥–æ–ø–æ–ª–Ω—è–µ—Ç—Å—è #0, –∞ –≤ –≥–æ–ª–æ–º –î–û–°
+  (PC DOS 7, MS DOS 7.*) - –ø—Ä–æ–±–µ–ª–∞–º–∏. }
   Result := fDelRight(fReplace(#0, ' ', StrPas(DiskInfo.FileSystem)));
   end;
 
@@ -183,8 +183,8 @@ function GetShare(Drive: Char): String; {AK155}
   with Regs do
     begin
     AH_ := $60; // CANONICALIZE FILENAME OR PATH
-    DS_ := segdossyslow16; SI_ := 0; // ®·ÂÆ§≠Æ• ®¨Ô
-    ES_ := segdossyslow16; DI_ := 4; // ‡•ß„´Ï‚†‚
+    DS_ := segdossyslow16; SI_ := 0; // –∏—Å—Ö–æ–¥–Ω–æ–µ –∏–º—è
+    ES_ := segdossyslow16; DI_ := 4; // —Ä–µ–∑—É–ª—å—Ç–∞—Ç
     intr_realmode(Regs, $21);
     Result := MemStr(segdossyslow32+4);
     if (Length(Result) <> 0) and (Result[1] = Drive) then

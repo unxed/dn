@@ -91,7 +91,7 @@ procedure TXDoubleWindow.SetState(AState: Word; Enable: Boolean);
     if Enable then
       begin
       Current.SetState(sfSelected, True);
-        // Á‚Æ°Î „·‚†≠Æ¢®´®·Ï ActivePanel ® PassivePanel
+        // —á—Ç–æ–±—ã —É—Å—Ç–∞–Ω–æ–≤–∏–ª–∏—Å—å ActivePanel –∏ PassivePanel
       EnableCommands(DblWndCommands)
       end
     else
@@ -162,11 +162,11 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
     evCommand:
       case Event.Command of
         cmChangeDirectory:
-          begin {AK155 ù‚Æ ·ÆÆ°È•≠®• ‡•†´Ï≠Æ ¨Æ¶≠Æ ØÆ´„Á®‚Ï íéãúäé
-            Æ‚ §•‡•¢†, ØÆÌ‚Æ¨„ ·‡†¢≠•≠®• · dtTree, ¨Ô£™Æ £Æ¢Æ‡Ô,
-            ≠•Æ¶®§†≠≠Æ•, ‡†°Æ‚†•‚ Ø‡†¢®´Ï≠Æ. çÆ, ™Æ≠•Á≠Æ, ≠†§Æ
-            ¢¨•·‚Æ Ì‚Æ£Æ ‚‡Ó™†Á•·‚¢† Æ‡£†≠®ßÆ¢†‚Ï ¢ §•‡•¢• Ø‡Ô¨Æ©
-            ¢ÎßÆ¢ ChDir Ø†≠•´® }
+          begin {AK155 –≠—Ç–æ —Å–æ–æ–±—â–µ–Ω–∏–µ —Ä–µ–∞–ª—å–Ω–æ –º–æ–∂–Ω–æ –ø–æ–ª—É—á–∏—Ç—å –¢–û–õ–¨–ö–û
+            –æ—Ç –¥–µ—Ä–µ–≤–∞, –ø–æ—ç—Ç–æ–º—É —Å—Ä–∞–≤–Ω–µ–Ω–∏–µ —Å dtTree, –º—è–≥–∫–æ –≥–æ–≤–æ—Ä—è,
+            –Ω–µ–æ–∂–∏–¥–∞–Ω–Ω–æ–µ, —Ä–∞–±–æ—Ç–∞–µ—Ç –ø—Ä–∞–≤–∏–ª—å–Ω–æ. –ù–æ, –∫–æ–Ω–µ—á–Ω–æ, –Ω–∞–¥–æ
+            –≤–º–µ—Å—Ç–æ —ç—Ç–æ–≥–æ —Ç—Ä—é–∫–∞—á–µ—Å—Ç–≤–∞ –æ—Ä–≥–∞–Ω–∏–∑–æ–≤–∞—Ç—å –≤ –¥–µ—Ä–µ–≤–µ –ø—Ä—è–º–æ–π
+            –≤—ã–∑–æ–≤ ChDir –ø–∞–Ω–µ–ª–∏ }
           Panel[Selected[NonFilePanelType <> dtTree]].
             FilePanel.HandleEvent(Event);
           Exit;

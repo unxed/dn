@@ -122,7 +122,7 @@ procedure TdrSeekDirectory(AvtDr: TArvidDrive);
       Delete(S, 1, 1); {DelFC(S);}
       SS := Norm12(SS);
       UpStr(SS); {JO ??? for OS/2}
-      {AK155: ����� 㡨���! �� 祬 ��� OS/2 � �ࢨ��? }
+      {AK155: нельзя убирать! При чем тут OS/2 к Арвиду? }
       Delete(SS, 9, 1);
       repeat
         Stream.Read(DD, SizeOf(DD));
@@ -174,7 +174,7 @@ procedure TdrGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
        (s[10] in [#0..#31]) or
        (s[11] in [#0..#31]) or
        (s[12] in [#0..#31]) then exit; }
-      {AK155: � �⫠���᪮� �⮣� �� �뫮 }
+      {AK155: в ритлабовском этого не было }
 
       if
         not (ArvidWithDN and Security and (FF.Attr and (Hidden+SysFile) <>

@@ -54,9 +54,9 @@ Sorry, no help available for this context.
 .topic _=65535
 
 .topic Dragging=1
-  ÜÜÜÜÜÜ
+  â–„â–„â–„â–„â–„â–„
    Size
-  ßßßßßß
+  â–€â–€â–€â–€â–€â–€
  If you press Shift while you use the arrow
  keys, you can change the size of the window.
  When it's at the size you want, press Enter.
@@ -64,10 +64,10 @@ Sorry, no help available for this context.
  If a window has a Resize corner, you can drag
  that corner to resize the window.
 
-  ÜÜÜÜÜÜ
+  â–„â–„â–„â–„â–„â–„
    Move
-  ßßßßßß
- When you choose Window³Size/Move, the active
+  â–€â–€â–€â–€â–€â–€
+ When you choose Windowâ”‚Size/Move, the active
  window moves in response to the arrow keys.
  Once you've moved the window to where you want
  it, press Enter.
@@ -79,52 +79,52 @@ Sorry, no help available for this context.
 
 .topic Index=2
 
-      ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   ÚÄÄ´ Welcome to DOS Navigator! ÛÄÄ
-   ³  ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ  Û
-   ³                                 Û
-   ³ {About Navigator and its authors:CommonInfo} Û
-   ³ {Navigator Windows:NavigatorsWindows}               Û
-   ³ ÍÍÍÍÍÍÍÍ Interface ÍÍÍÍÍÍÍÍÍÍÍÍ Û
-   ³ {Hotkey Overview:HotOverview}                 Û
-   ³ {Mouse Overview:MouseOverview}                 Û
-   ³ {Interface overview:Interface}              Û
-   ³ {Main menu:MainMenu}                       Û
-   ³ {Customizing your system:OptionsMenu}         Û
-   ³ {Dialog box elements:DialogItems}             Û
-   ³ ÍÍÍÍÍÍÍÍ Utilities ÍÍÍÍÍÍÍÍÍÍÍÍ Û
-   ³ {Working with files:Files}              Û
-   ³ {Working with disks:DiskOperations}              Û
-   ³ {Working with archives:Archives}           Û
-   ³ {Working with file descriptions:FilesBBS}  Û
-   ³ {User Menu:UserMenu}                       Û
-   ³ {Point-and-shoot operations:ExtFile}      Û
-   ³ {OS/2 support:OS2Support}                    Û
-   ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   â”Œâ”€â”€â”¤ Welcome to DOS Navigator! â–ˆâ”€â”€
+   â”‚  â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ  â–ˆ
+   â”‚                                 â–ˆ
+   â”‚ {About Navigator and its authors:CommonInfo} â–ˆ
+   â”‚ {Navigator Windows:NavigatorsWindows}               â–ˆ
+   â”‚ â•â•â•â•â•â•â•â• Interface â•â•â•â•â•â•â•â•â•â•â•â• â–ˆ
+   â”‚ {Hotkey Overview:HotOverview}                 â–ˆ
+   â”‚ {Mouse Overview:MouseOverview}                 â–ˆ
+   â”‚ {Interface overview:Interface}              â–ˆ
+   â”‚ {Main menu:MainMenu}                       â–ˆ
+   â”‚ {Customizing your system:OptionsMenu}         â–ˆ
+   â”‚ {Dialog box elements:DialogItems}             â–ˆ
+   â”‚ â•â•â•â•â•â•â•â• Utilities â•â•â•â•â•â•â•â•â•â•â•â• â–ˆ
+   â”‚ {Working with files:Files}              â–ˆ
+   â”‚ {Working with disks:DiskOperations}              â–ˆ
+   â”‚ {Working with archives:Archives}           â–ˆ
+   â”‚ {Working with file descriptions:FilesBBS}  â–ˆ
+   â”‚ {User Menu:UserMenu}                       â–ˆ
+   â”‚ {Point-and-shoot operations:ExtFile}      â–ˆ
+   â”‚ {OS/2 support:OS2Support}                    â–ˆ
+   â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
 
 .topic HelpOnHelp=3
 .title Using Help
 
- ş What you're reading right now is a "Help screen".
- ş Most Help screens have some highlighted
+ â–  What you're reading right now is a "Help screen".
+ â–  Most Help screens have some highlighted
    items ("Help keywords") on them that lead
    to another Help screen.
 
- ÚÄÄÄÄÄ¿ You can use the arrow keys to move
- ³Arrow³ the cursor from one Help keyword to
- ÀÄÄÄÄÄÙ another, then press Enter to choose
+ â”Œâ”€â”€â”€â”€â”€â” You can use the arrow keys to move
+ â”‚Arrowâ”‚ the cursor from one Help keyword to
+ â””â”€â”€â”€â”€â”€â”˜ another, then press Enter to choose
         that item.
 
- ÚÄÄÄÄÄ¿ With the mouse, you can click Help
- ³Mouse³ keyword to choose that item.
- ÀÄÄÄÄÄÙ
+ â”Œâ”€â”€â”€â”€â”€â” With the mouse, you can click Help
+ â”‚Mouseâ”‚ keyword to choose that item.
+ â””â”€â”€â”€â”€â”€â”˜
 
 
 .topic CommonInfo=4
-  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-  ³ About Navigator and Û
-  ³    its authors      Û
-  ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  â”‚ About Navigator and â–ˆ
+  â”‚    its authors      â–ˆ
+  â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
 ; /portions by Deleter/ Jan 2004
 
 Navigator is a DOS shell that combines a wide set of useful features.
@@ -158,21 +158,21 @@ echo area.
 
 .topic FeaturesOverview=5
 .title Overview
- ù {Multi-windowed interface:WindowsFeature}
- ù {Text Editor:EditorFeature}
- ù {Archives support:Archives}
- ù Power and useful {File Find:FileFind}
- ù {Clipboard:Clipboard}
- ù {Phone Book:Phone}
- ù {SpreadSheet:SpreadSheet}
- ù {File Panels:FilePanel} of {File Manager:FileManager}
- ù {Calculator:Calculator}
- ù {Make List File:MakeListFile}
- ù {Screen Savers:Savers}
- ù {User Menus:UserMenu}
- ù {Point and shot:ExtFile} on [Enter], [Shift-Enter], [Alt-Enter]
- ù {CD Player:CDPlayer}
- ù Games: {Tetris:Tetris} and {Pentix:Pentix}
+ âˆ™ {Multi-windowed interface:WindowsFeature}
+ âˆ™ {Text Editor:EditorFeature}
+ âˆ™ {Archives support:Archives}
+ âˆ™ Power and useful {File Find:FileFind}
+ âˆ™ {Clipboard:Clipboard}
+ âˆ™ {Phone Book:Phone}
+ âˆ™ {SpreadSheet:SpreadSheet}
+ âˆ™ {File Panels:FilePanel} of {File Manager:FileManager}
+ âˆ™ {Calculator:Calculator}
+ âˆ™ {Make List File:MakeListFile}
+ âˆ™ {Screen Savers:Savers}
+ âˆ™ {User Menus:UserMenu}
+ âˆ™ {Point and shot:ExtFile} on [Enter], [Shift-Enter], [Alt-Enter]
+ âˆ™ {CD Player:CDPlayer}
+ âˆ™ Games: {Tetris:Tetris} and {Pentix:Pentix}
 
 .topic WindowsFeature=6
 .title Windows Feature
@@ -616,23 +616,23 @@ executed when the batch is called.
 
 .topic NavigatorsWindows=19
 ; /portions by Deleter/ 07.02.2003
-               ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   ÚÄÄÄÄÄÄÄÄÄÄÄ´Navigator windowsÛÄÄÄÄÄÄÄÄÄÄ
-   ³           ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ          Û
-   ³                                        Û
-   ³ {Working with a lot of windows:Windows}          Û
-   ³  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ  Û
-   ³ {File Manager:FileManager}                           Û
-   ³ {Viewing text and binary files:View}          Û
-   ³ {Text editor:Editor}                            Û
-   ³ {Directory tree:DirTree}                         Û
-   ³ {SpreadSheet:SpreadSheet}                            Û
-   ³ {Calculator:Calculator}                             Û
-   ³ {Terminal:Terminal}                               Û
-   ³ {Telephone book:Phone}                         Û
-   ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+               â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤Navigator windowsâ–ˆâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   â”‚           â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ          â–ˆ
+   â”‚                                        â–ˆ
+   â”‚ {Working with a lot of windows:Windows}          â–ˆ
+   â”‚  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€  â–ˆ
+   â”‚ {File Manager:FileManager}                           â–ˆ
+   â”‚ {Viewing text and binary files:View}          â–ˆ
+   â”‚ {Text editor:Editor}                            â–ˆ
+   â”‚ {Directory tree:DirTree}                         â–ˆ
+   â”‚ {SpreadSheet:SpreadSheet}                            â–ˆ
+   â”‚ {Calculator:Calculator}                             â–ˆ
+   â”‚ {Terminal:Terminal}                               â–ˆ
+   â”‚ {Telephone book:Phone}                         â–ˆ
+   â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
 
-; ³ View a database file                       Û
+; â”‚ View a database file                       â–ˆ
 
 .topic FileManager=20
 .title File Manager
@@ -656,19 +656,19 @@ The various items of the File Manager window are:
 
 It looks like this:
 
- ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»ÉÍÍÍÍÍÍÍÍ E:\ ÍÍÍÍÍ[]Í»
- º ²E:\²                ºARC         ³ EXE     º
- º  ÃÄ[+] BBS           şºBBS         ³ FOXPRO2 º
- º  ÃÄ[+] TP            ±ºBP          ³ HELP    º
- º  ÃÄ[+] BP            ±ºBPRTL       ³ LEX     º
- º  ÃÄÄÄLEX             ±ºCOM         ³ NC      º
- º  ÃÄ[+] ARC           ºÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄº
- º°E:\°°°°°°°°°°°°°°°°°°ºº dnhlp.txt      14,83 º
- º°1535°files°with°77,43ºº¿ No files selected  º
- ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼ÈÍ³ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÄÙ
-             ³             ³         ³
-         The right panel   ³ The left panel
-                           ³
+ â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—â•”â•â•â•â•â•â•â•â• E:\ â•â•â•â•â•[]â•â•—
+ â•‘ â–“E:\â–“                â•‘ARC         â”‚ EXE     â•‘
+ â•‘  â”œâ”€[+] BBS           â– â•‘BBS         â”‚ FOXPRO2 â•‘
+ â•‘  â”œâ”€[+] TP            â–’â•‘BP          â”‚ HELP    â•‘
+ â•‘  â”œâ”€[+] BP            â–’â•‘BPRTL       â”‚ LEX     â•‘
+ â•‘  â”œâ”€â”€â”€LEX             â–’â•‘COM         â”‚ NC      â•‘
+ â•‘  â”œâ”€[+] ARC           â•‘â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â•‘
+ â•‘â–‘E:\â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â•‘â•‘ dnhlp.txt      14,83 â•‘
+ â•‘â–‘1535â–‘filesâ–‘withâ–‘77,43â•‘â•‘â” No files selected  â•‘
+ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•šâ•â”‚â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â”€â”˜
+             â”‚             â”‚         â”‚
+         The right panel   â”‚ The left panel
+                           â”‚
     Panels divider, that can be "dragged" to the left and right
     by using a mouse. This way, you can change the size of the
     panels. You can also use the keys Alt -  and Alt - .
@@ -738,30 +738,30 @@ The user can re-arrange the windows on the screen choosing "cascade"
 .topic WindowsType=23
 .title Types of windows
 
-     ÚÄÄ Click here with mouse to close the window
-     ³
-     ³           Click here to zoom the window to fit
-     ³           the whole screen   ³
-     ³                              ³
-     ³      ÚÄÄÄÄÄÄ Name of window  ³
-     ³      ³                       ³
-     ³  ÚÄÄÄÄÄ If you click and drag on top of the
-     ³  ³   ³  framework, you can change the position
-     ³  ³   ³  of the window        ³
+     â”Œâ”€â”€ Click here with mouse to close the window
+     â”‚
+     â”‚           Click here to zoom the window to fit
+     â”‚           the whole screen   â”‚
+     â”‚                              â”‚
+     â”‚      â”Œâ”€â”€â”€â”€â”€â”€ Name of window  â”‚
+     â”‚      â”‚                       â”‚
+     â”‚  â”Œâ”€â”€â”€â”€â”€ If you click and drag on top of the
+     â”‚  â”‚   â”‚  framework, you can change the position
+     â”‚  â”‚   â”‚  of the window        â”‚
                                  
-  ÉÍ[ş]ÍÍ Edit - A:\DN\DNHLP.TXT 1Í[]Í»
-  º                                    
-  º                                    ±
-  º                                    ş
-  º                  Scroller  ÄÄÄÄÄÄÄ±
-  º                           ³        ±
-  º                           ³        ±
-  º                           ³        ±
-  º                                   
-  ÈÍÍÍ35:12 [172]ÍÍÍÍ±ş±±±±±±±±±±±±ÄÙ
+  â•”â•[â– ]â•â• Edit - A:\DN\DNHLP.TXT 1â•[]â•â•—
+  â•‘                                    
+  â•‘                                    â–’
+  â•‘                                    â– 
+  â•‘                  Scroller  â”€â”€â”€â”€â”€â”€â”€â–’
+  â•‘                           â”‚        â–’
+  â•‘                           â”‚        â–’
+  â•‘                           â”‚        â–’
+  â•‘                                   
+  â•šâ•â•â•35:12 [172]â•â•â•â•â–’â– â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â”€â”˜
                                       
-    Dragging this corner will change  ³
-    the size of the windowÄÄÄÄÄÄÄÄÄÄÄÄÙ
+    Dragging this corner will change  â”‚
+    the size of the windowâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
 
 .topic Files=24
@@ -795,15 +795,15 @@ empty. This is possible with the command File|Delete.
 When trying to erase a non-empty directory Navigator will prompt you
 about that:
 
- ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ Confirm ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
- º                                                  º
- º                 Directory C:\QQP                 º
- º                   Is not empty.                  º
- º              Do you wish delete it?              º
- º                                                  º
- º °°°No°°°Ü     °°Yes°°°Ü   °°All°°°Ü   °Cancel°Ü  º
- º  ßßßßßßßß      ßßßßßßßß    ßßßßßßßß    ßßßßßßßß  º
- ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+ â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• Confirm â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+ â•‘                                                  â•‘
+ â•‘                 Directory C:\QQP                 â•‘
+ â•‘                   Is not empty.                  â•‘
+ â•‘              Do you wish delete it?              â•‘
+ â•‘                                                  â•‘
+ â•‘ â–‘â–‘â–‘Noâ–‘â–‘â–‘â–„     â–‘â–‘Yesâ–‘â–‘â–‘â–„   â–‘â–‘Allâ–‘â–‘â–‘â–„   â–‘Cancelâ–‘â–„  â•‘
+ â•‘  â–€â–€â–€â–€â–€â–€â–€â–€      â–€â–€â–€â–€â–€â–€â–€â–€    â–€â–€â–€â–€â–€â–€â–€â–€    â–€â–€â–€â–€â–€â–€â–€â–€  â•‘
+ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 If you simply "automatically" press ENTER, nothing will take place.
 
@@ -834,25 +834,25 @@ and internal format.
           use DN for merging volumes you should use `Binary
           splitting only' option in Spli dialog box.
 
-  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-  ³ Splitting process Û
-  ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  â”‚ Splitting process â–ˆ
+  â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
 
   Splitting and Combining files with Navigator looks like this:
 
-  ÉÍÍÍÍÍÍÍÍÍÍÍÍ Split File ÍÍÍÍÍÍÍÍÍÍÍ»
-  º                                   º
-  º            C:\DN.PRG              º
-  º               To                  º
-  º          A:\DN\DN.d01             º
-  º                                   º
-  º Read: ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ º
-  º Write:ÛÛÛÛÛÛ±±±±±±±±±±±±±±±±±±±±± º
-  º                                   º
-  º           °°°Stop°°°Ü             º
-  º            ßßßßßßßßß             º
-  ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ³ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
-                   ³
+  â•”â•â•â•â•â•â•â•â•â•â•â•â• Split File â•â•â•â•â•â•â•â•â•â•â•â•—
+  â•‘                                   â•‘
+  â•‘            C:\DN.PRG              â•‘
+  â•‘               To                  â•‘
+  â•‘          A:\DN\DN.d01             â•‘
+  â•‘                                   â•‘
+  â•‘ Read: â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â•‘
+  â•‘ Write:â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’ â•‘
+  â•‘                                   â•‘
+  â•‘           â–‘â–‘â–‘Stopâ–‘â–‘â–‘â–„             â•‘
+  â•‘            â–€â–€â–€â–€â–€â–€â–€â–€â–€             â•‘
+  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â”‚â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                   â”‚
    If this button is depressed, the process
    is interrupted.
 
@@ -860,26 +860,26 @@ and internal format.
 When splitting files, and the disk is full,
 Navigator shows the message:
 
- ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍ Confirm ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
- º                                        º
- º          Insert disk number 02         º
- º                                        º
- º          °°°OK°°°Ü   °Cancel°Ü         º
- º           ßßßßßßßß    ßßßßßßßß         º
- ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+ â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â• Confirm â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+ â•‘                                        â•‘
+ â•‘          Insert disk number 02         â•‘
+ â•‘                                        â•‘
+ â•‘          â–‘â–‘â–‘OKâ–‘â–‘â–‘â–„   â–‘Cancelâ–‘â–„         â•‘
+ â•‘           â–€â–€â–€â–€â–€â–€â–€â–€    â–€â–€â–€â–€â–€â–€â–€â–€         â•‘
+ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 If you have inserted a disk, on which a part of file to be splitted
 is already present, you see the message:
 
- ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍ Query ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
- º                                        º
- º          File already exists:          º
- º                 DN.D02                 º
- º             Overwrite it?              º
- º                                        º
- º     °°Yes°°°Ü °°Next°°Ü   °Cancel°Ü    º
- º      ßßßßßßßß  ßßßßßßßß    ßßßßßßßß    º
- ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+ â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â• Query â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+ â•‘                                        â•‘
+ â•‘          File already exists:          â•‘
+ â•‘                 DN.D02                 â•‘
+ â•‘             Overwrite it?              â•‘
+ â•‘                                        â•‘
+ â•‘     â–‘â–‘Yesâ–‘â–‘â–‘â–„ â–‘â–‘Nextâ–‘â–‘â–„   â–‘Cancelâ–‘â–„    â•‘
+ â•‘      â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€    â–€â–€â–€â–€â–€â–€â–€â–€    â•‘
+ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 If you choose the button "Yes", this part will be overwritten, and the
 current part of the file will be written to this disk.
@@ -897,33 +897,33 @@ current part of the file will be written to this disk.
 .topic SplitDialog=28
 .title Split-file dialog box
 
-     ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍ Split file ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-     º Split file dn.prg to                          º
- ÚÄÄº ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ º
- ³   º                                               º
- ³ ÚÄÄÄ[ ] Binary splitting only°°°°°°°°°°°°°°°°°°° º
- ³ÚÄÄÄÄ[ ] Verify disk writes°°°°°°°°°°°°°°°°°°°°°° º
- ³³³ º  [ ] Store long file name°ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
- ³³³ º                                               º  ³
- ³³³ º        °°°OK°°°Ü °Cancel°Ü °°Tree°°Ü °°Help°°Üº  ³
- ³³³ º         ßßßßßßßß  ßßßßßßßß  ßßßßßßß  ßßßßßßßßº  ³
- ³³³ ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ³ÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼  ³
- ³³³                                  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿  ³
- ÀÄÄ here the name of the file or directory appears, ³  ³
-  ³³ where the result of the work should go.         ³  ³
-  ³³                                                 ³  ³
-  ³³ If you press this button, you can choose the   ÄÙ  ³
-  ³³ destination from a Tree.                           ³
-  ³³                                                    ³
-  ³À Tick this box if you don't want to store additional³
-  ³  information in the created volumes, so you will be ³
-  ³  able to combine them without using of Navigator    ³
-  ³                                                     ³
-  ÀÄ If you have a doubt in the quality of diskettes    ³
-     you're splitting the file on, tick this box to     ³
-     be sure that the information is stored OK.         ³
-                                                        ³
-     Check this box to save long file names in created ÄÙ
+     â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â•â•â• Split file â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘ Split file dn.prg to                          â•‘
+ â”Œâ”€â”€â•‘ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â•‘
+ â”‚   â•‘                                               â•‘
+ â”‚ â”Œâ”€â”€â”€[ ] Binary splitting onlyâ–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘ â•‘
+ â”‚â”Œâ”€â”€â”€â”€[ ] Verify disk writesâ–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘ â•‘
+ â”‚â”‚â”‚ â•‘  [ ] Store long file nameâ–‘â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+ â”‚â”‚â”‚ â•‘                                               â•‘  â”‚
+ â”‚â”‚â”‚ â•‘        â–‘â–‘â–‘OKâ–‘â–‘â–‘â–„ â–‘Cancelâ–‘â–„ â–‘â–‘Treeâ–‘â–‘â–„ â–‘â–‘Helpâ–‘â–‘â–„â•‘  â”‚
+ â”‚â”‚â”‚ â•‘         â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â•‘  â”‚
+ â”‚â”‚â”‚ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â”‚â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•  â”‚
+ â”‚â”‚â”‚                                  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
+ â””â”€â”€ here the name of the file or directory appears, â”‚  â”‚
+  â”‚â”‚ where the result of the work should go.         â”‚  â”‚
+  â”‚â”‚                                                 â”‚  â”‚
+  â”‚â”‚ If you press this button, you can choose the   â”€â”˜  â”‚
+  â”‚â”‚ destination from a Tree.                           â”‚
+  â”‚â”‚                                                    â”‚
+  â”‚â”” Tick this box if you don't want to store additionalâ”‚
+  â”‚  information in the created volumes, so you will be â”‚
+  â”‚  able to combine them without using of Navigator    â”‚
+  â”‚                                                     â”‚
+  â””â”€ If you have a doubt in the quality of diskettes    â”‚
+     you're splitting the file on, tick this box to     â”‚
+     be sure that the information is stored OK.         â”‚
+                                                        â”‚
+     Check this box to save long file names in created â”€â”˜
      columes. Volumes created with this option cannot
      be recombined in pre-1.51.05a/DOS versions of DN
 
@@ -1043,41 +1043,41 @@ To exchange data between them, the same Clipboard used.
 
 The editor window looks like this:
 
-   ÉÍ[ş]ÍÍÍÍÍÍ Edit - E:\TP\DNHLP\A ÍÍÍÍ1Í[]Í»
-   ºÛÛFileÛÛEditÛÛSearchÛÛParagraphÛÛOptionsÛÛ
-   º                                     ±
-   º   ³     ³      ³            ³      ³     ş
-   º   ³     ³      ³ operation  ³      ³     ±
-   º   ³     ³      ³ with blocks³installation±
-   º   ³     ³      ³ and        ³of editor   ±
-   º   ³     ³      ³ paragraphs Ùoptions     ±
-   º   ³     ³      ³                         ±
-   º   ³     ³      À search operations       ±
-   º   ³     À Text block operations          ±
-   º   À File operations                      ±
-   º                                          
-   ÈÍÍÍÍ12:2 [174]Í()Íş±±±±±±±±±±±±±±±±±±±ÄÙ
+   â•”â•[â– ]â•â•â•â•â•â• Edit - E:\TP\DNHLP\A â•â•â•â•1â•[]â•â•—
+   â•‘â–ˆâ–ˆFileâ–ˆâ–ˆEditâ–ˆâ–ˆSearchâ–ˆâ–ˆParagraphâ–ˆâ–ˆOptionsâ–ˆâ–ˆ
+   â•‘                                     â–’
+   â•‘   â”‚     â”‚      â”‚            â”‚      â”‚     â– 
+   â•‘   â”‚     â”‚      â”‚ operation  â”‚      â”‚     â–’
+   â•‘   â”‚     â”‚      â”‚ with blocksâ”‚installationâ–’
+   â•‘   â”‚     â”‚      â”‚ and        â”‚of editor   â–’
+   â•‘   â”‚     â”‚      â”‚ paragraphs â”˜options     â–’
+   â•‘   â”‚     â”‚      â”‚                         â–’
+   â•‘   â”‚     â”‚      â”” search operations       â–’
+   â•‘   â”‚     â”” Text block operations          â–’
+   â•‘   â”” File operations                      â–’
+   â•‘                                          
+   â•šâ•â•â•â•12:2 [174]â•()â•â– â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â”€â”˜
                  
-        ³  ³   ³    À Block Type: Horizontal
-        ³  ³   ³      or Vertical
-        ³  ³   À Decimal ASCII code of the,
-        ³  ³     symbol which the cursor is on
-        ³  À Number of current column
-        À Number of current line
+        â”‚  â”‚   â”‚    â”” Block Type: Horizontal
+        â”‚  â”‚   â”‚      or Vertical
+        â”‚  â”‚   â”” Decimal ASCII code of the,
+        â”‚  â”‚     symbol which the cursor is on
+        â”‚  â”” Number of current column
+        â”” Number of current line
 
   See also:{"Types of windows":WindowsType}
 
 .topic EditorCommands=10001
-         ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
- ÚÄÄÄÄÄÄÄ³ Editor commands ÛÄÄÄÄÄÄ
- ³       ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ      Û
- ³                                Û
- ³ {Work with blocks:BlockCommands}               Û
- ³ {Moving on text:MovementCommands}                 Û
- ³ {Inserting and deleting:InsDelCommands}         Û
- ³ {Other additional commands:MiscCommands}      Û
- ³                                Û
- ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+         â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”‚ Editor commands â–ˆâ”€â”€â”€â”€â”€â”€
+ â”‚       â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ      â–ˆ
+ â”‚                                â–ˆ
+ â”‚ {Work with blocks:BlockCommands}               â–ˆ
+ â”‚ {Moving on text:MovementCommands}                 â–ˆ
+ â”‚ {Inserting and deleting:InsDelCommands}         â–ˆ
+ â”‚ {Other additional commands:MiscCommands}      â–ˆ
+ â”‚                                â–ˆ
+ â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
 
 .topic BlockCommands=10002
 .title Working with blocks
@@ -1087,56 +1087,56 @@ with the <Shift> key. With the mouse you can select text by moving the
 mouse cursor while pressing the left mouse-button.
 
         Action                      Key
- ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍ
-  Mark the beginning of a block   ³ Ctrl+K B
-  Mark the end of a block         ³ Ctrl+K K
-  Copy the block to Clipboard     ³ Ctrl+Ins
-  Move the block to Clipboard     ³ Shift+Del
-  Insert the copied block         ³ Shift+Ins
-  Delete the block                ³ Ctrl+Del
-  Read the block from file        ³ Ctrl+K R
-  Write the block to a file       ³ Ctrl+K W
-  Move the block left to right    ³ Ctrl+K I
-  Move the block to the left      ³ Ctrl+K U
-  Switch block-type (Vert./Hor.)  ³ Ctrl+B V
-  Align the block on end          ³ Ctrl+B J
-  Align the block on right end    ³ Ctrl+B R
-  Align the block on left end     ³ Ctrl+B L
-  Center the block                ³ Ctrl+B C
-  Mark whole text as stream block ³ Ctrl-Numpad5, Ctrl-A
-  Hide/show block selection       ³ Alt-H, Ctrl-H, Ctrl_K H
+ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•¤â•â•â•â•â•â•â•â•â•â•
+  Mark the beginning of a block   â”‚ Ctrl+K B
+  Mark the end of a block         â”‚ Ctrl+K K
+  Copy the block to Clipboard     â”‚ Ctrl+Ins
+  Move the block to Clipboard     â”‚ Shift+Del
+  Insert the copied block         â”‚ Shift+Ins
+  Delete the block                â”‚ Ctrl+Del
+  Read the block from file        â”‚ Ctrl+K R
+  Write the block to a file       â”‚ Ctrl+K W
+  Move the block left to right    â”‚ Ctrl+K I
+  Move the block to the left      â”‚ Ctrl+K U
+  Switch block-type (Vert./Hor.)  â”‚ Ctrl+B V
+  Align the block on end          â”‚ Ctrl+B J
+  Align the block on right end    â”‚ Ctrl+B R
+  Align the block on left end     â”‚ Ctrl+B L
+  Center the block                â”‚ Ctrl+B C
+  Mark whole text as stream block â”‚ Ctrl-Numpad5, Ctrl-A
+  Hide/show block selection       â”‚ Alt-H, Ctrl-H, Ctrl_K H
 
 .topic MovementCommands=10003
 .title Moving on text
 
         What move?                  Key
-  ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-   One character to the left³ Ctrl + S or 
-   One character to right   ³ Ctrl + D or 
-   One word to the left     ³ Ctrl + A or Ctrl + 
-   One word to the right    ³ Ctrl + F or Ctrl + 
-   One line upwards         ³ Ctrl + E or 
-   One line downwards       ³ Ctrl + X or 
-   Scroll upwards           ³ Ctrl + W
-   Scroll downwards         ³ Ctrl + Z
-   One page upwards         ³ Ctrl + R or PgUp
-   One page downwards       ³ Ctrl + C or PgDn
+  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•¤â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   One character to the leftâ”‚ Ctrl + S or 
+   One character to right   â”‚ Ctrl + D or 
+   One word to the left     â”‚ Ctrl + A or Ctrl + 
+   One word to the right    â”‚ Ctrl + F or Ctrl + 
+   One line upwards         â”‚ Ctrl + E or 
+   One line downwards       â”‚ Ctrl + X or 
+   Scroll upwards           â”‚ Ctrl + W
+   Scroll downwards         â”‚ Ctrl + Z
+   One page upwards         â”‚ Ctrl + R or PgUp
+   One page downwards       â”‚ Ctrl + C or PgDn
 
 .topic InsDelCommands=10004
 .title Insertion and deleting
 
-  ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-   Toggle Insert/Overwrite  ³
-    Mode                    ³ Ctrl+V or Ins
-   Delete the current line  ³ Ctrl+Y
-   Delete from the cursor-  ³
-    position to end of line ³ Ctrl+Q Y
-   Delete character at the  ³
-    left                    ³ Ctrl+H or Backspace
-   Delete character at the  ³
-    right                   ³ Ctrl+G or Del
-   Delete word after cursor ³ Ctrl+T
-   Delete word before cursor³ Ctrl+Backspace
+  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•¤â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Toggle Insert/Overwrite  â”‚
+    Mode                    â”‚ Ctrl+V or Ins
+   Delete the current line  â”‚ Ctrl+Y
+   Delete from the cursor-  â”‚
+    position to end of line â”‚ Ctrl+Q Y
+   Delete character at the  â”‚
+    left                    â”‚ Ctrl+H or Backspace
+   Delete character at the  â”‚
+    right                   â”‚ Ctrl+G or Del
+   Delete word after cursor â”‚ Ctrl+T
+   Delete word before cursorâ”‚ Ctrl+Backspace
 
 .topic MiscCommands=10005
 .title Editor commands
@@ -1148,34 +1148,34 @@ the borders of the window.
 
 Another feature of the editor is multilevel undo.
 
-  ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
-   Call menu                      ³ F10
-   Save text                      ³ Ctrl+K S or F2
-   Read a file from disk          ³ F3
-   Close the editor Window        ³ Alt+F3
-                                  ³
-   Insert a TAB                   ³ Ctrl+I or Tab
-   Undo                           ³ Alt+Backspace
-                                  ³
-   Toggle Line Draw mode          ³ Ctrl+Q M or F4
-                                  ³
-   Place a position marker in     ³
-    the text                      ³ Ctrl+K n (n=0..9)
-   Return to a marker             ³ Ctrl+Q n (n=0..9)
-   Insert any symbol in the text  ³
-      {ASCII Table:AsciiChart}                 ³ Ctrl+P
-                                  ³
-   Insert Current Date            ³ Ctrl+Q D
-   Insert Current Time            ³ Ctrl+Q T
-                                  ³
-   Uppercase Current Word         ³ Ctrl+[
-   Lowercase Current Word         ³ Ctrl+]
-   Capitalize Current Word        ³ Ctrl+\
-                                  ³
-   Search for a string            ³ Ctrl+Q F
-   Search and replace             ³ Ctrl+Q A
-   Repeat the last search         ³ Ctrl+L
-   Cancel operation               ³ Esc
+  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•¤â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Call menu                      â”‚ F10
+   Save text                      â”‚ Ctrl+K S or F2
+   Read a file from disk          â”‚ F3
+   Close the editor Window        â”‚ Alt+F3
+                                  â”‚
+   Insert a TAB                   â”‚ Ctrl+I or Tab
+   Undo                           â”‚ Alt+Backspace
+                                  â”‚
+   Toggle Line Draw mode          â”‚ Ctrl+Q M or F4
+                                  â”‚
+   Place a position marker in     â”‚
+    the text                      â”‚ Ctrl+K n (n=0..9)
+   Return to a marker             â”‚ Ctrl+Q n (n=0..9)
+   Insert any symbol in the text  â”‚
+      {ASCII Table:AsciiChart}                 â”‚ Ctrl+P
+                                  â”‚
+   Insert Current Date            â”‚ Ctrl+Q D
+   Insert Current Time            â”‚ Ctrl+Q T
+                                  â”‚
+   Uppercase Current Word         â”‚ Ctrl+[
+   Lowercase Current Word         â”‚ Ctrl+]
+   Capitalize Current Word        â”‚ Ctrl+\
+                                  â”‚
+   Search for a string            â”‚ Ctrl+Q F
+   Search and replace             â”‚ Ctrl+Q A
+   Repeat the last search         â”‚ Ctrl+L
+   Cancel operation               â”‚ Esc
 
 .topic DiskOperations=10006
 .title Working with disks
@@ -1220,9 +1220,9 @@ Untagging is made by the same keys.
 the panel's content.
    You can also tag all if you press {Ctrl-Gray+:_} on {"..":_}.
 
-³See also: {File panel view:PanelView}
-³          {Panel sorting:PanelSortSetup}
-³          {Hotkeys in file panel:PanelHotKeys}
+â”‚See also: {File panel view:PanelView}
+â”‚          {Panel sorting:PanelSortSetup}
+â”‚          {Hotkeys in file panel:PanelHotKeys}
 
 .topic LinkPanel=1101
 .title Link Panel
@@ -1235,41 +1235,41 @@ and "ARVID".
 differences of other types will be described according to the following view.
 An example of this type
 
-³  1  4a             2                 4b
-³                               3   
-³  eÍ[1]ÍÍÍÍÍÍÍÍÍÍÍ E:\DN ÍÍÍÍÍÍÍÍÍÍÍ[]Í»
-³  º    Name    ³    Name    ³    Name    5
-³  º..          ³            ³            ±6
-³  ºColors      ³            ³            ±
-³  ºXLT         ³            ³            ş7
-³  º   This is file list, it can looks:   ±
-³  º            like that:                ±
-³  ºenglish  dlg³  118 380³19.05.05³ 2:54³±
-³  ºrussian  dlg³  124 392³25.05.05³ 2:53³±
-³  ºdn       dsk³    7 905³28.05.05³16:59³±
-³  ºdnhgl    grp³      747³28.05.05³15:32³±
-³  ºdn       his³    3 409³28.05.05³18:35³±
-³  ºenglish  hlp³  134 094³19.05.05³ 2:53³±
-³  ºrussian  hlp³  206 716³25.05.05³ 2:53³±
-³  ºdnini    in_³    6 932³28.05.05³16:59³±
-³  ºdn       ini³    1 715³26.05.05³21:04³±
-³  ºdescript ion³       27³28.05.05³18:57³±
-³  ºenglish  lng³   21 637³19.05.05³ 2:54³8
-³ 9Ä10 470(2)ÄÄÁÄÄ10ÄÄÄÄÄÁÄÄ1 729 245(16)11
-³12XLT               1 105 25.05.05 11:29º
-³13XLT                                   º
-³14Recode tabels                         º
-³15[ A C D E F G H I * ]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+â”‚  1  4a             2                 4b
+â”‚                               3   
+â”‚  eâ•[1]â•â•â•â•â•â•â•â•â•â•â• E:\DN â•â•â•â•â•â•â•â•â•â•â•[]â•â•—
+â”‚  â•‘    Name    â”‚    Name    â”‚    Name    5
+â”‚  â•‘..          â”‚            â”‚            â–’6
+â”‚  â•‘Colors      â”‚            â”‚            â–’
+â”‚  â•‘XLT         â”‚            â”‚            â– 7
+â”‚  â•‘   This is file list, it can looks:   â–’
+â”‚  â•‘            like that:                â–’
+â”‚  â•‘english  dlgâ”‚  118 380â”‚19.05.05â”‚ 2:54â”‚â–’
+â”‚  â•‘russian  dlgâ”‚  124 392â”‚25.05.05â”‚ 2:53â”‚â–’
+â”‚  â•‘dn       dskâ”‚    7 905â”‚28.05.05â”‚16:59â”‚â–’
+â”‚  â•‘dnhgl    grpâ”‚      747â”‚28.05.05â”‚15:32â”‚â–’
+â”‚  â•‘dn       hisâ”‚    3 409â”‚28.05.05â”‚18:35â”‚â–’
+â”‚  â•‘english  hlpâ”‚  134 094â”‚19.05.05â”‚ 2:53â”‚â–’
+â”‚  â•‘russian  hlpâ”‚  206 716â”‚25.05.05â”‚ 2:53â”‚â–’
+â”‚  â•‘dnini    in_â”‚    6 932â”‚28.05.05â”‚16:59â”‚â–’
+â”‚  â•‘dn       iniâ”‚    1 715â”‚26.05.05â”‚21:04â”‚â–’
+â”‚  â•‘descript ionâ”‚       27â”‚28.05.05â”‚18:57â”‚â–’
+â”‚  â•‘english  lngâ”‚   21 637â”‚19.05.05â”‚ 2:54â”‚8
+â”‚ 9â”€10 470(2)â”€â”€â”´â”€â”€10â”€â”€â”€â”€â”€â”´â”€â”€1 729 245(16)11
+â”‚12XLT               1 105 25.05.05 11:29â•‘
+â”‚13XLT                                   â•‘
+â”‚14Recode tabels                         â•‘
+â”‚15[ A C D E F G H I * ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   1 - Sorting scheme indicator
   2 - Path to current directory
   3 - Column name
   4a - Global window number (left panel)
   4b - Maximize button (rigth panel)
-  5 Ä Scroll up button
-  6 Ä Scroll bar
+  5 â”€ Scroll up button
+  6 â”€ Scroll bar
   7 - Scroll bar marker
-  8 Ä Scroll down button
+  8 â”€ Scroll down button
   9 - Tagged files info (total size and quantity)
  10 - Divider. It splits the footer from the panel
  11 - Total files info (total size and quantity)
@@ -1285,31 +1285,31 @@ lists, as well as for the "TEMP:" panel. The main difference between them is
 the elements being displayed.
 An example of this type
 
-³eÍ[1]ÍÍÍÍÍÍÍÍÍ Find: *.* ÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-³º    Name    ³  Path                   
-³º..          ³E:\(0)                   ±
-³ºColorsû     ³E:\(0)\                  ş
-³ºXLT         ³E:\(0)\                  ±
-³ºdn       cfg³E:\(0)\                  ±
-³ºenglish  dlg³E:\(0)\                  ±
-³ºrussian  dlg³E:\(0)\                  ±
-³ºdn       dsk³E:\(0)\                  ±
-³ºdn       exe³E:\(0)\                  ±
-³ºdnhgl    grp³E:\(0)\                  ±
-³ºdn       his³E:\(0)\                  ±
-³ºenglish  hlp³E:\(0)\                  ±
-³ºrussian  hlp³E:\(0)\                  ±
-³ºdnini    in_³E:\(0)\                  ±
-³ºdn       ini³E:\(0)\                  ±
-³ºdescript ion³E:\(0)\                  ±
-³ºdescript°ion³E:\(0)\XLT\              
-³ºÄ600(1)ÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ1 730 996(24)º
-³ºXLT               1 105 25.05.05 11:29º
-³ºXLT                                   º
-³º                                      º
-³È[ A C D E F G H I * ]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+â”‚eâ•[1]â•â•â•â•â•â•â•â•â• Find: *.* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â”‚â•‘    Name    â”‚  Path                   
+â”‚â•‘..          â”‚E:\(0)                   â–’
+â”‚â•‘Colorsâˆš     â”‚E:\(0)\                  â– 
+â”‚â•‘XLT         â”‚E:\(0)\                  â–’
+â”‚â•‘dn       cfgâ”‚E:\(0)\                  â–’
+â”‚â•‘english  dlgâ”‚E:\(0)\                  â–’
+â”‚â•‘russian  dlgâ”‚E:\(0)\                  â–’
+â”‚â•‘dn       dskâ”‚E:\(0)\                  â–’
+â”‚â•‘dn       exeâ”‚E:\(0)\                  â–’
+â”‚â•‘dnhgl    grpâ”‚E:\(0)\                  â–’
+â”‚â•‘dn       hisâ”‚E:\(0)\                  â–’
+â”‚â•‘english  hlpâ”‚E:\(0)\                  â–’
+â”‚â•‘russian  hlpâ”‚E:\(0)\                  â–’
+â”‚â•‘dnini    in_â”‚E:\(0)\                  â–’
+â”‚â•‘dn       iniâ”‚E:\(0)\                  â–’
+â”‚â•‘descript ionâ”‚E:\(0)\                  â–’
+â”‚â•‘descriptâ–‘ionâ”‚E:\(0)\XLT\              
+â”‚â•‘â”€600(1)â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€1 730 996(24)â•‘
+â”‚â•‘XLT               1 105 25.05.05 11:29â•‘
+â”‚â•‘XLT                                   â•‘
+â”‚â•‘                                      â•‘
+â”‚â•š[ A C D E F G H I * ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-  The panel's name can be "TEMP:", "Branch:", "Find:" ¨«¨ "List:"
+  The panel's name can be "TEMP:", "Branch:", "Find:" Ğ¸Ğ»Ğ¸ "List:"
 Displayed after the colon are directory for which the branch is build,
 search mask, or name of a file-list.
 You cannot see files' descriptions in columns and footer, but one can see
@@ -1320,29 +1320,29 @@ full paths to the files.
 
 An example of this type
 
-³eÍ[1]ÍÍÍÍÍÍÍÍ RAR:(0).rar ÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-³º    Name    ³    Name    ³    Name    
-³º..          ³russian  lng³            ±
-³ºColorsû     ³            ³            ±
-³ºXLT         ³            ³            ş
-³ºdn       cfg³            ³            ±
-³ºenglish  dlg³            ³            ±
-³ºrussian  dlg³            ³            ±
-³ºdn       dsk³            ³            ±
-³ºdn       exe³            ³            ±
-³ºdnhgl    grp³            ³            ±
-³ºdn       his³            ³            ±
-³ºenglish  hlp³            ³            ±
-³ºrussian  hlp³            ³            ±
-³ºdnini    in_³            ³            ±
-³ºdn       ini³            ³            ±
-³ºdescript ion³            ³            ±
-³ºenglish  lng³            ³            
-³ºÄ600/516(1)ÄÁÄÄÄÄÄÄÄÄÄÄÄÄ1 730 996(16)º
-³ºXLT           <Š â «®£> 28.05.05 19:28º
-³ºXLT                                   º
-³º  Packed:  1 061         Ratio: 96%   º
-³È[ A C D E F G H I * ]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+â”‚eâ•[1]â•â•â•â•â•â•â•â• RAR:(0).rar â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â”‚â•‘    Name    â”‚    Name    â”‚    Name    
+â”‚â•‘..          â”‚russian  lngâ”‚            â–’
+â”‚â•‘Colorsâˆš     â”‚            â”‚            â–’
+â”‚â•‘XLT         â”‚            â”‚            â– 
+â”‚â•‘dn       cfgâ”‚            â”‚            â–’
+â”‚â•‘english  dlgâ”‚            â”‚            â–’
+â”‚â•‘russian  dlgâ”‚            â”‚            â–’
+â”‚â•‘dn       dskâ”‚            â”‚            â–’
+â”‚â•‘dn       exeâ”‚            â”‚            â–’
+â”‚â•‘dnhgl    grpâ”‚            â”‚            â–’
+â”‚â•‘dn       hisâ”‚            â”‚            â–’
+â”‚â•‘english  hlpâ”‚            â”‚            â–’
+â”‚â•‘russian  hlpâ”‚            â”‚            â–’
+â”‚â•‘dnini    in_â”‚            â”‚            â–’
+â”‚â•‘dn       iniâ”‚            â”‚            â–’
+â”‚â•‘descript ionâ”‚            â”‚            â–’
+â”‚â•‘english  lngâ”‚            â”‚            
+â”‚â•‘â”€600/516(1)â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€1 730 996(16)â•‘
+â”‚â•‘XLT           <ĞšĞ°Ñ‚Ğ°Ğ»Ğ¾Ğ³> 28.05.05 19:28â•‘
+â”‚â•‘XLT                                   â•‘
+â”‚â•‘  Packed:  1 061         Ratio: 96%   â•‘
+â”‚â•š[ A C D E F G H I * ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 You cam see the archive type and archive's file name.
 Descriptions and paths are unavaiable, but one can see information about
@@ -1395,11 +1395,11 @@ An additional (fifth) category, "None", can be selected when you use less than
 all four categories. If so, you should select "None" for empty places.
    Here is an example of that block:
 
-³      Put to the top:
-³    1 [   Directories   ]
-³    2 [    Archives     ]
-³    3 [   Executables   ]
-³    4 [      None       ]
+â”‚      Put to the top:
+â”‚    1 [   Directories   ]
+â”‚    2 [    Archives     ]
+â”‚    3 [   Executables   ]
+â”‚    4 [      None       ]
 
    This means that first will go directories, then archives, then executables,
 and then all other files. In each group files will be sorted according to
@@ -1426,7 +1426,7 @@ See also {File panel setup:PanelSetup}
 .title File panel Hot keys
 
  {Tagging:_}
- ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  Toggle file tagging ...................... Ins
 
  Select/unselect a group of files with      Ctrl+Gray Plus
@@ -1438,21 +1438,21 @@ See also {File panel setup:PanelSetup}
  Copy names of tagged files to Clipboard .. Ctrl-Ins
 
  {Miscellaneous commands:_}
- ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Re-read directory ......................... Alt+R, Ctrl+R
   Swap panels ............................... Ctrl+U
   Toggle Information in passive Panel ....... Alt+I, Ctrl+L
   Hide/show inactive File Panel ............. Ctrl+P
 
  {Copy to Command line:_}
- ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  Current file name  ...................... Ctrl+Enter
  Full pathname of current file ........... Shift+Ctrl+Enter
  Directory name of right File Panel ...... Ctrl+]
  Directory name of left File Panel ....... Ctrl+[
 
  {Directory changing:_}
- ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  Change current directory to upper dir
  (exit from archive file find, Temp drive) .. Ctrl+PgUp
 
@@ -1511,18 +1511,18 @@ A fragment of the file of extensions:
 
  Asm{{    @echo off
          echo $[1;36;40m[J[1;36;44m
-         Echo ÛßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßÛ
-         echo Û Assembling and linking COM file ...Û
-         echo ÛÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+         Echo â–ˆâ–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–ˆ
+         echo â–ˆ Assembling and linking COM file ...â–ˆ
+         echo â–ˆâ–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
          echo $[1;37;40m
          tasm !
          tlink /t/x !.obj
          echo $[1;36;40m}
  asm(    @echo off
          echo $[1;36;40m[J[1;36;44m
-         echo ÛßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßÛ
-         echo Û Assembling and linking EXE file... Û
-         echo ÛÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+         echo â–ˆâ–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–ˆ
+         echo â–ˆ Assembling and linking EXE file... â–ˆ
+         echo â–ˆâ–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
          echo $[1;37;40m
          tasm !
          tlink /x !.obj
@@ -1539,47 +1539,47 @@ A fragment of the file of extensions:
    ]
 
 .topic Interface=11006
- ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
- ³ General information about interface Û
- ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ â”‚ General information about interface â–ˆ
+ â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
 
 When Navigator is running, on screen is possible to observe following image,
 which represents the working environment of Navigator:
 
        {This is -:_}{main Navigator menu:MainMenu}{, when it is said, that for an :_}
-       {³ action the command String1|String2 should be used, :_}
-       {³ often whole String1 means the title of one of submenu main:_}
-       {³ menu ( or local menu of one of windows ), and String2 - the :_}
-       {³ title item of this submenu. This command could be also called:_}
-       {³ by key combination mentioned in the menu.:_}
+       {â”‚ action the command String1|String2 should be used, :_}
+       {â”‚ often whole String1 means the title of one of submenu main:_}
+       {â”‚ menu ( or local menu of one of windows ), and String2 - the :_}
+       {â”‚ title item of this submenu. This command could be also called:_}
+       {â”‚ by key combination mentioned in the menu.:_}
        {:_}
-ÛÛğÛÛFileÛÛDiskÛÛUtilitiesÛÛPanelÛÛManagerÛÛOptionsÛÛWindowÛÛÛÛÛÛÛÛÛÛÛ22:29:19
-                             ÉÍ[ş]ÍÍÍÍÍÍÍÍ E:\TP\DNHLP ÍÍÍÍÍÍÍÍÍ[]Í»
- C:\DN>arj f dn              º..          ³            ³            
- ARJ 2.30 Copyright (c) 1990-º dn      hlp³            ³            ±
- ÚÄÄÄÄÄÄÄÄÄÄÄÄÄ E:\TP\DNHLP\mº dn      txt³            ³            ±
- ³ 2.6 Start DN              º manual dn  ³            ³            ±
- ³                           º manual txt ³            ³            ±
- ³ For start DN you have onlyº            ³            ³            ±
- ³ are located its working fiº            ³            ³            ş
- ³ Whereas DN is a shell progº            ³            ³            ±
- ³ program   of   such  type º            ³            ³            ±
- ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄº            ³            ³            
-      ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄºÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄº
- C:\DN³    1 ³               º manual.dn   31,019   18-05-93   14:26º
-      ³    2 ³               º          No files selected           º
- E:\TP³    3 ³               ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÄÙ
-      ³    4 ³                                         ³
-      ³    5 ³       { All the area between command:_}     ³
- E:\TP³    6 ³       { by line and line of main menu is called:_}
-      ³    7 ³       { Desktop. All Navigator windows:_}
-      ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄ{ are located on Desktop:_}ÄÄÄÄÄÄÄÙ
+â–ˆâ–ˆĞâ–ˆâ–ˆFileâ–ˆâ–ˆDiskâ–ˆâ–ˆUtilitiesâ–ˆâ–ˆPanelâ–ˆâ–ˆManagerâ–ˆâ–ˆOptionsâ–ˆâ–ˆWindowâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ22:29:19
+                             â•”â•[â– ]â•â•â•â•â•â•â•â• E:\TP\DNHLP â•â•â•â•â•â•â•â•â•[]â•â•—
+ C:\DN>arj f dn              â•‘..          â”‚            â”‚            
+ ARJ 2.30 Copyright (c) 1990-â•‘ dn      hlpâ”‚            â”‚            â–’
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ E:\TP\DNHLP\mâ•‘ dn      txtâ”‚            â”‚            â–’
+ â”‚ 2.6 Start DN              â•‘ manual dn  â”‚            â”‚            â–’
+ â”‚                           â•‘ manual txt â”‚            â”‚            â–’
+ â”‚ For start DN you have onlyâ•‘            â”‚            â”‚            â–’
+ â”‚ are located its working fiâ•‘            â”‚            â”‚            â– 
+ â”‚ Whereas DN is a shell progâ•‘            â”‚            â”‚            â–’
+ â”‚ program   of   such  type â•‘            â”‚            â”‚            â–’
+ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•‘            â”‚            â”‚            
+      â”œâ”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â•‘â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•‘
+ C:\DNâ”‚    1 â”‚               â•‘ manual.dn   31,019   18-05-93   14:26â•‘
+      â”‚    2 â”‚               â•‘          No files selected           â•‘
+ E:\TPâ”‚    3 â”‚               â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â”€â”˜
+      â”‚    4 â”‚                                         â”‚
+      â”‚    5 â”‚       { All the area between command:_}     â”‚
+ E:\TPâ”‚    6 â”‚       { by line and line of main menu is called:_}
+      â”‚    7 â”‚       { Desktop. All Navigator windows:_}
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€{ are located on Desktop:_}â”€â”€â”€â”€â”€â”€â”€â”˜
  E:\TP\DNHLP>snip:_}
  Snipper 1.0 ( c ) 1987 Ziff Communications co.
- E:\TP\DNHLP >dir {<ÄÄÄÄÄÄÄÄ this is DOS command line:_}
- ÛB SortÛÛC DriveÛÛS SetupÛÛL ListÛÛV TempÛÛR Re-readÛÛY Memory InfoÛÛX QuitÛÛÛÛ:_}
+ E:\TP\DNHLP >dir {<â”€â”€â”€â”€â”€â”€â”€â”€ this is DOS command line:_}
+ â–ˆB Sortâ–ˆâ–ˆC Driveâ–ˆâ–ˆS Setupâ–ˆâ–ˆL Listâ–ˆâ–ˆV Tempâ–ˆâ–ˆR Re-readâ–ˆâ–ˆY Memory Infoâ–ˆâ–ˆX Quitâ–ˆâ–ˆâ–ˆâ–ˆ:_}
    {:_}
-   {Àline of Navigator status. Here are showed accessible:_}
+   {â””line of Navigator status. Here are showed accessible:_}
    {at present command of DN and those hot keys. The status:_}
    {line contains the list of commands and reacts on depression:_}
    {of keys <Shift>, <Ctrl>, <Alt>.:_}
@@ -1613,21 +1613,21 @@ cursor arrows are used, and [ENTER] - confirms chosen directory.
 The panel (or window) of directory tree appears as follows:
 
  {Current disk:_}
-   {³:_}
-   {³:_}  ÉÍ[ş]ÍÍÍÍÍÍÍ Directory Tree ÍÍÍÍÍÍÍ[]Í»
-   {ÀÄÄÄÄ:_} C:\                                 
-      º  ÃÄ[+] DOS {ÄÄÄÄÄÄÄÄÄÄÄÄ Directory with enclosed subdirectories:_}
-      º  ÃÄ[+] TOOLS         {(is opened by blank):_}
-      º  ÃÄ[+] !GAMES                        ±
-      º  ÃÄ[-] DN{ÄÄÄÄÄÄÄÄÄÄÄÄ Opened:_}         ±
-      º  ³ ÃÄÄÄ DOWNLOAD      {subdirectory:_}   ±
-      º  ³ ÀÄÄÄ VIEWERS                      ş
-      º  ÃÄÄÄ WORK {ÄÄÄÄÄÄÄÄÄÄÄÄÄ Directory without enclosed:_}
-      º  ÀÄÄÄ ROMANA.3          {subdirectories:_}
-   {ÚÄÄÄ:_} C:\DN\DOWNLOAD                       ±
-   {³:_}  º 14 files with 153,432 bytes {Ä¿:_}       
-   {³:_}  ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ{³:_}ÍÍÍÍÍÍÄÙ
-   {³:_}                                 {³:_}
+   {â”‚:_}
+   {â”‚:_}  â•”â•[â– ]â•â•â•â•â•â•â• Directory Tree â•â•â•â•â•â•â•[]â•â•—
+   {â””â”€â”€â”€â”€:_} C:\                                 
+      â•‘  â”œâ”€[+] DOS {â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Directory with enclosed subdirectories:_}
+      â•‘  â”œâ”€[+] TOOLS         {(is opened by blank):_}
+      â•‘  â”œâ”€[+] !GAMES                        â–’
+      â•‘  â”œâ”€[-] DN{â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Opened:_}         â–’
+      â•‘  â”‚ â”œâ”€â”€â”€ DOWNLOAD      {subdirectory:_}   â–’
+      â•‘  â”‚ â””â”€â”€â”€ VIEWERS                      â– 
+      â•‘  â”œâ”€â”€â”€ WORK {â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Directory without enclosed:_}
+      â•‘  â””â”€â”€â”€ ROMANA.3          {subdirectories:_}
+   {â”Œâ”€â”€â”€:_} C:\DN\DOWNLOAD                       â–’
+   {â”‚:_}  â•‘ 14 files with 153,432 bytes {â”€â”:_}       
+   {â”‚:_}  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{â”‚:_}â•â•â•â•â•â•â”€â”˜
+   {â”‚:_}                                 {â”‚:_}
    {Current directory:_}            {Information:_}
 
 
@@ -1647,28 +1647,28 @@ The window of formatting appears as follows:
 
   {Disk A or B       The volume label         Arrangement of sectors:_}
 
-           {³                ³                ³:_}
-   ÉÍ[ş]ÍÍÍ{³:_}ÍÍÍÍÍÍÍÍÍ Format{³:_}diskette ÍÍÍÍÍÍÍ{³:_}ÍÍÍÍÍÍÍÍÍ»
-   º       {³:_}                {³:_}                {³:_}         º
-   º  () Drive A         Volume label   Interleave    º
-   º  ( ) Drive B                        1             º
-   º                                                   º
- {ÚÄÄÄ:_} () Full format     Size      Tracks    Sec/Trk  º
- {³:_} º  ( ) Quick format     360       76       08    º
- {³:_} º                       400 ±      77 ±      09 ±   º
- {³:_} º  [ ] System disk      720 ş      78 ±      10 ş   º
- {³:_} º  [X] Detect drive     800 ±      79 ş      11 ±   º
- {³:_} º  [ ] Unconditional   1200       80       15    º
- {³:_} º      {³:_}                 {³:_}                          º
- {³:_} º      {³:_}       Ok   Ü    {³:_}   Cancel Ü               º
- {³:_} º      {³:_}     ßßßßßßßß    {³:_}   ßßßßßßßß               º
- {³:_} ÈÍÍÍÍÍÍ{³:_}ÍÍÍÍÍÍÍÍÍÍÍ{³:_}ÍÍÍÍÍ{³:_}ÍÍÍÍÍÍÍÍÍÍÍÍÍÍ{³:_}ÍÍÍÍÍÍÍÍÍÍÍ¼
- {³        ³           ³     ³              ³:_}
- {³ - System disk      ³  Volume label       Cancel option:_}
- {³ - Check up the type³  of formatted:_}
- {³ - Do not Ask       ³  diskette:_}
- {³                    ³:_}
- { - quick format      ÀÄ Begin the format process:_}
+           {â”‚                â”‚                â”‚:_}
+   â•”â•[â– ]â•â•â•{â”‚:_}â•â•â•â•â•â•â•â•â• Format{â”‚:_}diskette â•â•â•â•â•â•â•{â”‚:_}â•â•â•â•â•â•â•â•â•â•—
+   â•‘       {â”‚:_}                {â”‚:_}                {â”‚:_}         â•‘
+   â•‘  () Drive A         Volume label   Interleave    â•‘
+   â•‘  ( ) Drive B                        1             â•‘
+   â•‘                                                   â•‘
+ {â”Œâ”€â”€â”€:_} () Full format     Size      Tracks    Sec/Trk  â•‘
+ {â”‚:_} â•‘  ( ) Quick format     360       76       08    â•‘
+ {â”‚:_} â•‘                       400 â–’      77 â–’      09 â–’   â•‘
+ {â”‚:_} â•‘  [ ] System disk      720 â–       78 â–’      10 â–    â•‘
+ {â”‚:_} â•‘  [X] Detect drive     800 â–’      79 â–       11 â–’   â•‘
+ {â”‚:_} â•‘  [ ] Unconditional   1200       80       15    â•‘
+ {â”‚:_} â•‘      {â”‚:_}                 {â”‚:_}                          â•‘
+ {â”‚:_} â•‘      {â”‚:_}       Ok   â–„    {â”‚:_}   Cancel â–„               â•‘
+ {â”‚:_} â•‘      {â”‚:_}     â–€â–€â–€â–€â–€â–€â–€â–€    {â”‚:_}   â–€â–€â–€â–€â–€â–€â–€â–€               â•‘
+ {â”‚:_} â•šâ•â•â•â•â•â•{â”‚:_}â•â•â•â•â•â•â•â•â•â•â•{â”‚:_}â•â•â•â•â•{â”‚:_}â•â•â•â•â•â•â•â•â•â•â•â•â•â•{â”‚:_}â•â•â•â•â•â•â•â•â•â•â•â•
+ {â”‚        â”‚           â”‚     â”‚              â”‚:_}
+ {â”‚ - System disk      â”‚  Volume label       Cancel option:_}
+ {â”‚ - Check up the typeâ”‚  of formatted:_}
+ {â”‚ - Do not Ask       â”‚  diskette:_}
+ {â”‚                    â”‚:_}
+ { - quick format      â””â”€ Begin the format process:_}
  { - total format         with these options:_}
 
 
@@ -1685,14 +1685,14 @@ See also:{"Types of windows":WindowsType}
 DOS Navigator allows you to edit the volume label of a disk. The window
 for changing the volume label is easy to use:
 
-      ÉÍ[ş] Set Volume Label ÍÍÍÍÍ»
-      º                           º
-      º Label           °°°OK°°°Ü{ÄÄÄÄÄÄÄ Write label to disk:_}
-      º MS-DOS_5ÛÛÛÛÛÛ   ßßßßßßßß º
-      º  {³:_}              °Cancel°Ü{ÄÄÄÄÄÄÄ Cancel the action:_}
-      º  {³:_}               ßßßßßßßß º
-      ÈÍÍ{³:_}ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
-         {³:_}
+      â•”â•[â– ] Set Volume Label â•â•â•â•â•â•—
+      â•‘                           â•‘
+      â•‘ Label           â–‘â–‘â–‘OKâ–‘â–‘â–‘â–„{â”€â”€â”€â”€â”€â”€â”€ Write label to disk:_}
+      â•‘ MS-DOS_5â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–€â–€â–€â–€â–€â–€â–€â–€ â•‘
+      â•‘  {â”‚:_}              â–‘Cancelâ–‘â–„{â”€â”€â”€â”€â”€â”€â”€ Cancel the action:_}
+      â•‘  {â”‚:_}               â–€â–€â–€â–€â–€â–€â–€â–€ â•‘
+      â•šâ•â•{â”‚:_}â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+         {â”‚:_}
 
        {Desired volume label:_}
 
@@ -1827,7 +1827,7 @@ exponential form (1e-3 = 0.001). Besides, one can specify a literal
 multiplier after decimal number (right up to the number, without spaces).
 Russian and international multipliers' notation is allowed
 ('u' instead of Greek letter 'mu').
-For example, 1.2ª = 1.2k = 1200; 1.2¬ª = 1.2u = 0.0000012.
+For example, 1.2Ğº = 1.2k = 1200; 1.2Ğ¼Ğº = 1.2u = 0.0000012.
 'hecto' multiplier is missing, because its international notation (h)
 conflicts with assembler form of hexadecimal number.
 Multipliers are case-sensitive (for example, m = milli, M = mega),
@@ -1875,17 +1875,17 @@ that caused an error.
 are divided into 5 groups according to priority. In the range of one priority
 operators are executed from left to right.
 
-³1. Comparison operators (lowest priority)
-³       = # != <> < > >= <=
-³2. Adding operators
-³       + - | or & and
-³3. Multiplicative operators
-³       * / div % mod \ >> shr << shl
-³4. Exponentiation
-³       ^
-³5. Time (highest priority)
-³       :
-³(a:b = a*60+b, for example, 01:10 = 70).
+â”‚1. Comparison operators (lowest priority)
+â”‚       = # != <> < > >= <=
+â”‚2. Adding operators
+â”‚       + - | or & and
+â”‚3. Multiplicative operators
+â”‚       * / div % mod \ >> shr << shl
+â”‚4. Exponentiation
+â”‚       ^
+â”‚5. Time (highest priority)
+â”‚       :
+â”‚(a:b = a*60+b, for example, 01:10 = 70).
 
 {Prefix operators:_} (unary + and -, bitwise inversion ~) and all the functions
 have a higher priority over any infix operator.
@@ -2152,47 +2152,47 @@ disk directory in file panel and you can do with files from this
 list all operations accessible in {File:FileMenu} and {Panel:PanelMenu}.
 
 
-       ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ Find File ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-       º                                                    º
-       º     File mask ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±Şİ º
-       º                                                    º
-       º  Text to find ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±Şİ º
-       º    Hex string ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±    º
-       º   Options                                          º
-       º   [ ] {Advanced search:AdvanceSearch}     [ ] Case sensitive ÄÄÄÄÄÄ×ÄÄ¿
-   ÚÄÄÄ×ÄÄÄ[ ] Do not sort result  [ ] Whole words ÄÄÄÄÄÄÄÄÄ×Ä¿³
-   ³ÚÄÄ×ÄÄÄ[X] Recursive search    [ ] All code pages ÄÄÄÄÄÄ×¿³³
-   ³³ÚÄ×ÄÄÄ[ ] Search in archives                           º³³³
-   ³³³ º                                                    º³³³
-   ³³³ º   Scope                                            º³³³
-  ÚÅÅÅÄ×ÄÄÄ() Current directory  ( ) Entire disk ÄÄÄÄÄÄÄÄÄÄ×ÅÅÅ¿
- ÚÅÅÅÅÄ×ÄÄÄ( ) Selected           ( ) All drives ÄÄÄÄÄÄÄÄÄÄÄ×ÅÅÅÅ¿
- ³³³³³ º                                                    º³³³³³
- ³³³³³ º     OK  Ü   Advanced... Ü   Cancel Ü    Help  Ü  º³³³³³
- ³³³³³ º    ßßßßßßßß   ßßßßßßßßßßßßß   ßßßßßßßß   ßßßßßßßß  º³³³³³
- ³³³³³ ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼³³³³³
- ³³³³³                                                       ³³³³³
- ³³³³ÀÄÄÄÄ Check this box if you like to search files inside ³³³³³
- ³³³³      archives                                          ³³³³³
- ³³³ÀÄÄÄÄÄ If this check box is turned on (default),         ³³³³³
- ³³³       searching will proceed in all subdirectories      ³³³³³
- ³³³       existing in current search scope                  ³³³³³
- ³³ÀÄÄÄÄÄÄ Check this box if you don't want the search       ³³³³³
- ³³        results to be sorted                              ³³³³³
- ³³                                                          ³³³³³
- ³³      Text searching options:                             ³³³³³
- ³³If turned off, the case of searched text will be ignored ÄÙ³³³³
- ³³Check, if you like to search for whole words only ÄÄÄÄÄÄÄÄÄÙ³³³
- ³³When turbed on, the text will be searched in all code ÄÄÄÄÄÄÙ³³
- ³³pages known to DN                                            ³³
- ³³                                                             ³³
- ³³      Scope of file search:                                  ³³
- ³ÀÄÄÄÄÄÄ Search files in current directory                     ³³
- ÀÄÄÄÄÄÄÄ Search files among the selected and inside selected   ³³
-          directories                                           ³³
-          Search files on entire current disk ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ³
-          Search files on all accessible disks from C: to Z:     ³
-          except non-current slow drive media (CD etc.) ÄÄÄÄÄÄÄÄÄÙ
+       â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• Find File â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+       â•‘                                                    â•‘
+       â•‘     File mask â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–â–Œ â•‘
+       â•‘                                                    â•‘
+       â•‘  Text to find â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–â–Œ â•‘
+       â•‘    Hex string â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’    â•‘
+       â•‘   Options                                          â•‘
+       â•‘   [ ] {Advanced search:AdvanceSearch}     [ ] Case sensitive â”€â”€â”€â”€â”€â”€â•«â”€â”€â”
+   â”Œâ”€â”€â”€â•«â”€â”€â”€[ ] Do not sort result  [ ] Whole words â”€â”€â”€â”€â”€â”€â”€â”€â”€â•«â”€â”â”‚
+   â”‚â”Œâ”€â”€â•«â”€â”€â”€[X] Recursive search    [ ] All code pages â”€â”€â”€â”€â”€â”€â•«â”â”‚â”‚
+   â”‚â”‚â”Œâ”€â•«â”€â”€â”€[ ] Search in archives                           â•‘â”‚â”‚â”‚
+   â”‚â”‚â”‚ â•‘                                                    â•‘â”‚â”‚â”‚
+   â”‚â”‚â”‚ â•‘   Scope                                            â•‘â”‚â”‚â”‚
+  â”Œâ”¼â”¼â”¼â”€â•«â”€â”€â”€() Current directory  ( ) Entire disk â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•«â”¼â”¼â”¼â”
+ â”Œâ”¼â”¼â”¼â”¼â”€â•«â”€â”€â”€( ) Selected           ( ) All drives â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•«â”¼â”¼â”¼â”¼â”
+ â”‚â”‚â”‚â”‚â”‚ â•‘                                                    â•‘â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚â”‚ â•‘     OK  â–„   Advanced... â–„   Cancel â–„    Help  â–„  â•‘â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚â”‚ â•‘    â–€â–€â–€â–€â–€â–€â–€â–€   â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€   â–€â–€â–€â–€â–€â–€â–€â–€   â–€â–€â–€â–€â–€â–€â–€â–€  â•‘â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚â”‚ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚â”‚                                                       â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚â””â”€â”€â”€â”€ Check this box if you like to search files inside â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚      archives                                          â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â””â”€â”€â”€â”€â”€ If this check box is turned on (default),         â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚       searching will proceed in all subdirectories      â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚       existing in current search scope                  â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚â””â”€â”€â”€â”€â”€â”€ Check this box if you don't want the search       â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚        results to be sorted                              â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚                                                          â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚      Text searching options:                             â”‚â”‚â”‚â”‚â”‚
+ â”‚â”‚If turned off, the case of searched text will be ignored â”€â”˜â”‚â”‚â”‚â”‚
+ â”‚â”‚Check, if you like to search for whole words only â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜â”‚â”‚â”‚
+ â”‚â”‚When turbed on, the text will be searched in all code â”€â”€â”€â”€â”€â”€â”˜â”‚â”‚
+ â”‚â”‚pages known to DN                                            â”‚â”‚
+ â”‚â”‚                                                             â”‚â”‚
+ â”‚â”‚      Scope of file search:                                  â”‚â”‚
+ â”‚â””â”€â”€â”€â”€â”€â”€ Search files in current directory                     â”‚â”‚
+ â””â”€â”€â”€â”€â”€â”€â”€ Search files among the selected and inside selected   â”‚â”‚
+          directories                                           â”‚â”‚
+          Search files on entire current disk â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜â”‚
+          Search files on all accessible disks from C: to Z:     â”‚
+          except non-current slow drive media (CD etc.) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
 
 .topic ArcFileFind=21006
@@ -2208,23 +2208,23 @@ disk directory in file panel and you can do with files from this
 list all operations accessible in {File:FileMenu} and {Panel:PanelMenu}.
 
 
-       ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍ Find File in Archive ÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-       º                                                  º
-       º     File mask ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±Şİ º
-       º                                                  º
-       º   Options                                        º
-       º   [ ] {Advanced search:AdvanceSearch}     [X] Recursive search ÄÄ×Ä¿
-     ÚÄ×ÄÄÄ[ ] Do not sort result                         º ³
-     ³ º                                                  º ³
-     ³ º     OK  Ü  Advanced... Ü  Cancel Ü   Help  Ü   º ³
-     ³ º    ßßßßßßßß  ßßßßßßßßßßßßß  ßßßßßßßß  ßßßßßßßß   º ³
-     ³ ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼ ³
-     ³                                                      ³
-     ³     If this check box is turned on (default), ÄÄÄÄÄÄÄÙ
-     ³     searching will proceed in all subdirectories
-     ³     existing in current directory in archive
-     ³
-     ÀÄÄÄÄ Check this box if you don't want the search
+       â•”â•[â– ]â•â•â•â•â•â•â•â•â•â• Find File in Archive â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+       â•‘                                                  â•‘
+       â•‘     File mask â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–â–Œ â•‘
+       â•‘                                                  â•‘
+       â•‘   Options                                        â•‘
+       â•‘   [ ] {Advanced search:AdvanceSearch}     [X] Recursive search â”€â”€â•«â”€â”
+     â”Œâ”€â•«â”€â”€â”€[ ] Do not sort result                         â•‘ â”‚
+     â”‚ â•‘                                                  â•‘ â”‚
+     â”‚ â•‘     OK  â–„  Advanced... â–„  Cancel â–„   Help  â–„   â•‘ â”‚
+     â”‚ â•‘    â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€   â•‘ â”‚
+     â”‚ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• â”‚
+     â”‚                                                      â”‚
+     â”‚     If this check box is turned on (default), â”€â”€â”€â”€â”€â”€â”€â”˜
+     â”‚     searching will proceed in all subdirectories
+     â”‚     existing in current directory in archive
+     â”‚
+     â””â”€â”€â”€â”€ Check this box if you don't want the search
            results to be sorted
 
 
@@ -2246,42 +2246,42 @@ disk directory in file panel and you can do with files from this
 list all operations accessible in {File:FileMenu} and {Panel:PanelMenu}.
 
 
-      ÉÍ[ş]ÍÍÍÍÍÍÍÍÍ Find File in Found/Branch ÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-      º                                                      º
-      º     File mask ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±Şİ º
-      º                                                      º
-      º  Text to find ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±Şİ º
-      º    Hex string ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±    º
-      º   Options                                            º
-      º   [ ] {Advanced search:AdvanceSearch}        [ ] Case sensitive ÄÄÄÄÄ×¿
-  ÚÄÄÄ×ÄÄÄ[ ] Do not sort result     [ ] Whole words ÄÄÄÄÄÄÄÄ×Å¿
-  ³ÚÄÄ×ÄÄÄ[X] Search in directories  [ ] All code pages ÄÄÄÄÄ×ÅÅ¿
-  ³³ÚÄ×ÄÄÄ[ ] Search in archives                             º³³³
-  ³³³ º                                                      º³³³
-  ³³³ º   Scope                                              º³³³
- ÚÅÅÅÄ×ÄÄÄ() Entire panel  ( ) Selected ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ×ÅÅÅ¿
- ³³³³ º                                                      º³³³³
- ³³³³ º     OK  Ü   Advanced... Ü   Cancel Ü    Help  Ü    º³³³³
- ³³³³ º    ßßßßßßßß   ßßßßßßßßßßßßß   ßßßßßßßß   ßßßßßßßß    º³³³³
- ³³³³ ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼³³³³
- ³³³³                                                         ³³³³
- ³³³ÀÄÄÄÄ Check this box if you like to search files inside   ³³³³
- ³³³      archives                                            ³³³³
- ³³ÀÄÄÄÄÄ If this check box is turned on (default),           ³³³³
- ³³       searching will proceed in all directories           ³³³³
- ³³       present in File Search panel                        ³³³³
- ³ÀÄÄÄÄÄÄ Check this box if you don't want the search         ³³³³
- ³        results to be sorted                                ³³³³
- ³                                                            ³³³³
- ³      Text searching options:                               ³³³³
- ³If turned off, the case of searched text will be ignored ÄÄÄÙ³³³
- ³Check, if you like to search for whole words only ÄÄÄÄÄÄÄÄÄÄÄÙ³³
- ³When turbed on, the text will be searched in all code ÄÄÄÄÄÄÄÄÙ³
- ³pages known to DN                                              ³
- ³                                                               ³
- ³      Scope of file search:                                    ³
- ÀÄÄÄÄÄÄ Search files in entire File Search panel                ³
-         Search files among the selected and inside selected ÄÄÄÄÙ
+      â•”â•[â– ]â•â•â•â•â•â•â•â•â• Find File in Found/Branch â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+      â•‘                                                      â•‘
+      â•‘     File mask â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–â–Œ â•‘
+      â•‘                                                      â•‘
+      â•‘  Text to find â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–â–Œ â•‘
+      â•‘    Hex string â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’    â•‘
+      â•‘   Options                                            â•‘
+      â•‘   [ ] {Advanced search:AdvanceSearch}        [ ] Case sensitive â”€â”€â”€â”€â”€â•«â”
+  â”Œâ”€â”€â”€â•«â”€â”€â”€[ ] Do not sort result     [ ] Whole words â”€â”€â”€â”€â”€â”€â”€â”€â•«â”¼â”
+  â”‚â”Œâ”€â”€â•«â”€â”€â”€[X] Search in directories  [ ] All code pages â”€â”€â”€â”€â”€â•«â”¼â”¼â”
+  â”‚â”‚â”Œâ”€â•«â”€â”€â”€[ ] Search in archives                             â•‘â”‚â”‚â”‚
+  â”‚â”‚â”‚ â•‘                                                      â•‘â”‚â”‚â”‚
+  â”‚â”‚â”‚ â•‘   Scope                                              â•‘â”‚â”‚â”‚
+ â”Œâ”¼â”¼â”¼â”€â•«â”€â”€â”€() Entire panel  ( ) Selected â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•«â”¼â”¼â”¼â”
+ â”‚â”‚â”‚â”‚ â•‘                                                      â•‘â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚ â•‘     OK  â–„   Advanced... â–„   Cancel â–„    Help  â–„    â•‘â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚ â•‘    â–€â–€â–€â–€â–€â–€â–€â–€   â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€   â–€â–€â–€â–€â–€â–€â–€â–€   â–€â–€â–€â–€â–€â–€â–€â–€    â•‘â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â”‚                                                         â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚â””â”€â”€â”€â”€ Check this box if you like to search files inside   â”‚â”‚â”‚â”‚
+ â”‚â”‚â”‚      archives                                            â”‚â”‚â”‚â”‚
+ â”‚â”‚â””â”€â”€â”€â”€â”€ If this check box is turned on (default),           â”‚â”‚â”‚â”‚
+ â”‚â”‚       searching will proceed in all directories           â”‚â”‚â”‚â”‚
+ â”‚â”‚       present in File Search panel                        â”‚â”‚â”‚â”‚
+ â”‚â””â”€â”€â”€â”€â”€â”€ Check this box if you don't want the search         â”‚â”‚â”‚â”‚
+ â”‚        results to be sorted                                â”‚â”‚â”‚â”‚
+ â”‚                                                            â”‚â”‚â”‚â”‚
+ â”‚      Text searching options:                               â”‚â”‚â”‚â”‚
+ â”‚If turned off, the case of searched text will be ignored â”€â”€â”€â”˜â”‚â”‚â”‚
+ â”‚Check, if you like to search for whole words only â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜â”‚â”‚
+ â”‚When turbed on, the text will be searched in all code â”€â”€â”€â”€â”€â”€â”€â”€â”˜â”‚
+ â”‚pages known to DN                                              â”‚
+ â”‚                                                               â”‚
+ â”‚      Scope of file search:                                    â”‚
+ â””â”€â”€â”€â”€â”€â”€ Search files in entire File Search panel                â”‚
+         Search files among the selected and inside selected â”€â”€â”€â”€â”˜
          directories
 
 
@@ -2298,19 +2298,19 @@ disk directory in file panel and you can do with files from this
 list all operations accessible in {File:FileMenu} and {Panel:PanelMenu}.
 
 
-       ÉÍ[ş]ÍÍ Find File in Found/Branch in Archive ÍÍÍÍÍÍ»
-       º                                                  º
-       º     File mask ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±Şİ º
-       º                                                  º
-       º   Options                                        º
-       º   [ ] {Advanced search:AdvanceSearch}                            º
-     ÚÄ×ÄÄÄ[ ] Do not sort result                         º
-     ³ º                                                  º
-     ³ º     OK  Ü  Advanced... Ü  Cancel Ü   Help  Ü   º
-     ³ º    ßßßßßßßß  ßßßßßßßßßßßßß  ßßßßßßßß  ßßßßßßßß   º
-     ³ ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
-     ³
-     ÀÄÄÄÄ Check this box if you don't want the search
+       â•”â•[â– ]â•â• Find File in Found/Branch in Archive â•â•â•â•â•â•â•—
+       â•‘                                                  â•‘
+       â•‘     File mask â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–â–Œ â•‘
+       â•‘                                                  â•‘
+       â•‘   Options                                        â•‘
+       â•‘   [ ] {Advanced search:AdvanceSearch}                            â•‘
+     â”Œâ”€â•«â”€â”€â”€[ ] Do not sort result                         â•‘
+     â”‚ â•‘                                                  â•‘
+     â”‚ â•‘     OK  â–„  Advanced... â–„  Cancel â–„   Help  â–„   â•‘
+     â”‚ â•‘    â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€   â•‘
+     â”‚ â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     â”‚
+     â””â”€â”€â”€â”€ Check this box if you don't want the search
            results to be sorted
 
 
@@ -2351,11 +2351,11 @@ the following menu level, Navigator creates a temporary .BAT file with
 two parameters: First the name of the file on which the cursor was on,
 and second the name of a file-list of files marked in this panel.
 
- {Hints:_}: ş If User menu not found in current directory, DN will
+ {Hints:_}: â–  If User menu not found in current directory, DN will
           find out User menu in upper directories.
-        ş It is possible to switch between Local/Global User Menu
+        â–  It is possible to switch between Local/Global User Menu
           while User Menu is executed.
-        ş It is possible to start edit User Menu after call to it.
+        â–  It is possible to start edit User Menu after call to it.
 
  See also {"Format of user menu file":MenuFormat}
 
@@ -2379,30 +2379,30 @@ See also: {User Menu:UserMenu}
 
  Example                            Comment
 
- >1 Microsoft ~W~indows 3.1      ³ Shortcut a litter 'W'
-    win                          ³ run WIN
- >1                              ³ Divider
- >1 ~F~ormat diskette            ³
-   >2 1.4~4~ Mb                  ³ Next level
-     format a: /f:1440 /u        ³
-   >2 1.~2~ Mb                   ³
-     format a: /f:1200 /u        ³
-   >2 ~D~efine...                ³
-     <=format a:                 ³ Edit format params.
-                                 ³ Default is "format a:"
-                                 ³
- >1 ~M~ail                       ³ Next first level
-                                 ³ menu item
-   >2 ~G~et...                   ³
-     ............                ³ (skip)
-   >2 ~A~rchive                  ³
-     pkzip -mex archive\mail.zip ³ Call archiver
-     pkunzip -t archive\mail.zip ³ Check archive
-   >2 ~~ § àå¨¢¨à®¢ âì          ³
-     pkunzip archive\mail.zip    ³
- >1                              ³ Divider
- >1 ~G~ames                      ³
-   .........                     ³ etc.
+ >1 Microsoft ~W~indows 3.1      â”‚ Shortcut a litter 'W'
+    win                          â”‚ run WIN
+ >1                              â”‚ Divider
+ >1 ~F~ormat diskette            â”‚
+   >2 1.4~4~ Mb                  â”‚ Next level
+     format a: /f:1440 /u        â”‚
+   >2 1.~2~ Mb                   â”‚
+     format a: /f:1200 /u        â”‚
+   >2 ~D~efine...                â”‚
+     <=format a:                 â”‚ Edit format params.
+                                 â”‚ Default is "format a:"
+                                 â”‚
+ >1 ~M~ail                       â”‚ Next first level
+                                 â”‚ menu item
+   >2 ~G~et...                   â”‚
+     ............                â”‚ (skip)
+   >2 ~A~rchive                  â”‚
+     pkzip -mex archive\mail.zip â”‚ Call archiver
+     pkunzip -t archive\mail.zip â”‚ Check archive
+   >2 ~Ğ ~Ğ°Ğ·Ğ°Ñ€Ñ…Ğ¸Ğ²Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ          â”‚
+     pkunzip archive\mail.zip    â”‚
+ >1                              â”‚ Divider
+ >1 ~G~ames                      â”‚
+   .........                     â”‚ etc.
 
 .topic MenuEdit=16550
 .title Edit User Menu
@@ -2468,9 +2468,9 @@ menu elements of this level.
  {%3:_}...{%9:_} - User parameters
  (Is used for input a user values in input box)
 
-  {Hints:_}: ş Empty line after Menu Item header means Menu
+  {Hints:_}: â–  Empty line after Menu Item header means Menu
            separator in Menu box.
-         ş It is possible to set title of input box by string
+         â–  It is possible to set title of input box by string
            which have '<' at start, and to set default text in
            input box - use '<=' for it.
 
@@ -2493,62 +2493,62 @@ Use up and down arrows to scroll the list.
  By default CD player is started in minimized state:
 
 
-    É[{ş:_}]ÍÍÍÍÍÍ Celtic Guitar ÍÍÍÍÍÍ[{:_}]Í»
-    ºÚÄÄÄÄTrackÄÄÄÄÄÄÄÄ{Track Time:_}ÄÄÄÄÄ¿º
-    º³  {ÜÜÜ ÜÜÜ:_}      ÜÜÜ   Ü Ü ÜÜÜ   {A:CDplayerOptions}³º
-    º³  {Û Û ÜÜÛ:_}      Û Û ß ÛÜÛ   Û   {I:CDplayerOptions}³º
-    º³  {ÛÜÛ ÛÜÜ:_}      ÛÜÛ ß   Û   Û   {J:CDplayerOptions}³º
-    ºÀ{ÄTwo Irish BalladsÄÄÄÄÄÄÄÄÄÄÄÄÄÄ:_}Ùº
-    ÈÍ{  :_}ÍÍ{ < :_}ÍÍÍÍÍ{  :_}ÍÍÍÍÍ{ > :_}ÍÍ{  :_}ÍÍ¼
+    â•”[{â– :_}]â•â•â•â•â•â• Celtic Guitar â•â•â•â•â•â•[{:_}]â•â•—
+    â•‘â”Œâ”€â”€â”€â”€Trackâ”€â”€â”€â”€â”€â”€â”€â”€{Track Time:_}â”€â”€â”€â”€â”€â”â•‘
+    â•‘â”‚  {â–„â–„â–„ â–„â–„â–„:_}      â–„â–„â–„   â–„ â–„ â–„â–„â–„   {A:CDplayerOptions}â”‚â•‘
+    â•‘â”‚  {â–ˆ â–ˆ â–„â–„â–ˆ:_}      â–ˆ â–ˆ â–€ â–ˆâ–„â–ˆ   â–ˆ   {I:CDplayerOptions}â”‚â•‘
+    â•‘â”‚  {â–ˆâ–„â–ˆ â–ˆâ–„â–„:_}      â–ˆâ–„â–ˆ â–€   â–ˆ   â–ˆ   {J:CDplayerOptions}â”‚â•‘
+    â•‘â””{â”€Two Irish Balladsâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€:_}â”˜â•‘
+    â•šâ•{  :_}â•â•{ < :_}â•â•â•â•â•{  :_}â•â•â•â•â•{ > :_}â•â•{  :_}â•â•â•
 
   To get additional buttons for sound control you
 have to zoom the CD Player.
 (Control keys are listed in status line in the bottom line of the screen)
 
    Mouse button click in these areas
- ş Time mode indicator
+ â–  Time mode indicator
      - switches mode of time indication
- ş {Play modes indicator (ANJ):CDplayerOptions}
+ â–  {Play modes indicator (ANJ):CDplayerOptions}
      - switches current play <Mode>
- ş Big digits
+ â–  Big digits
      - choose a Track to play from a pane
- ş The Bottom line of digits border
+ â–  The Bottom line of digits border
      - choose a Track to play from a list of tracks
 
-               ÉÍ[ş]ÍÍÍÍÍÍÍ CD-Player ÍÍÍÍÍÍÍÍ[]Í»
-               ºÚÄÄÄÄTrackÄÄÄÄÄÄÄÄTrack TimeÄÄÄÄÄ¿º
-               º³    Ü ÜÜÜ  ÜÜÜ ÜÜÜ   ÜÜÜ ÜÜÜ   A³º
-               º³    Û ÛÜÜ  ÛÜÜ ÛÜÜ ß ÜÜÛ ÛÜÜ   N³º
-               º³    Û ÜÜÛ  ÛÜÛ ÛÜÛ ß ÛÜÜ ÛÜÛ   J³º
-               ºÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙº
-               º   Ü  < Ü         Ü  > Ü   Ü º
-               º  ßßßß  ßßß  ßßßßßßßßß  ßßß  ßßßß º
-               º    *   Ü       ş      Ü       Ü º
-               º  ßßßßßßß  ßßßßßßßßßßßßß  ßßßßßßß º
-               º  {  Set   :CDplayerOptions}Ü   Time   Ü   Mode   Ü º
-               º  ßßßßßßßßß  ßßßßßßßßß  ßßßßßßßßß º
-               º    Mix   Ü   Order  Ü  { Title  :CDplayerTitle}Ü º
-               º  ßßßßßßßßß  ßßßßßßßßß  ßßßßßßßßß º
-               ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+               â•”â•[â– ]â•â•â•â•â•â•â• CD-Player â•â•â•â•â•â•â•â•[]â•â•—
+               â•‘â”Œâ”€â”€â”€â”€Trackâ”€â”€â”€â”€â”€â”€â”€â”€Track Timeâ”€â”€â”€â”€â”€â”â•‘
+               â•‘â”‚    â–„ â–„â–„â–„  â–„â–„â–„ â–„â–„â–„   â–„â–„â–„ â–„â–„â–„   Aâ”‚â•‘
+               â•‘â”‚    â–ˆ â–ˆâ–„â–„  â–ˆâ–„â–„ â–ˆâ–„â–„ â–€ â–„â–„â–ˆ â–ˆâ–„â–„   Nâ”‚â•‘
+               â•‘â”‚    â–ˆ â–„â–„â–ˆ  â–ˆâ–„â–ˆ â–ˆâ–„â–ˆ â–€ â–ˆâ–„â–„ â–ˆâ–„â–ˆ   Jâ”‚â•‘
+               â•‘â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜â•‘
+               â•‘   â–„  < â–„         â–„  > â–„   â–„ â•‘
+               â•‘  â–€â–€â–€â–€  â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€  â–€â–€â–€â–€ â•‘
+               â•‘    *   â–„       â–       â–„       â–„ â•‘
+               â•‘  â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€ â•‘
+               â•‘  {  Set   :CDplayerOptions}â–„   Time   â–„   Mode   â–„ â•‘
+               â•‘  â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€ â•‘
+               â•‘    Mix   â–„   Order  â–„  { Title  :CDplayerTitle}â–„ â•‘
+               â•‘  â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€â–€ â•‘
+               â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   Buttons description:
 
-    {  :_}Ü  Play
-    ßßßß
-    {>  :_}Ü  Next Track
-    ßßßß
-    {<  :_}Ü  Previous Track
-    ßßßß
-    { :_}Ü  Fast Forward
-    ßßßß
-    { :_}Ü  Fast Backward
-    ßßßß
-    {*  :_}Ü  Pause
-    ßßßß
-    {ş  :_}Ü  Stop
-    ßßßß
-    {  :_}Ü  Eject
-    ßßßß
+    {  :_}â–„  Play
+    â–€â–€â–€â–€
+    {>  :_}â–„  Next Track
+    â–€â–€â–€â–€
+    {<  :_}â–„  Previous Track
+    â–€â–€â–€â–€
+    { :_}â–„  Fast Forward
+    â–€â–€â–€â–€
+    { :_}â–„  Fast Backward
+    â–€â–€â–€â–€
+    {*  :_}â–„  Pause
+    â–€â–€â–€â–€
+    {â–   :_}â–„  Stop
+    â–€â–€â–€â–€
+    {  :_}â–„  Eject
+    â–€â–€â–€â–€
 
 <{Set:CDplayerOptions}>
    - CD Player's options
@@ -2597,21 +2597,21 @@ have to zoom the CD Player.
 
 .topic TreeDialog=16558
 .title  Directories tree
-  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   D:\                            
-  ÃÄÄÂARVID                      ş
-  ³  ÃÄÄÂREADY                   ±
-  ³  ³  ÃÄÄÂUTILS                ±
-  ³  ³  ³  ÃÄÄÂSOUND             ±
-  ³  ³  ³  ³  ÀÄÄÄPLAYER         ±
-  ³  ³  ³  ÃÄÄÂFIDO              ±
-  ³  ³  ³  ³  ÃÄÄÄGECHO          ±
-  ³  ³  ³  ³  ÀÄÄÄUUE            ±
-  ³  ³  ³  ÃÄÄÄCONVERT           ±
-  ³  ³  ³  ÃÄÄÄVIDEO             ±
-  ³  ³  ³  ÃÄÄÄTESTERS           ±
-  ³  ³  ³  ÃÄÄÄCODERS            
- ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  â”œâ”€â”€â”¬ARVID                      â– 
+  â”‚  â”œâ”€â”€â”¬READY                   â–’
+  â”‚  â”‚  â”œâ”€â”€â”¬UTILS                â–’
+  â”‚  â”‚  â”‚  â”œâ”€â”€â”¬SOUND             â–’
+  â”‚  â”‚  â”‚  â”‚  â””â”€â”€â”€PLAYER         â–’
+  â”‚  â”‚  â”‚  â”œâ”€â”€â”¬FIDO              â–’
+  â”‚  â”‚  â”‚  â”‚  â”œâ”€â”€â”€GECHO          â–’
+  â”‚  â”‚  â”‚  â”‚  â””â”€â”€â”€UUE            â–’
+  â”‚  â”‚  â”‚  â”œâ”€â”€â”€CONVERT           â–’
+  â”‚  â”‚  â”‚  â”œâ”€â”€â”€VIDEO             â–’
+  â”‚  â”‚  â”‚  â”œâ”€â”€â”€TESTERS           â–’
+  â”‚  â”‚  â”‚  â”œâ”€â”€â”€CODERS            
+ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  D:\
  {3832:_} files with {221,200,115:_} bytes
 
@@ -2841,37 +2841,37 @@ and not affect menu for creating new File Manager (Ctrl-F3)
 At the most bottom is {Tabulated view:_} setting. Here is example of how it
 works.
 
-³If unchecked
-³
-³ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-³ ³ A: Remov.                          ³
-³ ³ C: Fixed FAT32  1120.5M            ³
-³ ³ D: Fixed FAT32  144.9M             ³
-³ ³ E: Fixed FAT32  1564.0M            ³
-³ ³ F: CD-ROM                          ³
-³ ³ G: CD-ROM  Eva Gold dvd2 0.0M      ³
-³ ³ H: Fixed FAT32  4926.6M            ³
-³ ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ ³ *: TEMP: empty                     ³
-³ ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ ³ 1: C:\Program Files\eMTemp  Alt-1 ³
-³ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-³
-³If checked
-³
-³ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-³ ³ A: Remov.                             ³
-³ ³ C: Fixed  FAT32               1120.5M ³
-³ ³ D: Fixed  FAT32                144.9M ³
-³ ³ E: Fixed  FAT32               1564.0M ³
-³ ³ F: CD-ROM                             ³
-³ ³ G: CD-ROM       Eva Gold dvd2    0.0M ³
-³ ³ H: Fixed  FAT32               4926.6M ³
-³ ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ ³ *: TEMP: empty                        ³
-³ ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ ³ 1: C:\Program Files\eMTemp     Alt-1 ³
-³ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+â”‚If unchecked
+â”‚
+â”‚ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ â”‚ A: Remov.                          â”‚
+â”‚ â”‚ C: Fixed FAT32  1120.5M            â”‚
+â”‚ â”‚ D: Fixed FAT32  144.9M             â”‚
+â”‚ â”‚ E: Fixed FAT32  1564.0M            â”‚
+â”‚ â”‚ F: CD-ROM                          â”‚
+â”‚ â”‚ G: CD-ROM  Eva Gold dvd2 0.0M      â”‚
+â”‚ â”‚ H: Fixed FAT32  4926.6M            â”‚
+â”‚ â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ â”‚ *: TEMP: empty                     â”‚
+â”‚ â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ â”‚ 1: C:\Program Files\eMTemp  Alt-1 â”‚
+â”‚ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â”‚
+â”‚If checked
+â”‚
+â”‚ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ â”‚ A: Remov.                             â”‚
+â”‚ â”‚ C: Fixed  FAT32               1120.5M â”‚
+â”‚ â”‚ D: Fixed  FAT32                144.9M â”‚
+â”‚ â”‚ E: Fixed  FAT32               1564.0M â”‚
+â”‚ â”‚ F: CD-ROM                             â”‚
+â”‚ â”‚ G: CD-ROM       Eva Gold dvd2    0.0M â”‚
+â”‚ â”‚ H: Fixed  FAT32               4926.6M â”‚
+â”‚ â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ â”‚ *: TEMP: empty                        â”‚
+â”‚ â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ â”‚ 1: C:\Program Files\eMTemp     Alt-1 â”‚
+â”‚ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
 
 .topic SetupTerminal=16569
@@ -2999,27 +2999,27 @@ of the name), then it will be shown as in the "Never" setting.
 
 For example, we have these files
 
-³Long_name
-³Name
-³.ext
-³Long_name.ext
-³Name.ext
-³Name.long_ext
-³.long_ext
-³Long_name.long_ext
-³
-³12.3 setting
-³
-³{Never:_}     {If exists and there:_}     {If does:_}       {Always:_}
-³            {are symbols before:_}   {not fit in:_}
-³Long_name      Long_name        Long_name      Long_nam
-³Name           Name             Name           Name
-³.ext           .ext             .ext                    ext
-³Long_name.e   Long_namext     Long_namext   Long_namext
-³Name.ext       Name     ext     Name.ext       Name     ext
-³.long_ext      .long_ext        .long_ext               lo
-³Long_name.l   Long_namlo     Long_namlo   Long_namlo
-³Name.long_e   Name     lo     Name.long_e   Name     lo
+â”‚Long_name
+â”‚Name
+â”‚.ext
+â”‚Long_name.ext
+â”‚Name.ext
+â”‚Name.long_ext
+â”‚.long_ext
+â”‚Long_name.long_ext
+â”‚
+â”‚12.3 setting
+â”‚
+â”‚{Never:_}     {If exists and there:_}     {If does:_}       {Always:_}
+â”‚            {are symbols before:_}   {not fit in:_}
+â”‚Long_name      Long_name        Long_name      Long_nam
+â”‚Name           Name             Name           Name
+â”‚.ext           .ext             .ext                    ext
+â”‚Long_name.e   Long_namext     Long_namext   Long_namext
+â”‚Name.ext       Name     ext     Name.ext       Name     ext
+â”‚.long_ext      .long_ext        .long_ext               lo
+â”‚Long_name.l   Long_namlo     Long_namlo   Long_namlo
+â”‚Name.long_e   Name     lo     Name.long_e   Name     lo
 
 See also {Divider and footer settings:PanelShowSetup2}
 
@@ -3092,11 +3092,11 @@ remaining space for names.
 Here is an example. Assume that we have the following file:
 This_is_a_file_with_a_very_long_name_and_with_extension.extension
 
-³"Left part and ext."  This_is_a_file_with_a_very_lextension
-³
-³"Left part"           This_is_a_file_with_a_very_long_name_
-³
-³"Right part"          ong_name_and_with_extension.extension
+â”‚"Left part and ext."  This_is_a_file_with_a_very_lextension
+â”‚
+â”‚"Left part"           This_is_a_file_with_a_very_long_name_
+â”‚
+â”‚"Right part"          ong_name_and_with_extension.extension
 
    "Show" - {If not fully shown anywhere:_}". If you select this option, long
 filename in the footer will be displayed only if it is not shown fully in the
@@ -3475,10 +3475,10 @@ submenu will be opened allowing to choose between changing of sort mode for
 current panel type only or for
 all panel types:
 
- ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
- ³All panel types    ³
- ³ Current panel type ³
- ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+ â”‚All panel types    â”‚
+ â”‚ Current panel type â”‚
+ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
  The item marked by diamond symbol in this submenu is the default action
 for items of the basic Files Sort menu. You can change the default value
@@ -3623,40 +3623,40 @@ This is a menu with on/off toggles.
 
 Encoding binary files to the printable text to been send by electronic mail.
 
-  ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ UU Encode ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-  º                                                          º
-  º   Encode to  °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°Şİ  º
-  º                                                          º
-  º  Prefixes                      Checksum level            º
-  º  [ ] File creation date&time   ( ) None                  º
-  º  [ ] Char mapping table        ( ) of Entire input file  º
-  º  [ ] Statistics                () of Each section       º
-  º                                ( ) of Each line          º
-  º  Lines per section  °°°° Şİ   ( ) Advanced 64-bit       º
-  º                                                          º
-  º  Target file format                                      º
-  º  () DOS <CR>+<LF>  ( ) UNIX                             º
-  º                                                          º
-  º                OK  Ü  Cancel Ü   Tree  Ü   Help  Ü     º
-  º               ßßßßßßßß  ßßßßßßßß  ßßßßßßßß  ßßßßßßßß     º
-  ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+  â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• UU Encode â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+  â•‘                                                          â•‘
+  â•‘   Encode to  â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–â–Œ  â•‘
+  â•‘                                                          â•‘
+  â•‘  Prefixes                      Checksum level            â•‘
+  â•‘  [ ] File creation date&time   ( ) None                  â•‘
+  â•‘  [ ] Char mapping table        ( ) of Entire input file  â•‘
+  â•‘  [ ] Statistics                () of Each section       â•‘
+  â•‘                                ( ) of Each line          â•‘
+  â•‘  Lines per section  â–‘â–‘â–‘â–‘ â–â–Œ   ( ) Advanced 64-bit       â•‘
+  â•‘                                                          â•‘
+  â•‘  Target file format                                      â•‘
+  â•‘  () DOS <CR>+<LF>  ( ) UNIX                             â•‘
+  â•‘                                                          â•‘
+  â•‘                OK  â–„  Cancel â–„   Tree  â–„   Help  â–„     â•‘
+  â•‘               â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€     â•‘
+  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 .topic UUDecode=48026
 .title UU Decode
 
 Decoding binary files, received by E-Mail
 
-  ÉÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍ UU Decode ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-  º   Target directory                            º
-  º  °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°Şİº
-  º                                               º
-  º   [ ] Check existing files                    º
-  º   [ ] Display error messages                  º
-  º   [ ] Save broken files                       º
-  º                                               º
-  º       °°°OK°°°Ü °Cancel°Ü °°Tree°°Ü °°Help°°Ü º
-  º        ßßßßßßßß  ßßßßßßßß  ßßßßßßßß  ßßßßßßßß º
-  ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+  â•”â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â•â•â• UU Decode â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+  â•‘   Target directory                            â•‘
+  â•‘  â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–â–Œâ•‘
+  â•‘                                               â•‘
+  â•‘   [ ] Check existing files                    â•‘
+  â•‘   [ ] Display error messages                  â•‘
+  â•‘   [ ] Save broken files                       â•‘
+  â•‘                                               â•‘
+  â•‘       â–‘â–‘â–‘OKâ–‘â–‘â–‘â–„ â–‘Cancelâ–‘â–„ â–‘â–‘Treeâ–‘â–‘â–„ â–‘â–‘Helpâ–‘â–‘â–„ â•‘
+  â•‘        â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€  â–€â–€â–€â–€â–€â–€â–€â–€ â•‘
+  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 .topic CompareDirs=48027
 .title Compare Directories
@@ -3709,9 +3709,9 @@ Options:
 Enter a {name:_} of archive.
 
 The default archive name could be
- ş {the same as a current file name:_} if you have only
+ â–  {the same as a current file name:_} if you have only
    one file selected
- ş {the same as a current directory name:_} if you have more
+ â–  {the same as a current directory name:_} if you have more
    than one selected files
 
 
@@ -3898,85 +3898,85 @@ See also {Dialog box elements:DialogItems}
 .topic SystemSetup=48037
 .title System Setup
 
-³{[X] Internal editor:_}      - To use internal editor with F4 and
-³                           external with Alt-F4; when switched off
-³                           - external editor will be used with F4
-³                           and internal with Alt-F4
-³
-³{[X] Use system clipboard:_} - When switched on, the text copied in
-³                           the Navigator will be possible to insert
-³                           into any another task in your system, and
-³                           any text copied in another task will be
-³                           available in DN. In this mode the #0
-³                           symbols will be replaced with spces when
-³                           string is placed to clipboard
-³
-³{[X] Clear R/O flag from CDRom:_} - The read only attribute will be
-³                                cleared from files when they copied
-³                                from CD-ROM
-³
-³{[X] Advanced copy:_} - When files copying proceeds, the files will
-³                    be read into common copy buffer and written
-³                    afterward from this buffer (the size of copy
-³                    buffer can be set by "Copy buffer limit" option
-³                    of current dialog). If this option switched off,
-³                    files will be copied subsequently one-by-one.
-³
-³
-³{Video Mode 1:_} Â User-defined videomodes, which can be
-³{Video Mode 2:_} Ù switched by <Alt-F10> and <Ctrl-F10>.
-³                   The standard videomodes can be set as
-³                   a number, which looks in hexadecimal
-³                   view as:
-³                   $<N><N>
-³                    where the 1-st <N> can be:
-³                     8 - modes 40 x ??
-³                     9 - modes 80 x ??
-³                    the 2-nd <N>:
-³                     0 - ?? x 12
-³                     1 - ?? x 14
-³                     2 - ?? x 25
-³                     3 - ?? x 30
-³                     4 - ?? x 34
-³                     5 - ?? x 43
-³                     6 - ?? x 50
-³                     7 - ?? x 60
-³                   Custom videomodes can be set as
-³                   Colmns*256 + Rows , where Columns is
-³                   a columns number, and Rows is a rows
-³                   number in console
-³
-³{Temporary directory:_} - The name and path of directory, in which
-³                       the temporary files will be placed
-³
-³ The disks options:
-³  Choose drive here    Here you can set options of disk choosen
-³ÚÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ¿ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-³Drives                  Current drive options
-³
-³A:                    {[X] Verify disk writes:_} - to check file
-³B:                   ş                       integrity after writing
-³C:                   ± {[X] Check free space  :_} - to check is there
-³D:                   ±                       enough free space on
-³E:                   ±                       destination drive
-³F:                   ±                       to copy selected files
-³G:                   ±                       to this drive
-³H:                    {[X] Unpack to drive directly:_} - when set,
-³                                   the "Through temporary directory"
-³                                   option will be cleared in
-³                                   "Extract files" dialog when
-³                                   unarchiving to this drive
-³                                   performed, otherwice this
-³                                   option will be preset
-³
-³{Copy buffer limit:_} - The limit of copy buffer in kilobytes
-³
-³{Force default archiver:_} - Can be set to name of one of the
-³                         archive types supported (see files
-³                         archiving dialog) or to empty string.
-³                         When set to name of archive type,
-³                         this type always will be set as
-³                         default archiver
+â”‚{[X] Internal editor:_}      - To use internal editor with F4 and
+â”‚                           external with Alt-F4; when switched off
+â”‚                           - external editor will be used with F4
+â”‚                           and internal with Alt-F4
+â”‚
+â”‚{[X] Use system clipboard:_} - When switched on, the text copied in
+â”‚                           the Navigator will be possible to insert
+â”‚                           into any another task in your system, and
+â”‚                           any text copied in another task will be
+â”‚                           available in DN. In this mode the #0
+â”‚                           symbols will be replaced with spces when
+â”‚                           string is placed to clipboard
+â”‚
+â”‚{[X] Clear R/O flag from CDRom:_} - The read only attribute will be
+â”‚                                cleared from files when they copied
+â”‚                                from CD-ROM
+â”‚
+â”‚{[X] Advanced copy:_} - When files copying proceeds, the files will
+â”‚                    be read into common copy buffer and written
+â”‚                    afterward from this buffer (the size of copy
+â”‚                    buffer can be set by "Copy buffer limit" option
+â”‚                    of current dialog). If this option switched off,
+â”‚                    files will be copied subsequently one-by-one.
+â”‚
+â”‚
+â”‚{Video Mode 1:_} â”¬ User-defined videomodes, which can be
+â”‚{Video Mode 2:_} â”˜ switched by <Alt-F10> and <Ctrl-F10>.
+â”‚                   The standard videomodes can be set as
+â”‚                   a number, which looks in hexadecimal
+â”‚                   view as:
+â”‚                   $<N><N>
+â”‚                    where the 1-st <N> can be:
+â”‚                     8 - modes 40 x ??
+â”‚                     9 - modes 80 x ??
+â”‚                    the 2-nd <N>:
+â”‚                     0 - ?? x 12
+â”‚                     1 - ?? x 14
+â”‚                     2 - ?? x 25
+â”‚                     3 - ?? x 30
+â”‚                     4 - ?? x 34
+â”‚                     5 - ?? x 43
+â”‚                     6 - ?? x 50
+â”‚                     7 - ?? x 60
+â”‚                   Custom videomodes can be set as
+â”‚                   Colmns*256 + Rows , where Columns is
+â”‚                   a columns number, and Rows is a rows
+â”‚                   number in console
+â”‚
+â”‚{Temporary directory:_} - The name and path of directory, in which
+â”‚                       the temporary files will be placed
+â”‚
+â”‚ The disks options:
+â”‚  Choose drive here    Here you can set options of disk choosen
+â”‚â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚Drives                  Current drive options
+â”‚
+â”‚A:                    {[X] Verify disk writes:_} - to check file
+â”‚B:                   â–                        integrity after writing
+â”‚C:                   â–’ {[X] Check free space  :_} - to check is there
+â”‚D:                   â–’                       enough free space on
+â”‚E:                   â–’                       destination drive
+â”‚F:                   â–’                       to copy selected files
+â”‚G:                   â–’                       to this drive
+â”‚H:                    {[X] Unpack to drive directly:_} - when set,
+â”‚                                   the "Through temporary directory"
+â”‚                                   option will be cleared in
+â”‚                                   "Extract files" dialog when
+â”‚                                   unarchiving to this drive
+â”‚                                   performed, otherwice this
+â”‚                                   option will be preset
+â”‚
+â”‚{Copy buffer limit:_} - The limit of copy buffer in kilobytes
+â”‚
+â”‚{Force default archiver:_} - Can be set to name of one of the
+â”‚                         archive types supported (see files
+â”‚                         archiving dialog) or to empty string.
+â”‚                         When set to name of archive type,
+â”‚                         this type always will be set as
+â”‚                         default archiver
 
 .topic OptionsStartup=48038
 .title Startup Options
@@ -4075,10 +4075,10 @@ Enter a search mask.
 
 .topic ViewFile=48057
 ; /portions by Deleter/ Jan 2004
- ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
- ³ Viewing and editing Û
- ³ files by extensions Û
- ÀÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ â”‚ Viewing and editing â–ˆ
+ â”‚ files by extensions â–ˆ
+ â””â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–„â–ˆ
 
 When the user is in file panel, he may occasionally need to view/edit
 a file by an external editor or a viewer. The possiblity to do it is
@@ -4156,11 +4156,11 @@ combinations is called {filters:_}.
    Filename suits filter, if it suits at least one wildcard in it.
 
 
-³Example:   *.exe;*.com;*.bat;*.btm;*.cmd  Ä¿
-³           *.asm;*.c;*.cpp;*.inc;*.pas    ÄÅ- This is a filters
-³           name.*; *.exe                  ÄÙ
+â”‚Example:   *.exe;*.com;*.bat;*.btm;*.cmd  â”€â”
+â”‚           *.asm;*.c;*.cpp;*.inc;*.pas    â”€â”¼- This is a filters
+â”‚           name.*; *.exe                  â”€â”˜
 
-In first case, all files with 'exe' 'áom' 'bat' 'btm' and 'cmd' extesions will
+In first case, all files with 'exe' 'Ñom' 'bat' 'btm' and 'cmd' extesions will
 be processed. In second - with 'asm' 'c' 'cpp' 'inc' and 'pas extensions. In
 third - files with 'name' name and any extension, and files with any name, but
 'exe' extension.
@@ -4169,9 +4169,9 @@ third - files with 'name' name and any extension, and files with any name, but
 filter with minus ("-") symbol. In this case all files will be processed
 except files, suiting wildcard with "-".
 
-³Example:  *.*; -*.txt; -text.*
-³          *.com; -command.com
-³          *.pas; *.c; -my*
+â”‚Example:  *.*; -*.txt; -text.*
+â”‚          *.com; -command.com
+â”‚          *.pas; *.c; -my*
 
 In firs case all files will be processed, except suiting '*.txt' and 'text.*'
 wildcards. In second - all '*.com' files except 'command.com'. In third - all
@@ -4223,15 +4223,15 @@ interpreter is different than <bootdrive>:\os2\cmd.exe
 
  There are three ways to run OS/2 applications:
 
-   ş From DOS command line:
+   â–  From DOS command line:
 
      Put before command string one of chars listed below:
          ">" - run foreground Full Screen OS/2 session
          "<" - run background Full Screen OS/2 session
          "]" - run foreground Windowed OS/2 session
          "[" - run background Windowed OS/2 session
-   ş Switch to OS/2 command prompt mode by {Alt-/:_}
-   ş Run executable files from file panel:
+   â–  Switch to OS/2 command prompt mode by {Alt-/:_}
+   â–  Run executable files from file panel:
 
      highlight required file and press
         - Alt-Shift-Enter to run it foreground
@@ -4242,7 +4242,7 @@ interpreter is different than <bootdrive>:\os2\cmd.exe
          sessions. Be sure that parameters for DOS
          sessions are acceptable for your applications.
 
- {Hints:_}: ş if Files Highlight option is enabled
+ {Hints:_}: â–  if Files Highlight option is enabled
           OS/2 batch files (*.CMD) are shown as executable
           files. You can start it as usual .EXE files by
           pressing Enter. If you'll press Shift-Enter,
@@ -4267,24 +4267,24 @@ given in "Files with descriptions" line of File Panel Defaults dialog box.
 .topic LinkStatusWnd=48062
 .title Navigator Link Status Window
 
-  ÉÍ[ş]ÍÍÍÍÍÍ Navigator Link ÍÍÍÍÍÍÍÍÍÍ»
-  º                                    º
-  º      COM1 57600/8N1/SREJ2.1024  ÄÄÄÄÄÄ Link Info
-  º     Receiving D:\DOC\PEPPER.DOC ÄÄÄÄÄÄ Status
-  º         0 errors per 489 Kb     ÄÄÄÄÄÄ Errors
-  º                                    º
-  ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+  â•”â•[â– ]â•â•â•â•â•â• Navigator Link â•â•â•â•â•â•â•â•â•â•â•—
+  â•‘                                    â•‘
+  â•‘      COM1 57600/8N1/SREJ2.1024  â”€â”€â”€â”€â”€â”€ Link Info
+  â•‘     Receiving D:\DOC\PEPPER.DOC â”€â”€â”€â”€â”€â”€ Status
+  â•‘         0 errors per 489 Kb     â”€â”€â”€â”€â”€â”€ Errors
+  â•‘                                    â•‘
+  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
    Link Info:
 
    57600/8N1/SREJ2.1024
               
-   ³     ³³³     ³ ÀÄÄÄ Actual frame size
-   ³     ³³³     ÀÄÄÄÄÄ Selective reject level
-   ³     ³³ÀÄÄÄÄÄÄÄÄÄÄÄ Number of stop bits
-   ³     ³ÀÄÄÄÄÄÄÄÄÄÄÄÄ Parity check type (None/Odd/Even/Mark/Space)
-   ³     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄ Number of data bits
-   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ BPS
+   â”‚     â”‚â”‚â”‚     â”‚ â””â”€â”€â”€ Actual frame size
+   â”‚     â”‚â”‚â”‚     â””â”€â”€â”€â”€â”€ Selective reject level
+   â”‚     â”‚â”‚â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Number of stop bits
+   â”‚     â”‚â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Parity check type (None/Odd/Even/Mark/Space)
+   â”‚     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Number of data bits
+   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ BPS
 
 
   See also: {Link Panel:LinkPanel}
@@ -4333,56 +4333,56 @@ compression methods.
 
            25 pin      25 pin
 
-   GND       7 ŞÄÄÄÄÄÄÄÄÄİ  7
+   GND       7 â–â”€â”€â”€â”€â”€â”€â”€â”€â”€â–Œ  7
 
-   TD        2 ŞÄÄÄÄ¿ ÚÄÄİ  2
-                  ÚÄÅÄÙ
-   RD        3 ŞÄÄÙ ÀÄÄÄÄİ  3
+   TD        2 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  2
+                  â”Œâ”€â”¼â”€â”˜
+   RD        3 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ  3
 
-   RTS       4 ŞÄÄÄÄ¿ ÚÄÄİ  4
-                  ÚÄÅÄÙ
-   CTS       5 ŞÄÄÙ ÀÄÄÄÄİ  5
+   RTS       4 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  4
+                  â”Œâ”€â”¼â”€â”˜
+   CTS       5 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ  5
 
-   DSR       6 ŞÄÄÄÄ¿ ÚÄÄİ  6
-                  ÚÄÅÄÙ
-   DTR      20 ŞÄÄÙ ÀÄÄÄÄİ 20
+   DSR       6 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  6
+                  â”Œâ”€â”¼â”€â”˜
+   DTR      20 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ 20
 
 
 
             9 pin       9 pin
 
-   GND       5 ŞÄÄÄÄÄÄÄÄÄİ  5
+   GND       5 â–â”€â”€â”€â”€â”€â”€â”€â”€â”€â–Œ  5
 
-   TD        3 ŞÄÄÄÄ¿ ÚÄÄİ  3
-                  ÚÄÅÄÙ
-   RD        2 ŞÄÄÙ ÀÄÄÄÄİ  2
+   TD        3 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  3
+                  â”Œâ”€â”¼â”€â”˜
+   RD        2 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ  2
 
-   RTS       7 ŞÄÄÄÄ¿ ÚÄÄİ  7
-                  ÚÄÅÄÙ
-   CTS       8 ŞÄÄÙ ÀÄÄÄÄİ  8
+   RTS       7 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  7
+                  â”Œâ”€â”¼â”€â”˜
+   CTS       8 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ  8
 
-   DSR       6 ŞÄÄÄÄ¿ ÚÄÄİ  6
-                  ÚÄÅÄÙ
-   DTR       4 ŞÄÄÙ ÀÄÄÄÄİ  4
+   DSR       6 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  6
+                  â”Œâ”€â”¼â”€â”˜
+   DTR       4 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ  4
 
 
 
 
            9 pin       25 pin
 
-   GND       5 ŞÄÄÄÄÄÄÄÄÄİ  7
+   GND       5 â–â”€â”€â”€â”€â”€â”€â”€â”€â”€â–Œ  7
 
-   TD        3 ŞÄÄÄÄ¿ ÚÄÄİ  2
-                  ÚÄÅÄÙ
-   RD        2 ŞÄÄÙ ÀÄÄÄÄİ  3
+   TD        3 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  2
+                  â”Œâ”€â”¼â”€â”˜
+   RD        2 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ  3
 
-   RTS       7 ŞÄÄÄÄ¿ ÚÄÄİ  4
-                  ÚÄÅÄÙ
-   CTS       8 ŞÄÄÙ ÀÄÄÄÄİ  5
+   RTS       7 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  4
+                  â”Œâ”€â”¼â”€â”˜
+   CTS       8 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ  5
 
-   DSR       6 ŞÄÄÄÄ¿ ÚÄÄİ  6
-                  ÚÄÅÄÙ
-   DTR       4 ŞÄÄÙ ÀÄÄÄÄİ 20
+   DSR       6 â–â”€â”€â”€â”€â” â”Œâ”€â”€â–Œ  6
+                  â”Œâ”€â”¼â”€â”˜
+   DTR       4 â–â”€â”€â”˜ â””â”€â”€â”€â”€â–Œ 20
 
   See also: {Link Status Window:LinkStatusWnd}
             {Link Panel:LinkPanel}
@@ -4450,16 +4450,16 @@ compression methods.
 .title Calendar
 Calendar window looks like this:
 
-  ÉÍ[ş]ÍÍÍÍÍ Calendar ÍÍÍÍÍÍÍÍÍ»
-  º April         2000 <  >  = º
-  º Mo  Tu  We  Th  Fr  Sa  Su º
-  º                      1   2 º
-  º  3   4   5   6   7   8   9 º
-  º 10  11  12  13  14  15  16 º
-  º 17  18  19  20  21  22 >23<º
-  º 24  25  26  27  28  29  30 º
-  º                    [16/114]º <- [week/day] indicator
-  ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+  â•”â•[â– ]â•â•â•â•â• Calendar â•â•â•â•â•â•â•â•â•â•—
+  â•‘ April         2000 <  >  = â•‘
+  â•‘ Mo  Tu  We  Th  Fr  Sa  Su â•‘
+  â•‘                      1   2 â•‘
+  â•‘  3   4   5   6   7   8   9 â•‘
+  â•‘ 10  11  12  13  14  15  16 â•‘
+  â•‘ 17  18  19  20  21  22 >23<â•‘
+  â•‘ 24  25  26  27  28  29  30 â•‘
+  â•‘                    [16/114]â•‘ <- [week/day] indicator
+  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 Use cursor keys "Left" and "Right" to jump to previous or next day.
 
@@ -4565,7 +4565,7 @@ only).
 .title Task List
 ; /portions by Deleter/ 07.02.2003
 
- ’ sk list has some useful options which can be set by keys in
+ Ğ¢Ğ°sk list has some useful options which can be set by keys in
 section {[Tasklist] :_} of {dn.ini:IniFile} file:
 
 {ShowExePaths (Boolean) :_} When set to 0 , the names of processes'
@@ -4705,7 +4705,7 @@ mask. It substitute all symbols to last point including. For example you have
 a directiory, containing files with different extensions. And you want to move
 to files with 'txt' extension. So, you activate a quick search and enter
 '>txt'. But usually only '>t' is quite enough. If you want to continue quick
-search by the name of file, you can clear the mask by pressing BackSpaáe and
+search by the name of file, you can clear the mask by pressing BackSpaÑe and
 start entering a name.
 
 .topic SelectPreset=48104
@@ -4721,10 +4721,10 @@ loading of appearance settings only or loading of complete set of settings
 from chosen preset (including {appearance:PanelShowSetup},
 {sorting:PanelSortSetup}, and {filter:AdvancedFilter} settings):
 
- ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
- ³Appearance only  ³
- ³ Full panel setup ³
- ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+ â”‚Appearance only  â”‚
+ â”‚ Full panel setup â”‚
+ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
   The item marked by diamond symbol in this submenu is the default action
 for items of the basic Select Panel Settings Preset menu. You can change the
@@ -4759,25 +4759,25 @@ forward or backward from one managing element to another. When the element
 becomes active, it is highlighted.
    To select an element also it is enough to click on it by the mouse.
 
-³   ÉÍÍ[ş]ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ Title ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-³   º ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                  º
-³   º ³ Input line ±±±±±±±±±±±±±±±±±±Şİ ³                  º
-³   º ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÉÍ[ş]Í History ÍÍÍÍ»           º
-³   º                       º input1                      º
-³   º                     ±  º input2           ş           º
-³   º   Scroll Bars       ş  ºÛinput3ÛÛÛÛÛÛÛÛÛÛÛ±           º
-³   º                     ±  º input4                      º
-³   º                     ±  È±±±ş±±±±±±±±±±±Í¼           º
-³   º  ±±±ş±±±±±±±±±±±                                   º
-³   º                                                       º
-³   º   Radio buttons    Check boxes       Combo box        º
-³   º    ( ) Case1        [ ] Option1       [Case1]         º
-³   º    () Case2        [X] Option2                       º
-³   º    ( ) Case3        [X] Option3                       º
-³   º                                                       º
-³   º                          Button Ü      Button   Ü   º
-³   º                         ßßßßßßßßßßß    ßßßßßßßßßßßß   º
-³   ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+â”‚   â•”â•â•[â– ]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• Title â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â”‚   â•‘ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                  â•‘
+â”‚   â•‘ â”‚ Input line â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–â–Œ â”‚                  â•‘
+â”‚   â•‘ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•”â•[â– ]â• History â•â•â•â•â•—           â•‘
+â”‚   â•‘                       â•‘ input1                      â•‘
+â”‚   â•‘                     â–’  â•‘ input2           â–            â•‘
+â”‚   â•‘   Scroll Bars       â–   â•‘â–ˆinput3â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–’           â•‘
+â”‚   â•‘                     â–’  â•‘ input4                      â•‘
+â”‚   â•‘                     â–’  â•šâ–’â–’â–’â– â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â•â•           â•‘
+â”‚   â•‘  â–’â–’â–’â– â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’                                   â•‘
+â”‚   â•‘                                                       â•‘
+â”‚   â•‘   Radio buttons    Check boxes       Combo box        â•‘
+â”‚   â•‘    ( ) Case1        [ ] Option1       [Case1]         â•‘
+â”‚   â•‘    () Case2        [X] Option2                       â•‘
+â”‚   â•‘    ( ) Case3        [X] Option3                       â•‘
+â”‚   â•‘                                                       â•‘
+â”‚   â•‘                          Button â–„      Button   â–„   â•‘
+â”‚   â•‘                         â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€    â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€â–€   â•‘
+â”‚   â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   The main elements of dialog box will be described below.
 
@@ -4801,8 +4801,8 @@ on these arrows.
 
  When option:
 
-³  Options => Configuration => System Setup... =>
-³          [X] Use system clipboard
+â”‚  Options => Configuration => System Setup... =>
+â”‚          [X] Use system clipboard
 
  is switched on, then the Clipboard shared with operating system is used.
 
@@ -4810,7 +4810,7 @@ on these arrows.
   ~~~~~~~
    The history - it the list, which is connected with Input Line. Pressing an
 arrow downwards in a Input or clicking by Mouse on icon at the right side of
-Input line (Şİ), it is possible to call the list of the previous values
+Input line (â–â–Œ), it is possible to call the list of the previous values
 of the Input line and to choose one from them.
 
   Button
@@ -4829,14 +4829,14 @@ rule, it is marked by the special color. It is possible simply to press
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Clusters for choice and setting of the standard parameters.
 
-³      Radio buttons                Check boxes
-³       ( ) Case 1                   [ ] Option1
-³       () Case 2                   [X] Option2
-³       ( ) Case 3                   [X] Option3
-³
-³      Choice of a single           Setting of various
-³      possible option among        independent parameters
-³      proposed variants
+â”‚      Radio buttons                Check boxes
+â”‚       ( ) Case 1                   [ ] Option1
+â”‚       () Case 2                   [X] Option2
+â”‚       ( ) Case 3                   [X] Option3
+â”‚
+â”‚      Choice of a single           Setting of various
+â”‚      possible option among        independent parameters
+â”‚      proposed variants
 
    Moving between parameters is possible by cursor keys or by the mouse.
 Setting of Check boxes values is possible by pressing Space bar.
@@ -4845,8 +4845,8 @@ Setting of Check boxes values is possible by pressing Space bar.
   ~~~~~~~~~~~
    Combo Boxes look like inscriptions enclosed into square brackets:
 
-³             Combo box
-³              [Case 1]
+â”‚             Combo box
+â”‚              [Case 1]
 
    Like Radio Buttons, the Combo box allows to make a choice of a single
 possible option among a number of proposed variants. The selection among all
@@ -4860,14 +4860,14 @@ usual menu.
   ~~~~~~~~~
      It is a vertical or horizontal bar, which looks as follows:
 
-³                                       ÚÄÄÄ¿
-³                   Runner ÄÄÄ¿         ³  ³ Less
-³                    ³        ³         ³ ± ³
-³                            ÀÄÄÄÄÄÄÄ ³ ş ³
-³ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿     ³ ± ³
-³ ³ ±±±±±±±±±±±±±±±±ş±±±±±±±±±± ³     ³ ± ³
-³ ³  Less                   More  ³     ³  ³ More
-³ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ     ÀÄÄÄÙ
+â”‚                                       â”Œâ”€â”€â”€â”
+â”‚                   Runner â”€â”€â”€â”         â”‚  â”‚ Less
+â”‚                    â”‚        â”‚         â”‚ â–’ â”‚
+â”‚                            â””â”€â”€â”€â”€â”€â”€â”€ â”‚ â–  â”‚
+â”‚ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”‚ â–’ â”‚
+â”‚ â”‚ â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’â– â–’â–’â–’â–’â–’â–’â–’â–’â–’â–’ â”‚     â”‚ â–’ â”‚
+â”‚ â”‚  Less                   More  â”‚     â”‚  â”‚ More
+â”‚ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”˜
 
 
    These strips can be used by work with Mouse for scrolling the contents of
@@ -4894,13 +4894,13 @@ among a number of listed items in Dialog box or to choose an item in a
 history of Input Lines and has the cursor-bar and the scroll bar for
 scrolling.
 
-³     ÚÄ ListÄÄÄÄÄÄÄ¿
-³     ³  Item 1    ³
-³     ³  Item 2    ş³
-³     ³ÛÛItem 3ÛÛÛÛ±³
-³     ³  Item 4    ±³
-³     ³  Item 5    ³
-³     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+â”‚     â”Œâ”€ Listâ”€â”€â”€â”€â”€â”€â”€â”
+â”‚     â”‚  Item 1    â”‚
+â”‚     â”‚  Item 2    â– â”‚
+â”‚     â”‚â–ˆâ–ˆItem 3â–ˆâ–ˆâ–ˆâ–ˆâ–’â”‚
+â”‚     â”‚  Item 4    â–’â”‚
+â”‚     â”‚  Item 5    â”‚
+â”‚     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
    You just need to choose required item from list (by cursor moving keys)
 and press {Enter:_}.
