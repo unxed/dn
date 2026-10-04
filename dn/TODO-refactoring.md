@@ -55,7 +55,7 @@ dead code of the layer deleted (7 routines, 3 constants); `vpsyslo2`/`vpsysext` 
 | `memory` | (deleted 2026-10-04) | `MemAlloc` is `GetMem` (`ReturnNilIfGrowHeapFails := True` in `dn.pas`: nil instead of an exception); `LowMemory` was always False: its 22 conditions are removed; the no-op `InitMemory`... are gone | **done** |
 | `realmode` (was three units, merged 2026-10-04) | real-mode calls of DOS (LFN of Windows 95, the clipboard, FAT32) | `go32` of FPC (DOS only) | **DOS only:** `{$IFDEF GO32V2}` in `lfn.pas`, `fsinfo.pas`, `videoman.pas`, `dnexec.pas`; on Linux and Windows they are stubs that fail |
 | `use16` | (deleted 2026-10-04) | `SmallInt` in `dbwatch`, `pktview`, `uucode`, `uue2inc` (`Word` is 16 bits in FPC anyway) | **done** |
-| `baseobjs` | `TObject` of DN = `TObject` of `tv/`; `FreeObject`, `ObjChangeType` | `tv/` | with the shims |
+| `objutil` (was `baseobjs`, renamed 2026-10-04) | `TObject` of DN = `TObject` of `tv/` (aliases; they stay because of the order of the units in a `uses` clause: a unit that adds `TvObjs` after `Collect` takes the DN names of the collections back, tried and reverted); `FreeObject` (16 uses), `ObjChangeType` (13 uses) | the aliases could go with the shims when `Collect` is gone; the two helpers could move to `tv/` (`TvObjs`) | **keep** |
 | `country` | the country table | `SysUtils` formats + the table of CP866 (ours) | keep |
 | `drivers` | the keys, the events, `DNKeyCode`, `MessageKey`, the cursor | — (it is the adapter to `tv/`) | keep, it is the border |
 

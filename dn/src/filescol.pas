@@ -210,7 +210,7 @@ function SameFile(P1, P2: PFileRec): Boolean;
 implementation
 uses
   Lfn, DNUtf8, mainapp, Menus, Views, panelroot, filepanel, Drives,
-  baseobjs, Commands, Messages,
+  objutil, Commands, Messages,
   {!!}CmdLine
   
   

@@ -94,7 +94,7 @@ uses
   basics, strutil, fileutil,
   mainapp, DNUtil,
   Commands, HistList, startup, dlgrecs
-  , baseobjs
+  , objutil
   ;
 
 { AK155 19/10/2006

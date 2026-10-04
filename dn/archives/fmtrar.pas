@@ -50,7 +50,7 @@ unit fmtrar; {RAR}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos
+  Archiver, basics, strutil, Defines, objutil, Streams, Dos
   ;
 
 type

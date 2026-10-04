@@ -56,7 +56,7 @@ unit fmtbz2; {bzip2}
 interface
 
 uses
-  Archiver, basics, strutil, fileutil, baseobjs
+  Archiver, basics, strutil, fileutil, objutil
   ;
 
 type

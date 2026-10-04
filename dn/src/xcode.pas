@@ -3,7 +3,7 @@ unit XCode;
 interface
 
 uses
-  Defines, baseobjs, Streams, keymap
+  Defines, objutil, Streams, keymap
   ;
 
 type

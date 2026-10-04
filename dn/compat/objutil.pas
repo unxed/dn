@@ -1,8 +1,9 @@
-{ The unit baseobjs of DN over tv/: DN has its own TEmptyObject/TObject there (the objects "taken out of the
-  library"); here they are the TObject of tv/ (TvObjs), so that the views and the other objects of DN have one root.
-  ObjChangeType changes the VMT link of an object (its type): the first pointer of the instance (an object type that
-  has virtual methods; see tv/DESIGN.md on the VMT). Written by us for DN (the original is dn/exclude.list). }
-unit baseobjs;
+{ objutil: the objects of DN over tv/. The TObject of DN is the TObject of tv/ (TvObjs): here are the two names as aliases (DN's own
+  TObject was taken out of the library; the original is dn/exclude.list) and two helpers that tv/ does not have: FreeObject
+  (Dispose(O, Done) and O := nil) and ObjChangeType (changes the VMT link of an object: its type). The aliases stay because of the
+  order of the units in a uses clause: the units of DN (Collect...) that come before this one in a clause hide TvObjs, and a unit that
+  adds TvObjs after them would take their names back. Written by us for DN. }
+unit objutil;
 
 {$mode objfpc}{$H-}
 

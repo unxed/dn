@@ -65,7 +65,7 @@ uses
   FilesCol, UserMenu, Colors, editcore, Editor, Macro,
   ArcView, HelpFile, Validate, ASCIITab, timeutil, Drives, Archiver,
   ArchSet, ArchDet, Setups, DNUtil, panelwinx, histories, calcline,
-  DnIni, Collect, baseobjs, Views, Scroller, evaluator,
+  DnIni, Collect, objutil, Views, Scroller, evaluator,
   HelpKern, VideoMan
   , calcwin, CellsCol 
   , DBView, DBWatch 

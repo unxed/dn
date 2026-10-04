@@ -50,7 +50,7 @@ unit ArvidTdr;
 interface
 
 uses
-  Arvid, baseobjs, Streams, strutil, Messages, mainapp, Commands, Collect,
+  Arvid, objutil, Streams, strutil, Messages, mainapp, Commands, Collect,
   Views, Drivers, Startup, keymap, basics, Lfn, uselfn, Dos, Tree,
   FilesCol, fileutil, Drives, filepanel
   , Defines

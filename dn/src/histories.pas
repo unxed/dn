@@ -52,7 +52,7 @@ unit histories;
 interface
 
 uses
-  Collect, Drivers, Defines, baseobjs, Streams, Views,
+  Collect, Drivers, Defines, objutil, Streams, Views,
   Drives, basics, keymap
   , DBView 
   ;

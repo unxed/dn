@@ -53,7 +53,7 @@ unit ArcView;
 interface
 
 uses
-  Collect, Defines, baseobjs, Streams, Views,
+  Collect, Defines, objutil, Streams, Views,
   FilesCol, DiskInfo,
   Drives, Commands, Archiver, FStorage
   ;

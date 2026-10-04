@@ -52,7 +52,7 @@ unit FileFind;
 interface
 
 uses
-  Defines, baseobjs, Streams, Views, Dialogs, Drivers,
+  Defines, objutil, Streams, Views, Dialogs, Drivers,
   FilesCol, Drives, progress, DiskInfo, Collect
   ;
 

@@ -51,7 +51,7 @@ unit keymap;
 interface
 
 uses
-  baseobjs, Defines, strutil
+  objutil, Defines, strutil
   ;
 
 type

@@ -2,7 +2,7 @@ unit Hash;
 
 interface
 uses
-  Collect, baseobjs;
+  Collect, objutil;
 
 type
   THashIndex = Longint;

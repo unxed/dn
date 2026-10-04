@@ -50,7 +50,7 @@ unit fmttar; {TAR}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams, Dos, timeutil
+  Archiver, basics, strutil, Defines, objutil, Streams, Dos, timeutil
   ;
 
 type

@@ -52,7 +52,7 @@ GetConst;
 interface
 
 uses
-  Collect, baseobjs
+  Collect, objutil
   ;
 
 type

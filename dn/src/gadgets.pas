@@ -52,7 +52,7 @@ unit gadgets;
 interface
 
 uses
-  Dos, Defines, baseobjs, Streams, Views, Drivers,
+  Dos, Defines, objutil, Streams, Views, Drivers,
   Collect, timeutil
   ;
 

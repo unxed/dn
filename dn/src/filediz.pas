@@ -51,7 +51,7 @@ unit Filediz;
 interface
 
 uses
-  FilesCol, Defines, baseobjs,
+  FilesCol, Defines, objutil,
   Commands
   ;
 
