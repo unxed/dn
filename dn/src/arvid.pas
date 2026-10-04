@@ -1058,9 +1058,9 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       Exit;
       end;
     if not WasTape then
-      FindList.Insert(New(PFindObject, Init(Name)));
+      FindList.Insert(PFindObject.Create(Name));
     if not WasDir then
-      FindList.Insert(New(PFindDir, Init(dr, LP)));
+      FindList.Insert(PFindDir.Create(dr, LP));
     WasTape := True;
     WasDir := True;
     FindList.Insert(P);
@@ -1127,7 +1127,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         then
           begin
           WasDir := True;
-          Add(New(PFindDir, Init(dr, LP)), Name);
+          Add(PFindDir.Create(dr, LP), Name);
           end;
         end;
       if not OOM then
@@ -1218,9 +1218,9 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
           if WasDir = False then
             begin
             WasDir := True;
-            Add(New(PFindDir, Init(dr, LP)), NName);
+            Add(PFindDir.Create(dr, LP), NName);
             end;
-          Add(New(PFindFile, Init(S0, AA0.ChildOrSize, AA0.Time)), NName);
+          Add(PFindFile.Create(S0, AA0.ChildOrSize, AA0.Time), NName);
           end;
         end;
       end;
