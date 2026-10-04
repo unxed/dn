@@ -143,7 +143,7 @@ except
     if IOResult <> 0 then
       Rewrite(DNErrFile);
     Writeln(DNErrFile, '');
-    Writeln(DNErrFile, 'DN/2 ' + VersionName + ' compiled '+VersionDate);
+    Writeln(DNErrFile, 'DN/2 ' + VersionName + ' build '+VersionRev+' compiled '+VersionDate);
     Writeln(DNErrFile, E.Message);
     if GetLocationInfo(ExceptAddr, FileName, LineNo) <> nil then
       Writeln(DNErrFile, 'Source location: '+FileName+' line ', LineNo)
