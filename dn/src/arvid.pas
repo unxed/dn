@@ -328,8 +328,8 @@ constructor TArvidDrive.Create(const AName: String);
     CurDir := '\';
   SeekDirectory;
   if ArvidDrives = nil then
-    New(ArvidDrives, Init($100, $100));
-  ArvidDrives^.Insert(@Self);
+    ArvidDrives := PCollection.Create($100, $100);
+  ArvidDrives.Insert(@Self);
   AddToDirectoryHistory(Name^+':'+CurDir, Integer(DriveType));
   end { TArvidDrive.Init };
 
@@ -387,8 +387,8 @@ destructor TArvidDrive.Destroy;
   begin
   if ArvidDrives <> nil then
     begin
-    ArvidDrives^.Delete(@Self);
-    if ArvidDrives^.Count = 0 then
+    ArvidDrives.Delete(@Self);
+    if ArvidDrives.Count = 0 then
       Dispose(ArvidDrives, Done);
     ArvidDrives := nil;
     end;
@@ -470,8 +470,8 @@ constructor TArvidDrive.Load(S: TStream);
     goto 1;
   SeekDirectory;
   if ArvidDrives = nil then
-    New(ArvidDrives, Init($100, $100));
-  ArvidDrives^.Insert(@Self);
+    ArvidDrives := PCollection.Create($100, $100);
+  ArvidDrives.Insert(@Self);
   end { TArvidDrive.Load };
 
 procedure TArvidDrive.Store(S: TStream);
