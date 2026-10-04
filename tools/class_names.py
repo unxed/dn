@@ -85,7 +85,33 @@ def declared_kinds(ts):
 
 def alias_targets(ts):
     result = []
+    in_type_section = False
+    aggregate_depth = 0
+    paren_depth = 0
+    section_ends = {
+        b"const", b"var", b"threadvar", b"resourcestring", b"label",
+        b"implementation", b"begin", b"initialization", b"finalization", b"uses",
+    }
     for i in range(len(ts) - 3):
+        word = ts[i].text.lower()
+        if word == b"type":
+            in_type_section = True
+            aggregate_depth = 0
+            paren_depth = 0
+        elif in_type_section and aggregate_depth == 0 and paren_depth == 0 and word in section_ends:
+            in_type_section = False
+        if not in_type_section:
+            continue
+        if ts[i].text == b"(":
+            paren_depth += 1
+        elif ts[i].text == b")" and paren_depth:
+            paren_depth -= 1
+        if word in (b"class", b"record") and i + 1 < len(ts):
+            following = ts[i + 1].text.lower()
+            if following not in (b"of", b";"):
+                aggregate_depth += 1
+        elif word == b"end" and aggregate_depth:
+            aggregate_depth -= 1
         if not ts[i].text.lower().startswith(b"p") or ts[i + 1].text != b"=":
             continue
         j = i + 2

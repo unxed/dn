@@ -25,18 +25,28 @@ class ClassNamesTests(unittest.TestCase):
         self.assertEqual(self.convert(source), source)
 
     def test_local_record_alias_shadows_library_class_alias(self):
-        lib = b'TView=class; PView=TView;'
-        source = b'TRecord=record; PView=^TRecord; var V:PView;'
+        lib = b'type TView=class; PView=TView;'
+        source = b'type TRecord=record; PView=^TRecord; var V:PView;'
         self.assertEqual(self.convert(source, [lib]), source)
 
+    def test_initialized_pointer_typed_variable_is_not_a_type_alias(self):
+        lib = b'type TView=class; PView=TView;'
+        source = b'var Current: PView = nil;'
+        self.assertEqual(self.convert(source, [lib]), b'var Current: TView = nil;')
+
+    def test_procedural_type_parameters_do_not_end_the_type_section(self):
+        source = b'type TView=class; TCallback=procedure(const Value: TView); PView=TView; var V:PView;'
+        self.assertEqual(self.convert(source),
+            b'type TView=class; TCallback=procedure(const Value: TView);  var V:TView;')
+
     def test_strings_and_comments_preserved(self):
-        lib = b'TView=class; PView=TView;'
+        lib = b'type TView=class; PView=TView;'
         source = b"PView.Create('PView''PView'); { PView { nested } } (* PView *) // PView\n"
         self.assertEqual(self.convert(source, [lib]),
             b"TView.Create('PView''PView'); { PView { nested } } (* PView *) // PView\n")
 
     def test_external_alias_and_case(self):
-        lib = b'TView=class; PView=TView;'
+        lib = b'type TView=class; PView=TView;'
         self.assertEqual(self.convert(b'var V:pVIEW;', [lib]), b'var V:TView;')
 
     def test_crlf_and_byte_encoding(self):
@@ -49,9 +59,9 @@ class ClassNamesTests(unittest.TestCase):
         self.assertEqual(self.convert(source), source)
 
     def test_local_class_alias(self):
-        lib = b'TView=class; PView=TView;'
-        source = b'TLocal=class; PLocal=TLocal; var X:PLocal;'
-        self.assertEqual(self.convert(source, [lib]), b'TLocal=class;  var X:TLocal;')
+        lib = b'type TView=class; PView=TView;'
+        source = b'type TLocal=class; PLocal=TLocal; var X:PLocal;'
+        self.assertEqual(self.convert(source, [lib]), b'type TLocal=class;  var X:TLocal;')
 
     def test_unterminated_comment_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'unterminated'):
@@ -59,7 +69,7 @@ class ClassNamesTests(unittest.TestCase):
 
     def test_ambiguous_alias_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'ambiguous'):
-            library_aliases([b'TA=class; PA=TA;', b'TB=class; PA=TB;'])
+            library_aliases([b'type TA=class; PA=TA;', b'type TB=class; PA=TB;'])
 
 
 if __name__ == '__main__':
