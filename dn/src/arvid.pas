@@ -1318,7 +1318,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     procedure DoCount(P_: Pointer);
     var P: PFindObject absolute P_;
       begin
-      Inc(R.A.X, Byte(P^.TT = ttFile));
+      Inc(R.A.X, Byte(P.TT = ttFile));
       end;
 
     begin
@@ -1328,13 +1328,13 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       Exit;
 
     R.Assign(58, 1, 59, 13);
-    P := New(PScrollBar, Init(R));
-    D^.Insert(P);
+    P := PScrollBar.Create(R);
+    D.Insert(P);
 
     R.Assign(2, 1, 58, 13);
-    New(PL, Init(R, 1, PScrollBar(P)));
-    PL^.NewLisT(FindList);
-    D^.Insert(PL);
+    PL := PFindBox.Create(R, 1, PScrollBar(P));
+    PL.NewLisT(FindList);
+    D.Insert(PL);
 
     R.A.X := 0;
     if  (FindList <> nil) then
@@ -1342,17 +1342,17 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
 
     FreeStr := FStr(R.A.X)+GetString(dlFilesFound);
     R.Assign(1, 13, 1+Length(FreeStr), 14);
-    P := New(PStaticText, Init(R, FreeStr));
-    P^.Options := P^.Options or ofCenterX;
-    D^.Insert(P);
+    P := TStaticText.Create(R, FreeStr);
+    P.Options := P.Options or ofCenterX;
+    D.Insert(P);
 
-    PL^.Select;
-    R.A.X := Desktop^.ExecView(D);
-    R.A.Y := PL^.Focused;
+    PL.Select;
+    R.A.X := Desktop.ExecView(D);
+    R.A.Y := PL.Focused;
 
-    PL^.List := nil;
+    PL.List := nil;
 
-    Dispose(D, Done);
+    D.Free;
 
     if R.A.X = cmNo then
       FreeObject(FindList);
@@ -1368,17 +1368,17 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       while R.B.X >= 0 do
         begin
         F := FindList.At(R.B.X);
-        if  (F^.TT = ttDir) and (FreeStr = '') then
-          FreeStr := CnvString(F^.Text);
-        if  (F^.TT = ttTape) then
+        if  (F.TT = ttDir) and (FreeStr = '') then
+          FreeStr := CnvString(F.Text);
+        if  (F.TT = ttTape) then
           Break;
           Dec(R.B.X);
         end;
-      if UpStrg(F^.Text^) <> UpStrg(GetName(Name^)) then
+      if UpStrg(F.Text^) <> UpStrg(GetName(Name^)) then
         begin
         FreeObject(Stream);
         CurDir := FreeStr;
-        FreeStr := MakeNormName(GetPath(Name^), F^.Text^);
+        FreeStr := MakeNormName(GetPath(Name^), F.Text^);
         DisposeStr(Name);
         Name := NewStr(FreeStr);
         Stream := PBufStream.Create(FreeStr, stOpenRead, 2048);
@@ -1399,8 +1399,8 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         Delete(CurDir, 1, 1); {DelFC(CurDir);}
       SeekDirectory;
       F := FindList.At(R.A.Y);
-      if F^.TT = ttFile then
-        FreeStr := MakeNormName(FreeStr, CnvString(PFindFile(F)^.Name));
+      if F.TT = ttFile then
+        FreeStr := MakeNormName(FreeStr, CnvString(PFindFile(F).Name));
       Message(Panel, evCommand, cmFindGotoFile, @FreeStr);
       end;
 
@@ -1438,7 +1438,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
   SDesc := DT.Text <> '';
   UpStr(DT.Text);
   if FindList <> nil then
-    Dispose(FindList, Done);
+    FindList.Free;
   FindList := nil;
   P := WriteMsg(GetString(dlPleaseStandBy));
   if DT.o and 2 <> 0 then
@@ -1456,7 +1456,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
   if FindList <> nil then
     ExecuteFindDialog;
   if FindList <> nil then
-    Dispose(FindList, Done);
+    FindList.Free;
   FindList := nil;
   end { TArvidDrive.DrvFindFile };
 
