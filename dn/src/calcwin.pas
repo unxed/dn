@@ -59,7 +59,7 @@ uses
   ;
 
 const
-  CellClipboard: PCellCollection = nil;
+  CellClipboard: TCellCollection = nil;
   ClipRect: record
     A, B: TPoint;
     end = (A: (X: 0; Y: 0); B: (X: 0; Y: 0));
@@ -80,7 +80,7 @@ type
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     procedure HandleEvent(var Event: TEvent); virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
   TCalcView = class(TView)
@@ -91,7 +91,7 @@ type
 
     HScroll, VScroll: TScrollBar;
     Delta, Cur, Mark: TPoint;
-    Cells: PCellCollection;
+    Cells: TCellCollection;
     NumC: Byte;
     Marking, BlockDraw, Modified: Boolean;
     ShowSeparators: Boolean;
@@ -101,7 +101,7 @@ type
     constructor Create(Bounds: TRect;
         AInfo: TCalcInput; ACellInfo: TInfoView;
         AHScroll, AVScroll: TScrollBar);
-    destructor Done; virtual;
+    destructor Destroy; override;
 
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -209,11 +209,11 @@ type
   TDbaseWriter = class(TBufStream)
     {KV}
     Header: THeaderDBF;
-    Fields: PDbfFieldCollection;
+    Fields: TDbfFieldCollection;
     CurRecord: LongInt;
     EofFlag: Boolean;
     constructor Create(FileName: FNameStr; Mode: Word; Size: SW_Word);
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure AddField(const NameField: String; TypeField: Char;
         LenField: Integer; DecField: Integer);
     procedure AddRecord;
@@ -293,15 +293,15 @@ function GetFileName(var FileName: String; Mask, Title, ALabel: String;
     Mask := x_x;
     B := False
     end;
-  D := TFileDialog(Application.ValidView(New(TFileDialog,
-          Init(Mask, Title, ALabel, Buttons, 211))));
+  D := TFileDialog(Application.ValidView(TFileDialog.Create(
+          Mask, Title, ALabel, Buttons, 211)));
   if D = nil then
     Exit;
   if B then
     D.SetData(S);
   C := Desktop.ExecView(D);
   if C <> cmCancel then
-    S := D^.GetFileName;
+    S := D.GetFileName;
   GetFileName := C;
   D.Free;
   
@@ -350,8 +350,8 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   R.B.X := 7;
   R.B.Y := Size.Y-1;
   P := TStaticText.Create(R, '');
-  P^.Options := P^.Options or ofFramed;
-  P^.GrowMode := gfGrowHiY;
+  P.Options := P.Options or ofFramed;
+  P.GrowMode := gfGrowHiY;
   Insert(P);
 
   R.A.X := 8;
@@ -359,8 +359,8 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   R.B.X := Size.X-1;
   R.B.Y := 4;
   P := TStaticText.Create(R, '');
-  P^.Options := P^.Options or ofFramed;
-  P^.GrowMode := gfGrowHiX;
+  P.Options := P.Options or ofFramed;
+  P.GrowMode := gfGrowHiX;
   Insert(P);
 
   GetExtent(R);
@@ -368,7 +368,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   R.B.Y := R.A.Y+1;
   P := TView(LoadResource(dlgWkzMenuBar));
   P.Locate(R);
-  P^.GrowMode := gfGrowHiX;
+  P.GrowMode := gfGrowHiX;
   Insert(P);
 
   GetExtent(R);
@@ -377,8 +377,8 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   R.B.Y := R.A.Y+1;
   Inc(R.A.X, 7);
   P := TCalcInput.Create(R, 240);
-  P^.GrowMode := gfGrowHiX;
-  P^.Options := P^.Options or ofSelectable;
+  P.GrowMode := gfGrowHiX;
+  P.Options := P.Options or ofSelectable;
   Insert(P);
 
   R.Assign(1, 2, 7, 4);
@@ -390,9 +390,9 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 2);
-  CalcView := New(TCalcView, Init(R, TCalcInput(P), P1,
+  CalcView := TCalcView.Create(R, TCalcInput(P), P1,
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
-        MakeScrollBar(sbVertical+sbHandleKeyboard)));
+        MakeScrollBar(sbVertical+sbHandleKeyboard));
   Insert(CalcView);
   CalcView.LoadSheet(AName);
   end { TCalcWindow.Init };
@@ -439,10 +439,10 @@ procedure TCalcWindow.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end;
 
-destructor TCalcWindow.Done;
+destructor TCalcWindow.Destroy;
   begin
   StoreViewInfo(Self);
-  inherited Done;
+  inherited Destroy;
   end;
 
 {-----------------------------    TCalcInput     ---------------------------}
@@ -507,8 +507,8 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
       CurrentCalc.X := Delta.X+Cur.X;
       CurrentCalc.Y := Delta.Y+Cur.Y;
       DelRight(NewS);
-      P := Cells^.Get(Delta.X+Cur.X, Delta.Y+Cur.Y);
-      if  (P <> nil) and (NewS = P^.S) then
+      P := Cells.Get(Delta.X+Cur.X, Delta.Y+Cur.Y);
+      if  (P <> nil) and (NewS = P.S) then
         Exit;
       if NewS = '' then
         begin
@@ -521,7 +521,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
           EndEdit := False;
           Exit;
           end;
-        Cells^.DelItem(Delta.X+Cur.X, Delta.Y+Cur.Y);
+        Cells.DelItem(Delta.X+Cur.X, Delta.Y+Cur.Y);
         goto 2;
         end;
 
@@ -544,7 +544,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
               end;
             end;
           end;
-      with Cells^.ReplaceItem(Delta.X+Cur.X, Delta.Y+Cur.Y, NewS)^ do
+      with Cells.ReplaceItem(Delta.X+Cur.X, Delta.Y+Cur.Y, NewS)^ do
         begin
         if TypeChanged then
           begin
@@ -584,7 +584,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
             ClearEvent(Event);
       end {case};
   end {case};
-  TInputLine.HandleEvent(Event);
+  inherited HandleEvent(Event);
   end { TCalcInput.HandleEvent };
 
 {-----------------------------    TCalcView     ---------------------------}
@@ -602,7 +602,7 @@ constructor TCalcView.Create(Bounds: TRect; AInfo: TCalcInput; ACellInfo: TInfoV
   EventMask := $FFFF;
   CalcInput := AInfo;
   CellInfo := ACellInfo;
-  TCalcInput(CalcInput).CalcView := Self;
+  CalcInput.CalcView := Self;
   FocusEvent.What := evNothing;
   FillChar(ColWidth, SizeOf(ColWidth), DefaultColWidth);
   Marking := False;
@@ -656,20 +656,20 @@ procedure TCalcView.SetState(AState: Word; Enable: Boolean);
   var
     Bounds: TRect;
   begin
-  TView.SetState(AState, Enable);
+  inherited SetState(AState, Enable);
   if Enable and (AState and sfFocused <> 0) then
     DrawView;
   if  (AState and sfActive <> 0) then
     if Enable then
       begin
-      HScroll^.GrowTo(HScroll^.Size.X, 1);
-      VScroll^.GrowTo(1, VScroll^.Size.Y);
+      HScroll.GrowTo(HScroll.Size.X, 1);
+      VScroll.GrowTo(1, VScroll.Size.Y);
       EnableCommands([cmUndo, cmCut, cmCopy, cmPaste, cmClear]);
       end
     else
       begin
-      HScroll^.GrowTo(HScroll^.Size.X, 0);
-      VScroll^.GrowTo(0, VScroll^.Size.Y);
+      HScroll.GrowTo(HScroll.Size.X, 0);
+      VScroll.GrowTo(0, VScroll.Size.Y);
       end;
   if Owner <> nil then
     begin
@@ -701,14 +701,14 @@ function MakeCellText(P: PCellrec): String; {KV}
     i, A1, A2: Integer;
   begin
   S1 := '';
-  case (P^.Options shr 4) and 7 of
+  case (P.Options shr 4) and 7 of
     0:
-      S1 := P^.S;
+      S1 := P.S;
     1:
-      Str(P^.Value: 0: P^.Decimals, S1);
+      Str(P.Value: 0: P.Decimals, S1);
     2:
       begin
-      Str(P^.Value: 0: 20, S1);
+      Str(P.Value: 0: 20, S1);
       i := Length(S1);
       while (i > 0) and (S1[i] = '0') do
         Dec(i);
@@ -719,7 +719,7 @@ function MakeCellText(P: PCellrec): String; {KV}
       end;
     3:
       begin
-      Str(P^.Value, S1);
+      Str(P.Value, S1);
       A1 := Pos('E', S1);
       if A1 > 0 then
         begin
@@ -731,15 +731,15 @@ function MakeCellText(P: PCellrec): String; {KV}
         end;
       end;
     4:
-      if P^.Value = 0 then
+      if P.Value = 0 then
         S1 := FalseStr
       else
         S1 := TrueStr;
     5:
-      MakeCurrency(P^.Value, S1);
+      MakeCurrency(P.Value, S1);
     6:
       begin
-      Str((P^.Value*100): 0: 2, S1);
+      Str((P.Value*100): 0: 2, S1);
       S1 := MakeComma(S1)+'%';
       end;
     7:
@@ -843,9 +843,9 @@ procedure TCalcView.Draw;
   SetLength(EmptyLine, Size.X);
   FillChar(EmptyLine[1], Size.X, ' ');
   MoveChar(B, ' ', C1, Size.X);
-  BC[6].C := '│';
-  MoveChar(B1, '─', C1, Size.X);
-  SetCellChar(B1[6], Byte('┼'));
+  BC[6].C := #$B3;
+  MoveChar(B1, #$C4, C1, Size.X);
+  SetCellChar(B1[6], $C5);
   NumC := 0;
   I := 7;
   J := Delta.X;
@@ -853,22 +853,22 @@ procedure TCalcView.Draw;
   EnX := Size.X;
 
   {Заголовки колонок и верхняя черта}
-  while (I < Size.X) and (J <= HScroll^.MaxVal) do
+  while (I < Size.X) and (J <= HScroll.MaxVal) do
     begin
     K := ColWidth[J];
     L := ColWidth[J+1];
     SetLength(S, K);
     FillChar(S[1], K, ' ');
-    S[K] := '│';
+    S[K] := #$B3;
     S1 := GetColName(J);
     Move(S1[1], S[K div 2], Length(S1));
-    SetCellChar(B1[I+K-1], Byte('┼'));
+    SetCellChar(B1[I+K-1], $C5);
     MoveStr(B[I], S, C1);
     if J < X1 then
       Inc(StX, K);
     if  (J > X2) and (EnX > I) then
       EnX := I;
-    if  (J = HScroll^.MaxVal) and (J <= X2) then
+    if  (J = HScroll.MaxVal) and (J <= X2) then
       EnX := I+K;
     Inc(NumC);
     Inc(J);
@@ -882,19 +882,19 @@ procedure TCalcView.Draw;
     J := Cur.X-NumC+1;
     Cur.X := NumC-1;
     HScroll.SetValue(Delta.X+J);
-    Delta.X := HScroll^.Value;
+    Delta.X := HScroll.Value;
     Exit;
     end;
-  TInfoView(CellInfo)^.SetInfo(GetCellName(CurPos.X, CurPos.Y),
+  CellInfo.SetInfo(GetCellName(CurPos.X, CurPos.Y),
      Owner.GetColorW(9));
   FillChar(Q^, SizeOf(Q^), 255);
-  for I := 1 to Cells^.Count do
+  for I := 1 to Cells.Count do
     begin
-    P := Cells^.At(I-1);
-    if  (P^.Row >= Delta.Y) and (P^.Row < Delta.Y+Size.Y-2) and
-        (P^.Col >= Delta.X) and (P^.Col < Delta.X+NumC+3)
+    P := Cells.At(I-1);
+    if  (P.Row >= Delta.Y) and (P.Row < Delta.Y+Size.Y-2) and
+        (P.Col >= Delta.X) and (P.Col < Delta.X+NumC+3)
     then
-      Q^[P^.Col-Delta.X, P^.Row-Delta.Y] := I-1;
+      Q^[P.Col-Delta.X, P.Row-Delta.Y] := I-1;
     end;
   WriteBufC(6, 0, Size.X, 1, B[6]);
   WriteBufC(0, 1, Size.X, 1, B1);
@@ -902,7 +902,7 @@ procedure TCalcView.Draw;
   for I := 0 to Size.Y-2 do
     begin
     MoveChar(B, ' ', C2, Size.X);
-    if Delta.Y+I <= VScroll^.MaxVal then
+    if Delta.Y+I <= VScroll.MaxVal then
       begin
       Str((Delta.Y+I+1): 5, S);
       MoveStr(B, S, C1);
@@ -914,7 +914,7 @@ procedure TCalcView.Draw;
           begin { ограничиваем длину по колонке }
           SetLength(S, K);
           FillChar(S[1], K, ' ');
-          S[K] := '│';
+          S[K] := #$B3;
           end
         else
           begin { длина до конца экрана }
@@ -925,9 +925,9 @@ procedure TCalcView.Draw;
         P := nil;
         if Q^[J, I] >= 0 then
           begin
-          P := Cells^.At(Q^[J, I]);
+          P := Cells.At(Q^[J, I]);
           S1 := MakeCellText(P);
-          FormatCellText(S1, K, ShowSeparators, P^.Options, S);
+          FormatCellText(S1, K, ShowSeparators, P.Options, S);
           end;
         if ShowSeparators or (P <> nil) then
           MoveStr(B[L], S, C2);
@@ -935,8 +935,8 @@ procedure TCalcView.Draw;
           begin
           if P <> nil then
             begin
-            S := P^.S;
-            case P^.Options and 3 of
+            S := P.S;
+            case P.Options and 3 of
               coText:
                 WriteStr(0, 0, '   T  ', 2);
               coValue:
@@ -950,13 +950,13 @@ procedure TCalcView.Draw;
             WriteStr(0, 0, GetString(dlWKZ_Empty), 2);
             S := '';
             end;
-          TCalcInput(CalcInput).SetData(S);
+          CalcInput.SetData(S);
           CalcInput.Draw;
           end;
         L := L+K;
         end;
       end;
-    BC[6].C := '│';
+    BC[6].C := #$B3;
     BC[6].A := C1;
     if  (Delta.Y+I >= Y1) and (Delta.Y+I <= Y2) and (StX < EnX)
     then
@@ -1001,13 +1001,13 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     begin
     MaxCol := 0;
     MaxRow := 0;
-    for i := 0 to Cells^.Count-1 do
+    for i := 0 to Cells.Count-1 do
       begin
-      P := Cells^.At(i);
-      if MaxCol < P^.Col then
-        MaxCol := P^.Col;
-      if MaxRow < P^.Row then
-        MaxRow := P^.Row;
+      P := Cells.At(i);
+      if MaxCol < P.Col then
+        MaxCol := P.Col;
+      if MaxRow < P.Row then
+        MaxRow := P.Row;
       end;
     end;
 
@@ -1018,11 +1018,11 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       P: PCellrec;
     begin
     FillChar(ColIndexArray, SizeOf(ColIndexArray), 255);
-    for i := 0 to Cells^.Count-1 do
+    for i := 0 to Cells.Count-1 do
       begin
-      P := Cells^.At(i);
-      if P^.Row = CurRow then
-        ColIndexArray[P^.Col] := i;
+      P := Cells.At(i);
+      if P.Row = CurRow then
+        ColIndexArray[P.Col] := i;
       end;
     end;
 
@@ -1039,7 +1039,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       R: CReal;
       i: Integer;
     begin
-    if Cells^.Count > 0 then
+    if Cells.Count > 0 then
       begin
       if MessageBox(GetString(dlWkzWarningClear), nil,
           mfYesNoCancel or mfConfirmation) <> cmYes
@@ -1092,9 +1092,9 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           if EndCh > StartCh then
             begin
             CellValue := System.Copy(S, StartCh, EndCh-StartCh);
-            P := Cells^.NewItem(CurCol, CurRow, CellValue);
-            MakeDefaultOptions(CellValue, P^.Options, P^.Decimals,
-               P^.Value);
+            P := Cells.NewItem(CurCol, CurRow, CellValue);
+            MakeDefaultOptions(CellValue, P.Options, P.Decimals,
+               P.Value);
             end;
           StartCh := EndCh+1;
           Inc(CurCol);
@@ -1118,7 +1118,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       R: CReal;
       i: Integer;
     begin
-    if Cells^.Count > 0 then
+    if Cells.Count > 0 then
       begin
       if MessageBox(GetString(dlWkzWarningClear), nil,
           mfYesNoCancel or mfConfirmation) <> cmYes
@@ -1130,11 +1130,11 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         fdOKButton+fdHelpButton) = cmCancel
     then
       Exit;
-    DBF.Init(FileName, stOpenRead, 16384);
+    DBF := TDbaseWriter.Create(FileName, stOpenRead, 16384);
     if DBF.Status <> stOK then
       begin
       MessFileNotOpen(FileName, DBF.ErrorInfo);
-      DBF.Done;
+      DBF.Free;
       Exit;
       end;
 
@@ -1147,7 +1147,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         CellValue := DBF.FieldAsString(i);
         DelRight(CellValue);
         if CellValue <> '' then
-          with Cells^.NewItem(i-1, DBF.CurRecord-1, CellValue)^ do
+          with Cells.NewItem(i-1, DBF.CurRecord-1, CellValue)^ do
             case DBF.FieldType(i) of
               'N': {число}
                 begin
@@ -1174,7 +1174,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         end;
       DBF.Next;
       end;
-    DBF.Done;
+    DBF.Free;
     ReCalc(True);
     Modified := True;
     Owner.Redraw;
@@ -1238,14 +1238,14 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           begin
           if ColIndexArray[CurCol] >= 0 then
             begin
-            P := Cells^.At(ColIndexArray[CurCol]);
-            if  ( (P^.Options and 3) = coText) or
-                ( ( (P^.Options and coFormula) <> 0) and (not
+            P := Cells.At(ColIndexArray[CurCol]);
+            if  ( (P.Options and 3) = coText) or
+                ( ( (P.Options and coFormula) <> 0) and (not
                    CalcFormulaFlag))
             then
-              Write(F.T, P^.S)
-            else if ((P^.Options and 3) = coValue) or
-                ( ( (P^.Options and coFormula) <> 0) and
+              Write(F.T, P.S)
+            else if ((P.Options and 3) = coValue) or
+                ( ( (P.Options and coFormula) <> 0) and
                  CalcFormulaFlag)
             then
               begin
@@ -1255,10 +1255,10 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
                 begin
                 // Оставляем 5 знаков после запятой, на случай если
                 // неправильно указан формат
-                if P^.Decimals <= 5 then
-                  Str(P^.Value: 0: 5, S)
+                if P.Decimals <= 5 then
+                  Str(P.Value: 0: 5, S)
                 else
-                  Str(P^.Value: 0: P^.Decimals, S);
+                  Str(P.Value: 0: P.Decimals, S);
                 while S[Length(S)] = '0' do
                   SetLength(S, Length(S)-1);
                 if S[Length(S)] = '.' then
@@ -1267,7 +1267,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
               Write(F.T, S);
               end
             else
-              Write(F.T, P^.S); {This code not use}
+              Write(F.T, P.S); {This code not use}
             end;
           if CurCol < MaxCol then
             Write(F.T, ColSeparator);
@@ -1286,16 +1286,16 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       S1: String;
     begin
     FillChar(TypeLenArr, SizeOf(TypeLenArr), 0);
-    for i := 0 to Cells^.Count-1 do
+    for i := 0 to Cells.Count-1 do
       begin
-      P := Cells^.At(i);
-      with TypeLenArr[P^.Col] do
+      P := Cells.At(i);
+      with TypeLenArr[P.Col] do
         begin
-        if  (P^.Options and coValue) <> coValue then
+        if  (P.Options and coValue) <> coValue then
           // Если в колонке текст или ошибка в формуле,
           // то эта колонка сохраняется как текстовая
           T := 'C'
-        else if (T = #0) and ((P^.Options and $F0) = coBool) then
+        else if (T = #0) and ((P.Options and $F0) = coBool) then
           // Если тип колонки еще не оределен и первое найденное значение
           // имеет формат Boolean, то устанавливаем тип Boolean
           T := 'L'
@@ -1305,25 +1305,25 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       end;
     // Делаем второй проход когда типы полей уже известны
     // для определения размерности
-    for i := 0 to Cells^.Count-1 do
+    for i := 0 to Cells.Count-1 do
       begin
-      P := Cells^.At(i);
-      with TypeLenArr[P^.Col] do
+      P := Cells.At(i);
+      with TypeLenArr[P.Col] do
         begin
         case T of
           'C':
             begin
-            if l < Length(P^.S) then
-              l := Length(P^.S);
+            if l < Length(P.S) then
+              l := Length(P.S);
             end;
           'N':
             begin
-            Str(P^.Value: 0: P^.Decimals, S1);
-            if D < P^.Decimals then
+            Str(P.Value: 0: P.Decimals, S1);
+            if D < P.Decimals then
               begin
               if l > 0 then
-                Inc(l, P^.Decimals-D);
-              D := P^.Decimals;
+                Inc(l, P.Decimals-D);
+              D := P.Decimals;
               end;
             if l < Length(S1) then
               l := Length(S1);
@@ -1367,12 +1367,12 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         Exit;
       end;
 
-    S.Init(FileName, stCreate, 16384);
+    S := TDbaseWriter.Create(FileName, stCreate, 16384);
     if S.Status <> stOK then
       begin
       PS := @FileName;
       Msg(erCantCreateFile, @PS, mfError+mfOKButton);
-      S.Done;
+      S.Free;
       Exit;
       end;
 
@@ -1411,25 +1411,25 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         begin
         if ColIndexArray[CurCol] >= 0 then
           begin
-          P := Cells^.At(ColIndexArray[CurCol]);
+          P := Cells.At(ColIndexArray[CurCol]);
           if TypeLenArr[CurCol].T = 'L' then
             begin
-            if P^.Value = 0 then
+            if P.Value = 0 then
               TmpS := 'F'
             else
               TmpS := 'T';
             S.FieldPutString(i, TmpS);
             end
           else if TypeLenArr[CurCol].T = 'N' then
-            S.FieldPutFloat(i, P^.Value)
+            S.FieldPutFloat(i, P.Value)
           else
-            S.FieldPutString(i, P^.S);
+            S.FieldPutString(i, P.S);
           end;
         Inc(i);
         end;
       end;
     S.WriteEndOfFile;
-    S.Done;
+    S.Free;
     end { ExportToDbf };
 
   procedure ExportToXls; {KV}
@@ -1455,12 +1455,12 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         Exit;
       end;
 
-    S.Init(FileName, stCreate, 16384);
+    S := TExcelWriter.Create(FileName, stCreate, 16384);
     if S.Status <> stOK then
       begin
       PS := @FileName;
       Msg(erCantCreateFile, @PS, mfError+mfOKButton);
-      S.Done;
+      S.Free;
       Exit;
       end;
 
@@ -1475,23 +1475,23 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           S.WriteBLANK(CurCol, CurRow, 0)
         else
           begin
-          P := Cells^.At(ColIndexArray[CurCol]);
-          if  (P^.Options and coFormula) <> 0 then
-            S.WriteLABEL(P^.S, CurCol, CurRow, 0)
+          P := Cells.At(ColIndexArray[CurCol]);
+          if  (P.Options and coFormula) <> 0 then
+            S.WriteLABEL(P.S, CurCol, CurRow, 0)
           else if (P.Options and coValue) = coValue then
             begin
-            if  (P^.Options and $F0) = coBool then
-              S.WriteBOOL(P^.Value <> 0, CurCol, CurRow, 0)
+            if  (P.Options and $F0) = coBool then
+              S.WriteBOOL(P.Value <> 0, CurCol, CurRow, 0)
             else
-              S.WriteNUMBER(P^.Value, CurCol, CurRow, 0);
+              S.WriteNUMBER(P.Value, CurCol, CurRow, 0);
             end
           else
-            S.WriteLABEL(P^.S, CurCol, CurRow, 0);
+            S.WriteLABEL(P.S, CurCol, CurRow, 0);
           end;
         end;
       end;
     S.WriteEOF;
-    S.Done;
+    S.Free;
     end { ExportToXls };
 
   procedure ExportToFile;
@@ -1511,38 +1511,38 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     lSetTAttr(F, Archive);
     lRewriteText(F);
     MaxLv := 0;
-    for I := 1 to Cells^.Count do
+    for I := 1 to Cells.Count do
       begin
-      P := Cells^.At(I-1);
-      if MaxLv < P^.Row then
-        MaxLv := P^.Row;
+      P := Cells.At(I-1);
+      if MaxLv < P.Row then
+        MaxLv := P.Row;
       end;
     for J := 0 to MaxLv do
       begin
       FillChar(C, SizeOf(C), 255);
       Maxr := 0;
-      for I := 1 to Cells^.Count do
+      for I := 1 to Cells.Count do
         begin
-        P := Cells^.At(I-1);
-        if J = P^.Row then
-          C[P^.Col] := I-1;
-        if Maxr < P^.Col then
-          Maxr := P^.Col;
+        P := Cells.At(I-1);
+        if J = P.Row then
+          C[P.Col] := I-1;
+        if Maxr < P.Col then
+          Maxr := P.Col;
         end;
       I := 0;
       while I <= Maxr do
         begin
         K := ColWidth[I];
         if ShowSeparators then
-          S := Strg(' ', K-1)+'│'
+          S := Strg(' ', K-1)+#$B3
         else
           S := Strg(' ', 255);
         if C[I] >= 0 then
           begin
-          P := Cells^.At(C[I]);
+          P := Cells.At(C[I]);
           S1 := MakeCellText(P);
           L1 := Length(S1);
-          FormatCellText(S1, K, ShowSeparators, P^.Options, S);
+          FormatCellText(S1, K, ShowSeparators, P.Options, S);
           end
         else
           L1 := Length(S);
@@ -1615,7 +1615,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
 
     begin {ChangeFormat}
     ClearEvent(Event);
-    P := Cells^.Get(Delta.X+Cur.X, Delta.Y+Cur.Y);
+    P := Cells.Get(Delta.X+Cur.X, Delta.Y+Cur.Y);
     if P = nil then
       begin
       FillChar(R, SizeOf(R), 0);
@@ -1623,10 +1623,10 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       end
     else
       begin
-      R.Display := (P^.Options shr 4) and 7;
-      R.Justify := (P^.Options shr 2) and 3;
-      Str(P^.Decimals, R.Dec);
-      R.Protect := (P^.Options shr 7) and 1;
+      R.Display := (P.Options shr 4) and 7;
+      R.Justify := (P.Options shr 2) and 3;
+      Str(P.Decimals, R.Dec);
+      R.Protect := (P.Options shr 7) and 1;
       end;
     if ExecResource(dlgSetCellFormat, R) = cmOK then
       begin
@@ -1650,7 +1650,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       NewOptions := ((R.Justify and 3) shl 2)
         or ((R.Display and 7) shl 4)
         or ((R.Protect and 1) shl 7);
-      Cells^.ForRectangle(X1, Y1, X2, Y2, @SetFormat);
+      Cells.ForRectangle(X1, Y1, X2, Y2, @SetFormat);
       end;
     Modified := True;
     DrawView;
@@ -1693,7 +1693,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     Event := FocusEvent;
     FocusEvent.What := evNothing;
     end;
-  TView.HandleEvent(Event);
+  inherited HandleEvent(Event);
   CurCol := Delta.X+Cur.X;
   case Event.What of
     evCommand:
@@ -1921,7 +1921,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           if  (Cur.X < NumC) then
             begin
             CheckMark;
-            if  (CurCol = HScroll^.MaxVal) then
+            if  (CurCol = HScroll.MaxVal) then
               begin
               if Cur.X > 0 then
                 Dec(Cur.X);
@@ -1934,7 +1934,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             ClearEvent(Event);
             Exit
             end
-          else if (CurCol = HScroll^.MaxVal) then
+          else if (CurCol = HScroll.MaxVal) then
             begin
             CheckMark;
             if Cur.X > 0 then
@@ -1975,14 +1975,14 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           MaxY := 0;
           Cur.Y := 0;
           Cur.X := 0;
-          for L := 1 to Cells^.Count do
+          for L := 1 to Cells.Count do
             begin
-            P := Cells^.At(L-1);
-            if P^.Col > MaxX then
-              MaxX := P^.Col;
+            P := Cells.At(L-1);
+            if P.Col > MaxX then
+              MaxX := P.Col;
             end;
-          if Cells^.Count <> 0 then
-            MaxY := P^.Row;
+          if Cells.Count <> 0 then
+            MaxY := P.Row;
           if  (L+ColWidth[CurCol] < Size.X) and (MaxX > 0) then
             begin
             L := 7;
@@ -2000,10 +2000,10 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             Inc(MaxX);
             end;
           VScroll.SetValue(MaxY-Size.Y+3);
-          Delta.Y := VScroll^.Value;
+          Delta.Y := VScroll.Value;
           Cur.Y := MaxY-Delta.Y;
           HScroll.SetValue(MaxX);
-          Delta.X := HScroll^.Value;
+          Delta.X := HScroll.Value;
           SetMark;
           DrawView;
           ClearEvent(Event);
@@ -2013,7 +2013,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           if  (Cur.Y < Size.Y-3) then
             begin
             CheckMark;
-            if  (Delta.Y+Cur.Y >= VScroll^.MaxVal) then
+            if  (Delta.Y+Cur.Y >= VScroll.MaxVal) then
               begin
               if Cur.Y > 0 then
                 Dec(Cur.Y);
@@ -2026,7 +2026,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             ClearEvent(Event);
             Exit
             end
-          else if (Delta.Y+Cur.Y >= VScroll^.MaxVal) then
+          else if (Delta.Y+Cur.Y >= VScroll.MaxVal) then
             begin
             if Cur.Y > 0 then
               Dec(Cur.Y);
@@ -2070,7 +2070,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           if Event.InfoPtr = HScroll then
             begin
             CheckMark;
-            Delta.X := HScroll^.Value;
+            Delta.X := HScroll.Value;
             SetMark;
             DrawView;
             Exit
@@ -2078,7 +2078,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           else if Event.InfoPtr = VScroll then
             begin
             CheckMark;
-            Delta.Y := VScroll^.Value;
+            Delta.Y := VScroll.Value;
             SetMark;
             DrawView;
             Exit
@@ -2098,13 +2098,13 @@ function TCalcView.GetCellValue(const S: String): Boolean;
   // DelSpaces(S); UpStr(S);
   if GetCellCoord(S, SR.Col, SR.Row) then
     begin
-    if not Cells^.Search(@SR, I) then
+    if not Cells.Search(@SR, I) then
       begin
       Res := 0;
       Result := True;
       end
     else
-      with PCellrec(Cells^.At(I))^ do
+      with PCellrec(Cells.At(I))^ do
         if Options and 3 <> 0 then
           begin
           Res := Value;
@@ -2123,14 +2123,14 @@ function TCalcView.GetFuncValue(S: String): Boolean;
     begin
     with PP^ do
       if  (Options and 3 <> 0) then
-        Res := Res+PP^.Value
+        Res := Res+PP.Value
     end;
 
   procedure DoMul(PP: PCellrec);
     begin
     with PP^ do
       if  (Options and 3 <> 0) then
-        Res := Res*PP^.Value
+        Res := Res*PP.Value
     end;
 
   var
@@ -2174,13 +2174,13 @@ function TCalcView.GetFuncValue(S: String): Boolean;
         not GetCellCoord(System.Copy(S1, I+1, MaxStringLength), AToX, AToY)
       then
         Exit;
-      Cells^.ForRectangle(AFromX, AFromY, AToX, AToY, Op);
+      Cells.ForRectangle(AFromX, AFromY, AToX, AToY, Op);
       end
     else
       begin
       if not GetCellCoord(S1, AFromX, AFromY) then
         Exit;
-      Cells^.ForRectangle(AFromX, AFromY, AFromX, AFromY, Op);
+      Cells.ForRectangle(AFromX, AFromY, AFromX, AFromY, Op);
       end;
     Inc(t); { пропустить запятую или скобку }
     end;
@@ -2206,7 +2206,7 @@ procedure TCalcView.CalcError(Index: TStrIdx);
   c := MessageBox(S, Self, {mfYesNoCancel}mfYesButton+mfError);
   end;
 
-destructor TCalcView.Done;
+destructor TCalcView.Destroy;
   begin
   if Cells <> nil then
     Cells.Free;
@@ -2259,7 +2259,7 @@ procedure TCalcView.LoadSheet(FName: String);
              Bounds.B.X-Bounds.A.X-12));
       Owner.Redraw;
       end;
-    New(Cells, Init(10, 10));
+    Cells := TCellCollection.Create(10, 10);
     Exit
     end;
   
@@ -2273,17 +2273,17 @@ procedure TCalcView.LoadSheet(FName: String);
     DisposeStr(TWindow(Owner).Title);
     TWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     end;
-  if S^.Status <> stOK then
+  if S.Status <> stOK then
     begin
     S.Free;
-    New(Cells, Init(10, 10));
+    Cells := TCellCollection.Create(10, 10);
     FillChar(ColWidth, SizeOf(ColWidth), DefaultColWidth);
     //   Owner.Redraw;
     Exit
     end;
-  S^.Read(ColWidth, SizeOf(ColWidth));
-  { Cells := PCellCollection(S^.Get);}
-  New(Cells, ShortLoad(S^));
+  S.Read(ColWidth, SizeOf(ColWidth));
+  { Cells := PCellCollection(S.Get);}
+  Cells := TCellCollection.ShortLoad(S);
   S.Free;
   if Cells = nil then
     begin
@@ -2296,7 +2296,7 @@ procedure TCalcView.LoadSheet(FName: String);
       TWindow(Owner).Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
       end;
-    New(Cells, Init(10, 10));
+    Cells := TCellCollection.Create(10, 10);
     FillChar(ColWidth, SizeOf(ColWidth), DefaultColWidth);
     end;
   Modified := False;
@@ -2324,7 +2324,7 @@ procedure TCalcView.SaveSheetAs;
   FName := lfGetLongFileName(lFExpand(FName));
   
   S := TDosStream.Create(FName, stOpen);
-  W := S^.Status;
+  W := S.Status;
   S.Free;
   if W = 0 then
     begin
@@ -2340,12 +2340,12 @@ procedure TCalcView.SaveSheetAs;
     TWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     Owner.Redraw;
     end;
-  {TInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
+  {CellInfo.SetInfo(' WORK ', Owner.GetColorW(12));}
   S := TBufStream.Create(FName, stCreate, 2048);
-  S^.Write(ColWidth, SizeOf(ColWidth));
-  { S^.Put(Cells);}
-  Cells^.ShortStore(S^);
-  if S^.Status <> stOK then
+  S.Write(ColWidth, SizeOf(ColWidth));
+  { S.Put(Cells);}
+  Cells.ShortStore(S);
+  if S.Status <> stOK then
     begin
     Msg(dlCanNotWrite, @PP, mfError+mfOKButton);
     end;
@@ -2364,12 +2364,12 @@ procedure TCalcView.SaveSheet;
     SaveSheetAs;
     Exit
     end;
-  {TInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
+  {CellInfo.SetInfo(' WORK ', Owner.GetColorW(12));}
   S := TBufStream.Create(SName^, stCreate, 2048);
-  S^.Write(ColWidth, SizeOf(ColWidth));
-  {S^.Put(Cells);}
-  Cells^.ShortStore(S^);
-  if S^.Status <> stOK then
+  S.Write(ColWidth, SizeOf(ColWidth));
+  {S.Put(Cells);}
+  Cells.ShortStore(S);
+  if S.Status <> stOK then
     Msg(dlCanNotWrite, SName, mfError+mfOKButton)
   else
     Modified := False;
@@ -2384,11 +2384,11 @@ procedure TCalcView.Copy;
 
   procedure ToClip(P: PCellrec);
     begin
-    with CellClipboard^.ReplaceItem(P^.Col, P^.Row, P^.S)^ do
+    with CellClipboard.ReplaceItem(P.Col, P.Row, P.S)^ do
       begin
-      Options := P^.Options;
-      Value := P^.Value;
-      Decimals := P^.Decimals;
+      Options := P.Options;
+      Value := P.Value;
+      Decimals := P.Decimals;
       end;
     end;
 
@@ -2412,8 +2412,8 @@ procedure TCalcView.Copy;
   if CellClipboard <> nil then
     CellClipboard.Free;
   CellClipboard := nil;
-  New(CellClipboard, Init(10, 10));
-  Cells^.ForRectangle(X1, Y1, X2, Y2, @ToClip);
+  CellClipboard := TCellCollection.Create(10, 10);
+  Cells.ForRectangle(X1, Y1, X2, Y2, @ToClip);
   ClipRect.A.X := X1;
   ClipRect.A.Y := Y1;
   ClipRect.B.X := X2;
@@ -2485,15 +2485,15 @@ procedure TCalcView.Paste;
     var
       S: String;
     begin
-    if  (P^.Options and coFormula) <> 0 then
-      S := ReformFormula(P^.S, 0, 0, DX, DY)
+    if  (P.Options and coFormula) <> 0 then
+      S := ReformFormula(P.S, 0, 0, DX, DY)
     else
-      S := P^.S;
-    with Cells^.ReplaceItem(P^.Col+DX, P^.Row+DY, S)^ do
+      S := P.S;
+    with Cells.ReplaceItem(P.Col+DX, P.Row+DY, S)^ do
       begin
-      Options := P^.Options;
-      Value := P^.Value;
-      Decimals := P^.Decimals;
+      Options := P.Options;
+      Value := P.Value;
+      Decimals := P.Decimals;
       end;
     end;
 
@@ -2503,8 +2503,8 @@ procedure TCalcView.Paste;
   Mark.X := Delta.X+Cur.X+ClipRect.B.X-ClipRect.A.X;
   Mark.Y := Delta.Y+Cur.Y+ClipRect.B.Y-ClipRect.A.Y;
   Clear;
-  for I := 1 to CellClipboard^.Count do
-    RewriteFormulaClip(CellClipboard^.At(I-1),
+  for I := 1 to CellClipboard.Count do
+    RewriteFormulaClip(CellClipboard.At(I-1),
       -ClipRect.A.X+Delta.X+Cur.X,
       -ClipRect.A.Y+Delta.Y+Cur.Y);
   ReCalc(False);
@@ -2534,7 +2534,7 @@ procedure TCalcView.Clear;
     end;
   for K := X1 to X2 do
     for L := Y1 to Y2 do
-      Cells^.DelItem(K, L);
+      Cells.DelItem(K, L);
   ReCalc(False);
   Modified := True;
   end { TCalcView.Clear };
@@ -2546,13 +2546,13 @@ procedure TCalcView.RewriteFormula(var P: PCellrec;
     O, D: Integer;
     V: CReal;
   begin
-  if  (P^.Options and coFormula) = 0 then
+  if  (P.Options and coFormula) = 0 then
     Exit;
-  S := ReformFormula(P^.S, LX, LY, DX, DY);
-  O := P^.Options;
-  D := P^.Decimals;
-  V := P^.Value;
-  P := Cells^.ReplaceItem(P^.Col, P^.Row, S);
+  S := ReformFormula(P.S, LX, LY, DX, DY);
+  O := P.Options;
+  D := P.Decimals;
+  V := P.Value;
+  P := Cells.ReplaceItem(P.Col, P.Row, S);
   with P^ do
     begin
     Options := O;
@@ -2567,15 +2567,15 @@ procedure TCalcView.InsertLine;
     P: PCellrec;
   begin
   L := Delta.Y+Cur.Y;
-  for I := 1 to Cells^.Count do
+  for I := 1 to Cells.Count do
     begin
-    P := Cells^.At(I-1);
-    if P^.Row >= VScroll^.MaxVal then
+    P := Cells.At(I-1);
+    if P.Row >= VScroll.MaxVal then
       Cells.AtFree(I-1)
     else
       begin
-      if P^.Row >= L then
-        Inc(P^.Row);
+      if P.Row >= L then
+        Inc(P.Row);
       RewriteFormula(P, 0, L, 0, 1);
       end;
     end;
@@ -2589,17 +2589,17 @@ procedure TCalcView.DeleteLine;
     P: PCellrec;
   begin
   L := Delta.Y+Cur.Y+1;
-  for I := 1 to Cells^.Count do
+  for I := 1 to Cells.Count do
     begin
-    P := Cells^.At(I-1);
+    P := Cells.At(I-1);
     RewriteFormula(P, 0, L, 0, -1);
-    if P^.Row = L-1 then
+    if P.Row = L-1 then
       begin
-      Cells^.FreeItem(P);
-      Cells^.AtPut(I-1, nil)
+      Cells.FreeItem(P);
+      Cells.AtPut(I-1, nil)
       end
-    else if P^.Row >= L then
-      Dec(P^.Row);
+    else if P.Row >= L then
+      Dec(P.Row);
     end;
   Cells.Pack;
   ReCalc(False);
@@ -2612,15 +2612,15 @@ procedure TCalcView.InsertCol;
     P: PCellrec;
   begin
   L := Delta.X+Cur.X;
-  for I := 1 to Cells^.Count do
+  for I := 1 to Cells.Count do
     begin
-    P := Cells^.At(I-1);
-    if P^.Col = HScroll^.MaxVal then
+    P := Cells.At(I-1);
+    if P.Col = HScroll.MaxVal then
       Cells.AtFree(I-1)
     else
       begin
-      if P^.Col >= L then
-        Inc(P^.Col);
+      if P.Col >= L then
+        Inc(P.Col);
       RewriteFormula(P, L, 0, 1, 0);
       end;
     end;
@@ -2637,18 +2637,18 @@ procedure TCalcView.DeleteCol;
     P: PCellrec;
   begin
   L := Delta.X+Cur.X+1;
-  for I := 1 to Cells^.Count do
+  for I := 1 to Cells.Count do
     begin
-    P := Cells^.At(I-1);
-    if P^.Col = L-1 then
+    P := Cells.At(I-1);
+    if P.Col = L-1 then
       begin
-      Cells^.FreeItem(P);
-      Cells^.AtPut(I-1, nil)
+      Cells.FreeItem(P);
+      Cells.AtPut(I-1, nil)
       end
     else
       begin
-      if P^.Col >= L then
-        Dec(P^.Col);
+      if P.Col >= L then
+        Dec(P.Col);
       RewriteFormula(P, L, 0, -1, 0);
       end;
     end;
@@ -2684,9 +2684,9 @@ procedure TCalcView.ReCalc(Full: Boolean);
     StartRecalc: Integer;
     ierr: Integer;
   begin
-  if not Cells^.TSort(StartRecalc) then
+  if not Cells.TSort(StartRecalc) then
     begin
-    with PCellrec(Cells^.At(StartRecalc-1))^ do
+    with PCellrec(Cells.At(StartRecalc-1))^ do
       begin
       CurrentCalc.X := Col;
       CurrentCalc.Y := Row;
@@ -2696,7 +2696,7 @@ procedure TCalcView.ReCalc(Full: Boolean);
     end;
   while StartRecalc <> 0 do
     begin
-    with PCellrec(Cells^.At(StartRecalc-1))^ do
+    with PCellrec(Cells.At(StartRecalc-1))^ do
       begin
       CurrentCalc.X := Col;
       CurrentCalc.Y := Row;
@@ -2742,7 +2742,7 @@ procedure TCalcView.GotoCell(Cell: String);
   Delta.X := X;
   Delta.Y := Y-(Size.Y-2) div 2;
   VScroll.SetValue(Delta.Y);
-  Delta.Y := VScroll^.Value;
+  Delta.Y := VScroll.Value;
   Cur.X := 0;
   Cur.Y := Y-Delta.Y;
   L := 0;
@@ -2779,30 +2779,30 @@ procedure TCalcView.SearchCell;
   function Found: Boolean;
     begin
     Found := True;
-    SearchPos.Y := P^.Row;
-    SearchPos.X := P^.Col;
-    GotoCell(GetCellName(P^.Col, P^.Row));
+    SearchPos.Y := P.Row;
+    SearchPos.X := P.Col;
+    GotoCell(GetCellName(P.Col, P.Row));
     if WasReplace then
       begin
       if  (SearchData.TxtOptions and 4 <> 0) then
         if  (SearchData.CellOptions = 0) then
           begin
-          S := P^.S;
+          S := P.S;
           Delete(S, k+l, Length(S1));
           Insert(ReplaceData.S1, S, k+l);
-          Cells^.ReplaceItem(P^.Col, P^.Row, S);
+          Cells.ReplaceItem(P.Col, P.Row, S);
           DrawView;
           Exit
           end
         else
           begin
-          if  (P^.Options and coFormula) <> 0 then
+          if  (P.Options and coFormula) <> 0 then
             begin
             Found := False;
             Exit
             end;
           Val(ReplaceData.S1, V, j);
-          Cells^.ReplaceItem(P^.Col, P^.Row, ReplaceData.S1)^.Value := V;
+          Cells.ReplaceItem(P.Col, P.Row, ReplaceData.S1)^.Value := V;
           DrawView;
           Exit
           end;
@@ -2825,16 +2825,16 @@ procedure TCalcView.SearchCell;
     S1 := UpStrg(SearchData.S)
   else
     S1 := SearchData.S;
-  for I := 1 to Cells^.Count do
+  for I := 1 to Cells.Count do
     begin
-    P := Cells^.At(I-1);
-    if  (P^.Row >= SearchPos.Y) and (P^.Col > SearchPos.X) then
+    P := Cells.At(I-1);
+    if  (P.Row >= SearchPos.Y) and (P.Col > SearchPos.X) then
       if  (SearchData.CellOptions = 0) then
         begin
         if SearchData.TxtOptions and 1 = 0 then
-          S := UpStrg(P^.S)
+          S := UpStrg(P.S)
         else
-          S := P^.S;
+          S := P.S;
         K := Pos(S1, S);
         L := 0;
         if SearchData.TxtOptions and 2 = 0 then
@@ -2882,7 +2882,7 @@ procedure TCalcView.SearchCell;
               SearchSign;
           until (K = 0) or (Length(S) < Length(S1));
         end
-      else if (P^.Options and 3 <> 0) and (V = P^.Value) then
+      else if (P.Options and 3 <> 0) and (V = P.Value) then
         begin
         if Found then
           Exit
@@ -2908,19 +2908,19 @@ constructor TDbaseWriter.Create(FileName: FNameStr; Mode: Word;
   inherited Create(FileName, Mode, Size);
   CurRecord := 0;
   EofFlag := False;
-  New(Fields, Init(10, 10));
+  Fields := TDbfFieldCollection.Create(10, 10);
   FillChar(Header, SizeOf(Header), 0);
   Header.DBFIdent := #3;
   if  (Mode = stOpen) or (Mode = stOpenRead) then
     ReadFile;
   end;
 
-destructor TDbaseWriter.Done; {KV}
+destructor TDbaseWriter.Destroy; {KV}
   begin
   if Fields <> nil then
     Fields.Free;
   Fields := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TDbaseWriter.AddField(const NameField: String; TypeField: Char;
@@ -2930,14 +2930,14 @@ procedure TDbaseWriter.AddField(const NameField: String; TypeField: Char;
   begin
   New(P);
   FillChar(P^, SizeOf(TDBFField), 0);
-  StrPCopy(P^.FieldName, System.Copy(NameField, 1, 10));
-  P^.FieldType := TypeField;
+  StrPCopy(P.FieldName, System.Copy(NameField, 1, 10));
+  P.FieldType := TypeField;
   if TypeField = 'C' then
-    P^.FLength.FieldLength := LenField
+    P.FLength.FieldLength := LenField
   else
     begin
-    P^.FLength.NumericLength := LenField;
-    P^.FLength.Decimals := DecField;
+    P.FLength.NumericLength := LenField;
+    P.FLength.Decimals := DecField;
     end;
   Fields.Insert(P);
   end;
@@ -2971,9 +2971,9 @@ procedure TDbaseWriter.CreateFile; {KV}
     i: Integer;
   begin
   Header.RecSize := 1;
-  for i := 0 to Fields^.Count-1 do
+  for i := 0 to Fields.Count-1 do
     begin
-    with PDBFField(Fields^.At(i))^ do
+    with PDBFField(Fields.At(i))^ do
       begin
       if FieldType = 'C' then
         Inc(Header.RecSize, FLength.FieldLength)
@@ -2981,13 +2981,13 @@ procedure TDbaseWriter.CreateFile; {KV}
         Inc(Header.RecSize, FLength.NumericLength);
       end;
     end;
-  Header.DataOffset := SizeOf(THeaderDBF)+(Fields^.Count)
+  Header.DataOffset := SizeOf(THeaderDBF)+(Fields.Count)
       *SizeOf(TDBFField)+1;
   inherited Seek(0);
   inherited Write(Header, SizeOf(Header));
-  for i := 0 to Fields^.Count-1 do
+  for i := 0 to Fields.Count-1 do
     begin
-    inherited Write(PDBFField(Fields^.At(i))^, SizeOf(TDBFField));
+    inherited Write(PDBFField(Fields.At(i))^, SizeOf(TDBFField));
     end;
   i := $1A0D;
   inherited Write(i, 2);
@@ -3006,7 +3006,7 @@ procedure TDbaseWriter.DeleteRecord; {KV}
 
 function TDbaseWriter.FCount: Integer;
   begin
-  FCount := Fields^.Count;
+  FCount := Fields.Count;
   end;
 
 function TDbaseWriter.FieldAsString(FieldIndex: Integer): String; {KV}
@@ -3069,9 +3069,9 @@ procedure TDbaseWriter.FieldPutString(FieldIndex: Integer;
     L: AWord;
     StrLen: Integer;
   begin
-  if  (FieldIndex < 1) or (FieldIndex > Fields^.Count) then
+  if  (FieldIndex < 1) or (FieldIndex > Fields.Count) then
     Exit;
-  P := PDBFField(Fields^.At(FieldIndex-1));
+  P := PDBFField(Fields.At(FieldIndex-1));
   FillChar(Buf, SizeOf(Buf), ' ');
   L := FieldLen(FieldIndex);
   if L > 2047 then
@@ -3098,7 +3098,7 @@ procedure TDbaseWriter.FieldPutInteger(FieldIndex: Integer;
     D: Byte;
     R: AWord;
   begin
-  if  (FieldIndex < 1) or (FieldIndex > Fields^.Count) then
+  if  (FieldIndex < 1) or (FieldIndex > Fields.Count) then
     Exit;
   L := FieldLen(FieldIndex);
   D := FieldDec(FieldIndex);
@@ -3125,7 +3125,7 @@ procedure TDbaseWriter.FieldPutFloat(FieldIndex: Integer;
   var
     S: String;
   begin
-  if  (FieldIndex < 1) or (FieldIndex > Fields^.Count) then
+  if  (FieldIndex < 1) or (FieldIndex > Fields.Count) then
     Exit;
   Str(FieldValue: FieldLen(FieldIndex): FieldDec(FieldIndex), S);
   FieldPutString(FieldIndex, S);
@@ -3133,12 +3133,12 @@ procedure TDbaseWriter.FieldPutFloat(FieldIndex: Integer;
 
 function TDbaseWriter.FieldName(FieldIndex: Integer): String; {KV}
   begin
-  FieldName := StrPas(PDBFField(Fields^.At(FieldIndex-1))^.FieldName);
+  FieldName := StrPas(PDBFField(Fields.At(FieldIndex-1))^.FieldName);
   end;
 
 function TDbaseWriter.FieldLen(FieldIndex: Integer): AWord; {KV}
   begin
-  with PDBFField(Fields^.At(FieldIndex-1))^ do
+  with PDBFField(Fields.At(FieldIndex-1))^ do
     begin
     if FieldType = 'C' then
       FieldLen := FLength.FieldLength
@@ -3149,7 +3149,7 @@ function TDbaseWriter.FieldLen(FieldIndex: Integer): AWord; {KV}
 
 function TDbaseWriter.FieldDec(FieldIndex: Integer): Byte; {KV}
   begin
-  with PDBFField(Fields^.At(FieldIndex-1))^ do
+  with PDBFField(Fields.At(FieldIndex-1))^ do
     begin
     if FieldType = 'C' then
       FieldDec := 0
@@ -3164,9 +3164,9 @@ function TDbaseWriter.FieldPos(NameField: String): Integer; {KV}
   begin
   UpStr(NameField);
   FieldIndex := 0;
-  for i := 0 to Fields^.Count-1 do
+  for i := 0 to Fields.Count-1 do
     begin
-    if UpStrg(StrPas(PDBFField(Fields^.At(i))^.FieldName)) = NameField
+    if UpStrg(StrPas(PDBFField(Fields.At(i))^.FieldName)) = NameField
     then
       begin
       FieldIndex := i+1;
@@ -3178,7 +3178,7 @@ function TDbaseWriter.FieldPos(NameField: String): Integer; {KV}
 
 function TDbaseWriter.FieldType(FieldIndex: Integer): Char; {KV}
   begin
-  FieldType := PDBFField(Fields^.At(FieldIndex-1))^.FieldType;
+  FieldType := PDBFField(Fields.At(FieldIndex-1))^.FieldType;
   end;
 
 function TDbaseWriter.FieldOffsetInBuffer(FieldIndex: Integer): Integer;
@@ -3190,7 +3190,7 @@ function TDbaseWriter.FieldOffsetInBuffer(FieldIndex: Integer): Integer;
   Offset := 1;
   for i := 0 to FieldIndex-2 do
     begin
-    with PDBFField(Fields^.At(i))^ do
+    with PDBFField(Fields.At(i))^ do
       begin
       if FieldType = 'C' then
         Inc(Offset, FLength.FieldLength)
