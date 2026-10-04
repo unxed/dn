@@ -505,7 +505,7 @@ function TMenuView.Execute: Word;
         else
           begin
           TrackKey(False);
-          if  (Current <> nil) and (Current^.Next = nil) then
+          if  (Current <> nil) and (Current.Next = nil) then
             TrackKey(True);
           end
         end
@@ -542,7 +542,7 @@ q:
         MouseActive := True;
         Exit;
         end;
-      Current := Current^.Next;
+      Current := Current.Next;
       end;
     end { TrackMouse };
 
@@ -550,7 +550,7 @@ q:
 
     procedure NextItem;
       begin
-      Current := Current^.Next;
+      Current := Current.Next;
       if Current = nil then
         Current := Menu^.Items;
       end;
@@ -564,7 +564,7 @@ q:
         P := nil;
       repeat
         NextItem
-      until Current^.Next = P;
+      until Current.Next = P;
       end;
 
     begin { TrackKey }
@@ -574,7 +574,7 @@ q:
           NextItem
         else
           PrevItem;
-      until Current^.Name <> nil;
+      until Current.Name <> nil;
     end { TrackKey };
 
   function MouseInOwner: Boolean;
@@ -650,13 +650,13 @@ q:
           if MouseInOwner
           then
             Current := Menu^.Default
-          else if (Current <> nil) and (Current^.Name <> nil)
+          else if (Current <> nil) and (Current.Name <> nil)
           then
             begin
             Action := DoSelect;
             ExecDefault := Mouse.X < Size.X-5;
             end
-          else if (Current <> nil) and (Current^.Name = nil)
+          else if (Current <> nil) and (Current.Name = nil)
           then
             Action := DoNothing
           else if MouseActive
@@ -721,7 +721,7 @@ q:
                   else
                     begin
                     TrackKey(False);
-                    {if Current^.Next = nil then TrackKey(true);}
+                    {if Current.Next = nil then TrackKey(true);}
                     {JO - зачем здесь это???}
                     end;
                   end
@@ -763,14 +763,14 @@ q:
                       P := Current;
                       Current := Menu^.Items;
                       repeat
-                        Current := Current^.Next;
+                        Current := Current.Next;
                         if Current = nil then
                           Current := Menu^.Items;
-                      until Current^.Next = P;
+                      until Current.Next = P;
                       end;
-                  while Current^.Name = nil do
+                  while Current.Name = nil do
                     begin
-                    Current := Current^.Next;
+                    Current := Current.Next;
                     if Current = nil then
                       Current := Menu^.Items;
                     end;
@@ -788,15 +788,15 @@ q:
                       end
                     else
                       begin
-                      Current := Current^.Next;
+                      Current := Current.Next;
                       if Current = nil then
                         Current := Menu^.Items;
                       end;
                   if Current = nil then
                     Current := Menu^.Items;
-                  while Current^.Name = nil do
+                  while Current.Name = nil do
                     begin
-                    Current := Current^.Next;
+                    Current := Current.Next;
                     if Current = nil then
                       Current := Menu^.Items;
                     end;
@@ -815,7 +815,7 @@ lEnter:
                   но в других случаях он может оказаться корячей клавишей
                   (например, в меню выбора дисков)}
                 if  (ParentMenu <> nil) and
-                    (ParentMenu^.Current^.Flags and
+                    (ParentMenu^.Current.Flags and
                          miAllowChangeDefault <> 0)
                 then
                   begin
@@ -932,7 +932,7 @@ lHotkey:
                 GetItemRect(Current, R);
                 R.A.X := R.A.X+Origin.X;
                 R.A.Y := R.B.Y+Origin.Y;
-                R.B := Owner^.Size;
+                R.B := Owner.Size;
                 if Size.Y = 1 then
                   Dec(R.A.X);
                 Target := TopMenu^.NewSubView(R, SubMenu, Self);
@@ -943,7 +943,7 @@ lHotkey:
             else if (Action = DoSelect) and ((Flags and miDisabled) = 0) then
               begin
               if (ParentMenu <> nil) and
-                (ParentMenu^.Current^.Flags and miExecDefault <> 0)
+                (ParentMenu^.Current.Flags and miExecDefault <> 0)
               then
                 ParentItem := ParentMenu^.Current
               else
@@ -967,7 +967,7 @@ lHotkey:
     В этом случае смена умолчания - только пробелом, да и то
     только при наличии разрешения (miAllowChangeDefault) }
     if (ParentMenu = nil) or
-       (ParentMenu^.Current^.Flags and miExecDefault = 0)
+       (ParentMenu^.Current.Flags and miExecDefault = 0)
     then
       Menu^.Default := Current;
     Current := nil;
@@ -1018,9 +1018,9 @@ function TMenuView.GetHelpCtx: Word;
 Loop:
   if C = nil then
     Exit;
-  if  (C^.Current <> nil) and (C^.Current^.HelpCtx <> hcNoContext) then
+  if  (C^.Current <> nil) and (C^.Current.HelpCtx <> hcNoContext) then
     begin
-    GetHelpCtx := C^.Current^.HelpCtx;
+    GetHelpCtx := C^.Current.HelpCtx;
     Exit;
     end;
   GetHelpCtx := C^.HelpCtx;
@@ -1432,7 +1432,7 @@ procedure TMenuBox.Draw;
         FrameLine(10);
         MoveCStr(B[3], P^.Name^, Color);
         if (P = Menu.Default) and (ParentMenu <> nil) and
-          (ParentMenu^.Current^.Flags and miExecDefault <> 0)
+          (ParentMenu^.Current.Flags and miExecDefault <> 0)
         then { помечаем алмазиком пункт, который выполняется по
           Enter на пункте родительского меню }
           MoveChar(B[2], #4, Byte(Color), 1);
@@ -1542,7 +1542,7 @@ function TMenuBox.Execute: Word;
 
 function TMenuBox.RightExpand: Boolean;
   begin
-  Result := not LastActionIsExpand and (Current^.Flags and miSubmenu <> 0);
+  Result := not LastActionIsExpand and (Current.Flags and miSubmenu <> 0);
     { Обычно по kbRight надо раскрывать подменю. Но если оно только что
     было раскрыто и теперь закрывается по нажатию стрелки ВПРАВО,
     то надо не опять раскрывать его, а передавать эту kbRight

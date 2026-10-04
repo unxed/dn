@@ -349,7 +349,7 @@ procedure TGameInfo.Draw;
   for I := 15 to Vis-5 do
     WriteLineC(0, I, Size.X, 1, B);
 
-  C := Owner^.GetColorW($1112);
+  C := Owner.GetColorW($1112);
   MoveChar(B, #196, C, Size.X);
   S := GetString(dlTetrisBest);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
@@ -540,7 +540,7 @@ procedure TGameView.SetState;
   begin
   inherited SetState(AState, Enable);
   if not Enable and (AState and (sfActive+sfFocused) <> 0) and
-      (Owner^.State and sfActive <> 0) and not Stop and
+      (Owner.State and sfActive <> 0) and not Stop and
     ValidMove(0, 0)
   then
     Stop := True;

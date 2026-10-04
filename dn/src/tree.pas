@@ -1699,7 +1699,7 @@ procedure TTreeView.Draw;
   C3 := GetColorW(3);
   C4 := GetColorW(4);
   ScrollBar^.PgStep := Size.Y*((Size.X+1) div 13);
-  if Owner^.GetState(sfActive) and GetState(sfSelected) then
+  if Owner.GetState(sfActive) and GetState(sfSelected) then
     C3 := GetColorW(3)
   else
     C3 := GetColorW(6);
@@ -1710,7 +1710,7 @@ procedure TTreeView.Draw;
     Delta.Y := CurPos-Size.Y+1;
   P := DC^.At(CurPos);
   if  (P^.Number = CurNum) and not Parital then
-    if Owner^.GetState(sfActive) and GetState(sfSelected) then
+    if Owner.GetState(sfActive) and GetState(sfSelected) then
       C3 := GetColorW(5)
     else
       C3 := GetColorW(7);
@@ -1961,7 +1961,7 @@ procedure TTreeView.SetState(AState: Word; Enable: Boolean);
          cmPanelMkDir,
         cmChangeDrive, cmPanelReread]);
   if AState and (sfFocused or sfActive or sfSelected) <> 0 then
-    if Owner^.GetState(sfActive) and GetState(sfSelected) then
+    if Owner.GetState(sfActive) and GetState(sfSelected) then
       begin
       if ScrollBar <> nil then
         ScrollBar.Show;

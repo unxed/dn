@@ -970,7 +970,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
           if  (P^.Owner <> nil) then
             begin
             if IOResult = 0 then
-              P^.Owner^.Attr := P^.Owner^.Attr or Copied;
+              P^.Owner.Attr := P^.Owner.Attr or Copied;
             if  (SourcePanel <> nil) then
               Message(SourcePanel, evCommand, cmCopyUnselect, P^.Owner);
             end;
@@ -1392,15 +1392,15 @@ lbStartWrite:
           SetDateAttr;
           if  (P^.Owner <> nil) then
             begin
-            P^.Owner^.Attr := P^.Owner^.Attr or Copied;
+            P^.Owner.Attr := P^.Owner.Attr or Copied;
             if  (SourcePanel <> nil) then
               Message(SourcePanel, evCommand, cmCopyUnselect, P^.Owner);
-            if  (P^.Owner^.DIZ <> nil) and
+            if  (P^.Owner.DIZ <> nil) and
                 (CopyOptions and cpoDesc <> 0)
             then
               begin
               Info^.Write(6, GetString(dlExportingDIZ));
-              ExportDiz(nil, GetName(CurNewName), P^.Owner^.DIZ, CopyDir);
+              ExportDiz(nil, GetName(CurNewName), P^.Owner.DIZ, CopyDir);
               end;
             end;
           {JO EAs - files}

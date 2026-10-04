@@ -145,7 +145,7 @@ procedure TSortView.Draw;
   C := GetString(dlSortTag)[SortSetup^.SortMode + 1];
   if (SortSetup^.SortFlags and psfInverted) <> 0  then
     C := Upcase(C);
-  MoveChar(B, C, Panel.Owner^.GetColorW(3), 1);
+  MoveChar(B, C, Panel.Owner.GetColorW(3), 1);
   WriteLineW(0, 0, 1, 1, B);
   end;
 

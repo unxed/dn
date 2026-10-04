@@ -768,10 +768,10 @@ Scroll:
   if  (DriveState and dsInvalid > 0) then
     begin
     C1 := GetColorW(1); { Normal }
-    for i := 0 to pred(Owner^.Size.Y) do
+    for i := 0 to pred(Owner.Size.Y) do
       begin
       MoveChar(B, ' ', C1, Size.X);
-      WriteLineC(0, i, Owner^.Size.X, 1, B[0]);
+      WriteLineC(0, i, Owner.Size.X, 1, B[0]);
       end;
     Exit;
     end;

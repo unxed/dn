@@ -884,7 +884,7 @@ procedure TCalcView.Draw;
     Exit;
     end;
   PInfoView(CellInfo)^.SetInfo(GetCellName(CurPos.X, CurPos.Y),
-     Owner^.GetColorW(9));
+     Owner.GetColorW(9));
   FillChar(Q^, SizeOf(Q^), 255);
   for I := 1 to Cells^.Count do
     begin
@@ -2338,7 +2338,7 @@ procedure TCalcView.SaveSheetAs;
     PWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     Owner.Redraw;
     end;
-  {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner^.GetColorW(12));}
+  {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
   S := PBufStream.Create(FName, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   { S^.Put(Cells);}
@@ -2362,7 +2362,7 @@ procedure TCalcView.SaveSheet;
     SaveSheetAs;
     Exit
     end;
-  {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner^.GetColorW(12));}
+  {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
   S := PBufStream.Create(SName^, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   {S^.Put(Cells);}
