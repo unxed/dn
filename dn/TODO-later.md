@@ -332,3 +332,9 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
   restores the directory of the panel; the "Alt-X" of the harness DNKEYS did not exit: DN asks "Do you wish to quit?" and the key `A2D00` does not reach it as Alt-X); the settings of the dialogs survive a restart
   (the section `[Saved]` of `dn.ini`). The UTF-8 build with the provider `DOS-UTF8/NAMES`: the file "дом 世界.txt" is in the panel (shown as `?` where the code page of the DOS screen has no glyph).
 - Not driven: the button "Save setup" of the panel setup dialogs (the presets of the panels) and the view of Cyrillic names with `chcp 866`; a hung emulator can write a huge file: always `timeout -k`.
+
+## Colors of the buttons (2026-10-04)
+- Users: the buttons are not as in the original DN (the default button was red, the others purple). Cause: the built-in `CColor` was the table of the OSP source (it is the scheme `jaroslaw.pal`: cyan on magenta, white on brown, white on
+  bright red); the colors of the original DN are the scheme `default.pal` (white on dark gray, cyan for the default button, yellow hot letters, dark gray text of the check boxes) as in the reference screenshots.
+  Now `palettes.CColor` is `default.pal`; `CColorOsp` keeps the old table; a palette that was saved with exactly the old table (nobody changed it) is replaced at the start (`ReadConfig`, `boot.pas`). The other schemes
+  are in `data/colors/` (Options -> Colors -> Load). Not compared pixel by pixel with the references: the input lines are black on the references and `9f` (white on light blue) in `default.pal`.
