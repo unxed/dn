@@ -56,7 +56,6 @@ uses
 
 type
   TSSaver = class;
-  PSSaver = TSSaver;
   TSSaver = class(TView)
     constructor Create(const Bounds: TRect);
     function Execute: Word; virtual;
@@ -69,7 +68,6 @@ procedure CallExternalSaver(const FN: String);
 
 type
   TProjector = class;
-  PProjector = TProjector;
   TProjector = class(TSSaver)
     Center: TPoint;
     Radius: Integer;
@@ -94,7 +92,6 @@ type
     end;
 
   TStarSkySaver = class;
-  PStarSkySaver = TStarSkySaver;
   TStarSkySaver = class(TSSaver)
     Stars: array[1..CNumSkyStars] of TSkyStar;
     NumSkyStars: Integer;
@@ -108,7 +105,6 @@ type
   TDestination = (dsUp, dsRight, dsDown, dsLeft);
 
   TClockSaver = class;
-  PClockSaver = TClockSaver;
   TClockSaver = class(TSSaver)
     X, Y, DX, DY, DDY: Integer;
     Dest: TDestination;
@@ -121,7 +117,7 @@ type
     end;
 
 const
-  SSaver: PSSaver = nil;
+  SSaver: TSSaver = nil;
 
 implementation
 

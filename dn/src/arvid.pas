@@ -201,7 +201,7 @@ type
     function GetDir: String; virtual;
     function GetDirectory(
          const FileMask: String;
-        var TotalInfo: TSize): PFilesCollection; virtual;
+        var TotalInfo: TSize): TFilesCollection; virtual;
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure RereadDirectory(S: String); virtual;
@@ -226,8 +226,8 @@ type
     procedure SeekDirectory;
     function OpenDirectory(const Dir: String;
                                  PutDirs: Boolean): TDrive; virtual;
-    procedure DrvFindFile(FC: PFilesCollection); virtual;
-    procedure ReadDescrptions(FilesC: PFilesCollection); virtual;
+    procedure DrvFindFile(FC: TFilesCollection); virtual;
+    procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
   private
     procedure Kill;
     end;
@@ -356,14 +356,14 @@ procedure TArvidDrive.Kill;
   EraseTempFile(Name^);
   end;
 
-function TArvidDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFilesCollection;
+function TArvidDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): TFilesCollection;
   var
-    FC: PFilesCollection;
+    FC: TFilesCollection;
     P: PString;
     DT: DateTime;
     TAttr: Word;
   begin
-  FC := PFilesCollection.Create($80, $40);
+  FC := TFilesCollection.Create($80, $40);
 {  if ArvidWithDN then
     GetFreeSpace(FreeSpace);}
   TotFiles := 0;
@@ -1026,7 +1026,7 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
   GlobalMessage(evCommand, cmPanelReread, nil);
   end { TArvidDrive.EditDescription };
 
-procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
+procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
   var
     DT: record
       Mask: String;
@@ -1063,9 +1063,9 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       Exit;
       end;
     if not WasTape then
-      FindList.Insert(PFindObject.Create(Name));
+      FindList.Insert(TFindObject.Create(Name));
     if not WasDir then
-      FindList.Insert(PFindDir.Create(dr, LP));
+      FindList.Insert(TFindDir.Create(dr, LP));
     WasTape := True;
     WasDir := True;
     FindList.Insert(P);
@@ -1132,7 +1132,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         then
           begin
           WasDir := True;
-          Add(PFindDir.Create(dr, LP), Name);
+          Add(TFindDir.Create(dr, LP), Name);
           end;
         end;
       if not OOM then
@@ -1164,7 +1164,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
                   ( (Attr = 0) or (FF.Attr and Attr <> 0)))
             then
               begin
-              Add(PFindFile.Create(TdrMakeFileName(SS), FF.Size,
+              Add(TFindFile.Create(TdrMakeFileName(SS), FF.Size,
                      FF.Time), Name);
               end;
             end;
@@ -1223,9 +1223,9 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
           if WasDir = False then
             begin
             WasDir := True;
-            Add(PFindDir.Create(dr, LP), NName);
+            Add(TFindDir.Create(dr, LP), NName);
             end;
-          Add(PFindFile.Create(S0, AA0.ChildOrSize, AA0.Time), NName);
+          Add(TFindFile.Create(S0, AA0.ChildOrSize, AA0.Time), NName);
           end;
         end;
       end;
@@ -1316,12 +1316,12 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     var
       D: TDialog;
       R: TRect;
-      PL: PFindBox;
+      PL: TFindBox;
       P: TView;
-      F: PFindObject;
+      F: TFindObject;
 
     procedure DoCount(P_: Pointer);
-    var P: PFindObject absolute P_;
+    var P: TFindObject absolute P_;
       begin
       Inc(R.A.X, Byte(P.TT = ttFile));
       end;
@@ -1337,7 +1337,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     D.Insert(P);
 
     R.Assign(2, 1, 58, 13);
-    PL := PFindBox.Create(R, 1, TScrollBar(P));
+    PL := TFindBox.Create(R, 1, TScrollBar(P));
     PL.NewLisT(FindList);
     D.Insert(PL);
 
@@ -1405,7 +1405,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       SeekDirectory;
       F := FindList.At(R.A.Y);
       if F.TT = ttFile then
-        FreeStr := MakeNormName(FreeStr, CnvString(PFindFile(F).Name));
+        FreeStr := MakeNormName(FreeStr, CnvString(TFindFile(F).Name));
       Message(Panel, evCommand, cmFindGotoFile, @FreeStr);
       end;
 
@@ -1495,7 +1495,7 @@ function TArvidDrive.OpenDirectory(const Dir: String;
   OpenDirectory := nil;
   end;
 
-procedure TArvidDrive.ReadDescrptions(FilesC: PFilesCollection);
+procedure TArvidDrive.ReadDescrptions(FilesC: TFilesCollection);
   begin
   end;
 

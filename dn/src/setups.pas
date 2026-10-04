@@ -69,7 +69,6 @@ type
     ForceDefArch: String[3];
     end;
 
-  PSysDialog = ^TSysDialog;
   TSysDialog = class(TDialog)
     LocalData: TSystemData;
     SysData: TSysData;
@@ -79,13 +78,11 @@ type
     procedure GetData(var Rec); virtual;
     end;
 
-  PCurrDriveInfo = ^TCurrDriveInfo;
   TCurrDriveInfo = class(TCheckBoxes)
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Press(Item: Integer); virtual;
     end;
 
-  PMouseBar = ^TMouseBar;
   TMouseBar = class(TScrollBar)
     constructor Create(var Bounds: TRect);
     procedure SetData(var Rec); virtual;

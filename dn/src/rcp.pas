@@ -85,7 +85,7 @@ const
   tidDLs = 'TStrIdx';
 
 var
-  Types: PValuesHolder;
+  Types: TValuesHolder;
   LngFileName: String;
   OutLngFileName: String;
   dlgFileName: String;
@@ -175,19 +175,19 @@ const
   {-DataCompBoy-}
 procedure ProcessDLs(Enable: Boolean);
   var
-    DLs: PTypeHolder;
-    SLM: PStrListMaker;
+    DLs: TTypeHolder;
+    SLM: TStrListMaker;
     Fail: Boolean;
     F: lText;
     S, S1: String;
-    P: PLngWord;
+    P: TLngWord;
   function DoSeekID(P_: Pointer): Boolean;
-  var P: PLngWord absolute P_;
+  var P: TLngWord absolute P_;
     begin
     DoSeekID := P^.Name = S1
     end;
   procedure DoTest(P_: Pointer);
-  var P: PLngWord absolute P_;
+  var P: TLngWord absolute P_;
     begin
     if P^.Mark = 0 then
       begin
@@ -320,7 +320,7 @@ procedure ProcessDLs(Enable: Boolean);
     end;
   ReRegisterType(RStringList);
   DLStream.Init(OutLngFileName, stOpenRead, 512);
-  LStringList := PStringList(DLStream.Get);
+  LStringList := TStringList(DLStream.Get);
   if  (LStringList = nil) and Enable then
     begin
     DLStream.Done;
@@ -342,8 +342,8 @@ var
   S: String;
   F: lText; {DataCompBoy}
   Line: LongInt;
-  IDs: PTypeHolder;
-  DLGs: PTypeHolder;
+  IDs: TTypeHolder;
+  DLGs: TTypeHolder;
 
 const
   idSubMenu = 'SUBMENU ';
@@ -382,7 +382,7 @@ const
   idDriveCheckBox = 'DRIVECHECKBOXES ';
   idColorPoint = 'COLORPOINT ';
 
-  TheRF: PIdxMaker = nil;
+  TheRF: TIdxMaker = nil;
 
 var
   D: PColorDialog;
@@ -432,9 +432,9 @@ function FSetExt(F: String; NewExt: String): String;
 
 procedure StoreResource(P: TStreamable; Id: TDlgIdx);
   var
-    W: PLngWord;
+    W: TLngWord;
   function HaveThisID(P_: Pointer): Boolean;
-  var P: PLngWord absolute P_;
+  var P: TLngWord absolute P_;
     begin
     HaveThisID := TDlgIdx(P^.l) = Id
     end;
@@ -471,7 +471,7 @@ function GetID(const S: String): LongInt;
   T.Init(0, FreeStr);
   if IDs^.Search(@T, I) then
     begin
-    GetID := PLngWord(IDs^.At(I))^.L;
+    GetID := TLngWord(IDs^.At(I))^.L;
     end
   else
     begin
@@ -660,7 +660,7 @@ procedure MakeEditorCommands;
 
 procedure ProcessDLGs;
   var
-    tP: PTypeHolder;
+    tP: TTypeHolder;
     St: TStream;
   function GetID(const S: String): LongInt;
     var
@@ -676,7 +676,7 @@ procedure ProcessDLGs;
     T.Init(0, FreeStr);
     if IDs^.Search(@T, L) then
       begin
-      GetID := PLngWord(IDs^.At(L))^.L;
+      GetID := TLngWord(IDs^.At(L))^.L;
       end
     else
       begin
@@ -851,7 +851,7 @@ procedure ProcessDLGs;
     T.Init(0, FreeStr);
     if not DLGs^.Search(@T, J) then
       Error('Unknown Resource ID - '+T.Name);
-    ID := TDlgIdx(PLngWord(DLGs^.At(J))^.l);
+    ID := TDlgIdx(TLngWord(DLGs^.At(J))^.l);
     FillChar(R, SizeOf(R), 0);
     New(D, Init(R, CompileMenu(S)));
     StoreResource(D, ID);
@@ -985,7 +985,7 @@ procedure ProcessDLGs;
     procedure MakeDriveCheckBoxes;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := PCurrDriveInfo.Create(R, GetItems);
+      PV := TCurrDriveInfo.Create(R, GetItems);
       D.Insert(PV);
       with PV^ do
         begin
@@ -1052,7 +1052,7 @@ procedure ProcessDLGs;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       if Mouse then
-        LastSB := PMouseBar.Create(R)
+        LastSB := TMouseBar.Create(R)
       else
         LastSB := TScrollBar.Create(R);
       D.Insert(LastSB);
@@ -1081,7 +1081,7 @@ procedure ProcessDLGs;
 
     procedure MakeColorPoint;
       var
-        P: PColorPoint;
+        P: TColorPoint;
       begin
       R.A.X := GetID(Token(S, i));
       R.B.X := R.A.X+1;
@@ -1119,11 +1119,11 @@ procedure ProcessDLGs;
     T.Init(0, FreeStr);
     if not DLGs^.Search(@T, J) then
       Error('Unknown Resource ID: '+T.Name);
-    ID := TDlgIdx(PLngWord(DLGs^.At(J))^.l);
+    ID := TDlgIdx(TLngWord(DLGs^.At(J))^.l);
     begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R.Assign(0, 0, TkL[1], TkL[2]) end;
     if ID = dlgSystemSetup then
       begin
-      D := New(PSysDialog, Init(R, Token(S, I)));
+      D := New(TSysDialog, Init(R, Token(S, I)));
       D.Awaken;
       end
     else if IdToken = idNotepad then
@@ -1231,14 +1231,14 @@ procedure ProcessDLGs;
   {-DataCompBoy-}
 
   procedure DoInsert(P_: Pointer);
-  var P: PLngWord absolute P_;
+  var P: TLngWord absolute P_;
     begin
     IDs.Insert(P);
     end;
 
   function FailCheck: Boolean;
     procedure DoCheck(P_: Pointer);
-    var P: PLngWord absolute P_;
+    var P: TLngWord absolute P_;
       begin
       if P^.Mark <> 1 then
         begin
@@ -1282,7 +1282,7 @@ procedure ProcessDLGs;
     Error('Could not create output file '+OutDlgFileName);
     end;
 
-  TheRF := PIdxMaker.Create(St);
+  TheRF := TIdxMaker.Create(St);
   while not Eof(F.T) do
     begin
     Readln(F.T, S);
@@ -1335,9 +1335,9 @@ function GetName(S: String): String;
 
 procedure CleanupTypes;
   procedure DoClean(P_: Pointer);
-  var P: PTypeHolder absolute P_;
+  var P: TTypeHolder absolute P_;
     procedure DoUnmark(P_: Pointer);
-    var P: PLngWord absolute P_;
+    var P: TLngWord absolute P_;
       begin
       P^.Mark := 0
       end;
@@ -1362,7 +1362,7 @@ var
 
 procedure InitParser;
   var
-    Sec: PIniSection;
+    Sec: TIniSection;
     I: Integer;
     K, S: String;
   begin
@@ -1377,10 +1377,10 @@ procedure InitParser;
         S := Sec^.GetValueAt(I);
         DelDoubles('  ', S);
         if K = 'CONST' then
-          Types.Insert(New(PTypeHolder, Init(ReplaceChar(' ', #0,
+          Types.Insert(New(TTypeHolder, Init(ReplaceChar(' ', #0,
                  S+' '), tmConst)))
         else if K = 'TYPE' then
-          Types.Insert(PTypeHolder.Create(S, tmEnum))
+          Types.Insert(TTypeHolder.Create(S, tmEnum))
         else
           Error('Undefined keyword "'+K+'" in [Parser] section');
         end;
@@ -1416,16 +1416,15 @@ begin
 end;
 
 type
-  PR_REditSaver = ^TEditSaver;
 
 function Build_REditSaver(var S: TStream): TStreamable;
 begin
-  Result := TStreamable(New(PR_REditSaver, Load(S)));
+  Result := TStreamable(New(TEditSaver, Load(S)));
 end;
 
 procedure Store_REditSaver(P: TStreamable; var S: TStream);
 begin
-  PR_REditSaver(P)^.Store(S);
+  TEditSaver(P)^.Store(S);
 end;
 
 procedure SetStreamRecs_rcp;

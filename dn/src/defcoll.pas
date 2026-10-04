@@ -54,7 +54,6 @@ uses
   ;
 
 type
-  PDefCollection = ^TDefCollection;
   TDefCollection = class(TStringCollection)
     constructor Create(ALimit, ADelta: LongInt); {Initialization }
     procedure ProceedFile(FName: String); {Read defines   }

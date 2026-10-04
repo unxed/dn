@@ -85,13 +85,11 @@ type
     end;
 
   TFieldCollection = class;
-  PFieldCollection = TFieldCollection;
   TFieldCollection = class(TCollection)
     procedure FreeItem(P: Pointer); override;
     end;
 
   TDBFile = class;
-  PDBFile = TDBFile;
   TDBFile = class(TObject)
     WriteMode: Byte;
     BaseName: String; {DataCompBoy}
@@ -201,7 +199,7 @@ constructor TDBFile.Create(const FileName: String);
     if Fields <> nil then
       Fields.Free;
     {piwamoto.src.end}
-    Fields := PFieldCollection.Create(NumFields, NumFields);
+    Fields := TFieldCollection.Create(NumFields, NumFields);
     RL := 1;
     for I := 1 to NumFields do
       begin

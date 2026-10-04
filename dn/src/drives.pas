@@ -168,7 +168,6 @@ type
   {-DataCompBoy-}
 
   TDIZCol = class;
-  PDIZCol = TDIZCol;
     {`2 Коллекция описаний из файла описаний. Используется для
     быстрого поиска описаний по имени при входе в каталог.
     Имена запоминаются в коллекции на верхнем регистре. }
@@ -719,7 +718,7 @@ procedure TDrive.UseFile(P: PFileRec; Command: Word);
 { Подготовка сортированной коллекции описаний, откуда описания будет
 удобно находить при считывании каталога. Используется ReadFileList}
 var
-  Descriptions: PDIZCol;
+  Descriptions: TDIZCol;
   PD: PDesc;
   IgnoreDiz: Boolean;
 
@@ -765,7 +764,7 @@ procedure PrepareDIZ(
   if Container <> '' then
     begin
     OpenFileList(Container);
-    Descriptions := PDIZCol.Create($10, $10);
+    Descriptions := TDIZCol.Create($10, $10);
     ReadFileList(DizNameProc, DizLineProc, DizEndProc);
     end;
   ClrIO;

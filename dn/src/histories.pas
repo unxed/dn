@@ -128,7 +128,6 @@ type
     end;
 
   TEditHistoryCol = class;
-  PEditHistoryCol = TEditHistoryCol;
   TEditHistoryCol = class(TCollection)
     function IndexOf(P: Pointer): LongInt; override;
     procedure PutItem(S: TStream; P: Pointer); override;
@@ -137,7 +136,6 @@ type
     end;
 
   TViewHistoryCol = class;
-  PViewHistoryCol = TViewHistoryCol;
   TViewHistoryCol = class(TEditHistoryCol)
     procedure PutItem(S: TStream; P: Pointer); override;
     function GetItem(S: TStream): Pointer; override;
@@ -288,7 +286,7 @@ procedure StoreViewInfo(P: Pointer);
   var
     Viewer: TFileWindow absolute P;
     
-    DBView: PDBWindow absolute P;
+    DBView: TDBWindow absolute P;
     
     
     SSView: TCalcWindow absolute P;
@@ -300,7 +298,7 @@ procedure StoreViewInfo(P: Pointer);
   if  (InterfaceData.Options and ouiTrackViewers = 0) or (P = nil) then
     Exit;
   if ViewHistory = nil then
-    ViewHistory := PViewHistoryCol.Create(30, 30);
+    ViewHistory := TViewHistoryCol.Create(30, 30);
   New(R);
 
   if TView(P).ClassType = TFileWindow then
@@ -416,7 +414,7 @@ procedure StoreExtViewer(const FileName: String);
   then
     Exit;
   if ViewHistory = nil then
-    ViewHistory := PViewHistoryCol.Create(30, 30);
+    ViewHistory := TViewHistoryCol.Create(30, 30);
   New(R);
 
   with R^ do
@@ -450,7 +448,7 @@ procedure StoreEditInfo(P: Pointer);
   then
     Exit;
   if EditHistory = nil then
-    EditHistory := PEditHistoryCol.Create(30, 30);
+    EditHistory := TEditHistoryCol.Create(30, 30);
   New(R);
   with TFileEditor(E.Intern), R^ do
     begin
@@ -618,7 +616,6 @@ function GetCommand(Idx: Integer): String;
 
 type
   TTHistList = class;
-  PTHistList = TTHistList;
   TTHistList = class(TListBox)
     EVHistory, CommandHistory, RolledFwd: Boolean;
     Dlg: TDlgIdx; {AK155}
@@ -905,7 +902,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
 function GetDialog(Dlg: TDlgIdx; var List: Pointer): TDialog;
   var
     D: TDialog;
-    L: PTHistList; {AK155}
+    L: TTHistList; {AK155}
     P: TView;
     R: TRect;
   begin
@@ -927,7 +924,7 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): TDialog;
 procedure EditHistoryMenu;
   var
     D: TDialog;
-    P: PTHistList;
+    P: TTHistList;
     I: Integer;
   begin
   if InterfaceData.Options and ouiTrackEditors = 0 then
@@ -938,7 +935,7 @@ procedure EditHistoryMenu;
   ClearHistories;
   LoadHistories; {AK155}
   if EditHistory = nil then
-    EditHistory := PEditHistoryCol.Create(30, 30);
+    EditHistory := TEditHistoryCol.Create(30, 30);
   {  if EditHistory.Count = 0 then Exit;}
   D := GetDialog(dlgEditHistory, Pointer(P));
   P.NewLisT(EditHistory);
@@ -967,7 +964,7 @@ procedure EditHistoryMenu;
 procedure ViewHistoryMenu;
   var
     D: TDialog;
-    P: PTHistList;
+    P: TTHistList;
     I: Integer;
   begin
   if InterfaceData.Options and ouiTrackViewers = 0 then
@@ -978,7 +975,7 @@ procedure ViewHistoryMenu;
   ClearHistories;
   LoadHistories; {AK155}
   if ViewHistory = nil then
-    ViewHistory := PViewHistoryCol.Create(30, 30);
+    ViewHistory := TViewHistoryCol.Create(30, 30);
   {  if ViewHistory.Count = 0 then Exit;}
   D := GetDialog(dlgViewHistory, Pointer(P));
   P.NewLisT(ViewHistory);
@@ -1061,7 +1058,7 @@ procedure CmdHistory;
 
   TListBox(P).NewLisT(CmdStrings);
   TListBox(P).FocusItem(CmdStrings.Count-1);
-  PTHistList(P).CommandHistory := True;
+  TTHistList(P).CommandHistory := True;
   if CmdStrings.Count > 0 then
     TListBox(P).FocusItem(CmdStrings.Count-1);
 

@@ -72,7 +72,6 @@ type
     Col: Byte;
     Row: AInt;
     end;
-  PCellCollection = ^TCellCollection;
   TCellCollection = class(TSortedCollection)
     constructor ShortLoad(var S: TStream);
     procedure ShortStore(var S: TStream);

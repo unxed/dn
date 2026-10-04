@@ -379,13 +379,13 @@ procedure TBookmarkLine.Draw;
     Ch: Char;
     B: array[0..20] of AWord;
 
-  function IsMarker(pLine: LongInt): Char;
+  function IsMarker(TLine: LongInt): Char;
     var
       I: Byte;
     begin
     IsMarker := #0;
     for I := 1 to 9 do
-      if P.MarkPos[I].Y = pLine then
+      if P.MarkPos[I].Y = TLine then
         begin
         IsMarker := Char(I+48);
         Break;

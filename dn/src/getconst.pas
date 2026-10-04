@@ -56,14 +56,11 @@ uses
   ;
 
 type
-  PValuesHolder = ^TValuesHolder;
-  PTypeHolder = ^TTypeHolder;
-  PLngWord = ^TLngWord;
   TTypeMode = (tmConst, tmEnum);
 
   { Collection of PTypeHolders }
   TValuesHolder = class(TCollection)
-    function GetType(ID: String): PTypeHolder;
+    function GetType(ID: String): TTypeHolder;
     function GetValue(S: String; var Complete: Boolean): LongInt;
     procedure Show;
     end;
@@ -84,7 +81,7 @@ type
     constructor Create(AL: LongInt; const AName: String);
     end;
 
-procedure ProcessFile(const FileName: String; Types: PValuesHolder);
+procedure ProcessFile(const FileName: String; Types: TValuesHolder);
 
 implementation
 
@@ -99,9 +96,9 @@ procedure Error(const S: String);
   Halt(2);
   end;
 
-function TValuesHolder.GetType(ID: String): PTypeHolder;
+function TValuesHolder.GetType(ID: String): TTypeHolder;
   function LookForType(P_: Pointer): Boolean;
-  var P: PTypeHolder absolute P_;
+  var P: TTypeHolder absolute P_;
     begin
     LookForType := P^.TypeID = Id;
     end;
@@ -111,9 +108,9 @@ function TValuesHolder.GetType(ID: String): PTypeHolder;
 
 function TValuesHolder.GetValue(S: String; var Complete: Boolean): LongInt;
   function DoScanValue(P_: Pointer): Boolean;
-  var P: PTypeHolder absolute P_;
+  var P: TTypeHolder absolute P_;
     function DoScan(P_: Pointer): Boolean;
-    var P: PLngWord absolute P_;
+    var P: TLngWord absolute P_;
       begin
       if P^.Name = S then
         begin
@@ -133,7 +130,7 @@ function TValuesHolder.GetValue(S: String; var Complete: Boolean): LongInt;
 
 procedure TTypeHolder.Show;
   procedure DoScan(P_: Pointer);
-  var P: PLngWord absolute P_;
+  var P: TLngWord absolute P_;
     begin
     Writeln(P^.Name, '=', P^.l);
     end;
@@ -143,9 +140,9 @@ procedure TTypeHolder.Show;
 
 function TTypeHolder.Compare(P1, P2: Pointer): Integer;
   begin
-  if PLngWord(P1)^.Name > PLngWord(P2)^.Name then
+  if TLngWord(P1)^.Name > TLngWord(P2)^.Name then
     Compare := 1
-  else if PLngWord(P1)^.Name < PLngWord(P2)^.Name then
+  else if TLngWord(P1)^.Name < TLngWord(P2)^.Name then
     Compare := -1
   else
     Compare := 0;
@@ -154,7 +151,7 @@ function TTypeHolder.Compare(P1, P2: Pointer): Integer;
 
 procedure TValuesHolder.Show;
   procedure DoScan(P_: Pointer);
-  var P: PTypeHolder absolute P_;
+  var P: TTypeHolder absolute P_;
     begin
     Writeln('TYPE ', P^.TypeID);
     Writeln(Strg(#196, 5+Length(P^.TypeID)));
@@ -185,7 +182,7 @@ const
   Blank = [#0..#32];
 
   {-DataCompBoy-}
-procedure ProcessFile(const FileName: String; Types: PValuesHolder);
+procedure ProcessFile(const FileName: String; Types: TValuesHolder);
   type
     TParseMode = (pmSkip, pmComment, pmConst, pmStartType, pmSeekType,
        pmType);
@@ -193,8 +190,8 @@ procedure ProcessFile(const FileName: String; Types: PValuesHolder);
     F: lText;
     US, S, ID: String;
     Eq: Integer;
-    P: PTypeHolder;
-    CurrentType: PTypeHolder;
+    P: TTypeHolder;
+    CurrentType: TTypeHolder;
     TypeCount: Word;
     CmtMode, Mode: TParseMode;
     CmtB, CmtE: Integer;
@@ -321,7 +318,7 @@ Loop:
     end;
 
   function LookForType(P_: Pointer): Boolean;
-  var P: PTypeHolder absolute P_;
+  var P: TTypeHolder absolute P_;
     begin
     LookForType := (Mode = pmConst) and (P^.Mode = tmConst) and
         (Pos(Copy(Id, 1, 2)+#0, P^.TypeID) > 0)

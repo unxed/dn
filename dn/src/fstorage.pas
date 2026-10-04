@@ -80,7 +80,6 @@ type
   TSwapLevel = (slNone, slCnv, slFail);
 
   TDirStorage = class;
-  PDirStorage = TDirStorage;
   TDirStorage = class(TStreamable)
     SwapLevel: TSwapLevel;
     Dirs: LongInt;

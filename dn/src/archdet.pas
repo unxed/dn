@@ -53,9 +53,9 @@ uses
   Archiver
   ;
 
-function DetectArchive: PARJArchive;
+function DetectArchive: TARJArchive;
 function GetArchiveTagBySign(Sign: TStr4): Byte;
-function GetArchiveByTag(ID: Byte): PARJArchive;
+function GetArchiveByTag(ID: Byte): TARJArchive;
 
 implementation
 
@@ -698,12 +698,12 @@ Function BZ2Detect: Boolean;
   end;
 
 
-function DetectArchive: PARJArchive;
+function DetectArchive: TARJArchive;
   begin
   if ACEDetect then
     DetectArchive := PACEArchive.Create
   else if ARJDetect then
-    DetectArchive := PARJArchive.Create
+    DetectArchive := TARJArchive.Create
   else if CABDetect then
     DetectArchive := PCABArchive.Create
   else if HADetect then
@@ -829,12 +829,12 @@ function GetArchiveTagBySign(Sign: TStr4): Byte;
   
   end { GetArchiveTagBySign };
 
-function GetArchiveByTag(ID: Byte): PARJArchive;
+function GetArchiveByTag(ID: Byte): TARJArchive;
   begin
   if ID = arcACE then
     GetArchiveByTag := PACEArchive.Create
   else if ID = arcARJ then
-    GetArchiveByTag := PARJArchive.Create
+    GetArchiveByTag := TARJArchive.Create
   else if ID = arcCAB then
     GetArchiveByTag := PCABArchive.Create
   else if ID = arcHA then

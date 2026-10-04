@@ -57,7 +57,6 @@ uses
 
 type
   TEditMacros = class;
-  PEditMacros = TEditMacros;
   TEditMacros = class(TObject)
     Name: PString;
     Commands: TCollection;
@@ -67,7 +66,6 @@ type
     end;
 
   TMacroCommand = class;
-  PMacroCommand = TMacroCommand;
   TMacroCommand = class(TObject)
     Command: Integer;
     Repetitions: Integer;
@@ -76,13 +74,11 @@ type
     end;
 
   TMacroGoto = class;
-  PMacroGoto = TMacroGoto;
   TMacroGoto = class(TMacroCommand)
     procedure ExecCommand(Editor: TView); virtual;
     end;
 
   TMacroMark = class;
-  PMacroMark = TMacroMark;
   TMacroMark = class(TMacroCommand)
     Mark: Boolean;
     constructor Create(AN: Integer; AMark: Boolean);
@@ -90,7 +86,6 @@ type
     end;
 
   TMacroString = class;
-  PMacroString = TMacroString;
   TMacroString = class(TMacroCommand)
     S: PString;
     constructor Create(const AString: String; ARepetitions: Word);
@@ -99,7 +94,6 @@ type
     end;
 
   TIDCollection = class;
-  PIDCollection = TIDCollection;
   TIDCollection = class(TSortedCollection)
     function Compare(P1, P2: Pointer): Integer; override;
     end;
@@ -120,7 +114,6 @@ uses
 
 type
   TLngWord = class;
-  PLngWord = TLngWord;
   TLngWord = class(TObject)
     Name: String[30];
     l: Word;
@@ -195,9 +188,9 @@ function Token(const S: String; var Pos: LongInt): String;
 
 function TIDCollection.Compare(P1, P2: Pointer): Integer;
   begin
-  if PLngWord(P1).Name > PLngWord(P2).Name then
+  if TLngWord(P1).Name > TLngWord(P2).Name then
     Compare := 1
-  else if PLngWord(P1).Name < PLngWord(P2).Name then
+  else if TLngWord(P1).Name < TLngWord(P2).Name then
     Compare := -1
   else
     Compare := 0;
@@ -213,7 +206,7 @@ constructor TLngWord.Create(AL: Word; const AName: String);
 constructor TEditMacros.Create(S: String; var F: TTextReader);
   var
     I, J: LongInt;
-    IDs: PIDCollection;
+    IDs: TIDCollection;
 
   function GetID(const S: String): LongInt;
     var
@@ -230,7 +223,7 @@ constructor TEditMacros.Create(S: String; var F: TTextReader);
     T := TLngWord.Create(0, FreeStr);
     if IDs.Search(T, I) then
       begin
-      GetID := PLngWord(IDs.At(I)).L;
+      GetID := TLngWord(IDs.At(I)).L;
       end
     else
       begin
@@ -254,19 +247,19 @@ constructor TEditMacros.Create(S: String; var F: TTextReader);
 
   procedure MakePrint;
     begin
-    Commands.Insert(PMacroString.Create(Token(S, i), GetID(Token(S, i))));
+    Commands.Insert(TMacroString.Create(Token(S, i), GetID(Token(S, i))));
     end;
 
   procedure MakeGotoXY(X, Y: Integer);
     begin
-    Commands.Insert(PMacroGoto.Create(X, Y));
+    Commands.Insert(TMacroGoto.Create(X, Y));
     end;
 
   procedure MakeIDs;
 
     procedure Add(N: Word; const S: String);
       begin
-      IDs.Insert(PLngWord.Create(N, S))
+      IDs.Insert(TLngWord.Create(N, S))
       end;
 
     begin
@@ -374,7 +367,7 @@ constructor TEditMacros.Create(S: String; var F: TTextReader);
   begin { TEditMacros.Init }
   inherited Create;
   Commands := TCollection.Create(10, 10);
-  IDs := PIDCollection.Create(100, 10);
+  IDs := TIDCollection.Create(100, 10);
   MakeIDs;
   while (S <> '') and (S[1] = ' ') do
     Delete(FreeStr, 1, 1);
@@ -400,14 +393,14 @@ constructor TEditMacros.Create(S: String; var F: TTextReader);
       else if Found('GOTOY ') then
         MakeGotoXY(-1, GetID(Token(S, I)))
       else if Found('GOTO ') then
-        Commands.Insert(PMacroMark.Create(GetID(Token(S, I)), False))
+        Commands.Insert(TMacroMark.Create(GetID(Token(S, I)), False))
       else if Found('MARK ') then
-        Commands.Insert(PMacroMark.Create(GetID(Token(S, I)), True))
+        Commands.Insert(TMacroMark.Create(GetID(Token(S, I)), True))
       else
         begin
         J := GetID(Token(S, I));
         if J > 0 then
-          Commands.Insert(PMacroCommand.Create(J, GetID(Token(S, I))));
+          Commands.Insert(TMacroCommand.Create(J, GetID(Token(S, I))));
         end;
       end;
     end;
@@ -417,7 +410,7 @@ constructor TEditMacros.Create(S: String; var F: TTextReader);
 
 procedure TEditMacros.Play(Editor: TView);
   procedure DoPlay(P_: Pointer);
-  var P: PMacroCommand absolute P_;
+  var P: TMacroCommand absolute P_;
     begin
     P.ExecCommand(Editor);
     end;
@@ -508,7 +501,6 @@ destructor TMacroString.Destroy;
 //       диалога dlgEditEnvironment)
 type
   TDOSVar = class;
-  PDOSVar = TDOSVar;
   TDOSVar = class(TObject)
     Name: PString;
     Value: AnsiString; {JO}
@@ -517,7 +509,6 @@ type
     end;
 
   TVarList = class;
-  PVarList = TVarList;
   TVarList = class(TListBox)
     Line: TLongInputLine;
     PrevFocused: Integer;
@@ -554,7 +545,7 @@ destructor TDOSVar.Destroy;
 
 procedure TVarList.FocusItem(Item: LongInt);
   var
-    P: PDOSVar;
+    P: TDOSVar;
   begin
   if  (PrevFocused >= 0) and
       (List <> nil) and (Focused < List.Count)
@@ -579,7 +570,7 @@ procedure TVarList.FocusItem(Item: LongInt);
 
 function TVarList.GetText(Item: LongInt; MaxLen: Integer): String;
   var
-    P: PDOSVar;
+    P: TDOSVar;
   begin
   P := List.At(Item);
   if P <> nil then
@@ -590,7 +581,7 @@ function TVarList.GetText(Item: LongInt; MaxLen: Integer): String;
 
 procedure TVarList.HandleEvent(var Event: TEvent);
   var
-    P: PDOSVar;
+    P: TDOSVar;
 
   procedure DeleteVar;
     begin
@@ -620,7 +611,7 @@ procedure TVarList.HandleEvent(var Event: TEvent);
     PrevFocused := -1;
     UpStr(S);
     List.AtInsert(Focused,
-      PDOSVar.Create(@s[1], Length(S), 0));
+      TDOSVar.Create(@s[1], Length(S), 0));
     SetRange(List.Count);
     FocusItem(Focused);
     DrawView;
@@ -690,7 +681,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
     var
       R: TRect;
       Control, Labl, Histry: TView;
-      PL: PVarList;
+      PL: TVarList;
       PI: TLongInputLine;
     function IsLongInputLine(P: TView): Boolean;
       begin
@@ -714,7 +705,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
     R.B.X := R.A.X;
     R.A.X := 3;
 
-    PL := PVarList.Create(R, 1, TScrollBar(Control));
+    PL := TVarList.Create(R, 1, TScrollBar(Control));
     D.Insert(PL);
 
     PI := TLongInputLine(D.FirstThat(IsLongInputLine));
@@ -736,7 +727,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
     end { MakeDialog };
 
   procedure DoPut(P_: Pointer);
-  var P: PDOSVar absolute P_;
+  var P: TDOSVar absolute P_;
     var
       J: LongInt;
 
@@ -778,7 +769,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
 //     что-то такое стpанное встpетится (что пpактически маловеpоятно),
 //     то pазумнее будет такую пеpеменную окpужения пpосто пpоигноpиpовать
     if (n1 <> n2) and (n2 - n1 < 255) then
-      PC.Insert(PDOSVar.Create(PChar(Env) + n1, n2-n1, I-n2-1));
+      PC.Insert(TDOSVar.Create(PChar(Env) + n1, n2-n1, I-n2-1));
     Inc(I);
     end;
 
@@ -856,11 +847,11 @@ function InitHighLight
 
   procedure InsertMacro;
     var
-      P: PEditMacros;
+      P: TEditMacros;
     begin
     if Macros = nil then
       Exit;
-    P := PEditMacros.Create(FreeStr, F);
+    P := TEditMacros.Create(FreeStr, F);
     if  (P.Commands.Count = 0) or (Macros.IndexOf(P) >= 0)
     then
       P.Free

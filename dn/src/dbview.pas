@@ -106,16 +106,13 @@ type
     end;
 
   TDBIndicator = class;
-  PDBIndicator = TDBIndicator;
   TDBViewer = class;
-  PDBViewer = TDBViewer;
 
   { -------- Eugeny Zvyagintzev ---------}
   TDBScrollBar = class;
-  PDBScrollBar = TDBScrollBar;
   TDBScrollBar = class(TScrollBar)
     ScrollBarType: Integer;
-    DBViewer: PDBViewer;
+    DBViewer: TDBViewer;
     procedure HandleEvent(var Event: TEvent); override;
     function GetPalette: TPalette; override;
     end;
@@ -123,16 +120,16 @@ type
 
   TDBViewer = class(TView)
     FileName: PString;
-    DBFile: PDBFile;
+    DBFile: TDBFile;
     isValid, KillAfterUse: Boolean;
     Buf: Pointer;
     SearchString: PString;
     StartRec: LongInt;
     NumRec: Word;
-    Indicator: PDBIndicator;
+    Indicator: TDBIndicator;
     Delta, Pos: TDBPoint;
-    VerticalScrollBar: PDBScrollBar;
-    HorizontalScrollBar: PDBScrollBar;
+    VerticalScrollBar: TDBScrollBar;
+    HorizontalScrollBar: TDBScrollBar;
     XCoder: TXCoder;
     constructor Create(R: TRect; const FName: String; var FileIsDBF: Boolean);
     {DataCompBoy}
@@ -149,7 +146,6 @@ type
     end;
 
   TMemoStream = class;
-  PMemoStream = TMemoStream;
   TMemoStream = class(TStream)
     StartPos: LongInt;
     Length: LongInt;
@@ -165,25 +161,23 @@ type
     end;
 
   TDBIndicator = class(TView)
-    DBViewer: PDBViewer;
+    DBViewer: TDBViewer;
     procedure Draw; override;
     {Constructor Load(var S : Tstream);
        Procedure Store(var S : TStream);}
     end;
 
   TFieldListBox = class;
-  PFieldListBox = TFieldListBox;
   TFieldListBox = class(TListBox)
     function GetText(Item: LongInt; MaxLen: Integer): String; override;
     end;
 
   TDBWindow = class;
-  PDBWindow = TDBWindow;
   TDBWindow = class(TFileWindow)
-    P: PDBViewer;
-    P1: PDBIndicator;
-    VSB: PDBScrollBar;
-    HSB: PDBScrollBar;
+    P: TDBViewer;
+    P1: TDBIndicator;
+    VSB: TDBScrollBar;
+    HSB: TDBScrollBar;
     RealName: String;
     {--- start -------- Eugeny Zvyagintzev ---------}
     constructor Create(FName: String; var FileIsDBF: Boolean);
@@ -719,7 +713,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
         end;
       end;
 
-    MemoStream := PMemoStream.Create(MemoStream, L, ML);
+    MemoStream := TMemoStream.Create(MemoStream, L, ML);
     if MemoStream.Status <> stOK then
       begin
       MemoStream.Free;
@@ -733,7 +727,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     D.Options := D.Options or ofCentered;
 
     R.Assign(D.Size.X-2, 2, D.Size.X-1, D.Size.Y-4);
-    PV := PViewScroll.Create(R);
+    PV := TViewScroll.Create(R);
     D.Insert(PV);
     { TODO: palette CScrollBar of PV^. }
 
@@ -1556,7 +1550,7 @@ constructor TDBWindow.Create(FName: String; var FileIsDBF: Boolean);
   Flags := Flags or wfMaxi;
   GetExtent(R);
   R.Grow(-1, -1);
-  P := PDBViewer.Create(R, FName, FileIsDBF);
+  P := TDBViewer.Create(R, FName, FileIsDBF);
   if P = nil then
     Fail;
   Insert(P);
@@ -1568,7 +1562,7 @@ constructor TDBWindow.Create(FName: String; var FileIsDBF: Boolean);
   { -------- Eugeny Zvyagintzev ---------}
   R.A.X := R.B.X;
   R.B.X := R.B.X+1;
-  VSB := PDBScrollBar.Create(R);
+  VSB := TDBScrollBar.Create(R);
   VSB.MaxVal := P.DBFile.NumRec-1;
   VSB.GrowMode := gfGrowLoX+gfGrowHiX+gfGrowHiY;
   VSB.DBViewer := P;
@@ -1580,7 +1574,7 @@ constructor TDBWindow.Create(FName: String; var FileIsDBF: Boolean);
   R.A.X := R.A.X+49;
   R.B.X := R.B.X-2;
   R.A.Y := R.B.Y-1;
-  HSB := PDBScrollBar.Create(R);
+  HSB := TDBScrollBar.Create(R);
   HSB.MaxVal := P.DBFile.NumFields-1;
   HSB.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
   HSB.DBViewer := P;
@@ -1592,7 +1586,7 @@ constructor TDBWindow.Create(FName: String; var FileIsDBF: Boolean);
   R.B.X := 34;
   R.A.Y := Size.Y-1;
   R.B.Y := Size.Y;
-  P1 := PDBIndicator.Create(R);
+  P1 := TDBIndicator.Create(R);
   P1.DBViewer := P;
   P1.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
   Insert(P1);

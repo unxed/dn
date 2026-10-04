@@ -84,14 +84,13 @@ type
     end;
 
   TExtCollection = class;
-  PExtCollection = TExtCollection;
   TExtCollection = class(TSortedCollection)
     function Compare(Key1, Key2: Pointer): Integer; override;
     procedure FreeItem(Item: Pointer); override;
     end;
 
 var
-  ExtCollection: PExtCollection;
+  ExtCollection: TExtCollection;
 
 function TExtCollection.Compare(Key1, Key2: Pointer): Integer;
   var
@@ -201,7 +200,7 @@ procedure PrepareExtCollection;
   begin
   if ExtCollection <> nil then
     ExtCollection.Free;
-  ExtCollection := PExtCollection.Create(50, 10);
+  ExtCollection := TExtCollection.Create(50, 10);
   PutExtFilter(Executables, ttExec);
   PutExtFilter(Archives, ttArc);
   PutExtFilter(CustomMask1, ttCust1);

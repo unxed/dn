@@ -72,7 +72,6 @@ type
   
 
   TKeyMacros = class;
-  PKeyMacros = TKeyMacros;
   TKeyMacros = class(TObject)
     Keys: PWordArray;
     Count: AInt;
@@ -95,7 +94,6 @@ const
 
 type
   THeapView = class;
-  PHeapView = THeapView;
   THeapView = class(TView)
     OldMem: LongInt;
     constructor Create(const Bounds: TRect);
@@ -104,7 +102,6 @@ type
     end;
 
   TClockView = class;
-  PClockView = TClockView;
   TClockView = class(TView)
     Refresh: Byte;
     LastTime: DateTime;

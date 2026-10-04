@@ -56,7 +56,6 @@ uses
 
 type
   TXDoubleWindow = class;
-  PXDoubleWindow = TXDoubleWindow;
   TXDoubleWindow = class(TDoubleWindow)
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     function GetPalette: TPalette; virtual;

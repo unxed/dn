@@ -63,9 +63,7 @@ cmAddGauge = 12002;
 
 type
   TPercentGauge = class;
-  PPercentGauge = TPercentGauge;
   TBarGauge = class;
-  PBarGauge = TBarGauge;
 
   { shows how much of the work is done, in per cent (MaxValue is 100 %) }
   TPercentGauge = class(TView)

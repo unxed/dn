@@ -64,7 +64,6 @@ type
   { Of course, these lines must not contain      }
   { strings with "=" or starting with "[".       }
   TIniSection = class;
-  PIniSection = TIniSection;
   TIniSection = class(TCollection)
     TheName: PString;
     constructor Create(const AName: String);
@@ -83,7 +82,6 @@ type
 
   { Collection of TIniSections }
   TIniFile = class;
-  PIniFile = TIniFile;
   TIniFile = class(TCollection)
     Modified: Boolean;
     Name: PString;
@@ -91,7 +89,7 @@ type
     destructor Destroy; override;
     function Get(const Section, Key: String): String;
     procedure Put(const Section, Key, Value: String);
-    function GetSection(Section: String): PIniSection;
+    function GetSection(Section: String): TIniSection;
     end;
 
 implementation
@@ -371,7 +369,7 @@ function TIniSection.GetValueAt(const Index: Integer): String;
 constructor TIniFile.Create(FileName: String; var AStatus: Integer);
   var
     T: TStream;
-    P: PIniSection;
+    P: TIniSection;
   begin
   inherited Create(5, 5);
   Name := NewStr(FileName);
@@ -391,7 +389,7 @@ destructor TIniFile.Destroy;
   var
     T: TStream;
   procedure DoPutItem(P_: Pointer);
-  var P: PIniSection absolute P_;
+  var P: TIniSection absolute P_;
     begin
     if P <> nil then
       P.Store(T);
@@ -407,9 +405,9 @@ destructor TIniFile.Destroy;
   inherited Destroy;
   end;
 
-function TIniFile.GetSection(Section: String): PIniSection;
+function TIniFile.GetSection(Section: String): TIniSection;
   function Search(P_: Pointer): Boolean;
-  var P: PIniSection absolute P_;
+  var P: TIniSection absolute P_;
     begin
     Search := UpStrg(P.Name) = Section
     end;
@@ -420,7 +418,7 @@ function TIniFile.GetSection(Section: String): PIniSection;
 
 function TIniFile.Get(const Section, Key: String): String;
   var
-    P: PIniSection;
+    P: TIniSection;
   begin
   P := GetSection(Section);
   if P <> nil
@@ -432,7 +430,7 @@ function TIniFile.Get(const Section, Key: String): String;
 
 procedure TIniFile.Put(const Section, Key, Value: String);
   var
-    P: PIniSection;
+    P: TIniSection;
   begin
   P := GetSection(Section);
   if P = nil then

@@ -525,11 +525,11 @@ procedure ExecFile(const FileName: String);
       ST: SessionType;
       S: String; {//AK155}
     begin
-    if  (PCommandLine(CommandLine).LineType in [ltWindow,
+    if  (TCommandLine(CommandLine).LineType in [ltWindow,
          ltFullScreen])
     then
       begin
-      if PCommandLine(CommandLine).LineType = ltFullScreen then
+      if TCommandLine(CommandLine).LineType = ltFullScreen then
         ST := stOS2FullScreen
       else
         ST := stOS2Windowed;

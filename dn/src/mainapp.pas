@@ -67,7 +67,6 @@ type
   end;
 
   TWriteWin = class;
-  PWriteWin = TWriteWin;
   TWriteWin = class(TWindow)
     Tmr: TEventTimer;
     IState: Byte;
@@ -100,8 +99,8 @@ var
   CommandLine: TView = nil;
   ResourceStream: TStream = nil;
   LngStream: TStream = nil;
-  LStringList: PStringList = nil;
-  Resource: PIdxResource = nil;
+  LStringList: TStringList = nil;
+  Resource: TIdxResource = nil;
   { the palettes of the program (the strings of attributes): those of DN (DNPalet), set in the initialization }
   CColor, CBlackWhite, CMonochrome: ShortString;
   appPalette: Integer absolute TvApp.AppPalette;
@@ -524,7 +523,7 @@ begin
   if Resource <> nil then
     Exit;
   ResourceStream := OpenResourceStream('.dlg');
-  Resource := PIdxResource.Create(ResourceStream);
+  Resource := TIdxResource.Create(ResourceStream);
 end;
 
 function LoadDialog(Key: TDlgIdx): TDialog;
@@ -605,7 +604,7 @@ end;
 function WriteMsg(Text: String): TView;
 var
   R: TRect;
-  W: PWriteWin;
+  W: TWriteWin;
   T: TStaticText;
   I, Lines, Wd, Cur: Integer;
 begin
@@ -632,7 +631,7 @@ begin
   R.Assign(0, 0, Wd + 6, Lines + 4);
   if Desktop <> nil then
     R.Move((Desktop.Size.X - (R.B.X - R.A.X)) div 2, (Desktop.Size.Y - (R.B.Y - R.A.Y)) div 2);
-  W := PWriteWin.Create(R, '', wnNoNumber);
+  W := TWriteWin.Create(R, '', wnNoNumber);
   W.Flags := 0;
   R.Assign(2, 1, Wd + 4, Lines + 3);
   T := TStaticText.Create(R, Text);
@@ -676,7 +675,7 @@ begin
   end;
   LngStream := PS;
   PS.Seek(0);
-  LStringList := PStringList(PS.Get);
+  LStringList := TStringList(PS.Get);
   if (PS.Status <> stOK) or (LStringList = nil) then
     ResourceFail('reading ' + LngId + '.lng');
 end;

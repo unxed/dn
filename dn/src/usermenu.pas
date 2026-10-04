@@ -107,7 +107,6 @@ type
     end;
 
   TUserCollection = class;
-  PUserCollection = TUserCollection;
   TUserCollection = class(TCollection)
     procedure FreeItem(P: Pointer); override;
     end;
@@ -636,7 +635,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   var
     F: TTextReader;
     F1: lText; {DataCompBoy}
-    P: PUserCollection;
+    P: TUserCollection;
     S, S1: String;
     I: LongInt;
     UI: PUserMenuItem;

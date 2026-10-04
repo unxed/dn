@@ -12,7 +12,6 @@ uses
   Defines, objutil, Streams, DNStrL, ObjType;
 
 type
-  PStrListMaker = ^TStrListMaker;
   TStrListMaker = class(TObject)
     constructor Create(AStrSize, AIndexSize: AWord);
     destructor Destroy; override;

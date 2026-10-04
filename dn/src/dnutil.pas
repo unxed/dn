@@ -377,7 +377,7 @@ constructor TDataSaver.Load(S: TStream);
           S.Read(Q, SizeOf(Q));
           if Q >= 0 then
             begin
-            TempFiles := PFilesCollection.Create(Q+1, $10);
+            TempFiles := TFilesCollection.Create(Q+1, $10);
             TempFiles.SortMode := psmLongName;
             TempFiles.Duplicates := False;
             {TempFiles.Owner := Self;}
@@ -555,7 +555,7 @@ constructor TDNApplication.Create;
   else
     R.A.X := R.B.X-7;
   R.B.Y := R.A.Y+1;
-  Clock := PClockView.Create(R);
+  Clock := TClockView.Create(R);
   if InterfaceData.Options and ouiClock = 0 then
     Clock.Hide;
   TClockView(Clock).Update;
@@ -648,7 +648,7 @@ procedure TDNApplication.InitCommandLine;
 
   R.A.Y := R.B.Y-1-Byte(InterfaceData.Options and ouiHideStatus = 0);
   R.B.Y := R.A.Y+1-Byte(HideCL);
-  CommandLine := PCommandLine.Create(R);
+  CommandLine := TCommandLine.Create(R);
   Insert(CommandLine);
   if not HideCL then
     ActivateView(CommandLine);
@@ -1365,7 +1365,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
         Q := P^.fViewMode;
         end;
       FileIsDBF := False;
-      W := PDBWindow.Create(RN+'|'+FileName, FileIsDBF);
+      W := TDBWindow.Create(RN+'|'+FileName, FileIsDBF);
       {If file is not valid DBF and NOT empty DBF file then use internal viewer}
       if  (W = nil) and (FileIsDBF = False) then
         Exit; { Flash }
@@ -1377,7 +1377,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
              fOrigin.Y+fSize.Y);
           AdjustToDesktopSize(R, fDeskSize);
           Locate(R);
-          with PDBWindow(W).P do
+          with TDBWindow(W).P do
             begin
             Delta := fdDelta;
             Pos := fdPos;
@@ -2104,13 +2104,13 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         end;
       else {case}
         if  (CmdLine.Str <> '')
-             and (PCommandLine(CommandLine).LineType in [ltWindow,
+             and (TCommandLine(CommandLine).LineType in [ltWindow,
              ltFullScreen])
         then
           begin
           S:= ' '+S;
           B := ShiftState and 3 <> 0;
-          if PCommandLine(CommandLine).LineType = ltWindow then
+          if TCommandLine(CommandLine).LineType = ltWindow then
             ST := stOS2Windowed
           else
             ST := stOS2FullScreen
@@ -2980,7 +2980,7 @@ procedure ClearSelection(AFP: Pointer; FC: Pointer);
     end;
 
   begin
-  PFilesCollection(FC).ForEach(UnSelect);
+  TFilesCollection(FC).ForEach(UnSelect);
   with TFilePanelRoot(AFP) do
     begin
     DrawView;
