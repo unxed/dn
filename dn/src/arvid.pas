@@ -279,10 +279,10 @@ constructor TArvidDrive.Create(const AName: String);
     q := Copy(AName, i+1, MaxStringLength);
     if q[Length(q)] in ['\', '/'] then
       SetLength(q, Length(q)-1);
-    Stream := New(PBufStream, Init(Copy(AName, 1, i-1), stOpen, 2048));
+    Stream := PBufStream.Create(Copy(AName, 1, i-1), stOpen, 2048);
     end
   else
-    Stream := New(PBufStream, Init(AName, stOpen, 2048));
+    Stream := PBufStream.Create(AName, stOpen, 2048);
 
   if Stream.Status <> stOK then
     begin
@@ -300,9 +300,9 @@ constructor TArvidDrive.Create(const AName: String);
       end;
     if i > 0
     then
-      Stream := New(PBufStream, Init(Copy(AName, 1, i-1), stOpen, 2048))
+      Stream := PBufStream.Create(Copy(AName, 1, i-1), stOpen, 2048)
     else
-      Stream := New(PBufStream, Init(AName, stOpen, 2048));
+      Stream := PBufStream.Create(AName, stOpen, 2048);
     if Stream.Status <> stOK then
       goto 1;
     end;
@@ -450,7 +450,7 @@ constructor TArvidDrive.Load(S: TStream);
   DriveType := dtArvid;
   S.Read(KillAfterUse, 1);
   Name := S.ReadStr;
-  Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+  Stream := PBufStream.Create(Name^, stOpen, 2048);
   if Stream.Status <> stOK then
     begin
 1:
@@ -488,7 +488,7 @@ procedure TArvidDrive.RereadDirectory(S: String);
   if filetype = avdAvt then
     begin
     Dispose(Stream, Done);
-    Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+    Stream := PBufStream.Create(Name^, stOpen, 2048);
     Stream.Seek(0);
     Stream.Read(AVT, SizeOf(AVT));
     SeekDirectory;
@@ -663,7 +663,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
     Stream.Seek(0);
     Stream.Write(AVT, SizeOf(AVT));
     Dispose(Stream, Done);
-    Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+    Stream := PBufStream.Create(Name^, stOpen, 2048);
     GlobalMessage(evCommand, cmPanelReread, nil);
     Exit;
     end
@@ -995,7 +995,7 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
       end;
     RealAttr := Attrb or Archive;
     end;
-  Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+  Stream := PBufStream.Create(Name^, stOpen, 2048);
   if Abort or (Stream.Status <> stOK) then
     begin
     Err;
@@ -1017,7 +1017,7 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
   Dispose(Stream, Done);
   if RealAttr <> $FFFF then
     SetAttr(RealAttr);
-  Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+  Stream := PBufStream.Create(Name^, stOpen, 2048);
   GlobalMessage(evCommand, cmPanelReread, nil);
   end { TArvidDrive.EditDescription };
 
@@ -1384,7 +1384,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         FreeStr := MakeNormName(GetPath(Name^), F^.Text^);
         DisposeStr(Name);
         Name := NewStr(FreeStr);
-        Stream := New(PBufStream, Init(FreeStr, stOpenRead, 2048));
+        Stream := PBufStream.Create(FreeStr, stOpenRead, 2048);
         FreeStr := CurDir;
         CurDir := '';
         if Stream.Status <> stOK then
