@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - tv          # the pointer of the submodule (a change of it is a change of the file `tv`, not of `tv/**`)
       - tv/**
       - tools/dos-run.sh
       - tools/render-dump.py
