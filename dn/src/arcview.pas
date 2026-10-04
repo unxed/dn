@@ -2071,8 +2071,8 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
   if Fils.Count > 0 then
     begin
 //используем '<>' в качестве пpизнака панели поиска
-    PDrv := New(PFindDrive, Init('<>'+FindRec.Mask,
-          Dirs, Fils));
+    PDrv := PFindDrive.Create('<>'+FindRec.Mask,
+          Dirs, Fils);
     PDrv.AMask := NewStr(FindRec.Mask);
     PDrv.NoMemory := MAvail <= MemReq;
     if (FindRec.Options and ffoNoSort) <> 0 then
