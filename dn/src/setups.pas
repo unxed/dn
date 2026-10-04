@@ -75,7 +75,7 @@ type
     SysData: TSysData;
     {constructor Init;}
     procedure Awaken; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure GetData(var Rec); virtual;
     end;
 
@@ -95,15 +95,13 @@ type
     end;
 
   
-  PSaversDialog = ^TSaversDialog;
   TSaversDialog = class(TDialog)
     constructor Create;
     procedure HandleEvent(var Event: TEvent); virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure Awaken; virtual;
     end;
 
-  PSaversListBox = ^TSaversListBox;
   TSaversListBox = class(TListBox)
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
@@ -181,7 +179,7 @@ procedure SystemSetup;
   if Resource = nil then
     Exit;
   D := TDialog
-            (Application.ValidView(TDialog(Resource^.Get(dlgSystemSetup))
+            (Application.ValidView(TDialog(Resource.Get(dlgSystemSetup))
         ));
   if D = nil then
     Exit;
@@ -189,7 +187,7 @@ procedure SystemSetup;
   if W <> cmCancel then
     begin
     D.GetData(Data);
-    SystemData := PSysDialog(D)^.LocalData;
+    SystemData := TSysDialog(D).LocalData;
     Message(Application, evCommand, cmUpdateConfig, nil);
     end;
   D.Free;
@@ -208,7 +206,7 @@ procedure InterfaceSetup;
     AltTab: Boolean;
     R: TRect;
   begin
-  with TApplication(Application)^ do
+  with TApplication(Application) do
     if ExecResource(dlgInterfaceSetup, InterfaceData) <> cmCancel then
       begin
       GetExtent(R);
@@ -226,10 +224,10 @@ procedure InterfaceSetup;
          ouiHideCmdline = 0);
       Message(Application, evCommand, cmUpdateConfig, nil);
       if InterfaceData.Options and ouiClock <> 0 then
-        if not Clock^.GetState(sfVisible) then
+        if not Clock.GetState(sfVisible) then
           Clock.Show;
       if InterfaceData.Options and ouiClock = 0 then
-        if Clock^.GetState(sfVisible) then
+        if Clock.GetState(sfVisible) then
           Clock.Hide;
       end;
   InterfaceDataOpt := InterfaceData.Options;
@@ -285,7 +283,7 @@ procedure SaversSetup;
   if Resource = nil then
     Exit;
   D := TDialog
-            (Application.ValidView(TDialog(Resource^.Get(dlgSaversSetup))
+            (Application.ValidView(TDialog(Resource.Get(dlgSaversSetup))
         ));
   if D = nil then
     Exit;
@@ -460,12 +458,12 @@ procedure TCurrDriveInfo.HandleEvent(var Event: TEvent);
        and (Event.Command = cmScrollBarChanged)
   then
     begin
-    W := PSysDialog(Owner)^.LocalData.Drives[Char
+    W := TSysDialog(Owner).LocalData.Drives[Char
           (Byte('A')+TScrollBar(Event.InfoPtr).Value)];
     SetData(W);
     end
   else if (Event.What = evKeyDown) and (Char(Event.CharCode) = ' ')
-         and (TypeOf(Owner.Current^) = TypeOf(TListBox))
+         and (Owner.Current.ClassType = TListBox)
   then
     Press(0);
   end;
@@ -476,7 +474,7 @@ procedure TCurrDriveInfo.Press(Item: Integer);
   begin
   inherited Press(Item);
   Owner.GetData(Data);
-  PSysDialog(Owner)^.LocalData.Drives[Char(Byte('A')+Data.Drives.Focus)
+  TSysDialog(Owner).LocalData.Drives[Char(Byte('A')+Data.Drives.Focus)
   ] := Value;
   end;
 
@@ -485,7 +483,7 @@ procedure TSysDialog.Awaken;
     C: Char;
   begin
   LocalData := SystemData;
-  New(SysData.Drives.List, Init(26, 1, False));
+  SysData.Drives.List := TLineCollection.Create(26, 1, False);
   for C := 'A' to 'Z' do
     SysData.Drives.List.Insert(NewStr(C+':'));
   Move(SystemData, SysData,
@@ -498,12 +496,12 @@ procedure TSysDialog.Awaken;
   SetData(SysData);
   end;
 
-destructor TSysDialog.Done;
+destructor TSysDialog.Destroy;
   var
     Data: TSysData;
   begin
   GetData(Data);
-  inherited Done;
+  inherited Destroy;
   Data.Drives.List.Free;
   end;
 
@@ -576,10 +574,10 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
         begin
         Owner.GetData(LocalData);
         A := LocalData.Available.List;
-        if A^.Count > 0 then
+        if A.Count > 0 then
           begin
-          PS := A^.At(LocalData.Available.Focus);
-          if  (PS <> nil) and (List^.FirstThat(SeekStr) = nil) then
+          PS := A.At(LocalData.Available.Focus);
+          if  (PS <> nil) and (List.FirstThat(SeekStr) = nil) then
             begin
             List.Insert(NewStr(PS^));
             S := List;
@@ -592,14 +590,14 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
       cmNo:
         begin
         F := Focused;
-        if F < List^.Count then
+        if F < List.Count then
           begin
           S := List;
           S.AtFree(F);
           List := nil;
           Owner.Lock;
           NewLisT(S);
-          if  (F > 0) and (F >= List^.Count) then
+          if  (F > 0) and (F >= List.Count) then
             Dec(F);
           FocusItem(F);
           Owner.UnLock;
@@ -625,21 +623,21 @@ constructor TSaversDialog.Create;
   Insert(Control);
 
   R.Assign(2, 3, 19, 13);
-  Control := New(PSaversListBox, Init(R, 1, TScrollBar(Control)));
+  Control := TSaversListBox.Create(R, 1, TScrollBar(Control));
   Insert(Control);
 
   R.Assign(2, 2, 18, 3);
-  Labl := New(TLabel, Init(R, GetString(dlSS_S_electedSavers), Control));
+  Labl := TLabel.Create(R, GetString(dlSS_S_electedSavers), Control);
   Insert(Labl);
 
   R.Assign(20, 6, 36, 8);
-  Control := New(TButton, Init(R, GetString(dlSS_A_dd), cmYes,
-         bfNormal+bfBroadcast));
+  Control := TButton.Create(R, GetString(dlSS_A_dd), cmYes,
+         bfNormal+bfBroadcast);
   Insert(Control);
 
   R.Assign(20, 8, 36, 10);
-  Control := New(TButton, Init(R, GetString(dlSS_R_emove), cmNo,
-         bfNormal+bfBroadcast));
+  Control := TButton.Create(R, GetString(dlSS_R_emove), cmNo,
+         bfNormal+bfBroadcast);
   Insert(Control);
 
   R.Assign(54, 3, 55, 13);
@@ -647,46 +645,46 @@ constructor TSaversDialog.Create;
   Insert(Control);
 
   R.Assign(37, 3, 54, 13);
-  Control := New(TListBox, Init(R, 1, TScrollBar(Control)));
+  Control := TListBox.Create(R, 1, TScrollBar(Control));
   Insert(Control);
 
   R.Assign(37, 2, 54, 3);
-  Labl := New(TLabel, Init(R, GetString(dlSSA_v_ailableSavers), Control));
+  Labl := TLabel.Create(R, GetString(dlSSA_v_ailableSavers), Control);
   Insert(Labl);
 
   R.Assign(2, 15, 18, 16);
-  Control := PInputline.Create(R, 3);
-  TInputline(Control).SetValidator(PRangeValidator.Create(1, 254));
+  Control := TInputLine.Create(R, 3);
+  TInputline(Control).SetValidator(TRangeValidator.Create(1, 254));
   { X-Man }
-  Control^.Options := Control^.Options or ofValidate;
+  Control.Options := Control.Options or ofValidate;
   Insert(Control);
 
   R.Assign(2, 14, 18, 15);
-  Labl := New(TLabel, Init(R, GetString(dlSS_T_ime), Control));
+  Labl := TLabel.Create(R, GetString(dlSS_T_ime), Control);
   Insert(Labl);
 
   R.Assign(20, 15, 55, 16);
-  Control := New(TCheckBoxes, Init(R,
-        NewSItem(GetString(dlSSUse_M_ouse), nil)));
+  Control := TCheckBoxes.Create(R,
+        NewSItem(GetString(dlSSUse_M_ouse), nil));
   Insert(Control);
 
   R.Assign(7, 17, 17, 19);
-  Control := New(TButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
+  Control := TButton.Create(R, GetString(dlOKButton), cmOK, bfDefault);
   Insert(Control);
 
   R.Assign(17, 17, 28, 19);
-  Control := New(TButton, Init(R, GetString(dlCancelButton), cmCancel,
-         bfNormal));
+  Control := TButton.Create(R, GetString(dlCancelButton), cmCancel,
+         bfNormal);
   Insert(Control);
 
   R.Assign(28, 17, 40, 19);
-  Control := New(TButton, Init(R, GetString(dlHelpButton), cmHelp,
-         bfNormal));
+  Control := TButton.Create(R, GetString(dlHelpButton), cmHelp,
+         bfNormal);
   Insert(Control);
 
   R.Assign(40, 17, 50, 19);
-  Control := New(TButton, Init(R, GetString(dlTestButton), cmTest,
-         bfNormal));
+  Control := TButton.Create(R, GetString(dlTestButton), cmTest,
+         bfNormal);
   Insert(Control);
 
   SelectNext(False);
@@ -719,11 +717,11 @@ procedure TSaversDialog.Awaken;
   Data := SaversData;
   Data.Available.Focus := 0;
   Data.Selected.Focus := 0;
-  New(Data.Available.List, Init(5, 5, False));
+  Data.Available.List := TLineCollection.Create(5, 5, False);
   if Data.Selected.List = nil
   then
-    New(Data.Selected.List, Init(5, 5, False));
-  with Data.Available.List^ do
+    Data.Selected.List := TLineCollection.Create(5, 5, False);
+  with Data.Available.List do
     begin
     Insert(NewStr(#249' Star flight'));
     Insert(NewStr(#249' Flash-light'));
@@ -741,19 +739,19 @@ procedure TSaversDialog.Awaken;
   end { TSaversDialog.Awaken };
 {-DataCompBoy-}
 
-destructor TSaversDialog.Done;
+destructor TSaversDialog.Destroy;
   var
     Data: TSaversData;
   begin
   GetData(Data);
-  inherited Done;
+  inherited Destroy;
   if  (Data.Available.List <> nil) then
     Data.Available.List.Free;
   end;
 
 function MakeSaversDialog: TDialog;
   begin
-  MakeSaversDialog := PSaversDialog.Create;
+  MakeSaversDialog := TSaversDialog.Create;
   end;
 
 
