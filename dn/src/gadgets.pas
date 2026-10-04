@@ -293,7 +293,7 @@ procedure TClockView.HandleEvent(var Event: TEvent);
       end;
     
     OldXCoord := -1; {-SSK}
-    TView.DragView(Event, dmDragMove, R, P, P);
+    DragView(Event, dmDragMove, R, P, P);
     end;
   end;
 
@@ -357,7 +357,7 @@ procedure TClockView.Update;
         else
           R.Assign(OldXCoord, Origin.y,
             OldXCoord+Length(TimeStr), Origin.y+Size.y);
-        TView.Locate(R);
+        Locate(R);
         end;
       UpdTicks := 330;
       end
@@ -369,7 +369,7 @@ procedure TClockView.Update;
           R.Assign(OldXCoord, Origin.y, OldXCoord+Length(TimeStr),
              Origin.y+Size.y);
           OldXCoord := -1;
-          TView.Locate(R);
+          Locate(R);
           end; {-SSK}
       if ShowSeconds then
         UpdTicks := 1000
@@ -406,7 +406,7 @@ procedure TClockView.Update;
           end;
         R.A.y := Origin.y;
         R.B.y := R.A.y+1;
-        TView.Locate(R);
+          Locate(R);
         OldShowSeconds := ShowSeconds
         end;
       end;
