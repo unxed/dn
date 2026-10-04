@@ -334,7 +334,7 @@ procedure TClockView.Update;
         if ShowDayOfWeek then
           begin
           DayWeek := hund; {DayOfWeek(Date)-1;}
-          {Cat: ·‚‡†≠≠Î• ™†™®•-‚Æ Ø‡Æ°´•¨Î...}
+          {Cat: —Å—Ç—Ä–∞–Ω–Ω—ã–µ –∫–∞–∫–∏–µ-—Ç–æ –ø—Ä–æ–±–ª–µ–º—ã...}
           if  (Length(DaysOfWeek) <> 14) and (Length(DaysOfWeek) <> 21)
           then
             TimeStr := ' '+Copy(GetString(stDaysWeek), 1+DayWeek*2, 2)

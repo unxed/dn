@@ -61,17 +61,17 @@ implementation
 uses
   Startup, Lfn, Messages, Defines, FilesCol, fileutil, strutil, UserMenu,
   basics, HistList, Commands, mainapp, DNUtil, Tree, Views, Drivers, Drives
-  {, dnfuncs} {надо вставлять до Dos}
+  {, dnfuncs} {╨╜╨░╨┤╨╛ ╨▓╤Б╤В╨░╨▓╨╗╤П╤В╤М ╨┤╨╛ Dos}
   , Dos, Dialogs, objutil
   , fileerrors, panelroot
   ;
 type
-  { Диалог создания списка файлов. В ресурсе должны быть
-  DirectLink на строку ввода имени файла (1) и строку ввода
-  шаблона строки файла (2) }
+  { ╨Ф╨╕╨░╨╗╨╛╨│ ╤Б╨╛╨╖╨┤╨░╨╜╨╕╤П ╤Б╨┐╨╕╤Б╨║╨░ ╤Д╨░╨╣╨╗╨╛╨▓. ╨Т ╤А╨╡╤Б╤Г╤А╤Б╨╡ ╨┤╨╛╨╗╨╢╨╜╤Л ╨▒╤Л╤В╤М
+  DirectLink ╨╜╨░ ╤Б╤В╤А╨╛╨║╤Г ╨▓╨▓╨╛╨┤╨░ ╨╕╨╝╨╡╨╜╨╕ ╤Д╨░╨╣╨╗╨░ (1) ╨╕ ╤Б╤В╤А╨╛╨║╤Г ╨▓╨▓╨╛╨┤╨░
+  ╤И╨░╨▒╨╗╨╛╨╜╨░ ╤Б╤В╤А╨╛╨║╨╕ ╤Д╨░╨╣╨╗╨░ (2) }
   TMakeListDlg = class(TDialog)
     procedure HandleEvent(var Event: TEvent); virtual;
-      { Для реакции на кнопки }
+      { ╨Ф╨╗╤П ╤А╨╡╨░╨║╤Ж╨╕╨╕ ╨╜╨░ ╨║╨╜╨╛╨┐╨║╨╕ }
     end;
 
 procedure InpLineReplace(P: TInputLine; const S: String);
@@ -109,8 +109,8 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
         Exit;
         end;
       cmOK:
-        begin { Не выпускаем с пустым именем списка или
-          с пустым шаблоном обработки файла }
+        begin { ╨Э╨╡ ╨▓╤Л╨┐╤Г╤Б╨║╨░╨╡╨╝ ╤Б ╨┐╤Г╤Б╤В╤Л╨╝ ╨╕╨╝╨╡╨╜╨╡╨╝ ╤Б╨┐╨╕╤Б╨║╨░ ╨╕╨╗╨╕
+          ╤Б ╨┐╤Г╤Б╤В╤Л╨╝ ╤И╨░╨▒╨╗╨╛╨╜╨╛╨╝ ╨╛╨▒╤А╨░╨▒╨╛╤В╨║╨╕ ╤Д╨░╨╣╨╗╨░ }
         for i := 1 to 2 do
         if TInputLine(DirectLink[i]).Data^ = '' then
           begin
@@ -408,8 +408,8 @@ AddrError:
     begin
     P := Files.At(I-1);
     UPr.Active := P;
-    {AK155 23-09-2003: разотметка по одному файлу тормозит страшно при
-большом числе файлов
+    {AK155 23-09-2003: ╤А╨░╨╖╨╛╤В╨╝╨╡╤В╨║╨░ ╨┐╨╛ ╨╛╨┤╨╜╨╛╨╝╤Г ╤Д╨░╨╣╨╗╤Г ╤В╨╛╤А╨╝╨╛╨╖╨╕╤В ╤Б╤В╤А╨░╤И╨╜╨╛ ╨┐╤А╨╕
+╨▒╨╛╨╗╤М╤И╨╛╨╝ ╤З╨╕╤Б╨╗╨╡ ╤Д╨░╨╣╨╗╨╛╨▓
     Message(APP, evCommand, cmCopyUnselect, P);
 /AK155}
     BB := False;
@@ -457,9 +457,9 @@ AddrError:
       end;
     end;
   Close(T.T);
-  { AK155 23-09-2003 Теперь скопом снимаем всю отметку. Делать это надо
-обязательно до RereadDirectory, так как она страшно тормзит при большом
-числе отмеченных файлов. }
+  { AK155 23-09-2003 ╨в╨╡╨┐╨╡╤А╤М ╤Б╨║╨╛╨┐╨╛╨╝ ╤Б╨╜╨╕╨╝╨░╨╡╨╝ ╨▓╤Б╤О ╨╛╤В╨╝╨╡╤В╨║╤Г. ╨Ф╨╡╨╗╨░╤В╤М ╤Н╤В╨╛ ╨╜╨░╨┤╨╛
+╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨╛ ╨┤╨╛ RereadDirectory, ╤В╨░╨║ ╨║╨░╨║ ╨╛╨╜╨░ ╤Б╤В╤А╨░╤И╨╜╨╛ ╤В╨╛╤А╨╝╨╖╨╕╤В ╨┐╤А╨╕ ╨▒╨╛╨╗╤М╤И╨╛╨╝
+╤З╨╕╤Б╨╗╨╡ ╨╛╤В╨╝╨╡╤З╨╡╨╜╨╜╤Л╤Е ╤Д╨░╨╣╨╗╨╛╨▓. }
   ClearSelection(APP, TFilePanelRoot(APP).Files);
   {/AK155}
   RereadDirectory(Dr);

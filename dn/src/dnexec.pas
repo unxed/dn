@@ -54,11 +54,11 @@ uses
   ;
 
 procedure ExecString(const S: AnsiString; const WS: String);
-  {` Выполнить строку S^ через командный процессор. WS, если она
-  не пуста, выводится на экран перед вызовом ком. процессора `}
+  {` ╨Т╤Л╨┐╨╛╨╗╨╜╨╕╤В╤М ╤Б╤В╤А╨╛╨║╤Г S^ ╤З╨╡╤А╨╡╨╖ ╨║╨╛╨╝╨░╨╜╨┤╨╜╤Л╨╣ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А. WS, ╨╡╤Б╨╗╨╕ ╨╛╨╜╨░
+  ╨╜╨╡ ╨┐╤Г╤Б╤В╨░, ╨▓╤Л╨▓╨╛╨┤╨╕╤В╤Б╤П ╨╜╨░ ╤Н╨║╤А╨░╨╜ ╨┐╨╡╤А╨╡╨┤ ╨▓╤Л╨╖╨╛╨▓╨╛╨╝ ╨║╨╛╨╝. ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А╨░ `}
 procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
-{JO:  отличается от ExecString наличием булевской переменной RR, которая}
-{     указывает, перечитывать панель после выполнения или нет           }
+{JO:  ╨╛╤В╨╗╨╕╤З╨░╨╡╤В╤Б╤П ╨╛╤В ExecString ╨╜╨░╨╗╨╕╤З╨╕╨╡╨╝ ╨▒╤Г╨╗╨╡╨▓╤Б╨║╨╛╨╣ ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╨╛╨╣ RR, ╨║╨╛╤В╨╛╤А╨░╤П}
+{     ╤Г╨║╨░╨╖╤Л╨▓╨░╨╡╤В, ╨┐╨╡╤А╨╡╤З╨╕╤В╤Л╨▓╨░╤В╤М ╨┐╨░╨╜╨╡╨╗╤М ╨┐╨╛╤Б╨╗╨╡ ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜╨╕╤П ╨╕╨╗╨╕ ╨╜╨╡╤В           }
 
 function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
 {DataCompBoy}
@@ -69,7 +69,7 @@ procedure ExecFile(const FileName: String); {DataCompBoy}
 procedure AnsiExec(const Path: String; const ComLine: AnsiString); {JO}
 
 const
-  fExec: Boolean = False; {выполняется внешняя программа}
+  fExec: Boolean = False; {╨▓╤Л╨┐╨╛╨╗╨╜╤П╨╡╤В╤Б╤П ╨▓╨╜╨╡╤И╨╜╤П╤П ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨░}
 
 implementation
 
@@ -82,13 +82,13 @@ uses DNRun,
   VideoMan, osdep, dnscreen, timeutil,
   
   Startup, UserMenu, Messages, Strings, filetype, TitleSet
-   {AK155 для перерисовки иконки}
+   {AK155 ╨┤╨╗╤П ╨┐╨╡╤А╨╡╤А╨╕╤Б╨╛╨▓╨║╨╕ ╨╕╨║╨╛╨╜╨║╨╕}
   ;
 
 {JO}
-{ AnsiExec - аналог DOS.Exec , который в качестве }
-{ коммандлайна использует строку типа Ansistring }
-{ и соответственно не имеет ограничения в 255 символов}
+{ AnsiExec - ╨░╨╜╨░╨╗╨╛╨│ DOS.Exec , ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨▓ ╨║╨░╤З╨╡╤Б╤В╨▓╨╡ }
+{ ╨║╨╛╨╝╨╝╨░╨╜╨┤╨╗╨░╨╣╨╜╨░ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В ╤Б╤В╤А╨╛╨║╤Г ╤В╨╕╨┐╨░ Ansistring }
+{ ╨╕ ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╨╡╨╜╨╜╨╛ ╨╜╨╡ ╨╕╨╝╨╡╨╡╤В ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╤П ╨▓ 255 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓}
 procedure AnsiExec(const Path: String; const ComLine: AnsiString);
   var
     PathBuf: array[0..255] of Char;
@@ -103,7 +103,7 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
   DosError := SysExecute(StrPCopy(PathBuf, Path), PChar(Ans1), nil,
       ExecFlags = efAsync, nil, -1, -1, -1);
 
-//  освобождаем каталог
+//  ╨╛╤Б╨▓╨╛╨▒╨╛╨╢╨┤╨░╨╡╨╝ ╨║╨░╤В╨░╨╗╨╛╨│
   if ActiveDir[2] = ':' then
     ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
 
@@ -112,19 +112,19 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
 {/JO}
 
 {AK155 30-12-2001
-Это попытка определить тип вызываемой программы, чтобы GUI-программу
-вызывать без ожидания завершения, а все прочие - с ожиданием.
-Если расширение не указано, то никаких попыток распознать GUI-программу
-не делается. В частности не производится, поиск по переменной окружения
-Path, так как это трудно сделать не криво. Например, если запускается
-некая prog, то неправильно искать в путях файл prog.exe. Может случиться,
-что найдем, а где-то раньше, например, в текущем каталоге, есть prog.com
-или prog.cmd, а мы его вызовем, будто он GUI. Кстати, Far глючит именно
-так. Запишите в текщий каталог notepad.cmd и введите в комстроке notepad.
-А потом нажмите Enter  на этом самом notepad.cmd.
+╨н╤В╨╛ ╨┐╨╛╨┐╤Л╤В╨║╨░ ╨╛╨┐╤А╨╡╨┤╨╡╨╗╨╕╤В╤М ╤В╨╕╨┐ ╨▓╤Л╨╖╤Л╨▓╨░╨╡╨╝╨╛╨╣ ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╤Л, ╤З╤В╨╛╨▒╤Л GUI-╨┐╤А╨╛╨│╤А╨░╨╝╨╝╤Г
+╨▓╤Л╨╖╤Л╨▓╨░╤В╤М ╨▒╨╡╨╖ ╨╛╨╢╨╕╨┤╨░╨╜╨╕╤П ╨╖╨░╨▓╨╡╤А╤И╨╡╨╜╨╕╤П, ╨░ ╨▓╤Б╨╡ ╨┐╤А╨╛╤З╨╕╨╡ - ╤Б ╨╛╨╢╨╕╨┤╨░╨╜╨╕╨╡╨╝.
+╨Х╤Б╨╗╨╕ ╤А╨░╤Б╤И╨╕╤А╨╡╨╜╨╕╨╡ ╨╜╨╡ ╤Г╨║╨░╨╖╨░╨╜╨╛, ╤В╨╛ ╨╜╨╕╨║╨░╨║╨╕╤Е ╨┐╨╛╨┐╤Л╤В╨╛╨║ ╤А╨░╤Б╨┐╨╛╨╖╨╜╨░╤В╤М GUI-╨┐╤А╨╛╨│╤А╨░╨╝╨╝╤Г
+╨╜╨╡ ╨┤╨╡╨╗╨░╨╡╤В╤Б╤П. ╨Т ╤З╨░╤Б╤В╨╜╨╛╤Б╤В╨╕ ╨╜╨╡ ╨┐╤А╨╛╨╕╨╖╨▓╨╛╨┤╨╕╤В╤Б╤П, ╨┐╨╛╨╕╤Б╨║ ╨┐╨╛ ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╨╛╨╣ ╨╛╨║╤А╤Г╨╢╨╡╨╜╨╕╤П
+Path, ╤В╨░╨║ ╨║╨░╨║ ╤Н╤В╨╛ ╤В╤А╤Г╨┤╨╜╨╛ ╤Б╨┤╨╡╨╗╨░╤В╤М ╨╜╨╡ ╨║╤А╨╕╨▓╨╛. ╨Э╨░╨┐╤А╨╕╨╝╨╡╤А, ╨╡╤Б╨╗╨╕ ╨╖╨░╨┐╤Г╤Б╨║╨░╨╡╤В╤Б╤П
+╨╜╨╡╨║╨░╤П prog, ╤В╨╛ ╨╜╨╡╨┐╤А╨░╨▓╨╕╨╗╤М╨╜╨╛ ╨╕╤Б╨║╨░╤В╤М ╨▓ ╨┐╤Г╤В╤П╤Е ╤Д╨░╨╣╨╗ prog.exe. ╨Ь╨╛╨╢╨╡╤В ╤Б╨╗╤Г╤З╨╕╤В╤М╤Б╤П,
+╤З╤В╨╛ ╨╜╨░╨╣╨┤╨╡╨╝, ╨░ ╨│╨┤╨╡-╤В╨╛ ╤А╨░╨╜╤М╤И╨╡, ╨╜╨░╨┐╤А╨╕╨╝╨╡╤А, ╨▓ ╤В╨╡╨║╤Г╤Й╨╡╨╝ ╨║╨░╤В╨░╨╗╨╛╨│╨╡, ╨╡╤Б╤В╤М prog.com
+╨╕╨╗╨╕ prog.cmd, ╨░ ╨╝╤Л ╨╡╨│╨╛ ╨▓╤Л╨╖╨╛╨▓╨╡╨╝, ╨▒╤Г╨┤╤В╨╛ ╨╛╨╜ GUI. ╨Ъ╤Б╤В╨░╤В╨╕, Far ╨│╨╗╤О╤З╨╕╤В ╨╕╨╝╨╡╨╜╨╜╨╛
+╤В╨░╨║. ╨Ч╨░╨┐╨╕╤И╨╕╤В╨╡ ╨▓ ╤В╨╡╨║╤Й╨╕╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ notepad.cmd ╨╕ ╨▓╨▓╨╡╨┤╨╕╤В╨╡ ╨▓ ╨║╨╛╨╝╤Б╤В╤А╨╛╨║╨╡ notepad.
+╨Р ╨┐╨╛╤В╨╛╨╝ ╨╜╨░╨╢╨╝╨╕╤В╨╡ Enter  ╨╜╨░ ╤Н╤В╨╛╨╝ ╤Б╨░╨╝╨╛╨╝ notepad.cmd.
 }
-{Результат - код подсистемы для Win32 PE, или 100 для Win16 NE,
- или 0 для прочих }
+{╨а╨╡╨╖╤Г╨╗╤М╤В╨░╤В - ╨║╨╛╨┤ ╨┐╨╛╨┤╤Б╨╕╤Б╤В╨╡╨╝╤Л ╨┤╨╗╤П Win32 PE, ╨╕╨╗╨╕ 100 ╨┤╨╗╤П Win16 NE,
+ ╨╕╨╗╨╕ 0 ╨┤╨╗╤П ╨┐╤А╨╛╤З╨╕╤Е }
 function Win32Program(const S: String): SmallWord;
   const
     PETag = $00004550; {'PE'#0#0}
@@ -171,7 +171,7 @@ function Win32Program(const S: String): SmallWord;
     Assign(f, SysOsPath(RealName));
     Reset(f, 1);
     if IOResult <> 0 then
-      Exit; {вообще-то, так быть не должно, раз мы ее нашли}
+      Exit; {╨▓╨╛╨╛╨▒╤Й╨╡-╤В╨╛, ╤В╨░╨║ ╨▒╤Л╤В╤М ╨╜╨╡ ╨┤╨╛╨╗╨╢╨╜╨╛, ╤А╨░╨╖ ╨╝╤Л ╨╡╨╡ ╨╜╨░╤И╨╗╨╕}
     end;
   Seek(f, $3C);
   BlockRead(f, NewExeOffs, 2, l);
@@ -228,7 +228,7 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
   DNRun.QuietRun := False;
   
   fExec := False;
-  {AK155, Cat: чтобы комстрока и меню не налазили на вывод}
+  {AK155, Cat: ╤З╤В╨╛╨▒╤Л ╨║╨╛╨╝╤Б╤В╤А╨╛╨║╨░ ╨╕ ╨╝╨╡╨╜╤О ╨╜╨╡ ╨╜╨░╨╗╨░╨╖╨╕╨╗╨╕ ╨╜╨░ ╨▓╤Л╨▓╨╛╨┤}
   GetCursorXY(X, Y);
   if InterfaceData.Options and ouiHideStatus = 0 then
     Inc(Y);
@@ -256,13 +256,13 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
   {JO}
   if RR then
     begin
-    ActDir1 := '>' + ActiveDir; //признак перечитывания подкаталогов в ветви
+    ActDir1 := '>' + ActiveDir; //╨┐╤А╨╕╨╖╨╜╨░╨║ ╨┐╨╡╤А╨╡╤З╨╕╤В╤Л╨▓╨░╨╜╨╕╤П ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓ ╨▓ ╨▓╨╡╤В╨▓╨╕
     GlobalMessage(evCommand, cmPanelReread, @ActDir1);
     GlobalMessage(evCommand, cmRereadInfo, nil);
     end;
   {/JO}
 
-  {AK155 без этого курсор комстроки не становится на место}
+  {AK155 ╨▒╨╡╨╖ ╤Н╤В╨╛╨│╨╛ ╨║╤Г╤А╤Б╨╛╤А ╨║╨╛╨╝╤Б╤В╤А╨╛╨║╨╕ ╨╜╨╡ ╤Б╤В╨░╨╜╨╛╨▓╨╕╤В╤Б╤П ╨╜╨░ ╨╝╨╡╤Б╤В╨╛}
   
   {/AK155}
   end { ExecStringRR };
@@ -296,7 +296,7 @@ function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
   UserParam.Active := FileRec;
   FName := FileRec^.FlName[True];
   {lGetDir(0, ActiveDir);}
-  {Cat:warn закомментировал это в процессе отлова багов, но надо будет проверить, не добавил ли новых}
+  {Cat:warn ╨╖╨░╨║╨╛╨╝╨╝╨╡╨╜╤В╨╕╤А╨╛╨▓╨░╨╗ ╤Н╤В╨╛ ╨▓ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╡ ╨╛╤В╨╗╨╛╨▓╨░ ╨▒╨░╨│╨╛╨▓, ╨╜╨╛ ╨╜╨░╨┤╨╛ ╨▒╤Г╨┤╨╡╤В ╨┐╤А╨╛╨▓╨╡╤А╨╕╤В╤М, ╨╜╨╡ ╨┤╨╛╨▒╨░╨▓╨╕╨╗ ╨╗╨╕ ╨╜╨╛╨▓╤Л╤Е}
   SearchExt := False;
   Local := True;
   f := TTextReader.Create('dn.ext');
@@ -461,8 +461,8 @@ RepeatLocal:
   Delete(S, 1, Succ(Length(S1)));
   F.Free;
 
-  // AK155 27/08/05 Поскольку DN/2 не завершается при выполнении
-  // внешней команды, то и незачем проверять Valid(cmQuit)
+  // AK155 27/08/05 ╨Я╨╛╤Б╨║╨╛╨╗╤М╨║╤Г DN/2 ╨╜╨╡ ╨╖╨░╨▓╨╡╤А╤И╨░╨╡╤В╤Б╤П ╨┐╤А╨╕ ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜╨╕╨╕
+  // ╨▓╨╜╨╡╤И╨╜╨╡╨╣ ╨║╨╛╨╝╨░╨╜╨┤╤Л, ╤В╨╛ ╨╕ ╨╜╨╡╨╖╨░╤З╨╡╨╝ ╨┐╤А╨╛╨▓╨╡╤А╤П╤В╤М Valid(cmQuit)
   if not Application.Valid(cmQuit) then
     begin
     Exit;
@@ -538,7 +538,7 @@ procedure ExecFile(const FileName: String);
       MessageKey(CommandLine, kbDown);
       Exit;
       end;
-    {AK155, см. dnutil.ExecCommandLine}
+    {AK155, ╤Б╨╝. dnutil.ExecCommandLine}
     S := '';
     CommandLine.SetData(S);
     {/AK155}

@@ -61,11 +61,11 @@ uses
 type
   TFilePanelRoot = class;
 
-  {` Базовый тип файловой панели }
+  {` ╨С╨░╨╖╨╛╨▓╤Л╨╣ ╤В╨╕╨┐ ╤Д╨░╨╣╨╗╨╛╨▓╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕ }
   TFilePanelRoot = class(TView)
     isValid, MSelect, SelectFlag, Loaded, ChangeLocked: Boolean;
-    SelfNum: Boolean; // Фактически - TPanelNum;
-      {` Какая это панель: правая или левая `}
+    SelfNum: Boolean; // ╨д╨░╨║╤В╨╕╤З╨╡╤Б╨║╨╕ - TPanelNum;
+      {` ╨Ъ╨░╨║╨░╤П ╤Н╤В╨╛ ╨┐╨░╨╜╨╡╨╗╤М: ╨┐╤А╨░╨▓╨░╤П ╨╕╨╗╨╕ ╨╗╨╡╨▓╨░╤П `}
     InfoView, DirView, DriveLine, SortView: TView;
     Delta, OldDelta, OldPos, DeltaX: LongInt;
     Files: PFilesCollection;
@@ -78,20 +78,20 @@ type
     TotalInfo: TSize;
     FreeSpace: String[50];
     PanelSetupSet: TPanelSetupSet;
-      {` Блок текущих настроей для всех типов панелей `}
+      {` ╨С╨╗╨╛╨║ ╤В╨╡╨║╤Г╤Й╨╕╤Е ╨╜╨░╤Б╤В╤А╨╛╨╡╨╣ ╨┤╨╗╤П ╨▓╤Б╨╡╤Е ╤В╨╕╨┐╨╛╨▓ ╨┐╨░╨╜╨╡╨╗╨╡╨╣ `}
     PanSetup: PPanelSetup;
-      {` Указывает внутрь PanelSetupSet на блок текущего типа панели `}
+      {` ╨г╨║╨░╨╖╤Л╨▓╨░╨╡╤В ╨▓╨╜╤Г╤В╤А╤М PanelSetupSet ╨╜╨░ ╨▒╨╗╨╛╨║ ╤В╨╡╨║╤Г╤Й╨╡╨│╨╛ ╤В╨╕╨┐╨░ ╨┐╨░╨╜╨╡╨╗╨╕ `}
     PresetNum: Byte;
-      {` На базе какого номера строились текущие настройки `}
+      {` ╨Э╨░ ╨▒╨░╨╖╨╡ ╨║╨░╨║╨╛╨│╨╛ ╨╜╨╛╨╝╨╡╤А╨░ ╤Б╤В╤А╨╛╨╕╨╗╨╕╤Б╤М ╤В╨╡╨║╤Г╤Й╨╕╨╡ ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ `}
     LFNLen, ExtLen: Byte;
-      {`2 Двоичные копии одноимённых строк из Panel^.PanSetup.Show.
-      Введены только для ускорения доступа. `}
+      {`2 ╨Ф╨▓╨╛╨╕╤З╨╜╤Л╨╡ ╨║╨╛╨┐╨╕╨╕ ╨╛╨┤╨╜╨╛╨╕╨╝╤С╨╜╨╜╤Л╤Е ╤Б╤В╤А╨╛╨║ ╨╕╨╖ Panel^.PanSetup.Show.
+      ╨Т╨▓╨╡╨┤╨╡╨╜╤Л ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П ╤Г╤Б╨║╨╛╤А╨╡╨╜╨╕╤П ╨┤╨╛╤Б╤В╤Г╨┐╨░. `}
     LFNLonger250: Boolean;
-      {` Поле имени широкое и должно быть последним `}
+      {` ╨Я╨╛╨╗╨╡ ╨╕╨╝╨╡╨╜╨╕ ╤И╨╕╤А╨╛╨║╨╛╨╡ ╨╕ ╨┤╨╛╨╗╨╢╨╜╨╛ ╨▒╤Л╤В╤М ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╝ `}
     DriveLetter: Char;
-      {` Для выбора обозначения диска в линейке дисков и меню дисков;
-        Обычно это Drive^.GetDriveLetter, но в процессе перемещении по полосе
-        дисков может временно быть и другое. `}
+      {` ╨Ф╨╗╤П ╨▓╤Л╨▒╨╛╤А╨░ ╨╛╨▒╨╛╨╖╨╜╨░╤З╨╡╨╜╨╕╤П ╨┤╨╕╤Б╨║╨░ ╨▓ ╨╗╨╕╨╜╨╡╨╣╨║╨╡ ╨┤╨╕╤Б╨║╨╛╨▓ ╨╕ ╨╝╨╡╨╜╤О ╨┤╨╕╤Б╨║╨╛╨▓;
+        ╨Ю╨▒╤Л╤З╨╜╨╛ ╤Н╤В╨╛ Drive^.GetDriveLetter, ╨╜╨╛ ╨▓ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╡ ╨┐╨╡╤А╨╡╨╝╨╡╤Й╨╡╨╜╨╕╨╕ ╨┐╨╛ ╨┐╨╛╨╗╨╛╤Б╨╡
+        ╨┤╨╕╤Б╨║╨╛╨▓ ╨╝╨╛╨╢╨╡╤В ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨▒╤Л╤В╤М ╨╕ ╨┤╤А╤Г╨│╨╛╨╡. `}
     PrevPresetNum: Byte;
     PrevPanelSetupSet: TPanelSetupSet;
 
@@ -101,7 +101,7 @@ type
     LastCurPos: TPoint;
     SelectedInfoInDividerMin, SelectedInfoInDividerMax: Word; {AK155}
     TotalInfoInDividerMin, TotalInfoInDividerMax: Word; {AK155}
-      {` Кординаты для D&D `}
+      {` ╨Ъ╨╛╤А╨┤╨╕╨╜╨░╤В╤Л ╨┤╨╗╤П D&D `}
     _Tmr1: TEventTimer;
     constructor Create(const Bounds: TRect; ADrive: Integer;
          AScrBar: PMyScrollBar);
@@ -117,94 +117,94 @@ type
     procedure ReadDirectory;
     procedure RereadDir;
     procedure RedrawPanelInfoDir; virtual; {<panelroot.001>}
-      {` Перерисовать панель, подвал и заголовок. Полоса дисков
-      не перерисовывается `}
+      {` ╨Я╨╡╤А╨╡╤А╨╕╤Б╨╛╨▓╨░╤В╤М ╨┐╨░╨╜╨╡╨╗╤М, ╨┐╨╛╨┤╨▓╨░╨╗ ╨╕ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║. ╨Я╨╛╨╗╨╛╤Б╨░ ╨┤╨╕╤Б╨║╨╛╨▓
+      ╨╜╨╡ ╨┐╨╡╤А╨╡╤А╨╕╤Б╨╛╨▓╤Л╨▓╨░╨╡╤В╤Б╤П `}
     procedure SendLocated;
-     {` Уведомление другой (нефайловой) панели об удержании
-      курсора на файле. Используется для QView и DizView`}
+     {` ╨г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╡ ╨┤╤А╤Г╨│╨╛╨╣ (╨╜╨╡╤Д╨░╨╣╨╗╨╛╨▓╨╛╨╣) ╨┐╨░╨╜╨╡╨╗╨╕ ╨╛╨▒ ╤Г╨┤╨╡╤А╨╢╨░╨╜╨╕╨╕
+      ╨║╤Г╤А╤Б╨╛╤А╨░ ╨╜╨░ ╤Д╨░╨╣╨╗╨╡. ╨Ш╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨┤╨╗╤П QView ╨╕ DizView`}
     procedure IncDrawDisabled;
     procedure DecDrawDisabled;
     procedure ChkNoMem;
     procedure ChDir(Dir: String);
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     procedure Reorder;
-      {` Пересортировать файлы в соответствии с текущими (изменившимися)
-      установками сортировки `}
+      {` ╨Я╨╡╤А╨╡╤Б╨╛╤А╤В╨╕╤А╨╛╨▓╨░╤В╤М ╤Д╨░╨╣╨╗╤Л ╨▓ ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╨╕╨╕ ╤Б ╤В╨╡╨║╤Г╤Й╨╕╨╝╨╕ (╨╕╨╖╨╝╨╡╨╜╨╕╨▓╤И╨╕╨╝╨╕╤Б╤П)
+      ╤Г╤Б╤В╨░╨╜╨╛╨▓╨║╨░╨╝╨╕ ╤Б╨╛╤А╤В╨╕╤А╨╛╨▓╨║╨╕ `}
     function CalcColPos(ColFlag: Word): Integer;
-      {` Подсчитать позицию последней из колонок, отмеченных в ColFlag.
-       Колонка имени и вертикальная линия после неё в счёт позиции
-       не входят. Например, CalcColPos(psnSize)=0. `}
+      {` ╨Я╨╛╨┤╤Б╤З╨╕╤В╨░╤В╤М ╨┐╨╛╨╖╨╕╤Ж╨╕╤О ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨╣ ╨╕╨╖ ╨║╨╛╨╗╨╛╨╜╨╛╨║, ╨╛╤В╨╝╨╡╤З╨╡╨╜╨╜╤Л╤Е ╨▓ ColFlag.
+       ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨╕╨╝╨╡╨╜╨╕ ╨╕ ╨▓╨╡╤А╤В╨╕╨║╨░╨╗╤М╨╜╨░╤П ╨╗╨╕╨╜╨╕╤П ╨┐╨╛╤Б╨╗╨╡ ╨╜╨╡╤С ╨▓ ╤Б╤З╤С╤В ╨┐╨╛╨╖╨╕╤Ж╨╕╨╕
+       ╨╜╨╡ ╨▓╤Е╨╛╨┤╤П╤В. ╨Э╨░╨┐╤А╨╕╨╝╨╡╤А, CalcColPos(psnSize)=0. `}
     function CalcLengthWithoutName: Integer;
     function CalcNameLength: Integer;
     function CalcLength: Integer;
     procedure FormatName(P: PFileRec; var S: String; var L: Integer);
-     {` Сформировать строку имени для колонки, L - фактическая ширина
-       (может быть не LFNLen, а 12, если под DualName установлен
-       показ коротких имён) `}
+     {` ╨б╤Д╨╛╤А╨╝╨╕╤А╨╛╨▓╨░╤В╤М ╤Б╤В╤А╨╛╨║╤Г ╨╕╨╝╨╡╨╜╨╕ ╨┤╨╗╤П ╨║╨╛╨╗╨╛╨╜╨║╨╕, L - ╤Д╨░╨║╤В╨╕╤З╨╡╤Б╨║╨░╤П ╤И╨╕╤А╨╕╨╜╨░
+       (╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨╜╨╡ LFNLen, ╨░ 12, ╨╡╤Б╨╗╨╕ ╨┐╨╛╨┤ DualName ╤Г╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜
+       ╨┐╨╛╨║╨░╨╖ ╨║╨╛╤А╨╛╤В╨║╨╕╤Е ╨╕╨╝╤С╨╜) `}
     procedure GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean); virtual;
-     {` Записать в заранее заполненный буфер B в нужные места Draw-код
-        разделителя колонок (SC). Используется для формирования
-        пустых элементов панели и для соединения разделителя
-        с вертикальными линиями колонок `}
+     {` ╨Ч╨░╨┐╨╕╤Б╨░╤В╤М ╨▓ ╨╖╨░╤А╨░╨╜╨╡╨╡ ╨╖╨░╨┐╨╛╨╗╨╜╨╡╨╜╨╜╤Л╨╣ ╨▒╤Г╤Д╨╡╤А B ╨▓ ╨╜╤Г╨╢╨╜╤Л╨╡ ╨╝╨╡╤Б╤В╨░ Draw-╨║╨╛╨┤
+        ╤А╨░╨╖╨┤╨╡╨╗╨╕╤В╨╡╨╗╤П ╨║╨╛╨╗╨╛╨╜╨╛╨║ (SC). ╨Ш╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨┤╨╗╤П ╤Д╨╛╤А╨╝╨╕╤А╨╛╨▓╨░╨╜╨╕╤П
+        ╨┐╤Г╤Б╤В╤Л╤Е ╤Н╨╗╨╡╨╝╨╡╨╜╤В╨╛╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ ╨╕ ╨┤╨╗╤П ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╤П ╤А╨░╨╖╨┤╨╡╨╗╨╕╤В╨╡╨╗╤П
+        ╤Б ╨▓╨╡╤А╤В╨╕╨║╨░╨╗╤М╨╜╤Л╨╝╨╕ ╨╗╨╕╨╜╨╕╤П╨╝╨╕ ╨║╨╛╨╗╨╛╨╜╨╛╨║ `}
     procedure GetParam(i: Integer);
-      {` Загрузить настройки (обычно) из пресета.
-         Собственно номер находится в младших 4 разрядах i. Если в
-      старших разрядах есть что-то ненулевое - настройки загружаются
-      полностью, если одни нули - загружается только секция Show
-      (но для всех классов панелей).
-         Если номер 1..10, то это номер пресета. Настройки и
-      старый номер пресета запоминаются перед загрузкой.
-         Если номер равен 11, то всё аналоагично, но настройки
-      загружаются не из пресета, а из другой панели.
-         Если номер равен 12, то меняются местами настройки
-      текущая и запомненная.
-         Когда задана загрузка только вида и текущая настройка вида
-      совпадает по содержанию с той, которая должна быть загружена,
-      вместо этой бессмысленной загрузки вызывается меню загрузки пресета.
-         См. также CM_ToggleShowMode.
+      {` ╨Ч╨░╨│╤А╤Г╨╖╨╕╤В╤М ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ (╨╛╨▒╤Л╤З╨╜╨╛) ╨╕╨╖ ╨┐╤А╨╡╤Б╨╡╤В╨░.
+         ╨б╨╛╨▒╤Б╤В╨▓╨╡╨╜╨╜╨╛ ╨╜╨╛╨╝╨╡╤А ╨╜╨░╤Е╨╛╨┤╨╕╤В╤Б╤П ╨▓ ╨╝╨╗╨░╨┤╤И╨╕╤Е 4 ╤А╨░╨╖╤А╤П╨┤╨░╤Е i. ╨Х╤Б╨╗╨╕ ╨▓
+      ╤Б╤В╨░╤А╤И╨╕╤Е ╤А╨░╨╖╤А╤П╨┤╨░╤Е ╨╡╤Б╤В╤М ╤З╤В╨╛-╤В╨╛ ╨╜╨╡╨╜╤Г╨╗╨╡╨▓╨╛╨╡ - ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨╖╨░╨│╤А╤Г╨╢╨░╤О╤В╤Б╤П
+      ╨┐╨╛╨╗╨╜╨╛╤Б╤В╤М╤О, ╨╡╤Б╨╗╨╕ ╨╛╨┤╨╜╨╕ ╨╜╤Г╨╗╨╕ - ╨╖╨░╨│╤А╤Г╨╢╨░╨╡╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╤Б╨╡╨║╤Ж╨╕╤П Show
+      (╨╜╨╛ ╨┤╨╗╤П ╨▓╤Б╨╡╤Е ╨║╨╗╨░╤Б╤Б╨╛╨▓ ╨┐╨░╨╜╨╡╨╗╨╡╨╣).
+         ╨Х╤Б╨╗╨╕ ╨╜╨╛╨╝╨╡╤А 1..10, ╤В╨╛ ╤Н╤В╨╛ ╨╜╨╛╨╝╨╡╤А ╨┐╤А╨╡╤Б╨╡╤В╨░. ╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨╕
+      ╤Б╤В╨░╤А╤Л╨╣ ╨╜╨╛╨╝╨╡╤А ╨┐╤А╨╡╤Б╨╡╤В╨░ ╨╖╨░╨┐╨╛╨╝╨╕╨╜╨░╤О╤В╤Б╤П ╨┐╨╡╤А╨╡╨┤ ╨╖╨░╨│╤А╤Г╨╖╨║╨╛╨╣.
+         ╨Х╤Б╨╗╨╕ ╨╜╨╛╨╝╨╡╤А ╤А╨░╨▓╨╡╨╜ 11, ╤В╨╛ ╨▓╤Б╤С ╨░╨╜╨░╨╗╨╛╨░╨│╨╕╤З╨╜╨╛, ╨╜╨╛ ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕
+      ╨╖╨░╨│╤А╤Г╨╢╨░╤О╤В╤Б╤П ╨╜╨╡ ╨╕╨╖ ╨┐╤А╨╡╤Б╨╡╤В╨░, ╨░ ╨╕╨╖ ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕.
+         ╨Х╤Б╨╗╨╕ ╨╜╨╛╨╝╨╡╤А ╤А╨░╨▓╨╡╨╜ 12, ╤В╨╛ ╨╝╨╡╨╜╤П╤О╤В╤Б╤П ╨╝╨╡╤Б╤В╨░╨╝╨╕ ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕
+      ╤В╨╡╨║╤Г╤Й╨░╤П ╨╕ ╨╖╨░╨┐╨╛╨╝╨╜╨╡╨╜╨╜╨░╤П.
+         ╨Ъ╨╛╨│╨┤╨░ ╨╖╨░╨┤╨░╨╜╨░ ╨╖╨░╨│╤А╤Г╨╖╨║╨░ ╤В╨╛╨╗╤М╨║╨╛ ╨▓╨╕╨┤╨░ ╨╕ ╤В╨╡╨║╤Г╤Й╨░╤П ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨░ ╨▓╨╕╨┤╨░
+      ╤Б╨╛╨▓╨┐╨░╨┤╨░╨╡╤В ╨┐╨╛ ╤Б╨╛╨┤╨╡╤А╨╢╨░╨╜╨╕╤О ╤Б ╤В╨╛╨╣, ╨║╨╛╤В╨╛╤А╨░╤П ╨┤╨╛╨╗╨╢╨╜╨░ ╨▒╤Л╤В╤М ╨╖╨░╨│╤А╤Г╨╢╨╡╨╜╨░,
+      ╨▓╨╝╨╡╤Б╤В╨╛ ╤Н╤В╨╛╨╣ ╨▒╨╡╤Б╤Б╨╝╤Л╤Б╨╗╨╡╨╜╨╜╨╛╨╣ ╨╖╨░╨│╤А╤Г╨╖╨║╨╕ ╨▓╤Л╨╖╤Л╨▓╨░╨╡╤В╤Б╤П ╨╝╨╡╨╜╤О ╨╖╨░╨│╤А╤Г╨╖╨║╨╕ ╨┐╤А╨╡╤Б╨╡╤В╨░.
+         ╨б╨╝. ╤В╨░╨║╨╢╨╡ CM_ToggleShowMode.
       `}
     procedure Rebound;
     procedure SetupPanelFromDrive;
-      {` После смены Drive принять к использованию секцию настроек,
-      соответствующюю классу нового Drive  `}
+      {` ╨Я╨╛╤Б╨╗╨╡ ╤Б╨╝╨╡╨╜╤Л Drive ╨┐╤А╨╕╨╜╤П╤В╤М ╨║ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╨╜╨╕╤О ╤Б╨╡╨║╤Ж╨╕╤О ╨╜╨░╤Б╤В╤А╨╛╨╡╨║,
+      ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╤Г╤О╤Й╤О╤О ╨║╨╗╨░╤Б╤Б╤Г ╨╜╨╛╨▓╨╛╨│╨╛ Drive  `}
     procedure AddSelected(PF: PFileRec);
-      {` Если PF^ выделен, он учитывается в SelNum, SelectedLen, PackedLen`}
+      {` ╨Х╤Б╨╗╨╕ PF^ ╨▓╤Л╨┤╨╡╨╗╨╡╨╜, ╨╛╨╜ ╤Г╤З╨╕╤В╤Л╨▓╨░╨╡╤В╤Б╤П ╨▓ SelNum, SelectedLen, PackedLen`}
     end;
   {`}
 
   {                                                                        }
   { WARNING: The following vars are mirrored in filepanel.PAS via ABSOLUTEs! }
-  { Это был комментарий Cat. Если б он ещё и объяснил, зачем это нужно.
-    Я этот фокус выкинул, вроде, хуже не стало. Так что отбой.}
+  { ╨н╤В╨╛ ╨▒╤Л╨╗ ╨║╨╛╨╝╨╝╨╡╨╜╤В╨░╤А╨╕╨╣ Cat. ╨Х╤Б╨╗╨╕ ╨▒ ╨╛╨╜ ╨╡╤Й╤С ╨╕ ╨╛╨▒╤К╤П╤Б╨╜╨╕╨╗, ╨╖╨░╤З╨╡╨╝ ╤Н╤В╨╛ ╨╜╤Г╨╢╨╜╨╛.
+    ╨п ╤Н╤В╨╛╤В ╤Д╨╛╨║╤Г╤Б ╨▓╤Л╨║╨╕╨╜╤Г╨╗, ╨▓╤А╨╛╨┤╨╡, ╤Е╤Г╨╢╨╡ ╨╜╨╡ ╤Б╤В╨░╨╗╨╛. ╨в╨░╨║ ╤З╤В╨╛ ╨╛╤В╨▒╨╛╨╣.}
 
 const
   ActivePanel: TFilePanelRoot = nil;
-    {` Указатель на активную файловую панель активного менеджера.
-     Устанавливается в TFilePanel.SetState, так что вне этого метода
-     значение этой переменной всегда корректно.`}
+    {` ╨г╨║╨░╨╖╨░╤В╨╡╨╗╤М ╨╜╨░ ╨░╨║╤В╨╕╨▓╨╜╤Г╤О ╤Д╨░╨╣╨╗╨╛╨▓╤Г╤О ╨┐╨░╨╜╨╡╨╗╤М ╨░╨║╤В╨╕╨▓╨╜╨╛╨│╨╛ ╨╝╨╡╨╜╨╡╨┤╨╢╨╡╤А╨░.
+     ╨г╤Б╤В╨░╨╜╨░╨▓╨╗╨╕╨▓╨░╨╡╤В╤Б╤П ╨▓ TFilePanel.SetState, ╤В╨░╨║ ╤З╤В╨╛ ╨▓╨╜╨╡ ╤Н╤В╨╛╨│╨╛ ╨╝╨╡╤В╨╛╨┤╨░
+     ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ ╤Н╤В╨╛╨╣ ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╨╛╨╣ ╨▓╤Б╨╡╨│╨┤╨░ ╨║╨╛╤А╤А╨╡╨║╤В╨╜╨╛.`}
   PassivePanel: TFilePanelRoot = nil;
-    {` Указатель на пассивную файловую панель активного менеджера.
-    см. ActivePanel. `}
+    {` ╨г╨║╨░╨╖╨░╤В╨╡╨╗╤М ╨╜╨░ ╨┐╨░╤Б╤Б╨╕╨▓╨╜╤Г╤О ╤Д╨░╨╣╨╗╨╛╨▓╤Г╤О ╨┐╨░╨╜╨╡╨╗╤М ╨░╨║╤В╨╕╨▓╨╜╨╛╨│╨╛ ╨╝╨╡╨╜╨╡╨┤╨╢╨╡╤А╨░.
+    ╤Б╨╝. ActivePanel. `}
   CtrlWas: Boolean = False;
-    {` Был зажат Ctrl вместе со стрелками. Используется для ускоренного
-    просмотра файлов в панели (типа Ctrl-Up, Up, отпустить Ctrl.
-    Интересно, что аналогичное слежение за отпусканием Ctrl при
-    перемещении по полосе дисков делается при помощи цикла с опросом
-    события, см. обработку kbCtrlLeft `}
+    {` ╨С╤Л╨╗ ╨╖╨░╨╢╨░╤В Ctrl ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б╨╛ ╤Б╤В╤А╨╡╨╗╨║╨░╨╝╨╕. ╨Ш╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨┤╨╗╤П ╤Г╤Б╨║╨╛╤А╨╡╨╜╨╜╨╛╨│╨╛
+    ╨┐╤А╨╛╤Б╨╝╨╛╤В╤А╨░ ╤Д╨░╨╣╨╗╨╛╨▓ ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ (╤В╨╕╨┐╨░ Ctrl-Up, Up, ╨╛╤В╨┐╤Г╤Б╤В╨╕╤В╤М Ctrl.
+    ╨Ш╨╜╤В╨╡╤А╨╡╤Б╨╜╨╛, ╤З╤В╨╛ ╨░╨╜╨░╨╗╨╛╨│╨╕╤З╨╜╨╛╨╡ ╤Б╨╗╨╡╨╢╨╡╨╜╨╕╨╡ ╨╖╨░ ╨╛╤В╨┐╤Г╤Б╨║╨░╨╜╨╕╨╡╨╝ Ctrl ╨┐╤А╨╕
+    ╨┐╨╡╤А╨╡╨╝╨╡╤Й╨╡╨╜╨╕╨╕ ╨┐╨╛ ╨┐╨╛╨╗╨╛╤Б╨╡ ╨┤╨╕╤Б╨║╨╛╨▓ ╨┤╨╡╨╗╨░╨╡╤В╤Б╤П ╨┐╤А╨╕ ╨┐╨╛╨╝╨╛╤Й╨╕ ╤Ж╨╕╨║╨╗╨░ ╤Б ╨╛╨┐╤А╨╛╤Б╨╛╨╝
+    ╤Б╨╛╨▒╤Л╤В╨╕╤П, ╤Б╨╝. ╨╛╨▒╤А╨░╨▒╨╛╤В╨║╤Г kbCtrlLeft `}
   DirsToChange: array[0..9] of PString = (nil, nil, nil, nil, nil, nil,
      nil, nil, nil, nil);
   QuickSearch: Boolean = False;
-  {AK155 5-01-2002. До этого было такое поле
-в TFilePanelRoot и в Tree.TTreeView. Поскольку по логике использования
-QuickSearch может быть только один, естественным решением является
-глобальная переменная, а от ее размазывания по объектам ничего, кроме
-глюков быть не может. Поводом для превращения этих поле в глобальную
-переменную послужило желание проанализировать ее в TCommandLine.Update }
+  {AK155 5-01-2002. ╨Ф╨╛ ╤Н╤В╨╛╨│╨╛ ╨▒╤Л╨╗╨╛ ╤В╨░╨║╨╛╨╡ ╨┐╨╛╨╗╨╡
+╨▓ TFilePanelRoot ╨╕ ╨▓ Tree.TTreeView. ╨Я╨╛╤Б╨║╨╛╨╗╤М╨║╤Г ╨┐╨╛ ╨╗╨╛╨│╨╕╨║╨╡ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╨╜╨╕╤П
+QuickSearch ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╤В╨╛╨╗╤М╨║╨╛ ╨╛╨┤╨╕╨╜, ╨╡╤Б╤В╨╡╤Б╤В╨▓╨╡╨╜╨╜╤Л╨╝ ╤А╨╡╤И╨╡╨╜╨╕╨╡╨╝ ╤П╨▓╨╗╤П╨╡╤В╤Б╤П
+╨│╨╗╨╛╨▒╨░╨╗╤М╨╜╨░╤П ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╨░╤П, ╨░ ╨╛╤В ╨╡╨╡ ╤А╨░╨╖╨╝╨░╨╖╤Л╨▓╨░╨╜╨╕╤П ╨┐╨╛ ╨╛╨▒╤К╨╡╨║╤В╨░╨╝ ╨╜╨╕╤З╨╡╨│╨╛, ╨║╤А╨╛╨╝╨╡
+╨│╨╗╤О╨║╨╛╨▓ ╨▒╤Л╤В╤М ╨╜╨╡ ╨╝╨╛╨╢╨╡╤В. ╨Я╨╛╨▓╨╛╨┤╨╛╨╝ ╨┤╨╗╤П ╨┐╤А╨╡╨▓╤А╨░╤Й╨╡╨╜╨╕╤П ╤Н╤В╨╕╤Е ╨┐╨╛╨╗╨╡ ╨▓ ╨│╨╗╨╛╨▒╨░╨╗╤М╨╜╤Г╤О
+╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Г╤О ╨┐╨╛╤Б╨╗╤Г╨╢╨╕╨╗╨╛ ╨╢╨╡╨╗╨░╨╜╨╕╨╡ ╨┐╤А╨╛╨░╨╜╨░╨╗╨╕╨╖╨╕╤А╨╛╨▓╨░╤В╤М ╨╡╨╡ ╨▓ TCommandLine.Update }
 
-//JO: не делаем сортировку в TFilePanelRoot.ReadDirectory
-//    значение True задаётся в процедурах поиска чтобы не сортировать
-//    панель с результатами поиска; важно следить, чтобы на выходе из
-//    процедуры всегда было значение False
+//JO: ╨╜╨╡ ╨┤╨╡╨╗╨░╨╡╨╝ ╤Б╨╛╤А╤В╨╕╤А╨╛╨▓╨║╤Г ╨▓ TFilePanelRoot.ReadDirectory
+//    ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ True ╨╖╨░╨┤╨░╤С╤В╤Б╤П ╨▓ ╨┐╤А╨╛╤Ж╨╡╨┤╤Г╤А╨░╤Е ╨┐╨╛╨╕╤Б╨║╨░ ╤З╤В╨╛╨▒╤Л ╨╜╨╡ ╤Б╨╛╤А╤В╨╕╤А╨╛╨▓╨░╤В╤М
+//    ╨┐╨░╨╜╨╡╨╗╤М ╤Б ╤А╨╡╨╖╤Г╨╗╤М╤В╨░╤В╨░╨╝╨╕ ╨┐╨╛╨╕╤Б╨║╨░; ╨▓╨░╨╢╨╜╨╛ ╤Б╨╗╨╡╨┤╨╕╤В╤М, ╤З╤В╨╛╨▒╤Л ╨╜╨░ ╨▓╤Л╤Е╨╛╨┤╨╡ ╨╕╨╖
+//    ╨┐╤А╨╛╤Ж╨╡╨┤╤Г╤А╤Л ╨▓╤Б╨╡╨│╨┤╨░ ╨▒╤Л╨╗╨╛ ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ False
   RereadNoSort: Boolean  = False;
 
 var
@@ -321,14 +321,14 @@ constructor TFilePanelRoot.Load(S: TStream);
   OldDelta := -1;
   PosChanged := False;
   S.Read(ForceReading, 1);
-//JO: 11-05-2006 - закомментаpенные ниже стpоки были ещё в pитлабовской
-//    веpсии; Для чего это нужно - не вполне понятно, но их наличие
-//    поpождает такой застаpелый глюк: пpи загpузке панели поиска или ветви
-//    у файла, котоpый является текущим, почему-то путь заменяется на
-//    значение Drive^.CurDir; После закомментаpивания никаких глюков или
-//    дополнительных тоpмозов на пеpвый взгляд не замечено, а учитывая, что
-//    в констpуктоpе Init значение Files не инициализиpуется, то можно его
-//    не инициализиpовать и в Load
+//JO: 11-05-2006 - ╨╖╨░╨║╨╛╨╝╨╝╨╡╨╜╤В╨░p╨╡╨╜╨╜╤Л╨╡ ╨╜╨╕╨╢╨╡ ╤Б╤Вp╨╛╨║╨╕ ╨▒╤Л╨╗╨╕ ╨╡╤Й╤С ╨▓ p╨╕╤В╨╗╨░╨▒╨╛╨▓╤Б╨║╨╛╨╣
+//    ╨▓╨╡p╤Б╨╕╨╕; ╨Ф╨╗╤П ╤З╨╡╨│╨╛ ╤Н╤В╨╛ ╨╜╤Г╨╢╨╜╨╛ - ╨╜╨╡ ╨▓╨┐╨╛╨╗╨╜╨╡ ╨┐╨╛╨╜╤П╤В╨╜╨╛, ╨╜╨╛ ╨╕╤Е ╨╜╨░╨╗╨╕╤З╨╕╨╡
+//    ╨┐╨╛p╨╛╨╢╨┤╨░╨╡╤В ╤В╨░╨║╨╛╨╣ ╨╖╨░╤Б╤В╨░p╨╡╨╗╤Л╨╣ ╨│╨╗╤О╨║: ╨┐p╨╕ ╨╖╨░╨│p╤Г╨╖╨║╨╡ ╨┐╨░╨╜╨╡╨╗╨╕ ╨┐╨╛╨╕╤Б╨║╨░ ╨╕╨╗╨╕ ╨▓╨╡╤В╨▓╨╕
+//    ╤Г ╤Д╨░╨╣╨╗╨░, ╨║╨╛╤В╨╛p╤Л╨╣ ╤П╨▓╨╗╤П╨╡╤В╤Б╤П ╤В╨╡╨║╤Г╤Й╨╕╨╝, ╨┐╨╛╤З╨╡╨╝╤Г-╤В╨╛ ╨┐╤Г╤В╤М ╨╖╨░╨╝╨╡╨╜╤П╨╡╤В╤Б╤П ╨╜╨░
+//    ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ Drive^.CurDir; ╨Я╨╛╤Б╨╗╨╡ ╨╖╨░╨║╨╛╨╝╨╝╨╡╨╜╤В╨░p╨╕╨▓╨░╨╜╨╕╤П ╨╜╨╕╨║╨░╨║╨╕╤Е ╨│╨╗╤О╨║╨╛╨▓ ╨╕╨╗╨╕
+//    ╨┤╨╛╨┐╨╛╨╗╨╜╨╕╤В╨╡╨╗╤М╨╜╤Л╤Е ╤В╨╛p╨╝╨╛╨╖╨╛╨▓ ╨╜╨░ ╨┐╨╡p╨▓╤Л╨╣ ╨▓╨╖╨│╨╗╤П╨┤ ╨╜╨╡ ╨╖╨░╨╝╨╡╤З╨╡╨╜╨╛, ╨░ ╤Г╤З╨╕╤В╤Л╨▓╨░╤П, ╤З╤В╨╛
+//    ╨▓ ╨║╨╛╨╜╤Б╤Вp╤Г╨║╤В╨╛p╨╡ Init ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ Files ╨╜╨╡ ╨╕╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨╕p╤Г╨╡╤В╤Б╤П, ╤В╨╛ ╨╝╨╛╨╢╨╜╨╛ ╨╡╨│╨╛
+//    ╨╜╨╡ ╨╕╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨╕p╨╛╨▓╨░╤В╤М ╨╕ ╨▓ Load
 { Files := PFilesCollection(S.Get);
   if Files <> nil then
     for I := 0 to Files^.Count-1 do
@@ -344,7 +344,7 @@ constructor TFilePanelRoot.Load(S: TStream);
 procedure TFilePanelRoot.Awaken;
   begin
   SetupPanelFromDrive;
- {! AK155 27.04.05 И без всего ниженаписанного нормально работает }
+ {! AK155 27.04.05 ╨Ш ╨▒╨╡╨╖ ╨▓╤Б╨╡╨│╨╛ ╨╜╨╕╨╢╨╡╨╜╨░╨┐╨╕╤Б╨░╨╜╨╜╨╛╨│╨╛ ╨╜╨╛╤А╨╝╨░╨╗╤М╨╜╨╛ ╤А╨░╨▒╨╛╤В╨░╨╡╤В }
 (*
   RereadDir;
   if  (DriveLine <> nil) then
@@ -381,7 +381,7 @@ procedure TFilePanelRoot.Store(S: TStream);
   S.Write(Delta, 2);
   S.Write(ForceReading, 1);
  {PFilesCollection(Files).Selected := ScrollBar^.Value;
-  S.Put(Files);} //JO: 11-05-2006 - см. комментаpий к TFilePanelRoot.Load;
+  S.Put(Files);} //JO: 11-05-2006 - ╤Б╨╝. ╨║╨╛╨╝╨╝╨╡╨╜╤В╨░p╨╕╨╣ ╨║ TFilePanelRoot.Load;
   end { TFilePanelRoot.Store };
 
 function TFilePanelRoot.Valid(Command: Word): Boolean;
@@ -405,14 +405,14 @@ destructor TFilePanelRoot.Destroy;
     begin
     ActivePanel := nil;
     PassivePanel := nil;
-    { панели уничтожаются только обе сразу, так что эти указатели
-    можно очистить за один раз }
+    { ╨┐╨░╨╜╨╡╨╗╨╕ ╤Г╨╜╨╕╤З╤В╨╛╨╢╨░╤О╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨╛╨▒╨╡ ╤Б╤А╨░╨╖╤Г, ╤В╨░╨║ ╤З╤В╨╛ ╤Н╤В╨╕ ╤Г╨║╨░╨╖╨░╤В╨╡╨╗╨╕
+    ╨╝╨╛╨╢╨╜╨╛ ╨╛╤З╨╕╤Б╤В╨╕╤В╤М ╨╖╨░ ╨╛╨┤╨╕╨╜ ╤А╨░╨╖ }
     end;
   inherited Destroy;
   end;
 
 procedure TFilePanelRoot.SetState(AState: Word; Enable: Boolean);
-   {По существу это используется при смене на нефайловую панель и обратно}
+   {╨Я╨╛ ╤Б╤Г╤Й╨╡╤Б╤В╨▓╤Г ╤Н╤В╨╛ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨┐╤А╨╕ ╤Б╨╝╨╡╨╜╨╡ ╨╜╨░ ╨╜╨╡╤Д╨░╨╣╨╗╨╛╨▓╤Г╤О ╨┐╨░╨╜╨╡╨╗╤М ╨╕ ╨╛╨▒╤А╨░╤В╨╜╨╛}
   var
     SortEn: Boolean;
   begin
@@ -453,15 +453,15 @@ procedure TFilePanelRoot.ChangeBounds(const Bounds: TRect);
     end;
   if InfoView <> nil then
     begin
-    if Loaded then { Без этого InfoView^.Draw может зациклиться }
+    if Loaded then { ╨С╨╡╨╖ ╤Н╤В╨╛╨│╨╛ InfoView^.Draw ╨╝╨╛╨╢╨╡╤В ╨╖╨░╤Ж╨╕╨║╨╗╨╕╤В╤М╤Б╤П }
       LineLength := CalcLength;
     PInfoView(InfoView).CompileShowOptions;
-      { При этом определится InfoView^.Size.Y }
+      { ╨Я╤А╨╕ ╤Н╤В╨╛╨╝ ╨╛╨┐╤А╨╡╨┤╨╡╨╗╨╕╤В╤Б╤П InfoView^.Size.Y }
     InfoViewHeight := InfoView.Size.Y;
     R := NewBounds;
     R.A.Y := R.B.Y-InfoViewHeight;
-    InfoView.SetBounds(R); {Тут может быть изменение Size.X}
-    { Перерисоваться InfoView^ еще успеет, и опять таки, обычно, не один раз}
+    InfoView.SetBounds(R); {╨в╤Г╤В ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╡ Size.X}
+    { ╨Я╨╡╤А╨╡╤А╨╕╤Б╨╛╨▓╨░╤В╤М╤Б╤П InfoView^ ╨╡╤Й╨╡ ╤Г╤Б╨┐╨╡╨╡╤В, ╨╕ ╨╛╨┐╤П╤В╤М ╤В╨░╨║╨╕, ╨╛╨▒╤Л╤З╨╜╨╛, ╨╜╨╡ ╨╛╨┤╨╕╨╜ ╤А╨░╨╖}
     Dec(NewBounds.B.Y, InfoViewHeight);
     end;
   SetBounds(NewBounds);
@@ -516,7 +516,7 @@ procedure TFilePanelRoot.RereadDir;
     BB: Boolean;
     TF: TFileRec;
     WasLoaded, B: Boolean;
-    PanelHeight: Integer; // Высота панели без строки заголовков колонок
+    PanelHeight: Integer; // ╨Т╤Л╤Б╨╛╤В╨░ ╨┐╨░╨╜╨╡╨╗╨╕ ╨▒╨╡╨╖ ╤Б╤В╤А╨╛╨║╨╕ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╛╨▓ ╨║╨╛╨╗╨╛╨╜╨╛╨║
 
   begin
   PanelHeight := Size.Y-Byte((Pansetup.Show.MiscOptions and 2) <> 0);
@@ -551,7 +551,7 @@ procedure TFilePanelRoot.RereadDir;
     end;
   ClrIO;
   Loaded := False;
-(* AK155 Зачем бы мог понадобиться этот кусок - непонятно
+(* AK155 ╨Ч╨░╤З╨╡╨╝ ╨▒╤Л ╨╝╨╛╨│ ╨┐╨╛╨╜╨░╨┤╨╛╨▒╨╕╤В╤М╤Б╤П ╤Н╤В╨╛╤В ╨║╤Г╤Б╨╛╨║ - ╨╜╨╡╨┐╨╛╨╜╤П╤В╨╜╨╛
   RedrawPanelInfoDir;
   if Abort then
     begin
@@ -619,7 +619,7 @@ procedure TFilePanelRoot.RereadDir;
               begin
               l := TFileRecFixedSize+Length(PP^.FlName[True]);
               Move(PP^, TF, l);
-              TF.UsageCount := 1; { заведомо P^.UsageCount=1 }
+              TF.UsageCount := 1; { ╨╖╨░╨▓╨╡╨┤╨╛╨╝╨╛ P^.UsageCount=1 }
               P^.UsageCount := PP^.UsageCount;
               Move(P^, PP^, l);
               Move(TF, P^, l);
@@ -673,7 +673,7 @@ procedure TFilePanelRoot.RedrawPanelInfoDir;
     DirView.DrawView;
   if SortView <> nil then
     SortView.SetState(sfVisible, (FMSetup.Show and fmsSortIndicator) <> 0);
-      { испоьзуется, например, при загрузке десктора }
+      { ╨╕╤Б╨┐╨╛╤М╨╖╤Г╨╡╤В╤Б╤П, ╨╜╨░╨┐╤А╨╕╨╝╨╡╤А, ╨┐╤А╨╕ ╨╖╨░╨│╤А╤Г╨╖╨║╨╡ ╨┤╨╡╤Б╨║╤В╨╛╤А╨░ }
   end;
 
 {-DataCompBoy-}
@@ -684,7 +684,7 @@ procedure TFilePanelRoot.ReadDirectory;
   if  (Owner <> nil) and
       (PDoubleWindow(Owner).NonFilePanelType = dtQView)
   then
-    NeedLocated := GetSTime; {чтобы сменить показ каталога}
+    NeedLocated := GetSTime; {╤З╤В╨╛╨▒╤Л ╤Б╨╝╨╡╨╜╨╕╤В╤М ╨┐╨╛╨║╨░╨╖ ╨║╨░╤В╨░╨╗╨╛╨│╨░}
   LineLength := CalcLength;
   Drive.Panel := Self;
   case Drive.DriveType of
@@ -704,9 +704,9 @@ procedure TFilePanelRoot.ReadDirectory;
   if Files <> nil then
     begin
     Files.Free;
-//JO: если нижележащего присвоения nil здесь не делать, то при вызове
-//    любого диалога изнутри Drive^.GetDirectory с большой вероятностью
-//    происходит падение после его закрытия
+//JO: ╨╡╤Б╨╗╨╕ ╨╜╨╕╨╢╨╡╨╗╨╡╨╢╨░╤Й╨╡╨│╨╛ ╨┐╤А╨╕╤Б╨▓╨╛╨╡╨╜╨╕╤П nil ╨╖╨┤╨╡╤Б╤М ╨╜╨╡ ╨┤╨╡╨╗╨░╤В╤М, ╤В╨╛ ╨┐╤А╨╕ ╨▓╤Л╨╖╨╛╨▓╨╡
+//    ╨╗╤О╨▒╨╛╨│╨╛ ╨┤╨╕╨░╨╗╨╛╨│╨░ ╨╕╨╖╨╜╤Г╤В╤А╨╕ Drive^.GetDirectory ╤Б ╨▒╨╛╨╗╤М╤И╨╛╨╣ ╨▓╨╡╤А╨╛╤П╤В╨╜╨╛╤Б╤В╤М╤О
+//    ╨┐╤А╨╛╨╕╤Б╤Е╨╛╨┤╨╕╤В ╨┐╨░╨┤╨╡╨╜╨╕╨╡ ╨┐╨╛╤Б╨╗╨╡ ╨╡╨│╨╛ ╨╖╨░╨║╤А╤Л╤В╨╕╤П
     Files := nil;
     end;
   Files := PFilesCollection(Drive.GetDirectory(
@@ -736,17 +736,17 @@ procedure TFilePanelRoot.ReadDirectory;
     SM := psmUnsorted;
   PFilesCollection(Files).SortMode := SM;
 
-  { Бывает сортировка по описаниям, поэтому Sort надо делать
-  после ReadDescrptions }
+  { ╨С╤Л╨▓╨░╨╡╤В ╤Б╨╛╤А╤В╨╕╤А╨╛╨▓╨║╨░ ╨┐╨╛ ╨╛╨┐╨╕╤Б╨░╨╜╨╕╤П╨╝, ╨┐╨╛╤Н╤В╨╛╨╝╤Г Sort ╨╜╨░╨┤╨╛ ╨┤╨╡╨╗╨░╤В╤М
+  ╨┐╨╛╤Б╨╗╨╡ ReadDescrptions }
   if SM <> psmUnsorted then
     Files.Sort;
   if Abort then
     Exit;
 
   Files.DelDuplicates(TotalInfo);
-    { Дупы возможны после поиска в панели списка с обходом
-      подкаталогов, если файлы из подкаталогов присутствовали
-      и на верхнем уровне тоже.}
+    { ╨Ф╤Г╨┐╤Л ╨▓╨╛╨╖╨╝╨╛╨╢╨╜╤Л ╨┐╨╛╤Б╨╗╨╡ ╨┐╨╛╨╕╤Б╨║╨░ ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ ╤Б╨┐╨╕╤Б╨║╨░ ╤Б ╨╛╨▒╤Е╨╛╨┤╨╛╨╝
+      ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓, ╨╡╤Б╨╗╨╕ ╤Д╨░╨╣╨╗╤Л ╨╕╨╖ ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓ ╨┐╤А╨╕╤Б╤Г╤В╤Б╤В╨▓╨╛╨▓╨░╨╗╨╕
+      ╨╕ ╨╜╨░ ╨▓╨╡╤А╤Е╨╜╨╡╨╝ ╤Г╤А╨╛╨▓╨╜╨╡ ╤В╨╛╨╢╨╡.}
 
   if DriveState and dsInvalid > 0 then
     Exit;
@@ -797,13 +797,13 @@ procedure TFilePanelRoot.GetUserParams(var FileRec: PFileRec; var List: String; 
     else
       S := '';
     List := SwpDir+'$dn'+ItoS(DNNumber)+S+'.lst';
-    {JO: вот здесь - очень спорный момент. Раньше список в виндовой версии       }
-    {    создавался по коротким именам, теперь - по тем, которые видно. И то,    }
-    {    и другое - спорное решение, в идеале в формате dn.mnu , dn.xrn и прочих }
-    {    местах, где этот список используется должна быть явная возможность      }
-    {    указать, по каким именам создаётся список, но сейчас её нет             }
-    {    (используются только макросы %1 и %2 для активной и пассивной панели    }
-    {    соответственно)                                                         }
+    {JO: ╨▓╨╛╤В ╨╖╨┤╨╡╤Б╤М - ╨╛╤З╨╡╨╜╤М ╤Б╨┐╨╛╤А╨╜╤Л╨╣ ╨╝╨╛╨╝╨╡╨╜╤В. ╨а╨░╨╜╤М╤И╨╡ ╤Б╨┐╨╕╤Б╨╛╨║ ╨▓ ╨▓╨╕╨╜╨┤╨╛╨▓╨╛╨╣ ╨▓╨╡╤А╤Б╨╕╨╕       }
+    {    ╤Б╨╛╨╖╨┤╨░╨▓╨░╨╗╤Б╤П ╨┐╨╛ ╨║╨╛╤А╨╛╤В╨║╨╕╨╝ ╨╕╨╝╨╡╨╜╨░╨╝, ╤В╨╡╨┐╨╡╤А╤М - ╨┐╨╛ ╤В╨╡╨╝, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨▓╨╕╨┤╨╜╨╛. ╨Ш ╤В╨╛,    }
+    {    ╨╕ ╨┤╤А╤Г╨│╨╛╨╡ - ╤Б╨┐╨╛╤А╨╜╨╛╨╡ ╤А╨╡╤И╨╡╨╜╨╕╨╡, ╨▓ ╨╕╨┤╨╡╨░╨╗╨╡ ╨▓ ╤Д╨╛╤А╨╝╨░╤В╨╡ dn.mnu , dn.xrn ╨╕ ╨┐╤А╨╛╤З╨╕╤Е }
+    {    ╨╝╨╡╤Б╤В╨░╤Е, ╨│╨┤╨╡ ╤Н╤В╨╛╤В ╤Б╨┐╨╕╤Б╨╛╨║ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨┤╨╛╨╗╨╢╨╜╨░ ╨▒╤Л╤В╤М ╤П╨▓╨╜╨░╤П ╨▓╨╛╨╖╨╝╨╛╨╢╨╜╨╛╤Б╤В╤М      }
+    {    ╤Г╨║╨░╨╖╨░╤В╤М, ╨┐╨╛ ╨║╨░╨║╨╕╨╝ ╨╕╨╝╨╡╨╜╨░╨╝ ╤Б╨╛╨╖╨┤╨░╤С╤В╤Б╤П ╤Б╨┐╨╕╤Б╨╛╨║, ╨╜╨╛ ╤Б╨╡╨╣╤З╨░╤Б ╨╡╤С ╨╜╨╡╤В             }
+    {    (╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╤О╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨╝╨░╨║╤А╨╛╤Б╤Л %1 ╨╕ %2 ╨┤╨╗╤П ╨░╨║╤В╨╕╨▓╨╜╨╛╨╣ ╨╕ ╨┐╨░╤Б╤Б╨╕╨▓╨╜╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕    }
+    {    ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╨╡╨╜╨╜╨╛)                                                         }
 
     {Make list}
     
@@ -863,7 +863,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
       Dec(A);
       if UpStrg(PFileRec(Files.At(A))^.FlName[True]) = Name then
         Break;
-      {AK155 странно, почему тут сравнивается только длинное имя. }
+      {AK155 ╤Б╤В╤А╨░╨╜╨╜╨╛, ╨┐╨╛╤З╨╡╨╝╤Г ╤В╤Г╤В ╤Б╤А╨░╨▓╨╜╨╕╨▓╨░╨╡╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╨╕╨╜╨╜╨╛╨╡ ╨╕╨╝╤П. }
       end;
     IncDrawDisabled;
     OldDirectory := DirectoryName;
@@ -937,10 +937,10 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if ChangeLocked then
       Exit;
 
-    {JO: дабы перейти к найденному файлу в архиве из панели поиска}
+    {JO: ╨┤╨░╨▒╤Л ╨┐╨╡╤А╨╡╨╣╤В╨╕ ╨║ ╨╜╨░╨╣╨┤╨╡╨╜╨╜╨╛╨╝╤Г ╤Д╨░╨╣╨╗╤Г ╨▓ ╨░╤А╤Е╨╕╨▓╨╡ ╨╕╨╖ ╨┐╨░╨╜╨╡╨╗╨╕ ╨┐╨╛╨╕╤Б╨║╨░}
     PathInside := FileName;
     if PathInside[2] = ':' then
-      PathInside[2] := ';'; {JO: меняем двоеточие не важно на что }
+      PathInside[2] := ';'; {JO: ╨╝╨╡╨╜╤П╨╡╨╝ ╨┤╨▓╨╛╨╡╤В╨╛╤З╨╕╨╡ ╨╜╨╡ ╨▓╨░╨╢╨╜╨╛ ╨╜╨░ ╤З╤В╨╛ }
     I := PosChar(':', PathInside);
     if I > 0 then
       begin
@@ -958,7 +958,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if ((Dr[2] = ':') or (Copy(Dr, 1, 2) = '\\'))
          and not (Drive.DriveType in [dtDisk, dtLink, dtArc])
     then
-      { переходим с панели поиска, списка и т.п. на диск }
+      { ╨┐╨╡╤А╨╡╤Е╨╛╨┤╨╕╨╝ ╤Б ╨┐╨░╨╜╨╡╨╗╨╕ ╨┐╨╛╨╕╤Б╨║╨░, ╤Б╨┐╨╕╤Б╨║╨░ ╨╕ ╤В.╨┐. ╨╜╨░ ╨┤╨╕╤Б╨║ }
       begin
       Drive.Free;
       Drive := TDrive.Create(Byte(UpCase(Dr[1]))-64, Self);
@@ -969,7 +969,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     DeltaX := 0;
     DirectoryName := Drive.GetDir;
     Drive.lChDir(Dr); {AK155, was Drive^.lChDir(DirectoryName);}
-{JO: не перечитываем сетевой каталог, из которого не вышли}
+{JO: ╨╜╨╡ ╨┐╨╡╤А╨╡╤З╨╕╤В╤Л╨▓╨░╨╡╨╝ ╤Б╨╡╤В╨╡╨▓╨╛╨╣ ╨║╨░╤В╨░╨╗╨╛╨│, ╨╕╨╖ ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╨╜╨╡ ╨▓╤Л╤И╨╗╨╕}
     if (Drive.DriveType = dtNet)
        and (DirectoryName = Drive.GetDir) then
       begin
@@ -979,7 +979,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
 {/JO}
     DriveLetter := Drive.GetDriveLetter;
     DirectoryName := Drive.GetDir;
-{JO: переходим с панельки Network на шару}
+{JO: ╨┐╨╡╤А╨╡╤Е╨╛╨┤╨╕╨╝ ╤Б ╨┐╨░╨╜╨╡╨╗╤М╨║╨╕ Network ╨╜╨░ ╤И╨░╤А╤Г}
     if (Drive.DriveType = dtNet)
         and (Copy(DirectoryName, 1, 2) = '\\') then
       begin
@@ -995,7 +995,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     AddToDirectoryHistory(DirectoryName, Integer(Drive.DriveType));
     DecDrawDisabled;
 
-    {JO: переходим к найденному файлу в архиве}
+    {JO: ╨┐╨╡╤А╨╡╤Е╨╛╨┤╨╕╨╝ ╨║ ╨╜╨░╨╣╨┤╨╡╨╜╨╜╨╛╨╝╤Г ╤Д╨░╨╣╨╗╤Г ╨▓ ╨░╤А╤Е╨╕╨▓╨╡}
     if  (PathInside <> '') then
       begin
       Drv := nil;
@@ -1101,15 +1101,15 @@ WrongArc:
     if  (PF = nil) then
       Exit;
     if (PF^.TType = ttUpDir) then
-      Files.ForEach(DoCount) // в том числе и отмеченные
+      Files.ForEach(DoCount) // ╨▓ ╤В╨╛╨╝ ╤З╨╕╤Б╨╗╨╡ ╨╕ ╨╛╤В╨╝╨╡╤З╨╡╨╜╨╜╤Л╨╡
     else
-      begin // отмеченные и текущий каталог
+      begin // ╨╛╤В╨╝╨╡╤З╨╡╨╜╨╜╤Л╨╡ ╨╕ ╤В╨╡╨║╤Г╤Й╨╕╨╣ ╨║╨░╤В╨░╨╗╨╛╨│
       if (SelNum <> 0) then
         Files.ForEach(DoSelCount);
       if (PF^.Attr and Directory <> 0) and (PF^.Size < 0) then
         Drive.GetDirLength(PF)
       else if SelNum = 0 then
-        Exit; // отмеченных нет, а этот и так известен
+        Exit; // ╨╛╤В╨╝╨╡╤З╨╡╨╜╨╜╤Л╤Е ╨╜╨╡╤В, ╨░ ╤Н╤В╨╛╤В ╨╕ ╤В╨░╨║ ╨╕╨╖╨▓╨╡╤Б╤В╨╡╨╜
       end;
     Abort := False;
     Recount;
@@ -1296,14 +1296,14 @@ WrongArc:
     if  (ShiftState and kbAltShift <> 0) then
       ExecLFN := ExecLFN xor InvLFN;
     FreeStr := PF^.FlName[ExecLFN];
-    {Cat: в DN/2 не надо добавлять точку в конце имени}
+    {Cat: ╨▓ DN/2 ╨╜╨╡ ╨╜╨░╨┤╨╛ ╨┤╨╛╨▒╨░╨▓╨╗╤П╤В╤М ╤В╨╛╤З╨║╤Г ╨▓ ╨║╨╛╨╜╤Ж╨╡ ╨╕╨╝╨╡╨╜╨╕}
     (*
    if PosChar('.', FreeStr) = 0 then AddStr(FreeStr, '.');
 *)
     if  (ShiftState and (kbLeftShift+kbRightShift) <> 0) then
       begin
       
-      LongName := { В колонках LFN, и Alt _не_ нажат, или наоборот }
+      LongName := { ╨Т ╨║╨╛╨╗╨╛╨╜╨║╨░╤Е LFN, ╨╕ Alt _╨╜╨╡_ ╨╜╨░╨╢╨░╤В, ╨╕╨╗╨╕ ╨╜╨░╨╛╨▒╨╛╤А╨╛╤В }
         (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0) = { Flash 23.05.2005 }
         (ShiftState and kbAltShift = 0);
       if LongName then
@@ -1391,7 +1391,7 @@ WrongArc:
     begin
     S := CnvString(Event.InfoPtr);
     S1 := S;
-    if S[1] = '>' then //признак перечитывания подкаталогов в ветви
+    if S[1] = '>' then //╨┐╤А╨╕╨╖╨╜╨░╨║ ╨┐╨╡╤А╨╡╤З╨╕╤В╤Л╨▓╨░╨╜╨╕╤П ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓ ╨▓ ╨▓╨╡╤В╨▓╨╕
       S := Copy(S, 2, MaxStringLength);
     MakeNoSlash(S);
     I := Length(S);
@@ -1426,7 +1426,7 @@ WrongArc:
       HistoryAdd(Event.InfoByte, S);
     end;
 
-{ Смена диска через меню Alt-F1/F2 }
+{ ╨б╨╝╨╡╨╜╨░ ╨┤╨╕╤Б╨║╨░ ╤З╨╡╤А╨╡╨╖ ╨╝╨╡╨╜╤О Alt-F1/F2 }
   procedure _ChangeDrive;
     var
       S: String;
@@ -1563,10 +1563,10 @@ WrongArc:
           end;
         if Drive.DriveType <> dtDisk then
           ReplaceDrive(S[1]);
-        {JO: раньше при переходе к списку из истории каталогов текущий }
-        {    каталог не менялся и, соответственно, список не находил   }
-        {    файлов, находящихся в его каталоге. Для исправления этого }
-        {    нижележащая строка                                        }
+        {JO: ╤А╨░╨╜╤М╤И╨╡ ╨┐╤А╨╕ ╨┐╨╡╤А╨╡╤Е╨╛╨┤╨╡ ╨║ ╤Б╨┐╨╕╤Б╨║╤Г ╨╕╨╖ ╨╕╤Б╤В╨╛╤А╨╕╨╕ ╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓ ╤В╨╡╨║╤Г╤Й╨╕╨╣ }
+        {    ╨║╨░╤В╨░╨╗╨╛╨│ ╨╜╨╡ ╨╝╨╡╨╜╤П╨╗╤Б╤П ╨╕, ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╨╡╨╜╨╜╨╛, ╤Б╨┐╨╕╤Б╨╛╨║ ╨╜╨╡ ╨╜╨░╤Е╨╛╨┤╨╕╨╗   }
+        {    ╤Д╨░╨╣╨╗╨╛╨▓, ╨╜╨░╤Е╨╛╨┤╤П╤Й╨╕╤Е╤Б╤П ╨▓ ╨╡╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨╡. ╨Ф╨╗╤П ╨╕╤Б╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╤Н╤В╨╛╨│╨╛ }
+        {    ╨╜╨╕╨╢╨╡╨╗╨╡╨╢╨░╤Й╨░╤П ╤Б╤В╤А╨╛╨║╨░                                        }
         Drive.lChDir(GetPath(S));
 
         Message(Self, evCommand, cmInsertDrive, TFindDrive.Create(S))
@@ -1673,7 +1673,7 @@ WrongArc:
       if  (ShiftState and kbAltShift <> 0) then
         ExecLFN := ExecLFN xor InvLFN;
       S := PF^.FlName[ExecLFN];
-      {Cat: в DN/2 не надо добавлять точку в конце имени}
+      {Cat: ╨▓ DN/2 ╨╜╨╡ ╨╜╨░╨┤╨╛ ╨┤╨╛╨▒╨░╨▓╨╗╤П╤В╤М ╤В╨╛╤З╨║╤Г ╨▓ ╨║╨╛╨╜╤Ж╨╡ ╨╕╨╝╨╡╨╜╨╕}
       (*
     if (PF^.Attr and Directory = 0) and
        (PosChar('.', S) = 0) then AddStr(S, '.');
@@ -1800,9 +1800,9 @@ WrongArc:
       begin
       if Drive.DriveType = dtArcFind
       then
-//JO: смысл громоздкой конструкции внизу - выделить путь к архиву из
-//    Owner'а UpFile (т.е. точечек '..') панели найденного в архиве и
-//    присоединить к нему путь к файлу внутри данного архива
+//JO: ╤Б╨╝╤Л╤Б╨╗ ╨│╤А╨╛╨╝╨╛╨╖╨┤╨║╨╛╨╣ ╨║╨╛╨╜╤Б╤В╤А╤Г╨║╤Ж╨╕╨╕ ╨▓╨╜╨╕╨╖╤Г - ╨▓╤Л╨┤╨╡╨╗╨╕╤В╤М ╨┐╤Г╤В╤М ╨║ ╨░╤А╤Е╨╕╨▓╤Г ╨╕╨╖
+//    Owner'╨░ UpFile (╤В.╨╡. ╤В╨╛╤З╨╡╤З╨╡╨║ '..') ╨┐╨░╨╜╨╡╨╗╨╕ ╨╜╨░╨╣╨┤╨╡╨╜╨╜╨╛╨│╨╛ ╨▓ ╨░╤А╤Е╨╕╨▓╨╡ ╨╕
+//    ╨┐╤А╨╕╤Б╨╛╨╡╨┤╨╕╨╜╨╕╤В╤М ╨║ ╨╜╨╡╨╝╤Г ╨┐╤Г╤В╤М ╨║ ╤Д╨░╨╣╨╗╤Г ╨▓╨╜╤Г╤В╤А╨╕ ╨┤╨░╨╜╨╜╨╛╨│╨╛ ╨░╤А╤Е╨╕╨▓╨░
         S := MakeNormName(
           Copy(TFindDrive(Drive).UpFile^.Owner^, 1, Pos(':',
            Copy(TFindDrive(Drive).UpFile^.Owner^, 3, MaxStringLength))+2)
@@ -1810,7 +1810,7 @@ WrongArc:
       else
         S := MakeNormName(PF^.Owner^, PF^.FlName[uLfn]);
       (*
-{JO: переходим к найденному файлу в архиве}
+{JO: ╨┐╨╡╤А╨╡╤Е╨╛╨┤╨╕╨╝ ╨║ ╨╜╨░╨╣╨┤╨╡╨╜╨╜╨╛╨╝╤Г ╤Д╨░╨╣╨╗╤Г ╨▓ ╨░╤А╤Е╨╕╨▓╨╡}
       if PathFoundInArc(PF^.Owner^) and
           ArcViewer(S, S, FreeByte) then
             begin
@@ -1860,14 +1860,14 @@ WrongArc:
     if  (PF^.Attr and Directory = 0) then
       begin
       if not ArcViewer(S, S) then
-        {AK155: по CtrlPgDn входим в архив}
+        {AK155: ╨┐╨╛ CtrlPgDn ╨▓╤Е╨╛╨┤╨╕╨╝ ╨▓ ╨░╤А╤Е╨╕╨▓}
         _Enter
       else if PathFoundInArc(S) then
-        {JO: переходим к найденному файлу в архиве    }
+        {JO: ╨┐╨╡╤А╨╡╤Е╨╛╨┤╨╕╨╝ ╨║ ╨╜╨░╨╣╨┤╨╡╨╜╨╜╨╛╨╝╤Г ╤Д╨░╨╣╨╗╤Г ╨▓ ╨░╤А╤Е╨╕╨▓╨╡    }
         GotoSingle(PF^.FlName[True]);
       end
     else
-      begin { Входим в каталог }
+      begin { ╨Т╤Е╨╛╨┤╨╕╨╝ ╨▓ ╨║╨░╤В╨░╨╗╨╛╨│ }
       S := MakeNormName(S, '.');
       GotoFile(S);
       end;
@@ -1917,7 +1917,7 @@ WrongArc:
       
       CondLfn: TUseLFN; {JO}
       
-      PanelHeight: Integer; // Высота панели без строки заголовков колонок
+      PanelHeight: Integer; // ╨Т╤Л╤Б╨╛╤В╨░ ╨┐╨░╨╜╨╡╨╗╨╕ ╨▒╨╡╨╖ ╤Б╤В╤А╨╛╨║╨╕ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╛╨▓ ╨║╨╛╨╗╨╛╨╜╨╛╨║
     begin
     PanelHeight := Size.Y-Byte((Pansetup.Show.MiscOptions and 2) <> 0);
     case DNKeyCode(Event) of
@@ -2038,7 +2038,7 @@ WrongArc:
       kbUp, kbDown, kbUpUp, kbDownUp:
         begin
         CtrlWas := ShiftState and kbCtrlShift <> 0;
-           {AK155 IMHO это место недостижимо, так как событие съедает
+           {AK155 IMHO ╤Н╤В╨╛ ╨╝╨╡╤Б╤В╨╛ ╨╜╨╡╨┤╨╛╤Б╤В╨╕╨╢╨╕╨╝╨╛, ╤В╨░╨║ ╨║╨░╨║ ╤Б╨╛╨▒╤Л╤В╨╕╨╡ ╤Б╤К╨╡╨┤╨░╨╡╤В
            TFilePanel }
         end;
       kbCtrlR:
@@ -2073,7 +2073,7 @@ WrongArc:
         begin
         if  (Drive.DriveType = dtDisk) then
           begin
-          {JO: сохраняем в S имя каталога верхнего уровня для текущего}
+          {JO: ╤Б╨╛╤Е╤А╨░╨╜╤П╨╡╨╝ ╨▓ S ╨╕╨╝╤П ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨▓╨╡╤А╤Е╨╜╨╡╨│╨╛ ╤Г╤А╨╛╨▓╨╜╤П ╨┤╨╗╤П ╤В╨╡╨║╤Г╤Й╨╡╨│╨╛}
           s := Drive.CurDir+'\';
           l := GetRootStart(s)+1;
           s := Copy(s, l, PosChar('\', Copy(s, l, MaxStringLength))-1);
@@ -2121,7 +2121,7 @@ WrongArc:
           Recount;
           CE;
           end;
-      { Flash 23.05.2005: Добавлено взятие короткого имени с путём }
+      { Flash 23.05.2005: ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╨╛ ╨▓╨╖╤П╤В╨╕╨╡ ╨║╨╛╤А╨╛╤В╨║╨╛╨│╨╛ ╨╕╨╝╨╡╨╜╨╕ ╤Б ╨┐╤Г╤В╤С╨╝ }
       kbCtrlIns, kbCtrlShiftIns, kbCtrlAltIns, kbCtrlAltShiftIns:
         {if ShiftState and kbCtrlShift<>0 then}_CtrlIns;
       kbCtrlEnter, kbCtrlShiftEnter, kbCtrlAltEnter:
@@ -2507,8 +2507,8 @@ WrongArc:
         cmEraseGroup:
           EraseGroup;
         cmFindTree:
-          (* {fmiDirLen упраздняется, так что ничего не остаётся.
-              А с самой cmFindTree тоже надо бы разобраться }
+          (* {fmiDirLen ╤Г╨┐╤А╨░╨╖╨┤╨╜╤П╨╡╤В╤Б╤П, ╤В╨░╨║ ╤З╤В╨╛ ╨╜╨╕╤З╨╡╨│╨╛ ╨╜╨╡ ╨╛╤Б╤В╨░╤С╤В╤Б╤П.
+              ╨Р ╤Б ╤Б╨░╨╝╨╛╨╣ cmFindTree ╤В╨╛╨╢╨╡ ╨╜╨░╨┤╨╛ ╨▒╤Л ╤А╨░╨╖╨╛╨▒╤А╨░╤В╤М╤Б╤П }
           if  (Drive^.DriveType = dtDisk) and
               (PanelFlags and fmiDirLen <> 0) and
               (Char(Event.InfoPtr^) = DirectoryName[1])
@@ -2851,9 +2851,9 @@ WrongArc:
             CE;
             end;
 
-        (*AK155 19-06-2002. Такого, вроде, не бывает никогда. Почти идентичный
-кусок есть в filepanel, так он действительно работает. И если тот кусок
-закоментарить, то DN глючит, но сюда управление все равно не попадает.
+        (*AK155 19-06-2002. ╨в╨░╨║╨╛╨│╨╛, ╨▓╤А╨╛╨┤╨╡, ╨╜╨╡ ╨▒╤Л╨▓╨░╨╡╤В ╨╜╨╕╨║╨╛╨│╨┤╨░. ╨Я╨╛╤З╤В╨╕ ╨╕╨┤╨╡╨╜╤В╨╕╤З╨╜╤Л╨╣
+╨║╤Г╤Б╨╛╨║ ╨╡╤Б╤В╤М ╨▓ filepanel, ╤В╨░╨║ ╨╛╨╜ ╨┤╨╡╨╣╤Б╤В╨▓╨╕╤В╨╡╨╗╤М╨╜╨╛ ╤А╨░╨▒╨╛╤В╨░╨╡╤В. ╨Ш ╨╡╤Б╨╗╨╕ ╤В╨╛╤В ╨║╤Г╤Б╨╛╨║
+╨╖╨░╨║╨╛╨╝╨╡╨╜╤В╨░╤А╨╕╤В╤М, ╤В╨╛ DN ╨│╨╗╤О╤З╨╕╤В, ╨╜╨╛ ╤Б╤О╨┤╨░ ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╨╡ ╨▓╤Б╨╡ ╤А╨░╨▓╨╜╨╛ ╨╜╨╡ ╨┐╨╛╨┐╨░╨┤╨░╨╡╤В.
                  cmScrollBarChanged: if ScrollBar = Event.InfoPtr then begin
                                       if MSelect then
                                         begin
@@ -2887,11 +2887,11 @@ WrongArc:
       MakeLocal(Event.Where, MPos);
       if 
          (PanSetup.Show.ColumnsMask and psLFN_InColumns = 0) or
-           { Ширина колонки короткого имени не меняется }
+           { ╨и╨╕╤А╨╕╨╜╨░ ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨║╨╛╤А╨╛╤В╨║╨╛╨│╨╛ ╨╕╨╝╨╡╨╜╨╕ ╨╜╨╡ ╨╝╨╡╨╜╤П╨╡╤В╤Б╤П }
          
          ((MPos.X mod LineLength) <> LFNLen)
       then
-        begin { D&D файла }
+        begin { D&D ╤Д╨░╨╣╨╗╨░ }
         if  (MPos.Y = 0) and ColumnTitles then
           begin
           LastRDelay := RepeatDelay;
@@ -3020,7 +3020,7 @@ WrongArc:
                   CE;
                  end*)
       else
-        begin { Изменение мышью ширины колонки "Имя" }
+        begin { ╨Ш╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╡ ╨╝╤Л╤И╤М╤О ╤И╨╕╤А╨╕╨╜╤Л ╨║╨╛╨╗╨╛╨╜╨║╨╕ "╨Ш╨╝╤П" }
         PSDEL := MPos.X div LineLength;
         repeat
           if MPos.X-LineLength*PSDEL-EXTLen >= 5 then
@@ -3065,17 +3065,17 @@ procedure TFilePanelRoot.Reorder;
     ScrollBarValue: LongInt;
   begin
   if Files = nil then
-    Exit; //AK155 на всякий случай; бывает ли nil - не знаю
+    Exit; //AK155 ╨╜╨░ ╨▓╤Б╤П╨║╨╕╨╣ ╤Б╨╗╤Г╤З╨░╨╣; ╨▒╤Л╨▓╨░╨╡╤В ╨╗╨╕ nil - ╨╜╨╡ ╨╖╨╜╨░╤О
   Files.SortMode := PanSetup^.Sort.SortMode;
   if PanSetup^.Sort.SortMode = psmUnsorted then
-    RereadDir { Несортированный - это такой, как читается с диска;
-      но поскольку первоначальный порядок мы уже потеряли, надо
-      перечитать заново }
+    RereadDir { ╨Э╨╡╤Б╨╛╤А╤В╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ - ╤Н╤В╨╛ ╤В╨░╨║╨╛╨╣, ╨║╨░╨║ ╤З╨╕╤В╨░╨╡╤В╤Б╤П ╤Б ╨┤╨╕╤Б╨║╨░;
+      ╨╜╨╛ ╨┐╨╛╤Б╨║╨╛╨╗╤М╨║╤Г ╨┐╨╡╤А╨▓╨╛╨╜╨░╤З╨░╨╗╤М╨╜╤Л╨╣ ╨┐╨╛╤А╤П╨┤╨╛╨║ ╨╝╤Л ╤Г╨╢╨╡ ╨┐╨╛╤В╨╡╤А╤П╨╗╨╕, ╨╜╨░╨┤╨╛
+      ╨┐╨╡╤А╨╡╤З╨╕╤В╨░╤В╤М ╨╖╨░╨╜╨╛╨▓╨╛ }
   else
     begin
     ScrollBarValue := ScrollBar.Value;
     if ScrollBarValue >= Files.Count then
-      Exit; { AK155 IMHO так бывает только как 0 >= 0 }
+      Exit; { AK155 IMHO ╤В╨░╨║ ╨▒╤Л╨▓╨░╨╡╤В ╤В╨╛╨╗╤М╨║╨╛ ╨║╨░╨║ 0 >= 0 }
     Cur := Files.At(ScrollBarValue);
     Files.Sort;
     for ScrollBarValue := 0 to Files.Count-1 do
@@ -3109,9 +3109,9 @@ function TFilePanelRoot.CalcColPos(ColFlag: Word): Integer;
         Result := MaxViewWidth;
         Exit;
         end;
-      if L = -2 then {время}
+      if L = -2 then {╨▓╤А╨╡╨╝╤П}
         L := 7-CountryInfo.TimeFmt;
-          {для 24-часового формата - 6, для 12-часового - 7}
+          {╨┤╨╗╤П 24-╤З╨░╤Б╨╛╨▓╨╛╨│╨╛ ╤Д╨╛╤А╨╝╨░╤В╨░ - 6, ╨┤╨╗╤П 12-╤З╨░╤Б╨╛╨▓╨╛╨│╨╛ - 7}
       Inc(Result, L);
       end;
     Flags := Flags shr 1;
@@ -3159,13 +3159,13 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
   if P^.Selected and (Startup.FMSetup.TagChar[1] <> ' ') then
     OPT := OPT+flnSelected;
 
-{Табулировать расширение
- ┌──────────────────────────┐
- │         Никогда          │ 0
- │      Если оно есть       │ 1
- │  Если оно не помещается  │ 2
- │          Всегда          │ 3
- └──────────────────────────┘
+{╨в╨░╨▒╤Г╨╗╨╕╤А╨╛╨▓╨░╤В╤М ╤А╨░╤Б╤И╨╕╤А╨╡╨╜╨╕╨╡
+ тФМтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФР
+ тФВ         ╨Э╨╕╨║╨╛╨│╨┤╨░          тФВ 0
+ тФВ      ╨Х╤Б╨╗╨╕ ╨╛╨╜╨╛ ╨╡╤Б╤В╤М       тФВ 1
+ тФВ  ╨Х╤Б╨╗╨╕ ╨╛╨╜╨╛ ╨╜╨╡ ╨┐╨╛╨╝╨╡╤Й╨░╨╡╤В╤Б╤П  тФВ 2
+ тФВ          ╨Т╤Б╨╡╨│╨┤╨░          тФВ 3
+ тФФтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФШ
 }
   W := PosLastDot(S);
   ExtNotExist := (W = 1) or (W >= Length(S));
@@ -3216,13 +3216,13 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
 
   if P^.Attr and Directory <> 0 then
     begin
-{          ┌────────────┐
-Регистр им │  кАк еСТь  │ 0
-  Каталого │   малыми   │ 1
-  .......  │ С большой  │ 2
-           │  БОЛЬШИМИ  │ 3
-           │    авто    │ 4
-           └────────────┘ }
+{          тФМтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФР
+╨а╨╡╨│╨╕╤Б╤В╤А ╨╕╨╝ тФВ  ╨║╨Р╨║ ╨╡╨б╨в╤М  тФВ 0
+  ╨Ъ╨░╤В╨░╨╗╨╛╨│╨╛ тФВ   ╨╝╨░╨╗╤Л╨╝╨╕   тФВ 1
+  .......  тФВ ╨б ╨▒╨╛╨╗╤М╤И╨╛╨╣  тФВ 2
+           тФВ  ╨С╨Ю╨Ы╨м╨и╨Ш╨Ь╨Ш  тФВ 3
+           тФВ    ╨░╨▓╤В╨╛    тФВ 4
+           тФФтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФШ }
     case Pansetup.Show.DirRegister of
       1:
         OPT := OPT or flnLowCase;
@@ -3236,7 +3236,7 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
     end {case};
     end
   else
-    begin { Аналогично }
+    begin { ╨Р╨╜╨░╨╗╨╛╨│╨╕╤З╨╜╨╛ }
     case Pansetup.Show.FileRegister of
       1:
         OPT := OPT or flnLowCase;
@@ -3276,9 +3276,9 @@ procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean)
       L := FileColWidht[i];
       if L = -1 then
         Exit;
-      if L = -2 then {время}
+      if L = -2 then {╨▓╤А╨╡╨╝╤П}
         L := 7-CountryInfo.TimeFmt;
-          {для 24-часового формата - 6, для 12-часового - 7}
+          {╨┤╨╗╤П 24-╤З╨░╤Б╨╛╨▓╨╛╨│╨╛ ╤Д╨╛╤А╨╝╨░╤В╨░ - 6, ╨┤╨╗╤П 12-╤З╨░╤Б╨╛╨▓╨╛╨│╨╛ - 7}
       if L <> 0 then
         begin
         inc(X, L);
@@ -3304,9 +3304,9 @@ procedure TFilePanelRoot.SetupPanelFromDrive;
     
     and (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0)
     ;
-    {JO: если ширина колонки имени больше 250 символов,
-     её показываем после остальных колонок}
-  if Owner <> nil { nil бывает во время Load } then
+    {JO: ╨╡╤Б╨╗╨╕ ╤И╨╕╤А╨╕╨╜╨░ ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨╕╨╝╨╡╨╜╨╕ ╨▒╨╛╨╗╤М╤И╨╡ 250 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓,
+     ╨╡╤С ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╨╝ ╨┐╨╛╤Б╨╗╨╡ ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╤Е ╨║╨╛╨╗╨╛╨╜╨╛╨║}
+  if Owner <> nil { nil ╨▒╤Л╨▓╨░╨╡╤В ╨▓╨╛ ╨▓╤А╨╡╨╝╤П Load } then
     PDoubleWindow(Owner).SetMaxiState(Self);
   end;
 
@@ -3316,7 +3316,7 @@ procedure TFilePanelRoot.AddSelected(PF: PFileRec);
   if Selected then
     begin
     if Size > 0 then
-      begin { у каталога с неизвестным размером Size=-1}
+      begin { ╤Г ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╤Б ╨╜╨╡╨╕╨╖╨▓╨╡╤Б╤В╨╜╤Л╨╝ ╤А╨░╨╖╨╝╨╡╤А╨╛╨╝ Size=-1}
       SelectedLen := SelectedLen + Size;
       PackedLen := PackedLen + PSize;
       end;
@@ -3337,15 +3337,15 @@ procedure TFilePanelRoot.GetParam(i: Integer);
   ShowOnly := (i and not $0F) = 0;
   PC := dt2pc[Drive.DriveType];
   case NewPresetNum of
-   1..10: { Пресет }
+   1..10: { ╨Я╤А╨╡╤Б╨╡╤В }
     NewSetupSet := PanSetupPreset[NewPresetNum];
-   11: { Другая панель }
+   11: { ╨Ф╤А╤Г╨│╨░╤П ╨┐╨░╨╜╨╡╨╗╤М }
     begin
     P := OtherFilePanel(Self);
     NewSetupSet := P.PanelSetupSet;
     NewPresetNum := P.PresetNum;
     end;
-   else {12, Откат }
+   else {12, ╨Ю╤В╨║╨░╤В }
     begin
     NewSetupSet := PrevPanelSetupSet;
     NewPresetNum := PrevPresetNum;
@@ -3354,13 +3354,13 @@ procedure TFilePanelRoot.GetParam(i: Integer);
   if ShowOnly and MemEqual(PanelSetupSet[PC].Show, NewSetupSet[PC].Show,
        SizeOf(TPanelShowSetup))
   then
-    begin { Задана загрузка вида, совпадающего с текущим }
+    begin { ╨Ч╨░╨┤╨░╨╜╨░ ╨╖╨░╨│╤А╤Г╨╖╨║╨░ ╨▓╨╕╨┤╨░, ╤Б╨╛╨▓╨┐╨░╨┤╨░╤О╤Й╨╡╨│╨╛ ╤Б ╤В╨╡╨║╤Г╤Й╨╕╨╝ }
     if not MenuOnError or (NewPresetNum <> PresetNum) then
       PresetNum := NewPresetNum
     else
       CM_SelectColumn(Self);
-      { Тут возможна рекурсия, но её глубина ограничена усердием
-      пользователя в нажимании одного и того же }
+      { ╨в╤Г╤В ╨▓╨╛╨╖╨╝╨╛╨╢╨╜╨░ ╤А╨╡╨║╤Г╤А╤Б╨╕╤П, ╨╜╨╛ ╨╡╤С ╨│╨╗╤Г╨▒╨╕╨╜╨░ ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨░ ╤Г╤Б╨╡╤А╨┤╨╕╨╡╨╝
+      ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П ╨▓ ╨╜╨░╨╢╨╕╨╝╨░╨╜╨╕╨╕ ╨╛╨┤╨╜╨╛╨│╨╛ ╨╕ ╤В╨╛╨│╨╛ ╨╢╨╡ }
     Exit;
     end;
 
@@ -3387,7 +3387,7 @@ procedure TFilePanelRoot.GetParam(i: Integer);
       Reorder;
     end;
   SetupPanelFromDrive;
-  Rebound; { могли измениться и панели, и подвал; заодно и перерисуем всё }
+  Rebound; { ╨╝╨╛╨│╨╗╨╕ ╨╕╨╖╨╝╨╡╨╜╨╕╤В╤М╤Б╤П ╨╕ ╨┐╨░╨╜╨╡╨╗╨╕, ╨╕ ╨┐╨╛╨┤╨▓╨░╨╗; ╨╖╨░╨╛╨┤╨╜╨╛ ╨╕ ╨┐╨╡╤А╨╡╤А╨╕╤Б╤Г╨╡╨╝ ╨▓╤Б╤С }
   Owner.UnLock;
   end {TFilePanelRoot.GetParam};
 
@@ -3400,7 +3400,7 @@ procedure TFilePanelRoot.Rebound;
   R.B.Y := Owner.Size.Y-1;
   ChangeBounds(R);
   SortView.SetState(sfVisible, (FMSetup.Show and fmsSortIndicator) <> 0);
-    { используется при смене видимости индикатора в setups.FMSetup }
+    { ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨┐╤А╨╕ ╤Б╨╝╨╡╨╜╨╡ ╨▓╨╕╨┤╨╕╨╝╨╛╤Б╤В╨╕ ╨╕╨╜╨┤╨╕╨║╨░╤В╨╛╤А╨░ ╨▓ setups.FMSetup }
   Owner.Redraw;
   end;
 

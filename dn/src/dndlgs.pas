@@ -68,10 +68,10 @@ const
 
 type
   TComboBox = class(TView)
-    Selected: Word; // текущий номер варианта (нумерация от 1)
-    Count: Word; { не отрывать от Selected! См. Load,Store}
+    Selected: Word; // ╤В╨╡╨║╤Г╤Й╨╕╨╣ ╨╜╨╛╨╝╨╡╤А ╨▓╨░╤А╨╕╨░╨╜╤В╨░ (╨╜╤Г╨╝╨╡╤А╨░╤Ж╨╕╤П ╨╛╤В 1)
+    Count: Word; { ╨╜╨╡ ╨╛╤В╤А╤Л╨▓╨░╤В╤М ╨╛╤В Selected! ╨б╨╝. Load,Store}
     Menu: PMenu;
-    Items: array[1..10] of PMenuItem; // прямые ссылки в меню
+    Items: array[1..10] of PMenuItem; // ╨┐╤А╤П╨╝╤Л╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╨▓ ╨╝╨╡╨╜╤О
     constructor Create(var Bounds: TRect; AStrings: PSItem);
     procedure BuildMenu(AStrings: PSItem);
     destructor Done; virtual;
@@ -99,7 +99,7 @@ type
 
 
   TParamText = class(TStaticText)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: ╤Н╤В╨╛╤В ╨╛╨▒╤К╨╡╨║╤В ╨▓╤Л╨╜╨╡╤Б╨╡╨╜ ╨▓ ╨┐╨╗╨░╨│╨╕╨╜╨╜╤Г╤О ╨╝╨╛╨┤╨╡╨╗╤М; ╨╕╨╖╨╝╨╡╨╜╤П╤В╤М ╨║╤А╨░╨╣╨╜╨╡ ╨╛╤Б╤В╨╛╤А╨╛╨╢╨╜╨╛!}
     ParamCount: AInt;
     ParamList: Pointer;
     constructor Create(var Bounds: TRect; const AText: String;
@@ -112,7 +112,7 @@ type
     end;
 
   TBookmark = class(TLabel)
-    {` Закладка страницы блокнота со страницами TNotepas }
+    {` ╨Ч╨░╨║╨╗╨░╨┤╨║╨░ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨▒╨╗╨╛╨║╨╜╨╛╤В╨░ ╤Б╨╛ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░╨╝╨╕ TNotepas }
     constructor Create(var Bounds: TRect; AText: String; ALink: TView);
     procedure Draw; virtual;
     procedure FocusLink; virtual;
@@ -121,7 +121,7 @@ type
   TPage = class(TDialog)
     Bookmark: TBookmark;
     PrevPage: TPage;
-      { циклический список }
+      { ╤Ж╨╕╨║╨╗╨╕╤З╨╡╤Б╨║╨╕╨╣ ╤Б╨┐╨╕╤Б╨╛╨║ }
     procedure InitFrame; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetPalette: TPalette; virtual;
@@ -137,7 +137,7 @@ type
     {<dialogs.001>}
   TNotepad = class(TDialog)
     Page: array[0..9] of TPage;
-    BookmarkStart: integer; { X-коррдината левой линии закладок }
+    BookmarkStart: integer; { X-╨║╨╛╤А╤А╨┤╨╕╨╜╨░╤В╨░ ╨╗╨╡╨▓╨╛╨╣ ╨╗╨╕╨╜╨╕╨╕ ╨╖╨░╨║╨╗╨░╨┤╨╛╨║ }
     ActivePage: Integer;
     NumPages: Integer;
     constructor Create(var Bounds: TRect; ATitle: TTitleStr;
@@ -459,10 +459,10 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
       MB: TMenuBox;
       C: Word;
     begin
-{ Меню-список открываем поверх строки, совмещая строку
-и соответствующий пункт меню. Меню вставляем в приложение, так
-как если его вставлять в диалог, то в некоторых палитрах цвета
-получаются очень странные.
+{ ╨Ь╨╡╨╜╤О-╤Б╨┐╨╕╤Б╨╛╨║ ╨╛╤В╨║╤А╤Л╨▓╨░╨╡╨╝ ╨┐╨╛╨▓╨╡╤А╤Е ╤Б╤В╤А╨╛╨║╨╕, ╤Б╨╛╨▓╨╝╨╡╤Й╨░╤П ╤Б╤В╤А╨╛╨║╤Г
+╨╕ ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╤Г╤О╤Й╨╕╨╣ ╨┐╤Г╨╜╨║╤В ╨╝╨╡╨╜╤О. ╨Ь╨╡╨╜╤О ╨▓╤Б╤В╨░╨▓╨╗╤П╨╡╨╝ ╨▓ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╡, ╤В╨░╨║
+╨║╨░╨║ ╨╡╤Б╨╗╨╕ ╨╡╨│╨╛ ╨▓╤Б╤В╨░╨▓╨╗╤П╤В╤М ╨▓ ╨┤╨╕╨░╨╗╨╛╨│, ╤В╨╛ ╨▓ ╨╜╨╡╨║╨╛╤В╨╛╤А╤Л╤Е ╨┐╨░╨╗╨╕╤В╤А╨░╤Е ╤Ж╨▓╨╡╤В╨░
+╨┐╨╛╨╗╤Г╤З╨░╤О╤В╤Б╤П ╨╛╤З╨╡╨╜╤М ╤Б╤В╤А╨░╨╜╨╜╤Л╨╡.
 }
     R.Assign(-2,-Selected,0,0);
     MakeGlobal(R.A, R.A);
@@ -488,7 +488,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
   case Event.What of
     evMouseDown:
       begin
-      Select; { Вместо TView.HandleEvent }
+      Select; { ╨Т╨╝╨╡╤Б╤В╨╛ TView.HandleEvent }
       OpenList;
       end;
     evKeyDown:
@@ -513,7 +513,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
           end;
 
 (*
-        kbDown, kbUp: { протез навигации стрелками }
+        kbDown, kbUp: { ╨┐╤А╨╛╤В╨╡╨╖ ╨╜╨░╨▓╨╕╨│╨░╤Ж╨╕╨╕ ╤Б╤В╤А╨╡╨╗╨║╨░╨╝╨╕ }
           begin
           PGroup(Owner).SelectNext(DNKeyCode(Event) = kbUp);
           ClearEvent(Event);
@@ -527,7 +527,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
             OpenList;
       end {case};
   end {case};
-//  inherited HandleEvent делать больше нечего }
+//  inherited HandleEvent ╨┤╨╡╨╗╨░╤В╤М ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡╤З╨╡╨│╨╛ }
   end { TComboBox.HandleEvent };
 
 function TComboBox.DataSize: Integer;
@@ -537,12 +537,12 @@ function TComboBox.DataSize: Integer;
 
 procedure TComboBox.GetData(var Rec);
   begin
-  Word(Rec) := Selected-1; // совместимость с TRadioButtons
+  Word(Rec) := Selected-1; // ╤Б╨╛╨▓╨╝╨╡╤Б╤В╨╕╨╝╨╛╤Б╤В╤М ╤Б TRadioButtons
   end;
 
 procedure TComboBox.SetData(var Rec);
   begin
-  Selected := Word(Rec)+1; // совместимость с TRadioButtons
+  Selected := Word(Rec)+1; // ╤Б╨╛╨▓╨╝╨╡╤Б╤В╨╕╨╝╨╛╤Б╤В╤М ╤Б TRadioButtons
   DrawView;
   end;
 
@@ -554,7 +554,7 @@ constructor TComboBox.Load(var S: TStream);
     P: PString;
   begin
   inherited Load(S);
-  S.Read(Selected, 2*SizeOf(Word)); // включая Count
+  S.Read(Selected, 2*SizeOf(Word)); // ╨▓╨║╨╗╤О╤З╨░╤П Count
   Menu := NewMenu(nil);
   PLastItem := @Menu^.Items;
   for i := 1 to Count do
@@ -575,7 +575,7 @@ procedure TComboBox.Store(var S: TStream);
     i: Integer;
   begin
   inherited Store(S);
-  S.Write(Selected, 2*SizeOf(Selected)); // включая Count
+  S.Write(Selected, 2*SizeOf(Selected)); // ╨▓╨║╨╗╤О╤З╨░╤П Count
   for i := 1 to Count do
     S.WriteStr(Items[i]^.Name);
   end;
@@ -787,14 +787,14 @@ procedure TNotepadFrame.FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Int
 
 const
   FrameC: array[boolean] of record
-       H: Char; // горизонтальная линия
-       C0,  // верхние углы (слева и справа)
-       C1,  // вертикальные линии
-       C2:  // нижние углы
+       H: Char; // ╨│╨╛╤А╨╕╨╖╨╛╨╜╤В╨░╨╗╤М╨╜╨░╤П ╨╗╨╕╨╜╨╕╤П
+       C0,  // ╨▓╨╡╤А╤Е╨╜╨╕╨╡ ╤Г╨│╨╗╤Л (╤Б╨╗╨╡╨▓╨░ ╨╕ ╤Б╨┐╤А╨░╨▓╨░)
+       C1,  // ╨▓╨╡╤А╤В╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ ╨╗╨╕╨╜╨╕╨╕
+       C2:  // ╨╜╨╕╨╢╨╜╨╕╨╡ ╤Г╨│╨╗╤Л
          array[1..2] of char;
        end =
-    ((H: '─'; C0: ('╟', '┤'); C1: ('║', '│'); C2: ('╟', '┘') ),
-     (H: '═'; C0: ('╚', '╗'); C1: (' ', '║'); C2: ('╔', '╝') )
+    ((H: #$C4; C0: (#$C7, #$B4); C1: (#$BA, #$B3); C2: (#$C7, #$D9) ),
+     (H: #$CD; C0: (#$C8, #$BB); C1: (' ', #$BA); C2: (#$C9, #$BC) )
     );
 
 procedure TBookmark.Draw;
@@ -808,9 +808,9 @@ procedure TBookmark.Draw;
   LineColor := Owner.GetColorW(2);
   with FrameC[Light] do
     begin
-    { Снять заусенец на правом верхнем углу верхней неактивной закладки }
+    { ╨б╨╜╤П╤В╤М ╨╖╨░╤Г╤Б╨╡╨╜╨╡╤Ж ╨╜╨░ ╨┐╤А╨░╨▓╨╛╨╝ ╨▓╨╡╤А╤Е╨╜╨╡╨╝ ╤Г╨│╨╗╤Г ╨▓╨╡╤А╤Е╨╜╨╡╨╣ ╨╜╨╡╨░╨║╤В╨╕╨▓╨╜╨╛╨╣ ╨╖╨░╨║╨╗╨░╨┤╨║╨╕ }
     if not Light and (Origin.Y = 1) then
-      C := '┐'
+      C := #$C9
     else
       C := C0[2];
 

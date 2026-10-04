@@ -53,8 +53,8 @@ uses osdep, dnscreen;
 
 var
   ScreenMirror: Pointer;
-   {` Выводимая информаци сравнивается с содержимым, и, если всё совпадает,
-    вывод в консоль не производится. См. Views._vp.ShowBuffer `}
+   {` ╨Т╤Л╨▓╨╛╨┤╨╕╨╝╨░╤П ╨╕╨╜╤Д╨╛╤А╨╝╨░╤Ж╨╕ ╤Б╤А╨░╨▓╨╜╨╕╨▓╨░╨╡╤В╤Б╤П ╤Б ╤Б╨╛╨┤╨╡╤А╨╢╨╕╨╝╤Л╨╝, ╨╕, ╨╡╤Б╨╗╨╕ ╨▓╤Б╤С ╤Б╨╛╨▓╨┐╨░╨┤╨░╨╡╤В,
+    ╨▓╤Л╨▓╨╛╨┤ ╨▓ ╨║╨╛╨╜╤Б╨╛╨╗╤М ╨╜╨╡ ╨┐╤А╨╛╨╕╨╖╨▓╨╛╨┤╨╕╤В╤Б╤П. ╨б╨╝. Views._vp.ShowBuffer `}
 
 procedure DetectVideo;
 
@@ -280,7 +280,7 @@ procedure SetCrtData;
   begin
   GetScreenMode(@SrcSize, True);
 (*
-  {AK155 при SrcSize.Y=300 (w2k, wXP) DN падает}
+  {AK155 ╨┐╤А╨╕ SrcSize.Y=300 (w2k, wXP) DN ╨┐╨░╨┤╨░╨╡╤В}
   if  (SrcSize.Y > 100) or (SrcSize.X*SrcSize.Y*2 > 32768) then
     begin
     SysTVSetScrMode(3);
@@ -356,7 +356,7 @@ function SetVideoMode(Mode: Word): Boolean;
     sm80x60:
       Rows := 60;
     $140A..$FFFE:
-      begin {минимальный размер окна 20x10, меньше просто нет смысла}
+      begin {╨╝╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╤Л╨╣ ╤А╨░╨╖╨╝╨╡╤А ╨╛╨║╨╜╨░ 20x10, ╨╝╨╡╨╜╤М╤И╨╡ ╨┐╤А╨╛╤Б╤В╨╛ ╨╜╨╡╤В ╤Б╨╝╤Л╤Б╨╗╨░}
       Rows := Lo(Mode);
       Cols := Hi(Mode);
       if Rows < 10 then
@@ -366,9 +366,9 @@ function SetVideoMode(Mode: Word): Boolean;
 
 {
 piwamoto: current mode == target mode
-VPSYSD32.SetScreenSize всегда чистит экран при смене видеорежима и делает
-кучу проверок, что тормозит и не нужно нам в случае если размер экрана до
-запуска DN и его рабочий размер совпадают
+VPSYSD32.SetScreenSize ╨▓╤Б╨╡╨│╨┤╨░ ╤З╨╕╤Б╤В╨╕╤В ╤Н╨║╤А╨░╨╜ ╨┐╤А╨╕ ╤Б╨╝╨╡╨╜╨╡ ╨▓╨╕╨┤╨╡╨╛╤А╨╡╨╢╨╕╨╝╨░ ╨╕ ╨┤╨╡╨╗╨░╨╡╤В
+╨║╤Г╤З╤Г ╨┐╤А╨╛╨▓╨╡╤А╨╛╨║, ╤З╤В╨╛ ╤В╨╛╤А╨╝╨╛╨╖╨╕╤В ╨╕ ╨╜╨╡ ╨╜╤Г╨╢╨╜╨╛ ╨╜╨░╨╝ ╨▓ ╤Б╨╗╤Г╤З╨░╨╡ ╨╡╤Б╨╗╨╕ ╤А╨░╨╖╨╝╨╡╤А ╤Н╨║╤А╨░╨╜╨░ ╨┤╨╛
+╨╖╨░╨┐╤Г╤Б╨║╨░ DN ╨╕ ╨╡╨│╨╛ ╤А╨░╨▒╨╛╤З╨╕╨╣ ╤А╨░╨╖╨╝╨╡╤А ╤Б╨╛╨▓╨┐╨░╨┤╨░╤О╤В
 }
   if (Rows = ScreenHeight) and (Cols = ScreenWidth)
     then Exit;
@@ -380,10 +380,10 @@ VPSYSD32.SetScreenSize всегда чистит экран при смене видеорежима и делает
       ScreenHeight := Rows;
       ScreenWidth := Cols;
       ScreenMode := Mode;
-      {AK155 Число видеострок курсора зависит от видеорежима, а в окне - еще и
-от операционки. Но сразу после установки режима курсор прижат к нижнему
-краю знакоместа, так что lo(Drivers.CursorLines) равно максимальному
-номеру видеостроки знака. Это используется при изменениях вида курсора.}
+      {AK155 ╨з╨╕╤Б╨╗╨╛ ╨▓╨╕╨┤╨╡╨╛╤Б╤В╤А╨╛╨║ ╨║╤Г╤А╤Б╨╛╤А╨░ ╨╖╨░╨▓╨╕╤Б╨╕╤В ╨╛╤В ╨▓╨╕╨┤╨╡╨╛╤А╨╡╨╢╨╕╨╝╨░, ╨░ ╨▓ ╨╛╨║╨╜╨╡ - ╨╡╤Й╨╡ ╨╕
+╨╛╤В ╨╛╨┐╨╡╤А╨░╤Ж╨╕╨╛╨╜╨║╨╕. ╨Э╨╛ ╤Б╤А╨░╨╖╤Г ╨┐╨╛╤Б╨╗╨╡ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨║╨╕ ╤А╨╡╨╢╨╕╨╝╨░ ╨║╤Г╤А╤Б╨╛╤А ╨┐╤А╨╕╨╢╨░╤В ╨║ ╨╜╨╕╨╢╨╜╨╡╨╝╤Г
+╨║╤А╨░╤О ╨╖╨╜╨░╨║╨╛╨╝╨╡╤Б╤В╨░, ╤В╨░╨║ ╤З╤В╨╛ lo(Drivers.CursorLines) ╤А╨░╨▓╨╜╨╛ ╨╝╨░╨║╤Б╨╕╨╝╨░╨╗╤М╨╜╨╛╨╝╤Г
+╨╜╨╛╨╝╨╡╤А╤Г ╨▓╨╕╨┤╨╡╨╛╤Б╤В╤А╨╛╨║╨╕ ╨╖╨╜╨░╨║╨░. ╨н╤В╨╛ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨┐╤А╨╕ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╤П╤Е ╨▓╨╕╨┤╨░ ╨║╤Г╤А╤Б╨╛╤А╨░.}
       Drivers.CursorLines := GetCursorSize;
       {/AK155}
       end;
@@ -437,7 +437,7 @@ procedure InitVideo;
 procedure DoneVideo;
   begin
   FillChar(ScreenBuffer^, ScreenWidth*ScreenHeight*2, 0);
-  {JO: нужно, чтобы куски панелей не "линяли" в UserScreen}
+  {JO: ╨╜╤Г╨╢╨╜╨╛, ╤З╤В╨╛╨▒╤Л ╨║╤Г╤Б╨║╨╕ ╨┐╨░╨╜╨╡╨╗╨╡╨╣ ╨╜╨╡ "╨╗╨╕╨╜╤П╨╗╨╕" ╨▓ UserScreen}
   if UserScreen <> nil then
     Move(UserScreen^, ScreenBuffer^, UserScreenSize);
   FreeMem(UserScreen, UserScreenSize); {Cat}
@@ -450,8 +450,8 @@ procedure DoneVideo;
     WordRec(OldCursorPos).Hi := ScreenHeight-1; {KV}
   if WordRec(OldCursorPos).Lo > ScreenWidth-1 then
     WordRec(OldCursorPos).Lo := ScreenWidth-1; {KV}
-  {JO: под OS/2 после смены видеорежима GetCursorXY даёт нулевые координаты}
-  {    как с этим бороться - пока не знаю                                   }
+  {JO: ╨┐╨╛╨┤ OS/2 ╨┐╨╛╤Б╨╗╨╡ ╤Б╨╝╨╡╨╜╤Л ╨▓╨╕╨┤╨╡╨╛╤А╨╡╨╢╨╕╨╝╨░ GetCursorXY ╨┤╨░╤С╤В ╨╜╤Г╨╗╨╡╨▓╤Л╨╡ ╨║╨╛╨╛╤А╨┤╨╕╨╜╨░╤В╤Л}
+  {    ╨║╨░╨║ ╤Б ╤Н╤В╨╕╨╝ ╨▒╨╛╤А╨╛╤В╤М╤Б╤П - ╨┐╨╛╨║╨░ ╨╜╨╡ ╨╖╨╜╨░╤О                                   }
   if OldCursorPos <> 0 then
     MoveCursorTo(WordRec(OldCursorPos).Lo, WordRec(OldCursorPos).Hi);
   {KV}

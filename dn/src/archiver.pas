@@ -69,10 +69,10 @@ type
     Select: Boolean;
     Attr: AWord;
     USize, PSize: Int64;
-      {AK155: размер в архиве - такой, какой он есть,
-        и он может быть большим, даже если текущая плаформа
-        не поддерживает больших файлов. Поэтому тут надо
-        использовать именно Int64, а не TFileSize }
+      {AK155: ╤А╨░╨╖╨╝╨╡╤А ╨▓ ╨░╤А╤Е╨╕╨▓╨╡ - ╤В╨░╨║╨╛╨╣, ╨║╨░╨║╨╛╨╣ ╨╛╨╜ ╨╡╤Б╤В╤М,
+        ╨╕ ╨╛╨╜ ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨▒╨╛╨╗╤М╤И╨╕╨╝, ╨┤╨░╨╢╨╡ ╨╡╤Б╨╗╨╕ ╤В╨╡╨║╤Г╤Й╨░╤П ╨┐╨╗╨░╤Д╨╛╤А╨╝╨░
+        ╨╜╨╡ ╨┐╨╛╨┤╨┤╨╡╤А╨╢╨╕╨▓╨░╨╡╤В ╨▒╨╛╨╗╤М╤И╨╕╤Е ╤Д╨░╨╣╨╗╨╛╨▓. ╨Я╨╛╤Н╤В╨╛╨╝╤Г ╤В╤Г╤В ╨╜╨░╨┤╨╛
+        ╨╕╤Б╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╤М ╨╕╨╝╨╡╨╜╨╜╨╛ Int64, ╨░ ╨╜╨╡ TFileSize }
     Date: LongInt;
     end;
 
@@ -80,7 +80,7 @@ type
   TFInfo = record
     FName: String; {DataCompBoy}
     USize, PSize: Int64;
-      {AK155: см. выше }
+      {AK155: ╤Б╨╝. ╨▓╤Л╤И╨╡ }
     Date: LongInt;
     Attr: Byte;
     Last: Byte;
@@ -264,9 +264,9 @@ procedure MakeArchive(S: String; Files: TCollection;
      MoveMode, AddToExisting: Boolean; Owner: Pointer);
 procedure UnarchiveFiles(const FName: String);
 procedure SkipSFX;
-  {` Устанавливает ArcPos на начало собственно архива.
-  Перед вызовом ArcFile^ должен быть уже открыт и позиционирован
-  на начало. После вызова позиция в ArcFile^ не определена `}
+  {` ╨г╤Б╤В╨░╨╜╨░╨▓╨╗╨╕╨▓╨░╨╡╤В ArcPos ╨╜╨░ ╨╜╨░╤З╨░╨╗╨╛ ╤Б╨╛╨▒╤Б╤В╨▓╨╡╨╜╨╜╨╛ ╨░╤А╤Е╨╕╨▓╨░.
+  ╨Я╨╡╤А╨╡╨┤ ╨▓╤Л╨╖╨╛╨▓╨╛╨╝ ArcFile^ ╨┤╨╛╨╗╨╢╨╡╨╜ ╨▒╤Л╤В╤М ╤Г╨╢╨╡ ╨╛╤В╨║╤А╤Л╤В ╨╕ ╨┐╨╛╨╖╨╕╤Ж╨╕╨╛╨╜╨╕╤А╨╛╨▓╨░╨╜
+  ╨╜╨░ ╨╜╨░╤З╨░╨╗╨╛. ╨Я╨╛╤Б╨╗╨╡ ╨▓╤Л╨╖╨╛╨▓╨░ ╨┐╨╛╨╖╨╕╤Ж╨╕╤П ╨▓ ArcFile^ ╨╜╨╡ ╨╛╨┐╤А╨╡╨┤╨╡╨╗╨╡╨╜╨░ `}
 function _Cardinal(L: LongInt): Real; {piwamoto}
 function FromOct(S: String): TFileSize; {fixed by piwamoto}
 function CheckForSpaces(S: String): Boolean; { Flash }
@@ -283,9 +283,9 @@ uses
   ArcView, FileCopy, HistList, {FStorage,}Menus, ArchDet,
    {UserSavr,}DnIni, Messages,
   {JO}VideoMan, DnExec 
-  {/JO:  добавил для функции ArcExec}
-  , Eraser {JO: для разархивирования через временный подкаталог}
-  , UserMenu {JO: для скрывания панелей при разархивировании }
+  {/JO:  ╨┤╨╛╨▒╨░╨▓╨╕╨╗ ╨┤╨╗╤П ╤Д╤Г╨╜╨║╤Ж╨╕╨╕ ArcExec}
+  , Eraser {JO: ╨┤╨╗╤П ╤А╨░╨╖╨░╤А╤Е╨╕╨▓╨╕╤А╨╛╨▓╨░╨╜╨╕╤П ╤З╨╡╤А╨╡╨╖ ╨▓╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╣ ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│}
+  , UserMenu {JO: ╨┤╨╗╤П ╤Б╨║╤А╤Л╨▓╨░╨╜╨╕╤П ╨┐╨░╨╜╨╡╨╗╨╡╨╣ ╨┐╤А╨╕ ╤А╨░╨╖╨░╤А╤Е╨╕╨▓╨╕╤А╨╛╨▓╨░╨╜╨╕╨╕ }
   , Dos, Drivers, profile, Tree
   , osdep;
 
@@ -607,7 +607,7 @@ function TARJArchive.GetSign: TStr4;
 procedure TARJArchive.GetFile;
   const
 
-    {  побитовые флаги для поля ARJ_Flags заголовка }
+    {  ╨┐╨╛╨▒╨╕╤В╨╛╨▓╤Л╨╡ ╤Д╨╗╨░╨│╨╕ ╨┤╨╗╤П ╨┐╨╛╨╗╤П ARJ_Flags ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨░ }
     GARBLED_FLAG = $01; // indicates passworded file
     OLD_SECURED_FLAG = $02;
     VOLUME_FLAG = $04; // continued file to next volume (file is split)
@@ -770,7 +770,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       begin
       ClrIO;
       {piwamoto.src.begin}
-      {JO:  используем символ #$14 для временного разделения имён файлов}
+      {JO:  ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╨╝ ╤Б╨╕╨╝╨▓╨╛╨╗ #$14 ╨┤╨╗╤П ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛╨│╨╛ ╤А╨░╨╖╨┤╨╡╨╗╨╡╨╜╨╕╤П ╨╕╨╝╤С╨╜ ╤Д╨░╨╣╨╗╨╛╨▓}
       if not ((PF^.Attr and Directory <> 0) and (D.Options and 1 = 0))
       then
         if B then
@@ -789,7 +789,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
         else
           S1 := GetShortRelPath(MakeNormName(SS, SR.SR.Name));
         
-        {JO:  используем символ #$14 для временного разделения имён файлов}
+        {JO:  ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╨╝ ╤Б╨╕╨╝╨▓╨╛╨╗ #$14 ╨┤╨╗╤П ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛╨│╨╛ ╤А╨░╨╖╨┤╨╡╨╗╨╡╨╜╨╕╤П ╨╕╨╝╤С╨╜ ╤Д╨░╨╣╨╗╨╛╨▓}
         if  (SR.SR.Attr and (Directory +VolumeID ) =
              0)
         then
@@ -853,7 +853,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
         S1 := GetShortRelPath(MakeNormName(PF^.Owner^, PF^.FlName[True]))
           
           ;
-      {JO:  используем символ #$14 для временного разделения имён файлов}
+      {JO:  ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╨╝ ╤Б╨╕╨╝╨▓╨╛╨╗ #$14 ╨┤╨╗╤П ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛╨│╨╛ ╤А╨░╨╖╨┤╨╡╨╗╨╡╨╜╨╕╤П ╨╕╨╝╤С╨╜ ╤Д╨░╨╣╨╗╨╛╨▓}
       if PF^.Attr and Directory = 0
       then
         if B then
@@ -866,11 +866,11 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       else if Arc.PutDirs then
         PutDir(S1)
       else {JO}
-        {для пустых каталогов надо обязательно подставлять имя без маски, иначе}
+        {╨┤╨╗╤П ╨┐╤Г╤Б╤В╤Л╤Е ╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓ ╨╜╨░╨┤╨╛ ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨╛ ╨┐╨╛╨┤╤Б╤В╨░╨▓╨╗╤П╤В╤М ╨╕╨╝╤П ╨▒╨╡╨╖ ╨╝╨░╤Б╨║╨╕, ╨╕╨╜╨░╤З╨╡}
         begin
-        {архиваторы их игнорируют; для непустых каталогов такая подстановка приводит}
+        {╨░╤А╤Е╨╕╨▓╨░╤В╨╛╤А╤Л ╨╕╤Е ╨╕╨│╨╜╨╛╤А╨╕╤А╤Г╤О╤В; ╨┤╨╗╤П ╨╜╨╡╨┐╤Г╤Б╤В╤Л╤Е ╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓ ╤В╨░╨║╨░╤П ╨┐╨╛╨┤╤Б╤В╨░╨╜╨╛╨▓╨║╨░ ╨┐╤А╨╕╨▓╨╛╨┤╨╕╤В}
         ClrIO;
-        {с некоторыми архиваторами (ZIP) к тому, что файлы попадают в архив дважды}
+        {╤Б ╨╜╨╡╨║╨╛╤В╨╛╤А╤Л╨╝╨╕ ╨░╤А╤Е╨╕╨▓╨░╤В╨╛╤А╨░╨╝╨╕ (ZIP) ╨║ ╤В╨╛╨╝╤Г, ╤З╤В╨╛ ╤Д╨░╨╣╨╗╤Л ╨┐╨╛╨┐╨░╨┤╨░╤О╤В ╨▓ ╨░╤А╤Е╨╕╨▓ ╨┤╨▓╨░╨╢╨┤╤Л}
         lFindFirst(MakeNormName(S1, x_x), AnyFileDir, SR);
         if IsDummyDir( SR.SR.Name )
         then
@@ -915,8 +915,8 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       end;
     end;
 
-  {JO: ввёл функцию ArcExec по аналогии с TArcDrive.Exec в Arcview для разбора}
-  {    длинной командной строки                                               }
+  {JO: ╨▓╨▓╤С╨╗ ╤Д╤Г╨╜╨║╤Ж╨╕╤О ArcExec ╨┐╨╛ ╨░╨╜╨░╨╗╨╛╨│╨╕╨╕ ╤Б TArcDrive.Exec ╨▓ Arcview ╨┤╨╗╤П ╤А╨░╨╖╨▒╨╛╤А╨░}
+  {    ╨┤╨╗╨╕╨╜╨╜╨╛╨╣ ╨║╨╛╨╝╨░╨╜╨┤╨╜╨╛╨╣ ╤Б╤В╤А╨╛╨║╨╕                                               }
   function ArcExec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
     var
       S: String;
@@ -947,12 +947,12 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       Msg(dlArcMsg8, @L, mfOKButton or mfError);
       end;
 
-    {AK155 20/12/2001 Если под Win32 пытаться в отладчике прошагать
-  эту функцию, то получается полная блокировка клавиатуры и мыши
-  сразу на входе (даже с begin сойти не получается).
-  Этот эффект исчезает, если параметр AnsiString заменить на String.
-  Под OS/2 все шагается без проблем. Интересно, чей это глюк -
-  виндового отладчика или виндовой RTL? Хорошо, если первое. }
+    {AK155 20/12/2001 ╨Х╤Б╨╗╨╕ ╨┐╨╛╨┤ Win32 ╨┐╤Л╤В╨░╤В╤М╤Б╤П ╨▓ ╨╛╤В╨╗╨░╨┤╤З╨╕╨║╨╡ ╨┐╤А╨╛╤И╨░╨│╨░╤В╤М
+  ╤Н╤В╤Г ╤Д╤Г╨╜╨║╤Ж╨╕╤О, ╤В╨╛ ╨┐╨╛╨╗╤Г╤З╨░╨╡╤В╤Б╤П ╨┐╨╛╨╗╨╜╨░╤П ╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨║╨░ ╨║╨╗╨░╨▓╨╕╨░╤В╤Г╤А╤Л ╨╕ ╨╝╤Л╤И╨╕
+  ╤Б╤А╨░╨╖╤Г ╨╜╨░ ╨▓╤Е╨╛╨┤╨╡ (╨┤╨░╨╢╨╡ ╤Б begin ╤Б╨╛╨╣╤В╨╕ ╨╜╨╡ ╨┐╨╛╨╗╤Г╤З╨░╨╡╤В╤Б╤П).
+  ╨н╤В╨╛╤В ╤Н╤Д╤Д╨╡╨║╤В ╨╕╤Б╤З╨╡╨╖╨░╨╡╤В, ╨╡╤Б╨╗╨╕ ╨┐╨░╤А╨░╨╝╨╡╤В╤А AnsiString ╨╖╨░╨╝╨╡╨╜╨╕╤В╤М ╨╜╨░ String.
+  ╨Я╨╛╨┤ OS/2 ╨▓╤Б╨╡ ╤И╨░╨│╨░╨╡╤В╤Б╤П ╨▒╨╡╨╖ ╨┐╤А╨╛╨▒╨╗╨╡╨╝. ╨Ш╨╜╤В╨╡╤А╨╡╤Б╨╜╨╛, ╤З╨╡╨╣ ╤Н╤В╨╛ ╨│╨╗╤О╨║ -
+  ╨▓╨╕╨╜╨┤╨╛╨▓╨╛╨│╨╛ ╨╛╤В╨╗╨░╨┤╤З╨╕╨║╨░ ╨╕╨╗╨╕ ╨▓╨╕╨╜╨┤╨╛╨▓╨╛╨╣ RTL? ╨е╨╛╤А╨╛╤И╨╛, ╨╡╤Б╨╗╨╕ ╨┐╨╡╤А╨▓╨╛╨╡. }
     begin { ArcExec }
     ArcExec := True;
     S := Prg+' '+Cmd;
@@ -964,7 +964,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
         CmdLineLim := 120;
         ListLineLim := CmdLineLim-Length(Prg+Cmd)-7;
         CmdLineOK := False;
-        SS1 := Lst; {для перестраховки}
+        SS1 := Lst; {╨┤╨╗╤П ╨┐╨╡╤А╨╡╤Б╤В╤А╨░╤Е╨╛╨▓╨║╨╕}
         I1 := 1;
         repeat
           ClrIO;
@@ -999,7 +999,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
             end;
           for J := 1 to Length(SS1) do
             if SS1[J] = #$14 then
-              SS1[J] := #$20; {JO: заменяем временный символ на пробелы}
+              SS1[J] := #$20; {JO: ╨╖╨░╨╝╨╡╨╜╤П╨╡╨╝ ╨▓╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╣ ╤Б╨╕╨╝╨▓╨╛╨╗ ╨╜╨░ ╨┐╤А╨╛╨▒╨╡╨╗╤Л}
           Writeln(T.T, '@'+S+' '+SS1);
         until CmdLineOK;
         Write(T.T, '@del '+EX);
@@ -1016,27 +1016,27 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
     DoneSysError;
     DoneEvents;
     DoneVideo;
-    {AK155 Под OS/2, во-первых, PATH обычно не умещается
-      в 255 символов, во-вторых, нет проблем с памятью,
-      в третьих архиватор может оказаться ДОСовым.
-      Так что пускай PATH просматривает cmd.exe, а мы не
-      будем заниматься самодеятельностью }
-    {AK155, дописано позже, чем комментарий к OS/2.
-      Под Win32 тоже не следует заниматься самодеятельностью.
-      Во-первых, мы отдаем консоль в каком-то не таком состоянии,
-      так что консольный rar не может вводить с клавиатуры.
-      Во-вторых, стОило ли работать с ansistring, чтобы потом вызвать
+    {AK155 ╨Я╨╛╨┤ OS/2, ╨▓╨╛-╨┐╨╡╤А╨▓╤Л╤Е, PATH ╨╛╨▒╤Л╤З╨╜╨╛ ╨╜╨╡ ╤Г╨╝╨╡╤Й╨░╨╡╤В╤Б╤П
+      ╨▓ 255 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓, ╨▓╨╛-╨▓╤В╨╛╤А╤Л╤Е, ╨╜╨╡╤В ╨┐╤А╨╛╨▒╨╗╨╡╨╝ ╤Б ╨┐╨░╨╝╤П╤В╤М╤О,
+      ╨▓ ╤В╤А╨╡╤В╤М╨╕╤Е ╨░╤А╤Е╨╕╨▓╨░╤В╨╛╤А ╨╝╨╛╨╢╨╡╤В ╨╛╨║╨░╨╖╨░╤В╤М╤Б╤П ╨Ф╨Ю╨б╨╛╨▓╤Л╨╝.
+      ╨в╨░╨║ ╤З╤В╨╛ ╨┐╤Г╤Б╨║╨░╨╣ PATH ╨┐╤А╨╛╤Б╨╝╨░╤В╤А╨╕╨▓╨░╨╡╤В cmd.exe, ╨░ ╨╝╤Л ╨╜╨╡
+      ╨▒╤Г╨┤╨╡╨╝ ╨╖╨░╨╜╨╕╨╝╨░╤В╤М╤Б╤П ╤Б╨░╨╝╨╛╨┤╨╡╤П╤В╨╡╨╗╤М╨╜╨╛╤Б╤В╤М╤О }
+    {AK155, ╨┤╨╛╨┐╨╕╤Б╨░╨╜╨╛ ╨┐╨╛╨╖╨╢╨╡, ╤З╨╡╨╝ ╨║╨╛╨╝╨╝╨╡╨╜╤В╨░╤А╨╕╨╣ ╨║ OS/2.
+      ╨Я╨╛╨┤ Win32 ╤В╨╛╨╢╨╡ ╨╜╨╡ ╤Б╨╗╨╡╨┤╤Г╨╡╤В ╨╖╨░╨╜╨╕╨╝╨░╤В╤М╤Б╤П ╤Б╨░╨╝╨╛╨┤╨╡╤П╤В╨╡╨╗╤М╨╜╨╛╤Б╤В╤М╤О.
+      ╨Т╨╛-╨┐╨╡╤А╨▓╤Л╤Е, ╨╝╤Л ╨╛╤В╨┤╨░╨╡╨╝ ╨║╨╛╨╜╤Б╨╛╨╗╤М ╨▓ ╨║╨░╨║╨╛╨╝-╤В╨╛ ╨╜╨╡ ╤В╨░╨║╨╛╨╝ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╕,
+      ╤В╨░╨║ ╤З╤В╨╛ ╨║╨╛╨╜╤Б╨╛╨╗╤М╨╜╤Л╨╣ rar ╨╜╨╡ ╨╝╨╛╨╢╨╡╤В ╨▓╨▓╨╛╨┤╨╕╤В╤М ╤Б ╨║╨╗╨░╨▓╨╕╨░╤В╤Г╤А╤Л.
+      ╨Т╨╛-╨▓╤В╨╛╤А╤Л╤Е, ╤Б╤В╨Ю╨╕╨╗╨╛ ╨╗╨╕ ╤А╨░╨▒╨╛╤В╨░╤В╤М ╤Б ansistring, ╤З╤В╨╛╨▒╤Л ╨┐╨╛╤В╨╛╨╝ ╨▓╤Л╨╖╨▓╨░╤В╤М
       Dos.Exec?}
     if B then
       begin
-      {JO: разбираем ту часть командной строки, которая содержит список файлов    }
-      {    на куски удобоваримой для командного процессора длины                  }
+      {JO: ╤А╨░╨╖╨▒╨╕╤А╨░╨╡╨╝ ╤В╤Г ╤З╨░╤Б╤В╤М ╨║╨╛╨╝╨░╨╜╨┤╨╜╨╛╨╣ ╤Б╤В╤А╨╛╨║╨╕, ╨║╨╛╤В╨╛╤А╨░╤П ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В ╤Б╨┐╨╕╤Б╨╛╨║ ╤Д╨░╨╣╨╗╨╛╨▓    }
+      {    ╨╜╨░ ╨║╤Г╤Б╨║╨╕ ╤Г╨┤╨╛╨▒╨╛╨▓╨░╤А╨╕╨╝╨╛╨╣ ╨┤╨╗╤П ╨║╨╛╨╝╨░╨╜╨┤╨╜╨╛╨│╨╛ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А╨░ ╨┤╨╗╨╕╨╜╤Л                  }
       
       CmdLineLim := 95;
       
       ListLineLim := CmdLineLim-Length(Prg+Cmd)-7;
       CmdLineOK := False;
-      SS1 := Lst; {для перестраховки}
+      SS1 := Lst; {╨┤╨╗╤П ╨┐╨╡╤А╨╡╤Б╤В╤А╨░╤Е╨╛╨▓╨║╨╕}
       repeat
         if Length(Lst) >= ListLineLim then
           begin
@@ -1055,12 +1055,12 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
           end;
         for J := 1 to Length(SS1) do
           if SS1[J] = #$14 then
-            SS1[J] := #$20; {JO: заменяем временный символ на пробелы}
+            SS1[J] := #$20; {JO: ╨╖╨░╨╝╨╡╨╜╤П╨╡╨╝ ╨▓╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╣ ╤Б╨╕╨╝╨▓╨╛╨╗ ╨╜╨░ ╨┐╤А╨╛╨▒╨╡╨╗╤Л}
         DelDoubles('  ', S);
         AnsiDelDoubles('  ', SS1);
-        {JO: AnsiExec - процедура из модуля DNExec , которая }
-        {    используется вместо DOS.Exec и в качестве       }
-        {    коммандлайна использует строку типа Ansistring  }
+        {JO: AnsiExec - ╨┐╤А╨╛╤Ж╨╡╨┤╤Г╤А╨░ ╨╕╨╖ ╨╝╨╛╨┤╤Г╨╗╤П DNExec , ╨║╨╛╤В╨╛╤А╨░╤П }
+        {    ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П ╨▓╨╝╨╡╤Б╤В╨╛ DOS.Exec ╨╕ ╨▓ ╨║╨░╤З╨╡╤Б╤В╨▓╨╡       }
+        {    ╨║╨╛╨╝╨╝╨░╨╜╨┤╨╗╨░╨╣╨╜╨░ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В ╤Б╤В╤А╨╛╨║╤Г ╤В╨╕╨┐╨░ Ansistring  }
         SwapVectors;
         AnsiExec(GetEnv('COMSPEC'), '/c '+S+' '+SS1+' ');
         DE := DosError;
@@ -1090,9 +1090,9 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       else {case}
         StdMsg8;
     end {case};
-//JO: подсовываем в качестве InfoPtr заведомо несуществующий путь
-//    из одного символа #22, чтобы не перечитывались панели производные
-//    от TFindDrive, т.к. в них после этой процедуры ничего не изменится
+//JO: ╨┐╨╛╨┤╤Б╨╛╨▓╤Л╨▓╨░╨╡╨╝ ╨▓ ╨║╨░╤З╨╡╤Б╤В╨▓╨╡ InfoPtr ╨╖╨░╨▓╨╡╨┤╨╛╨╝╨╛ ╨╜╨╡╤Б╤Г╤Й╨╡╤Б╤В╨▓╤Г╤О╤Й╨╕╨╣ ╨┐╤Г╤В╤М
+//    ╨╕╨╖ ╨╛╨┤╨╜╨╛╨│╨╛ ╤Б╨╕╨╝╨▓╨╛╨╗╨░ #22, ╤З╤В╨╛╨▒╤Л ╨╜╨╡ ╨┐╨╡╤А╨╡╤З╨╕╤В╤Л╨▓╨░╨╗╨╕╤Б╤М ╨┐╨░╨╜╨╡╨╗╨╕ ╨┐╤А╨╛╨╕╨╖╨▓╨╛╨┤╨╜╤Л╨╡
+//    ╨╛╤В TFindDrive, ╤В.╨║. ╨▓ ╨╜╨╕╤Е ╨┐╨╛╤Б╨╗╨╡ ╤Н╤В╨╛╨╣ ╨┐╤А╨╛╤Ж╨╡╨┤╤Г╤А╤Л ╨╜╨╕╤З╨╡╨│╨╛ ╨╜╨╡ ╨╕╨╖╨╝╨╡╨╜╨╕╤В╤Б╤П
     GlobalMessage(evCommand, cmPanelReread, @NotAPath);
     GlobalMessage(evCommand, cmRereadInfo, nil);
     
@@ -1299,14 +1299,14 @@ procedure UnarchiveFiles(const FName: String);
   if  (Length(DT.S) > 3) and (DT.S[Length(DT.S)] <> '\') then
     DT.S := DT.S+'\';
   {JO}
-  // пpовеpяем, находится ли диск в списке дисков, на котоpые надо
-  // pазаpхивиpовать не чеpез вpеменный подкаталог (по умолчанию A: и B:)
+  // ╨┐p╨╛╨▓╨╡p╤П╨╡╨╝, ╨╜╨░╤Е╨╛╨┤╨╕╤В╤Б╤П ╨╗╨╕ ╨┤╨╕╤Б╨║ ╨▓ ╤Б╨┐╨╕╤Б╨║╨╡ ╨┤╨╕╤Б╨║╨╛╨▓, ╨╜╨░ ╨║╨╛╤В╨╛p╤Л╨╡ ╨╜╨░╨┤╨╛
+  // p╨░╨╖╨░p╤Е╨╕╨▓╨╕p╨╛╨▓╨░╤В╤М ╨╜╨╡ ╤З╨╡p╨╡╨╖ ╨▓p╨╡╨╝╨╡╨╜╨╜╤Л╨╣ ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│ (╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О A: ╨╕ B:)
   if  (DT.S <> '') and (Length(DT.S) >= 2) then
     begin
     if DT.S[2] = ':' then
       DDr := UpCase(DT.S[1])
     else
-      DDr := #1; {любой символ не входящий в 'A'..'Z'}
+      DDr := #1; {╨╗╤О╨▒╨╛╨╣ ╤Б╨╕╨╝╨▓╨╛╨╗ ╨╜╨╡ ╨▓╤Е╨╛╨┤╤П╤Й╨╕╨╣ ╨▓ 'A'..'Z'}
     end
   else
     begin
@@ -1342,7 +1342,7 @@ TryAgain:
     ExtrDir := ExtrDir+'\';
 
   {JO}
-  // проверяем, содержит ли каталог назначения файлы
+  // ╨┐╤А╨╛╨▓╨╡╤А╤П╨╡╨╝, ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В ╨╗╨╕ ╨║╨░╤В╨░╨╗╨╛╨│ ╨╜╨░╨╖╨╜╨░╤З╨╡╨╜╨╕╤П ╤Д╨░╨╣╨╗╤Л
   DosError := 0;
   lFindFirst(MakeNormName(ExtrDir, x_x), AnyFileDir, SR); {JO}
   if IsDummyDir(SR.FullName) then
@@ -1350,8 +1350,8 @@ TryAgain:
   if IsDummyDir(SR.FullName) then
     lFindNext(SR);
   lFindClose(SR);
-  // для разархивирования на дискеты и тестирования не используем
-  // временный подкаталог
+  // ╨┤╨╗╤П ╤А╨░╨╖╨░╤А╤Е╨╕╨▓╨╕╤А╨╛╨▓╨░╨╜╨╕╤П ╨╜╨░ ╨┤╨╕╤Б╨║╨╡╤В╤Л ╨╕ ╤В╨╡╤Б╤В╨╕╤А╨╛╨▓╨░╨╜╨╕╤П ╨╜╨╡ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╨╝
+  // ╨▓╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╣ ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│
   if  ( (DT.W and 8) = 0) or ((DT.W and 2) <> 0) or (DosError <> 0) then
     begin
     TempExtrDir := ExtrDir;
@@ -1359,7 +1359,7 @@ TryAgain:
     end
   else
     begin
-    { даём имя временному подкаталогу в каталоге назначения}
+    { ╨┤╨░╤С╨╝ ╨╕╨╝╤П ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛╨╝╤Г ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│╤Г ╨▓ ╨║╨░╤В╨░╨╗╨╛╨│╨╡ ╨╜╨░╨╖╨╜╨░╤З╨╡╨╜╨╕╤П}
     DNN := DNNumber;
     while True do
       begin
@@ -1375,8 +1375,8 @@ TryAgain:
     end;
   Inhr := CreateDirInheritance(ExtrDir, True);
   CreateDirInheritance(TempExtrDir, False);
-  //JO: если каталог назначения не создался (напpимеp, если диск доступен
-  //    только на чтение), то нет смысла и вызывать аpхиватоp
+  //JO: ╨╡╤Б╨╗╨╕ ╨║╨░╤В╨░╨╗╨╛╨│ ╨╜╨░╨╖╨╜╨░╤З╨╡╨╜╨╕╤П ╨╜╨╡ ╤Б╨╛╨╖╨┤╨░╨╗╤Б╤П (╨╜╨░╨┐p╨╕╨╝╨╡p, ╨╡╤Б╨╗╨╕ ╨┤╨╕╤Б╨║ ╨┤╨╛╤Б╤В╤Г╨┐╨╡╨╜
+  //    ╤В╨╛╨╗╤М╨║╨╛ ╨╜╨░ ╤З╤В╨╡╨╜╨╕╨╡), ╤В╨╛ ╨╜╨╡╤В ╤Б╨╝╤Л╤Б╨╗╨░ ╨╕ ╨▓╤Л╨╖╤Л╨▓╨░╤В╤М ╨░p╤Е╨╕╨▓╨░╤В╨╛p
   if not PathExist(TempExtrDir) then
     Exit;
   {/JO}
@@ -1446,8 +1446,8 @@ TryAgain:
     ExecStringRR(S, '', False);
     end
   else
-//JO: поскольку в DPMI32 веpсии ExecStringRR выполняется
-//    с выгpузкой DN/2, то вместо неё делаем AnsiExec
+//JO: ╨┐╨╛╤Б╨║╨╛╨╗╤М╨║╤Г ╨▓ DPMI32 ╨▓╨╡p╤Б╨╕╨╕ ExecStringRR ╨▓╤Л╨┐╨╛╨╗╨╜╤П╨╡╤В╤Б╤П
+//    ╤Б ╨▓╤Л╨│p╤Г╨╖╨║╨╛╨╣ DN/2, ╤В╨╛ ╨▓╨╝╨╡╤Б╤В╨╛ ╨╜╨╡╤С ╨┤╨╡╨╗╨░╨╡╨╝ AnsiExec
     begin
     DoneSysError;
     DoneEvents;
@@ -1467,12 +1467,12 @@ TryAgain:
     goto ex
   else
     begin
-    { перекидываем файлы из временного подкаталога в каталог назначения}
+    { ╨┐╨╡╤А╨╡╨║╨╕╨┤╤Л╨▓╨░╨╡╨╝ ╤Д╨░╨╣╨╗╤Л ╨╕╨╖ ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛╨│╨╛ ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨▓ ╨║╨░╤В╨░╨╗╨╛╨│ ╨╜╨░╨╖╨╜╨░╤З╨╡╨╜╨╕╤П}
     PV := TUserWindow.Create;
     Desktop.Insert(PV);
     CopyDirContent(TempExtrDir, ExtrDir, True, (DT.W and 4 <> 0));
     PV.Free;
-    { удаляем временный каталог со всем, что в нём осталось}
+    { ╤Г╨┤╨░╨╗╤П╨╡╨╝ ╨▓╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ ╤Б╨╛ ╨▓╤Б╨╡╨╝, ╤З╤В╨╛ ╨▓ ╨╜╤С╨╝ ╨╛╤Б╤В╨░╨╗╨╛╤Б╤М}
     SetLength(TempExtrDir, Length(TempExtrDir)-1);
     S := GetPath(TempExtrDir);
     FRT := NewFileRec(GetName(TempExtrDir),
@@ -1486,7 +1486,7 @@ TryAgain:
     OldConfirms := Confirms;
     Confirms := 0;
     LFN.lChDir(S);
-     {освобождаем каталог}
+     {╨╛╤Б╨▓╨╛╨▒╨╛╨╢╨┤╨░╨╡╨╝ ╨║╨░╤В╨░╨╗╨╛╨│}
     if ActiveDir[2] = ':' then
       ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
     
@@ -1505,7 +1505,7 @@ ex:
   AType.Free; AType := nil;
   if  (not TempDirUsed) or (Inhr > 0) then
     begin
-    ExtrDir := '>' + ExtrDir; //признак перечитывания подкаталогов в ветви
+    ExtrDir := '>' + ExtrDir; //╨┐╤А╨╕╨╖╨╜╨░╨║ ╨┐╨╡╤А╨╡╤З╨╕╤В╤Л╨▓╨░╨╜╨╕╤П ╨┐╨╛╨┤╨║╨░╤В╨░╨╗╨╛╨│╨╛╨▓ ╨▓ ╨▓╨╡╤В╨▓╨╕
     GlobalMessage(evCommand, cmPanelReread, @ExtrDir);
     GlobalMessage(evCommand, cmRereadInfo, nil);
     end;

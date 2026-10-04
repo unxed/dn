@@ -58,7 +58,7 @@ uses
 
 type
   MyApp = class(TDNApplication)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: ╤Н╤В╨╛╤В ╨╛╨▒╤К╨╡╨║╤В ╨▓╤Л╨╜╨╡╤Б╨╡╨╜ ╨▓ ╨┐╨╗╨░╨│╨╕╨╜╨╜╤Г╤О ╨╝╨╛╨┤╨╡╨╗╤М; ╨╕╨╖╨╝╨╡╨╜╤П╤В╤М ╨║╤А╨░╨╣╨╜╨╡ ╨╛╤Б╤В╨╛╤А╨╛╨╢╨╜╨╛!}
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure GetEvent(var Event: TEvent); virtual;
     procedure Idle; virtual;
@@ -255,7 +255,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         cmNavyLinkSetup,
         cmQuit:
           HandleCommand(Event);
-        {Cat: проверяем, не пора ли запускать плагины - EventCatcher-ы}
+        {Cat: ╨┐╤А╨╛╨▓╨╡╤А╤П╨╡╨╝, ╨╜╨╡ ╨┐╨╛╤А╨░ ╨╗╨╕ ╨╖╨░╨┐╤Г╤Б╨║╨░╤В╤М ╨┐╨╗╨░╨│╨╕╨╜╤Л - EventCatcher-╤Л}
         
         {/Cat}
       end {case};

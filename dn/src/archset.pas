@@ -132,7 +132,7 @@ procedure SetupArchive(ArchCommand: Word);
       {/JO}
       
       UseLFN: Word; {Checkbox}
-      {≠„¶•≠ ¢ DOS ® W32-¢•‡·®ÔÂ}
+      {–Ω—É–∂–µ–Ω –≤ DOS –∏ W32-–≤–µ—Ä—Å–∏—è—Ö}
       
       end;
 
