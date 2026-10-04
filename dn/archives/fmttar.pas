@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PTARArchive = ^TTARArchive;
-  TTARArchive = object(TARJArchive)
-    constructor Init;
+  TTARArchive = class;
+  PTARArchive = TTARArchive;
+  TTARArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -111,7 +112,7 @@ implementation
 
 { ----------------------------- TAR ------------------------------------}
 
-constructor TTARArchive.Init;
+constructor TTARArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -120,7 +121,7 @@ constructor TTARArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'TAR'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'TAR'));
@@ -188,13 +189,13 @@ procedure TTARArchive.GetFile;
     DT: DateTime;
     W: AWord;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if ArcFile.GetPos = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit
     end;
-  ArcFile^.Read(Buffer, BlkSize);
-  if ArcFile^.Status <> stOK then
+  ArcFile.Read(Buffer, BlkSize);
+  if ArcFile.Status <> stOK then
     begin
     FileInfo.Last := 2;
     Exit
@@ -216,11 +217,11 @@ procedure TTARArchive.GetFile;
      DT.Min, DT.Sec);
   PackTime(DT, FileInfo.Date);
 (*
-  ArcFile^.Seek(ArcFile^.GetPos+
+  ArcFile.Seek(ArcFile.GetPos+
      (Trunc((FileInfo.PSize+BlkSize-1) / BlkSize)*BlkSize));
 *)
   W := Word(CompRec(FileInfo.PSize).Lo) and (BlkSize-1);
-  ArcFile^.Seek(CompToFSize(ArcFile^.GetPos + FileInfo.PSize -
+  ArcFile.Seek(CompToFSize(ArcFile.GetPos + FileInfo.PSize -
                             W + BlkSize*Byte(W<>0)));
   end { TTARArchive.GetFile };
 

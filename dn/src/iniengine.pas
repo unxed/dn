@@ -137,9 +137,10 @@ type
     Parameter: PChar;
     end;
 
-  PIniErrors = ^TIniErrors;
-  TIniErrors = object(TCollection)
-    procedure FreeItem(Item: Pointer); virtual;
+  TIniErrors = class;
+  PIniErrors = TIniErrors;
+  TIniErrors = class(TCollection)
+    procedure FreeItem(Item: Pointer); override;
     end;
 
 const
@@ -157,12 +158,12 @@ procedure AddIniError(Size: Byte; Group: PChar; Parameter: PChar);
     p: PIniError;
   begin
   if IniErrors = nil then
-    IniErrors := New(PIniErrors, Init(1, 1));
+    IniErrors := PIniErrors.Create(1, 1);
   New(p);
   p^.Size := Size;
   p^.Group := Group;
   p^.Parameter := Parameter;
-  IniErrors^.Insert(p);
+  IniErrors.Insert(p);
   end;
 
 procedure ShowIniErrors;
@@ -209,7 +210,7 @@ procedure ShowIniErrors;
   begin { ShowIniErrors }
   if IniErrors <> nil then
     begin
-    IniErrors^.ForEach(Show);
+    IniErrors.ForEach(Show);
     ClearIniErrors;
     end;
   end { ShowIniErrors };
@@ -218,8 +219,8 @@ procedure ClearIniErrors;
   begin
   if IniErrors <> nil then
     begin
-    IniErrors^.FreeAll;
-    Dispose(IniErrors, Done);
+    IniErrors.FreeAll;
+    IniErrors.Free;
     IniErrors := nil;
     end;
   end;
@@ -711,10 +712,10 @@ procedure WriteIniCache(INItime, INIsize: LongInt);
   if INIModified then
     begin
     INIModified := False;
-    S.Init(SourceDir+'dn.cbc', stCreate, 8192);
+    S := TBufStream.Create(SourceDir+'dn.cbc', stCreate, 8192);
     if S.Status <> stOK then
       begin
-      S.Done;
+      S.Free;
       Exit;
       end;
     S.Write(IniCacheSign, SizeOf(IniCacheSign));
@@ -722,7 +723,7 @@ procedure WriteIniCache(INItime, INIsize: LongInt);
     S.Write(INIsize, SizeOf(INIsize));
     S.Write(iniparamblock_START,
          Ofs(iniparamblock_END)-Ofs(iniparamblock_START));
-    S.Done;
+    S.Free;
     end;
   end;
 
@@ -733,29 +734,29 @@ function ReadIniCache(INItime, INIsize: LongInt): Boolean;
     Sign: array[1..60] of Char;
   begin
   Result := False;
-  S.Init(SourceDir+'dn.cbc', stOpenRead, 8192);
+  S := TBufStream.Create(SourceDir+'dn.cbc', stOpenRead, 8192);
   if  (S.Status <> stOK) or (S.GetSize = 0) then
     begin
-    S.Done;
+    S.Free;
     Exit;
     end;
   S.Read(Sign, SizeOf(Sign));
-  if Sign <> IniCacheSign then begin S.Done; Exit; end;
+  if Sign <> IniCacheSign then begin S.Free; Exit; end;
   S.Read(I, SizeOf(I));
-  if I <> INItime then begin S.Done; Exit; end;
+  if I <> INItime then begin S.Free; Exit; end;
   S.Read(I, SizeOf(I));
-  if I <> INIsize then begin S.Done; Exit; end;
+  if I <> INIsize then begin S.Free; Exit; end;
   if (S.GetSize - S.GetPos) <>
       (Ofs(iniparamblock_END)-Ofs(iniparamblock_START)) then
     begin
-    S.Done;
+    S.Free;
     Exit;
     end;
   S.Read(iniparamblock_START,
          Ofs(iniparamblock_END)-Ofs(iniparamblock_START));
   if S.Status = stOK then
     Result := True;
-  S.Done;
+  S.Free;
   end;
 {/JO}
 end.

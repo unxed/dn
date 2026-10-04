@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PACEArchive = ^TACEArchive;
-  TACEArchive = object(TARJArchive)
-    constructor Init;
+  TACEArchive = class;
+  PACEArchive = TACEArchive;
+  TACEArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -97,7 +98,7 @@ var
 implementation
 { ---------------------------------- ACE --------------------------------- }
 
-constructor TACEArchive.Init;
+constructor TACEArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -106,7 +107,7 @@ constructor TACEArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ACE'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ACE'));
@@ -180,14 +181,14 @@ procedure TACEArchive.GetFile;
     C: Char;
   begin
 1:
-  FP := ArcFile^.GetPos;
-  if  (FP = ArcFile^.GetSize) then
+  FP := ArcFile.GetPos;
+  if  (FP = ArcFile.GetSize) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P, 15);{HeadCRC..OriginSize}
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P, 15);{HeadCRC..OriginSize}
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -195,7 +196,7 @@ procedure TACEArchive.GetFile;
   if (P.HeadType <> 1) and
      (P.HeadType <> 3) then
     begin {it's not a file}
-      ArcFile^.Seek(FP + P.HeadSize +
+      ArcFile.Seek(FP + P.HeadSize +
                     (P.PackedSize)*Byte(P.HeadFlags and 1) + 4);
       goto 1;
     end;
@@ -204,12 +205,12 @@ procedure TACEArchive.GetFile;
   if P.HeadType = 3 then
     begin
     CompRec(FileInfo.PSize).Hi := P.OriginSize;
-    ArcFile^.Read(FileInfo.USize, 8);
+    ArcFile.Read(FileInfo.USize, 8);
     end;
-  ArcFile^.Read(P.DateTime, 20);{DateTime..NameLen}
+  ArcFile.Read(P.DateTime, 20);{DateTime..NameLen}
   FileInfo.FName := '';
   repeat
-    ArcFile^.Read(C, 1);
+    ArcFile.Read(C, 1);
     Dec(P.NameLen);
     FileInfo.FName := FileInfo.FName+C;
   until P.NameLen = 0;
@@ -218,7 +219,7 @@ procedure TACEArchive.GetFile;
   FileInfo.Attr := Byte(P.Attr and not Hidden);
   if  (P.HeadFlags and $4000) <> 0 then
     FileInfo.Attr := FileInfo.Attr or Hidden;
-  ArcFile^.Seek(CompToFSize(FP + P.HeadSize + FileInfo.PSize + 4));
+  ArcFile.Seek(CompToFSize(FP + P.HeadSize + FileInfo.PSize + 4));
   end { TACEArchive.GetFile };
 
 end.

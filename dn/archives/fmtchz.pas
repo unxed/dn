@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PCHZArchive = ^TCHZArchive;
-  TCHZArchive = object(TARJArchive)
-    constructor Init;
+  TCHZArchive = class;
+  PCHZArchive = TCHZArchive;
+  TCHZArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -77,7 +78,7 @@ implementation
 
 { ----------------------------- CHZ ------------------------------------}
 
-constructor TCHZArchive.Init;
+constructor TCHZArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -86,7 +87,7 @@ constructor TCHZArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'CHARC'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'CHARC'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-E'));
@@ -157,14 +158,14 @@ procedure TCHZArchive.GetFile;
   label 1;
   begin
 1:
-  FP := ArcFile^.GetPos;
-  if FP = ArcFile^.GetSize then
+  FP := ArcFile.GetPos;
+  if FP = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P, 4);
-  if  (ArcFile^.Status <> stOK) or (Copy(P.Id, 1, 3) <> 'SCh')
+  ArcFile.Read(P, 4);
+  if  (ArcFile.Status <> stOK) or (Copy(P.Id, 1, 3) <> 'SCh')
   then
     begin
     FileInfo.Last := 2;
@@ -172,9 +173,9 @@ procedure TCHZArchive.GetFile;
     end;
   if P.Id[4] = 'D' then
     begin
-    ArcFile^.Seek(FP+9);
-    ArcFile^.Read(S[0], 1);
-    ArcFile^.Read(S[1], Length(S));
+    ArcFile.Seek(FP+9);
+    ArcFile.Read(S[0], 1);
+    ArcFile.Read(S[1], Length(S));
     CDir := CDir+S+'\';
     goto 1;
     end
@@ -188,8 +189,8 @@ procedure TCHZArchive.GetFile;
       end;
     goto 1;
     end;
-  ArcFile^.Read(P.PackedSize, SizeOf(P)-4);
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P.PackedSize, SizeOf(P)-4);
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -203,9 +204,9 @@ procedure TCHZArchive.GetFile;
   if P.NameLen > 255 then
     P.NameLen := 255;
   FileInfo.FName[0] := Char(P.NameLen);
-  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
+  ArcFile.Read(FileInfo.FName[1], P.NameLen);
   FileInfo.FName := CDir+FileInfo.FName;
-  ArcFile^.Seek(FP+P.PackedSize);
+  ArcFile.Seek(FP+P.PackedSize);
   end { TCHZArchive.GetFile };
 
 end.

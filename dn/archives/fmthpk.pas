@@ -55,9 +55,10 @@ uses
   ;
 
 type
-  PHPKArchive = ^THPKArchive;
-  THPKArchive = object(TARJArchive)
-    constructor Init;
+  THPKArchive = class;
+  PHPKArchive = THPKArchive;
+  THPKArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -72,9 +73,10 @@ type
     Name: PString;
     end;
 
-  PHPKCollection = ^THPKCollection;
-  THPKCollection = object(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
+  THPKCollection = class;
+  PHPKCollection = THPKCollection;
+  THPKCollection = class(TCollection)
+    procedure FreeItem(P: Pointer); override;
     end;
 
 var
@@ -84,7 +86,7 @@ implementation
 
 { ----------------------------- HPK ------------------------------------}
 
-constructor THPKArchive.Init;
+constructor THPKArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -93,7 +95,7 @@ constructor THPKArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HPACK'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HPACK'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'X'));
@@ -168,26 +170,26 @@ procedure THPKArchive.GetFile;
     DT: DateTime;
     R: PHPKRec;
   begin
-  if HPKCol^.Count = 0 then
+  if HPKCol.Count = 0 then
     begin
     FileInfo.Last := 1;
-    Dispose(HPKCol, Done);
+    HPKCol.Free;
     HPKCol := nil;
     Exit;
     end;
-  FileInfo.USize := PHPKRec(HPKCol^.At(0))^.USize;
-  FileInfo.PSize := PHPKRec(HPKCol^.At(0))^.PSize;
-  GetUNIXDate(PHPKRec(HPKCol^.At(0))^.Date, DT.Year, DT.Month, DT.Day,
+  FileInfo.USize := PHPKRec(HPKCol.At(0))^.USize;
+  FileInfo.PSize := PHPKRec(HPKCol.At(0))^.PSize;
+  GetUNIXDate(PHPKRec(HPKCol.At(0))^.Date, DT.Year, DT.Month, DT.Day,
      DT.Hour, DT.Min, DT.Sec);
   PackTime(DT, FileInfo.Date);
-  if PHPKRec(HPKCol^.At(0))^.Name <> nil {DataCompBoy}
+  if PHPKRec(HPKCol.At(0))^.Name <> nil {DataCompBoy}
     then
-    FileInfo.FName := PHPKRec(HPKCol^.At(0))^.Name^ {DataCompBoy}
+    FileInfo.FName := PHPKRec(HPKCol.At(0))^.Name^ {DataCompBoy}
   else
     FileInfo.FName := ''; {DataCompBoy}
   FileInfo.Last := 0;
   FileInfo.Attr := 0;
-  HPKCol^.AtFree(0);
+  HPKCol.AtFree(0);
   end { THPKArchive.GetFile };
 
 end.

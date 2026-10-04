@@ -54,10 +54,11 @@ uses
   ;
 
 type
-  PRARArchive = ^TRARArchive;
-  TRARArchive = object(TARJArchive)
+  TRARArchive = class;
+  PRARArchive = TRARArchive;
+  TRARArchive = class(TARJArchive)
     VersionToExtr: Byte;
-    constructor Init;
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -100,7 +101,7 @@ uses
 
 { ----------------------------- RAR ------------------------------------}
 
-constructor TRARArchive.Init;
+constructor TRARArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -109,7 +110,7 @@ constructor TRARArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'RAR'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'RAR'));
@@ -248,23 +249,23 @@ procedure TRARArchive.GetFile;
   label 1;
   begin
 1:
-  if  (ArcFile^.GetPos = ArcFile^.GetSize) then
+  if  (ArcFile.GetPos = ArcFile.GetSize) then
     begin
     if Encrypted then
       Msg(dlArcEncrypted, nil, mfOKButton);
     FileInfo.Last := 1;
     Exit;
     end;
-  if  (ArcFile^.Status <> stOK) then
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
   if RAR2 then
     begin
-    FP := ArcFile^.GetPos;
-    ArcFile^.Read(P2, 7);
-    if  (ArcFile^.Status <> stOK) then
+    FP := ArcFile.GetPos;
+    ArcFile.Read(P2, 7);
+    if  (ArcFile.Status <> stOK) then
       begin
       FileInfo.Last := 2;
       Exit;
@@ -280,8 +281,8 @@ procedure TRARArchive.GetFile;
     {/piwamoto}
     if P2.HeadType = $74 then
       begin
-      ArcFile^.Read(P2.PSize, SizeOf(P2)-7);
-      if  (ArcFile^.Status <> stOK) then
+      ArcFile.Read(P2.PSize, SizeOf(P2)-7);
+      if  (ArcFile.Status <> stOK) then
         begin
         FileInfo.Last := 2;
         Exit;
@@ -302,10 +303,10 @@ procedure TRARArchive.GetFile;
         P2.NameLen := 255;
       if P2.HeadFlags and $100 <> 0 then
         begin { HIGH_PACK_SIZE and HIGH_UNP_SIZE presents}
-        ArcFile^.Read(CompRec(FileInfo.PSize).Hi, 4);
-        ArcFile^.Read(CompRec(FileInfo.USize).Hi, 4);
+        ArcFile.Read(CompRec(FileInfo.PSize).Hi, 4);
+        ArcFile.Read(CompRec(FileInfo.USize).Hi, 4);
         end;
-      ArcFile^.Read(FileInfo.FName[1], P2.NameLen);
+      ArcFile.Read(FileInfo.FName[1], P2.NameLen);
       SetLength(FileInfo.FName, P2.NameLen);
       if P2.HeadFlags and $200 <> 0 then
         SetLength(FileInfo.FName, (PosChar(#0, FileInfo.FName)-1));
@@ -316,12 +317,12 @@ procedure TRARArchive.GetFile;
           Break;
         System.Delete(FileInfo.FName, Ps, 1);
       until False;
-      if  (ArcFile^.Status <> stOK) then
+      if  (ArcFile.Status <> stOK) then
         begin
         FileInfo.Last := 2;
         Exit;
         end;
-      ArcFile^.Seek(CompToFSize(FP+P2.HeadSize+FileInfo.PSize));
+      ArcFile.Seek(CompToFSize(FP+P2.HeadSize+FileInfo.PSize));
       if P2.Ver > VersionToExtr then
         VersionToExtr := P2.Ver;
       Exit;
@@ -331,18 +332,18 @@ procedure TRARArchive.GetFile;
     if P2.HeadFlags and $8000 <> 0
     then
       begin
-      ArcFile^.Read(FP, 4);
-      ArcFile^.Seek(ArcFile^.GetPos-4);
+      ArcFile.Read(FP, 4);
+      ArcFile.Seek(ArcFile.GetPos-4);
       end
     else
       FP := 0;
-    ArcFile^.Seek(ArcFile^.GetPos+FP+P2.HeadSize-7);
+    ArcFile.Seek(ArcFile.GetPos+FP+P2.HeadSize-7);
     goto 1;
     end
   else
     begin
-    ArcFile^.Read(P, SizeOf(P)-2);
-    if  (ArcFile^.Status <> stOK) or (P.NameLen = 0) then
+    ArcFile.Read(P, SizeOf(P)-2);
+    if  (ArcFile.Status <> stOK) or (P.NameLen = 0) then
       begin
       FileInfo.Last := 2;
       Exit;
@@ -354,22 +355,22 @@ procedure TRARArchive.GetFile;
     FileInfo.Attr := Byte(P.Flags and $04 <> 0)*Hidden;
     if P.Flags and $08 <> 0 then
       begin
-      {ArcFile^.Read(P, P.CommLen);}
-      ArcFile^.Seek(ArcFile^.GetPos+P.CommLen);
-      if  (ArcFile^.Status <> stOK) then
+      {ArcFile.Read(P, P.CommLen);}
+      ArcFile.Seek(ArcFile.GetPos+P.CommLen);
+      if  (ArcFile.Status <> stOK) then
         begin
         FileInfo.Last := 2;
         Exit;
         end;
       end;
     SetLength(FileInfo.FName, P.NameLen);
-    ArcFile^.Read(FileInfo.FName[1], P.NameLen);
-    if  (ArcFile^.Status <> stOK) then
+    ArcFile.Read(FileInfo.FName[1], P.NameLen);
+    if  (ArcFile.Status <> stOK) then
       begin
       FileInfo.Last := 2;
       Exit;
       end;
-    ArcFile^.Seek(ArcFile^.GetPos+P.PSize);
+    ArcFile.Seek(ArcFile.GetPos+P.PSize);
     if P.Ver > VersionToExtr then
       VersionToExtr := P.Ver;
     end;

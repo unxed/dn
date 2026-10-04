@@ -66,8 +66,9 @@ type
   TStrIndex = array[0..9999] of TStrIndexRec;
   PStrIndex = ^TStrIndex;
 
-  PStringList = ^TStringList;
-  TStringList = object(TObject)
+  TStringList = class;
+  PStringList = TStringList;
+  TStringList = class(TObject)
   private
     Index: PStrIndex;
     IndexSize: AWord;
@@ -76,19 +77,19 @@ type
     procedure ReadStr(var S: String; Offset, Skip: AWord);
   public
     function Get(Key: AWord): String;
-    destructor Done; virtual;
-    constructor Load(var S: TStream);
+    destructor Destroy; override;
+    constructor Load(S: TStream);
     end;
 
 implementation
 
-constructor TStringList.Load(var S: TStream);
+constructor TStringList.Load(S: TStream);
   var
     Size: AWord;
     N: LongInt;
   begin
-  inherited Init;
-  Stream := @S;
+  inherited Create;
+  Stream := S;
   S.Read(Size, SizeOf(Size));
   BasePos := i32(S.GetPos);
   S.Seek(Size + BasePos);
@@ -100,9 +101,10 @@ constructor TStringList.Load(var S: TStream);
     S.Read(Index^, N);
   end;
 
-destructor TStringList.Done;
+destructor TStringList.Destroy;
   begin
   FreeMem(Index, IndexSize*SizeOf(TStrIndexRec));
+  inherited Destroy;
   end;
 
 function TStringList.Get(Key: AWord): String;
@@ -129,17 +131,17 @@ procedure TStringList.ReadStr(var S: String; Offset, Skip: AWord);
 var
   B: Byte; }
   begin
-  Stream^.Seek(BasePos+Offset);
-  Stream^.Status := 0;
+  Stream.Seek(BasePos+Offset);
+  Stream.Status := 0;
   Inc(Skip);
   repeat
     {Cat}
     (*
-    Stream^.Read(B, 1);
+    Stream.Read(B, 1);
     SetLength(S, B);
-    Stream^.Read(S[1],B);
+    Stream.Read(S[1],B);
 *)
-    Stream^.ReadStrV(S);
+    Stream.ReadStrV(S);
     {/Cat}
     Dec(Skip);
   until Skip = 0;

@@ -94,37 +94,37 @@ type
       udDelLine: (Lines: PCollection; Vertical, InsM: Boolean);
     end;
 
-  PDoCollection = ^TDoCollection;
-  TDoCollection = object(TCollection)
+  TDoCollection = class;
+  TDoCollection = class(TCollection)
     DoKind: TDoKind; {-$VOL}
-    procedure FreeItem(P: Pointer); virtual;
-    constructor Init(ReOrUn_do: TDoKind); {-$VOL}
+    procedure FreeItem(P: Pointer); override;
+    constructor Create(ReOrUn_do: TDoKind); {-$VOL}
     end;
 
   { TInfoLine }
 
-  PInfoLine = ^TInfoLine;
-  TInfoLine = object(TView)
-    constructor Init(var R: TRect);
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+  TInfoLine = class;
+  TInfoLine = class(TView)
+    constructor Create(const R: TRect);
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
   { TBookmarkLine }
 
-  PBookmarkLine = ^TBookmarkLine;
-  TBookmarkLine = object(TView)
-    procedure Draw; virtual;
+  TBookmarkLine = class;
+  TBookmarkLine = class(TView)
+    procedure Draw; override;
     end;
 
   { TAttrBufStream }
 
-  PAttrBufStream = ^TAttrBufStream;
-  TAttrBufStream = object(TBufStream)
+  TAttrBufStream = class;
+  TAttrBufStream = class(TBufStream)
     OldAttr: Word;
     F: lFile;
-    constructor Init(FileName: String; Mode, Size: Word);
-    destructor Done; virtual;
+    constructor Create(const FileName: String; Mode, Size: Word);
+    destructor Destroy; override;
     end;
 
 function CheckForOver(Name: String): PStream;
@@ -182,17 +182,17 @@ procedure TDoCollection.FreeItem(P: Pointer);
   Dispose(T);
   end { TDoCollection.FreeItem };
 
-constructor TDoCollection.Init(ReOrUn_do: TDoKind); {-$VOL}
+constructor TDoCollection.Create(ReOrUn_do: TDoKind); {-$VOL}
   begin
-  inherited Init($100, $80);
+  inherited Create($100, $80);
   DoKind := ReOrUn_do;
   end; {-$VOL}
 
 { TInfoLine }
 
-constructor TInfoLine.Init(var R: TRect);
+constructor TInfoLine.Create(var R: TRect);
   begin
-  inherited Init(R);
+  inherited Create(R);
   EventMask := evMouseDown;
   GrowMode := gfGrowHiX+gfGrowHiY+gfGrowLoY;
   end;
@@ -430,15 +430,15 @@ procedure TBookmarkLine.Draw;
     end;
   end { TBookmarkLine.Draw };
 
-constructor TAttrBufStream.Init(FileName: String; Mode, Size: Word);
+constructor TAttrBufStream.Create(FileName: String; Mode, Size: Word);
   begin
-  inherited Init(FileName, Mode, Size);
+  inherited Create(FileName, Mode, Size);
   OldAttr := $FFFF;
   end;
 
-destructor TAttrBufStream.Done;
+destructor TAttrBufStream.Destroy;
   begin
-  inherited Done;
+  inherited Destroy;
   if OldAttr <> $FFFF then
     lSetFAttr(F, OldAttr);
   end;

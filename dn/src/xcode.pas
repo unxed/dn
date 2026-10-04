@@ -8,9 +8,9 @@ uses
 
 type
 
-  PXCoder = ^TXCoder;
+  TXCoder = class;
   {`2 Работа с перекодировками в просмотре, dbf и т.п.}
-  TXCoder = object(TObject)
+  TXCoder = class(TObject)
     XLatCP: TXLatCP;
     KeyMap: TKeyMap;
       {` KeyMap=kmXlat для кодировки, загруженной из xlt-файла`}
@@ -20,9 +20,9 @@ type
       {` Обозначение кодировки для индикации в рамке.
       Это имя предопределённой кодировки или имя файла загруженной
       xlt-таблицы без пути `}
-    constructor Init(AMaxCodeTagLen: Byte);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Create(AMaxCodeTagLen: Byte);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
     procedure UseToAscii;
       {` Настроить всё на kmXlat на основании XLatCP[ToAscii]`}
     procedure UseKeyMap;
@@ -42,9 +42,9 @@ uses
   basics, strutil, Lfn, DNStdDlg, mainapp, Commands, DnIni
   ;
 
-constructor TXCoder.Init(AMaxCodeTagLen: Byte);
+constructor TXCoder.Create(AMaxCodeTagLen: Byte);
   begin
-  inherited Init;
+  inherited Create;
   KeyMap := kmAscii;
   UseKeyMap;
   if (AMaxCodeTagLen > 8) then
@@ -52,7 +52,7 @@ constructor TXCoder.Init(AMaxCodeTagLen: Byte);
   MaxCodeTagLen := AMaxCodeTagLen;
   end;
 
-procedure TXCoder.Store(var S: TStream);
+procedure TXCoder.Store(S: TStream);
   begin
   S.Write(KeyMap, SizeOf(KeyMap));
   S.Write(MaxCodeTagLen, SizeOf(MaxCodeTagLen));
@@ -61,7 +61,7 @@ procedure TXCoder.Store(var S: TStream);
     S.Write(XLatCP[ToAscii], SizeOf(TXLat));
   end;
 
-constructor TXCoder.Load(var S: TStream);
+constructor TXCoder.Load(S: TStream);
   var
     FName: PString;
   begin

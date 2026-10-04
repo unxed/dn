@@ -55,9 +55,10 @@ uses
   ;
 
 type
-  PTGZArchive = ^TTGZArchive;
-  TTGZArchive = object(TARJArchive)
-    constructor Init;
+  TTGZArchive = class;
+  PTGZArchive = TTGZArchive;
+  TTGZArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -66,12 +67,12 @@ type
 implementation
 { ----------------------------- TAR ------------------------------------}
 
-constructor TTGZArchive.Init;
+constructor TTGZArchive.Create;
   var
     Sign: TStr5;
     q: String;
   begin
-  TObject.Init;
+  inherited Create;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
@@ -148,8 +149,8 @@ procedure TTGZArchive.GetFile;
     DT: DateTime;
     C: Char;
   begin
-  ArcFile^.Read(P, SizeOf(P));
-  if ArcFile^.Eof then
+  ArcFile.Read(P, SizeOf(P));
+  if ArcFile.Eof then
     begin
     FileInfo.Last := 1;
     Exit;
@@ -172,21 +173,21 @@ procedure TTGZArchive.GetFile;
       P.Time := 10 {skip 10 bytes}
     else
       begin
-      ArcFile^.Read(P.Time, SizeOf(P.Time));
+      ArcFile.Read(P.Time, SizeOf(P.Time));
       P.Time := P.Time shr 16+12;
       end;
-    ArcFile^.Seek(ArcPos+P.Time);
+    ArcFile.Seek(ArcPos+P.Time);
     repeat
-      ArcFile^.Read(C, 1);
+      ArcFile.Read(C, 1);
       if C <> #0 then
         FileInfo.FName := FileInfo.FName+C
       else
         Break;
-    until ArcFile^.Status <> stOK;
+    until ArcFile.Status <> stOK;
     end;
-  FileInfo.PSize := ArcFile^.GetSize;
-  ArcFile^.Seek(CompToFSize(FileInfo.PSize-4));
-  ArcFile^.Read(FileInfo.USize, SizeOf(FileInfo.USize));
+  FileInfo.PSize := ArcFile.GetSize;
+  ArcFile.Seek(CompToFSize(FileInfo.PSize-4));
+  ArcFile.Read(FileInfo.USize, SizeOf(FileInfo.USize));
   FileInfo.Attr := 0;
   FileInfo.Last := 0;
   end { TTGZArchive.GetFile };

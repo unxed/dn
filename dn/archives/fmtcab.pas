@@ -54,10 +54,11 @@ uses
   ;
 
 type
-  PCABArchive = ^TCABArchive;
-  TCABArchive = object(TARJArchive)
+  TCABArchive = class;
+  PCABArchive = TCABArchive;
+  TCABArchive = class(TARJArchive)
     FilesNumber: LongInt;
-    constructor Init;
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -84,7 +85,7 @@ type
 implementation
 { ---------------------- CAB (by Neverowsky A.)---------------------------}
 
-constructor TCABArchive.Init;
+constructor TCABArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -93,7 +94,7 @@ constructor TCABArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   {-i0 turns on console output}
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'MSCAB -i0'));
   
@@ -176,9 +177,9 @@ procedure TCABArchive.GetFile;
   begin
   if  (FilesNumber < 0) then
     begin
-    ArcFile^.Read(CFHEADER, SizeOf(CFHEADER));
+    ArcFile.Read(CFHEADER, SizeOf(CFHEADER));
     FilesNumber := CFHEADER.cFiles;
-    ArcFile^.Seek(ArcPos+CFHEADER.coffFiles);
+    ArcFile.Seek(ArcPos+CFHEADER.coffFiles);
     end;
   if  (FilesNumber = 0) then
     begin
@@ -186,15 +187,15 @@ procedure TCABArchive.GetFile;
     Exit;
     end;
   Dec(FilesNumber);
-  ArcFile^.Read(FH, SizeOf(FH));
-  if  (ArcFile^.Status <> 0) then
+  ArcFile.Read(FH, SizeOf(FH));
+  if  (ArcFile.Status <> 0) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
   FileInfo.FName := '';
   repeat
-    ArcFile^.Read(C, 1);
+    ArcFile.Read(C, 1);
     if C <> #0 then
       FileInfo.FName := FileInfo.FName+C;
   until (C = #0) or (Length(FileInfo.FName) > 100);

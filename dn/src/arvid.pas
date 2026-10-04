@@ -171,8 +171,9 @@ const
 type
   TAvdType = (avdTdr, avdAvt);
 
-  PArvidDrive = ^TArvidDrive;
-  TArvidDrive = object(TDrive)
+  TArvidDrive = class;
+  PArvidDrive = TArvidDrive;
+  TArvidDrive = class(TDrive)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     Name: PString;
     Stream: PStream;
@@ -195,14 +196,14 @@ type
     {this for AVT: location of directory cell.
                                CurDirPos for AVT is position of a root node}
 
-    constructor Init(const AName: String);
+    constructor Create(const AName: String);
     procedure lChDir(ADir: String); virtual;
     function GetDir: String; virtual;
     function GetDirectory(
          const FileMask: String;
         var TotalInfo: TSize): PFilesCollection; virtual;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
     procedure RereadDirectory(S: String); virtual;
     procedure KillUse; virtual;
     procedure UseFile(P: PFileRec; Command: Word); virtual;
@@ -221,7 +222,7 @@ type
     procedure GetDirInfo(var B: TDiskInfoRec); virtual;
     procedure EditDescription(PF: PFileRec); virtual;
     procedure GetDirLength(PF: PFileRec); virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure SeekDirectory;
     function OpenDirectory(const Dir: String;
                                  PutDirs: Boolean): PDrive; virtual;
@@ -246,7 +247,7 @@ uses
   , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}, Math
   , osdep;
 
-constructor TArvidDrive.Init(const AName: String);
+constructor TArvidDrive.Create(const AName: String);
   var
     Attrb: Word;
     i: Integer;
@@ -271,7 +272,7 @@ constructor TArvidDrive.Init(const AName: String);
   label 1;
 
   begin { TArvidDrive.Init }
-  TObject.Init;
+  inherited Create(0, nil);
   i := PosChar(':', Copy(AName, 3, MaxStringLength))+2;
   if i > 2 then
     begin
@@ -382,7 +383,7 @@ function TArvidDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize)
   
   end { TArvidDrive.GetDirectory };
 
-destructor TArvidDrive.Done;
+destructor TArvidDrive.Destroy;
   begin
   if ArvidDrives <> nil then
     begin
@@ -395,7 +396,7 @@ destructor TArvidDrive.Done;
     Dispose(Stream, Done);
   Stream := nil;
   DisposeStr(Name);
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TArvidDrive.lChDir(ADir: String);
@@ -441,10 +442,10 @@ function TArvidDrive.GetDir: String;
     GetDir := 'AVT:'+Nm+'\'+CurDir;
   end;
 
-constructor TArvidDrive.Load(var S: TStream);
+constructor TArvidDrive.Load(S: TStream);
   label 1;
   begin
-  TObject.Init;
+  inherited Create(0, nil);
   inherited Load(S);
   DriveType := dtArvid;
   S.Read(KillAfterUse, 1);
@@ -453,7 +454,7 @@ constructor TArvidDrive.Load(var S: TStream);
   if Stream^.Status <> stOK then
     begin
 1:
-    Done;
+    Destroy;
     {      Drives.DriveLoadingError:=True;}
     Fail;
     end;
@@ -473,7 +474,7 @@ constructor TArvidDrive.Load(var S: TStream);
   ArvidDrives^.Insert(@Self);
   end { TArvidDrive.Load };
 
-procedure TArvidDrive.Store(var S: TStream);
+procedure TArvidDrive.Store(S: TStream);
   begin
   inherited Store(S);
   S.Write(KillAfterUse, 1);
@@ -1052,7 +1053,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       New(FindList, Init($100, $100));
     if OOM or (not MemOK) or (MaxAvail < (FindList^.Count+$200)*4) then
       begin
-      Dispose(PObject(P), Done);
+      Dispose(TStreamable(P), Done);
       OOM := True;
       Exit;
       end;

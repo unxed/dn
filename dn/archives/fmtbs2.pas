@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PBS2Archive = ^TBS2Archive;
-  TBS2Archive = object(TARJArchive)
-    constructor Init;
+  TBS2Archive = class;
+  PBS2Archive = TBS2Archive;
+  TBS2Archive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -77,7 +78,7 @@ implementation
 
 { ----------------------------- BS2 ------------------------------------}
 
-constructor TBS2Archive.Init;
+constructor TBS2Archive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -86,7 +87,7 @@ constructor TBS2Archive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'BS2'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'BS2'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-xy'));
@@ -151,20 +152,20 @@ procedure TBS2Archive.GetFile;
   var
     P: BSA2Hdr;
   begin
-  ArcFile^.Read(P, 6);
+  ArcFile.Read(P, 6);
   { if (Copy(P.ID,1,2) = #0#0) then begin FileInfo.Last := 1;Exit;end;}
-  if  (ArcFile^.Status <> stOK) then
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if ArcFile.GetPos = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P.Unknown[7], SizeOf(P)-6);
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P.Unknown[7], SizeOf(P)-6);
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -176,8 +177,8 @@ procedure TBS2Archive.GetFile;
   FileInfo.PSize := P.PackedSize;
   FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
   FileInfo.FName[0] := Char(P.NameLen);
-  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
+  ArcFile.Read(FileInfo.FName[1], P.NameLen);
+  ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { TBS2Archive.GetFile };
 
 end.

@@ -79,8 +79,9 @@ type
 
   TSwapLevel = (slNone, slCnv, slFail);
 
-  PDirStorage = ^TDirStorage;
-  TDirStorage = object(TObject)
+  TDirStorage = class;
+  PDirStorage = TDirStorage;
+  TDirStorage = class(TObject)
     SwapLevel: TSwapLevel;
     Dirs: LongInt;
     Files: LongInt;
@@ -93,10 +94,10 @@ type
     CurPos: LongInt;
     TotalLength, TotalCLength: TSize;
     vSavePos, vSize{!!s}: LongInt;
-    constructor Init;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    destructor Done; virtual;
+    constructor Create;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
+    destructor Destroy; override;
     procedure AddFile(FName: String; Size, CSize: TSize; Date: LongInt;
          Attr: Byte);
     procedure ResetPointer(const Dir: String);
@@ -140,9 +141,9 @@ procedure TDirStorage.TryStream(Sz: LongInt);
   until Stream <> nil;
   end;
 
-constructor TDirStorage.Init;
+constructor TDirStorage.Create;
   begin
-  inherited Init;
+  inherited Create;
   SwapLevel := slNone;
 
   TryStream(-1);
@@ -165,34 +166,34 @@ procedure TDirStorage.FixError;
     N: Word;
   begin
   OldStream := Stream;
-  OldStream^.Status := stOK;
+  OldStream.Status := stOK;
 
 LLL:
 
   TryStream(-1);
 
   Count := vSize;
-  OldStream^.Seek(0);
+  OldStream.Seek(0);
   while Count > 0 do
     begin
     if Count > BufSize then
       N := BufSize
     else
       N := Count;
-    OldStream^.Read(Buffer, N);
-    if OldStream^.Status <> stOK then
+    OldStream.Read(Buffer, N);
+    if OldStream.Status <> stOK then
       __Error;
-    Stream^.Write(Buffer, N);
-    if Stream^.Status <> stOK then
+    Stream.Write(Buffer, N);
+    if Stream.Status <> stOK then
       begin
-      Dispose(Stream, Done);
+      Stream.Free;
       Stream := nil;
       goto LLL
       end;
     Dec(Count, N);
     end;
-  Dispose(OldStream, Done);
-  Stream^.Seek(vSavePos);
+  OldStream.Free;
+  Stream.Seek(vSavePos);
   end { TDirStorage.FixError };
 
 procedure TDirStorage.InitStream(X, E, M: LongInt);
@@ -203,20 +204,20 @@ procedure TDirStorage.InitStream(X, E, M: LongInt);
   case SwapLevel of
     slCnv:
       begin
-      Stream := New(PMemoryStream, Init(M, 2048));
-      if Stream^.Status <> stOK then
+      Stream := PMemoryStream.Create(M, 2048);
+      if Stream.Status <> stOK then
         begin
-        Dispose(Stream, Done);
+        Stream.Free;
         Stream := nil
         end;
       end;
   end {case};
   end { TDirStorage.InitStream };
 
-destructor TDirStorage.Done;
+destructor TDirStorage.Destroy;
   begin
   if Stream <> nil then
-    Dispose(Stream, Done);
+    Stream.Free;
   Stream := nil;
   end;
 
@@ -233,7 +234,7 @@ procedure TDirStorage.AddFile(FName: String; Size, CSize: TSize; Date: LongInt; 
   begin
   if Stream = nil then
     Exit;
-  Stream^.Status := stOK;
+  Stream.Status := stOK;
   vSeek(Max(0, (vSize)-TStoredFixLength));
   L := 0;
   if  (FName <> #0) and (FName <> '') then
@@ -309,7 +310,7 @@ function TDirStorage.GetNextFile: Boolean;
   CurPos := -1;
   if Stream = nil then
     Exit;
-  while Stream^.Status = stOK do
+  while Stream.Status = stOK do
     begin
     FilePtr := vSavePos;
     vRead(SF, TStoredFixLength);
@@ -349,7 +350,7 @@ procedure TDirStorage.UpdateRecord;
     Exit;
   if  (CurPos > 0) and (CurFile.Name <> '') then
     begin
-    Stream^.Status := stOK;
+    Stream.Status := stOK;
     vSeek(CurPos);
     vRead(s, SizeOf(s));
     vSeek(CurPos);
@@ -357,11 +358,10 @@ procedure TDirStorage.UpdateRecord;
     end;
   end;
 
-constructor TDirStorage.Load(var S: TStream);
+constructor TDirStorage.Load(S: TStream);
   var
     P, L: LongInt; {!!s}
   begin
-  TObject.Init;
   S.Read(Dirs, SizeOf(Dirs));
   S.Read(Files, SizeOf(Files));
   S.Read(TotalLength, SizeOf(TotalLength));
@@ -371,12 +371,12 @@ constructor TDirStorage.Load(var S: TStream);
   TryStream(L);
   P := i32(S.GetPos);
   repeat
-    Stream^.CopyFrom(S, L);
-    if Stream^.Status = stOK then
+    Stream.CopyFrom(S, L);
+    if Stream.Status = stOK then
       Break
     else
       begin
-      Dispose(Stream, Done);
+      Stream.Free;
       Stream := nil;
       TryStream(L);
       S.Seek(P);
@@ -384,7 +384,7 @@ constructor TDirStorage.Load(var S: TStream);
   until False;
   end { TDirStorage.Load };
 
-procedure TDirStorage.Store(var S: TStream);
+procedure TDirStorage.Store(S: TStream);
   var
     L: LongInt;
   begin
@@ -396,8 +396,8 @@ procedure TDirStorage.Store(var S: TStream);
   L := vSize;
   S.Write(L, SizeOf(L));
   vSeek(0);
-  Stream^.Status := stOK;
-  S.CopyFrom(Stream^, vSize);
+  Stream.Status := stOK;
+  S.CopyFrom(Stream, vSize);
   end;
 
 {-DataCompBoy-}
@@ -425,7 +425,7 @@ procedure TDirStorage.Truncate(N: LongInt);
   NF := 0;
   ND := 0;
   NI := 0;
-  while Stream^.Status = stOK do
+  while Stream.Status = stOK do
     begin
     Inc(NI);
     L := vSavePos;
@@ -467,7 +467,7 @@ procedure TDirStorage.WipeCur;
     s: TStored;
   begin
   L := vSavePos;
-  Stream^.Status := stOK;
+  Stream.Status := stOK;
   vSeek(FilePtr);
   vRead(s, SizeOf(s)); {DataCompBoy}
   vSeek(FilePtr); {DataCompBoy}
@@ -482,8 +482,8 @@ procedure TDirStorage.WipeCur;
 procedure TDirStorage.vWrite(const Buf; Count: LongInt);
   begin
   repeat
-    Stream^.Write(Buf, Count);
-    if Stream^.Status = stOK
+    Stream.Write(Buf, Count);
+    if Stream.Status = stOK
     then
       begin
       vSize := Max(vSize, vSavePos+Count);
@@ -497,17 +497,17 @@ procedure TDirStorage.vWrite(const Buf; Count: LongInt);
 
 procedure TDirStorage.vSeek(Pos: LongInt);
   begin
-  Stream^.Seek(Pos);
+  Stream.Seek(Pos);
   vSavePos := Pos;
   end;
 
 procedure TDirStorage.vTruncate;
   begin
-  Stream^.Truncate;
-  if Stream^.Status = stOK
+  Stream.Truncate;
+  if Stream.Status = stOK
   then
     begin
-    vSize := i32(Stream^.GetPos);
+    vSize := i32(Stream.GetPos);
     vSavePos := vSize
     end
   else
@@ -516,8 +516,8 @@ procedure TDirStorage.vTruncate;
 
 procedure TDirStorage.vRead(var Buf; Count: LongInt);
   begin
-  Stream^.Read(Buf, Count);
-  if Stream^.Status = stOK
+  Stream.Read(Buf, Count);
+  if Stream.Status = stOK
   then
     Inc(vSavePos, Count)
   else

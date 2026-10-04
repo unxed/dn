@@ -69,22 +69,24 @@ type
 
   { TViewScroll }
 
-  PViewScroll = ^TViewScroll;
-  TViewScroll = object(TView)
+  TViewScroll = class;
+  PViewScroll = TViewScroll;
+  TViewScroll = class(TView)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     MaxV, Value: TFileSize;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     function GetPartCode: LongInt;
-    procedure Draw; virtual;
+    procedure Draw; override;
     function GetSize: Integer;
     procedure DrawPos(Pos: Integer);
     end;
 
   { TFileViewer }
 
-  PFileViewer = ^TFileViewer;
-  TFileViewer = object(TView)
+  TFileViewer = class;
+  PFileViewer = TFileViewer;
+  TFileViewer = class(TView)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     Filtr: Boolean;
     NoEdit: Boolean;
@@ -124,17 +126,17 @@ type
     HiLite: Boolean; {PZ 2000.06.09}
     ScrollEOF: Boolean; {AK155}
     HiLitePar: THighliteParams;
-    constructor Init(var Bounds: TRect; AStream: PStream;
+    constructor Create(const Bounds: TRect; AStream: PStream;
         const AFileName, AVFileName: String;
         ASB: PView; Quick, Hex: Boolean); {DataCompBoy}
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    destructor Done; virtual;
-    procedure Draw; virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    destructor Destroy; override;
+    procedure Draw; override;
     function ReadFile(const FName, VFName: String; NewStream: Boolean)
       : Boolean; {DataCompBoy}
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    procedure HandleEvent(var Event: TEvent); override;
     function WriteModify: Boolean;
     procedure CountDown(ANumber: Integer); virtual;
     procedure CountUp(ANumber: Integer); virtual;
@@ -142,10 +144,10 @@ type
     procedure MakeLines; virtual;
     procedure SaveToFile(FN: String);
     function Valid(Command: Word): Boolean; virtual;
-    procedure ChangeBounds(const Bounds: TRect); virtual;
-    function GetPalette: TPalette; virtual;
+    procedure ChangeBounds(const Bounds: TRect); override;
+    function GetPalette: TPalette; override;
     procedure DoHighlite(var B: TScreenCell; const S: String; const Attr: String);
-    procedure Update; virtual; {AK155}
+    procedure Update; override; {AK155}
     procedure SeekEof;
     procedure SeekBof;
     function BreakOnStreamReadError: Boolean;
@@ -154,49 +156,55 @@ type
     procedure AdjustBuf;
     end;
 
-  PHFileViewer = ^THFileViewer;
+  THFileViewer = class;
+  PHFileViewer = THFileViewer;
     {`2 Просмотр, который вставляется не в окно, а в панель менеджера`}
-  THFileViewer = object(TFileViewer)
-    procedure ChangeBounds(const Bounds: TRect); virtual;
-    function GetPalette: TPalette; virtual;
+  THFileViewer = class(TFileViewer)
+    procedure ChangeBounds(const Bounds: TRect); override;
+    function GetPalette: TPalette; override;
     end;
 
-  PQFileViewer = ^TQFileViewer;
+  TQFileViewer = class;
+  PQFileViewer = TQFileViewer;
     {`2 Quick View`}
-  TQFileViewer = object(THFileViewer)
+  TQFileViewer = class(THFileViewer)
     procedure ChangeFile(FR: PFileRec); virtual;
     end;
 
-  PDFileViewer = ^TDFileViewer;
+  TDFileViewer = class;
+  PDFileViewer = TDFileViewer;
     {`2 Description View`}
-  TDFileViewer = object(THFileViewer)
-    procedure HandleEvent(var Event: TEvent); virtual;
+  TDFileViewer = class(THFileViewer)
+    procedure HandleEvent(var Event: TEvent); override;
     procedure ChangeFile(FR: PFileRec); virtual;
     end;
 
-  PNFileViewer = ^TNFileViewer;
+  TNFileViewer = class;
+  PNFileViewer = TNFileViewer;
     {`IMHO просмотр memo в dbf`}
-  TNFileViewer = object(TFileViewer)
-    function GetPalette: TPalette; virtual;
+  TNFileViewer = class(TFileViewer)
+    function GetPalette: TPalette; override;
     end;
 
-  PViewInfo = ^TViewInfo;
-  TViewInfo = object(TView)
+  TViewInfo = class;
+  PViewInfo = TViewInfo;
+  TViewInfo = class(TView)
     Viewer: PFileViewer;
-    constructor Init(var R: TRect; AViewer: PFileViewer);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    constructor Create(const R: TRect; AViewer: PFileViewer);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
-  PFileWindow = ^TFileWindow;
-  TFileWindow = object( {TStd}TWindow)
-    constructor Init(const FileName, VFileName: String; Hex: Boolean);
+  TFileWindow = class;
+  PFileWindow = TFileWindow;
+  TFileWindow = class(TWindow)
+    constructor Create(const FileName, VFileName: String; Hex: Boolean);
     {DataCompBoy}
-    function GetPalette: TPalette; virtual;
+    function GetPalette: TPalette; override;
     function ReactOnCmd: Boolean; virtual;
-    procedure ChangeBounds(const Bounds: TRect); virtual;
+    procedure ChangeBounds(const Bounds: TRect); override;
     end;
 
 const
@@ -436,21 +444,21 @@ LExit:
   Info := nil;
   end { SearchFileStr };
 
-constructor TViewInfo.Init(var R: TRect; AViewer: PFileViewer);
+constructor TViewInfo.Create(const R: TRect; AViewer: PFileViewer);
   begin
-  inherited Init(R);
+  inherited Create(R);
   Viewer := AViewer;
   GrowMode := gfGrowHiY+gfGrowLoY+gfGrowHiX;
   EventMask := evMouse;
   end;
 
-constructor TViewInfo.Load(var S: TStream);
+constructor TViewInfo.Load(S: TStream);
   begin
   inherited Load(S);
   GetPeerViewPtr(S, Viewer);
   end;
 
-procedure TViewInfo.Store(var S: TStream);
+procedure TViewInfo.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, Viewer);
@@ -650,7 +658,7 @@ function TFileViewer.WriteModify;
   begin
   B := BufModified;
   WriteModify := False;
-  if  (Buf = nil) or (Fl = nil) or (Fl^.Status <> stOK) or not B then
+  if  (Buf = nil) or (Fl = nil) or (Fl.Status <> stOK) or not B then
     Exit;
   I := MessageBox(GetString(dlViewQuery), nil, mfWarning+mfYesNoCancel);
   WriteModify := I = cmCancel;
@@ -683,21 +691,21 @@ function TFileViewer.WriteModify;
          or (TypeOf(Fl^) = TypeOf(TBufStream))
   then
     begin
-    Dispose(Fl, Done);
+    Fl.Free;
     ClrIO;
     NeedAbort := True;
     A := 0;
     Fl := New(PDosStream, Init(FileName, stOpen));
-    if not Abort and (Fl^.Status <> stOK) then
+    if not Abort and (Fl.Status <> stOK) then
       begin
-      Dispose(Fl, Done);
+      Fl.Free;
       A := GetFileAttr(FileName);
       SetFileAttr(FileName, A and not ReadOnly);
       Fl := New(PDosStream, Init(FileName, stOpen));
       end;
-    if  (Fl^.Status <> stOK) or (Abort) then
+    if  (Fl.Status <> stOK) or (Abort) then
       begin
-      Dispose(Fl, Done);
+      Fl.Free;
       Fl := New(PDosStream, Init(FileName, stOpenRead));
       MessageBox(GetString(dlFBBNoWrite)+FileName, nil,
          mfError+mfOKButton);
@@ -709,7 +717,7 @@ function TFileViewer.WriteModify;
       end;
     if A <> 0 then
       begin
-      Dispose(Fl, Done);
+      Fl.Free;
       SetFileAttr(FileName, A);
       Fl := New(PDosStream, Init(FileName, stOpenRead));
       end;
@@ -1067,13 +1075,13 @@ procedure TFileViewer.Update;
     end;
   end;
 
-constructor TFileViewer.Init;
+constructor TFileViewer.Create
   var
     C: Char;
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   ViewMode := vmText;
-  XCoder.Init(8);
+  XCoder := TXCoder.Create(8);
   FillChar(MarkPos, SizeOf(MarkPos), $FF);
   HelpCtx := hcView;
   GrowMode := gfGrowHiX+gfGrowHiY;
@@ -1098,7 +1106,7 @@ constructor TFileViewer.Init;
   try
     if Fl = nil then
       ReadFile(AFileName, AVFileName, True)
-    else if Fl^.Status = stOK then
+    else if Fl.Status = stOK then
       ReadFile(' ', ' ', False);
   except
     on E: eFileError do
@@ -1107,18 +1115,18 @@ constructor TFileViewer.Init;
   {AK155 Это для автодочитывания файла с изменяющейся длиной,
     см. Update }
   NewTimer(UpdateViewTmr, 500);
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   {/AK155}
   end { TFileViewer.Init };
 
-destructor TFileViewer.Done;
+destructor TFileViewer.Destroy;
   begin
   EnableCommands([cmUnWrap]);
   if Buf <> nil then
     FreeMem(Buf, BufSize);
   Buf := nil;
   if Fl <> nil then
-    Dispose(Fl, Done);
+    Fl.Free;
   Fl := nil;
   if not (TottalExit or Exiting) and KillAfterUse then
     begin
@@ -1128,10 +1136,10 @@ destructor TFileViewer.Done;
       RereadDirectory(GetPath(FileName));
     end;
   Info := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
-constructor TFileViewer.Load;
+constructor TFileViewer.Load(S: TStream)
   var
     FP: TFileSize;
   begin
@@ -1676,7 +1684,7 @@ function TFileViewer.ReadFile;
   if NewStream then
     begin
     if Fl <> nil then
-      Dispose(Fl, Done);
+      Fl.Free;
     Fl := nil;
     if FName = '' then
       Exit;
@@ -1716,7 +1724,7 @@ function TFileViewer.ReadFile;
     GetMem(Buf, 100);
     Move(DirString[1], Buf^, Length(DirString));
     MakeLines;
-    Fl^.Status := stOK; { сбрасываем stInitError }
+    Fl.Status := stOK; { сбрасываем stInitError }
     Exit;
     end;
   BreakOnStreamReadError;
@@ -2069,9 +2077,9 @@ function TFileViewer.BreakOnStreamReadError: Boolean;
     E: eFileError;
   begin
   BreakOnStreamReadError := False;
-  if Fl^.Status <> stOK then
+  if Fl.Status <> stOK then
     begin
-    if Fl^.Status = stInitError then
+    if Fl.Status = stInitError then
       MessFileNotOpen(FileName, Fl^.ErrorInfo)
     else
       MessFileNotRead(FileName, Fl^.ErrorInfo);
@@ -2388,7 +2396,7 @@ procedure TFileViewer.HandleEvent;
                 end;
           cmReanimator:
 DoSave:
-              if  (Fl <> nil) and (Fl^.Status = stOK) then
+              if  (Fl <> nil) and (Fl.Status = stOK) then
                 begin
                 CE;
                 FreeStr := GetFileNameDialog(x_x, GetString(dlSaveFileAs),
@@ -3537,7 +3545,7 @@ function TFileViewer.Valid;
   end;
 
 { TFileWindow }
-constructor TFileWindow.Init(const FileName, VFileName: String; Hex: Boolean);
+constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   var
     R: TRect;
     P: PView;

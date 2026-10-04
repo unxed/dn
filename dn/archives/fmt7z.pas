@@ -78,15 +78,16 @@ uses
   ;
 
 type
-  PS7ZArchive = ^TS7ZArchive;
-  TS7ZArchive = object(TARJArchive)
+  TS7ZArchive = class;
+  PS7ZArchive = TS7ZArchive;
+  TS7ZArchive = class(TARJArchive)
     ListFileName: String;
     ListFile: System.Text;
-    constructor Init;
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 implementation
@@ -96,7 +97,7 @@ uses
 
 { --- 7-Zip implemented by piwamoto --- }
 
-constructor TS7ZArchive.Init;
+constructor TS7ZArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -105,7 +106,7 @@ constructor TS7ZArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
 
   { the name of the program in the system where the names of files are case sensitive (archiver.ini can give another) }
 {$IFDEF UNIX}
@@ -222,14 +223,14 @@ procedure TS7ZArchive.GetFile;
   FileInfo.Last := 0;
   end { TS7ZArchive.GetFile };
 
-destructor TS7ZArchive.Done;
+destructor TS7ZArchive.Destroy;
   begin
   if TextRec(ListFile).Handle <> 0 then
     begin
     System.Close(ListFile);
     EraseFile(ListFileName);
     end;
-  inherited Done;
+  inherited Destroy;
   end;
 
 end.

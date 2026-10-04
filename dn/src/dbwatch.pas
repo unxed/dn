@@ -84,13 +84,15 @@ type
     Pos: AWord;
     end;
 
-  PFieldCollection = ^TFieldCollection;
-  TFieldCollection = object(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
+  TFieldCollection = class;
+  PFieldCollection = TFieldCollection;
+  TFieldCollection = class(TCollection)
+    procedure FreeItem(P: Pointer); override;
     end;
 
-  PDBFile = ^TDBFile;
-  TDBFile = object(TObject)
+  TDBFile = class;
+  PDBFile = TDBFile;
+  TDBFile = class(TObject)
     WriteMode: Byte;
     BaseName: String; {DataCompBoy}
     BaseFile: TBufStream;
@@ -100,8 +102,8 @@ type
     NumFields: SmallInt;
     Loc: LongInt;
     Fields: PCollection;
-    constructor Init(FileName: String); {DataCompBoy}
-    destructor Done; virtual;
+    constructor Create(const FileName: String); {DataCompBoy}
+    destructor Destroy; override;
     procedure Read(var Buf; Num: Word);
     procedure Seek(NewLoc: LongInt);
     function GetField(Name: String; var Buf): String;
@@ -155,10 +157,10 @@ function NewField(Name: String; Who: Char; len: Word; Dec: Byte;
 
 procedure TDBFile.OpenMode(Mode: Word);
   begin
-  BaseFile.Init(BaseName, Mode, 16384);
+  BaseFile := TBufStream.Create(BaseName, Mode, 16384);
   end;
 
-constructor TDBFile.Init(FileName: String);
+constructor TDBFile.Create(const FileName: String);
 
   {--- start -------- Eugeny Zvyagintzev ---- 17-06-2002 ----}
   type
@@ -197,9 +199,9 @@ constructor TDBFile.Init(FileName: String);
     ReadFldStru := True;
     BaseFile.Seek(32);
     if Fields <> nil then
-      Dispose(Fields, Done);
+      Fields.Free;
     {piwamoto.src.end}
-    Fields := New(PFieldCollection, Init(NumFields, NumFields));
+    Fields := PFieldCollection.Create(NumFields, NumFields);
     RL := 1;
     for I := 1 to NumFields do
       begin
@@ -229,31 +231,31 @@ constructor TDBFile.Init(FileName: String);
         Exit;
         end;
       with FBuf do
-        Fields^.Insert(NewField(S, Who, FieldLen, FieldDec, RL-FieldLen));
+        Fields.Insert(NewField(S, Who, FieldLen, FieldDec, RL-FieldLen));
       end;
     end { ReadFldStru };
 
   var
     BaseFileSize: Longint; {!!s}
   begin { TDBFile.Init }
-  inherited Init;
+  inherited Create;
   BaseName := lFExpand(FileName); {DataCompBoy}
   OpenMode(stOpenRead);
   if BaseFile.Status <> stOK then
     begin
-    BaseFile.Done;
+    BaseFile.Free;
     Fail;
     end;
   BaseFile.Read(Date, 32);
   if BaseFile.Status <> stOK then
     begin
-    BaseFile.Done;
+    BaseFile.Free;
     Fail;
     end;
   BaseFileSize := i32(BaseFile.GetSize);
   if BaseFileSize-HeaderLen < 0 then
     begin
-    BaseFile.Done;
+    BaseFile.Free;
     Fail;
     end; {JOHN_SW}
   {piwamoto.src.begin} {bugfixed .DBF detection}
@@ -269,14 +271,14 @@ constructor TDBFile.Init(FileName: String);
       (FBuf.Name[0] <> #13)
   then
     begin
-    BaseFile.Done;
+    BaseFile.Free;
     Fail;
     end;
   if not ReadFldStru(True) then
     begin
-    Dispose(Fields, Done);
+    Fields.Free;
     Fields := nil;
-    BaseFile.Done;
+    BaseFile.Free;
     Fail;
     end;
   {--- start -------- Eugeny Zvyagintzev ---- 17-06-2002 ----}
@@ -284,9 +286,9 @@ constructor TDBFile.Init(FileName: String);
   if  (RL <> RecLen) then
     if not ReadFldStru(False) then
       begin
-      Dispose(Fields, Done);
+      Fields.Free;
       Fields := nil;
-      BaseFile.Done;
+      BaseFile.Free;
       Fail;
       end
     else if (RL <> RecLen) then
@@ -335,7 +337,7 @@ procedure TDBFile.Seek(NewLoc: LongInt);
 
 function TDBFile.GetFieldRec(N: SmallInt): PFieldRec;
   begin
-  GetFieldRec := Fields^.At(N);
+  GetFieldRec := Fields.At(N);
   end;
 
 function TDBFile.GetField(Name: String; var Buf): String;
@@ -373,11 +375,11 @@ function TDBFile.GetNField(N: Word; var Buf): String;
   GetNField := S;
   end;
 
-destructor TDBFile.Done;
+destructor TDBFile.Destroy;
   begin
-  Dispose(Fields, Done);
+  Fields.Free;
   Fields := nil;
-  BaseFile.Done;
+  BaseFile.Free;
   end;
 
 end.

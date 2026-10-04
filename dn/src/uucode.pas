@@ -1608,7 +1608,7 @@ procedure DecodeStr(var Src, Dst);
       InputFileName := MakeNormName(PF^.Owner^, PF^.FlName[uLfn]);
       if not ExistFile(InputFileName) then
         Exit;
-      InputStream := New(PTextReader, Init(InputFileName));
+      InputStream := PTextReader.Create(InputFileName);
       if  (InputStream = nil) then
         Exit;
       Get_String;
@@ -2390,7 +2390,7 @@ beg:
         Exit
         end;
 
-      SouSize := i32(FileSize(ST.F)); {!!s}
+      SouSize := i32(FileSize(ST.F); {!!s}
 
       if SouSize < 3 then
         begin

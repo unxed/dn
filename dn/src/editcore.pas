@@ -102,9 +102,10 @@ type
 
   { TFileEditor }
 
-  PFileEditor = ^TFileEditor;
+  TFileEditor = class;
+  PFileEditor = TFileEditor;
     {`2}
-  TFileEditor = object(TView)
+  TFileEditor = class(TView)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     HScroll, VScroll: PScrollBar;
     ReplaceAll: Boolean;
@@ -165,18 +166,18 @@ type
 
     MenuItemStr: array[Boolean] of PString;
     
-    constructor Init(var Bounds: TRect;
+    constructor Create(const Bounds: TRect;
          AHScrollBar, AVScrollBar: PScrollBar;
         var FileName: String); {DataCompBoy}
-    constructor Load(var S: TStream);
-    destructor Done; virtual;
-    procedure Store(var S: TStream);
-    procedure Awaken; virtual;
+    constructor Load(S: TStream);
+    destructor Destroy; override;
+    procedure Store(S: TStream); override;
+    procedure Awaken; override;
     procedure DoHighlite(var B: TScreenCell; const S: LongString; const Attr: String);
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Draw; virtual;
-    function Valid(Command: Word): Boolean; virtual;
-    function GetPalette: TPalette; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
+    function Valid(Command: Word): Boolean; override;
+    function GetPalette: TPalette; override;
     function GetLineAsIs(Index: LongInt): LongString;
       {` строка читается "как есть", без перекодировки `}
     function GetLine(Index: LongInt): LongString;
@@ -188,7 +189,7 @@ type
       {` the lines of the clipboard into the internal lines: P itself or a new collection (then dispose it) `}
     function IntLen(const S: LongString): LongInt;
       {` the length of a line of the user (UTF-8) in the columns of the editor `}
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     function ValidBlock: Boolean;
     procedure CalcMenu;
     function Search(StartX, StartY: Word): Boolean;
@@ -196,7 +197,7 @@ type
     procedure ModifyLine(Index: LongInt; S: LongString;
          DelSpaces: Boolean);
     procedure SetLimits;
-    procedure ChangeBounds(const R: TRect); virtual;
+    procedure ChangeBounds(const R: TRect); override;
     procedure ScrollTo(DeltaX, DeltaY: LongInt);
     function LimitX: LongInt;
     function LimitY: LongInt;
@@ -875,7 +876,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
   end {case}; {case of DoKind}
   end { TFileEditor.Convert4Do }; {-$VOL}
 
-constructor TFileEditor.Load(var S: TStream);
+constructor TFileEditor.Load(S: TStream);
   begin
   inherited Load(S);
   {/Cat}
@@ -883,7 +884,7 @@ constructor TFileEditor.Load(var S: TStream);
   
   end;
 
-procedure TFileEditor.Store(var S: TStream);
+procedure TFileEditor.Store(S: TStream);
   begin
   inherited Store(S);
   MIStore(@Self, S);
@@ -902,7 +903,7 @@ function TFileEditor.GetPalette: TPalette;
   end;
 
 { TFileEditor }
-constructor TFileEditor.Init(var Bounds: TRect; AHScrollBar, AVScrollBar: PScrollBar; var FileName: String);
+constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: PScrollBar; var FileName: String);
   var
     { FileToView: Text; }
     Line: String;
@@ -912,7 +913,7 @@ constructor TFileEditor.Init(var Bounds: TRect; AHScrollBar, AVScrollBar: PScrol
     { Xt: String; }
     I: Integer;
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   InsertMode := True; {Cat}
   DrawMode := 0; {Cat}
   BlockVisible := False; {Cat}
@@ -978,7 +979,7 @@ constructor TFileEditor.Init(var Bounds: TRect; AHScrollBar, AVScrollBar: PScrol
   {/Cat}
   end { TFileEditor.Init };
 
-destructor TFileEditor.Done;
+destructor TFileEditor.Destroy;
   begin
   DisposeStr(MenuItemStr[False]);
   DisposeStr(MenuItemStr[True]);
@@ -1019,7 +1020,7 @@ destructor TFileEditor.Done;
     ClipboardWindow := nil;
     end;
   {/Cat}
-  inherited Done;
+  inherited Destroy;
   end { TFileEditor.Done };
 
 procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);

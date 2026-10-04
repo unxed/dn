@@ -55,8 +55,9 @@ uses
   ;
 
 type
-  PXDoubleWindow = ^TXDoubleWindow;
-  TXDoubleWindow = object(TDoubleWindow)
+  TXDoubleWindow = class;
+  PXDoubleWindow = TXDoubleWindow;
+  TXDoubleWindow = class(TDoubleWindow)
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -80,16 +81,16 @@ procedure TXDoubleWindow.SetState(AState: Word; Enable: Boolean);
   if  (AState and sfDragging <> 0) or
       (AState and (sfSelected+sfActive) <> 0)
   then
-    Separator^.Draw;
+    Separator.Draw;
   if AState = sfSelected then
     begin
     SetState(sfActive, Enable);
     
-    TrashCan^.Hide;
+    TrashCan.Hide;
     
     if Enable then
       begin
-      Current^.SetState(sfSelected, True);
+      Current.SetState(sfSelected, True);
         // чтобы установились ActivePanel и PassivePanel
       EnableCommands(DblWndCommands)
       end
@@ -97,10 +98,10 @@ procedure TXDoubleWindow.SetState(AState: Word; Enable: Boolean);
       DisableCommands(DblWndCommands);
     end
     
-  else if TrashCan^.ImVisible then
+  else if TrashCan.ImVisible then
     begin
-    TrashCan^.Show;
-    TrashCan^.MakeFirst;
+    TrashCan.Show;
+    TrashCan.MakeFirst;
     end;
   
   end { TXDoubleWindow.SetState };
@@ -121,8 +122,8 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
       begin
       if AnyPanel <> nil then
         begin
-        Visible[i] := AnyPanel^.GetState(sfVisible);
-        Selected[i] := AnyPanel^.GetState(sfSelected);
+        Visible[i] := AnyPanel.GetState(sfVisible);
+        Selected[i] := AnyPanel.GetState(sfSelected);
         end;
       end;
     end;
@@ -167,19 +168,19 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
             вместо этого трюкачества организовать в дереве прямой
             вызов ChDir панели }
           Panel[Selected[NonFilePanelType <> dtTree]].
-            FilePanel^.HandleEvent(Event);
+            FilePanel.HandleEvent(Event);
           Exit;
           end;
         cmChangeTree:
           if NonFilePanelType = dtTree then
-            Panel[NonFilePanel].AnyPanel^.HandleEvent(Event);
+            Panel[NonFilePanel].AnyPanel.HandleEvent(Event);
         cmRereadInfo:
           begin
           for i := pLeft to pRight do
             begin
             with Panel[i] do
               if AnyPanel <> nil then
-                AnyPanel^.HandleEvent(Event);
+                AnyPanel.HandleEvent(Event);
             end;
           Exit;
           end;
@@ -192,9 +193,9 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
         cmRereadDir:
           begin
           EV := Event;
-          Panel[pLeft].FilePanel^.HandleEvent(Event);
+          Panel[pLeft].FilePanel.HandleEvent(Event);
           Event := EV;
-          Panel[pRight].FilePanel^.HandleEvent(Event);
+          Panel[pRight].FilePanel.HandleEvent(Event);
           ClearEvent(Event);
           end;
         cmPushName,

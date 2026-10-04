@@ -62,40 +62,43 @@ cmResetGauge = 12001;
 cmAddGauge = 12002;
 
 type
-  PPercentGauge = ^TPercentGauge;
-  PBarGauge = ^TBarGauge;
+  TPercentGauge = class;
+  PPercentGauge = TPercentGauge;
+  TBarGauge = class;
+  PBarGauge = TBarGauge;
 
   { shows how much of the work is done, in per cent (MaxValue is 100 %) }
-  TPercentGauge = object(TView)
+  TPercentGauge = class(TView)
     MaxValue, CurValue: LongInt;
     procedure AddProgress(Progress: LongInt);
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    constructor Init(var Bounds: TRect; AMaxValue: LongInt);
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    constructor Create(const Bounds: TRect; AMaxValue: LongInt);
     function SolveForX(Y, Z: LongInt): Integer;
     function SolveForY(X, Z: LongInt): Integer;
     procedure UpdateView(Progress: LongInt); virtual;
     end;
 
   { the same as a bar }
-  TBarGauge = object(TPercentGauge)
-    procedure Draw; virtual;
+  TBarGauge = class(TPercentGauge)
+    procedure Draw; override;
     end;
-  PWhileView = ^TWhileView;
-  TWhileView = object(TGroup)
+  TWhileView = class;
+  PWhileView = TWhileView;
+  TWhileView = class(TGroup)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     Lines: PCollection;
     But: PButton;
     QuitNormal: Boolean;
     Top, Bottom: String[SizeOf(String)-1];
-    constructor Init(Bounds: TRect);
+    constructor Create(const Bounds: TRect);
     procedure Write(N: Integer; S: String);
-    function GetPalette: TPalette; virtual;
-    function Valid(C: Word): Boolean; virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    destructor Done; virtual;
+    function GetPalette: TPalette; override;
+    function Valid(C: Word): Boolean; override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    destructor Destroy; override;
     procedure ClearInterior;
   private
     Side: (sdLeft, sdRight);
@@ -109,9 +112,9 @@ uses
   mainapp, Commands, Dos, TitleSet, basics, strutil, fileutil
   ;
 
-constructor TPercentGauge.Init(var Bounds: TRect; AMaxValue: LongInt);
+constructor TPercentGauge.Create(const Bounds: TRect; AMaxValue: LongInt);
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   CurValue := 0;
   MaxValue := AMaxValue;
   EventMask := EventMask or evBroadcast;
@@ -193,21 +196,21 @@ procedure TWhileView.InsBut;
     R: TRect;
   begin
   R.Assign(1, Size.Y-3, 13, Size.Y-1);
-  New(But, Init(R, GetString(dlStop), cmCancel, bfDefault));
-  But^.Options := But^.Options or ofCenterX;
+  But := PButton.Create(R, GetString(dlStop), cmCancel, bfDefault);
+  But.Options := But.Options or ofCenterX;
   Insert(But);
   end;
 
-constructor TWhileView.Init(Bounds: TRect);
+constructor TWhileView.Create(const Bounds: TRect);
   var
     I: Integer;
   begin
-  TGroup.Init(Bounds);
+  inherited Create(Bounds);
   QuitNormal := False;
   Options := (Options or ofCentered or ofTopSelect) and not ofSelectable;
-  Lines := New(PLineCollection, Init(Bounds.B.Y-Bounds.A.Y, 10, False));
+  Lines := PLineCollection.Create(Bounds.B.Y-Bounds.A.Y, 10, False);
   for I := 0 to Bounds.B.Y-Bounds.A.Y-2 do
-    Lines^.Insert(NewStr(''));
+    Lines.Insert(NewStr(''));
   SetState(sfShadow, True);
   InsBut;
   Top := '';
@@ -221,15 +224,15 @@ procedure TWhileView.Write(N: Integer; S: String);
     I: Integer;
     S1: String;
   begin
-  if N < Lines^.Count then
+  if N < Lines.Count then
     begin
-    if CnvString(Lines^.At(N)) = S then
+    if CnvString(Lines.At(N)) = S then
       Exit;
-    Lines^.AtFree(N);
+    Lines.AtFree(N);
     end
   else
     Exit;
-  Lines^.AtInsert(N, NewStr(S));
+  Lines.AtInsert(N, NewStr(S));
   if Length(S) > Size.X-4 then
     begin
     Lock;
@@ -247,7 +250,7 @@ procedure TWhileView.Write(N: Integer; S: String);
       end;
     Boolean(Side) := not Boolean(Side);
     Locate(R);
-    Dispose(But, Done);
+    But.Free;
     But := nil;
     InsBut;
     UnLock;
@@ -266,10 +269,10 @@ procedure TWhileView.ClearInterior;
   var
     I, C: Integer;
   begin
-  C := Lines^.Count-1;
-  Lines^.FreeAll;
+  C := Lines.Count-1;
+  Lines.FreeAll;
   for I := 0 to C do
-    Lines^.Insert(NewStr(''));
+    Lines.Insert(NewStr(''));
   DrawView;
   end;
 
@@ -305,7 +308,7 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
 
   procedure MoveView;
     begin
-    Desktop^.GetExtent(R);
+    Desktop.GetExtent(R);
     Inc(R.A.Y, Size.Y-1);
     SetState(sfDragging, True);
     DrawView;
@@ -314,7 +317,7 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
     end;
 
   begin
-  Owner^.GetExtent(R);
+  Owner.GetExtent(R);
   case Event.What of
     evKeyDown:
       case DNKeyCode(Event) of
@@ -323,7 +326,7 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
           Event.What := evCommand;
           Event.Command := cmCancel;
           Event.InfoPtr := But;
-          Application^.PutEvent(Event);
+          Application.PutEvent(Event);
           ClearEvent(Event);
           end;
         kbLeft:
@@ -368,7 +371,7 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
             ClearEvent(Event);
       end {case};
   end {case};
-  TGroup.HandleEvent(Event);
+  inherited HandleEvent(Event);
   end { TWhileView.HandleEvent };
 
 procedure TWhileView.Draw;
@@ -400,7 +403,7 @@ procedure TWhileView.Draw;
       end;
     Boolean(Side) := not Boolean(Side);
     Locate(R);
-    Dispose(But, Done);
+    But.Free;
     But := nil;
     InsBut;
     UnLock;
@@ -422,7 +425,7 @@ procedure TWhileView.Draw;
       end;
     Boolean(Side) := not Boolean(Side);
     Locate(R);
-    Dispose(But, Done);
+    But.Free;
     But := nil;
     InsBut;
     UnLock;
@@ -447,19 +450,19 @@ procedure TWhileView.Draw;
   for I := 0 to Size.Y-5 do
     begin
     MoveChar(B[1], ' ', C2, Size.X-2);
-    if I < Lines^.Count then
+    if I < Lines.Count then
       begin
-      PS := Lines^.At(I);
+      PS := Lines.At(I);
       if PS <> nil then
         MoveStr(B[(Size.X-Length(PS^)) div 2], PS^, C2);
       end;
     WriteLineC(0, I+1, Size.X, 1, B);
     end;
   MoveChar(B[1], ' ', C2, Size.X-2);
-  WriteLineC(0, But^.Origin.Y, But^.Origin.X, 2, B);
-  WriteLineC(But^.Origin.X+But^.Size.X, But^.Origin.Y, Size.X, 2,
-    B[But^.Origin.X+But^.Size.X]);
-  But^.Draw;
+  WriteLineC(0, But.Origin.Y, But.Origin.X, 2, B);
+  WriteLineC(But.Origin.X+But.Size.X, But.Origin.Y, Size.X, 2,
+    B[But.Origin.X+But.Size.X]);
+  But.Draw;
   end { TWhileView.Draw };
 
 function TWhileView.Valid(C: Word): Boolean;
@@ -467,33 +470,33 @@ function TWhileView.Valid(C: Word): Boolean;
   Result := (C <> cmQuit) and (C <> cmClose) and inherited Valid(C);
   end;
 
-destructor TWhileView.Done;
+destructor TWhileView.Destroy;
   begin
-  Dispose(Lines, Done);
+  Lines.Free;
   Lines := nil;
-  TGroup.Done;
+  inherited Destroy;
   end;
 
 procedure DispatchEvents(InfoView: PWhileView; var CancelParam: Boolean);
   var
     Event: TEvent;
   begin
-  Application^.GetEvent(Event);
+  Application.GetEvent(Event);
   if  (Event.What = evCommand) and (Event.Command = cmCancel) and
-      (Event.InfoPtr = InfoView^.But) or
+      (Event.InfoPtr = InfoView.But) or
       (Event.What = evKeyDown) and (DNKeyCode(Event) = kbESC)
   then
     begin
-    InfoView^.ClearEvent(Event);
+    InfoView.ClearEvent(Event);
     CancelParam := True;
     end;
   if  (Event.What <> evNothing)
     { and not ((Event.What = evKeyDown) and
     (DNKeyCode(Event) = kbEnter))}
     then
-    {and InfoView^.MouseInView(Event.Where)
+    {and InfoView.MouseInView(Event.Where)
     or (Event.What = evKeyDown) and ((Event.ScanCode=kbAltS) or (Event.))
-    then Application}InfoView^.HandleEvent(Event);
+    then Application}InfoView.HandleEvent(Event);
   end;
 
 end.

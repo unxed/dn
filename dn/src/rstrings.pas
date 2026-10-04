@@ -61,25 +61,27 @@ type
   PIndexArray = ^TIndexArray;
   TIndexArray = array[0..65520 div SizeOf(TOffsetType)-1] of TOffsetType;
 
-  PIdxResource = ^TIdxResource;
-  TIdxResource = object(TObject)
+  TIdxResource = class;
+  PIdxResource = TIdxResource;
+  TIdxResource = class(TObject)
     Stream: PStream;
     Index: PIndexArray;
     Count: AInt;
-    constructor Init(AStream: PStream);
-    destructor Done; virtual;
-    function Get(Key: TDlgIdx): PObject;
+    constructor Create(AStream: PStream);
+    destructor Destroy; override;
+    function Get(Key: TDlgIdx): TStreamable;
     end;
 
-  PIdxMaker = ^TIdxMaker;
-  TIdxMaker = object(TObject)
+  TIdxMaker = class;
+  PIdxMaker = TIdxMaker;
+  TIdxMaker = class(TObject)
     Stream: PStream;
     TempStream: PBufStream;
     Index: PIndexArray;
     Count: AInt;
-    constructor Init(AStream: PStream);
-    destructor Done; virtual;
-    procedure Put(Item: PObject; Key: TDlgIdx);
+    constructor Create(AStream: PStream);
+    destructor Destroy; override;
+    procedure Put(Item: TStreamable; Key: TDlgIdx);
     function Empty(Key: TDlgIdx): Boolean;
     end;
 
@@ -92,52 +94,53 @@ uses
 const
   TempStreamName = '$MAKERES.TMP';
 
-constructor TIdxResource.Init(AStream: PStream);
+constructor TIdxResource.Create(AStream: PStream);
   begin
   Stream := AStream;
-  AStream^.Read(Count, SizeOf(Count));
+  AStream.Read(Count, SizeOf(Count));
   GetMem(Index, Count*SizeOf(TOffsetType));
-  AStream^.Read(Index^, Count*SizeOf(TOffsetType));
+  AStream.Read(Index^, Count*SizeOf(TOffsetType));
   end;
 
-destructor TIdxResource.Done;
+destructor TIdxResource.Destroy;
   begin
   FreeMem(Index, Count*SizeOf(TOffsetType));
-  Dispose(Stream, Done);
+  Stream.Free;
+  inherited Destroy;
   end;
 
-function TIdxResource.Get(Key: TDlgIdx): PObject;
+function TIdxResource.Get(Key: TDlgIdx): TStreamable;
 
   procedure Chk;
     begin
-    if Stream^.Status <> stOK then
+    if Stream.Status <> stOK then
       ResourceAccessError
     end;
 
   begin
   Chk;
-  Stream^.Seek(Index^[Integer(Key)]);
+  Stream.Seek(Index^[Integer(Key)]);
   Chk;
   Get := Stream^.Get;
   Chk;
   end;
 
-constructor TIdxMaker.Init(AStream: PStream);
+constructor TIdxMaker.Create(AStream: PStream);
   begin
-  New(TempStream, Init(TempStreamName, stCreate, 1024));
+  TempStream := PBufStream.Create(TempStreamName, stCreate, 1024);
   Stream := AStream;
   Count := 0;
   GetMem(Index, 65520);
   FillChar(Index^, 65520, $FF);
   end;
 
-procedure TIdxMaker.Put(Item: PObject; Key: TDlgIdx);
+procedure TIdxMaker.Put(Item: TStreamable; Key: TDlgIdx);
   begin
   if Count <= Integer(Key) then
     Count := Integer(Key)+1;
-  Index^[Integer(Key)] := i32(TempStream^.GetPos);
-  TempStream^.Put(Item);
-  if TempStream^.Status <> stOK then
+  Index^[Integer(Key)] := i32(TempStream.GetPos);
+  TempStream.Put(Item);
+  if TempStream.Status <> stOK then
     begin
     Writeln('Cannot write object #', Integer(Key));
     Halt(2);
@@ -149,7 +152,7 @@ function TIdxMaker.Empty(Key: TDlgIdx): Boolean;
   Empty := Index^[Integer(Key)] = -1
   end;
 
-destructor TIdxMaker.Done;
+destructor TIdxMaker.Destroy;
   var
     I: LongInt;
     IdxSize: LongInt;
@@ -160,23 +163,23 @@ destructor TIdxMaker.Done;
   IdxSize := Count*SizeOf(TOffsetType);
   for I := 0 to Count-1 do
     Inc(Index^[I], IdxSize+SizeOf(Count));
-  Stream^.Write(Count, SizeOf(Count));
-  Stream^.Write(Index^, Count*SizeOf(TOffsetType));
-  MaxPos := i32(TempStream^.GetPos);
-  TempStream^.Seek(0);
+  Stream.Write(Count, SizeOf(Count));
+  Stream.Write(Index^, Count*SizeOf(TOffsetType));
+  MaxPos := i32(TempStream.GetPos);
+  TempStream.Seek(0);
   for I := 0 to MaxPos do
     begin
-    TempStream^.Read(B, 1);
-    Stream^.Write(B, 1);
+    TempStream.Read(B, 1);
+    Stream.Write(B, 1);
     end;
-  if Stream^.Status <> stOK then
+  if Stream.Status <> stOK then
     Writeln('Status is invalid');
-  Dispose(Stream, Done);
-  Dispose(TempStream, Done);
+  Stream.Free;
+  TempStream.Free;
   FreeMem(Index, 65520);
   Assign(F, SysOsPath(TempStreamName));
   Erase(F);
-  inherited Done;
+  inherited Destroy;
   end { TIdxMaker.Done };
 
 end.

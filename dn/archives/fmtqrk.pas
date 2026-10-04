@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PQuarkArchive = ^TQuArkArchive;
-  TQuArkArchive = object(TARJArchive)
-    constructor Init;
+  TQuArkArchive = class;
+  PQuarkArchive = TQuArkArchive;
+  TQuArkArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -66,7 +67,7 @@ implementation
 
 { --------------------- Quark (by Luzin Aleksey) -------------------------}
 
-constructor TQuArkArchive.Init;
+constructor TQuArkArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -75,7 +76,7 @@ constructor TQuArkArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'QuArk'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'QuArk'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
@@ -151,31 +152,31 @@ procedure TQuArkArchive.GetFile;
       TPC: Byte;
       end;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if ArcFile.GetPos = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(FH, SizeOf(FH));
-  if  (ArcFile^.Status <> 0) then
+  ArcFile.Read(FH, SizeOf(FH));
+  if  (ArcFile.Status <> 0) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
   SetLength(FileInfo.FName, FH.LengthOfName);
-  ArcFile^.Read(FileInfo.FName[1], FH.LengthOfName);
+  ArcFile.Read(FileInfo.FName[1], FH.LengthOfName);
   if FileInfo.FName = '' then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Read(FH1, SizeOf(FH1));
+  ArcFile.Read(FH1, SizeOf(FH1));
   FileInfo.Last := 0;
   FileInfo.Date := FH1.DateTime;
   FileInfo.Attr := FH1.Attr and not Hidden;
   FileInfo.USize := FH1.RealSize;
   FileInfo.PSize := FH1.PackSize;
-  ArcFile^.Seek(ArcFile^.GetPos+FH1.PackSize);
+  ArcFile.Seek(ArcFile.GetPos+FH1.PackSize);
   end { TQuArkArchive.GetFile };
 
 end.

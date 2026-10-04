@@ -54,11 +54,12 @@ uses
   ;
 
 type
-  PAINArchive = ^TAINArchive;
-  TAINArchive = object(TARJArchive)
+  TAINArchive = class;
+  PAINArchive = TAINArchive;
+  TAINArchive = class(TARJArchive)
     ListFileName: String;
     ListFile: System.Text;
-    constructor Init;
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -73,7 +74,7 @@ uses
 
 { ------------------------------- AIN ------------------------------------- }
 
-constructor TAINArchive.Init;
+constructor TAINArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -82,7 +83,7 @@ constructor TAINArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'AIN'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'AIN'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
@@ -166,7 +167,7 @@ procedure TAINArchive.GetFile;
   if TextRec(ListFile).Handle = 0 then
     begin { первый вызов: вызов архиватора для вывода оглавления }
     FileInfo.Last := 2;
-    ArcFile^.Close;
+    ArcFile.Close;
     ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
     s := '/C '
       

@@ -180,10 +180,11 @@ procedure FileChanged(const Name: String);
 
 
 type
-  PTempFile = ^TTempFile;
-  TTempFile = object(TBufStream)
-    constructor Init(const AExt: String; ABufSize: SW_Word);
-    destructor Done; virtual;
+  TTempFile = class;
+  PTempFile = TTempFile;
+  TTempFile = class(TBufStream)
+    constructor Create(const AExt: String; ABufSize: SW_Word);
+    destructor Destroy; override;
     end;
   
 
@@ -208,23 +209,23 @@ var
   SaveHelpCtx: Word;
 
 
-constructor TTempFile.Init(const AExt: String; ABufSize: SW_Word);
+constructor TTempFile.Create(const AExt: String; ABufSize: SW_Word);
   var
     S: FNameStr;
     L: LongInt;
   begin
   L := CalcTmpId;
   S := CalcTmpFName(L, AExt, True);
-  inherited Init(S, (stCreate and fmDeny) or fmDenyAll or fmDenyChild,
+  inherited Create(S, (stCreate and fmDeny) or fmDenyAll or fmDenyChild,
      ABufSize);
   end;
 
-destructor TTempFile.Done;
+destructor TTempFile.Destroy;
   var
     S: FNameStr;
   begin
   S := FName;
-  inherited Done;
+  inherited Destroy;
   EraseFile(S);
   end;
 

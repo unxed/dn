@@ -120,8 +120,9 @@ type
   { 5 = Disabled selection }
   { 6 = Shortcut selection }
 
-  PMenuView = ^TMenuView;
-  TMenuView = object(TView)
+  TMenuView = class;
+  PMenuView = TMenuView;
+  TMenuView = class(TView)
     ParentMenu: PMenuView;
     Menu: PMenu;
     Current: PMenuItem;
@@ -132,9 +133,9 @@ type
        TMenuBar. Ни к чему строить такие ловушки. Для классов есть
        операция 'is', но для объектов её аналога нет, поэтому приходится
        исхитряться. }
-    constructor Init(var Bounds: TRect);
-    constructor Load(var S: TStream);
-    function Execute: Word; virtual;
+    constructor Create(var Bounds: TRect);
+    constructor Load(S: TStream);
+    function Execute: Word; override;
       { AK155 21.05.2005 (ak50521a.dif) Добавил учёт поля Disabled.
         До этого Disabled-элемент в Draw отображался бледно, но
         в Execute выбирался наравне с доступными. Это может понадобиться
@@ -143,13 +144,13 @@ type
         комбобокса. }
     function FindItem(Ch: Char): PMenuItem;
     procedure GetItemRect(Item: PMenuItem; var R: TRect); virtual;
-    function GetHelpCtx: Word; virtual;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    function GetHelpCtx: Word; override;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     function HotKey(KeyCode: LongInt): PMenuItem;
     function NewSubView(var Bounds: TRect; AMenu: PMenu;
         AParentMenu: PMenuView): PMenuView; virtual;
-    procedure Store(var S: TStream);
+    procedure Store(S: TStream);
     function RightExpand: Boolean; virtual;
       { по kbRight раскрывать подменю }
     function LeftCollapse: Boolean; virtual;
@@ -166,13 +167,14 @@ type
   { 5 = Disabled selection }
   { 6 = Shortcut selection }
 
-  PMenuBar = ^TMenuBar;
-  TMenuBar = object(TMenuView)
-    constructor Init(var Bounds: TRect; AMenu: PMenu);
-    destructor Done; virtual;
-    procedure Draw; virtual;
+  TMenuBar = class;
+  PMenuBar = TMenuBar;
+  TMenuBar = class(TMenuView)
+    constructor Create(var Bounds: TRect; AMenu: PMenu);
+    destructor Destroy; override;
+    procedure Draw; override;
     procedure GetItemRect(Item: PMenuItem; var R: TRect); virtual;
-    function Execute: Word; virtual;
+    function Execute: Word; override;
     end;
 
   { TMenuBox object }
@@ -185,15 +187,16 @@ type
   { 5 = Disabled selection }
   { 6 = Shortcut selection }
 
-  PMenuBox = ^TMenuBox;
-  TMenuBox = object(TMenuView)
+  TMenuBox = class;
+  PMenuBox = TMenuBox;
+  TMenuBox = class(TMenuView)
     TopItem: PMenuItem;
     ComboBoxPal: Boolean;
-    constructor Init(var Bounds: TRect; AMenu: PMenu;
+    constructor Create(var Bounds: TRect; AMenu: PMenu;
         AParentMenu: PMenuView);
-    procedure Draw; virtual;
+    procedure Draw; override;
     procedure GetItemRect(Item: PMenuItem; var R: TRect); virtual;
-    function Execute: Word; virtual;
+    function Execute: Word; override;
     function RightExpand: Boolean; virtual;
     function LeftCollapse: Boolean; virtual;
     end;
@@ -208,10 +211,11 @@ type
   { 5 = Disabled selection }
   { 6 = Shortcut selection }
 
-  PMenuPopup = ^TMenuPopup;
-  TMenuPopup = object(TMenuBox)
-    constructor Init(var Bounds: TRect; AMenu: PMenu);
-    procedure HandleEvent(var Event: TEvent); virtual;
+  TMenuPopup = class;
+  PMenuPopup = TMenuPopup;
+  TMenuPopup = class(TMenuBox)
+    constructor Create(var Bounds: TRect; AMenu: PMenu);
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
   { TStatusItem }
@@ -243,19 +247,20 @@ type
   { 5 = Disabled selection }
   { 6 = Shortcut selection }
 
-  PStatusLine = ^TStatusLine;
-  TStatusLine = object(TView)
+  TStatusLine = class;
+  PStatusLine = TStatusLine;
+  TStatusLine = class(TView)
     Items: PStatusItem;
     Defs: PStatusDef;
-    constructor Init(var Bounds: TRect; ADefs: PStatusDef);
-    constructor Load(var S: TStream);
-    destructor Done; virtual;
-    procedure Draw; virtual;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    constructor Create(var Bounds: TRect; ADefs: PStatusDef);
+    constructor Load(S: TStream);
+    destructor Destroy; override;
+    procedure Draw; override;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     function Hint(AHelpCtx: Word): String; virtual;
-    procedure Store(var S: TStream);
-    procedure Update; virtual;
+    procedure Store(S: TStream);
+    procedure Update; override;
   private
     procedure DrawSelect(Selected: PStatusItem);
     procedure FindItems;
@@ -409,15 +414,15 @@ procedure DisposeMenu(Menu: PMenu);
 
 { TMenuView }
 
-constructor TMenuView.Init(var Bounds: TRect);
+constructor TMenuView.Create(var Bounds: TRect);
   begin
   Bounds.B.X := Bounds.A.X; {new}
   Bounds.B.Y := Bounds.A.Y; {new}
-  TView.Init(Bounds);
+  inherited Create(Bounds);
   EventMask := EventMask or evBroadcast;
   end;
 
-constructor TMenuView.Load(var S: TStream);
+constructor TMenuView.Load(S: TStream);
 
   function DoLoadMenu: PMenu;
     var
@@ -460,7 +465,7 @@ constructor TMenuView.Load(var S: TStream);
     end { DoLoadMenu: };
 
   begin { TMenuView.Load }
-  TView.Load(S);
+  inherited Load(S);
   Menu := DoLoadMenu;
   end { TMenuView.Load };
 
@@ -1154,10 +1159,10 @@ function TMenuView.HotKey(KeyCode: LongInt): PMenuItem;
 function TMenuView.NewSubView(var Bounds: TRect; AMenu: PMenu;
     AParentMenu: PMenuView): PMenuView;
   begin
-  NewSubView := New(PMenuBox, Init(Bounds, AMenu, AParentMenu));
+  NewSubView := TMenuBox.Create(Bounds, AMenu, AParentMenu);
   end;
 
-procedure TMenuView.Store(var S: TStream);
+procedure TMenuView.Store(S: TStream);
 
   procedure DoStoreMenu(Menu: PMenu);
     var
@@ -1191,7 +1196,7 @@ procedure TMenuView.Store(var S: TStream);
     end { DoStoreMenu };
 
   begin { TMenuView.Store }
-  TView.Store(S);
+  inherited Store(S);
   DoStoreMenu(Menu);
   end { TMenuView.Store };
 
@@ -1207,20 +1212,21 @@ function TMenuView.LeftCollapse: Boolean;
 
 { TMenuBar }
 
-constructor TMenuBar.Init(var Bounds: TRect; AMenu: PMenu);
+constructor TMenuBar.Create(var Bounds: TRect; AMenu: PMenu);
   var
     R: TRect;
   begin
-  TMenuView.Init(Bounds);
+  inherited Create(Bounds);
   GrowMode := gfGrowHiX;
   Menu := AMenu;
   Options := Options or ofPreProcess;
   end;
 
-destructor TMenuBar.Done;
+destructor TMenuBar.Destroy;
   begin
-  TMenuView.Done;
   DisposeMenu(Menu);
+  inherited Destroy;
+
   end;
 
 procedure TMenuBar.Draw;
@@ -1293,10 +1299,10 @@ function TMenuBar.Execute: Word;
 
 { TMenuBox }
 
-constructor TMenuBox.Init(var Bounds: TRect; AMenu: PMenu;
+constructor TMenuBox.Create(var Bounds: TRect; AMenu: PMenu;
     AParentMenu: PMenuView);
   begin
-  TMenuView.Init(Bounds);
+  inherited Create(Bounds);
   State := State or sfShadow;
   Options := Options or ofPreProcess;
   Menu := AMenu;
@@ -1550,9 +1556,9 @@ function TMenuBox.LeftCollapse: Boolean;
 
 {TMenuPopup}
 
-constructor TMenuPopup.Init(var Bounds: TRect; AMenu: PMenu);
+constructor TMenuPopup.Create(var Bounds: TRect; AMenu: PMenu);
   begin
-  inherited Init(Bounds, AMenu, nil);
+  inherited Create(Bounds, AMenu, nil);
   end;
 
 procedure TMenuPopup.HandleEvent(var Event: TEvent);
@@ -1582,9 +1588,9 @@ procedure TMenuPopup.HandleEvent(var Event: TEvent);
 
 { TStatusLine }
 
-constructor TStatusLine.Init(var Bounds: TRect; ADefs: PStatusDef);
+constructor TStatusLine.Create(var Bounds: TRect; ADefs: PStatusDef);
   begin
-  TView.Init(Bounds);
+  inherited Create(Bounds);
   Options := Options or ofPreProcess;
   EventMask := EventMask or evBroadcast;
   GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
@@ -1592,7 +1598,7 @@ constructor TStatusLine.Init(var Bounds: TRect; ADefs: PStatusDef);
   FindItems;
   end;
 
-constructor TStatusLine.Load(var S: TStream);
+constructor TStatusLine.Load(S: TStream);
 
   function DoLoadStatusItems: PStatusItem;
     var
@@ -1640,12 +1646,12 @@ constructor TStatusLine.Load(var S: TStream);
     end;
 
   begin { TStatusLine.Load }
-  TView.Load(S);
+  inherited Load(S);
   Defs := DoLoadStatusDefs;
   FindItems;
   end { TStatusLine.Load };
 
-destructor TStatusLine.Done;
+destructor TStatusLine.Destroy;
   var
     T: PStatusDef;
 
@@ -1670,7 +1676,7 @@ destructor TStatusLine.Done;
     DisposeItems(T^.Items);
     Dispose(T);
     end;
-  TView.Done;
+  inherited Destroy;
   end { TStatusLine.Done };
 
 procedure TStatusLine.Draw;
@@ -1923,7 +1929,7 @@ function TStatusLine.Hint(AHelpCtx: Word): String;
     Hint := '';
   end;
 
-procedure TStatusLine.Store(var S: TStream);
+procedure TStatusLine.Store(S: TStream);
 
   procedure DoStoreStatusItems(Cur: PStatusItem);
     var
@@ -1972,7 +1978,7 @@ procedure TStatusLine.Store(var S: TStream);
     end { DoStoreStatusDefs };
 
   begin { TStatusLine.Store }
-  TView.Store(S);
+  inherited Store(S);
   DoStoreStatusDefs(Defs);
   end { TStatusLine.Store };
 

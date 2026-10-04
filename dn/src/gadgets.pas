@@ -59,28 +59,30 @@ uses
 type
   
   { Trash can object }
-  PTrashCan = ^TTrashCan;
-  TTrashCan = object(TView)
+  TTrashCan = class;
+  PTrashCan = TTrashCan;
+  TTrashCan = class(TView)
     ImVisible: Boolean;
-    constructor Init(var R: TRect);
-    function GetPalette: TPalette; virtual;
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    constructor Create(const R: TRect);
+    function GetPalette: TPalette; override;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     end;
   
 
-  PKeyMacros = ^TKeyMacros;
-  TKeyMacros = object(TObject)
+  TKeyMacros = class;
+  PKeyMacros = TKeyMacros;
+  TKeyMacros = class(TObject)
     Keys: PWordArray;
     Count: AInt;
     Limit: AInt;
-    constructor Init;
-    constructor Load(var S: TStream);
-    destructor Done; virtual;
+    constructor Create;
+    constructor Load(S: TStream);
+    destructor Destroy; override;
     procedure Play;
     procedure PutKey(KeyCode: LongInt);
-    procedure Store(var S: TStream);
+    procedure Store(S: TStream);
     end;
 
 const
@@ -92,16 +94,18 @@ const
   MacroRecord: Boolean = False;
 
 type
-  PHeapView = ^THeapView;
-  THeapView = object(TView)
+  THeapView = class;
+  PHeapView = THeapView;
+  THeapView = class(TView)
     OldMem: LongInt;
-    constructor Init(var Bounds: TRect);
-    procedure Update; virtual;
-    procedure Draw; virtual;
+    constructor Create(const Bounds: TRect);
+    procedure Update; override;
+    procedure Draw; override;
     end;
 
-  PClockView = ^TClockView;
-  TClockView = object(TView)
+  TClockView = class;
+  PClockView = TClockView;
+  TClockView = class(TView)
     Refresh: Byte;
     LastTime: DateTime;
     LastSemi: Boolean;
@@ -109,10 +113,10 @@ type
     OldXCoord: AInt; {-SSK}
     OldShowSeconds: Boolean;
     Utimer: TEventTimer;
-    constructor Init(var Bounds: TRect);
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Update; virtual;
-    procedure Draw; virtual;
+    constructor Create(const Bounds: TRect);
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Update; override;
+    procedure Draw; override;
     end;
   
 procedure PrintFiles(Files: PCollection; Own: PView);
@@ -126,9 +130,9 @@ uses
   , Calendar 
   ; {-$VIV}
 
-constructor TKeyMacros.Init;
+constructor TKeyMacros.Create;
   begin
-  inherited Init;
+  inherited Create;
   Limit := 10;
   Count := 0;
   Keys := GetMem(Limit*SizeOf(Word));
@@ -136,15 +140,16 @@ constructor TKeyMacros.Init;
     Fail;
   end;
 
-destructor TKeyMacros.Done;
+destructor TKeyMacros.Destroy;
   begin
   if Keys <> nil then
     FreeMem(Keys, Limit*SizeOf(Word));
-  inherited Done;
+  inherited Destroy;
   end;
 
-constructor TKeyMacros.Load(var S: TStream);
+constructor TKeyMacros.Load(S: TStream);
   begin
+  inherited Create;
   S.Read(Limit, SizeOf(Limit)*2);
   Keys := GetMem(SizeOf(Word)*Limit);
   if Keys = nil then
@@ -152,7 +157,7 @@ constructor TKeyMacros.Load(var S: TStream);
   S.Read(Keys^, SizeOf(Word)*Count);
   end;
 
-procedure TKeyMacros.Store(var S: TStream);
+procedure TKeyMacros.Store(S: TStream);
   begin
   S.Write(Limit, SizeOf(Limit)*2);
   S.Write(Keys^, SizeOf(Word)*Count);
@@ -188,9 +193,9 @@ procedure TKeyMacros.Play;
   end;
 {------ Heap Window object ----------}
 
-constructor THeapView.Init(var Bounds: TRect);
+constructor THeapView.Create(const Bounds: TRect);
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   OldMem := 0;
   end;
 
@@ -221,11 +226,11 @@ function LeadingZero(w: Word): String;
   if Length(Result) < 2 then
     Result := '0' + Result;
   end;
-constructor TClockView.Init(var Bounds: TRect);
+constructor TClockView.Create(const Bounds: TRect);
   var
     s, hund: Word;
   begin
-  TView.Init(Bounds);
+  inherited Create(Bounds);
   FillChar(LastTime, SizeOf(LastTime), #$FF);
   TimeStr := '';
   Refresh := 1;
@@ -236,7 +241,7 @@ constructor TClockView.Init(var Bounds: TRect);
   GrowMode := gfGrowHiX;
   GetTime(LastHour, LastMin, s, hund);
   LastSemi := hund < 50;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   if ShowSeconds then
     UpdTicks := 1000
   else
@@ -276,7 +281,7 @@ procedure TClockView.HandleEvent(var Event: TEvent);
     R: TRect;
   begin
   P := Size;
-  Application^.GetBounds(R);
+  Application.GetBounds(R);
   if Event.What = evMouseDown then
     begin
     
@@ -417,9 +422,9 @@ const
 
   { TTrashCan }
 
-constructor TTrashCan.Init(var R: TRect);
+constructor TTrashCan.Create(const R: TRect);
   begin
-  inherited Init(R);
+  inherited Create(R);
   Options := Options or ofTopSelect;
   EventMask := EventMask or evBroadcast;
   GrowMode := gfGrowAll;
@@ -428,7 +433,7 @@ constructor TTrashCan.Init(var R: TRect);
 
 function TTrashCan.GetPalette: TPalette;
   begin
-  Result := @CTrashCan;
+  Result := MakePalette(CTrashCan);
   end;
 
 procedure TTrashCan.Draw;
@@ -470,7 +475,7 @@ procedure TTrashCan.HandleEvent(var Event: TEvent);
     Exit;
   if not ((Event.EventFlags and 2) <> 0) then
     begin
-    Owner^.GetExtent(Limits);
+    Owner.GetExtent(Limits);
     DragView(Event, dmDragMove, Limits, Size, Size);
     Exit;
     end;
@@ -501,26 +506,26 @@ procedure PrintFiles(Files: PCollection; Own: PView);
   if Files = nil then
     Exit;
   J := 0;
-  for I := 0 to Files^.Count-1 do
+  for I := 0 to Files.Count-1 do
     begin
-    PF := Files^.At(I);
+    PF := Files.At(I);
     if PF^.Attr and Directory = 0 then
       Inc(J);
     end;
   if J = 0 then
     Exit;
-  if Files^.Count = 1 then
+  if Files.Count = 1 then
     S := GetString(dlDIFile)+' '+
-         Cut(PFileRec(Files^.At(0))^.FlName[True], 40)
+         Cut(PFileRec(Files.At(0))^.FlName[True], 40)
   else
-    S := ItoS(Files^.Count)+' '+GetString(dlDIFiles);
+    S := ItoS(Files.Count)+' '+GetString(dlDIFiles);
   if MessageBox(GetString(dlPM_Print)+S+'?', nil, mfYesNoConfirm)
      <> cmYes
   then
     Exit;
-  for I := 0 to Files^.Count-1 do
+  for I := 0 to Files.Count-1 do
     begin
-    PF := Files^.At(I);
+    PF := Files.At(I);
     if PF^.Attr and Directory = 0 then
       begin
       S := MakeNormName(PF^.Owner^, PF^.FlName[True]);

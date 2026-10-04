@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PZXZArchive = ^TZXZArchive;
-  TZXZArchive = object(TARJArchive)
-    constructor Init;
+  TZXZArchive = class;
+  PZXZArchive = TZXZArchive;
+  TZXZArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -78,7 +79,7 @@ implementation
 
 { ------------------------------ ZXZip aka $Z ----------------------------- }
 
-constructor TZXZArchive.Init;
+constructor TZXZArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -87,7 +88,7 @@ constructor TZXZArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ZXZIP386'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ZXUNZIP'));
@@ -156,16 +157,16 @@ procedure TZXZArchive.GetFile;
     P: ZXZHdr;
     Len: AWord;
   begin
-  ArcFile^.Read(P, SizeOf(P));
-  FP := ArcFile^.GetPos;
-  if  (ArcFile^.Status <> stOK) or (FP > 65280) then
+  ArcFile.Read(P, SizeOf(P));
+  FP := ArcFile.GetPos;
+  if  (ArcFile.Status <> stOK) or (FP > 65280) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
   if  (P.Name[0] < #32) or
       (P.PackedSize > P.SectorSize*256) or
-      ( (P.PackedSize+FP-SizeOf(P)-17) > ArcFile^.GetSize) or
+      ( (P.PackedSize+FP-SizeOf(P)-17) > ArcFile.GetSize) or
       (P.MethodID > 3) or
       (P.SectorSize = 0)
   then
@@ -201,7 +202,7 @@ procedure TZXZArchive.GetFile;
   FileInfo.USize := LongInt(Len);
   FileInfo.PSize := LongInt(P.PackedSize);
   FileInfo.Date := 0;
-  ArcFile^.Seek(FP+P.PackedSize);
+  ArcFile.Seek(FP+P.PackedSize);
   end { TZXZArchive.GetFile };
 
 end.

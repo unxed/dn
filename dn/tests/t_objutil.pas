@@ -6,7 +6,7 @@ uses objutil;
 type
   TA = class;
   PA = TA;
-  TA = class(TObject)
+  TA = class(TStreamable)
     N: Integer;
     function Name: Integer; virtual;
   end;
@@ -19,7 +19,7 @@ function TB.Name: Integer; begin Result := 2; end;
 
 var
   P: PA;
-  Q: PObject;
+  Q: TStreamable;
 begin
   P := TA.Create;
   P.N := 7;

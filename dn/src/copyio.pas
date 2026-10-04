@@ -82,7 +82,7 @@ const
 
 function IsLabel(P: PView): Boolean;
   begin
-  IsLabel := TypeOf(P^) = TypeOf(TLabel);
+  IsLabel := P is TLabel;
   end;
 
 procedure GetMaxMem;
@@ -164,9 +164,9 @@ procedure LongCopy(Fn1: String);
 
   procedure DsplInfo;
     begin
-    PInfo^.Write(5, GetString(dlRead)+
+    PInfo.Write(5, GetString(dlRead)+
       Copy(Strg(#219, (LongInt(WL)*Cs) div (Ls + Byte(Ls=0)))+Strg(#177, WL), 1, WL));
-    PInfo^.Write(6, GetString(dlWrite)+
+    PInfo.Write(6, GetString(dlWrite)+
       Copy(Strg(#219, (LongInt(WL)*CD) div (Ls + Byte(Ls=0)))+Strg(#177, WL), 1, WL));
     end;
 
@@ -280,7 +280,7 @@ procedure LongCopy(Fn1: String);
       end;
     CreateDirInheritance(D, False);
     lAssignFile(F2, Fn2);
-    PInfo^.Write(3, (Fn2));
+    PInfo.Write(3, (Fn2));
     ClrIO;
     lReWriteFile(F2, 1);
     if not BinarySplit then
@@ -423,22 +423,22 @@ Rep:
       S, K, L: String;
     begin
     D := PDialog(LoadResource(dlgNextSection));
-    V := PLabel(D^.FirstThat(IsLabel));
-    S := V^.Text^;
-    DisposeStr(V^.Text);
+    V := PLabel(D.FirstThat(IsLabel));
+    S := V.Text^;
+    DisposeStr(V.Text);
     Replace('%D', ItoS(Count), S);
-    V^.Text := NewStr(S);
+    V.Text := NewStr(S);
     lFSplit(Fn1, S, K, L);
-    D^.SetData(S);
-    if Desktop^.ExecView(D) = cmCancel then
+    D.SetData(S);
+    if Desktop.ExecView(D) = cmCancel then
       begin
-      Dispose(D, Done);
+      D.Free;
       Abort := True;
       Exit
       end;
     Abort := False;
-    D^.GetData(S);
-    Dispose(D, Done);
+    D.GetData(S);
+    D.Free;
     Fn1 := MakeNormName(S, K+L);
     NewTimer(Timer, 0);
     end { RequirePath };
@@ -465,7 +465,7 @@ Rep:
       FileMode := 0;
       lAssignFile(F1, Fn1);
       lResetFile(F1, 1);
-      PInfo^.Write(1, (Fn1));
+      PInfo.Write(1, (Fn1));
     until ((IOResult = 0) and (CheckSvoi <> 0))
      or Abort or CopyCancelled;
     end { InsCor };
@@ -512,10 +512,9 @@ Rep:
 
     // Строка 1 в диалоге должна быть пустой - туда вставляется имя файла
     R.Assign(0, 1, Length(aa)+Length(aaa), 2);
-    P := New(PStaticText, Init(R,
-          (aa+aaa)));
-    P^.Options := P^.Options or ofCenterX;
-    D^.Insert(P);
+    P := TStaticText.Create(R, aa+aaa);
+    P.Options := P.Options or ofCenterX;
+    D.Insert(P);
 
     S := '';
     HistoryAdd(hsFBBCopy, lFExpand(a));
@@ -539,13 +538,13 @@ Rep:
         DTA.W := 0 or 4;
       end;
 
-    D^.SetData(DTA);
-    if Desktop^.ExecView(D) = cmCancel then
+    D.SetData(DTA);
+    if Desktop.ExecView(D) = cmCancel then
       begin
-      Dispose(D, Done);
+      D.Free;
       Exit
       end;
-    D^.GetData(DTA);
+    D.GetData(DTA);
     BinarySplit := DTA.W and 1 <> 0;
     DiskVerify := DTA.W and 2 <> 0;
     if not Tuda then
@@ -591,7 +590,7 @@ Rep:
     else
       PartSize := 0;
     S := (DTA.S);
-    Dispose(D, Done);
+    D.Free;
     if S = '' then
       S := '.';
     S := lFExpand(S);
@@ -728,17 +727,17 @@ _Abort_:
     goto _Abort_;
 
   R.Assign(1, 1, 36, 13);
-  New(PInfo, Init(R));
+  PInfo := PWhileView.Create(R);
   if PInfo = nil then
     goto _Abort_;
   if Tuda then
-    PInfo^.Top := GetString(dlFBBDEFragment)
+    PInfo.Top := GetString(dlFBBDEFragment)
   else
-    PInfo^.Top := GetString(dlFBBFragment);
-  PInfo^.Bottom := '';
-  PInfo^.SetState(sfShadow, True);
-  Desktop^.Insert(PInfo);
-  PInfo^.Write(1, (Fn1));
+    PInfo.Top := GetString(dlFBBFragment);
+  PInfo.Bottom := '';
+  PInfo.SetState(sfShadow, True);
+  Desktop.Insert(PInfo);
+  PInfo.Write(1, (Fn1));
   lFSplit(Fn2, d, n, x);
   if Tuda and (UpCase(x[2]) = 'D') and (StoI(Copy(x, 3, 2)) > 0) then
     case csv of
@@ -749,9 +748,9 @@ _Abort_:
     end {case};
   lAssignFile(F2, Fn2);
   ClrIO;
-  PInfo^.Write(2, GetString(dlFBBFragmentTo));
-  PInfo^.Write(3, (Fn2));
-  wl := PInfo^.Size.x-8;
+  PInfo.Write(2, GetString(dlFBBFragmentTo));
+  PInfo.Write(3, (Fn2));
+  wl := PInfo.Size.x-8;
   if not Tuda then
     RequireNew
   else
@@ -766,8 +765,8 @@ _Abort_:
         <> cmYes
       then
         begin
-        Desktop^.Delete(PInfo);
-        Dispose(PInfo, Done);
+        Desktop.Delete(PInfo);
+        PInfo.Free;
         Close(F2.F);
         goto _Abort_;
         end;
@@ -777,8 +776,8 @@ _Abort_:
     if  (IOResult <> 0) or Abort then
       begin
       MessageBox(GetString(erCantCreateFile)+Fn2, nil, mfError+mfOKButton);
-      Desktop^.Delete(PInfo);
-      Dispose(PInfo, Done);
+      Desktop.Delete(PInfo);
+      PInfo.Free;
       goto _Abort_;
       end;
     end;
@@ -799,8 +798,8 @@ _Abort_:
   until (Cd >= Ls) or Abort or CopyCancelled;
   Dec(SkyEnabled);
 Ex:
-  Desktop^.Delete(PInfo);
-  Dispose(PInfo, Done);
+  Desktop.Delete(PInfo);
+  PInfo.Free;
   Close(F1.F);
   SetFTime(F2.F, Olddate);
   Close(F2.F);

@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PUFAArchive = ^TUFAArchive;
-  TUFAArchive = object(TARJArchive)
-    constructor Init;
+  TUFAArchive = class;
+  PUFAArchive = TUFAArchive;
+  TUFAArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -66,7 +67,7 @@ implementation
 
 { ---------------------- UFA (by Luzin Aleksey)---------------------------}
 
-constructor TUFAArchive.Init;
+constructor TUFAArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -75,7 +76,7 @@ constructor TUFAArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'UFA'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'UFA'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
@@ -146,13 +147,13 @@ procedure TUFAArchive.GetFile;
       FileNameSize: AWord;
       end;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if ArcFile.GetPos = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(FH, SizeOf(FH));
-  if  (ArcFile^.Status <> 0) or (FH.FileNameSize > 512) then
+  ArcFile.Read(FH, SizeOf(FH));
+  if  (ArcFile.Status <> 0) or (FH.FileNameSize > 512) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -160,7 +161,7 @@ procedure TUFAArchive.GetFile;
   if FH.FileNameSize > 250 then
     FH.FileNameSize := 250;
   SetLength(FileInfo.FName, FH.FileNameSize);
-  ArcFile^.Read(FileInfo.FName[1], FH.FileNameSize);
+  ArcFile.Read(FileInfo.FName[1], FH.FileNameSize);
   if FileInfo.FName = '' then
     begin
     FileInfo.Last := 2;
@@ -171,7 +172,7 @@ procedure TUFAArchive.GetFile;
   FileInfo.USize := FH.OriginalSize;
   FileInfo.PSize := FH.PackSize;
   FileInfo.Date := FH.DateTime;
-  ArcFile^.Seek(ArcFile^.GetPos+FH.PackSize);
+  ArcFile.Seek(ArcFile.GetPos+FH.PackSize);
   end { TUFAArchive.GetFile };
 
 end.

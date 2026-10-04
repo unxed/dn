@@ -59,8 +59,9 @@ uses
   ;
 
 type
-  PArcDrive = ^TArcDrive;
-  TArcDrive = object(TDrive)
+  TArcDrive = class;
+  PArcDrive = TArcDrive;
+  TArcDrive = class(TDrive)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     ArcName: String; {DataCompBoy}
     VArcName: String; {JO}
@@ -72,10 +73,10 @@ type
     ArcSize: TFileSize; {сохраняются вместе}
     ForceRescan: Boolean;
     Password: String;
-    constructor Init(const AName, VAName: String);
-    constructor InitCol(PC: PDirStorage; const AName, VAName: String);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
+    constructor Create(const AName, VAName: String); overload;
+    constructor Create(PC: PDirStorage; const AName, VAName: String);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
     procedure RereadDirectory(S: String); virtual; {DataCompBoy}
     procedure KillUse; virtual;
     function ReadArchive: Boolean;
@@ -120,7 +121,7 @@ type
     procedure GetDirInfo(var B: TDiskInfoRec); virtual;
     function GetFullFlags: Word; virtual;
     procedure GetDirLength(PF: PFileRec); virtual; {DataCompBoy}
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure StdMsg4;
     function OpenDirectory(const Dir: String;
                                  PutDirs: Boolean): PDrive; virtual;
@@ -212,13 +213,13 @@ procedure TArcDrive.StdMsg4;
   end;
 
 {-DataCompBoy-}
-constructor TArcDrive.Init(const AName, VAName: String);
+constructor TArcDrive.Create(const AName, VAName: String);
   var
     SR: lSearchRec;
     I: Integer;
     xt, Q: String;
   begin
-  TObject.Init;
+  inherited Create(0, nil);
 
   I := PosChar(':', Copy(VAName, 3, MaxStringLength))+2;
   if I > 2 then
@@ -273,11 +274,11 @@ constructor TArcDrive.Init(const AName, VAName: String);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TArcDrive.InitCol(PC: PDirStorage; const AName, VAName: String);
+constructor TArcDrive.Create(PC: PDirStorage; const AName, VAName: String);
   var
     SR: lSearchRec;
   begin
-  TObject.Init;
+  inherited Create(0, nil);
   ArcName := lFExpand(AName);
   {VArcName := lFExpand(VAName);}
   lFindFirst(ArcName, AnyFileDir, SR); {JO}
@@ -316,7 +317,7 @@ constructor TArcDrive.InitCol(PC: PDirStorage; const AName, VAName: String);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TArcDrive.Load(var S: TStream);
+constructor TArcDrive.Load(S: TStream);
   var
     SR: lSearchRec;
   label
@@ -387,7 +388,7 @@ procedure TArcDrive.KillUse;
     EraseTempFile(ArcName);
   end;
 
-procedure TArcDrive.Store(var S: TStream);
+procedure TArcDrive.Store(S: TStream);
   begin
   inherited Store(S);
   S.WriteStr(@ArcName); {S.Write(ArcName[0],1 + Length(ArcName));}
@@ -400,7 +401,7 @@ procedure TArcDrive.Store(var S: TStream);
   S.Write(ForceRescan, 1);
   end;
 
-destructor TArcDrive.Done;
+destructor TArcDrive.Destroy;
   begin
   if Files <> nil then
     Dispose(Files, Done);
@@ -408,7 +409,7 @@ destructor TArcDrive.Done;
   if AType <> nil then
     Dispose(AType, Done);
   AType := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 {-DataCompBoy-}

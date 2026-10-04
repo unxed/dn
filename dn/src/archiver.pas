@@ -89,8 +89,9 @@ type
     { 2 - broken arc  }
     end;
 
-  PARJArchive = ^TARJArchive;
-  TARJArchive = object(TObject)
+  TARJArchive = class;
+  PARJArchive = TARJArchive;
+  TARJArchive = class(TObject)
     Packer,
     UnPacker,
     Extract,
@@ -126,23 +127,24 @@ type
     
     UseLFN: Boolean; {Checkbox}
     
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
     procedure Save;
     function GetVal(const Sign, AFile, Name, Default: PChar): String;
-    constructor Init;
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
-  PFileInfo = ^TFileInfo;
-  TFileInfo = object(TSortedCollection)
-    function Compare(P1, P2: Pointer): Integer; virtual;
-    procedure FreeItem(Item: Pointer); virtual;
-    procedure PutItem(var S: TStream; Item: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
+  TFileInfo = class;
+  PFileInfo = TFileInfo;
+  TFileInfo = class(TSortedCollection)
+    function Compare(P1, P2: Pointer): Integer; override;
+    procedure FreeItem(Item: Pointer); override;
+    procedure PutItem(S: TStream; Item: Pointer); override;
+    function GetItem(S: TStream): Pointer; override;
     end;
 
   
@@ -309,14 +311,14 @@ function TFileInfo.Compare(P1, P2: Pointer): Integer;
     Compare := 1-2*Integer(UpStrg(F1^.FName^) > UpStrg(F2^.FName^));
   end;
 
-procedure TFileInfo.PutItem(var S: TStream; Item: Pointer);
+procedure TFileInfo.PutItem(S: TStream; Item: Pointer);
   begin
   S.WriteStr(PArcFile(Item)^.FName);
   S.Write(PArcFile(Item)^.Select,
        SizeOf(Boolean)+SizeOf(AWord)+3*SizeOf(LongInt));
   end;
 
-function TFileInfo.GetItem(var S: TStream): Pointer;
+function TFileInfo.GetItem(S: TStream): Pointer;
   var
     P: PArcFile;
   begin
@@ -328,7 +330,7 @@ function TFileInfo.GetItem(var S: TStream): Pointer;
 
 { --------------------------- All archives -------------------------------- }
 
-constructor TARJArchive.Load(var S: TStream);
+constructor TARJArchive.Load(S: TStream);
   begin
   Packer := S.ReadStr;
   UnPacker := S.ReadStr;
@@ -361,7 +363,7 @@ constructor TARJArchive.Load(var S: TStream);
 
   end { TARJArchive.Load };
 
-procedure TARJArchive.Store(var S: TStream);
+procedure TARJArchive.Store(S: TStream);
   begin
   S.WriteStr(Packer);
   S.WriteStr(UnPacker);
@@ -496,7 +498,7 @@ function TARJArchive.GetVal(const Sign, AFile, Name, Default: PChar)
   GetVal := S;
   end;
 
-destructor TARJArchive.Done;
+destructor TARJArchive.Destroy;
   begin
   DisposeStr(Packer);
   DisposeStr(UnPacker);
@@ -521,12 +523,12 @@ destructor TARJArchive.Done;
   DisposeStr(NormalCompression);
   DisposeStr(GoodCompression);
   DisposeStr(UltraCompression);
-  { inherited Done;}
+  { inherited Destroy;}
   end { TARJArchive.Done };
 
 { ----------------------------- ARJ ------------------------------------}
 
-constructor TARJArchive.Init;
+constructor TARJArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -535,7 +537,7 @@ constructor TARJArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  inherited Init;
+  inherited Create;
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ARJ'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ARJ'));

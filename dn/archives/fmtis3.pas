@@ -54,11 +54,12 @@ uses
   ;
 
 type
-  PIS3Archive = ^TIS3Archive;
-  TIS3Archive = object(TARJArchive)
+  TIS3Archive = class;
+  PIS3Archive = TIS3Archive;
+  TIS3Archive = class(TARJArchive)
     FoldersOffs: LongInt; {!!s}
     FilesNumber: LongInt;
-    constructor Init;
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -89,7 +90,7 @@ implementation
 
 { --- Z --- aka LIB --- aka InstallShield 3.00.xxx --- by piwamoto ------- }
 
-constructor TIS3Archive.Init;
+constructor TIS3Archive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -98,7 +99,7 @@ constructor TIS3Archive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ICOMP'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ICOMP'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-d'));
@@ -173,25 +174,25 @@ procedure TIS3Archive.GetFile;
   begin
   if FoldersOffs < 0 then
     begin
-    ArcFile^.Seek(ArcPos+$c);
-    ArcFile^.Read(FP, SizeOf(FP));
+    ArcFile.Seek(ArcPos+$c);
+    ArcFile.Read(FP, SizeOf(FP));
     FilesNumber := FP and $ffff;
-    ArcFile^.Seek(ArcPos+$29);
-    ArcFile^.Read(FP, SizeOf(FP));
+    ArcFile.Seek(ArcPos+$29);
+    ArcFile.Read(FP, SizeOf(FP));
     FoldersOffs := i32(FP+ArcPos);
-    ArcFile^.Seek(ArcPos+$33);
-    ArcFile^.Read(FP, SizeOf(FP));
+    ArcFile.Seek(ArcPos+$33);
+    ArcFile.Read(FP, SizeOf(FP));
     FP := i32(FP+ArcPos);
-    ArcFile^.Seek(FP);
+    ArcFile.Seek(FP);
     end;
-  FP := i32(ArcFile^.GetPos);
+  FP := i32(ArcFile.GetPos);
   if  (FilesNumber = 0) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P, SizeOf(P));
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P, SizeOf(P));
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -202,14 +203,14 @@ procedure TIS3Archive.GetFile;
 
   for I := 1 to P.NameLen do
     begin
-    ArcFile^.Read(C, 1);
+    ArcFile.Read(C, 1);
     FileInfo.FName := FileInfo.FName+C;
     end;
 
   for I := 0 to P.FolderNum do
     begin
-    ArcFile^.Seek(FO);
-    ArcFile^.Read(P1, SizeOf(P1));
+    ArcFile.Seek(FO);
+    ArcFile.Read(P1, SizeOf(P1));
     FO := FO+P1.SizeOfHdr;
     end;
   FO := FO-P1.SizeOfHdr+SizeOf(P1);
@@ -218,8 +219,8 @@ procedure TIS3Archive.GetFile;
   SetLength(S, (P1.SizeOfName));
   if S <> '' then
     begin
-    ArcFile^.Seek(FO);
-    ArcFile^.Read(S[1], P1.SizeOfName);
+    ArcFile.Seek(FO);
+    ArcFile.Read(S[1], P1.SizeOfName);
     FileInfo.FName := S+'\'+FileInfo.FName;
     end;
 
@@ -229,7 +230,7 @@ procedure TIS3Archive.GetFile;
   FileInfo.Attr := 0;
   FileInfo.Date := (P.DateTime shr 16) or (P.DateTime shl 16);
   Dec(FilesNumber);
-  ArcFile^.Seek(FP+SizeOf(P)+P.NameLen+13);
+  ArcFile.Seek(FP+SizeOf(P)+P.NameLen+13);
   end { TIS3Archive.GetFile };
 
 end.

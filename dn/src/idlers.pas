@@ -55,27 +55,29 @@ uses
   ;
 
 type
-  PSSaver = ^TSSaver;
-  TSSaver = object(TView)
-    constructor Init(var Bounds: TRect);
+  TSSaver = class;
+  PSSaver = TSSaver;
+  TSSaver = class(TView)
+    constructor Create(const Bounds: TRect);
     function Execute: Word; virtual;
     procedure Update; virtual;
     procedure Draw; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 procedure CallExternalSaver(const FN: String);
 
 type
-  PProjector = ^TProjector;
-  TProjector = object(TSSaver)
+  TProjector = class;
+  PProjector = TProjector;
+  TProjector = class(TSSaver)
     Center: TPoint;
     Radius: Integer;
     Screen: Pointer;
     NextU: LongInt;
     LastDay: Byte;
     DX, DY, DDX: Integer;
-    constructor Init;
+    constructor Create;
     procedure Draw; virtual;
     procedure Update; virtual;
     end;
@@ -91,12 +93,13 @@ type
     Next: TEventTimer
     end;
 
-  PStarSkySaver = ^TStarSkySaver;
-  TStarSkySaver = object(TSSaver)
+  TStarSkySaver = class;
+  PStarSkySaver = TStarSkySaver;
+  TStarSkySaver = class(TSSaver)
     Stars: array[1..CNumSkyStars] of TSkyStar;
     NumSkyStars: Integer;
     CommonDelay: Byte;
-    constructor Init;
+    constructor Create;
     procedure Draw; virtual;
     procedure Update; virtual;
     procedure InitStar(Index: Integer);
@@ -104,16 +107,17 @@ type
 
   TDestination = (dsUp, dsRight, dsDown, dsLeft);
 
-  PClockSaver = ^TClockSaver;
-  TClockSaver = object(TSSaver)
+  TClockSaver = class;
+  PClockSaver = TClockSaver;
+  TClockSaver = class(TSSaver)
     X, Y, DX, DY, DDY: Integer;
     Dest: TDestination;
     Rest, Clr: Byte; {JO}
     dH, dM, dS, dSS: Word;
-    constructor Init;
+    constructor Create;
     procedure Update; virtual;
     procedure Draw; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 const
@@ -148,7 +152,7 @@ function TSSaver.Execute: Word;
     GetEvent(Event);
     Update;
     HideCursor;
-    Application^.Idle;
+    Application.Idle;
     if StartupData.Unload and osuInactivityExit = 0 then
       NewTimer(T, 60*60*1000);
     WW := ShiftState shl 8+ShiftState2;
@@ -167,30 +171,30 @@ procedure TSSaver.Draw;
   WriteLineC(0, 0, Size.X, Size.Y, B);
   end;
 
-constructor TSSaver.Init(var Bounds: TRect);
+constructor TSSaver.Create(const Bounds: TRect);
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   Options := Options or ofSelectable;
   HideCursor;
   HideMouse;
   end;
 
-destructor TSSaver.Done;
+destructor TSSaver.Destroy;
   begin
   SSaver := nil;
   ShowMouse;
-  inherited Done;
+  inherited Destroy;
   end;
 
-constructor TStarSkySaver.Init;
+constructor TStarSkySaver.Create;
   label 1;
   var
     R: TRect;
     I, J: Integer;
   begin
   Randomize;
-  Application^.GetExtent(R);
-  inherited Init(R);
+  Application.GetExtent(R);
+  inherited Create(R);
   NumSkyStars := 2*Size.X-64;
   for I := 1 to NumSkyStars do
     InitStar(I);
@@ -293,7 +297,7 @@ procedure TStarSkySaver.Update;
     HideMouse;
   end { TStarSkySaver.Update };
 
-constructor TProjector.Init;
+constructor TProjector.Create;
   label 1;
   var
     R: TRect;
@@ -303,8 +307,8 @@ constructor TProjector.Init;
   if MaxAvail < I then
     Fail;
   Randomize;
-  Application^.GetExtent(R);
-  inherited Init(R);
+  Application.GetExtent(R);
+  inherited Create(R);
   GetMem(Screen, I);
   Move(ScreenBuffer^, Screen^, I);
   Radius := 4;
@@ -413,12 +417,12 @@ procedure TProjector.Update;
     HideMouse;
   end { TProjector.Update };
 
-constructor TClockSaver.Init;
+constructor TClockSaver.Create;
   var
     R: TRect;
   begin
-  Application^.GetExtent(R);
-  inherited Init(R);
+  Application.GetExtent(R);
+  inherited Create(R);
   X := Size.X div 2-3;
   Y := Size.Y div 2;
   DX := 1-Random(3);
@@ -500,10 +504,10 @@ procedure TClockSaver.Update;
     HideMouse;
   end { TClockSaver.Update };
 
-destructor TClockSaver.Done;
+destructor TClockSaver.Destroy;
   begin
   SetBlink(CurrentBlink);
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure CallExternalSaver(const FN: String);
@@ -541,13 +545,13 @@ procedure CallExternalSaver(const FN: String);
   MouseWhere.X := MX div 8;
   MouseWhere.Y := MY div 8;
   ShowMouse;
-  Application^.Redraw;
+  Application.Redraw;
   if DosError = 0 then
     begin
     Event.What := evCommand;
     Event.Command := cmValid;
     Event.InfoPtr := nil;
-    Application^.PutEvent(Event);
+    Application.PutEvent(Event);
     end;
   end { CallExternalSaver };
 

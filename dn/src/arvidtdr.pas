@@ -97,12 +97,12 @@ procedure TdrSeekDirectory(AvtDr: PArvidDrive);
     SS: String[12];
     S: String;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
-    Stream^.Status := stOK;
-    Stream^.Seek(D.DirTableOfs);
-    Stream^.Read(DD, SizeOf(DD));
-    CurDirPos := i32(Stream^.GetPos);
+    Stream.Status := stOK;
+    Stream.Seek(D.DirTableOfs);
+    Stream.Read(DD, SizeOf(DD));
+    CurDirPos := i32(Stream.GetPos);
     S := CurDir;
     CurLevel := 0;
     CurDir := '';
@@ -125,7 +125,7 @@ procedure TdrSeekDirectory(AvtDr: PArvidDrive);
       {AK155: нельзя убирать! При чем тут OS/2 к Арвиду? }
       Delete(SS, 9, 1);
       repeat
-        Stream^.Read(DD, SizeOf(DD));
+        Stream.Read(DD, SizeOf(DD));
       until (UpStrg(Copy(DD.Name, 1, 11)) = SS) and (DD.Level = Lv)
          or (DD.Level < Lv);
       if  (DD.Level < Lv) or (DD.Level = 0) then
@@ -133,7 +133,7 @@ procedure TdrSeekDirectory(AvtDr: PArvidDrive);
       Insert('.', SS, 9);
       MakeSlash(CurDir);
       CurDir := CurDir+TdrMakeFileName(SS);
-      CurDirPos := i32(Stream^.GetPos);
+      CurDirPos := i32(Stream.GetPos);
       CurLevel := Lv;
       Inc(Lv);
       end;
@@ -158,7 +158,7 @@ procedure TdrGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
       S: String;
       b: Byte;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       S := FF.Name;
       Insert('.', S, 9);
@@ -192,12 +192,12 @@ procedure TdrGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
         F^.DIZ^.Line := SeekPos;
         if FF.Description <> 0 then
           begin
-          j := i32(Stream^.GetPos);
-          Stream^.Seek(D.DescTableOfs+FF.Description-1);
+          j := i32(Stream.GetPos);
+          Stream.Seek(D.DescTableOfs+FF.Description-1);
           {Cat:warn AnsiString}
-          Stream^.Read(FreeStr, 2);
-          Stream^.Read(FreeStr[1], Length(FreeStr));
-          Stream^.Seek(j);
+          Stream.Read(FreeStr, 2);
+          Stream.Read(FreeStr[1], Length(FreeStr));
+          Stream.Seek(j);
           F^.DIZ^.DIZText := FreeStr;
           end
         else
@@ -209,18 +209,18 @@ procedure TdrGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
           TotLen := TotLen+FF.Size;
           end;
 
-        FC^.Insert(F);
+        FC.Insert(F);
         end;
       end
     end { AddFile };
 
   begin { TdrGetDirectory }
-  with AvtDr^ do
+  with AvtDr do
     begin
-    Stream^.Seek(CurDirPos);
+    Stream.Seek(CurDirPos);
     repeat
-      SeekPos := i32(Stream^.GetPos+2);
-      Stream^.Read(DD, SizeOf(DD));
+      SeekPos := i32(Stream.GetPos+2);
+      Stream.Read(DD, SizeOf(DD));
       if DD.Level = CurLevel+1 then
         begin
         Move(DD.Name, FF, SizeOf(FF));
@@ -229,15 +229,15 @@ procedure TdrGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
         end;
     until (DD.Level = 0) or (DD.Level <= CurLevel);
 
-    Stream^.Status := stOK;
-    Stream^.Seek(D.FileTableOfs+CurFile*SizeOf(TTdrFileCell));
+    Stream.Status := stOK;
+    Stream.Seek(D.FileTableOfs+CurFile*SizeOf(TTdrFileCell));
 
-    FC^.SetLimit(FC^.Count+CurFileNum);
+    FC.SetLimit(FC.Count+CurFileNum);
 
     for I := 1 to CurFileNum do
       begin
-      SeekPos := i32(Stream^.GetPos);
-      Stream^.Read(FF, SizeOf(FF));
+      SeekPos := i32(Stream.GetPos);
+      Stream.Read(FF, SizeOf(FF));
       AddFile;
       end;
 
@@ -254,45 +254,45 @@ procedure TdrEditDescription(AvtDr: PArvidDrive; var S, Nam: String; var PF: PFi
       L: Word;
       B: array[1..512] of Byte;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
-      J := i32(Stream^.GetSize);
+      J := i32(Stream.GetSize);
       repeat
         I := J-512;
         if I < D.PosTableOfs then
           I := D.PosTableOfs;
         L := J-I;
-        Stream^.Seek(I);
-        Stream^.Read(B, L);
-        Stream^.Seek(I+512);
-        Stream^.Write(B, L);
+        Stream.Seek(I);
+        Stream.Read(B, L);
+        Stream.Seek(I+512);
+        Stream.Write(B, L);
         J := I;
       until J <= D.PosTableOfs;
       FillChar(B, 512, 0);
-      Stream^.Seek(I);
-      Stream^.Write(B, 512);
+      Stream.Seek(I);
+      Stream.Write(B, 512);
       Inc(D.PosTableOfs, 512);
       end
     end { ExpandStream };
 
   begin { TdrEditDescription }
-  with AvtDr^ do
+  with AvtDr do
     begin
-    Stream^.Read(FF, SizeOf(FF));
+    Stream.Read(FF, SizeOf(FF));
     if Length(S) <= Length(PF^.DIZ^.DIZText) then
       begin
       if S = '' then
         begin
         FF.Description := 0;
-        Stream^.Seek(PF^.DIZ^.Line);
-        Stream^.Write(FF, SizeOf(FF));
+        Stream.Seek(PF^.DIZ^.Line);
+        Stream.Write(FF, SizeOf(FF));
         end
       else
         begin
-        Stream^.Seek(D.DescTableOfs+FF.Description-1);
+        Stream.Seek(D.DescTableOfs+FF.Description-1);
         I := Length(S);
-        Stream^.Write(I, 2);
-        Stream^.Write(S[1], I);
+        Stream.Write(I, 2);
+        Stream.Write(S[1], I);
         end;
       end
     else
@@ -302,13 +302,13 @@ procedure TdrEditDescription(AvtDr: PArvidDrive; var S, Nam: String; var PF: PFi
         ExpandStream;
       FF.Description := D.DescTableLen+1;
       {+1 by piwamoto:new desc creation fix}
-      Stream^.Seek(PF^.DIZ^.Line);
-      Stream^.Write(FF, SizeOf(FF));
+      Stream.Seek(PF^.DIZ^.Line);
+      Stream.Write(FF, SizeOf(FF));
       Inc(D.DescTableLen, Length(S)+2);
-      Stream^.Seek(D.DescTableOfs+FF.Description-1);
+      Stream.Seek(D.DescTableOfs+FF.Description-1);
       I := Length(S);
-      Stream^.Write(I, 2);
-      Stream^.Write(S[1], I);
+      Stream.Write(I, 2);
+      Stream.Write(S[1], I);
       end;
     end
   end { TdrEditDescription };
@@ -322,25 +322,25 @@ procedure TdrCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt; var LL: TSize)
       FF: TTdrFileCell;
       I: Integer;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
-      Stream^.Status := stOK;
-      Stream^.Seek(D.FileTableOfs+DD*SizeOf(TTdrFileCell));
+      Stream.Status := stOK;
+      Stream.Seek(D.FileTableOfs+DD*SizeOf(TTdrFileCell));
       for I := 1 to Num do
         begin
-        Stream^.Read(FF, SizeOf(FF));
+        Stream.Read(FF, SizeOf(FF));
         LL := LL+FF.Size;
         end;
       end
     end;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     SPos := CurDirPos;
     repeat
-      Stream^.Seek(SPos);
-      Stream^.Read(DD, SizeOf(DD));
-      SPos := i32(Stream^.GetPos);
+      Stream.Seek(SPos);
+      Stream.Read(DD, SizeOf(DD));
+      SPos := i32(Stream.GetPos);
       if DD.Level > CurLevel then
         CountDirectory(DD.Files, DD.NumFiles);
     until (DD.Level = 0) or (DD.Level <= CurLevel);
@@ -352,22 +352,22 @@ function TdrInit(AvtDr: PArvidDrive): Boolean;
   var
     J: Word;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     TdrInit := False;
     filetype := avdTdr;
-    Stream^.Seek(0);
-    Stream^.Read(D, SizeOf(D));
-    if  (Stream^.Status <> stOK) or
-        (_Cardinal(D.PosTableOfs) > Stream^.GetSize)
+    Stream.Seek(0);
+    Stream.Read(D, SizeOf(D));
+    if  (Stream.Status <> stOK) or
+        (_Cardinal(D.PosTableOfs) > Stream.GetSize)
     then
       Exit; {piwamoto: reject invalid TDRs}
     TapeFmt := D.TapeFmt;
     TapeTotalTime := D.TapeLen;
     PosTableOfs := D.PosTableOfs;
-    Stream^.Seek(D.PosTableOfs);
-    Stream^.Read(J, SizeOf(J));
-    {  if Stream^.Status <> stOK then exit;} {commented by piwamoto}
+    Stream.Seek(D.PosTableOfs);
+    Stream.Read(J, SizeOf(J));
+    {  if Stream.Status <> stOK then exit;} {commented by piwamoto}
     TapeRecordedTime := J*8;
     TdrInit := True;
     end

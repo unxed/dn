@@ -181,8 +181,8 @@ procedure ReplaceT(P: PTextReader; var F: lText; Del: Boolean);
     FName: String;
     Attr: Word;
   begin
-  FName := P^.FileName;
-  Dispose(P, Done);
+  FName := P.FileName;
+  P.Free;
   ClrIO;
   Close(F.T);
   ClrIO;

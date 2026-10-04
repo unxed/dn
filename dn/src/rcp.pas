@@ -430,7 +430,7 @@ function FSetExt(F: String; NewExt: String): String;
   end;
 {-DataCompBoy-}
 
-procedure StoreResource(P: PObject; Id: TDlgIdx);
+procedure StoreResource(P: TStreamable; Id: TDlgIdx);
   var
     W: PLngWord;
   function HaveThisID(P_: Pointer): Boolean;
@@ -1410,20 +1410,20 @@ Same:
 type
   PR_RStringList = ^DNStrL.TStringList;
 
-function Build_RStringList(var S: TStream): PObject;
+function Build_RStringList(var S: TStream): TStreamable;
 begin
-  Result := PObject(New(PR_RStringList, Load(S)));
+  Result := TStreamable(New(PR_RStringList, Load(S)));
 end;
 
 type
   PR_REditSaver = ^TEditSaver;
 
-function Build_REditSaver(var S: TStream): PObject;
+function Build_REditSaver(var S: TStream): TStreamable;
 begin
-  Result := PObject(New(PR_REditSaver, Load(S)));
+  Result := TStreamable(New(PR_REditSaver, Load(S)));
 end;
 
-procedure Store_REditSaver(P: PObject; var S: TStream);
+procedure Store_REditSaver(P: TStreamable; var S: TStream);
 begin
   PR_REditSaver(P)^.Store(S);
 end;

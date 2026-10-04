@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PSQZArchive = ^TSQZArchive;
-  TSQZArchive = object(TARJArchive)
-    constructor Init;
+  TSQZArchive = class;
+  PSQZArchive = TSQZArchive;
+  TSQZArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -79,7 +80,7 @@ implementation
 
 { ----------------------------- SQZ ------------------------------------}
 
-constructor TSQZArchive.Init;
+constructor TSQZArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -88,7 +89,7 @@ constructor TSQZArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'SQZ'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'SQZ'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
@@ -156,8 +157,8 @@ procedure TSQZArchive.GetFile;
     P: SQZHdr;
   begin
 1:
-  ArcFile^.Read(P, 1);
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P, 1);
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -170,11 +171,11 @@ procedure TSQZArchive.GetFile;
   { if P.Size < $19 then} {changed by piwamoto}
   if P.Size < 18 then
     begin
-    ArcFile^.Read(i, 2);
-    ArcFile^.Seek(ArcFile^.GetPos+i);
+    ArcFile.Read(i, 2);
+    ArcFile.Seek(ArcFile.GetPos+i);
     goto 1;
     end;
-  ArcFile^.Read(P.Sum, P.Size+1);
+  ArcFile.Read(P.Sum, P.Size+1);
   {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
   FileInfo.Last := 0;
   FileInfo.Attr := P.Attr and not Hidden;
@@ -188,7 +189,7 @@ procedure TSQZArchive.GetFile;
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
+  ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { TSQZArchive.GetFile };
 
 end.

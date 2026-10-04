@@ -87,8 +87,9 @@ const
   NoTempDir: Boolean = False; {JO}
 
 type
-  PDNApplication = ^TDNApplication;
-  TDNApplication = object(TApplication)
+  TDNApplication = class;
+  PDNApplication = TDNApplication;
+  TDNApplication = class(TApplication)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     IdleClick: TEventTimer;
     IdleEvt: TEvent;
@@ -96,18 +97,18 @@ type
 
     Pk1, Pk2, Pk3, Pk4: PView;
 
-    constructor Init;
-    destructor Done; virtual;
-    procedure InitMenuBar; virtual;
-    procedure InitCommandLine; virtual;
-    procedure InitDesktop; virtual;
-    procedure InitStatusLine; virtual;
+    constructor Create;
+    destructor Destroy; override;
+    procedure InitMenuBar; override;
+    procedure InitCommandLine; override;
+    procedure InitDesktop; override;
+    procedure InitStatusLine; override;
     procedure ViewFile(AltExt, NoExtFile: Boolean; FileName: String);
     {AK155}
     procedure AddFormat;
     procedure EditFile(Intern: Boolean; FileName: String);
     {DataCompBoy}
-    procedure OutOfMemory; virtual;
+    procedure OutOfMemory; override;
     procedure RetrieveDesktop(const FileName: String; LS: PStream;
          LoadColors: Boolean); {DataCompBoy}
     procedure SaveDesktop(const FileName: String); {DataCompBoy}
@@ -224,12 +225,13 @@ const
   #13#3'Copyright (C) 1991-99 RIT Research Labs'#13#13};
 
 type
-  PDataSaver = ^TDataSaver;
-  TDataSaver = object(TView)
-    constructor Init;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    destructor Done; virtual;
+  TDataSaver = class;
+  PDataSaver = TDataSaver;
+  TDataSaver = class(TView)
+    constructor Create;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
+    destructor Destroy; override;
     end;
 
 const
@@ -310,16 +312,16 @@ procedure StoreIndexes(var S: TStream);
     S.Write(ColorIndexes^, ColorSize);
   end;
 
-constructor TDataSaver.Init;
+constructor TDataSaver.Create;
   var
     R: TRect;
   begin
   R.Assign(0, 0, 0, 0);
-  inherited Init(R);
+  inherited Create(R);
   SetState(sfVisible, False);
   Options := Options and not ofSelectable;
   EventMask := 0;
-  DataSaver := @Self;
+  DataSaver := Self;
   end;
 
 const
@@ -335,16 +337,16 @@ const
           читать несколько подряд расположенных переменных - это у нас в
           исходнике они подряд, а компилятор может думать иначе}
 
-constructor TDataSaver.Load(var S: TStream);
+constructor TDataSaver.Load(S: TStream);
   var
     D, L: AWord;
     Q, Q2: LongInt;
   begin
   if DataSaver <> nil then
-    Dispose(DataSaver, Done);
+    DataSaver.Free;
   DataSaver := nil;
   inherited Load(S);
-  DataSaver := @Self;
+  DataSaver := Self;
   repeat
     S.Read(D, SizeOf(D));
     if D = 0 then
@@ -377,7 +379,7 @@ constructor TDataSaver.Load(var S: TStream);
             TempFiles := New(PFilesCollection, Init(Q+1, $10));
             TempFiles^.SortMode := psmLongName;
             TempFiles^.Duplicates := False;
-            {TempFiles^.Owner := @Self;}
+            {TempFiles^.Owner := Self;}
             for Q2 := 0 to Q do
               TempFiles^.AtInsert(Q2, LoadFileRecOwn(S, TempDirs));
             end;
@@ -390,7 +392,7 @@ constructor TDataSaver.Load(var S: TStream);
   until D = 0;
   end { TDataSaver.Load };
 
-procedure TDataSaver.Store(var S: TStream);
+procedure TDataSaver.Store(S: TStream);
 
   var
     D: AWord;
@@ -446,10 +448,10 @@ procedure TDataSaver.Store(var S: TStream);
   S.Write(D, SizeOf(D));
   end { TDataSaver.Store };
 
-destructor TDataSaver.Done;
+destructor TDataSaver.Destroy;
   begin
   DataSaver := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 {-DataCompBoy-}
@@ -523,7 +525,7 @@ procedure ClearSwap;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TDNApplication.Init;
+constructor TDNApplication.Create;
   var
     R: TRect;
     I: Integer;
@@ -542,7 +544,7 @@ constructor TDNApplication.Init;
   if RunFirst then
     ClearSwap;
 
-  TApplication.Init;
+  inherited Create;
 
   LoadHistories;
 
@@ -654,7 +656,7 @@ procedure TDNApplication.InitCommandLine;
 {-DataCompBoy-}
 procedure SaveRealDsk;
   begin
-  PDNApplication(Application)^.SaveDesktop
+  PDNApplication(Application).SaveDesktop
     (SourceDir+'dn'+GetEnv('DNDSK')+'.dsk');
   end;
 {-DataCompBoy-}
@@ -669,13 +671,13 @@ procedure SaveDsk;
     if StartDir <> '' then
       StartDir := '<' + StartDir; {помечаем, что StartDir нужно сохpанить}
    
-    PDNApplication(Application)^.SaveDesktop
+    PDNApplication(Application).SaveDesktop
       (SwpDir+'dn'+ItoS(DNNumber)+'.swp');
     end;
   end;
 
 {-DataCompBoy-}
-destructor TDNApplication.Done;
+destructor TDNApplication.Destroy;
   var
     B: Word;
     SaveStream: PStream;
@@ -723,7 +725,7 @@ destructor TDNApplication.Done;
   HideCommandLine := (CommandLine <> nil)
        and not CommandLine^.GetState(sfVisible);
   B := $8000 or (Byte(HideCommandLine));
-  inherited Done;
+  inherited Destroy;
   
   DoneDrivers;
   end { TDNApplication.Done };
@@ -902,7 +904,7 @@ procedure TDNApplication.LoadDesktop(var S: TStream);
         begin
         if DataSaver <> nil then
           begin
-          Dispose(DataSaver, Done);
+          DataSaver.Free;
           DataSaver := nil;
           Continue
           end;
@@ -951,7 +953,7 @@ procedure TDNApplication.StoreDesktop(var S: TStream);
   if DataSaver <> nil then
     begin
     S.Put(DataSaver);
-    Dispose(DataSaver, Done);
+    DataSaver.Free;
     DataSaver := nil;
     end;
   Desktop^.ForEach(WriteView);
