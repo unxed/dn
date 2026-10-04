@@ -69,7 +69,9 @@ const
 type
 
 
-  PInfoView = ^TInfoView;
+  TCalcView = class;
+  TCalcInput = class;
+  TInfoView = class;
 
 
   TCalcWindow = class(TUniWindow)
@@ -85,7 +87,7 @@ type
 
     FocusEvent: TEvent;
     CalcInput: TCalcInput;
-    CellInfo: PInfoView;
+    CellInfo: TInfoView;
 
     HScroll, VScroll: TScrollBar;
     Delta, Cur, Mark: TPoint;
@@ -97,7 +99,7 @@ type
     CurrentCalc, SearchPos, ErrorCell: TPoint;
     SName: PString; {DataCompBoy}
     constructor Create(Bounds: TRect;
-        AInfo: TCalcInput; ACellInfo: PInfoView;
+        AInfo: TCalcInput; ACellInfo: TInfoView;
         AHScroll, AVScroll: TScrollBar);
     destructor Done; virtual;
 
@@ -333,7 +335,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   var
     R: TRect;
     P: TView;
-    P1: PInfoView;
+    P1: TInfoView;
   begin
   if  (AName = '') or (GetFileAttr(AName+#0) and Directory <> 0) then
     AName := UntitledName
@@ -380,9 +382,9 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   Insert(P);
 
   R.Assign(1, 2, 7, 4);
-  P1 := PInfoView.Create(R);
-  PInfoView(P1)^.InfoStr := '';
-  PInfoView(P1)^.InfoAttr := GetColorW(9);
+  P1 := TInfoView.Create(R);
+  TInfoView(P1).InfoStr := '';
+  TInfoView(P1).InfoAttr := GetColorW(9);
   Insert(P1);
 
   GetExtent(R);
@@ -392,7 +394,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
         MakeScrollBar(sbVertical+sbHandleKeyboard)));
   Insert(CalcView);
-  CalcView^.LoadSheet(AName);
+  CalcView.LoadSheet(AName);
   end { TCalcWindow.Init };
 {-DataCompBoy-}
 
@@ -400,7 +402,7 @@ constructor TCalcWindow.Load(var S: TStream);
   var
     R: TRect;
     P: TView;
-    P1: PInfoView;
+    P1: TInfoView;
   begin
   inherited Load(S);
   GetSubViewPtr(S, CalcView);
@@ -421,13 +423,13 @@ procedure TCalcWindow.HandleEvent(var Event: TEvent);
     evCommand:
       case Event.Command of
         cmClose, cmQuit:
-          if not CalcView^.AskSave then
+          if not CalcView.AskSave then
             ClearEvent(Event);
       end {case};
     evBroadcast:
       case Event.Command of
         cmFindView:
-          if PString(Event.InfoPtr)^ = CnvString(CalcView^.SName) then
+          if PString(Event.InfoPtr)^ = CnvString(CalcView.SName) then
             begin
             Self.Select;
             ClearEvent(Event);
@@ -499,7 +501,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
     begin
     GetData(NewS);
     EndEdit := True;
-    with CalcView^ do
+    with CalcView do
       begin
       Modified := True;
       CurrentCalc.X := Delta.X+Cur.X;
@@ -558,7 +560,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
 
   procedure Transfer;
     begin
-    CalcView^.FocusEvent := Event;
+    CalcView.FocusEvent := Event;
     if EndEdit then
       TWindow(Owner).SelectNext(False);
     ClearEvent(Event)
@@ -587,7 +589,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
 
 {-----------------------------    TCalcView     ---------------------------}
 
-constructor TCalcView.Create(Bounds: TRect; AInfo: TCalcInput; ACellInfo: PInfoView; AHScroll, AVScroll: TScrollBar);
+constructor TCalcView.Create(Bounds: TRect; AInfo: TCalcInput; ACellInfo: TInfoView; AHScroll, AVScroll: TScrollBar);
   var
     I, J: Integer;
   begin
@@ -883,7 +885,7 @@ procedure TCalcView.Draw;
     Delta.X := HScroll^.Value;
     Exit;
     end;
-  PInfoView(CellInfo)^.SetInfo(GetCellName(CurPos.X, CurPos.Y),
+  TInfoView(CellInfo)^.SetInfo(GetCellName(CurPos.X, CurPos.Y),
      Owner.GetColorW(9));
   FillChar(Q^, SizeOf(Q^), 255);
   for I := 1 to Cells^.Count do
@@ -949,7 +951,7 @@ procedure TCalcView.Draw;
             S := '';
             end;
           TCalcInput(CalcInput).SetData(S);
-          CalcInput^.Draw;
+          CalcInput.Draw;
           end;
         L := L+K;
         end;
@@ -2338,7 +2340,7 @@ procedure TCalcView.SaveSheetAs;
     TWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     Owner.Redraw;
     end;
-  {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
+  {TInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
   S := TBufStream.Create(FName, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   { S^.Put(Cells);}
@@ -2362,7 +2364,7 @@ procedure TCalcView.SaveSheet;
     SaveSheetAs;
     Exit
     end;
-  {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
+  {TInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
   S := TBufStream.Create(SName^, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   {S^.Put(Cells);}
