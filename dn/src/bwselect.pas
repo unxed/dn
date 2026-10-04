@@ -71,7 +71,7 @@ constructor T_BWSelector.Create(var Bounds: TRect; ASelType: TColorSel;
     AStrings: PSItem);
   begin
   SelType := ASelType;
-  inherited Create(Bounds, AStrings);
+  inherited Create(Bounds);
   EventMask := EventMask or evBroadcast;
   Options := Options or (ofSelectable+ofFirstClick+ofFramed);
   end;
