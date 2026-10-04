@@ -1100,7 +1100,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
        if TimerExpired(Tmr) then
        begin
          UpdateWriteView(Info);
-         Application^.Idle;
+         Application.Idle;
          NewTimer(Tmr, 150);
        end;
        Ln := Copy(GetLine(AI), BoundStart, BoundEnd);
@@ -1147,7 +1147,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         if TimerExpired(Tmr) then
           begin
           UpdateWriteView(Info);
-          Application^.Idle;
+          Application.Idle;
           NewTimer(Tmr, 150);
           end;
         ln := Copy(GetLine(AI), BoundStart, BoundEnd);
@@ -1743,7 +1743,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           Desktop^.Lock;
         if Application <> nil then
           begin
-          {AK155}Application^.InsertWindow(New(PFileWindow,
+          {AK155}Application.InsertWindow(New(PFileWindow,
               Init(EditName, EditName, False)));
           Message(Application, evCommand, cmViewText,
             @EditName);

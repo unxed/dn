@@ -170,7 +170,7 @@ function ESC_Pressed: Boolean;
   var
     E: TEvent;
   begin
-  Application^.Idle;
+  Application.Idle;
   GetKeyEvent(E);
   ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
   end;

@@ -291,7 +291,7 @@ function GetFileName(var FileName: String; Mask, Title, ALabel: String;
     Mask := x_x;
     B := False
     end;
-  D := PFileDialog(Application^.ValidView(New(PFileDialog,
+  D := PFileDialog(Application.ValidView(New(PFileDialog,
           Init(Mask, Title, ALabel, Buttons, 211))));
   if D = nil then
     Exit;
@@ -1772,7 +1772,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
                   Break;
                   end;
               end {case};
-            Application^.Idle;
+            Application.Idle;
             end;
           CE;
           end;

@@ -245,7 +245,7 @@ procedure TFilePanelRoot.ChkNoMem;
   begin
   if Drive^.NoMemory and (DrawDisableLvl = 0) then
     begin
-    Application^.OutOfMemory;
+    Application.OutOfMemory;
     Drive^.NoMemory := False;
     end;
   end;

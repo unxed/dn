@@ -450,7 +450,7 @@ procedure InsertCalc;
   if Calc = nil then
     begin
     Calc := MakeDialog;
-    Application^.InsertWindow(PWindow(Calc));
+    Application.InsertWindow(PWindow(Calc));
     end
   else
     Calc^.Select;

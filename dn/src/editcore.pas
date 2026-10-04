@@ -1447,7 +1447,7 @@ function GetFileNameDialog(Mask, Title, Name: String; Buttons, HistoryID: Word):
      B: Boolean;
 begin
   S := ''; B := false; if Mask = '' then begin Mask := x_x; B := true end;
-  D := PFileDialog(Application^.ValidView(New(PFileDialog,
+  D := PFileDialog(Application.ValidView(New(PFileDialog,
         Init(Mask, Title, Name, Buttons, HistoryID))));
   if D = nil then Exit;
   if B then D^.SetData(S);
@@ -1479,7 +1479,7 @@ procedure OpenEditor;
   if S = '' then
     Exit;
   Desktop^.GetExtent(R);
-  Application^.InsertWindow(New(PEditWindow, Init(R, S)));
+  Application.InsertWindow(New(PEditWindow, Init(R, S)));
   end;
 {-DataCompBoy-}
 
@@ -2290,7 +2290,7 @@ procedure TFileEditor.Draw;
           if Ch > '9' then
             Ch := '0';
           end;
-        MoveCStr(B[Delta.X-Pos.X], FreeStr, Application^.GetColorW($4240));
+        MoveCStr(B[Delta.X-Pos.X], FreeStr, Application.GetColorW($4240));
         end;
       end;
     if BV and (A >= Mark.A.Y) and (A <= Mark.B.Y) then
@@ -3981,7 +3981,7 @@ Ex:
       end;
     {/AK155}
 
-    Application^.HandleEvent(Event);
+    Application.HandleEvent(Event);
     HelpCtx := hcEditor;
     ClearEvent(Event);
     Exit;
@@ -5080,7 +5080,7 @@ procedure OpenSmartpad;
 
   if  (SmartWindow <> nil) and SmartWindow^.GetState(sfModal) then
     Exit;
-  PV := Application^.TopView;
+  PV := Application.TopView;
   Desktop^.GetExtent(R);
   R.Grow(-2, -2);
   if  (SmartWindow <> nil) then
@@ -5177,7 +5177,7 @@ procedure OpenClipBoard; {-$VOL begin}
   if  (ClipboardWindow <> nil) and ClipboardWindow^.GetState(sfModal)
   then
     Exit;
-  PV := Application^.TopView;
+  PV := Application.TopView;
   Desktop^.GetExtent(R);
   if  (ClipboardWindow <> nil) then
     begin

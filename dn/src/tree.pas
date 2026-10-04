@@ -244,7 +244,7 @@ function ESC_Pressed: Boolean;
   var
     E: TEvent;
   begin
-  Application^.Idle;
+  Application.Idle;
   GetKeyEvent(E);
   ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
   end;
@@ -707,7 +707,7 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
   New(D, Init(R, ATitle, Drv));
   D^.Options := D^.Options or ofCentered;
   S := '';
-  D := PTreeDialog(Application^.ValidView(D));
+  D := PTreeDialog(Application.ValidView(D));
   if D <> nil then
     if Desktop^.ExecView(D) = cmOK then
       D^.GetData(S);

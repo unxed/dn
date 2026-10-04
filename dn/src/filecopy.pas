@@ -2449,7 +2449,7 @@ qqqq:
   InitMemBuf;
   if MemBuf = nil then
     begin
-    Application^.OutOfMemory;
+    Application.OutOfMemory;
     goto 1;
     end;
   New(CopyQueue, Init(250, 100));

@@ -940,7 +940,7 @@ procedure MakeArchive(S: String; Files: PCollection; MoveMode, AddToExisting: Bo
         L: array[0..1] of PtrInt;
         ST: String;
       begin
-      Application^.Redraw;
+      Application.Redraw;
       ST := S;
       Pointer(L[0]) := @ST;
       L[1] := DE;
@@ -1084,7 +1084,7 @@ procedure MakeArchive(S: String; Files: PCollection; MoveMode, AddToExisting: Bo
     InitSysError;
     case DE of
       0:
-        Application^.Redraw;
+        Application.Redraw;
       8:
         StdMsg(1);
       else {case}
@@ -1459,7 +1459,7 @@ TryAgain:
     InitVideo;
     InitEvents;
     InitSysError;
-    Application^.Redraw;
+    Application.Redraw;
     end;
   
   {JO}
