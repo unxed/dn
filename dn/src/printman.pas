@@ -57,7 +57,6 @@ uses
   ;
 
 type
-  PStringCol = ^TStringCol;
   TStringCol = class(TCollection)
     procedure FreeItem(P: Pointer); virtual;
     procedure PutItem(var S: TStream; P: Pointer); virtual;
@@ -90,7 +89,7 @@ type
     procedure InitPrinter;
     function Valid(C: Word): Boolean; virtual;
     procedure Update; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 
@@ -153,14 +152,14 @@ constructor TPMWindow.Create(R: TRect);
   S := TPrintStatus.Create(R);
   Insert(S);
   R.Assign(2, 1, Size.X-13, Size.Y-4);
-  P := New(TPrintManager, Init(R, S, TScrollBar(P)));
+  P := TPrintManager.Create(R, S, TScrollBar(P));
   Insert(P);
   R.Assign(Size.X-12, 2, Size.X-2, 4);
-  Insert(New(TButton, Init(R, GetString(dlDeleteButton), cmOK, 0)));
+  Insert(TButton.Create(R, GetString(dlDeleteButton), cmOK, 0));
   R.Assign(Size.X-12, 4, Size.X-2, 6);
-  Insert(New(TButton, Init(R, GetString(dlCloseButton), cmClose, 0)));
+  Insert(TButton.Create(R, GetString(dlCloseButton), cmClose, 0));
   R.Assign(Size.X-12, 6, Size.X-2, 8);
-  Insert(New(TButton, Init(R, GetString(dlPauseButton), cmNo, 0)));
+  Insert(TButton.Create(R, GetString(dlPauseButton), cmNo, 0));
   SelectNext(False);
   HelpCtx := hcPrintManager;
   end { TPMWindow.Init };
@@ -186,19 +185,19 @@ procedure TPrintStatus.Draw;
   S1 := '';
   C := GetColorW($0102);
   MoveChar(B, ' ', C, Size.X);
-  if  (Print^.Paused) or (Print^.List = nil) or (Print^.List^.Count = 0)
+  if  (Print.Paused) or (Print.List = nil) or (Print.List.Count = 0)
   then
     S := GetString(dlPrintingPaused)
   else
     begin
     S := GetString(dlPrinting);
-    S := S+CutH(PString(Print^.List^.At(0))^, Size.X-CStrLen(S));
-    if Print^.FileLen <> 0 then
+    S := S+CutH(PString(Print.List.At(0))^, Size.X-CStrLen(S));
+    if Print.FileLen <> 0 then
       S1 := '~'+Copy(
-          Strg(#219, Trunc(((Size.X-6)*Print^.FilePos) / Print^.FileLen)) +
+          Strg(#219, Trunc(((Size.X-6)*Print.FilePos) / Print.FileLen)) +
             Strg(#177, Size.X-6),
           1, Size.X-6) +
-        ' ~' + Percent(Print^.FilePos+1, Print^.FileLen+1);
+        ' ~' + Percent(Print.FilePos+1, Print.FileLen+1);
     end;
   MoveCStr(B, '~'+S+'~', C);
   WriteLineC(0, 0, Size.X, 1, B);
@@ -294,7 +293,7 @@ function TPrintManager.SetDestination: Boolean;
     begin
     MessageBox(GetString(dlNotPrinter), nil, mfError+mfOKButton);
     if PrintDevice <> nil then
-      PrintDevice^.Status := 0;
+      PrintDevice.Status := 0;
     Exit;
     end;
 
@@ -305,29 +304,29 @@ function TPrintManager.SetDestination: Boolean;
 //    для них не работает SysFileSeek, вызываемая в TDOSStream.Init,
 //    что тем не менее не мешает производить на них запись. Ситуацию
 //    можно отловить по коду ошибки 87 (проверено по крайней мере под Win XP)
-  if (PrintDevice^.Status <> stOK)
-      and (PrintDevice^.ErrorInfo = 87) then
-    PrintDevice^.Status := stOK;
+  if (PrintDevice.Status <> stOK)
+      and (PrintDevice.ErrorInfo = 87) then
+    PrintDevice.Status := stOK;
 
-  if PrintDevice^.Status <> stOK then
+  if PrintDevice.Status <> stOK then
     begin
     MessageBox(GetString(dlPrintNoInit) + ^M^C'RC=' +
-               ItoS(PrintDevice^.ErrorInfo), nil, mfError+mfOKButton);
+               ItoS(PrintDevice.ErrorInfo), nil, mfError+mfOKButton);
     PrintDevice := OldP;
     if PrintDevice <> nil then
-      PrintDevice^.Status := 0;
+      PrintDevice.Status := 0;
     Exit;
     end;
 
   if (RPrinterSetup.Device in [10,11])
-      and (SysFileIsDevice(PrintDevice^.Handle) and $FF = 0) then
+      and (SysFileIsDevice(PrintDevice.Handle) and $FF = 0) then
     begin
     MessageBox(GetString(dlNotPrinter), nil, mfError+mfOKButton);
     PrintDevice.Free;
     EraseByName(S);
     PrintDevice := OldP;
     if PrintDevice <> nil then
-      PrintDevice^.Status := 0;
+      PrintDevice.Status := 0;
     Exit;
     end;
 
@@ -354,21 +353,21 @@ constructor TPrintManager.Load(var S: TStream);
   isValid := True;
 
 //JO: см. комментарий к TPrintManager.SetDestination;
-  if (PrintDevice^.Status <> stOK)
-      and (PrintDevice^.ErrorInfo = 87) then
-    PrintDevice^.Status := stOK;
-  if PrintDevice^.Status <> stOK then
+  if (PrintDevice.Status <> stOK)
+      and (PrintDevice.ErrorInfo = 87) then
+    PrintDevice.Status := stOK;
+  if PrintDevice.Status <> stOK then
     begin
     isValid := False;
     MessageBox(GetString(dlPrintNoInit)+ ^M^C'RC=' +
-               ItoS(PrintDevice^.ErrorInfo), nil, mfError+mfOKButton);
-    PrintDevice^.Status := 0;
+               ItoS(PrintDevice.ErrorInfo), nil, mfError+mfOKButton);
+    PrintDevice.Status := 0;
     Exit;
     end;
-  PrintStream := New(TBufStream, Init(PString(List^.At(0))^, stOpenRead,
-         $400));
-  FileLen := PrintStream^.GetSize;
-  PrintStream^.Seek(FilePos);
+  PrintStream := TBufStream.Create(PString(List.At(0))^, stOpenRead,
+         $400);
+  FileLen := PrintStream.GetSize;
+  PrintStream.Seek(FilePos);
   {PrintStream := nil;}
   Printer := Self;
   RegisterToBackground(Self);
@@ -383,7 +382,7 @@ procedure TPrintManager.Store(var S: TStream);
   S.Write(FilePos, 4);
   end;
 
-destructor TPrintManager.Done;
+destructor TPrintManager.Destroy;
   begin
   Printer := nil;
   if PrintStream <> nil then
@@ -396,7 +395,7 @@ destructor TPrintManager.Done;
     FreeMem(Buffer, BufSize);
   Buffer := nil;
   DisposeStr(OutName);
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TPrintManager.Valid(C: Word): Boolean;
@@ -439,9 +438,9 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
         cmOK:
           begin
           Inc(LockUpdate);
-          if  (List <> nil) and (List^.Count > Focused) and
+          if  (List <> nil) and (List.Count > Focused) and
 
-                      (MessageBox(GetString(dlPDeleteQeury1)+Cut(PString(List^.At(
+                      (MessageBox(GetString(dlPDeleteQeury1)+Cut(PString(List.At(
                       Focused))^, 40)+
                 GetString(dlPDeleteQeury2), nil, mfYesNoConfirm) = cmYes)
           then
@@ -457,7 +456,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
               until PrintBuffer(1);
               end;
             List.AtFree(Focused);
-            SetRange(List^.Count);
+            SetRange(List.Count);
             DrawView;
             if Status <> nil then
               Status.DrawView;
@@ -472,11 +471,11 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
 procedure TPrintManager.PrintFile(const FileName: String);
   begin
   if List = nil then
-    List := PStringCol.Create(10, 10);
+    List := TStringCol.Create(10, 10);
   
   List.Insert(NewStr(lfGetLongFileName(FileName)));
   
-  SetRange(List^.Count);
+  SetRange(List.Count);
   DrawView;
   if Status <> nil then
     Status.DrawView;
@@ -488,7 +487,7 @@ procedure TPrintManager.InitPrinter;
  {var
     Hndl: Word;}
   begin
-(* Hndl := PrintDevice^.Handle;
+(* Hndl := PrintDevice.Handle;
   asm
     MOV  BX, Hndl
     MOV  AX,4400H   { IOCTL, GET DEV ATTR }
@@ -551,9 +550,9 @@ function TPrintManager.PrintBuffer(Num: Word): Boolean;
   PrintBuffer := True;
   {BB := NeedAbort;
  NeedAbort := True; Abort := False;}
-  PrintDevice^.Status := 0;
-  PrintDevice^.Write(Buffer^, Num);
-  PrintDevice^.Status := 0;
+  PrintDevice.Status := 0;
+  PrintDevice.Write(Buffer^, Num);
+  PrintDevice.Status := 0;
   {NeedAbort := BB;}
   if Abort then
     goto 1;
@@ -569,9 +568,9 @@ procedure TPrintManager.Update;
       S: String;
     begin
     if List <> nil then
-      S := PString(List^.At(0))^;
+      S := PString(List.At(0))^;
     Inc(LockUpdate);
-    if  (PrintStream^.Status <> stOK) then
+    if  (PrintStream.Status <> stOK) then
       MessageBox(GetString(dlCantPrintFile)+S, nil,
         mfError+mfOKButton);
     PrintStream.Free;
@@ -579,7 +578,7 @@ procedure TPrintManager.Update;
     if InMask(GetName(S), '$DN????$.PRN') then
       EraseFile(S);
     List.AtFree(0);
-    SetRange(List^.Count);
+    SetRange(List.Count);
     FocusItem(Focused-1);
     DrawView;
     if Status <> nil then
@@ -592,28 +591,28 @@ procedure TPrintManager.Update;
     Exit;
   if  (PrintStream = nil) then
     begin
-    if  (List = nil) or (List^.Count < 1) then
+    if  (List = nil) or (List.Count < 1) then
       begin
       if not Owner.GetState(sfDragging) then
         Owner.Free;
       Exit;
       end;
-    PrintStream := New(TBufStream, Init(PString(List^.At(0))^,
-           stOpenRead, $400));
+    PrintStream := TBufStream.Create(PString(List.At(0))^,
+           stOpenRead, $400);
     FileLen := 0;
     FilePos := 0;
-    if PrintStream^.Status <> stOK
+    if PrintStream.Status <> stOK
     then
       WriteERROR
     else
       begin
-      FileLen := PrintStream^.GetSize;
+      FileLen := PrintStream.GetSize;
       if RPrinterSetup.InitPrinter = '' then
         begin
         BufCount := MaxBufCount;
         if BufCount > FileLen then
           BufCount := i32(FileLen);
-        PrintStream^.Read(Buffer^, BufCount);
+        PrintStream.Read(Buffer^, BufCount);
         end
       else
         begin
@@ -626,8 +625,8 @@ procedure TPrintManager.Update;
     begin
     if PrintBuffer(BufCount) then
       begin
-      FilePos := PrintStream^.GetPos;
-      if  (FilePos >= FileLen) or (PrintStream^.Status <> stOK) then
+      FilePos := PrintStream.GetPos;
+      if  (FilePos >= FileLen) or (PrintStream.Status <> stOK) then
         begin
         if RPrinterSetup.AfterFile <> '' then
           begin
@@ -646,7 +645,7 @@ procedure TPrintManager.Update;
         BufCount := MaxBufCount;
         if BufCount+FilePos > FileLen then
           BufCount := i32(FileLen-FilePos);
-        PrintStream^.Read(Buffer^, BufCount);
+        PrintStream.Read(Buffer^, BufCount);
         end;
       end;
     end;
@@ -662,7 +661,7 @@ procedure SetupPrinter;
   if ExecResource(dlgPrinterSetup, RPrinterSetup) = cmOK then
     Message(Application, evCommand, cmUpdateConfig, nil);
   if  (LastDest <> RPrinterSetup.Device) and (Printer <> nil) then
-    Printer^.SetDestination;
+    Printer.SetDestination;
   end;
 
 procedure PrintFile(const S: String);
@@ -682,7 +681,7 @@ procedure PrintFile(const S: String);
       end;
     end;
   if Printer <> nil then
-    Printer^.PrintFile(S);
+    Printer.PrintFile(S);
   end;
 
 
