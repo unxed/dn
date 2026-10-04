@@ -65,7 +65,7 @@ program RCP;
 {file                                                                 }
 
 uses
-  Lfn, Collect, Drivers, Dos, Defines, objutil, Streams, basics,
+  Lfn, osdep, Collect, Drivers, Dos, Defines, objutil, Streams, basics,
   strutil, fileutil,
   RStrings, GetConst, Menus, Commands, Setups, DNHelp, Views, mainapp,
    Startup,
@@ -303,11 +303,11 @@ procedure ProcessDLs(Enable: Boolean);
     DLs.ForEach(DoTest);
     if Fail then
       Halt(1);
-    DLStream := TBufStream.Create(OutLngFileName, stCreate, 512);
+    DLStream := TBufStream.Create(SysOsPath(OutLngFileName), stCreate, 512);
     if DLStream.Status <> stOK then
       Error('Cannot create file '+OutLngFileName);
     Writeln('Writing ', OutLngFileName);
-    SLM.Store(DLStream);
+    DLStream.Put(SLM);
     if DLStream.Status <> stOK then
       begin
       DLStream.Free;
@@ -319,7 +319,7 @@ procedure ProcessDLs(Enable: Boolean);
     SLM.Free;
     end;
   ReRegisterType(RStringList);
-  DLStream := TBufStream.Create(OutLngFileName, stOpenRead, 512);
+  DLStream := TBufStream.Create(SysOsPath(OutLngFileName), stOpenRead, 512);
   LStringList := TStringList(DLStream.Get);
   if  (LStringList = nil) and Enable then
     begin
@@ -400,14 +400,14 @@ var
 type
   TEditSaver = class(TStreamable)
     constructor Create;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
     end;
 
 const
   REditSaver: TStreamRec = (ObjType: 12335; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 
-constructor TEditSaver.Load(var S: TStream);
+constructor TEditSaver.Load(S: TStream);
   begin
   S.Read(NumCommands, SizeOf(NumCommands));
   S.Read(EditCommands, SizeOf(TEditCommand)*NumCommands);
@@ -418,7 +418,7 @@ constructor TEditSaver.Create;
   inherited Create;
   end;
 
-procedure TEditSaver.Store(var S: TStream);
+procedure TEditSaver.Store(S: TStream);
   begin
   S.Write(NumCommands, SizeOf(NumCommands));
   S.Write(EditCommands, SizeOf(TEditCommand)*NumCommands);
@@ -475,7 +475,7 @@ function GetID(const S: String): LongInt;
     SetLength(FreeStr, Length(FreeStr)-1);
   DelRight(FreeStr);
   T := TLngWord.Create(0, FreeStr);
-  if IDs.Search(@T, I) then
+  if IDs.Search(T, I) then
     begin
     GetID := TLngWord(IDs.At(I)).L;
     end
@@ -680,7 +680,7 @@ procedure ProcessDLGs;
       SetLength(FreeStr, Length(FreeStr)-1);
     DelRight(FreeStr);
     T := TLngWord.Create(0, FreeStr);
-    if IDs.Search(@T, L) then
+    if IDs.Search(T, L) then
       begin
       GetID := TLngWord(IDs.At(L)).L;
       end
@@ -855,7 +855,7 @@ procedure ProcessDLGs;
     I := Length(idMenu);
     FreeStr := Token(S, I);
     T := TLngWord.Create(0, FreeStr);
-    if not DLGs.Search(@T, J) then
+    if not DLGs.Search(T, J) then
       Error('Unknown Resource ID - '+T.Name);
     ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
     FillChar(R, SizeOf(R), 0);
@@ -1123,7 +1123,7 @@ procedure ProcessDLGs;
     InPage := False;
     FreeStr := Token(S, I);
     T := TLngWord.Create(0, FreeStr);
-    if not DLGs.Search(@T, J) then
+    if not DLGs.Search(T, J) then
       Error('Unknown Resource ID: '+T.Name);
     ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
     begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R.Assign(0, 0, TkL[1], TkL[2]) end;
@@ -1279,7 +1279,7 @@ procedure ProcessDLGs;
   Line := 0;
   if IOResult <> 0 then
     Error('Could not open input file');
-  St := TBufStream.Create(OutDlgFileName, stCreate, 512);
+  St := TBufStream.Create(SysOsPath(OutDlgFileName), stCreate, 512);
   if St.Status <> stOK then
     begin
     Close(F.T);
@@ -1413,17 +1413,17 @@ Same:
     CutWord := S;
   end;
 
-function Build_RStringList(var S: TStream): TStreamable;
+function Build_RStringList(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStrL.TStringList.Load(S));
 end;
 
-function Build_REditSaver(var S: TStream): TStreamable;
+function Build_REditSaver(S: TStream): TStreamable;
 begin
   Result := TStreamable(TEditSaver.Load(S));
 end;
 
-procedure Store_REditSaver(P: TStreamable; var S: TStream);
+procedure Store_REditSaver(P: TStreamable; S: TStream);
 begin
   TEditSaver(P).Store(S);
 end;

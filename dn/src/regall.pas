@@ -520,1617 +520,1617 @@ procedure RegisterAll;
     RegisterType(RColorPoint);
   end;
 
-function Build_RFilterValidator(var S: TStream): TStreamable;
+function Build_RFilterValidator(S: TStream): TStreamable;
 begin
   Result := TStreamable(Validate.TFilterValidator.Load(S));
 end;
 
-procedure Store_RFilterValidator(P: TStreamable; var S: TStream);
+procedure Store_RFilterValidator(P: TStreamable; S: TStream);
 begin
   Validate.TFilterValidator(P).Store(S);
 end;
 
-function Build_RRangeValidator(var S: TStream): TStreamable;
+function Build_RRangeValidator(S: TStream): TStreamable;
 begin
   Result := TStreamable(Validate.TRangeValidator.Load(S));
 end;
 
-procedure Store_RRangeValidator(P: TStreamable; var S: TStream);
+procedure Store_RRangeValidator(P: TStreamable; S: TStream);
 begin
   Validate.TRangeValidator(P).Store(S);
 end;
 
-function Build_RView(var S: TStream): TStreamable;
+function Build_RView(S: TStream): TStreamable;
 begin
   Result := TStreamable(Views.TView.Load(S));
 end;
 
-procedure Store_RView(P: TStreamable; var S: TStream);
+procedure Store_RView(P: TStreamable; S: TStream);
 begin
   Views.TView(P).Store(S);
 end;
 
-function Build_RFrame(var S: TStream): TStreamable;
+function Build_RFrame(S: TStream): TStreamable;
 begin
   Result := TStreamable(Views.TFrame.Load(S));
 end;
 
-procedure Store_RFrame(P: TStreamable; var S: TStream);
+procedure Store_RFrame(P: TStreamable; S: TStream);
 begin
   Views.TFrame(P).Store(S);
 end;
 
-function Build_RScrollBar(var S: TStream): TStreamable;
+function Build_RScrollBar(S: TStream): TStreamable;
 begin
   Result := TStreamable(Views.TScrollBar.Load(S));
 end;
 
-procedure Store_RScrollBar(P: TStreamable; var S: TStream);
+procedure Store_RScrollBar(P: TStreamable; S: TStream);
 begin
   Views.TScrollBar(P).Store(S);
 end;
 
-function Build_RGroup(var S: TStream): TStreamable;
+function Build_RGroup(S: TStream): TStreamable;
 begin
   Result := TStreamable(Views.TGroup.Load(S));
 end;
 
-procedure Store_RGroup(P: TStreamable; var S: TStream);
+procedure Store_RGroup(P: TStreamable; S: TStream);
 begin
   Views.TGroup(P).Store(S);
 end;
 
-function Build_RWindow(var S: TStream): TStreamable;
+function Build_RWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(Views.TWindow.Load(S));
 end;
 
-procedure Store_RWindow(P: TStreamable; var S: TStream);
+procedure Store_RWindow(P: TStreamable; S: TStream);
 begin
   Views.TWindow(P).Store(S);
 end;
 
-function Build_RZIPArchiver(var S: TStream): TStreamable;
+function Build_RZIPArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtzip.TZIPArchive.Load(S));
 end;
 
-procedure Store_RZIPArchiver(P: TStreamable; var S: TStream);
+procedure Store_RZIPArchiver(P: TStreamable; S: TStream);
 begin
   fmtzip.TZIPArchive(P).Store(S);
 end;
 
-function Build_RLHAArchiver(var S: TStream): TStreamable;
+function Build_RLHAArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtlha.TLHAArchive.Load(S));
 end;
 
-procedure Store_RLHAArchiver(P: TStreamable; var S: TStream);
+procedure Store_RLHAArchiver(P: TStreamable; S: TStream);
 begin
   fmtlha.TLHAArchive(P).Store(S);
 end;
 
-function Build_RRARArchiver(var S: TStream): TStreamable;
+function Build_RRARArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtrar.TRARArchive.Load(S));
 end;
 
-procedure Store_RRARArchiver(P: TStreamable; var S: TStream);
+procedure Store_RRARArchiver(P: TStreamable; S: TStream);
 begin
   fmtrar.TRARArchive(P).Store(S);
 end;
 
-function Build_RCABArchiver(var S: TStream): TStreamable;
+function Build_RCABArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtcab.TCABArchive.Load(S));
 end;
 
-procedure Store_RCABArchiver(P: TStreamable; var S: TStream);
+procedure Store_RCABArchiver(P: TStreamable; S: TStream);
 begin
   fmtcab.TCABArchive(P).Store(S);
 end;
 
-function Build_RACEArchiver(var S: TStream): TStreamable;
+function Build_RACEArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtace.TACEArchive.Load(S));
 end;
 
-procedure Store_RACEArchiver(P: TStreamable; var S: TStream);
+procedure Store_RACEArchiver(P: TStreamable; S: TStream);
 begin
   fmtace.TACEArchive(P).Store(S);
 end;
 
-function Build_RHAArchiver(var S: TStream): TStreamable;
+function Build_RHAArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtha.THAArchive.Load(S));
 end;
 
-procedure Store_RHAArchiver(P: TStreamable; var S: TStream);
+procedure Store_RHAArchiver(P: TStreamable; S: TStream);
 begin
   fmtha.THAArchive(P).Store(S);
 end;
 
-function Build_RARCArchiver(var S: TStream): TStreamable;
+function Build_RARCArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtarc.TARCArchive.Load(S));
 end;
 
-procedure Store_RARCArchiver(P: TStreamable; var S: TStream);
+procedure Store_RARCArchiver(P: TStreamable; S: TStream);
 begin
   fmtarc.TARCArchive(P).Store(S);
 end;
 
-function Build_RBSAArchiver(var S: TStream): TStreamable;
+function Build_RBSAArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtbsa.TBSAArchive.Load(S));
 end;
 
-procedure Store_RBSAArchiver(P: TStreamable; var S: TStream);
+procedure Store_RBSAArchiver(P: TStreamable; S: TStream);
 begin
   fmtbsa.TBSAArchive(P).Store(S);
 end;
 
-function Build_RBS2Archiver(var S: TStream): TStreamable;
+function Build_RBS2Archiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtbs2.TBS2Archive.Load(S));
 end;
 
-procedure Store_RBS2Archiver(P: TStreamable; var S: TStream);
+procedure Store_RBS2Archiver(P: TStreamable; S: TStream);
 begin
   fmtbs2.TBS2Archive(P).Store(S);
 end;
 
-function Build_RHYPArchiver(var S: TStream): TStreamable;
+function Build_RHYPArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmthyp.THYPArchive.Load(S));
 end;
 
-procedure Store_RHYPArchiver(P: TStreamable; var S: TStream);
+procedure Store_RHYPArchiver(P: TStreamable; S: TStream);
 begin
   fmthyp.THYPArchive(P).Store(S);
 end;
 
-function Build_RLIMArchiver(var S: TStream): TStreamable;
+function Build_RLIMArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtlim.TLIMArchive.Load(S));
 end;
 
-procedure Store_RLIMArchiver(P: TStreamable; var S: TStream);
+procedure Store_RLIMArchiver(P: TStreamable; S: TStream);
 begin
   fmtlim.TLIMArchive(P).Store(S);
 end;
 
-function Build_RHPKArchiver(var S: TStream): TStreamable;
+function Build_RHPKArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmthpk.THPKArchive.Load(S));
 end;
 
-procedure Store_RHPKArchiver(P: TStreamable; var S: TStream);
+procedure Store_RHPKArchiver(P: TStreamable; S: TStream);
 begin
   fmthpk.THPKArchive(P).Store(S);
 end;
 
-function Build_RTARArchiver(var S: TStream): TStreamable;
+function Build_RTARArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmttar.TTARArchive.Load(S));
 end;
 
-procedure Store_RTARArchiver(P: TStreamable; var S: TStream);
+procedure Store_RTARArchiver(P: TStreamable; S: TStream);
 begin
   fmttar.TTARArchive(P).Store(S);
 end;
 
-function Build_RTGZArchiver(var S: TStream): TStreamable;
+function Build_RTGZArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmttgz.TTGZArchive.Load(S));
 end;
 
-procedure Store_RTGZArchiver(P: TStreamable; var S: TStream);
+procedure Store_RTGZArchiver(P: TStreamable; S: TStream);
 begin
   fmttgz.TTGZArchive(P).Store(S);
 end;
 
-function Build_RZXZArchiver(var S: TStream): TStreamable;
+function Build_RZXZArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtzxz.TZXZArchive.Load(S));
 end;
 
-procedure Store_RZXZArchiver(P: TStreamable; var S: TStream);
+procedure Store_RZXZArchiver(P: TStreamable; S: TStream);
 begin
   fmtzxz.TZXZArchive(P).Store(S);
 end;
 
-function Build_RQUARKArchiver(var S: TStream): TStreamable;
+function Build_RQUARKArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtqrk.TQuArkArchive.Load(S));
 end;
 
-procedure Store_RQUARKArchiver(P: TStreamable; var S: TStream);
+procedure Store_RQUARKArchiver(P: TStreamable; S: TStream);
 begin
   fmtqrk.TQuArkArchive(P).Store(S);
 end;
 
-function Build_RUFAArchiver(var S: TStream): TStreamable;
+function Build_RUFAArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtufa.TUFAArchive.Load(S));
 end;
 
-procedure Store_RUFAArchiver(P: TStreamable; var S: TStream);
+procedure Store_RUFAArchiver(P: TStreamable; S: TStream);
 begin
   fmtufa.TUFAArchive(P).Store(S);
 end;
 
-function Build_RIS3Archiver(var S: TStream): TStreamable;
+function Build_RIS3Archiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtis3.TIS3Archive.Load(S));
 end;
 
-procedure Store_RIS3Archiver(P: TStreamable; var S: TStream);
+procedure Store_RIS3Archiver(P: TStreamable; S: TStream);
 begin
   fmtis3.TIS3Archive(P).Store(S);
 end;
 
-function Build_RSQZArchiver(var S: TStream): TStreamable;
+function Build_RSQZArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtsqz.TSQZArchive.Load(S));
 end;
 
-procedure Store_RSQZArchiver(P: TStreamable; var S: TStream);
+procedure Store_RSQZArchiver(P: TStreamable; S: TStream);
 begin
   fmtsqz.TSQZArchive(P).Store(S);
 end;
 
-function Build_RHAPArchiver(var S: TStream): TStreamable;
+function Build_RHAPArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmthap.THAPArchive.Load(S));
 end;
 
-procedure Store_RHAPArchiver(P: TStreamable; var S: TStream);
+procedure Store_RHAPArchiver(P: TStreamable; S: TStream);
 begin
   fmthap.THAPArchive(P).Store(S);
 end;
 
-function Build_RZOOArchiver(var S: TStream): TStreamable;
+function Build_RZOOArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtzoo.TZOOArchive.Load(S));
 end;
 
-procedure Store_RZOOArchiver(P: TStreamable; var S: TStream);
+procedure Store_RZOOArchiver(P: TStreamable; S: TStream);
 begin
   fmtzoo.TZOOArchive(P).Store(S);
 end;
 
-function Build_RCHZArchiver(var S: TStream): TStreamable;
+function Build_RCHZArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtchz.TCHZArchive.Load(S));
 end;
 
-procedure Store_RCHZArchiver(P: TStreamable; var S: TStream);
+procedure Store_RCHZArchiver(P: TStreamable; S: TStream);
 begin
   fmtchz.TCHZArchive(P).Store(S);
 end;
 
-function Build_RUC2Archiver(var S: TStream): TStreamable;
+function Build_RUC2Archiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtuc2.TUC2Archive.Load(S));
 end;
 
-procedure Store_RUC2Archiver(P: TStreamable; var S: TStream);
+procedure Store_RUC2Archiver(P: TStreamable; S: TStream);
 begin
   fmtuc2.TUC2Archive(P).Store(S);
 end;
 
-function Build_RAINArchiver(var S: TStream): TStreamable;
+function Build_RAINArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtain.TAINArchive.Load(S));
 end;
 
-procedure Store_RAINArchiver(P: TStreamable; var S: TStream);
+procedure Store_RAINArchiver(P: TStreamable; S: TStream);
 begin
   fmtain.TAINArchive(P).Store(S);
 end;
 
-function Build_RS7ZArchiver(var S: TStream): TStreamable;
+function Build_RS7ZArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmt7z.TS7ZArchive.Load(S));
 end;
 
-procedure Store_RS7ZArchiver(P: TStreamable; var S: TStream);
+procedure Store_RS7ZArchiver(P: TStreamable; S: TStream);
 begin
   fmt7z.TS7ZArchive(P).Store(S);
 end;
 
-function Build_RBZ2Archiver(var S: TStream): TStreamable;
+function Build_RBZ2Archiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(fmtbz2.TBZ2Archive.Load(S));
 end;
 
-procedure Store_RBZ2Archiver(P: TStreamable; var S: TStream);
+procedure Store_RBZ2Archiver(P: TStreamable; S: TStream);
 begin
   fmtbz2.TBZ2Archive(P).Store(S);
 end;
 
-function Build_RARJArchiver(var S: TStream): TStreamable;
+function Build_RARJArchiver(S: TStream): TStreamable;
 begin
   Result := TStreamable(Archiver.TARJArchive.Load(S));
 end;
 
-procedure Store_RARJArchiver(P: TStreamable; var S: TStream);
+procedure Store_RARJArchiver(P: TStreamable; S: TStream);
 begin
   Archiver.TARJArchive(P).Store(S);
 end;
 
-function Build_RFileInfo(var S: TStream): TStreamable;
+function Build_RFileInfo(S: TStream): TStreamable;
 begin
   Result := TStreamable(Archiver.TFileInfo.Load(S));
 end;
 
-procedure Store_RFileInfo(P: TStreamable; var S: TStream);
+procedure Store_RFileInfo(P: TStreamable; S: TStream);
 begin
   Archiver.TFileInfo(P).Store(S);
 end;
 
-function Build_RArcDrive(var S: TStream): TStreamable;
+function Build_RArcDrive(S: TStream): TStreamable;
 begin
   Result := TStreamable(ArcView.TArcDrive.Load(S));
 end;
 
-procedure Store_RArcDrive(P: TStreamable; var S: TStream);
+procedure Store_RArcDrive(P: TStreamable; S: TStream);
 begin
   ArcView.TArcDrive(P).Store(S);
 end;
 
-function Build_RArvidDrive(var S: TStream): TStreamable;
+function Build_RArvidDrive(S: TStream): TStreamable;
 begin
   Result := TStreamable(Arvid.TArvidDrive.Load(S));
 end;
 
-procedure Store_RArvidDrive(P: TStreamable; var S: TStream);
+procedure Store_RArvidDrive(P: TStreamable; S: TStream);
 begin
   Arvid.TArvidDrive(P).Store(S);
 end;
 
-function Build_RTable(var S: TStream): TStreamable;
+function Build_RTable(S: TStream): TStreamable;
 begin
   Result := TStreamable(ASCIITab.TTable.Load(S));
 end;
 
-procedure Store_RTable(P: TStreamable; var S: TStream);
+procedure Store_RTable(P: TStreamable; S: TStream);
 begin
   ASCIITab.TTable(P).Store(S);
 end;
 
-function Build_RReport(var S: TStream): TStreamable;
+function Build_RReport(S: TStream): TStreamable;
 begin
   Result := TStreamable(ASCIITab.TReport.Load(S));
 end;
 
-procedure Store_RReport(P: TStreamable; var S: TStream);
+procedure Store_RReport(P: TStreamable; S: TStream);
 begin
   ASCIITab.TReport(P).Store(S);
 end;
 
-function Build_RASCIIChart(var S: TStream): TStreamable;
+function Build_RASCIIChart(S: TStream): TStreamable;
 begin
   Result := TStreamable(ASCIITab.TASCIIChart.Load(S));
 end;
 
-procedure Store_RASCIIChart(P: TStreamable; var S: TStream);
+procedure Store_RASCIIChart(P: TStreamable; S: TStream);
 begin
   ASCIITab.TASCIIChart(P).Store(S);
 end;
 
-function Build_RCalcWindow(var S: TStream): TStreamable;
+function Build_RCalcWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(calcwin.TCalcWindow.Load(S));
 end;
 
-procedure Store_RCalcWindow(P: TStreamable; var S: TStream);
+procedure Store_RCalcWindow(P: TStreamable; S: TStream);
 begin
   calcwin.TCalcWindow(P).Store(S);
 end;
 
-function Build_RCalcView(var S: TStream): TStreamable;
+function Build_RCalcView(S: TStream): TStreamable;
 begin
   Result := TStreamable(calcwin.TCalcView.Load(S));
 end;
 
-procedure Store_RCalcView(P: TStreamable; var S: TStream);
+procedure Store_RCalcView(P: TStreamable; S: TStream);
 begin
   calcwin.TCalcView(P).Store(S);
 end;
 
-function Build_RCalcInfo(var S: TStream): TStreamable;
+function Build_RCalcInfo(S: TStream): TStreamable;
 begin
   Result := TStreamable(calcwin.TCalcInput.Load(S));
 end;
 
-procedure Store_RCalcInfo(P: TStreamable; var S: TStream);
+procedure Store_RCalcInfo(P: TStreamable; S: TStream);
 begin
   calcwin.TCalcInput(P).Store(S);
 end;
 
-function Build_RInfoView(var S: TStream): TStreamable;
+function Build_RInfoView(S: TStream): TStreamable;
 begin
   Result := TStreamable(calcwin.TInfoView.Load(S));
 end;
 
-procedure Store_RInfoView(P: TStreamable; var S: TStream);
+procedure Store_RInfoView(P: TStreamable; S: TStream);
 begin
   calcwin.TInfoView(P).Store(S);
 end;
 
-function Build_RCellCollection(var S: TStream): TStreamable;
+function Build_RCellCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(CellsCol.TCellCollection.Load(S));
 end;
 
-procedure Store_RCellCollection(P: TStreamable; var S: TStream);
+procedure Store_RCellCollection(P: TStreamable; S: TStream);
 begin
   CellsCol.TCellCollection(P).Store(S);
 end;
 
-function Build_RCalendarView(var S: TStream): TStreamable;
+function Build_RCalendarView(S: TStream): TStreamable;
 begin
   Result := TStreamable(Calendar.TCalendarView.Load(S));
 end;
 
-procedure Store_RCalendarView(P: TStreamable; var S: TStream);
+procedure Store_RCalendarView(P: TStreamable; S: TStream);
 begin
   Calendar.TCalendarView(P).Store(S);
 end;
 
-function Build_RCalendarWindow(var S: TStream): TStreamable;
+function Build_RCalendarWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(Calendar.TCalendarWindow.Load(S));
 end;
 
-procedure Store_RCalendarWindow(P: TStreamable; var S: TStream);
+procedure Store_RCalendarWindow(P: TStreamable; S: TStream);
 begin
   Calendar.TCalendarWindow(P).Store(S);
 end;
 
-function Build_RCalcLine(var S: TStream): TStreamable;
+function Build_RCalcLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(calcline.TCalcLine.Load(S));
 end;
 
-procedure Store_RCalcLine(P: TStreamable; var S: TStream);
+procedure Store_RCalcLine(P: TStreamable; S: TStream);
 begin
   calcline.TCalcLine(P).Store(S);
 end;
 
-function Build_RIndicator(var S: TStream): TStreamable;
+function Build_RIndicator(S: TStream): TStreamable;
 begin
   Result := TStreamable(calcline.TIndicator.Load(S));
 end;
 
-procedure Store_RIndicator(P: TStreamable; var S: TStream);
+procedure Store_RIndicator(P: TStreamable; S: TStream);
 begin
   calcline.TIndicator(P).Store(S);
 end;
 
-function Build_RCollection(var S: TStream): TStreamable;
+function Build_RCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(Collect.TCollection.Load(S));
 end;
 
-procedure Store_RCollection(P: TStreamable; var S: TStream);
+procedure Store_RCollection(P: TStreamable; S: TStream);
 begin
   Collect.TCollection(P).Store(S);
 end;
 
-function Build_RLineCollection(var S: TStream): TStreamable;
+function Build_RLineCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(Collect.TLineCollection.Load(S));
 end;
 
-procedure Store_RLineCollection(P: TStreamable; var S: TStream);
+procedure Store_RLineCollection(P: TStreamable; S: TStream);
 begin
   Collect.TLineCollection(P).Store(S);
 end;
 
-function Build_RStringCollection(var S: TStream): TStreamable;
+function Build_RStringCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(Collect.TStringCollection.Load(S));
 end;
 
-procedure Store_RStringCollection(P: TStreamable; var S: TStream);
+procedure Store_RStringCollection(P: TStreamable; S: TStream);
 begin
   Collect.TStringCollection(P).Store(S);
 end;
 
-function Build_RStrCollection(var S: TStream): TStreamable;
+function Build_RStrCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(Collect.TStrCollection.Load(S));
 end;
 
-procedure Store_RStrCollection(P: TStreamable; var S: TStream);
+procedure Store_RStrCollection(P: TStreamable; S: TStream);
 begin
   Collect.TStrCollection(P).Store(S);
 end;
 
-function Build_RStringList(var S: TStream): TStreamable;
+function Build_RStringList(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStrL.TStringList.Load(S));
 end;
 
-function Build_RColorSelector(var S: TStream): TStreamable;
+function Build_RColorSelector(S: TStream): TStreamable;
 begin
   Result := TStreamable(ColorSel.TColorSelector.Load(S));
 end;
 
-procedure Store_RColorSelector(P: TStreamable; var S: TStream);
+procedure Store_RColorSelector(P: TStreamable; S: TStream);
 begin
   ColorSel.TColorSelector(P).Store(S);
 end;
 
-function Build_RMonoSelector(var S: TStream): TStreamable;
+function Build_RMonoSelector(S: TStream): TStreamable;
 begin
   Result := TStreamable(ColorSel.TMonoSelector.Load(S));
 end;
 
-procedure Store_RMonoSelector(P: TStreamable; var S: TStream);
+procedure Store_RMonoSelector(P: TStreamable; S: TStream);
 begin
   ColorSel.TMonoSelector(P).Store(S);
 end;
 
-function Build_RColorDisplay(var S: TStream): TStreamable;
+function Build_RColorDisplay(S: TStream): TStreamable;
 begin
   Result := TStreamable(ColorSel.TColorDisplay.Load(S));
 end;
 
-procedure Store_RColorDisplay(P: TStreamable; var S: TStream);
+procedure Store_RColorDisplay(P: TStreamable; S: TStream);
 begin
   ColorSel.TColorDisplay(P).Store(S);
 end;
 
-function Build_RColorGroupList(var S: TStream): TStreamable;
+function Build_RColorGroupList(S: TStream): TStreamable;
 begin
   Result := TStreamable(ColorSel.TColorGroupList.Load(S));
 end;
 
-procedure Store_RColorGroupList(P: TStreamable; var S: TStream);
+procedure Store_RColorGroupList(P: TStreamable; S: TStream);
 begin
   ColorSel.TColorGroupList(P).Store(S);
 end;
 
-function Build_RColorItemList(var S: TStream): TStreamable;
+function Build_RColorItemList(S: TStream): TStreamable;
 begin
   Result := TStreamable(ColorSel.TColorItemList.Load(S));
 end;
 
-procedure Store_RColorItemList(P: TStreamable; var S: TStream);
+procedure Store_RColorItemList(P: TStreamable; S: TStream);
 begin
   ColorSel.TColorItemList(P).Store(S);
 end;
 
-function Build_RColorDialog(var S: TStream): TStreamable;
+function Build_RColorDialog(S: TStream): TStreamable;
 begin
   Result := TStreamable(ColorSel.TColorDialog.Load(S));
 end;
 
-procedure Store_RColorDialog(P: TStreamable; var S: TStream);
+procedure Store_RColorDialog(P: TStreamable; S: TStream);
 begin
   ColorSel.TColorDialog(P).Store(S);
 end;
 
-function Build_RR_BWSelector(var S: TStream): TStreamable;
+function Build_RR_BWSelector(S: TStream): TStreamable;
 begin
   Result := TStreamable(bwselect.T_BWSelector.Load(S));
 end;
 
-procedure Store_RR_BWSelector(P: TStreamable; var S: TStream);
+procedure Store_RR_BWSelector(P: TStreamable; S: TStream);
 begin
   bwselect.T_BWSelector(P).Store(S);
 end;
 
-function Build_RDBWindow(var S: TStream): TStreamable;
+function Build_RDBWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(DBView.TDBWindow.Load(S));
 end;
 
-procedure Store_RDBWindow(P: TStreamable; var S: TStream);
+procedure Store_RDBWindow(P: TStreamable; S: TStream);
 begin
   DBView.TDBWindow(P).Store(S);
 end;
 
-function Build_RDBViewer(var S: TStream): TStreamable;
+function Build_RDBViewer(S: TStream): TStreamable;
 begin
   Result := TStreamable(DBView.TDBViewer.Load(S));
 end;
 
-procedure Store_RDBViewer(P: TStreamable; var S: TStream);
+procedure Store_RDBViewer(P: TStreamable; S: TStream);
 begin
   DBView.TDBViewer(P).Store(S);
 end;
 
-function Build_RDBIndicator(var S: TStream): TStreamable;
+function Build_RDBIndicator(S: TStream): TStreamable;
 begin
   Result := TStreamable(DBView.TDBIndicator.Load(S));
 end;
 
-procedure Store_RDBIndicator(P: TStreamable; var S: TStream);
+procedure Store_RDBIndicator(P: TStreamable; S: TStream);
 begin
   DBView.TDBIndicator(P).Store(S);
 end;
 
-function Build_RFieldListBox(var S: TStream): TStreamable;
+function Build_RFieldListBox(S: TStream): TStreamable;
 begin
   Result := TStreamable(DBView.TFieldListBox.Load(S));
 end;
 
-procedure Store_RFieldListBox(P: TStreamable; var S: TStream);
+procedure Store_RFieldListBox(P: TStreamable; S: TStream);
 begin
   DBView.TFieldListBox(P).Store(S);
 end;
 
-function Build_RDialog(var S: TStream): TStreamable;
+function Build_RDialog(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TDialog.Load(S));
 end;
 
-procedure Store_RDialog(P: TStreamable; var S: TStream);
+procedure Store_RDialog(P: TStreamable; S: TStream);
 begin
   Dialogs.TDialog(P).Store(S);
 end;
 
-function Build_RInputLine(var S: TStream): TStreamable;
+function Build_RInputLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TInputLine.Load(S));
 end;
 
-procedure Store_RInputLine(P: TStreamable; var S: TStream);
+procedure Store_RInputLine(P: TStreamable; S: TStream);
 begin
   Dialogs.TInputLine(P).Store(S);
 end;
 
-function Build_RHexLine(var S: TStream): TStreamable;
+function Build_RHexLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.THexLine.Load(S));
 end;
 
-procedure Store_RHexLine(P: TStreamable; var S: TStream);
+procedure Store_RHexLine(P: TStreamable; S: TStream);
 begin
   DNDlgs.THexLine(P).Store(S);
 end;
 
-function Build_RLongInputLine(var S: TStream): TStreamable;
+function Build_RLongInputLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TLongInputLine.Load(S));
 end;
 
-procedure Store_RLongInputLine(P: TStreamable; var S: TStream);
+procedure Store_RLongInputLine(P: TStreamable; S: TStream);
 begin
   Dialogs.TLongInputLine(P).Store(S);
 end;
 
-function Build_RButton(var S: TStream): TStreamable;
+function Build_RButton(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TButton.Load(S));
 end;
 
-procedure Store_RButton(P: TStreamable; var S: TStream);
+procedure Store_RButton(P: TStreamable; S: TStream);
 begin
   Dialogs.TButton(P).Store(S);
 end;
 
-function Build_RCluster(var S: TStream): TStreamable;
+function Build_RCluster(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TCluster.Load(S));
 end;
 
-procedure Store_RCluster(P: TStreamable; var S: TStream);
+procedure Store_RCluster(P: TStreamable; S: TStream);
 begin
   Dialogs.TCluster(P).Store(S);
 end;
 
-function Build_RRadioButtons(var S: TStream): TStreamable;
+function Build_RRadioButtons(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TRadioButtons.Load(S));
 end;
 
-procedure Store_RRadioButtons(P: TStreamable; var S: TStream);
+procedure Store_RRadioButtons(P: TStreamable; S: TStream);
 begin
   Dialogs.TRadioButtons(P).Store(S);
 end;
 
-function Build_RComboBox(var S: TStream): TStreamable;
+function Build_RComboBox(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.TComboBox.Load(S));
 end;
 
-procedure Store_RComboBox(P: TStreamable; var S: TStream);
+procedure Store_RComboBox(P: TStreamable; S: TStream);
 begin
   DNDlgs.TComboBox(P).Store(S);
 end;
 
-function Build_RCheckBoxes(var S: TStream): TStreamable;
+function Build_RCheckBoxes(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TCheckBoxes.Load(S));
 end;
 
-procedure Store_RCheckBoxes(P: TStreamable; var S: TStream);
+procedure Store_RCheckBoxes(P: TStreamable; S: TStream);
 begin
   Dialogs.TCheckBoxes(P).Store(S);
 end;
 
-function Build_RMultiCheckBoxes(var S: TStream): TStreamable;
+function Build_RMultiCheckBoxes(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TMultiCheckBoxes.Load(S));
 end;
 
-procedure Store_RMultiCheckBoxes(P: TStreamable; var S: TStream);
+procedure Store_RMultiCheckBoxes(P: TStreamable; S: TStream);
 begin
   Dialogs.TMultiCheckBoxes(P).Store(S);
 end;
 
-function Build_RListBox(var S: TStream): TStreamable;
+function Build_RListBox(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TListBox.Load(S));
 end;
 
-procedure Store_RListBox(P: TStreamable; var S: TStream);
+procedure Store_RListBox(P: TStreamable; S: TStream);
 begin
   Dialogs.TListBox(P).Store(S);
 end;
 
-function Build_RStaticText(var S: TStream): TStreamable;
+function Build_RStaticText(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TStaticText.Load(S));
 end;
 
-procedure Store_RStaticText(P: TStreamable; var S: TStream);
+procedure Store_RStaticText(P: TStreamable; S: TStream);
 begin
   Dialogs.TStaticText(P).Store(S);
 end;
 
-function Build_RLabel(var S: TStream): TStreamable;
+function Build_RLabel(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.TLabel.Load(S));
 end;
 
-procedure Store_RLabel(P: TStreamable; var S: TStream);
+procedure Store_RLabel(P: TStreamable; S: TStream);
 begin
   Dialogs.TLabel(P).Store(S);
 end;
 
-function Build_RHistory(var S: TStream): TStreamable;
+function Build_RHistory(S: TStream): TStreamable;
 begin
   Result := TStreamable(Dialogs.THistory.Load(S));
 end;
 
-procedure Store_RHistory(P: TStreamable; var S: TStream);
+procedure Store_RHistory(P: TStreamable; S: TStream);
 begin
   Dialogs.THistory(P).Store(S);
 end;
 
-function Build_RParamText(var S: TStream): TStreamable;
+function Build_RParamText(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.TParamText.Load(S));
 end;
 
-procedure Store_RParamText(P: TStreamable; var S: TStream);
+procedure Store_RParamText(P: TStreamable; S: TStream);
 begin
   DNDlgs.TParamText(P).Store(S);
 end;
 
-function Build_RNotepad(var S: TStream): TStreamable;
+function Build_RNotepad(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.TNotepad.Load(S));
 end;
 
-procedure Store_RNotepad(P: TStreamable; var S: TStream);
+procedure Store_RNotepad(P: TStreamable; S: TStream);
 begin
   DNDlgs.TNotepad(P).Store(S);
 end;
 
-function Build_RPage(var S: TStream): TStreamable;
+function Build_RPage(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.TPage.Load(S));
 end;
 
-procedure Store_RPage(P: TStreamable; var S: TStream);
+procedure Store_RPage(P: TStreamable; S: TStream);
 begin
   DNDlgs.TPage(P).Store(S);
 end;
 
-function Build_RBookmark(var S: TStream): TStreamable;
+function Build_RBookmark(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.TBookmark.Load(S));
 end;
 
-procedure Store_RBookmark(P: TStreamable; var S: TStream);
+procedure Store_RBookmark(P: TStreamable; S: TStream);
 begin
   DNDlgs.TBookmark(P).Store(S);
 end;
 
-function Build_RPageFrame(var S: TStream): TStreamable;
+function Build_RPageFrame(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.TPageFrame.Load(S));
 end;
 
-procedure Store_RPageFrame(P: TStreamable; var S: TStream);
+procedure Store_RPageFrame(P: TStreamable; S: TStream);
 begin
   DNDlgs.TPageFrame(P).Store(S);
 end;
 
-function Build_RNotepadFrame(var S: TStream): TStreamable;
+function Build_RNotepadFrame(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNDlgs.TNotepadFrame.Load(S));
 end;
 
-procedure Store_RNotepadFrame(P: TStreamable; var S: TStream);
+procedure Store_RNotepadFrame(P: TStreamable; S: TStream);
 begin
   DNDlgs.TNotepadFrame(P).Store(S);
 end;
 
-function Build_RDiskInfo(var S: TStream): TStreamable;
+function Build_RDiskInfo(S: TStream): TStreamable;
 begin
   Result := TStreamable(DiskInfo.TDiskInfo.Load(S));
 end;
 
-procedure Store_RDiskInfo(P: TStreamable; var S: TStream);
+procedure Store_RDiskInfo(P: TStreamable; S: TStream);
 begin
   DiskInfo.TDiskInfo(P).Store(S);
 end;
 
-function Build_RDriveView(var S: TStream): TStreamable;
+function Build_RDriveView(S: TStream): TStreamable;
 begin
   Result := TStreamable(DiskInfo.TDriveView.Load(S));
 end;
 
-procedure Store_RDriveView(P: TStreamable; var S: TStream);
+procedure Store_RDriveView(P: TStreamable; S: TStream);
 begin
   DiskInfo.TDriveView(P).Store(S);
 end;
 
-function Build_RBackground(var S: TStream): TStreamable;
+function Build_RBackground(S: TStream): TStreamable;
 begin
   Result := TStreamable(mainapp.TBackground.Load(S));
 end;
 
-procedure Store_RBackground(P: TStreamable; var S: TStream);
+procedure Store_RBackground(P: TStreamable; S: TStream);
 begin
   mainapp.TBackground(P).Store(S);
 end;
 
-function Build_RDesktop(var S: TStream): TStreamable;
+function Build_RDesktop(S: TStream): TStreamable;
 begin
   Result := TStreamable(mainapp.TDesktop.Load(S));
 end;
 
-procedure Store_RDesktop(P: TStreamable; var S: TStream);
+procedure Store_RDesktop(P: TStreamable; S: TStream);
 begin
   mainapp.TDesktop(P).Store(S);
 end;
 
-function Build_RFileInputLine(var S: TStream): TStreamable;
+function Build_RFileInputLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStdDlg.TFileInputLine.Load(S));
 end;
 
-procedure Store_RFileInputLine(P: TStreamable; var S: TStream);
+procedure Store_RFileInputLine(P: TStreamable; S: TStream);
 begin
   DNStdDlg.TFileInputLine(P).Store(S);
 end;
 
-function Build_RFileCollection(var S: TStream): TStreamable;
+function Build_RFileCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStdDlg.TFileCollection.Load(S));
 end;
 
-procedure Store_RFileCollection(P: TStreamable; var S: TStream);
+procedure Store_RFileCollection(P: TStreamable; S: TStream);
 begin
   DNStdDlg.TFileCollection(P).Store(S);
 end;
 
-function Build_RFileList(var S: TStream): TStreamable;
+function Build_RFileList(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStdDlg.TFileList.Load(S));
 end;
 
-procedure Store_RFileList(P: TStreamable; var S: TStream);
+procedure Store_RFileList(P: TStreamable; S: TStream);
 begin
   DNStdDlg.TFileList(P).Store(S);
 end;
 
-function Build_RFileInfoPane(var S: TStream): TStreamable;
+function Build_RFileInfoPane(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStdDlg.TFileInfoPane.Load(S));
 end;
 
-procedure Store_RFileInfoPane(P: TStreamable; var S: TStream);
+procedure Store_RFileInfoPane(P: TStreamable; S: TStream);
 begin
   DNStdDlg.TFileInfoPane(P).Store(S);
 end;
 
-function Build_RFileDialog(var S: TStream): TStreamable;
+function Build_RFileDialog(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStdDlg.TFileDialog.Load(S));
 end;
 
-procedure Store_RFileDialog(P: TStreamable; var S: TStream);
+procedure Store_RFileDialog(P: TStreamable; S: TStream);
 begin
   DNStdDlg.TFileDialog(P).Store(S);
 end;
 
-function Build_RSortedListBox(var S: TStream): TStreamable;
+function Build_RSortedListBox(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNStdDlg.TSortedListBox.Load(S));
 end;
 
-procedure Store_RSortedListBox(P: TStreamable; var S: TStream);
+procedure Store_RSortedListBox(P: TStreamable; S: TStream);
 begin
   DNStdDlg.TSortedListBox(P).Store(S);
 end;
 
-function Build_RDataSaver(var S: TStream): TStreamable;
+function Build_RDataSaver(S: TStream): TStreamable;
 begin
   Result := TStreamable(DNUtil.TDataSaver.Load(S));
 end;
 
-procedure Store_RDataSaver(P: TStreamable; var S: TStream);
+procedure Store_RDataSaver(P: TStreamable; S: TStream);
 begin
   DNUtil.TDataSaver(P).Store(S);
 end;
 
-function Build_RDrive(var S: TStream): TStreamable;
+function Build_RDrive(S: TStream): TStreamable;
 begin
   Result := TStreamable(Drives.TDrive.Load(S));
 end;
 
-procedure Store_RDrive(P: TStreamable; var S: TStream);
+procedure Store_RDrive(P: TStreamable; S: TStream);
 begin
   Drives.TDrive(P).Store(S);
 end;
 
-function Build_RInfoLine(var S: TStream): TStreamable;
+function Build_RInfoLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(editundo.TInfoLine.Load(S));
 end;
 
-procedure Store_RInfoLine(P: TStreamable; var S: TStream);
+procedure Store_RInfoLine(P: TStreamable; S: TStream);
 begin
   editundo.TInfoLine(P).Store(S);
 end;
 
-function Build_RBookLine(var S: TStream): TStreamable;
+function Build_RBookLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(editundo.TBookmarkLine.Load(S));
 end;
 
-procedure Store_RBookLine(P: TStreamable; var S: TStream);
+procedure Store_RBookLine(P: TStreamable; S: TStream);
 begin
   editundo.TBookmarkLine(P).Store(S);
 end;
 
-function Build_RXFileEditor(var S: TStream): TStreamable;
+function Build_RXFileEditor(S: TStream): TStreamable;
 begin
   Result := TStreamable(Editor.TXFileEditor.Load(S));
 end;
 
-procedure Store_RXFileEditor(P: TStreamable; var S: TStream);
+procedure Store_RXFileEditor(P: TStreamable; S: TStream);
 begin
   Editor.TXFileEditor(P).Store(S);
 end;
 
-function Build_RFindDrive(var S: TStream): TStreamable;
+function Build_RFindDrive(S: TStream): TStreamable;
 begin
   Result := TStreamable(FileFind.TFindDrive.Load(S));
 end;
 
-procedure Store_RFindDrive(P: TStreamable; var S: TStream);
+procedure Store_RFindDrive(P: TStreamable; S: TStream);
 begin
   FileFind.TFindDrive(P).Store(S);
 end;
 
-function Build_RTempDrive(var S: TStream): TStreamable;
+function Build_RTempDrive(S: TStream): TStreamable;
 begin
   Result := TStreamable(FileFind.TTempDrive.Load(S));
 end;
 
-procedure Store_RTempDrive(P: TStreamable; var S: TStream);
+procedure Store_RTempDrive(P: TStreamable; S: TStream);
 begin
   FileFind.TTempDrive(P).Store(S);
 end;
 
-function Build_RFilesCollection(var S: TStream): TStreamable;
+function Build_RFilesCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(FilesCol.TFilesCollection.Load(S));
 end;
 
-procedure Store_RFilesCollection(P: TStreamable; var S: TStream);
+procedure Store_RFilesCollection(P: TStreamable; S: TStream);
 begin
   FilesCol.TFilesCollection(P).Store(S);
 end;
 
-function Build_RFilePanel(var S: TStream): TStreamable;
+function Build_RFilePanel(S: TStream): TStreamable;
 begin
   Result := TStreamable(filepanel.TFilePanel.Load(S));
 end;
 
-procedure Store_RFilePanel(P: TStreamable; var S: TStream);
+procedure Store_RFilePanel(P: TStreamable; S: TStream);
 begin
   filepanel.TFilePanel(P).Store(S);
 end;
 
-function Build_RFlPInfoView(var S: TStream): TStreamable;
+function Build_RFlPInfoView(S: TStream): TStreamable;
 begin
   Result := TStreamable(filepanel.TInfoView.Load(S));
 end;
 
-procedure Store_RFlPInfoView(P: TStreamable; var S: TStream);
+procedure Store_RFlPInfoView(P: TStreamable; S: TStream);
 begin
   filepanel.TInfoView(P).Store(S);
 end;
 
-function Build_RDirView(var S: TStream): TStreamable;
+function Build_RDirView(S: TStream): TStreamable;
 begin
   Result := TStreamable(filepanel.TDirView.Load(S));
 end;
 
-procedure Store_RDirView(P: TStreamable; var S: TStream);
+procedure Store_RDirView(P: TStreamable; S: TStream);
 begin
   filepanel.TDirView(P).Store(S);
 end;
 
-function Build_RSortView(var S: TStream): TStreamable;
+function Build_RSortView(S: TStream): TStreamable;
 begin
   Result := TStreamable(topview.TSortView.Load(S));
 end;
 
-procedure Store_RSortView(P: TStreamable; var S: TStream);
+procedure Store_RSortView(P: TStreamable; S: TStream);
 begin
   topview.TSortView(P).Store(S);
 end;
 
-function Build_RSeparator(var S: TStream): TStreamable;
+function Build_RSeparator(S: TStream): TStreamable;
 begin
   Result := TStreamable(panelwin.TSeparator.Load(S));
 end;
 
-procedure Store_RSeparator(P: TStreamable; var S: TStream);
+procedure Store_RSeparator(P: TStreamable; S: TStream);
 begin
   panelwin.TSeparator(P).Store(S);
 end;
 
-function Build_RDriveLine(var S: TStream): TStreamable;
+function Build_RDriveLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(filepanel.TDriveLine.Load(S));
 end;
 
-procedure Store_RDriveLine(P: TStreamable; var S: TStream);
+procedure Store_RDriveLine(P: TStreamable; S: TStream);
 begin
   filepanel.TDriveLine(P).Store(S);
 end;
 
-function Build_RDirStorage(var S: TStream): TStreamable;
+function Build_RDirStorage(S: TStream): TStreamable;
 begin
   Result := TStreamable(FStorage.TDirStorage.Load(S));
 end;
 
-procedure Store_RDirStorage(P: TStreamable; var S: TStream);
+procedure Store_RDirStorage(P: TStreamable; S: TStream);
 begin
   FStorage.TDirStorage(P).Store(S);
 end;
 
-function Build_RFileViewer(var S: TStream): TStreamable;
+function Build_RFileViewer(S: TStream): TStreamable;
 begin
   Result := TStreamable(FViewer.TFileViewer.Load(S));
 end;
 
-procedure Store_RFileViewer(P: TStreamable; var S: TStream);
+procedure Store_RFileViewer(P: TStreamable; S: TStream);
 begin
   FViewer.TFileViewer(P).Store(S);
 end;
 
-function Build_RFileWindow(var S: TStream): TStreamable;
+function Build_RFileWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(FViewer.TFileWindow.Load(S));
 end;
 
-procedure Store_RFileWindow(P: TStreamable; var S: TStream);
+procedure Store_RFileWindow(P: TStreamable; S: TStream);
 begin
   FViewer.TFileWindow(P).Store(S);
 end;
 
-function Build_RViewScroll(var S: TStream): TStreamable;
+function Build_RViewScroll(S: TStream): TStreamable;
 begin
   Result := TStreamable(FViewer.TViewScroll.Load(S));
 end;
 
-procedure Store_RViewScroll(P: TStreamable; var S: TStream);
+procedure Store_RViewScroll(P: TStreamable; S: TStream);
 begin
   FViewer.TViewScroll(P).Store(S);
 end;
 
-function Build_RQFileViewer(var S: TStream): TStreamable;
+function Build_RQFileViewer(S: TStream): TStreamable;
 begin
   Result := TStreamable(FViewer.TQFileViewer.Load(S));
 end;
 
-procedure Store_RQFileViewer(P: TStreamable; var S: TStream);
+procedure Store_RQFileViewer(P: TStreamable; S: TStream);
 begin
   FViewer.TQFileViewer(P).Store(S);
 end;
 
-function Build_RDFileViewer(var S: TStream): TStreamable;
+function Build_RDFileViewer(S: TStream): TStreamable;
 begin
   Result := TStreamable(FViewer.TDFileViewer.Load(S));
 end;
 
-procedure Store_RDFileViewer(P: TStreamable; var S: TStream);
+procedure Store_RDFileViewer(P: TStreamable; S: TStream);
 begin
   FViewer.TDFileViewer(P).Store(S);
 end;
 
-function Build_RViewInfo(var S: TStream): TStreamable;
+function Build_RViewInfo(S: TStream): TStreamable;
 begin
   Result := TStreamable(FViewer.TViewInfo.Load(S));
 end;
 
-procedure Store_RViewInfo(P: TStreamable; var S: TStream);
+procedure Store_RViewInfo(P: TStreamable; S: TStream);
 begin
   FViewer.TViewInfo(P).Store(S);
 end;
 
-function Build_RTrashCan(var S: TStream): TStreamable;
+function Build_RTrashCan(S: TStream): TStreamable;
 begin
   Result := TStreamable(gadgets.TTrashCan.Load(S));
 end;
 
-procedure Store_RTrashCan(P: TStreamable; var S: TStream);
+procedure Store_RTrashCan(P: TStreamable; S: TStream);
 begin
   gadgets.TTrashCan(P).Store(S);
 end;
 
-function Build_RKeyMacros(var S: TStream): TStreamable;
+function Build_RKeyMacros(S: TStream): TStreamable;
 begin
   Result := TStreamable(gadgets.TKeyMacros.Load(S));
 end;
 
-procedure Store_RKeyMacros(P: TStreamable; var S: TStream);
+procedure Store_RKeyMacros(P: TStreamable; S: TStream);
 begin
   gadgets.TKeyMacros(P).Store(S);
 end;
 
-function Build_RHelpTopic(var S: TStream): TStreamable;
+function Build_RHelpTopic(S: TStream): TStreamable;
 begin
   Result := TStreamable(HelpKern.THelpTopic.Load(S));
 end;
 
-procedure Store_RHelpTopic(P: TStreamable; var S: TStream);
+procedure Store_RHelpTopic(P: TStreamable; S: TStream);
 begin
   HelpKern.THelpTopic(P).Store(S);
 end;
 
-function Build_RHelpIndex(var S: TStream): TStreamable;
+function Build_RHelpIndex(S: TStream): TStreamable;
 begin
   Result := TStreamable(HelpKern.THelpIndex.Load(S));
 end;
 
-procedure Store_RHelpIndex(P: TStreamable; var S: TStream);
+procedure Store_RHelpIndex(P: TStreamable; S: TStream);
 begin
   HelpKern.THelpIndex(P).Store(S);
 end;
 
-function Build_REditHistoryCol(var S: TStream): TStreamable;
+function Build_REditHistoryCol(S: TStream): TStreamable;
 begin
   Result := TStreamable(histories.TEditHistoryCol.Load(S));
 end;
 
-procedure Store_REditHistoryCol(P: TStreamable; var S: TStream);
+procedure Store_REditHistoryCol(P: TStreamable; S: TStream);
 begin
   histories.TEditHistoryCol(P).Store(S);
 end;
 
-function Build_RViewHistoryCol(var S: TStream): TStreamable;
+function Build_RViewHistoryCol(S: TStream): TStreamable;
 begin
   Result := TStreamable(histories.TViewHistoryCol.Load(S));
 end;
 
-procedure Store_RViewHistoryCol(P: TStreamable; var S: TStream);
+procedure Store_RViewHistoryCol(P: TStreamable; S: TStream);
 begin
   histories.TViewHistoryCol(P).Store(S);
 end;
 
-function Build_RMenuBar(var S: TStream): TStreamable;
+function Build_RMenuBar(S: TStream): TStreamable;
 begin
   Result := TStreamable(Menus.TMenuBar.Load(S));
 end;
 
-procedure Store_RMenuBar(P: TStreamable; var S: TStream);
+procedure Store_RMenuBar(P: TStreamable; S: TStream);
 begin
   Menus.TMenuBar(P).Store(S);
 end;
 
-function Build_RMenuBox(var S: TStream): TStreamable;
+function Build_RMenuBox(S: TStream): TStreamable;
 begin
   Result := TStreamable(Menus.TMenuBox.Load(S));
 end;
 
-procedure Store_RMenuBox(P: TStreamable; var S: TStream);
+procedure Store_RMenuBox(P: TStreamable; S: TStream);
 begin
   Menus.TMenuBox(P).Store(S);
 end;
 
-function Build_RStatusLine(var S: TStream): TStreamable;
+function Build_RStatusLine(S: TStream): TStreamable;
 begin
   Result := TStreamable(Menus.TStatusLine.Load(S));
 end;
 
-procedure Store_RStatusLine(P: TStreamable; var S: TStream);
+procedure Store_RStatusLine(P: TStreamable; S: TStream);
 begin
   Menus.TStatusLine(P).Store(S);
 end;
 
-function Build_RMenuPopup(var S: TStream): TStreamable;
+function Build_RMenuPopup(S: TStream): TStreamable;
 begin
   Result := TStreamable(Menus.TMenuPopup.Load(S));
 end;
 
-procedure Store_RMenuPopup(P: TStreamable; var S: TStream);
+procedure Store_RMenuPopup(P: TStreamable; S: TStream);
 begin
   Menus.TMenuPopup(P).Store(S);
 end;
 
-function Build_RFileEditor(var S: TStream): TStreamable;
+function Build_RFileEditor(S: TStream): TStreamable;
 begin
   Result := TStreamable(editcore.TFileEditor.Load(S));
 end;
 
-procedure Store_RFileEditor(P: TStreamable; var S: TStream);
+procedure Store_RFileEditor(P: TStreamable; S: TStream);
 begin
   editcore.TFileEditor(P).Store(S);
 end;
 
-function Build_REditWindow(var S: TStream): TStreamable;
+function Build_REditWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(editwin.TEditWindow.Load(S));
 end;
 
-procedure Store_REditWindow(P: TStreamable; var S: TStream);
+procedure Store_REditWindow(P: TStreamable; S: TStream);
 begin
   editwin.TEditWindow(P).Store(S);
 end;
 
-function Build_RDStringView(var S: TStream): TStreamable;
+function Build_RDStringView(S: TStream): TStreamable;
 begin
   Result := TStreamable(StrView.TDStringView.Load(S));
 end;
 
-procedure Store_RDStringView(P: TStreamable; var S: TStream);
+procedure Store_RDStringView(P: TStreamable; S: TStream);
 begin
   StrView.TDStringView(P).Store(S);
 end;
 
-function Build_RPhone(var S: TStream): TStreamable;
+function Build_RPhone(S: TStream): TStreamable;
 begin
   Result := TStreamable(Phones.TPhone.Load(S));
 end;
 
-procedure Store_RPhone(P: TStreamable; var S: TStream);
+procedure Store_RPhone(P: TStreamable; S: TStream);
 begin
   Phones.TPhone(P).Store(S);
 end;
 
-function Build_RPhoneDir(var S: TStream): TStreamable;
+function Build_RPhoneDir(S: TStream): TStreamable;
 begin
   Result := TStreamable(Phones.TPhoneDir.Load(S));
 end;
 
-procedure Store_RPhoneDir(P: TStreamable; var S: TStream);
+procedure Store_RPhoneDir(P: TStreamable; S: TStream);
 begin
   Phones.TPhoneDir(P).Store(S);
 end;
 
-function Build_RPhoneCollection(var S: TStream): TStreamable;
+function Build_RPhoneCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(Phones.TPhoneCollection.Load(S));
 end;
 
-procedure Store_RPhoneCollection(P: TStreamable; var S: TStream);
+procedure Store_RPhoneCollection(P: TStreamable; S: TStream);
 begin
   Phones.TPhoneCollection(P).Store(S);
 end;
 
-function Build_RStringCol(var S: TStream): TStreamable;
+function Build_RStringCol(S: TStream): TStreamable;
 begin
   Result := TStreamable(PrintMan.TStringCol.Load(S));
 end;
 
-procedure Store_RStringCol(P: TStreamable; var S: TStream);
+procedure Store_RStringCol(P: TStreamable; S: TStream);
 begin
   PrintMan.TStringCol(P).Store(S);
 end;
 
-function Build_RPrintManager(var S: TStream): TStreamable;
+function Build_RPrintManager(S: TStream): TStreamable;
 begin
   Result := TStreamable(PrintMan.TPrintManager.Load(S));
 end;
 
-procedure Store_RPrintManager(P: TStreamable; var S: TStream);
+procedure Store_RPrintManager(P: TStreamable; S: TStream);
 begin
   PrintMan.TPrintManager(P).Store(S);
 end;
 
-function Build_RPrintStatus(var S: TStream): TStreamable;
+function Build_RPrintStatus(S: TStream): TStreamable;
 begin
   Result := TStreamable(PrintMan.TPrintStatus.Load(S));
 end;
 
-procedure Store_RPrintStatus(P: TStreamable; var S: TStream);
+procedure Store_RPrintStatus(P: TStreamable; S: TStream);
 begin
   PrintMan.TPrintStatus(P).Store(S);
 end;
 
-function Build_RPMWindow(var S: TStream): TStreamable;
+function Build_RPMWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(PrintMan.TPMWindow.Load(S));
 end;
 
-procedure Store_RPMWindow(P: TStreamable; var S: TStream);
+procedure Store_RPMWindow(P: TStreamable; S: TStream);
 begin
   PrintMan.TPMWindow(P).Store(S);
 end;
 
-function Build_RScroller(var S: TStream): TStreamable;
+function Build_RScroller(S: TStream): TStreamable;
 begin
   Result := TStreamable(Scroller.TScroller.Load(S));
 end;
 
-procedure Store_RScroller(P: TStreamable; var S: TStream);
+procedure Store_RScroller(P: TStreamable; S: TStream);
 begin
   Scroller.TScroller(P).Store(S);
 end;
 
-function Build_RListViewer(var S: TStream): TStreamable;
+function Build_RListViewer(S: TStream): TStreamable;
 begin
   Result := TStreamable(Scroller.TListViewer.Load(S));
 end;
 
-procedure Store_RListViewer(P: TStreamable; var S: TStream);
+procedure Store_RListViewer(P: TStreamable; S: TStream);
 begin
   Scroller.TListViewer(P).Store(S);
 end;
 
-function Build_RSysDialog(var S: TStream): TStreamable;
+function Build_RSysDialog(S: TStream): TStreamable;
 begin
   Result := TStreamable(Setups.TSysDialog.Load(S));
 end;
 
-procedure Store_RSysDialog(P: TStreamable; var S: TStream);
+procedure Store_RSysDialog(P: TStreamable; S: TStream);
 begin
   Setups.TSysDialog(P).Store(S);
 end;
 
-function Build_RCurrDriveInfo(var S: TStream): TStreamable;
+function Build_RCurrDriveInfo(S: TStream): TStreamable;
 begin
   Result := TStreamable(Setups.TCurrDriveInfo.Load(S));
 end;
 
-procedure Store_RCurrDriveInfo(P: TStreamable; var S: TStream);
+procedure Store_RCurrDriveInfo(P: TStreamable; S: TStream);
 begin
   Setups.TCurrDriveInfo(P).Store(S);
 end;
 
-function Build_RMouseBar(var S: TStream): TStreamable;
+function Build_RMouseBar(S: TStream): TStreamable;
 begin
   Result := TStreamable(Setups.TMouseBar.Load(S));
 end;
 
-procedure Store_RMouseBar(P: TStreamable; var S: TStream);
+procedure Store_RMouseBar(P: TStreamable; S: TStream);
 begin
   Setups.TMouseBar(P).Store(S);
 end;
 
-function Build_RSaversDialog(var S: TStream): TStreamable;
+function Build_RSaversDialog(S: TStream): TStreamable;
 begin
   Result := TStreamable(Setups.TSaversDialog.Load(S));
 end;
 
-procedure Store_RSaversDialog(P: TStreamable; var S: TStream);
+procedure Store_RSaversDialog(P: TStreamable; S: TStream);
 begin
   Setups.TSaversDialog(P).Store(S);
 end;
 
-function Build_RSaversListBox(var S: TStream): TStreamable;
+function Build_RSaversListBox(S: TStream): TStreamable;
 begin
   Result := TStreamable(Setups.TSaversListBox.Load(S));
 end;
 
-procedure Store_RSaversListBox(P: TStreamable; var S: TStream);
+procedure Store_RSaversListBox(P: TStreamable; S: TStream);
 begin
   Setups.TSaversListBox(P).Store(S);
 end;
 
-function Build_RTextCollection(var S: TStream): TStreamable;
+function Build_RTextCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(dlgrecs.TTextCollection.Load(S));
 end;
 
-procedure Store_RTextCollection(P: TStreamable; var S: TStream);
+procedure Store_RTextCollection(P: TStreamable; S: TStream);
 begin
   dlgrecs.TTextCollection(P).Store(S);
 end;
 
-function Build_RGameWindow(var S: TStream): TStreamable;
+function Build_RGameWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tetris.TGameWindow.Load(S));
 end;
 
-procedure Store_RGameWindow(P: TStreamable; var S: TStream);
+procedure Store_RGameWindow(P: TStreamable; S: TStream);
 begin
   Tetris.TGameWindow(P).Store(S);
 end;
 
-function Build_RGameView(var S: TStream): TStreamable;
+function Build_RGameView(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tetris.TGameView.Load(S));
 end;
 
-procedure Store_RGameView(P: TStreamable; var S: TStream);
+procedure Store_RGameView(P: TStreamable; S: TStream);
 begin
   Tetris.TGameView(P).Store(S);
 end;
 
-function Build_RGameInfo(var S: TStream): TStreamable;
+function Build_RGameInfo(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tetris.TGameInfo.Load(S));
 end;
 
-procedure Store_RGameInfo(P: TStreamable; var S: TStream);
+procedure Store_RGameInfo(P: TStreamable; S: TStream);
 begin
   Tetris.TGameInfo(P).Store(S);
 end;
 
-function Build_RTreeView(var S: TStream): TStreamable;
+function Build_RTreeView(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.TTreeView.Load(S));
 end;
 
-procedure Store_RTreeView(P: TStreamable; var S: TStream);
+procedure Store_RTreeView(P: TStreamable; S: TStream);
 begin
   Tree.TTreeView(P).Store(S);
 end;
 
-function Build_RTreeReader(var S: TStream): TStreamable;
+function Build_RTreeReader(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.TTreeReader.Load(S));
 end;
 
-procedure Store_RTreeReader(P: TStreamable; var S: TStream);
+procedure Store_RTreeReader(P: TStreamable; S: TStream);
 begin
   Tree.TTreeReader(P).Store(S);
 end;
 
-function Build_RTreeWindow(var S: TStream): TStreamable;
+function Build_RTreeWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.TTreeWindow.Load(S));
 end;
 
-procedure Store_RTreeWindow(P: TStreamable; var S: TStream);
+procedure Store_RTreeWindow(P: TStreamable; S: TStream);
 begin
   Tree.TTreeWindow(P).Store(S);
 end;
 
-function Build_RTreePanel(var S: TStream): TStreamable;
+function Build_RTreePanel(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.TTreePanel.Load(S));
 end;
 
-procedure Store_RTreePanel(P: TStreamable; var S: TStream);
+procedure Store_RTreePanel(P: TStreamable; S: TStream);
 begin
   Tree.TTreePanel(P).Store(S);
 end;
 
-function Build_RTreeDialog(var S: TStream): TStreamable;
+function Build_RTreeDialog(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.TTreeDialog.Load(S));
 end;
 
-procedure Store_RTreeDialog(P: TStreamable; var S: TStream);
+procedure Store_RTreeDialog(P: TStreamable; S: TStream);
 begin
   Tree.TTreeDialog(P).Store(S);
 end;
 
-function Build_RTreeInfoView(var S: TStream): TStreamable;
+function Build_RTreeInfoView(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.TTreeInfoView.Load(S));
 end;
 
-procedure Store_RTreeInfoView(P: TStreamable; var S: TStream);
+procedure Store_RTreeInfoView(P: TStreamable; S: TStream);
 begin
   Tree.TTreeInfoView(P).Store(S);
 end;
 
-function Build_RHTreeView(var S: TStream): TStreamable;
+function Build_RHTreeView(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.THTreeView.Load(S));
 end;
 
-procedure Store_RHTreeView(P: TStreamable; var S: TStream);
+procedure Store_RHTreeView(P: TStreamable; S: TStream);
 begin
   Tree.THTreeView(P).Store(S);
 end;
 
-function Build_RDirCollection(var S: TStream): TStreamable;
+function Build_RDirCollection(S: TStream): TStreamable;
 begin
   Result := TStreamable(Tree.TDirCollection.Load(S));
 end;
 
-procedure Store_RDirCollection(P: TStreamable; var S: TStream);
+procedure Store_RDirCollection(P: TStreamable; S: TStream);
 begin
   Tree.TDirCollection(P).Store(S);
 end;
 
-function Build_REditScrollBar(var S: TStream): TStreamable;
+function Build_REditScrollBar(S: TStream): TStreamable;
 begin
   Result := TStreamable(UniWin.TEditScrollBar.Load(S));
 end;
 
-procedure Store_REditScrollBar(P: TStreamable; var S: TStream);
+procedure Store_REditScrollBar(P: TStreamable; S: TStream);
 begin
   UniWin.TEditScrollBar(P).Store(S);
 end;
 
-function Build_REditFrame(var S: TStream): TStreamable;
+function Build_REditFrame(S: TStream): TStreamable;
 begin
   Result := TStreamable(UniWin.TEditFrame.Load(S));
 end;
 
-procedure Store_REditFrame(P: TStreamable; var S: TStream);
+procedure Store_REditFrame(P: TStreamable; S: TStream);
 begin
   UniWin.TEditFrame(P).Store(S);
 end;
 
-function Build_RUserWindow(var S: TStream): TStreamable;
+function Build_RUserWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(UserMenu.TUserWindow.Load(S));
 end;
 
-procedure Store_RUserWindow(P: TStreamable; var S: TStream);
+procedure Store_RUserWindow(P: TStreamable; S: TStream);
 begin
   UserMenu.TUserWindow(P).Store(S);
 end;
 
-function Build_RUserView(var S: TStream): TStreamable;
+function Build_RUserView(S: TStream): TStreamable;
 begin
   Result := TStreamable(UserMenu.TUserView.Load(S));
 end;
 
-procedure Store_RUserView(P: TStreamable; var S: TStream);
+procedure Store_RUserView(P: TStreamable; S: TStream);
 begin
   UserMenu.TUserView(P).Store(S);
 end;
 
-function Build_RMyScrollBar(var S: TStream): TStreamable;
+function Build_RMyScrollBar(S: TStream): TStreamable;
 begin
   Result := TStreamable(Views.TMyScrollBar.Load(S));
 end;
 
-procedure Store_RMyScrollBar(P: TStreamable; var S: TStream);
+procedure Store_RMyScrollBar(P: TStreamable; S: TStream);
 begin
   Views.TMyScrollBar(P).Store(S);
 end;
 
-function Build_RDoubleWindow(var S: TStream): TStreamable;
+function Build_RDoubleWindow(S: TStream): TStreamable;
 begin
   Result := TStreamable(panelwinx.TXDoubleWindow.Load(S));
 end;
 
-procedure Store_RDoubleWindow(P: TStreamable; var S: TStream);
+procedure Store_RDoubleWindow(P: TStreamable; S: TStream);
 begin
   panelwinx.TXDoubleWindow(P).Store(S);
 end;
 
-function Build_RColorPoint(var S: TStream): TStreamable;
+function Build_RColorPoint(S: TStream): TStreamable;
 begin
   Result := TStreamable(inputfname.TColorPoint.Load(S));
 end;
 
-procedure Store_RColorPoint(P: TStreamable; var S: TStream);
+procedure Store_RColorPoint(P: TStreamable; S: TStream);
 begin
   inputfname.TColorPoint(P).Store(S);
 end;

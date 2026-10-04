@@ -12,7 +12,7 @@ uses
   Defines, objutil, Streams, DNStrL, ObjType;
 
 type
-  TStrListMaker = class(TObject)
+  TStrListMaker = class(TStreamable)
     constructor Create(AStrSize, AIndexSize: AWord);
     destructor Destroy; override;
     procedure Put(Key: AWord; S: String);
