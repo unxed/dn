@@ -440,7 +440,7 @@ StartType:
           Eq := Pos('=', S);
           S := RemoveLeadSpaces(Copy(S, Eq+1, MaxStringLength));
           US := RemoveLeadSpaces(Copy(US, Eq+1, MaxStringLength));
-          P.Insert(New(PLngWord, Init(CalcValue(US), ID)));
+          P.Insert(TLngWord.Create(CalcValue(US), ID));
           US := RemoveLeadSpaces(US);
           if US[1] = ';' then
             US := Copy(US, 2, MaxStringLength);
@@ -491,7 +491,7 @@ StartType:
         ID := Ident(1);
         if ID <> '' then
           begin
-          CurrentType.Insert(PLngWord.Create(TypeCount, ID));
+          CurrentType.Insert(TLngWord.Create(TypeCount, ID));
           Inc(TypeCount);
           if S[1] = ',' then
             begin
