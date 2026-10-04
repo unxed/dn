@@ -1602,15 +1602,15 @@ Recurce:
        ) or
 
   
-  {IS3}(ArcId = $8c655d13 {#$13#$5D#$65#$8C}) or
-  {ZOO}(ArcId = $fdc4a7dc {#$DC#$A7#$C4#$FD}) or
+  {IS3}(ArcId = (-1939514093 { $8c655d13 }) {#$13#$5D#$65#$8C}) or
+  {ZOO}(ArcId = (-37443620 { $fdc4a7dc }) {#$DC#$A7#$C4#$FD}) or
   {CHZ}(ArcId = $46684353 {'SChF'}) or
   {CHZ}(ArcId = $44684353 {'SChD'}) or
   {LHA}((ArcId and $f8ffffff) = $30686C2D{-lh0...-lh7}) or {LHA/LZH}
 (* piwamoto: this code useful only with very small BufferSize
   {LHA}(ArcId = $736F5920) or {' Yos' LHA/LZH .COM SFX}
 *)
-  {7Z }(ArcId = $AFBC7A37) or {7-Zip}
+  {7Z }(ArcId = (-1346602441 { $AFBC7A37 })) or {7-Zip}
   {GZ }((ArcIdArr[0] = $1f) and
         (ArcIdArr[1] in [$8b, $9d]) and
         (ArcIdArr[2] = $08) and
@@ -1623,7 +1623,7 @@ Recurce:
   {ACE}(ArcId = $4543412a {'*ACE'}) or
   {ACE}(ArcId = $78667321 {'!sfx'}) or {!sfx - ACE-SFX script}
   {ACE}(ArcId = $5846532a {'*SFX'}) or {**SFX** - ACE-SFX script}
-  {CAB}(ArcId = $8648862a) or {digital sign for Microsoft's hotfixes}
+  {CAB}(ArcId = (-2042067414 { $8648862a })) or {digital sign for Microsoft's hotfixes}
   {CAB}(ArcId = $4643534d {'MSCF'});
 
    if ((ArcPos + BufferSize - ArcPosID) > 3) and not ArcFile^.EOF
@@ -1691,7 +1691,7 @@ Recurce:
     ArcPos := ArcPos+ArcPosID;
     Exit;
     end;
-  if (ArcId = $8648862a) and (ReEntrance < 2) then
+  if (ArcId = (-2042067414 { $8648862a })) and (ReEntrance < 2) then
     begin {digital sign for Microsoft's hotfixes}
     ArcPos := PEobjRec.Offset + $400{known offset.min=$600, max=$5c00};
     goto Recurce;

@@ -68,7 +68,7 @@ implementation
 
 uses
   objutil, fileutil, basics, mainapp, DnExec, Commands, strutil, Messages,
-  Dos
+  Dos, osdep
   ;
 
 { ------------------------------- AIN ------------------------------------- }
@@ -179,7 +179,7 @@ procedure TAINArchive.GetFile;
       AnsiExec(GetEnv('COMSPEC'), s)
     else
       MessageBox(^C+GetString(dlCmdLineTooLong), nil, mfOKButton+mfError);
-    System.Assign(ListFile, ListFileName);
+    System.Assign(ListFile, SysOsPath(ListFileName));
     System.Reset(ListFile);
     if IOResult <> 0 then
       Exit;

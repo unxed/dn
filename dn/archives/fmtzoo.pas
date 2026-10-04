@@ -160,7 +160,7 @@ procedure TZOOArchive.GetFile;
     S: String;
   begin
   ArcFile^.Read(P, 4);
-  if  (ArcFile^.Status <> stOK) or (P.Id <> $FDC4A7DC) then
+  if  (ArcFile^.Status <> stOK) or (P.Id <> (-37443620 { $FDC4A7DC })) then
     begin
     FileInfo.Last := 2;
     Exit;
