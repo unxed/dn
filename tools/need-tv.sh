@@ -10,3 +10,7 @@ if [ ! -f "$here/tv/src/tvgeom.pas" ]; then
     git -C "$here" submodule update --init --depth 1 tv >&2 ||
         { echo "ERROR: no tv/. Run: git submodule update --init tv   (or set DN_TV=/path/to/a/checkout of https://github.com/unxed/tv)" >&2; exit 1; }
 fi
+# tv/ is checked out at another commit than the one recorded in dn (an old checkout after a pull, or your own work in tv/): a build can fail on names that the recorded version has.
+if [ -z "${DN_TV:-}" ] && git -C "$here" submodule status tv 2>/dev/null | grep -q '^[+-]'; then
+    echo "NOTE: tv/ is not at the commit recorded in dn; if the build fails on a missing name run: git submodule update --init tv" >&2
+fi
