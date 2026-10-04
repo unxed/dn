@@ -186,7 +186,7 @@ type
     HSB: PDBScrollBar;
     RealName: String;
     {--- start -------- Eugeny Zvyagintzev ---------}
-    constructor Create(const FName: String; var FileIsDBF: Boolean);
+    constructor Create(FName: String; var FileIsDBF: Boolean);
     {--- finish -------- Eugeny Zvyagintzev ---------}
     function GetPalette: TPalette; override;
     constructor Load(S: TStream);
@@ -228,7 +228,7 @@ function TFieldListBox.GetText(Item: LongInt; MaxLen: Integer): String;
     S1, S2, S3, S4: String[20];
     M: array[0..4] of Pointer;
   begin
-  P := List^.At(Item);
+  P := List.At(Item);
   PtrInt(M[0]) := Item+1;
   M[1] := @P^.Name;
   M[2] := @S1;
@@ -274,18 +274,18 @@ procedure TDBScrollBar.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case ScrollBarType of
     sbVertical:
-      if DBViewer^.Delta.Y <> Value then
+      if DBViewer.Delta.Y <> Value then
         begin
-        DBViewer^.Delta.Y := Value;
+        DBViewer.Delta.Y := Value;
         DBViewer.DrawView;
-        DBViewer^.Indicator^.Draw;
+        DBViewer.Indicator.Draw;
         end;
     sbHorizontal:
-      if DBViewer^.Delta.X <> Value then
+      if DBViewer.Delta.X <> Value then
         begin
-        DBViewer^.Delta.X := Value;
+        DBViewer.Delta.X := Value;
         DBViewer.DrawView;
-        DBViewer^.Indicator^.Draw;
+        DBViewer.Indicator.Draw;
         end;
   end {case};
   end;
@@ -297,10 +297,10 @@ constructor TMemoStream.Create(AStream: TStream; Start, len: LongInt);
   StartPos := Start;
   Length := len;
   BaseStream := AStream;
-  if AStream^.Status = stOK then
-    AStream^.Seek(StartPos);
-  ErrorInfo := BaseStream^.ErrorInfo;
-  Status := BaseStream^.Status;
+  if AStream.Status = stOK then
+    AStream.Seek(StartPos);
+  ErrorInfo := BaseStream.ErrorInfo;
+  Status := BaseStream.Status;
   end;
 
 destructor TMemoStream.Destroy;
@@ -314,15 +314,15 @@ function TMemoStream.GetPos: TFileSize;
   var
     L: TFileSize;
   begin
-  L := BaseStream^.GetPos-StartPos;
+  L := BaseStream.GetPos-StartPos;
   if L < 0 then
     begin
-    BaseStream^.Seek(StartPos);
+    BaseStream.Seek(StartPos);
     L := 0;
     end;
   GetPos := L;
-  ErrorInfo := BaseStream^.ErrorInfo;
-  Status := BaseStream^.Status;
+  ErrorInfo := BaseStream.ErrorInfo;
+  Status := BaseStream.Status;
   end;
 
 function TMemoStream.GetSize: TFileSize;
@@ -332,9 +332,9 @@ function TMemoStream.GetSize: TFileSize;
 
 procedure TMemoStream.Read(var Buf; Count: LongInt);
   begin
-  BaseStream^.Read(Buf, Count);
-  ErrorInfo := BaseStream^.ErrorInfo;
-  Status := BaseStream^.Status;
+  BaseStream.Read(Buf, Count);
+  ErrorInfo := BaseStream.ErrorInfo;
+  Status := BaseStream.Status;
   end;
 
 procedure TMemoStream.Seek(Pos: TFileSize);
@@ -342,23 +342,23 @@ procedure TMemoStream.Seek(Pos: TFileSize);
     L: TFileSize;
   begin
   L := Pos+StartPos;
-  BaseStream^.Seek(L);
-  ErrorInfo := BaseStream^.ErrorInfo;
-  Status := BaseStream^.Status;
+  BaseStream.Seek(L);
+  ErrorInfo := BaseStream.ErrorInfo;
+  Status := BaseStream.Status;
   end;
 
 procedure TMemoStream.Truncate;
   begin
-  BaseStream^.Truncate;
-  ErrorInfo := BaseStream^.ErrorInfo;
-  Status := BaseStream^.Status;
+  BaseStream.Truncate;
+  ErrorInfo := BaseStream.ErrorInfo;
+  Status := BaseStream.Status;
   end;
 
 procedure TMemoStream.Write(const Buf; Count: LongInt);
   begin
-  BaseStream^.Write(Buf, Count);
-  ErrorInfo := BaseStream^.ErrorInfo;
-  Status := BaseStream^.Status;
+  BaseStream.Write(Buf, Count);
+  ErrorInfo := BaseStream.ErrorInfo;
+  Status := BaseStream.Status;
 
   {Move(AStream^, Self, sizeof(TStream));}
   end;
@@ -379,7 +379,7 @@ constructor TDBViewer.Create(R: TRect; const FName: String; var FileIsDBF: Boole
     isValid := False
   else if isValid then
     TempFile := '';
-  XCoder.Init(8);
+  XCoder := TXCoder.Create(8);
   end;
 {-DataCompBoy-}
 
@@ -420,12 +420,12 @@ function TDBViewer.Failed(var FileIsDBF: Boolean): Boolean;
     I: LongInt;
   begin
   Failed := False;
-  New(DBFile, Init(CnvString(FileName)));
+  DBFile := TDBFile.Create(CnvString(FileName));
 
   if DBFile <> nil then
     begin
     I := 65520;
-    if DBFile^.NumRec = 0 then
+    if DBFile.NumRec = 0 then
       begin
       GetInfo(dlDBEmptyStruc);
       {     DisposeStr(SearchString);
@@ -440,10 +440,10 @@ function TDBViewer.Failed(var FileIsDBF: Boolean): Boolean;
       end;
     if MaxAvail < I then
       I := MaxAvail;
-    if LongInt(I) > DBFile^.NumRec*LongInt(DBFile^.RecLen) then
-      I := DBFile^.NumRec*LongInt(DBFile^.RecLen);
-    NumRec := I div DBFile^.RecLen;
-    I := NumRec*DBFile^.RecLen;
+    if LongInt(I) > DBFile.NumRec*LongInt(DBFile.RecLen) then
+      I := DBFile.NumRec*LongInt(DBFile.RecLen);
+    NumRec := I div DBFile.RecLen;
+    I := NumRec*DBFile.RecLen;
     StartRec := 0;
     if I <> 0 then
       GetMem(Buf, I);
@@ -451,8 +451,8 @@ function TDBViewer.Failed(var FileIsDBF: Boolean): Boolean;
   isValid := (DBFile <> nil) and (Buf <> nil);
   if isValid then
     begin
-    DBFile^.Seek(0);
-    DBFile^.Read(Buf^, NumRec);
+    DBFile.Seek(0);
+    DBFile.Read(Buf^, NumRec);
     end;
   FileIsDBF := isValid;
   end { TDBViewer.Failed };
@@ -479,7 +479,7 @@ destructor TDBViewer.Destroy;
   begin
   DisposeStr(SearchString);
   if Buf <> nil then
-    FreeMem(Buf, NumRec*DBFile^.RecLen);
+    FreeMem(Buf, NumRec*DBFile.RecLen);
   if DBFile <> nil then
     DBFile.Free;
   DBFile := nil;
@@ -515,17 +515,17 @@ function TDBViewer.GetRecord(N: LongInt): Pointer;
   GetRecord := nil;
   if N < 0 then
     N := 0;
-  if N >= DBFile^.NumRec then
+  if N >= DBFile.NumRec then
     Exit;
   if  (N < StartRec) or (N >= StartRec+NumRec) then
     begin
     StartRec := N-(NumRec div 2);
     if StartRec < 0 then
       StartRec := 0;
-    DBFile^.Seek(StartRec);
-    DBFile^.Read(Buf^, NumRec);
+    DBFile.Seek(StartRec);
+    DBFile.Read(Buf^, NumRec);
     end;
-  GetRecord := @PByteArray(Buf)^[(N-StartRec)*DBFile^.RecLen];
+  GetRecord := @PByteArray(Buf)^[(N-StartRec)*DBFile.RecLen];
   end;
 
 function TDBViewer.Valid(Command: Word): Boolean;
@@ -544,25 +544,25 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
       end;
   begin
   R.Assign(1, 1, 50, 18);
-  D := New(TDialog, Init(R, GetString(StrIdx)+Cut(FileName^, 20)));
-  D^.Options := D^.Options or ofCentered;
+  D := TDialog.Create(R, GetString(StrIdx)+Cut(FileName^, 20));
+  D.Options := D.Options or ofCentered;
 
   R.Assign(2, 2, 48, 3);
-  P := New(TStaticText, Init(R, GetString(dlDBViewInfoString)));
+  P := TStaticText.Create(R, GetString(dlDBViewInfoString));
   D.Insert(P);
 
   R.Assign(46, 3, 47, 13);
   P := TScrollBar.Create(R);
-  P^.Options := P^.Options or ofPostProcess;
+  P.Options := P.Options or ofPostProcess;
   D.Insert(P);
 
   R.Assign(2, 3, 46, 13);
-  P := New(PFieldListBox, Init(R, 1, TScrollBar(P)));
+  P := TFieldListBox.Create(R, 1, TScrollBar(P));
   D.Insert(P);
 
   R.Assign(30, 14, 40, 16);
-  P := New(TButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
-  P^.Options := P^.Options or ofCenterX;
+  P := TButton.Create(R, GetString(dlOKButton), cmOK, bfDefault);
+  P.Options := P.Options or ofCenterX;
   D.Insert(P);
 
   D.SelectNext(False);
@@ -571,7 +571,7 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
   if D = nil then
     Exit;
 
-  Data.List := DBFile^.Fields;
+  Data.List := DBFile.Fields;
   Data.Focused := Delta.X;
   D.SetData(Data);
   if Desktop.ExecView(D) = cmOK then
@@ -600,7 +600,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       Done: Boolean;
       PFR: PFieldRec;
     begin
-    PFR := DBFile^.GetFieldRec(Delta.X);
+    PFR := DBFile.GetFieldRec(Delta.X);
     GotoRec.S1 := ItoS(Delta.Y+1);
     GotoRec.S2 := PFR^.Name;
     if  (ExecResource(dlgDBFGoto, GotoRec) <> cmOK) or
@@ -611,9 +611,9 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     GotoRec.S2 := UpStrg(DelSpaces(GotoRec.S2));
     Done := False;
     if PFR^.Name <> GotoRec.S2 then
-      while (not Done) and (FldCnt < DBFile^.NumFields) do
+      while (not Done) and (FldCnt < DBFile.NumFields) do
         begin
-        PFR := DBFile^.GetFieldRec(FldCnt);
+        PFR := DBFile.GetFieldRec(FldCnt);
         if PFR^.Name = GotoRec.S2 then
           Done := True
         else
@@ -651,7 +651,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     P := GetRecord(Delta.Y);
     if P = nil then
       Exit;
-    PFR := DBFile^.GetFieldRec(Delta.X);
+    PFR := DBFile.GetFieldRec(Delta.X);
     if PFR = nil then
       Exit;
     if  (PFR^.Who <> 'M') then
@@ -666,12 +666,12 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     else
       Xt := '.FPT';
     MemoStream := TDosStream.Create(Dr+Nm+Xt, stOpenRead);
-    if  (MemoStream = nil) or (MemoStream^.Status <> stOK) then
+    if  (MemoStream = nil) or (MemoStream.Status <> stOK) then
       begin
       if MemoStream <> nil then
         MemoStream.Free;
       MemoStream := TBufStream.Create(Dr+Nm+'.dbt', stOpenRead, 512);
-      if  (MemoStream = nil) or (MemoStream^.Status <> stOK) then
+      if  (MemoStream = nil) or (MemoStream.Status <> stOK) then
         begin
         if MemoStream <> nil then
           MemoStream.Free;
@@ -682,15 +682,15 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
         {JOHN_SW}
         begin
         L := L*512;
-        MemoStream^.Seek(L);
+        MemoStream.Seek(L);
         repeat
-          MemoStream^.Read(Nm[1], 1);
+          MemoStream.Read(Nm[1], 1);
           if Nm[1] <> #$1A then
             Inc(ML)
           else
             Break
-        until MemoStream^.Status <> stOK;
-        if  (MemoStream = nil) or (MemoStream^.Status <> stOK) then
+        until MemoStream.Status <> stOK;
+        if  (MemoStream = nil) or (MemoStream.Status <> stOK) then
           begin
           ErrMsg(dlDBViewNoMemo);
           if MemoStream <> nil then
@@ -705,22 +705,22 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       if L <> 0 then
         {JOHN_SW}
         begin
-        MemoStream^.Seek(4);
-        MemoStream^.Read(ML, 4);
+        MemoStream.Seek(4);
+        MemoStream.Read(ML, 4);
         ML := LongInt(SwapEndian(LongWord(ML)));
 
         L := L*ML;
-        MemoStream^.Seek(L+4);
-        ML := i32(MemoStream^.GetPos);
+        MemoStream.Seek(L+4);
+        ML := i32(MemoStream.GetPos);
         ML := 0;
-        MemoStream^.Read(ML, 4);
+        MemoStream.Read(ML, 4);
         ML := LongInt(SwapEndian(LongWord(ML)));
         Inc(L, 8);
         end;
       end;
 
     MemoStream := PMemoStream.Create(MemoStream, L, ML);
-    if MemoStream^.Status <> stOK then
+    if MemoStream.Status <> stOK then
       begin
       MemoStream.Free;
       MemoStream := nil;
@@ -729,22 +729,22 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     Desktop.GetExtent(R);
     R.Grow(-2, -2);
     R.Assign(1, 1, 70, 20);
-    D := New(TDialog, Init(R, GetString(dlDBViewViewMemo)));
-    D^.Options := D^.Options or ofCentered;
+    D := TDialog.Create(R, GetString(dlDBViewViewMemo));
+    D.Options := D.Options or ofCentered;
 
-    R.Assign(D^.Size.X-2, 2, D^.Size.X-1, D^.Size.Y-4);
+    R.Assign(D.Size.X-2, 2, D.Size.X-1, D.Size.Y-4);
     PV := PViewScroll.Create(R);
     D.Insert(PV);
     { TODO: palette CScrollBar of PV^. }
 
-    R.Assign(2, 2, D^.Size.X-2, D^.Size.Y-4);
+    R.Assign(2, 2, D.Size.X-2, D.Size.Y-4);
     PV := TNFileViewer.Create(R, MemoStream, '', '', PV, False, False);
 
     D.Insert(PV);
 
-    R.Assign(30, D^.Size.Y-3, 40, D^.Size.Y-1);
-    PV := New(TButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
-    PV^.Options := PV^.Options or ofCenterX;
+    R.Assign(30, D.Size.Y-3, 40, D.Size.Y-1);
+    PV := TButton.Create(R, GetString(dlOKButton), cmOK, bfDefault);
+    PV.Options := PV.Options or ofCenterX;
     D.Insert(PV);
 
     D.SelectNext(False);
@@ -784,7 +784,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     else
       begin
       FirstFld := 0;
-      LastFld := DBFile^.NumFields-1;
+      LastFld := DBFile.NumFields-1;
       end;
     CurFld := Delta.X;
     if not StartSearch then
@@ -800,13 +800,13 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     {--- finish -------- Eugeny Zvyagintzev ---- 19-10-2002 ----}
 
     R.Assign(1, 1, 30, 9);
-    New(V, Init(R));
-    V^.Top := GetString(dlSearching)+' "'+Cut(SearchData.S, 40)+'"';
-    V^.Write(1, GetString(dlPercentComplete));
+    V := TWhileView.Create(R);
+    V.Top := GetString(dlSearching)+' "'+Cut(SearchData.S, 40)+'"';
+    V.Write(1, GetString(dlPercentComplete));
     Desktop.Insert(V);
     Abort := False;
     NewTimer(T, 50);
-    while ((CurRow < DBFile^.NumRec) and (SearchData.Direction <> 1)) or
+    while ((CurRow < DBFile.NumRec) and (SearchData.Direction <> 1)) or
         ( (SearchData.Direction = 1) and (CurRow >= 0))
     do
       begin
@@ -815,8 +815,8 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
         DispatchEvents(V, Abort);
         if Abort then
           Break;
-        V^.Write(1, StrGrd(DBFile^.NumRec, CurRow, 30, False));
-        V^.Write(2, Percent(DBFile^.NumRec, CurRow)+'%');
+        V.Write(1, StrGrd(DBFile.NumRec, CurRow, 30, False));
+        V.Write(2, Percent(DBFile.NumRec, CurRow)+'%');
         NewTimer(T, 50);
         end;
       P := GetRecord(CurRow);
@@ -826,7 +826,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
         begin
         if Abort then
           Break;
-        PFR := DBFile^.GetFieldRec(CurFld);
+        PFR := DBFile.GetFieldRec(CurFld);
         Move(P^[PFR^.Pos], S[1], PFR^.len);
         S[0] := Char(PFR^.len);
 
@@ -881,13 +881,13 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
   begin
     RetValue := false;
     repeat
-      case DBFile^.WriteMode of
+      case DBFile.WriteMode of
         0 : begin
-              DBFile^.BaseFile.Done;
-              DBFile^.OpenMode(stOpen);
-              Inc(DBFile^.WriteMode);
-              if DBFile^.BaseFile.Status = stOK then Inc(DBFile^.WriteMode)
-              else DBFile^.OpenMode(stOpenRead);
+              DBFile.BaseFile.Free;
+              DBFile.OpenMode(stOpen);
+              Inc(DBFile.WriteMode);
+              if DBFile.BaseFile.Status = stOK then Inc(DBFile.WriteMode)
+              else DBFile.OpenMode(stOpenRead);
             end;
         1 : begin
               ErrMsg(dlDBCantEdit);
@@ -907,27 +907,27 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
   begin
     if not ReOpenInWriteMode then Exit;
     BaseRec := Delta.Y;
-    CurRec := DBFile^.NumRec-1;
+    CurRec := DBFile.NumRec-1;
     p := GetRecord(BaseRec);
 
     while CurRec >= BaseRec do begin
-      DBFile^.Seek(CurRec);
-      DBFile^.BaseFile.Read(p^[0],DBFile^.RecLen);
-      DBFile^.Seek(CurRec);   { TBufStream bug ? }
-      DBFile^.Seek(CurRec+1); { если перед этим не сделать Seek(CurRec),        }
+      DBFile.Seek(CurRec);
+      DBFile.BaseFile.Read(p^[0],DBFile.RecLen);
+      DBFile.Seek(CurRec);   { TBufStream bug ? }
+      DBFile.Seek(CurRec+1); { если перед этим не сделать Seek(CurRec),        }
                               { то позиционирование идёт на один байт дальше    }
                               { чем нужо. Почему - так и не понял. Особенность. }
-      DBFile^.BaseFile.Write(p^[0], DBFile^.RecLen);
+      DBFile.BaseFile.Write(p^[0], DBFile.RecLen);
       dec(CurRec);
     end;
-    FillChar(p^[0], DBFile^.RecLen, ' ');
-    DBFile^.Seek(BaseRec);
-    DBFile^.BaseFile.Write(p^[0], DBFile^.RecLen);
+    FillChar(p^[0], DBFile.RecLen, ' ');
+    DBFile.Seek(BaseRec);
+    DBFile.BaseFile.Write(p^[0], DBFile.RecLen);
 
-    inc(DBFile^.NumRec);
-    DBFile^.BaseFile.Seek(0);
-    DBFile^.BaseFile.Write(DBFile^.Date,32);
-    StartRec := DBFile^.NumRec; { for refresh records buffer }
+    inc(DBFile.NumRec);
+    DBFile.BaseFile.Seek(0);
+    DBFile.BaseFile.Write(DBFile.Date,32);
+    StartRec := DBFile.NumRec; { for refresh records buffer }
     p := GetRecord(BaseRec);
   end;
 
@@ -938,22 +938,22 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     b : byte;
   begin
     if (UpFlag and (Delta.Y <= 0)) or
-       ((not UpFlag) and (Delta.Y >= (DBFile^.NumRec-1))) then
+       ((not UpFlag) and (Delta.Y >= (DBFile.NumRec-1))) then
       Exit;
     if NumRec < 2 then Exit;
     if not ReOpenInWriteMode then Exit;
     BaseRec := Delta.Y;
     if UpFlag then dec(BaseRec);
-    DBFile^.Seek(BaseRec);
-    DBFile^.BaseFile.Read(Buf^, DBFile^.RecLen * 2);
-    for i := 0 to DBFile^.RecLen - 1 do begin
+    DBFile.Seek(BaseRec);
+    DBFile.BaseFile.Read(Buf^, DBFile.RecLen * 2);
+    for i := 0 to DBFile.RecLen - 1 do begin
       b := PByteArray(Buf)^[i];
-      PByteArray(Buf)^[i] := PByteArray(Buf)^[i + DBFile^.RecLen];
-      PByteArray(Buf)^[i + DBFile^.RecLen] := b;
+      PByteArray(Buf)^[i] := PByteArray(Buf)^[i + DBFile.RecLen];
+      PByteArray(Buf)^[i + DBFile.RecLen] := b;
     end;
-    DBFile^.Seek(BaseRec);
-    DBFile^.BaseFile.Write(Buf^, DBFile^.RecLen * 2);
-    StartRec := DBFile^.NumRec; { for refresh records buffer }
+    DBFile.Seek(BaseRec);
+    DBFile.BaseFile.Write(Buf^, DBFile.RecLen * 2);
+    StartRec := DBFile.NumRec; { for refresh records buffer }
     if UpFlag then dec(Delta.Y) else inc(Delta.Y);
     GetRecord(Delta.Y);
   end;
@@ -971,8 +971,8 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       p^[0] := $20
     else
       p^[0] := $2A;
-    DBFile^.Seek(Delta.Y);
-    DBFile^.BaseFile.Write(p^[0], DBFile^.RecLen);
+    DBFile.Seek(Delta.Y);
+    DBFile.BaseFile.Write(p^[0], DBFile.RecLen);
     end { DeleteRecord };
 
   { -------- Eugeny Zvyagintzev ---------}
@@ -994,9 +994,9 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       S := AddSpace(S, FldLen);
       XLatStr(S, XCoder.XlatCP[FromAscii]); {John_SW 14-03-2003}
       Move(S[1], P[PFR^.Pos], FldLen);
-      DBFile^.Seek(Delta.Y);
-      DBFile^.BaseFile.Seek(DBFile^.BaseFile.GetPos+PFR^.Pos);
-      DBFile^.BaseFile.Write(S[1], FldLen);
+      DBFile.Seek(Delta.Y);
+      DBFile.BaseFile.Seek(DBFile.BaseFile.GetPos+PFR^.Pos);
+      DBFile.BaseFile.Write(S[1], FldLen);
       end;
 
     function GetDig: Word;
@@ -1017,7 +1017,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     label redat;
     begin { EditField }
     if not ReOpenInWriteMode then Exit; { KV }
-    PFR := DBFile^.GetFieldRec(Delta.X);
+    PFR := DBFile.GetFieldRec(Delta.X);
     if PFR^.Who = 'M' then
       Exit;
     P := GetRecord(Delta.Y);
@@ -1159,7 +1159,7 @@ redat:
             if DBFile <> nil then
               begin
               if Buf <> nil then
-                FreeMem(Buf, NumRec*DBFile^.RecLen);
+                FreeMem(Buf, NumRec*DBFile.RecLen);
               DBFile.Free;
               Buf := nil;
               DBFile := nil;
@@ -1244,12 +1244,12 @@ redat:
           begin
           XCoder.NextXLat;
           CED;
-          Indicator^.Draw;
+          Indicator.Draw;
           end; {John_SW 14-03-2003}
         cmLoadXlatTable:
           begin
           XCoder.LoadXlatTable;
-          Indicator^.Draw;
+          Indicator.Draw;
           CED;
           end; {John_SW 18-03-2003}
       end {case};
@@ -1257,7 +1257,7 @@ redat:
       case DNKeyCode(Event) of
         kbEnter:
           begin
-          if Delta.X < DBFile^.NumFields-1 then
+          if Delta.X < DBFile.NumFields-1 then
             Inc(Delta.X)
           else
             begin
@@ -1274,7 +1274,7 @@ redat:
           end;
         kbRight:
           begin
-          if Delta.X < DBFile^.NumFields-1 then
+          if Delta.X < DBFile.NumFields-1 then
             Inc(Delta.X);
           CED;
           end;
@@ -1285,7 +1285,7 @@ redat:
           end;
         kbEnd:
           begin
-          Delta.X := DBFile^.NumFields-1;
+          Delta.X := DBFile.NumFields-1;
           CED;
           end;
         kbUp:
@@ -1315,7 +1315,7 @@ redat:
           end;
         kbCtrlPgDn:
           begin
-          Delta.Y := DBFile^.NumRec-1;
+          Delta.Y := DBFile.NumRec-1;
           CED;
           end;
         {              kbCtrlD: begin DeleteRecord; CED; end;}
@@ -1369,35 +1369,35 @@ procedure TDBViewer.Draw;
   C3 := GetColorW(3);
   if Delta.Y < 0 then
     Delta.Y := 0;
-  if Delta.Y >= DBFile^.NumRec then
-    Delta.Y := DBFile^.NumRec-1;
+  if Delta.Y >= DBFile.NumRec then
+    Delta.Y := DBFile.NumRec-1;
   if Pos.Y > Delta.Y then
     Pos.Y := Delta.Y;
   if Pos.Y+Size.Y-2 < Delta.Y then
     Pos.Y := Delta.Y-Size.Y+2;
   if Pos.Y < 0 then
     Pos.Y := 0;
-  if Delta.X > DBFile^.NumFields-1 then
-    Delta.X := DBFile^.NumFields-1;
+  if Delta.X > DBFile.NumFields-1 then
+    Delta.X := DBFile.NumFields-1;
   if Pos.X > Delta.X then
     Pos.X := Delta.X;
   {if Indicator <> nil then Indicator^.Draw;}
   { -------- Eugeny Zvyagintzev ---------}
   if  (VerticalScrollBar <> nil)
-       and (VerticalScrollBar^.Value <> Delta.Y)
+       and (VerticalScrollBar.Value <> Delta.Y)
   then
     begin
     VerticalScrollBar.SetValue(Delta.Y);
     if Indicator <> nil then
-      Indicator^.Draw;
+      Indicator.Draw;
     end;
   if  (HorizontalScrollBar <> nil)
-       and (HorizontalScrollBar^.Value <> Delta.X)
+       and (HorizontalScrollBar.Value <> Delta.X)
   then
     begin
     HorizontalScrollBar.SetValue(Delta.X);
     if Indicator <> nil then
-      Indicator^.Draw;
+      Indicator.Draw;
     end;
   { -------- Eugeny Zvyagintzev ---------}
   repeat
@@ -1406,9 +1406,9 @@ procedure TDBViewer.Draw;
     NFN := 0;
     I := 1;
     FldPart := 0;
-    while (I < Size.X) and (J < DBFile^.NumFields) do
+    while (I < Size.X) and (J < DBFile.NumFields) do
       begin
-      PFR := DBFile^.GetFieldRec(J);
+      PFR := DBFile.GetFieldRec(J);
       FN[NFN] := PFR;
       if PFR <> nil then
         begin
@@ -1434,7 +1434,7 @@ procedure TDBViewer.Draw;
   for K := 1 to Size.Y-1 do
     begin
     MoveChar(B, ' ', C2, Size.X);
-    if DBFile^.NumRec > 0 then
+    if DBFile.NumRec > 0 then
       begin
       J := Delta.X;
       I := 1;
@@ -1496,26 +1496,26 @@ procedure TDBIndicator.Draw;
     PFR: PFieldRec;
   begin
   {10171114/10171114═══[C 10,10]═WIN═}
-  if  (DBViewer = nil) or (DBViewer^.DBFile = nil) then
+  if  (DBViewer = nil) or (DBViewer.DBFile = nil) then
     Exit;
-  if DBViewer^.Delta.Y < 0 then
-    DBViewer^.Delta.Y := 0;
-  if DBViewer^.Delta.X > DBViewer^.DBFile^.NumFields-1 then
-    DBViewer^.Delta.X := DBViewer^.DBFile^.NumFields-1;
+  if DBViewer.Delta.Y < 0 then
+    DBViewer.Delta.Y := 0;
+  if DBViewer.Delta.X > DBViewer.DBFile.NumFields-1 then
+    DBViewer.Delta.X := DBViewer.DBFile.NumFields-1;
   if Origin.Y <> Owner.Size.Y-1 then
     MoveTo(Origin.X, Owner.Size.Y-1);
-  PFR := DBViewer^.DBFile^.GetFieldRec(DBViewer^.Delta.X);
+  PFR := DBViewer.DBFile.GetFieldRec(DBViewer.Delta.X);
   if  (State and sfDragging <> 0) or (State and sfActive = 0) then
     C := 196
   else
     C := 205;
   S := AddSpace
-        (ItoS(DBViewer^.Delta.Y+1)+'/'+ItoS(DBViewer^.DBFile^.NumRec), 10);
+        (ItoS(DBViewer.Delta.Y+1)+'/'+ItoS(DBViewer.DBFile.NumRec), 10);
   Replace(' ', Char(C), S);
   S1 := AddSpace(ItoS(PFR^.len)+','+ItoS(PFR^.Dec)+']', 7);
   Replace(' ', Char(C), S1);
   S := S+Char(C)+'['+PFR^.Who+' '+S1;
-  S := S+Char(C)+DBViewer^.XCoder.CodeTag;
+  S := S+Char(C)+DBViewer.XCoder.CodeTag;
   S := Copy(S, 1, Owner.Size.X-4);
   if Byte(S[0]) <> Size.X then
     begin
@@ -1524,17 +1524,17 @@ procedure TDBIndicator.Draw;
     end;
   {--- start -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
   if State and sfDragging <> 0 then
-    C := TWindow(Owner).Frame^.GetColorW($05)
+    C := TWindow(Owner).Frame.GetColorW($05)
   else if State and sfActive = 0 then
-    C := TWindow(Owner).Frame^.GetColorW($01)
+    C := TWindow(Owner).Frame.GetColorW($01)
   else
-    C := TWindow(Owner).Frame^.GetColorW($03);
+    C := TWindow(Owner).Frame.GetColorW($03);
   {--- finish -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
   MoveStr(B, S, C);
   WriteLineC(0, 0, Size.X, 1, B);
   end { TDBIndicator.Draw };
 
-constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
+constructor TDBWindow.Create(FName: String; var FileIsDBF: Boolean);
   var
     R: TRect;
     I: Integer;
@@ -1550,7 +1550,7 @@ constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
   FName := lFExpand(FName);
   if I <= 0 then
     s := FName;
-  inherited Create(R, s, 0);
+  inherited Create(s, FName, False);
   RealName := s;
   Options := Options or ofTileable;
   Flags := Flags or wfMaxi;
@@ -1560,43 +1560,43 @@ constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
   if P = nil then
     Fail;
   Insert(P);
-  if not P^.isValid then
+  if not P.isValid then
     begin
-    Done;
+    Free;
     Fail;
     end;
   { -------- Eugeny Zvyagintzev ---------}
   R.A.X := R.B.X;
   R.B.X := R.B.X+1;
   VSB := PDBScrollBar.Create(R);
-  VSB^.MaxVal := P^.DBFile^.NumRec-1;
-  VSB^.GrowMode := gfGrowLoX+gfGrowHiX+gfGrowHiY;
-  VSB^.DBViewer := P;
-  VSB^.SetStep(Size.Y-4, 1);
-  VSB^.ScrollBarType := sbVertical;
+  VSB.MaxVal := P.DBFile.NumRec-1;
+  VSB.GrowMode := gfGrowLoX+gfGrowHiX+gfGrowHiY;
+  VSB.DBViewer := P;
+  VSB.SetStep(Size.Y-4, 1);
+  VSB.ScrollBarType := sbVertical;
   Insert(VSB);
-  P^.VerticalScrollBar := VSB;
+  P.VerticalScrollBar := VSB;
   GetBounds(R);
   R.A.X := R.A.X+49;
   R.B.X := R.B.X-2;
   R.A.Y := R.B.Y-1;
   HSB := PDBScrollBar.Create(R);
-  HSB^.MaxVal := P^.DBFile^.NumFields-1;
-  HSB^.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
-  HSB^.DBViewer := P;
-  HSB^.ScrollBarType := sbHorizontal;
+  HSB.MaxVal := P.DBFile.NumFields-1;
+  HSB.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
+  HSB.DBViewer := P;
+  HSB.ScrollBarType := sbHorizontal;
   Insert(HSB);
-  P^.HorizontalScrollBar := HSB;
+  P.HorizontalScrollBar := HSB;
   { -------- Eugeny Zvyagintzev ---------}
   R.A.X := 2;
   R.B.X := 34;
   R.A.Y := Size.Y-1;
   R.B.Y := Size.Y;
   P1 := PDBIndicator.Create(R);
-  P1^.DBViewer := P;
-  P1^.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
+  P1.DBViewer := P;
+  P1.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
   Insert(P1);
-  P^.Indicator := P1;
+  P.Indicator := P1;
   end { TDBWindow.Init };
 
 constructor TDBWindow.Load(S: TStream);
@@ -1604,16 +1604,16 @@ constructor TDBWindow.Load(S: TStream);
   inherited Load(S);
   GetSubViewPtr(S, P);
   GetSubViewPtr(S, P1);
-  P1^.DBViewer := P;
-  P^.Indicator := P1;
+  P1.DBViewer := P;
+  P.Indicator := P1;
   GetSubViewPtr(S, VSB);
-  VSB^.DBViewer := P;
-  VSB^.ScrollBarType := sbVertical;
-  P^.VerticalScrollBar := VSB;
+  VSB.DBViewer := P;
+  VSB.ScrollBarType := sbVertical;
+  P.VerticalScrollBar := VSB;
   GetSubViewPtr(S, HSB);
-  HSB^.DBViewer := P;
-  HSB^.ScrollBarType := sbHorizontal;
-  P^.HorizontalScrollBar := HSB;
+  HSB.DBViewer := P;
+  HSB.ScrollBarType := sbHorizontal;
+  P.HorizontalScrollBar := HSB;
 
   Redraw;
   end;
@@ -1633,8 +1633,8 @@ procedure TDBWindow.SetState(AState: Word; Enable: Boolean);
   inherited SetState(AState, Enable);
   if P1 <> nil then
     begin
-    P1^.SetState(AState, Enable);
-    P1^.Draw;
+    P1.SetState(AState, Enable);
+    P1.Draw;
     end;
   end;
 {--- finish -------- Eugeny Zvyagintzev ---- 14-03-2003 ----}
