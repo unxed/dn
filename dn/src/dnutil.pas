@@ -252,9 +252,7 @@ procedure PutInClipLong(const S: LongString);
 implementation
 
 uses
-{$IFDEF LINUX}
   DNRun,
-{$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
   DNHelp, DnIni, iniengine, cfgstate, DNErrLog, histories,
   VideoMan, panelwin, Messages, HistList, FileFind,
@@ -2506,8 +2504,8 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         SaveDnIniSettings(@ActiveLanguage);
         DoneIniEngine;
        
-        ExecString('', '');
-       
+        RestartPending := True;
+        Application^.EndModal(cmQuit);
         end;
       end;
     L.FreeAll;
@@ -2717,7 +2715,8 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         end
       else
         begin
-        ExecString('', '');
+        RestartPending := True;
+        Application^.EndModal(cmQuit);
         end;
     {-DataCompBoy-}
     

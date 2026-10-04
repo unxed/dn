@@ -111,6 +111,96 @@ uses
   , DnIni, Math
   ;
 
+{ The line holds UTF-8 in the build DNUTF8 (a character is 1..4 bytes: the cursor, Backspace, Delete, the scrolling and the mouse go by characters),
+  else bytes of the code page (a character is a byte). Not UTF-8 (a byte of the code page that stands alone) is a character of a byte. Wide (double cell)
+  characters are counted as one cell: TODO-later.md. }
+function CharAt(const S: String; P: Integer): Integer;       { the bytes of the character that starts at P }
+  var
+    K: Integer;
+  begin
+  Result := 1;
+{$IFDEF DNUTF8}
+  if (P < 1) or (P > Length(S)) then
+    Exit;
+  case Byte(S[P]) of
+    $C2..$DF: Result := 2;
+    $E0..$EF: Result := 3;
+    $F0..$F4: Result := 4;
+  end;
+  if P+Result-1 > Length(S) then
+    Result := 1
+  else
+    for K := 1 to Result-1 do
+      if Byte(S[P+K]) and $C0 <> $80 then
+        Result := 1;
+{$ENDIF}
+  end;
+
+function CharBefore(const S: String; P: Integer): Integer;  { the bytes of the character that ends at P }
+  var
+    K: Integer;
+  begin
+  Result := 1;
+{$IFDEF DNUTF8}
+  K := P;
+  while (K > 1) and (P-K < 3) and (Byte(S[K]) and $C0 = $80) do
+    Dec(K);
+  if (K >= 1) and (CharAt(S, K) = P-K+1) then
+    Result := P-K+1;
+{$ENDIF}
+  end;
+
+function CellsIn(const S: String): Integer;
+  var
+    I: Integer;
+  begin
+  Result := 0;
+  I := 1;
+  while I <= Length(S) do
+    begin
+    Inc(I, CharAt(S, I));
+    Inc(Result);
+    end;
+  end;
+
+function BytesFor(const S: String; Cells: Integer): Integer; { the bytes of the first Cells characters }
+  begin
+  Result := 0;
+  while (Cells > 0) and (Result < Length(S)) do
+    begin
+    Inc(Result, CharAt(S, Result+1));
+    Dec(Cells);
+    end;
+  end;
+
+function WholeChars(const S: String): String;                { without a character that is cut at the end }
+  var
+    I: Integer;
+  begin
+  I := 1;
+  while (I <= Length(S)) and (I+CharAt(S, I)-1 <= Length(S)) do
+    Inc(I, CharAt(S, I));
+  Result := Copy(S, 1, I-1);
+{$IFDEF DNUTF8}
+  if (I <= Length(S)) and (Byte(S[I]) and $C0 <> $C0) then
+    Result := S;  { not a cut sequence: a stray byte, drawn as it is }
+{$ENDIF}
+  end;
+
+{ the text of a key: UTF-8 in the build DNUTF8, else the byte of the code page }
+function TypedText(const Event: TEvent): String;
+  begin
+{$IFDEF DNUTF8}
+  if (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) then
+    begin
+    SetLength(Result, Min(Event.TextLength, 255));
+    Move(Event.Text[0], Result[1], Length(Result));
+    Exit;
+    end;
+{$ENDIF}
+  Result := Char(Event.CharCode);
+  end;
+
 const
   CursorMustBeVisible: Boolean = False;
   PrevCmdLineCursorVisible: Boolean = False;
@@ -254,7 +344,7 @@ procedure TCommandLine.Update;
     MenuActive
   then
     Exit;
-  P.X := CurX+Min(Length(Dir), 50)-DeltaX;
+  P.X := CellsIn(Copy(Str, DeltaX+1, CurX-DeltaX))+Min(Length(Dir), 50);
   P.Y := 0;
   MakeGlobal(P, P);
   //AK155  BB := not Overwrite  xor (InterfaceData.Options and ouiBlockInsertCursor <> 0);
@@ -314,11 +404,11 @@ procedure TCommandLine.Draw;
     CurX := Length(Str);
   if DeltaX > CurX then
     DeltaX := CurX;
-  if CurX-DeltaX > Size.X-Min(Length(Dir), 50)-1 then
-    DeltaX := CurX-Size.X+Min(Length(Dir), 50)+1;
+  while CellsIn(Copy(Str, DeltaX+1, CurX-DeltaX)) > Size.X-Min(Length(Dir), 50)-1 do
+    Inc(DeltaX, CharAt(Str, DeltaX+1));
   MoveChar(B, ' ', C1, Size.X);
   MoveStr(B, S^, C3);
-  MoveStr(B[SW], Copy(Str, DeltaX+1, Size.X-SW), C1);
+  MoveStr(B[SW], WholeChars(Copy(Str, DeltaX+1, Size.X-SW)), C1);
   if not MenuActive then
     ShowCursor
   else
@@ -357,7 +447,8 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
     P: TPoint;
     i, l, c, ls: Integer;
     s1: String;
-    S: String;
+    S, T: String;
+    CW: Integer;
     Changed: Boolean;
   label
     EndLFN;
@@ -392,7 +483,7 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
           end
         else
           begin
-          CurX := DeltaX+P.X-Min(Length(Dir), 50);
+          CurX := DeltaX+BytesFor(Copy(Str, DeltaX+1, 255), P.X-Min(Length(Dir), 50));
           CE2
           end;
       end;
@@ -558,14 +649,11 @@ EndLFN:
             end;
           #32..#126, #128..#255:
             begin
-            if Overwrite then
-              if CurX >= Length(Str) then
-                Str := Str+Char(Event.CharCode)
-              else
-                Str[CurX+1] := Char(Event.CharCode)
-            else
-              Insert(Char(Event.CharCode), Str, CurX+1);
-            Inc(CurX);
+            T := TypedText(Event);
+            if Overwrite and (CurX < Length(Str)) then
+              Delete(Str, CurX+1, CharAt(Str, CurX+1));
+            Insert(T, Str, CurX+1);
+            Inc(CurX, Length(T));
             StrModified := True;
             CE2;
             end;
@@ -643,8 +731,9 @@ EndLFN:
                 begin
                 if CurX > 0 then
                   begin
-                  Delete(Str, CurX, 1);
-                  Dec(CurX);
+                  CW := CharBefore(Str, CurX);
+                  Delete(Str, CurX-CW+1, CW);
+                  Dec(CurX, CW);
                   if CurX = 0 then
                     StrCleared := True;
                   CE2
@@ -698,13 +787,13 @@ EndLFN:
               kbLeft, kbCtrlS, kbShiftLeft:
                 begin
                 if CurX > 0 then
-                  Dec(CurX);
+                  Dec(CurX, CharBefore(Str, CurX));
                 CE2
                 end;
               kbRight, kbCtrlD, kbShiftRight:
                 begin
                 if CurX < Length(Str) then
-                  Inc(CurX);
+                  Inc(CurX, CharAt(Str, CurX+1));
                 CE2
                 end;
               kbCtrlIns, kbCtrlShiftIns:
@@ -733,7 +822,7 @@ EndLFN:
                 end;
               kbDel:
                 begin
-                Delete(Str, CurX+1, 1);
+                Delete(Str, CurX+1, CharAt(Str, CurX+1));
                 CE2
                 end;
               kbEnd, kbShiftEnd, kbCtrlEnd:

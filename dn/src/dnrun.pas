@@ -18,6 +18,10 @@ var
 {$ENDIF}
 
 procedure RunExternal(const CmdLine: String);
+var
+  RestartPending: Boolean = False;   { set by the command that restarts DN (change of the language, Restart): the program starts itself again after the shutdown }
+{ Starts DN again (the same program, the same parameters): Unix replaces the process (exec), else the new one runs and the old one ends after it. Called by dn.pas after the shutdown. }
+procedure RestartSelf;
 {$IFDEF GO32V2}
 { Ctrl-O: shows the user screen (what the programs left) until a key is pressed; the caller redraws DN. }
 procedure ShowUserScreenDos;
@@ -26,7 +30,7 @@ procedure ShowUserScreenDos;
 implementation
 
 uses
-  SysUtils, Dos{$IFDEF GO32V2}, go32, Drivers{$ENDIF}, osdep, DNErrLog{$IFDEF LINUX}, TvVtRun{$ENDIF};
+  SysUtils, Dos{$IFDEF UNIX}, BaseUnix{$ENDIF}{$IFDEF GO32V2}, go32, Drivers{$ENDIF}, osdep, DNErrLog{$IFDEF LINUX}, TvVtRun{$ENDIF};
 
 {$IFDEF LINUX}
 function CurDir: AnsiString;
@@ -167,6 +171,34 @@ begin
   end;
 {$ENDIF}
   SysRunShell(CmdLine);      { Unix: the terminal is given to the shell for the command }
+{$ENDIF}
+end;
+
+procedure RestartSelf;
+var
+  Strs: array of AnsiString;
+  I: Integer;
+{$IFDEF UNIX}
+  Args: array of PAnsiChar;
+{$ENDIF}
+begin
+  DNTrace('RestartSelf: ' + ParamStr(0));
+{$IFDEF UNIX}
+  SetLength(Strs, ParamCount + 1);
+  SetLength(Args, ParamCount + 2);
+  for I := 0 to ParamCount do
+  begin
+    Strs[I] := ParamStr(I);
+    Args[I] := PAnsiChar(Strs[I]);
+  end;
+  Args[ParamCount + 1] := nil;
+  fpExecve(PAnsiChar(Strs[0]), @Args[0], envp);
+  DNTrace('RestartSelf: exec failed, errno ' + IntToStr(fpGetErrno));
+{$ELSE}
+  SetLength(Strs, ParamCount);
+  for I := 1 to ParamCount do
+    Strs[I - 1] := ParamStr(I);
+  ExecuteProcess(ParamStr(0), Strs);
 {$ENDIF}
 end;
 
