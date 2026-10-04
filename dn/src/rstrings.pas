@@ -64,10 +64,10 @@ type
   TIdxResource = class;
   PIdxResource = TIdxResource;
   TIdxResource = class(TObject)
-    Stream: PStream;
+    Stream: TStream;
     Index: PIndexArray;
     Count: AInt;
-    constructor Create(AStream: PStream);
+    constructor Create(AStream: TStream);
     destructor Destroy; override;
     function Get(Key: TDlgIdx): TStreamable;
     end;
@@ -75,11 +75,11 @@ type
   TIdxMaker = class;
   PIdxMaker = TIdxMaker;
   TIdxMaker = class(TObject)
-    Stream: PStream;
-    TempStream: PBufStream;
+    Stream: TStream;
+    TempStream: TBufStream;
     Index: PIndexArray;
     Count: AInt;
-    constructor Create(AStream: PStream);
+    constructor Create(AStream: TStream);
     destructor Destroy; override;
     procedure Put(Item: TStreamable; Key: TDlgIdx);
     function Empty(Key: TDlgIdx): Boolean;
@@ -94,7 +94,7 @@ uses
 const
   TempStreamName = '$MAKERES.TMP';
 
-constructor TIdxResource.Create(AStream: PStream);
+constructor TIdxResource.Create(AStream: TStream);
   begin
   Stream := AStream;
   AStream.Read(Count, SizeOf(Count));
@@ -125,9 +125,9 @@ function TIdxResource.Get(Key: TDlgIdx): TStreamable;
   Chk;
   end;
 
-constructor TIdxMaker.Create(AStream: PStream);
+constructor TIdxMaker.Create(AStream: TStream);
   begin
-  TempStream := PBufStream.Create(TempStreamName, stCreate, 1024);
+  TempStream := TBufStream.Create(TempStreamName, stCreate, 1024);
   Stream := AStream;
   Count := 0;
   GetMem(Index, 65520);

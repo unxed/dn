@@ -53,7 +53,7 @@ interface
 uses
   progress;
 
-function FindFileWithSPF(pFileName: String; Info: PWhileView): String;
+function FindFileWithSPF(pFileName: String; Info: TWhileView): String;
 
 implementation
 
@@ -65,7 +65,7 @@ uses
 
 {-DataCompBoy-}
 function RecursiveCheck(Name, pPath: String; DoMore: Boolean;
-     Info: PWhileView): String;
+     Info: TWhileView): String;
   var
     SR: lSearchRec;
     SC: TStringCollection;
@@ -130,7 +130,7 @@ q:
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-function FindFileWithSPF(pFileName: String; Info: PWhileView): String;
+function FindFileWithSPF(pFileName: String; Info: TWhileView): String;
   var
     F: lText;
     S, S2: String;

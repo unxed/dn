@@ -67,13 +67,13 @@ const
   TrueStr: String[10] = 'True';
 
 type
-  PCalcView = ^TCalcView;
-  PCalcInput = ^TCalcInput;
+
+
   PInfoView = ^TInfoView;
 
-  PCalcWindow = ^TCalcWindow;
+
   TCalcWindow = class(TUniWindow)
-    CalcView: PCalcView;
+    CalcView: TCalcView;
     constructor Create(Bounds: TRect; AName: String); {DataCompBoy}
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -84,10 +84,10 @@ type
   TCalcView = class(TView)
 
     FocusEvent: TEvent;
-    CalcInput: PCalcInput;
+    CalcInput: TCalcInput;
     CellInfo: PInfoView;
 
-    HScroll, VScroll: PScrollBar;
+    HScroll, VScroll: TScrollBar;
     Delta, Cur, Mark: TPoint;
     Cells: PCellCollection;
     NumC: Byte;
@@ -97,8 +97,8 @@ type
     CurrentCalc, SearchPos, ErrorCell: TPoint;
     SName: PString; {DataCompBoy}
     constructor Create(Bounds: TRect;
-        AInfo: PCalcInput; ACellInfo: PInfoView;
-        AHScroll, AVScroll: PScrollBar);
+        AInfo: TCalcInput; ACellInfo: PInfoView;
+        AHScroll, AVScroll: TScrollBar);
     destructor Done; virtual;
 
     constructor Load(var S: TStream);
@@ -133,7 +133,7 @@ type
     end;
 
   TCalcInput = class(TInputLine)
-    CalcView: PCalcView;
+    CalcView: TCalcView;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     function GetPalette: TPalette; virtual;
@@ -280,7 +280,7 @@ function GetFileName(var FileName: String; Mask, Title, ALabel: String;
      Buttons: Word): Word;
   var
     S: String;
-    D: PFileDialog;
+    D: TFileDialog;
     B: Boolean;
     C: Word;
   begin
@@ -291,7 +291,7 @@ function GetFileName(var FileName: String; Mask, Title, ALabel: String;
     Mask := x_x;
     B := False
     end;
-  D := PFileDialog(Application.ValidView(New(PFileDialog,
+  D := TFileDialog(Application.ValidView(New(TFileDialog,
           Init(Mask, Title, ALabel, Buttons, 211))));
   if D = nil then
     Exit;
@@ -332,7 +332,7 @@ procedure TInfoView.Draw;
 constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   var
     R: TRect;
-    P: PView;
+    P: TView;
     P1: PInfoView;
   begin
   if  (AName = '') or (GetFileAttr(AName+#0) and Directory <> 0) then
@@ -347,7 +347,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   R.A.Y := 5;
   R.B.X := 7;
   R.B.Y := Size.Y-1;
-  P := PStaticText.Create(R, '');
+  P := TStaticText.Create(R, '');
   P^.Options := P^.Options or ofFramed;
   P^.GrowMode := gfGrowHiY;
   Insert(P);
@@ -356,7 +356,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   R.A.Y := 2;
   R.B.X := Size.X-1;
   R.B.Y := 4;
-  P := PStaticText.Create(R, '');
+  P := TStaticText.Create(R, '');
   P^.Options := P^.Options or ofFramed;
   P^.GrowMode := gfGrowHiX;
   Insert(P);
@@ -364,7 +364,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   GetExtent(R);
   R.Grow(-1, -1);
   R.B.Y := R.A.Y+1;
-  P := PView(LoadResource(dlgWkzMenuBar));
+  P := TView(LoadResource(dlgWkzMenuBar));
   P.Locate(R);
   P^.GrowMode := gfGrowHiX;
   Insert(P);
@@ -374,7 +374,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   Inc(R.A.Y);
   R.B.Y := R.A.Y+1;
   Inc(R.A.X, 7);
-  P := PCalcInput.Create(R, 240);
+  P := TCalcInput.Create(R, 240);
   P^.GrowMode := gfGrowHiX;
   P^.Options := P^.Options or ofSelectable;
   Insert(P);
@@ -388,7 +388,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 2);
-  CalcView := New(PCalcView, Init(R, PCalcInput(P), P1,
+  CalcView := New(TCalcView, Init(R, TCalcInput(P), P1,
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
         MakeScrollBar(sbVertical+sbHandleKeyboard)));
   Insert(CalcView);
@@ -399,7 +399,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
 constructor TCalcWindow.Load(var S: TStream);
   var
     R: TRect;
-    P: PView;
+    P: TView;
     P1: PInfoView;
   begin
   inherited Load(S);
@@ -560,7 +560,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
     begin
     CalcView^.FocusEvent := Event;
     if EndEdit then
-      PWindow(Owner).SelectNext(False);
+      TWindow(Owner).SelectNext(False);
     ClearEvent(Event)
     end;
 
@@ -587,7 +587,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
 
 {-----------------------------    TCalcView     ---------------------------}
 
-constructor TCalcView.Create(Bounds: TRect; AInfo: PCalcInput; ACellInfo: PInfoView; AHScroll, AVScroll: PScrollBar);
+constructor TCalcView.Create(Bounds: TRect; AInfo: TCalcInput; ACellInfo: PInfoView; AHScroll, AVScroll: TScrollBar);
   var
     I, J: Integer;
   begin
@@ -600,7 +600,7 @@ constructor TCalcView.Create(Bounds: TRect; AInfo: PCalcInput; ACellInfo: PInfoV
   EventMask := $FFFF;
   CalcInput := AInfo;
   CellInfo := ACellInfo;
-  PCalcInput(CalcInput)^.CalcView := Self;
+  TCalcInput(CalcInput).CalcView := Self;
   FocusEvent.What := evNothing;
   FillChar(ColWidth, SizeOf(ColWidth), DefaultColWidth);
   Marking := False;
@@ -672,9 +672,9 @@ procedure TCalcView.SetState(AState: Word; Enable: Boolean);
   if Owner <> nil then
     begin
     GetBounds(Bounds);
-    DisposeStr(PWindow(Owner).Title);
+    DisposeStr(TWindow(Owner).Title);
     if SName <> nil then
-      PWindow(Owner).Title := NewStr(Cut(SName^,
+      TWindow(Owner).Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
     end;
   end { TCalcView.SetState };
@@ -948,7 +948,7 @@ procedure TCalcView.Draw;
             WriteStr(0, 0, GetString(dlWKZ_Empty), 2);
             S := '';
             end;
-          PCalcInput(CalcInput).SetData(S);
+          TCalcInput(CalcInput).SetData(S);
           CalcInput^.Draw;
           end;
         L := L+K;
@@ -977,9 +977,9 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     TColTypeAndLengthArray = array[0..255] of TColTypeAndLengthRec; {KV}
 
   var
-    Inf: PCalcInput;
+    Inf: TCalcInput;
     S: String;
-    St: PStream;
+    St: TStream;
     MaxX, MaxY, K, L: Integer;
     P: PCellrec;
     FName: String;
@@ -1684,7 +1684,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     CurCol: AInt;
 
   begin {TCalcView.HandleEvent}
-  Inf := PCalcInput(CalcInput);
+  Inf := TCalcInput(CalcInput);
   if GetState(sfFocused) and (FocusEvent.What <> evNothing) then
     begin
     PutEvent(Event);
@@ -2037,7 +2037,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           begin
           Marking := False;
           SetMark; //DrawView;
-          PWindow(Owner).SelectNext(False);
+          TWindow(Owner).SelectNext(False);
           ClearEvent(Event);
           end;
         kbTab:
@@ -2056,7 +2056,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             Marking := False;
             SetMark;
             DrawView;
-            PWindow(Owner).SelectNext(True);
+            TWindow(Owner).SelectNext(True);
             Event.InfoPtr := CalcInput;
             CalcInput.PutEvent(Event);
             ClearEvent(Event)
@@ -2237,7 +2237,7 @@ function TCalcView.AskSave: Boolean;
 {-DataCompBoy-}
 procedure TCalcView.LoadSheet(FName: String);
   var
-    S: PStream;
+    S: TStream;
     Bounds: TRect;
   begin
   GetBounds(Bounds);
@@ -2252,8 +2252,8 @@ procedure TCalcView.LoadSheet(FName: String);
     SName := NewStr(UntitledName);
     if Owner <> nil then
       begin
-      DisposeStr(PWindow(Owner).Title);
-      PWindow(Owner).Title := NewStr(Cut(SName^,
+      DisposeStr(TWindow(Owner).Title);
+      TWindow(Owner).Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
       Owner.Redraw;
       end;
@@ -2263,13 +2263,13 @@ procedure TCalcView.LoadSheet(FName: String);
   
   FName := lfGetLongFileName(lFExpand(FName));
   
-  S := PBufStream.Create(FName, stOpenRead, 2048);
+  S := TBufStream.Create(FName, stOpenRead, 2048);
   DisposeStr(SName);
   SName := NewStr(FName);
   if Owner <> nil then
     begin
-    DisposeStr(PWindow(Owner).Title);
-    PWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
+    DisposeStr(TWindow(Owner).Title);
+    TWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     end;
   if S^.Status <> stOK then
     begin
@@ -2290,8 +2290,8 @@ procedure TCalcView.LoadSheet(FName: String);
     SName := NewStr(UntitledName);
     if Owner <> nil then
       begin
-      DisposeStr(PWindow(Owner).Title);
-      PWindow(Owner).Title := NewStr(Cut(SName^,
+      DisposeStr(TWindow(Owner).Title);
+      TWindow(Owner).Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
       end;
     New(Cells, Init(10, 10));
@@ -2305,7 +2305,7 @@ procedure TCalcView.LoadSheet(FName: String);
 {-DataCompBoy-}
 procedure TCalcView.SaveSheetAs;
   var
-    S: PStream;
+    S: TStream;
     FName: String;
     W: Word;
     PP: Pointer;
@@ -2321,7 +2321,7 @@ procedure TCalcView.SaveSheetAs;
   
   FName := lfGetLongFileName(lFExpand(FName));
   
-  S := PDosStream.Create(FName, stOpen);
+  S := TDosStream.Create(FName, stOpen);
   W := S^.Status;
   S.Free;
   if W = 0 then
@@ -2334,12 +2334,12 @@ procedure TCalcView.SaveSheetAs;
   SName := NewStr(FName);
   if Owner <> nil then
     begin
-    DisposeStr(PWindow(Owner).Title);
-    PWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
+    DisposeStr(TWindow(Owner).Title);
+    TWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     Owner.Redraw;
     end;
   {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
-  S := PBufStream.Create(FName, stCreate, 2048);
+  S := TBufStream.Create(FName, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   { S^.Put(Cells);}
   Cells^.ShortStore(S^);
@@ -2355,7 +2355,7 @@ procedure TCalcView.SaveSheetAs;
 
 procedure TCalcView.SaveSheet;
   var
-    S: PStream;
+    S: TStream;
   begin
   if SName^ = UntitledName then
     begin
@@ -2363,7 +2363,7 @@ procedure TCalcView.SaveSheet;
     Exit
     end;
   {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner.GetColorW(12));}
-  S := PBufStream.Create(SName^, stCreate, 2048);
+  S := TBufStream.Create(SName^, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   {S^.Put(Cells);}
   Cells^.ShortStore(S^);

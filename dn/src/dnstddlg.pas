@@ -23,17 +23,11 @@ const
   fdNoLoadDir = TvFileDlg.fdNoLoadDir;
 
 type
-  PFileCollection = TvFiles.PFileCollection;
   TFileCollection = TvFiles.TFileCollection;
-  PSortedListBox = TvFileDlg.PSortedListBox;
   TSortedListBox = TvFileDlg.TSortedListBox;
-  PFileInputLine = TvFileDlg.PFileInputLine;
   TFileInputLine = TvFileDlg.TFileInputLine;
-  PFileList = TvFileDlg.PFileList;
   TFileList = TvFileDlg.TFileList;
-  PFileInfoPane = TvFileDlg.PFileInfoPane;
   TFileInfoPane = TvFileDlg.TFileInfoPane;
-  PFileDialog = TvFileDlg.PFileDialog;
   TFileDialog = TvFileDlg.TFileDialog;
 
 { The name of a file chosen in the dialog; '' if it was cancelled. }
@@ -48,11 +42,11 @@ uses
 
 function GetFileNameDialog(Mask, Title, Name: String; Buttons, HistoryId: Word): String;
 var
-  D: PFileDialog;
+  D: TFileDialog;
   R: Word;
 begin
   Result := '';
-  D := PFileDialog.Create(Mask, Title, Name, Buttons, HistoryId);
+  D := TFileDialog.Create(Mask, Title, Name, Buttons, HistoryId);
   if Application <> nil then
   begin
     R := Application.ExecView(D);

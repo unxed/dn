@@ -165,7 +165,7 @@ var
 
 function QSMaskPlusStar: String;
   {` добавить '*' в конце QSMask, если там её не было `}
-procedure InitQuickSearch(Panel: PView);
+procedure InitQuickSearch(Panel: TView);
 procedure StopQuickSearch;
 procedure DoQuickSearch(Key: Word);
 function QuickSearchString(SizeX: Word): String;
@@ -205,7 +205,7 @@ uses
   ;
 
 var
-  QSPanel: PView;
+  QSPanel: TView;
   SaveHelpCtx: Word;
 
 
@@ -1234,13 +1234,13 @@ function QSMaskPlusStar: String;
     Result := Result + '*';
   end;
 
-procedure InitQuickSearch(Panel: PView);
+procedure InitQuickSearch(Panel: TView);
   begin
   QSMask := '';
   LastSuccessPos := 1;
   QuickSearch := True;
   QSPanel := Panel;
-  with PFilePanelRoot(QSPanel)^ do
+  with TFilePanelRoot(QSPanel)^ do
     begin
     SaveHelpCtx := HelpCtx;
     HelpCtx := hcQuickSearch;

@@ -67,7 +67,7 @@ type
   PIndicator = ^TIndicator;
   TIndicator = class(TView)
     CalcLine: PCalcLine;
-    Radio: PRadioButtons;
+    Radio: TRadioButtons;
     Value: CReal;
     SResult: array[0..5] of String[40];
     CalcError: Boolean;
@@ -86,7 +86,7 @@ type
 procedure InsertCalc;
 
 const
-  Calc: PView = nil;
+  Calc: TView = nil;
 
 implementation
 
@@ -411,7 +411,7 @@ procedure TCalcLine.SetValues(SetSelf: Boolean);
       begin
       GetData(S);
       HistoryAdd(hsCalcLine, S);
-      with PIndicator(PDialog(Owner).DirectLink[3])^ do
+      with PIndicator(TDialog(Owner).DirectLink[3])^ do
         begin
         Radio.GetData(SelectedForm);
         S := SResult[SelectedForm];
@@ -423,13 +423,13 @@ procedure TCalcLine.SetValues(SetSelf: Boolean);
 
 procedure InsertCalc;
 
-  function MakeDialog: PDialog;
+  function MakeDialog: TDialog;
     var
-      Dlg: PDialog;
+      Dlg: TDialog;
       R: TRect;
       Indicator: PIndicator;
     begin
-    Dlg := PDialog(LoadResource(dlgCalculator));
+    Dlg := TDialog(LoadResource(dlgCalculator));
     R.Move(10, 5);
     Dlg^.Number := GetNum;
 
@@ -439,7 +439,7 @@ procedure InsertCalc;
     New(Indicator, Init(R));
     Indicator^.Options := Indicator^.Options or ofFramed;
     Indicator^.CalcLine := PCalcLine(Dlg^.DirectLink[1]);
-    Indicator^.Radio := PRadioButtons(Dlg^.DirectLink[2]);
+    Indicator^.Radio := TRadioButtons(Dlg^.DirectLink[2]);
     Dlg.Insert(Indicator);
     Dlg^.DirectLink[3] := Indicator;
 
@@ -450,7 +450,7 @@ procedure InsertCalc;
   if Calc = nil then
     begin
     Calc := MakeDialog;
-    Application.InsertWindow(PWindow(Calc));
+    Application.InsertWindow(TWindow(Calc));
     end
   else
     Calc.Select;

@@ -53,7 +53,7 @@ uses
   Collect
   ;
 
-procedure MakeListFile(APP: Pointer; Files: PCollection);
+procedure MakeListFile(APP: Pointer; Files: TCollection);
 function ParseAddress(Address: String; var Zone, Net, Node, Point: Word)
   : Boolean;
 
@@ -75,7 +75,7 @@ type
       { Для реакции на кнопки }
     end;
 
-procedure InpLineReplace(P: PInputLine; const S: String);
+procedure InpLineReplace(P: TInputLine; const S: String);
   begin
   with P^ do
     begin
@@ -99,13 +99,13 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
     case Event.Command of
       cmYes:
         begin
-        InpLineReplace(PInputLine(DirectLink[2]), '!:!\!.!');
+        InpLineReplace(TInputLine(DirectLink[2]), '!:!\!.!');
         ClearEvent(Event);
         Exit;
         end;
       cmNo:
         begin
-        InpLineReplace(PInputLine(DirectLink[2]), '#:#\#.#');
+        InpLineReplace(TInputLine(DirectLink[2]), '#:#\#.#');
         ClearEvent(Event);
         Exit;
         end;
@@ -113,9 +113,9 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
         begin { Не выпускаем с пустым именем списка или
           с пустым шаблоном обработки файла }
         for i := 1 to 2 do
-        if PInputLine(DirectLink[i])^.Data^ = '' then
+        if TInputLine(DirectLink[i]).Data^ = '' then
           begin
-          PInputLine(DirectLink[i]).Select;
+          TInputLine(DirectLink[i]).Select;
           ClearEvent(Event);
           Exit;
           end;
@@ -125,7 +125,7 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end;
 
-procedure PrepareMakeListDialog(P: PDialog);
+procedure PrepareMakeListDialog(P: TDialog);
   begin
   ObjChangeType(P, TypeOf(TMakeListDlg));
   end;
@@ -173,7 +173,7 @@ function ParseAddress(Address: String; var Zone, Net, Node, Point: Word)
   ParseAddress := True;
   end { ParseAddress };
 
-procedure MakeListFile(APP: Pointer; Files: PCollection);
+procedure MakeListFile(APP: Pointer; Files: TCollection);
   label AddrError, Retry;
   var
     I, J, K: Integer;
@@ -461,7 +461,7 @@ AddrError:
   { AK155 23-09-2003 Теперь скопом снимаем всю отметку. Делать это надо
 обязательно до RereadDirectory, так как она страшно тормзит при большом
 числе отмеченных файлов. }
-  ClearSelection(APP, PFilePanelRoot(APP)^.Files);
+  ClearSelection(APP, TFilePanelRoot(APP).Files);
   {/AK155}
   RereadDirectory(Dr);
   GlobalMessage(evCommand, cmRereadInfo, nil);

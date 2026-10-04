@@ -56,24 +56,24 @@ uses
 const
   TabStep: Integer = 8;
 
-procedure MISaveFileAs(AED: PFileEditor);
-procedure MISaveFile(AED: PFileEditor);
-procedure MIOpenFile(AED: PFileEditor);
-procedure MILoadFile(AED: PFileEditor; Name: String);
-function MIReadBlock(AED: PFileEditor; var FileName: String;
+procedure MISaveFileAs(AED: TFileEditor);
+procedure MISaveFile(AED: TFileEditor);
+procedure MIOpenFile(AED: TFileEditor);
+procedure MILoadFile(AED: TFileEditor; Name: String);
+function MIReadBlock(AED: TFileEditor; var FileName: String;
     RetCollector: Boolean): Pointer;
-procedure MILockFile(AED: PFileEditor);
-procedure MIUnLockFile(AED: PFileEditor);
+procedure MILockFile(AED: TFileEditor);
+procedure MIUnLockFile(AED: TFileEditor);
 
-procedure MIStore(AED: PFileEditor; var S: TStream);
-procedure MILoad(AED: PFileEditor; var S: TStream);
-procedure MIAwaken(AED: PFileEditor);
+procedure MIStore(AED: TFileEditor; var S: TStream);
+procedure MILoad(AED: TFileEditor; var S: TStream);
+procedure MIAwaken(AED: TFileEditor);
 
 const
-  SmartWindow: PEditWindow = nil;
-  ClipboardWindow: PEditWindow = nil;
-  SmartWindowPtr: ^PEditWindow = @SmartWindow;
-  ClipboardWindowPtr: ^PEditWindow = @ClipboardWindow;
+  SmartWindow: TEditWindow = nil;
+  ClipboardWindow: TEditWindow = nil;
+  SmartWindowPtr: ^TEditWindow = @SmartWindow;
+  ClipboardWindowPtr: ^TEditWindow = @ClipboardWindow;
 
 implementation
 uses
@@ -103,10 +103,10 @@ function ESC_Pressed: Boolean;
   end;
 
 {-DataCompBoy-}
-procedure MISaveFileAs(AED: PFileEditor);
+procedure MISaveFileAs(AED: TFileEditor);
   var
     FileName: String;
-    S: PStream;
+    S: TStream;
     
   begin
   {Cat}
@@ -133,12 +133,12 @@ procedure MISaveFileAs(AED: PFileEditor);
       WriteBlock(EditName, S, FileLines, EdOpt.ForcedCRLF, OptimalFill);
       S.Free;
       FileChanged(EditName);
-      DisposeStr(PWindow(Owner).Title);
+      DisposeStr(TWindow(Owner).Title);
       if EditName = ''
       then
-        PWindow(Owner).Title := NewStr(GetString(dlEditTitle))
+        TWindow(Owner).Title := NewStr(GetString(dlEditTitle))
       else
-        PWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
+        TWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
             (EditName));
       Owner.Redraw;
       Modified := False;
@@ -149,7 +149,7 @@ procedure MISaveFileAs(AED: PFileEditor);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure MIOpenFile(AED: PFileEditor);
+procedure MIOpenFile(AED: TFileEditor);
   var
     FileName: String;
   begin
@@ -179,9 +179,9 @@ procedure MIOpenFile(AED: PFileEditor);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure MISaveFile(AED: PFileEditor);
+procedure MISaveFile(AED: TFileEditor);
   var
-    S: PBufStream;
+    S: TBufStream;
     I: LongInt;
     F: lFile;
     Dr: String;
@@ -189,7 +189,7 @@ procedure MISaveFile(AED: PFileEditor);
     Xt: String;
     OldAttr: Word;
     L: array[0..0] of PtrInt;
-    PC: PLineCollection;
+    PC: TLineCollection;
     FileExist: Boolean;
     TempEAContainerName: String;
     TempEAContainer: lFile;
@@ -207,7 +207,7 @@ procedure MISaveFile(AED: PFileEditor);
       if ClipBoardStream <> nil then
         ClipBoardStream.Free;
       ClipBoardStream := nil;
-      PC := PLineCollection.Create(100, 5, True);
+      PC := TLineCollection.Create(100, 5, True);
       for I := 0 to FileLines^.Count-1 do
         PC.Insert(NewLongStr(CnvLongString(FileLines^.At(I))));
       CopyLines2Stream(PC, ClipBoardStream);
@@ -320,7 +320,7 @@ procedure MISaveFile(AED: PFileEditor);
 {-DataCompBoy-}
 {$IFDEF DNUTF8}
 { UTF-8 inside: is the file UTF-8 (then the editor works with it by the table of the document) or bytes of a code page (then by the code page) }
-procedure ScanDocU8(AED: PFileEditor);
+procedure ScanDocU8(AED: TFileEditor);
   var
     I: LongInt;
     P: PLongString;
@@ -351,13 +351,13 @@ procedure ScanDocU8(AED: PFileEditor);
   end;
 {$ENDIF}
 
-procedure MILoadFile(AED: PFileEditor; Name: String);
+procedure MILoadFile(AED: TFileEditor; Name: String);
   label
     1;
   var
     Nm: String;
     Xt: String;
-    PC: PCollection; {-$VOL}
+    PC: TCollection; {-$VOL}
     
   begin
   with AED^ do
@@ -381,7 +381,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
     if Name = '' then
       begin
       {FileLines := GetCollector(1000, 100);}
-      FileLines := PLineCollection.Create(300, 1000, True);
+      FileLines := TLineCollection.Create(300, 1000, True);
       {-SBlocks}
       if ClipBrd then
         begin {-$VOL begin}
@@ -411,7 +411,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
       if FileLines = nil then
         begin
         {FileLines := GetCollector(1000, 100);}
-        FileLines := PLineCollection.Create(300, 1000, True);
+        FileLines := TLineCollection.Create(300, 1000, True);
         {-SBlocks}
         FileLines.Insert(NewLongStr(''));
         KeyMap := kmAscii;
@@ -441,7 +441,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
     if Name <> '' then
       Name := lFExpand(Name);
     EditName := Name;
-    DisposeStr(PWindow(Owner).Title);
+    DisposeStr(TWindow(Owner).Title);
     {Cat:warn а не бред ли это?}
     if '*^&'+EditName = TempFile then
       begin
@@ -450,18 +450,18 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
       end;
     if SmartPad then
       begin
-      PWindow(Owner).Title := NewStr('SmartPad(TM) - '+EditName);
+      TWindow(Owner).Title := NewStr('SmartPad(TM) - '+EditName);
       end
     else if ClipBrd then
       begin
-      PWindow(Owner).Title := NewStr('Clipboard');
+      TWindow(Owner).Title := NewStr('Clipboard');
       end
     else if EditName <> ''
     then
-      PWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
+      TWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
           (EditName))
     else
-      PWindow(Owner).Title := NewStr(GetString(dlEditTitle));
+      TWindow(Owner).Title := NewStr(GetString(dlEditTitle));
     MILockFile(AED);
     lFSplit(EditName, FreeStr, Nm, Xt);
     {PZ 2000.06.09}
@@ -479,17 +479,17 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-function MIReadBlock(AED: PFileEditor; var FileName: String;
+function MIReadBlock(AED: TFileEditor; var FileName: String;
     RetCollector: Boolean): Pointer;
   var
-    S: PDosStream;
+    S: TDosStream;
     B: ^ByteArray;
     I: LongInt;
     FFSize: LongInt; {!!s}
     J: LongInt; // длина прочитанного в буфер куска
     K: LongInt;
     LCount: LongInt;
-    Lines: PLineCollection {PCollector}; {-SBlocks}
+    Lines: TLineCollection {PCollector}; {-SBlocks}
     S1, ST, S2: LongString;
     L: LongInt;
     KeyMapDetecting: Boolean;
@@ -598,7 +598,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
     end { SearchLines };
 {/AK155}
   var
-    Info: PView;
+    Info: TView;
     ep: Boolean;
     tmr: TEventTimer;
   begin { MIReadBlock }
@@ -612,7 +612,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
     ODOA := 0;
     OD := 0;
     OA := 0;
-    S := PBufStream.Create(FileName, stOpenRead, 1024);
+    S := TBufStream.Create(FileName, stOpenRead, 1024);
     if  (S^.Status <> stOK) then
       begin
       K := S^.ErrorInfo;
@@ -641,7 +641,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
     Info := nil;
     I := 0;
     FFSize := i32(S^.GetSize);
-    Lines := New(PLineCollection, Init(1000 + (FFSize div 20), 1000, True));
+    Lines := New(TLineCollection, Init(1000 + (FFSize div 20), 1000, True));
     {-$VOL begin}
     if EditorDefaults.EdOpt and ebfTRp = 0
     then
@@ -723,7 +723,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
       {MIReadBlock := PStdCollector(Lines)^.Collection;}
       {PStdCollector(Lines)^.Collection := nil;}
       {Lines.Free; Lines:=nil;}
-      MIReadBlock := PLineCollection(Lines); {-SBlocks}
+      MIReadBlock := TLineCollection(Lines); {-SBlocks}
       Lines := nil; {-SBlocks}
       end;
     S.Free;
@@ -733,7 +733,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
   end { MIReadBlock };
 {-DataCompBoy-}
 
-procedure MILockFile(AED: PFileEditor);
+procedure MILockFile(AED: TFileEditor);
   begin
   with AED^ do
     begin
@@ -741,12 +741,12 @@ procedure MILockFile(AED: PFileEditor);
       Exit;
     if Locker <> nil then
       Locker.Free;
-    Locker := New(PDosStream, Init(EditName, (stOpenRead and fmDeny) or
+    Locker := New(TDosStream, Init(EditName, (stOpenRead and fmDeny) or
            fmDenyWrite));
     end
   end;
 
-procedure MIUnLockFile(AED: PFileEditor);
+procedure MIUnLockFile(AED: TFileEditor);
   begin
   with AED^ do
     begin
@@ -759,7 +759,7 @@ procedure MIUnLockFile(AED: PFileEditor);
     end
   end;
 
-procedure MIStore(AED: PFileEditor; var S: TStream);
+procedure MIStore(AED: TFileEditor; var S: TStream);
   begin
   with AED^ do
     begin
@@ -794,7 +794,7 @@ procedure MIStore(AED: PFileEditor; var S: TStream);
     end
   end { MIStore };
 
-procedure MILoad(AED: PFileEditor; var S: TStream);
+procedure MILoad(AED: TFileEditor; var S: TStream);
   var
     SS: PString;
   begin
@@ -842,14 +842,14 @@ procedure MILoad(AED: PFileEditor; var S: TStream);
     S.Read(BlockVisible, SizeOf(BlockVisible)); {Cat}
     S.Read(EdOpt.ForcedCRLF, SizeOf(EdOpt.ForcedCRLF)); {Cat}
     isValid := True;
-    Macros := PCollection.Create(10, 10);
+    Macros := TCollection.Create(10, 10);
     LastDir := -1;
     MenuItemStr[True] := NewStr(GetString(dlMenuItemOn));
     MenuItemStr[False] := NewStr(GetString(dlMenuItemOff));
     end
   end { MILoad };
 
-procedure MIAwaken(AED: PFileEditor);
+procedure MIAwaken(AED: TFileEditor);
   var
     X, Y: LongInt;
     XD: TPoint;

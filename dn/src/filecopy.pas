@@ -59,7 +59,7 @@ type
     {2` Используется для D&D в InfoPtr информации к событию `}
   TCopyRec = record
     FC: PFilesCollection;
-    Owner: PView;  // панель, из которой тащили
+    Owner: TView;  // панель, из которой тащили
     Where: TPoint; // где бросили (глобальные координаты)
     end;
     {`}
@@ -69,7 +69,7 @@ const
   CopyDirName: String = ''; {DataCompBoy}
   RevertBar: Boolean = False; {DataCompBoy}
 
-procedure CopyFiles(Files: PCollection; SourcePanel: PView;
+procedure CopyFiles(Files: TCollection; SourcePanel: TView;
      MoveMode: Boolean; FromTemp: Byte);
 function SelectDialog(Select: Boolean; var ST: String;
      var XORSelect: Boolean): Boolean;
@@ -79,8 +79,8 @@ function CopyDialog(var CopyDir: String; var Mask: String;
     {DataCompBoy}
     var CopyOpt: Word; var CopyMode: Word;
     var CopyPrn: Boolean; {var Inheread: Byte;}
-    MoveMode: Boolean; Files: PCollection;
-    FromTemp: Byte; SourcePanel: PView; Link: Boolean): Boolean;
+    MoveMode: Boolean; Files: TCollection;
+    FromTemp: Byte; SourcePanel: TView; Link: Boolean): Boolean;
   { Если диалог завершился удачно и not CopyPrn, то CopyDir
    заведомо не пуста, притом в конце обязательно есть '\'.}
 
@@ -108,7 +108,7 @@ uses
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
   , fileerrors
-  , panelroot {JO: PFilePanelRoot нужен чтобы делать недоступным }
+  , panelroot {JO: TFilePanelRoot нужен чтобы делать недоступным }
   {    копирование описаний }
   
 
@@ -259,14 +259,14 @@ procedure BeepAftercopy;
   SysBeepEx {PlaySound}(1259, 110);
   end;
 
-procedure PrepareSelectDialog(P: PDialog);
+procedure PrepareSelectDialog(P: TDialog);
   var
     S: String;
   begin
   with P^ do
     begin
     if DirectLink[1] <> nil then
-      PInputline(DirectLink[1])^.SetValidator(New(PFilterValidator,
+      TInputline(DirectLink[1]).SetValidator(New(PFilterValidator,
           Init([#32..#255] - ['|', '>', '<'])));
     end;
   end;
@@ -457,14 +457,14 @@ procedure InitMemBuf;
 {AK155}
 function AppendQuery(const S: String): Word;
   var
-    D: PDialog;
-    P: PStaticText;
+    D: TDialog;
+    P: TStaticText;
     R: TRect;
   begin
-  D := PDialog(LoadResource(dlgAppendQuery));
+  D := TDialog(LoadResource(dlgAppendQuery));
   D^.Options := D^.Options or ofCentered;
   R.Assign(2, 4, D^.Size.X-2, 5);
-  P := PStaticText.Create(R, ^C+S);
+  P := TStaticText.Create(R, ^C+S);
   D.Insert(P);
   AppendQuery := Desktop.ExecView(D);
   end;
@@ -500,7 +500,7 @@ procedure TOverriteDialog.HandleEvent(var Event: TEvent);
   end;
 
 {-DataCompBoy-}
-procedure FilesCopy(Files: PCollection; SourcePanel: PView;
+procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     const CopyDir, Mask: String; CopyMode, CopyOptions: Word;
     CopyPrn, RR: Boolean);
 
@@ -511,12 +511,12 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     SkipAllBad: Boolean;
     ToRead, ToWrite: TSize;
     CopyStartTime, CopyElapsedTime: LongInt; {John_SW 30-06-2005}
-    CopyQueue, Dirs: PCollection;
+    CopyQueue, Dirs: TCollection;
     iQueue: Integer;
     CurOldName, CurNewName: String;
     CurDate: LongInt;
     CurAttr: Byte;
-    Info: PWhileView;
+    Info: TWhileView;
     R: TRect;
     Drv, InhR: Byte;
     ReD: set of Char;
@@ -625,8 +625,8 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     var
       AcceptAll: Word;
       I: Word;
-      D: PDialog;
-      P: PView;
+      D: TDialog;
+      P: TView;
       R: TRect;
       S: String;
       D1, D2,
@@ -650,7 +650,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
       L1 := PredSpace(L1, Length(L2))
     else
       L2 := PredSpace(L2, Length(L1));
-    D := PDialog(LoadResource(dlgOverwriteQuery));
+    D := TDialog(LoadResource(dlgOverwriteQuery));
     D.GetExtent(R);
     R.Grow(-1, -1);
     Inc(R.A.Y);
@@ -670,7 +670,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     for I := 1 to Length(S) do
       if S[I] = ^M then
         Inc(R.B.Y);
-    P := New(PStaticText, Init(R, ^C+GetString(dlFile)+' '+Cut(NName,
+    P := New(TStaticText, Init(R, ^C+GetString(dlFile)+' '+Cut(NName,
            40)+S));
     D.Insert(P);
 
@@ -1439,7 +1439,7 @@ lbStartWrite:
       PS: array[1..2] of Pointer;
       DEr: Boolean;
       Drive: Byte;
-      D: PDialog; {John_SW}{process locked files}
+      D: TDialog; {John_SW}{process locked files}
       R: TRect;   {John_SW}
       S: String;  {John_SW}
 
@@ -1651,11 +1651,11 @@ lbStartWrite:
       ForceDispatch;
 {--- start -------- Eugeny Zvyagintzev and Max Piwamoto 04-02-2005 ----}
       If SkipAllBad Then Exit;
-      D := PDialog(LoadResource(dlgSkipBadFile));
+      D := TDialog(LoadResource(dlgSkipBadFile));
       D^.Options := D^.Options or ofCentered;
       S:=Cut(FName,52);
       R.A.X:=1; R.A.Y:=3; R.B.X:=53; R.B.Y:=4;
-      D.Insert(PStaticText.Create(R,^C+S));
+      D.Insert(TStaticText.Create(R,^C+S));
       Case Desktop.ExecView(D) Of
        cmOK: Goto 1;
        cmYes: begin SkipAllBad := True; Exit; end;
@@ -2324,7 +2324,7 @@ TryGetInfo:
 
   procedure __Remove;
     var
-      RRC: PStringCollection;
+      RRC: TStringCollection;
 
     procedure DoRemove(P_: Pointer);
     var P: PFileRec absolute P_;
@@ -2360,7 +2360,7 @@ TryGetInfo:
       end;
 
     begin { __Remove }
-    RRC := PStringCollection.Create($10, $8, False);
+    RRC := TStringCollection.Create($10, $8, False);
     Files.ForEach(DoRemove);
     RRC.ForEach(DoReread);
     RRC.Free;
@@ -2528,7 +2528,7 @@ qqqq:
 результатов того, что произошло после последнего тика таймера.
 }
     SourcePanel.DrawView;
-    PFilePanelRoot(SourcePanel)^.InfoView.DrawView;
+    TFilePanelRoot(SourcePanel).InfoView.DrawView;
     end;
   
   if Flush then
@@ -2549,11 +2549,11 @@ var
   DialogMoveMode: Boolean;
 
   {-DataCompBoy-}
-function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; var CopyMode: Word; var CopyPrn: Boolean; MoveMode: Boolean; Files: PCollection; FromTemp: Byte; SourcePanel: PView; Link: Boolean): Boolean;
+function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; var CopyMode: Word; var CopyPrn: Boolean; MoveMode: Boolean; Files: TCollection; FromTemp: Byte; SourcePanel: TView; Link: Boolean): Boolean;
   var
     PF: PFileRec;
-    D: PDialog;
-    P, P1, P2: PView; {JO: P2 - чекбоксы}
+    D: TDialog;
+    P, P1, P2: TView; {JO: P2 - чекбоксы}
     R: TRect;
     S, S1, S4: String;
     DT: record
@@ -2585,7 +2585,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
         Inc(Fl)
     end;
 
-  procedure PrepareDialog(P: PDialog);
+  procedure PrepareDialog(P: TDialog);
     var
       R: TRect;
     begin
@@ -2597,16 +2597,16 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
         Title := NewStr(GetString(dlFCMove));
         end;
       R.Assign(2, 1, Size.X-3, 2);
-      Insert(PLabel.Create(R, DialogLabel, DirectLink[1]));
+      Insert(TLabel.Create(R, DialogLabel, DirectLink[1]));
       {JO}
       if  (FMSetup.Options and fmoAlwaysCopyDesc = 0) and
           (SourcePanel <> nil) and
-          (PFilePanelRoot(SourcePanel)^.Drive <> nil) and
-          (PFilePanelRoot(SourcePanel)^.Drive^.DriveType = dtDisk) and
-          (PFilePanelRoot(SourcePanel)^.
+          (TFilePanelRoot(SourcePanel).Drive <> nil) and
+          (TFilePanelRoot(SourcePanel).Drive^.DriveType = dtDisk) and
+          (TFilePanelRoot(SourcePanel).
             PanSetup.Show.ColumnsMask and psShowDescript = 0)
       then
-        PCheckBoxes(DirectLink[2])^.SetButtonState(cpoDesc, False);
+        TCheckBoxes(DirectLink[2]).SetButtonState(cpoDesc, False);
       {/JO}
       end;
     end;
@@ -2776,9 +2776,9 @@ AK155. При этом то восстанавливалось зацикливание, то становилось
 
   if  (FMSetup.Options and fmoAlwaysCopyDesc = 0) and
       (SourcePanel <> nil) and
-      (PFilePanelRoot(SourcePanel)^.Drive <> nil) and
-      (PFilePanelRoot(SourcePanel)^.Drive^.DriveType = dtDisk) and
-      (PFilePanelRoot(SourcePanel)^.
+      (TFilePanelRoot(SourcePanel).Drive <> nil) and
+      (TFilePanelRoot(SourcePanel).Drive^.DriveType = dtDisk) and
+      (TFilePanelRoot(SourcePanel).
         PanSetup.Show.ColumnsMask and psShowDescript = 0)
   then
     CopyOpt := CopyOpt and not cpoDesc; {JO}
@@ -2895,7 +2895,7 @@ AK155. При этом то восстанавливалось зацикливание, то становилось
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure CopyFiles(Files: PCollection; SourcePanel: PView; MoveMode: Boolean; FromTemp: Byte);
+procedure CopyFiles(Files: TCollection; SourcePanel: TView; MoveMode: Boolean; FromTemp: Byte);
 
   var
     CopyDir: String;

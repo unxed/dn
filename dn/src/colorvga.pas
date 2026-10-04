@@ -84,9 +84,9 @@ type
   TColorVGADialog = class(TDialog)
     ThisProcedureExecuteFirstTime: Boolean;
     TL: array[1..3] of PRegLabel;
-    TS: array[1..3] of PScrollBar;
+    TS: array[1..3] of TScrollBar;
     TV: PColorView;
-    TT: PListBox;
+    TT: TListBox;
     Color: PRegLabel;
 
     constructor Create;
@@ -181,7 +181,7 @@ procedure TRegLabel.Draw;
 constructor TColorVGADialog.Create;
   var
     R: TRect;
-    Control, Labl, Histry: PView;
+    Control, Labl, Histry: TView;
     i: Integer;
     S: String;
   begin
@@ -190,16 +190,16 @@ constructor TColorVGADialog.Create;
   inherited Create(R, GetString(dlColors_VGA));
   Options := Options or ofCentered;
   R.Assign(21, 2, 22, 18);
-  Control := PScrollBar.Create(R);
+  Control := TScrollBar.Create(R);
   Insert(Control);
 
   R.Assign(3, 2, 21, 18);
-  TT := New(PListBox, Init(R, 1, PScrollBar(Control)));
+  TT := New(TListBox, Init(R, 1, TScrollBar(Control)));
   {   TT^.HelpCtx := hcHelp;}
   Insert(TT);
 
   R.Assign(2, 1, 17, 2);
-  Labl := New(PLabel, Init(R, GetString(dlColors_P_alette), TT));
+  Labl := New(TLabel, Init(R, GetString(dlColors_P_alette), TT));
   Insert(Labl);
 
   R.Assign(25, 12, 47, 18);
@@ -216,7 +216,7 @@ constructor TColorVGADialog.Create;
   then
     begin
     R.Assign(25, 3, 47, 4);
-    TS[1] := PScrollBar.Create(R);
+    TS[1] := TScrollBar.Create(R);
     Insert(TS[1]);
 
     R.Assign(24, 2, 45, 3);
@@ -224,7 +224,7 @@ constructor TColorVGADialog.Create;
     Insert(TL[1]);
 
     R.Assign(25, 6, 47, 7);
-    TS[2] := PScrollBar.Create(R);
+    TS[2] := TScrollBar.Create(R);
     Insert(TS[2]);
 
     R.Assign(24, 5, 45, 6);
@@ -232,7 +232,7 @@ constructor TColorVGADialog.Create;
     Insert(TL[2]);
 
     R.Assign(25, 9, 47, 10);
-    TS[3] := PScrollBar.Create(R);
+    TS[3] := TScrollBar.Create(R);
     Insert(TS[3]);
 
     R.Assign(24, 8, 45, 9);
@@ -242,7 +242,7 @@ constructor TColorVGADialog.Create;
   else
     begin
     R.Assign(25, 6, 47, 7);
-    TS[1] := PScrollBar.Create(R);
+    TS[1] := TScrollBar.Create(R);
     Insert(TS[1]);
 
     R.Assign(24, 5, 45, 6);
@@ -252,22 +252,22 @@ constructor TColorVGADialog.Create;
 
   S := GetString(dlColors_D_efault);
   R.Assign(2, 19, 4+Length(S), 21);
-  Control := PButton.Create(R, S, cmYes, bfBroadcast+bfNormal);
+  Control := TButton.Create(R, S, cmYes, bfBroadcast+bfNormal);
   Insert(Control);
 
   R.Assign(18, 19, 28, 21);
-  Control := New(PButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
+  Control := New(TButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
   Control^.HelpCtx := cmOK;
   Insert(Control);
 
   R.Assign(28, 19, 38, 21);
-  Control := New(PButton, Init(R, GetString(dlCancelButton), cmCancel,
+  Control := New(TButton, Init(R, GetString(dlCancelButton), cmCancel,
          bfNormal));
   Control^.HelpCtx := cmCancel;
   Insert(Control);
 
   R.Assign(38, 19, 48, 21);
-  Control := New(PButton, Init(R, GetString(dlHelpButton), cmHelp,
+  Control := New(TButton, Init(R, GetString(dlHelpButton), cmHelp,
          bfNormal));
   Insert(Control);
 
@@ -290,7 +290,7 @@ procedure TColorVGADialog.HandleEvent(var Event: TEvent);
   function UpdateRGB: Boolean;
     var
       I: Byte;
-      L: PScrollBar;
+      L: TScrollBar;
 
     begin
 
@@ -408,7 +408,7 @@ procedure VGAColorRegister;
 
   var
     DataRec: record
-      List: PStringCollection;
+      List: TStringCollection;
       Selection: Word;
       end;
 

@@ -80,7 +80,7 @@ var
 const
   NBf: Byte = 0;
 
-function IsLabel(P: PView): Boolean;
+function IsLabel(P: TView): Boolean;
   begin
   IsLabel := P is TLabel;
   end;
@@ -147,7 +147,7 @@ procedure LongCopy(Fn1: String);
     PathBuffer: array[0..255] of Char; {целевой каталог}
     nhd: NHdr;
     ohd: OHdr absolute nhd;
-    PInfo: PWhileView;
+    PInfo: TWhileView;
     CopyCancelled: Boolean;
     BinarySplit: Boolean;
     NewMode: Boolean;
@@ -418,12 +418,12 @@ Rep:
 
   procedure RequirePath;
     var
-      D: PDialog;
-      V: PLabel;
+      D: TDialog;
+      V: TLabel;
       S, K, L: String;
     begin
-    D := PDialog(LoadResource(dlgNextSection));
-    V := PLabel(D.FirstThat(IsLabel));
+    D := TDialog(LoadResource(dlgNextSection));
+    V := TLabel(D.FirstThat(IsLabel));
     S := V.Text^;
     DisposeStr(V.Text);
     Replace('%D', ItoS(Count), S);
@@ -484,8 +484,8 @@ Rep:
 
   function CopyDialog: Boolean;
     var
-      D: PDialog;
-      P: PView;
+      D: TDialog;
+      P: TView;
       R: TRect;
       S, Mask: String;
       SR: lSearchRec;
@@ -506,9 +506,9 @@ Rep:
     CopyDialog := False;
     if Tuda
     then
-      D := PDialog(LoadResource(dlgCombineFile))
+      D := TDialog(LoadResource(dlgCombineFile))
     else
-      D := PDialog(LoadResource(dlgSplitFile));
+      D := TDialog(LoadResource(dlgSplitFile));
 
     // Строка 1 в диалоге должна быть пустой - туда вставляется имя файла
     R.Assign(0, 1, Length(aa)+Length(aaa), 2);
@@ -727,7 +727,7 @@ _Abort_:
     goto _Abort_;
 
   R.Assign(1, 1, 36, 13);
-  PInfo := PWhileView.Create(R);
+  PInfo := TWhileView.Create(R);
   if PInfo = nil then
     goto _Abort_;
   if Tuda then

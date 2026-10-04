@@ -60,9 +60,9 @@ type
   PEditMacros = TEditMacros;
   TEditMacros = class(TObject)
     Name: PString;
-    Commands: PCollection;
-    constructor Create(S: String; var F: PTextReader);
-    procedure Play(Editor: PView);
+    Commands: TCollection;
+    constructor Create(S: String; var F: TTextReader);
+    procedure Play(Editor: TView);
     destructor Destroy; override;
     end;
 
@@ -72,13 +72,13 @@ type
     Command: Integer;
     Repetitions: Integer;
     constructor Create(ACommand, ARepetitions: Word);
-    procedure ExecCommand(Editor: PView); virtual;
+    procedure ExecCommand(Editor: TView); virtual;
     end;
 
   TMacroGoto = class;
   PMacroGoto = TMacroGoto;
   TMacroGoto = class(TMacroCommand)
-    procedure ExecCommand(Editor: PView); virtual;
+    procedure ExecCommand(Editor: TView); virtual;
     end;
 
   TMacroMark = class;
@@ -86,7 +86,7 @@ type
   TMacroMark = class(TMacroCommand)
     Mark: Boolean;
     constructor Create(AN: Integer; AMark: Boolean);
-    procedure ExecCommand(Editor: PView); virtual;
+    procedure ExecCommand(Editor: TView); virtual;
     end;
 
   TMacroString = class;
@@ -94,7 +94,7 @@ type
   TMacroString = class(TMacroCommand)
     S: PString;
     constructor Create(const AString: String; ARepetitions: Word);
-    procedure ExecCommand(Editor: PView); virtual;
+    procedure ExecCommand(Editor: TView); virtual;
     destructor Destroy; override;
     end;
 
@@ -108,7 +108,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
 function InitHighLight
     (const FName: String;
     var HiLitePar: THighliteParams;
-    Macros: PCollection;
+    Macros: TCollection;
     EdOptions: PEditOptions): Boolean;
 
 implementation
@@ -210,7 +210,7 @@ constructor TLngWord.Create(AL: Word; const AName: String);
   l := AL;
   end;
 
-constructor TEditMacros.Create(S: String; var F: PTextReader);
+constructor TEditMacros.Create(S: String; var F: TTextReader);
   var
     I, J: LongInt;
     IDs: PIDCollection;
@@ -373,7 +373,7 @@ constructor TEditMacros.Create(S: String; var F: PTextReader);
 
   begin { TEditMacros.Init }
   inherited Create;
-  Commands := PCollection.Create(10, 10);
+  Commands := TCollection.Create(10, 10);
   IDs := PIDCollection.Create(100, 10);
   MakeIDs;
   while (S <> '') and (S[1] = ' ') do
@@ -415,7 +415,7 @@ constructor TEditMacros.Create(S: String; var F: PTextReader);
   IDs := nil;
   end { TEditMacros.Init };
 
-procedure TEditMacros.Play(Editor: PView);
+procedure TEditMacros.Play(Editor: TView);
   procedure DoPlay(P_: Pointer);
   var P: PMacroCommand absolute P_;
     begin
@@ -439,7 +439,7 @@ constructor TMacroCommand.Create(ACommand, ARepetitions: Word);
   Repetitions := ARepetitions;
   end;
 
-procedure TMacroCommand.ExecCommand(Editor: PView);
+procedure TMacroCommand.ExecCommand(Editor: TView);
   var
     I: Integer;
   begin
@@ -447,15 +447,15 @@ procedure TMacroCommand.ExecCommand(Editor: PView);
     Message(Editor.Owner, evCommand, Command, nil);
   end;
 
-procedure TMacroGoto.ExecCommand(Editor: PView);
+procedure TMacroGoto.ExecCommand(Editor: TView);
   begin
   if  (Command < 0) then
-    PFileEditor(Editor).ScrollTo(PFileEditor(Editor).Delta.X,
+    TFileEditor(Editor).ScrollTo(TFileEditor(Editor).Delta.X,
        Repetitions)
   else if (Repetitions < 0) then
-    PFileEditor(Editor).ScrollTo(Command, PFileEditor(Editor).Delta.Y)
+    TFileEditor(Editor).ScrollTo(Command, TFileEditor(Editor).Delta.Y)
   else
-    PFileEditor(Editor).ScrollTo(Command, Repetitions);
+    TFileEditor(Editor).ScrollTo(Command, Repetitions);
   end;
 
 constructor TMacroMark.Create(AN: Integer; AMark: Boolean);
@@ -465,13 +465,13 @@ constructor TMacroMark.Create(AN: Integer; AMark: Boolean);
   Mark := AMark;
   end;
 
-procedure TMacroMark.ExecCommand(Editor: PView);
+procedure TMacroMark.ExecCommand(Editor: TView);
   begin
   if Mark then
-    with PFileEditor(Editor) do
+    with TFileEditor(Editor) do
       MarkPos[Command] := Delta
   else
-    with PFileEditor(Editor) do
+    with TFileEditor(Editor) do
       ScrollTo(MarkPos[Command].X, MarkPos[Command].Y);
   end;
 
@@ -482,7 +482,7 @@ constructor TMacroString.Create(const AString: String; ARepetitions: Word);
   Repetitions := ARepetitions;
   end;
 
-procedure TMacroString.ExecCommand(Editor: PView);
+procedure TMacroString.ExecCommand(Editor: TView);
   var
     I, J: Integer;
   begin
@@ -519,9 +519,9 @@ type
   TVarList = class;
   PVarList = TVarList;
   TVarList = class(TListBox)
-    Line: PLongInputLine;
+    Line: TLongInputLine;
     PrevFocused: Integer;
-    SText: PView;
+    SText: TView;
     procedure FocusItem(Item: LongInt); override;
     function GetText(Item: LongInt; MaxLen: Integer): String; override;
     procedure HandleEvent(var Event: TEvent); override;
@@ -680,44 +680,44 @@ procedure TVarList.HandleEvent(var Event: TEvent);
 
 procedure EditDOSEnvironment(Env: PByteArray);
   var
-    D: PDialog;
-    P: PView;
+    D: TDialog;
+    P: TView;
     R: TRect;
-    PC: PCollection;
+    PC: TCollection;
     I: LongInt;
 
   procedure MakeDialog;
     var
       R: TRect;
-      Control, Labl, Histry: PView;
+      Control, Labl, Histry: TView;
       PL: PVarList;
-      PI: PLongInputLine;
-    function IsLongInputLine(P: PView): Boolean;
+      PI: TLongInputLine;
+    function IsLongInputLine(P: TView): Boolean;
       begin
       IsLongInputLine := P.ClassType = TLongInputLine
       end;
-    function IsButton(P: PView): Boolean;
+    function IsButton(P: TView): Boolean;
       begin
       IsButton := P.ClassType = TButton
       end;
     begin
-    D := PDialog(LoadResource(dlgEditEnvironment));
+    D := TDialog(LoadResource(dlgEditEnvironment));
     Control := D.FirstThat(IsButton);
 
     R.A.X := Control.Origin.X-1;
     R.B.X := R.A.X+1;
     R.A.Y := 3;
     R.B.Y := 14;
-    Control := PScrollBar.Create(R);
+    Control := TScrollBar.Create(R);
     D.Insert(Control);
 
     R.B.X := R.A.X;
     R.A.X := 3;
 
-    PL := PVarList.Create(R, 1, PScrollBar(Control));
+    PL := PVarList.Create(R, 1, TScrollBar(Control));
     D.Insert(PL);
 
-    PI := PLongInputLine(D.FirstThat(IsLongInputLine));
+    PI := TLongInputLine(D.FirstThat(IsLongInputLine));
     if PI = nil then
       begin
       D.Free;
@@ -726,7 +726,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
       end;
 
     R.Assign(2, 2, 43, 3);
-    Labl := PLabel.Create(R, GetString(dlEnvVarLabel), PL);
+    Labl := TLabel.Create(R, GetString(dlEnvVarLabel), PL);
     D.Insert(Labl);
 
     PL.Options := PL.Options or ofPostProcess;
@@ -761,7 +761,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
   var
     n1, n2: Longint;
   begin { EditDOSEnvironment }
-  PC := PCollection.Create(10, 10);
+  PC := TCollection.Create(10, 10);
 
   I := 0;
   while Env^[I] <> 0 do
@@ -833,10 +833,10 @@ procedure EditDOSEnvironment(Env: PByteArray);
 function InitHighLight
     (const FName: String;
     var HiLitePar: THighliteParams;
-    Macros: PCollection;
+    Macros: TCollection;
     EdOptions: PEditOptions): Boolean;
   var
-    F: PTextReader;
+    F: TTextReader;
     I: Integer;
     CaseStr: String; {PZ - 2000.04.11}
 
@@ -997,7 +997,7 @@ function InitHighLight
     Macros.FreeAll;
   InitHighLight := False; {PZ 2000.06.09 Default is No Highlight }
   FillChar(HiLitePar, SizeOf(HiLitePar), 0);
-  F := PTextReader.Create(SourceDir+'dn.hgl');
+  F := TTextReader.Create(SourceDir+'dn.hgl');
   if F = nil then
     Exit;
   while not F.Eof do

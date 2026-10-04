@@ -175,7 +175,7 @@ function GetDizPath(const Path: String; PreferedName: String): String;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure ReplaceT(P: PTextReader; var F: lText; Del: Boolean);
+procedure ReplaceT(P: TTextReader; var F: lText; Del: Boolean);
   var
     I: Integer;
     FName: String;

@@ -88,7 +88,7 @@ procedure PostQuitMessage;
   w95locked := True;
   Event.What := evCommand;
   Event.Command := cmQuit;
-  PDNApplication(Application)^.HandleCommand(Event);
+  TDNApplication(Application).HandleCommand(Event);
   if w95locked then
     MyApplication.HandleEvent(Event);
   end;
@@ -332,7 +332,7 @@ procedure MyApp.HandleEvent(var Event: TEvent);
   var
     s: Word;
 
-  procedure UpView(P: PView);
+  procedure UpView(P: TView);
     begin
     P.MakeFirst;
     Clock.MakeFirst;

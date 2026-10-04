@@ -68,17 +68,17 @@ function MakeString(S: String; UserParams: PUserParams;
 
 type
   TUserView = class;
-  PUserView = TUserView;
+
   TUserView = class(TScroller)
     Grabbing: Boolean;
-    constructor Create(const R: TRect; H, V: PScrollBar);
+    constructor Create(const R: TRect; H, V: TScrollBar);
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure ChangeBounds(const Bounds: TRect); override;
     end;
 
   TUserWindow = class;
-  PUserWindow = TUserWindow;
+
   TUserWindow = class(TWindow)
     OldScreenWidth: Word;
     constructor Create;
@@ -122,7 +122,7 @@ constructor TUserWindow.Create;
   OldScreenWidth := ScreenWidth;
   GetExtent(R);
   R.Grow(-1, -1);
-  Insert(New(PUserView, Init(R,
+  Insert(New(TUserView, Init(R,
            StandardScrollBar(sbHorizontal+sbHandleKeyboard),
         StandardScrollBar(sbVertical+sbHandleKeyboard))));
   ClearPositionalEvents := False;
@@ -157,7 +157,7 @@ procedure TUserWindow.SetState(AState: Word; Enable: Boolean);
     end;
   end;
 
-constructor TUserView.Create(const R: TRect; H, V: PScrollBar);
+constructor TUserView.Create(const R: TRect; H, V: TScrollBar);
   begin
   inherited Create(R, H, V);
   SetLimit(ScreenWidth, ScreenHeight);
@@ -217,7 +217,7 @@ procedure TUserView.HandleEvent(var Event: TEvent);
           if Owner.GetState(sfSelected) then
             Message(Owner, evCommand, cmClose, nil)
           else
-            PView(Event.InfoPtr^) := Owner;
+            TView(Event.InfoPtr^) := Owner;
           ClearEvent(Event);
           end;
       end {case};
@@ -634,7 +634,7 @@ function MakeString(S: String; UserParams: PUserParams;
 
 function ExecUserMenu(DoGlobal: Boolean): Boolean;
   var
-    F: PTextReader;
+    F: TTextReader;
     F1: lText; {DataCompBoy}
     P: PUserCollection;
     S, S1: String;
@@ -643,7 +643,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
     StartPos: Integer;
     Items, OItems, SItems: PMenuItem;
     Menu: PMenu;
-    PV: PView;
+    PV: TView;
     R: TRect;
     NI, NW: Word;
     EnterParms: Boolean;
@@ -741,7 +741,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   if DoGlobal then
     goto 2;
 
-  F := PTextReader.Create(SwpDir+'$dn'+ItoS(DNNumber)+'$.mnu');
+  F := TTextReader.Create(SwpDir+'$dn'+ItoS(DNNumber)+'$.mnu');
   if F <> nil then
     goto 1;
 
@@ -754,7 +754,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   if I = 0 then
     goto 2;
   repeat
-    F := PTextReader.Create(S);
+    F := TTextReader.Create(S);
     if F <> nil then
       goto 1;
 
@@ -768,7 +768,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   until I < 3;
 2:
   DoGlobal := True;
-  F := PTextReader.Create(SourceDir+'dn.mnu');
+  F := TTextReader.Create(SourceDir+'dn.mnu');
   if F = nil then
     begin
     ErrMsg(dlMNUNotFound);
@@ -833,7 +833,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       R.A.X := 0;
       R.B.X := NW;
       R.B.Y := Min(R.B.Y, NI);
-      PV := PMenuBox.Create(R, Menu, nil);
+      PV := TMenuBox.Create(R, Menu, nil);
       PV^.Options := PV^.Options or ofCentered;
       I := Application.ExecView(PV);
       PV.Free;
@@ -864,7 +864,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
         I := I-1000;
         NW := I;
         UI := P^.At(I);
-        F := PTextReader.Create(S);
+        F := TTextReader.Create(S);
         lAssignText(F1, SwpDir+'$DN'+ItoS(DNNumber)+'$'+CmdExt);
         lRewriteText(F1);
         
@@ -936,7 +936,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
 
 type
   TGrabber = class;
-  PGrabber = TGrabber;
+
   TGrabber = class(TView)
     ModalEnd: Boolean;
     Screen: PAWordArray;
@@ -957,7 +957,7 @@ const
 
 procedure ScreenGrabber(ShowMessage: Boolean);
   var
-    P: PGrabber;
+    P: TGrabber;
     B: Boolean;
   begin
   if Here then
@@ -971,7 +971,7 @@ procedure ScreenGrabber(ShowMessage: Boolean);
     end;
   B := MsgActive;
   MsgActive := False;
-  P := PGrabber.Create;
+  P := TGrabber.Create;
   Application.ExecView(P);
   P.Free;
   Here := False;
@@ -1086,7 +1086,7 @@ procedure TGrabber.HandleEvent(var Event: TEvent);
     begin
     if ClipBoard <> nil then
       ClipBoard.Free;
-    ClipBoard := PLineCollection.Create(R.B.Y-R.A.Y, 10, True);
+    ClipBoard := TLineCollection.Create(R.B.Y-R.A.Y, 10, True);
     for I := R.A.Y to R.B.Y-1 do
       begin
       S := '';
@@ -1209,7 +1209,7 @@ function QuickExecExternal(N: Integer): Boolean;
   var
     UserParams: tUserParams;
     TitleStr, DefStr, S: String;
-    F: PTextReader;
+    F: TTextReader;
     F1: lText;
     I: Integer;
     OS2: Char;
@@ -1220,13 +1220,13 @@ function QuickExecExternal(N: Integer): Boolean;
   QuickExecExternal := False;
 
   Local := True;
-  F := PTextReader.Create('dn.xrn');
+  F := TTextReader.Create('dn.xrn');
 
   if F = nil then
     begin
 RL:
     Local := False;
-    F := PTextReader.Create(SourceDir+'dn.xrn');
+    F := TTextReader.Create(SourceDir+'dn.xrn');
     end;
   if F = nil then
     Exit;

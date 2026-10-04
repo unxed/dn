@@ -17,7 +17,7 @@ const
 
 type
   { the table: the characters 0..255 in 8 rows of 32; the cursor is the current character (Data = its code) }
-  PTable = ^TTable;
+
   TTable = class(TView)
     procedure Draw; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -27,7 +27,7 @@ type
   end;
 
   { the line with the character, its decimal and hexadecimal code }
-  PReport = ^TReport;
+
   TReport = class(TView)
     ASCIIChar: LongInt;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -36,7 +36,7 @@ type
     constructor Load(var S: TStream);
   end;
 
-  PASCIIChart = ^TASCIIChart;
+
   TASCIIChart = class(TWindow)
     destructor Done; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -224,7 +224,7 @@ end;
 
 constructor TASCIIChart.Create(var R: TRect);
 var
-  Control: PView;
+  Control: TView;
   T: TRect;
 begin
   R.Assign(0, 0, 34, 12);
@@ -238,12 +238,12 @@ begin
   GetExtent(R);
   R.Grow(-1, -1);
   T.Assign(R.A.X, R.B.Y - 1, R.B.X, R.B.Y);
-  Control := PReport.Create(T);
+  Control := TReport.Create(T);
   Control^.Options := Control^.Options or ofFramed;
   Control^.EventMask := evBroadcast or Control^.EventMask;
   Insert(Control);
   T.Assign(R.A.X, R.A.Y, R.B.X, R.B.Y - 2);
-  Control := PTable.Create(T);
+  Control := TTable.Create(T);
   Control^.Options := Control^.Options or ofSelectable or ofFramed;
   Control^.EventMask := $FFFF;
   Control^.BlockCursor;
@@ -289,11 +289,11 @@ end;
 
 procedure ASCIITable;
 var
-  P: PWindow;
+  P: TWindow;
   W: Word;
   E: TEvent;
   R: TRect;
-  CR: PView;
+  CR: TView;
 
   function GetCH: Boolean;
   begin
@@ -308,7 +308,7 @@ var
   end;
 
 begin
-  P := PASCIIChart.Create(R);
+  P := TASCIIChart.Create(R);
   P^.MoveTo(boundsASCII.X, boundsASCII.Y);
   P.SetData(CharASCII);
   CR := Desktop.Current;

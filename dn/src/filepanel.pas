@@ -58,7 +58,7 @@ uses
 
 type
   TFilePanel = class;
-  PFilePanel = TFilePanel;
+
   TFilePanel = class(TFilePanelRoot)
     procedure Draw; virtual;
     procedure SetState(AState: Word; Enable: Boolean); virtual;
@@ -84,7 +84,7 @@ type
       Результат True обозначает, что формирование строки закончено и
     последующие процедуры не вызываются. }
   TInfoView = class(TView)
-    Panel: PFilePanel;
+    Panel: TFilePanel;
     DnD: TPanelBottomDnD;
     LineMaker: array[0..MaxFooterHeight] of array[0..6] of TFooterProc;
       {` Для каждой строки подвала, начиная с разделителя,
@@ -117,12 +117,12 @@ type
   PDriveLine = TDriveLine;
   {`2 }
   TDriveLine = class(TView)
-    Panel: PFilePanel;
+    Panel: TFilePanel;
     DriveLine: String[29];
     ViewLine: String[60];
     CharDelta: AInt;
     LogDrvMap: LongInt; {Cat}
-    constructor Create(const R: TRect; APanel: PFilePanel);
+    constructor Create(const R: TRect; APanel: TFilePanel);
     procedure MakeDriveLine;
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -190,7 +190,7 @@ var
     в результате других сопоставлений с маской (например, при
     автообновлении панелей). `}
 
-constructor TDriveLine.Create(const R: TRect; APanel: PFilePanel);
+constructor TDriveLine.Create(const R: TRect; APanel: TFilePanel);
   begin
   inherited Create(R);
   Panel := APanel;
@@ -295,7 +295,7 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
   { AK155 29.01.06 }
   procedure BracketClick(T: TPanelNum);
     var
-      TargetPanel: PView;
+      TargetPanel: TView;
       Manager: PDoubleWindow;
     const
       HideCommand: array[TPanelNum] of Word =
@@ -928,7 +928,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
   var
     P: TPoint;
     Y: Integer;
-    Mover: PView;
+    Mover: TView;
     S: String;
     FC: PFilesCollection;
     C: TCopyRec;
@@ -1359,7 +1359,7 @@ procedure PrepareLongName(IV: PInfoView; var S: String; var I: Integer);
   { Длинное имя в подвале или на разделителе. Результат - в S,
     Сдвиг для выравнивания - в I (-1 - центрировать) }
   var
-    D: PDrive;
+    D: TDrive;
     CutLen: Integer;
     Dif1Start, Dif2Start: Integer;
     ExtPos: Integer; { начало расширения в формируемой строке }
@@ -1399,7 +1399,7 @@ procedure PrepareLongName(IV: PInfoView; var S: String; var I: Integer);
     D := Panel^.Drive;
     S := PF^.FlName[True];
     S1 := UpStrg(S);
-    PFilePanelRoot(D^.Panel)^.FormatName(PF, Dummy, l);
+    TFilePanelRoot(D^.Panel).FormatName(PF, Dummy, l);
       { Повторяем форматирование для панели, чтобы было с чем сравнивать }
     UpStr(flnPanelName);
       { Сравнивать надо регистронезависимо }
@@ -1724,7 +1724,7 @@ function TInfoView.GetPalette: TPalette;
 function TDirView.GetText(MaxWidth: Integer): String;
   begin
   Result := 
-    (PFilePanelRoot(Panel)^.DirectoryName);
+    (TFilePanelRoot(Panel).DirectoryName);
   Result := Cut(Result, MaxWidth);
   end { TDirView.Draw };
 
@@ -1763,11 +1763,11 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
   var
     PF: PFileRec;
     CurPos: LongInt;
-    PPC: PCollection;
+    PPC: TCollection;
     MPos: TPoint;
     LastRDelay: Word;
     I, J: LongInt;
-    PDr: PDrive;
+    PDr: TDrive;
     KeyCode: LongInt; {Cat}
 
   procedure CE;

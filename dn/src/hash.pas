@@ -43,7 +43,7 @@ type
     function Equal(Item1, Item2: Pointer): Boolean; virtual;
       {` Совпадают ли ключи Item1^ и Item2^.
       Этот метод обязательно надо перекрыть. `}
-    constructor Create(BaseColl: PCollection);
+    constructor Create(BaseColl: TCollection);
       {` резервирование памяти под HT^ и очистка HT `}
     function GetHashIndex(Item: Pointer; var N: THashIndex): Boolean;
       {` Поиск элемента в хеш-таблице.
@@ -61,7 +61,7 @@ implementation
 const
   EmptyIndex = $FFFFFFFF;
 
-constructor THash.Create(BaseColl: PCollection);
+constructor THash.Create(BaseColl: TCollection);
   var
     Size: Longint;
     MinCount: Integer;

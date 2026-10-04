@@ -245,7 +245,7 @@ procedure TCommandLine.GetDir;
         1: (l: LongInt; S: String[1]);
         2: (C: Char);
       end;
-    D: PDialog;
+    D: TDialog;
   begin
   Inc(SkyEnabled);
   repeat
@@ -258,7 +258,7 @@ procedure TCommandLine.GetDir;
         MM.l := 0;
         MM.C := GetCurDrive;
         MM.S := MM.C;
-        D := PDialog(LoadResource(dlgDiskError));
+        D := TDialog(LoadResource(dlgDiskError));
         if D <> nil then
           begin
           D.SetData(MM);

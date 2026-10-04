@@ -66,10 +66,10 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
     S, CurDir, ID: String;
     P: PArcFile;
     PC: PDirStorage;
-    F: PTextReader;
+    F: TTextReader;
     DT: DateTime;
     I, J: Integer;
-    Drv: PArcDrive;
+    Drv: TArcDrive;
   label 1, 2, 3;
   begin
   S := TempFile;
@@ -93,7 +93,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       lGetDir(0, CurDir); {GetDir(0, CurDir);}
       {Cat}
       GlobalMessage(evCommand, cmRereadDir, @CurDir);
-      F := PTextReader.Create(S);
+      F := TTextReader.Create(S);
       if F = nil then
         Exit;
       P := nil;
@@ -198,7 +198,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       end;
     if ID = 'AIN:' then
       begin
-      F := PTextReader.Create(S);
+      F := TTextReader.Create(S);
       if F = nil then
         Exit;
       P := nil;
@@ -261,7 +261,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       end;
     if ID = '7Z!:' then
       begin {piwamoto}
-        F := PTextReader.Create(S);
+        F := TTextReader.Create(S);
         if F = nil then Exit;
         P := nil;
         PC.Create;

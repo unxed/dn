@@ -56,14 +56,14 @@ uses
   , Defines
   ;
 
-procedure TdrSeekDirectory(AvtDr: PArvidDrive);
-procedure TdrGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
+procedure TdrSeekDirectory(AvtDr: TArvidDrive);
+procedure TdrGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
     var FC: PFilesCollection; const FileMask: String);
-procedure TdrEditDescription(AvtDr: PArvidDrive; var S, Nam: String;
+procedure TdrEditDescription(AvtDr: TArvidDrive; var S, Nam: String;
      var PF: PFileRec);
-procedure TdrCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt;
+procedure TdrCalcTotal(AvtDr: TArvidDrive; const Offset: LongInt;
      var LL: TSize);
-function TdrInit(AvtDr: PArvidDrive): Boolean;
+function TdrInit(AvtDr: TArvidDrive): Boolean;
 function TdrMakeFileName(S: String): String; {JO}
 
 implementation
@@ -89,7 +89,7 @@ function TdrMakeFileName(S: String): String;
   Result := S;
   end;
 
-procedure TdrSeekDirectory(AvtDr: PArvidDrive);
+procedure TdrSeekDirectory(AvtDr: TArvidDrive);
   var
     I, J: LongInt;
     Lv: Integer;
@@ -144,7 +144,7 @@ procedure TdrSeekDirectory(AvtDr: PArvidDrive);
     end
   end { TdrSeekDirectory };
 
-procedure TdrGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
+procedure TdrGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
     var FC: PFilesCollection; const FileMask: String);
   var
     FF: TTdrFileCell;
@@ -244,7 +244,7 @@ procedure TdrGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
     end
   end { TdrGetDirectory };
 
-procedure TdrEditDescription(AvtDr: PArvidDrive; var S, Nam: String; var PF: PFileRec);
+procedure TdrEditDescription(AvtDr: TArvidDrive; var S, Nam: String; var PF: PFileRec);
   var
     FF: TTdrFileCell;
     I, J{!!s}: LongInt;
@@ -313,7 +313,7 @@ procedure TdrEditDescription(AvtDr: PArvidDrive; var S, Nam: String; var PF: PFi
     end
   end { TdrEditDescription };
 
-procedure TdrCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt; var LL: TSize);
+procedure TdrCalcTotal(AvtDr: TArvidDrive; const Offset: LongInt; var LL: TSize);
   var
     DD: TTdrDirCell;
     SPos: LongInt;{!!s}
@@ -348,7 +348,7 @@ procedure TdrCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt; var LL: TSize)
     end
   end { TdrCalcTotal };
 
-function TdrInit(AvtDr: PArvidDrive): Boolean;
+function TdrInit(AvtDr: TArvidDrive): Boolean;
   var
     J: Word;
   begin

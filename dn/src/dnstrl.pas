@@ -73,7 +73,7 @@ type
     Index: PStrIndex;
     IndexSize: AWord;
     BasePos: LongInt;
-    Stream: PStream;
+    Stream: TStream;
     procedure ReadStr(var S: String; Offset, Skip: AWord);
   public
     function Get(Key: AWord): String;

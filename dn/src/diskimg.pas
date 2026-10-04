@@ -100,10 +100,10 @@ type
   {/Cat}
 
   {-DataCompBoy-}
-function UnpackImage(const FName, DestDir: String; PInfo: PWhileView)
+function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
   : Boolean;
   var
-    F: PBufStream;
+    F: TBufStream;
     Error, Cancel: Boolean;
     Tmr: TEventTimer;
 
@@ -184,12 +184,12 @@ function UnpackImage(const FName, DestDir: String; PInfo: PWhileView)
     procedure WriteFile(const ADir: String; const ANm: Str12; Clus: Word;
         len, Date: LongInt; Attr: Byte);
       var
-        B: PBufStream;
+        B: TBufStream;
         Dir, FName: String;
 
       procedure TryInit;
         begin
-        B := PBufStream.Create(FName, stCreate, $8000);
+        B := TBufStream.Create(FName, stCreate, $8000);
         if B^.Status <> stOK then
           begin
           B.Free;
@@ -479,7 +479,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: PWhileView)
   Error := False;
   Cancel := False;
   NewTimer(Tmr, 0);
-  F := PBufStream.Create(FName, stOpenRead, $8000);
+  F := TBufStream.Create(FName, stOpenRead, $8000);
   DoIt;
   Error := Error or (F^.Status <> stOK);
   F.Free;
@@ -504,7 +504,7 @@ procedure DoIt(AOwner: Pointer; AFiles: PFilesCollection;
   var
     I: Integer;
     PF: PFileRec;
-    PInfo: PWhileView;
+    PInfo: TWhileView;
     R: TRect;
   begin
   if ADestPath = '' then

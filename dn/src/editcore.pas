@@ -78,7 +78,7 @@ uses
   ;
 
 const
-  ClipBoard: PCollection = nil;
+  ClipBoard: TCollection = nil;
 
   CFileEditor = #13#14#16#17#18#19#20#21#22#23#24#25;
 
@@ -103,15 +103,15 @@ type
   { TFileEditor }
 
   TFileEditor = class;
-  PFileEditor = TFileEditor;
+
     {`2}
   TFileEditor = class(TView)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
-    HScroll, VScroll: PScrollBar;
+    HScroll, VScroll: TScrollBar;
     ReplaceAll: Boolean;
     Delta: TPoint;
     EditName: String; {DataCompBoy}
-    FileLines: PLineCollection {PCollector}; {-SBlocks}
+    FileLines: TLineCollection {PCollector}; {-SBlocks}
     isValid, Marking: Boolean;
     SmartPad: Boolean;
     ClipBrd: Boolean; {-$VOL}
@@ -146,12 +146,12 @@ type
     PrevSearchDir: byte;
       {`Эта переменная принимается во внимание
       только при SearchOnDisplay `}
-    UndoInfo: PCollection;
-    RedoInfo: PCollection; {-$VOL}
+    UndoInfo: TCollection;
+    RedoInfo: TCollection; {-$VOL}
     UndoTimes, LastSaveUndoTimes: LongInt;
     ChPosition: Boolean;
-    Macros: PCollection;
-    Locker: PStream;
+    Macros: TCollection;
+    Locker: TStream;
     LastDir: Integer;
     MemEnough: Boolean;
     KeyMap: TKeyMap; {-$VIV}
@@ -162,12 +162,12 @@ type
 
     HiLitePar: THighliteParams;
 
-    InfoL, BMrk: PView;
+    InfoL, BMrk: TView;
 
     MenuItemStr: array[Boolean] of PString;
     
     constructor Create(const Bounds: TRect;
-         AHScrollBar, AVScrollBar: PScrollBar;
+         AHScrollBar, AVScrollBar: TScrollBar;
         var FileName: String); {DataCompBoy}
     constructor Load(S: TStream);
     destructor Destroy; override;
@@ -182,10 +182,10 @@ type
       {` строка читается "как есть", без перекодировки `}
     function GetLine(Index: LongInt): LongString;
       {` строка перекодируется из KeyMap в ASCII `}
-    function GetSelection: PCollection;
-    function BlockToClip(P: PCollection): PCollection;
+    function GetSelection: TCollection;
+    function BlockToClip(P: TCollection): TCollection;
       {` the lines of a block of the editor (internal) into the text of the clipboard (UTF-8 with -dDNUTF8); P is changed `}
-    function BlockFromClip(P: PCollection): PCollection;
+    function BlockFromClip(P: TCollection): TCollection;
       {` the lines of the clipboard into the internal lines: P itself or a new collection (then dispose it) `}
     function IntLen(const S: LongString): LongInt;
       {` the length of a line of the user (UTF-8) in the columns of the editor `}
@@ -193,7 +193,7 @@ type
     function ValidBlock: Boolean;
     procedure CalcMenu;
     function Search(StartX, StartY: Word): Boolean;
-    procedure InsertBlock(ABlock: PCollection; SaveUndo: Boolean);
+    procedure InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
     procedure ModifyLine(Index: LongInt; S: LongString;
          DelSpaces: Boolean);
     procedure SetLimits;
@@ -243,7 +243,7 @@ procedure OpenSmartpad;
 procedure OpenClipBoard;
 
 const
-  ClipBoardStream: PStream = nil; {-$VOL}
+  ClipBoardStream: TStream = nil; {-$VOL}
 
 type
   TSearchData = record
@@ -313,9 +313,9 @@ const
   kbDown, kbCtrlDown,
   kbShiftDown, kbCtrlShiftDown);
 
-  {SmartWindow: PEditWindow = nil;}
+  {SmartWindow: TEditWindow = nil;}
   {Cat: перенёс эти переменные в модуль editfile}
-  {ClipboardWindow: PEditWindow = nil;}
+  {ClipboardWindow: TEditWindow = nil;}
   {Cat: внимание! появились указатели SmartWindowPtr и ClipboardWindowPtr}
 
 function MemAvail: LongInt;
@@ -351,7 +351,7 @@ procedure TFileEditor.ChangeBlockCase(C: Word);
     I, J, K, L, SX, EX, SY, EY: LongInt;
     S, S1: LongString;
     A: String[4];
-    P: PCollection;
+    P: TCollection;
     OldMark: TRect;
     CaseArray: ^TXLat;
     CapTable: PXLat;
@@ -506,7 +506,7 @@ procedure TFileEditor.StrFromAscii(var S: LongString);
     XLatBuf(S[1], Length(S), KeyMapDescr[KeyMap].XLatCP^[FromAscii]);
   end;
 
-function TFileEditor.BlockToClip(P: PCollection): PCollection;
+function TFileEditor.BlockToClip(P: TCollection): TCollection;
   var
     I: LongInt;
     L: PLongString;
@@ -523,17 +523,17 @@ function TFileEditor.BlockToClip(P: PCollection): PCollection;
   Result := P;
   end;
 
-function TFileEditor.BlockFromClip(P: PCollection): PCollection;
+function TFileEditor.BlockFromClip(P: TCollection): TCollection;
 {$IFDEF DNUTF8}
   var
     I: LongInt;
     L: PLongString;
-    R: PLineCollection;
+    R: TLineCollection;
   begin
   Result := P;
   if P = nil then
     Exit;
-  R := PLineCollection.Create(P^.Count+1, 10, True);
+  R := TLineCollection.Create(P^.Count+1, 10, True);
   for I := 0 to P^.Count-1 do
     begin
     L := P^.At(I);
@@ -612,7 +612,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udDelLine:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             for I := 0 to Count-1 do
               P^.Lines.Insert(NewLongStr(GetLine(P^.Where.Y+I)));
             UndoInfo.Insert(P);
@@ -624,7 +624,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udDelBlock:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             if Lines^.Count > 0 then
               S := CnvString(Lines^.At(0))
             else
@@ -713,7 +713,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udReplaceBlock, udClearBlock:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             for I := Where.Y to Lines^.Count+Where.Y-1 do
               begin
               S := GetLine(I);
@@ -759,14 +759,14 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsLine:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             P^.Lines.Insert(NewLongStr(GetLine(P^.Where.Y)));
             P^.Lines.Insert(NewLongStr(GetLine(P^.Where.Y+1)));
             RedoInfo.Insert(P);
             end;
           udDelBlock:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             if Lines^.Count > 0 then
               S := CnvLongString(Lines^.At(0))
             else
@@ -796,7 +796,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsBlock, udFormatBlock:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             for I := 1 to Byte(Str^[2])*256+Byte(Str^[1]) do
               P^.Lines.Insert(NewLongStr(GetLine(Delta.Y+I-1)));
             RedoInfo.Insert(P);
@@ -827,7 +827,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsVertBlock:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             for I := 1 to Count do
               begin
               S := Copy(GetLine(I+Where.Y-1), Where.X+1, Width);
@@ -853,7 +853,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udReplaceBlock, udClearBlock:
             begin
-            P^.Lines := PLineCollection.Create(10, 10, True);
+            P^.Lines := TLineCollection.Create(10, 10, True);
             for I := Where.Y to Lines^.Count+Where.Y-1 do
               begin
               S := GetLine(I);
@@ -903,7 +903,7 @@ function TFileEditor.GetPalette: TPalette;
   end;
 
 { TFileEditor }
-constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: PScrollBar; var FileName: String);
+constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TScrollBar; var FileName: String);
   var
     { FileToView: Text; }
     Line: String;
@@ -970,8 +970,8 @@ constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: PS
   else
     Line := FileName;
   {FileLines := GetCollector(3000, 100);}
-  FileLines := PLineCollection.Create(300, 1000, True); {-SBlocks}
-  Macros := PCollection.Create(10, 10);
+  FileLines := TLineCollection.Create(300, 1000, True); {-SBlocks}
+  Macros := TCollection.Create(10, 10);
 
   MenuItemStr[True] := NewStr(GetString(dlMenuItemOn));
   MenuItemStr[False] := NewStr(GetString(dlMenuItemOff));
@@ -1221,7 +1221,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
         New(P);
         P^.What := What;
         P^.Where := Where;
-        P^.Lines := PLineCollection.Create(10, 10, True);
+        P^.Lines := TLineCollection.Create(10, 10, True);
         P^.Lines.Insert(NewLongStr(LongString(Info)));
         P^.KeyMap := KeyMap; {-$VIV}
         UndoInfo.Insert(P);
@@ -1243,7 +1243,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       New(P);
       P^.What := What;
       P^.Where := Where;
-      P^.Lines := PCollection(Info);
+      P^.Lines := TCollection(Info);
       P^.KeyMap := KeyMap; {-$VIV}
       UndoInfo.Insert(P);
       Inc(UndoTimes);
@@ -1266,7 +1266,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
       P^.Where := Where;
       P^.Vertical := VertBlock;
       P^.InsM := InsertMode; {-$VOL}
-      P^.Lines := PCollection(Info);
+      P^.Lines := TCollection(Info);
       P^.KeyMap := KeyMap; {-$VIV}
       UndoInfo.Insert(P);
       Inc(UndoTimes);
@@ -1331,7 +1331,7 @@ procedure TFileEditor.CalcMenu;
     BlkC: TCommandSet;
 
   begin { TFileEditor.CalcMenu }
-  if  (Owner = nil) or (PEditWindow(Owner)^.MenuBar = nil) then
+  if  (Owner = nil) or (TEditWindow(Owner).MenuBar = nil) then
     Exit;
   BlkC := [cmCopy, cmCut, cmClear, cmBlockWrite, cmFJustify,
      cmCopyBlock, cmMoveBlock,
@@ -1377,7 +1377,7 @@ procedure TFileEditor.CalcMenu;
     SetM(EdOpt.SmartTab);
     end;
   GetCommands(GC);
-  PEditWindow(Owner)^.MenuBar.SetCommands(GC);
+  TEditWindow(Owner).MenuBar.SetCommands(GC);
   SetCommands(GC);
   end { TFileEditor.CalcMenu };
 
@@ -1443,11 +1443,11 @@ function TFileEditor.LimitY: LongInt;
 (*
 function GetFileNameDialog(Mask, Title, Name: String; Buttons, HistoryID: Word): String;
  var S: String;
-     D: PFileDialog;
+     D: TFileDialog;
      B: Boolean;
 begin
   S := ''; B := false; if Mask = '' then begin Mask := x_x; B := true end;
-  D := PFileDialog(Application.ValidView(New(PFileDialog,
+  D := TFileDialog(Application.ValidView(New(TFileDialog,
         Init(Mask, Title, Name, Buttons, HistoryID))));
   if D = nil then Exit;
   if B then D.SetData(S);
@@ -1470,7 +1470,7 @@ end;
 procedure OpenEditor;
   var
     R: TRect;
-    P: PWindow;
+    P: TWindow;
     S: String;
   begin
   S := GetFileNameDialog(x_x, GetString(dlED_OpenFile),
@@ -1479,7 +1479,7 @@ procedure OpenEditor;
   if S = '' then
     Exit;
   Desktop.GetExtent(R);
-  Application.InsertWindow(PEditWindow.Create(R, S));
+  Application.InsertWindow(TEditWindow.Create(R, S));
   end;
 {-DataCompBoy-}
 
@@ -1497,9 +1497,9 @@ procedure TFileEditor.SetLimits;
     VScroll.SetParams(Delta.Y, 0, FileLines^.Count-1, Size.Y, 1);
   end;
 
-function TFileEditor.GetSelection: PCollection;
+function TFileEditor.GetSelection: TCollection;
   var
-    P: PCollection;
+    P: TCollection;
     S: LongString;
     I: LongInt;
   begin
@@ -1507,7 +1507,7 @@ function TFileEditor.GetSelection: PCollection;
   MemEnough := True;
   if not (BlockVisible and ValidBlock) then
     Exit;
-  P := PLineCollection.Create(Mark.B.Y-Mark.A.Y+1, 5, True);
+  P := TLineCollection.Create(Mark.B.Y-Mark.A.Y+1, 5, True);
   for I := Mark.A.Y to Mark.B.Y do
     begin
     S := GetLine(I);
@@ -1550,7 +1550,7 @@ function TFileEditor.Valid(Command: Word): Boolean;
     begin
     if Modified then
       Message(Self, evCommand, cmSaveText, nil);
-    PEditWindow(Owner)^.ModalEnd := True;
+    TEditWindow(Owner).ModalEnd := True;
     Exit;
     end;
   if  ( (Command = cmClose) or (Command = cmQuit)) then
@@ -1952,13 +1952,13 @@ _LExit:
   end { TFileEditor.Search };
 {/Cat}
 
-procedure TFileEditor.InsertBlock(ABlock: PCollection; SaveUndo: Boolean);
+procedure TFileEditor.InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
   var
     I, Q: LongInt;
     S, S1, S2: LongString;
     P: PLongString;
     L, J: LongInt;
-    LL: PCollection;
+    LL: TCollection;
   begin
   if  (ABlock = nil) or (ABlock^.Count = 0) then
     Exit;
@@ -1998,7 +1998,7 @@ procedure TFileEditor.InsertBlock(ABlock: PCollection; SaveUndo: Boolean);
           S := ''
         else
           S := P^;
-        LL := PLineCollection.Create(ABlock^.Count, 10, True);
+        LL := TLineCollection.Create(ABlock^.Count, 10, True);
         if LL <> nil then
           begin
           for I := 0 to ABlock^.Count do
@@ -2377,7 +2377,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
   var
     ChPos, WM, DelWord, WasMA, WasMB: Boolean;
     P: PLongString;
-    PL: PCollection;
+    PL: TCollection;
     S: LongString;
     LastY, LastX, i: LongInt;
     OldDelta,
@@ -2660,7 +2660,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
     Dec(LastX);
     end;
 
-  procedure DeleteBlock(ChangePos: Boolean; L: PCollection);
+  procedure DeleteBlock(ChangePos: Boolean; L: TCollection);
     label L1;
     begin
     if not BlockVisible then
@@ -2766,7 +2766,7 @@ L1:
 
   procedure PasteBlock;
     var
-      Block, CB: PCollection;
+      Block, CB: TCollection;
       i: Integer;
       P1, P2: PLongString;
       InUse: Boolean;
@@ -3045,7 +3045,7 @@ EndDel:
   {-DataCompBoy-}
   procedure BlockRead;
     var
-      P: PCollection;
+      P: TCollection;
       S: String;
     begin
     ChangeLine;
@@ -3073,14 +3073,14 @@ EndDel:
   {-DataCompBoy-}
   procedure BlockWrite;
     var
-      P: PCollection;
-      PS: PLineCollection {PStdCollector}; {-SBlocks}
+      P: TCollection;
+      PS: TLineCollection {PStdCollector}; {-SBlocks}
       S, SST: LongString;
-      R: PStream;
+      R: TStream;
       I, J, K: LongInt;
       CRLF: String[2];
       VB: Boolean;
-      PI: PView;
+      PI: TView;
       A: Word;
 
       {Cat: эта процедура теперь умеет работать с длинными строками
@@ -3281,7 +3281,7 @@ EndDel:
     var
       S: LongString;
       I, OldX: LongInt;
-      P: PLineCollection;
+      P: TLineCollection;
       TP: TPoint;
     begin
     ChangeLine;
@@ -3467,7 +3467,7 @@ EndDel:
 
   procedure PasteWinBlock;
     var
-      CB: PCollection;
+      CB: TCollection;
     begin
     EnableMarking := False;
     Marking := False;
@@ -3477,7 +3477,7 @@ EndDel:
       DeleteBlock(True, GetSelection);
     BlockOff;
 
-    if GetWinClip(PLineCollection(ClipBoard) {, On}) then
+    if GetWinClip(TLineCollection(ClipBoard) {, On}) then
       begin
       CB := BlockFromClip(ClipBoard);
       InsertBlock(CB, True);
@@ -3758,7 +3758,7 @@ EndDel:
       Res, S: String;
       I, Min1, Max1, Min2, Max2, Min3, Max3, Min4, Max4, P: Integer;
       Q: Pointer;
-      Info: PWhileView;
+      Info: TWhileView;
       R: TRect;
     label Ex;
 
@@ -3879,14 +3879,14 @@ EndDel:
       Q := @Res;
       case ExecResource(dlgSrchFailed, Q) of
         cmYes:
-          PDNApplication(Application)^.EditFile(True,
+          TDNApplication(Application).EditFile(True,
              SourceDir+'dn.spf');
         cmNo:
-          PDNApplication(Application)^.EditFile(True, S);
+          TDNApplication(Application).EditFile(True, S);
       end
       end
     else
-      PDNApplication(Application)^.EditFile(True, Res);
+      TDNApplication(Application).EditFile(True, Res);
 
 Ex:
     Info.Free;
@@ -3937,7 +3937,7 @@ Ex:
     end; {/AK155}
 
   var
-    PC: PCollection;
+    PC: TCollection;
     R: TRect;
     UEditName, UEditPath: String;
     GlobalConfigEdit: Boolean;
@@ -4035,7 +4035,7 @@ Ex:
               Exit;
             CE;
             Owner.Redraw;
-            PEditWindow(Owner)^.ModalEnd := True;
+            TEditWindow(Owner).ModalEnd := True;
             ClearEvent(Event);
             end;
           end;
@@ -4190,7 +4190,7 @@ Ex:
           CE
           end;
         cmGetName:
-          PString(Event.InfoPtr)^:= PWindow(Owner).Title^;
+          PString(Event.InfoPtr)^:= TWindow(Owner).Title^;
         cmCtrlHome:
           begin
           ScrollTo(Delta.X, Pos.Y);
@@ -5071,7 +5071,7 @@ procedure OpenSmartpad;
   {--- start -------- Eugeny Zvyagintzev ---------}
   var
     PS: PString;
-    V: PFileEditor;
+    V: TFileEditor;
     I: Integer;
     P: PEditRecord;
     {--- finish -------- Eugeny Zvyagintzev ---------}
@@ -5088,12 +5088,12 @@ procedure OpenSmartpad;
     InsertInfo;
     if  (PV <> Application) then
       begin
-      {if PView(PV).Owner = Pointer(Desktop) then SmartWindow.MakeFirst;}
+      {if TView(PV).Owner = Pointer(Desktop) then SmartWindow.MakeFirst;}
       Desktop.Delete(SmartWindow);
       Desktop.ExecView(SmartWindow);
       Desktop.InsertBefore(SmartWindow, Desktop.Last);
       Desktop.SetCurrent(PV, EnterSelect);
-      {if PView(PV).Owner = Pointer(Desktop) then PView(PV).MakeFirst;}
+      {if TView(PV).Owner = Pointer(Desktop) then TView(PV).MakeFirst;}
       end
     else
       SmartWindow.Select;

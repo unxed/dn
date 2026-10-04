@@ -1,13 +1,7 @@
 { What DN calls differently from tv/ (the interface part of the unit Views). }
 type
-  PView = TvViews.PView;
-  PGroup = TvViews.PGroup;
   TCommandSet = TvViews.TCommandSet;
   TPalette = TvViews.TPalette;
-  PFrame = TvWindow.PFrame;
-  PScrollBar = TvWindow.PScrollBar;
-  PScroller = TvWindow.PScroller;
-  PWindow = TvWindow.PWindow;
 
   { DN units see these through Views (in the original they came with the Views of DN); same meaning as in Defines }
   AInt = SmallInt;
@@ -50,8 +44,8 @@ type
 { The views that are updated from time to time (DN): RegisterToBackground adds a view, its Update is called by
   RunBackground (the idle loop of the program, TProgram.Idle of mainapp) when the view's UpdTicks milliseconds have
   passed since the last call. A view that is destroyed leaves the list by itself. }
-procedure RegisterToBackground(P: PView);
-procedure UnregisterFromBackground(P: PView);
+procedure RegisterToBackground(P: TView);
+procedure UnregisterFromBackground(P: TView);
 procedure RunBackground;
 
 type
@@ -73,7 +67,7 @@ var
   TaggedDataOnly: Boolean = False;
 
 { Message with a long integer in the event (DN; Message takes a pointer). }
-function MessageL(Receiver: PView; What, Command: Word; InfoLng: LongInt): Pointer;
+function MessageL(Receiver: TView; What, Command: Word; InfoLng: LongInt): Pointer;
 
 { The next free number of a window, 1..9 (0 if all are used); the number is free again when the window is destroyed. }
 function GetNum: Integer;

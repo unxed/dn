@@ -91,7 +91,7 @@ type
     end;
 
 const
-  FindList: PCollection = nil;
+  FindList: TCollection = nil;
 
 implementation
 

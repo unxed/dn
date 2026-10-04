@@ -101,10 +101,10 @@ type
 
   PLineViewer = ^TLineViewer;
   TLineViewer = class(TScroller)
-    FileLines: PLineCollection;
+    FileLines: TLineCollection;
     isValid: Boolean;
     constructor Create(var Bounds: TRect;
-         AHScrollBar, AVScrollBar: PScrollBar; Buffer: PCharArray);
+         AHScrollBar, AVScrollBar: TScrollBar; Buffer: PCharArray);
     destructor Done; virtual;
     procedure Draw; virtual;
     procedure InitCol(Buffer: PCharArray);
@@ -116,7 +116,7 @@ type
   TMsgViewer = class(TLineViewer)
     FromUser, ToUser, Date, Subj: PString;
     constructor Create(var Bounds: TRect;
-         AHScrollBar, AVScrollBar: PScrollBar; FName: String);
+         AHScrollBar, AVScrollBar: TScrollBar; FName: String);
     destructor Done; virtual;
     end;
 
@@ -135,7 +135,7 @@ type
 
   PMsgViewerDlg = ^TMsgViewerDlg;
   TMsgViewerDlg = class(TDialog)
-    Lb1, Lb2, Lb3, Lb4: PLabel;
+    Lb1, Lb2, Lb3, Lb4: TLabel;
     CurMsg: PString;
     FV: PMsgViewer;
     constructor Create(FName: String);
@@ -296,7 +296,7 @@ function fns_z(n: SmallInt): String;
   end;
 
 procedure Msg2Strs(FName: String; var FromUser, ToUser, Subj, Date: String;
-    var C: PLineCollection);
+    var C: TLineCollection);
   var
     message: TBufStream; {file of char;}
     header: MessageHeader;
@@ -592,7 +592,7 @@ procedure CutFromAddr(st: String);
     end;
   end;
 
-procedure Buffer2Strs(Buffer: PCharArray; var C: PLineCollection);
+procedure Buffer2Strs(Buffer: PCharArray; var C: TLineCollection);
   var
     I: Word;
     st: String;
@@ -676,7 +676,7 @@ function TPktListDialog.GetPalette: TPalette;
 constructor TPktListDialog.Create(FName: String; C: PPktCol);
   var
     R: TRect;
-    View: PView;
+    View: TView;
   begin
   HelpCtx := hcPktListDialog;
   Desktop.GetExtent(R);
@@ -691,40 +691,40 @@ constructor TPktListDialog.Create(FName: String; C: PPktCol);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y);
-  lb := New(PPktList, Init(R, 1, PScrollBar(View)));
+  lb := New(PPktList, Init(R, 1, TScrollBar(View)));
   lb^.Options := lb^.Options+ofFramed;
   Insert(lb);
   lb^.NewLisT(C);
   lb^.SetRange(C^.Count);
   R.Assign(2, 1, 8, 2);
-  View := PLabel.Create(R, '~From~', nil);
+  View := TLabel.Create(R, '~From~', nil);
   Insert(View);
   R.Assign(31, 1, 35, 2);
-  View := PLabel.Create(R, '~To~', nil);
+  View := TLabel.Create(R, '~To~', nil);
   Insert(View);
   R.Assign(52, 1, 58, 2);
-  View := PLabel.Create(R, '~Subj~', nil);
+  View := TLabel.Create(R, '~Subj~', nil);
   Insert(View);
   SelectNext(False);
   end { TPktListDialog.Init };
 
-function PktHeaderDlg(AText: String): PDialog;
+function PktHeaderDlg(AText: String): TDialog;
   var
     R: TRect;
-    Dialog: PDialog;
-    View: PView;
+    Dialog: TDialog;
+    View: TView;
   begin
   R.Assign(13, 6, 66, 17);
-  Dialog := New(PDialog, Init(R, GetString(dlPktHeader)));
+  Dialog := New(TDialog, Init(R, GetString(dlPktHeader)));
   with Dialog^ do
     begin
     Options := Options+ofCenterX+ofCenterY;
     R.Assign(20, 8, 32, 10);
-    View := PButton.Create(R, 'Ok', cmOK, bfDefault);
+    View := TButton.Create(R, 'Ok', cmOK, bfDefault);
     View^.Options := View^.Options+ofCenterX;
     Insert(View);
     R.Assign(2, 1, 51, 8);
-    View := PStaticText.Create(R, AText);
+    View := TStaticText.Create(R, AText);
     Insert(View);
     SelectNext(False);
     end;
@@ -736,7 +736,7 @@ procedure ViewPktHeader(MsgCount: SmallInt);
     W: Word;
     s1, s2, s3: String;
     S: String;
-    D: PDialog;
+    D: TDialog;
   begin
   ReadPktHeader(PktFileName, W, s1, s2, s3);
   S := GetString(dlPktFile)+FExpand(PktFileName)+#13+s1+#13+s2+#13+s3+#13+
@@ -782,7 +782,7 @@ procedure TPktListDialog.HandleEvent(var Event: TEvent);
   end { TPktListDialog.HandleEvent };
 
 constructor TLineViewer.Create(var Bounds: TRect; AHScrollBar,
-    AVScrollBar: PScrollBar; Buffer: PCharArray);
+    AVScrollBar: TScrollBar; Buffer: PCharArray);
   begin
   HelpCtx := hcLineViewer;
   Options := Options or {ofCentered}ofSelectable;
@@ -849,7 +849,7 @@ procedure TLineViewer.Draw;
 procedure TLineViewer.InitCol(Buffer: PCharArray);
   begin
   isValid := True;
-  FileLines := PLineCollection.Create(5, 5, False);
+  FileLines := TLineCollection.Create(5, 5, False);
   Buffer2Strs(Buffer, FileLines);
   Limit.X := 255;
   Limit.Y := FileLines^.Count;
@@ -868,7 +868,7 @@ function TLineViewer.Valid(Command: LongInt): Boolean;
   end;
 
 constructor TMsgViewer.Create(var Bounds: TRect; AHScrollBar,
-    AVScrollBar: PScrollBar; FName: String);
+    AVScrollBar: TScrollBar; FName: String);
   var
     s1, s2, s3, s4: String;
   begin
@@ -877,7 +877,7 @@ constructor TMsgViewer.Create(var Bounds: TRect; AHScrollBar,
   Options := Options or {ofCentered}ofSelectable;
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
-  FileLines := PLineCollection.Create(5, 5, False);
+  FileLines := TLineCollection.Create(5, 5, False);
   Msg2Strs(FName, s1, s2, s3, s4, FileLines);
   FromUser := NewStr(s1);
   ToUser := NewStr(s2);
@@ -907,8 +907,8 @@ constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
     FA, TA: TNetAddr);
   var
     R: TRect;
-    View: PView;
-    VS: PScrollBar;
+    View: TView;
+    VS: TScrollBar;
     S: String;
   begin
   HelpCtx := hcPktMsgViewer;
@@ -929,22 +929,22 @@ constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
   R.Assign(1, 1, 79, 2);
   S := '~Msg~  :'+just(ItoS(MsgN), 5, 1)+'/'+just(ItoS(AllMsg), 5, 2)
     +Spaces(30)+'~Date~ :'+S4;
-  View := PLabel.Create(R, S, nil);
+  View := TLabel.Create(R, S, nil);
   Insert(View);
   PS1 := NewStr(DelChar(S, '~'));
   R.Assign(1, 2, 79, 3);
   S := '~From~ :'+just(S1, 50, 2)+PktFromAddr;
-  View := PLabel.Create(R, S, nil);
+  View := TLabel.Create(R, S, nil);
   Insert(View);
   Ps2 := NewStr(DelChar(S, '~'));
   R.Assign(1, 3, 79, 4);
   S := '~To~   :'+just(S2, 50, 2)+'2:'+ItoS(TA.Net)+'/'+ItoS(TA.Node);
-  View := PLabel.Create(R, S, nil);
+  View := TLabel.Create(R, S, nil);
   Insert(View);
   Ps3 := NewStr(DelChar(S, '~'));
   R.Assign(1, 4, 79, 5);
   S := '~Subj~ :'+S3;
-  View := PLabel.Create(R, S, nil);
+  View := TLabel.Create(R, S, nil);
   Insert(View);
   Ps4 := NewStr(DelChar(S, '~'));
   SelectNext(False);
@@ -1050,8 +1050,8 @@ procedure TPktMsgViewer.HandleEvent(var Event: TEvent);
 constructor TMsgViewerDlg.Create(FName: String);
   var
     R: TRect;
-    View: PView;
-    VS: PScrollBar;
+    View: TView;
+    VS: TScrollBar;
   begin
   Desktop.GetExtent(R);
   inherited Create(R, GetString(dlNetMailView)+FExpand(FName));
@@ -1069,17 +1069,17 @@ constructor TMsgViewerDlg.Create(FName: String);
   FV^.Options := FV^.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
-  Lb1 := New(PLabel, Init(R,
+  Lb1 := New(TLabel, Init(R,
          '~Msg~  :Private '+Spaces(30)+'~Date~ :'+FV^.Date^, nil));
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
-  Lb2 := PLabel.Create(R, '~From~ :'+FV^.FromUser^, nil);
+  Lb2 := TLabel.Create(R, '~From~ :'+FV^.FromUser^, nil);
   Insert(Lb2);
   R.Assign(1, 3, 79, 4);
-  Lb3 := PLabel.Create(R, '~To  ~ :'+FV^.ToUser^, nil);
+  Lb3 := TLabel.Create(R, '~To  ~ :'+FV^.ToUser^, nil);
   Insert(Lb3);
   R.Assign(1, 4, 79, 5);
-  Lb4 := PLabel.Create(R, '~Subj~ :'+FV^.Subj^, nil);
+  Lb4 := TLabel.Create(R, '~Subj~ :'+FV^.Subj^, nil);
   Insert(Lb4);
   SelectNext(False);
   CurMsg := NewStr(FName);
@@ -1099,7 +1099,7 @@ function GetPrevMsg(FName: String): String;
     Num: Word;
     Tm: TEventTimer;
     Sr: lSearchRec;
-    VM: PView;
+    VM: TView;
   begin
   lFSplit(FName, D, N, E);
   while (N[1] = '0') and (N <> '') do
@@ -1143,7 +1143,7 @@ function GetNextMsg(FName: String): String;
     Num, St: Word;
     Tm: TEventTimer;
     Sr: lSearchRec;
-    VM: PView;
+    VM: TView;
   begin
   lFSplit(FName, D, N, E);
   while (N[1] = '0') and (N <> '') do
@@ -1186,9 +1186,9 @@ function GetNextMsg(FName: String): String;
 
 procedure TMsgViewerDlg.GotoMsg;
   var
-    VS: PScrollBar;
+    VS: TScrollBar;
     R: TRect;
-    View: PView;
+    View: TView;
   begin
   DisposeStr(Title);
   Title := NewStr(GetString(dlNetMailView)+CurMsg^);
@@ -1214,17 +1214,17 @@ procedure TMsgViewerDlg.GotoMsg;
   Lb4 := nil;
   R.Assign(1, 1, 79, 2);
   if FV <> nil then
-    Lb1 := New(PLabel, Init(R,
+    Lb1 := New(TLabel, Init(R,
            '~Msg  ~:Private '+Spaces(30)+'~Date~ :'+FV^.Date^, nil));
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
-  Lb2 := PLabel.Create(R, '~From ~:'+FV^.FromUser^, nil);
+  Lb2 := TLabel.Create(R, '~From ~:'+FV^.FromUser^, nil);
   Insert(Lb2);
   R.Assign(1, 3, 79, 4);
-  Lb3 := PLabel.Create(R, '~To   ~:'+FV^.ToUser^, nil);
+  Lb3 := TLabel.Create(R, '~To   ~:'+FV^.ToUser^, nil);
   Insert(Lb3);
   R.Assign(1, 4, 79, 5);
-  Lb4 := PLabel.Create(R, '~Subj ~:'+FV^.Subj^, nil);
+  Lb4 := TLabel.Create(R, '~Subj ~:'+FV^.Subj^, nil);
   Insert(Lb4);
   SelectNext(False);
   Redraw;
@@ -1407,7 +1407,7 @@ procedure ViewPktFile(FName: String);
   var
     C: PPktCol;
     D: PPktListDialog;
-    W: PView;
+    W: TView;
     R: TRect;
   begin
   PktFileName := FName;
@@ -1517,7 +1517,7 @@ function ViewPktFileE(FName: String; MsgVisible: Boolean): Boolean;
   var
     C: PPktCol;
     D: PPktListDialog;
-    W: PView;
+    W: TView;
     R: TRect;
   begin
   PktFileName := FName;

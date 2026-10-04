@@ -79,7 +79,7 @@ uses
   
   ;
 
-procedure UUDecode(AFileCollection: PCollection);
+procedure UUDecode(AFileCollection: TCollection);
 
 
 
@@ -114,7 +114,7 @@ function MaxAvail: LongInt;
 var
   Timer: TEventTimer;
 
-function ApplicationIdle(Info: PWhileView): Boolean;
+function ApplicationIdle(Info: TWhileView): Boolean;
   var
     C: Boolean;
   begin
@@ -141,7 +141,7 @@ procedure RereadGlobal(OutputDir: String); {DataCompBoy}
 {!  declarations !}
 
 var
-  PI: PWhileView;
+  PI: TWhileView;
   R: TRect;
 var
   ErrorNumber: SmallInt;
@@ -201,7 +201,7 @@ var
   TmpCRC: Word;
   SectCRC: Word;
   SectSSz: LongInt;
-  InputStream: PTextReader;
+  InputStream: TTextReader;
   TmpInFile: lFile;
   OutFile: lFile;
   CurFileName: String;
@@ -275,7 +275,7 @@ function MatchCurFileName(const FName: string): Boolean;
 
   {-DataCompBoy-}
 function UU_Decode(
-    AFileCollection: PCollection;
+    AFileCollection: TCollection;
     const OutputDir: String; ChkOvr, DispErr, RecoverBrokenUUE: Boolean)
   : Boolean;
   {! the declarations were here !}
@@ -1609,14 +1609,14 @@ procedure DecodeStr(var Src, Dst);
       InputFileName := MakeNormName(PF^.Owner^, PF^.FlName[uLfn]);
       if not ExistFile(InputFileName) then
         Exit;
-      InputStream := PTextReader.Create(InputFileName);
+      InputStream := TTextReader.Create(InputFileName);
       if  (InputStream = nil) then
         Exit;
       Get_String;
       if not EndOfFile then
         begin
         R.Assign(0, 0, 40, 12);
-        PI := PWhileView.Create(R);
+        PI := TWhileView.Create(R);
         PI.Top := GetString(dlUUDecode);
         PI.Write(1, GetString(dlUUDecodingTo)+Cut(InputFileName, 40));
         PI.Write(2, GetString(dlFC_To)+' '+OutputDir);
@@ -1660,7 +1660,7 @@ procedure DecodeStr(var Src, Dst);
       end { DoUuDecode };
 
     {var
-    PP,P1 : PView;
+    PP,P1 : TView;
     PL : PSortedListBox;}
 
     begin { Uu_Decode }
@@ -1689,7 +1689,7 @@ procedure DecodeStr(var Src, Dst);
     end { DecodeStr };
   {-DataCompBoy-}
 
-  procedure UUDecode(AFileCollection: PCollection);
+  procedure UUDecode(AFileCollection: TCollection);
     var
       Dr: record
         S: String;
@@ -1786,7 +1786,7 @@ procedure Clear64(n:T64);near;external;
       Xt: String;
       Dr: String;
       P: Pointer;
-      PI: PWhileView;
+      PI: TWhileView;
       R: TRect;
       Cancel, All, Skip: Boolean; { Flash 30-04-2003 }
 
@@ -2485,7 +2485,7 @@ beg:
       GetMem(SouBuf, sss);
 
       R.Assign(0, 0, 40, 9);
-      PI := PWhileView.Create(R);
+      PI := TWhileView.Create(R);
       PI.Top := GetString(dlUUEncode);
       PI.Write(1, GetString(dlUUEncoding)+Cut(FName, 40));
       PI.Write(2, GetString(dlFC_To));

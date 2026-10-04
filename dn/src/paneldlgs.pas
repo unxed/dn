@@ -53,7 +53,7 @@ uses
   ;
 
 procedure CM_AdvancedFilter(AFP: Pointer);
-function GetSelection(P: PFilePanelRoot; Single: Boolean):
+function GetSelection(P: TFilePanelRoot; Single: Boolean):
   PFilesCollection;
 function SelectFiles(AFP: Pointer; Select, XORs: Boolean): Boolean;
 procedure CM_CopyFiles(AFP: Pointer; MoveMode, Single: Boolean);
@@ -89,7 +89,7 @@ function PanelSetupTag(const PSS: TPanelSetupSet;
 procedure CM_SelectColumn(AFP: Pointer); {JO}
 
 
-function FirstNameNum(P: PFilePanelRoot): LongInt;
+function FirstNameNum(P: TFilePanelRoot): LongInt;
 {` AK155 Получение первого номера (от 1) в коллекции файлов панели,
   соответствующего не фиктивному имени '..', а настоящему имени.
   Возвращает либо 1, если это корень диска и элемента '..' нет,
@@ -114,7 +114,7 @@ type
     function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
     end;
 
-procedure DrawViews(P: PFilePanelRoot);
+procedure DrawViews(P: TFilePanelRoot);
   begin
   P.DrawView;
   if P^.InfoView <> nil then
@@ -278,11 +278,11 @@ type
 
 procedure TSaveSetupDialg.HandleEvent(var Event: TEvent);
   var
-    T: PCheckBoxes;
+    T: TCheckBoxes;
   begin
   if (Event.What = evCommand) and (Event.Command = cmSelectAll) then
     begin
-    T := PCheckBoxes(DirectLink[2]);
+    T := TCheckBoxes(DirectLink[2]);
     with T^ do
       begin
       if Value = $FFF then
@@ -297,7 +297,7 @@ procedure TSaveSetupDialg.HandleEvent(var Event: TEvent);
     inherited HandleEvent(Event);
   end;
 
-procedure PrepareSaveSetupDialog(P: PDialog);
+procedure PrepareSaveSetupDialog(P: TDialog);
   begin
   ObjChangeType(P, TypeOf(TSaveSetupDialg));
   ObjChangeType(P^.DirectLink[1], TypeOf(TPanelClassRB));
@@ -323,13 +323,13 @@ procedure TPanelClassRB.MovedTo(Item: Integer);
 procedure TPanelClassRB.ChangeClass(Item: Integer);
   { Реакция на смену выбора типа панели: перерисовка блока пресетов }
   var
-    T: PCheckBoxes;
+    T: TCheckBoxes;
     i: Integer;
     S: String;
   begin
   PanelClass := Item;
-//  T := PRadioButtons(PDialog(Owner).DirectLink[2]);
-  T := PCheckBoxes(PDialog(Owner).DirectLink[2]);
+//  T := TRadioButtons(TDialog(Owner).DirectLink[2]);
+  T := TCheckBoxes(TDialog(Owner).DirectLink[2]);
   with T^.Strings^ do
     begin
     { Освобождение обозначений десяти пресетов, если они есть.
@@ -356,7 +356,7 @@ procedure TSaveSetupButton.Press;
   var
     TargetSetupSet: PPanelSetupSet;
     PC: TPanelClass;
-    TargetPanel: PFilePanelRoot;
+    TargetPanel: TFilePanelRoot;
     TargetBlock: Word;
     Cmd: Word;
     SaveTaggedDataOnly: Boolean;
@@ -422,7 +422,7 @@ function TShowDialog.OwnDataAddress(P: PPanelSetup): Pointer;
 procedure TShowDialog.HandleEvent(var Event: TEvent);
   var
     N: Integer;
-    P: PFilePanelRoot;
+    P: TFilePanelRoot;
     Cmd: Word;
   procedure LoadData(N: Integer; NewSetupSet: PPanelSetupSet);
     var
@@ -433,7 +433,7 @@ procedure TShowDialog.HandleEvent(var Event: TEvent);
     SetData(OwnDataAddress(@NewSetupSet^[PC])^);
     ClearEvent(Event);
     end;
-  procedure TagUntagAll(P: PView);
+  procedure TagUntagAll(P: TView);
     begin
     Message(P, evCommand, Cmd, nil);
     end;
@@ -485,7 +485,7 @@ procedure TShowDialog.HandleEvent(var Event: TEvent);
 выбора списка и строки ввода. }
 
 var
-  OkButton, AddButton: PButton;
+  OkButton, AddButton: TButton;
 
 type
 
@@ -554,14 +554,14 @@ destructor TFilterDialog.Done;
 
 procedure CM_AdvancedFilter(AFP: Pointer);
   var
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     i: Byte;
-    C: PStringCollection;
+    C: TStringCollection;
     ClrPlus, ClrMinus: Boolean;
     S, FileMask: String;
     FItem: Integer;
     SelectFilterLine: Boolean;
-    PC: PStringCollection;
+    PC: TStringCollection;
       { Коллекция расширений с элементами типа ' *.pas'.
       Первый символ текста элемента - признак отметки:
       пробел - значит не отмечен }
@@ -585,7 +585,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
       fc: PFilesCollection;
       i: Integer;
     begin
-    PC := PStringCollection.Create(20, 20, False);
+    PC := TStringCollection.Create(20, 20, False);
     fc := P^.Drive^.GetDirectory(x_x, ti);
     for i := 0 to fc^.Count-1 do
       with PFileRec(fc^.Items^[i])^ do
@@ -601,29 +601,29 @@ procedure CM_AdvancedFilter(AFP: Pointer);
 
   function GetMaskSelection: String;
     var
-      D: PDialog;
-      PL: PListBox;
+      D: TDialog;
+      PL: TListBox;
       IL: PInputline;
       Cmd: Word;
 
-    function MakeDialog: PDialog;
+    function MakeDialog: TDialog;
       var
-        Dlg: PDialog;
+        Dlg: TDialog;
         b: Integer;
       begin
-      Dlg := PDialog(LoadResource(dlgAdvancedFilter));
+      Dlg := TDialog(LoadResource(dlgAdvancedFilter));
       ObjChangeType(Dlg, TypeOf(TFilterDialog));
       with Dlg^ do
         begin
-        PL := PListBox(DirectLink[2]);
+        PL := TListBox(DirectLink[2]);
         ObjChangeType(PL, TypeOf(TExtSelList));
         PL^.NewLisT(PC);
-        IL := PInputLine(DirectLink[1]);
+        IL := TInputLine(DirectLink[1]);
         ObjChangeType(IL, TypeOf(TFilterLine));
-        OkButton := PButton(DirectLink[4]);
-        AddButton := PButton(DirectLink[3]);
+        OkButton := TButton(DirectLink[4]);
+        AddButton := TButton(DirectLink[3]);
         for b := 3 to 5 do
-          with PButton(DirectLink[b])^ do
+          with TButton(DirectLink[b])^ do
             Options := Options and not ofSelectable;
           { Кнопки "OK", "Добавить" и "Закрыть" по Tab пропускаются }
         ObjChangeType(Dlg^.DirectLink[7], TypeOf(TSaveSetupButton));
@@ -750,7 +750,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
           Replace(';'+Copy(FileMask, 3, 5)+';', ';', S)
         else
           Replace(';- '+FileMask+';', ';', S);
-        C := PStringCollection.Create(4, 4, False);
+        C := TStringCollection.Create(4, 4, False);
         repeat
           i := PosChar(';', S);
           if i = 0 then
@@ -793,7 +793,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
   end { CM_AdvancedFilter };
 {------------------- CM_AdvancedFilter -----------------------}
 
-function FirstNameNum(P: PFilePanelRoot): LongInt;
+function FirstNameNum(P: TFilePanelRoot): LongInt;
   begin
   FirstNameNum := 1;
   with P^.Files^ do
@@ -803,7 +803,7 @@ function FirstNameNum(P: PFilePanelRoot): LongInt;
 {/AK155}
 
 {AK155: оформил эту процедуру по-человечески }
-function GetSelection(P: PFilePanelRoot; Single: Boolean):
+function GetSelection(P: TFilePanelRoot; Single: Boolean):
   PFilesCollection;
   var
     FC: PFilesCollection absolute Result;
@@ -849,7 +849,7 @@ function SelectFiles(AFP: Pointer; Select, XORs: Boolean): Boolean;
   var
     S, SN: String;
     I: LongInt;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     PF: PFileRec; {DataCompBoy}
     J, K: Byte; {JO}
     {SD: String;} {JO}
@@ -925,7 +925,7 @@ function SelectFiles(AFP: Pointer; Select, XORs: Boolean): Boolean;
 procedure CM_CopyFiles(AFP: Pointer; MoveMode, Single: Boolean);
   var
     FC: PFilesCollection;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
   CurrentDirectory := P^.Drive^.GetRealName;
   if P^.Files^.Count = 0 then
@@ -943,7 +943,7 @@ procedure InvertSelection(AFP: Pointer; dr: Boolean);
   var
     I: LongInt;
     PF: PFileRec;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     J, K: Byte;
     {SD: String;} {JO}
   begin
@@ -1012,8 +1012,8 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
       FMask: String;
       S: Word;
       end; {-$VOL added, DataCompBoy changed}
-    Info: PView;
-    P: PFilePanelRoot absolute AFP;
+    Info: TView;
+    P: TFilePanelRoot absolute AFP;
     
     DialRes: Byte; {JO}
   const
@@ -1022,7 +1022,7 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
     CompareLength = 4;
     CompareContens = 8;
     
-  function IsCheckboxes(P: PView): Boolean;
+  function IsCheckboxes(P: TView): Boolean;
     begin
     IsCheckboxes := TypeOf(P^) = TypeOf(TCheckBoxes);
     end;
@@ -1055,7 +1055,7 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
   DT.S := ComareDirsOptions.S;
 (* !! AK155 04.05.05 временно - надо разобраться
   {$IFDEF DualName}
-  D := PDialog(LoadResource(dlgCompareDirs));
+  D := TDialog(LoadResource(dlgCompareDirs));
   if D = nil then
     Exit;
   {JO: левое условие означает, что показ коротких имён включен в активной }
@@ -1065,7 +1065,7 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
   then
     begin {JO: делаем недоступным чекбокс регистрочувствительности}
     P1 := D^.FirstThat(IsCheckboxes);
-    PCheckBoxes(P1)^.SetButtonState(16, False);
+    TCheckBoxes(P1).SetButtonState(16, False);
     end;
   D.SetData(DT);
   DialRes := Desktop.ExecView(D);
@@ -1118,7 +1118,7 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
 procedure CM_EraseFiles(AFP: Pointer; Single: Boolean);
   var
     FC: PFilesCollection;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
   FC := GetSelection(P, Single);
   if  (FC = nil) or (P^.Drive = nil) then
@@ -1132,8 +1132,8 @@ procedure CM_EraseFiles(AFP: Pointer; Single: Boolean);
 
 procedure CM_MakeList(AFP: Pointer);
   var
-    FC: PCollection;
-    P: PFilePanelRoot absolute AFP;
+    FC: TCollection;
+    P: TFilePanelRoot absolute AFP;
   begin
   if  (P^.Files^.Count = 0) then
     Exit;
@@ -1170,14 +1170,14 @@ procedure CM_SetAttributes(AFP: Pointer; Single: Boolean; CurPos: Integer);
     K: Word;
     S: String;
     R: TRect;
-    PInfo: PWhileView;
+    PInfo: TWhileView;
     DTT, DTT1, DTT_Cr, DTT1_Cr, DTT_LAc, DTT1_LAc: LongInt;
     DT, DT1, DT_Cr, DT1_Cr, DT_LAc, DT1_LAc: DateTime;
     DateSet, TimeSet, CrDateSet, CrTimeSet, LAcDateSet, LAcTimeSet:
      Boolean;
     Res: Word;
-    Dlg: PDialog;
-    P: PFilePanelRoot absolute AFP;
+    Dlg: TDialog;
+    P: TFilePanelRoot absolute AFP;
     PF: PFileRec;
     ok: Boolean;
     CmdDlg: Word; {JO}
@@ -1225,7 +1225,7 @@ procedure CM_SetAttributes(AFP: Pointer; Single: Boolean; CurPos: Integer);
   FillChar(D, SizeOf(D), 0);
   if  (P^.SelNum > 0) and not Single then
     begin
-    Dlg := PDialog(LoadResource(dlgFilesAttr));
+    Dlg := TDialog(LoadResource(dlgFilesAttr));
 CurTime1:
     Dlg.SetData(D);
     CmdDlg := Desktop.ExecView(Dlg);
@@ -1273,7 +1273,7 @@ CurTime1:
     S := MakeNormName(PF^.Owner^, PF^.FlName[uLfn]);
     AddStr(S, #0);
     SetLength(S, Length(S)-1);
-    Dlg := PDialog(LoadResource(dlgFileAttr));
+    Dlg := TDialog(LoadResource(dlgFileAttr));
     D.C := GetFileAttr(S);
     if GetFileAges(S, DTT, DTT_Cr, DTT_LAc) <> 0 then
       begin
@@ -1594,7 +1594,7 @@ CurTime:
 {-DataCompBoy-}
 
 
-procedure PrepareShowDialog(P: PDialog);
+procedure PrepareShowDialog(P: TDialog);
   var
     i: Integer;
   begin
@@ -1614,7 +1614,7 @@ procedure CM_SetShowParms(AFP: Pointer);
   var
     J, K, Old: Word;
     Idx: TDlgIdx;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     R: TRect;
   begin
   @PreExecuteDialog := @PrepareShowDialog;
@@ -1659,7 +1659,7 @@ procedure CM_CopyTemp(AFP: Pointer);
   var
     FC: PFilesCollection;
     C: TCopyRec;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
   FC := GetSelection(P, False);
   C.Owner := P;
@@ -1674,9 +1674,9 @@ procedure CM_CopyTemp(AFP: Pointer);
 {-DataCompBoy-}
 procedure CM_ArchiveFiles(AFP: Pointer);
   var
-    PC: PCollection;
+    PC: TCollection;
     S: String;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     Dir: DirStr;
     Name: NameStr;
     Ext: ExtStr;
@@ -1704,7 +1704,7 @@ procedure CM_ArchiveFiles(AFP: Pointer);
 procedure CM_Print(AFP: Pointer);
   var
     N: Integer;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
   if  (P^.Drive^.DriveType in [dtDisk, dtFind, dtTemp, dtList]) then
     PrintFiles(GetSelection(P, False), P);
@@ -1713,7 +1713,7 @@ procedure CM_Print(AFP: Pointer);
 
 procedure CM_ToggleDescriptions(AFP: Pointer);
   var
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
   case P^.Drive^.DriveType of
     dtDisk,
@@ -1740,7 +1740,7 @@ procedure CM_ToggleDescriptions(AFP: Pointer);
 
 procedure CM_ToggleLongNames(AFP: Pointer);
   var
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
   if P^.Drive^.DriveType in [dtArc, dtArcFind] then
     Exit;
@@ -1764,7 +1764,7 @@ procedure CM_ToggleLongNames(AFP: Pointer);
 
 procedure CM_ToggleShowMode(AFP: Pointer);
   var
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
 {!! Это переключени в то ли 2, то ли 1, надо просто выкинуть }
 (*
@@ -1785,7 +1785,7 @@ procedure CM_ToggleShowMode(AFP: Pointer);
   end;
 
 type
-  PDragger = ^TDragger;
+
   TDragger = class(TView)
     Text: PString;
     constructor Create(R: TRect; AText: String);
@@ -1796,13 +1796,13 @@ type
 procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
   var
     R: TRect;
-    Mover: PView;
+    Mover: TView;
     Event: TEvent;
     P: PPoint absolute AP;
     FC: PFilesCollection absolute AFC;
     C: PCopyRec absolute AC;
 
-  function ContainsMouse(P: PView): Boolean;
+  function ContainsMouse(P: TView): Boolean;
     begin
     ContainsMouse := (P^.State and sfVisible <> 0) and
       P^.MouseInView(R.A);
@@ -1811,7 +1811,7 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
   begin
   {Application.BFSpeed;}
   Desktop.MakeLocal(P^, R.A);
-  Mover := PDragger.Create(R, Text);
+  Mover := TDragger.Create(R, Text);
   Desktop.Insert(Mover);
   Desktop.GetExtent(R);
   Event.Where := P^;
@@ -1866,7 +1866,7 @@ procedure CM_DragDropper(AFP: Pointer; CurPos: Integer; EV: Pointer);
     FC: PFilesCollection;
     I: LongInt;
     S: String;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
 
   begin
   C.Owner := P;
@@ -1895,7 +1895,7 @@ procedure CM_DragDropper(AFP: Pointer; CurPos: Integer; EV: Pointer);
 
 procedure CM_Dropped(AFP, EI: Pointer);
   var
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     MPos: TPoint;
     I, J, K: LongInt;
     Ev: TEvent;
@@ -2025,7 +2025,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     PF: PFileRec;
     Nm: String;
     Sn: String;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     Event: PEvent absolute PEV;
     ScrollBarValue: Integer;
     ReEnableCmdLine: Boolean;
@@ -2156,7 +2156,7 @@ procedure CM_RenameSingleDialog(AFP, PEV: Pointer);
     Nm: String;
     Sn: String;
     DlgRes: Word;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     Event: PEvent absolute PEV;
     ScrollBarValue: Integer;
     U: lFile;
@@ -2209,8 +2209,8 @@ procedure CM_SortBy(AFP: Pointer);
     PM, DefPM: PMenuItem;
     N, W: Word;
     R: TRect;
-    PV: PView;
-    P: PFilePanelRoot absolute AFP;
+    PV: TView;
+    P: TFilePanelRoot absolute AFP;
     Idx: TStrIdx;
     i: Word;
     Mode: Word;
@@ -2285,7 +2285,7 @@ procedure CM_SortBy(AFP: Pointer);
     R.A.Y := R.B.Y-NumSortModes-1;
   R.B.X := R.A.X+100;
   R.B.Y := R.A.Y+100; {R.B := R.A;}
-  PV := PMenuBox.Create(R, Menu, nil);
+  PV := TMenuBox.Create(R, Menu, nil);
   PV^.HelpCtx := hcSortBy;
   while true do
     begin
@@ -2355,7 +2355,7 @@ function TSortDialog.OwnDataAddress(P: PPanelSetup): Pointer;
   Result := @P^.Sort;
   end;
 
-procedure PrepareSortDialog(P: PDialog);
+procedure PrepareSortDialog(P: TDialog);
   begin
   ObjChangeType(P, TypeOf(TSortDialog));
     { Подменяем диалогу тип, чтобы подсунуть свой HandleEvent}
@@ -2386,7 +2386,7 @@ procedure CM_PanelSortSetup;
 {-DataCompBoy-}
 function CM_ChangeDirectory(AFP: Pointer): String;
   var
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     S: String;
   begin
   CM_ChangeDirectory := '';
@@ -2413,7 +2413,7 @@ procedure CM_MakeDir(AFP: Pointer);
     PF: PFileRec;
     DN: String;
     I, J: LongInt;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
   begin
   P^.Drive^.MakeDir;
   if CreatedDir = '' then
@@ -2443,7 +2443,7 @@ procedure CM_MakeDir(AFP: Pointer);
 procedure CM_LongCopy(AFP: Pointer);
   var
     S: String;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     PF: PFileRec;
   begin
   if  (P^.Files^.Count = 0) or (P^.Drive^.DriveType >= dtArcFind) then
@@ -2521,8 +2521,8 @@ procedure CM_ChangeCase(AFP: Pointer);
   var
     FC: PFilesCollection;
     L: TNamesCaseOptions;
-    P: PFilePanelRoot absolute AFP;
-    Info: PWhileView;
+    P: TFilePanelRoot absolute AFP;
+    Info: TWhileView;
     TT: TEventTimer;
     R: TRect;
     NameChange, ExtChange: ChPr;
@@ -2711,12 +2711,12 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
   {` Меню выбора номера блока настроек панели `}
   var
     I: Integer;
-    P: PFilePanelRoot absolute AFP;
+    P: TFilePanelRoot absolute AFP;
     Menu: PMenu;
     Items: PMenuItem;
     SelectedItem: PMenuItem;
     R: TRect;
-    PV: PView;
+    PV: TView;
     N, W: Word;
     PSetup: PPanelSetup;
     NameI: String;
@@ -2779,7 +2779,7 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
     R.A.Y := R.B.Y-N-2;
   R.B.X := R.A.X+100;
   R.B.Y := R.A.Y+100; {R.B := R.A;}
-  PV := PMenuBox.Create(R, Menu, nil);
+  PV := TMenuBox.Create(R, Menu, nil);
   PV^.HelpCtx := hcSelectPreset;
   Menu^.Default := SelectedItem;
   N := Desktop.ExecView(PV);

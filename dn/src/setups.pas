@@ -130,7 +130,7 @@ procedure ConfirmSetup;
 function TerminalSetup: Boolean;
 
 procedure SaversSetup;
-function MakeSaversDialog: PDialog;
+function MakeSaversDialog: TDialog;
 
 
 const
@@ -172,7 +172,7 @@ function TerminalSetup: Boolean;
 procedure SystemSetup;
   var
     W: Word;
-    D: PDialog;
+    D: TDialog;
     B: Boolean;
     Data: TSysData;
     i: Char;
@@ -180,8 +180,8 @@ procedure SystemSetup;
   OpenResource;
   if Resource = nil then
     Exit;
-  D := PDialog
-            (Application.ValidView(PDialog(Resource^.Get(dlgSystemSetup))
+  D := TDialog
+            (Application.ValidView(TDialog(Resource^.Get(dlgSystemSetup))
         ));
   if D = nil then
     Exit;
@@ -208,7 +208,7 @@ procedure InterfaceSetup;
     AltTab: Boolean;
     R: TRect;
   begin
-  with PApplication(Application)^ do
+  with TApplication(Application)^ do
     if ExecResource(dlgInterfaceSetup, InterfaceData) <> cmCancel then
       begin
       GetExtent(R);
@@ -278,14 +278,14 @@ procedure MouseSetup;
 procedure SaversSetup;
   var
     W: Word;
-    D: PDialog;
+    D: TDialog;
     B: Boolean;
   begin
   OpenResource;
   if Resource = nil then
     Exit;
-  D := PDialog
-            (Application.ValidView(PDialog(Resource^.Get(dlgSaversSetup))
+  D := TDialog
+            (Application.ValidView(TDialog(Resource^.Get(dlgSaversSetup))
         ));
   if D = nil then
     Exit;
@@ -461,7 +461,7 @@ procedure TCurrDriveInfo.HandleEvent(var Event: TEvent);
   then
     begin
     W := PSysDialog(Owner)^.LocalData.Drives[Char
-          (Byte('A')+PScrollBar(Event.InfoPtr).Value)];
+          (Byte('A')+TScrollBar(Event.InfoPtr).Value)];
     SetData(W);
     end
   else if (Event.What = evKeyDown) and (Char(Event.CharCode) = ' ')
@@ -562,7 +562,7 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
   var
     PS: PString;
     F: Integer;
-    A, S: PCollection;
+    A, S: TCollection;
     LocalData: TSaversData;
   function SeekStr(P_: Pointer): Boolean;
   var P: PString absolute P_;
@@ -613,79 +613,79 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
 constructor TSaversDialog.Create;
   var
     R: TRect;
-    D: PDialog;
-    Control, Labl, Histry: PView;
+    D: TDialog;
+    Control, Labl, Histry: TView;
   begin
   R.Assign(0, 0, 57, 20);
   inherited Create(R, GetString(dlScreenSaverSetup));
   Options := Options or ofCentered or ofValidate;
   HelpCtx := hcSavers;
   R.Assign(19, 3, 20, 13);
-  Control := PScrollBar.Create(R);
+  Control := TScrollBar.Create(R);
   Insert(Control);
 
   R.Assign(2, 3, 19, 13);
-  Control := New(PSaversListBox, Init(R, 1, PScrollBar(Control)));
+  Control := New(PSaversListBox, Init(R, 1, TScrollBar(Control)));
   Insert(Control);
 
   R.Assign(2, 2, 18, 3);
-  Labl := New(PLabel, Init(R, GetString(dlSS_S_electedSavers), Control));
+  Labl := New(TLabel, Init(R, GetString(dlSS_S_electedSavers), Control));
   Insert(Labl);
 
   R.Assign(20, 6, 36, 8);
-  Control := New(PButton, Init(R, GetString(dlSS_A_dd), cmYes,
+  Control := New(TButton, Init(R, GetString(dlSS_A_dd), cmYes,
          bfNormal+bfBroadcast));
   Insert(Control);
 
   R.Assign(20, 8, 36, 10);
-  Control := New(PButton, Init(R, GetString(dlSS_R_emove), cmNo,
+  Control := New(TButton, Init(R, GetString(dlSS_R_emove), cmNo,
          bfNormal+bfBroadcast));
   Insert(Control);
 
   R.Assign(54, 3, 55, 13);
-  Control := PScrollBar.Create(R);
+  Control := TScrollBar.Create(R);
   Insert(Control);
 
   R.Assign(37, 3, 54, 13);
-  Control := New(PListBox, Init(R, 1, PScrollBar(Control)));
+  Control := New(TListBox, Init(R, 1, TScrollBar(Control)));
   Insert(Control);
 
   R.Assign(37, 2, 54, 3);
-  Labl := New(PLabel, Init(R, GetString(dlSSA_v_ailableSavers), Control));
+  Labl := New(TLabel, Init(R, GetString(dlSSA_v_ailableSavers), Control));
   Insert(Labl);
 
   R.Assign(2, 15, 18, 16);
   Control := PInputline.Create(R, 3);
-  PInputline(Control)^.SetValidator(PRangeValidator.Create(1, 254));
+  TInputline(Control).SetValidator(PRangeValidator.Create(1, 254));
   { X-Man }
   Control^.Options := Control^.Options or ofValidate;
   Insert(Control);
 
   R.Assign(2, 14, 18, 15);
-  Labl := New(PLabel, Init(R, GetString(dlSS_T_ime), Control));
+  Labl := New(TLabel, Init(R, GetString(dlSS_T_ime), Control));
   Insert(Labl);
 
   R.Assign(20, 15, 55, 16);
-  Control := New(PCheckBoxes, Init(R,
+  Control := New(TCheckBoxes, Init(R,
         NewSItem(GetString(dlSSUse_M_ouse), nil)));
   Insert(Control);
 
   R.Assign(7, 17, 17, 19);
-  Control := New(PButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
+  Control := New(TButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
   Insert(Control);
 
   R.Assign(17, 17, 28, 19);
-  Control := New(PButton, Init(R, GetString(dlCancelButton), cmCancel,
+  Control := New(TButton, Init(R, GetString(dlCancelButton), cmCancel,
          bfNormal));
   Insert(Control);
 
   R.Assign(28, 17, 40, 19);
-  Control := New(PButton, Init(R, GetString(dlHelpButton), cmHelp,
+  Control := New(TButton, Init(R, GetString(dlHelpButton), cmHelp,
          bfNormal));
   Insert(Control);
 
   R.Assign(40, 17, 50, 19);
-  Control := New(PButton, Init(R, GetString(dlTestButton), cmTest,
+  Control := New(TButton, Init(R, GetString(dlTestButton), cmTest,
          bfNormal));
   Insert(Control);
 
@@ -751,7 +751,7 @@ destructor TSaversDialog.Done;
     Data.Available.List.Free;
   end;
 
-function MakeSaversDialog: PDialog;
+function MakeSaversDialog: TDialog;
   begin
   MakeSaversDialog := PSaversDialog.Create;
   end;

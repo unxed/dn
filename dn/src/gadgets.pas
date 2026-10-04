@@ -60,7 +60,7 @@ type
   
   { Trash can object }
   TTrashCan = class;
-  PTrashCan = TTrashCan;
+
   TTrashCan = class(TView)
     ImVisible: Boolean;
     constructor Create(const R: TRect);
@@ -90,7 +90,7 @@ const
   LastMin: Word = 0;
 
 const
-  KeyMacroses: PCollection = nil;
+  KeyMacroses: TCollection = nil;
   MacroRecord: Boolean = False;
 
 type
@@ -119,7 +119,7 @@ type
     procedure Draw; override;
     end;
   
-procedure PrintFiles(Files: PCollection; Own: PView);
+procedure PrintFiles(Files: TCollection; Own: TView);
 
 
 implementation
@@ -303,7 +303,7 @@ procedure TClockView.Update;
     d, mn, y: Word;
     SS: String[40];
     Event: TEvent;
-    P: PView;
+    P: TView;
     DayWeek: Byte;
     R: TRect;
     StdClockWidth: Byte;
@@ -497,7 +497,7 @@ procedure TTrashCan.SetState(AState: Word; Enable: Boolean);
 
 {-DataCompBoy-}
 
-procedure PrintFiles(Files: PCollection; Own: PView);
+procedure PrintFiles(Files: TCollection; Own: TView);
   var
     PF: PFileRec;
     I, J: Integer;

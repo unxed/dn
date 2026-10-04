@@ -101,7 +101,7 @@ type
     Unused: array[0..31] of Byte;
     NumFields: SmallInt;
     Loc: LongInt;
-    Fields: PCollection;
+    Fields: TCollection;
     constructor Create(const FileName: String); {DataCompBoy}
     destructor Destroy; override;
     procedure Read(var Buf; Num: Word);

@@ -57,8 +57,8 @@ uses
 type
   TPanelDescr = record
   {` Описатель одной (из двух) панелей }
-    AnyPanel: PView; // если на этой панели что-то видно - то именно это.
-    FilePanel: PFilePanel; { Файловая панель. Имеется всегда, но,
+    AnyPanel: TView; // если на этой панели что-то видно - то именно это.
+    FilePanel: TFilePanel; { Файловая панель. Имеется всегда, но,
       возможно, скрыта, чтобы показать нефайловую.
       Если видна файловая панель, то AnyPanel = FilePanel }
     PanelType: Byte; // тип AnyPanel
@@ -128,10 +128,10 @@ type
       {`скрыть/показать панель`}
     procedure ChangeDrv(N: TPanelNum);
       {`сменить диск с диалогом (Alt-F1/F2)`}
-    procedure SetMaxiState(P: PFilePanelRoot);
+    procedure SetMaxiState(P: TFilePanelRoot);
       {` Установить состояние максимизированности активной файловой
         панели в соответствии с её настройкой `}
-    procedure ToggleViewMaxiState(P: PView; Other: TPanelNum);
+    procedure ToggleViewMaxiState(P: TView; Other: TPanelNum);
       {` Инвертировать состояние максимизированности активной панели
         (возможно, нефайловой). Номер другой панели - Other `}
     end;
@@ -173,9 +173,9 @@ uses
 
 constructor TDoubleWindow.Create(const Bounds: TRect; ANumber, ADrive: Integer);
   var
-    P: PFilePanel;
+    P: TFilePanel;
     R: TRect;
-    PV: PView;
+    PV: TView;
     i: TPanelNum;
   begin
   inherited Create(Bounds, '', ANumber);
@@ -209,7 +209,7 @@ constructor TDoubleWindow.Create(const Bounds: TRect; ANumber, ADrive: Integer);
 procedure TDoubleWindow.InitPanel(N: TPanelNum; R: TRect);
   var
     PV: PMyScrollBar;
-    P: PFilePanel;
+    P: TFilePanel;
     P1: PInfoView;
     P2: PDirView;
     P3: PSortView;
@@ -224,7 +224,7 @@ procedure TDoubleWindow.InitPanel(N: TPanelNum; R: TRect);
   Inc(B.A.Y);
   Dec(B.B.Y, 3);
   PV := PMyScrollBar.Create(B);
-  P := PFilePanel.Create(R, Panel[N].Drive, PV);
+  P := TFilePanel.Create(R, Panel[N].Drive, PV);
   if Abort then
     begin
     P.Free;
@@ -261,7 +261,7 @@ procedure TDoubleWindow.InitPanel(N: TPanelNum; R: TRect);
   with Panel[N] do
     begin
     AnyPanel := P;
-    FilePanel := PFilePanel(P);
+    FilePanel := TFilePanel(P);
     PanelType := dtPanel;
     FilePanel.SelfNum := N;
     P.Select;
@@ -381,7 +381,7 @@ constructor TDoubleWindow.Load(S: TStream);
         end;
 
     dtTree:
-      with PHTreeView(Panel[NonFilePanel].AnyPanel) do
+      with THTreeView(Panel[NonFilePanel].AnyPanel) do
         ReadAfterLoad;
 
     dtInfo:
@@ -434,7 +434,7 @@ function MakeVScroll: PViewScroll;
   end;
 
 { Контроль свежесозданной нефайловой панели P; при ошибках будет P=nil }
-function ValidVP(var P: PView; S: PView {скроллбар}): Boolean;
+function ValidVP(var P: TView; S: TView {скроллбар}): Boolean;
   begin
   Result := False;
   if (S = nil) or (P = nil) or not P.Valid(0) then
@@ -447,7 +447,7 @@ function ValidVP(var P: PView; S: PView {скроллбар}): Boolean;
   Result := True;
   end;
 
-procedure InsertView(var P: PView; S: PView; Manager: PDoubleWindow);
+procedure InsertView(var P: TView; S: TView; Manager: PDoubleWindow);
   begin
   if ValidVP(P, S) then
     with Manager do
@@ -461,44 +461,44 @@ procedure InsertView(var P: PView; S: PView; Manager: PDoubleWindow);
 { Построители нефайловых панелей }
 
 function InsertQView(R1: TRect;
-    Manager: PDoubleWindow; Other: PFilePanelRoot): PView;
+    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
   var
     S: PViewScroll;
   begin
   S := MakeVScroll;
-  Result := PQFileViewer.Create(R1, nil, '', '', S, True,
+  Result := TQFileViewer.Create(R1, nil, '', '', S, True,
            (EditorDefaults.ViOpt and 1) <> 0);
   InsertView(Result, S, Manager);
   end { InsertQView };
 
 function InsertDizView(R1: TRect;
-    Manager: PDoubleWindow; Other: PFilePanelRoot): PView;
+    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
   var
     S: PViewScroll;
   begin
   S := MakeVScroll;
-  Result := PDFileViewer.Create(R1, nil, '', '', S, True,
+  Result := TDFileViewer.Create(R1, nil, '', '', S, True,
     (EditorDefaults.ViOpt and 1) <> 0);
   InsertView(Result, S, Manager);
   end { InsertDizView };
 
 function InsertTree(R1: TRect;
-    Manager: PDoubleWindow; Other: PFilePanelRoot): PView;
+    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
   var
     S: PMyScrollBar;
-    P: PView;
+    P: TView;
   begin
   S := PMyScrollBar.Create(VScrollRect);
   S.Options := S.Options or ofPostProcess;
   { Область делим по вертикали между подвалом (2 строки) и деревом}
   Dec(R1.B.Y, 2);
-  Result := PHTreeView.Create(R1, 0, False, S);
+  Result := THTreeView.Create(R1, 0, False, S);
   if ValidVP(Result, S) then
     begin
     R1.A.Y := R1.B.Y;
     Inc(R1.B.Y, 2);
-    P := PTreeInfoView.Create(R1, PHTreeView(Result));
-    PHTreeView(Result).Info := P;
+    P := TTreeInfoView.Create(R1, THTreeView(Result));
+    THTreeView(Result).Info := P;
     with Manager do
       begin
       Insert(P);
@@ -509,7 +509,7 @@ function InsertTree(R1: TRect;
   end { InsertTree };
 
 function InsertInfo(R1: TRect;
-    Manager: PDoubleWindow; Other: PFilePanelRoot): PView;
+    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
   begin
   Result := PDiskInfo.Create(R1, Other);
   Result.Hide;
@@ -522,7 +522,7 @@ function InsertInfo(R1: TRect;
 
 type
   TPanelConstructor = function(R1: TRect;
-    Manager: PDoubleWindow; Other: PFilePanelRoot): PView;
+    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
 
 { В этот массив кто угодно (плагин, к примеру) может добавить свой
 элемент вместо любого nil, после чего этот новый тип нефайловой панели
@@ -545,7 +545,7 @@ const
 procedure TDoubleWindow.SwitchView(dtType: Byte);
   var
     R1: TRect;
-    V: PView;
+    V: TView;
     N, Selected: TPanelNum;
     VisibleN: Boolean;
   label Ex;
@@ -645,7 +645,7 @@ procedure TDoubleWindow.InitInterior;
 procedure TDoubleWindow.SwitchPanel(N: TPanelNum);
   var
     R, RN: TRect;
-    ThisPanel: PView;
+    ThisPanel: TView;
     NewXBound: Integer;
     ForceResize: Boolean;
   begin
@@ -693,7 +693,7 @@ procedure TDoubleWindow.ChangeDrv(N: TPanelNum);
     R, R1: TRect;
     S: String;
     P: TPoint;
-    ThisPanel: PView;
+    ThisPanel: TView;
     PanelSelected, PanelVisible: Boolean;
   begin
   ThisPanel := Panel[N].AnyPanel;
@@ -752,7 +752,7 @@ procedure TDoubleWindow.ChangeDrv(N: TPanelNum);
   UnLock;
   end { TDoubleWindow.ChangeDrv };
 
-procedure TDoubleWindow.SetMaxiState(P: PFilePanelRoot);
+procedure TDoubleWindow.SetMaxiState(P: TFilePanelRoot);
   var
     Other: TPanelNum;
   begin
@@ -771,7 +771,7 @@ procedure TDoubleWindow.SetMaxiState(P: PFilePanelRoot);
     ToggleViewMaxiState(P, not P.SelfNum);
   end;
 
-procedure TDoubleWindow.ToggleViewMaxiState(P: PView; Other: TPanelNum);
+procedure TDoubleWindow.ToggleViewMaxiState(P: TView; Other: TPanelNum);
   begin
   Lock;
   if not PanelZoomed then
@@ -862,9 +862,9 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
   var
     R, R1, R2: TRect;
     I, K: Integer;
-    AP, PP: PFilePanel;
+    AP, PP: TFilePanel;
     D: Word;
-    P: PView;
+    P: TView;
     N: TPanelNum;
     S: String;
     WPanel: TPanelDescr;

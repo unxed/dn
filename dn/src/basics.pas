@@ -98,7 +98,7 @@ type
   TTextReaderBuf = array[0..TextReaderBufSize-1] of Char;
 
   TTextReader = class;
-  PTextReader = TTextReader;
+
   TTextReader = class
     Eof: Boolean;
     constructor Create(const FName: String); {DataCompBoy}
@@ -174,7 +174,7 @@ procedure CheckOS;
 procedure ClrIO;
 
 function MemOK: Boolean;
-function GetMeMemoStream: PStream; {-$VOL}
+function GetMeMemoStream: TStream; {-$VOL}
 function MemAdjust(L: LongInt): LongInt;
 procedure FillWord(var B; Count, W: Word);
 procedure LocateCursor(X, Y: Byte);
@@ -672,14 +672,14 @@ procedure CheckOS;
   end;
 
 
-function GetMeMemoStream: PStream; {-$VOL begin}
+function GetMeMemoStream: TStream; {-$VOL begin}
   const
     _1: Byte = 1;
   var
-    S: PStream;
+    S: TStream;
     Pos: LongInt;
   begin
-  S := PMemoryStream.Create(2048, 2048);
+  S := TMemoryStream.Create(2048, 2048);
   {Cat: а теперь запишем туда единичку, чтобы другие глупые процедуры,     }
   {     которые читают из потока то, что они туда не записывали, считали,  }
   {     что наш поток содержит длинные строки                              }

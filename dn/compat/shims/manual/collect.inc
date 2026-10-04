@@ -5,7 +5,7 @@
   TODO: the streams of the long strings, the resource collections. }
 type
   TSortedCollection = class;
-  PSortedCollection = TSortedCollection;
+
   TSortedCollection = class(TvObjs.TSortedCollection)
     procedure Sort;
     procedure QSort;
@@ -13,7 +13,7 @@ type
   end;
 
   TStringCollection = class;
-  PStringCollection = TStringCollection;
+
   TStringCollection = class(TSortedCollection)
     LongStrings: Boolean;
     constructor Create(ALimit, ADelta: LongInt; ALongStrings: Boolean);
@@ -25,14 +25,14 @@ type
 
   { not sorted: Insert appends }
   TUnSortedStrCollection = class;
-  PUnSortedStrCollection = TUnSortedStrCollection;
+
   TUnSortedStrCollection = class(TStringCollection)
     procedure Insert(Item: Pointer); override;
   end;
 
   { the items are zero-terminated strings (PChar) }
   TStrCollection = class;
-  PStrCollection = TStrCollection;
+
   TStrCollection = class(TSortedCollection)
     function Compare(Key1, Key2: Pointer): Integer; override;
     procedure FreeItem(Item: Pointer); override;
@@ -42,7 +42,7 @@ type
 
   { a collection of lines (not sorted) }
   TLineCollection = class;
-  PLineCollection = TLineCollection;
+
   TLineCollection = class(TCollection)
     LongStrings: Boolean;
     constructor Create(ALimit, ADelta: LongInt; ALongStrings: Boolean);

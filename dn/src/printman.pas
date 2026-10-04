@@ -64,7 +64,7 @@ type
     function GetItem(var S: TStream): Pointer; virtual;
     end;
 
-  PPrintManager = ^TPrintManager;
+
   TPrintManager = class(TListBox)
     isValid: Boolean;
     OutName: PString;
@@ -72,14 +72,14 @@ type
     Paused: Boolean;
     FileLen: TFileSize;
     FilePos: TFileSize;
-    Status: PView;
-    PrintStream: PStream;
+    Status: TView;
+    PrintStream: TStream;
     Buffer: PByteArray;
     BufSize: Word;
     BufCount: Word;
-    PrintDevice: PDosStream;
-    constructor Create(var Bounds: TRect; AStatus: PView;
-         AScrollBar: PScrollBar);
+    PrintDevice: TDosStream;
+    constructor Create(var Bounds: TRect; AStatus: TView;
+         AScrollBar: TScrollBar);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     function PrintBuffer(Num: Word): Boolean;
@@ -93,21 +93,21 @@ type
     destructor Done; virtual;
     end;
 
-  PPrintStatus = ^TPrintStatus;
+
   TPrintStatus = class(TView)
-    Print: PPrintManager;
+    Print: TPrintManager;
     procedure Draw; virtual;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;
 
-  PPMWindow = ^TPMWindow;
+
   TPMWindow = class(TDialog)
     constructor Create(R: TRect);
     end;
 
 const
-  Printer: PPrintManager = nil;
+  Printer: TPrintManager = nil;
   MaxBufCount = 128;
 
 procedure SetupPrinter;
@@ -141,26 +141,26 @@ function TStringCol.GetItem(var S: TStream): Pointer;
 
 constructor TPMWindow.Create(R: TRect);
   var
-    P: PView;
-    S: PView;
+    P: TView;
+    S: TView;
   begin
   inherited Create(R, GetString(dlPManagerTitle));
   Number := GetNum;
   R.Assign(Size.X-13, 1, Size.X-12, Size.Y-4);
-  P := PScrollBar.Create(R);
+  P := TScrollBar.Create(R);
   Insert(P);
   R.Assign(2, Size.Y-4, Size.X-14, Size.Y-2);
-  S := PPrintStatus.Create(R);
+  S := TPrintStatus.Create(R);
   Insert(S);
   R.Assign(2, 1, Size.X-13, Size.Y-4);
-  P := New(PPrintManager, Init(R, S, PScrollBar(P)));
+  P := New(TPrintManager, Init(R, S, TScrollBar(P)));
   Insert(P);
   R.Assign(Size.X-12, 2, Size.X-2, 4);
-  Insert(New(PButton, Init(R, GetString(dlDeleteButton), cmOK, 0)));
+  Insert(New(TButton, Init(R, GetString(dlDeleteButton), cmOK, 0)));
   R.Assign(Size.X-12, 4, Size.X-2, 6);
-  Insert(New(PButton, Init(R, GetString(dlCloseButton), cmClose, 0)));
+  Insert(New(TButton, Init(R, GetString(dlCloseButton), cmClose, 0)));
   R.Assign(Size.X-12, 6, Size.X-2, 8);
-  Insert(New(PButton, Init(R, GetString(dlPauseButton), cmNo, 0)));
+  Insert(New(TButton, Init(R, GetString(dlPauseButton), cmNo, 0)));
   SelectNext(False);
   HelpCtx := hcPrintManager;
   end { TPMWindow.Init };
@@ -207,7 +207,7 @@ procedure TPrintStatus.Draw;
   WriteLineC(0, 1, Size.X, 1, B);
   end { TPrintStatus.Draw };
 
-constructor TPrintManager.Create(var Bounds: TRect; AStatus: PView; AScrollBar: PScrollBar);
+constructor TPrintManager.Create(var Bounds: TRect; AStatus: TView; AScrollBar: TScrollBar);
   var
     S: String;
   begin
@@ -215,7 +215,7 @@ constructor TPrintManager.Create(var Bounds: TRect; AStatus: PView; AScrollBar: 
   Options := Options or ofPostProcess;
   Status := AStatus;
   if Status <> nil then
-    PPrintStatus(Status)^.Print := Self;
+    TPrintStatus(Status).Print := Self;
   Printer := Self;
   BufSize := MaxBufCount;
   GetMem(Buffer, BufSize);
@@ -234,7 +234,7 @@ function TPrintManager.SetDestination: Boolean;
   var
     S, S1: String;
     P: Boolean;
-    OldP: PDosStream;
+    OldP: TDosStream;
     hFile: LongInt;
     NotDev: Boolean;
   begin
@@ -299,7 +299,7 @@ function TPrintManager.SetDestination: Boolean;
     end;
 
   OldP := PrintDevice;
-  PrintDevice := PDosStream.Create(S, stCreate);
+  PrintDevice := TDosStream.Create(S, stCreate);
 
 //JO: для расшаренных сетевых принтеров статус не будет stOK, т.к.
 //    для них не работает SysFileSeek, вызываемая в TDOSStream.Init,
@@ -348,7 +348,7 @@ constructor TPrintManager.Load(var S: TStream);
   OutName := S.ReadStr;
   S.Read(Paused, 1);
   S.Read(FilePos, 4);
-  PrintDevice := PDosStream.Create(OutName^, stCreate);
+  PrintDevice := TDosStream.Create(OutName^, stCreate);
   BufSize := MaxBufCount;
   GetMem(Buffer, BufSize);
   isValid := True;
@@ -365,7 +365,7 @@ constructor TPrintManager.Load(var S: TStream);
     PrintDevice^.Status := 0;
     Exit;
     end;
-  PrintStream := New(PBufStream, Init(PString(List^.At(0))^, stOpenRead,
+  PrintStream := New(TBufStream, Init(PString(List^.At(0))^, stOpenRead,
          $400));
   FileLen := PrintStream^.GetSize;
   PrintStream^.Seek(FilePos);
@@ -598,7 +598,7 @@ procedure TPrintManager.Update;
         Owner.Free;
       Exit;
       end;
-    PrintStream := New(PBufStream, Init(PString(List^.At(0))^,
+    PrintStream := New(TBufStream, Init(PString(List^.At(0))^,
            stOpenRead, $400));
     FileLen := 0;
     FilePos := 0;
@@ -667,13 +667,13 @@ procedure SetupPrinter;
 
 procedure PrintFile(const S: String);
   var
-    W: PView;
+    W: TView;
     R: TRect;
   begin
   R.Assign(0, 0, 50, 9);
   if Printer = nil then
     begin
-    W := Application.ValidView(PPMWindow.Create(R));
+    W := Application.ValidView(TPMWindow.Create(R));
     if W <> nil then
       begin
       W.Hide;

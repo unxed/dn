@@ -248,7 +248,7 @@ const
   DefaultAddArchiver: AWord = arcUNK;
 
 const
-  ArcFile: PBufStream = nil;
+  ArcFile: TBufStream = nil;
 var
   FileInfo: TFInfo;
   ArcPos: TFileSize;
@@ -256,11 +256,11 @@ var
 const
   ArcFileName: String = ''; {DataCompBoy}
   VArcFileName: String = ''; {JO}
-  PReader: PView = nil;
+  PReader: TView = nil;
 
-function ArchiveFiles(const S: String; Files: PCollection;
+function ArchiveFiles(const S: String; Files: TCollection;
      MoveMode: Boolean; Owner: Pointer): Boolean;
-procedure MakeArchive(S: String; Files: PCollection;
+procedure MakeArchive(S: String; Files: TCollection;
      MoveMode, AddToExisting: Boolean; Owner: Pointer);
 procedure UnarchiveFiles(const FName: String);
 procedure SkipSFX;
@@ -706,7 +706,7 @@ procedure TARJArchive.GetFile;
   ArcFile.Seek(CompToFSize(ArcFile.GetPos+FileInfo.PSize));
   end { TARJArchive.GetFile };
 
-function ArchiveFiles(const S: String; Files: PCollection; MoveMode: Boolean; Owner: Pointer): Boolean;
+function ArchiveFiles(const S: String; Files: TCollection; MoveMode: Boolean; Owner: Pointer): Boolean;
   var
     C: TStr4;
     q: Byte;
@@ -733,7 +733,7 @@ function CheckForSpaces(S: String): Boolean;
 { Flash <<< }
 
 {-DataCompBoy-}
-procedure MakeArchive(S: String; Files: PCollection; MoveMode, AddToExisting: Boolean; Owner: Pointer);
+procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Boolean; Owner: Pointer);
 
   var
     AID: Word;
@@ -1203,7 +1203,7 @@ TryAgain:
   if AddToExisting and (CnvString(Arc.SetPathInside) <> '') then
     begin
     if Owner <> nil then
-      Message(PView(Owner).Owner, evCommand, cmPushInternalName,
+      Message(TView(Owner).Owner, evCommand, cmPushInternalName,
          @SIntern);
     if SIntern <> '' then
       begin
@@ -1256,7 +1256,7 @@ procedure UnarchiveFiles(const FName: String);
     FCT: PFilesCollection;
     FRT: PFileRec;
     OldConfirms: Word;
-    PV: PView;
+    PV: TView;
     Inhr: Byte;
     DDr: Char;
     SR: lSearchRec;
@@ -1265,7 +1265,7 @@ procedure UnarchiveFiles(const FName: String);
   begin { UnarchiveFiles }
   lFSplit(FName, Dr, Nm, Xt);
   ArcFileName := FName;
-  ArcFile := PBufStream.Create(FName, stOpenRead, ArcBufSize);
+  ArcFile := TBufStream.Create(FName, stOpenRead, ArcBufSize);
   if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
     begin
     if TempFile <> '' then
@@ -1468,7 +1468,7 @@ TryAgain:
   else
     begin
     { перекидываем файлы из временного подкаталога в каталог назначения}
-    PV := PUserWindow.Create;
+    PV := TUserWindow.Create;
     Desktop.Insert(PV);
     CopyDirContent(TempExtrDir, ExtrDir, True, (DT.W and 4 <> 0));
     PV.Free;

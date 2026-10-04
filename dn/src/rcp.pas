@@ -661,7 +661,7 @@ procedure MakeEditorCommands;
 procedure ProcessDLGs;
   var
     tP: PTypeHolder;
-    St: PStream;
+    St: TStream;
   function GetID(const S: String): LongInt;
     var
       T: TLngWord;
@@ -690,7 +690,7 @@ procedure ProcessDLGs;
   procedure SetSavers;
     
     var
-      D: PDialog;
+      D: TDialog;
     begin
     D := MakeSaversDialog;
     StoreResource(D, dlgSaversSetup);
@@ -768,7 +768,7 @@ procedure ProcessDLGs;
     begin
     PM := CompileStatus;
     R.Assign(0, 0, 80, 1);
-    StatusLine := PStatusLine.Create(R, PM);
+    StatusLine := TStatusLine.Create(R, PM);
     StoreResource(StatusLine, dlgStatusLine);
     StatusLine.Free;
     StatusLine := nil;
@@ -842,7 +842,7 @@ procedure ProcessDLGs;
       ID: TDlgIdx;
       T: TLngWord;
       R: TRect;
-      D: PMenuBar;
+      D: TMenuBar;
       I: LongInt;
       J: LongInt;
     begin
@@ -860,14 +860,14 @@ procedure ProcessDLGs;
 
   procedure CompileDialog(S: String; IdToken: String);
     var
-      D: PDialog;
+      D: TDialog;
       Notepad: PNotepad;
       Page: PPage;
       R: TRect;
       I: LongInt;
       J: LongInt;
-      PV: PView;
-      LastSB: PScrollBar;
+      PV: TView;
+      LastSB: TScrollBar;
       nDirectLink: Byte;
       InPage: Boolean;
 
@@ -921,7 +921,7 @@ procedure ProcessDLGs;
     procedure MakeLabel;
       var
         B: String;
-        P: PLabel;
+        P: TLabel;
       begin
       R.A.X := GetID(Token(S, i));
       R.A.Y := GetID(Token(S, i));
@@ -978,7 +978,7 @@ procedure ProcessDLGs;
     procedure MakeCheckBoxes;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := PCheckBoxes.Create(R, GetItems);
+      PV := TCheckBoxes.Create(R, GetItems);
       D.Insert(PV);
       end;
 
@@ -997,7 +997,7 @@ procedure ProcessDLGs;
     procedure MakeRadioButtons;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := PRadioButtons.Create(R, GetItems);
+      PV := TRadioButtons.Create(R, GetItems);
       D.Insert(PV);
       end;
 
@@ -1043,7 +1043,7 @@ procedure ProcessDLGs;
         else
           Options := Options or GetID(B);
         end;
-      PV := PButton.Create(R, K, CmD, Flags);
+      PV := TButton.Create(R, K, CmD, Flags);
       PV^.Options := PV^.Options or Options;
       D.Insert(PV);
       end { MakeButton };
@@ -1054,28 +1054,28 @@ procedure ProcessDLGs;
       if Mouse then
         LastSB := PMouseBar.Create(R)
       else
-        LastSB := PScrollBar.Create(R);
+        LastSB := TScrollBar.Create(R);
       D.Insert(LastSB);
       end;
 
     procedure MakeListBox;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(PListBox, Init(R, GetID(Token(S, i)), LastSB));
+      PV := New(TListBox, Init(R, GetID(Token(S, i)), LastSB));
       D.Insert(PV);
       end;
 
     procedure MakeStaticText;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(PStaticText, Init(R, Token(S, i)));
+      PV := New(TStaticText, Init(R, Token(S, i)));
       D.Insert(PV);
       end;
 
     procedure MakeParamText;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); PV := PParamText.Create(R, TkS[1], TkL[2]) end;
+      begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); PV := TParamText.Create(R, TkS[1], TkL[2]) end;
       D.Insert(PV);
       end;
 
@@ -1223,7 +1223,7 @@ procedure ProcessDLGs;
     StoreResource(D, ID);
     if ID = dlgSystemSetup then
       begin
-      New(PCollection(DData.Drives.List), Init(0, 10));
+      New(TCollection(DData.Drives.List), Init(0, 10));
       D.SetData(DData);
       end;
     D.Free;
@@ -1273,7 +1273,7 @@ procedure ProcessDLGs;
   Line := 0;
   if IOResult <> 0 then
     Error('Could not open input file');
-  St := PBufStream.Create(OutDlgFileName, stCreate, 512);
+  St := TBufStream.Create(OutDlgFileName, stCreate, 512);
   if St^.Status <> stOK then
     begin
     Close(F.T);
