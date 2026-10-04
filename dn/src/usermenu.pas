@@ -122,9 +122,9 @@ constructor TUserWindow.Create;
   OldScreenWidth := ScreenWidth;
   GetExtent(R);
   R.Grow(-1, -1);
-  Insert(New(TUserView, Init(R,
+  Insert(TUserView.Create(R,
            StandardScrollBar(sbHorizontal+sbHandleKeyboard),
-        StandardScrollBar(sbVertical+sbHandleKeyboard))));
+        StandardScrollBar(sbVertical+sbHandleKeyboard)));
   ClearPositionalEvents := False;
     { пусть единообразно обработается в mainapp }
   end;
@@ -170,7 +170,7 @@ constructor TUserView.Create(const R: TRect; H, V: TScrollBar);
     Byte(InterfaceData.Options and ouiHideMenu = 0)
     { +
    Byte(InterfaceData.Options and ouiHideStatus = 0)});
-  Delta.Y := VScrollBar^.Value;
+  Delta.Y := VScrollBar.Value;
   end;
 
 procedure TUserView.ChangeBounds(const Bounds: TRect);
@@ -681,9 +681,9 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       KB: Word;
     begin
     DoSubMenu := nil;
-    if i = P^.Count then
+    if i = P.Count then
       Exit;
-    UI := P^.At(i);
+    UI := P.At(i);
     {if UI^.Text = nil then begin DoSubMenu := NewLine(DoSubMenu); Exit end;}
     KB := kbNoKey;
     P2 := nil;
@@ -694,10 +694,10 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       P1 := NewItem('Empty line', '', kbNoKey, 1000+i,
           hcLUserMenu+Byte(DoGlobal), nil);
     DoSubMenu := P1;
-    while (i < P^.Count-1) do
+    while (i < P.Count-1) do
       begin
       Inc(i);
-      PU := P^.At(i);
+      PU := P.At(i);
       MenuLast := P1;
       if PU^.Level < UI^.Level then
         begin
@@ -777,12 +777,12 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
 1:
   Message(Desktop, evBroadcast, cmGetUserParamsWL, @UserParams);
   ClrIO;
-  New(P, Init(10, 10));
+  P := TUserCollection.Create(10, 10);
   I := 0;
   NW := 30;
-  while (not F^.Eof) and (IOResult = 0) do
+  while (not F.Eof) and (IOResult = 0) do
     begin
-    S := F^.GetStr;
+    S := F.GetStr;
     Inc(I);
     DelLeft(S);
     DelRight(S);
@@ -815,9 +815,9 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
         end;
       end;
     end;
-  S := F^.FileName;
+  S := F.FileName;
   F.Free;
-  if P^.Count > 0 then
+  if P.Count > 0 then
     begin
     StartPos := -1;
     repeat
@@ -834,7 +834,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       R.B.X := NW;
       R.B.Y := Min(R.B.Y, NI);
       PV := TMenuBox.Create(R, Menu, nil);
-      PV^.Options := PV^.Options or ofCentered;
+      PV.Options := PV.Options or ofCentered;
       I := Application.ExecView(PV);
       PV.Free;
       DisposeMenu(Menu);
@@ -855,15 +855,15 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
         Break;
         end;
       StartPos := I-999;
-      if  (StartPos >= P^.Count-1) or
-          (PUserMenuItem(P^.At(StartPos-1))^.Level >=
-               PUserMenuItem(P^.At(StartPos))^.Level)
+      if  (StartPos >= P.Count-1) or
+          (PUserMenuItem(P.At(StartPos-1))^.Level >=
+               PUserMenuItem(P.At(StartPos))^.Level)
       then
         begin
         ExecUserMenu := True;
         I := I-1000;
         NW := I;
-        UI := P^.At(I);
+        UI := P.At(I);
         F := TTextReader.Create(S);
         lAssignText(F1, SwpDir+'$DN'+ItoS(DNNumber)+'$'+CmdExt);
         lRewriteText(F1);
@@ -874,10 +874,10 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
         if F <> nil then
           begin
           for I := 0 to UI^.Line-1 do
-            S := F^.GetStr;
-          while not F^.Eof do
+            S := F.GetStr;
+          while not F.Eof do
             begin
-            S := F^.GetStr;
+            S := F.GetStr;
             DelLeft(S);
             DelRight(S);
             if  (S <> '') then
@@ -1101,7 +1101,7 @@ procedure TGrabber.HandleEvent(var Event: TEvent);
       SyncClipIn;
     if ClipBoardStream <> nil
     then
-      ClipBoardStream^.Seek(Positive(ClipBoardStream^.GetPos-4));
+      ClipBoardStream.Seek(Positive(ClipBoardStream.GetPos-4));
     CopyLines2Stream(ClipBoard, ClipBoardStream);
     end { MakeClip };
 
@@ -1230,10 +1230,10 @@ RL:
     end;
   if F = nil then
     Exit;
-  while not F^.Eof do
+  while not F.Eof do
     begin
     OS2 := #0;
-    TitleStr := F^.GetStr;
+    TitleStr := F.GetStr;
 
     I := PosChar(';', TitleStr);
     if I > 0 then
@@ -1295,9 +1295,9 @@ RL:
   EnterParms := False;
   Message(Desktop, evBroadcast, cmGetUserParamsWL, @UserParams);
   ClrIO;
-  while not F^.Eof do
+  while not F.Eof do
     begin
-    S := F^.GetStr;
+    S := F.GetStr;
     DelRight(S);
     DelLeft(S);
     if  (S <> '') and (S[1] = ';') then
