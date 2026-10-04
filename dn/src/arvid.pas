@@ -779,7 +779,7 @@ procedure TArvidDrive.ChangeUp(var S: String);
   Prev.lChDir(Prev.CurDir);
 {AK155 Если GetState(sfSelected+sfActive), то и так ActivePanel = Panel
   if  (Prev.DriveType = dtDisk) and
-      (PView(Panel)^.GetState(sfSelected+sfActive))
+      (PView(Panel).GetState(sfSelected+sfActive))
   then
     ActivePanel := Panel;
 /AK155}

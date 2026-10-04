@@ -456,7 +456,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
               repeat
               until PrintBuffer(1);
               end;
-            List^.AtFree(Focused);
+            List.AtFree(Focused);
             SetRange(List^.Count);
             DrawView;
             if Status <> nil then
@@ -474,7 +474,7 @@ procedure TPrintManager.PrintFile(const FileName: String);
   if List = nil then
     List := PStringCol.Create(10, 10);
   
-  List^.Insert(NewStr(lfGetLongFileName(FileName)));
+  List.Insert(NewStr(lfGetLongFileName(FileName)));
   
   SetRange(List^.Count);
   DrawView;
@@ -578,7 +578,7 @@ procedure TPrintManager.Update;
     PrintStream := nil;
     if InMask(GetName(S), '$DN????$.PRN') then
       EraseFile(S);
-    List^.AtFree(0);
+    List.AtFree(0);
     SetRange(List^.Count);
     FocusItem(Focused-1);
     DrawView;

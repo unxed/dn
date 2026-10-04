@@ -521,7 +521,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
 (*
         kbDown, kbUp: { протез навигации стрелками }
           begin
-          PGroup(Owner)^.SelectNext(DNKeyCode(Event) = kbUp);
+          PGroup(Owner).SelectNext(DNKeyCode(Event) = kbUp);
           ClearEvent(Event);
           end;
 *)

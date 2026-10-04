@@ -208,7 +208,7 @@ procedure FreeLastUnmarked(C: PCollection);
     Exit;
   I := C^.Count;
   if C^.LastThat(IsThat) <> nil then
-    C^.AtFree(I);
+    C.AtFree(I);
   end;
 
 function TEditHistoryCol.IndexOf(P: Pointer): LongInt;
@@ -398,9 +398,9 @@ Q:
     if I >= 0 then
       begin
       R^.FName^[1] := PViewRecord(ViewHistory^.At(I))^.FName^[1];
-      ViewHistory^.AtFree(I);
+      ViewHistory.AtFree(I);
       end;
-    ViewHistory^.AtInsert(0, R);
+    ViewHistory.AtInsert(0, R);
     end;
   if ViewHistory^.Count > MaxEditHistorySize then
     FreeLastUnmarked(ViewHistory);
@@ -430,9 +430,9 @@ procedure StoreExtViewer(const FileName: String);
   if I >= 0 then
     begin
     R^.FName^[1] := PViewRecord(ViewHistory^.At(I))^.FName^[1];
-    ViewHistory^.AtFree(I);
+    ViewHistory.AtFree(I);
     end;
-  ViewHistory^.AtInsert(0, R);
+  ViewHistory.AtInsert(0, R);
   if ViewHistory^.Count > MaxEditHistorySize then
     FreeLastUnmarked(ViewHistory);
   end { StoreExtViewer };
@@ -446,7 +446,7 @@ procedure StoreEditInfo(P: Pointer);
 
   begin
   if  (InterfaceData.Options and ouiTrackEditors = 0) or
-      (PFileEditor(E^.Intern)^.EditName = '')
+      (PFileEditor(E^.Intern).EditName = '')
   then
     Exit;
   if EditHistory = nil then
@@ -490,9 +490,9 @@ procedure StoreEditInfo(P: Pointer);
   if I >= 0 then
     begin
     R^.FName^[1] := PViewRecord(EditHistory^.At(I))^.FName^[1];
-    EditHistory^.AtFree(I);
+    EditHistory.AtFree(I);
     end;
-  EditHistory^.AtInsert(0, R);
+  EditHistory.AtInsert(0, R);
   if EditHistory^.Count > MaxEditHistorySize then
     FreeLastUnmarked(EditHistory);
   SaveHistories; {AK155}
@@ -513,12 +513,12 @@ procedure AddCommand(const LastCommand: String);
       P := CmdStrings^.At(I);
       if Copy(CnvString(P), 2, MaxStringLength) = LastCommand then
         begin
-        CmdStrings^.AtDelete(I);
-        CmdStrings^.Insert(P);
+        CmdStrings.AtDelete(I);
+        CmdStrings.Insert(P);
         goto 1;
         end;
       end;
-    CmdStrings^.Insert(NewStr(' '+LastCommand));
+    CmdStrings.Insert(NewStr(' '+LastCommand));
 1:
     I := 0;
     while (CmdStrings^.Count > 50) and
@@ -529,7 +529,7 @@ procedure AddCommand(const LastCommand: String);
       if FreeStr[1] <> '+' then
         begin
         {if LastTHistPos > I then Dec(LastTHistPos);}
-        CmdStrings^.AtFree(I);
+        CmdStrings.AtFree(I);
         end
       else
         Inc(I);
@@ -563,8 +563,8 @@ Message(CommandLine, evCommand, cmExecCommandLine, nil);
       begin
       if CmdStrings^.Count <= 0 then
         Break;
-      M^.AtInsert(0, CmdStrings^.At(CmdStrings^.Count-1));
-      CmdStrings^.AtDelete(CmdStrings^.Count-1);
+      M.AtInsert(0, CmdStrings^.At(CmdStrings^.Count-1));
+      CmdStrings.AtDelete(CmdStrings^.Count-1);
       end;
     CmdStrings.Free;
     CmdStrings := M;
@@ -808,7 +808,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
                and (CurString > 0)
           then
             Dec(CurString);
-          List^.AtFree(Focused);
+          List.AtFree(Focused);
           SetRange(List^.Count);
           DrawView;
           end;
@@ -888,11 +888,11 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   I := -1;
   P := DirHistory^.FirstThat(IsThat);
   if P <> nil then
-    DirHistory^.AtDelete(I)
+    DirHistory.AtDelete(I)
   else
     P := NewStr(' '+S);
   if P <> nil then
-    DirHistory^.AtInsert(0, P);
+    DirHistory.AtInsert(0, P);
   if DirHistory^.Count > MaxDirHistorySize then
     begin
     P := DirHistory^.LastThat(IsThis);
@@ -913,12 +913,12 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): PDialog;
 
   R.Assign(D^.Size.X-3, 2, D^.Size.X-2, 13);
   P := PScrollBar.Create(R);
-  D^.Insert(P);
+  D.Insert(P);
 
   R.Assign(2, 2, D^.Size.X-3, 13);
   L := New(PTHistList, Init(R, 1, PScrollBar(P)));
   L^.Dlg := Dlg; {AK155: см. TTHistList.HandleEvent, cmYes }
-  D^.Insert(L);
+  D.Insert(L);
   List := L;
 
   GetDialog := D;
@@ -1135,13 +1135,13 @@ procedure ClearHistories;
     begin
     if C = nil then
       Exit;
-    C^.Pack;
+    C.Pack;
     i := 0;
     while i < C^.Count do
       begin
       FreeStr := CnvString(C^.At(i));
       if FreeStr[1] = ' ' then
-        C^.AtFree(i)
+        C.AtFree(i)
       else
         Inc(i);
       end;
@@ -1151,13 +1151,13 @@ procedure ClearHistories;
     begin
     if C = nil then
       Exit;
-    C^.Pack;
+    C.Pack;
     i := 0;
     while i < C^.Count do
       begin
       FreeStr := CnvString(PEditRecord(C^.At(i))^.FName);
       if FreeStr[1] = ' ' then
-        C^.AtFree(i)
+        C.AtFree(i)
       else
         Inc(i);
       end;

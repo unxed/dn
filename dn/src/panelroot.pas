@@ -380,7 +380,7 @@ procedure TFilePanelRoot.Store(S: TStream);
   S.Write(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
   S.Write(Delta, 2);
   S.Write(ForceReading, 1);
- {PFilesCollection(Files)^.Selected := ScrollBar^.Value;
+ {PFilesCollection(Files).Selected := ScrollBar^.Value;
   S.Put(Files);} //JO: 11-05-2006 - см. комментаpий к TFilePanelRoot.Load;
   end { TFilePanelRoot.Store };
 
@@ -531,7 +531,7 @@ procedure TFilePanelRoot.RereadDir;
     begin
     LineLength := CalcLength;
     if Files <> nil then
-      ScrollBar^.SetParams(PFilesCollection(Files)^.Selected, 0,
+      ScrollBar^.SetParams(PFilesCollection(Files).Selected, 0,
          Files^.Count-1,
          PanelHeight*((Size.X+1) div LineLength), 1);
     CurrentDirectory := ActiveDir;
@@ -726,7 +726,7 @@ procedure TFilePanelRoot.ReadDirectory;
   
   if Files = nil then
     Files := PFilesCollection.Create($10, $10);
-  PFilesCollection(Files)^.Panel := @Self;
+  PFilesCollection(Files).Panel := @Self;
   SelNum := 0;
   SelectedLen := 0;
   PackedLen := 0;
@@ -734,7 +734,7 @@ procedure TFilePanelRoot.ReadDirectory;
   SM := PanSetup^.Sort.SortMode;
   if RereadNoSort then
     SM := psmUnsorted;
-  PFilesCollection(Files)^.SortMode := SM;
+  PFilesCollection(Files).SortMode := SM;
 
   { Бывает сортировка по описаниям, поэтому Sort надо делать
   после ReadDescrptions }
@@ -1101,11 +1101,11 @@ WrongArc:
     if  (PF = nil) then
       Exit;
     if (PF^.TType = ttUpDir) then
-      Files^.ForEach(DoCount) // в том числе и отмеченные
+      Files.ForEach(DoCount) // в том числе и отмеченные
     else
       begin // отмеченные и текущий каталог
       if (SelNum <> 0) then
-        Files^.ForEach(DoSelCount);
+        Files.ForEach(DoSelCount);
       if (PF^.Attr and Directory <> 0) and (PF^.Size < 0) then
         Drive^.GetDirLength(PF)
       else if SelNum = 0 then
@@ -1160,7 +1160,7 @@ WrongArc:
         begin
         DriveType := dtArcFind;
         UpFile^.Owner := PDir;
-        Dirs^.Insert(PDir);
+        Dirs.Insert(PDir);
         end;
       end;
     if  (Drive^.DriveType = dtFind) and
@@ -1171,7 +1171,7 @@ WrongArc:
         DriveType := dtArcFind;
         PDir := NewStr(PFindDrive(Drive^.Prev)^.UpFile^.Owner^);
         UpFile^.Owner := PDir;
-        Dirs^.Insert(PDir);
+        Dirs.Insert(PDir);
         end;
     if  (Drive^.DriveType = dtArc) or (Drive^.DriveType = dtArvid) then
       Drive^.lChDir(#0);
@@ -1209,10 +1209,10 @@ WrongArc:
       Exit;
     PF := Files^.At(CurPos);
     if PF^.TType <> ttUpDir then
-      Files^.ForEach(Sel)
+      Files.ForEach(Sel)
     else
       begin
-      Files^.ForEach(SelAll);
+      Files.ForEach(SelAll);
       PF^.Selected := False;
       end;
     Recount;
@@ -1255,7 +1255,7 @@ WrongArc:
       SS := UpStrg(GetExt(PF^.FlName[uLfn]))
     else
       SS := UpStrg(GetSName(PF^.FlName[uLfn]));
-    Files^.ForEach(Sel);
+    Files.ForEach(Sel);
     Recount;
     Owner.Redraw;
     end { SelectExt };
@@ -1279,7 +1279,7 @@ WrongArc:
     Drive^.HandleCommand(W, FC);
     if FC <> nil then
       begin
-      FC^.DeleteAll;
+      FC.DeleteAll;
       FC.Free;
       end;
     end { HandleCommand };
@@ -2105,13 +2105,13 @@ WrongArc:
           if SelNum = 0 then
             begin
             if PFileRec(Files^.At(CurPos))^.TType <> ttUpDir then
-              Files^.AtFree(CurPos);
+              Files.AtFree(CurPos);
             end
           else
             while I < Files^.Count do
               if PFileRec(Files^.At(I))^.Selected then
                 begin
-                Files^.AtFree(I);
+                Files.AtFree(I);
                 if I < CurPos then
                   Dec(CurPos);
                 end
@@ -2386,7 +2386,7 @@ WrongArc:
     if FC^.Count <> 0 then
       begin
       UUDecode(FC);
-      FC^.DeleteAll;
+      FC.DeleteAll;
       end;
     FC.Free;
     end;
@@ -2519,7 +2519,7 @@ WrongArc:
         cmInsertFile:
           if Files <> nil then
             begin
-            Files^.AtInsert(Files^.Count, Event.InfoPtr);
+            Files.AtInsert(Files^.Count, Event.InfoPtr);
             ScrollBar^.SetParams(ScrollBar^.Value, 0, Files^.Count-1,
                 (Size.Y-Byte(ColumnTitles))*
                 ( (Size.X+1) div LineLength), 1);

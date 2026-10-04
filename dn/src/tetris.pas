@@ -449,7 +449,7 @@ procedure TGameView.ShowScores;
   R.Assign(2, 4, D^.Size.X-2, 14);
   P := PView.Create(R);
   P^.Options := P^.Options or ofFramed;
-  D^.Insert(P);
+  D.Insert(P);
   for I := 1 to 10 do
     with HiScores[I+10*Byte(Pentix)] do
       begin
@@ -466,7 +466,7 @@ procedure TGameView.ShowScores;
       else
         S := '';
       R.Assign(2, 3+I, D^.Size.X-2, 4+I);
-      D^.Insert(PLabel.Create(R, S, nil));
+      D.Insert(PLabel.Create(R, S, nil));
       end;
   PP := Stop;
   Stop := True;

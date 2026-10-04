@@ -246,7 +246,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         udInsLine:
           begin
           ModifyLine(P^.Where.Y, CnvLongString(P^.Str), False);
-          FileLines^.AtFree(P^.Where.Y+1);
+          FileLines.AtFree(P^.Where.Y+1);
           for L := 1 to 9 do
             if MarkPos[L].Y >= P^.Where.Y then
               Dec(MarkPos[L].Y);
@@ -284,7 +284,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           S := P^.Str^;
           J := Byte(S[2])*256+Byte(S[1]);
           for I := 1 to J do
-            FileLines^.AtFree(Delta.Y);
+            FileLines.AtFree(Delta.Y);
           for L := 1 to 9 do
             if MarkPos[L].Y >= Delta.Y then
               Dec(MarkPos[L].Y, J);
@@ -341,7 +341,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           end;
         udDupeLine:
           begin
-          FileLines^.AtFree(P^.Where.Y+1);
+          FileLines.AtFree(P^.Where.Y+1);
           for L := 1 to 9 do
             if MarkPos[L].Y >= P^.Where.Y then
               Dec(MarkPos[L].Y);
@@ -379,7 +379,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
             begin
             KeyMapAtInsert(P^.Where.Y, P^.Lines^.At(P^.Lines^.Count-1));
             {-$VIV}
-            P^.Lines^.AtDelete(P^.Lines^.Count-1);
+            P^.Lines.AtDelete(P^.Lines^.Count-1);
             Inc(J);
             end;
           for L := 1 to 9 do
@@ -390,7 +390,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       end {case};
       WorkModified := False;
       ChangeLine;
-      UndoInfo^.AtFree(UndoInfo^.Count-1);
+      UndoInfo.AtFree(UndoInfo^.Count-1);
       Dec(UndoTimes);
       Modified := True;
       if not JustSaved and (UndoTimes = LastSaveUndoTimes) then
@@ -451,7 +451,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         udDelLine:
           begin
           for I := 1 to P^.Count do
-            FileLines^.AtFree(P^.Where.Y);
+            FileLines.AtFree(P^.Where.Y);
           J := P^.Count;
           for L := 1 to 9 do
             if MarkPos[L].Y >= P^.Where.Y then
@@ -463,14 +463,14 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           if P^.Lines^.Count > 0 then
             begin
             ModifyLine(P^.Where.Y, CnvLongString(P^.Lines^.At(0)), False);
-            P^.Lines^.AtDelete(0);
+            P^.Lines.AtDelete(0);
             end;
           J := 0;
           while P^.Lines^.Count > 0 do
             begin
             KeyMapAtInsert(P^.Where.Y+P^.Lines^.Count,
                  P^.Lines^.At(P^.Lines^.Count-1));
-            P^.Lines^.AtDelete(P^.Lines^.Count-1);
+            P^.Lines.AtDelete(P^.Lines^.Count-1);
             Inc(J);
             end;
           for L := 1 to 9 do
@@ -501,7 +501,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
             begin
             J := P^.Lines^.Count-1;
             for I := 0 to J do
-              FileLines^.AtFree(P^.Where.Y);
+              FileLines.AtFree(P^.Where.Y);
             Inc(J);
             for L := 1 to 9 do
               if MarkPos[L].Y >= P^.Where.Y then
@@ -521,12 +521,12 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           end;
         udInsBlock, udFormatBlock:
           begin
-          FileLines^.AtFree(Delta.Y);
+          FileLines.AtFree(Delta.Y);
           J := -1;
           while P^.Lines^.Count > 0 do
             begin
             KeyMapAtInsert(Delta.Y, P^.Lines^.At(P^.Lines^.Count-1));
-            P^.Lines^.AtDelete(P^.Lines^.Count-1);
+            P^.Lines.AtDelete(P^.Lines^.Count-1);
             Inc(J);
             end;
           for L := 1 to 9 do
@@ -549,7 +549,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         udSubDelLine:
           begin
           ModifyLine(P^.Where.Y, CnvLongString(P^.Str), False);
-          FileLines^.AtFree(P^.Where.Y+1);
+          FileLines.AtFree(P^.Where.Y+1);
           SetLimits;
           end;
         udIndentBlock:
@@ -629,7 +629,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
 
       WorkModified := False;
       ChangeLine;
-      RedoInfo^.AtFree(RedoInfo^.Count-1);
+      RedoInfo.AtFree(RedoInfo^.Count-1);
       Inc(UndoTimes);
       Modified := True;
       if not JustSaved and (UndoTimes = LastSaveUndoTimes) then
@@ -805,7 +805,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         Abort := True;
         Exit
         end;
-      P^.Insert(PS);
+      P.Insert(PS);
       Left := W;
       LS := EdOpt.RightSide-EdOpt.LeftSide;
       end { WriteLeft };
@@ -842,10 +842,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     if not (ValidBlock and BlockVisible) or VertBlock then
       Exit;
     ChangeLine;
-    {if UndoInfo <> nil then UndoInfo^.FreeAll; Inc(UndoTimes);}
+    {if UndoInfo <> nil then UndoInfo.FreeAll; Inc(UndoTimes);}
     New(P, Init((Mark.B.Y-Mark.A.Y+1)*2, 10, True));
     for I := Mark.A.Y to Mark.B.Y-Integer(Mark.B.X = 0) do
-      P^.Insert(NewLongStr(GetLine(I)));
+      P.Insert(NewLongStr(GetLine(I)));
     TP.Y := Mark.A.Y;
     TP.X := 0;
     StoreUndoInfo(udDelBlock, TP, P);
@@ -903,7 +903,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     Delta.Y := Mark.A.Y;
     Delta.X := 0;
     for I := Mark.A.Y to LG do
-      FileLines^.AtFree(Delta.Y);
+      FileLines.AtFree(Delta.Y);
     Q := LG-Mark.A.Y;
     Mark.A.X := 0;
     Mark.B.Y := Mark.A.Y+P^.Count;
@@ -915,7 +915,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       begin
       Dec(Q);
       KeyMapAtInsert(Delta.Y, P^.At(P^.Count-1));
-      P^.AtDelete(P^.Count-1);
+      P.AtDelete(P^.Count-1);
       end;
     if Q > 0 then
       for L := 1 to 9 do
@@ -1203,7 +1203,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     {    QuickSort(Mark.A.Y, Mark.B.Y);}
     {/AK155}
     if UndoInfo <> nil then
-      UndoInfo^.FreeAll;
+      UndoInfo.FreeAll;
     Inc(UndoTimes);
     Modified := True;
     Info.Free;

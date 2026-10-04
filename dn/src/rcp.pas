@@ -300,7 +300,7 @@ procedure ProcessDLs(Enable: Boolean);
       end;
     Close(F.T);
     Fail := False;
-    DLs^.ForEach(DoTest);
+    DLs.ForEach(DoTest);
     if Fail then
       Halt(1);
     DLStream.Init(OutLngFileName, stCreate, 512);
@@ -884,14 +884,14 @@ procedure ProcessDLGs;
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := New(PInputline, Init(R, GetID(Token(S, i))));
-      D^.Insert(PV);
+      D.Insert(PV);
       j := GetID(Token(S, i));
       if j > 0 then
         begin
         R.A.X := R.B.X;
         R.B.X := R.A.X+3;
         New(P, Init(R, PInputline(PV), j));
-        D^.Insert(P);
+        D.Insert(P);
         end;
       end;
 
@@ -902,7 +902,7 @@ procedure ProcessDLGs;
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := New(PLongInputline, Init(R, GetID(Token(S, i))));
-      D^.Insert(PV);
+      D.Insert(PV);
       j := GetID(Token(S, i));
       if j > 0 then
         Error('LongInputLine dosn''t have a history, line '+ItoS(Line));
@@ -914,7 +914,7 @@ procedure ProcessDLGs;
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := New(PHexLine, Init(R, PInputline(PV)));
-      D^.Insert(PV);
+      D.Insert(PV);
       end;
     {-DataCompBoy-}
 
@@ -929,7 +929,7 @@ procedure ProcessDLGs;
       B := Token(S, i);
       R.B.X := R.A.X+2+CStrLen(B);
       New(P, Init(R, B, PV));
-      D^.Insert(P);
+      D.Insert(P);
       while i < Length(S) do
         P^.Options := P^.Options or GetID(Token(S, i));
       end;
@@ -979,14 +979,14 @@ procedure ProcessDLGs;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := PCheckBoxes.Create(R, GetItems);
-      D^.Insert(PV);
+      D.Insert(PV);
       end;
 
     procedure MakeDriveCheckBoxes;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := PCurrDriveInfo.Create(R, GetItems);
-      D^.Insert(PV);
+      D.Insert(PV);
       with PV^ do
         begin
         Options := Options or ofPostProcess;
@@ -998,14 +998,14 @@ procedure ProcessDLGs;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := PRadioButtons.Create(R, GetItems);
-      D^.Insert(PV);
+      D.Insert(PV);
       end;
 
     procedure MakeComboBox;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := PComboBox.Create(R, GetItems);
-      D^.Insert(PV);
+      D.Insert(PV);
       end;
 
     procedure MakePage;
@@ -1045,7 +1045,7 @@ procedure ProcessDLGs;
         end;
       PV := PButton.Create(R, K, CmD, Flags);
       PV^.Options := PV^.Options or Options;
-      D^.Insert(PV);
+      D.Insert(PV);
       end { MakeButton };
 
     procedure MakeScrollBar(Mouse: Boolean);
@@ -1055,28 +1055,28 @@ procedure ProcessDLGs;
         LastSB := PMouseBar.Create(R)
       else
         LastSB := PScrollBar.Create(R);
-      D^.Insert(LastSB);
+      D.Insert(LastSB);
       end;
 
     procedure MakeListBox;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := New(PListBox, Init(R, GetID(Token(S, i)), LastSB));
-      D^.Insert(PV);
+      D.Insert(PV);
       end;
 
     procedure MakeStaticText;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := New(PStaticText, Init(R, Token(S, i)));
-      D^.Insert(PV);
+      D.Insert(PV);
       end;
 
     procedure MakeParamText;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); PV := PParamText.Create(R, TkS[1], TkL[2]) end;
-      D^.Insert(PV);
+      D.Insert(PV);
       end;
 
     procedure MakeColorPoint;
@@ -1088,7 +1088,7 @@ procedure ProcessDLGs;
       R.A.Y := GetID(Token(S, i));
       R.B.X := R.A.X+1;
       New(P, Init(R, GetID(Token(S, i))));
-      D^.Insert(P);
+      D.Insert(P);
       while i < Length(S) do
         P^.Options := P^.Options or GetID(Token(S, i));
       end;
@@ -1233,7 +1233,7 @@ procedure ProcessDLGs;
   procedure DoInsert(P_: Pointer);
   var P: PLngWord absolute P_;
     begin
-    IDs^.Insert(P);
+    IDs.Insert(P);
     end;
 
   function FailCheck: Boolean;
@@ -1248,7 +1248,7 @@ procedure ProcessDLGs;
       end;
     begin
     FailCheck := False;
-    DLGs^.ForEach(DoCheck);
+    DLGs.ForEach(DoCheck);
     end;
 
   {-DataCompBoy-}
@@ -1256,15 +1256,15 @@ procedure ProcessDLGs;
   DLGs := Types^.GetType(tidDLGs);
   New(IDs, Init('', tmConst));
   tP := Types^.GetType(tidCommands);
-  tP^.ForEach(DoInsert);
+  tP.ForEach(DoInsert);
   tP := Types^.GetType(tidHelpCtx);
-  tP^.ForEach(DoInsert);
+  tP.ForEach(DoInsert);
   tP := Types^.GetType(tidHistory);
-  tP^.ForEach(DoInsert);
+  tP.ForEach(DoInsert);
   tP := Types^.GetType(tidKbdconst);
-  tP^.ForEach(DoInsert);
+  tP.ForEach(DoInsert);
   tP := Types^.GetType(tidOptions);
-  tP^.ForEach(DoInsert);
+  tP.ForEach(DoInsert);
 
   Writeln('Reading ', dlgFileName);
   lAssignText(F, dlgFileName);
@@ -1318,7 +1318,7 @@ procedure ProcessDLGs;
   Writeln(#13'Writing ', OutDlgFileName);
   TheRF.Free;
 
-  IDs^.DeleteAll;
+  IDs.DeleteAll;
   IDs.Free;
   end { ProcessDLGs };
 {-DataCompBoy-}
@@ -1342,10 +1342,10 @@ procedure CleanupTypes;
       P^.Mark := 0
       end;
     begin
-    P^.ForEach(DoUnmark);
+    P.ForEach(DoUnmark);
     end;
   begin
-  Types^.ForEach(DoClean);
+  Types.ForEach(DoClean);
   end;
 
 function ReplaceChar(A, B: Char; S: String): String;
@@ -1377,10 +1377,10 @@ procedure InitParser;
         S := Sec^.GetValueAt(I);
         DelDoubles('  ', S);
         if K = 'CONST' then
-          Types^.Insert(New(PTypeHolder, Init(ReplaceChar(' ', #0,
+          Types.Insert(New(PTypeHolder, Init(ReplaceChar(' ', #0,
                  S+' '), tmConst)))
         else if K = 'TYPE' then
-          Types^.Insert(PTypeHolder.Create(S, tmEnum))
+          Types.Insert(PTypeHolder.Create(S, tmEnum))
         else
           Error('Undefined keyword "'+K+'" in [Parser] section');
         end;

@@ -419,22 +419,22 @@ procedure VGAColorRegister;
   with DataRec do
     begin
     New(List, Init(16, 0, False));
-    List^.AtInsert(0, NewStr(GetString(dlColors_C00)));
-    List^.AtInsert(1, NewStr(GetString(dlColors_C01)));
-    List^.AtInsert(2, NewStr(GetString(dlColors_C02)));
-    List^.AtInsert(3, NewStr(GetString(dlColors_C03)));
-    List^.AtInsert(4, NewStr(GetString(dlColors_C04)));
-    List^.AtInsert(5, NewStr(GetString(dlColors_C05)));
-    List^.AtInsert(6, NewStr(GetString(dlColors_C06)));
-    List^.AtInsert(7, NewStr(GetString(dlColors_C07)));
-    List^.AtInsert(8, NewStr(GetString(dlColors_C08)));
-    List^.AtInsert(9, NewStr(GetString(dlColors_C09)));
-    List^.AtInsert(10, NewStr(GetString(dlColors_C10)));
-    List^.AtInsert(11, NewStr(GetString(dlColors_C11)));
-    List^.AtInsert(12, NewStr(GetString(dlColors_C12)));
-    List^.AtInsert(13, NewStr(GetString(dlColors_C13)));
-    List^.AtInsert(14, NewStr(GetString(dlColors_C14)));
-    List^.AtInsert(15, NewStr(GetString(dlColors_C15)));
+    List.AtInsert(0, NewStr(GetString(dlColors_C00)));
+    List.AtInsert(1, NewStr(GetString(dlColors_C01)));
+    List.AtInsert(2, NewStr(GetString(dlColors_C02)));
+    List.AtInsert(3, NewStr(GetString(dlColors_C03)));
+    List.AtInsert(4, NewStr(GetString(dlColors_C04)));
+    List.AtInsert(5, NewStr(GetString(dlColors_C05)));
+    List.AtInsert(6, NewStr(GetString(dlColors_C06)));
+    List.AtInsert(7, NewStr(GetString(dlColors_C07)));
+    List.AtInsert(8, NewStr(GetString(dlColors_C08)));
+    List.AtInsert(9, NewStr(GetString(dlColors_C09)));
+    List.AtInsert(10, NewStr(GetString(dlColors_C10)));
+    List.AtInsert(11, NewStr(GetString(dlColors_C11)));
+    List.AtInsert(12, NewStr(GetString(dlColors_C12)));
+    List.AtInsert(13, NewStr(GetString(dlColors_C13)));
+    List.AtInsert(14, NewStr(GetString(dlColors_C14)));
+    List.AtInsert(15, NewStr(GetString(dlColors_C15)));
 
     { oldPalette := VGA_palette;}
 

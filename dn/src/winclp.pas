@@ -136,13 +136,13 @@ function TextLines(const T: AnsiString): PLineCollection;
     while (Q <= Length(T)) and not (T[Q] in [#10, #13]) do
       Inc(Q);
     S := FromSys(Copy(T, P, Q - P));
-    Result^.Insert(NewLongStr(S));
+    Result.Insert(NewLongStr(S));
     if (Q < Length(T)) and (T[Q] = #13) and (T[Q + 1] = #10) then
       Inc(Q);
     P := Q + 1;
     end;
   if Result^.Count = 0 then
-    Result^.Insert(NewLongStr(''));
+    Result.Insert(NewLongStr(''));
   end;
 
 function SetWinClip(PC: PLineCollection): Boolean;

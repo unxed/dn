@@ -549,21 +549,21 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
 
   R.Assign(2, 2, 48, 3);
   P := New(PStaticText, Init(R, GetString(dlDBViewInfoString)));
-  D^.Insert(P);
+  D.Insert(P);
 
   R.Assign(46, 3, 47, 13);
   P := PScrollBar.Create(R);
   P^.Options := P^.Options or ofPostProcess;
-  D^.Insert(P);
+  D.Insert(P);
 
   R.Assign(2, 3, 46, 13);
   P := New(PFieldListBox, Init(R, 1, PScrollBar(P)));
-  D^.Insert(P);
+  D.Insert(P);
 
   R.Assign(30, 14, 40, 16);
   P := New(PButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
   P^.Options := P^.Options or ofCenterX;
-  D^.Insert(P);
+  D.Insert(P);
 
   D^.SelectNext(False);
 
@@ -734,18 +734,18 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
 
     R.Assign(D^.Size.X-2, 2, D^.Size.X-1, D^.Size.Y-4);
     PV := PViewScroll.Create(R);
-    D^.Insert(PV);
+    D.Insert(PV);
     { TODO: palette CScrollBar of PV^. }
 
     R.Assign(2, 2, D^.Size.X-2, D^.Size.Y-4);
     PV := PNFileViewer.Create(R, MemoStream, '', '', PV, False, False);
 
-    D^.Insert(PV);
+    D.Insert(PV);
 
     R.Assign(30, D^.Size.Y-3, 40, D^.Size.Y-1);
     PV := New(PButton, Init(R, GetString(dlOKButton), cmOK, bfDefault));
     PV^.Options := PV^.Options or ofCenterX;
-    D^.Insert(PV);
+    D.Insert(PV);
 
     D^.SelectNext(False);
 
@@ -1524,11 +1524,11 @@ procedure TDBIndicator.Draw;
     end;
   {--- start -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
   if State and sfDragging <> 0 then
-    C := PWindow(Owner)^.Frame^.GetColorW($05)
+    C := PWindow(Owner).Frame^.GetColorW($05)
   else if State and sfActive = 0 then
-    C := PWindow(Owner)^.Frame^.GetColorW($01)
+    C := PWindow(Owner).Frame^.GetColorW($01)
   else
-    C := PWindow(Owner)^.Frame^.GetColorW($03);
+    C := PWindow(Owner).Frame^.GetColorW($03);
   {--- finish -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
   MoveStr(B, S, C);
   WriteLineC(0, 0, Size.X, 1, B);

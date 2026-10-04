@@ -560,7 +560,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
     begin
     CalcView^.FocusEvent := Event;
     if EndEdit then
-      PWindow(Owner)^.SelectNext(False);
+      PWindow(Owner).SelectNext(False);
     ClearEvent(Event)
     end;
 
@@ -672,9 +672,9 @@ procedure TCalcView.SetState(AState: Word; Enable: Boolean);
   if Owner <> nil then
     begin
     GetBounds(Bounds);
-    DisposeStr(PWindow(Owner)^.Title);
+    DisposeStr(PWindow(Owner).Title);
     if SName <> nil then
-      PWindow(Owner)^.Title := NewStr(Cut(SName^,
+      PWindow(Owner).Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
     end;
   end { TCalcView.SetState };
@@ -1073,7 +1073,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       MessFileNotOpen(FileName, i);
       Exit;
       end;
-    Cells^.FreeAll;
+    Cells.FreeAll;
     CurRow := 0;
     while not Eof(F.T) do
       begin
@@ -1136,7 +1136,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       Exit;
       end;
 
-    Cells^.FreeAll;
+    Cells.FreeAll;
     DBF.First;
     while not DBF.EofFlag do
       begin
@@ -2037,7 +2037,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           begin
           Marking := False;
           SetMark; //DrawView;
-          PWindow(Owner)^.SelectNext(False);
+          PWindow(Owner).SelectNext(False);
           ClearEvent(Event);
           end;
         kbTab:
@@ -2056,7 +2056,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             Marking := False;
             SetMark;
             DrawView;
-            PWindow(Owner)^.SelectNext(True);
+            PWindow(Owner).SelectNext(True);
             Event.InfoPtr := CalcInput;
             CalcInput^.PutEvent(Event);
             ClearEvent(Event)
@@ -2252,8 +2252,8 @@ procedure TCalcView.LoadSheet(FName: String);
     SName := NewStr(UntitledName);
     if Owner <> nil then
       begin
-      DisposeStr(PWindow(Owner)^.Title);
-      PWindow(Owner)^.Title := NewStr(Cut(SName^,
+      DisposeStr(PWindow(Owner).Title);
+      PWindow(Owner).Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
       Owner.Redraw;
       end;
@@ -2268,8 +2268,8 @@ procedure TCalcView.LoadSheet(FName: String);
   SName := NewStr(FName);
   if Owner <> nil then
     begin
-    DisposeStr(PWindow(Owner)^.Title);
-    PWindow(Owner)^.Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
+    DisposeStr(PWindow(Owner).Title);
+    PWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     end;
   if S^.Status <> stOK then
     begin
@@ -2290,8 +2290,8 @@ procedure TCalcView.LoadSheet(FName: String);
     SName := NewStr(UntitledName);
     if Owner <> nil then
       begin
-      DisposeStr(PWindow(Owner)^.Title);
-      PWindow(Owner)^.Title := NewStr(Cut(SName^,
+      DisposeStr(PWindow(Owner).Title);
+      PWindow(Owner).Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
       end;
     New(Cells, Init(10, 10));
@@ -2334,8 +2334,8 @@ procedure TCalcView.SaveSheetAs;
   SName := NewStr(FName);
   if Owner <> nil then
     begin
-    DisposeStr(PWindow(Owner)^.Title);
-    PWindow(Owner)^.Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
+    DisposeStr(PWindow(Owner).Title);
+    PWindow(Owner).Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
     Owner.Redraw;
     end;
   {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner^.GetColorW(12));}
@@ -2569,7 +2569,7 @@ procedure TCalcView.InsertLine;
     begin
     P := Cells^.At(I-1);
     if P^.Row >= VScroll^.MaxVal then
-      Cells^.AtFree(I-1)
+      Cells.AtFree(I-1)
     else
       begin
       if P^.Row >= L then
@@ -2599,7 +2599,7 @@ procedure TCalcView.DeleteLine;
     else if P^.Row >= L then
       Dec(P^.Row);
     end;
-  Cells^.Pack;
+  Cells.Pack;
   ReCalc(False);
   Modified := True;
   end;
@@ -2614,7 +2614,7 @@ procedure TCalcView.InsertCol;
     begin
     P := Cells^.At(I-1);
     if P^.Col = HScroll^.MaxVal then
-      Cells^.AtFree(I-1)
+      Cells.AtFree(I-1)
     else
       begin
       if P^.Col >= L then
@@ -2653,7 +2653,7 @@ procedure TCalcView.DeleteCol;
   Move(ColWidth[L], ColWidth[L-1],
     SizeOf(ColWidth[0])*(High(ColWidth)-L+1));
   ColWidth[High(ColWidth)] := DefaultColWidth;
-  Cells^.Pack;
+  Cells.Pack;
   ReCalc(False);
   Modified := True;
   end { TCalcView.DeleteCol };
@@ -2937,7 +2937,7 @@ procedure TDbaseWriter.AddField(const NameField: String; TypeField: Char;
     P^.FLength.NumericLength := LenField;
     P^.FLength.Decimals := DecField;
     end;
-  Fields^.Insert(P);
+  Fields.Insert(P);
   end;
 
 procedure TDbaseWriter.AddRecord; {KV}
@@ -3236,7 +3236,7 @@ procedure TDbaseWriter.ReadFile; {KV}
   begin
   inherited Seek(0);
   FillChar(Header, SizeOf(Header), 0);
-  Fields^.FreeAll;
+  Fields.FreeAll;
   inherited Read(Header, SizeOf(Header));
   if Status <> stOK then
     Exit;
@@ -3248,7 +3248,7 @@ procedure TDbaseWriter.ReadFile; {KV}
       inherited Read(R.FieldName[1], SizeOf(R)-1);
       New(P);
       Move(R, P^, SizeOf(R));
-      Fields^.Insert(P);
+      Fields.Insert(P);
       end;
   until (R.FieldName[0] = #$0D) or (Status <> stOK);
   EofFlag := (Header.LastRecord = 0);

@@ -354,7 +354,7 @@ procedure Msg2Strs(FName: String; var FromUser, ToUser, Subj, Date: String;
       begin
       if buf <> #13 then
         txtbuf := txtbuf+buf;
-      C^.Insert(NewStr(txtbuf));
+      C.Insert(NewStr(txtbuf));
       txtbuf := '';
       end
     else
@@ -608,7 +608,7 @@ procedure Buffer2Strs(Buffer: PCharArray; var C: PLineCollection);
       st := DelChar(DelChar(st, #13), #10);
       if  (st[1] = #1) and (Pos('MSGID', st) <> 0) then
         CutFromAddr(st);
-      C^.Insert(NewStr(st));
+      C.Insert(NewStr(st));
       st := '';
       end;
     if Ch <> #0 then
@@ -623,7 +623,7 @@ procedure Buffer2Strs(Buffer: PCharArray; var C: PLineCollection);
           Inc(I);
           end;
         st := DelChar(DelChar(st, #13), #10);
-        C^.Insert(NewStr(st));
+        C.Insert(NewStr(st));
         st := '';
         end
       else
@@ -634,7 +634,7 @@ procedure Buffer2Strs(Buffer: PCharArray; var C: PLineCollection);
       st := DelChar(DelChar(st, #13), #10);
       if  (st[1] = #1) and (Pos('MSGID', st) <> 0) then
         CutFromAddr(st);
-      C^.Insert(NewStr(st));
+      C.Insert(NewStr(st));
       st := '';
       end;
     Inc(I);
@@ -1025,7 +1025,7 @@ procedure TPktMsgViewer.SaveAsText;
     end;
   InitSysError;
   Area := '';
-  FV^.FileLines^.ForEach(FindArea);
+  FV^.FileLines.ForEach(FindArea);
   Writeln(F, GetString(dlLine));
   Writeln(F, 'AREA: '+Area);
   Writeln(F, PS1^);
@@ -1033,7 +1033,7 @@ procedure TPktMsgViewer.SaveAsText;
   Writeln(F, Ps3^);
   Writeln(F, Ps4^);
   Writeln(F, GetString(dlLine));
-  FV^.FileLines^.ForEach(WriteFile);
+  FV^.FileLines.ForEach(WriteFile);
   System.Close(F);
   end { TPktMsgViewer.SaveAsText };
 
@@ -1274,7 +1274,7 @@ procedure TMsgViewerDlg.SaveAsText;
   Writeln(F, 'To   : '+FV^.ToUser^);
   Writeln(F, 'Subj : '+FV^.Subj^);
   Writeln(F, GetString(dlLine));
-  FV^.FileLines^.ForEach(WriteFile);
+  FV^.FileLines.ForEach(WriteFile);
   System.Close(F);
   end { TMsgViewerDlg.SaveAsText };
 

@@ -211,7 +211,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     Owner^.MakeLocal(Event.Where, T);
     if T.X >= Owner^.Size.X-2 then
       begin
-      PWindow(Owner)^.Frame^.HandleEvent(Event);
+      PWindow(Owner).Frame^.HandleEvent(Event);
       Exit;
       end;
     MakeLocal(Event.Where, T);
@@ -240,7 +240,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     else if (T.X > 31) and (T.X < 35) then
       Event.Command := cmSwitchKeyMapping
     else if (T.X = 37) then
-      PFileEditor(Owner^.Current)^.ScrollTo(0, 0) {AK155}
+      PFileEditor(Owner^.Current).ScrollTo(0, 0) {AK155}
     else if FastBookmark and ((T.X > 37) and (T.X < 47)) then
       begin
       BookMark := T.X-38;
@@ -288,14 +288,14 @@ procedure TInfoLine.Draw;
     begin
     if Owner^.GetState(sfDragging)
     then
-      Color := PWindow(Owner)^.Frame^.GetColorW(5)
+      Color := PWindow(Owner).Frame^.GetColorW(5)
     else
-      Color := PWindow(Owner)^.Frame^.GetColorW(2);
+      Color := PWindow(Owner).Frame^.GetColorW(2);
     Ch2 := #196;
     end
   else
     begin
-    Color := PWindow(Owner)^.Frame^.GetColorW(3);
+    Color := PWindow(Owner).Frame^.GetColorW(3);
     Ch2 := #205;
     end;
   if not Owner^.GetState(sfActive) then
@@ -403,14 +403,14 @@ procedure TBookmarkLine.Draw;
     begin
     if Owner^.GetState(sfDragging)
     then
-      Col := PWindow(Owner)^.Frame^.GetColorW(5)
+      Col := PWindow(Owner).Frame^.GetColorW(5)
     else
-      Col := PWindow(Owner)^.Frame^.GetColorW(2);
+      Col := PWindow(Owner).Frame^.GetColorW(2);
     Ch := #179;
     end
   else
     begin
-    Col := PWindow(Owner)^.Frame^.GetColorW(3);
+    Col := PWindow(Owner).Frame^.GetColorW(3);
     Ch := #186;
     end;
   if not ShowBookmarks then

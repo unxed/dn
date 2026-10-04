@@ -811,7 +811,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
           NW := CStrLen(S);
         UI^.Line := I;
         UI^.RunFrom2E := RF2E;
-        P^.Insert(UI);
+        P.Insert(UI);
         end;
       end;
     end;
@@ -1095,7 +1095,7 @@ procedure TGrabber.HandleEvent(var Event: TEvent);
         C := Char(WordRec(Screen^[I*Size.X+J]).Lo);
         S := S+C;
         end;
-      ClipBoard^.Insert(NewLongStr(S));
+      ClipBoard.Insert(NewLongStr(S));
       end;
     if SystemData.Options and ossUseSysClip <> 0 then
       SyncClipIn;

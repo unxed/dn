@@ -149,20 +149,20 @@ R.Assign(1, 1, Size.X - 1, 2);
     PI := PI^.Next;
   if  (PI <> nil) then
     PI := Pointer(PI^.SubMenu);
-  PFileEditor(Intern)^.OptMenu := Pointer(PI);
+  PFileEditor(Intern).OptMenu := Pointer(PI);
   if Title <> nil then
     DisposeStr(Title);
-  if PFileEditor(Intern)^.SmartPad then
+  if PFileEditor(Intern).SmartPad then
     begin
-    Title := NewStr('SmartPad(TM) - '+PFileEditor(Intern)^.EditName);
+    Title := NewStr('SmartPad(TM) - '+PFileEditor(Intern).EditName);
     end
-  else if PFileEditor(Intern)^.ClipBrd then
+  else if PFileEditor(Intern).ClipBrd then
     begin
     Title := NewStr('Clipboard');
     end
   else
     Title := NewStr(GetString(dlEditTitle)+' - '+
-        (PFileEditor(Intern)^.EditName));
+        (PFileEditor(Intern).EditName));
   LoadCommands;
   end { TEditWindow.Load };
 
@@ -238,7 +238,7 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
     Pi := Pi^.Next;
   if  (Pi <> nil) then
     Pi := Pointer(Pi^.SubMenu);
-  PFileEditor(Intern)^.OptMenu := Pointer(Pi);
+  PFileEditor(Intern).OptMenu := Pointer(Pi);
 
   Insert(Intern);
   MILoadFile(Intern, FileName);

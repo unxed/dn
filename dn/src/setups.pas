@@ -461,7 +461,7 @@ procedure TCurrDriveInfo.HandleEvent(var Event: TEvent);
   then
     begin
     W := PSysDialog(Owner)^.LocalData.Drives[Char
-          (Byte('A')+PScrollBar(Event.InfoPtr)^.Value)];
+          (Byte('A')+PScrollBar(Event.InfoPtr).Value)];
     SetData(W);
     end
   else if (Event.What = evKeyDown) and (Char(Event.CharCode) = ' ')
@@ -487,7 +487,7 @@ procedure TSysDialog.Awaken;
   LocalData := SystemData;
   New(SysData.Drives.List, Init(26, 1, False));
   for C := 'A' to 'Z' do
-    SysData.Drives.List^.Insert(NewStr(C+':'));
+    SysData.Drives.List.Insert(NewStr(C+':'));
   Move(SystemData, SysData,
      SizeOf(SysData.Options)+SizeOf(SysData.Mode1)*2);
   SysData.Temp := SystemData.Temp;
@@ -581,7 +581,7 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
           PS := A^.At(LocalData.Available.Focus);
           if  (PS <> nil) and (List^.FirstThat(SeekStr) = nil) then
             begin
-            List^.Insert(NewStr(PS^));
+            List.Insert(NewStr(PS^));
             S := List;
             List := nil;
             NewLisT(S);
@@ -595,7 +595,7 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
         if F < List^.Count then
           begin
           S := List;
-          S^.AtFree(F);
+          S.AtFree(F);
           List := nil;
           Owner.Lock;
           NewLisT(S);

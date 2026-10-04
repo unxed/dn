@@ -133,12 +133,12 @@ procedure MISaveFileAs(AED: PFileEditor);
       WriteBlock(EditName, S, FileLines, EdOpt.ForcedCRLF, OptimalFill);
       S.Free;
       FileChanged(EditName);
-      DisposeStr(PWindow(Owner)^.Title);
+      DisposeStr(PWindow(Owner).Title);
       if EditName = ''
       then
-        PWindow(Owner)^.Title := NewStr(GetString(dlEditTitle))
+        PWindow(Owner).Title := NewStr(GetString(dlEditTitle))
       else
-        PWindow(Owner)^.Title := NewStr(GetString(dlEditTitle)+' - '+
+        PWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
             (EditName));
       Owner.Redraw;
       Modified := False;
@@ -209,7 +209,7 @@ procedure MISaveFile(AED: PFileEditor);
       ClipBoardStream := nil;
       PC := PLineCollection.Create(100, 5, True);
       for I := 0 to FileLines^.Count-1 do
-        PC^.Insert(NewLongStr(CnvLongString(FileLines^.At(I))));
+        PC.Insert(NewLongStr(CnvLongString(FileLines^.At(I))));
       CopyLines2Stream(PC, ClipBoardStream);
       PC.Free;
       end
@@ -393,14 +393,14 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
             begin
             while Count > 0 do
               begin
-              FileLines^.Insert(At(Count-1));
+              FileLines.Insert(At(Count-1));
               AtDelete(Count-1);
               end;
             PC.Free;
             end;
         end; {-$VOL end}
       if FileLines^.Count = 0 then
-        FileLines^.Insert(NewLongStr(''))
+        FileLines.Insert(NewLongStr(''))
       end
     else
       begin
@@ -413,7 +413,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
         {FileLines := GetCollector(1000, 100);}
         FileLines := PLineCollection.Create(300, 1000, True);
         {-SBlocks}
-        FileLines^.Insert(NewLongStr(''));
+        FileLines.Insert(NewLongStr(''));
         KeyMap := kmAscii;
         end;
       if Name <> '' then
@@ -441,7 +441,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
     if Name <> '' then
       Name := lFExpand(Name);
     EditName := Name;
-    DisposeStr(PWindow(Owner)^.Title);
+    DisposeStr(PWindow(Owner).Title);
     {Cat:warn а не бред ли это?}
     if '*^&'+EditName = TempFile then
       begin
@@ -450,18 +450,18 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
       end;
     if SmartPad then
       begin
-      PWindow(Owner)^.Title := NewStr('SmartPad(TM) - '+EditName);
+      PWindow(Owner).Title := NewStr('SmartPad(TM) - '+EditName);
       end
     else if ClipBrd then
       begin
-      PWindow(Owner)^.Title := NewStr('Clipboard');
+      PWindow(Owner).Title := NewStr('Clipboard');
       end
     else if EditName <> ''
     then
-      PWindow(Owner)^.Title := NewStr(GetString(dlEditTitle)+' - '+
+      PWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
           (EditName))
     else
-      PWindow(Owner)^.Title := NewStr(GetString(dlEditTitle));
+      PWindow(Owner).Title := NewStr(GetString(dlEditTitle));
     MILockFile(AED);
     lFSplit(EditName, FreeStr, Nm, Xt);
     {PZ 2000.06.09}
@@ -591,7 +591,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
         if (ST <> '') and (ST[Length(ST)] = ' ') then
           LongDelRight(ST);
 
-        Lines^.Insert(NewLongStr(ST));
+        Lines.Insert(NewLongStr(ST));
         ST := '';
         end;
       end
@@ -707,7 +707,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
       System.Delete(ST, 1, 1);
     while (ST <> '') and (ST[Length(ST)] = ' ') do
       SetLength(ST, Length(ST)-1);
-    Lines^.Insert(NewLongStr(ST));
+    Lines.Insert(NewLongStr(ST));
     if KeyMapDetecting then
       KeyMap := CodePageDetector.DetectedCodePage;
     if  (ODOA shl 1 >= OD+OA) then
