@@ -69,7 +69,7 @@ type
   Содержит особенности, специфические для типа панели (диск,
   архив и т.п. Используется, в частности, для отрисовки строк
   файловой панели.`}
-  TDrive = class(TObject)
+  TDrive = class(TStreamable)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     Panel: Pointer{TFilePanelRoot};
     Prev: TDrive;
@@ -90,7 +90,7 @@ type
     function GetDir: String; virtual; {DataCompBoy}
     function GetDirectory(
          const FileMask: String;
-        var TotalInfo: TSize): PFilesCollection; virtual;
+        var TotalInfo: TSize): TFilesCollection; virtual;
     procedure CopyFiles(Files: TCollection; Own: TView; MoveMode: Boolean)
       ; virtual;
     procedure CopyFilesInto(Files: TCollection; Own: TView;
@@ -131,8 +131,8 @@ type
     destructor Destroy; override;
     function OpenDirectory(const Dir: String;
                                  PutDirs: Boolean): TDrive; virtual;
-    procedure DrvFindFile(FC: PFilesCollection); virtual;
-    procedure ReadDescrptions(FilesC: PFilesCollection); virtual;
+    procedure DrvFindFile(FC: TFilesCollection); virtual;
+    procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
     function GetDriveLetter: Char; virtual;
       {` Для выбора обозначения диска в линейке дисков и меню дисков `}
     end;
@@ -141,7 +141,7 @@ procedure RereadDirectory(Dir: String);
 
 const
   TempDirs: TSortedCollection = nil;
-  TempFiles: PFilesCollection = nil;
+  TempFiles: TFilesCollection = nil;
 
 implementation
 uses
@@ -561,8 +561,7 @@ procedure TDrive.CopyFiles(Files: TCollection; Own: TView; MoveMode: Boolean);
   else
     RevertBar := False;
   if Disposable then
-    FileCopy.CopyFiles(Files, Own, MoveMode, 2*Byte(TypeOf(Self) =
-           TypeOf(TFindDrive)));
+    FileCopy.CopyFiles(Files, Own, MoveMode, 2*Byte(Self is TFindDrive));
   end;
 
 procedure TDrive.CopyFilesInto(Files: TCollection; Own: TView; MoveMode: Boolean);
@@ -729,7 +728,7 @@ function DizNameProc(const N: string; TextStart: Integer): Boolean;
   var
     I: Integer;
   begin
-  IgnoreDiz := Descriptions^.Search(@N, I);
+  IgnoreDiz := Descriptions.Search(@N, I);
     // Повторное описание игнорируем
   if not IgnoreDiz then
     begin
@@ -776,7 +775,7 @@ procedure PrepareDIZ(
 {-DataCompBoy-}
 procedure TossDescriptions(
     PDizContainer: Pointer;
-    FilesC: PFilesCollection);
+    FilesC: TFilesCollection);
   var
     I, J: LongInt;
     P: PFileRec;
@@ -784,16 +783,16 @@ procedure TossDescriptions(
     PD: PDesc;
     iLFN: TUseLFN;
   begin
-  for I := 1 to FilesC^.Count do
+  for I := 1 to FilesC.Count do
     begin
-    P := FilesC^.At(I-1);
+    P := FilesC.At(I-1);
     for iLFN := High(TUseLFN) downto Low(TUseLFN) do
       begin
       FName := P^.FlName[iLFN];
       {if P^.Attr and (Directory+SysFile) <> 0 then LowStr(FName);}
-      if Descriptions^.Search(@FName, J) then
+      if Descriptions.Search(@FName, J) then
         begin
-        PD := PDesc(Descriptions^.At(J));
+        PD := PDesc(Descriptions.At(J));
         New(P^.DIZ);
         P^.DIZ^.DIZText := PD^.DIZText;
         P^.DIZ^.Container := PDizContainer;
@@ -809,7 +808,7 @@ procedure TossDescriptions(
 {-DataCompBoy-}
 
 
-procedure TDrive.ReadDescrptions(FilesC: PFilesCollection);
+procedure TDrive.ReadDescrptions(FilesC: TFilesCollection);
   begin
   PrepareDIZ(CurDir, DizOwner);
   if Descriptions <> nil then
@@ -825,13 +824,13 @@ function TDrive.GetDriveLetter: Char;
   end;
 
 {-DataCompBoy-}
-function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFilesCollection;
+function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): TFilesCollection;
   var
     SR: lSearchRec;
     P: PFileRec;
     I, J: Integer;
     TFiles: Word;
-    Files: PFilesCollection;
+    Files: TFilesCollection;
     MemReq: LongInt;
     MAvail: LongInt;
     SearchAttr: word;
@@ -853,8 +852,8 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFi
   Abort := False;
   NoMemory := False;
   TotalInfo := 0;
-  Files := PFilesCollection.Create($10, $20);
-  Files^.Panel := Panel;
+  Files := TFilesCollection.Create($10, $20);
+  Files.Panel := Panel;
 
   {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
   {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
@@ -884,7 +883,7 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFi
         TotalInfo := TotalInfo+P^.Size;
         Inc(TFiles);
         end;
-      with Files^ do
+      with Files do
         AtInsert(Count, P)
       end;
     DosError := 0;
@@ -910,7 +909,7 @@ function TDrive.isUp: Boolean;
 procedure TDrive.RereadDirectory(S: String);
   begin
   if Prev <> nil then
-    Prev^.RereadDirectory(S);
+    Prev.RereadDirectory(S);
   end;
 
 procedure TDrive.GetDirInfo(var B: TDiskInfoRec);
@@ -922,7 +921,7 @@ procedure TDrive.GetDirInfo(var B: TDiskInfoRec);
 procedure TDrive.KillUse;
   begin
   if Prev <> nil then
-    Prev^.KillUse;
+    Prev.KillUse;
   end;
 
 procedure TDrive.GetDown(var B: TScreenCell; C: Word; P: PFileRec; var LFN_inCurFileLine: Boolean);
@@ -1124,7 +1123,7 @@ function TDrive.OpenDirectory(const Dir: String;
       { несортированная коллекция, элементы которой создаются при помощи
       NewStr и после использования переносятся в Dirs }
     Dirs: TStringCollection;
-    Files: PFilesCollection;
+    Files: TFilesCollection;
     P: PString;
     tmr: TEventTimer;
     MemReq: LongInt;
@@ -1153,7 +1152,7 @@ function TDrive.OpenDirectory(const Dir: String;
       if  (SR.SR.Attr and Hidden = 0) or (not Security) then
         if SR.SR.Attr and Directory = 0 then
           begin
-          Files.AtInsert(Files^.Count, NewFileRec(SR.FullName,
+          Files.AtInsert(Files.Count, NewFileRec(SR.FullName,
               
               SR.SR.Name,
               
@@ -1172,7 +1171,7 @@ function TDrive.OpenDirectory(const Dir: String;
           AddDirectory(Dr^+SR.FullName);
           if PutDirs then
             begin
-            Files.AtInsert(Files^.Count, NewFileRec(SR.FullName,
+            Files.AtInsert(Files.Count, NewFileRec(SR.FullName,
                 
                 SR.SR.Name,
                 
@@ -1198,18 +1197,18 @@ function TDrive.OpenDirectory(const Dir: String;
   DirsToProcess := TStringCollection.Create($10, $10, False);
 
   PI := WriteMsg(GetString(dlReadingList));
-  New(Files, Init($10, $10));
+  Files := TFilesCollection.Create($10, $10);
   {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
   {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
   {    доступный изначально объём                                              }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
   AddDirectory(lFExpand(Dir));
-  I := DirsToProcess^.Count-1;
+  I := DirsToProcess.Count-1;
   Abort := False;
   while (I >= 0) and (not Abort) and (MAvail > MemReq) do
     begin
-    P := DirsToProcess^.At(I);
+    P := DirsToProcess.At(I);
     DirsToProcess.AtDelete(I);
     Dirs.Insert(P);
     ReadDir(P);
@@ -1219,23 +1218,23 @@ function TDrive.OpenDirectory(const Dir: String;
       if ESC_Pressed then
         Abort := True;
       end;
-    I := DirsToProcess^.Count-1;
+    I := DirsToProcess.Count-1;
     end;
   PI.Free;
   // JO: здесь сортировка не нужна, т.к. она делается в TFindDrive.GetDirectory
   //     и в результате мы получаем сортировку дважды
-  {Files^.Sort;}
+  {Files.Sort;}
 //используем '><' в качестве пpизнака ветви
   PDrv := TFindDrive.Create('><'+Dir, Dirs, Files);
-  PDrv^.NoMemory := MAvail <= MemReq;
+  PDrv.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
   end { TDrive.OpenDirectory };
 
 {-DataCompBoy-} {JO - 31-03-2006 - сделал виртуальным методом TDrive}
-procedure TDrive.DrvFindFile(FC: PFilesCollection);
+procedure TDrive.DrvFindFile(FC: TFilesCollection);
   var
     PInfo: TWhileView;
-    Files: PFilesCollection;
+    Files: TFilesCollection;
     Directories: TCollection;
     BB: Byte; {-$VOL}
     R: TRect;
@@ -1257,21 +1256,21 @@ procedure TDrive.DrvFindFile(FC: PFilesCollection);
     FindRec.AddChar := '*.*'
   else
     FindRec.AddChar := '';
-  New(Files, Init($10, $10));
-  Files^.SortMode := psmLongName;
+  Files := TFilesCollection.Create($10, $10);
+  Files.SortMode := psmLongName;
   Directories := TStringCollection.Create(30, 30, False);
   R.Assign(1, 1, 40, 10);
   Inc(SkyEnabled);
-  PInfo.Create(R);
-  PInfo^.Options := PInfo^.Options or ofSelectable or ofCentered;
+  PInfo := TWhileView.Create(R);
+  PInfo.Options := PInfo.Options or ofSelectable or ofCentered;
   if FindRec.What = ''
   then
-    PInfo^.Top := GetString(dlDBViewSearch)+Cut(FindRec.Mask, 50)
+    PInfo.Top := GetString(dlDBViewSearch)+Cut(FindRec.Mask, 50)
   else
-    PInfo^.Top := GetString(dlDBViewSearch)+Cut(FindRec.Mask, 30)
+    PInfo.Top := GetString(dlDBViewSearch)+Cut(FindRec.Mask, 30)
       +' | '+Cut(FindRec.What, 17);
-  PInfo^.Bottom := GetString(dlNoFilesFound);
-  PInfo^.Write(1, GetString(dlDBViewSearchingIn));
+  PInfo.Bottom := GetString(dlNoFilesFound);
+  PInfo.Write(1, GetString(dlDBViewSearchingIn));
   Desktop.Insert(PInfo);
   BB := FindFiles(Files, Directories, FindRec, PInfo, FC, False);
   Desktop.Delete(PInfo);
