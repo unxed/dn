@@ -82,7 +82,7 @@ procedure CloseProfile;
 implementation
 
 uses
-  Strings, Streams, strutil
+  Strings, Streams
   ;
 
 { The most expensive operation with buffered streams is seeking --
@@ -92,7 +92,6 @@ uses
   function if in buffer and one DOS function if out of buffer.
 }
 type
-  PModBufStream = ^TModBufStream;
   TModBufStream = class(TBufStream)
     procedure SeekRel(Delta: Integer);
     end;
@@ -105,7 +104,7 @@ procedure TModBufStream.SeekRel(Delta: Integer);
 { Current parameters
 }
 const
-  CurFile: PModBufStream = nil;
+  CurFile: TModBufStream = nil;
   CurFileName: PChar = nil;
   CurMode: Longint = 0;
   CurApp: LongInt = 0;
@@ -115,7 +114,7 @@ procedure CloseFile;
   begin
   if CurFile <> nil then
     begin
-    Dispose(CurFile, Done);
+    CurFile.Free;
     CurFile := nil
     end;
   StrDispose(CurFileName);
@@ -140,8 +139,8 @@ function OpenFile(FileName: PChar; Mode: Longint): Boolean;
       Exit;
       end;
     CurFileName := StrNew(FileName);
-    CurFile := New(PModBufStream, Init(StrPas(FileName), Mode, 4096));
-    Result := (CurFile <> nil) and (CurFile^.Status = 0);
+    CurFile := TModBufStream.Create(StrPas(FileName), Mode, 4096);
+    Result := (CurFile <> nil) and (CurFile.Status = 0);
     CurMode := Mode;
     if not Result then
       CloseFile;
@@ -156,8 +155,8 @@ function CreateFile(FileName: PChar): Boolean;
   if FileName = nil then
     Exit;
   CurFileName := StrNew(FileName);
-  CurFile := New(PModBufStream, Init(StrPas(FileName), stCreate, 4096));
-  Res := (CurFile <> nil) and (CurFile^.Status = 0);
+  CurFile := TModBufStream.Create(StrPas(FileName), stCreate, 4096);
+  Res := (CurFile <> nil) and (CurFile.Status = 0);
   if not Res then
     CloseFile;
   CreateFile := Res
@@ -170,7 +169,7 @@ procedure ReadLine(Buf: PChar);
     Count: Word;
   begin
   Count := 0;
-  with CurFile^ do
+  with CurFile do
     begin
     repeat
       Read(Buf[0], 1);
@@ -207,12 +206,12 @@ function FindApplication(AppName: PChar): Boolean;
   if  (CurAppName <> nil) and (StrIComp(CurAppName, AppName) = 0)
   then
     begin
-    CurFile^.Seek(CurApp);
+    CurFile.Seek(CurApp);
     FindApplication := True;
     end
   else
     begin
-    CurFile^.Seek(0);
+    CurFile.Seek(0);
     repeat
       ReadLine(Buf);
       if IsAppLine(Buf) then
@@ -220,18 +219,18 @@ function FindApplication(AppName: PChar): Boolean;
           (StrEnd(Buf)-1)[0] := #0;
         StrDispose(CurAppName);
         CurAppName := StrNew(Buf+1);
-        CurApp := i32(CurFile^.GetPos);
+        CurApp := LongInt(CurFile.GetPos);
         if  (CurAppName <> nil) and (StrIComp(CurAppName, AppName) = 0)
         then
           begin
           FindApplication := True;
-          CurFile^.Reset;
-          CurApp := i32(CurFile^.GetPos);
+          CurFile.Reset;
+          CurApp := LongInt(CurFile.GetPos);
           Exit
           end
         end
-    until CurFile^.Status <> 0;
-    CurFile^.Reset;
+    until CurFile.Status <> 0;
+    CurFile.Reset;
     end
   end { FindApplication };
 
@@ -240,7 +239,7 @@ procedure AddApplication(AppName: PChar);
     _L: array[0..2] of Char = #13#10'[';
     _R: array[0..2] of Char = ']'#13#10;
   begin
-  with CurFile^ do
+  with CurFile do
     begin
     Seek(GetSize);
     Write(_L, 3);
@@ -248,7 +247,7 @@ procedure AddApplication(AppName: PChar);
     Write(_R, 3);
     StrDispose(CurAppName);
     CurAppName := StrNew(AppName);
-    CurApp := i32(CurFile^.GetPos)
+    CurApp := LongInt(CurFile.GetPos)
     end
   end;
 
@@ -279,7 +278,7 @@ function FindKey(KeyName: PChar; Dest: PChar): Boolean;
   if KeyName = nil then
     Exit;
   repeat
-    pos := i32(CurFile^.GetPos);
+    pos := LongInt(CurFile.GetPos);
     ReadLine(Buf);
     P := StrScan(Buf, '=');
     if P <> nil then
@@ -288,18 +287,18 @@ function FindKey(KeyName: PChar; Dest: PChar): Boolean;
       FirstInsignificant(Buf)[0] := #0;
       if StrIComp(Buf, KeyName) = 0 then
         begin
-        CurFile^.Reset;
+        CurFile.Reset;
         if Dest = nil
         then
-          CurFile^.Seek(pos)
+          CurFile.Seek(pos)
         else
           StrCopy(Dest, P+1);
         FindKey := True;
         Exit
         end;
       end;
-  until IsAppLine(Buf) or (CurFile^.Status <> 0);
-  CurFile^.Reset;
+  until IsAppLine(Buf) or (CurFile.Status <> 0);
+  CurFile.Reset;
   end { FindKey };
 
 procedure DeleteBuf(Dest, Source: LongInt);
@@ -309,20 +308,20 @@ procedure DeleteBuf(Dest, Source: LongInt);
   begin
   p := Dest;
   repeat
-    if CurFile^.GetSize-Source >= 256
+    if CurFile.GetSize-Source >= 256
     then
       Count := 256
     else
-      Count := i32(CurFile^.GetSize)-Source;
-    CurFile^.Seek(Source);
-    CurFile^.Read(Buf, Count);
-    CurFile^.Seek(Dest);
-    CurFile^.Write(Buf, Count);
+      Count := LongInt(CurFile.GetSize)-Source;
+    CurFile.Seek(Source);
+    CurFile.Read(Buf, Count);
+    CurFile.Seek(Dest);
+    CurFile.Write(Buf, Count);
     Inc(Source, Count);
     Inc(Dest, Count);
-  until Source = CurFile^.GetSize;
-  CurFile^.Truncate;
-  CurFile^.Seek(p)
+  until Source = CurFile.GetSize;
+  CurFile.Truncate;
+  CurFile.Seek(p)
   end;
 
 procedure DeleteLine;
@@ -330,10 +329,10 @@ procedure DeleteLine;
     pos: LongInt;
     Buf: array[0..255] of Char;
   begin
-  pos := i32(CurFile^.GetPos);
+  pos := LongInt(CurFile.GetPos);
   ReadLine(Buf);
-  CurFile^.Reset;
-  DeleteBuf(pos, i32(CurFile^.GetPos));
+  CurFile.Reset;
+  DeleteBuf(pos, LongInt(CurFile.GetPos));
   end;
 
 procedure InsertLine(Size: Word);
@@ -341,8 +340,8 @@ procedure InsertLine(Size: Word);
     pos, Count, Source, Dest: LongInt;
     Buf: array[0..255] of Char;
   begin
-  pos := i32(CurFile^.GetPos);
-  Source := Round(CurFile^.GetSize);
+  pos := LongInt(CurFile.GetPos);
+  Source := Round(CurFile.GetSize);
   Dest := Source+Size;
   repeat
     if Source-pos >= 256
@@ -352,12 +351,12 @@ procedure InsertLine(Size: Word);
       Count := Source-pos;
     Dec(Source, Count);
     Dec(Dest, Count);
-    CurFile^.Seek(Source);
-    CurFile^.Read(Buf, Count);
-    CurFile^.Seek(Dest);
-    CurFile^.Write(Buf, Count);
+    CurFile.Seek(Source);
+    CurFile.Read(Buf, Count);
+    CurFile.Seek(Dest);
+    CurFile.Write(Buf, Count);
   until Source = pos;
-  CurFile^.Seek(pos)
+  CurFile.Seek(pos)
   end { InsertLine };
 
 function InQuotes(Str: PChar): Boolean;
@@ -399,8 +398,8 @@ function GetPrivateProfileString(ApplicationName, KeyName: PChar; Default: PChar
                    Size-(Copy-ReturnedString)-1))+1
             end
           end
-      until Res or (CurFile^.Status <> 0);
-      CurFile^.Reset;
+      until Res or (CurFile.Status <> 0);
+      CurFile.Reset;
       Copy[0] := #0;
       GetPrivateProfileString := Copy-ReturnedString-1;
       Exit
@@ -462,22 +461,22 @@ function WritePrivateProfileString(ApplicationName, KeyName, Str, FileName: PCha
     if KeyName = nil
     then
       begin
-      CurFile^.Seek(CurApp);
+      CurFile.Seek(CurApp);
       repeat
-        p := i32(CurFile^.GetPos);
+        p := LongInt(CurFile.GetPos);
         ReadLine(Buf);
-        Res := IsAppLine(Buf) or (CurFile^.Status <> 0);
+        Res := IsAppLine(Buf) or (CurFile.Status <> 0);
         if not Res and (Buf[0] <> ';') then
-          DeleteBuf(p, i32(CurFile^.GetPos));
+          DeleteBuf(p, LongInt(CurFile.GetPos));
       until Res;
-      CurFile^.Reset;
+      CurFile.Reset;
       end
     else
       begin
       if FindKey(KeyName, nil) then
         DeleteLine
       else
-        CurFile^.Seek(CurApp);
+        CurFile.Seek(CurApp);
       if Str <> nil then
         begin
         StrLCopy(Buf, KeyName, 256);
@@ -485,7 +484,7 @@ function WritePrivateProfileString(ApplicationName, KeyName, Str, FileName: PCha
         StrLCat(Buf, Str, 256);
         StrLCat(Buf, #13#10, 256);
         InsertLine(StrLen(Buf));
-        CurFile^.Write(Buf, StrLen(Buf))
+        CurFile.Write(Buf, StrLen(Buf))
         end
       end
     end
