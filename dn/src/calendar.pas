@@ -23,7 +23,6 @@ uses
 
 type
 
-  PCalendarView = ^TCalendarView;
   TCalendarView = class(TView)
     Year: AWord;
     Month: Byte;
@@ -57,9 +56,8 @@ type
     procedure YearChanged;
     end;
 
-  PCalendarWindow = ^TCalendarWindow;
   TCalendarWindow = class(TWindow)
-    CalendarView: PCalendarView;
+    CalendarView: TCalendarView;
     constructor Create;
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Awaken; virtual;
@@ -116,7 +114,7 @@ const
   { 12 = Info panel }
 
 const
-  Calend: PCalendarWindow = nil;
+  Calend: TCalendarWindow = nil;
 
   (*****************************************************************
  *
@@ -529,7 +527,7 @@ constructor TCalendarWindow.Create;
   MoveTo(25, 7);
   GetExtent(R);
   R.Grow(-1, -1);
-  CalendarView := PCalendarView.Create(R);
+  CalendarView := TCalendarView.Create(R);
   Insert(CalendarView);
   Calend := Self;
   HelpCtx := hcCalendar;
@@ -564,7 +562,7 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
           Close;
         kbEnter:
           begin
-          InterfaceStr := CalendarView^.GetDateText;
+          InterfaceStr := CalendarView.GetDateText;
           Event.What := evCommand;
           Event.Command := cmInsertText;
           Application.PutEvent(Event);
@@ -574,7 +572,7 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
           end;
         kbCtrlIns:
           begin
-          PutInClip(CalendarView^.GetDateText);
+          PutInClip(CalendarView.GetDateText);
           ClearEvent(Event);
           end;
       end {case};
@@ -593,7 +591,7 @@ procedure TCalendarWindow.Awaken;
 destructor TCalendarWindow.Done;
   begin
   Calend := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TCalendarWindow.GetPalette: TPalette;
@@ -642,7 +640,7 @@ constructor TCalendarView.Load(var S: TStream);
 
 destructor TCalendarView.Done;
   begin
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TCalendarView.Draw;
@@ -1096,7 +1094,7 @@ procedure TCalendarView.YearChanged;
 procedure InsertCalendar;
   begin
   if Calend = nil then
-    Application.InsertWindow(PCalendarWindow.Create)
+    Application.InsertWindow(TCalendarWindow.Create)
   else
     Calend.Select;
   end;
