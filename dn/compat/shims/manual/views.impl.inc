@@ -43,10 +43,10 @@ begin
   while I < Length(Background) do
   begin
     P := Background[I].View;
-    if (P^.UpdTicks > 0) and (Now - Background[I].Last >= QWord(P^.UpdTicks)) then
+    if (P.UpdTicks > 0) and (Now - Background[I].Last >= QWord(P.UpdTicks)) then
     begin
       Background[I].Last := Now;
-      P^.Update;
+      P.Update;
     end;
     Inc(I);
   end;
@@ -68,7 +68,7 @@ begin
   Event.What := What;
   Event.Command := Command;
   Event.InfoLong := InfoLng;
-  Receiver^.HandleEvent(Event);
+  Receiver.HandleEvent(Event);
   if Event.What = evNothing then
     Result := Event.InfoPtr;
 end;
@@ -107,5 +107,5 @@ begin
   end;
   for I := 0 to High(Background) do
     if Background[I].View <> nil then
-      Background[I].View^.Update;
+      Background[I].View.Update;
 end;

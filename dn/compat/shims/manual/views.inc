@@ -48,9 +48,10 @@ procedure RunBackground;
 type
   { A scroll bar of the panels of DN. TODO: DN hides the bar by an option of the setup (Startup); here it is an
     ordinary scroll bar. }
-  PMyScrollBar = ^TMyScrollBar;
-  TMyScrollBar = object(TScrollBar)
-    procedure Draw; virtual;
+  TMyScrollBar = class;
+  PMyScrollBar = TMyScrollBar;
+  TMyScrollBar = class(TScrollBar)
+    procedure Draw; override;
   end;
 
   { the video buffer of DN: 80x25 cells of 16 bits }
