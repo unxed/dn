@@ -76,7 +76,7 @@ uses
   dirwatch, realmode, 
   Tree
   , filetype, panelsetup
-  , osdep, cfgstate;
+  , osdep, cfgstate, palettes;
 
 {AK155 Мало проверить, что имя временного каталога непусто, надо
 еще проверить, что он существует, и что в нем можно создавать и
@@ -535,6 +535,9 @@ procedure DoStartup;
       end {case};
       end;
     S.Done;
+    { the default of the builds before 2026-10-04 (the table of the OSP source: red and magenta buttons) was saved with the config: it is replaced by the colors of DN if the user did not change it }
+    if SystemColors[apColor] = palettes.CColorOsp then
+      SystemColors[apColor] := palettes.CColor;
     Security := Startup.FMSetup.Show and fmsShowHidden = 0;
 
     SystemDataOpt := SystemData.Options;
