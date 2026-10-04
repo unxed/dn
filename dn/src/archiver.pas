@@ -1203,7 +1203,7 @@ TryAgain:
   if AddToExisting and (CnvString(Arc.SetPathInside) <> '') then
     begin
     if Owner <> nil then
-      Message(PView(Owner)^.Owner, evCommand, cmPushInternalName,
+      Message(PView(Owner).Owner, evCommand, cmPushInternalName,
          @SIntern);
     if SIntern <> '' then
       begin
