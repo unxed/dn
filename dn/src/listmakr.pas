@@ -15,9 +15,9 @@ type
   PStrListMaker = ^TStrListMaker;
   TStrListMaker = class(TObject)
     constructor Create(AStrSize, AIndexSize: AWord);
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure Put(Key: AWord; S: String);
-    procedure Store(var S: TStream);
+    procedure Store(S: TStream);
   private
     Text: array of Byte;      { the strings, one after another (a length byte, the characters) }
     TextLen: LongInt;
@@ -43,11 +43,11 @@ begin
   RunCount := 0;
 end;
 
-destructor TStrListMaker.Done;
+destructor TStrListMaker.Destroy;
 begin
   Text := nil;
   Runs := nil;
-  inherited Done;
+  inherited Destroy;
 end;
 
 procedure TStrListMaker.Put(Key: AWord; S: String);
@@ -79,7 +79,7 @@ begin
   Inc(TextLen, N);
 end;
 
-procedure TStrListMaker.Store(var S: TStream);
+procedure TStrListMaker.Store(S: TStream);
 var
   Sz, Cnt: AWord;
 begin
@@ -91,19 +91,19 @@ begin
   if RunCount > 0 then S.Write(Runs[0], RunCount * SizeOf(TStrIndexRec));
 end;
 
-function BuildNothing(var S: TStream): TStreamable;
+function BuildNothing(S: TStream): TStreamable;
 begin
   Result := nil;
 end;
 
-procedure StoreMaker(P: TStreamable; var S: TStream);
+procedure StoreMaker(P: TStreamable; S: TStream);
 begin
-  PStrListMaker(P)^.Store(S);
+  TStrListMaker(P).Store(S);
 end;
 
 initialization
   RStrListMaker.ObjType := otStrListMaker;
-  RStrListMaker.VmtLink := PtrUInt(TypeOf(TStrListMaker));
+  RStrListMaker.VmtLink := PtrUInt(TClass(TStrListMaker));
   RStrListMaker.Load := @BuildNothing;
   RStrListMaker.Store := @StoreMaker;
 end.
