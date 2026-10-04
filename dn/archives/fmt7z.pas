@@ -183,7 +183,7 @@ procedure TS7ZArchive.GetFile;
   begin
   if TextRec(ListFile).Handle = 0 then
     begin { первый вызов: вызов архиватора для вывода оглавления }
-    FreeObject(ArcFile);
+    FreeAndNil(ArcFile);
     {AK155 если архив не закрыть, то архиватор
       выдаёт sharing violation }
     ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
