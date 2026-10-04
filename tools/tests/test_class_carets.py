@@ -135,6 +135,28 @@ class ClassCaretsTest(unittest.TestCase):
         out = self.convert(source, libraries=[library, source])
         self.assertIn(b"P^.X", out)
 
+    def test_record_class_field(self):
+        source = (
+            b"type TView = class end;\n"
+            b"  TDescr = record\n"
+            b"    AnyPanel: TView;\n"
+            b"  end;\n"
+            b"begin\n"
+            b"  X.AnyPanel^.Show;\n"
+            b"end.\n"
+        )
+        self.assertIn(b"AnyPanel.Show", self.convert(source))
+
+    def test_integer_local_does_not_shadow_class_local(self):
+        source = (
+            b"type TDrive = class\n"
+            b"    Panel: TDrive;\n"
+            b"  end;\n"
+            b"procedure A; var D: Integer; begin end;\n"
+            b"procedure B; var D: TDrive; begin D^.Panel := nil; end;\n"
+        )
+        self.assertIn(b"D.Panel", self.convert(source))
+
     def test_same_unit_string_field_does_not_shadow_class_field(self):
         source = (
             b"type TView = class\n"
