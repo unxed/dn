@@ -437,7 +437,7 @@ function LoadFileRecOwn(var s: TStream; Dirs: TCollection): PFileRec;
   if Result <> nil then
     begin
     s.Read(w, SizeOf(w));
-    Result^.Owner := Dirs^.At(w);
+    Result^.Owner := Dirs.At(w);
     end;
   end;
 
@@ -447,7 +447,7 @@ procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: TCollection)
     w: LongInt;
   begin
   StoreFileRec(s, fr);
-  w := Dirs^.IndexOf(fr^.Owner);
+  w := Dirs.IndexOf(fr^.Owner);
   s.Write(w, SizeOf(w));
   end;
 
@@ -456,7 +456,7 @@ constructor TFilesCollection.Load(S: TStream);
   var
     C, I: LongInt;
   begin
-  inherited Create;
+  inherited Load(S);
   S.Read(Count, SizeOf(Count));
   S.Read(Limit, SizeOf(Limit));
   S.Read(Delta, SizeOf(Delta));
@@ -638,12 +638,12 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
   NameDirsSortEnabled := False;
   if Panel <> nil then
     begin
-    SortFlags := TFilePanel(Panel).PanSetup^.Sort.SortFlags;
-    Move(TFilePanel(Panel).PanSetup^.Sort.Ups, Ups, SizeOf(Ups));
-    CmpMethod := TFilePanel(Panel).PanSetup^.Sort.CompareMethod;
+    SortFlags := TFilePanel(Panel).PanSetup.Sort.SortFlags;
+    Move(TFilePanel(Panel).PanSetup.Sort.Ups, Ups, SizeOf(Ups));
+    CmpMethod := TFilePanel(Panel).PanSetup.Sort.CompareMethod;
     if TFilePanel(Panel).Drive <> nil then
       {JO: все типы панели, представляющие собой раскрытую ветвь}
-      Branched := TFilePanel(Panel).Drive^.DriveType
+      Branched := TFilePanel(Panel).Drive.DriveType
         in [dtFind, dtTemp, dtList, dtArcFind]
     else
       Branched := False;
@@ -1344,10 +1344,10 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   if  (C = '+') then
     Items := Lnk
   else
-    Items := P^.FindItem(C);
+    Items := P.FindItem(C);
   if Items <> nil then
     Menu^.Default := Items;
-  P^.HelpCtx := hcSelectDrive+Byte(IncludeTemp = True);
+  P.HelpCtx := hcSelectDrive+Byte(IncludeTemp = True);
 
   N := Desktop.ExecView(P);
   P.Free;
@@ -1602,7 +1602,7 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
   H := nil;
   if SortMode = psmUnsorted then
     begin
-    New(H, Init(Self));
+    H := TFilesHash.Create(Self);
     if H.HT <> nil then
       Exit; //! Наверно, памяти мало, сообщить бы об этом
     @IsDupe := @IsUnsortedDupe;
