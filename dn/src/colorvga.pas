@@ -89,7 +89,7 @@ type
     TT: PListBox;
     Color: PRegLabel;
 
-    constructor Init;
+    constructor Create;
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
@@ -178,7 +178,7 @@ procedure TRegLabel.Draw;
     end;
   end;
 
-constructor TColorVGADialog.Init;
+constructor TColorVGADialog.Create;
   var
     R: TRect;
     Control, Labl, Histry: PView;
@@ -187,10 +187,10 @@ constructor TColorVGADialog.Init;
   begin
 
   R.Assign(6, 0, 56, 22);
-  inherited Init(R, GetString(dlColors_VGA));
+  inherited Create(R, GetString(dlColors_VGA));
   Options := Options or ofCentered;
   R.Assign(21, 2, 22, 18);
-  Control := New(PScrollBar, Init(R));
+  Control := PScrollBar.Create(R);
   Insert(Control);
 
   R.Assign(3, 2, 21, 18);
@@ -203,7 +203,7 @@ constructor TColorVGADialog.Init;
   Insert(Labl);
 
   R.Assign(25, 12, 47, 18);
-  TV := New(PColorView, Init(R));
+  TV := PColorView.Create(R);
   Insert(TV);
 
   R.Assign(24, 11, 38, 12);
@@ -216,7 +216,7 @@ constructor TColorVGADialog.Init;
   then
     begin
     R.Assign(25, 3, 47, 4);
-    TS[1] := New(PScrollBar, Init(R));
+    TS[1] := PScrollBar.Create(R);
     Insert(TS[1]);
 
     R.Assign(24, 2, 45, 3);
@@ -224,7 +224,7 @@ constructor TColorVGADialog.Init;
     Insert(TL[1]);
 
     R.Assign(25, 6, 47, 7);
-    TS[2] := New(PScrollBar, Init(R));
+    TS[2] := PScrollBar.Create(R);
     Insert(TS[2]);
 
     R.Assign(24, 5, 45, 6);
@@ -232,7 +232,7 @@ constructor TColorVGADialog.Init;
     Insert(TL[2]);
 
     R.Assign(25, 9, 47, 10);
-    TS[3] := New(PScrollBar, Init(R));
+    TS[3] := PScrollBar.Create(R);
     Insert(TS[3]);
 
     R.Assign(24, 8, 45, 9);
@@ -242,7 +242,7 @@ constructor TColorVGADialog.Init;
   else
     begin
     R.Assign(25, 6, 47, 7);
-    TS[1] := New(PScrollBar, Init(R));
+    TS[1] := PScrollBar.Create(R);
     Insert(TS[1]);
 
     R.Assign(24, 5, 45, 6);
@@ -252,7 +252,7 @@ constructor TColorVGADialog.Init;
 
   S := GetString(dlColors_D_efault);
   R.Assign(2, 19, 4+Length(S), 21);
-  Control := New(PButton, Init(R, S, cmYes, bfBroadcast+bfNormal));
+  Control := PButton.Create(R, S, cmYes, bfBroadcast+bfNormal);
   Insert(Control);
 
   R.Assign(18, 19, 28, 21);
@@ -439,7 +439,7 @@ procedure VGAColorRegister;
     { oldPalette := VGA_palette;}
 
     if Application.ExecuteDialog(
-        New(PColorVGADialog, Init),
+        PColorVGADialog.Create,
         @DataRec) = cmCancel
     then
       SetPalette(VGA_palette)
@@ -455,7 +455,7 @@ procedure VGAColorRegister;
           end;
          }
       end;
-    Dispose(List, Done);
+    List.Free;
 
     end;
 

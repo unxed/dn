@@ -1502,7 +1502,7 @@ procedure TFindDrive.ChangeUp(var S: String);
 в TFindDrive.ChangeRoot
   if Prev = nil then
     begin
-    New(Prev, Init(0, Panel));
+    Prev.Create(0, Panel);
     if Prev = nil then
       Exit;
     GlobalMessage(evCommand, cmRereadInfo, nil);
@@ -1549,7 +1549,7 @@ InsertDrive, а в нём FindDrive обязательно получит Prev <> nil.
 //    Exit;
     end;
 (* AK155 16.05.2005
-  New(Prev, Init(0, Panel));
+  Prev.Create(0, Panel);
   if Prev = nil then
     Exit;
   GlobalMessage(evCommand, cmRereadInfo, nil);

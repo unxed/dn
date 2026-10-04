@@ -40,7 +40,7 @@ type
   TASCIIChart = class(TWindow)
     destructor Done; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
-    constructor Init(var R: TRect);
+    constructor Create(var R: TRect);
   end;
 
 { Shows the table; the chosen character is sent to the program as a key. }
@@ -222,13 +222,13 @@ end;
 
 { --- TASCIIChart --- }
 
-constructor TASCIIChart.Init(var R: TRect);
+constructor TASCIIChart.Create(var R: TRect);
 var
   Control: PView;
   T: TRect;
 begin
   R.Assign(0, 0, 34, 12);
-  inherited Init(R, GetString(dlASCIIChart), wnNoNumber);
+  inherited Create(R, GetString(dlASCIIChart), wnNoNumber);
   Flags := Flags and not (wfGrow or wfZoom);
   Options := Options and ofTopSelect;
   HelpCtx := hcAsciiChart;
@@ -238,12 +238,12 @@ begin
   GetExtent(R);
   R.Grow(-1, -1);
   T.Assign(R.A.X, R.B.Y - 1, R.B.X, R.B.Y);
-  Control := New(PReport, Init(T));
+  Control := PReport.Create(T);
   Control^.Options := Control^.Options or ofFramed;
   Control^.EventMask := evBroadcast or Control^.EventMask;
   Insert(Control);
   T.Assign(R.A.X, R.A.Y, R.B.X, R.B.Y - 2);
-  Control := New(PTable, Init(T));
+  Control := PTable.Create(T);
   Control^.Options := Control^.Options or ofSelectable or ofFramed;
   Control^.EventMask := $FFFF;
   Control^.BlockCursor;
@@ -308,14 +308,14 @@ var
   end;
 
 begin
-  P := New(PASCIIChart, Init(R));
+  P := PASCIIChart.Create(R);
   P^.MoveTo(boundsASCII.X, boundsASCII.Y);
   P^.SetData(CharASCII);
   CR := Desktop^.Current;
   while GetCH do
     ;
   boundsASCII := P^.Origin;
-  Dispose(P, Done);
+  P.Free;
   if CR <> nil then
     CR^.Select;
 end;

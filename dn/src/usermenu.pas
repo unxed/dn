@@ -816,7 +816,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       end;
     end;
   S := F^.FileName;
-  Dispose(F, Done);
+  F.Free;
   if P^.Count > 0 then
     begin
     StartPos := -1;
@@ -833,10 +833,10 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       R.A.X := 0;
       R.B.X := NW;
       R.B.Y := Min(R.B.Y, NI);
-      PV := New(PMenuBox, Init(R, Menu, nil));
+      PV := PMenuBox.Create(R, Menu, nil);
       PV^.Options := PV^.Options or ofCentered;
       I := Application.ExecView(PV);
-      Dispose(PV, Done);
+      PV.Free;
       DisposeMenu(Menu);
       if I < 1000 then
         begin
@@ -910,12 +910,12 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
             end;
           end;
         Close(F1.T);
-        Dispose(F, Done);
+        F.Free;
         Break;
         end;
     until False;
     end;
-  Dispose(P, Done);
+  P.Free;
   FreeStr := DefStr;
   if TitleStr = '' then
     TitleStr := GetString(dlMenuParamLabel);
@@ -971,9 +971,9 @@ procedure ScreenGrabber(ShowMessage: Boolean);
     end;
   B := MsgActive;
   MsgActive := False;
-  P := New(PGrabber, Init);
+  P := PGrabber.Create;
   Application.ExecView(P);
-  Dispose(P, Done);
+  P.Free;
   Here := False;
   MsgActive := B;
   end;
@@ -1085,8 +1085,8 @@ procedure TGrabber.HandleEvent(var Event: TEvent);
       C: Char;
     begin
     if ClipBoard <> nil then
-      Dispose(ClipBoard, Done);
-    ClipBoard := New(PLineCollection, Init(R.B.Y-R.A.Y, 10, True));
+      ClipBoard.Free;
+    ClipBoard := PLineCollection.Create(R.B.Y-R.A.Y, 10, True);
     for I := R.A.Y to R.B.Y-1 do
       begin
       S := '';
@@ -1249,7 +1249,7 @@ RL:
         goto 1;
       end;
     end;
-  Dispose(F, Done);
+  F.Free;
   if Local then
     goto RL;
   Exit;
@@ -1277,7 +1277,7 @@ RL:
 
   if IOResult <> 0 then
     begin
-    Dispose(F, Done);
+    F.Free;
     Exit
     end;
   Writeln(F1.T, '@Echo off');
@@ -1336,7 +1336,7 @@ RL:
 
   Write(F1.T, '@DEL ', FreeStr);
   Close(F1.T);
-  Dispose(F, Done);
+  F.Free;
 
   if OS2 <> #0 then
     S := OS2+'call '+FreeStr

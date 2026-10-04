@@ -621,7 +621,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
   begin
   ReadArchive; {AK155 26-11-2002}
   AFiles := PFilesCollection.Create($10, $10);
-  {FD := New(PFilesCollection, Init($40, $10));}
+  {FD := PFilesCollection.Create($40, $10);}
   PFilesCollection(AFiles).Panel := Panel;
   GetDirectory := AFiles;
   CheckSlashDot(CurDir);

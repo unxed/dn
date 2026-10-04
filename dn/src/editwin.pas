@@ -66,7 +66,7 @@ type
     MenuBar: PMenuBar;
     UpMenu: PMenu;
     ModalEnd: Boolean;
-    constructor Init(R: TRect; FileName: String);
+    constructor Create(R: TRect; FileName: String);
     constructor Load(var S: TStream);
     //    procedure ChangeBounds(const R: TRect); virtual;
     procedure Store(var S: TStream);
@@ -208,12 +208,12 @@ procedure TEditWindow.Store(var S: TStream);
   end;
 
 { TEditWindow }
-constructor TEditWindow.Init(R: TRect; FileName: String);
+constructor TEditWindow.Create(R: TRect; FileName: String);
   var
     pm: PMenu;
     Pi: PMenuItem;
   begin
-  inherited Init(R, '', 0);
+  inherited Create(R, '', 0);
   LoadCommands;
   Options := Options or ofTileable;
   Flags := Flags or wfMaxi;
@@ -248,13 +248,13 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
     Fail;
     end;
 R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
-  AInfo := New(PInfoLine, Init(R));
+  AInfo := PInfoLine.Create(R);
   InsertBefore(AInfo, First);
   GetExtent(R);
   R.B.X := R.A.X+1;
   Inc(R.A.Y, 2);
   Dec(R.B.Y);
-  ABookLine := New(PBookmarkLine, Init(R));
+  ABookLine := PBookmarkLine.Create(R);
   ABookLine^.GrowMode := gfGrowHiY;
   Insert(ABookLine);
 

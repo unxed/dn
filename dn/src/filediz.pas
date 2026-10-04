@@ -285,7 +285,7 @@ function OpenFileList(const AConatainerPath: string): Boolean;
   Reset(OldConatainerFile);
   if (IOResult = 0) and ReadNextS then
     begin
-//      Descriptions := New(PDIZCol, Init($10, $10));
+//      Descriptions := PDIZCol.Create($10, $10);
     Result := True;
     end
   else

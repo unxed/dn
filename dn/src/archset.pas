@@ -79,7 +79,7 @@ procedure UpdateARH(Arch: PARJArchive);
       if A <> nil then
         begin
         A^.Save;
-        Dispose(A, Done);
+        A.Free;
         A := nil;
         end;
       end;
@@ -210,7 +210,7 @@ procedure SetupArchive(ArchCommand: Word);
   W := Desktop^.ExecView(D);
   if W = cmOK then
     D^.GetData(DT);
-  Dispose(D, Done);
+  D.Free;
   if W <> cmOK then
     goto Ex;
   if SystemData.ForceDefArch = '' then
@@ -256,7 +256,7 @@ procedure SetupArchive(ArchCommand: Word);
   UpdateARH(Arch);
   Message(Application, evCommand, cmUpdateConfig, nil);
 Ex:
-  Dispose(Arch, Done);
+  Arch.Free;
   end { SetupArchive };
 
 end.

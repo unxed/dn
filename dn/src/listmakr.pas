@@ -14,7 +14,7 @@ uses
 type
   PStrListMaker = ^TStrListMaker;
   TStrListMaker = class(TObject)
-    constructor Init(AStrSize, AIndexSize: AWord);
+    constructor Create(AStrSize, AIndexSize: AWord);
     destructor Done; virtual;
     procedure Put(Key: AWord; S: String);
     procedure Store(var S: TStream);
@@ -34,9 +34,9 @@ const
   MaxRun = 16;
 
 { the sizes of the arguments are a hint only: the arrays grow as needed }
-constructor TStrListMaker.Init(AStrSize, AIndexSize: AWord);
+constructor TStrListMaker.Create(AStrSize, AIndexSize: AWord);
 begin
-  inherited Init;
+  inherited Create;
   SetLength(Text, AStrSize);
   SetLength(Runs, AIndexSize);
   TextLen := 0;

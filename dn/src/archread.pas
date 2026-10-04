@@ -97,7 +97,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       if F = nil then
         Exit;
       P := nil;
-      New(PC, Init);
+      PC.Create;
       while not F^.Eof do
         begin
         S := F^.GetStr;
@@ -202,7 +202,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       if F = nil then
         Exit;
       P := nil;
-      New(PC, Init);
+      PC.Create;
       repeat
         S := F^.GetStr;
         ID := Copy(S, 9, 2);
@@ -264,7 +264,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
         F := PTextReader.Create(S);
         if F = nil then Exit;
         P := nil;
-        New(PC, Init);
+        PC.Create;
         Repeat
          S := F^.GetStr;
         Until (S[1] = '-') or (F^.EOF);
@@ -300,7 +300,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
     {next archive}
 
     S := F^.FileName;
-    Dispose(F, Done);
+    F.Free;
     EraseFile(S);
     GlobalMessage(evCommand, cmRereadDir, @TempDir);
     if PC^.Files = 0 then

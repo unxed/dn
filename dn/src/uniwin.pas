@@ -114,7 +114,7 @@ procedure TUniWindow.InitFrame;
     R: TRect;
   begin
   R.Assign(0, 0, Size.X, Size.Y);
-  Frame := New(PEditFrame, Init(R));
+  Frame := PEditFrame.Create(R);
   end;
 
 function TUniWindow.MakeScrollBar(AOptions: Word): PScrollBar;

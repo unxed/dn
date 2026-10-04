@@ -679,7 +679,7 @@ function GetMeMemoStream: PStream; {-$VOL begin}
     S: PStream;
     Pos: LongInt;
   begin
-  S := New(PMemoryStream, Init(2048, 2048));
+  S := PMemoryStream.Create(2048, 2048);
   {Cat: а теперь запишем туда единичку, чтобы другие глупые процедуры,     }
   {     которые читают из потока то, что они туда не записывали, считали,  }
   {     что наш поток содержит длинные строки                              }
@@ -689,7 +689,7 @@ function GetMeMemoStream: PStream; {-$VOL begin}
   {/Cat}
   if S^.Status <> stOK then
     begin
-    Dispose(S, Done);
+    S.Free;
     S := nil
     end;
   GetMeMemoStream := S;

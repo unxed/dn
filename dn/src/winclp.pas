@@ -128,7 +128,7 @@ function TextLines(const T: AnsiString): PLineCollection;
     P, Q: LongInt;
     S: AnsiString;
   begin
-  Result := New(PLineCollection, Init(10, 10, True));
+  Result := PLineCollection.Create(10, 10, True);
   P := 1;
   while P <= Length(T) do
     begin
@@ -164,7 +164,7 @@ function GetWinClip(var PCL: PLineCollection {; NeedStream: boolean})
   if T = '' then
     Exit;
   if PCL <> nil then
-    Dispose(PCL, Done);
+    PCL.Free;
   PCL := TextLines(T);
   Result := True;
   end;
@@ -188,7 +188,7 @@ procedure SyncClipOut {(NeedStream: boolean)};
   if (T = '') or (T = LinesText(PLineCollection(editcore.ClipBoard))) then
     Exit;
   if editcore.ClipBoard <> nil then
-    Dispose(editcore.ClipBoard, Done);
+    editcore.ClipBoard.Free;
   editcore.ClipBoard := TextLines(T);
   end;
 

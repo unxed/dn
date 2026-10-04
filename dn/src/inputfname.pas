@@ -68,7 +68,7 @@ type
   PColorPoint = ^TColorPoint;
   TColorPoint = class(TView)
     Color: Byte;
-    constructor Init(var ABounds: TRect; AColor: Byte);
+    constructor Create(var ABounds: TRect; AColor: Byte);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream); virtual;
     procedure Draw; virtual;
@@ -119,11 +119,11 @@ procedure TInputFName.HandleEvent(var Event: TEvent);
     inherited HandleEvent(Event);
   end { TInputFName.HandleEvent };
 
-constructor TColorPoint.Init(var ABounds: TRect; AColor: Byte);
+constructor TColorPoint.Create(var ABounds: TRect; AColor: Byte);
   begin
   ABounds.B.X := ABounds.A.X+1;
   ABounds.B.Y := ABounds.A.Y+1;
-  inherited Init(ABounds);
+  inherited Create(ABounds);
   Color := AColor;
   end;
 

@@ -190,7 +190,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
             end;
           MacroRecord := True;
           KeyMacroses^.AtFree(WW);
-          New(PM, Init);
+          PM.Create;
           KeyMacroses^.AtInsert(WW, PM);
           CurrentMacro := PM;
           end

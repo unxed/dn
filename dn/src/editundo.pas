@@ -155,7 +155,7 @@ procedure TDoCollection.FreeItem(P: Pointer);
         udDelLine, udDelBlock, udReplaceBlock,
         udClearBlock:
           begin
-          Dispose(T^.Lines, Done);
+          T^.Lines.Free;
           T^.Lines := nil
           end;
         udInsChar:
@@ -171,7 +171,7 @@ procedure TDoCollection.FreeItem(P: Pointer);
         udInsLine, udInsBlock, udFormatBlock, udDelBlock, udInsVertBlock,
         udReplaceBlock, udClearBlock:
           begin
-          Dispose(T^.Lines, Done);
+          T^.Lines.Free;
           T^.Lines := nil
           end;
         udDelChar, udDelLine, udBackDel:
@@ -534,13 +534,13 @@ function CheckForOver(Name: String): PStream; {<editfile.001>}
         end;
       else {case}
         begin
-        Dispose(S, Done);
+        S.Free;
         S := nil;
         end;
     end {case};
     Exit;
     end;
-  Dispose(S, Done);
+  S.Free;
   S := nil;
   if Abort then
     Exit;
@@ -561,7 +561,7 @@ function CheckForOver(Name: String): PStream; {<editfile.001>}
   if Abort or (S = nil) or (S^.Status <> stOK) then
     begin
     CantWrite(Name);
-    Dispose(S, Done);
+    S.Free;
     S := nil;
     Exit
     end;

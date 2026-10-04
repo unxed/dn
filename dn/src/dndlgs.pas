@@ -73,7 +73,7 @@ type
     Count: Word; { не отрывать от Selected! См. Load,Store}
     Menu: PMenu;
     Items: array[1..10] of PMenuItem; // прямые ссылки в меню
-    constructor Init(var Bounds: TRect; AStrings: PSItem);
+    constructor Create(var Bounds: TRect; AStrings: PSItem);
     procedure BuildMenu(AStrings: PSItem);
     destructor Done; virtual;
     procedure SetState(AState: Word; Enable: Boolean); virtual;
@@ -92,7 +92,7 @@ type
     InputLine: PInputline;
     DeltaX, CurX: Integer;
     Sec: Boolean;
-    constructor Init(R: TRect; AInputLine: PInputline);
+    constructor Create(R: TRect; AInputLine: PInputline);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -104,7 +104,7 @@ type
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     ParamCount: AInt;
     ParamList: Pointer;
-    constructor Init(var Bounds: TRect; const AText: String;
+    constructor Create(var Bounds: TRect; const AText: String;
         AParamCount: AInt);
     constructor Load(var S: TStream);
     function DataSize: Integer; virtual;
@@ -116,7 +116,7 @@ type
   PBookmark = ^TBookmark;
   TBookmark = class(TLabel)
     {` Закладка страницы блокнота со страницами TNotepas }
-    constructor Init(var Bounds: TRect; AText: String; ALink: PView);
+    constructor Create(var Bounds: TRect; AText: String; ALink: PView);
     procedure Draw; virtual;
     procedure FocusLink; virtual;
     end;
@@ -145,7 +145,7 @@ type
     BookmarkStart: integer; { X-коррдината левой линии закладок }
     ActivePage: Integer;
     NumPages: Integer;
-    constructor Init(var Bounds: TRect; ATitle: TTitleStr;
+    constructor Create(var Bounds: TRect; ATitle: TTitleStr;
       ABookmarkStart: integer);
     function NewPage(const ATitle: String): PPage;
     procedure InitFrame; virtual;
@@ -163,10 +163,10 @@ type
 
 implementation
 
-constructor TParamText.Init(var Bounds: TRect; const AText: String;
+constructor TParamText.Create(var Bounds: TRect; const AText: String;
     AParamCount: AInt);
   begin
-  TStaticText.Init(Bounds, AText);
+  inherited Create(Bounds, AText);
   ParamCount := AParamCount;
   end;
 
@@ -202,11 +202,11 @@ procedure TParamText.Store(var S: TStream);
 
 { TLabel }
 
-constructor THexLine.Init(R: TRect; AInputLine: PInputline);
+constructor THexLine.Create(R: TRect; AInputLine: PInputline);
   begin
   if AInputLine = nil then
     Exit;
-  inherited Init(R);
+  inherited Create(R);
   Options := Options or ofSelectable or ofPostProcess;
   EventMask := $FFFF;
   InputLine := AInputLine;
@@ -388,9 +388,9 @@ procedure THexLine.Draw;
 
 { /------------------ TComboBox ----------------\ }
 
-constructor TComboBox.Init(var Bounds: TRect; AStrings: PSItem);
+constructor TComboBox.Create(var Bounds: TRect; AStrings: PSItem);
   begin
-  TView.Init(Bounds);
+  inherited Create(Bounds);
   Options := ofSelectable;
   BuildMenu(AStrings);
   Selected := 1;
@@ -425,7 +425,7 @@ procedure TComboBox.BuildMenu(AStrings: PSItem);
 destructor TComboBox.Done;
   begin
   DisposeMenu(Menu);
-  TView.Done;
+  inherited Destroy;
   end;
 
 procedure TComboBox.SetState(AState: Word; Enable: Boolean);
@@ -595,7 +595,7 @@ procedure TPage.InitFrame;
     R: TRect;
   begin
   GetExtent(R);
-  Frame := PFrame(New(PPageFrame, Init(R)));
+  Frame := PFrame(PPageFrame.Create(R));
   end;
 
 function TPage.GetPalette: TPalette;
@@ -656,9 +656,9 @@ procedure TPage.Store(var S: TStream);
   PutPeerViewPtr(S, PrevPage);
   end;
 
-constructor TBookmark.Init(var Bounds: TRect; AText: String; ALink: PView);
+constructor TBookmark.Create(var Bounds: TRect; AText: String; ALink: PView);
   begin
-  inherited Init(Bounds, AText, ALink);
+  inherited Create(Bounds, AText, ALink);
   PPage(ALink)^.Bookmark := @Self;
   end;
 
@@ -679,10 +679,10 @@ procedure TBookmark.FocusLink;
   Owner^.UnLock;
   end;
 
-constructor TNotepad.Init(var Bounds: TRect; ATitle: TTitleStr;
+constructor TNotepad.Create(var Bounds: TRect; ATitle: TTitleStr;
      ABookmarkStart: integer);
   begin
-  inherited Init(Bounds, ATitle);
+  inherited Create(Bounds, ATitle);
   BookmarkStart := ABookmarkStart;
   end;
 
@@ -691,7 +691,7 @@ procedure TNotepad.InitFrame;
     R: TRect;
   begin
   GetExtent(R);
-  Frame := PFrame(New(PNotepadFrame, Init(R)));
+  Frame := PFrame(PNotepadFrame.Create(R));
   end;
 
 function TNotepad.NewPage(const ATitle: String): PPage;
@@ -711,7 +711,7 @@ function TNotepad.NewPage(const ATitle: String): PPage;
   R.B.X := Size.X-1;
   R.A.Y := 2*NumPages - 1;
   R.B.Y := R.A.Y + 3;
-  Insert(New(PBookmark, Init(R, ATitle, Result)));
+  Insert(PBookmark.Create(R, ATitle, Result));
   end {TNotepad.NewPage};
 
 constructor TNotepad.Load(var S: TStream);

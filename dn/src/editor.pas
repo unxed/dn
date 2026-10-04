@@ -887,7 +887,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
 1:
       if Abort then
         begin
-        Dispose(P, Done);
+        P.Free;
         Exit
         end;
     until I > LG+1;
@@ -895,7 +895,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     WriteLeft;
     if Abort then
       begin
-      Dispose(P, Done);
+      P.Free;
       Exit
       end;
     Marking := False;
@@ -923,7 +923,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           Dec(MarkPos[L].Y, Q);
     SetLimits;
     DrawView;
-    Dispose(P, Done);
+    P.Free;
     ChangeLine;
     EnableMarking := True;
     end { FormatBlock };
@@ -951,7 +951,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       begin
       {PC := GetSelection;}
       {if PC = nil then Exit;}
-      {L := New(PStdCollector, Init(10));}
+      {L := PStdCollector.Create(10);}
       {Dispose(PStdCollector(L)^.Collection, Done);}
       {PStdCollector(L)^.Collection := PC;}
       {PStdCollector(L)^.Count := PC^.Count;}
@@ -965,7 +965,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     then
       begin
       if Block then
-        Dispose(L, Done);
+        L.Free;
       Exit;
       end;
     R.Assign(1, 1, 30, 10);
@@ -1022,7 +1022,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
 1:
     P^.Free;
     if Block then
-      Dispose(L, Done);
+      L.Free;
     end { Print };
   {-DataCompBoy-}
 
@@ -1206,7 +1206,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       UndoInfo^.FreeAll;
     Inc(UndoTimes);
     Modified := True;
-    Dispose(Info, Done);
+    Info.Free;
     end { SortBlock };
 
   procedure CalcBlock;
@@ -1389,7 +1389,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     begin
     ChangeLine;
     if  (ClipBoard <> nil) then
-      Dispose(ClipBoard, Done);
+      ClipBoard.Free;
     ClipBoard := BlockToClip(GetSelection);
     SetWinClip(PLineCollection(ClipBoard));
     end;

@@ -884,13 +884,13 @@ EndLFN:
   end { TCommandLine.HandleEvent };
 
 (*
-constructor TCmdWindow.Init(R: TRect);
+constructor TCmdWindow.Create(R: TRect);
 begin
- inherited Init(R, 'Command Line', 0);
+ inherited Create(R, 'Command Line', 0);
  GetExtent(R);
  Palette := wpCyanWindow;
  R.Grow(-1, -1);
- Insert(New(PCmdLine, Init(R)));
+ Insert(PCmdLine.Create(R));
 end;
 
 procedure TCmdLine.Draw;

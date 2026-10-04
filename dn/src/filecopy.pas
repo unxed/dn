@@ -333,7 +333,7 @@ type
     len: Word; // длина блока, который будем читать
     Eof: Byte;
     Attr: Byte;
-    constructor Init(var ALen: LongInt; AOwner: Pointer;
+    constructor Create(var ALen: LongInt; AOwner: Pointer;
          const AOldName, ANewName: String;
         ASize: TSize; ADate: LongInt; AAttr: Byte; AEOF: ShortInt);
     procedure PrepareToWrite; virtual;
@@ -347,7 +347,7 @@ type
     CopyIt: Boolean;
     Own: PFileRec;
     Attr: Byte;
-    constructor Init(const AOld, ANew: String; ACopy: Boolean;
+    constructor Create(const AOld, ANew: String; ACopy: Boolean;
          AnOwn: PFileRec; AnAttr: Byte);
     function DOld: String;
     function DNew: String;
@@ -356,9 +356,9 @@ type
 
   { TDirName }
 
-constructor TDirName.Init(const AOld, ANew: String; ACopy: Boolean; AnOwn: PFileRec; AnAttr: Byte);
+constructor TDirName.Create(const AOld, ANew: String; ACopy: Boolean; AnOwn: PFileRec; AnAttr: Byte);
   begin
-  inherited Init;
+  inherited Create;
   OldName := NewStr(AOld);
   NewName := NewStr(fReplace('.\', '\', ANew));
   CopyIt := ACopy;
@@ -391,9 +391,9 @@ destructor TDirName.Done;
 
 { TLine }
 
-constructor TLine.Init(var ALen: LongInt; AOwner: Pointer; const AOldName, ANewName: String; ASize: TSize; ADate: LongInt; AAttr: Byte; AEOF: ShortInt);
+constructor TLine.Create(var ALen: LongInt; AOwner: Pointer; const AOldName, ANewName: String; ASize: TSize; ADate: LongInt; AAttr: Byte; AEOF: ShortInt);
   begin
-  inherited Init;
+  inherited Create;
   if MaxAvail < 2048 then
     Fail;
   len := ALen;
@@ -464,7 +464,7 @@ function AppendQuery(const S: String): Word;
   D := PDialog(LoadResource(dlgAppendQuery));
   D^.Options := D^.Options or ofCentered;
   R.Assign(2, 4, D^.Size.X-2, 5);
-  P := New(PStaticText, Init(R, ^C+S));
+  P := PStaticText.Create(R, ^C+S);
   D^.Insert(P);
   AppendQuery := Desktop^.ExecView(D);
   end;
@@ -703,7 +703,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     else
       Overwrite := cmSkip;
 
-    Dispose(D, Done);
+    D.Free;
 
     CopyCancel := I = cmCancel;
     end { Overwrite };
@@ -1655,7 +1655,7 @@ lbStartWrite:
       D^.Options := D^.Options or ofCentered;
       S:=Cut(FName,52);
       R.A.X:=1; R.A.Y:=3; R.B.X:=53; R.B.Y:=4;
-      D^.Insert(New(PStaticText, Init(R,^C+S)));
+      D^.Insert(PStaticText.Create(R,^C+S));
       Case Desktop^.ExecView(D) Of
        cmOK: Goto 1;
        cmYes: begin SkipAllBad := True; Exit; end;
@@ -1788,7 +1788,7 @@ PrepareResume:
       WW := Min(ReadLen, MemBufSize-MemBufPos);
       if WW > ln-Rd then
         WW := Round(ln-Rd);
-      P := New(pLine, Init(WW, Own, FName, NName, ln, Dtt, Attr, EOF));
+      P := pLine.Create(WW, Own, FName, NName, ln, Dtt, Attr, EOF);
       if P = nil then
         begin { исчерпан буфер }
         ReadProgress;
@@ -1831,7 +1831,7 @@ FileRead:
           goto FileRead;
           end;
         CopyCancel := True;
-        Dispose(P, Done);
+        P.Free;
         P := nil;
         Break;
         end;
@@ -1883,7 +1883,7 @@ FileRead:
      or SkipRequested; {-$VOL}
     if P <> nil then
       begin
-      Dispose(P, Done); // выскочили по Break после Init, но до Insert
+      P.Free; // выскочили по Break после Init, но до Insert
       P := nil;
       end;
 
@@ -2360,10 +2360,10 @@ TryGetInfo:
       end;
 
     begin { __Remove }
-    RRC := New(PStringCollection, Init($10, $8, False));
+    RRC := PStringCollection.Create($10, $8, False);
     Files^.ForEach(DoRemove);
     RRC^.ForEach(DoReread);
-    Dispose(RRC, Done);
+    RRC.Free;
     end { __Remove };
 
   procedure DoReset(P_: Pointer);
@@ -2488,7 +2488,7 @@ qqqq:
       (ElapsedTime(Timer) > 30*1000)
   then
     BeepAftercopy;
-  Dispose(CopyQueue, Done);
+  CopyQueue.Free;
   CopyQueue := nil;
   DoneMemBuf;
 1:
@@ -2501,10 +2501,10 @@ qqqq:
     end
   else
     
-    Dispose(Info, Done);
+    Info.Free;
 
   if Dirs <> nil then
-    Dispose(Dirs, Done);
+    Dirs.Free;
   Dirs := nil;
   if CopyOptions and cpoMove <> 0 then
     __Remove;
@@ -2534,7 +2534,7 @@ qqqq:
   if Flush then
     begin
     SysDiskReset;
-    Dispose(Info, Done);
+    Info.Free;
     end;
   
   end { FilesCopy };
@@ -2597,7 +2597,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
         Title := NewStr(GetString(dlFCMove));
         end;
       R.Assign(2, 1, Size.X-3, 2);
-      Insert(New(PLabel, Init(R, DialogLabel, DirectLink[1])));
+      Insert(PLabel.Create(R, DialogLabel, DirectLink[1]));
       {JO}
       if  (FMSetup.Options and fmoAlwaysCopyDesc = 0) and
           (SourcePanel <> nil) and
@@ -2963,7 +2963,7 @@ procedure CopyDirContent(Source, Destination: String;
   FC^.Pack;
   if FC^.Count <= 0 then
     begin
-    Dispose(FC, Done);
+    FC.Free;
     Exit;
     end;
 
@@ -2975,7 +2975,7 @@ procedure CopyDirContent(Source, Destination: String;
   NotifyResume;
   Dec(SkyEnabled);
   FC^.DeleteAll;
-  Dispose(FC, Done);
+  FC.Free;
   end { CopyDirContent };
 {/JO}
 

@@ -17,7 +17,7 @@ type
     CShape, CPos: AWord;
     CheckIO: Boolean;
     isValid: Boolean;
-    constructor Init(ACheck: Boolean);
+    constructor Create(ACheck: Boolean);
     destructor Done; virtual;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -34,12 +34,12 @@ uses
 
 { ------------------------------------------------------------------------- }
 
-constructor TUserSaver.Init(ACheck: Boolean);
+constructor TUserSaver.Create(ACheck: Boolean);
   var
     R: TRect;
   begin
   R.Assign(0, 0, 0, 0);
-  inherited Init(R);
+  inherited Create(R);
   CheckIO := ACheck;
   SetState(sfVisible, False);
   isValid := True;
@@ -97,7 +97,7 @@ procedure TUserSaver.Store(var S: TStream);
 
 procedure InsertUserSaver(ACheck: Boolean);
   begin
-  Desktop^.Insert(New(PUserSaver, Init(ACheck)));
+  Desktop^.Insert(PUserSaver.Create(ACheck));
   FreeMem(UserScreen, UserScreenSize);
   UserScreenSize := ScreenWidth*ScreenHeight*2;
   UserScreenWidth := ScreenWidth;

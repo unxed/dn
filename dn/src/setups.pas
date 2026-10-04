@@ -87,7 +87,7 @@ type
 
   PMouseBar = ^TMouseBar;
   TMouseBar = class(TScrollBar)
-    constructor Init(var Bounds: TRect);
+    constructor Create(var Bounds: TRect);
     procedure SetData(var Rec); virtual;
     procedure GetData(var Rec); virtual;
     function DataSize: Integer; virtual;
@@ -97,7 +97,7 @@ type
   
   PSaversDialog = ^TSaversDialog;
   TSaversDialog = class(TDialog)
-    constructor Init;
+    constructor Create;
     procedure HandleEvent(var Event: TEvent); virtual;
     destructor Done; virtual;
     procedure Awaken; virtual;
@@ -192,7 +192,7 @@ procedure SystemSetup;
     SystemData := PSysDialog(D)^.LocalData;
     Message(Application, evCommand, cmUpdateConfig, nil);
     end;
-  Dispose(D, Done);
+  D.Free;
   SystemDataOpt := SystemData.Options;
   CopyLimit := SystemData.CopyLimitBuf;
   ForceDefaultArchiver := SystemData.ForceDefArch;
@@ -295,7 +295,7 @@ procedure SaversSetup;
     D^.GetData(SaversData);
     Message(Application, evCommand, cmUpdateConfig, nil);
     end;
-  Dispose(D, Done);
+  D.Free;
   end;
 
 
@@ -504,7 +504,7 @@ destructor TSysDialog.Done;
   begin
   GetData(Data);
   inherited Done;
-  Dispose(Data.Drives.List, Done);
+  Data.Drives.List.Free;
   end;
 
 procedure TSysDialog.GetData(var Rec);
@@ -524,9 +524,9 @@ procedure TSysDialog.GetData(var Rec);
 {----------------------------------------------------------------------------}
 {                                 Mouse Setup                                }
 {----------------------------------------------------------------------------}
-constructor TMouseBar.Init(var Bounds: TRect);
+constructor TMouseBar.Create(var Bounds: TRect);
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   Options := Options or ofSelectable;
   SetParams(0, 0, Size.X-1, 3, 1);
   end;
@@ -610,18 +610,18 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end { TSaversListBox.HandleEvent };
 
-constructor TSaversDialog.Init;
+constructor TSaversDialog.Create;
   var
     R: TRect;
     D: PDialog;
     Control, Labl, Histry: PView;
   begin
   R.Assign(0, 0, 57, 20);
-  inherited Init(R, GetString(dlScreenSaverSetup));
+  inherited Create(R, GetString(dlScreenSaverSetup));
   Options := Options or ofCentered or ofValidate;
   HelpCtx := hcSavers;
   R.Assign(19, 3, 20, 13);
-  Control := New(PScrollBar, Init(R));
+  Control := PScrollBar.Create(R);
   Insert(Control);
 
   R.Assign(2, 3, 19, 13);
@@ -643,7 +643,7 @@ constructor TSaversDialog.Init;
   Insert(Control);
 
   R.Assign(54, 3, 55, 13);
-  Control := New(PScrollBar, Init(R));
+  Control := PScrollBar.Create(R);
   Insert(Control);
 
   R.Assign(37, 3, 54, 13);
@@ -655,8 +655,8 @@ constructor TSaversDialog.Init;
   Insert(Labl);
 
   R.Assign(2, 15, 18, 16);
-  Control := New(PInputline, Init(R, 3));
-  PInputline(Control)^.SetValidator(New(PRangeValidator, Init(1, 254)));
+  Control := PInputline.Create(R, 3);
+  PInputline(Control)^.SetValidator(PRangeValidator.Create(1, 254));
   { X-Man }
   Control^.Options := Control^.Options or ofValidate;
   Insert(Control);
@@ -748,12 +748,12 @@ destructor TSaversDialog.Done;
   GetData(Data);
   inherited Done;
   if  (Data.Available.List <> nil) then
-    Dispose(Data.Available.List, Done);
+    Data.Available.List.Free;
   end;
 
 function MakeSaversDialog: PDialog;
   begin
-  MakeSaversDialog := New(PSaversDialog, Init);
+  MakeSaversDialog := PSaversDialog.Create;
   end;
 
 

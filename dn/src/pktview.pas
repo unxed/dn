@@ -70,7 +70,7 @@ type
     FOfs: LongInt;
     Fu, Tu, Su, DT: PString;
     FA, TA: TNetAddr;
-    constructor Init(O: LongInt; Afu, Atu, Asu, Adt: String;
+    constructor Create(O: LongInt; Afu, Atu, Asu, Adt: String;
         FAddr, TAddr: TNetAddr);
     procedure GetMsgInfo(var FromUser, ToUser, Subj, Date: String);
     {!}
@@ -81,7 +81,7 @@ type
   PPktCol = ^TPktCol;
   TPktCol = class(TCollection)
     FName: PString;
-    constructor Init(PktFile: String);
+    constructor Create(PktFile: String);
     destructor Done; virtual;
     end;
 
@@ -93,7 +93,7 @@ type
   PPktListDialog = ^TPktListDialog;
   TPktListDialog = class(TDialog)
     lb: PPktList;
-    constructor Init(FName: String; C: PPktCol);
+    constructor Create(FName: String; C: PPktCol);
     destructor Done; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetPalette: TPalette; virtual;
@@ -103,7 +103,7 @@ type
   TLineViewer = class(TScroller)
     FileLines: PLineCollection;
     isValid: Boolean;
-    constructor Init(var Bounds: TRect;
+    constructor Create(var Bounds: TRect;
          AHScrollBar, AVScrollBar: PScrollBar; Buffer: PCharArray);
     destructor Done; virtual;
     procedure Draw; virtual;
@@ -115,7 +115,7 @@ type
   PMsgViewer = ^TMsgViewer;
   TMsgViewer = class(TLineViewer)
     FromUser, ToUser, Date, Subj: PString;
-    constructor Init(var Bounds: TRect;
+    constructor Create(var Bounds: TRect;
          AHScrollBar, AVScrollBar: PScrollBar; FName: String);
     destructor Done; virtual;
     end;
@@ -124,7 +124,7 @@ type
   TPktMsgViewer = class(TDialog)
     FV: PLineViewer;
     PS1, Ps2, Ps3, Ps4: PString;
-    constructor Init(Buf: PCharArray; S1, S2, S3, S4: String;
+    constructor Create(Buf: PCharArray; S1, S2, S3, S4: String;
          MsgN: Word; AllMsg: Word;
         FA, TA: TNetAddr);
     destructor Done; virtual;
@@ -138,7 +138,7 @@ type
     Lb1, Lb2, Lb3, Lb4: PLabel;
     CurMsg: PString;
     FV: PMsgViewer;
-    constructor Init(FName: String);
+    constructor Create(FName: String);
     destructor Done; virtual;
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -402,10 +402,10 @@ l1:
   ReadPktHeader := Res;
   end { ReadPktHeader };
 
-constructor TPktObj.Init(O: LongInt; Afu, Atu, Asu, Adt: String;
+constructor TPktObj.Create(O: LongInt; Afu, Atu, Asu, Adt: String;
      FAddr, TAddr: TNetAddr);
   begin
-  inherited Init;
+  inherited Create;
   FOfs := O;
   Fu := NewStr(Afu);
   Su := NewStr(Asu);
@@ -415,7 +415,7 @@ constructor TPktObj.Init(O: LongInt; Afu, Atu, Asu, Adt: String;
   TA := TAddr;
   end;
 
-constructor TPktCol.Init(PktFile: String);
+constructor TPktCol.Create(PktFile: String);
   label l1;
   var
     PH: PacketHeader;
@@ -430,7 +430,7 @@ constructor TPktCol.Init(PktFile: String);
     Date, FromUser, ToUser, Subj: String;
     AFrm, ATo: TNetAddr;
   begin
-  inherited Init(0, 1);
+  inherited Create(0, 1);
   FName := NewStr(PktFile);
   F.Init(PktFile, stOpenRead, 4096);
   if F.Status <> stOK then
@@ -564,12 +564,12 @@ var
 
 procedure InitPktCol(FName: String);
   begin
-  PktCol := New(PPktCol, Init(FName));
+  PktCol := PPktCol.Create(FName);
   end;
 
 procedure DonePktCOl;
   begin
-  Dispose(PktCol, Done);
+  PktCol.Free;
   end;
 
 function DelChar(s: String; Ch: Char): String;
@@ -657,7 +657,7 @@ function TPktList.GetText(Item: LongInt; MaxLen: LongInt): String;
 
 destructor TPktListDialog.Done;
   begin
-  Dispose(lb, Done);
+  lb.Free;
   inherited Done;
   end;
 
@@ -673,14 +673,14 @@ function TPktListDialog.GetPalette: TPalette;
   GetPalette := MakePalette(Pal);
   end;
 
-constructor TPktListDialog.Init(FName: String; C: PPktCol);
+constructor TPktListDialog.Create(FName: String; C: PPktCol);
   var
     R: TRect;
     View: PView;
   begin
   HelpCtx := hcPktListDialog;
   Desktop^.GetExtent(R);
-  inherited Init(R, GetString(dlPktView)+FName);
+  inherited Create(R, GetString(dlPktView)+FName);
   Options := Options or {ofCentered}ofSelectable;
   GrowMode := gfGrowHiX+gfGrowHiY;
   View := StandardScrollBar(sbVertical+sbHandleKeyboard);
@@ -697,13 +697,13 @@ constructor TPktListDialog.Init(FName: String; C: PPktCol);
   lb^.NewLisT(C);
   lb^.SetRange(C^.Count);
   R.Assign(2, 1, 8, 2);
-  View := New(PLabel, Init(R, '~From~', nil));
+  View := PLabel.Create(R, '~From~', nil);
   Insert(View);
   R.Assign(31, 1, 35, 2);
-  View := New(PLabel, Init(R, '~To~', nil));
+  View := PLabel.Create(R, '~To~', nil);
   Insert(View);
   R.Assign(52, 1, 58, 2);
-  View := New(PLabel, Init(R, '~Subj~', nil));
+  View := PLabel.Create(R, '~Subj~', nil);
   Insert(View);
   SelectNext(False);
   end { TPktListDialog.Init };
@@ -720,11 +720,11 @@ function PktHeaderDlg(AText: String): PDialog;
     begin
     Options := Options+ofCenterX+ofCenterY;
     R.Assign(20, 8, 32, 10);
-    View := New(PButton, Init(R, 'Ok', cmOK, bfDefault));
+    View := PButton.Create(R, 'Ok', cmOK, bfDefault);
     View^.Options := View^.Options+ofCenterX;
     Insert(View);
     R.Assign(2, 1, 51, 8);
-    View := New(PStaticText, Init(R, AText));
+    View := PStaticText.Create(R, AText);
     Insert(View);
     SelectNext(False);
     end;
@@ -744,7 +744,7 @@ procedure ViewPktHeader(MsgCount: SmallInt);
     GetString(dlPktMsg)+ItoS(MsgCount);
   D := PktHeaderDlg(S);
   Desktop^.ExecView(D);
-  Dispose(D, Done);
+  D.Free;
   end;
 
 procedure TPktListDialog.HandleEvent(var Event: TEvent);
@@ -773,7 +773,7 @@ procedure TPktListDialog.HandleEvent(var Event: TEvent);
               Pc^.FA, Pc^.TA));
         Dispose(Buf);
         Desktop^.ExecView(D);
-        Dispose(D, Done);
+        D.Free;
         end;
       kbF2:
         ViewPktHeader(lb^.List^.Count);
@@ -781,21 +781,21 @@ procedure TPktListDialog.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end { TPktListDialog.HandleEvent };
 
-constructor TLineViewer.Init(var Bounds: TRect; AHScrollBar,
+constructor TLineViewer.Create(var Bounds: TRect; AHScrollBar,
     AVScrollBar: PScrollBar; Buffer: PCharArray);
   begin
   HelpCtx := hcLineViewer;
   Options := Options or {ofCentered}ofSelectable;
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
-  TScroller.Init(Bounds, AHScrollBar, AVScrollBar);
+  inherited Create(Bounds, AHScrollBar, AVScrollBar);
   TLineViewer.InitCol(Buffer);
   end;
 
 destructor TLineViewer.Done;
   begin
-  Dispose(FileLines, Done);
-  TScroller.Done;
+  FileLines.Free;
+  inherited Destroy;
   end;
 
 procedure TLineViewer.Draw;
@@ -849,7 +849,7 @@ procedure TLineViewer.Draw;
 procedure TLineViewer.InitCol(Buffer: PCharArray);
   begin
   isValid := True;
-  FileLines := New(PLineCollection, Init(5, 5, False));
+  FileLines := PLineCollection.Create(5, 5, False);
   Buffer2Strs(Buffer, FileLines);
   Limit.X := 255;
   Limit.Y := FileLines^.Count;
@@ -867,17 +867,17 @@ function TLineViewer.Valid(Command: LongInt): Boolean;
   Valid := isValid;
   end;
 
-constructor TMsgViewer.Init(var Bounds: TRect; AHScrollBar,
+constructor TMsgViewer.Create(var Bounds: TRect; AHScrollBar,
     AVScrollBar: PScrollBar; FName: String);
   var
     s1, s2, s3, s4: String;
   begin
   HelpCtx := hcMsgViewer;
-  TScroller.Init(Bounds, AHScrollBar, AVScrollBar);
+  inherited Create(Bounds, AHScrollBar, AVScrollBar);
   Options := Options or {ofCentered}ofSelectable;
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
-  FileLines := New(PLineCollection, Init(5, 5, False));
+  FileLines := PLineCollection.Create(5, 5, False);
   Msg2Strs(FName, s1, s2, s3, s4, FileLines);
   FromUser := NewStr(s1);
   ToUser := NewStr(s2);
@@ -902,7 +902,7 @@ destructor TMsgViewer.Done;
   inherited Done;
   end;
 
-constructor TPktMsgViewer.Init(Buf: PCharArray; S1, S2, S3, S4: String;
+constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
      MsgN: Word; AllMsg: Word;
     FA, TA: TNetAddr);
   var
@@ -913,7 +913,7 @@ constructor TPktMsgViewer.Init(Buf: PCharArray; S1, S2, S3, S4: String;
   begin
   HelpCtx := hcPktMsgViewer;
   Desktop^.GetExtent(R);
-  inherited Init(R, GetString(dlViewMsg));
+  inherited Create(R, GetString(dlViewMsg));
   Options := Options or ofCentered;
   VS := StandardScrollBar(sbVertical+sbHandleKeyboard);
   Inc(VS^.Origin.Y, 5);
@@ -923,28 +923,28 @@ constructor TPktMsgViewer.Init(Buf: PCharArray; S1, S2, S3, S4: String;
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
   EventMask := $FFFF;
-  FV := New(PLineViewer, Init(R, nil, VS, Buf));
+  FV := PLineViewer.Create(R, nil, VS, Buf);
   FV^.Options := FV^.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
   S := '~Msg~  :'+just(ItoS(MsgN), 5, 1)+'/'+just(ItoS(AllMsg), 5, 2)
     +Spaces(30)+'~Date~ :'+S4;
-  View := New(PLabel, Init(R, S, nil));
+  View := PLabel.Create(R, S, nil);
   Insert(View);
   PS1 := NewStr(DelChar(S, '~'));
   R.Assign(1, 2, 79, 3);
   S := '~From~ :'+just(S1, 50, 2)+PktFromAddr;
-  View := New(PLabel, Init(R, S, nil));
+  View := PLabel.Create(R, S, nil);
   Insert(View);
   Ps2 := NewStr(DelChar(S, '~'));
   R.Assign(1, 3, 79, 4);
   S := '~To~   :'+just(S2, 50, 2)+'2:'+ItoS(TA.Net)+'/'+ItoS(TA.Node);
-  View := New(PLabel, Init(R, S, nil));
+  View := PLabel.Create(R, S, nil);
   Insert(View);
   Ps3 := NewStr(DelChar(S, '~'));
   R.Assign(1, 4, 79, 5);
   S := '~Subj~ :'+S3;
-  View := New(PLabel, Init(R, S, nil));
+  View := PLabel.Create(R, S, nil);
   Insert(View);
   Ps4 := NewStr(DelChar(S, '~'));
   SelectNext(False);
@@ -963,7 +963,7 @@ destructor TPktMsgViewer.Done;
   DisposeStr(Ps2);
   DisposeStr(Ps3);
   DisposeStr(Ps4);
-  Dispose(FV, Done);
+  FV.Free;
   inherited Done;
   end;
 
@@ -1047,14 +1047,14 @@ procedure TPktMsgViewer.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end;
 
-constructor TMsgViewerDlg.Init(FName: String);
+constructor TMsgViewerDlg.Create(FName: String);
   var
     R: TRect;
     View: PView;
     VS: PScrollBar;
   begin
   Desktop^.GetExtent(R);
-  inherited Init(R, GetString(dlNetMailView)+FExpand(FName));
+  inherited Create(R, GetString(dlNetMailView)+FExpand(FName));
   Options := Options or ofCentered;
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
@@ -1065,7 +1065,7 @@ constructor TMsgViewerDlg.Init(FName: String);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
-  FV := New(PMsgViewer, Init(R, nil, VS, FName));
+  FV := PMsgViewer.Create(R, nil, VS, FName);
   FV^.Options := FV^.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
@@ -1073,13 +1073,13 @@ constructor TMsgViewerDlg.Init(FName: String);
          '~Msg~  :Private '+Spaces(30)+'~Date~ :'+FV^.Date^, nil));
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
-  Lb2 := New(PLabel, Init(R, '~From~ :'+FV^.FromUser^, nil));
+  Lb2 := PLabel.Create(R, '~From~ :'+FV^.FromUser^, nil);
   Insert(Lb2);
   R.Assign(1, 3, 79, 4);
-  Lb3 := New(PLabel, Init(R, '~To  ~ :'+FV^.ToUser^, nil));
+  Lb3 := PLabel.Create(R, '~To  ~ :'+FV^.ToUser^, nil);
   Insert(Lb3);
   R.Assign(1, 4, 79, 5);
-  Lb4 := New(PLabel, Init(R, '~Subj~ :'+FV^.Subj^, nil));
+  Lb4 := PLabel.Create(R, '~Subj~ :'+FV^.Subj^, nil);
   Insert(Lb4);
   SelectNext(False);
   CurMsg := NewStr(FName);
@@ -1123,7 +1123,7 @@ function GetPrevMsg(FName: String): String;
         begin
         GetPrevMsg := MakeNormName(D, Sr.FullName);
         if VM <> nil then
-          Dispose(VM, Done);
+          VM.Free;
         lFindClose(Sr);
         Exit;
         end;
@@ -1132,7 +1132,7 @@ function GetPrevMsg(FName: String): String;
     if  (Num = 0) then
       GetPrevMsg := '';
     if VM <> nil then
-      Dispose(VM, Done);
+      VM.Free;
     end;
   end { GetPrevMsg };
 
@@ -1168,7 +1168,7 @@ function GetNextMsg(FName: String): String;
         begin
         GetNextMsg := MakeNormName(D, Sr.FullName);
         if VM <> nil then
-          Dispose(VM, Done);
+          VM.Free;
         lFindClose(Sr);
         Exit;
         end
@@ -1180,7 +1180,7 @@ function GetNextMsg(FName: String): String;
         end;
       end;
     if VM <> nil then
-      Dispose(VM, Done);
+      VM.Free;
     end;
   end { GetNextMsg };
 
@@ -1192,7 +1192,7 @@ procedure TMsgViewerDlg.GotoMsg;
   begin
   DisposeStr(Title);
   Title := NewStr(GetString(dlNetMailView)+CurMsg^);
-  Dispose(FV, Done);
+  FV.Free;
   VS := StandardScrollBar(sbVertical+sbHandleKeyboard);
   EventMask := $FFFF;
   Inc(VS^.Origin.Y, 5);
@@ -1201,16 +1201,16 @@ procedure TMsgViewerDlg.GotoMsg;
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
-  FV := New(PMsgViewer, Init(R, nil, VS, CurMsg^));
+  FV := PMsgViewer.Create(R, nil, VS, CurMsg^);
   FV^.Options := FV^.Options or ofFramed;
   Insert(FV);
-  Dispose(Lb1, Done);
+  Lb1.Free;
   Lb1 := nil;
-  Dispose(Lb2, Done);
+  Lb2.Free;
   Lb2 := nil;
-  Dispose(Lb3, Done);
+  Lb3.Free;
   Lb3 := nil;
-  Dispose(Lb4, Done);
+  Lb4.Free;
   Lb4 := nil;
   R.Assign(1, 1, 79, 2);
   if FV <> nil then
@@ -1218,13 +1218,13 @@ procedure TMsgViewerDlg.GotoMsg;
            '~Msg  ~:Private '+Spaces(30)+'~Date~ :'+FV^.Date^, nil));
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
-  Lb2 := New(PLabel, Init(R, '~From ~:'+FV^.FromUser^, nil));
+  Lb2 := PLabel.Create(R, '~From ~:'+FV^.FromUser^, nil);
   Insert(Lb2);
   R.Assign(1, 3, 79, 4);
-  Lb3 := New(PLabel, Init(R, '~To   ~:'+FV^.ToUser^, nil));
+  Lb3 := PLabel.Create(R, '~To   ~:'+FV^.ToUser^, nil);
   Insert(Lb3);
   R.Assign(1, 4, 79, 5);
-  Lb4 := New(PLabel, Init(R, '~Subj ~:'+FV^.Subj^, nil));
+  Lb4 := PLabel.Create(R, '~Subj ~:'+FV^.Subj^, nil);
   Insert(Lb4);
   SelectNext(False);
   Redraw;
@@ -1353,11 +1353,11 @@ procedure TMsgViewerDlg.HandleEvent(var Event: TEvent);
 
 destructor TMsgViewerDlg.Done;
   begin
-  Dispose(FV, Done);
-  Dispose(Lb1, Done);
-  Dispose(Lb2, Done);
-  Dispose(Lb3, Done);
-  Dispose(Lb4, Done);
+  FV.Free;
+  Lb1.Free;
+  Lb2.Free;
+  Lb3.Free;
+  Lb4.Free;
   DisposeStr(CurMsg);
   inherited Done;
   end;
@@ -1419,25 +1419,25 @@ procedure ViewPktFile(FName: String);
     end;
   W := WriteMsg(^M^M^C+GetString(dlReadingPkt));
   UpdateWriteView(W);
-  C := New(PPktCol, Init(FName));
+  C := PPktCol.Create(FName);
   W^.Free;
-  D := New(PPktListDialog, Init(FName, C));
+  D := PPktListDialog.Create(FName, C);
   Desktop^.ExecView(D);
-  Dispose(D, Done);
+  D.Free;
   if Assigned(C) then
-    Dispose(C, Done);
+    C.Free;
   end { ViewPktFile };
 
 type
   PLimitStream = ^TLimitStream;
   TLimitStream = class(TDOSStream)
-    constructor Init(FileName: FNameStr; Mode: Word; Limit: LongInt);
+    constructor Create(FileName: FNameStr; Mode: Word; Limit: LongInt);
     end;
 
-constructor TLimitStream.Init(FileName: FNameStr; Mode: Word;
+constructor TLimitStream.Create(FileName: FNameStr; Mode: Word;
      Limit: LongInt);
   begin
-  inherited Init(FileName, Mode);
+  inherited Create(FileName, Mode);
   if Status = stOK then
     if Limit < StreamSize then
       StreamSize := Limit
@@ -1468,7 +1468,7 @@ function IsMsgFile(FName: String): Boolean;
   L[5] := -1;
   L[5] := SearchFileStr(F, XL, #1'PID: ', 0, False, False, False, False,
        True, False);
-  Dispose(F, Done);
+  F.Free;
   N := 0;
   for i := 1 to 5 do
     if L[i] > 0 then
@@ -1489,9 +1489,9 @@ procedure ViewMsgFile(FName: String);
       mfError+mfOKButton);
     Exit;
     end;
-  D := New(PMsgViewerDlg, Init(FName));
+  D := PMsgViewerDlg.Create(FName);
   Desktop^.ExecView(D);
-  Dispose(D, Done);
+  D.Free;
   end;
 
 function ViewMsgFileE(FName: String): Boolean;
@@ -1505,9 +1505,9 @@ function ViewMsgFileE(FName: String): Boolean;
     TempFile := '';
     FileName := FName;
     ViewMsgFileE := True;
-    D := New(PMsgViewerDlg, Init(FName));
+    D := PMsgViewerDlg.Create(FName);
     Desktop^.ExecView(D);
-    Dispose(D, Done);
+    D.Free;
     end
   else
     ViewMsgFileE := True;
@@ -1530,13 +1530,13 @@ function ViewPktFileE(FName: String; MsgVisible: Boolean): Boolean;
     ViewPktFileE := True;
     W := WriteMsg(^M^M^C+GetString(dlReadingPkt));
     UpdateWriteView(W);
-    C := New(PPktCol, Init(FName));
+    C := PPktCol.Create(FName);
     W^.Free;
-    D := New(PPktListDialog, Init(FName, C));
+    D := PPktListDialog.Create(FName, C);
     Desktop^.ExecView(D);
-    Dispose(D, Done);
+    D.Free;
     if Assigned(C) then
-      Dispose(C, Done);
+      C.Free;
     end
   else
     ViewPktFileE := False;

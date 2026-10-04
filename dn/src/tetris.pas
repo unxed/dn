@@ -75,7 +75,7 @@ var
 type
   PGameWindow = ^TGameWindow;
   TGameWindow = class(TDialog)
-    constructor Init;
+    constructor Create;
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
@@ -108,7 +108,7 @@ type
       StLv, EndLv: Byte;
       Score: LongInt;
       end;
-    constructor Init(R: TRect);
+    constructor Create(R: TRect);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     procedure NewGame;
@@ -230,7 +230,7 @@ function LevelDelay(Level: Byte): Word;
   LevelDelay := Delay*200
   end { LevelDelay };
 
-constructor TGameWindow.Init;
+constructor TGameWindow.Create;
   var
     R: TRect;
     Gm: PGameView;
@@ -243,15 +243,15 @@ constructor TGameWindow.Init;
   else
     Vis := Min(19, Vis) {Tetris};
   R.Assign(1, 1, 30+Shi*2, 4+Vis);
-  inherited Init(R, GetString(dlGameTitle));
+  inherited Create(R, GetString(dlGameTitle));
   Number := GetNum;
   HelpCtx := hcTetris+TetrisRec.S;
   Options := Options or ofCentered;
   R.Assign(2, 2, 2+Shi*2, 2+Vis);
-  Gm := New(PGameView, Init(R));
+  Gm := PGameView.Create(R);
   Insert(Gm);
   R.Assign(4+Shi*2, 1, 27+Shi*2, Vis-3);
-  Info := New(PGameInfo, Init(R));
+  Info := PGameInfo.Create(R);
   Insert(Info);
   Info^.Gm := Gm;
   Gm^.Info := Info;
@@ -372,7 +372,7 @@ procedure TGameInfo.Draw;
   WriteLineC(0, 14, Size.X, 1, B);
   end { TGameInfo.Draw };
 
-constructor TGameView.Init;
+constructor TGameView.Create;
   var
     I, J: Integer;
     S: PDosStream;
@@ -380,7 +380,7 @@ constructor TGameView.Init;
     B: array[0..1024] of Byte;
   begin
   Randomize;
-  inherited Init(R);
+  inherited Create(R);
   Options := Options or ofFramed or ofSelectable or ofPreProcess;
   EventMask := $FFFF;
   Game := @Self;
@@ -399,10 +399,10 @@ constructor TGameView.Init;
     HiScores[I].StLv := 1;
     HiScores[I].EndLv := 1;
     end;
-  S := New(PDosStream, Init(SourceDir+'tetris.cfg', stOpenRead));
+  S := PDosStream.Create(SourceDir+'tetris.cfg', stOpenRead);
   if S^.Status = stOK then
     S^.Read(B, SizeOf(HiScores));
-  Dispose(S, Done);
+  S.Free;
   I := SizeOf(HiScores);
   XorScramble(B, I);
   Move(B, HiScores, SizeOf(HiScores));
@@ -418,9 +418,9 @@ constructor TGameView.Init;
         HiScores[I].StLv := 1;
         HiScores[I].EndLv := 1;
         end;
-      S := New(PDosStream, Init(SourceDir+'tetris.cfg', stCreate));
+      S := PDosStream.Create(SourceDir+'tetris.cfg', stCreate);
       S^.Write(HiScores, SizeOf(HiScores));
-      Dispose(S, Done);
+      S.Free;
       end;
   NewGame;
   RegisterToBackground(@Self);
@@ -447,7 +447,7 @@ procedure TGameView.ShowScores;
   begin
   D := PDialog(LoadResource(TDlgIdx(Byte(dlgTetrisTop10)+Byte(Pentix))));
   R.Assign(2, 4, D^.Size.X-2, 14);
-  P := New(PView, Init(R));
+  P := PView.Create(R);
   P^.Options := P^.Options or ofFramed;
   D^.Insert(P);
   for I := 1 to 10 do
@@ -466,13 +466,13 @@ procedure TGameView.ShowScores;
       else
         S := '';
       R.Assign(2, 3+I, D^.Size.X-2, 4+I);
-      D^.Insert(New(PLabel, Init(R, S, nil)));
+      D^.Insert(PLabel.Create(R, S, nil));
       end;
   PP := Stop;
   Stop := True;
   Desktop^.ExecView(D);
   Stop := PP;
-  Dispose(D, Done);
+  D.Free;
   end { TGameView.ShowScores };
 
 constructor TGameView.Load(var S: TStream);
@@ -592,12 +592,12 @@ function TGameView.MoveDown;
     HiScores[I+10*Byte(Pentix)].StLv := StartLevel;
     HiScores[I+10*Byte(Pentix)].EndLv := Level;
     HiScores[I+10*Byte(Pentix)].Score := Score;
-    S := New(PDosStream, Init(SourceDir+'tetris.cfg', stCreate));
+    S := PDosStream.Create(SourceDir+'tetris.cfg', stCreate);
     Move(HiScores, B, SizeOf(HiScores));
     J := SizeOf(HiScores);
     XorScramble(B, J);
     S^.Write(B, SizeOf(HiScores));
-    Dispose(S, Done);
+    S.Free;
     ShowScores(I);
     end { CheckHiScores };
 

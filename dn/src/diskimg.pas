@@ -189,10 +189,10 @@ function UnpackImage(const FName, DestDir: String; PInfo: PWhileView)
 
       procedure TryInit;
         begin
-        B := New(PBufStream, Init(FName, stCreate, $8000));
+        B := PBufStream.Create(FName, stCreate, $8000);
         if B^.Status <> stOK then
           begin
-          Dispose(B, Done);
+          B.Free;
           B := nil;
           end;
         end;
@@ -266,7 +266,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: PWhileView)
       GetMem(CpyBuf, BytesPerClu);
       Cpy;
       FreeMem(CpyBuf, BytesPerClu);
-      Dispose(B, Done);
+      B.Free;
       B := nil;
       if Error then
         EraseFile(FName)
@@ -479,10 +479,10 @@ function UnpackImage(const FName, DestDir: String; PInfo: PWhileView)
   Error := False;
   Cancel := False;
   NewTimer(Tmr, 0);
-  F := New(PBufStream, Init(FName, stOpenRead, $8000));
+  F := PBufStream.Create(FName, stOpenRead, $8000);
   DoIt;
   Error := Error or (F^.Status <> stOK);
-  Dispose(F, Done);
+  F.Free;
   F := nil;
   if Error then
     MessageBox(GetString(dlImageError)+' '+Cut(FName, 40), nil,
@@ -512,7 +512,7 @@ procedure DoIt(AOwner: Pointer; AFiles: PFilesCollection;
   ADestPath := MakeNormName(ADestPath, '');
 
   R.Assign(1, 1, 26, 10);
-  New(PInfo, Init(R));
+  PInfo.Create(R);
   PInfo^.Top := GetString(dlImage);
   Desktop^.Insert(PInfo);
 
@@ -528,7 +528,7 @@ procedure DoIt(AOwner: Pointer; AFiles: PFilesCollection;
       Message(AOwner, evCommand, cmCopyUnselect, PF);
     end;
 
-  Dispose(PInfo, Done);
+  PInfo.Free;
   PInfo := nil;
   RereadGlobal(ADestPath);
   end { DoIt };
@@ -547,7 +547,7 @@ procedure UnpackDiskImages(AOwner: Pointer; Files: PFilesCollection);
   then
     DoIt(AOwner, Files, DestPath);
   Files^.DeleteAll;
-  Dispose(Files, Done);
+  Files.Free;
   Files := nil;
   end;
 
