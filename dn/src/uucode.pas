@@ -1,3 +1,4 @@
+{ en-utf8 }
 {/////////////////////////////////////////////////////////////////////////
 //
 //  Dos Navigator Open Source 1.51.08
@@ -49,20 +50,20 @@
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
 {AK155
-   Переписал все ассемблерные и inline подпрограммы под
-   32-разрядный VP. При этом никаких условных компиляций не делал.
-   Мутную и неэффективную процедуру MoveSection переписал короче и проще.
+   Rewrote all assembler and inline routines for
+   32-bit VP. No conditional compilation was used for this.
+   The obscure and inefficient procedure MoveSection was rewritten shorter and simpler.
 
-   По состоянию на 08/03/2001 компилируется только декодирование.
+   As of 08/03/2001 only decoding compiles.
 
-   04/06/2001 - подключил кодирование с новым модулем uue2inc.pas (см.).
-   По-прежнему все ассемблерные вставки чисто 32-разрядные.
+   04/06/2001 - connected encoding with the new unit uue2inc.pas (see).
+   All assembler inserts are still purely 32-bit.
 }
 {Cat
-   23/08/2001 - переделал очень много чего, основное - заменил в операциях
-   с дисковыми буферами, да и во многих других местах Word-ы на Longint-ы,
-   что позволяет избавиться от ограничения в 900 строк в секции и наверняка
-   ещё кучи глюков, которые выискивать не хочется - проще исправить  ;-)
+   23/08/2001 - redid a lot; mainly replaced Words with Longints in the operations
+   with disk buffers, and in many other places,
+   which removes the limit of 900 lines per section and probably
+   a heap of other bugs that I do not want to hunt for - easier to fix  ;-)
 }
 unit UUCode;
 
@@ -137,7 +138,7 @@ procedure RereadGlobal(OutputDir: String); {DataCompBoy}
 
 
 
-{!  описания !}
+{!  declarations !}
 
 var
   PI: PWhileView;
@@ -240,17 +241,17 @@ var
   CurFileTime,
   HeapBegin,
   HeapEnd: LongInt;
-  {!  описания !}
+  {!  declarations !}
 
 function MatchCurFileName(const FName: string): Boolean;
-  { AK155 8-11-2004 Делается попытка сопоставить FName и CurFileName.
-  Если они равны (с точностью до регистра), то успех.
-    Если не равны, то проверяется не случай ли это типа
-  FName = 'Untitled-2_.jpg' и
+  { AK155 8-11-2004 Tries to match FName and CurFileName.
+  If they are equal (up to case), it is a success.
+    If not equal, checks whether this is a case like
+  FName = 'Untitled-2_.jpg' and
   CurFileName = 'Untitled-2_.jpg  FastPOST/WIN32 2.3rc10/2.0.0',
-  Заранее всё после пробела отбросить нельзя, так как пробел может быть
-  и в имени файла. В этом случае также успех, и при этом CurFileName
-  усекается до длины FName.
+  Everything after a space cannot be discarded up front, since a space may be
+  part of the file name. In that case it is a success as well, and CurFileName
+  is truncated to the length of FName.
   }
   var
     l: SmallInt;
@@ -259,12 +260,12 @@ function MatchCurFileName(const FName: string): Boolean;
   l := Length(FName);
   Result := False;
   if l > Length(CurFileName) then
-    exit; // совсем не совпадают
+    exit; // no match at all
   for i := 1 to l do
     if Upcase(FName[i]) <> Upcase(CurFileName[i]) then
-      exit; // совсем не совпадают
+      exit; // no match at all
   if l <> Length(CurFileName) then
-    begin // FName совпал с началом CurFileName
+    begin // FName matched the beginning of CurFileName
     if (CurFileName[l+1] <> ' ') then
       exit;
     SetLength(CurFileName, l);
@@ -277,7 +278,7 @@ function UU_Decode(
     AFileCollection: PCollection;
     const OutputDir: String; ChkOvr, DispErr, RecoverBrokenUUE: Boolean)
   : Boolean;
-  {! тут были описания !}
+  {! the declarations were here !}
 
   procedure FReadLn;
     begin
@@ -415,7 +416,7 @@ procedure CalcBufCRC(var Buf; Size: LongInt; var PrevSum: Word);
     PrevSum := Sum;
     end;
 
-  {Cat: не всегда она будет возвращать Word, что приводит к глюкам}
+  {Cat: it will not always return Word, which leads to bugs}
   function SmartDiv(L: LongInt; W: LongInt): LongInt;
   begin
   Result := LongInt(LongWord(L) div LongWord(W));
@@ -733,7 +734,7 @@ function MemEqu(var A, B; Size: LongInt): Boolean;
       begin
       if ft = 0 then
         Exit;
-      {Cat: изменил FileMode с $40 на 2 - иначе время не ставится}
+      {Cat: changed FileMode from $40 to 2 - otherwise the time is not set}
       lAssignFile(f, OutputDir+OutFName);
       FileMode := 2;
       lResetFile(f, 1);
@@ -829,12 +830,12 @@ function MemEqu(var A, B; Size: LongInt): Boolean;
       i, i1: SmallInt;
     begin
     {AK155  8-11-2004
-    В качестве имени файла не просто берём первое слово, что неверно для
-    длинных имён с пробелами, а таки пытаемся угадать длинное имя.
-    Если есть имя в кавычках - берём его; если есть знак '<' (который мы
-    генерируем - берём до него); если нет ни того, ни другого - берём
-    до конца строки. При этом можно подхватить и лишнее, но его, скорее
-    всего, потом отсечёт MatchCurFileName }
+    For the file name we do not just take the first word, which is wrong for
+    long names with spaces, but try to guess the long name.
+    If there is a quoted name - take it; if there is a '<' sign (which we
+    generate - take up to it); if there is neither - take
+    up to the end of the line. Something extra may be picked up, but it will most
+    likely be cut off later by MatchCurFileName }
     i := Pos('"', StrT);
     i1 := Pos('<', StrT)-1;
     if (i <> 0) and ((i < i1) or (i1 < 0)) then
@@ -848,7 +849,7 @@ function MemEqu(var A, B; Size: LongInt): Boolean;
       Dec(i1);
     AuxT := Copy(StrT, 1, i1);
     {UpStr(AuxT);}lFSplit(AuxT, D, N, E); {nl:=Min(nl,8);el:=Min(el,4);}
-    {JO: для OS/2 это как-то странно}
+    {JO: this is somehow strange for OS/2}
     AuxT := N+E;
     end;
 
@@ -1035,11 +1036,11 @@ procedure CalcLnCRC(var Strng: String; var CRC: Word);
       if POutBuf = nil then
         Exit;
       {AK155
-Такое бывает при массовом раскодировании, когда в одном файле был ююк
-без section, но с '`', затем встретился файл с 'M', а затем - файл с 'end',
-но без ююков (скажем, программа на Паскале). Так по этому end происходит
-вызов с POutBuf = nil. А предотвратить такое сложно, не разрушив при этом
-возможность раскодирования всяких не вполне корректных ююков}
+This happens with mass decoding, when one file was a UU-encoded file
+without section but with '`', then a file with 'M' was met, and then a file with 'end',
+but without UU-encoded data (say, a Pascal program). So this end causes
+a call with POutBuf = nil. And it is hard to prevent without breaking
+the decoding of various not quite correct UU-encoded files}
       if KickBack = True then
         begin
         s := StrT;
@@ -1728,8 +1729,8 @@ procedure DecodeStr(var Src, Dst);
 
   
 
-  (* {Это все не нужно, итак как используется не ассемблерный obj,
-а паскальный unit}
+  (* {All this is not needed, since a Pascal unit is used,
+not an assembler obj}
 
 type
         T64             = record
@@ -1752,10 +1753,10 @@ procedure Clear64(n:T64);near;external;
 {$ENDIF}
 *)
 
-  {Cat: не всегда она будет возвращать Word, что приводит к глюкам
-      (кстати: ещё один потенциальный источник глюков -  в модуле две функции
-      называются SmartDiv, но вместе с тем этот SmartDiv абсолютно отличается
-      от того, который был раньше)}
+  {Cat: it will not always return Word, which leads to bugs
+      (by the way: another potential source of bugs - the unit has two functions
+      named SmartDiv, and this SmartDiv is absolutely different
+      from the one that was there before)}
   function SmartDiv(L: LongInt; W: LongInt): LongInt;
   begin
   Result := LongInt(LongWord(L) div LongWord(W));
@@ -1836,7 +1837,7 @@ procedure Clear64(n:T64);near;external;
       var
         sl: Byte absolute s;
       begin
-      {Cat: шаманство?  ;-)
+      {Cat: shamanism?  ;-)
  if TxtBufSize + sl > OutBufSize then
  asm
    nop
@@ -1889,7 +1890,7 @@ procedure Clear64(n:T64);near;external;
       WriteLnT('')
       end;
 
-    {Cat: эта функция есть в strutil.pas}
+    {Cat: this function exists in strutil.pas}
     (*
 function ItoS(a:longint):string;
  var s : string[40];
@@ -2279,7 +2280,7 @@ function GetDecimal(Number: Word): String;
       LastSectSize := ls;
       end;
 
-    {Cat: незачем два раза открывать файл}
+    {Cat: no need to open the file twice}
     (*
 procedure GetFInfo;
 var f:lfile;
@@ -2356,8 +2357,8 @@ beg:
       if UUEData.Format = 1 then
         GetLnEnd := #10;
 
-      {Cat:todo ругаться при неправильном количестве строк вместо того,
-          чтобы молча брать какое-то другое}
+      {Cat:todo complain about a wrong number of lines instead of
+          silently taking some other one}
       NLines := 900;
 
       Val(UUEData.NLines, l, Err);
@@ -2390,7 +2391,7 @@ beg:
         Exit
         end;
 
-      SouSize := i32(FileSize(ST.F); {!!s}
+      SouSize := i32(FileSize(ST.F)); {!!s}
 
       if SouSize < 3 then
         begin
@@ -2400,7 +2401,7 @@ beg:
         Exit; {Input file is too small}
         end;
 
-      {Cat: GetFInfo всего лишь получает время модификации файла}
+      {Cat: GetFInfo merely gets the modification time of the file}
       (*
  GetFInfo;
 *)
@@ -2411,8 +2412,8 @@ beg:
       NumSect := SmartDiv(SouSize, MaxSectSize)-1;
       SectNo := 0;
 
-      {Cat: раньше в этом месте проверялось наличие файла, но оно проверяется ещё
-      и в StartSection, поэтому запрос на перезапись появлялся дважды}
+      {Cat: this place used to check that the file exists, but that is also checked
+      in StartSection, so the overwrite request appeared twice}
       (*
  LocalFreeStr:=Dr+Nm+Xt;
  lAssignFile(t,LocalFreeStr);
@@ -2451,8 +2452,8 @@ beg:
       sss := Max(SectSize, LastSectSize);
       SectNo := 0;
       Ma := MaxAvail-OutBufSize-sss;
-      {Cat: убрал ограничение на размер буфера - в VP можно и побольше памяти
-      выделить - и, соответственно, ограничение в 900 строк в секции}
+      {Cat: removed the limit on the buffer size - VP can allocate more memory -
+      and, accordingly, the limit of 900 lines per section}
       (*
  if (Ma<20000) or (OutBufSize>$FFEF) then
  begin
