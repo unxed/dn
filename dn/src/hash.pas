@@ -8,7 +8,8 @@ type
   THashIndex = Longint;
   THashTable = array[0..0] of THashIndex;
 
-  PHash = ^THash;
+  THash = class;
+  PHash = THash;
   {`2 Хеш-таблица, добавочная к коллекции. Создаётся после
   заполнения коллекции, так как требует знания окончательного
   числа элементов. Используется для очень быстрого поиска
@@ -20,7 +21,7 @@ type
   на 10% или более. Если при создании для такой таблицы не
   хватит памяти, после Init будет HT=nil.
   `}
-  THash = object(TObject)
+  THash = class(TObject)
     HT: ^THashTable;
       {` Хеш-таблица.
       Содержит индексы в Items^ или EmptyIndex (свободные) `}
@@ -42,7 +43,7 @@ type
     function Equal(Item1, Item2: Pointer): Boolean; virtual;
       {` Совпадают ли ключи Item1^ и Item2^.
       Этот метод обязательно надо перекрыть. `}
-    constructor Init(BaseColl: PCollection);
+    constructor Create(BaseColl: PCollection);
       {` резервирование памяти под HT^ и очистка HT `}
     function GetHashIndex(Item: Pointer; var N: THashIndex): Boolean;
       {` Поиск элемента в хеш-таблице.
@@ -52,7 +53,7 @@ type
     function AddItem(CollIndex: Integer): Boolean;
       {` Запись в хеш-таблицу нового элемента Items^[CollIndex]^.
       Результат False, если элемент c таким ключом уже есть `}
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 implementation
@@ -60,13 +61,13 @@ implementation
 const
   EmptyIndex = $FFFFFFFF;
 
-constructor THash.Init(BaseColl: PCollection);
+constructor THash.Create(BaseColl: PCollection);
   var
     Size: Longint;
     MinCount: Integer;
   begin
-  inherited Init;
-  MinCount := BaseColl^.Count * 11 div 10; // запас 10%
+  inherited Create;
+  MinCount := BaseColl.Count * 11 div 10; // запас 10%
   Count := 1024;
   while Count < MinCount do
     Count := Count*2;
@@ -74,14 +75,14 @@ constructor THash.Init(BaseColl: PCollection);
   GetMem(HT, Size);
   if HT <> nil then
     FillChar(HT^, Size, $FF);
-  Items := BaseColl^.Items;
+  Items := BaseColl.Items;
   end;
 
-destructor THash.Done;
+destructor THash.Destroy;
   begin
   if HT <> nil then
     FreeMem(HT);
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure THash.Hash(Item: Pointer);

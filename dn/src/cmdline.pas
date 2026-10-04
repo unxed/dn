@@ -56,13 +56,14 @@ uses
   ;
 
 type
-  PCommandLine = ^TCommandLine;
-  TCommandLine = object(TView)
+  TCommandLine = class;
+  PCommandLine = TCommandLine;
+  TCommandLine = class(TView)
     Dir: String;
     DeltaX, CurX: LongInt;
     Overwrite: Boolean;
     LineType: (ltNormal, ltFullScreen, ltWindow, ltTimer);
-    constructor Init(R: TRect);
+    constructor Create(const R: TRect);
     procedure Draw; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure SetState(AState: Word; Enable: Boolean); virtual;
@@ -83,7 +84,7 @@ type
 
      PCmdWindow = ^TCmdWindow;
      TCmdWindow = object(TWindow)
-      constructor Init(R: TRect);
+      constructor Create(const R: TRect);
      end;
 *)
 
@@ -205,9 +206,9 @@ const
   CursorMustBeVisible: Boolean = False;
   PrevCmdLineCursorVisible: Boolean = False;
 
-constructor TCommandLine.Init(R: TRect);
+constructor TCommandLine.Create(const R: TRect);
   begin
-  inherited Init(R);
+  inherited Create(R);
   EventMask := $FFFF;
   Options := Options {or ofSelectable} or ofPostProcess
     or ofFirstClick {or ofTopSelect};
@@ -260,10 +261,10 @@ procedure TCommandLine.GetDir;
         D := PDialog(LoadResource(dlgDiskError));
         if D <> nil then
           begin
-          D^.SetData(MM);
-          Application^.ExecView(D);
-          D^.GetData(MM);
-          Dispose(D, Done);
+          D.SetData(MM);
+          Application.ExecView(D);
+          D.GetData(MM);
+          D.Free;
           end;
         UpStr(MM.S);
         if ValidDrive(MM.S[1]) then
@@ -301,11 +302,10 @@ procedure TCommandLine.QueryCursorVisible; {AK155}
   begin
   CursorMustBeVisible :=
       (State and sfDisabled = 0) and not QuickSearch and
-      ( (Desktop^.Current = nil)
-      or (TypeOf((Desktop^.Current^)) = TypeOf(TXDoubleWindow))
-      or (TypeOf((Desktop^.Current^)) = TypeOf(TUserWindow))
-       or (TypeOf((Desktop^.Current^)) =
-           TypeOf(TTrashCan)) 
+      ( (Desktop.Current = nil)
+      or (Desktop.Current is TXDoubleWindow)
+      or (Desktop.Current is TUserWindow)
+       or (Desktop.Current is TTrashCan) 
       );
   end;
 
@@ -337,10 +337,10 @@ procedure TCommandLine.Update;
   if
     (SSaver <> nil) or 
       (Size.X = 0) or (Size.Y = 0) or
-      (Desktop^.GetState(sfActive) and
-        (Desktop^.Current <> nil) and
-        (Desktop^.Current^.GetState(sfCursorVis) or
-        Desktop^.Current^.GetState(sfModal))) or
+      (Desktop.GetState(sfActive) and
+        (Desktop.Current <> nil) and
+        (Desktop.Current.GetState(sfCursorVis) or
+        Desktop.Current.GetState(sfModal))) or
     MenuActive
   then
     Exit;
@@ -368,7 +368,7 @@ procedure TCommandLine.Update;
 
 procedure TCommandLine.SetState(AState: Word; Enable: Boolean);
   begin
-  TView.SetState(AState, Enable);
+  inherited SetState(AState, Enable);
   if AState and (sfActive or sfFocused) <> 0 then
     begin
     DrawView;
@@ -618,7 +618,7 @@ EndLFN:
                          MessageKey(@Self, kbUp);
 }
             AddCommand(Str);
-            CurString := CmdStrings^.Count;
+            CurString := CmdStrings.Count;
             StrModified := False;
             {/AK155}
             end;
@@ -750,7 +750,7 @@ EndLFN:
                 if StrModified then
                   begin
                   AddCommand(Str);
-                  CurString := CmdStrings^.Count;
+                  CurString := CmdStrings.Count;
                   StrModified := False;
                   end;
                 if CurString > 0 then
@@ -771,7 +771,7 @@ EndLFN:
                 if StrModified then
                   begin
                   AddCommand(Str);
-                  CurString := CmdStrings^.Count;
+                  CurString := CmdStrings.Count;
                   StrModified := False;
                   end;
                 Str := GetCommand(CurString);

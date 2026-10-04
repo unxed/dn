@@ -206,7 +206,7 @@ procedure PhoneBook(Manual: Boolean);
     D^.Insert(PL);
     R.Assign(2, 2, 53, 3);
 
-    {    PV := New(PLabel, Init(R, GetString(dlPhonesLabel),PL));}
+    {    PV := New(PLabel, Init(R, GetString(dlPhonesLabel),PL);}
     PL^.GroupLabel := New(PLabel, Init(R, GetString(dlPhonesLabelGroup),
            PL));
     D^.Insert(PL^.GroupLabel);
@@ -801,7 +801,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         GetString(dlFileName), fdOKButton+fdHelpButton, hsImportPhones);
     if S = '' then
       Exit;
-    F := New(PTextReader, Init(S));
+    F := PTextReader.Create(S);
     if F = nil then
       begin
       MessageBox(GetString(dlFBBNoOpen)+S, nil, mfError+mfOKButton);
@@ -1079,12 +1079,12 @@ procedure TPhoneCollection.ShortStore(var S: TStream);
     TCount, TLimit, TDelta: AInt;
   procedure DoPutItem(P: Pointer);
     begin
-    if TypeOf((PObject(P)^)) = TypeOf(TPhone) then
+    if TypeOf((TStreamable(P)^)) = TypeOf(TPhone) then
       begin
       S.Write(VObjType, 2);
       PPhone(P)^.Store(S);
       end
-    else if TypeOf((PObject(P)^)) = TypeOf(TPhoneDir) then
+    else if TypeOf((TStreamable(P)^)) = TypeOf(TPhoneDir) then
       begin
       S.Write(VObjType2, 2);
       PPhoneDir(P)^.Store(S);
@@ -1164,7 +1164,7 @@ constructor TPhone.Load(var S: TStream);
   begin
   Number := S.ReadStr;
   S.ReadStrV(Name);
-  {S.Read(Name[0],1); S.Read(Name[1], Byte(Name[0]));}
+  {S.Read(Name[0],1); S.Read(Name[1], Byte(Name[0]);}
   Memo1 := S.ReadStr;
   Memo2 := S.ReadStr;
   end;
@@ -1221,7 +1221,7 @@ constructor TPhoneDir.Load(var S: TStream);
     Q: TFileSize;
   begin
   S.ReadStrV(Name);
-  {S.Read(Name[0],1); S.Read(Name[1], Byte(Name[0]));}
+  {S.Read(Name[0],1); S.Read(Name[1], Byte(Name[0]);}
   Memo1 := S.ReadStr;
   Memo2 := S.ReadStr;
   S.Read(Password, 1);

@@ -53,9 +53,10 @@ uses
   ;
 
 type
-  PZIPArchive = ^TZIPArchive;
-  TZIPArchive = object(TARJArchive)
-    constructor Init;
+  TZIPArchive = class;
+  PZIPArchive = TZIPArchive;
+  TZIPArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -104,7 +105,7 @@ uses
 
 { ----------------------------- ZIP ------------------------------------}
 
-constructor TZIPArchive.Init;
+constructor TZIPArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -113,7 +114,7 @@ constructor TZIPArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'PKZIP'));
@@ -197,8 +198,8 @@ procedure TZIPArchive.GetFile;
   begin
   if CentralDirRecPresent then
     begin
-    ArcFile^.Read(HCF.Id, SizeOf(HCF.Id));
-    if  (ArcFile^.Status <> stOK) or (HCF.Id and $FFFF <> $4B50) then
+    ArcFile.Read(HCF.Id, SizeOf(HCF.Id));
+    if  (ArcFile.Status <> stOK) or (HCF.Id and $FFFF <> $4B50) then
       begin
       FileInfo.Last := 2;
       Exit;
@@ -208,11 +209,11 @@ procedure TZIPArchive.GetFile;
       FileInfo.Last := 1;
       Exit;
       end;
-    ArcFile^.Read(HCF.VersionMade, SizeOf(HCF)-SizeOf(HCF.Id));
+    ArcFile.Read(HCF.VersionMade, SizeOf(HCF)-SizeOf(HCF.Id));
     if HCF.FNameLength > 255 then
       HCF.FNameLength := 255;
     SetLength(FileInfo.FName, HCF.FNameLength);
-    ArcFile^.Read(FileInfo.FName[1], HCF.FNameLength);
+    ArcFile.Read(FileInfo.FName[1], HCF.FNameLength);
     FileInfo.Last := 0;
     FileInfo.Attr := (HCF.GeneralPurpose and 1)*Hidden;
     FileInfo.Date := HCF.LastModDate;
@@ -222,21 +223,21 @@ procedure TZIPArchive.GetFile;
        (HCF.OriginalSize = (-1 { $FFFFFFFF })) and
        (HCF.CompressedSize = (-1 { $FFFFFFFF })) then
       begin {search for Zip64 extended information extra field}
-        FP := ArcFile^.GetPos;
-        ArcFile^.Read(ExtraFieldHeader, SizeOf(ExtraFieldHeader));
+        FP := ArcFile.GetPos;
+        ArcFile.Read(ExtraFieldHeader, SizeOf(ExtraFieldHeader));
         if ExtraFieldHeader.HeaderID = 1 then
           begin
-            ArcFile^.Read(FileInfo.USize, 8);
-            ArcFile^.Read(FileInfo.PSize, 8);
+            ArcFile.Read(FileInfo.USize, 8);
+            ArcFile.Read(FileInfo.PSize, 8);
           end;
-        ArcFile^.Seek(FP);
+        ArcFile.Seek(FP);
       end;
-    ArcFile^.Seek(ArcFile^.GetPos+HCF.ExtraField+HCF.FileCommLength);
+    ArcFile.Seek(ArcFile.GetPos+HCF.ExtraField+HCF.FileCommLength);
     end
   else {CentralDirRecPresent}
     begin
 1:
-    ArcFile^.Read(P.Id, 4);
+    ArcFile.Read(P.Id, 4);
     if P.Id = $02014b50 then
       begin
       FileInfo.Last := 1;
@@ -245,32 +246,32 @@ procedure TZIPArchive.GetFile;
     if P.Id = $08074B50 then
       {skip Spanned/Split block}
       begin
-      ArcFile^.Read(P.Id, 12);
+      ArcFile.Read(P.Id, 12);
       goto 1;
       end;
-    ArcFile^.Read(P.Extract, SizeOf(P)-4);
-    if  (ArcFile^.Status <> stOK) or (P.Id <> $04034B50) then
+    ArcFile.Read(P.Extract, SizeOf(P)-4);
+    if  (ArcFile.Status <> stOK) or (P.Id <> $04034B50) then
       begin
       FileInfo.Last := 2;
       Exit;
       end;
     if P.FNameLength > 255 then
       P.FNameLength := 255;
-    ArcFile^.Read(FileInfo.FName[1], P.FNameLength);
+    ArcFile.Read(FileInfo.FName[1], P.FNameLength);
     SetLength(FileInfo.FName, P.FNameLength);
     FileInfo.Last := 0;
     FileInfo.Attr := (P.GeneralPurpose and 1)*Hidden;
     FileInfo.Date := P.LastModDate;
-    FP := ArcFile^.GetPos+P.ExtraField+P.CompressedSize;
+    FP := ArcFile.GetPos+P.ExtraField+P.CompressedSize;
     if  ( (P.GeneralPurpose and 8) <> 0) and (P.CompressedSize = 0) then
       begin
       FPP := FP;
-      FP := SearchFileStr(@ArcFile^, NullXlatTable, 'PK'#03#04, FPP,
+      FP := SearchFileStr(ArcFile, NullXlatTable, 'PK'#03#04, FPP,
            True, False, False, False, False, False);
         {local file header signature}
       if FP < 0 then
         begin
-        FP := SearchFileStr(@ArcFile^, NullXlatTable, 'PK'#01#02, FPP,
+        FP := SearchFileStr(ArcFile, NullXlatTable, 'PK'#01#02, FPP,
            True, False, False, False, False, False);
         {central file header signature}
         if FP < 0 then
@@ -279,13 +280,14 @@ procedure TZIPArchive.GetFile;
           Exit;
           end;
         end;
-      ArcFile^.Seek(FP-8);
-      ArcFile^.Read(P.CompressedSize, 8);
+      ArcFile.Seek(FP-8);
+      ArcFile.Read(P.CompressedSize, 8);
       end;
     FileInfo.USize := P.OriginalSize;
     FileInfo.PSize := P.CompressedSize;
-    ArcFile^.Seek(FP);
+    ArcFile.Seek(FP);
     end;
   end { TZIPArchive.GetFile };
 
 end.
+

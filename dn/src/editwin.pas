@@ -271,12 +271,12 @@ procedure TEditWindow.SetState(AState: Word; Enable: Boolean);
 type
   PR_REditSaver = ^TEditSaver;
 
-function Build_REditSaver(var S: TStream): PObject;
+function Build_REditSaver(var S: TStream): TStreamable;
 begin
-  Result := PObject(New(PR_REditSaver, Load(S)));
+  Result := TStreamable(New(PR_REditSaver, Load(S)));
 end;
 
-procedure Store_REditSaver(P: PObject; var S: TStream);
+procedure Store_REditSaver(P: TStreamable; var S: TStream);
 begin
   PR_REditSaver(P)^.Store(S);
 end;

@@ -54,16 +54,17 @@ uses
   ;
 
 type
-  PUC2Archive = ^TUC2Archive;
-  TUC2Archive = object(TARJArchive)
+  TUC2Archive = class;
+  PUC2Archive = TUC2Archive;
+  TUC2Archive = class(TARJArchive)
     ListFileName: String;
     ListFile: System.Text;
     BaseDir: String;
-    constructor Init;
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 implementation
@@ -75,7 +76,7 @@ uses
 
 { ----------------------------- UC2 ------------------------------------}
 
-constructor TUC2Archive.Init;
+constructor TUC2Archive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -84,7 +85,7 @@ constructor TUC2Archive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'UC'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'UC'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'E'));
@@ -288,14 +289,14 @@ NextRecord:
 
   end { TUC2Archive.GetFile };
 
-destructor TUC2Archive.Done;
+destructor TUC2Archive.Destroy;
   begin
   if TextRec(ListFile).Handle <> 0 then
     begin
     System.Close(ListFile);
     EraseFile(ListFileName);
     end;
-  inherited Done;
+  inherited Destroy;
   end;
 
 end.

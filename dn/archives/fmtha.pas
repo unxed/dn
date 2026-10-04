@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PHAArchive = ^THAArchive;
-  THAArchive = object(TARJArchive)
-    constructor Init;
+  THAArchive = class;
+  PHAArchive = THAArchive;
+  THAArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -74,7 +75,7 @@ type
 implementation
 { ----------------------------- HA ------------------------------------}
 
-constructor THAArchive.Init;
+constructor THAArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -83,7 +84,7 @@ constructor THAArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HA'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HA'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
@@ -153,8 +154,8 @@ procedure THAArchive.GetFile;
     C: Char;
     DT: DateTime;
   begin
-  ArcFile^.Read(P, SizeOf(P));
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P, SizeOf(P));
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 1;
     Exit;
@@ -168,12 +169,12 @@ procedure THAArchive.GetFile;
   PackTime(DT, FileInfo.Date);
   FileInfo.FName := '';
   repeat
-    ArcFile^.Read(C, 1);
+    ArcFile.Read(C, 1);
     if C <> #0 then
       FileInfo.FName := FileInfo.FName+C;
   until (C = #0) or (Length(FileInfo.FName) > 77);
   repeat
-    ArcFile^.Read(C, 1);
+    ArcFile.Read(C, 1);
     if C <> #0 then
       FileInfo.FName := FileInfo.FName+C;
   until (C = #0) or (Length(FileInfo.FName) > 78);
@@ -185,15 +186,15 @@ procedure THAArchive.GetFile;
   Replace(#255, '\', FileInfo.FName);
   if P.Method and $0f = $0e then
     FileInfo.Attr := Directory;
-  ArcFile^.Read(C, 1);
-  FP := ArcFile^.GetPos+P.PackedSize+Byte(C);
-  if  (Int64(FP) > ArcFile^.GetSize) or (ArcFile^.Status <> stOK)
+  ArcFile.Read(C, 1);
+  FP := ArcFile.GetPos+P.PackedSize+Byte(C);
+  if  (Int64(FP) > ArcFile.GetSize) or (ArcFile.Status <> stOK)
   then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Seek(FP);
+  ArcFile.Seek(FP);
   end { THAArchive.GetFile };
 
 end.

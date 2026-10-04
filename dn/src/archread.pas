@@ -93,7 +93,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       lGetDir(0, CurDir); {GetDir(0, CurDir);}
       {Cat}
       GlobalMessage(evCommand, cmRereadDir, @CurDir);
-      F := New(PTextReader, Init(S));
+      F := PTextReader.Create(S);
       if F = nil then
         Exit;
       P := nil;
@@ -198,7 +198,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       end;
     if ID = 'AIN:' then
       begin
-      F := New(PTextReader, Init(S));
+      F := PTextReader.Create(S);
       if F = nil then
         Exit;
       P := nil;
@@ -261,7 +261,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       end;
     if ID = '7Z!:' then
       begin {piwamoto}
-        F := New(PTextReader, Init(S));
+        F := PTextReader.Create(S);
         if F = nil then Exit;
         P := nil;
         New(PC, Init);

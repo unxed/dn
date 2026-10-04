@@ -56,28 +56,31 @@ uses
   ;
 
 type
-  PTreeWindow = ^TTreeWindow;
-  TTreeWindow = object( {TStd}TWindow)
-    constructor Init(var Bounds: TRect);
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+  TTreeWindow = class;
+  PTreeWindow = TTreeWindow;
+  TTreeWindow = class(TWindow)
+    constructor Create(const Bounds: TRect);
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
     end;
 
-  PTreeReader = ^TTreeReader;
-  TTreeReader = object(TView)
-    procedure HandleEvent(var Event: TEvent); virtual;
+  TTreeReader = class;
+  PTreeReader = TTreeReader;
+  TTreeReader = class(TView)
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
-  PTreeDialog = ^TTreeDialog;
-  TTreeDialog = object(TDialog)
+  TTreeDialog = class;
+  PTreeDialog = TTreeDialog;
+  TTreeDialog = class(TDialog)
     Tree: PView;
     isValid: Boolean;
-    constructor Init(R: TRect; const ATitle: String; ADrive: Byte);
-    {procedure HandleEvent(var Event: TEvent); virtual;}
-    function GetPalette: TPalette; virtual;
-    function Valid(Command: Word): Boolean; virtual;
+    constructor Create(R: TRect; const ATitle: String; ADrive: Byte);
+    {procedure HandleEvent(var Event: TEvent); override;}
+    function GetPalette: TPalette; override;
+    function Valid(Command: Word): Boolean; override;
     end;
 
   PDirRec = ^TDirRec;
@@ -94,8 +97,9 @@ type
     {см. комментарий к TFileRec}
     end;
 
-  PTreeView = ^TTreeView;
-  TTreeView = object(TView)
+  TTreeView = class;
+  PTreeView = TTreeView;
+  TTreeView = class(TView)
     ScrollBar: PScrollBar;
     CurPtr: PDirRec;
     isValid {, QuickSearch}: Boolean;
@@ -107,73 +111,77 @@ type
     Parital, DrawDisabled,
     LocateEnabled, MouseTracking, WasChanged: Boolean;
     InfoView: PView;
-    constructor Init(R: TRect; ADrive: Integer; ParitalView: Boolean;
+    constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
         ScrBar: PScrollBar);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    function Valid(Command: Word): Boolean; virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    function Valid(Command: Word): Boolean; override;
     function Expanded(P: PDirRec; i: Integer): Boolean;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     procedure ReadTree(CountLen: Boolean);
     procedure Reread(CountLen: Boolean);
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure HandleCommand(var Event: TEvent);
     function GetDirName(N: Integer): String;
-    procedure SetData(var Rec); virtual;
-    procedure GetData(var Rec); virtual;
+    procedure SetData(var Rec); override;
+    procedure GetData(var Rec); override;
     procedure CollapseBranch(N: Integer);
-    function DataSize: Integer; virtual;
+    function DataSize: Integer; override;
     function FindDir(Dir: String): Integer; {DataCompBoy}
     procedure ReadAfterLoad;
-    function GetPalette: TPalette; virtual;
-    procedure Draw; virtual;
-    destructor Done; virtual;
+    function GetPalette: TPalette; override;
+    procedure Draw; override;
+    destructor Destroy; override;
     end;
 
-  PTreePanel = ^TTreePanel;
-  TTreePanel = object(TTreeView)
-    procedure HandleEvent(var Event: TEvent); virtual;
+  TTreePanel = class;
+  PTreePanel = TTreePanel;
+  TTreePanel = class(TTreeView)
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
-  PTreeInfoView = ^TTreeInfoView;
-  TTreeInfoView = object(TView)
+  TTreeInfoView = class;
+  PTreeInfoView = TTreeInfoView;
+  TTreeInfoView = class(TView)
     Tree: PTreeView;
     Down: String;
     Loaded: Boolean;
-    constructor Init(R: TRect; ATree: PTreeView);
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    constructor Create(R: TRect; ATree: PTreeView);
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure MakeDown;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    function GetPalette: TPalette; virtual;
-    destructor Done; virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    function GetPalette: TPalette; override;
+    destructor Destroy; override;
     end;
 
-  PDTreeInfoView = ^TDTreeInfoView; { дерево в диалоге }
-  TDTreeInfoView = object(TTreeInfoView)
-    function GetPalette: TPalette; virtual;
+  TDTreeInfoView = class; { дерево в диалоге }
+  TDTreeInfoView = class(TTreeInfoView)
+    function GetPalette: TPalette; override;
     end;
 
-  PHTreeView = ^THTreeView;
+  THTreeView = class;
+  PHTreeView = THTreeView;
    {`2 панель дерева с подвалом `}
-  THTreeView = object(TTreePanel)
+  THTreeView = class(TTreePanel)
     Info: PView;
-    constructor Init(R: TRect; ADrive: Integer; ParitalView: Boolean;
+    constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
         ScrBar: PScrollBar);
-    procedure ChangeBounds(const Bounds: TRect); virtual;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    function GetPalette: TPalette; virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    destructor Done; virtual;
+    procedure ChangeBounds(const Bounds: TRect); override;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    function GetPalette: TPalette; override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    destructor Destroy; override;
     end;
 
-  PDirCollection = ^TDirCollection;
-  TDirCollection = object(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
-    procedure PutItem(var S: TStream; Item: Pointer); virtual;
+  TDirCollection = class;
+  PDirCollection = TDirCollection;
+  TDirCollection = class(TCollection)
+    procedure FreeItem(P: Pointer); override;
+    function GetItem(S: TStream): Pointer; override;
+    procedure PutItem(S: TStream; Item: Pointer); override;
     end;
 
 function ChangeDir(ATitle: TTitleStr; Drv: Byte): String; {DataCompBoy}
@@ -706,15 +714,15 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
   ChangeDir := S;
   end;
 
-destructor TTreeInfoView.Done;
+destructor TTreeInfoView.Destroy;
   begin
   PHTreeView(Tree).Info := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
-constructor TTreeInfoView.Init(R: TRect; ATree: PTreeView);
+constructor TTreeInfoView.Create(R: TRect; ATree: PTreeView);
   begin
-  inherited Init(R);
+  inherited Create(R);
   Tree := ATree;
   Options := Options or ofPostProcess;
   EventMask := evBroadcast;
@@ -733,14 +741,14 @@ procedure TTreeInfoView.HandleEvent(var Event: TEvent);
     end;
   end;
 
-constructor TTreeInfoView.Load(var S: TStream);
+constructor TTreeInfoView.Load(S: TStream);
   begin
   inherited Load(S);
   GetPeerViewPtr(S, Tree);
   Loaded := True;
   end;
 
-procedure TTreeInfoView.Store(var S: TStream);
+procedure TTreeInfoView.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, Tree);
@@ -800,12 +808,12 @@ procedure TTreeInfoView.MakeDown;
     end;
   end;
 
-constructor TTreeDialog.Init(R: TRect; const ATitle: String; ADrive: Byte);
+constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
   var
     R1, R2: TRect;
     P: PView;
   begin
-  inherited Init(R, ATitle);
+  inherited Create(R, ATitle);
   HelpCtx := hcTreeDialog;
   isValid := True;
   if R.B.X-R.A.X < 24 then
@@ -876,13 +884,13 @@ begin
  inherited HandleEvent(Event);
 end;*)
 
-constructor TTreeWindow.Init(var Bounds: TRect);
+constructor TTreeWindow.Create(const Bounds: TRect);
   var
     R: TRect;
     P: PView;
     S: PScrollBar;
   begin
-  inherited Init(Bounds, GetString(dlTreeTitle), 0);
+  inherited Create(Bounds, GetString(dlTreeTitle), 0);
   GetExtent(R);
   R.Grow(-1, -1);
   R.A.X := R.B.X;
@@ -901,13 +909,13 @@ constructor TTreeWindow.Init(var Bounds: TRect);
   Insert(P);
   end { TTreeWindow.Init };
 
-constructor TTreeWindow.Load(var S: TStream);
+constructor TTreeWindow.Load(S: TStream);
   begin
   inherited Load(S);
   PTreeView(Current)^.ReadAfterLoad;
   end;
 
-procedure TTreeWindow.Store(var S: TStream);
+procedure TTreeWindow.Store(S: TStream);
   begin
   inherited Store(S);
   end;
@@ -932,13 +940,13 @@ procedure TTreeWindow.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end;
 
-constructor TTreeView.Init(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: PScrollBar);
+constructor TTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: PScrollBar);
   var
     I, Lv: Integer;
     S, D: String;
     P: PDirRec;
   begin
-  inherited Init(R);
+  inherited Create(R);
   Abort := False;
   if ParitalView then
     HelpCtx := hcDirTree;
@@ -964,7 +972,7 @@ constructor TTreeView.Init(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrB
   isValid := not Abort and (ScrollBar <> nil);
   end { TTreeView.Init };
 
-destructor TTreeView.Done;
+destructor TTreeView.Destroy;
   begin
   if DC <> nil then
     begin
@@ -972,7 +980,7 @@ destructor TTreeView.Done;
     Dispose(DC, Done);
     DC := nil;
     end;
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TTreeView.GetPalette: TPalette;
@@ -982,7 +990,7 @@ function TTreeView.GetPalette: TPalette;
   GetPalette := MakePalette(S);
   end;
 
-constructor TTreeView.Load(var S: TStream);
+constructor TTreeView.Load(S: TStream);
   var
     P: Pointer;
   begin
@@ -1017,7 +1025,7 @@ function THTreeView.GetPalette: TPalette;
   GetPalette := MakePalette(S);
   end;
 
-procedure TTreeView.Store(var S: TStream);
+procedure TTreeView.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, ScrollBar);
@@ -2045,19 +2053,19 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
   end {case};
   end { TTreePanel.HandleEvent };
 
-constructor THTreeView.Init(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: PScrollBar);
+constructor THTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; ScrBar: PScrollBar);
   begin
-  inherited Init(R, ADrive, True, ScrBar);
+  inherited Create(R, ADrive, True, ScrBar);
   Info := nil;
   end;
 
-constructor THTreeView.Load(var S: TStream);
+constructor THTreeView.Load(S: TStream);
   begin
   inherited Load(S);
   GetPeerViewPtr(S, Info);
   end;
 
-procedure THTreeView.Store(var S: TStream);
+procedure THTreeView.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, Info);
@@ -2094,11 +2102,11 @@ procedure THTreeView.SetState(AState: Word; Enable: Boolean);
   end;
 
 { AK155 26-01-2003. Раньше Info не освобождалось вообще }
-destructor THTreeView.Done;
+destructor THTreeView.Destroy;
   begin
   if Info <> nil then
     Info^.Free;
-  inherited Done;
+  inherited Destroy;
   end;
 
 {-DataCompBoy-}

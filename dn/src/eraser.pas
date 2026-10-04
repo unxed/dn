@@ -79,11 +79,11 @@ function ValidErase(Files: PCollection): Boolean;
   ValidErase := False;
   if Files = nil then
     Exit;
-  if Files^.Count = 0 then
+  if Files.Count = 0 then
     Exit;
-  if Files^.Count = 1 then
+  if Files.Count = 1 then
     begin
-    PF := Files^.At(0);
+    PF := Files.At(0);
     if PF^.Attr and Directory <> 0 then
       S := GetString(dlEraseConfirmDir)
     else
@@ -94,15 +94,15 @@ function ValidErase(Files: PCollection): Boolean;
     end
   else
     S := GetString(dlEraseConfirms1);
-  if  (Files^.Count = 1) and (Confirms and cfSingleErase = 0) then
+  if  (Files.Count = 1) and (Confirms and cfSingleErase = 0) then
     I := cmYes
   else
     I := MessageBox(S, nil, mfConfirmation+mfYesButton+mfNoButton);
   if  (I <> cmYes) then
     Exit;
-  if  (Files^.Count > 1) and (Confirms and cfMultiErase <> 0) then
+  if  (Files.Count > 1) and (Confirms and cfMultiErase <> 0) then
     begin
-    S := GetString(dlEraseConfirm2)+ItoS(Files^.Count)
+    S := GetString(dlEraseConfirm2)+ItoS(Files.Count)
         +' '+GetString(dlDIFiles)+' ?';
     if MessageBox(S, nil, mfConfirmation+mfYesButton+mfNoButton)
        <> cmYes
@@ -138,7 +138,7 @@ procedure EraseFiles(Files: PCollection);
 
   procedure InfoWrite(N: Integer; const S: Str40);
     begin
-    PInfo^.Write(N, S);
+    PInfo.Write(N, S);
     end;
 
   procedure CalcCancel;
@@ -189,15 +189,15 @@ procedure EraseFiles(Files: PCollection);
     DosDelDir := False;
     Abort := False;
     Params.RC := 0;
-    New(DC, Init($10, $10, False));
-    New(TD, Init($10, $10, False));
-    DC^.Insert(NewStr(FreeStr));
+    DC := PDirCol.Create($10, $10, False);
+    TD := PDirCol.Create($10, $10, False);
+    DC.Insert(NewStr(FreeStr));
 
-    while (DC^.Count>0) and (not EraseCancel) and (not Abort) do
+    while (DC.Count>0) and (not EraseCancel) and (not Abort) do
       begin
-      FreeStr := PString(DC^.At(0))^;
-      DC^.AtFree(0);
-      PInfo^.Write(2, Cut(GetName(FreeStr), 40));
+      FreeStr := PString(DC.At(0))^;
+      DC.AtFree(0);
+      PInfo.Write(2, Cut(GetName(FreeStr), 40));
 
       if Word(Length(FreeStr))+Word(Length(x_x)) > MaxPathLen-1 then
         begin
@@ -234,7 +234,7 @@ procedure EraseFiles(Files: PCollection);
               Abort := True;
               Break;
               end;
-            DC^.AtInsert(0, NewStr(s));
+            DC.AtInsert(0, NewStr(s));
             end;
           end
         else
@@ -269,22 +269,22 @@ procedure EraseFiles(Files: PCollection);
           end;
         if FreeStr[Length(FreeStr)] = '\'
         then
-          TD^.AtInsert(0, NewStr(Copy(FreeStr, 1, Length(FreeStr)-1)))
+          TD.AtInsert(0, NewStr(Copy(FreeStr, 1, Length(FreeStr)-1)))
         else
-          TD^.AtInsert(0, NewStr(FreeStr));
+          TD.AtInsert(0, NewStr(FreeStr));
         end
       else
         Break;
       end;
-    DC^.FreeAll;
-    Dispose(DC, Done);
+    DC.FreeAll;
+    DC.Free;
     DosDelDir := not Abort;
     if not Abort then
-      while (TD^.Count > 0) and (not EraseCancel) and (not Abort) do
+      while (TD.Count > 0) and (not EraseCancel) and (not Abort) do
         begin
         CalcCancel; {JOHN_SW}
         ClrIO;
-        s := PString(TD^.At(0))^;
+        s := PString(TD.At(0))^;
 TryDel:
         lRmDir(s);
         Params.RC := IOResult;
@@ -294,13 +294,13 @@ TryDel:
         if Params.RC <> 0 then
           begin
           DosDelDir := False;
-          FreeStr := PString(TD^.At(0))^;
+          FreeStr := PString(TD.At(0))^;
           Break;
           end;
-        TD^.AtFree(0);
+        TD.AtFree(0);
         end;
-    TD^.FreeAll;
-    Dispose(TD, Done);
+    TD.FreeAll;
+    TD.Free;
     end { DosDelDir: };
 
   function DeleteDirectory(Dir: String; Cluster: Word): Boolean;
@@ -361,7 +361,7 @@ TryDel:
       MessageBox(S, @Params, mfError+mfOKButton);
       Abort := True;
       end;
-    PInfo^.DrawView;
+    PInfo.DrawView;
     end { DeleteDirectory };
 
   var
@@ -389,8 +389,8 @@ TryDel:
   ClrIO;
   CtrlBreakHit := False; {JO}
   R.Assign(1, 1, 26, 9);
-  New(PInfo, Init(R));
-  PInfo^.Top := GetString(dlErase);
+  PInfo := PWhileView.Create(R);
+  PInfo.Top := GetString(dlErase);
   DOSMode := True;
 
   EraseCancel := False;
@@ -400,16 +400,16 @@ TryDel:
 
   if Abort then
     begin
-    Dispose(PInfo, Done);
+    PInfo.Free;
     NotifyResume; {Cat}
     Exit;
     end;
   Inc(SkyEnabled);
-  Desktop^.Insert(PInfo);
+  Desktop.Insert(PInfo);
 
-  for I := 1 to Files^.Count do
+  for I := 1 to Files.Count do
     begin
-    PF := Files^.At(I-1);
+    PF := Files.At(I-1);
     {JO: файлы, найденные в архивах нельзя удалить из панели поиска}
     if PathFoundInArc(PF^.Owner^) then
       Continue;
@@ -465,13 +465,13 @@ LLL:
           else
             if not SkipAll then begin
               D := PDialog(LoadResource(dlgSkipBadFile));
-              D^.Options := D^.Options or ofCentered;
+              D.Options := D.Options or ofCentered;
               R.A.X := 1; R.A.Y := 2; R.B.X := 53; R.B.Y := 3;
-              D^.Insert(New(PStaticText, Init(R,GetString(dlErasingNoFile))));
+              D.Insert(TStaticText.Create(R, GetString(dlErasingNoFile)));
               inc(R.A.Y); inc(R.B.Y);
               S := FormatLongName(S,50,0,0,nfmNull);
-              D^.Insert(New(PStaticText, Init(R,^C+S)));
-              Case Desktop^.ExecView(D) Of
+              D.Insert(TStaticText.Create(R, ^C+S));
+              Case Desktop.ExecView(D) Of
                cmOK:     Goto LLL {Dec(I)};
                cmYes:    SkipAll := True;
                cmCancel: Break;
@@ -501,19 +501,19 @@ DeleteDirDIZ:
 
   if Flush then
     begin
-    PInfo^.ClearInterior;
+    PInfo.ClearInterior;
     InfoWrite(1, GetString(dlFlushingBuffers));
     end
   else
     
-    Dispose(PInfo, Done);
+    PInfo.Free;
 
   {Cat: Во-первых, совершенно непонятно, зачем перечитывать _все_ диски
       Во-вторых, такой способ не работает с сетевыми путями}
   (*
   DrivesSet := [];
-  for I := 0 to Files^.Count-1 do
-      DrivesSet := [UpCase(PFileRec(Files^.At(I))^.Owner^[1])] + DrivesSet;
+  for I := 0 to Files.Count-1 do
+      DrivesSet := [UpCase(PFileRec(Files.At(I))^.Owner^[1])] + DrivesSet;
   S := 'A:\';
   for ch := 'A' to 'Z' do
     if ch in DrivesSet then
@@ -523,22 +523,22 @@ DeleteDirDIZ:
         RereadDirectory(S);
       end;
 *)
-  RereadCollection := New(PStringCollection, Init(32, 32, False));
+  RereadCollection := PStringCollection.Create(32, 32, False);
   {сортированная, без повторов}
-  for I := 0 to Files^.Count-1 do
+  for I := 0 to Files.Count-1 do
     begin
-    RereadCollection^.Insert(PFileRec(Files^.At(I))^.Owner);
-    if PFileRec(Files^.At(I))^.Attr and Directory <> 0 then
+    RereadCollection.Insert(PFileRec(Files.At(I))^.Owner);
+    if PFileRec(Files.At(I))^.Attr and Directory <> 0 then
       begin
-      PStr1 := NewStr('>'+MakeNormName(PFileRec(Files^.At(I))^.Owner^,
-            PFileRec(Files^.At(I))^.FlName[True])+'\');
-      RereadCollection^.Insert(PStr1);
+      PStr1 := NewStr('>'+MakeNormName(PFileRec(Files.At(I))^.Owner^,
+            PFileRec(Files.At(I))^.FlName[True])+'\');
+      RereadCollection.Insert(PStr1);
       end;
     end;
   S := #0;
-  for I := 0 to RereadCollection^.Count-1 do
+  for I := 0 to RereadCollection.Count-1 do
     begin
-    PS := RereadCollection^.At(I);
+    PS := RereadCollection.At(I);
     if S <> Copy(PS^, 1, Length(S)) then
       {если уже перечитали вышележащий каталог, то этот перечитывать не надо}
       begin
@@ -548,15 +548,15 @@ DeleteDirDIZ:
       RereadDirectory(S);
       end;
     end;
-  RereadCollection^.DeleteAll;
-  Dispose(RereadCollection, Done);
+  RereadCollection.DeleteAll;
+  RereadCollection.Free;
   {/Cat}
   GlobalMessage(evCommand, cmRereadInfo, nil);
   
   if Flush then
     begin
     osdep.SysDiskReset;
-    Dispose(PInfo, Done);
+    PInfo.Free;
     end;
   
   Dec(SkyEnabled);

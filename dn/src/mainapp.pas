@@ -26,44 +26,49 @@ var
   EventQueue: array[1..MaxEvents] of TEvent;
 
 type
-  PBackground = ^TBackground;
-  TBackground = object(TvApp.TBackground)
-    constructor Init(var Bounds: TRect; APattern: Char);
+  TBackground = class;
+  PBackground = TBackground;
+  TBackground = class(TvApp.TBackground)
+    constructor Create(const Bounds: TRect; APattern: Byte);
   end;
 
-  PDesktop = ^TDesktop;
-  TDesktop = object(TvApp.TDeskTop)
+  TDesktop = class;
+  PDesktop = TDesktop;
+  TDesktop = class(TvApp.TDeskTop)
     procedure Clear;
   end;
 
-  PProgram = ^TProgram;
-  TProgram = object(TvApp.TApplication)
+  TProgram = class;
+  PProgram = TProgram;
+  TProgram = class(TvApp.TApplication)
     IdleSecs: TEventTimer;
-    constructor Init;
-    destructor Done; virtual;
+    constructor Create;
+    destructor Destroy; override;
     procedure ActivateView(P: PView);
     { the screen savers of DN (the list of the available ones, the choice of one): TODO, nothing is done; Data is a TSaversData }
     procedure InsertAvIdlerN(const Data; N: Integer);
     { the idler views (the screen saver, the clock...): TODO, nothing is done }
     procedure InsertIdler;
     procedure InsertIdlerN(N: Integer);
-    procedure GetEvent(var Event: TEvent); virtual;
-    procedure Idle; virtual;
+    procedure GetEvent(var Event: TEvent); override;
+    procedure Idle; override;
     procedure InitCommandLine; virtual;
     function SetScreenMode(Mode: Word): Boolean;
   end;
 
-  PApplication = ^TApplication;
-  TApplication = object(TProgram)
+  TApplication = class;
+  PApplication = TApplication;
+  TApplication = class(TProgram)
     Clock: PView;
-    constructor Init;
-    destructor Done; virtual;
+    constructor Create;
+    destructor Destroy; override;
     procedure ShowUserScreen;
     procedure WhenShow; virtual;
   end;
 
-  PWriteWin = ^TWriteWin;
-  TWriteWin = object(TWindow)
+  TWriteWin = class;
+  PWriteWin = TWriteWin;
+  TWriteWin = class(TWindow)
     Tmr: TEventTimer;
     IState: Byte;
   end;
@@ -72,7 +77,7 @@ procedure UpdateWriteView(P: Pointer);
 procedure OpenResource;
 function ExecResource(Key: TDlgIdx; var Data): Word;
 function ExecDialog(D: PDialog; var Data): Word;
-function LoadResource(Key: TDlgIdx): PObject;
+function LoadResource(Key: TDlgIdx): TStreamable;
 function GlobalMessage(What, Command: Word; InfoPtr: Pointer): Pointer;
 function GlobalMessageL(What, Command: Word; InfoLng: LongInt): Pointer;
 procedure GlobalEvent(What, Command: Word; InfoPtr: Pointer);
@@ -108,9 +113,9 @@ implementation
 
 uses basics, fileutil, langid, Videoman, osdep, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun{$ENDIF};
 
-constructor TBackground.Init(var Bounds: TRect; APattern: Char);
+constructor TBackground.Create(const Bounds: TRect; APattern: Byte);
 begin
-  inherited Init(Bounds, Ord(APattern));
+  inherited Create(Bounds, APattern);
 end;
 
 procedure TDesktop.Clear;
@@ -122,7 +127,7 @@ begin
   begin
     P := Last;
     Delete(P);
-    Dispose(P, Done);
+    P.Free;
   end;
   Unlock;
 end;
@@ -130,15 +135,15 @@ end;
 { As TProgram.Init of DN (the order matters: the status line, the menu and the desktop are inserted in this order, then the
   command line is made; the menu views of DN are made with a zero size (TMenuView.Init) and get the height of one row here).
   The Init of TvApp.TProgram is not called: it makes the views of TV (DN has its own menus). }
-constructor TProgram.Init;
+constructor TProgram.Create;
 var
   R: TRect;
 begin
   DNTrace('TProgram.Init');
-  Application := @Self;
+  Application := Self;
   InitScreen;
   R.Assign(0, 0, ScreenWidth, ScreenHeight);
-  TvViews.TGroup.Init(R);
+  TvViews.TGroup.Create(R);
   State := sfVisible or sfSelected or sfFocused or sfModal or sfExposed;
   Options := 0;
   Buffer := TvScreen.ScreenBuffer;
@@ -153,9 +158,9 @@ begin
     Insert(Desktop);
   InitCommandLine;
   if StatusLine <> nil then
-    StatusLine^.GrowTo(StatusLine^.Size.X, 1);
+    StatusLine.GrowTo(StatusLine.Size.X, 1);
   if MenuBar <> nil then
-    MenuBar^.GrowTo(MenuBar^.Size.X, 1);
+    MenuBar.GrowTo(MenuBar.Size.X, 1);
   NewTimer(IdleSecs, 0);
   DNTrace('TProgram.Init: done, size=' + IntToStr(Size.X) + 'x' + IntToStr(Size.Y));
 end;
@@ -163,25 +168,25 @@ end;
 { As TProgram.Done of DN: the menu, the status line and the desktop are disposed first and Application is nil before the group
   is destroyed (the broadcasts that the views send while they go find nobody: the command line looks at Desktop^). The Done of
   TvApp.TProgram is not called (it clears the pointers and destroys the group in one go). }
-destructor TProgram.Done;
+destructor TProgram.Destroy;
 begin
   if MenuBar <> nil then
-    Dispose(MenuBar, Done);
+    MenuBar.Free;
   MenuBar := nil;
   if StatusLine <> nil then
-    Dispose(StatusLine, Done);
+    StatusLine.Free;
   StatusLine := nil;
   if Desktop <> nil then
-    Dispose(Desktop, Done);
+    Desktop.Free;
   Desktop := nil;
   Application := nil;
-  TvViews.TGroup.Done;
+  inherited Destroy;
 end;
 
 procedure TProgram.ActivateView(P: PView);
 begin
   if P <> nil then
-    P^.Select;
+    P.Select;
 end;
 
 procedure TProgram.InsertAvIdlerN(const Data; N: Integer);
@@ -202,8 +207,8 @@ begin
   { as in Turbo Vision: the status line sees the keys and the clicks on it }
   if (Event.What <> evNothing) and (StatusLine <> nil) then
     if ((Event.What and evKeyDown) <> 0) or
-       (((Event.What and evMouseDown) <> 0) and StatusLine^.MouseInView(Event.Where)) then
-      StatusLine^.HandleEvent(Event);
+       (((Event.What and evMouseDown) <> 0) and StatusLine.MouseInView(Event.Where)) then
+      StatusLine.HandleEvent(Event);
   if Event.What = evKeyDown then
     DNTrace('key ' + IntToHex(Event.KeyCode, 4) + ' shift ' + IntToHex(Event.ControlKeyState, 4));
   { the state of the shift keys is that of keyboard and mouse events: the field is not set in the messages (commands, broadcasts) }
@@ -233,8 +238,8 @@ var
 
 procedure TraceView(P: PView);
 begin
-  DNTrace('view ' + IntToHex(PtrUInt(P), 8) + ' origin ' + IntToStr(P^.Origin.X) + ',' + IntToStr(P^.Origin.Y) + ' size ' +
-    IntToStr(P^.Size.X) + 'x' + IntToStr(P^.Size.Y) + ' state ' + IntToHex(P^.State, 4) + ' options ' + IntToHex(P^.Options, 4));
+  DNTrace('view ' + IntToHex(PtrUInt(P), 8) + ' origin ' + IntToStr(P.Origin.X) + ',' + IntToStr(P.Origin.Y) + ' size ' +
+    IntToStr(P.Size.X) + 'x' + IntToStr(P.Size.Y) + ' state ' + IntToHex(P.State, 4) + ' options ' + IntToHex(P.Options, 4));
 end;
 
 procedure CheckScreenDump;
@@ -291,7 +296,7 @@ begin
     I := Pos(':', Entry);
     Ev.Where.X := StrToIntDef(Copy(Entry, 1, I - 1), 0);
     Ev.Where.Y := StrToIntDef(Copy(Entry, I + 1, 9), 0);
-    Application^.PutEvent(Ev);
+    Application.PutEvent(Ev);
     DNTrace('mouse event ' + IntToHex(Ev.What, 2) + ' at ' + IntToStr(Ev.Where.X) + ',' + IntToStr(Ev.Where.Y));
   end;
   { DOSBox-X without a display reports Alt as pressed (bit 3 of the shift flags at 0040:0017): clear the flags, the keys are
@@ -334,14 +339,14 @@ begin
         if not (PByte(TvScreen.ScreenBuffer)[I * SizeOf(TScreenCell)] in [0, 32]) then
           Inc(N);
     DNTrace('dump: screen ' + IntToStr(ScreenWidth) + 'x' + IntToStr(ScreenHeight) + ', non-blank cells in the buffer: ' + IntToStr(N) +
-      ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application^.LockFlag) + ' desktop ' +
-      IntToStr(Desktop^.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application^.Buffer = TvScreen.ScreenBuffer, True));
+      ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application.LockFlag) + ' desktop ' +
+      IntToStr(Desktop.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application.Buffer = TvScreen.ScreenBuffer, True));
     { the help context decides what the status line shows }
     DNTrace('mouse driver: ' + BoolToStr(DosMousePresent, True));
     DNTrace('idle calls: ' + IntToStr(IdleCount) + ' shift state ' + IntToHex(ShiftState, 2) + ' ' + IntToHex(ShiftState2, 2) + ' old ' + IntToHex(OldShiftState, 2));
-    DNTrace('help ctx: app ' + IntToStr(Application^.GetHelpCtx) + ' desktop ' + IntToStr(Desktop^.GetHelpCtx) + ' status ' +
-      IntToStr(StatusLine^.HelpCtx) + ' topview ' + IntToHex(PtrUInt(StatusLine^.TopView), 8) + ' app ' + IntToHex(PtrUInt(Application), 8) +
-      ' current ' + IntToHex(PtrUInt(Application^.Current), 8) + ' desktop.current ' + IntToHex(PtrUInt(Desktop^.Current), 8));
+    DNTrace('help ctx: app ' + IntToStr(Application.GetHelpCtx) + ' desktop ' + IntToStr(Desktop.GetHelpCtx) + ' status ' +
+      IntToStr(StatusLine.HelpCtx) + ' topview ' + IntToHex(PtrUInt(StatusLine.TopView), 8) + ' app ' + IntToHex(PtrUInt(Application), 8) +
+      ' current ' + IntToHex(PtrUInt(Application.Current), 8) + ' desktop.current ' + IntToHex(PtrUInt(Desktop.Current), 8));
     { the focused control of the window on top of the desktop, if that is a group (a test aid; the top view may be a menu, which
       is not a group: the access violation is taken, the trace must not kill the program) }
     try
@@ -386,11 +391,11 @@ begin
     ReadScreenCells;               { the copy of the screen that DN reads }
   if StatusLine <> nil then
   begin
-    StatusLine^.Update;
+    StatusLine.Update;
     if IdleCount < 4 then
-      DNTrace('idle ' + IntToStr(IdleCount) + ': status help ctx ' + IntToStr(StatusLine^.HelpCtx) + ' top help ctx ' +
-        IntToStr(StatusLine^.TopView^.GetHelpCtx) + ' items ' + IntToHex(PtrUInt(StatusLine^.Items), 8) + ' defs ' +
-        IntToHex(PtrUInt(StatusLine^.Defs), 8));
+      DNTrace('idle ' + IntToStr(IdleCount) + ': status help ctx ' + IntToStr(StatusLine.HelpCtx) + ' top help ctx ' +
+        IntToStr(StatusLine.TopView.GetHelpCtx) + ' items ' + IntToHex(PtrUInt(StatusLine.Items), 8) + ' defs ' +
+        IntToHex(PtrUInt(StatusLine.Defs), 8));
   end;
   RunBackground;
   CheckScreenDump;
@@ -408,7 +413,7 @@ end;
 
 { As TApplication.Init / Done of DN: the video manager of DN (videoman.pas) is started and stopped here, the user screen is the
   screen that was there before DN (osdep grabbed it). The language files and the resources are disposed at the end. }
-constructor TApplication.Init;
+constructor TApplication.Create;
 begin
   Videoman.InitVideo;
   if (UserScreen <> nil) and (Length(SysStartScreen) > 0) and (SysStartScreenWidth = UserScreenWidth) and
@@ -417,21 +422,21 @@ begin
     Move(SysStartScreen[0], UserScreen^, Length(SysStartScreen) * 2);
     ScreenSaved := True;
   end;
-  inherited Init;
+  inherited Create;
 end;
 
-destructor TApplication.Done;
+destructor TApplication.Destroy;
 begin
   if LStringList <> nil then
-    Dispose(LStringList, Done);
+    LStringList.Free;
   LStringList := nil;
   if LngStream <> nil then
-    Dispose(LngStream, Done);
+    LngStream.Free;
   LngStream := nil;
   if Resource <> nil then
-    Dispose(Resource, Done);
+    Resource.Free;
   Resource := nil;
-  inherited Done;
+  inherited Destroy;
   DoneHistory;
   DoneSysError;
   Videoman.DoneVideo;
@@ -503,12 +508,12 @@ begin
   if S = '' then
     S := SourceDir;
   MakeSlash(S);
-  PS := New(PBufStream, Init(S + LngId + Ext, stOpenRead, 1024));
-  if PS^.Status <> stOK then
+  PS := PBufStream.Create(S + LngId + Ext, stOpenRead, 1024);
+  if PS.Status <> stOK then
   begin
-    Dispose(PS, Done);
-    PS := New(PBufStream, Init(StartupDir + LngId + Ext, stOpenRead, 1024));
-    if PS^.Status <> stOK then
+    PS.Free;
+    PS := PBufStream.Create(StartupDir + LngId + Ext, stOpenRead, 1024);
+    if PS.Status <> stOK then
       ResourceFail(LngId + Ext);
   end;
   Result := PS;
@@ -519,7 +524,7 @@ begin
   if Resource <> nil then
     Exit;
   ResourceStream := OpenResourceStream('.dlg');
-  New(Resource, Init(ResourceStream));
+  Resource := PIdxResource.Create(ResourceStream);
 end;
 
 function LoadDialog(Key: TDlgIdx): PDialog;
@@ -528,16 +533,16 @@ begin
   OpenResource;
   if Resource = nil then
     Exit;
-  Result := PDialog(Resource^.Get(Key));
-  Result := PDialog(Application^.ValidView(Result));
+  Result := PDialog(Resource.Get(Key));
+  Result := PDialog(Application.ValidView(Result));
 end;
 
 function ExecDialog(D: PDialog; var Data): Word;
 begin
-  D^.SetData(Data);
-  Result := Desktop^.ExecView(D);
+  D.SetData(Data);
+  Result := Desktop.ExecView(D);
   if Result <> cmCancel then
-    D^.GetData(Data);
+    D.GetData(Data);
 end;
 
 { TODO: PreExecuteDialog may be a procedure local to the caller (the original ExecResource had no stack frame for that: VP asm) }
@@ -556,17 +561,17 @@ begin
   DNTrace('ExecResource: executing');
   Result := ExecDialog(D, Data);
   DNTrace('ExecResource: done ' + IntToStr(Result));
-  Dispose(D, Done);
+  D.Free;
   PreExecuteDialog := nil;
 end;
 
-function LoadResource(Key: TDlgIdx): PObject;
+function LoadResource(Key: TDlgIdx): TStreamable;
 begin
   Result := nil;
   OpenResource;
   if Resource = nil then
     Exit;
-  Result := Resource^.Get(Key);
+  Result := Resource.Get(Key);
 end;
 
 function GlobalMessage(What, Command: Word; InfoPtr: Pointer): Pointer;
@@ -587,7 +592,7 @@ begin
   E.What := What;
   E.Command := Command;
   E.InfoPtr := InfoPtr;
-  Application^.PutEvent(E);
+  Application.PutEvent(E);
 end;
 
 function ViewPresent(Command: Word; InfoPtr: Pointer): PView;
@@ -626,14 +631,14 @@ begin
     Wd := 60;
   R.Assign(0, 0, Wd + 6, Lines + 4);
   if Desktop <> nil then
-    R.Move((Desktop^.Size.X - (R.B.X - R.A.X)) div 2, (Desktop^.Size.Y - (R.B.Y - R.A.Y)) div 2);
-  New(W, Init(R, '', wnNoNumber));
-  W^.Flags := 0;
+    R.Move((Desktop.Size.X - (R.B.X - R.A.X)) div 2, (Desktop.Size.Y - (R.B.Y - R.A.Y)) div 2);
+  W := PWriteWin.Create(R, '', wnNoNumber);
+  W.Flags := 0;
   R.Assign(2, 1, Wd + 4, Lines + 3);
-  New(T, Init(R, Text));
-  W^.Insert(T);
+  T := PStaticText.Create(R, Text);
+  W.Insert(T);
   if Desktop <> nil then
-    Desktop^.Insert(W);
+    Desktop.Insert(W);
   Result := W;
 end;
 
@@ -652,27 +657,27 @@ var
 begin
   PS := OpenResourceStream('.lng');
   { the strings are read from memory: the file is copied (as the original does) }
-  XS := New(PMemoryStream, Init(PS^.GetSize, PS^.GetSize));
-  if XS^.Status <> stOK then
+  XS := PMemoryStream.Create(PS.GetSize, PS.GetSize);
+  if XS.Status <> stOK then
   begin
-    Dispose(XS, Done);
+    XS.Free;
     XS := nil;
   end;
   if XS <> nil then
   begin
-    XS^.CopyFrom(PS^, PS^.GetSize);
-    if XS^.Status = stOK then
+    XS.CopyFrom(PS, PS.GetSize);
+    if XS.Status = stOK then
     begin
-      Dispose(PS, Done);
+      PS.Free;
       PS := XS;
     end
     else
-      Dispose(XS, Done);
+      XS.Free;
   end;
   LngStream := PS;
-  PS^.Seek(0);
-  LStringList := PStringList(PS^.Get);
-  if (PS^.Status <> stOK) or (LStringList = nil) then
+  PS.Seek(0);
+  LStringList := PStringList(PS.Get);
+  if (PS.Status <> stOK) or (LStringList = nil) then
     ResourceFail('reading ' + LngId + '.lng');
 end;
 
@@ -680,7 +685,7 @@ function GetString(Index: TStrIdx): String;
 begin
   if LStringList = nil then
     InitLngStream;
-  Result := LStringList^.Get(Word(Ord(Index)));
+  Result := LStringList.Get(Word(Ord(Index)));
 end;
 
 procedure ToggleCommandLine(OnOff: Boolean);
@@ -694,7 +699,7 @@ var
 begin
   if Desktop = nil then
     Exit;
-  S := Desktop^.Size;
+  S := Desktop.Size;
   { keep the rectangle inside the desktop (it may have become smaller) }
   if R.B.X > S.X then
     R.Move(S.X - R.B.X, 0);

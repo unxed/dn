@@ -274,7 +274,7 @@ begin
   ClearEvent(Event);
   Event.What := evKeyDown;
   SetDNKeyCode(Event, Code);
-  Receiver^.HandleEvent(Event);
+  Receiver.HandleEvent(Event);
   if Event.What = evNothing then
     Result := Event.InfoPtr;
 end;

@@ -244,7 +244,7 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
     EV.What := evCommand;
     EV.Command := cmShowTimeInfo;
     EV.InfoPtr := nil;
-    Application^.PutEvent(EV);
+    Application.PutEvent(EV);
     end;
   I := DosError;
   ClrIO;
@@ -252,7 +252,7 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
   EraseFile(SwpDir+'$DN'+ItoS(DNNumber)+'$.LST'); {DataCompBoy}
   { the screen of TV, the events and the memory are not stopped for the program: nothing to start again }
   
-  Application^.Redraw;
+  Application.Redraw;
   {JO}
   if RR then
     begin
@@ -299,12 +299,12 @@ function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
   {Cat:warn закомментировал это в процессе отлова багов, но надо будет проверить, не добавил ли новых}
   SearchExt := False;
   Local := True;
-  f := New(PTextReader, Init('dn.ext'));
+  f := PTextReader.Create('dn.ext');
   if f = nil then
     begin
 RL:
     Local := False;
-    f := New(PTextReader, Init(SourceDir+'dn.ext'));
+    f := PTextReader.Create(SourceDir+'dn.ext');
     end;
   if f = nil then
     Exit;
@@ -323,9 +323,9 @@ RL:
     BgCh := '(';
     EnCh := ')';
     end;
-  while (not f^.Eof) and (not AllRight) do
+  while (not f.Eof) and (not AllRight) do
     begin
-    s := f^.GetStr;
+    s := f.GetStr;
     if s[1] <> ' ' then
       begin
       I := PosChar(BgCh, s);
@@ -343,7 +343,7 @@ RL:
           lRewriteText(F1);
           if IOResult <> 0 then
             begin
-            Dispose(f, Done);
+            f.Free;
             Exit;
             end;
           
@@ -385,10 +385,10 @@ RL:
               Writeln(F1.T, s);
               First := False;
               end;
-            if  (f^.Eof) then
+            if  (f.Eof) then
               Break;
             if not EF then
-              s := f^.GetStr;
+              s := f.GetStr;
           until (IOResult <> 0) or Abort or EF;
           Close(F1.T);
           AllRight := True;
@@ -396,7 +396,7 @@ RL:
         end;
       end;
     end;
-  Dispose(f, Done);
+  f.Free;
   {D.Filter:=''; MakeTMaskData(D);}
   if not EF and not Abort and Local then
     goto RL;
@@ -431,19 +431,19 @@ function ExecExtFile(const ExtFName: String; UserParams: PUserParams;
   Local := True;
   FName := UserParams^.Active^.FlName[True];
 
-  F := New(PTextReader, Init(ExtFName));
+  F := PTextReader.Create(ExtFName);
 
   if F = nil then
     begin
 RepeatLocal:
     Local := False;
-    F := New(PTextReader, Init(SourceDir+ExtFName));
+    F := PTextReader.Create(SourceDir+ExtFName);
     end;
   if F = nil then
     Exit;
-  while not F^.Eof do
+  while not F.Eof do
     begin
-    S := F^.GetStr;
+    S := F.GetStr;
     DelLeft(S);
     S1 := fDelLeft(Copy(S, 1, pred(PosChar(':', S))));
     if  (S1 = '') or (S1[1] = ';') then
@@ -452,18 +452,18 @@ RepeatLocal:
       goto 1111;
     end;
   ExecExtFile := False;
-  Dispose(F, Done);
+  F.Free;
   {D.Filter := ''; MakeTMaskData(D);}
   if Local then
     goto RepeatLocal;
   Exit;
 1111:
   Delete(S, 1, Succ(Length(S1)));
-  Dispose(F, Done);
+  F.Free;
 
   // AK155 27/08/05 Поскольку DN/2 не завершается при выполнении
   // внешней команды, то и незачем проверять Valid(cmQuit)
-  if not Application^.Valid(cmQuit) then
+  if not Application.Valid(cmQuit) then
     begin
     Exit;
     end;
@@ -525,11 +525,11 @@ procedure ExecFile(const FileName: String);
       ST: SessionType;
       S: String; {//AK155}
     begin
-    if  (PCommandLine(CommandLine)^.LineType in [ltWindow,
+    if  (PCommandLine(CommandLine).LineType in [ltWindow,
          ltFullScreen])
     then
       begin
-      if PCommandLine(CommandLine)^.LineType = ltFullScreen then
+      if PCommandLine(CommandLine).LineType = ltFullScreen then
         ST := stOS2FullScreen
       else
         ST := stOS2Windowed;
@@ -540,7 +540,7 @@ procedure ExecFile(const FileName: String);
       end;
     {AK155, см. dnutil.ExecCommandLine}
     S := '';
-    CommandLine^.SetData(S);
+    CommandLine.SetData(S);
     {/AK155}
     if B then
       ExecString(M, #13#10+ (ActiveDir)+'>'+ (M))

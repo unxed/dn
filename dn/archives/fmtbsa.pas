@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PBSAArchive = ^TBSAArchive;
-  TBSAArchive = object(TARJArchive)
-    constructor Init;
+  TBSAArchive = class;
+  PBSAArchive = TBSAArchive;
+  TBSAArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -76,7 +77,7 @@ implementation
 
 { ----------------------------- BSA ------------------------------------}
 
-constructor TBSAArchive.Init;
+constructor TBSAArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -85,7 +86,7 @@ constructor TBSAArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'BSARC'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'BSARC'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-xy'));
@@ -150,27 +151,27 @@ procedure TBSAArchive.GetFile;
   var
     P: BSAHdr;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if ArcFile.GetPos = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P, 4);
+  ArcFile.Read(P, 4);
   if  (Copy(P.Id, 1, 2) = #0#0)
   then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  if  (ArcFile^.Status <> stOK)
+  if  (ArcFile.Status <> stOK)
            or not ((P.Id[4] in [#0, #7]) and (Copy(P.Id, 2, 2) = #0#$AE))
   then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Read(P.PackedSize, SizeOf(P)-4);
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P.PackedSize, SizeOf(P)-4);
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -182,8 +183,8 @@ procedure TBSAArchive.GetFile;
   FileInfo.PSize := P.PackedSize;
   FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
   FileInfo.FName[0] := Char(P.NameLen);
-  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize+1);
+  ArcFile.Read(FileInfo.FName[1], P.NameLen);
+  ArcFile.Seek(ArcFile.GetPos+P.PackedSize+1);
   end { TBSAArchive.GetFile };
 
 end.

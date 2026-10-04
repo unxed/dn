@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PLIMArchive = ^TLIMArchive;
-  TLIMArchive = object(TARJArchive)
-    constructor Init;
+  TLIMArchive = class;
+  PLIMArchive = TLIMArchive;
+  TLIMArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -78,7 +79,7 @@ implementation
 
 { ----------------------------- LIM ------------------------------------}
 
-constructor TLIMArchive.Init;
+constructor TLIMArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -87,7 +88,7 @@ constructor TLIMArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'LIMIT'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'LIMIT'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
@@ -162,10 +163,10 @@ procedure TLIMArchive.GetFile;
     FileInfo.FName := '';
     C := #1;
     while (i < 80) and (C <> #0)
-         and not Abort and (ArcFile^.Status = stOK)
+         and not Abort and (ArcFile.Status = stOK)
     do
       begin
-      ArcFile^.Read(C, 1);
+      ArcFile.Read(C, 1);
       if C <> #0 then
         FileInfo.FName := FileInfo.FName+C;
       Inc(i);
@@ -174,27 +175,27 @@ procedure TLIMArchive.GetFile;
 
   begin { TLIMArchive.GetFile }
 1:
-  ArcFile^.Read(P, 4);
-  if  (ArcFile^.Status = stOK) and (P.Id = $F813) and (P.Method = 5)
+  ArcFile.Read(P, 4);
+  if  (ArcFile.Status = stOK) and (P.Id = $F813) and (P.Method = 5)
   then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  if  (ArcFile^.Status = stOK) and (P.Id = $D180)
+  if  (ArcFile.Status = stOK) and (P.Id = $D180)
   then
     begin
     GetName;
     CDir := FileInfo.FName;
     goto 1;
     end;
-  if  (ArcFile^.Status <> stOK) or (P.Id <> $f123) then
+  if  (ArcFile.Status <> stOK) or (P.Id <> $f123) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Read(P.ThreeZeros[2], SizeOf(P)-4);
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P.ThreeZeros[2], SizeOf(P)-4);
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -209,7 +210,7 @@ procedure TLIMArchive.GetFile;
   FileInfo.FName := CDir+'\'+FileInfo.FName;
   if P.ThreeZeros[3] and Directory <> 0 then
     goto 1;
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
+  ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { TLIMArchive.GetFile };
 
 end.

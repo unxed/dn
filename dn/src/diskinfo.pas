@@ -71,33 +71,35 @@ type
     ClusterSize: PString;
     end;
 
-  PDriveView = ^TDriveView;
+  TDriveView = class;
+  PDriveView = TDriveView;
 
-  PDiskInfo = ^TDiskInfo;
-  TDiskInfo = object(TView)
+  TDiskInfo = class;
+  PDiskInfo = TDiskInfo;
+  TDiskInfo = class(TView)
     Info: TDiskInfoRec;
     Delta: TPoint;
     OtherPanel: PView{PFilePanelRoot};
       { Файловая панель, с которой связана данная панель информации }
     DriveView: PDriveView;
       { Диск/шара в верхней рамке. См. InsertDriveView и Done }
-    constructor Init(R: TRect; Panel: PView{PFilePanelRoot});
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
+    constructor Create(R: TRect; Panel: PView{PFilePanelRoot});
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
     procedure InsertDriveView;
       { Для инфо о диске создать DriveView и вставить в Owner }
     procedure ReadData;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function GetPalette: TPalette; virtual;
-    procedure Draw; virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    destructor Done; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    function GetPalette: TPalette; override;
+    procedure Draw; override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    destructor Destroy; override;
     end;
 
-  TDriveView = object(TTopView)
+  TDriveView = class(TTopView)
     InfoPanel: PDiskInfo;
-    function GetText(MaxWidth: Integer): String; virtual;
-    destructor Done; virtual;
+    function GetText(MaxWidth: Integer): String; override;
+    destructor Destroy; override;
     end;
 
 function CountDirLen(const Dir: String; Recurse: Boolean;
@@ -130,15 +132,16 @@ const
   sReadMeTxt = 'ReadMe.Txt';
 
 type
-  PTeamView = ^TTeamView;
-  TTeamView = object(TView)
+  TTeamView = class;
+  PTeamView = TTeamView;
+  TTeamView = class(TView)
     LastTick: LongInt;
     Strings: array[1..20] of Integer;
-    constructor Init(var R: TRect);
-    procedure Draw; virtual;
-    procedure Update; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    destructor Done; virtual;
+    constructor Create(const R: TRect);
+    procedure Draw; override;
+    procedure Update; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    destructor Destroy; override;
     end;
 
 const
@@ -172,9 +175,9 @@ function ESC_Pressed: Boolean;
   ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
   end;
 
-constructor TTeamView.Init(var R: TRect);
+constructor TTeamView.Create(const R: TRect);
   begin
-  inherited Init(R);
+  inherited Create(R);
   UpdTicks := 500;
   Options := Options or ofPreProcess;
   RegisterToBackground(@Self);
@@ -240,10 +243,10 @@ procedure TTeamView.HandleEvent(var Event: TEvent);
     end
   end;
 
-destructor TTeamView.Done;
+destructor TTeamView.Destroy;
   begin
   TeamView := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TDriveView.GetText(MaxWidth: Integer): String;
@@ -271,11 +274,11 @@ function TDriveView.GetText(MaxWidth: Integer): String;
     end;
   end;
 
-destructor TDriveView.Done;
+destructor TDriveView.Destroy;
   begin
   if InfoPanel <> nil then
     InfoPanel^.DriveView := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure DispInfo(var Info: TDiskInfoRec);
@@ -306,24 +309,24 @@ procedure DispInfo(var Info: TDiskInfoRec);
   FillChar(Info, SizeOf(Info), 0);
   end { DispInfo };
 
-constructor TDiskInfo.Load(var S: TStream);
+constructor TDiskInfo.Load(S: TStream);
   begin
-  TObject.Init;
+  inherited Create;
   inherited Load(S);
   S.Read(Delta, SizeOf(Delta));
   GetPeerViewPtr(S, DriveView);
   end;
 
-procedure TDiskInfo.Store(var S: TStream);
+procedure TDiskInfo.Store(S: TStream);
   begin
   inherited Store(S);
   S.Write(Delta, SizeOf(Delta));
   PutPeerViewPtr(S, DriveView);
   end;
 
-constructor TDiskInfo.Init(R: TRect; Panel: PView);
+constructor TDiskInfo.Create(R: TRect; Panel: PView);
   begin
-  TView.Init(R);
+  inherited Create(R);
   OtherPanel := Panel;
   HelpCtx := hcDiskInfo;
   EventMask := evCommand or evKeyDown;
@@ -358,7 +361,7 @@ DriveView явно завершать нельзя - он будет завершён, как член
 взаимными ссылками, которые обнуляем при завершении адресата ссылки.
 См. также TDriveView.Done;
 }
-destructor TDiskInfo.Done;
+destructor TDiskInfo.Destroy;
   begin
   DispInfo(Info);
   if DriveView <> nil then
@@ -366,7 +369,7 @@ destructor TDiskInfo.Done;
     DriveView^.InfoPanel := nil;
     DriveView^.Free;
     end;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TDiskInfo.SetState(AState: Word; Enable: Boolean);
@@ -509,7 +512,7 @@ procedure TDiskInfo.Draw;
       I := 0;
     Replace('~', #0'~', S);
     S := '~'#0+S;
-    {MoveStr(B[I], S, Lo(C));}
+    {MoveStr(B[I], S, Lo(C);}
     MoveCStr(B[I], S, C);
     WriteLineC(0, Y, Size.X, 1, B);
     Inc(Y);
@@ -786,26 +789,26 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
 
   B.InfoFile := ifDirInfo;
   B.DirInfo := New(PStringCollection, Init($10, $10, False));
-  F := New(PTextReader, Init(MakeNormName(Dr, sDirinfo)));
+  F := PTextReader.Create(MakeNormName(Dr, sDirinfo));
   if F = nil then
     begin
     B.InfoFile := ifFileID;
-    F := New(PTextReader, Init(MakeNormName(Dr, sFileID)));
+    F := PTextReader.Create(MakeNormName(Dr, sFileID));
     end;
   if F = nil then
     begin
     B.InfoFile := ifReadMe;
-    F := New(PTextReader, Init(MakeNormName(Dr, sReadMe)));
+    F := PTextReader.Create(MakeNormName(Dr, sReadMe));
     end;
   if F = nil then
     begin
     B.InfoFile := ifReadTxt;
-    F := New(PTextReader, Init(MakeNormName(Dr, sReadTxt)));
+    F := PTextReader.Create(MakeNormName(Dr, sReadTxt));
     end;
   if F = nil then
     begin
     B.InfoFile := ifReadMeTxt;
-    F := New(PTextReader, Init(MakeNormName(Dr, sReadMeTxt)));
+    F := PTextReader.Create(MakeNormName(Dr, sReadMeTxt));
     end;
   if F = nil then
     B.InfoFile := ifFileID; {JO}

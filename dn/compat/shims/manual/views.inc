@@ -1,5 +1,14 @@
 { What DN calls differently from tv/ (the interface part of the unit Views). }
 type
+  PView = TvViews.PView;
+  PGroup = TvViews.PGroup;
+  TCommandSet = TvViews.TCommandSet;
+  TPalette = TvViews.TPalette;
+  PFrame = TvWindow.PFrame;
+  PScrollBar = TvWindow.PScrollBar;
+  PScroller = TvWindow.PScroller;
+  PWindow = TvWindow.PWindow;
+
   { DN units see these through Views (in the original they came with the Views of DN); same meaning as in Defines }
   AInt = SmallInt;
   AWord = Word;

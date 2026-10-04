@@ -56,9 +56,10 @@ uses
   ;
 
 type
-  PZOOArchive = ^TZOOArchive;
-  TZOOArchive = object(TARJArchive)
-    constructor Init;
+  TZOOArchive = class;
+  PZOOArchive = TZOOArchive;
+  TZOOArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -82,7 +83,7 @@ implementation
 
 { ----------------------------- ZOO ------------------------------------}
 
-constructor TZOOArchive.Init;
+constructor TZOOArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -91,7 +92,7 @@ constructor TZOOArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ZOO'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'ZOO'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'eo'));
@@ -159,20 +160,20 @@ procedure TZOOArchive.GetFile;
     C: Char;
     S: String;
   begin
-  ArcFile^.Read(P, 4);
-  if  (ArcFile^.Status <> stOK) or (P.Id <> (-37443620 { $FDC4A7DC })) then
+  ArcFile.Read(P, 4);
+  if  (ArcFile.Status <> stOK) or (P.Id <> (-37443620 { $FDC4A7DC })) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Read(P.Info, 2);
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P.Info, 2);
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
   {if (P.Info = $0002) then begin FileInfo.Last := 1;Exit;end;}
-  ArcFile^.Read(P.NextHDR, SizeOf(P)-6);
+  ArcFile.Read(P.NextHDR, SizeOf(P)-6);
   {if (P.Method > 20) then begin FileInfo.Last:=2;Exit;end;}
   FileInfo.Last := 0;
   FileInfo.Attr := 0;
@@ -180,17 +181,17 @@ procedure TZOOArchive.GetFile;
   FileInfo.PSize := P.PackedSize;
   FileInfo.Date := (P.Date shl 16) or (P.Date shr 16);
   FileInfo.FName := '';
-  FP := ArcFile^.GetPos;
+  FP := ArcFile.GetPos;
   repeat
-    ArcFile^.Read(C, 1);
+    ArcFile.Read(C, 1);
     if C <> #0 then
       FileInfo.FName := FileInfo.FName+C;
   until (C = #0) or (Length(FileInfo.FName) > 77);
-  ArcFile^.Seek(FP+19);
-  ArcFile^.Read(S[0], 1);
+  ArcFile.Seek(FP+19);
+  ArcFile.Read(S[0], 1);
   if S <> '' then
     begin
-    ArcFile^.Read(S[1], Byte(S[0]));
+    ArcFile.Read(S[1], Byte(S[0]));
     S[Length(S)] := '\';
     end;
   FileInfo.FName := S+FileInfo.FName;
@@ -199,7 +200,7 @@ procedure TZOOArchive.GetFile;
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Seek(P.NextHDR);
+  ArcFile.Seek(P.NextHDR);
   end { TZOOArchive.GetFile };
 
 end.

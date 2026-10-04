@@ -127,19 +127,21 @@ type
     { Flash <<< }
     end;
 
-  PEditHistoryCol = ^TEditHistoryCol;
-  TEditHistoryCol = object(TCollection)
-    function IndexOf(P: Pointer): LongInt; virtual;
-    procedure PutItem(var S: TStream; P: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
-    procedure FreeItem(P: Pointer); virtual;
+  TEditHistoryCol = class;
+  PEditHistoryCol = TEditHistoryCol;
+  TEditHistoryCol = class(TCollection)
+    function IndexOf(P: Pointer): LongInt; override;
+    procedure PutItem(S: TStream; P: Pointer); override;
+    function GetItem(S: TStream): Pointer; override;
+    procedure FreeItem(P: Pointer); override;
     end;
 
-  PViewHistoryCol = ^TViewHistoryCol;
-  TViewHistoryCol = object(TEditHistoryCol)
-    procedure PutItem(var S: TStream; P: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
-    procedure FreeItem(P: Pointer); virtual;
+  TViewHistoryCol = class;
+  PViewHistoryCol = TViewHistoryCol;
+  TViewHistoryCol = class(TEditHistoryCol)
+    procedure PutItem(S: TStream; P: Pointer); override;
+    function GetItem(S: TStream): Pointer; override;
+    procedure FreeItem(P: Pointer); override;
     end;
 
 procedure AddToDirectoryHistory(S: String; DriveType: Integer);
@@ -232,13 +234,13 @@ function TEditHistoryCol.IndexOf(P: Pointer): LongInt;
     end;
   end;
 
-procedure TEditHistoryCol.PutItem(var S: TStream; P: Pointer);
+procedure TEditHistoryCol.PutItem(S: TStream; P: Pointer);
   begin
   S.WriteStr(PEditRecord(P)^.FName);
   S.Write(PEditRecord(P)^.fOrigin, SizeOf(TEditRecord)-SizeOf(PString));
   end;
 
-function TEditHistoryCol.GetItem(var S: TStream): Pointer;
+function TEditHistoryCol.GetItem(S: TStream): Pointer;
   var
     R: PEditRecord;
   begin
@@ -257,13 +259,13 @@ procedure TEditHistoryCol.FreeItem(P: Pointer);
     end;
   end;
 
-procedure TViewHistoryCol.PutItem(var S: TStream; P: Pointer);
+procedure TViewHistoryCol.PutItem(S: TStream; P: Pointer);
   begin
   S.WriteStr(PViewRecord(P)^.FName);
   S.Write(PViewRecord(P)^.fOrigin, SizeOf(TViewRecord)-SizeOf(PString));
   end;
 
-function TViewHistoryCol.GetItem(var S: TStream): Pointer;
+function TViewHistoryCol.GetItem(S: TStream): Pointer;
   var
     R: PViewRecord;
   begin
@@ -301,7 +303,7 @@ procedure StoreViewInfo(P: Pointer);
     ViewHistory := New(PViewHistoryCol, Init(30, 30));
   New(R);
 
-  if TypeOf((PObject(P)^)) = TypeOf(TFileWindow) then
+  if TypeOf((TStreamable(P)^)) = TypeOf(TFileWindow) then
     with PFileViewer(Viewer^.Current)^, R^ do
       begin
       if VFileName = '' then
@@ -340,7 +342,7 @@ fBufPos: AWord оно может не помещаться. Но, с другой стороны,
       XCoder.ToHistory(fKeyMap, fToAscii, fCodeTag);
       end
        {-DataCompBoy-}
-  else if TypeOf((PObject(P)^)) = TypeOf(TDBWindow) then
+  else if TypeOf((TStreamable(P)^)) = TypeOf(TDBWindow) then
     with DBView^, R^ do
       begin
       if DBView^.RealName = '' then
@@ -359,7 +361,7 @@ fBufPos: AWord оно может не помещаться. Но, с другой стороны,
       end
       
       
-  else if TypeOf((PObject(P)^)) = TypeOf(TCalcWindow) then
+  else if TypeOf((TStreamable(P)^)) = TypeOf(TCalcWindow) then
     with SSView^, R^ do
       begin
       
@@ -615,16 +617,17 @@ function GetCommand(Idx: Integer): String;
   end;
 
 type
-  PTHistList = ^TTHistList;
-  TTHistList = object(TListBox)
+  TTHistList = class;
+  PTHistList = TTHistList;
+  TTHistList = class(TListBox)
     EVHistory, CommandHistory, RolledFwd: Boolean;
     Dlg: TDlgIdx; {AK155}
     function ItemStr(I: LongInt): PString;
-    function IsSelected(I: LongInt): Boolean; virtual;
-    function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
-    procedure SelectItem(Item: LongInt); virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    destructor Done; virtual;
+    function IsSelected(I: LongInt): Boolean; override;
+    function GetText(Item: LongInt; MaxLen: Integer): String; override;
+    procedure SelectItem(Item: LongInt); override;
+    procedure HandleEvent(var Event: TEvent); override;
+    destructor Destroy; override;
     end;
 
 function TTHistList.IsSelected(I: LongInt): Boolean;
@@ -831,10 +834,10 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end { TTHistList.HandleEvent };
 
-destructor TTHistList.Done;
+destructor TTHistList.Destroy;
   begin
   List := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure AddToDirectoryHistory(S: String; DriveType: Integer);

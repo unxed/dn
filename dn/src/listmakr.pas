@@ -91,12 +91,12 @@ begin
   if RunCount > 0 then S.Write(Runs[0], RunCount * SizeOf(TStrIndexRec));
 end;
 
-function BuildNothing(var S: TStream): PObject;
+function BuildNothing(var S: TStream): TStreamable;
 begin
   Result := nil;
 end;
 
-procedure StoreMaker(P: PObject; var S: TStream);
+procedure StoreMaker(P: TStreamable; var S: TStream);
 begin
   PStrListMaker(P)^.Store(S);
 end;

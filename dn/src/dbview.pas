@@ -105,20 +105,23 @@ type
     Y: LongInt;
     end;
 
-  PDBIndicator = ^TDBIndicator;
-  PDBViewer = ^TDBViewer;
+  TDBIndicator = class;
+  PDBIndicator = TDBIndicator;
+  TDBViewer = class;
+  PDBViewer = TDBViewer;
 
   { -------- Eugeny Zvyagintzev ---------}
-  PDBScrollBar = ^TDBScrollBar;
-  TDBScrollBar = object(TScrollBar)
+  TDBScrollBar = class;
+  PDBScrollBar = TDBScrollBar;
+  TDBScrollBar = class(TScrollBar)
     ScrollBarType: Integer;
     DBViewer: PDBViewer;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function GetPalette: TPalette; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    function GetPalette: TPalette; override;
     end;
   { -------- Eugeny Zvyagintzev ---------}
 
-  TDBViewer = object(TView)
+  TDBViewer = class(TView)
     FileName: PString;
     DBFile: PDBFile;
     isValid, KillAfterUse: Boolean;
@@ -131,63 +134,66 @@ type
     VerticalScrollBar: PDBScrollBar;
     HorizontalScrollBar: PDBScrollBar;
     XCoder: TXCoder;
-    constructor Init(R: TRect; FName: String; var FileIsDBF: Boolean);
+    constructor Create(R: TRect; const FName: String; var FileIsDBF: Boolean);
     {DataCompBoy}
-    function Valid(Command: Word): Boolean; virtual;
+    function Valid(Command: Word): Boolean; override;
     function GetRecord(N: LongInt): Pointer;
     procedure GetInfo(StrIdx: TStrIdx);
-    procedure HandleEvent(var Event: TEvent); virtual;
-    destructor Done; virtual;
-    procedure Draw; virtual;
-    function GetPalette: TPalette; virtual;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    procedure HandleEvent(var Event: TEvent); override;
+    destructor Destroy; override;
+    procedure Draw; override;
+    function GetPalette: TPalette; override;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
     function Failed(var FileIsDBF: Boolean): Boolean;
     end;
 
-  PMemoStream = ^TMemoStream;
-  TMemoStream = object(TStream)
+  TMemoStream = class;
+  PMemoStream = TMemoStream;
+  TMemoStream = class(TStream)
     StartPos: LongInt;
     Length: LongInt;
     BaseStream: PStream;
-    constructor Init(AStream: PStream; Start, len: LongInt);
-    destructor Done; virtual;
-    function GetPos: TFileSize; virtual;
-    function GetSize: TFileSize; virtual;
-    procedure Read(var Buf; Count: LongInt); virtual;
-    procedure Seek(Pos: TFileSize); virtual;
-    procedure Truncate; virtual;
-    procedure Write(const Buf; Count: LongInt); virtual;
+    constructor Create(AStream: PStream; Start, len: LongInt);
+    destructor Destroy; override;
+    function GetPos: TFileSize; override;
+    function GetSize: TFileSize; override;
+    procedure Read(var Buf; Count: LongInt); override;
+    procedure Seek(Pos: TFileSize); override;
+    procedure Truncate; override;
+    procedure Write(const Buf; Count: LongInt); override;
     end;
 
-  TDBIndicator = object(TView)
+  TDBIndicator = class(TView)
     DBViewer: PDBViewer;
-    procedure Draw; virtual;
+    procedure Draw; override;
     {Constructor Load(var S : Tstream);
        Procedure Store(var S : TStream);}
     end;
 
-  PFieldListBox = ^TFieldListBox;
-  TFieldListBox = object(TListBox)
-    function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
+  TFieldListBox = class;
+  PFieldListBox = TFieldListBox;
+  TFieldListBox = class(TListBox)
+    function GetText(Item: LongInt; MaxLen: Integer): String; override;
     end;
 
-  PDBWindow = ^TDBWindow;
-  TDBWindow = object(TFileWindow)
+  TDBWindow = class;
+  PDBWindow = TDBWindow;
+  TDBWindow = class(TFileWindow)
     P: PDBViewer;
     P1: PDBIndicator;
     VSB: PDBScrollBar;
     HSB: PDBScrollBar;
     RealName: String;
     {--- start -------- Eugeny Zvyagintzev ---------}
-    constructor Init(FName: String; var FileIsDBF: Boolean);
+    constructor Create(const FName: String; var FileIsDBF: Boolean);
     {--- finish -------- Eugeny Zvyagintzev ---------}
-    function GetPalette: TPalette; virtual;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    function GetPalette: TPalette; override;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     {John_SW 14-03-2003}
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 const
@@ -285,9 +291,9 @@ procedure TDBScrollBar.HandleEvent(var Event: TEvent);
   end;
 { -------- Eugeny Zvyagintzev ---------}
 
-constructor TMemoStream.Init(AStream: PStream; Start, len: LongInt);
+constructor TMemoStream.Create(AStream: PStream; Start, len: LongInt);
   begin
-  TObject.Init;
+  inherited Create;
   StartPos := Start;
   Length := len;
   BaseStream := AStream;
@@ -297,11 +303,11 @@ constructor TMemoStream.Init(AStream: PStream; Start, len: LongInt);
   Status := BaseStream^.Status;
   end;
 
-destructor TMemoStream.Done;
+destructor TMemoStream.Destroy;
   begin
   Dispose(BaseStream, Done);
   BaseStream := nil;
-  TObject.Done;
+  inherited Destroy;
   end;
 
 function TMemoStream.GetPos: TFileSize;
@@ -358,7 +364,7 @@ procedure TMemoStream.Write(const Buf; Count: LongInt);
   end;
 
 {-DataCompBoy-}
-constructor TDBViewer.Init(R: TRect; FName: String; var FileIsDBF: Boolean);
+constructor TDBViewer.Create(R: TRect; const FName: String; var FileIsDBF: Boolean);
   begin
   inherited Init(R);
   KillAfterUse := TempFile <> '';
@@ -377,7 +383,7 @@ constructor TDBViewer.Init(R: TRect; FName: String; var FileIsDBF: Boolean);
   end;
 {-DataCompBoy-}
 
-procedure TDBViewer.Store(var S: TStream);
+procedure TDBViewer.Store(S: TStream);
   begin
   inherited Store(S);
   S.Write(KillAfterUse, SizeOf(KillAfterUse));
@@ -451,7 +457,7 @@ function TDBViewer.Failed(var FileIsDBF: Boolean): Boolean;
   FileIsDBF := isValid;
   end { TDBViewer.Failed };
 
-constructor TDBViewer.Load(var S: TStream);
+constructor TDBViewer.Load(S: TStream);
   var
     FileIsDBF: Boolean;
   begin
@@ -469,7 +475,7 @@ constructor TDBViewer.Load(var S: TStream);
   XCoder.Load(S);
   end;
 
-destructor TDBViewer.Done;
+destructor TDBViewer.Destroy;
   begin
   DisposeStr(SearchString);
   if Buf <> nil then
@@ -485,7 +491,7 @@ destructor TDBViewer.Done;
     end;
   {--- finish -------- Eugeny Zvyagintzev ---- 07-08-2002 -----}
   DisposeStr(FileName);
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TDBViewer.GetPalette: TPalette;
@@ -1528,7 +1534,7 @@ procedure TDBIndicator.Draw;
   WriteLineC(0, 0, Size.X, 1, B);
   end { TDBIndicator.Draw };
 
-constructor TDBWindow.Init(FName: String; var FileIsDBF: Boolean);
+constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
   var
     R: TRect;
     I: Integer;
@@ -1593,7 +1599,7 @@ constructor TDBWindow.Init(FName: String; var FileIsDBF: Boolean);
   P^.Indicator := P1;
   end { TDBWindow.Init };
 
-constructor TDBWindow.Load(var S: TStream);
+constructor TDBWindow.Load(S: TStream);
   begin
   inherited Load(S);
   GetSubViewPtr(S, P);
@@ -1612,7 +1618,7 @@ constructor TDBWindow.Load(var S: TStream);
   Redraw;
   end;
 
-procedure TDBWindow.Store(var S: TStream);
+procedure TDBWindow.Store(S: TStream);
   begin
   inherited Store(S);
   PutSubViewPtr(S, P);
@@ -1633,10 +1639,10 @@ procedure TDBWindow.SetState(AState: Word; Enable: Boolean);
   end;
 {--- finish -------- Eugeny Zvyagintzev ---- 14-03-2003 ----}
 
-destructor TDBWindow.Done;
+destructor TDBWindow.Destroy;
   begin
   StoreViewInfo(@Self);
-  inherited Done;
+  inherited Destroy;
   end;
 
 

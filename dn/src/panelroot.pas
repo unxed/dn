@@ -59,9 +59,10 @@ uses
   ;
 
 type
-  PFilePanelRoot = ^TFilePanelRoot;
+  TFilePanelRoot = class;
+  PFilePanelRoot = TFilePanelRoot;
   {` Базовый тип файловой панели }
-  TFilePanelRoot = object(TView)
+  TFilePanelRoot = class(TView)
     isValid, MSelect, SelectFlag, Loaded, ChangeLocked: Boolean;
     SelfNum: Boolean; // Фактически - TPanelNum;
       {` Какая это панель: правая или левая `}
@@ -102,11 +103,11 @@ type
     TotalInfoInDividerMin, TotalInfoInDividerMax: Word; {AK155}
       {` Кординаты для D&D `}
     _Tmr1: TEventTimer;
-    constructor Init(var Bounds: TRect; ADrive: Integer;
+    constructor Create(const Bounds: TRect; ADrive: Integer;
          AScrBar: PMyScrollBar);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
-    destructor Done; virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
+    destructor Destroy; override;
     procedure Awaken; virtual;
     procedure CommandHandle(var Event: TEvent);
     procedure ChangeBounds(const Bounds: TRect); virtual;
@@ -249,9 +250,9 @@ procedure TFilePanelRoot.ChkNoMem;
     end;
   end;
 
-constructor TFilePanelRoot.Init(var Bounds: TRect; ADrive: Integer; AScrBar: PMyScrollBar);
+constructor TFilePanelRoot.Create(const Bounds: TRect; ADrive: Integer; AScrBar: PMyScrollBar);
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   NewTimer(_Tmr1, 0);
   CommandEnabling := True;
   Abort := False;
@@ -285,7 +286,7 @@ constructor TFilePanelRoot.Init(var Bounds: TRect; ADrive: Integer; AScrBar: PMy
   DecDrawDisabled;
   end { TFilePanelRoot.Init };
 
-constructor TFilePanelRoot.Load(var S: TStream);
+constructor TFilePanelRoot.Load(S: TStream);
   var
     I: LongInt;
     dumm: array[1..20] of Byte;
@@ -359,7 +360,7 @@ procedure TFilePanelRoot.Awaken;
 *)
   end;
 
-procedure TFilePanelRoot.Store(var S: TStream);
+procedure TFilePanelRoot.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, ScrollBar);
@@ -390,7 +391,7 @@ function TFilePanelRoot.Valid(Command: Word): Boolean;
     Valid := Drive^.Disposable;
   end;
 
-destructor TFilePanelRoot.Done;
+destructor TFilePanelRoot.Destroy;
   var
     P: PDrive;
   begin
@@ -407,7 +408,7 @@ destructor TFilePanelRoot.Done;
     { панели уничтожаются только обе сразу, так что эти указатели
     можно очистить за один раз }
     end;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TFilePanelRoot.SetState(AState: Word; Enable: Boolean);

@@ -63,12 +63,13 @@ const
   
 
 type
-  PDrive = ^TDrive;
+  TDrive = class;
+  PDrive = TDrive;
 {`2 Вспомогательный объект, вставляемый в файловую панель.
   Содержит особенности, специфические для типа панели (диск,
   архив и т.п. Используется, в частности, для отрисовки строк
   файловой панели.`}
-  TDrive = object(TObject)
+  TDrive = class(TObject)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     Panel: Pointer{PFilePanelRoot};
     Prev: PDrive;
@@ -81,9 +82,9 @@ type
       {` Зависит от типа панели; введен на всякий случай для
       облегчения будущего ввода новых типов панелей. `}
     
-    constructor Init(ADrive: Byte; AOwner: Pointer);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
+    constructor Create(ADrive: Byte; AOwner: Pointer);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); virtual;
     procedure KillUse; virtual;
     procedure lChDir(ADir: String); virtual; {DataCompBoy}
     function GetDir: String; virtual; {DataCompBoy}
@@ -127,7 +128,7 @@ type
     function GetFullFlags: Word; virtual;
     procedure EditDescription(PF: PFileRec); virtual; {DataCompBoy}
     procedure GetDirLength(PF: PFileRec); virtual; {DataCompBoy}
-    destructor Done; virtual;
+    destructor Destroy; override;
     function OpenDirectory(const Dir: String;
                                  PutDirs: Boolean): PDrive; virtual;
     procedure DrvFindFile(FC: PFilesCollection); virtual;
@@ -166,13 +167,14 @@ type
     {`}
   {-DataCompBoy-}
 
-  PDIZCol = ^TDIZCol;
+  TDIZCol = class;
+  PDIZCol = TDIZCol;
     {`2 Коллекция описаний из файла описаний. Используется для
     быстрого поиска описаний по имени при входе в каталог.
     Имена запоминаются в коллекции на верхнем регистре. }
-  TDIZCol = object(TSortedCollection)
-    procedure FreeItem(P: Pointer); virtual;
-    function Compare(P1, P2: Pointer): Integer; virtual;
+  TDIZCol = class(TSortedCollection)
+    procedure FreeItem(P: Pointer); override;
+    function Compare(P1, P2: Pointer): Integer; override;
     end;
     {`}
 
@@ -219,9 +221,9 @@ procedure TDrive.GetFreeSpace(var S: String);
   end;
 
 {-DataCompBoy-}
-constructor TDrive.Init(ADrive: Byte; AOwner: Pointer);
+constructor TDrive.Create(ADrive: Byte; AOwner: Pointer);
   begin
-  TObject.Init;
+  inherited Create;
   Panel := AOwner;
   ClrIO;
   if ADrive < $1B then
@@ -235,9 +237,9 @@ constructor TDrive.Init(ADrive: Byte; AOwner: Pointer);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TDrive.Load(var S: TStream);
+constructor TDrive.Load(S: TStream);
   begin
-  TObject.Init;
+  inherited Create;
   Prev := PDrive(S.Get);
   S.ReadStrV(CurDir);
   {S.Read(CurDir[0], 1); S.Read(CurDir[1], Length(CurDir));}
@@ -250,7 +252,7 @@ constructor TDrive.Load(var S: TStream);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TDrive.Store(var S: TStream);
+procedure TDrive.Store(S: TStream);
   begin
   S.Put(Prev);
   S.WriteStr(@CurDir); {S.Write(CurDir, Length(CurDir)+1);}
@@ -259,11 +261,11 @@ procedure TDrive.Store(var S: TStream);
   end;
 {-DataCompBoy-}
 
-destructor TDrive.Done;
+destructor TDrive.Destroy;
   begin
   if Prev <> nil then
-    Dispose(Prev, Done);
-  inherited Done;
+    Prev.Free;
+  inherited Destroy;
   end;
 
 function TDrive.Disposable: Boolean;
@@ -813,7 +815,7 @@ procedure TDrive.ReadDescrptions(FilesC: PFilesCollection);
   if Descriptions <> nil then
     begin
     TossDescriptions(@DizOwner, FilesC);
-    Dispose(Descriptions, Done);
+    Descriptions.Free;
     end;
   end;
 

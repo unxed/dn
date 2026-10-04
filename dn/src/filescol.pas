@@ -144,16 +144,17 @@ type
     TLineCollection = TTextCollection;
 *)
 
-  PFilesCollection = ^TFilesCollection;
-  TFilesCollection = object(TSortedCollection)
+  TFilesCollection = class;
+  PFilesCollection = TFilesCollection;
+  TFilesCollection = class(TSortedCollection)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     SortMode: Byte;
     Selected: LongInt;
     Panel: Pointer; {PFilePanel}
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
-    procedure FreeItem(Item: Pointer); virtual;
-    function Compare(Key1, Key2: Pointer): Integer; virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    procedure FreeItem(Item: Pointer); override;
+    function Compare(Key1, Key2: Pointer): Integer; override;
     function FileCompare(Key1, Key2: Pointer): Integer;
     procedure DelDuplicates(var TotalInfo: TSize);
       {` Устранение записей, ссылающихся на один и тот же файл.
@@ -162,12 +163,13 @@ type
     end;
 
 type
-  PFilesHash = ^TFilesHash;
+  TFilesHash = class;
+  PFilesHash = TFilesHash;
   {` Хэшировщик, применяемый для быстрого поиска по имени/пути
     в несортированных коллекциях `}
-  TFilesHash = object(THash)
-    procedure Hash(Item: Pointer); virtual;
-    function Equal(Item1, Item2: Pointer): Boolean; virtual;
+  TFilesHash = class(THash)
+    procedure Hash(Item: Pointer); override;
+    function Equal(Item1, Item2: Pointer): Boolean; override;
     end;
 
 const
@@ -450,11 +452,11 @@ procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: PCollection)
   end;
 
 {-DataCompBoy-}
-constructor TFilesCollection.Load(var S: TStream);
+constructor TFilesCollection.Load(S: TStream);
   var
     C, I: LongInt;
   begin
-  TObject.Init;
+  inherited Create;
   S.Read(Count, SizeOf(Count));
   S.Read(Limit, SizeOf(Limit));
   S.Read(Delta, SizeOf(Delta));
@@ -479,7 +481,7 @@ constructor TFilesCollection.Load(var S: TStream);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TFilesCollection.Store(var S: TStream);
+procedure TFilesCollection.Store(S: TStream);
   var
     I, J, Sel: LongInt;
   begin
@@ -1590,7 +1592,7 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
 
   function IsUnsortedDupe(i: Integer): Boolean;
     begin
-    Result := not H^.AddItem(i);
+    Result := not H.AddItem(i);
     end;
 
   begin
@@ -1601,7 +1603,7 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
   if SortMode = psmUnsorted then
     begin
     New(H, Init(@Self));
-    if H^.HT <> nil then
+    if H.HT <> nil then
       Exit; //! Наверно, памяти мало, сообщить бы об этом
     @IsDupe := @IsUnsortedDupe;
     end
@@ -1631,7 +1633,7 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
   Duplicates := False;
   { лишнюю память в Items^ не освобождаем }
   if H <> nil then
-    Dispose(H, Done);
+    H.Free;
   end;
 
 end.

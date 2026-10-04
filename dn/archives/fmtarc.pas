@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PARCArchive = ^TARCArchive;
-  TARCArchive = object(TARJArchive)
-    constructor Init;
+  TARCArchive = class;
+  PARCArchive = TARCArchive;
+  TARCArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -77,7 +78,7 @@ implementation
 
 { ----------------------------- ARC ------------------------------------}
 
-constructor TARCArchive.Init;
+constructor TARCArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -86,7 +87,7 @@ constructor TARCArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'PAK'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'PAK'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'E'));
@@ -153,16 +154,16 @@ procedure TARCArchive.GetFile;
     i: AWord;
     P: ARCHdr;
   begin
-  ArcFile^.Read(P, 2);
-  if  (P.Mark = $1a {^Z}) and (P.Version <> 0) and (ArcFile^.Status = stOK)
+  ArcFile.Read(P, 2);
+  if  (P.Mark = $1a {^Z}) and (P.Version <> 0) and (ArcFile.Status = stOK)
   then
-    ArcFile^.Read(P.Name, SizeOf(P)-2);
+    ArcFile.Read(P.Name, SizeOf(P)-2);
   if  (P.Version = 0) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  if  (ArcFile^.Status <> stOK) then
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -179,7 +180,7 @@ procedure TARCArchive.GetFile;
   FileInfo.USize := P.OriginSize;
   FileInfo.PSize := P.PackedSize;
   FileInfo.Date := (P.Date shr 16) or (P.Date shl 16);
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
+  ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { TARCArchive.GetFile };
 
 end.

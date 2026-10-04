@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PLHAArchive = ^TLHAArchive;
-  TLHAArchive = object(TARJArchive)
-    constructor Init;
+  TLHAArchive = class;
+  PLHAArchive = TLHAArchive;
+  TLHAArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -82,7 +83,7 @@ uses
 
 { ----------------------------- LHA ------------------------------------}
 
-constructor TLHAArchive.Init;
+constructor TLHAArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -91,7 +92,7 @@ constructor TLHAArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'LHA'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'LHA'));
@@ -162,21 +163,21 @@ procedure TLHAArchive.GetFile;
     s: String;
     DT: DateTime;
   begin
-  ArcFile^.Read(P.Size, SizeOf(P.Size));
+  ArcFile.Read(P.Size, SizeOf(P.Size));
   if  (P.Size = 0) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P.Sum, P.Size-SizeOf(P.Size));
-  if  (ArcFile^.Status <> stOK) or (P.MethodID[1] <> '-')
+  ArcFile.Read(P.Sum, P.Size-SizeOf(P.Size));
+  if  (ArcFile.Status <> stOK) or (P.MethodID[1] <> '-')
        or (P.MethodID[2] <> 'l')
   then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  FP := ArcFile^.GetPos+2;
+  FP := ArcFile.GetPos+2;
   if P.Level = 2 then
     begin
     P.Name[0] := Chr(Byte(P.Name[3])-3);
@@ -185,9 +186,9 @@ procedure TLHAArchive.GetFile;
     GetUNIXDate(P.Date, DT.Year, DT.Month, DT.Day, DT.Hour, DT.Min,
        DT.Sec);
     PackTime(DT, P.Date);
-    ArcFile^.Seek(FP+Byte(P.Name[0])+$1b-P.Size);
+    ArcFile.Seek(FP+Byte(P.Name[0])+$1b-P.Size);
     end;
-  ArcFile^.Read(HS, 2);
+  ArcFile.Read(HS, 2);
   System.Move(P.Name, FileInfo.FName, Byte(P.Name[0])+1);
   FileInfo.Last := 0;
   FileInfo.Attr := P.Attr and not Hidden;
@@ -197,7 +198,7 @@ procedure TLHAArchive.GetFile;
   if  (HS <> 0) and (P.Level <> 0) then
     begin
     HS := HS-2;
-    ArcFile^.Read(P.Name, Min(255, HS));
+    ArcFile.Read(P.Name, Min(255, HS));
     if  (P.Name[0] = #2) then
       begin
       i := 1;
@@ -211,7 +212,7 @@ procedure TLHAArchive.GetFile;
       System.Insert(s, FileInfo.FName, 1);
       end;
     end;
-  ArcFile^.Seek(FP+P.PackedSize);
+  ArcFile.Seek(FP+P.PackedSize);
   end { TLHAArchive.GetFile };
 
 end.

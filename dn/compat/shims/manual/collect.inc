@@ -4,50 +4,56 @@
   ShortStrings (PStr), with ALongStrings to AnsiStrings (PLongString).
   TODO: the streams of the long strings, the resource collections. }
 type
-  PSortedCollection = ^TSortedCollection;
-  TSortedCollection = object(TvObjs.TSortedCollection)
+  TSortedCollection = class;
+  PSortedCollection = TSortedCollection;
+  TSortedCollection = class(TvObjs.TSortedCollection)
     procedure Sort;
     procedure QSort;
     procedure QuickSort(L, R: LongInt);
   end;
 
-  PStringCollection = ^TStringCollection;
-  TStringCollection = object(TSortedCollection)
+  TStringCollection = class;
+  PStringCollection = TStringCollection;
+  TStringCollection = class(TSortedCollection)
     LongStrings: Boolean;
-    constructor Init(ALimit, ADelta: LongInt; ALongStrings: Boolean);
-    function Compare(Key1, Key2: Pointer): Integer; virtual;
-    procedure FreeItem(Item: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
-    procedure PutItem(var S: TStream; Item: Pointer); virtual;
+    constructor Create(ALimit, ADelta: LongInt; ALongStrings: Boolean);
+    function Compare(Key1, Key2: Pointer): Integer; override;
+    procedure FreeItem(Item: Pointer); override;
+    function GetItem(S: TStream): Pointer; override;
+    procedure PutItem(S: TStream; Item: Pointer); override;
   end;
 
   { not sorted: Insert appends }
-  PUnSortedStrCollection = ^TUnSortedStrCollection;
-  TUnSortedStrCollection = object(TStringCollection)
-    procedure Insert(Item: Pointer); virtual;
+  TUnSortedStrCollection = class;
+  PUnSortedStrCollection = TUnSortedStrCollection;
+  TUnSortedStrCollection = class(TStringCollection)
+    procedure Insert(Item: Pointer); override;
   end;
 
   { the items are zero-terminated strings (PChar) }
-  PStrCollection = ^TStrCollection;
-  TStrCollection = object(TSortedCollection)
-    function Compare(Key1, Key2: Pointer): Integer; virtual;
-    procedure FreeItem(Item: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
-    procedure PutItem(var S: TStream; Item: Pointer); virtual;
+  TStrCollection = class;
+  PStrCollection = TStrCollection;
+  TStrCollection = class(TSortedCollection)
+    function Compare(Key1, Key2: Pointer): Integer; override;
+    procedure FreeItem(Item: Pointer); override;
+    function GetItem(S: TStream): Pointer; override;
+    procedure PutItem(S: TStream; Item: Pointer); override;
   end;
 
   { a collection of lines (not sorted) }
-  PLineCollection = ^TLineCollection;
-  TLineCollection = object(TCollection)
+  TLineCollection = class;
+  PLineCollection = TLineCollection;
+  TLineCollection = class(TCollection)
     LongStrings: Boolean;
-    constructor Init(ALimit, ADelta: LongInt; ALongStrings: Boolean);
-    procedure FreeItem(Item: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
-    procedure PutItem(var S: TStream; Item: Pointer); virtual;
+    constructor Create(ALimit, ADelta: LongInt; ALongStrings: Boolean);
+    procedure FreeItem(Item: Pointer); override;
+    function GetItem(S: TStream): Pointer; override;
+    procedure PutItem(S: TStream; Item: Pointer); override;
   end;
 
   { a collection of the names of directories: the names are compared without the case }
-  PDirCol = ^TDirCol;
-  TDirCol = object(TStringCollection)
-    function Compare(Key1, Key2: Pointer): Integer; virtual;
+  TDirCol = class;
+  PDirCol = TDirCol;
+  TDirCol = class(TStringCollection)
+    function Compare(Key1, Key2: Pointer): Integer; override;
   end;

@@ -83,10 +83,11 @@ type
     FType: Integer;
     end;
 
-  PExtCollection = ^TExtCollection;
-  TExtCollection = object(TSortedCollection)
-    function Compare(Key1, Key2: Pointer): Integer; virtual;
-    procedure FreeItem(Item: Pointer); virtual;
+  TExtCollection = class;
+  PExtCollection = TExtCollection;
+  TExtCollection = class(TSortedCollection)
+    function Compare(Key1, Key2: Pointer): Integer; override;
+    procedure FreeItem(Item: Pointer); override;
     end;
 
 var
@@ -184,14 +185,14 @@ procedure PutExtFilter(Filter: string; T: Integer);
       if MZ[i] = '|' then
         MZ[i] := '0';
     l := i-1;
-    if ExtCollection^.Search(@MZ, i) then
+    if ExtCollection.Search(@MZ, i) then
       { дублирование: такого быть не должно }
     else
       begin
       New(P);
       P^.Mask := M;
       P^.FType := T;
-      ExtCollection^.AtInsert(i, P);
+      ExtCollection.AtInsert(i, P);
       end;
     end;
   end;
@@ -199,8 +200,8 @@ procedure PutExtFilter(Filter: string; T: Integer);
 procedure PrepareExtCollection;
   begin
   if ExtCollection <> nil then
-    Dispose(ExtCollection, Done);
-  New(ExtCollection, Init(50,10));
+    ExtCollection.Free;
+  ExtCollection := PExtCollection.Create(50, 10);
   PutExtFilter(Executables, ttExec);
   PutExtFilter(Archives, ttArc);
   PutExtFilter(CustomMask1, ttCust1);
@@ -229,8 +230,8 @@ function GetFileType(const S: String; Attr: Byte): Integer;
     Ext := UpStrg(Copy(S, PosLastDot(S)+1, 255));
     if Ext = '' then
       Ext := '.';{no extension}
-    if ExtCollection^.Search(@Ext, N) then
-      Result := PExtItem(ExtCollection^.At(N))^.FType
+    if ExtCollection.Search(@Ext, N) then
+      Result := PExtItem(ExtCollection.At(N))^.FType
     else
       Result := 0
     end;

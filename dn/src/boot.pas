@@ -139,7 +139,7 @@ procedure InvalidateTempDir;
   if not BadTemp(TempDir) then
     begin
     TempDir := TempDir+'TEMP';
-    MkDir(SysOsPath(TempDir));          { it was Copy(TempDir, 1, Length(TempDir)-1): the directory TEM was made (the name has no \ at its end) }
+    MkDir(SysOsPath(TempDir);          { it was Copy(TempDir, 1, Length(TempDir)-1): the directory TEM was made (the name has no \ at its end) }
     MakeSlash(TempDir);
     ClrIO;
     if not BadTemp(TempDir) then
@@ -195,7 +195,7 @@ procedure DoStartup;
       F: PTextReader;
     begin
     FileMode := $40;
-    F := New(PTextReader, Init(SourceDir+'dnhgl.grp'));
+    F := PTextReader.Create(SourceDir+'dnhgl.grp');
     if F = nil then
       Exit;
     if not F^.Eof then
@@ -634,7 +634,7 @@ procedure DoStartup;
   ReadIni;
   if ApplyCodetables <> 0 then
     writeln(GetString(dlCoutrySetupErr));
-  Val(SaversData.Time, SkyDelay, Integer(SPos1)); 
+  Val(SaversData.Time, SkyDelay, Integer(SPos1); 
   if SkyDelay = 0 then
     SkyDelay := 255; { X-Man }
   {ExecDNAutoexec;}

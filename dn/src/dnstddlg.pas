@@ -52,14 +52,14 @@ var
   R: Word;
 begin
   Result := '';
-  New(D, Init(Mask, Title, Name, Buttons, HistoryId));
+  D := PFileDialog.Create(Mask, Title, Name, Buttons, HistoryId);
   if Application <> nil then
   begin
-    R := Application^.ExecView(D);
+    R := Application.ExecView(D);
     if R <> cmCancel then
-      Result := D^.GetFileName;
+      Result := D.GetFileName;
   end;
-  Dispose(D, Done);
+  D.Free;
 end;
 
 function GetFileNameMenu(Path, Mask, Default: String; PutNumbers: Boolean; var More, None: Boolean): String;

@@ -74,7 +74,7 @@ var
 
 type
   {(c) SeYKo}
-  TCodePageDetector = object(TObject)
+  TCodePageDetector = class(TObject)
     procedure CheckString(P1: PChar; len: Integer);
     function DetectedCodePage: TKeyMap;
   private
@@ -358,14 +358,14 @@ function ReadXlt(FN: string; var N: Integer): PCodeConv;
     begin
     if Pos('\', FN) = 0 then
       FN := SourceDir+'xlt\' + FN;
-    S.Init(FN, stOpenRead);
+    S := TDosStream.Create(FN, stOpenRead);
     if  (S.GetSize >= 2) and (S.GetSize <= 256*4) then
       begin
       N := i32(S.GetSize);
       GetMem(Result, N);
       S.Read(Result^, N);
       end;
-    S.Done;
+    S.Free;
     end;
   end;
 

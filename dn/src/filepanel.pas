@@ -57,8 +57,9 @@ uses
   ;
 
 type
-  PFilePanel = ^TFilePanel;
-  TFilePanel = object(TFilePanelRoot)
+  TFilePanel = class;
+  PFilePanel = TFilePanel;
+  TFilePanel = class(TFilePanelRoot)
     procedure Draw; virtual;
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -74,21 +75,22 @@ const
   MaxFooterHeight = 4;
 
 type
-  PInfoView = ^TInfoView;
+  TInfoView = class;
+  PInfoView = TInfoView;
   TFooterProc = function(IV: PInfoView): Boolean;
     { Процедура формирования (части) строки подвала. Для каждой
     строки таких процедур может быть задано несколько, они вызываются
     по порядку.
       Результат True обозначает, что формирование строки закончено и
     последующие процедуры не вызываются. }
-  TInfoView = object(TView)
+  TInfoView = class(TView)
     Panel: PFilePanel;
     DnD: TPanelBottomDnD;
     LineMaker: array[0..MaxFooterHeight] of array[0..6] of TFooterProc;
       {` Для каждой строки подвала, начиная с разделителя,
        последовательность процедур формирования этой строки.
        Каждая последовательность завершается nil.`}
-    constructor Init(R: TRect);
+    constructor Create(const R: TRect);
     procedure Compile(Value: Word;
       FullProc, BriefProc: TFooterProc);
     procedure CompileShowOptions;
@@ -98,33 +100,35 @@ type
         заполняет DnD координатами строк, из которых возможен D&D.
         Первое используется в TFilePanelRoot.ChangeBounds,
         второе в HandleEvent}
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
-  PDirView = ^TDirView;
-  TDirView = object(TTopView)
+  TDirView = class;
+  PDirView = TDirView;
+  TDirView = class(TTopView)
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetText(MaxWidth: Integer): String; virtual;
     end;
 
-  PDriveLine = ^TDriveLine;
+  TDriveLine = class;
+  PDriveLine = TDriveLine;
   {`2 }
-  TDriveLine = object(TView)
+  TDriveLine = class(TView)
     Panel: PFilePanel;
     DriveLine: String[29];
     ViewLine: String[60];
     CharDelta: AInt;
     LogDrvMap: LongInt; {Cat}
-    constructor Init(var R: TRect; APanel: PFilePanel);
+    constructor Create(const R: TRect; APanel: PFilePanel);
     procedure MakeDriveLine;
     function GetPalette: TPalette; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Draw; virtual;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Load(S: TStream);
+    procedure Store(S: TStream);
     procedure Refresh; {Cat}
     procedure Update; virtual;
      {` AK155 18.03.2005 Раньше настройка автообновления строки дисков
@@ -186,9 +190,9 @@ var
     в результате других сопоставлений с маской (например, при
     автообновлении панелей). `}
 
-constructor TDriveLine.Init(var R: TRect; APanel: PFilePanel);
+constructor TDriveLine.Create(const R: TRect; APanel: PFilePanel);
   begin
-  inherited Init(R);
+  inherited Create(R);
   Panel := APanel;
   EventMask := evMouse or evBroadcast;
   MakeDriveLine;
@@ -198,7 +202,7 @@ constructor TDriveLine.Init(var R: TRect; APanel: PFilePanel);
   RegisterToBackground(@Self);
   end;
 
-constructor TDriveLine.Load(var S: TStream);
+constructor TDriveLine.Load(S: TStream);
   begin
   inherited Load(S);
   MakeDriveLine;
@@ -414,7 +418,7 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
   end {case};
   end { TDriveLine.HandleEvent };
 
-procedure TDriveLine.Store(var S: TStream);
+procedure TDriveLine.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, Panel);
@@ -902,19 +906,19 @@ Scroll:
 
 {                                 TInfoView                                  }
 {----------------------------------------------------------------------------}
-constructor TInfoView.Init(R: TRect);
+constructor TInfoView.Create(const R: TRect);
   begin
-  inherited Init(R);
+  inherited Create(R);
   EventMask := evMouse;
   end;
 
-constructor TInfoView.Load(var S: TStream);
+constructor TInfoView.Load(S: TStream);
   begin
   inherited Load(S);
   GetPeerViewPtr(S, Panel);
   end;
 
-procedure TInfoView.Store(var S: TStream);
+procedure TInfoView.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, Panel);

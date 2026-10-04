@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PHYPArchive = ^THYPArchive;
-  THYPArchive = object(TARJArchive)
-    constructor Init;
+  THYPArchive = class;
+  PHYPArchive = THYPArchive;
+  THYPArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -77,7 +78,7 @@ implementation
 
 { ----------------------------- HYP ------------------------------------}
 
-constructor THYPArchive.Init;
+constructor THYPArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -86,7 +87,7 @@ constructor THYPArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HYPER'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'HYPER'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-x'));
@@ -152,26 +153,26 @@ procedure THYPArchive.GetFile;
   var
     P: HYPHdr;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if ArcFile.GetPos = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P, 4);
+  ArcFile.Read(P, 4);
   if  (P.Id and $ffff = 0) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  if  (ArcFile^.Status <> stOK) or
+  if  (ArcFile.Status <> stOK) or
       ( (P.Id <> $2550481A {^Z'HP%'}) and (P.Id <> $2554531A {^Z'ST%'}))
   then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Read(P.PackedSize, SizeOf(P)-4);
-  if  (ArcFile^.Status <> stOK) then
+  ArcFile.Read(P.PackedSize, SizeOf(P)-4);
+  if  (ArcFile.Status <> stOK) then
     begin
     FileInfo.Last := 2;
     Exit;
@@ -183,8 +184,8 @@ procedure THYPArchive.GetFile;
   FileInfo.PSize := P.PackedSize;
   FileInfo.Date := P.Date {P.Date shl 16) or (P.Date shr 16)};
   FileInfo.FName[0] := Char(P.NameLen);
-  ArcFile^.Read(FileInfo.FName[1], P.NameLen);
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize);
+  ArcFile.Read(FileInfo.FName[1], P.NameLen);
+  ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { THYPArchive.GetFile };
 
 end.

@@ -60,9 +60,10 @@ uses
   ;
 
 type
-  PBZ2Archive = ^TBZ2Archive;
-  TBZ2Archive = object(TARJArchive)
-    constructor Init;
+  TBZ2Archive = class;
+  PBZ2Archive = TBZ2Archive;
+  TBZ2Archive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -71,12 +72,12 @@ type
 implementation
 { ----------------------------- BZIP2 ------------------------------------ }
 
-constructor TBZ2Archive.Init;
+constructor TBZ2Archive.Create;
   var
     Sign: TStr5;
     q: String;
   begin
-  TObject.Init;
+  inherited Create;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
@@ -145,7 +146,7 @@ procedure TBZ2Archive.GetFile;
   var
     S: String;
   begin
-  if ArcFile^.GetPos = ArcFile^.GetSize then
+  if ArcFile.GetPos = ArcFile.GetSize then
     begin
     FileInfo.Last := 1;
     Exit;
@@ -154,12 +155,12 @@ procedure TBZ2Archive.GetFile;
   FileInfo.FName := GetSName(ArcFileName);
   if (S = '.TBZ') or (S = '.TBZ2') then
     FileInfo.FName := FileInfo.FName + '.TAR';
-  FileInfo.PSize := ArcFile^.GetSize;
+  FileInfo.PSize := ArcFile.GetSize;
   FileInfo.USize := 0;
   FileInfo.Date := 0;
   FileInfo.Attr := 0;
   FileInfo.Last := 0;
-  ArcFile^.Seek(ArcFile^.GetSize);
+  ArcFile.Seek(ArcFile.GetSize);
   end { TBZ2Archive.GetFile };
 
 end.

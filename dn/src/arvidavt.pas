@@ -170,7 +170,7 @@ function AvtGetCell(AvtDr: PArvidDrive): LongInt;
     M: TAvtMediaCell;
     B: PChar;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     if AVT.FreeCell = 0 then
       begin
@@ -178,25 +178,25 @@ function AvtGetCell(AvtDr: PArvidDrive): LongInt;
       Inc(AVT.AfterLastCell, SizeOf(T));
       if  (PosTableOfs <> 0) and (AVT.AfterLastCell >= PosTableOfs) then
         begin
-        Stream^.Seek(AVT.AvtMediaCell);
-        Stream^.Read(M, SizeOf(M));
+        Stream.Seek(AVT.AvtMediaCell);
+        Stream.Read(M, SizeOf(M));
         GetMem(B, M.PositionTableSize);
-        Stream^.Seek(PosTableOfs);
-        Stream^.Read(B^, M.PositionTableSize);
+        Stream.Seek(PosTableOfs);
+        Stream.Read(B^, M.PositionTableSize);
         Inc(PosTableOfs, 512);
         M.PositionTable := PosTableOfs;
-        Stream^.Seek(PosTableOfs);
-        Stream^.Write(B^, M.PositionTableSize);
+        Stream.Seek(PosTableOfs);
+        Stream.Write(B^, M.PositionTableSize);
         FreeMem(B, M.PositionTableSize);
-        Stream^.Seek(AVT.AvtMediaCell);
-        Stream^.Write(M, SizeOf(M));
+        Stream.Seek(AVT.AvtMediaCell);
+        Stream.Write(M, SizeOf(M));
         end;
       end
     else
       begin
       AvtGetCell := AVT.FreeCell;
-      Stream^.Seek(AVT.FreeCell);
-      Stream^.Read(T, SizeOf(T));
+      Stream.Seek(AVT.FreeCell);
+      Stream.Read(T, SizeOf(T));
       AVT.FreeCell := T.NextTextCell;
       end;
     end
@@ -206,13 +206,13 @@ procedure AvtFreeCell(AvtDr: PArvidDrive; const l: LongInt);
   var
     T: TAvtTextCell;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     if l = 0 then
       Exit;
     T.NextTextCell := AVT.FreeCell;
-    Stream^.Seek(l);
-    Stream^.Write(T, SizeOf(T));
+    Stream.Seek(l);
+    Stream.Write(T, SizeOf(T));
     AVT.FreeCell := l;
     end
   end;
@@ -221,20 +221,20 @@ function AvtCellRotateLeft(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
   var
     Right: LongInt;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
-    Stream^.Seek(Loc);
-    Stream^.Read(FCtemp, SizeOf(FCtemp));
-    Stream^.Seek(FCtemp.RightFileCell);
-    Stream^.Read(FCRtemp, SizeOf(FCRtemp));
+    Stream.Seek(Loc);
+    Stream.Read(FCtemp, SizeOf(FCtemp));
+    Stream.Seek(FCtemp.RightFileCell);
+    Stream.Read(FCRtemp, SizeOf(FCRtemp));
     if  (FCRtemp.Flags and avtBalance) = $00000300 then
       begin
       Right := AvtCellRotateRight(AvtDr, FCtemp.RightFileCell);
-      Stream^.Seek(Loc);
-      Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc);
+      Stream.Read(FCtemp, SizeOf(FCtemp));
       FCtemp.RightFileCell := Right;
-      Stream^.Seek(FCtemp.RightFileCell);
-      Stream^.Read(FCRtemp, SizeOf(FCRtemp));
+      Stream.Seek(FCtemp.RightFileCell);
+      Stream.Read(FCRtemp, SizeOf(FCRtemp));
       end;
     Right := FCtemp.RightFileCell;
     FCtemp.RightFileCell := FCRtemp.LeftFileCell;
@@ -246,10 +246,10 @@ function AvtCellRotateLeft(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
     else
       FCtemp.Flags := (FCtemp.Flags and (not avtBalance)) or $00000300;
     FCRtemp.Flags := (FCRtemp.Flags and (not avtBalance)) or $00000300;
-    Stream^.Seek(Loc);
-    Stream^.Write(FCtemp, SizeOf(FCtemp));
-    Stream^.Seek(Right);
-    Stream^.Write(FCRtemp, SizeOf(FCRtemp));
+    Stream.Seek(Loc);
+    Stream.Write(FCtemp, SizeOf(FCtemp));
+    Stream.Seek(Right);
+    Stream.Write(FCRtemp, SizeOf(FCRtemp));
     AvtCellRotateLeft := Right;
     end
   end { AvtCellRotateLeft };
@@ -258,20 +258,20 @@ function AvtCellRotateRight(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
   var
     Left: LongInt;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
-    Stream^.Seek(Loc);
-    Stream^.Read(FCtemp, SizeOf(FCtemp));
-    Stream^.Seek(FCtemp.LeftFileCell);
-    Stream^.Read(FCLtemp, SizeOf(FCLtemp));
+    Stream.Seek(Loc);
+    Stream.Read(FCtemp, SizeOf(FCtemp));
+    Stream.Seek(FCtemp.LeftFileCell);
+    Stream.Read(FCLtemp, SizeOf(FCLtemp));
     if  (FCLtemp.Flags and avtBalance) = $00000100 then
       begin
       Left := AvtCellRotateLeft(AvtDr, FCtemp.LeftFileCell);
-      Stream^.Seek(Loc);
-      Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc);
+      Stream.Read(FCtemp, SizeOf(FCtemp));
       FCtemp.LeftFileCell := Left;
-      Stream^.Seek(FCtemp.LeftFileCell);
-      Stream^.Read(FCLtemp, SizeOf(FCLtemp));
+      Stream.Seek(FCtemp.LeftFileCell);
+      Stream.Read(FCLtemp, SizeOf(FCLtemp));
       end;
     Left := FCtemp.LeftFileCell;
     FCtemp.LeftFileCell := FCLtemp.RightFileCell;
@@ -283,10 +283,10 @@ function AvtCellRotateRight(AvtDr: PArvidDrive; Loc: LongInt): LongInt;
     else
       FCtemp.Flags := (FCtemp.Flags and (not avtBalance)) or $00000100;
     FCLtemp.Flags := (FCLtemp.Flags and (not avtBalance)) or $00000100;
-    Stream^.Seek(Loc);
-    Stream^.Write(FCtemp, SizeOf(FCtemp));
-    Stream^.Seek(Left);
-    Stream^.Write(FCLtemp, SizeOf(FCLtemp));
+    Stream.Seek(Loc);
+    Stream.Write(FCtemp, SizeOf(FCtemp));
+    Stream.Seek(Left);
+    Stream.Write(FCLtemp, SizeOf(FCLtemp));
     AvtCellRotateRight := Left;
     end
   end { AvtCellRotateRight };
@@ -297,12 +297,12 @@ procedure AvtCheckTree(AvtDr: PArvidDrive);
   var
     LeftHight:  LongInt;
     RightHight: LongInt;
-  begin with AvtDr^ do begin
+  begin with AvtDr do begin
     AvtNodeHight:=0;
     if Loc <> 0 then begin
-      Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
       LeftHight:=AvtNodeHight(FCtemp.LeftFileCell);
-      Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
       RightHight:=AvtNodeHight(FCtemp.RightFileCell);
       if LeftHight >= RightHight then
         AvtNodeHight:=LeftHight + 1 else
@@ -315,27 +315,27 @@ procedure AvtCheckTree(AvtDr: PArvidDrive);
     LeftHight:  LongInt;
     RightHight: LongInt;
     Balance:    LongInt;
-  begin with AvtDr^ do begin
+  begin with AvtDr do begin
     if Loc <> 0 then begin
-      Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
       if (FCtemp.Flags and avtIsDir) <> 0 then begin
         AvtNodeCheck(FCtemp.ChildOrSize);
-        Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+        Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
       end;
       AvtNodeCheck(FCtemp.LeftFileCell);
-      Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
       AvtNodeCheck(FCtemp.RightFileCell);
-      Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
 
       LeftHight:=AvtNodeHight(FCtemp.LeftFileCell);
-      Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+      Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
       RightHight:=AvtNodeHight(FCtemp.RightFileCell);
       Balance:=RightHight-LeftHight;
       if (Balance < -1) or (Balance > 1) then
         MessageBox(GetString(erInvalidFileFormat), nil, mfError + mfOKButton)
       else begin
         Balance:=(Balance shl 8) and $00000300;
-        Stream^.Seek(Loc); Stream^.Read(FCtemp, SizeOf(FCtemp));
+        Stream.Seek(Loc); Stream.Read(FCtemp, SizeOf(FCtemp));
         if Balance <> (FCtemp.Flags and $00000300) then
           MessageBox(GetString(erInvalidFileFormat), nil, mfError + mfOKButton);
       end;
@@ -343,7 +343,7 @@ procedure AvtCheckTree(AvtDr: PArvidDrive);
   end end;
 
 begin
-  AvtNodeCheck(AvtDr^.AVT.RootDirCell);
+  AvtNodeCheck(AvtDr.AVT.RootDirCell);
 end;
 }
 
@@ -369,10 +369,10 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
       T: TAvtTextCell;
       L: LongInt;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
-      Stream^.Seek(Loc);
-      Stream^.Read(FC, SizeOf(FC));
+      Stream.Seek(Loc);
+      Stream.Read(FC, SizeOf(FC));
       case FC.Flags and AvtCellFormat of
         avtCell2:
           L := FC.DescPtr2;
@@ -383,8 +383,8 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
       end {case};
       while L <> 0 do
         begin
-        Stream^.Seek(L);
-        Stream^.Read(T, SizeOf(T));
+        Stream.Seek(L);
+        Stream.Read(T, SizeOf(T));
         AvtFreeCell(AvtDr, L);
         L := T.NextTextCell;
         end;
@@ -395,8 +395,8 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
         L := 0 {avtCell0,avtCell1,avtCell2};
       while L <> 0 do
         begin
-        Stream^.Seek(L);
-        Stream^.Read(T, SizeOf(T));
+        Stream.Seek(L);
+        Stream.Read(T, SizeOf(T));
         AvtFreeCell(AvtDr, L);
         L := T.NextTextCell;
         end;
@@ -406,21 +406,21 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
 
   procedure AvtFreeTree(const Loc: LongInt);
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       if Loc = 0 then
         Exit;
-      Stream^.Seek(Loc);
-      Stream^.Read(FC, SizeOf(FC));
+      Stream.Seek(Loc);
+      Stream.Read(FC, SizeOf(FC));
       if FC.Flags and AvtIsDir <> 0 then
         begin
         AvtFreeTree(FC.ChildOrSize);
-        Stream^.Seek(Loc);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(Loc);
+        Stream.Read(FC, SizeOf(FC));
         end;
       AvtFreeTree(FC.LeftFileCell);
-      Stream^.Seek(Loc);
-      Stream^.Read(FC, SizeOf(FC));
+      Stream.Seek(Loc);
+      Stream.Read(FC, SizeOf(FC));
       AvtFreeTree(FC.RightFileCell);
       AvtDelCell(Loc);
       end
@@ -438,15 +438,15 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
         CurBalance: LongInt;
         RightZeroBal: Boolean;
       begin
-      with AvtDr^ do
+      with AvtDr do
         begin
-        Stream^.Seek(Loc);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(Loc);
+        Stream.Read(FC, SizeOf(FC));
         CurBalance := FC.Flags and avtBalance;
         if FC.LeftFileCell <> 0 then
           begin
-          Stream^.Seek(FC.LeftFileCell);
-          Stream^.Read(FCL, SizeOf(FCL));
+          Stream.Seek(FC.LeftFileCell);
+          Stream.Read(FCL, SizeOf(FCL));
           LeftBalance := FCL.Flags and avtBalance;
           end;
         if  (FC.LeftFileCell = 0) or
@@ -460,14 +460,14 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
           else
             {       if CurBalance = $00000100}
             begin
-            Stream^.Seek(FC.RightFileCell);
-            Stream^.Read(FCR, SizeOf(FCR));
+            Stream.Seek(FC.RightFileCell);
+            Stream.Read(FCR, SizeOf(FCR));
             RightZeroBal := (FCR.Flags and avtBalance) = 0;
             Loc := AvtCellRotateLeft(AvtDr, Loc);
-            Stream^.Seek(Loc);
-            Stream^.Read(FC, SizeOf(FC));
-            Stream^.Seek(FC.LeftFileCell);
-            Stream^.Read(FCL, SizeOf(FCL));
+            Stream.Seek(Loc);
+            Stream.Read(FC, SizeOf(FC));
+            Stream.Seek(FC.LeftFileCell);
+            Stream.Read(FCL, SizeOf(FCL));
             if RightZeroBal then
               begin
               FC.Flags := (FC.Flags and (not avtBalance)) or $00000300;
@@ -478,11 +478,11 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
               FC.Flags := (FC.Flags and (not avtBalance)) {or $00000000};
               FCL.Flags := (FCL.Flags and (not avtBalance)) {or $00000000};
               end;
-            Stream^.Seek(FC.LeftFileCell);
-            Stream^.Write(FCL, SizeOf(FCL));
+            Stream.Seek(FC.LeftFileCell);
+            Stream.Write(FCL, SizeOf(FCL));
             end;
-          Stream^.Seek(Loc);
-          Stream^.Write(FC, SizeOf(FC));
+          Stream.Seek(Loc);
+          Stream.Write(FC, SizeOf(FC));
           end;
         AvtRestoreLeftBalance := Loc;
         end
@@ -495,15 +495,15 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
         CurBalance: LongInt;
         LeftZeroBal: Boolean;
       begin
-      with AvtDr^ do
+      with AvtDr do
         begin
-        Stream^.Seek(Loc);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(Loc);
+        Stream.Read(FC, SizeOf(FC));
         CurBalance := FC.Flags and avtBalance;
         if FC.RightFileCell <> 0 then
           begin
-          Stream^.Seek(FC.RightFileCell);
-          Stream^.Read(FCR, SizeOf(FCR));
+          Stream.Seek(FC.RightFileCell);
+          Stream.Read(FCR, SizeOf(FCR));
           RightBalance := FCR.Flags and avtBalance;
           end;
         if  (FC.RightFileCell = 0) or
@@ -517,14 +517,14 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
           else
             {       if CurBalance = $00000300}
             begin
-            Stream^.Seek(FC.LeftFileCell);
-            Stream^.Read(FCL, SizeOf(FCL));
+            Stream.Seek(FC.LeftFileCell);
+            Stream.Read(FCL, SizeOf(FCL));
             LeftZeroBal := (FCL.Flags and avtBalance) = 0;
             Loc := AvtCellRotateRight(AvtDr, Loc);
-            Stream^.Seek(Loc);
-            Stream^.Read(FC, SizeOf(FC));
-            Stream^.Seek(FC.RightFileCell);
-            Stream^.Read(FCR, SizeOf(FCR));
+            Stream.Seek(Loc);
+            Stream.Read(FC, SizeOf(FC));
+            Stream.Seek(FC.RightFileCell);
+            Stream.Read(FCR, SizeOf(FCR));
             if LeftZeroBal then
               begin
               FC.Flags := (FC.Flags and (not avtBalance)) or $00000100;
@@ -535,11 +535,11 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
               FC.Flags := (FC.Flags and (not avtBalance)) {or $00000000};
               FCR.Flags := (FCR.Flags and (not avtBalance)) {or $00000000};
               end;
-            Stream^.Seek(FC.RightFileCell);
-            Stream^.Write(FCR, SizeOf(FCR));
+            Stream.Seek(FC.RightFileCell);
+            Stream.Write(FCR, SizeOf(FCR));
             end;
-          Stream^.Seek(Loc);
-          Stream^.Write(FC, SizeOf(FC));
+          Stream.Seek(Loc);
+          Stream.Write(FC, SizeOf(FC));
           end;
         AvtRestoreRightBalance := Loc;
         end
@@ -550,10 +550,10 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
         OldBalance: LongInt;
         L1, L2: LongInt;
       begin
-      with AvtDr^ do
+      with AvtDr do
         begin
-        Stream^.Seek(Loc);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(Loc);
+        Stream.Read(FC, SizeOf(FC));
         if FC.LeftFileCell = 0 then
           begin
           l0 := Loc;
@@ -561,17 +561,17 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
           Exit;
           end;
         L1 := FC.LeftFileCell;
-        Stream^.Seek(L1);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(L1);
+        Stream.Read(FC, SizeOf(FC));
         OldBalance := FC.Flags and avtBalance;
         L2 := AvtTreeRemoveLeftmost(L1);
         if L1 <> L2 then
           begin
-          Stream^.Seek(Loc);
-          Stream^.Read(FC, SizeOf(FC));
+          Stream.Seek(Loc);
+          Stream.Read(FC, SizeOf(FC));
           FC.LeftFileCell := L2;
-          Stream^.Seek(Loc);
-          Stream^.Write(FC, SizeOf(FC));
+          Stream.Seek(Loc);
+          Stream.Write(FC, SizeOf(FC));
           end;
         AvtTreeRemoveLeftmost := AvtRestoreLeftBalance(Loc, OldBalance);
         end
@@ -582,10 +582,10 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
         OldBalance3: LongInt;
         L1, L2: LongInt;
       begin
-      with AvtDr^ do
+      with AvtDr do
         begin
-        Stream^.Seek(Loc);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(Loc);
+        Stream.Read(FC, SizeOf(FC));
         if FC.RightFileCell = 0 then
           begin
           l0 := Loc;
@@ -593,17 +593,17 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
           Exit;
           end;
         L1 := FC.RightFileCell;
-        Stream^.Seek(L1);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(L1);
+        Stream.Read(FC, SizeOf(FC));
         OldBalance := FC.Flags and avtBalance;
         L2 := AvtTreeRemoveRightmost(L1);
         if L1 <> L2 then
           begin
-          Stream^.Seek(Loc);
-          Stream^.Read(FC, SizeOf(FC));
+          Stream.Seek(Loc);
+          Stream.Read(FC, SizeOf(FC));
           FC.RightFileCell := L2;
-          Stream^.Seek(Loc);
-          Stream^.Write(FC, SizeOf(FC));
+          Stream.Seek(Loc);
+          Stream.Write(FC, SizeOf(FC));
           end;
         AvtTreeRemoveRightmost := AvtRestoreRightBalance(Loc, OldBalance);
         end
@@ -611,30 +611,30 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
 
     { function AvtTreeNodeRemove(const Loc: LongInt): LongInt; }
     begin { AvtTreeNodeRemove }
-    with AvtDr^ do
+    with AvtDr do
       begin
       AvtTreeNodeRemove := Loc;
       if Loc = 0 then
         Exit;
-      Stream^.Seek(Loc);
-      Stream^.Read(FC, SizeOf(FC));
-      SN := AvtCellName(FC, Stream^);
+      Stream.Seek(Loc);
+      Stream.Read(FC, SizeOf(FC));
+      SN := AvtCellName(FC, Stream);
       if AvtCMP(AName, SN) < 0 then
         begin
         L1 := FC.LeftFileCell;
         if L1 <> 0 then
           begin
-          Stream^.Seek(L1);
-          Stream^.Read(FC, SizeOf(FC));
+          Stream.Seek(L1);
+          Stream.Read(FC, SizeOf(FC));
           OldBalance := FC.Flags and avtBalance;
           L2 := AvtTreeNodeRemove(L1);
           if L1 <> L2 then
             begin
-            Stream^.Seek(Loc);
-            Stream^.Read(FC, SizeOf(FC));
+            Stream.Seek(Loc);
+            Stream.Read(FC, SizeOf(FC));
             FC.LeftFileCell := L2;
-            Stream^.Seek(Loc);
-            Stream^.Write(FC, SizeOf(FC));
+            Stream.Seek(Loc);
+            Stream.Write(FC, SizeOf(FC));
             end;
           AvtTreeNodeRemove := AvtRestoreLeftBalance(Loc, OldBalance);
           end;
@@ -644,17 +644,17 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
         L1 := FC.RightFileCell;
         if L1 <> 0 then
           begin
-          Stream^.Seek(L1);
-          Stream^.Read(FC, SizeOf(FC));
+          Stream.Seek(L1);
+          Stream.Read(FC, SizeOf(FC));
           OldBalance := FC.Flags and avtBalance;
           L2 := AvtTreeNodeRemove(L1);
           if L1 <> L2 then
             begin
-            Stream^.Seek(Loc);
-            Stream^.Read(FC, SizeOf(FC));
+            Stream.Seek(Loc);
+            Stream.Read(FC, SizeOf(FC));
             FC.RightFileCell := L2;
-            Stream^.Seek(Loc);
-            Stream^.Write(FC, SizeOf(FC));
+            Stream.Seek(Loc);
+            Stream.Write(FC, SizeOf(FC));
             end;
           AvtTreeNodeRemove := AvtRestoreRightBalance(Loc, OldBalance);
           end;
@@ -676,14 +676,14 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
                 DelDirAnswer := cmOK
               else
                 begin
-                Stream^.Seek(FC.ChildOrSize);
-                Stream^.Read(FCR, SizeOf(FCR));
+                Stream.Seek(FC.ChildOrSize);
+                Stream.Read(FCR, SizeOf(FCR));
                 if  (FCR.LeftFileCell = 0) and (FCR.RightFileCell = 0)
                 then
                   DelDirAnswer := cmOK
                 else
                   begin
-                  if AvtCellName(FCR, Stream^) = '..' then
+                  if AvtCellName(FCR, Stream) = '..' then
                     DelDirAnswer := cmOK
                   else
                     DelDirAnswer := MessageBox
@@ -702,8 +702,8 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
           if not (DelDirAnswer in [cmYes, cmOK]) then
             Exit;
           AvtFreeTree(FC.ChildOrSize);
-          Stream^.Seek(Loc);
-          Stream^.Read(FC, SizeOf(FC));
+          Stream.Seek(Loc);
+          Stream.Read(FC, SizeOf(FC));
           end;
         AvtDelFile := True;
         if FC.RightFileCell = 0 then
@@ -713,41 +713,41 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
             0, $00000100:
               begin
               L1 := FC.RightFileCell;
-              Stream^.Seek(L1);
-              Stream^.Read(FCR, SizeOf(FCR));
+              Stream.Seek(L1);
+              Stream.Read(FCR, SizeOf(FCR));
               OldBalance := FCR.Flags and avtBalance;
               L2 := AvtTreeRemoveLeftmost(L1);
-              Stream^.Seek(Loc);
-              Stream^.Read(FC, SizeOf(FC));
+              Stream.Seek(Loc);
+              Stream.Read(FC, SizeOf(FC));
               FC.RightFileCell := L2;
-              Stream^.Seek(L0);
-              Stream^.Read(FCL, SizeOf(FCL));
+              Stream.Seek(L0);
+              Stream.Read(FCL, SizeOf(FCL));
               FCL.LeftFileCell := FC.LeftFileCell;
               FCL.RightFileCell := FC.RightFileCell;
               FCL.Flags := (FCL.Flags and (not avtBalance))
                    or (FC.Flags and $00000300);
-              Stream^.Seek(L0);
-              Stream^.Write(FCL, SizeOf(FCL));
+              Stream.Seek(L0);
+              Stream.Write(FCL, SizeOf(FCL));
               AvtTreeNodeRemove := AvtRestoreRightBalance(L0, OldBalance);
               end;
             $00000300:
               begin
               L1 := FC.LeftFileCell;
-              Stream^.Seek(L1);
-              Stream^.Read(FCL, SizeOf(FCL));
+              Stream.Seek(L1);
+              Stream.Read(FCL, SizeOf(FCL));
               OldBalance := FCL.Flags and avtBalance;
               L2 := AvtTreeRemoveRightmost(L1);
-              Stream^.Seek(Loc);
-              Stream^.Read(FC, SizeOf(FC));
+              Stream.Seek(Loc);
+              Stream.Read(FC, SizeOf(FC));
               FC.LeftFileCell := L2;
-              Stream^.Seek(L0);
-              Stream^.Read(FCR, SizeOf(FCR));
+              Stream.Seek(L0);
+              Stream.Read(FCR, SizeOf(FCR));
               FCR.LeftFileCell := FC.LeftFileCell;
               FCR.RightFileCell := FC.RightFileCell;
               FCR.Flags := (FCR.Flags and (not avtBalance))
                    or (FC.Flags and $00000300);
-              Stream^.Seek(L0);
-              Stream^.Write(FCR, SizeOf(FCR));
+              Stream.Seek(L0);
+              Stream.Write(FCR, SizeOf(FCR));
               AvtTreeNodeRemove := AvtRestoreLeftBalance(L0, OldBalance);
               end;
           end {case};
@@ -758,7 +758,7 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
 
   { function AvtDelFile( AName: PathStr): Boolean; }
   begin { AvtDelFile }
-  with AvtDr^ do
+  with AvtDr do
     begin
     AvtDelFile := False;
     SaveCurDir := CurDir;
@@ -785,7 +785,7 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
     AName := Nm+Xt;
     if Length(AName) = 0 then
       goto 1;
-    Stream^.Status := stOK;
+    Stream.Status := stOK;
     OemToCharSt(AName);
     NewCurDirPos := AvtTreeNodeRemove(CurDirPos);
     if NewCurDirPos <> CurDirPos then
@@ -793,16 +793,16 @@ function AvtDelFile(AvtDr: PArvidDrive; AName: String): Boolean;
       if CurDirCellPos = 0 then
         begin
         AVT.RootDirCell := NewCurDirPos;
-        Stream^.Seek(0);
-        Stream^.Write(AVT, SizeOf(AVT));
+        Stream.Seek(0);
+        Stream.Write(AVT, SizeOf(AVT));
         end
       else
         begin
-        Stream^.Seek(CurDirCellPos);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(CurDirCellPos);
+        Stream.Read(FC, SizeOf(FC));
         FC.ChildOrSize := NewCurDirPos;
-        Stream^.Seek(CurDirCellPos);
-        Stream^.Write(FC, SizeOf(FC));
+        Stream.Seek(CurDirCellPos);
+        Stream.Write(FC, SizeOf(FC));
         end;
       CurDirPos := NewCurDirPos;
       end;
@@ -846,7 +846,7 @@ function AvtNewFile(
       L, L2: LongInt;
       I: Integer;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       if S = '' then
         begin
@@ -871,9 +871,9 @@ function AvtNewFile(
         if Length(S) <> 0 then
           L2 := AvtGetCell(AvtDr);
         T.NextTextCell := L2;
-        Stream^.Seek(L);
+        Stream.Seek(L);
         L := L2;
-        Stream^.Write(T, SizeOf(T));
+        Stream.Write(T, SizeOf(T));
         end;
       end
     end { AvtPutText };
@@ -882,7 +882,7 @@ function AvtNewFile(
     var
       I: Integer;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       if Length(S) < 13 then
         begin
@@ -908,7 +908,7 @@ function AvtNewFile(
 
   procedure AvtPutDesc(S: String);
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       if Length(S) <> 0 then
         FC.DescPtr2 := AvtPutText(S)
@@ -919,7 +919,7 @@ function AvtNewFile(
 
   procedure AvtNewCell;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       NewCell := AvtGetCell(AvtDr);
       FC.Flags := 0;
@@ -948,8 +948,8 @@ function AvtNewFile(
         FC.StartSector := AStartSector;
         CreatedCellIsDir := False;
         end;
-      Stream^.Seek(NewCell);
-      Stream^.Write(FC, SizeOf(FC));
+      Stream.Seek(NewCell);
+      Stream.Write(FC, SizeOf(FC));
       AvtNewFile := 1;
       end
     end { AvtNewCell };
@@ -959,7 +959,7 @@ function AvtNewFile(
       OldBalance: LongInt;
       NewPointer: LongInt;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       if APos = 0 then
         begin
@@ -967,9 +967,9 @@ function AvtNewFile(
         AvtTreeNodeInsert := NewCell;
         Exit;
         end;
-      Stream^.Seek(APos);
-      Stream^.Read(FCtemp, SizeOf(FCtemp));
-      SN := AvtCellName(FCtemp, Stream^);
+      Stream.Seek(APos);
+      Stream.Read(FCtemp, SizeOf(FCtemp));
+      SN := AvtCellName(FCtemp, Stream);
       AvtTreeNodeInsert := APos;
       if SS = SN then
         begin
@@ -981,20 +981,20 @@ function AvtNewFile(
         begin
         if FCtemp.LeftFileCell <> 0 then
           begin
-          Stream^.Seek(FCtemp.LeftFileCell);
-          Stream^.Read(FCLtemp, SizeOf(FCLtemp));
+          Stream.Seek(FCtemp.LeftFileCell);
+          Stream.Read(FCLtemp, SizeOf(FCLtemp));
           OldBalance := FCLtemp.Flags and avtBalance;
           NewPointer := AvtTreeNodeInsert(FCtemp.LeftFileCell);
-          Stream^.Seek(APos);
-          Stream^.Read(FCtemp, SizeOf(FCtemp));
+          Stream.Seek(APos);
+          Stream.Read(FCtemp, SizeOf(FCtemp));
           if NewPointer <> FCtemp.LeftFileCell then
             begin
             FCtemp.LeftFileCell := NewPointer;
-            Stream^.Seek(APos);
-            Stream^.Write(FCtemp, SizeOf(FCtemp));
+            Stream.Seek(APos);
+            Stream.Write(FCtemp, SizeOf(FCtemp));
             end;
-          Stream^.Seek(FCtemp.LeftFileCell);
-          Stream^.Read(FCLtemp, SizeOf(FCLtemp));
+          Stream.Seek(FCtemp.LeftFileCell);
+          Stream.Read(FCLtemp, SizeOf(FCLtemp));
           if  ( (FCLtemp.Flags and avtBalance) <> OldBalance) and
               ( (FCLtemp.Flags and avtBalance) <> 0)
           then
@@ -1004,19 +1004,19 @@ function AvtNewFile(
               APos := AvtCellRotateRight(AvtDr, APos);
               AvtTreeNodeInsert := APos;
 
-              Stream^.Seek(APos);
-              Stream^.Read(FCtemp, SizeOf(FCtemp));
+              Stream.Seek(APos);
+              Stream.Read(FCtemp, SizeOf(FCtemp));
               FCtemp.Flags := (FCtemp.Flags and (not avtBalance))
                 {or $00000000};
-              Stream^.Seek(APos);
-              Stream^.Write(FCtemp, SizeOf(FCtemp));
+              Stream.Seek(APos);
+              Stream.Write(FCtemp, SizeOf(FCtemp));
 
-              Stream^.Seek(FCtemp.RightFileCell);
-              Stream^.Read(FCRtemp, SizeOf(FCRtemp));
+              Stream.Seek(FCtemp.RightFileCell);
+              Stream.Read(FCRtemp, SizeOf(FCRtemp));
               FCRtemp.Flags := (FCRtemp.Flags and (not avtBalance))
                 {or $00000000};
-              Stream^.Seek(FCtemp.RightFileCell);
-              Stream^.Write(FCRtemp, SizeOf(FCRtemp));
+              Stream.Seek(FCtemp.RightFileCell);
+              Stream.Write(FCRtemp, SizeOf(FCRtemp));
               end
             else
               begin
@@ -1026,8 +1026,8 @@ function AvtNewFile(
               else
                 FCtemp.Flags := (FCtemp.Flags and (not avtBalance))
                    or $00000300;
-              Stream^.Seek(APos);
-              Stream^.Write(FCtemp, SizeOf(FCtemp));
+              Stream.Seek(APos);
+              Stream.Write(FCtemp, SizeOf(FCtemp));
               end;
             end;
           end
@@ -1041,28 +1041,28 @@ function AvtNewFile(
           else
             FCtemp.Flags := (FCtemp.Flags and (not avtBalance))
                or $00000300;
-          Stream^.Seek(APos);
-          Stream^.Write(FCtemp, SizeOf(FCtemp));
+          Stream.Seek(APos);
+          Stream.Write(FCtemp, SizeOf(FCtemp));
           end;
         end
       else
         begin {SS > SN}
         if FCtemp.RightFileCell <> 0 then
           begin
-          Stream^.Seek(FCtemp.RightFileCell);
-          Stream^.Read(FCRtemp, SizeOf(FCRtemp));
+          Stream.Seek(FCtemp.RightFileCell);
+          Stream.Read(FCRtemp, SizeOf(FCRtemp));
           OldBalance := FCRtemp.Flags and avtBalance;
           NewPointer := AvtTreeNodeInsert(FCtemp.RightFileCell);
-          Stream^.Seek(APos);
-          Stream^.Read(FCtemp, SizeOf(FCtemp));
+          Stream.Seek(APos);
+          Stream.Read(FCtemp, SizeOf(FCtemp));
           if NewPointer <> FCtemp.RightFileCell then
             begin
             FCtemp.RightFileCell := NewPointer;
-            Stream^.Seek(APos);
-            Stream^.Write(FCtemp, SizeOf(FCtemp));
+            Stream.Seek(APos);
+            Stream.Write(FCtemp, SizeOf(FCtemp));
             end;
-          Stream^.Seek(FCtemp.RightFileCell);
-          Stream^.Read(FCRtemp, SizeOf(FCRtemp));
+          Stream.Seek(FCtemp.RightFileCell);
+          Stream.Read(FCRtemp, SizeOf(FCRtemp));
           if  ( (FCRtemp.Flags and avtBalance) <> OldBalance) and
               ( (FCRtemp.Flags and avtBalance) <> 0)
           then
@@ -1072,19 +1072,19 @@ function AvtNewFile(
               APos := AvtCellRotateLeft(AvtDr, APos);
               AvtTreeNodeInsert := APos;
 
-              Stream^.Seek(APos);
-              Stream^.Read(FCtemp, SizeOf(FCtemp));
+              Stream.Seek(APos);
+              Stream.Read(FCtemp, SizeOf(FCtemp));
               FCtemp.Flags := (FCtemp.Flags and (not avtBalance))
                 {or $00000000};
-              Stream^.Seek(APos);
-              Stream^.Write(FCtemp, SizeOf(FCtemp));
+              Stream.Seek(APos);
+              Stream.Write(FCtemp, SizeOf(FCtemp));
 
-              Stream^.Seek(FCtemp.LeftFileCell);
-              Stream^.Read(FCLtemp, SizeOf(FCLtemp));
+              Stream.Seek(FCtemp.LeftFileCell);
+              Stream.Read(FCLtemp, SizeOf(FCLtemp));
               FCLtemp.Flags := (FCLtemp.Flags and (not avtBalance))
                 {or $00000000};
-              Stream^.Seek(FCtemp.LeftFileCell);
-              Stream^.Write(FCLtemp, SizeOf(FCLtemp));
+              Stream.Seek(FCtemp.LeftFileCell);
+              Stream.Write(FCLtemp, SizeOf(FCLtemp));
               end
             else
               begin
@@ -1094,8 +1094,8 @@ function AvtNewFile(
               else
                 FCtemp.Flags := (FCtemp.Flags and (not avtBalance))
                    or $00000100;
-              Stream^.Seek(APos);
-              Stream^.Write(FCtemp, SizeOf(FCtemp));
+              Stream.Seek(APos);
+              Stream.Write(FCtemp, SizeOf(FCtemp));
               end;
             end;
           end
@@ -1109,8 +1109,8 @@ function AvtNewFile(
           else
             FCtemp.Flags := (FCtemp.Flags and (not avtBalance))
                or $00000100;
-          Stream^.Seek(APos);
-          Stream^.Write(FCtemp, SizeOf(FCtemp));
+          Stream.Seek(APos);
+          Stream.Write(FCtemp, SizeOf(FCtemp));
           end;
         end;
       end
@@ -1122,11 +1122,11 @@ function AvtNewFile(
       DD: TAvtFileCell;
       I: Integer;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       NewCellFailed := False;
       Lv := CurLevel+1;
-      Stream^.Status := stOK;
+      Stream.Status := stOK;
       if AName[1] = '\' then
         Delete(AName, 1, 1); {DelFC(AName);}
       while AName <> '' do
@@ -1183,16 +1183,16 @@ function AvtNewFile(
           if CurDirCellPos = 0 then
             begin
             AVT.RootDirCell := NewCurDirPos;
-            Stream^.Seek(0);
-            Stream^.Write(AVT, SizeOf(AVT));
+            Stream.Seek(0);
+            Stream.Write(AVT, SizeOf(AVT));
             end
           else
             begin
-            Stream^.Seek(CurDirCellPos);
-            Stream^.Read(FC, SizeOf(FC));
+            Stream.Seek(CurDirCellPos);
+            Stream.Read(FC, SizeOf(FC));
             FC.ChildOrSize := NewCurDirPos;
-            Stream^.Seek(CurDirCellPos);
-            Stream^.Write(FC, SizeOf(FC));
+            Stream.Seek(CurDirCellPos);
+            Stream.Write(FC, SizeOf(FC));
             end;
           CurDirPos := NewCurDirPos;
           end;
@@ -1212,7 +1212,7 @@ function AvtNewFile(
 
   { function AvtNewFile; }
   begin { AvtNewFile }
-  with AvtDr^ do
+  with AvtDr do
     begin
     AvtNewFile := 0;
     if  (filetype <> avdAvt) or (Length(AName) = 0) then
@@ -1228,7 +1228,7 @@ function AvtNewFile(
     if  (AName <> '') and (AName[1] = '\') then
       Delete(AName, 1, 1); {DelFC(AName);}
     lFSplit(AName, Dr, Nm, Xt);
-    Stream^.Status := stOK;
+    Stream.Status := stOK;
     if CurDir2 <> Dr then
       begin
       CurDir := Dr;
@@ -1284,7 +1284,7 @@ procedure AvtSeekDirectory(AvtDr: PArvidDrive);
     SeekFailed: Boolean;
     S, SS, S2: String;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     {  S:=Ascii_Ansi(CurDir);}
     S := CurDir;
@@ -1294,7 +1294,7 @@ procedure AvtSeekDirectory(AvtDr: PArvidDrive);
     CurLevel := 0;
     Lv := 1;
     CurDirCellPos := 0;
-    Stream^.Status := stOK;
+    Stream.Status := stOK;
     SeekFailed := False;
     if S[1] = '\' then
       Delete(S, 1, 1); {DelFC(S);}
@@ -1318,11 +1318,11 @@ procedure AvtSeekDirectory(AvtDr: PArvidDrive);
           SeekFailed := True;
           Break;
           end;
-        Stream^.Seek(CurDirPos);
-        Stream^.Read(DD, SizeOf(DD));
-        if Stream^.Status <> stOK then
+        Stream.Seek(CurDirPos);
+        Stream.Read(DD, SizeOf(DD));
+        if Stream.Status <> stOK then
           Break;
-        S2 := AvtCellName(DD, Stream^);
+        S2 := AvtCellName(DD, Stream);
         if AvtCMP(SS, S2) < 0 then
           begin
           CurDirPos := DD.LeftFileCell;
@@ -1348,7 +1348,7 @@ procedure AvtSeekDirectory(AvtDr: PArvidDrive);
           Break;
           end;
         end;
-      if Stream^.Status <> stOK then
+      if Stream.Status <> stOK then
         Break;
       if SeekFailed then
         begin
@@ -1374,19 +1374,19 @@ procedure AvtGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
     IsDir: Boolean;
     Str: String;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     if ALocation = 0 then
       Exit;
-    Stream^.Status := stOK;
-    Stream^.Seek(ALocation);
-    if Stream^.Status <> stOK then
+    Stream.Status := stOK;
+    Stream.Seek(ALocation);
+    if Stream.Status <> stOK then
       Exit;
-    Stream^.Read(Cell, SizeOf(Cell));
-    if Stream^.Status <> stOK then
+    Stream.Read(Cell, SizeOf(Cell));
+    if Stream.Status <> stOK then
       Exit;
     AvtGetDirectory(AvtDr, Cell.LeftFileCell, FC, FileMask);
-    Str := CharToOemStr(AvtCellName(Cell, Stream^));
+    Str := CharToOemStr(AvtCellName(Cell, Stream));
     IsDir := Cell.Flags and AvtIsDir <> 0;
     if IsDir then
       TAttr := Cell.Attr or Directory
@@ -1406,14 +1406,14 @@ procedure AvtGetDirectory(AvtDr: PArvidDrive; var ALocation: LongInt;
       New(F^.DIZ);
       F^.DIZ^.Container := nil;
       F^.DIZ^.Line := ALocation;
-      F^.DIZ^.DIZText := CharToOemStr(AvtCellDesc(Cell, Stream^));
+      F^.DIZ^.DIZText := CharToOemStr(AvtCellDesc(Cell, Stream));
       if not IsDir then
         begin
         Inc(TotFiles);
         TotLen := TotLen+Cell.ChildOrSize;
         end;
       F^.PSize := ALocation; {non standard use: location in AVT file}
-      FC^.Insert(F);
+      FC.Insert(F);
       end;
     AvtGetDirectory(AvtDr, Cell.RightFileCell, FC, FileMask);
     end
@@ -1433,15 +1433,15 @@ function CopyFilesToArvid(const S: String; Files: PCollection;
   function FindDrive(P_: Pointer): Boolean;
   var P: PArvidDrive absolute P_;
     begin
-    FindDrive := P^.Name^ = S2;
+    FindDrive := P.Name^ = S2;
     end;
 
   begin
   CopyFilesToArvid := False;
   if Owner = nil then
     Exit;
-  PD := PFilePanel(Owner)^.Drive;
-  if PD^.DriveType = dtArvid then
+  PD := PFilePanel(Owner).Drive;
+  if PD.DriveType = dtArvid then
     Exit;
   if ArvidDrives = nil then
     Exit;
@@ -1464,19 +1464,19 @@ function CopyFilesToArvid(const S: String; Files: PCollection;
     S2 := S2+'.TDR'
   else
     S2 := S2+'.AVT';
-  PAD := ArvidDrives^.FirstThat(FindDrive);
+  PAD := ArvidDrives.FirstThat(FindDrive);
   if PAD = nil then
     Exit;
   CopyFilesToArvid := True;
   ToStr := Copy(S, I, 256);
   if ToStr = '' then
     ToStr := '\';
-  OldDir := PAD^.CurDir;
-  PAD^.CurDir := ToStr;
-  PAD^.SeekDirectory;
-  PAD^.CopyFilesInto(Files, Owner, MoveMode);
-  PAD^.CurDir := OldDir;
-  PAD^.SeekDirectory;
+  OldDir := PAD.CurDir;
+  PAD.CurDir := ToStr;
+  PAD.SeekDirectory;
+  PAD.CopyFilesInto(Files, Owner, MoveMode);
+  PAD.CurDir := OldDir;
+  PAD.SeekDirectory;
   end { CopyFilesToArvid };
 
 procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
@@ -1501,15 +1501,15 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
       PC: PFilesCollection;
       Dummy: TSize;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
-      PD^.lChDir(S2);
-      PC := PFilesCollection(PD^.GetDirectory(x_x, Dummy));
-      PC^.SortMode := psmLongName;  {<sort141.001>}
-      PC^.Sort;
-      for I := 0 to PC^.Count-1 do
+      PD.lChDir(S2);
+      PC := PFilesCollection(PD.GetDirectory(x_x, Dummy));
+      PC.SortMode := psmLongName;  {<sort141.001>}
+      PC.Sort;
+      for I := 0 to PC.Count-1 do
         begin
-        PF := PC^.At(I);
+        PF := PC.At(I);
         S3 := MakeNormName(S1, PF^.FlName[True]);
         S4 := MakeNormName(S2, PF^.FlName[True]);
 
@@ -1542,19 +1542,19 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
             end;
           end;
         end;
-      Dispose(PC, Done);
+      PC.Free;
       end
     end { AvtWalkTree };
 
   begin { AvtCopyFilesInto }
-  with AvtDr^ do
+  with AvtDr do
     begin
     if Own = nil then
       Exit;
-    PD := PFilePanel(Own)^.Drive;
-    if PD^.DriveType = dtArvid then
+    PD := PFilePanel(Own).Drive;
+    if PD.DriveType = dtArvid then
       Exit;
-    From := PD^.GetRealName;
+    From := PD.GetRealName;
     S2 := From;
     J := 0;
     I := Pos(':', S2);
@@ -1591,9 +1591,9 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
         end;
       Writeln(T.T, '');
       P := WriteMsg(GetString(dlPleaseStandBy));
-      for I := 0 to AFiles^.Count-1 do
+      for I := 0 to AFiles.Count-1 do
         begin
-        PF := AFiles^.At(I);
+        PF := AFiles.At(I);
         S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
         S2 := MakeNormName(From, PF^.FlName[True]);
         if  (PF^.Attr and Directory) = 0 then
@@ -1607,7 +1607,7 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
              'COPYDIR '+SquashesName(S2)+' TP:'+SquashesName(S1)+' /I/O/R/C/H')
           end;
         end;
-      P^.Free;
+      P.Free;
       if CmdFileCreated then
         MessageBox(GetString(dlArvidCmdFileCreated)+CmdFileNam,
           nil, mfInformation+mfOKButton)
@@ -1627,9 +1627,9 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
         Exit;
         end;
       P := WriteMsg(GetString(dlPleaseStandBy));
-      for I := 0 to AFiles^.Count-1 do
+      for I := 0 to AFiles.Count-1 do
         begin
-        PF := AFiles^.At(I);
+        PF := AFiles.At(I);
         S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
         S2 := MakeNormName(From, PF^.FlName[True]);
         Desc := '';
@@ -1644,16 +1644,16 @@ procedure AvtCopyFilesInto(AvtDr: PArvidDrive; AFiles: PCollection;
              PF^.Attr);
           S1 := S1+'\';
           S2 := S2+'\';
-          OldDir := PD^.GetDir;
+          OldDir := PD.GetDir;
           AvtWalkTree;
-          PD^.lChDir(OldDir);
+          PD.lChDir(OldDir);
           end;
         end;
-      P^.Free;
-      Stream^.Seek(0);
-      Stream^.Write(AVT, SizeOf(AVT));
-      Dispose(Stream, Done);
-      Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+      P.Free;
+      Stream.Seek(0);
+      Stream.Write(AVT, SizeOf(AVT));
+      Stream.Free;
+      Stream := PBufStream.Create(Name^, stOpen, 2048);
       end;
     GlobalMessage(evCommand, cmPanelReread, nil);
     end
@@ -1667,7 +1667,7 @@ procedure AvtEraseFiles(AvtDr: PArvidDrive; AFiles: PCollection);
     R: Boolean;
     S: String;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     if filetype <> avdAvt then
       begin
@@ -1675,11 +1675,11 @@ procedure AvtEraseFiles(AvtDr: PArvidDrive; AFiles: PCollection);
          mfInformation+mfOKButton);
       Exit;
       end;
-    if AFiles^.Count = 0 then
+    if AFiles.Count = 0 then
       Exit;
-    if AFiles^.Count = 1 then
+    if AFiles.Count = 1 then
       begin
-      PF := AFiles^.At(0);
+      PF := AFiles.At(0);
       if  (PF^.Attr and Directory) <> 0
       then
         S := GetString(dlEraseConfirmDir)+Cut(PF^.FlName[True], 40)+' ?'
@@ -1692,9 +1692,9 @@ procedure AvtEraseFiles(AvtDr: PArvidDrive; AFiles: PCollection);
         {+mfFastButton});
     if  (I <> cmYes) then
       Exit;
-    if AFiles^.Count > 1 then
+    if AFiles.Count > 1 then
       begin
-      S := GetString(dlEraseConfirm2)+ItoS(AFiles^.Count)
+      S := GetString(dlEraseConfirm2)+ItoS(AFiles.Count)
           +' '+GetString(dlDIFiles)+' ?';
       I := MessageBox(S, nil, mfConfirmation+mfYesButton+mfNoButton);
       if  (I <> cmYes) then
@@ -1702,20 +1702,20 @@ procedure AvtEraseFiles(AvtDr: PArvidDrive; AFiles: PCollection);
       end;
     ArvidDeleteAllFiles := False;
     P := WriteMsg(GetString(dlPleaseStandBy));
-    for I := 0 to AFiles^.Count-1 do
+    for I := 0 to AFiles.Count-1 do
       begin
-      PF := AFiles^.At(I);
+      PF := AFiles.At(I);
       S := PF^.FlName[True];
       R := AvtDelFile(AvtDr, S);
       if R = False then
         MessageBox(GetString(dlErasingNoFile)+S, nil, mfError+mfOKButton);
       end;
     { AvtCheckTree(AvtDr); }
-    P^.Free;
-    Stream^.Seek(0);
-    Stream^.Write(AVT, SizeOf(AVT));
-    Dispose(Stream, Done);
-    Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+    P.Free;
+    Stream.Seek(0);
+    Stream.Write(AVT, SizeOf(AVT));
+    Stream.Free;
+    Stream := PBufStream.Create(Name^, stOpen, 2048);
     GlobalMessage(evCommand, cmPanelReread, nil);
     end
   end { AvtEraseFiles };
@@ -1724,7 +1724,7 @@ procedure AvtMakeDir(AvtDr: PArvidDrive);
   var
     S: String;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     if filetype <> avdAvt then
       begin
@@ -1742,10 +1742,10 @@ procedure AvtMakeDir(AvtDr: PArvidDrive);
     MakeSlash(S);
     AvtNewFile(AvtDr, S, '', True, 0, 0, 0, 0);
     { AvtCheckTree(AvtDr); }
-    Stream^.Seek(0);
-    Stream^.Write(AVT, SizeOf(AVT));
-    Dispose(Stream, Done);
-    Stream := New(PBufStream, Init(Name^, stOpen, 2048));
+    Stream.Seek(0);
+    Stream.Write(AVT, SizeOf(AVT));
+    Stream.Free;
+    Stream := PBufStream.Create(Name^, stOpen, 2048);
     GlobalMessage(evCommand, cmPanelReread, nil);
     end
   end { AvtMakeDir };
@@ -1763,7 +1763,7 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
       L, L2: LongInt;
       I: Integer;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       if S = '' then
         begin
@@ -1788,9 +1788,9 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
         if Length(S) <> 0 then
           L2 := AvtGetCell(AvtDr);
         T.NextTextCell := L2;
-        Stream^.Seek(L);
+        Stream.Seek(L);
         L := L2;
-        Stream^.Write(T, SizeOf(T));
+        Stream.Write(T, SizeOf(T));
         end;
       end
     end { AvtPutText };
@@ -1799,7 +1799,7 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
     var
       I: Integer;
     begin
-    with AvtDr^ do
+    with AvtDr do
       begin
       if Length(S) < 13 then
         begin
@@ -1824,12 +1824,12 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
     end { AvtPutName };
 
   begin { AvtEditDescription }
-  with AvtDr^ do
+  with AvtDr do
     begin
     FreeStr := OemToCharStr(S);
-    L1 := i32(Stream^.GetPos);
-    Stream^.Read(C, SizeOf(C));
-    if Stream^.Status <> stOK then
+    L1 := i32(Stream.GetPos);
+    Stream.Read(C, SizeOf(C));
+    if Stream.Status <> stOK then
       Exit;
     case C.Flags and AvtCellFormat of
       avtCell2:
@@ -1841,9 +1841,9 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
     end {case};
     while L <> 0 do
       begin
-      Stream^.Seek(L);
-      Stream^.Read(T, SizeOf(T));
-      if Stream^.Status <> stOK then
+      Stream.Seek(L);
+      Stream.Read(T, SizeOf(T));
+      if Stream.Status <> stOK then
         Exit;
       AvtFreeCell(AvtDr, L);
       L := T.NextTextCell;
@@ -1870,15 +1870,15 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
         if Length(FreeStr) <> 0 then
           L3 := AvtGetCell(AvtDr);
         T.NextTextCell := L3;
-        Stream^.Seek(L);
+        Stream.Seek(L);
         L := L3;
-        Stream^.Write(T, SizeOf(T));
+        Stream.Write(T, SizeOf(T));
         end;
       end;
     case C.Flags and AvtCellFormat of
       avtCell0..avtCell1:
         begin
-        Nam := AvtCellName(C, Stream^);
+        Nam := AvtCellName(C, Stream);
         C.Flags := (C.Flags and not AvtCellFormat) or avtCell3;
         C.NonUsed1 := 0;
         C.NonUsed2 := 0;
@@ -1890,8 +1890,8 @@ procedure AvtEditDescription(AvtDr: PArvidDrive; var S, Nam: String);
       avtCell3:
         C.DescPtr3 := L2;
     end {case};
-    Stream^.Seek(L1);
-    Stream^.Write(C, SizeOf(C));
+    Stream.Seek(L1);
+    Stream.Write(C, SizeOf(C));
     end
   end { AvtEditDescription };
 
@@ -1900,13 +1900,13 @@ procedure AvtCalcTotal(AvtDr: PArvidDrive; const Offset: LongInt;
   var
     AA: TAvtFileCell;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     if Offset = 0 then
       Exit;
-    Stream^.Seek(Offset);
-    Stream^.Read(AA, SizeOf(AA));
-    if Stream^.Status <> stOK then
+    Stream.Seek(Offset);
+    Stream.Read(AA, SizeOf(AA));
+    if Stream.Status <> stOK then
       Exit;
     AvtCalcTotal(AvtDr, AA.LeftFileCell, LL);
     if AA.Flags and AvtIsDir <> 0
@@ -1924,31 +1924,31 @@ function AvtInit(AvtDr: PArvidDrive): Boolean;
     I: LongInt;
     J: Word;
   begin
-  with AvtDr^ do
+  with AvtDr do
     begin
     AvtInit := False;
     filetype := avdAvt;
-    Stream^.Seek(AVT.AvtMediaCell);
-    Stream^.Read(A, SizeOf(A));
-    if Stream^.Status <> stOK then
+    Stream.Seek(AVT.AvtMediaCell);
+    Stream.Read(A, SizeOf(A));
+    if Stream.Status <> stOK then
       Exit;
     TapeFmt := A.TapeFmt;
     if TapeFmt <> 0 then
       begin
       TapeTotalTime := A.TapeLen*60;
       PosTableOfs := A.PositionTable;
-      Stream^.Seek(A.PositionTable);
+      Stream.Seek(A.PositionTable);
       if A.PositionTableSize <> 4656 then
         begin
-        Stream^.Read(I, SizeOf(I));
-        if Stream^.Status <> stOK then
+        Stream.Read(I, SizeOf(I));
+        if Stream.Status <> stOK then
           Exit;
         TapeRecordedTime := I*4;
         end
       else
         begin
-        Stream^.Read(J, SizeOf(J));
-        if Stream^.Status <> stOK then
+        Stream.Read(J, SizeOf(J));
+        if Stream.Status <> stOK then
           Exit;
         TapeRecordedTime := J*8;
         end;

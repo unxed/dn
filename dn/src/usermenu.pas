@@ -67,21 +67,23 @@ function MakeString(S: String; UserParams: PUserParams;
     HandleTildes: Boolean; TM: PString): String;
 
 type
-  PUserView = ^TUserView;
-  TUserView = object(TScroller)
+  TUserView = class;
+  PUserView = TUserView;
+  TUserView = class(TScroller)
     Grabbing: Boolean;
-    constructor Init(var R: TRect; H, V: PScrollBar);
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure ChangeBounds(const Bounds: TRect); virtual;
+    constructor Create(const R: TRect; H, V: PScrollBar);
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure ChangeBounds(const Bounds: TRect); override;
     end;
 
-  PUserWindow = ^TUserWindow;
-  TUserWindow = object(TWindow)
+  TUserWindow = class;
+  PUserWindow = TUserWindow;
+  TUserWindow = class(TWindow)
     OldScreenWidth: Word;
-    constructor Init;
-    procedure CalcBounds(var Bounds: TRect; Delta: TPoint); virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    constructor Create;
+    procedure CalcBounds(var Bounds: TRect; Delta: TPoint); override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     end;
 
 const
@@ -104,18 +106,19 @@ type
     RunFrom2E: Boolean;
     end;
 
-  PUserCollection = ^TUserCollection;
-  TUserCollection = object(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
+  TUserCollection = class;
+  PUserCollection = TUserCollection;
+  TUserCollection = class(TCollection)
+    procedure FreeItem(P: Pointer); override;
     end;
 
-constructor TUserWindow.Init;
+constructor TUserWindow.Create;
   var
     R: TRect;
   begin
   Desktop^.GetExtent(R);
   R.Grow(1, 1);
-  inherited Init(R, GetString(dlOutputTitle), 0);
+  inherited Create(R, GetString(dlOutputTitle), 0);
   OldScreenWidth := ScreenWidth;
   GetExtent(R);
   R.Grow(-1, -1);
@@ -154,9 +157,9 @@ procedure TUserWindow.SetState(AState: Word; Enable: Boolean);
     end;
   end;
 
-constructor TUserView.Init(var R: TRect; H, V: PScrollBar);
+constructor TUserView.Create(const R: TRect; H, V: PScrollBar);
   begin
-  inherited Init(R, H, V);
+  inherited Create(R, H, V);
   SetLimit(ScreenWidth, ScreenHeight);
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
@@ -738,7 +741,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   if DoGlobal then
     goto 2;
 
-  F := New(PTextReader, Init(SwpDir+'$dn'+ItoS(DNNumber)+'$.mnu'));
+  F := PTextReader.Create(SwpDir+'$dn'+ItoS(DNNumber)+'$.mnu');
   if F <> nil then
     goto 1;
 
@@ -751,7 +754,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   if I = 0 then
     goto 2;
   repeat
-    F := New(PTextReader, Init(S));
+    F := PTextReader.Create(S);
     if F <> nil then
       goto 1;
 
@@ -765,7 +768,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   until I < 3;
 2:
   DoGlobal := True;
-  F := New(PTextReader, Init(SourceDir+'dn.mnu'));
+  F := PTextReader.Create(SourceDir+'dn.mnu');
   if F = nil then
     begin
     ErrMsg(dlMNUNotFound);
@@ -861,7 +864,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
         I := I-1000;
         NW := I;
         UI := P^.At(I);
-        F := New(PTextReader, Init(S));
+        F := PTextReader.Create(S);
         lAssignText(F1, SwpDir+'$DN'+ItoS(DNNumber)+'$'+CmdExt);
         lRewriteText(F1);
         
@@ -932,16 +935,17 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
 {-DataCompBoy-}
 
 type
-  PGrabber = ^TGrabber;
-  TGrabber = object(TView)
+  TGrabber = class;
+  PGrabber = TGrabber;
+  TGrabber = class(TView)
     ModalEnd: Boolean;
     Screen: PAWordArray;
     R: TRect;
     BufSize: Word;
-    constructor Init;
-    destructor Done; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Draw; virtual;
+    constructor Create;
+    destructor Destroy; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
     function Execute: Word; virtual;
     end;
 
@@ -974,12 +978,12 @@ procedure ScreenGrabber(ShowMessage: Boolean);
   MsgActive := B;
   end;
 
-constructor TGrabber.Init;
+constructor TGrabber.Create;
   var
     BB: TRect;
   begin
   Application^.GetExtent(BB);
-  inherited Init(BB);
+  inherited Create(BB);
   R.A := Top;
   R.B := Bot;
   BufSize := Application^.Size.X*2*Application^.Size.Y;
@@ -995,11 +999,11 @@ constructor TGrabber.Init;
   {EventMask := $FFFF;}
   end;
 
-destructor TGrabber.Done;
+destructor TGrabber.Destroy;
   begin
   if Screen <> nil then
     FreeMem(Screen, BufSize);
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TGrabber.Draw;
@@ -1216,13 +1220,13 @@ function QuickExecExternal(N: Integer): Boolean;
   QuickExecExternal := False;
 
   Local := True;
-  F := New(PTextReader, Init('dn.xrn'));
+  F := PTextReader.Create('dn.xrn');
 
   if F = nil then
     begin
 RL:
     Local := False;
-    F := New(PTextReader, Init(SourceDir+'dn.xrn'));
+    F := PTextReader.Create(SourceDir+'dn.xrn');
     end;
   if F = nil then
     Exit;

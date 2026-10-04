@@ -7,29 +7,31 @@ uses
   ;
 
 type
-  PTopView = ^TTopView;
+  TTopView = class;
+  PTopView = TTopView;
   {`2 Базовый тип для текста, выводимого в заголовке панели. }
-  TTopView = object(TView)
+  TTopView = class(TView)
     Panel: PView; //фактически -  PFilePanel
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
-    procedure Draw; virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    procedure Draw; override;
       {` Текст центрируется, не перекрывая элемент управления окна
       менеджера `}
-    function GetPalette: TPalette; virtual;
+    function GetPalette: TPalette; override;
     function GetText(MaxWidth: Integer): String; virtual;
       {` Этот метод обязательно должен быть перекрыт `}
     end;
   {`}
 
-  PSortView = ^TSortView;
+  TSortView = class;
+  PSortView = TSortView;
     {`2 Индикация текущей сортировки панели буковкой в левом верхнем углу `}
-  TSortView = object(TView)
+  TSortView = class(TView)
     Panel: PView; //фактически -  PFilePanel;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    constructor Load(S: TStream);
+    procedure Store(S: TStream); override;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
 implementation
@@ -41,13 +43,13 @@ uses
 const
   CTopView = #11#12;
 
-constructor TTopView.Load(var S: TStream);
+constructor TTopView.Load(S: TStream);
   begin
   inherited Load(S);
   GetPeerViewPtr(S, Panel);
   end;
 
-procedure TTopView.Store(var S: TStream);
+procedure TTopView.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, Panel);
@@ -74,8 +76,8 @@ procedure TTopView.Draw;
     Width: Integer;
     Right: Boolean;
   begin
-  Right := PDoubleWindow(Owner)^.Panel[pRight].AnyPanel = Panel;
-  Width := Panel^.Size.X - 4 - Ord(Right);
+  Right := PDoubleWindow(Owner).Panel[pRight].AnyPanel = Panel;
+  Width := Panel.Size.X - 4 - Ord(Right);
     {4 - это ширина элемента управления (номера окна в левой панели
      и кнопки максимизации в правой панели. Для правой панели ещё
      один символ - это пробел между индикатором сортировки и TopView }
@@ -84,7 +86,7 @@ procedure TTopView.Draw;
   S := GetText(Width);
   if StrCols(S) < Width - 2 then
     S := ' ' + S + ' ';
-  R.A := Panel^.Origin;
+  R.A := Panel.Origin;
   R.B.Y := R.A.Y;
   Dec(R.A.Y);
   D := (Width - StrCols(S) + 4) div 2;
@@ -102,7 +104,7 @@ procedure TTopView.Draw;
     Exit;
     end;
   C := GetColorW(1);
-  if not Panel^.GetState(sfSelected) then
+  if not Panel.GetState(sfSelected) then
     C := GetColorW(2);
   MoveChar(B, ' ', C, Size.X);
   MoveStr(B[0], S, C);
@@ -111,13 +113,13 @@ procedure TTopView.Draw;
 
 { ---------------------------- TSortView ------------------------------ }
 
-constructor TSortView.Load(var S: TStream);
+constructor TSortView.Load(S: TStream);
   begin
   inherited Load(S);
   GetPeerViewPtr(S, Panel);
   end;
 
-procedure TSortView.Store(var S: TStream);
+procedure TSortView.Store(S: TStream);
   begin
   inherited Store(S);
   PutPeerViewPtr(S, Panel);
@@ -143,7 +145,7 @@ procedure TSortView.Draw;
   C := GetString(dlSortTag)[SortSetup^.SortMode + 1];
   if (SortSetup^.SortFlags and psfInverted) <> 0  then
     C := Upcase(C);
-  MoveChar(B, C, Panel^.Owner^.GetColorW(3), 1);
+  MoveChar(B, C, Panel.Owner^.GetColorW(3), 1);
   WriteLineW(0, 0, 1, 1, B);
   end;
 

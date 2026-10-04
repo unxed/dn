@@ -97,13 +97,14 @@ const
 type
   TTextReaderBuf = array[0..TextReaderBufSize-1] of Char;
 
-  PTextReader = ^TTextReader;
-  TTextReader = object
+  TTextReader = class;
+  PTextReader = TTextReader;
+  TTextReader = class
     Eof: Boolean;
-    constructor Init(const FName: String); {DataCompBoy}
+    constructor Create(const FName: String); {DataCompBoy}
     function GetStr: String;
     function FileName: String; {DataCompBoy}
-    destructor Done; virtual;
+    destructor Destroy; override;
   private
     Handle: lFile; {DataCompBoy}
     BufSz: Integer;
@@ -326,7 +327,7 @@ function MemOK: Boolean;
 
 
 {-DataCompBoy-}
-constructor TTextReader.Init(const FName: String);
+constructor TTextReader.Create(const FName: String);
   var
     FileSz: TFileSize;
     ToRead: Integer;
@@ -354,7 +355,7 @@ constructor TTextReader.Init(const FName: String);
       end;
     end;
   BufPos := 0;
-  end { TTextReader.Init };
+  end { TTextReader.Create };
 {-DataCompBoy-}
 
 {-DataCompBoy-}
@@ -453,7 +454,7 @@ function TTextReader.GetStr: String;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-destructor TTextReader.Done;
+destructor TTextReader.Destroy;
   begin
   ClrIO;
   Close(Handle.F);

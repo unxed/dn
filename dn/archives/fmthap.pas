@@ -54,9 +54,10 @@ uses
   ;
 
 type
-  PHAPArchive = ^THAPArchive;
-  THAPArchive = object(TARJArchive)
-    constructor Init;
+  THAPArchive = class;
+  PHAPArchive = THAPArchive;
+  THAPArchive = class(TARJArchive)
+    constructor Create;
     procedure GetFile; virtual;
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
@@ -77,7 +78,7 @@ implementation
 
 { ----------------------------- HAP ------------------------------------}
 
-constructor THAPArchive.Init;
+constructor THAPArchive.Create;
   var
     Sign: TStr5;
     q: String;
@@ -86,7 +87,7 @@ constructor THAPArchive.Init;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  TObject.Init;
+  inherited Create;
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'HAP3'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'PAH3'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
@@ -152,14 +153,14 @@ procedure THAPArchive.GetFile;
     P: HAPHdr;
     C: Char;
   begin
-  ArcFile^.Read(P, 1);
-  if  (ArcFile^.GetPos = ArcFile^.GetSize) then
+  ArcFile.Read(P, 1);
+  if  (ArcFile.GetPos = ArcFile.GetSize) then
     begin
     FileInfo.Last := 1;
     Exit;
     end;
-  ArcFile^.Read(P.Id, SizeOf(P)-1);
-  if  (ArcFile^.Status <> stOK) or (P.Id <> $574a688e {#142#104#74#87})
+  ArcFile.Read(P.Id, SizeOf(P)-1);
+  if  (ArcFile.Status <> stOK) or (P.Id <> $574a688e {#142#104#74#87})
   then
     begin
     FileInfo.Last := 2;
@@ -173,19 +174,19 @@ procedure THAPArchive.GetFile;
   FileInfo.Date := P.Date;
   FileInfo.FName := '';
   repeat
-    ArcFile^.Read(C, 1);
+    ArcFile.Read(C, 1);
     if C <> #0 then
       FileInfo.FName := FileInfo.FName+C;
   until (C = #0) or (Length(FileInfo.FName) > 77);
   repeat
-    ArcFile^.Read(C, 1);
-  until (C in [#$15, #$16]) or (ArcFile^.Status <> stOK);
-  if  (ArcFile^.Status <> stOK) or (Length(FileInfo.FName) > 79) then
+    ArcFile.Read(C, 1);
+  until (C in [#$15, #$16]) or (ArcFile.Status <> stOK);
+  if  (ArcFile.Status <> stOK) or (Length(FileInfo.FName) > 79) then
     begin
     FileInfo.Last := 2;
     Exit;
     end;
-  ArcFile^.Seek(ArcFile^.GetPos+P.PackedSize-1);
+  ArcFile.Seek(ArcFile.GetPos+P.PackedSize-1);
   end { THAPArchive.GetFile };
 
 end.

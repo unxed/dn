@@ -38,9 +38,9 @@ begin
   Sort;
 end;
 
-constructor TStringCollection.Init(ALimit, ADelta: LongInt; ALongStrings: Boolean);
+constructor TStringCollection.Create(ALimit, ADelta: LongInt; ALongStrings: Boolean);
 begin
-  inherited Init(ALimit, ADelta);
+  inherited Create(ALimit, ADelta);
   LongStrings := ALongStrings;
 end;
 
@@ -65,7 +65,7 @@ begin
     DisposeStr(PStr(Item));
 end;
 
-function TStringCollection.GetItem(var S: TStream): Pointer;
+function TStringCollection.GetItem(S: TStream): Pointer;
 begin
   if LongStrings then
     Result := S.ReadLongStr
@@ -73,7 +73,7 @@ begin
     Result := S.ReadStr;
 end;
 
-procedure TStringCollection.PutItem(var S: TStream; Item: Pointer);
+procedure TStringCollection.PutItem(S: TStream; Item: Pointer);
 begin
   if LongStrings then
     S.WriteLongStr(PLongString(Item))
@@ -96,9 +96,9 @@ begin
   StrDispose(PChar(Item));
 end;
 
-constructor TLineCollection.Init(ALimit, ADelta: LongInt; ALongStrings: Boolean);
+constructor TLineCollection.Create(ALimit, ADelta: LongInt; ALongStrings: Boolean);
 begin
-  inherited Init(ALimit, ADelta);
+  inherited Create(ALimit, ADelta);
   LongStrings := ALongStrings;
 end;
 
@@ -112,7 +112,7 @@ begin
     DisposeStr(PStr(Item));
 end;
 
-function TLineCollection.GetItem(var S: TStream): Pointer;
+function TLineCollection.GetItem(S: TStream): Pointer;
 begin
   if LongStrings then
     Result := S.ReadLongStr
@@ -120,7 +120,7 @@ begin
     Result := S.ReadStr;
 end;
 
-procedure TLineCollection.PutItem(var S: TStream; Item: Pointer);
+procedure TLineCollection.PutItem(S: TStream; Item: Pointer);
 begin
   if LongStrings then
     S.WriteLongStr(PLongString(Item))
@@ -128,12 +128,12 @@ begin
     S.WriteStr(PStr(Item));
 end;
 
-function TStrCollection.GetItem(var S: TStream): Pointer;
+function TStrCollection.GetItem(S: TStream): Pointer;
 begin
   Result := S.StrRead;
 end;
 
-procedure TStrCollection.PutItem(var S: TStream; Item: Pointer);
+procedure TStrCollection.PutItem(S: TStream; Item: Pointer);
 begin
   S.StrWrite(PChar(Item));
 end;
