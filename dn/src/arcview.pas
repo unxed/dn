@@ -312,7 +312,7 @@ constructor TArcDrive.Create(PC: PDirStorage; const AName, VAName: String);
     end;
   SkipSFX;
   AType := DetectArchive;
-  FreeObject(ArcFile);
+  ArcFile.Free;
   end { TArcDrive.InitCol };
 {-DataCompBoy-}
 
@@ -364,7 +364,7 @@ constructor TArcDrive.Load(S: TStream);
       end;
     SkipSFX;
     AType := DetectArchive;
-    FreeObject(ArcFile);
+    ArcFile.Free;
     if AType = nil then
       begin
 Failure:
@@ -383,7 +383,7 @@ Failure:
 procedure TArcDrive.KillUse;
   begin
   if Prev <> nil then
-    Prev^.KillUse;
+    Prev.KillUse;
   if KillAfterUse then
     EraseTempFile(ArcName);
   end;
@@ -458,10 +458,10 @@ function TArcDrive.ReadArchive: Boolean;
   AType := DetectArchive;
   if AType = nil then
     begin
-    FreeObject(ArcFile);
+    ArcFile.Free;
     Exit;
     end;
-  New(Files, Init);
+  Files := PDirStorage.Create;
   if Files = nil then
     Exit;
   P := nil;
@@ -528,7 +528,7 @@ function TArcDrive.ReadArchive: Boolean;
   Dec(SkyEnabled);
   if P <> nil then
     P^.Free;
-  FreeObject(ArcFile);
+  ArcFile.Free;
   CDir := '';
   if  (FileInfo.Last = 2) or
       ( (AType.GetID = arcZIP) and not CentralDirRecPresent)
@@ -596,7 +596,7 @@ function TArcDrive.GetDir: String;
   CheckSlashDot(CurDir);
   if  (Length(CurDir) > 0) and (not (CurDir[1] in ['\', '/'])) then
     CurDir := '\'+CurDir;
-  if  (Prev <> nil) and (Prev^.DriveType = dtDisk) then
+  if  (Prev <> nil) and (Prev.DriveType = dtDisk) then
     lFSplit(VArcName, Dr, Nm, Xt) {JO}
   else
     lFSplit(ArcName, Dr, Nm, Xt);
@@ -1059,18 +1059,18 @@ procedure TArcDrive.ChangeUp(var S: String);
     New(Prev, Init(0, Panel));
     if Prev = nil then
       Exit;
-    {Prev^.Owner := Owner;}
+    {Prev.Owner := Owner;}
     end;
   PFilePanel(Panel)^.Drive := Prev;
   if TypeOf(Prev^) = TypeOf(TDrive) then
-    Prev^.lChDir(GetPath(VArcName));
+    Prev.lChDir(GetPath(VArcName));
   {piwamoto: VArcName is a feature, not a bug :-)}
-  if  (Prev^.DriveType = dtDisk) and
+  if  (Prev.DriveType = dtDisk) and
       (PView(Panel)^.GetState(sfSelected+sfActive))
   then
     ActivePanel := Panel;
   GlobalMessage(evCommand, cmRereadInfo, nil);
-  if  (Prev^.DriveType = dtDisk) then
+  if  (Prev.DriveType = dtDisk) then
     S := GetName(VArcName)
   else
     S := GetName(ArcName);
@@ -1762,7 +1762,7 @@ function TArcDrive.GetFullFlags: Word;
 procedure TArcDrive.RereadDirectory(S: String);
   begin
   if Prev <> nil then
-    Prev^.RereadDirectory(S);
+    Prev.RereadDirectory(S);
   end;
 
 procedure TArcDrive.GetDirInfo(var B: TDiskInfoRec);
