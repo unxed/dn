@@ -389,7 +389,7 @@ destructor TArvidDrive.Destroy;
     begin
     ArvidDrives.Delete(@Self);
     if ArvidDrives.Count = 0 then
-      Dispose(ArvidDrives, Done);
+      ArvidDrives.Free;
     ArvidDrives := nil;
     end;
   if Stream <> nil then
