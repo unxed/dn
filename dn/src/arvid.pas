@@ -1053,7 +1053,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       FindList := PCollection.Create($100, $100);
     if OOM or (not MemOK) or (MaxAvail < (FindList.Count+$200)*4) then
       begin
-      Dispose(TStreamable(P), Done);
+      TStreamable(P).Free;
       OOM := True;
       Exit;
       end;
