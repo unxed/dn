@@ -69,7 +69,6 @@ type
   { Диалог создания списка файлов. В ресурсе должны быть
   DirectLink на строку ввода имени файла (1) и строку ввода
   шаблона строки файла (2) }
-  PMakeListDlg = ^TMakeListDlg;
   TMakeListDlg = class(TDialog)
     procedure HandleEvent(var Event: TEvent); virtual;
       { Для реакции на кнопки }
@@ -77,7 +76,7 @@ type
 
 procedure InpLineReplace(P: TInputLine; const S: String);
   begin
-  with P^ do
+  with P do
     begin
     Select;
     SelStart := CurPos;
@@ -250,7 +249,7 @@ procedure MakeListFile(APP: Pointer; Files: TCollection);
     end { MakeStr };
 
   begin { MakeListFile }
-  if Files^.Count = 0 then
+  if Files.Count = 0 then
     Exit;
   Message(APP, evBroadcast, cmGetUserParams, @UPr);
   FillChar(S, SizeOf(S), 0);
@@ -405,9 +404,9 @@ AddrError:
       end;
     end;
   Message(Desktop, evBroadcast, cmGetUserParams, @UPr);
-  for I := 1 to Files^.Count do
+  for I := 1 to Files.Count do
     begin
-    P := Files^.At(I-1);
+    P := Files.At(I-1);
     UPr.Active := P;
     {AK155 23-09-2003: разотметка по одному файлу тормозит страшно при
 большом числе файлов
