@@ -129,6 +129,7 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `topview.pas` (was `topview_`) | the view that shows the top of a stack of windows and the sorted view (`TTopView`, `TSortView`) |
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
+| `cfgstate.pas` (ours) | the image of the records of the dialogs (what `dn.cfg` held) in the section `[Saved]` of `dn.ini`: hex pieces, read and written through `profile.pas` |
 | `fatalerr.pas` (the place of an address and the wait for a key at the fatal-error screen of `dn.pas`; was in `vpsyslow`, ours) | what the crash screen needs |
 | `compat/dnscreen.pas` (the 16-bit cell screen and the cursor of DN over `tv/`, was the `SysTv*` part of `vpsyslow`, ours) | the copy of the screen for the code that reads the screen, the cursor shape |
 | `compat/osdep.pas` (was `vpsyslow`, ours), `realmode.pas` (was `dpmi32`, `dpmi32df` and `doslow`) | the system layer: files, drives, time, keys, the terminal, running programs, the search of a directory with the times of a file, the calls of the real mode of DOS (replaces the runtime of Virtual Pascal; named by what it does) |
