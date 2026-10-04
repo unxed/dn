@@ -207,7 +207,6 @@ constructor TEditMacros.Init(S: String; var F: PTextReader);
   var
     I, J: LongInt;
     IDs: PIDCollection;
-    Error: Boolean;
 
   function GetID(const S: String): LongInt;
     var

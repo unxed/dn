@@ -208,7 +208,9 @@ const
   cfgCalcFormat = 69; {AK155}
 
   dlAbout = #13#3'DN/2 Open Source'+
-  #13#3'Version %s, %s'+
+  #13#3'Version %s'+
+  #13#3'Build %s'+
+  #13#3'Compiled %s'+
   #13#3'https://github.com/unxed/dn'#13+
   #13#3'Based on '+
   'Dos Navigator Open Source 1.51.08'#13+
@@ -960,7 +962,7 @@ procedure TDNApplication.StoreDesktop(var S: TStream);
 
 function CacheLngId: String;
   begin
-  CacheLngId := VersionName+LngId+VersionDate+'123';
+  CacheLngId := VersionName+LngId+VersionDate+VersionRev+'123';
   
   end;
 
@@ -1960,11 +1962,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   procedure MessageBoxAbout;
     var
-      D: array[1..2] of PString;
+      D: array[1..3] of PString;
     begin
     
     D[1] := NewStr(VersionName);
-    D[2] := NewStr(#13+#3+'Compiled '+VersionDate);
+    D[2] := NewStr(VersionRev);
+    D[3] := NewStr(VersionDate);
     MessageBox2(dlAbout, ^C'Based on Dos Navigator'#13+
   ^C'Copyright (C) 1991-99 RIT Research Labs'#13#13+
   ^C'This product is a FREEWARE', @D, nil, mfAbout+mfOKButton);
