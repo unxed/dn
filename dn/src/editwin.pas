@@ -87,7 +87,6 @@ uses
   ;
 
 type
-  PEditSaver = ^TEditSaver;
   TEditSaver = class(TObject)
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -112,14 +111,14 @@ procedure TEditSaver.Store(var S: TStream);
 
 procedure LoadCommands;
   var
-    P: PEditSaver;
+    P: TEditSaver;
   begin
   if MaxCommands = 0 then
     begin
     if not Registered then
       RegisterType(REditSaver);
     Registered := True;
-    P := PEditSaver(LoadResource(dlgEditorCommands));
+    P := TEditSaver(LoadResource(dlgEditorCommands));
     P.Free;
     end;
   end;
@@ -227,9 +226,9 @@ R.Assign(1, 1, Size.X - 1, 2);
   {MenuBar.Options := MenuBar.Options or ofPostProcess;}
 R.Assign(1, 2, Size.X - 1, Size.Y - 1);
 
-  Intern := New(TXFileEditor, Init(R,
+  Intern := TXFileEditor.Create(R,
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
-        MakeScrollBar(sbVertical+sbHandleKeyboard), FileName));
+        MakeScrollBar(sbVertical+sbHandleKeyboard), FileName);
 
 
 
@@ -242,9 +241,9 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
 
   Insert(Intern);
   MILoadFile(Intern, FileName);
-  if not Intern^.isValid then
+  if not Intern.isValid then
     begin
-    Done;
+    Free;
     Fail;
     end;
 R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
@@ -255,11 +254,11 @@ R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
   Inc(R.A.Y, 2);
   Dec(R.B.Y);
   ABookLine := TBookmarkLine.Create(R);
-  ABookLine^.GrowMode := gfGrowHiY;
+  ABookLine.GrowMode := gfGrowHiY;
   Insert(ABookLine);
 
-  Intern^.InfoL := AInfo;
-  Intern^.BMrk := ABookLine;
+  Intern.InfoL := AInfo;
+  Intern.BMrk := ABookLine;
   end { TEditWindow.Init };
 
 procedure TEditWindow.SetState(AState: Word; Enable: Boolean);
@@ -268,23 +267,20 @@ procedure TEditWindow.SetState(AState: Word; Enable: Boolean);
   Redraw;
   end;
 
-type
-  PR_REditSaver = ^TEditSaver;
-
 function Build_REditSaver(var S: TStream): TStreamable;
 begin
-  Result := TStreamable(New(PR_REditSaver, Load(S)));
+  Result := TStreamable(TEditSaver.Load(S));
 end;
 
 procedure Store_REditSaver(P: TStreamable; var S: TStream);
 begin
-  PR_REditSaver(P)^.Store(S);
+  TEditSaver(P).Store(S);
 end;
 
 procedure SetStreamRecs_edwin;
 begin
 
-  REditSaver.VmtLink := PtrUInt(TypeOf(TEditSaver));
+  REditSaver.VmtLink := PtrUInt(System.TClass(TEditSaver));
   REditSaver.Load := @Build_REditSaver;
 
   REditSaver.Store := @Store_REditSaver;
