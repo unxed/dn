@@ -110,12 +110,12 @@ function LinesText(PC: TLineCollection): AnsiString;
   Result := '';
   if PC = nil then
     Exit;
-  for I := 0 to PC^.Count - 1 do
+  for I := 0 to PC.Count - 1 do
     begin
-    if PC^.LongStrings then
-      L := PLongString(PC^.At(I))^
+    if PC.LongStrings then
+      L := PLongString(PC.At(I))^
     else
-      L := PStr(PC^.At(I))^;
+      L := PStr(PC.At(I))^;
     if I > 0 then
       Result := Result + #10;
     Result := Result + ToSys(L);
@@ -141,7 +141,7 @@ function TextLines(const T: AnsiString): TLineCollection;
       Inc(Q);
     P := Q + 1;
     end;
-  if Result^.Count = 0 then
+  if Result.Count = 0 then
     Result.Insert(NewLongStr(''));
   end;
 
