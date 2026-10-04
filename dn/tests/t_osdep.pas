@@ -30,6 +30,7 @@ begin
   StrPCopy(P, 'vpsys2.tmp');
   Check(SysFileCreate(P, Open_Access_ReadWrite, 0, HI) = 0, 'SysFileCreate');
   Buf[0] := 7; Buf[1] := 8; Buf[2] := 9;
+  Check(FileWrite(HI, Buf, 3) = 3, 'three bytes are written (the RTL: SysFileWrite is gone)');
   Check((SysFileSeek(HI, 0, 0, Act) = 0) and (Act = 0), 'SysFileSeek to the beginning');
   FillChar(Buf, SizeOf(Buf), 0);
   Check((SysFileSeek(HI, 0, 2, Act) = 0) and (Act = 3), 'SysFileSeek to the end gives the size');
