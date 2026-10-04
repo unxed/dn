@@ -57,7 +57,6 @@ uses
 type
   { TUniWindow }
 
-  PUniWindow = ^TUniWindow;
   TUniWindow = class(TWindow)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     function GetPalette: TPalette; virtual;
@@ -68,14 +67,12 @@ type
 
   { TEditScrollBar }
 
-  PEditScrollBar = ^TEditScrollBar;
   TEditScrollBar = class(TScrollBar)
     function GetPalette: TPalette; virtual;
     end;
 
   { TEditFrame }
 
-  PEditFrame = ^TEditFrame;
   TEditFrame = class(TFrame)
     function GetPalette: TPalette; virtual;
     end;
@@ -114,12 +111,12 @@ procedure TUniWindow.InitFrame;
     R: TRect;
   begin
   R.Assign(0, 0, Size.X, Size.Y);
-  Frame := PEditFrame.Create(R);
+  Frame := TEditFrame.Create(R);
   end;
 
 function TUniWindow.MakeScrollBar(AOptions: Word): TScrollBar;
   var
-    P: PEditScrollBar;
+    P: TEditScrollBar;
     R: TRect;
   begin
   GetExtent(R);
@@ -140,12 +137,12 @@ function TUniWindow.MakeScrollBar(AOptions: Word): TScrollBar;
     Dec(R.B.X, 2);
     R.A.Y := R.B.Y-1;
     end;
-  New(P, Init(R));
+  P := TEditScrollBar.Create(R);
   if AOptions and sbVertical = 0 then
-    P^.GrowMode := gfGrowLoY+gfGrowHiY+gfGrowHiX
+    P.GrowMode := gfGrowLoY+gfGrowHiY+gfGrowHiX
   else {p^.GrowMode:=gfGrowHiY+gfGrowHiX}
     ;
-  P^.Options := P^.Options or ofPostProcess;
+  P.Options := P.Options or ofPostProcess;
   Insert(P);
   MakeScrollBar := P;
   end { TUniWindow.MakeScrollBar };
