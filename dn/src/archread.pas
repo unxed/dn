@@ -65,7 +65,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
   var
     S, CurDir, ID: String;
     P: PArcFile;
-    PC: PDirStorage;
+    PC: TDirStorage;
     F: TTextReader;
     DT: DateTime;
     I, J: Integer;
@@ -97,10 +97,10 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       if F = nil then
         Exit;
       P := nil;
-      PC.Create;
-      while not F^.Eof do
+      PC := TDirStorage.Create;
+      while not F.Eof do
         begin
-        S := F^.GetStr;
+        S := F.GetStr;
         DelLeft(S);
         DelRight(S);
         ID := Copy(S, 1, 4);
@@ -121,7 +121,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
           if P <> nil then
             begin
             PackTime(DT, P^.Date);
-            PC^.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
+            PC.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
             DisposeStr(P^.FName);
             Dispose(P);
             end;
@@ -141,7 +141,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
           if P <> nil then
             begin
             PackTime(DT, P^.Date);
-            PC^.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
+            PC.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
             DisposeStr(P^.FName);
             Dispose(P);
             end;
@@ -202,22 +202,22 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
       if F = nil then
         Exit;
       P := nil;
-      PC.Create;
+      PC := TDirStorage.Create;
       repeat
-        S := F^.GetStr;
+        S := F.GetStr;
         ID := Copy(S, 9, 2);
         I := PosChar('%', S);
-      until ((ID = ': ') and (I > 50)) or (F^.Eof);
+      until ((ID = ': ') and (I > 50)) or (F.Eof);
       I := PosChar(',', S);
-      if  (I < 12) or (F^.Eof) then
+      if  (I < 12) or (F.Eof) then
         goto 2;
       ID := Copy(S, 11, I-11);
       Val(ID, J, I);
       for I := 1 to 4 do
-        S := F^.GetStr;
-      while (J <> 0) and (not F^.Eof) do
+        S := F.GetStr;
+      while (J <> 0) and (not F.Eof) do
         begin
-        S := F^.GetStr;
+        S := F.GetStr;
         DelLeft(S);
         DelRight(S);
         New(P);
@@ -226,7 +226,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
         if I = 0 then
           begin
           P^.FName := NewStr('\'+S);
-          S := F^.GetStr;
+          S := F.GetStr;
           DelLeft(S);
           DelRight(S);
           end
@@ -250,7 +250,7 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
         DT.Min := StoI(Copy(S, 4, 2));
         DT.Sec := StoI(Copy(S, 7, 2));
         PackTime(DT, P^.Date);
-        PC^.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
+        PC.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
         DisposeStr(P^.FName);
         Dispose(P);
         P := nil;
@@ -264,13 +264,13 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
         F := TTextReader.Create(S);
         if F = nil then Exit;
         P := nil;
-        PC.Create;
+        PC := TDirStorage.Create;
         Repeat
-         S := F^.GetStr;
-        Until (S[1] = '-') or (F^.EOF);
-        if F^.EOF then Goto 3;
+         S := F.GetStr;
+        Until (S[1] = '-') or (F.EOF);
+        if F.EOF then Goto 3;
         repeat
-         S := F^.GetStr;
+         S := F.GetStr;
          if (S[1] = '-') or (Length(S) < 54) then Goto 3;
          New(P);
          DT.Year := StoI(Copy(S,1,4));
@@ -289,25 +289,25 @@ procedure ReadArcList; {changed & AIN added by piwamoto}
            end
            else P^.Attr := 0;
          P^.FName := NewStr('\'+fDelRight(Copy(S, 54, 255)));
-         PC^.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
+         PC.AddFile(P^.FName^, P^.USize, P^.PSize, P^.Date, P^.Attr);
          DisposeStr(P^.FName);
          Dispose(P);
          P:=nil;
-        until F^.EOF;
+        until F.EOF;
       3:
       ID := '';
       end;
     {next archive}
 
-    S := F^.FileName;
+    S := F.FileName;
     F.Free;
     EraseFile(S);
     GlobalMessage(evCommand, cmRereadDir, @TempDir);
-    if PC^.Files = 0 then
-      Dispose(PC, Done)
+    if PC.Files = 0 then
+      PC.Free
     else
       begin
-      New(Drv, InitCol(PC, ArcFileName, VArcFileName));
+      Drv := TArcDrive.Create(PC, ArcFileName, VArcFileName);
       if Message(Application, evBroadcast, cmFindForced, Drv) = nil then
         if Message(Application, evCommand, cmInsertDrive, Drv) = nil
         then
