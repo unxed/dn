@@ -56,7 +56,7 @@ program DN;
 
 uses
 
-  DNErrLog, Drivers, Lfn, uselfn,
+  DNErrLog, DNRun, Drivers, Lfn, uselfn,
   boot, Dos, mainapp,
   Menus, panelroot, filepanel, FileCopy, Filediz, Filelst, Eraser,
   DiskInfo, basics, strutil, fileutil, os2sess, highlite,
@@ -109,6 +109,8 @@ try
   begin
  
   RUN_IT;
+  if RestartPending then
+    RestartSelf;
  
   end
   {/Cat}
