@@ -68,7 +68,7 @@ type
       {` Какая это панель: правая или левая `}
     InfoView, DirView, DriveLine, SortView: TView;
     Delta, OldDelta, OldPos, DeltaX: LongInt;
-    Files: PFilesCollection;
+    Files: TFilesCollection;
     DirectoryName, OldDirectory: String;
     ScrollBar: PMyScrollBar;
     DrawDisableLvl, SelNum, LineLength: LongInt;
@@ -455,7 +455,7 @@ procedure TFilePanelRoot.ChangeBounds(const Bounds: TRect);
     begin
     if Loaded then { Без этого InfoView^.Draw может зациклиться }
       LineLength := CalcLength;
-    PInfoView(InfoView).CompileShowOptions;
+    TInfoView(InfoView).CompileShowOptions;
       { При этом определится InfoView^.Size.Y }
     InfoViewHeight := InfoView.Size.Y;
     R := NewBounds;
@@ -511,7 +511,7 @@ procedure TFilePanelRoot.RereadDir;
     P, PP, CurP: PFileRec;
     I, J, Pos: LongInt;
     l: LongInt;
-    FC {,FCC}: PFilesCollection;
+    FC {,FCC}: TFilesCollection;
     NewDir: String;
     BB: Boolean;
     TF: TFileRec;
@@ -531,7 +531,7 @@ procedure TFilePanelRoot.RereadDir;
     begin
     LineLength := CalcLength;
     if Files <> nil then
-      ScrollBar.SetParams(PFilesCollection(Files).Selected, 0,
+      ScrollBar.SetParams(TFilesCollection(Files).Selected, 0,
          Files.Count-1,
          PanelHeight*((Size.X+1) div LineLength), 1);
     CurrentDirectory := ActiveDir;
@@ -578,7 +578,7 @@ procedure TFilePanelRoot.RereadDir;
     RedrawPanelInfoDir;
     Exit
     end;
-  FC := PFilesCollection(Files);
+  FC := TFilesCollection(Files);
   Files := nil;
   IncDrawDisabled;
   Pos := ScrollBar.Value;
@@ -682,7 +682,7 @@ procedure TFilePanelRoot.ReadDirectory;
     SM: Word;
   begin
   if  (Owner <> nil) and
-      (PDoubleWindow(Owner).NonFilePanelType = dtQView)
+      (TDoubleWindow(Owner).NonFilePanelType = dtQView)
   then
     NeedLocated := GetSTime; {чтобы сменить показ каталога}
   LineLength := CalcLength;
@@ -709,7 +709,7 @@ procedure TFilePanelRoot.ReadDirectory;
 //    происходит падение после его закрытия
     Files := nil;
     end;
-  Files := PFilesCollection(Drive.GetDirectory(
+  Files := TFilesCollection(Drive.GetDirectory(
          PanSetup^.FileMask, TotalInfo));
 
 //  if PanSetup.Show.FreeSpaceInfo <> fseNotShow then
@@ -725,8 +725,8 @@ procedure TFilePanelRoot.ReadDirectory;
 
   
   if Files = nil then
-    Files := PFilesCollection.Create($10, $10);
-  PFilesCollection(Files).Panel := Self;
+    Files := TFilesCollection.Create($10, $10);
+  TFilesCollection(Files).Panel := Self;
   SelNum := 0;
   SelectedLen := 0;
   PackedLen := 0;
@@ -734,7 +734,7 @@ procedure TFilePanelRoot.ReadDirectory;
   SM := PanSetup^.Sort.SortMode;
   if RereadNoSort then
     SM := psmUnsorted;
-  PFilesCollection(Files).SortMode := SM;
+  TFilesCollection(Files).SortMode := SM;
 
   { Бывает сортировка по описаниям, поэтому Sort надо делать
   после ReadDescrptions }
@@ -1437,7 +1437,7 @@ WrongArc:
     Abort := False;
     OldDelta := -1;
     MPos.X := Origin.X+Size.X div 2;
-    PDriveLine(DriveLine).Refresh; {AK155}
+    TDriveLine(DriveLine).Refresh; {AK155}
     if DriveSelectVCenter then
       {-$X-Man}
       MPos.Y := Origin.Y+Size.Y div 2 {-$VIV} {-$X-Man}
@@ -1601,10 +1601,10 @@ WrongArc:
           case DNKeyCode(Event) of
             kbCtrlLeft, kbCtrlShiftLeft:
               if DriveLine <> nil then
-                PDriveLine(DriveLine).ShiftLetter(-1);
+                TDriveLine(DriveLine).ShiftLetter(-1);
             kbCtrlRight, kbCtrlShiftRight:
               if DriveLine <> nil then
-                PDriveLine(DriveLine).ShiftLetter(+1);
+                TDriveLine(DriveLine).ShiftLetter(+1);
           end {case};
           DriveLine.DrawView;
           end;
@@ -1911,7 +1911,7 @@ WrongArc:
       aaa: Word;
       bbb, ccc: Byte;
       l: LongInt;
-      FC: PFilesCollection;
+      FC: TFilesCollection;
       s: String;
       s2: LongString;
       
@@ -2408,7 +2408,7 @@ WrongArc:
   {/JO}
 
   var
-    FC: PFilesCollection;
+    FC: TFilesCollection;
     PSDEL: Byte;
     ColumnTitles: Boolean;
   begin { TFilePanelRoot.CommandHandle }
@@ -3297,7 +3297,7 @@ procedure TFilePanelRoot.SetupPanelFromDrive;
   begin
   DriveLetter := Drive.GetDriveLetter;
   PanSetup := @PanelSetupSet[dt2pc[Drive.DriveType]];
-  PInfoView(InfoView).CompileShowOptions;
+  TInfoView(InfoView).CompileShowOptions;
   LFNLen := SToI(PanSetup.Show.LFNLen);
   EXTLen := SToI(PanSetup.Show.EXTLen);
   LFNLonger250 := (LFNLen >= 250)
@@ -3307,7 +3307,7 @@ procedure TFilePanelRoot.SetupPanelFromDrive;
     {JO: если ширина колонки имени больше 250 символов,
      её показываем после остальных колонок}
   if Owner <> nil { nil бывает во время Load } then
-    PDoubleWindow(Owner).SetMaxiState(Self);
+    TDoubleWindow(Owner).SetMaxiState(Self);
   end;
 
 procedure TFilePanelRoot.AddSelected(PF: PFileRec);
@@ -3406,7 +3406,7 @@ procedure TFilePanelRoot.Rebound;
 
 function OtherFilePanel(P: TFilePanelRoot): TFilePanelRoot;
   begin
-  Result := PDoubleWindow(P.Owner).Panel[not P.SelfNum].FilePanel;
+  Result := TDoubleWindow(P.Owner).Panel[not P.SelfNum].FilePanel;
   end;
 
 end.

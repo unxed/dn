@@ -53,7 +53,7 @@ uses
   ;
 
 procedure SetupArchive(ArchCommand: Word);
-procedure UpdateARH(Arch: PARJArchive);
+procedure UpdateARH(Arch: TARJArchive);
 
 implementation
 
@@ -62,10 +62,10 @@ uses
   mainapp, strutil, Commands, profile, DnIni
   ;
 
-procedure UpdateARH(Arch: PARJArchive);
+procedure UpdateARH(Arch: TARJArchive);
   var
     J: Word;
-    A: PARJArchive;
+    A: TARJArchive;
     P: TView;
   begin
   if Arch <> nil then
@@ -93,7 +93,7 @@ procedure SetupArchive(ArchCommand: Word);
     D: TDialog;
     P: TView;
     R: TRect;
-    Arch: PARJArchive;
+    Arch: TARJArchive;
     W: Word;
 
     DT: record

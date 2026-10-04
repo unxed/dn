@@ -181,7 +181,6 @@ procedure FileChanged(const Name: String);
 
 type
   TTempFile = class;
-  PTempFile = TTempFile;
   TTempFile = class(TBufStream)
     constructor Create(const AExt: String; ABufSize: SW_Word);
     destructor Destroy; override;

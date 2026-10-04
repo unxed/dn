@@ -58,14 +58,12 @@ type
    { строка быстрого переименования (Alt-F6). Она исполняется прямо
    в менедждере, без объемлющего диалога, поэтому имеет свой метод
    Execute. Цвета палитры (C) заносятся в CM_RenameSingleL}
-  PInputFName = ^TInputFName;
   TInputFName = class(TInputLine)
     EndView: Word;
     function Execute: Word; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
 
-  PColorPoint = ^TColorPoint;
   TColorPoint = class(TView)
     Color: Byte;
     constructor Create(var ABounds: TRect; AColor: Byte);

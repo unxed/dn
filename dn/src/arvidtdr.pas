@@ -58,7 +58,7 @@ uses
 
 procedure TdrSeekDirectory(AvtDr: TArvidDrive);
 procedure TdrGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
-    var FC: PFilesCollection; const FileMask: String);
+    var FC: TFilesCollection; const FileMask: String);
 procedure TdrEditDescription(AvtDr: TArvidDrive; var S, Nam: String;
      var PF: PFileRec);
 procedure TdrCalcTotal(AvtDr: TArvidDrive; const Offset: LongInt;
@@ -145,7 +145,7 @@ procedure TdrSeekDirectory(AvtDr: TArvidDrive);
   end { TdrSeekDirectory };
 
 procedure TdrGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
-    var FC: PFilesCollection; const FileMask: String);
+    var FC: TFilesCollection; const FileMask: String);
   var
     FF: TTdrFileCell;
     DD: TTdrDirCell;

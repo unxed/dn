@@ -58,7 +58,6 @@ type
   TFindDir = class;
   TFindFile = class;
   TFindBox = class;
-  PFindObject = TFindObject;
   TFindObject = class(TObject)
     Text: PString;
     TT: (ttTape, ttDir, ttFile);
@@ -67,14 +66,12 @@ type
     destructor Destroy; override;
     end;
 
-  PFindDir = TFindDir;
   TFindDir = class(TFindObject)
     Pos: LongInt;
     constructor Create(const S: String; APos: LongInt);
     function GetText: String; virtual;
     end;
 
-  PFindFile = TFindFile;
   TFindFile = class(TFindObject)
     Name: PString;
     Size: LongInt;
@@ -84,7 +81,6 @@ type
     function GetText: String; virtual;
     end;
 
-  PFindBox = TFindBox;
   TFindBox = class(TListBox)
     function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
     function IsSelected(Item: LongInt): Boolean; virtual;
@@ -157,7 +153,7 @@ function TFindFile.GetText: String;
 
 function TFindBox.GetText(Item: LongInt; MaxLen: Integer): String;
   var
-    P: PFindObject;
+    P: TFindObject;
   begin
   P := List.At(Item);
   if P <> nil then
@@ -168,7 +164,7 @@ function TFindBox.GetText(Item: LongInt; MaxLen: Integer): String;
 
 function TFindBox.IsSelected(Item: LongInt): Boolean;
   var
-    P: PFindObject;
+    P: TFindObject;
   begin
   P := List.At(Item);
   IsSelected := (P <> nil) and (P.TT = ttTape);

@@ -145,7 +145,6 @@ type
 *)
 
   TFilesCollection = class;
-  PFilesCollection = TFilesCollection;
   TFilesCollection = class(TSortedCollection)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     SortMode: Byte;
@@ -164,7 +163,6 @@ type
 
 type
   TFilesHash = class;
-  PFilesHash = TFilesHash;
   {` Хэшировщик, применяемый для быстрого поиска по имени/пути
     в несортированных коллекциях `}
   TFilesHash = class(THash)
@@ -1581,7 +1579,7 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
     TIsDupe = function(i: Integer): Boolean;
   var
     i,j, DupeStart, k: Integer;
-    H: PFilesHash;
+    H: TFilesHash;
     S: TSize;
     IsDupe: TIsDupe;
 

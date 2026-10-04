@@ -72,16 +72,14 @@ type
     end;
 
   TDriveView = class;
-  PDriveView = TDriveView;
 
   TDiskInfo = class;
-  PDiskInfo = TDiskInfo;
   TDiskInfo = class(TView)
     Info: TDiskInfoRec;
     Delta: TPoint;
     OtherPanel: TView{TFilePanelRoot};
       { Файловая панель, с которой связана данная панель информации }
-    DriveView: PDriveView;
+    DriveView: TDriveView;
       { Диск/шара в верхней рамке. См. InsertDriveView и Done }
     constructor Create(R: TRect; Panel: TView{TFilePanelRoot});
     constructor Load(S: TStream);
@@ -97,7 +95,7 @@ type
     end;
 
   TDriveView = class(TTopView)
-    InfoPanel: PDiskInfo;
+    InfoPanel: TDiskInfo;
     function GetText(MaxWidth: Integer): String; override;
     destructor Destroy; override;
     end;
@@ -133,7 +131,6 @@ const
 
 type
   TTeamView = class;
-  PTeamView = TTeamView;
   TTeamView = class(TView)
     LastTick: LongInt;
     Strings: array[1..20] of Integer;
@@ -145,7 +142,7 @@ type
     end;
 
 const
-  TeamView: PTeamView = nil;
+  TeamView: TTeamView = nil;
 
 var
   FreeSpc, TotalSpc: TSize;

@@ -77,7 +77,7 @@ function AvtNewFile(AvtDr: TArvidDrive;
     AAttr: Word): Word;
 procedure AvtSeekDirectory(AvtDr: TArvidDrive);
 procedure AvtGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
-    var FC: PFilesCollection; const FileMask: String);
+    var FC: TFilesCollection; const FileMask: String);
 function CopyFilesToArvid(const S: String; Files: TCollection;
      MoveMode: Boolean; Owner: Pointer): Boolean;
 procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
@@ -1366,7 +1366,7 @@ procedure AvtSeekDirectory(AvtDr: TArvidDrive);
   end { AvtSeekDirectory };
 
 procedure AvtGetDirectory(AvtDr: TArvidDrive; var ALocation: LongInt;
-    var FC: PFilesCollection; const FileMask: String);
+    var FC: TFilesCollection; const FileMask: String);
   var
     TAttr: Word;
     F: PFileRec;
@@ -1498,13 +1498,13 @@ procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
   procedure AvtWalkTree;
     var
       I: Integer;
-      PC: PFilesCollection;
+      PC: TFilesCollection;
       Dummy: TSize;
     begin
     with AvtDr do
       begin
       PD.lChDir(S2);
-      PC := PFilesCollection(PD.GetDirectory(x_x, Dummy));
+      PC := TFilesCollection(PD.GetDirectory(x_x, Dummy));
       PC.SortMode := psmLongName;  {<sort141.001>}
       PC.Sort;
       for I := 0 to PC.Count-1 do

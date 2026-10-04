@@ -73,7 +73,6 @@ type
     end;
 
   TTreeDialog = class;
-  PTreeDialog = TTreeDialog;
   TTreeDialog = class(TDialog)
     Tree: TView;
     isValid: Boolean;
@@ -706,7 +705,7 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
   D := TTreeDialog.Create(R, ATitle, Drv);
   D.Options := D.Options or ofCentered;
   S := '';
-  D := PTreeDialog(Application.ValidView(D));
+  D := TTreeDialog(Application.ValidView(D));
   if D <> nil then
     if Desktop.ExecView(D) = cmOK then
       D.GetData(S);
@@ -1141,7 +1140,7 @@ procedure TTreeView.HandleEvent(var Event: TEvent);
 
 {AK155}
 function MkFcFromDirRec(D: PDirRec; var FullName: String)
-  : PFilesCollection;
+  : TFilesCollection;
   var
     l: LongInt;
     fr: PFileRec;
@@ -1307,7 +1306,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
   {-DataCompBoy-}
   procedure EraseDir;
     var
-      FC: PFilesCollection;
+      FC: TFilesCollection;
       D: PDirRec;
       S: String;
       OldDir: String;
@@ -2013,7 +2012,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
   {-DataCompBoy-}
   procedure CopyDir;
     var
-      FC: PFilesCollection;
+      FC: TFilesCollection;
       D: PDirRec;
       S: String;
       OldDir, NewDir: String;

@@ -80,7 +80,6 @@ const
 
 type
   TSeparator = class;
-  PSeparator = TSeparator;
   {`2 Вертикальный разделитель между панелями. Имитирует левую линию
   рамки правой панели и правую линию рамки левой панели (на самом
   деле панели рамок не имеют вообще.) }
@@ -95,10 +94,9 @@ type
   {`}
 
   TDoubleWindow = class;
-  PDoubleWindow = TDoubleWindow;
   {`2 Двухпанельный менеджер.}
   TDoubleWindow = class(TWindow)
-    Separator: PSeparator; // вертикальный между панелями
+    Separator: TSeparator; // вертикальный между панелями
     Panel: array[TPanelNum] of TPanelDescr;
     OldBounds: TRect;
     OldPanelBounds: TRect;
@@ -190,7 +188,7 @@ constructor TDoubleWindow.Create(const Bounds: TRect; ANumber, ADrive: Integer);
   R.Grow(-1, 0);
   R.A.X := R.B.X div 2;
   R.B.X := R.A.X+2;
-  Separator := PSeparator.Create(R, Size.X);
+  Separator := TSeparator.Create(R, Size.X);
   Insert(Separator);
   InitInterior;
   PassivePanel := Panel[pLeft].FilePanel;
@@ -210,10 +208,10 @@ procedure TDoubleWindow.InitPanel(N: TPanelNum; R: TRect);
   var
     PV: PMyScrollBar;
     P: TFilePanel;
-    P1: PInfoView;
-    P2: PDirView;
-    P3: PSortView;
-    PD: PDriveLine;
+    P1: TInfoView;
+    P2: TDirView;
+    P3: TSortView;
+    PD: TDriveLine;
     B: TRect;
   begin
   if Abort then
@@ -232,22 +230,22 @@ procedure TDoubleWindow.InitPanel(N: TPanelNum; R: TRect);
     Exit
     end;
 
-  P1 := PInfoView.Create(R);
+  P1 := TInfoView.Create(R);
   P1.Panel := P;
   P1.CompileShowOptions;
   P.InfoView := P1;
 
-  P2 := PDirView.Create(R);
+  P2 := TDirView.Create(R);
   P2.Panel := P;
   P.DirView := P2;
   P2.EventMask := $FFFF;
 
-  P3 := PSortView.Create(R);
+  P3 := TSortView.Create(R);
   P3.Panel := P;
   P.SortView := P3;
   P3.EventMask := evMouseDown;
 
-  PD := PDriveLine.Create(R, P);
+  PD := TDriveLine.Create(R, P);
   P.DriveLine := PD;
 
   P.ChangeBounds(R);
@@ -385,7 +383,7 @@ constructor TDoubleWindow.Load(S: TStream);
         ReadAfterLoad;
 
     dtInfo:
-      with PDiskInfo(Panel[NonFilePanel].AnyPanel) do
+      with TDiskInfo(Panel[NonFilePanel].AnyPanel) do
         begin
         OtherPanel := Panel[not NonFilePanel].FilePanel;
         ReadData;
@@ -427,9 +425,9 @@ const
     Остальное не важно.}
 
 { Создание вертикального скроллбара для панели просмотра }
-function MakeVScroll: PViewScroll;
+function MakeVScroll: TViewScroll;
   begin
-  Result := PViewScroll.Create(VScrollRect);
+  Result := TViewScroll.Create(VScrollRect);
   Result.Options := Result.Options or ofPostProcess;
   end;
 
@@ -447,7 +445,7 @@ function ValidVP(var P: TView; S: TView {скроллбар}): Boolean;
   Result := True;
   end;
 
-procedure InsertView(var P: TView; S: TView; Manager: PDoubleWindow);
+procedure InsertView(var P: TView; S: TView; Manager: TDoubleWindow);
   begin
   if ValidVP(P, S) then
     with Manager do
@@ -461,9 +459,9 @@ procedure InsertView(var P: TView; S: TView; Manager: PDoubleWindow);
 { Построители нефайловых панелей }
 
 function InsertQView(R1: TRect;
-    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
+    Manager: TDoubleWindow; Other: TFilePanelRoot): TView;
   var
-    S: PViewScroll;
+    S: TViewScroll;
   begin
   S := MakeVScroll;
   Result := TQFileViewer.Create(R1, nil, '', '', S, True,
@@ -472,9 +470,9 @@ function InsertQView(R1: TRect;
   end { InsertQView };
 
 function InsertDizView(R1: TRect;
-    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
+    Manager: TDoubleWindow; Other: TFilePanelRoot): TView;
   var
-    S: PViewScroll;
+    S: TViewScroll;
   begin
   S := MakeVScroll;
   Result := TDFileViewer.Create(R1, nil, '', '', S, True,
@@ -483,7 +481,7 @@ function InsertDizView(R1: TRect;
   end { InsertDizView };
 
 function InsertTree(R1: TRect;
-    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
+    Manager: TDoubleWindow; Other: TFilePanelRoot): TView;
   var
     S: PMyScrollBar;
     P: TView;
@@ -509,20 +507,20 @@ function InsertTree(R1: TRect;
   end { InsertTree };
 
 function InsertInfo(R1: TRect;
-    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
+    Manager: TDoubleWindow; Other: TFilePanelRoot): TView;
   begin
-  Result := PDiskInfo.Create(R1, Other);
+  Result := TDiskInfo.Create(R1, Other);
   Result.Hide;
   Manager.Insert(Result);
-  PDiskInfo(Result).InsertDriveView;
-  PDiskInfo(Result).ReadData;
+  TDiskInfo(Result).InsertDriveView;
+  TDiskInfo(Result).ReadData;
   // Это надо делать после Insert
   end { InsertTree };
 
 
 type
   TPanelConstructor = function(R1: TRect;
-    Manager: PDoubleWindow; Other: TFilePanelRoot): TView;
+    Manager: TDoubleWindow; Other: TFilePanelRoot): TView;
 
 { В этот массив кто угодно (плагин, к примеру) может добавить свой
 элемент вместо любого nil, после чего этот новый тип нефайловой панели
@@ -801,7 +799,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
   var
     Selected: Boolean;
     Visible: array [TPanelNum] of Boolean;
-    Sp: PSeparator;
+    Sp: TSeparator;
     EV: TEvent;
 
   procedure CE;

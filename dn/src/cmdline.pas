@@ -57,7 +57,6 @@ uses
 
 type
   TCommandLine = class;
-  PCommandLine = TCommandLine;
   TCommandLine = class(TView)
     Dir: String;
     DeltaX, CurX: LongInt;

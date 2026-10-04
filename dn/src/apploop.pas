@@ -98,12 +98,12 @@ procedure MyApp.GetEvent(var Event: TEvent);
   var
     W: Word;
     WW: Word;
-    PM: PKeyMacros;
+    PM: TKeyMacros;
 
   const
     MacroPlaying: Boolean = False;
     MacroKey: Integer = 0;
-    CurrentMacro: PKeyMacros = nil;
+    CurrentMacro: TKeyMacros = nil;
     QuitEvent: TEvent = (What: evKeyDown; KeyCode: kbAltX);
   begin
   

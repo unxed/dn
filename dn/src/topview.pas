@@ -8,7 +8,6 @@ uses
 
 type
   TTopView = class;
-  PTopView = TTopView;
   {`2 Базовый тип для текста, выводимого в заголовке панели. }
   TTopView = class(TView)
     Panel: TView; //фактически -  TFilePanel
@@ -24,7 +23,6 @@ type
   {`}
 
   TSortView = class;
-  PSortView = TSortView;
     {`2 Индикация текущей сортировки панели буковкой в левом верхнем углу `}
   TSortView = class(TView)
     Panel: TView; //фактически -  TFilePanel;
@@ -76,7 +74,7 @@ procedure TTopView.Draw;
     Width: Integer;
     Right: Boolean;
   begin
-  Right := PDoubleWindow(Owner).Panel[pRight].AnyPanel = Panel;
+  Right := TDoubleWindow(Owner).Panel[pRight].AnyPanel = Panel;
   Width := Panel.Size.X - 4 - Ord(Right);
     {4 - это ширина элемента управления (номера окна в левой панели
      и кнопки максимизации в правой панели. Для правой панели ещё

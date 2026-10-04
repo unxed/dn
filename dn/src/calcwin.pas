@@ -200,7 +200,6 @@ type
     Tag: Byte; { for multiindex, only dB IV }
     end;
 
-  PDbfFieldCollection = ^TDbfFieldCollection;
   TDbfFieldCollection = class(TCollection)
     {KV}
     procedure FreeItem(Item: Pointer); virtual;

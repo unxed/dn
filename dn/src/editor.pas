@@ -72,7 +72,6 @@ uses
   ;
 
 type
-  PSortCollection = ^TSortCollection;
   TSortCollection = class(TSortedCollection)
     function Compare(Key1, Key2: Pointer): Integer; virtual;
     end;
@@ -1279,10 +1278,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
 
   procedure PlayMacro;
     var
-      P: PEditMacros;
+      P: TEditMacros;
 
     function DoFind(P_: Pointer): Boolean;
-    var P: PEditMacros absolute P_;
+    var P: TEditMacros absolute P_;
       begin
       if UpStrg(P.Name^) = UpCase(Event.InfoChar) then
         begin

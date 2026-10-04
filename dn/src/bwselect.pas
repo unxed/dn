@@ -56,7 +56,6 @@ uses
   Defines, Streams, Drivers, Views, Commands, Dialogs, TvColorSel;
 
 type
-  P_BWSelector = ^T_BWSelector;
   T_BWSelector = class(TMonoSelector)
     SelType: TColorSel; {Is't a selector of Foreground color ? }
     constructor Create(var Bounds: TRect; ASelType: TColorSel;

@@ -65,7 +65,6 @@ type
   PCharArray = ^TCharArray;
   TCharArray = array[0..65500] of Char;
 
-  PPktObj = ^TPktObj;
   TPktObj = class(TObject)
     FOfs: LongInt;
     Fu, Tu, Su, DT: PString;
@@ -78,28 +77,24 @@ type
     destructor Done; virtual;
     end;
 
-  PPktCol = ^TPktCol;
   TPktCol = class(TCollection)
     FName: PString;
     constructor Create(PktFile: String);
     destructor Done; virtual;
     end;
 
-  PPktList = ^TPktList;
   TPktList = class(TListBox)
     function GetText(Item: LongInt; MaxLen: LongInt): String; virtual;
     end;
 
-  PPktListDialog = ^TPktListDialog;
   TPktListDialog = class(TDialog)
-    lb: PPktList;
-    constructor Create(FName: String; C: PPktCol);
+    lb: TPktList;
+    constructor Create(FName: String; C: TPktCol);
     destructor Done; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetPalette: TPalette; virtual;
     end;
 
-  PLineViewer = ^TLineViewer;
   TLineViewer = class(TScroller)
     FileLines: TLineCollection;
     isValid: Boolean;
@@ -112,7 +107,6 @@ type
     function Valid(Command: LongInt): Boolean; virtual;
     end;
 
-  PMsgViewer = ^TMsgViewer;
   TMsgViewer = class(TLineViewer)
     FromUser, ToUser, Date, Subj: PString;
     constructor Create(var Bounds: TRect;
@@ -120,9 +114,8 @@ type
     destructor Done; virtual;
     end;
 
-  PPktMsgViewer = ^TPktMsgViewer;
   TPktMsgViewer = class(TDialog)
-    FV: PLineViewer;
+    FV: TLineViewer;
     PS1, Ps2, Ps3, Ps4: PString;
     constructor Create(Buf: PCharArray; S1, S2, S3, S4: String;
          MsgN: Word; AllMsg: Word;
@@ -133,11 +126,10 @@ type
     procedure SaveAsText;
     end;
 
-  PMsgViewerDlg = ^TMsgViewerDlg;
   TMsgViewerDlg = class(TDialog)
     Lb1, Lb2, Lb3, Lb4: TLabel;
     CurMsg: PString;
-    FV: PMsgViewer;
+    FV: TMsgViewer;
     constructor Create(FName: String);
     destructor Done; virtual;
     function GetPalette: TPalette; virtual;
@@ -481,7 +473,7 @@ l1:
     if St = '' then
       St := ' ';
     Subj := St;
-    Insert(New(PPktObj, Init(LPos, FromUser, ToUser, Subj, Date, AFrm,
+    Insert(New(TPktObj, Init(LPos, FromUser, ToUser, Subj, Date, AFrm,
            ATo)));
     repeat
       F.Read(ch, 1);
@@ -517,7 +509,7 @@ procedure TPktObj.GetMsgTxt(var Buffer: PCharArray; var MsgLen: Word);
   var
     F: TBufStream;
     LPos: LongInt;
-    PktMsg: PPktObj;
+    PktMsg: TPktObj;
     st: String;
     I: Word;
     PH: PacketHeader;
@@ -560,11 +552,11 @@ destructor TPktCol.Done;
   end;
 
 var
-  PktCol: PPktCol;
+  PktCol: TPktCol;
 
 procedure InitPktCol(FName: String);
   begin
-  PktCol := PPktCol.Create(FName);
+  PktCol := TPktCol.Create(FName);
   end;
 
 procedure DonePktCOl;
@@ -644,7 +636,7 @@ procedure Buffer2Strs(Buffer: PCharArray; var C: TLineCollection);
 function TPktList.GetText(Item: LongInt; MaxLen: LongInt): String;
   var
     FromUser, ToUser, Subj, Date: String;
-    Pc: PPktObj;
+    Pc: TPktObj;
     s1, s2, s3: String;
   begin
   Pc := List^.At(Item);
@@ -673,7 +665,7 @@ function TPktListDialog.GetPalette: TPalette;
   GetPalette := MakePalette(Pal);
   end;
 
-constructor TPktListDialog.Create(FName: String; C: PPktCol);
+constructor TPktListDialog.Create(FName: String; C: TPktCol);
   var
     R: TRect;
     View: TView;
@@ -691,7 +683,7 @@ constructor TPktListDialog.Create(FName: String; C: PPktCol);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y);
-  lb := New(PPktList, Init(R, 1, TScrollBar(View)));
+  lb := New(TPktList, Init(R, 1, TScrollBar(View)));
   lb^.Options := lb^.Options+ofFramed;
   Insert(lb);
   lb^.NewLisT(C);
@@ -749,9 +741,9 @@ procedure ViewPktHeader(MsgCount: SmallInt);
 
 procedure TPktListDialog.HandleEvent(var Event: TEvent);
   var
-    Pc: PPktObj;
+    Pc: TPktObj;
     Buf: PCharArray;
-    D: PPktMsgViewer;
+    D: TPktMsgViewer;
     M: Word;
     s1, s2, s3, s4: String;
   begin
@@ -768,7 +760,7 @@ procedure TPktListDialog.HandleEvent(var Event: TEvent);
         s2 := Pc^.Tu^;
         s3 := Pc^.Su^;
         s4 := Pc^.DT^;
-        D := New(PPktMsgViewer, Init(Buf, s1, s2, s3, s4, lb^.Focused+1,
+        D := New(TPktMsgViewer, Init(Buf, s1, s2, s3, s4, lb^.Focused+1,
                lb^.List^.Count,
               Pc^.FA, Pc^.TA));
         Dispose(Buf);
@@ -923,7 +915,7 @@ constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
   EventMask := $FFFF;
-  FV := PLineViewer.Create(R, nil, VS, Buf);
+  FV := TLineViewer.Create(R, nil, VS, Buf);
   FV^.Options := FV^.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
@@ -1065,7 +1057,7 @@ constructor TMsgViewerDlg.Create(FName: String);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
-  FV := PMsgViewer.Create(R, nil, VS, FName);
+  FV := TMsgViewer.Create(R, nil, VS, FName);
   FV^.Options := FV^.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
@@ -1201,7 +1193,7 @@ procedure TMsgViewerDlg.GotoMsg;
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
-  FV := PMsgViewer.Create(R, nil, VS, CurMsg^);
+  FV := TMsgViewer.Create(R, nil, VS, CurMsg^);
   FV^.Options := FV^.Options or ofFramed;
   Insert(FV);
   Lb1.Free;
@@ -1405,8 +1397,8 @@ l_e:
 
 procedure ViewPktFile(FName: String);
   var
-    C: PPktCol;
-    D: PPktListDialog;
+    C: TPktCol;
+    D: TPktListDialog;
     W: TView;
     R: TRect;
   begin
@@ -1419,9 +1411,9 @@ procedure ViewPktFile(FName: String);
     end;
   W := WriteMsg(^M^M^C+GetString(dlReadingPkt));
   UpdateWriteView(W);
-  C := PPktCol.Create(FName);
+  C := TPktCol.Create(FName);
   W.Free;
-  D := PPktListDialog.Create(FName, C);
+  D := TPktListDialog.Create(FName, C);
   Desktop.ExecView(D);
   D.Free;
   if Assigned(C) then
@@ -1429,7 +1421,6 @@ procedure ViewPktFile(FName: String);
   end { ViewPktFile };
 
 type
-  PLimitStream = ^TLimitStream;
   TLimitStream = class(TDOSStream)
     constructor Create(FileName: FNameStr; Mode: Word; Limit: LongInt);
     end;
@@ -1446,7 +1437,7 @@ constructor TLimitStream.Create(FileName: FNameStr; Mode: Word;
 function IsMsgFile(FName: String): Boolean;
   label l_e;
   var
-    F: PLimitStream;
+    F: TLimitStream;
     L: array[1..5] of PtrInt;
     i, N: ShortInt;
     XL: TXlat;
@@ -1481,7 +1472,7 @@ function IsMsgFile(FName: String): Boolean;
 
 procedure ViewMsgFile(FName: String);
   var
-    D: PMsgViewerDlg;
+    D: TMsgViewerDlg;
   begin
   if not IsMsgFile(FName) then
     begin
@@ -1489,14 +1480,14 @@ procedure ViewMsgFile(FName: String);
       mfError+mfOKButton);
     Exit;
     end;
-  D := PMsgViewerDlg.Create(FName);
+  D := TMsgViewerDlg.Create(FName);
   Desktop.ExecView(D);
   D.Free;
   end;
 
 function ViewMsgFileE(FName: String): Boolean;
   var
-    D: PMsgViewerDlg;
+    D: TMsgViewerDlg;
   begin
   if IsMsgFile(FName) then
     begin
@@ -1505,7 +1496,7 @@ function ViewMsgFileE(FName: String): Boolean;
     TempFile := '';
     FileName := FName;
     ViewMsgFileE := True;
-    D := PMsgViewerDlg.Create(FName);
+    D := TMsgViewerDlg.Create(FName);
     Desktop.ExecView(D);
     D.Free;
     end
@@ -1515,8 +1506,8 @@ function ViewMsgFileE(FName: String): Boolean;
 
 function ViewPktFileE(FName: String; MsgVisible: Boolean): Boolean;
   var
-    C: PPktCol;
-    D: PPktListDialog;
+    C: TPktCol;
+    D: TPktListDialog;
     W: TView;
     R: TRect;
   begin
@@ -1530,9 +1521,9 @@ function ViewPktFileE(FName: String; MsgVisible: Boolean): Boolean;
     ViewPktFileE := True;
     W := WriteMsg(^M^M^C+GetString(dlReadingPkt));
     UpdateWriteView(W);
-    C := PPktCol.Create(FName);
+    C := TPktCol.Create(FName);
     W.Free;
-    D := PPktListDialog.Create(FName, C);
+    D := TPktListDialog.Create(FName, C);
     Desktop.ExecView(D);
     D.Free;
     if Assigned(C) then

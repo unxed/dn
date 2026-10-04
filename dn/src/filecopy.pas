@@ -58,7 +58,7 @@ type
   PCopyRec = ^TCopyRec;
     {2` Используется для D&D в InfoPtr информации к событию `}
   TCopyRec = record
-    FC: PFilesCollection;
+    FC: TFilesCollection;
     Owner: TView;  // панель, из которой тащили
     Where: TPoint; // где бросили (глобальные координаты)
     end;
@@ -172,12 +172,10 @@ type
     DIZ: PDiz;
     end;
 
-  PCopyCollection = ^TCopyCollection;
   TCopyCollection = class(TCollection)
     procedure FreeItem(P: Pointer); virtual;
     end;
 
-  PDirCollection = ^TDirCollection;
   TDirCollection = class(TSortedCollection)
     procedure FreeItem(P: Pointer); virtual;
     function Compare(P1, P2: Pointer): Integer; virtual;
@@ -322,7 +320,6 @@ var
   WriteStream: lFile;
 
 type
-  pLine = ^TLine;
   TLine = class(TObject)
     { Элемент CopyQueue}
     Owner: PFileRec;
@@ -340,7 +337,6 @@ type
     destructor Destroy; override;
     end;
 
-  PDirName = ^TDirName;
   TDirName = class(TObject)
     OldName, NewName: PString;
     Check: Boolean;
@@ -484,7 +480,6 @@ var
   StopDlgData: word;
 
 type
-  POverriteDialog = ^TOverriteDialog;
   TOverriteDialog = class(TDialog)
     procedure HandleEvent(var Event: TEvent); virtual;
     end;
@@ -813,7 +808,7 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     procedure DoSkip;
       begin
       while (iQueue < CopyQueue.Count-1)
-        and (pLine(CopyQueue.At(iQueue))^.Eof and eoEnd = 0)
+        and (TLine(CopyQueue.At(iQueue))^.Eof and eoEnd = 0)
       do
         Inc(iQueue);
       SkipRequested := iQueue >= CopyQueue.Count-1;
@@ -1937,7 +1932,7 @@ FileRead:
       S: String;
 
     procedure DoCopyDirectory(P_: Pointer);
-    var P: PDirName absolute P_;
+    var P: TDirName absolute P_;
       begin
       if P^.CopyIt then
         CopyDirectory(P^.DOld, P^.DNew, P^.Own)
@@ -1981,7 +1976,7 @@ FileRead:
   procedure MakeDirectories;
     var
       P: PFileRec;
-      PD: PDirName;
+      PD: TDirName;
       I: Integer;
       S: String;
       FrPos: Integer;
@@ -2216,7 +2211,7 @@ TrueCopy:
     label 1, 2;
 
     function NoCheck(P_: Pointer): Boolean;
-    var P: PDirName absolute P_;
+    var P: TDirName absolute P_;
       begin
       Inc(FrPos);
       NoCheck := not P^.Check;

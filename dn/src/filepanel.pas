@@ -76,8 +76,7 @@ const
 
 type
   TInfoView = class;
-  PInfoView = TInfoView;
-  TFooterProc = function(IV: PInfoView): Boolean;
+  TFooterProc = function(IV: TInfoView): Boolean;
     { Процедура формирования (части) строки подвала. Для каждой
     строки таких процедур может быть задано несколько, они вызываются
     по порядку.
@@ -107,14 +106,12 @@ type
     end;
 
   TDirView = class;
-  PDirView = TDirView;
   TDirView = class(TTopView)
     procedure HandleEvent(var Event: TEvent); virtual;
     function GetText(MaxWidth: Integer): String; virtual;
     end;
 
   TDriveLine = class;
-  PDriveLine = TDriveLine;
   {`2 }
   TDriveLine = class(TView)
     Panel: TFilePanel;
@@ -297,12 +294,12 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
   procedure BracketClick(T: TPanelNum);
     var
       TargetPanel: TView;
-      Manager: PDoubleWindow;
+      Manager: TDoubleWindow;
     const
       HideCommand: array[TPanelNum] of Word =
          (cmHideLeft, cmHideRight);
     begin
-    Manager := PDoubleWindow(Panel.Owner);
+    Manager := TDoubleWindow(Panel.Owner);
     { Если панель распахнута, то операция применяется к ней, независимо
       от того, правая или левая скобка была нажата. Так что подгоняем
       T к внутренннему номеру данной панели }
@@ -931,7 +928,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
     Y: Integer;
     Mover: TView;
     S: String;
-    FC: PFilesCollection;
+    FC: TFilesCollection;
     C: TCopyRec;
 
   procedure CE;
@@ -1067,7 +1064,7 @@ var
   CDivdier: Byte;
   LFN_inCurFileLine: Boolean;
 
-function MakeDivider(IV: PInfoView): Boolean;
+function MakeDivider(IV: TInfoView): Boolean;
   var
     C: Word;
     I: Integer;
@@ -1088,7 +1085,7 @@ function MakeDivider(IV: PInfoView): Boolean;
     end;
   end;
 
-function MakeCurFile(IV: PInfoView): Boolean;
+function MakeCurFile(IV: TInfoView): Boolean;
   begin
   with IV do
     begin
@@ -1103,7 +1100,7 @@ function MakeCurFile(IV: PInfoView): Boolean;
   Result := True;
   end;
 
-function MakeFilter(IV: PInfoView): Boolean;
+function MakeFilter(IV: TInfoView): Boolean;
   var
     S: String;
     I: Integer;
@@ -1122,7 +1119,7 @@ function MakeFilter(IV: PInfoView): Boolean;
     end;
   end;
 
-function MakeQSMask(IV: PInfoView): Boolean;
+function MakeQSMask(IV: TInfoView): Boolean;
   begin
   Result := QuickSearch and (Pointer(IV.Panel) = Pointer(ActivePanel));
    { Flash 25-01-2004:
@@ -1133,7 +1130,7 @@ function MakeQSMask(IV: PInfoView): Boolean;
     MoveCStr(B[0], QuickSearchString(IV.Size.X), Swap(C2_3));
   end;
 
-function MakeSelected(IV: PInfoView): Boolean;
+function MakeSelected(IV: TInfoView): Boolean;
   var
     S: String;
     I: Integer;
@@ -1165,7 +1162,7 @@ function MakeSelected(IV: PInfoView): Boolean;
     end;
   end;
 
-function MakeSelectedBrief(IV: PInfoView): Boolean;
+function MakeSelectedBrief(IV: TInfoView): Boolean;
   var
     S: String;
     I: Integer;
@@ -1185,7 +1182,7 @@ function MakeSelectedBrief(IV: PInfoView): Boolean;
   Result := False;
   end;
 
-function MakeTotals(IV: PInfoView): Boolean;
+function MakeTotals(IV: TInfoView): Boolean;
   var
     S: String;
     FilesCount: LongInt;
@@ -1220,7 +1217,7 @@ function MakeTotals(IV: PInfoView): Boolean;
   Result := True;
   end;
 
-function MakeTotalsBrief(IV: PInfoView): Boolean;
+function MakeTotalsBrief(IV: TInfoView): Boolean;
   var
     S: String;
     FilesCount: LongInt;
@@ -1242,7 +1239,7 @@ function MakeTotalsBrief(IV: PInfoView): Boolean;
   Result := False;
   end;
 
-function MakeFreeSpace(IV: PInfoView): Boolean;
+function MakeFreeSpace(IV: TInfoView): Boolean;
   var
     S: String;
     I: Integer;
@@ -1260,7 +1257,7 @@ function MakeFreeSpace(IV: PInfoView): Boolean;
   Result := True;
   end;
 
-function MakePathDecr(IV: PInfoView): Boolean;
+function MakePathDecr(IV: TInfoView): Boolean;
   var
     S2: String;
     I: Integer;
@@ -1312,7 +1309,7 @@ function MakePathDecr(IV: PInfoView): Boolean;
     end;
   end;
 
-function MakePacked(IV: PInfoView): Boolean;
+function MakePacked(IV: TInfoView): Boolean;
   var
     S: String;
     I: Integer;
@@ -1334,7 +1331,7 @@ function MakePacked(IV: PInfoView): Boolean;
     end;
   end;
 
-function MakeRatio(IV: PInfoView): Boolean;
+function MakeRatio(IV: TInfoView): Boolean;
   var
     S: String;
     I: Integer;
@@ -1356,7 +1353,7 @@ function MakeRatio(IV: PInfoView): Boolean;
   Result := False;
   end;
 
-procedure PrepareLongName(IV: PInfoView; var S: String; var I: Integer);
+procedure PrepareLongName(IV: TInfoView; var S: String; var I: Integer);
   { Длинное имя в подвале или на разделителе. Результат - в S,
     Сдвиг для выравнивания - в I (-1 - центрировать) }
   var
@@ -1530,7 +1527,7 @@ ShowRight:
     end;
   end { PrepareLongName };
 
-function MakeLongName(IV: PInfoView): Boolean;
+function MakeLongName(IV: TInfoView): Boolean;
   var
     S: String;
     I: Integer;
@@ -1549,7 +1546,7 @@ function MakeLongName(IV: PInfoView): Boolean;
   MoveCStr(B[I], S, Swap(C8_9));
   end;
 
-function Terminate(IV: PInfoView): Boolean;
+function Terminate(IV: TInfoView): Boolean;
   begin
   Result := True;
   end;
@@ -1789,15 +1786,15 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     begin
     if  (Files.Count = 0) or (Event.InfoPtr = nil) then
       Exit;
-    OSM := PFilesCollection(Files).SortMode;
-    PFilesCollection(Files).SortMode := fcmPreciseCompare;
+    OSM := TFilesCollection(Files).SortMode;
+    TFilesCollection(Files).SortMode := fcmPreciseCompare;
     for I := 0 to Files.Count-1 do
       if Files.FileCompare(Files.At(I), Event.InfoPtr) = 0 then
         goto 1; {-$VOL}
-    PFilesCollection(Files).SortMode := OSM;
+    TFilesCollection(Files).SortMode := OSM;
     Exit;
 1:
-    PFilesCollection(Files).SortMode := OSM;
+    TFilesCollection(Files).SortMode := OSM;
     PF := {Event.InfoPtr}Files.At(I);
     with PF^ do
       if Selected then

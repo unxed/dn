@@ -54,7 +54,7 @@ uses
   FilesCol
   ;
 
-procedure UnpackDiskImages(AOwner: Pointer; Files: PFilesCollection);
+procedure UnpackDiskImages(AOwner: Pointer; Files: TFilesCollection);
 
 implementation
 
@@ -499,7 +499,7 @@ procedure RereadGlobal(const OutputDir: String);
   GlobalMessage(evCommand, cmRereadTree, @OutputDir);
   end;
 
-procedure DoIt(AOwner: Pointer; AFiles: PFilesCollection;
+procedure DoIt(AOwner: Pointer; AFiles: TFilesCollection;
      var ADestPath: String);
   var
     I: Integer;
@@ -533,7 +533,7 @@ procedure DoIt(AOwner: Pointer; AFiles: PFilesCollection;
   RereadGlobal(ADestPath);
   end { DoIt };
 
-procedure UnpackDiskImages(AOwner: Pointer; Files: PFilesCollection);
+procedure UnpackDiskImages(AOwner: Pointer; Files: TFilesCollection);
   var
     DestPath: String;
   begin

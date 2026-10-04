@@ -65,8 +65,8 @@ type
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     ArcName: String; {DataCompBoy}
     VArcName: String; {JO}
-    AType: PARJArchive;
-    Files: PDirStorage;
+    AType: TARJArchive;
+    Files: TDirStorage;
     KillAfterUse: Boolean;
     FakeKillAfterUse: Boolean; {временная пустышка}
     ArcDate: LongInt;
@@ -74,7 +74,7 @@ type
     ForceRescan: Boolean;
     Password: String;
     constructor Create(const AName, VAName: String); overload;
-    constructor Create(PC: PDirStorage; const AName, VAName: String);
+    constructor Create(PC: TDirStorage; const AName, VAName: String);
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure RereadDirectory(S: String); virtual; {DataCompBoy}
@@ -84,7 +84,7 @@ type
     function GetDir: String; virtual;
     function GetDirectory(
          const FileMask: String;
-        var TotalInfo: TSize): PFilesCollection; virtual;
+        var TotalInfo: TSize): TFilesCollection; virtual;
     function Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
     {JO:  выделил список файлов в командной строке или путь к               }
     {     файлу-списку в отдельный параметр Lst;                            }
@@ -125,8 +125,8 @@ type
     procedure StdMsg4;
     function OpenDirectory(const Dir: String;
                                  PutDirs: Boolean): TDrive; virtual;
-    procedure DrvFindFile(FC: PFilesCollection); virtual;
-    procedure ReadDescrptions(FilesC: PFilesCollection); virtual;
+    procedure DrvFindFile(FC: TFilesCollection); virtual;
+    procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
     function GetDriveLetter: Char; virtual;
     end;
 
@@ -274,7 +274,7 @@ constructor TArcDrive.Create(const AName, VAName: String);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TArcDrive.Create(PC: PDirStorage; const AName, VAName: String);
+constructor TArcDrive.Create(PC: TDirStorage; const AName, VAName: String);
   var
     SR: lSearchRec;
   begin
@@ -340,7 +340,7 @@ constructor TArcDrive.Load(S: TStream);
   DriveType := dtArc;
   ArcFileName := ArcName;
   VArcFileName := VArcName;
-  Files := PDirStorage(S.Get);
+  Files := TDirStorage(S.Get);
     { AK155 Данные о файлах надо прочитать из потока независио
     от того, будет ли найден сам архив и надо ли его перечитывать,
     иначе собьётся дальнейшее чтение потока }
@@ -461,7 +461,7 @@ function TArcDrive.ReadArchive: Boolean;
     ArcFile.Free;
     Exit;
     end;
-  Files := PDirStorage.Create;
+  Files := TDirStorage.Create;
   if Files = nil then
     Exit;
   P := nil;
@@ -605,12 +605,12 @@ function TArcDrive.GetDir: String;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFilesCollection;
+function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): TFilesCollection;
   var
     F: PFileRec;
     I, si: LongInt;
     AllFiles: Boolean;
-    AFiles, FD: PFilesCollection;
+    AFiles, FD: TFilesCollection;
     TTL, TPL: TSize;
     _USize, _PSize: TSize;
     FR: TFileRec;
@@ -620,12 +620,12 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
     MAvail: LongInt;
   begin
   ReadArchive; {AK155 26-11-2002}
-  AFiles := PFilesCollection.Create($10, $10);
+  AFiles := TFilesCollection.Create($10, $10);
   {FD := PFilesCollection.Create($40, $10);}
-  PFilesCollection(AFiles).Panel := Panel;
+  TFilesCollection(AFiles).Panel := Panel;
   GetDirectory := AFiles;
   CheckSlashDot(CurDir);
-  FD := PFilesCollection.Create($40, $10);
+  FD := TFilesCollection.Create($40, $10);
   TTL := 0;
   TPL := 0;
   {GetDirectory := AFiles;}AllFiles := (FileMask = x_x)
@@ -1216,7 +1216,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
     DNN: Byte;
     TempExtrDir: String;
     TempDirUsed: Boolean;
-    FCT: PFilesCollection;
+    FCT: TFilesCollection;
     FRT: PFileRec;
     OldConfirms: Word;
     PV: TView;
@@ -1419,7 +1419,7 @@ TryAgain:
         
         0, 0, 0, 0, Directory,
         @S);
-    FCT := PFilesCollection.Create(1, 1);
+    FCT := TFilesCollection.Create(1, 1);
     FCT.AtInsert(0, FRT);
     OldConfirms := Confirms;
     Confirms := 0;
@@ -1827,7 +1827,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
   var
     PDrv: TDrive;
     Dirs: TStringCollection;
-    Fils: PFilesCollection;
+    Fils: TFilesCollection;
     FR: PFileRec;
     tmr: TEventTimer;
     _USize, _PSize: TSize;
@@ -1843,7 +1843,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
   NewTimer(tmr, 0);
   Dirs := TStringCollection.Create($10, $10, False);
   PI := WriteMsg(GetString(dlReadingList));
-  Fils := PFilesCollection.Create($10, $10);
+  Fils := TFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
@@ -1918,12 +1918,12 @@ function TArcDrive.OpenDirectory(const Dir: String;
   OpenDirectory := PDrv;
   end { TArcDrive.OpenDirectory };
 
-procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
+procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
   var
     I: LongInt;
     PDrv: TFindDrive;
     Dirs: TStringCollection;
-    Fils: PFilesCollection;
+    Fils: TFilesCollection;
     FR: PFileRec;
     tmr: TEventTimer;
     _USize, _PSize: TSize;
@@ -1982,7 +1982,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
 
   Dirs := TStringCollection.Create($10, $10, False);
   PI := WriteMsg(^M^M^C+GetString(dlSearching)+'...');
-  Fils := PFilesCollection.Create($10, $10);
+  Fils := TFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
@@ -2085,7 +2085,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
                  mfInformation+mfOKButton);
   end { TArcDrive.DrvFindFile };
 
-procedure TArcDrive.ReadDescrptions(FilesC: PFilesCollection);
+procedure TArcDrive.ReadDescrptions(FilesC: TFilesCollection);
   begin
   end;
 

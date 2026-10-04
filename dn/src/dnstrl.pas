@@ -67,7 +67,6 @@ type
   PStrIndex = ^TStrIndex;
 
   TStringList = class;
-  PStringList = TStringList;
   TStringList = class(TObject)
   private
     Index: PStrIndex;

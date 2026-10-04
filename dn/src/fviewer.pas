@@ -70,7 +70,6 @@ type
   { TViewScroll }
 
   TViewScroll = class;
-  PViewScroll = TViewScroll;
   TViewScroll = class(TView)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
     MaxV, Value: TFileSize;
@@ -187,7 +186,6 @@ type
     end;
 
   TViewInfo = class;
-  PViewInfo = TViewInfo;
   TViewInfo = class(TView)
     Viewer: TFileViewer;
     constructor Create(const R: TRect; AViewer: TFileViewer);
@@ -1749,7 +1747,7 @@ function TFileViewer.ReadFile;
     FileSize := 0;
   AdjustBuf;
   if SB <> nil then
-    PViewScroll(SB).MaxV := FileSize;
+    TViewScroll(SB).MaxV := FileSize;
   Seek(0);
   XDelta := 0;
   if  (UpStrg(VFileName) <> UpStrg(FileName)) then
@@ -2376,10 +2374,10 @@ procedure TFileViewer.HandleEvent;
       Loaded := False;
       if SB <> nil then
         begin
-        PViewScroll(SB).MaxV := FileSize;
-        PViewScroll(SB).Value := FilePos+BufPos;
+        TViewScroll(SB).MaxV := FileSize;
+        TViewScroll(SB).Value := FilePos+BufPos;
         end;
-      PViewScroll(SB).DrawView;
+      TViewScroll(SB).DrawView;
       end;
     case Event.What of
       evBroadcast:
@@ -2645,9 +2643,9 @@ DoSave:
               { стать на начало строки, но так,
                  чтобы не сдвинуть вверх ползунок курсора }
               CountDown(1);
-              ScrollerPos := PViewScroll(SB).GetPartCode;
+              ScrollerPos := TViewScroll(SB).GetPartCode;
               CountUp(1);
-              if ScrollerPos <> PViewScroll(SB).GetPartCode then
+              if ScrollerPos <> TViewScroll(SB).GetPartCode then
                 CountDown(1);
               end;
             if Lines[Size.Y-1].Pos < 0 then
@@ -2866,7 +2864,7 @@ DoSave:
             DrawView;
             if BufPos = 0 then
               begin
-              PViewScroll(SB).Value := 0;
+              TViewScroll(SB).Value := 0;
               SB.DrawView;
               end;
             end;
@@ -3567,7 +3565,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   R.Grow(-1, -1);
   R.A.X := R.B.X;
   Inc(R.B.X);
-  P := PViewScroll.Create(R);
+  P := TViewScroll.Create(R);
   P.GrowMode := gfGrowHiX+gfGrowLoX+gfGrowHiY;
   Insert(P);
   GetExtent(R);
@@ -3581,7 +3579,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   Inc(R.A.X);
   R.A.Y := R.B.Y-1;
   Dec(R.B.X, 2);
-  P := PViewInfo.Create(R, PV);
+  P := TViewInfo.Create(R, PV);
   Insert(P);
   PV.Info := P;
   end { TFileWindow.Init };

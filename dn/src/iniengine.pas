@@ -138,13 +138,12 @@ type
     end;
 
   TIniErrors = class;
-  PIniErrors = TIniErrors;
   TIniErrors = class(TCollection)
     procedure FreeItem(Item: Pointer); override;
     end;
 
 const
-  IniErrors: PIniErrors = nil;
+  IniErrors: TIniErrors = nil;
 
 procedure TIniErrors.FreeItem(Item: Pointer);
   var
@@ -158,7 +157,7 @@ procedure AddIniError(Size: Byte; Group: PChar; Parameter: PChar);
     p: PIniError;
   begin
   if IniErrors = nil then
-    IniErrors := PIniErrors.Create(1, 1);
+    IniErrors := TIniErrors.Create(1, 1);
   New(p);
   p^.Size := Size;
   p^.Group := Group;

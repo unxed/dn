@@ -90,7 +90,6 @@ type
     end;
 
   TARJArchive = class;
-  PARJArchive = TARJArchive;
   TARJArchive = class(TObject)
     Packer,
     UnPacker,
@@ -139,7 +138,6 @@ type
     end;
 
   TFileInfo = class;
-  PFileInfo = TFileInfo;
   TFileInfo = class(TSortedCollection)
     function Compare(P1, P2: Pointer): Integer; override;
     procedure FreeItem(Item: Pointer); override;
@@ -739,7 +737,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
     AID: Word;
     C: String[40];
     CurDir: String;
-    Arc: PARJArchive;
+    Arc: TARJArchive;
     f: lFile;
     D: record
       Name: String;
@@ -1236,7 +1234,7 @@ Ex:
 {-DataCompBoy-}
 procedure UnarchiveFiles(const FName: String);
   var
-    AType: PARJArchive;
+    AType: TARJArchive;
     S: String;
     DT: record
       S: String;
@@ -1253,7 +1251,7 @@ procedure UnarchiveFiles(const FName: String);
     DNN: Byte;
     TempExtrDir: String;
     TempDirUsed: Boolean;
-    FCT: PFilesCollection;
+    FCT: TFilesCollection;
     FRT: PFileRec;
     OldConfirms: Word;
     PV: TView;
@@ -1481,7 +1479,7 @@ TryAgain:
         
         0, 0, 0, 0, Directory,
         @S);
-    FCT := PFilesCollection.Create(1, 1);
+    FCT := TFilesCollection.Create(1, 1);
     FCT.AtInsert(0, FRT);
     OldConfirms := Confirms;
     Confirms := 0;
