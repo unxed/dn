@@ -300,15 +300,15 @@ procedure TGameInfo.Draw;
   WriteLineC(0, 0, Size.X, 1, B);
 
   MoveChar(B, ' ', C, Size.X);
-  MoveCStr(B, GetString(dlGameScore2)+ItoS(Gm^.Score)+'~', C);
+  MoveCStr(B, GetString(dlGameScore2)+ItoS(Gm.Score)+'~', C);
   MoveChar(B[Size.X-1], #179, C, 1);
   WriteLineC(0, 1, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
-  MoveCStr(B, GetString(dlGameLines)+ItoS(Gm^.Lines)+'~', C);
+  MoveCStr(B, GetString(dlGameLines)+ItoS(Gm.Lines)+'~', C);
   MoveChar(B[Size.X-1], #179, C, 1);
   WriteLineC(0, 2, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
-  MoveCStr(B, GetString(dlGameLevel)+ItoS(Gm^.Level)+'~', C);
+  MoveCStr(B, GetString(dlGameLevel)+ItoS(Gm.Level)+'~', C);
   MoveChar(B[Size.X-1], #179, C, 1);
   WriteLineC(0, 3, Size.X, 1, B);
   { MoveChar(B, #196, C, Size.X);
@@ -322,17 +322,17 @@ procedure TGameInfo.Draw;
   MoveChar(B, #195, C, 1);
   MoveChar(B[Size.X-1], #180, C, 1);
   WriteLineC(0, 4, Size.X, 1, B);
-  K := ((15-Gm^.NextFig mod 7) shl 8)+219;
+  K := ((15-Gm.NextFig mod 7) shl 8)+219;
   for I := 5 to 10 do
     begin
     MoveChar(B, ' ', 07, Size.X);
-    if not Gm^.Stop and Gm^.Preview then
+    if not Gm.Stop and Gm.Preview then
       begin
-      for J := 1 to ColPo[Gm^.NextFig] do
-        if Figures[Gm^.NextFig*5+J, 1] = I-4 then
+      for J := 1 to ColPo[Gm.NextFig] do
+        if Figures[Gm.NextFig*5+J, 1] = I-4 then
           begin
-          B[Figures[Gm^.NextFig*5+J, 2]*2+3] := CellFromBIOS(K);
-          B[Figures[Gm^.NextFig*5+J, 2]*2+4] := CellFromBIOS(K);
+          B[Figures[Gm.NextFig*5+J, 2]*2+3] := CellFromBIOS(K);
+          B[Figures[Gm.NextFig*5+J, 2]*2+4] := CellFromBIOS(K);
           end;
       end;
     MoveChar(B, #179, C, 1);
@@ -358,12 +358,12 @@ procedure TGameInfo.Draw;
   WriteLineC(0, 11, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B,
-     GetString(dlTetName)+Gm^.HiScores[1+10*Byte(Gm^.Pentix)].Name, C);
+     GetString(dlTetName)+Gm.HiScores[1+10*Byte(Gm.Pentix)].Name, C);
   MoveChar(B[Size.X-1], #179, C, 1);
   WriteLineC(0, 12, Size.X, 1, B);
   MoveChar(B, ' ', C, Size.X);
   MoveCStr(B, GetString(dlGameScore) +
-    ItoS(Gm^.HiScores[1+10*Byte(Gm^.Pentix)].Score), C);
+    ItoS(Gm.HiScores[1+10*Byte(Gm.Pentix)].Score), C);
   MoveChar(B[Size.X-1], #179, C, 1);
   WriteLineC(0, 13, Size.X, 1, B);
   MoveChar(B, #196, C, Size.X);
@@ -400,8 +400,8 @@ constructor TGameView.Create;
     HiScores[I].EndLv := 1;
     end;
   S := TDosStream.Create(SourceDir+'tetris.cfg', stOpenRead);
-  if S^.Status = stOK then
-    S^.Read(B, SizeOf(HiScores));
+  if S.Status = stOK then
+    S.Read(B, SizeOf(HiScores));
   S.Free;
   I := SizeOf(HiScores);
   XorScramble(B, I);
@@ -419,7 +419,7 @@ constructor TGameView.Create;
         HiScores[I].EndLv := 1;
         end;
       S := TDosStream.Create(SourceDir+'tetris.cfg', stCreate);
-      S^.Write(HiScores, SizeOf(HiScores));
+      S.Write(HiScores, SizeOf(HiScores));
       S.Free;
       end;
   NewGame;
@@ -446,9 +446,9 @@ procedure TGameView.ShowScores;
     PP: Boolean;
   begin
   D := TDialog(LoadResource(TDlgIdx(Byte(dlgTetrisTop10)+Byte(Pentix))));
-  R.Assign(2, 4, D^.Size.X-2, 14);
+  R.Assign(2, 4, D.Size.X-2, 14);
   P := TView.Create(R);
-  P^.Options := P^.Options or ofFramed;
+  P.Options := P.Options or ofFramed;
   D.Insert(P);
   for I := 1 to 10 do
     with HiScores[I+10*Byte(Pentix)] do
@@ -465,7 +465,7 @@ procedure TGameView.ShowScores;
         end
       else
         S := '';
-      R.Assign(2, 3+I, D^.Size.X-2, 4+I);
+      R.Assign(2, 3+I, D.Size.X-2, 4+I);
       D.Insert(TLabel.Create(R, S, nil));
       end;
   PP := Stop;
@@ -494,7 +494,7 @@ procedure TGameView.Store(var S: TStream);
 destructor TGameView.Done;
   begin
   Game := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TGameView.NewGame;
@@ -596,7 +596,7 @@ function TGameView.MoveDown;
     Move(HiScores, B, SizeOf(HiScores));
     J := SizeOf(HiScores);
     XorScramble(B, J);
-    S^.Write(B, SizeOf(HiScores));
+    S.Write(B, SizeOf(HiScores));
     S.Free;
     ShowScores(I);
     end { CheckHiScores };
@@ -673,7 +673,7 @@ function TGameView.MoveDown;
       Draw;
       MessageBox(GetString(dlGameOver), @Score, mfInformation+mfOKButton);
       CheckHiScores;
-      Info^.Draw;
+      Info.Draw;
       end;
     DrawView;
     MoveDown := False;
