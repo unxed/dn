@@ -115,7 +115,7 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
         for i := 1 to 2 do
         if PInputLine(DirectLink[i])^.Data^ = '' then
           begin
-          PInputLine(DirectLink[i])^.Select;
+          PInputLine(DirectLink[i]).Select;
           ClearEvent(Event);
           Exit;
           end;

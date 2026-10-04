@@ -202,7 +202,7 @@ procedure WindowManager;
 
   begin { WindowManager }
   PC.Create(10, 10);
-  Desktop^.ForEach(InsView);
+  Desktop.ForEach(InsView);
 (* AK155 Контроль на Count = 0 не нужен, так как если окон нет, то
 cmWindowManager задизейблена.
   if PC^.Count = 0 then
@@ -248,31 +248,31 @@ cmWindowManager задизейблена.
 
 while true do
   begin
-  Cmd := Desktop^.ExecView(D);
-  D^.GetData(DT); { Теперь DT.P = PC }
+  Cmd := Desktop.ExecView(D);
+  D.GetData(DT); { Теперь DT.P = PC }
   PV := PView(DT.P^.At(DT.n));
   if Cmd = cmCancel then
     Break;
   if Cmd = cmOK then { "Select" }
     begin
-    PV^.Select;
+    PV.Select;
     Break;
     end;
   if Cmd = cmNo then { "Close" }
     begin
     if PV^.Valid(cmClose) then
       begin
-      PV^.Free;
+      PV.Free;
       DT.P := nil;
-      D^.SetData(DT); {при этом NewList освободит PC }
+      D.SetData(DT); {при этом NewList освободит PC }
       PC.Create(10, 10);
-      Desktop^.ForEach(InsView);
+      Desktop.ForEach(InsView);
       if PC^.Count = 0 then
         Break;
       if DT.n >= PC^.Count then
         Dec(DT.n);
       DT.P := PC;
-      D^.SetData(DT);
+      D.SetData(DT);
       end;
     end
   end;

@@ -296,8 +296,8 @@ function GetFileName(var FileName: String; Mask, Title, ALabel: String;
   if D = nil then
     Exit;
   if B then
-    D^.SetData(S);
-  C := Desktop^.ExecView(D);
+    D.SetData(S);
+  C := Desktop.ExecView(D);
   if C <> cmCancel then
     S := D^.GetFileName;
   GetFileName := C;
@@ -948,7 +948,7 @@ procedure TCalcView.Draw;
             WriteStr(0, 0, GetString(dlWKZ_Empty), 2);
             S := '';
             end;
-          PCalcInput(CalcInput)^.SetData(S);
+          PCalcInput(CalcInput).SetData(S);
           CalcInput^.Draw;
           end;
         L := L+K;
@@ -1104,7 +1104,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     ReCalc(True);
     Modified := True;
     if Owner <> nil then
-      Owner^.Redraw;
+      Owner.Redraw;
     end { ImportFromCsv };
 
   procedure ImportFromDbf; {KV}
@@ -1175,7 +1175,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     DBF.Done;
     ReCalc(True);
     Modified := True;
-    Owner^.Redraw;
+    Owner.Redraw;
     end { ImportFromDbf };
 
   procedure ExportToCsv; {KV}
@@ -1732,13 +1732,13 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           begin
           SaveSheetAs;
           CE;
-          Owner^.Redraw;
+          Owner.Redraw;
           end;
         cmSave:
           begin
           SaveSheet;
           CE;
-          Owner^.Redraw;
+          Owner.Redraw;
           end;
         cmOpen:
           begin
@@ -2255,7 +2255,7 @@ procedure TCalcView.LoadSheet(FName: String);
       DisposeStr(PWindow(Owner)^.Title);
       PWindow(Owner)^.Title := NewStr(Cut(SName^,
              Bounds.B.X-Bounds.A.X-12));
-      Owner^.Redraw;
+      Owner.Redraw;
       end;
     New(Cells, Init(10, 10));
     Exit
@@ -2276,7 +2276,7 @@ procedure TCalcView.LoadSheet(FName: String);
     S.Free;
     New(Cells, Init(10, 10));
     FillChar(ColWidth, SizeOf(ColWidth), DefaultColWidth);
-    //   Owner^.Redraw;
+    //   Owner.Redraw;
     Exit
     end;
   S^.Read(ColWidth, SizeOf(ColWidth));
@@ -2336,7 +2336,7 @@ procedure TCalcView.SaveSheetAs;
     begin
     DisposeStr(PWindow(Owner)^.Title);
     PWindow(Owner)^.Title := NewStr(Cut(SName^, Bounds.B.X-Bounds.A.X-12));
-    Owner^.Redraw;
+    Owner.Redraw;
     end;
   {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner^.GetColorW(12));}
   S := PBufStream.Create(FName, stCreate, 2048);

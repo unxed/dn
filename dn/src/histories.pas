@@ -313,7 +313,7 @@ procedure StoreViewInfo(P: Pointer);
       
       fOrigin := Viewer^.Origin;
       fSize := Viewer^.Size;
-      fDeskSize := Desktop^.Size;
+      fDeskSize := Desktop.Size;
       if Filtr then
         fViewMode := ViewMode
       else
@@ -350,7 +350,7 @@ fBufPos: AWord оно может не помещаться. Но, с другой стороны,
       FName := NewStr(' '+DBView^.RealName);
       fOrigin := Origin;
       fSize := Size;
-      fDeskSize := Desktop^.Size;
+      fDeskSize := Desktop.Size;
       fViewMode := vmDB;
       with P^ do
         begin
@@ -369,7 +369,7 @@ fBufPos: AWord оно может не помещаться. Но, с другой стороны,
       
       fOrigin := Origin;
       fSize := Size;
-      fDeskSize := Desktop^.Size;
+      fDeskSize := Desktop.Size;
       with CalcView^ do
         begin
         if ShowSeparators then
@@ -459,7 +459,7 @@ procedure StoreEditInfo(P: Pointer);
     
     fOrigin := Owner^.Origin;
     fSize := Owner^.Size;
-    fDeskSize := Desktop^.Size;
+    fDeskSize := Desktop.Size;
     fMarks := MarkPos;
     fBlockStart := Mark.A;
     fBlockEnd := Mark.B;
@@ -600,7 +600,7 @@ procedure LoadCommands(var S: TStream);
   {AK155 Перерисовка комстроки не нужна, а очистка даже мешает}
   (*
  StrModified := False;
- if CommandLine <> nil then CommandLine^.DrawView;
+ if CommandLine <> nil then CommandLine.DrawView;
  Str := '';
 *)
   {/AK155}
@@ -897,7 +897,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
     begin
     P := DirHistory^.LastThat(IsThis);
     if P <> nil then
-      DirHistory^.Free(P);
+      DirHistory.Free(P);
     end;
   SaveHistories; {AK155}
   end { AddToDirectoryHistory };
@@ -943,7 +943,7 @@ procedure EditHistoryMenu;
   D := GetDialog(dlgEditHistory, Pointer(P));
   P^.NewLisT(EditHistory);
   P^.EVHistory := True;
-  if Desktop^.ExecView(D) = cmOK then
+  if Desktop.ExecView(D) = cmOK then
     I := P^.Focused
   else
     I := -1;
@@ -983,7 +983,7 @@ procedure ViewHistoryMenu;
   D := GetDialog(dlgViewHistory, Pointer(P));
   P^.NewLisT(ViewHistory);
   P^.EVHistory := True;
-  if Desktop^.ExecView(D) = cmOK then
+  if Desktop.ExecView(D) = cmOK then
     I := P^.Focused
   else
     I := -1;
@@ -1031,7 +1031,7 @@ function DirHistoryMenu: String;
   if DirHistory^.Count > 1 then
     PListBox(P)^.Focused := 1;
 
-  I := Desktop^.ExecView(D);
+  I := Desktop.ExecView(D);
 
   DT.I := PListBox(P)^.Focused;
   D.Free;
@@ -1065,7 +1065,7 @@ procedure CmdHistory;
   if CmdStrings^.Count > 0 then
     PListBox(P)^.FocusItem(CmdStrings^.Count-1);
 
-  I := Desktop^.ExecView(D);
+  I := Desktop.ExecView(D);
 
   DT.I := PListBox(P)^.Focused;
   D.Free;
@@ -1076,7 +1076,7 @@ procedure CmdHistory;
 
   CurString := DT.I;
   Str := GetCommand(DT.I);
-  CommandLine^.DrawView;
+  CommandLine.DrawView;
   MessageKey(CommandLine, kbEnd);
   if I <> cmYes then
     MessageKey(CommandLine, kbEnter);

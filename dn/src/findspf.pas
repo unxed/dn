@@ -179,7 +179,7 @@ function FindFileWithSPF(pFileName: String; Info: PWhileView): String;
     Writeln(F.T, GetString(dlSPF24));
     Writeln(F.T, GetString(dlSPF25));
     Close(F.T);
-    Info^.Hide; {Cat}
+    Info.Hide; {Cat}
     MessageBox(GetString(dlSPFht), nil, mfOKButton);
     Exit;
     end;

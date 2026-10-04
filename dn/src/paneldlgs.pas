@@ -116,9 +116,9 @@ type
 
 procedure DrawViews(P: PFilePanelRoot);
   begin
-  P^.DrawView;
+  P.DrawView;
   if P^.InfoView <> nil then
-    P^.InfoView^.DrawView;
+    P^.InfoView.DrawView;
   end;
 
 function TSelectList.IsSelected(I: LongInt): Boolean;
@@ -239,7 +239,7 @@ type
   TShowDialog = class(TDialog)
     function OwnDataAddress(P: PPanelSetup): Pointer; virtual;
       { Адрес того блока данных внутри P^, с которым работает
-      данный диалог, то есть, в данном случае, адрес P^.Show.
+      данный диалог, то есть, в данном случае, адрес P.Show.
       Этот метод перекрывается в диалогах сортировки и фильтра.
       Виртуализация этого метода используется в программе обработки
       нажатия кнопки "записать" TSaveSetupButtonPress. }
@@ -348,7 +348,7 @@ procedure TPanelClassRB.ChangeClass(Item: Integer);
           PanelSetupTag(PanSetupPreset[i], TPanelClass(PanelClass));
       AtInsert(i-1, NewStr(S));
       end;
-    T^.DrawView;
+    T.DrawView;
     end;
   end;
 
@@ -416,7 +416,7 @@ procedure TSaveSetupButton.Press;
 
 function TShowDialog.OwnDataAddress(P: PPanelSetup): Pointer;
   begin
-  Result := @P^.Show;
+  Result := @P.Show;
   end;
 
 procedure TShowDialog.HandleEvent(var Event: TEvent);
@@ -661,7 +661,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
     D^.Options := D^.Options or ofCentered;
     PL^.FocusItem(FItem);
     IL^.Data^ := FileMask;
-    Cmd := Desktop^.ExecView(D);
+    Cmd := Desktop.ExecView(D);
 
     SelectFilterLine := True;
     if (Cmd = cmYes) or (Cmd = cmNo) then
@@ -1067,14 +1067,14 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
     P1 := D^.FirstThat(IsCheckboxes);
     PCheckBoxes(P1)^.SetButtonState(16, False);
     end;
-  D^.SetData(DT);
-  DialRes := Desktop^.ExecView(D);
+  D.SetData(DT);
+  DialRes := Desktop.ExecView(D);
   if DialRes = cmCancel then
     begin
     D.Free;
     Exit
     end;
-  D^.GetData(DT);
+  D.GetData(DT);
   {$ELSE}
 !! *)
   DialRes := ExecResource(dlgCompareDirs, DT);
@@ -1111,7 +1111,7 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
 
   PFilesCollection(P^.Files)^.SortMode := OSM1;
   DD^.SortMode := OSM2;
-  Info^.Free;
+  Info.Free;
   end { CM_CompareDirs };
 {-DataCompBoy-}
 
@@ -1227,8 +1227,8 @@ procedure CM_SetAttributes(AFP: Pointer; Single: Boolean; CurPos: Integer);
     begin
     Dlg := PDialog(LoadResource(dlgFilesAttr));
 CurTime1:
-    Dlg^.SetData(D);
-    CmdDlg := Desktop^.ExecView(Dlg);
+    Dlg.SetData(D);
+    CmdDlg := Desktop.ExecView(Dlg);
     case CmdDlg of
       cmYes:
         begin
@@ -1257,7 +1257,7 @@ CurTime1:
         Exit;
         end;
     end {case};
-    Dlg^.GetData(D);
+    Dlg.GetData(D);
     Dlg.Free;
     NotifyResume; {Cat}
     end
@@ -1291,8 +1291,8 @@ CurTime1:
     D.D_LAc := FormatDateTime(DT_LAc, False);
     D.S := D.C;
 CurTime:
-    Dlg^.SetData(D);
-    CmdDlg := Desktop^.ExecView(Dlg);
+    Dlg.SetData(D);
+    CmdDlg := Desktop.ExecView(Dlg);
     case CmdDlg of
       cmYes:
         begin
@@ -1337,7 +1337,7 @@ CurTime:
         Exit;
         end;
     end {case};
-    Dlg^.GetData(D);
+    Dlg.GetData(D);
     
     Dlg^.EnableCommands([cmYes, cmNo]);
     
@@ -1460,7 +1460,7 @@ CurTime:
   PInfo^.Top := GetString(dlSetAttr);
   PInfo^.Bottom := '';
   PInfo^.SetState(sfShadow, True);
-  Desktop^.Insert(PInfo);
+  Desktop.Insert(PInfo);
 
   if Single then
     begin
@@ -1579,7 +1579,7 @@ CurTime:
         PF^.Selected := False;
       end;
     end;
-  Desktop^.Delete(PInfo);
+  Desktop.Delete(PInfo);
   PInfo.Free;
   if  (ActivePanel = P) and (P^.Drive^.DriveType = dtDisk)
   then
@@ -1622,20 +1622,20 @@ procedure CM_SetShowParms(AFP: Pointer);
     begin
     TaggedDataOnly := True;
     TaggedDataCount := 0;
-    J := ExecResource(dlgPanelShowSetup, PanSetup^.Show);
+    J := ExecResource(dlgPanelShowSetup, PanSetup.Show);
     TaggedDataOnly := False;
     TaggedDataCount := 0;
     case J of
       cmOK:
         begin
-        K := Min(252, Max(5, StoI(PanSetup^.Show.LFNLen)));
+        K := Min(252, Max(5, StoI(PanSetup.Show.LFNLen)));
         LFNLen := K;
-        EXTLen := Max(0, Min(StoI(PanSetup^.Show.EXTLen), K-5));
-        PanSetup^.Show.LFNLen := ItoS(LFNLen);
-        PanSetup^.Show.ExtLen := ItoS(ExtLen);
+        EXTLen := Max(0, Min(StoI(PanSetup.Show.EXTLen), K-5));
+        PanSetup.Show.LFNLen := ItoS(LFNLen);
+        PanSetup.Show.ExtLen := ItoS(ExtLen);
         LFNLonger250 := (LFNLen >= 250)
           
-          and (PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0)
+          and (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0)
           ;
         PDoubleWindow(P^.Owner)^.SetMaxiState(P);
         end;
@@ -1643,7 +1643,7 @@ procedure CM_SetShowParms(AFP: Pointer);
         Exit;
     end {case};
     DeltaX := 0;
-    if (PanSetup^.Show.PathDescrInfo <> fseNotShow) and
+    if (PanSetup.Show.PathDescrInfo <> fseNotShow) and
        (Drive^.DizOwner = '')
     then
       Drive^.ReadDescrptions(Files);;
@@ -1651,7 +1651,7 @@ procedure CM_SetShowParms(AFP: Pointer);
     R.A.Y := 1;
     R.B.Y := Owner^.Size.Y-1;
     ChangeBounds(R);
-    Owner^.Redraw;
+    Owner.Redraw;
     end;
   end { CM_SetShowParms };
 
@@ -1719,8 +1719,8 @@ procedure CM_ToggleDescriptions(AFP: Pointer);
     dtDisk,
     dtArvid:
       begin
-      P^.PanSetup^.Show.ColumnsMask :=
-        P^.PanSetup^.Show.ColumnsMask xor psShowDescript;
+      P^.PanSetup.Show.ColumnsMask :=
+        P^.PanSetup.Show.ColumnsMask xor psShowDescript;
       P^.DeltaX := 0;
       P^.RereadDir;
       DrawViews(P);
@@ -1730,8 +1730,8 @@ procedure CM_ToggleDescriptions(AFP: Pointer);
     dtArcFind,
     dtTemp:
       begin
-      P^.PanSetup^.Show.ColumnsMask :=
-        P^.PanSetup^.Show.ColumnsMask xor psShowDir;
+      P^.PanSetup.Show.ColumnsMask :=
+        P^.PanSetup.Show.ColumnsMask xor psShowDir;
       DrawViews(P);
       end;
 
@@ -1745,7 +1745,7 @@ procedure CM_ToggleLongNames(AFP: Pointer);
   if P^.Drive^.DriveType in [dtArc, dtArcFind] then
     Exit;
   
-  with P^.PanSetup^.Show do
+  with P^.PanSetup.Show do
     ColumnsMask := ColumnsMask xor psLFN_InColumns;
   
   P^.DeltaX := 0;
@@ -1810,25 +1810,25 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
 
   begin
   {Application.BFSpeed;}
-  Desktop^.MakeLocal(P^, R.A);
+  Desktop.MakeLocal(P^, R.A);
   Mover := PDragger.Create(R, Text);
-  Desktop^.Insert(Mover);
-  Desktop^.GetExtent(R);
+  Desktop.Insert(Mover);
+  Desktop.GetExtent(R);
   Event.Where := P^;
   Event.What := evMouseDown;
   Event.Buttons := mbLeftButton;
   SetEventDouble(Event, False);
   Mover^.DragView(Event, dmDragMove, R, Mover^.Size, Mover^.Size);
   R.A := Mover^.Origin;
-  Mover^.Free;
+  Mover.Free;
   if Event.What = evMouseUp then
     {AK155 13-08-2003 Может быть не evMouseUp, если во время
     перетаскивания нажали Esc, см. TView.DragView}
     begin
     C^.FC := FC;
-    Desktop^.MakeGlobal(R.A, R.A);
+    Desktop.MakeGlobal(R.A, R.A);
     C^.Where := R.A;
-    Message(Desktop^.FirstThat(ContainsMouse), evBroadcast, cmDropped, C);
+    Message(Desktop.FirstThat(ContainsMouse), evBroadcast, cmDropped, C);
     end;
   FC.Free;
   end { DragMover };
@@ -1909,7 +1909,7 @@ procedure CM_Dropped(AFP, EI: Pointer);
     RevertBar := False;
   MPos := PCopyRec(EI)^.Where;
   P^.MakeLocal(MPos, MPos);
-  ColumnTitles := (P^.Pansetup^.Show.MiscOptions and 2) <> 0;
+  ColumnTitles := (P^.Pansetup.Show.MiscOptions and 2) <> 0;
   I := P^.Delta+(MPos.X div P^.LineLength)
         *(P^.Size.Y-Byte(ColumnTitles))
     +MPos.Y-Byte(ColumnTitles);
@@ -2054,7 +2054,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     
     Nm := PF^.FlName[True];
   
-  if  (P^.PanSetup^.Show.ColumnsMask and psLFN_InColumns = 0)
+  if  (P^.PanSetup.Show.ColumnsMask and psLFN_InColumns = 0)
   then
     R.Assign(0, 0, 13, 1)
   else
@@ -2087,7 +2087,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   PIF^.C[3] := P^.GetColorW(4);
   PIF^.C[4] := P^.GetColorW(2);
   
-  PIF^.SetData(S);
+  PIF.SetData(S);
   PIF^.SetValidator(New(PFilterValidator,
          Init([#32..#255]-IllegalCharSet-['\', '/', '*', '?', '"'])));
   PIF^.SelectAll(False);
@@ -2098,8 +2098,8 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     not CommandLine.GetState(sfDisabled);
   if ReEnableCmdLine then
     begin
-    CommandLine^.SetState(sfDisabled, True);
-    CommandLine^.Update;
+    CommandLine.SetState(sfDisabled, True);
+    CommandLine.Update;
     end;
 
   NotifySuspend; {AK155 25-01-2004 Если не отключить автообновление
@@ -2108,12 +2108,12 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
       уже зафиксированную позицию }
 
   PIF^.HelpCtx := hcRenameFile;
-  P^.ScrollBar^.Hide;
+  P^.ScrollBar.Hide;
   DlgRes := P^.Owner.ExecView(PIF);
-  PIF^.GetData(S);
+  PIF.GetData(S);
 
   if ReEnableCmdLine then
-    CommandLine^.SetState(sfDisabled, False);
+    CommandLine.SetState(sfDisabled, False);
 
   if S[Length(S)] = '.' then
     SetLength(S, Length(S)-1);
@@ -2140,7 +2140,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
 *)
     end
   else
-    PIF^.Free;
+    PIF.Free;
   NotifyResume; {AK155 25-01-2004}
   end { CM_RenameSingleL };
 {-DataCompBoy-}
@@ -2271,10 +2271,10 @@ procedure CM_SortBy(AFP: Pointer);
   Menu^.Default := DefPM;
 
   W := 16;
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   R.A := P^.Origin;
   P^.Owner^.MakeGlobal(R.A, R.A);
-  Desktop^.MakeLocal(R.A, R.A);
+  Desktop.MakeLocal(R.A, R.A);
   if R.A.X < 0 then
     R.A.X := 0
   else if R.A.X+W > R.B.X then
@@ -2289,7 +2289,7 @@ procedure CM_SortBy(AFP: Pointer);
   PV^.HelpCtx := hcSortBy;
   while true do
     begin
-    N := Desktop^.ExecView(PV);
+    N := Desktop.ExecView(PV);
     if N = 0 then
       Break;
 
@@ -2574,7 +2574,7 @@ procedure CM_ChangeCase(AFP: Pointer);
       end;
     if i <> 0 then
       begin
-      Info^.Hide;
+      Info.Hide;
       MessFileNotRename(PF^.FlName[True], S, i);
       MessageBox
           (GetString(dlFCNoRename1)+GetString(dlDIFile)+^M^C+Cut(PF^.
@@ -2672,13 +2672,13 @@ procedure CM_ChangeCase(AFP: Pointer);
   R.Assign(0, 0, 20, 7);
   New(Info, Init(R));
   Info^.Write(1, Copy(GetString(dlPleaseStandBy), 4, MaxStringLength));
-  Desktop^.Insert(Info);
+  Desktop.Insert(Info);
   NewTimer(TT, 1000);
   Abort := False;
   FC^.FirstThat(DoChangeCase);
   Abort := False;
   MessageL(P, evCommand, cmPanelReread, 0);
-  Info^.Free;
+  Info.Free;
   FC^.DeleteAll;
   FC.Free;
   end { CM_ChangeCase };
@@ -2765,10 +2765,10 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
 
   N := 9;
   W := 15;
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   R.A := P^.Origin;
   P^.Owner^.MakeGlobal(R.A, R.A);
-  Desktop^.MakeLocal(R.A, R.A);
+  Desktop.MakeLocal(R.A, R.A);
   if R.A.X < 0 then
     R.A.X := 0
   else if R.A.X+W > R.B.X then
@@ -2782,7 +2782,7 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
   PV := PMenuBox.Create(R, Menu, nil);
   PV^.HelpCtx := hcSelectPreset;
   Menu^.Default := SelectedItem;
-  N := Desktop^.ExecView(PV);
+  N := Desktop.ExecView(PV);
   PV.Free;
   DisposeMenu(Menu);
  {JO}

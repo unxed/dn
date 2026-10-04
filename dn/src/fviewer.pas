@@ -359,7 +359,7 @@ function SearchFileStr( F: PStream; var XLAT: TXlat; const What: String; Pos: TF
       Info^.Write(2, Percent(L, I));
       if  (not Inserted) and TimerExpired(Tmr) then
         begin
-        Desktop^.Insert(Info);
+        Desktop.Insert(Info);
         Inserted := True;
         end;
       if Inserted then
@@ -682,7 +682,7 @@ function TFileViewer.WriteModify;
       FileName := FreeStr;
       VFileName := FileName;
       WriteModify := True;
-      Owner^.Redraw;
+      Owner.Redraw;
       end
     else
       Exit;
@@ -1300,7 +1300,7 @@ procedure TFileViewer.Draw;
     MakeLines;
   end *);
   C := CC[1];
-  {AK155  if Info <> nil then Info^.DrawView;}
+  {AK155  if Info <> nil then Info.DrawView;}
   if {(FileName = '') or }(Buf = nil) then
     begin
     HideCursor;
@@ -1655,7 +1655,7 @@ procedure TFileViewer.Draw;
       ExposedPos := Lines[ExposedLine+1].Pos
   end {case};
   if Info <> nil then
-    Info^.DrawView;
+    Info.DrawView;
   end { TFileViewer.Draw };
 
 function TFileViewer.ReadFile;
@@ -1783,14 +1783,14 @@ procedure TFileViewer.SetState;
       begin
       if SB <> nil then
         begin
-        SB^.Show;
+        SB.Show;
         SB^.EventMask := $FFFF
         end;
       DrawView
       end
     else if SB <> nil then
       begin
-      SB^.Hide;
+      SB.Hide;
       SB^.EventMask := 0;
       end;
     end;
@@ -2048,7 +2048,7 @@ procedure TFileViewer.SaveToFile(FN: String);
   else
 2:
     S.CopyFrom(Fl^, Fl^.GetSize);
-  P^.Free;
+  P.Free;
   S.Truncate; {AK155 на случай записи короткого файла поверх длинного}
   S.Done;
   FN := GetPath(FN);
@@ -2094,7 +2094,7 @@ function TFileViewer.BreakOnStreamReadError: Boolean;
 а прямо в менеджер файлов, так что при QuickView закрывать владельца
 не просто не нужно, а недопустимо }
     if  (Owner <> nil) and not QuickView then
-      Owner^.Free;
+      Owner.Free;
     isValid := False;
     raise E;
     end;
@@ -2132,7 +2132,7 @@ procedure TFileViewer.SeekEof;
     end;
   WC := FilePos+BufPos;
   i := WL mod 16;
-  Owner^.Lock;
+  Owner.Lock;
   {AK155}
   if TypeOf(Fl^) = TypeOf(TDOSStream) then
     begin
@@ -2206,7 +2206,7 @@ procedure TFileViewer.SeekEof;
   DrawView;
 
 EndProc:
-  Owner^.UnLock;
+  Owner.UnLock;
   end { TFileViewer.SeekEof };
 
 procedure TFileViewer.HandleEvent;
@@ -2324,9 +2324,9 @@ procedure TFileViewer.HandleEvent;
     begin
 
     D := PDialog(LoadResource(dlgViewerFind));
-    D^.SetData(SearchString);
-    I := Desktop^.ExecView(D);
-    D^.GetData(SR);
+    D.SetData(SearchString);
+    I := Desktop.ExecView(D);
+    D.GetData(SR);
     D.Free;
     if I = cmCancel then
       Exit;
@@ -2380,7 +2380,7 @@ procedure TFileViewer.HandleEvent;
         PViewScroll(SB)^.MaxV := FileSize;
         PViewScroll(SB)^.Value := FilePos+BufPos;
         end;
-      PViewScroll(SB)^.DrawView;
+      PViewScroll(SB).DrawView;
       end;
     case Event.What of
       evBroadcast:
@@ -2391,7 +2391,7 @@ procedure TFileViewer.HandleEvent;
             then
               if (Owner <> nil) and not QuickView then
                 begin
-                Owner^.Select;
+                Owner.Select;
                 ClearEvent(Event);
                 end;
           cmReanimator:
@@ -2428,7 +2428,7 @@ DoSave:
                 Exit
                 end;
               WriteModify;
-              {if Desktop<>nil then Desktop^.Lock;}
+              {if Desktop<>nil then Desktop.Lock;}
               if (Application <> nil) and (FileSize < $7FFFFFF) then
                 begin
                 if FileName <> VFileName then
@@ -2438,7 +2438,7 @@ DoSave:
                   GetLineNumberForOffset(FileName, i32(FilePos+BufPos))
                   );
                 end;
-              {if Desktop<>nil then Desktop^.UnLock;}
+              {if Desktop<>nil then Desktop.UnLock;}
               CE;
               if  (Owner <> nil) and (TypeOf(Owner^) = TypeOf(TFileWindow))
               then
@@ -2639,7 +2639,7 @@ DoSave:
             end;
           cmScrollBarChanged:
             begin
-            Desktop^.Lock;
+            Desktop.Lock;
             Seek(PComp(Event.InfoPtr)^);
             if  (ViewMode = vmText) and (Event.InfoLong <> 0) then
               begin
@@ -2655,7 +2655,7 @@ DoSave:
               SeekEof
             else
               DrawView;
-            Desktop^.UnLock;
+            Desktop.UnLock;
             end;
           cmSwitchKeyMapping:
             begin
@@ -2706,10 +2706,10 @@ DoSave:
                 Dec(BufPos)
               else if FilePos > 100 then
                 begin
-                Owner^.Lock;
+                Owner.Lock;
                 Seek(FilePos-100);
                 BufPos := 99;
-                Owner^.UnLock;
+                Owner.UnLock;
                 end;
               DrawView;
               CE
@@ -2729,9 +2729,9 @@ DoSave:
                 Inc(BufPos)
               else
                 begin
-                Owner^.Lock;
+                Owner.Lock;
                 Seek(FilePos+BufPos+1);
-                Owner^.UnLock;
+                Owner.UnLock;
                 end;
               DrawView;
               CE
@@ -2868,7 +2868,7 @@ DoSave:
             if BufPos = 0 then
               begin
               PViewScroll(SB)^.Value := 0;
-              SB^.DrawView;
+              SB.DrawView;
               end;
             end;
           kbLeft:
@@ -3071,7 +3071,7 @@ NotKb:
                           DisposeStr(PWindow(Owner)^.Title);
                           PWindow(Owner)^.Title := NewStr
                                 (GetString(dlViewFile));
-                          PWindow(Owner)^.Redraw;
+                          PWindow(Owner).Redraw;
                           end;
                         else {case}
                           begin
@@ -3555,8 +3555,8 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
        ouiStoreViewerPosition = 0)
   then
     begin
-    Desktop^.GetExtent(LastViewerBounds);
-    LastViewerDeskSize := Desktop^.Size;
+    Desktop.GetExtent(LastViewerBounds);
+    LastViewerDeskSize := Desktop.Size;
     end;
   R := LastViewerBounds;
   AdjustToDesktopSize(R, LastViewerDeskSize);
@@ -3593,7 +3593,7 @@ procedure TFileWindow.ChangeBounds(const Bounds: TRect);
   if not GetState(sfModal) then
     begin
     GetBounds(LastViewerBounds);
-    LastViewerDeskSize := Desktop^.Size;
+    LastViewerDeskSize := Desktop.Size;
     end;
   end;
 

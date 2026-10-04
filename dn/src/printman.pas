@@ -433,7 +433,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
           begin
           Paused := not Paused;
           if Status <> nil then
-            Status^.DrawView;
+            Status.DrawView;
           ClearEvent(Event);
           end;
         cmOK:
@@ -460,7 +460,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
             SetRange(List^.Count);
             DrawView;
             if Status <> nil then
-              Status^.DrawView;
+              Status.DrawView;
             end;
           ClearEvent(Event);
           Dec(LockUpdate);
@@ -479,7 +479,7 @@ procedure TPrintManager.PrintFile(const FileName: String);
   SetRange(List^.Count);
   DrawView;
   if Status <> nil then
-    Status^.DrawView;
+    Status.DrawView;
   end;
 
 procedure TPrintManager.InitPrinter;
@@ -583,7 +583,7 @@ procedure TPrintManager.Update;
     FocusItem(Focused-1);
     DrawView;
     if Status <> nil then
-      Status^.DrawView;
+      Status.DrawView;
     Dec(LockUpdate);
     end;
 
@@ -595,7 +595,7 @@ procedure TPrintManager.Update;
     if  (List = nil) or (List^.Count < 1) then
       begin
       if not Owner^.GetState(sfDragging) then
-        Owner^.Free;
+        Owner.Free;
       Exit;
       end;
     PrintStream := New(PBufStream, Init(PString(List^.At(0))^,
@@ -651,7 +651,7 @@ procedure TPrintManager.Update;
       end;
     end;
   if Status <> nil then
-    Status^.DrawView;
+    Status.DrawView;
   end { TPrintManager.Update };
 
 procedure SetupPrinter;
@@ -676,9 +676,9 @@ procedure PrintFile(const S: String);
     W := Application.ValidView(PPMWindow.Create(R));
     if W <> nil then
       begin
-      W^.Hide;
-      Desktop^.InsertView(W, Desktop^.Last);
-      W^.Show;
+      W.Hide;
+      Desktop.InsertView(W, Desktop.Last);
+      W.Show;
       end;
     end;
   if Printer <> nil then

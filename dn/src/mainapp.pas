@@ -350,22 +350,22 @@ begin
     { the focused control of the window on top of the desktop, if that is a group (a test aid; the top view may be a menu, which
       is not a group: the access violation is taken, the trace must not kill the program) }
     try
-      if (Desktop^.Current <> nil) and (PGroup(Desktop^.Current)^.Current <> nil) then
+      if (Desktop.Current <> nil) and (PGroup(Desktop.Current)^.Current <> nil) then
         begin
-          TraceView(PGroup(Desktop^.Current)^.Current);
-          if PGroup(Desktop^.Current)^.Current^.Size.Y = 1 then
-            DNTrace('as input line: maxlen ' + IntToStr(PInputLine(PGroup(Desktop^.Current)^.Current)^.MaxLen) + ' curpos ' + IntToStr(PInputLine(PGroup(Desktop^.Current)^.Current)^.CurPos) + ' data [' + PInputLine(PGroup(Desktop^.Current)^.Current)^.Data^ + ']');
+          TraceView(PGroup(Desktop.Current)^.Current);
+          if PGroup(Desktop.Current)^.Current^.Size.Y = 1 then
+            DNTrace('as input line: maxlen ' + IntToStr(PInputLine(PGroup(Desktop.Current)^.Current)^.MaxLen) + ' curpos ' + IntToStr(PInputLine(PGroup(Desktop.Current)^.Current)^.CurPos) + ' data [' + PInputLine(PGroup(Desktop.Current)^.Current)^.Data^ + ']');
         end;
     except
       DNTrace('(the top view of the desktop is not a window)');
     end;
     { the geometry of the main views (a test aid) }
-    V := Desktop^.Last;
+    V := Desktop.Last;
     if V <> nil then
       repeat
         V := V^.Next;
         TraceView(V);
-      until V = Desktop^.Last;
+      until V = Desktop.Last;
     if MenuBar <> nil then
       TraceView(MenuBar);
     if StatusLine <> nil then
@@ -601,7 +601,7 @@ begin
 end;
 
 { A window with a text (the program shows it while it does something long: "Reading the file..."); the caller disposes it
-  (Info^.Free). It is made at once: DN shows it only if the work takes time (TWriteWin.Tmr), TODO. }
+  (Info.Free). It is made at once: DN shows it only if the work takes time (TWriteWin.Tmr), TODO. }
 function WriteMsg(Text: String): PView;
 var
   R: TRect;

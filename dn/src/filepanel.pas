@@ -316,7 +316,7 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
     else
       begin { правая кнопка мыши: активизация и
           распахивание/восстановление (как Alt-Ctrl-Z) }
-      TargetPanel^.Select;
+      TargetPanel.Select;
       Message(TargetPanel^.Owner, evCommand, cmMaxi, nil);
       end;
     end;
@@ -568,7 +568,7 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
       if not GetState(sfActive+sfSelected) and
           (ScrollBar <> nil) and ScrollBar^.GetState(sfVisible)
       then
-        ScrollBar^.Hide;
+        ScrollBar.Hide;
       DoDraw := True;
       end
     else
@@ -585,13 +585,13 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
       DoDraw := True;
       if ScrollBar <> nil then
         begin
-        ScrollBar^.Show;
+        ScrollBar.Show;
         ScrollBar^.Options := ScrollBar^.Options or ofPostProcess;
         end;
       if InfoView <> nil then
-        InfoView^.DrawView;
+        InfoView.DrawView;
       if DirView <> nil then
-        DirView^.DrawView;
+        DirView.DrawView;
       if  (Drive^.DriveType = dtDisk) then
         begin
         AddToDirectoryHistory(DirectoryName, Integer(dtDisk));
@@ -611,7 +611,7 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
     EnableCommands(PanelCommands);
     if  (ScrollBar <> nil) and not ScrollBar^.GetState(sfVisible) then
       begin
-      ScrollBar^.Show;
+      ScrollBar.Show;
       ScrollBar^.Options := ScrollBar^.Options or ofPostProcess;
       end;
     end;
@@ -631,14 +631,14 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
       begin
       if ScrollBar <> nil then
         begin
-        ScrollBar^.Hide;
+        ScrollBar.Hide;
         ScrollBar^.Options := ScrollBar^.Options and (not ofPostProcess);
         end;
       DoDraw := True;
       if InfoView <> nil then
-        InfoView^.DrawView;
+        InfoView.DrawView;
       if DirView <> nil then
-        DirView^.DrawView;
+        DirView.DrawView;
       end;
   if DoDraw then
     begin
@@ -808,7 +808,7 @@ Scroll:
   CS := 179+C2 shl 8;
   CW := 32+C2 shl 8;
 
-  ColumnTitles := (Pansetup^.Show.MiscOptions and 2) <> 0;
+  ColumnTitles := (Pansetup.Show.MiscOptions and 2) <> 0;
   PgS := (Size.Y-Byte(ColumnTitles))
         *((Size.X+1) div LineLength);
   if PgS = 0 then
@@ -1023,7 +1023,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
         end; {AK155}
       if Panel^.GetState(sfActive) and not Panel^.GetState(sfSelected)
       then
-        Panel^.Select; {AK155}
+        Panel.Select; {AK155}
       if Panel^.GetState(sfActive+sfSelected) then
         begin
         with Panel^ do
@@ -1286,7 +1286,7 @@ function MakePathDecr(IV: PInfoView): Boolean;
         Mask := psShowDescript;
         end;
       end;
-    if Panel^.PanSetup^.Show.ColumnsMask and Mask <> 0
+    if Panel^.PanSetup.Show.ColumnsMask and Mask <> 0
     then
       begin
       { выводим в подвале то, что не поместилось в панели }
@@ -1587,7 +1587,7 @@ procedure TInfoView.CompileShowOptions;
   if @Self = nil then
     Exit;
   FillChar(ElNumber, SizeOf(ElNumber), 0);
-  with Panel^.PanSetup^.Show do
+  with Panel^.PanSetup.Show do
     begin
     Compile(MaxFooterHeight+1, MakeDivider, nil);
     Compile(ShowCurFile, MakeCurFile, nil);
@@ -1813,7 +1813,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
       begin
       DrawView;
       if InfoView <> nil then
-        InfoView^.DrawView;
+        InfoView.DrawView;
       NewTimer(_Tmr1, 500);
       end;
     end { CM_CopyUnselect };
@@ -1847,7 +1847,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
 
   begin { TFilePanel.HandleEvent }
   
-  uLfn := PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0;
+  uLfn := PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0;
   
   inherited HandleEvent(Event);
   if Event.What = evNothing then
@@ -1894,7 +1894,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           )
         )
     then
-      CommandLine^.HandleEvent(Event);
+      CommandLine.HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
   I := ShiftState2;
@@ -1913,7 +1913,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             panelwin при обработке Ctrl-[ и Ctrl-], возможно, с Alt.
             Вот этот самый Alt и используем для инверсии
             признака работы с длинным или коротким именем }
-            if (PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0) =
+            if (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0) =
                (ShiftState and kbAltShift <> 0)
             then
               PString(Event.InfoPtr)^:= lfGetShortFileName(DirectoryName)
@@ -1948,7 +1948,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
         if Char(Event.CharCode) = #27 then
           begin
           StopQuickSearch;
-          InfoView^.DrawView;
+          InfoView.DrawView;
           CED;
           Exit
           end;
@@ -1974,7 +1974,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           if not MaskSearch(0) then
             DoQuickSearch(kbBack)
           else
-            InfoView^.DrawView; { надо сменить и маску, и данные о файле }
+            InfoView.DrawView; { надо сменить и маску, и данные о файле }
           QSLastSuccessPos := LastSuccessPos;
           CED;
           Exit;
@@ -1991,14 +1991,14 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             (I and $40 <> 0)) or
           ( (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254) and
             (ShiftState and 3 <> 0) and (ShiftState and 4 = 0) and
-            (not CommandLine^.GetState(sfVisible)) and
+            (not CommandLine.GetState(sfVisible)) and
             (InterfaceData.Options and ouiHideCmdline <> 0))
       then
         begin
         if QuickSearch then
           begin
           StopQuickSearch;
-          InfoView^.DrawView; {Cat}
+          InfoView.DrawView; {Cat}
           end
         else
           begin
@@ -2008,7 +2008,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
         if  (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254) then
           begin
           if not ((ShiftState and 3 <> 0) and (not
-                   CommandLine^.GetState(sfVisible)))
+                   CommandLine.GetState(sfVisible)))
           then
             begin
             ShiftState2 := I and $BF;
@@ -2050,7 +2050,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             Exit;
             end;
           StopQuickSearch;
-          InfoView^.DrawView;
+          InfoView.DrawView;
           end;
 GotoKb:
         case DNKeyCode(Event) of
@@ -2070,21 +2070,21 @@ GotoKb:
             CE;
             DeltaX := 0;
             OldDelta := -1;
-            Owner^.Redraw
+            Owner.Redraw
             end;
           kbCtrlEnd:
             begin
             CE;
             DeltaX := LineLength-Size.X-1;
             OldDelta := -1;
-            Owner^.Redraw
+            Owner.Redraw
             end;
           kbHome:
             begin
             CE;
             OldDelta := -1;
             ScrollBar^.SetValue(0);
-            Owner^.Redraw
+            Owner.Redraw
             end;
           { Flash <<< }
           kbEnd:
@@ -2138,7 +2138,7 @@ GotoKb:
               if CurPos = ScrollBar^.Value then
                 DrawView;
               if InfoView <> nil then
-                InfoView^.DrawView;
+                InfoView.DrawView;
               end;
           kbAltQuote:
             begin
@@ -2203,7 +2203,7 @@ GotoKb:
               end;
             PosChanged := True;
             if InfoView <> nil then
-              InfoView^.DrawView;
+              InfoView.DrawView;
             CED;
             PosChanged := False;
             if  (RepeatDelay <> 0) and QuickViewEnabled then

@@ -158,7 +158,7 @@ procedure TValuesHolder.Show;
     begin
     Writeln('TYPE ', P^.TypeID);
     Writeln(Strg(#196, 5+Length(P^.TypeID)));
-    P^.Show;
+    P.Show;
     end;
   begin
   ForEach(DoScan);

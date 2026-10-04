@@ -772,8 +772,8 @@ procedure RUN_IT;
   with MyApplication do
     begin
     Lock;
-    MenuBar^.MakeFirst;
-    Desktop^.MakeFirst;
+    MenuBar.MakeFirst;
+    Desktop.MakeFirst;
     Clock^.MakeFirst;
     UnLock;
     end;

@@ -679,7 +679,7 @@ constructor TPktListDialog.Create(FName: String; C: PPktCol);
     View: PView;
   begin
   HelpCtx := hcPktListDialog;
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   inherited Create(R, GetString(dlPktView)+FName);
   Options := Options or {ofCentered}ofSelectable;
   GrowMode := gfGrowHiX+gfGrowHiY;
@@ -743,7 +743,7 @@ procedure ViewPktHeader(MsgCount: SmallInt);
     {!!!'Packet Size: '+PrintUsing('###,###',GetFileSize(PktFileName))+' byte(s)'+#13+}
     GetString(dlPktMsg)+ItoS(MsgCount);
   D := PktHeaderDlg(S);
-  Desktop^.ExecView(D);
+  Desktop.ExecView(D);
   D.Free;
   end;
 
@@ -772,7 +772,7 @@ procedure TPktListDialog.HandleEvent(var Event: TEvent);
                lb^.List^.Count,
               Pc^.FA, Pc^.TA));
         Dispose(Buf);
-        Desktop^.ExecView(D);
+        Desktop.ExecView(D);
         D.Free;
         end;
       kbF2:
@@ -912,7 +912,7 @@ constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
     S: String;
   begin
   HelpCtx := hcPktMsgViewer;
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   inherited Create(R, GetString(dlViewMsg));
   Options := Options or ofCentered;
   VS := StandardScrollBar(sbVertical+sbHandleKeyboard);
@@ -1053,7 +1053,7 @@ constructor TMsgViewerDlg.Create(FName: String);
     View: PView;
     VS: PScrollBar;
   begin
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   inherited Create(R, GetString(dlNetMailView)+FExpand(FName));
   Options := Options or ofCentered;
   GrowMode := gfGrowHiX+gfGrowHiY;
@@ -1420,9 +1420,9 @@ procedure ViewPktFile(FName: String);
   W := WriteMsg(^M^M^C+GetString(dlReadingPkt));
   UpdateWriteView(W);
   C := PPktCol.Create(FName);
-  W^.Free;
+  W.Free;
   D := PPktListDialog.Create(FName, C);
-  Desktop^.ExecView(D);
+  Desktop.ExecView(D);
   D.Free;
   if Assigned(C) then
     C.Free;
@@ -1490,7 +1490,7 @@ procedure ViewMsgFile(FName: String);
     Exit;
     end;
   D := PMsgViewerDlg.Create(FName);
-  Desktop^.ExecView(D);
+  Desktop.ExecView(D);
   D.Free;
   end;
 
@@ -1506,7 +1506,7 @@ function ViewMsgFileE(FName: String): Boolean;
     FileName := FName;
     ViewMsgFileE := True;
     D := PMsgViewerDlg.Create(FName);
-    Desktop^.ExecView(D);
+    Desktop.ExecView(D);
     D.Free;
     end
   else
@@ -1531,9 +1531,9 @@ function ViewPktFileE(FName: String; MsgVisible: Boolean): Boolean;
     W := WriteMsg(^M^M^C+GetString(dlReadingPkt));
     UpdateWriteView(W);
     C := PPktCol.Create(FName);
-    W^.Free;
+    W.Free;
     D := PPktListDialog.Create(FName, C);
-    Desktop^.ExecView(D);
+    Desktop.ExecView(D);
     D.Free;
     if Assigned(C) then
       C.Free;

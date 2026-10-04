@@ -116,7 +116,7 @@ constructor TUserWindow.Create;
   var
     R: TRect;
   begin
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   R.Grow(1, 1);
   inherited Create(R, GetString(dlOutputTitle), 0);
   OldScreenWidth := ScreenWidth;
@@ -136,7 +136,7 @@ procedure TUserWindow.CalcBounds(var Bounds: TRect; Delta: TPoint);
     inherited CalcBounds(Bounds, Delta);
     Exit
     end;
-  Desktop^.GetExtent(Bounds);
+  Desktop.GetExtent(Bounds);
   Bounds.Grow(1, 2);
   Inc(Bounds.B.Y);
   OldScreenWidth := ScreenWidth;
@@ -166,7 +166,7 @@ constructor TUserView.Create(const R: TRect; H, V: PScrollBar);
   Options := Options or ofSelectable;
   Grabbing := False;
   ScrollTo(0,
-    Byte(CommandLine^.GetState(sfVisible))+
+    Byte(CommandLine.GetState(sfVisible))+
     Byte(InterfaceData.Options and ouiHideMenu = 0)
     { +
    Byte(InterfaceData.Options and ouiHideStatus = 0)});
@@ -226,10 +226,10 @@ procedure TUserView.HandleEvent(var Event: TEvent);
       { Flash >>> }
       if  (DNKeyCode(Event) = kbShiftUp) or (DNKeyCode(Event) = kbShiftDown)
       then
-        CommandLine^.HandleEvent(Event);
+        CommandLine.HandleEvent(Event);
       { Flash <<< }
       if Size.X = ScreenWidth then
-        CommandLine^.HandleEvent(Event);
+        CommandLine.HandleEvent(Event);
       end;
   end {case};
   end { TUserView.HandleEvent };

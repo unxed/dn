@@ -348,7 +348,7 @@ procedure TDrive.MakeTop(var S: String);
     i: TFileColNumber;
     LFNLen: Word;
   begin
-  Flags := PFilePanelRoot(Panel)^.PanSetup^.Show.ColumnsMask;
+  Flags := PFilePanelRoot(Panel)^.PanSetup.Show.ColumnsMask;
   for i := Low(TFileColAllowed) to High(TFileColAllowed) do
     begin
     if not ColAllowed[i] then
@@ -451,7 +451,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     D: Word;
     i: TFileColNumber;
   begin {TDrive.GetFull}
-  Flags := PFilePanelRoot(Panel)^.PanSetup^.Show.ColumnsMask;
+  Flags := PFilePanelRoot(Panel)^.PanSetup.Show.ColumnsMask;
   for i := Low(TFileColAllowed) to High(TFileColAllowed) do
     begin
     if not ColAllowed[i] then
@@ -841,7 +841,7 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFi
   PName := @SR.FullName;
   
   if (Panel <> nil) and
-     ((PFilePanelRoot(Panel)^.PanSetup^.Show.ColumnsMask
+     ((PFilePanelRoot(Panel)^.PanSetup.Show.ColumnsMask
        and psLFN_InColumns) = 0)
   then // в панели короткие имена
     PName := @SR.SR.Name;
@@ -932,14 +932,14 @@ procedure TDrive.GetDown(var B: TScreenCell; C: Word; P: PFileRec; var LFN_inCur
   begin
   if P = nil then
     Exit;
-  w := PFilePanelRoot(Panel)^.PanSetup^.Show.CurFileNameType;
+  w := PFilePanelRoot(Panel)^.PanSetup.Show.CurFileNameType;
   if w = cfnHide then
     S2 := ''
   else
     begin
     NameWidht := 13 + CountryInfo.TimeFmt; // уместить 12-часовое время
     
-    uLfn := PFilePanelRoot(Panel)^.PanSetup^.Show.
+    uLfn := PFilePanelRoot(Panel)^.PanSetup.Show.
       ColumnsMask and psLFN_InColumns <> 0;
     if w = cfnTypeOther then
       S2 := P^.FlName[uLfn xor InvLFN]
@@ -1023,9 +1023,9 @@ function TDrive.GetRealDir: String;
             D := PDialog(LoadResource(dlgDiskError));
             if D <> nil then
               begin
-              D^.SetData(MM);
+              D.SetData(MM);
               Application.ExecView(D);
-              D^.GetData(MM);
+              D.GetData(MM);
               D.Free;
               end;
             UpStr(MM.S);
@@ -1056,9 +1056,9 @@ function TDrive.GetRealDir: String;
               D := PDialog(LoadResource(dlgDiskError));
               if D <> nil then
                 begin
-                D^.SetData(MM);
+                D.SetData(MM);
                 Application.ExecView(D);
-                D^.GetData(MM);
+                D.GetData(MM);
                 D.Free;
                 end;
               UpStr(MM.S);
@@ -1221,7 +1221,7 @@ function TDrive.OpenDirectory(const Dir: String;
       end;
     I := DirsToProcess^.Count-1;
     end;
-  PI^.Free;
+  PI.Free;
   // JO: здесь сортировка не нужна, т.к. она делается в TFindDrive.GetDirectory
   //     и в результате мы получаем сортировку дважды
   {Files^.Sort;}
@@ -1272,9 +1272,9 @@ procedure TDrive.DrvFindFile(FC: PFilesCollection);
       +' | '+Cut(FindRec.What, 17);
   PInfo^.Bottom := GetString(dlNoFilesFound);
   PInfo^.Write(1, GetString(dlDBViewSearchingIn));
-  Desktop^.Insert(PInfo);
+  Desktop.Insert(PInfo);
   BB := FindFiles(Files, Directories, FindRec, PInfo, FC, False);
-  Desktop^.Delete(PInfo);
+  Desktop.Delete(PInfo);
   Dec(SkyEnabled);
   PInfo.Free;
   if  (BB and ffSeD2Lng) <> 0 then
@@ -1301,7 +1301,7 @@ procedure RereadDirectory(Dir: String);
   
   Dir := lfGetLongFileName(Dir);
   
-  Desktop^.ForEach(Action);
+  Desktop.ForEach(Action);
   end;
 
 end.

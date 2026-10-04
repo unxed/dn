@@ -176,7 +176,7 @@ procedure PhoneBook(Manual: Boolean);
     begin
     D := PDialog(LoadResource(dlgPhoneBook));
     D^.ForEach(DoSearchButton);
-    ReturnButton^.Hide;
+    ReturnButton.Hide;
     PV := D^.StandardScrollBar(sbVertical+sbHandleKeyboard);
     R.Assign(D^.Size.X-3, 3, D^.Size.X-2, 12);
     PV^.Locate(R);
@@ -213,7 +213,7 @@ procedure PhoneBook(Manual: Boolean);
 
     PL^.ItemLabel := New(PLabel, Init(R, GetString(dlPhonesLabelPhones),
            PL));
-    PL^.ItemLabel^.Hide;
+    PL^.ItemLabel.Hide;
     D^.Insert(PL^.ItemLabel);
 
 
@@ -226,8 +226,8 @@ procedure PhoneBook(Manual: Boolean);
     D^.Insert(PV);
     PL^.Info := PDStringView(PV);
 
-    R.A.X := Desktop^.ExecView(D);
-    D^.GetData(DT);
+    R.A.X := Desktop.ExecView(D);
+    D.GetData(DT);
     D.Free;
     if R.A.X <> cmDialPhone then
       Exit;
@@ -414,10 +414,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       PSortedCollection(C)^.Search(Ph, Focused);
       C^.AtInsert(Focused, Ph);
       end;
-    Owner^.Lock;
+    Owner.Lock;
     NewLisT(C);
     FocusItem(R.A.X);
-    Owner^.UnLock;
+    Owner.UnLock;
     Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
     Phones := C;
     if Phones^.Count > 16380 then
@@ -470,10 +470,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     if not Append and (C^.Count > Focused) then
       C^.AtFree(Focused);
     C^.Insert(PPhone.Create(DT.Number, DT.Name, DT.Memo1, DT.Memo2));
-    Owner^.Lock;
+    Owner.Lock;
     NewLisT(C);
     FocusItem(R.A.X);
-    Owner^.UnLock;
+    Owner.UnLock;
     Active^.Phones := C;
     Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
     if Phones^.Count > 16380 then
@@ -517,10 +517,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     P1 := PPhoneDir.Create(Dt.Password, Dt.Name, Dt.Memo1, Dt.Memo2);
     P1^.Encrypted := False;
     C^.Insert(P1);
-    Owner^.Lock;
+    Owner.Lock;
     NewLisT(C);
     FocusItem(I);
-    Owner^.UnLock;
+    Owner.UnLock;
     Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
     Phones := C;
     if Phones^.Count > 16380 then
@@ -559,10 +559,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     List := nil;
     I := Focused;
     C^.Insert(PPhone.Create(DT.Number, DT.Name, DT.Memo1, DT.Memo2));
-    Owner^.Lock;
+    Owner.Lock;
     NewLisT(C);
     FocusItem(I);
-    Owner^.UnLock;
+    Owner.UnLock;
     Active^.Phones := C;
     Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
     if Phones^.Count > 16380 then
@@ -609,10 +609,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         Exit;
 
       DisableCommands([cmDialPhone, cmImportPhones]);
-      GroupLabel^.Hide;
-      ItemLabel^.Show;
-      EnterButton^.Hide;
-      ReturnButton^.Show;
+      GroupLabel.Hide;
+      ItemLabel.Show;
+      EnterButton.Hide;
+      ReturnButton.Show;
 
       (*     if{ SearchMode and} (List <> nil) then
        begin
@@ -629,9 +629,9 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         C := PPhoneCollection.Create(10, 10);
         C^.Insert(New(PPhone, Init(' ', '..', GetString(dlPhonesUpDir),
                '')));
-        Owner^.Lock;
+        Owner.Lock;
         NewLisT(C);
-        Owner^.UnLock;
+        Owner.UnLock;
         Active^.Phones := C;
         Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
         if Phones^.Count > 16380 then
@@ -654,10 +654,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       end
     else
       begin
-      GroupLabel^.Show;
-      ItemLabel^.Hide;
-      EnterButton^.Show;
-      ReturnButton^.Hide;
+      GroupLabel.Show;
+      ItemLabel.Hide;
+      EnterButton.Show;
+      ReturnButton.Hide;
       if Focused > 0 then
         begin
         DialPhone;
@@ -736,10 +736,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
            '')));
     NewLisT(PC);
     HideCursor;
-    EnterButton^.Hide;
-    ReturnButton^.Show;
-    GroupLabel^.Hide;
-    ItemLabel^.Show;
+    EnterButton.Hide;
+    ReturnButton.Show;
+    GroupLabel.Hide;
+    ItemLabel.Show;
     end { SearchPhone };
 
   procedure ImportPhones;
@@ -828,7 +828,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         end;
       end;
     if PV <> nil then
-      PV^.Free;
+      PV.Free;
     MessageBox(^C+ItoS(M)+GetString(dlPB_CnvReport), nil,
        mfInformation+mfOKButton);
     List := nil;
@@ -995,20 +995,20 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         Info^.S2 := Ph^.Memo2^
       else
         Info^.S2 := '';
-      Info^.DrawView;
+      Info.DrawView;
       end
     else if Info <> nil then
       begin
       Info^.S1 := '';
       Info^.S2 := '';
-      Info^.DrawView;
+      Info.DrawView;
       end;
     end;
   if Active = nil then
     begin
     DisableCommands([cmDialPhone, cmImportPhones]);
     EnableCommands([cmPhoneBookMode, cmCopyPhone]);
-    Owner^.Redraw
+    Owner.Redraw
     end
   else
     begin
@@ -1018,7 +1018,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       DisableCommands([cmDialPhone, cmCopyPhone])
     else
       EnableCommands([cmDialPhone, cmCopyPhone]);
-    Owner^.Redraw
+    Owner.Redraw
     end;
 
   if SearchMode then

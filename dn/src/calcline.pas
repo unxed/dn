@@ -193,7 +193,7 @@ procedure TIndicator.HandleEvent(var Event: TEvent);
       cmCopyClip:
         begin
         ClearEvent(Event);
-        Radio^.GetData(SelectedForm);
+        Radio.GetData(SelectedForm);
         PutInClip(SResult[SelectedForm]);
         end;
       cmChangeFormat:
@@ -413,7 +413,7 @@ procedure TCalcLine.SetValues(SetSelf: Boolean);
       HistoryAdd(hsCalcLine, S);
       with PIndicator(PDialog(Owner)^.DirectLink[3])^ do
         begin
-        Radio^.GetData(SelectedForm);
+        Radio.GetData(SelectedForm);
         S := SResult[SelectedForm];
         end;
       SetData(S);
@@ -453,7 +453,7 @@ procedure InsertCalc;
     Application.InsertWindow(PWindow(Calc));
     end
   else
-    Calc^.Select;
+    Calc.Select;
   end { InsertCalc };
 
 end.
