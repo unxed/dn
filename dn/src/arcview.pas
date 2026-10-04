@@ -301,11 +301,11 @@ constructor TArcDrive.Create(PC: PDirStorage; const AName, VAName: String);
   if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
     begin
     StdMsg(4);
-    Dispose(ArcFile, Done);
+    ArcFile.Free;
     ArcFile := nil;
     if Files <> nil then
       begin
-      Dispose(Files, Done);
+      Files.Free;
       Files := nil
       end;
     Fail;
@@ -358,7 +358,7 @@ constructor TArcDrive.Load(S: TStream);
     ArcFile := PBufStream.Create(ArcName, stOpenRead, ArcBufSize);
     if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
       begin
-      Dispose(ArcFile, Done);
+      ArcFile.Free;
       ArcFile := nil;
       goto Failure;
       end;
@@ -370,7 +370,7 @@ constructor TArcDrive.Load(S: TStream);
 Failure:
       StdMsg(4);
       if Files <> nil then
-        Dispose(Files, Done);
+        Files.Free;
       Files := nil;
       S.Read(ForceRescan, 1);
       Fail;
@@ -404,7 +404,7 @@ procedure TArcDrive.Store(S: TStream);
 destructor TArcDrive.Destroy;
   begin
   if Files <> nil then
-    Dispose(Files, Done);
+    Files.Free;
   Files := nil;
   if AType <> nil then
     Dispose(AType, Done);
@@ -442,13 +442,13 @@ function TArcDrive.ReadArchive: Boolean;
   VArcFileName := VArcName;
   if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
     begin
-    Dispose(ArcFile, Done);
+    ArcFile.Free;
     ArcFile := nil;
     StdMsg4;
     Exit;
     end;
   if Files <> nil then
-    Dispose(Files, Done);
+    Files.Free;
   Files := nil;
   Files := nil;
   SkipSFX;
@@ -488,7 +488,7 @@ function TArcDrive.ReadArchive: Boolean;
          Copy(Strg(#219, 25 div Trunc(Ln / (ArcFile.GetPos+1))) +
            Strg(#177, 25),
          1, 25));
-      P^.Write(3, ItoS(Files^.Files)+GetString(dlFilesFound));
+      P^.Write(3, ItoS(Files.Files)+GetString(dlFilesFound));
       NewTimer(T, 300);
       end;
     AType^.GetFile;
@@ -504,11 +504,11 @@ function TArcDrive.ReadArchive: Boolean;
         FileInfo.Attr := FileInfo.Attr or Directory;
 
       {attribute "Hidden" means "with password"}
-      Files^.AddFile(FileInfo.FName, FileInfo.USize,
+      Files.AddFile(FileInfo.FName, FileInfo.USize,
         FileInfo.PSize, FileInfo.Date, FileInfo.Attr);
       if FileInfo.Attr and Directory <> 0
       then
-        Files^.AddFile(MakeNormName(FileInfo.FName, '..'),
+        Files.AddFile(MakeNormName(FileInfo.FName, '..'),
           FileInfo.USize, FileInfo.PSize, FileInfo.Date, 0);
 
       if  (P <> nil) and TimerExpired(T) then
@@ -535,7 +535,7 @@ function TArcDrive.ReadArchive: Boolean;
   then
     StdMsg(6);
   ReadArchive := True;
-  if Files^.Files = 0 then
+  if Files.Files = 0 then
     begin
     StdMsg(7);
     ReadArchive := False;
@@ -631,25 +631,25 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
   {GetDirectory := AFiles;}AllFiles := (FileMask = x_x)
        or (FileMask = '*');
   FD^.SortMode := psmLongName; {<sort141.001>}
-  Files^.ResetPointer('');
+  Files.ResetPointer('');
   {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
   {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
   {    доступный изначально объём                                              }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
-  while not Files^.Last and Files^.GetNextFile and (MAvail > MemReq) do
+  while not Files.Last and Files.GetNextFile and (MAvail > MemReq) do
     begin
-    _USize := Files^.CurFile.Size;
-    _PSize := Files^.CurFile.CSize;
-    if  (UpStrg(CurDir+'\') = UpStrg(Files^.LastDir)) and
-        (AllFiles or InFilter(Files^.CurFile.Name, FileMask))
+    _USize := Files.CurFile.Size;
+    _PSize := Files.CurFile.CSize;
+    if  (UpStrg(CurDir+'\') = UpStrg(Files.LastDir)) and
+        (AllFiles or InFilter(Files.CurFile.Name, FileMask))
     then
       begin
-      if Files^.CurFile.Name = '' then
+      if Files.CurFile.Name = '' then
         Continue;
-      if Files^.CurFile.Name = '..' then
+      if Files.CurFile.Name = '..' then
         Continue;
-      with Files^.CurFile do
+      with Files.CurFile do
         begin
         F := NewFileRec(Name, GetURZ(Name), 
             _USize, Date, 0, 0, Attr, @CurDir);
@@ -660,11 +660,11 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
       TTL := TTL+_USize;
       TPL := TPL+_PSize;
       end
-    else if (UpStrg(CurDir+'\') = UpStrg(Copy(Files^.LastDir, 1,
+    else if (UpStrg(CurDir+'\') = UpStrg(Copy(Files.LastDir, 1,
                Length(CurDir)+1)))
     then
       begin
-      Dr := Copy(Files^.LastDir, Length(CurDir)+2, MaxStringLength);
+      Dr := Copy(Files.LastDir, Length(CurDir)+2, MaxStringLength);
       I := PosChar('\', Dr);
       if I = 0 then
         I := Length(Dr)+1;
@@ -702,11 +702,11 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
       end
     else
       Continue;
-    if AFiles^.Search(F, si) then
+    if AFiles.Search(F, si) then
       DelFileRec(F)
-      {else AFiles^.Insert(F);}
+      {else AFiles.Insert(F);}
     else
-      AFiles^.AtInsert(si, F);
+      AFiles.AtInsert(si, F);
     end;
 
   NoMemory := MAvail <= MemReq;
@@ -727,7 +727,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
        0, 0, Directory, OW);
   F^.Attr := $8000 or F^.Attr;
   F^.PSize := {Round}(TPL);
-  AFiles^.AtInsert(0, F);
+  AFiles.AtInsert(0, F);
   FD^.DeleteAll;
   Dispose(FD, Done);
   end { TArcDrive.GetDirectory };
@@ -1113,13 +1113,13 @@ function TArcDrive.MakeListFile(PC: PCollection; UseUnp: Boolean; var B: Boolean
     begin
     if not (SS[Length(SS)] in ['\', '/']) then
       AddStr(SS, '\');
-    Files^.ResetPointer('');
-    while not Files^.Last and Files^.GetNextFile do
-      if  (SS = Copy(Files^.LastDir, 1, Length(SS)))
-        and (Files^.CurFile.Name <> '')
+    Files.ResetPointer('');
+    while not Files.Last and Files.GetNextFile do
+      if  (SS = Copy(Files.LastDir, 1, Length(SS)))
+        and (Files.CurFile.Name <> '')
       then
         begin
-        S1 := Files^.LastDir+Files^.CurFile.Name;
+        S1 := Files.LastDir+Files.CurFile.Name;
         if S1[1] in ['\', '/'] then
           Delete(S1, 1, 1); {DelFC(S1);}
         if  (Copy(S1, Length(S1)-2, 3) = '\..')
@@ -1314,7 +1314,7 @@ procedure TArcDrive.ExtractFiles(AFiles: PCollection; ExtrDir: String;
   SS := MakeListFile(AFiles, True, B);
   S := ' ';
   Pswd := False;
-  AFiles^.ForEach(Unselect);
+  AFiles.ForEach(Unselect);
   ExtrChar := CnvString(AType^.ExtractWP);
   if Options and 1 = 0 then
     ExtrChar := CnvString(AType^.Extract);
@@ -1531,11 +1531,11 @@ procedure TArcDrive.EraseFiles(AFiles: PCollection);
     P: PString;
     B: Boolean;
   begin
-  if AFiles^.Count = 0 then
+  if AFiles.Count = 0 then
     Exit;
-  if AFiles^.Count = 1 then
+  if AFiles.Count = 1 then
     begin
-    PF := AFiles^.At(0);
+    PF := AFiles.At(0);
     S := GetString(dlEraseConfirm1)+PF^.FlName[True]+' ?';
     end
   else
@@ -1544,9 +1544,9 @@ procedure TArcDrive.EraseFiles(AFiles: PCollection);
       {+mfFastButton});
   if  (I <> cmYes) then
     Exit;
-  if AFiles^.Count > 1 then
+  if AFiles.Count > 1 then
     begin
-    S := GetString(dlEraseConfirm2)+ItoS(AFiles^.Count)
+    S := GetString(dlEraseConfirm2)+ItoS(AFiles.Count)
         +' '+GetString(dlDIFiles)+' ?';
     J := MessageBox(S, nil, mfConfirmation+mfYesButton+mfNoButton);
     if  (J <> cmYes) then
@@ -1787,11 +1787,11 @@ procedure TArcDrive.GetDirInfo(var B: TDiskInfoRec);
   B.Title := NewStr(GetString(dlDICurArchive));
   B.Dir := NewStr(ArcName);
 
-  Fl := Files^.Files;
-  PSz := Files^.TotalCLength;
-  USz := Files^.TotalLength;
+  Fl := Files.Files;
+  PSz := Files.TotalCLength;
+  USz := Files.TotalLength;
   {
-  if Files <> nil then Files^.ForEach(DoCount);
+  if Files <> nil then Files.ForEach(DoCount);
   }
   B.Files := NewStr(GetString(dlDIArcTotalFiles)+ItoS(Fl)+'~');
 
@@ -1845,7 +1845,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
   PI := WriteMsg(GetString(dlReadingList));
   New(Fils, Init($10, $10));
   Fils^.SortMode := psmLongName;
-  Files^.ResetPointer('');
+  Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
   l := Length(Root);
   {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
@@ -1853,18 +1853,18 @@ function TArcDrive.OpenDirectory(const Dir: String;
   {    доступный изначально объём                                              }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
-  while not Files^.Last and Files^.GetNextFile and (MAvail > MemReq)
+  while not Files.Last and Files.GetNextFile and (MAvail > MemReq)
   do
     begin
-    if  (Root = Copy(UpStrg(Files^.LastDir), 1, L)) then
+    if  (Root = Copy(UpStrg(Files.LastDir), 1, L)) then
       begin
-      with Files^.CurFile do
+      with Files.CurFile do
         begin
         if  (Name = '') or (Name = '..') then
           Continue;
         _USize := Size;
         _PSize := CSize;
-        PDir := NewStr(Files^.LastDir);
+        PDir := NewStr(Files.LastDir);
         Inc(MemReq, Length(PDir^)+1);
         FR := NewFileRec(Name, GetURZ(Name), 
             _USize, Date, 0, 0, Attr, PDir);
@@ -1875,9 +1875,9 @@ function TArcDrive.OpenDirectory(const Dir: String;
         Dirs^.Insert(PDir);
       Fils^.AtInsert(Fils^.Count, FR);
       {JO: добавляем каталоги}
-      if PutDirs and (Length(Files^.LastDir) > L) then
+      if PutDirs and (Length(Files.LastDir) > L) then
         begin
-        LDir := Files^.LastDir;
+        LDir := Files.LastDir;
         repeat
           SetLength(LDir, Length(LDir)-1);
           for I := Length(LDir) downto L do
@@ -1984,7 +1984,7 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
   PI := WriteMsg(^M^M^C+GetString(dlSearching)+'...');
   New(Fils, Init($10, $10));
   Fils^.SortMode := psmLongName;
-  Files^.ResetPointer('');
+  Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
   L := Length(Root);
   {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
@@ -1992,26 +1992,26 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
   {    доступный изначально объём                                              }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
-  while not Files^.Last and Files^.GetNextFile and (MAvail > MemReq)
+  while not Files.Last and Files.GetNextFile and (MAvail > MemReq)
   do
     begin
-    if  (Root = Copy(UpStrg(Files^.LastDir), 1, L)) then
+    if  (Root = Copy(UpStrg(Files.LastDir), 1, L)) then
       begin
-      with Files^.CurFile do
+      with Files.CurFile do
         begin
         if  ( (FindRec.Options and ffoAdvanced = 0) or
               (Date >= DateAfter) and (Date <= DateBefore)
             and (Size >= SizeGreat) and (Size <= SizeLess)
             and ((Attr = 0) or (FileInfo.Attr and Attr <> 0)))
           and ((FindRec.Options and ffoRecursive <> 0) or
-              (Root = UpStrg(Files^.LastDir)))
+              (Root = UpStrg(Files.LastDir)))
           and (Name <> '') and (Name <> '..')
           and InFilter(Name, FindRec.Mask+FindRec.AddChar)
         then
           begin
           _USize := Size;
           _PSize := CSize;
-          PDir := NewStr(Files^.LastDir);
+          PDir := NewStr(Files.LastDir);
           Inc(MemReq, Length(PDir^)+1);
           FR := NewFileRec(Name, GetURZ(Name), 
               _USize, Date, 0, 0, Attr, PDir);
@@ -2022,9 +2022,9 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
           Fils^.AtInsert(Fils^.Count, FR);
           end;
         {JO: добавляем каталоги}
-        if Length(Files^.LastDir) > L then
+        if Length(Files.LastDir) > L then
           begin
-          LDir := Files^.LastDir;
+          LDir := Files.LastDir;
           repeat
             SetLength(LDir, Length(LDir)-1);
             for I := Length(LDir) downto L do
