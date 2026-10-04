@@ -176,11 +176,9 @@ def caret_is_class_deref(ts, caret_index, class_names, class_vars):
     nxt = caret_index + 1
     if nxt >= len(ts):
         return False
-    if not (
-        ts[nxt].text == b"."
-        or ts[nxt].text.lower() == b"do"
-        or ts[nxt].text in (b")", b",", b";")
-    ):
+    # Only member access and `with ... do`. A trailing ^ before )/,/; is often
+    # a PString/record-pointer dereference that shares a field name with a class.
+    if not (ts[nxt].text == b"." or ts[nxt].text.lower() == b"do"):
         return False
 
     prev = caret_index - 1

@@ -135,6 +135,25 @@ class ClassCaretsTest(unittest.TestCase):
         out = self.convert(source, libraries=[library, source])
         self.assertIn(b"P^.X", out)
 
+    def test_keeps_pstring_field_dereference(self):
+        source = (
+            b"type TView = class\n"
+            b"    Owner: TView;\n"
+            b"  end;\n"
+            b"  TFileRec = record\n"
+            b"    Owner: PString;\n"
+            b"  end;\n"
+            b"  PFileRec = ^TFileRec;\n"
+            b"var PF: PFileRec;\n"
+            b"begin\n"
+            b"  S := PF^.Owner^;\n"
+            b"  Owner^.Redraw;\n"
+            b"end.\n"
+        )
+        out = self.convert(source)
+        self.assertIn(b"PF^.Owner^", out)
+        self.assertIn(b"Owner.Redraw", out)
+
     def test_record_class_field(self):
         source = (
             b"type TView = class end;\n"
