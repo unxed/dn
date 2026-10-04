@@ -484,7 +484,7 @@ procedure TArvidDrive.Store(S: TStream);
 procedure TArvidDrive.RereadDirectory(S: String);
   begin
   if Prev <> nil then
-    Prev^.RereadDirectory(S);
+    Prev.RereadDirectory(S);
   if filetype = avdAvt then
     begin
     Stream.Free;
@@ -498,7 +498,7 @@ procedure TArvidDrive.RereadDirectory(S: String);
 procedure TArvidDrive.KillUse;
   begin
   if Prev <> nil then
-    Prev^.KillUse;
+    Prev.KillUse;
   Kill;
   end;
 
@@ -578,8 +578,8 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
   { CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boolean); virtual; }
   begin { TArvidDrive.CopyFiles }
   CtrlBreakHit := False;
-  AFiles^.Pack;
-  if AFiles^.Count <= 0 then
+  AFiles.Pack;
+  if AFiles.Count <= 0 then
     Exit;
   lFSplit(Name^, Dr, Nm, Xt);
   if filetype = avdTdr then
@@ -607,9 +607,9 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
       Delete(CopyDir, 1, 1); {DelFC(CopyDir);}
       end;
     S2 := CurDir;
-    for I := 0 to AFiles^.Count-1 do
+    for I := 0 to AFiles.Count-1 do
       begin
-      PF := AFiles^.At(I);
+      PF := AFiles.At(I);
       Stream.Seek( {Cat:warn}Round(PF^.PSize));
       Stream.Read(FC, SizeOf(FC));
       Desc := AvtCellDesc(FC, Stream);
@@ -659,7 +659,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
           end;
         end;
       end;
-    P^.Free;
+    P.Free;
     Stream.Seek(0);
     Stream.Write(AVT, SizeOf(AVT));
     Stream.Free;
@@ -708,9 +708,9 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
       end;
     Writeln(T.T, '');
     P := WriteMsg(GetString(dlPleaseStandBy));
-    for I := 0 to AFiles^.Count-1 do
+    for I := 0 to AFiles.Count-1 do
       begin
-      PF := AFiles^.At(I);
+      PF := AFiles.At(I);
       S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
       S2 := MakeNormName(CopyDir, MkName(Mask, PF^.FlName[True]));
       if  (PF^.Attr and Directory) = 0 then
@@ -724,7 +724,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
            'COPYDIR TP:'+SquashesName(S1)+' '+SquashesName(S2)+' /I/O/R/C/H')
         end;
       end;
-    P^.Free;
+    P.Free;
     if CmdFileCreated then
       MessageBox(GetString(dlArvidCmdFileCreated)+CmdFileNam,
         nil, mfInformation+mfOKButton)
@@ -774,10 +774,10 @@ procedure TArvidDrive.ChangeUp(var S: String);
     if Prev = nil then
       Exit;
     end;
-  PFilePanel(Panel)^.Drive := Prev;
-  Prev^.lChDir(Prev^.CurDir);
+  PFilePanel(Panel).Drive := Prev;
+  Prev.lChDir(Prev.CurDir);
 {AK155 Если GetState(sfSelected+sfActive), то и так ActivePanel = Panel
-  if  (Prev^.DriveType = dtDisk) and
+  if  (Prev.DriveType = dtDisk) and
       (PView(Panel)^.GetState(sfSelected+sfActive))
   then
     ActivePanel := Panel;
@@ -1448,7 +1448,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     SearchInAllFiles
   else
     SearchInStream(Stream, GetName(Name^));
-  P^.Free;
+  P.Free;
   if FindList = nil then
     begin
     MessageBox(^C+GetString(dlNoFilesFound), nil,
@@ -1480,7 +1480,7 @@ procedure TArvidDrive.GetDirLength(PF: PFileRec);
     TdrCalcTotal(@Self, CurDirPos, LL)
   else
     AvtCalcTotal(@Self, CurDirPos, LL);
-  P^.Free;
+  P.Free;
   PF^.Size := LL;
   PF^.Attr := PF^.Attr or $80;
   CurDir := SaveDir;
