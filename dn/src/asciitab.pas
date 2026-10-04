@@ -239,14 +239,14 @@ begin
   R.Grow(-1, -1);
   T.Assign(R.A.X, R.B.Y - 1, R.B.X, R.B.Y);
   Control := TReport.Create(T);
-  Control^.Options := Control^.Options or ofFramed;
-  Control^.EventMask := evBroadcast or Control^.EventMask;
+  Control.Options := Control.Options or ofFramed;
+  Control.EventMask := evBroadcast or Control.EventMask;
   Insert(Control);
   T.Assign(R.A.X, R.A.Y, R.B.X, R.B.Y - 2);
   Control := TTable.Create(T);
-  Control^.Options := Control^.Options or ofSelectable or ofFramed;
-  Control^.EventMask := $FFFF;
-  Control^.BlockCursor;
+  Control.Options := Control.Options or ofSelectable or ofFramed;
+  Control.EventMask := $FFFF;
+  Control.BlockCursor;
   Insert(Control);
   Control.Select;
   fASCIITable := True;
@@ -282,7 +282,7 @@ end;
 destructor TASCIIChart.Done;
 begin
   fASCIITable := False;
-  inherited Done;
+  inherited Destroy;
 end;
 
 { --- the procedure --- }
@@ -309,12 +309,12 @@ var
 
 begin
   P := TASCIIChart.Create(R);
-  P^.MoveTo(boundsASCII.X, boundsASCII.Y);
+  P.MoveTo(boundsASCII.X, boundsASCII.Y);
   P.SetData(CharASCII);
   CR := Desktop.Current;
   while GetCH do
     ;
-  boundsASCII := P^.Origin;
+  boundsASCII := P.Origin;
   P.Free;
   if CR <> nil then
     CR.Select;
