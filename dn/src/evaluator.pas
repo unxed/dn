@@ -237,7 +237,7 @@ type
   FnEval2 = procedure (var D: CReal; d2: CReal);
   FnEval3 = procedure (var D: CReal; d2, d3: CReal);
   PFnDesc = ^TFnDesc;
-  TFnDesc = class
+  TFnDesc = record
     n {ame}: String[8];
     E {val}: Pointer {FnEval};
     A {rguments}: Integer;
@@ -562,7 +562,7 @@ procedure ScanSym;
 
 
     if CurCalcView <> nil then
-      with TCalcView(CurCalcView)^ do
+      with TCalcView(CurCalcView) do
         begin
         if Expression[T] = '(' then
           begin { что-то вроде sum(a1:a30) в wkz}
