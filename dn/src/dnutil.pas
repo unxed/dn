@@ -254,7 +254,7 @@ uses
   DNRun,
 {$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
-  DNHelp, DnIni, iniengine, histories,
+  DNHelp, DnIni, iniengine, cfgstate, histories,
   VideoMan, panelwin, Messages, HistList, FileFind,
   
   Phones, 
@@ -771,9 +771,10 @@ procedure WriteHighlite;
 procedure WriteConfig;
   
   var
-    S: TBufStream;
+    S: TMemoryStream;
     I: AWord;
     SPos: LongInt;
+    OldCfg: File;
 
   procedure StoreBlock(I: AWord; var B; Sz: AWord);
     begin
@@ -801,13 +802,7 @@ procedure WriteConfig;
   begin { WriteConfig }
   
   ConfigModified := False;
-  S.Init(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stCreate, 16384);
-  if S.Status <> stOK then
-    begin
-    Msg(erCantOpenConfig, nil, mfError+mfOKButton);
-    S.Done;
-    Exit;
-    end;
+  S.Init(16384, 4096);                      { the image of the records; it goes to the section [Saved] of dn.ini (cfgstate.pas) }
   S.Write(ConfigSigns[NumSupportedConfigs].Sign[1],
      ConfigSigns[NumSupportedConfigs].SignLen);
   if ConfigSigns[NumSupportedConfigs].HavVer then
@@ -860,6 +855,20 @@ procedure WriteConfig;
        SizeOf(CalcFormat));
 
   StoreBlock(0, I, 0);
+  if SaveState(DnIniFileName, GetEnv('DNCFG'), S.Data^, S.Size) then
+    begin
+    { the old file of the records is not needed any more: it stays as dn.old (a copy to go back to) }
+    {$I-}
+    Assign(OldCfg, SourceDir+'dn'+GetEnv('DNCFG')+'.old');
+    Erase(OldCfg);
+    if IOResult <> 0 then;
+    Assign(OldCfg, SourceDir+'dn'+GetEnv('DNCFG')+'.cfg');
+    Rename(OldCfg, SourceDir+'dn'+GetEnv('DNCFG')+'.old');
+    if IOResult <> 0 then;
+    {$I+}
+    end
+  else
+    Msg(erCantOpenConfig, nil, mfError+mfOKButton);
   S.Done;
   WriteHighlite; {JO}
    {DNPRG}

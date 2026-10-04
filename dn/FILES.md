@@ -36,7 +36,7 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `setups.pas`, `paneldlgs.pas` (was `fltools`) | the dialogs of the settings; the dialogs of the panel (select group, filter, the button "Save setup") |
 | `panelsetup.pas` (was `pdsetup`), `panelwinx.pas` (was `xdblwnd`), `fsinfo.pas` (was `fltl`) | the settings records of a panel (show, sort); the window with two panels, the extended one; the information of the file system (cluster, serial number, file ages) |
 | `dnini.pas`, `iniengine.pas` (was `dnini_p`) | `dn.ini`: reading and writing the settings |
-| `boot.pas` (was `dn1.pas`) | reading `dn.cfg` (`ReadConfig`), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
+| `boot.pas` (was `dn1.pas`) | reading the settings image of `dn.ini` (`ReadConfig`; the old `dn.cfg` once), applying the settings after a dialog (`UpdateConfig`), `DoStartup`, `RUN_IT` (the start of the program) |
 | `macro.pas` | the macros of the editor (record, play) |
 
 ## Panels and files
@@ -60,7 +60,7 @@ The names of the units are words without digits and underscores (a unit has the 
 
 | What | File on disk (next to the program) | Written by | Read by |
 |---|---|---|---|
-| Settings of the dialogs (`StartupData`, `SystemData`, panel presets...): a **binary** dump of the records (the old way) | `dn.cfg` (blocks `cfg*` in `dnutil.pas`) | `WriteConfig` (`dnutil.pas`): at the exit **only if** `ConfigModified` (`startup.pas`; the dialogs set it) and at some other places | `ReadConfig` (`boot.pas`) at the start |
+| Settings of the dialogs (`StartupData`, `SystemData`, panel presets...): a **binary** image of the records (the old format of `dn.cfg`), now **inside `dn.ini`**, in the section `[Saved]` as hex pieces (`[Saved<suffix>]` for `DNCFG=<suffix>`) | `dn.ini`, section `[Saved]` (`cfgstate.pas`; the blocks `cfg*` of the image are in `dnutil.pas`). The old `dn.cfg` is read once if the section is not there and is renamed to `dn.old` | `WriteConfig` (`dnutil.pas`): at the exit **only if** `ConfigModified` (`startup.pas`; the dialogs set it) and at some other places | `ReadConfig` (`boot.pas`) at the start |
 | Settings in **text** form (the new way, a person may edit it: Options -> edit `dn.ini`) | `dn.ini` | the ini engine: `iniengine.pas` (`RegisterVar`: what is in the file), the variables are in `dnini.pas`; `copyini.pas` carries values over to `StartupData` | at the start |
 | The cache of the parsed `dn.ini` (the start is faster; safe to delete; was `dnini.in_`) | `dn.cac` | `iniengine.pas` | `iniengine.pas` |
 | Desktop saved by the user or by autosave | `dn.dsk` | `SaveRealDsk` (`dnutil.pas`): Options -> Save desktop (`cmSaveDesk`) and at the exit when `StartupData.Unload and osuAutosave` (Options -> Startup, "Autosave Desktop") | `Init` of the application |
@@ -75,7 +75,7 @@ The names of the units are words without digits and underscores (a unit has the 
 | Resources: dialogs, menus, strings, help of a language | `<language>.dlg`, `<language>.lng`, `<language>.hlp` (`english`, `russian`, `ukrain`) | the build (`rcp`, `tvhc`) | `mainapp.pas`, `langid.pas` |
 | Tables of the layouts of the keyboard, the palettes | `xlt/*.xlt`, `colors/*.pal` (from `dn/data/`) | people | `xcode.pas`, `dnutil.pas` |
 
-Why two files for the settings: `dn.cfg` is the memory dump of the records of the dialogs (what DN did first); `dn.ini` is the text file that came later and holds the rest. Merging them (everything in `dn.ini`) is a feature, not a rename: `dn.cfg` is a binary dump of the records and would need a text form for each of them (`TODO-later.md`).
+One file for the settings (2026-10-04): the image of the records that `dn.cfg` held lives in the section `[Saved]` of `dn.ini` (hex, written by DN at the exit, not for editing; `cfgstate.pas`), the rest of the file (the comments, the settings of the people) is not touched. Making a text key of every field of every record (instead of the image) is a later step (`TODO-later.md`).
 One directory: every file in the table is composed as `SourceDir + name` (`basics.SourceDir`: the directory of the program, or the directory in the environment variable `DN2`, set in `dlgrecs.pas`), so the settings, the histories and the desktop can be moved by `DN2`; the Unix per-user directory (`~/.config/dn`) is not the default yet (`TODO-later.md`).
 
 * The flags of the Startup dialog are `osu*` in `commands.pas` (`osuAutosave = $02`, `osuPreserveDir = $08`...); `StartupData.Load` is for the start, `.Unload` is for the exit. The dialog is in `setups.pas`.

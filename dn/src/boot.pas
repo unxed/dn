@@ -76,7 +76,7 @@ uses
   dirwatch, realmode, 
   Tree
   , filetype, panelsetup
-  , osdep;
+  , osdep, cfgstate;
 
 {AK155 Мало проверить, что имя временного каталога непусто, надо
 еще проверить, что он существует, и что в нем можно создавать и
@@ -226,12 +226,36 @@ procedure DoStartup;
 
   function ReadConfig: LongInt;
     var
-      S: TBufStream;
+      S: TMemoryStream;
       CFGVer: AWord;
       ID: AWord;
       L: AWord;
       p: Pointer;
       I: LongInt;
+
+    { The image of the records: the section [Saved] of dn.ini (cfgstate.pas); if it is not there, the old file dn.cfg (it is
+      read once: the next exit writes the section and renames the file to dn.old). S is empty if there is nothing. }
+    procedure LoadImage;
+      var
+        Img: Pointer;
+        ImgSize: LongInt;
+        Old: TBufStream;
+      begin
+      S.Init(0, 4096);
+      if LoadState(DnIniFileName, GetEnv('DNCFG'), Img, ImgSize) then
+        begin
+        S.Write(Img^, ImgSize);
+        FreeMem(Img, ImgSize);
+        end
+      else
+        begin
+        Old.Init(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stOpenRead, 16384);
+        if (Old.Status = stOK) and (Old.GetSize <> 0) then
+          S.CopyFrom(Old, Old.GetSize);
+        Old.Done;
+        end;
+      S.Seek(0);
+      end;
 
     procedure SRead(var Buf);
       begin
@@ -271,7 +295,7 @@ procedure DoStartup;
     begin { ReadConfig: }
     ReadConfig := -1;
     CFGVer := 0;
-    S.Init(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stOpenRead, 16384);
+    LoadImage;
     if  (S.Status = stOK) and (S.GetSize <> 0) then
       GetVer;
     if  (CFGVer  = 0) or (CFGVer > VersionWord) then
