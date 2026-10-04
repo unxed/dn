@@ -1283,8 +1283,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
          Archive+Byte(Security)*Hidden+ReadOnly+SysFile, SR);
     while (DosError = 0) and not Abort do
       begin
-      New(St, Init(MakeNormName(GetPath(Name^), SR.Name), stOpenRead,
-           2048));
+      St := PBufStream.Create(MakeNormName(GetPath(Name^), SR.Name), stOpenRead, 2048);
       if St.Status = stOK then
         begin
         SearchInStream(St, SR.Name);
@@ -1298,8 +1297,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     while (DosError = 0) and not Abort do
       begin
       New(St, Init(MakeNormName(GetPath(Name^), SR.Name), stOpenRead,
-           2048));
-      if St.Status = stOK then
+      St := PBufStream.Create(MakeNormName(GetPath(Name^), SR.Name), stOpenRead, 2048);
         begin
         SearchInStream(St, SR.Name);
         end;
