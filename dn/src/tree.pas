@@ -538,7 +538,7 @@ function GetDirLen(Dir: String): TSize; {DataCompBoy}
     Event.Command := cmRereadTree;
     Event.InfoPtr := @Dir;
     if P <> nil then
-      P^.HandleEvent(Event);
+      P.HandleEvent(Event);
     end;
 
   begin
@@ -828,7 +828,7 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
   Dec(P^.Origin.X, 14);
   Dec(R1.B.Y);
   Tree := New(PTreeView, Init(R1, ADrive, False, PScrollBar(P)));
-  if Tree^.Valid(0) then
+  if Tree.Valid(0) then
     Insert(Tree)
   else
     begin
@@ -880,7 +880,7 @@ function TTreeDialog.Valid(Command: Word): Boolean;
 
 (*procedure TTreeDialog.HandleEvent;
 begin
- {if Event.What = evCommand then Tree^.HandleEvent(Event);}
+ {if Event.What = evCommand then Tree.HandleEvent(Event);}
  inherited HandleEvent(Event);
 end;*)
 
@@ -1593,7 +1593,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
             Ev.What := evBroadcast;
             Ev.Command := cmUnArchive;
             Ev.InfoPtr := Event.InfoPtr;
-            PCopyRec(Event.InfoPtr)^.Owner^.HandleEvent(Ev);
+            PCopyRec(Event.InfoPtr)^.Owner.HandleEvent(Ev);
             if Ev.What = evNothing then
               begin
               CE;

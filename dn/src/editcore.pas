@@ -1394,7 +1394,7 @@ procedure TFileEditor.SetState(AState: Word; Enable: Boolean);
       begin
       if HScroll <> nil then
         HScroll.Show;
-      HScroll^.MakeFirst;
+      HScroll.MakeFirst;
       if VScroll <> nil then
         VScroll.Show;
       DrawView;
@@ -5088,7 +5088,7 @@ procedure OpenSmartpad;
     InsertInfo;
     if  (PV <> Application) then
       begin
-      {if PView(PV).Owner = Pointer(Desktop) then SmartWindow^.MakeFirst;}
+      {if PView(PV).Owner = Pointer(Desktop) then SmartWindow.MakeFirst;}
       Desktop.Delete(SmartWindow);
       Desktop.ExecView(SmartWindow);
       Desktop.InsertBefore(SmartWindow, Desktop.Last);

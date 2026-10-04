@@ -334,8 +334,8 @@ procedure MyApp.HandleEvent(var Event: TEvent);
 
   procedure UpView(P: PView);
     begin
-    P^.MakeFirst;
-    Clock^.MakeFirst;
+    P.MakeFirst;
+    Clock.MakeFirst;
     end;
 
   begin

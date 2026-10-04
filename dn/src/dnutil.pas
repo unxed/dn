@@ -480,8 +480,8 @@ function CheckExit: Boolean;
     Event: TEvent;
   function FindQuit(P: PView): Boolean;
     begin
-    P^.HandleEvent(Event);
-    FindQuit := (Event.What = evNothing) or not P^.Valid(cmQuit);
+    P.HandleEvent(Event);
+    FindQuit := (Event.What = evNothing) or not P.Valid(cmQuit);
     end;
   begin
   { if FormatWindow <> nil then begin CheckExit := False; Exit; end;}
@@ -558,7 +558,7 @@ constructor TDNApplication.Create;
   Clock := PClockView.Create(R);
   if InterfaceData.Options and ouiClock = 0 then
     Clock.Hide;
-  PClockView(Clock)^.Update;
+  PClockView(Clock).Update;
 
   Desktop.GetExtent(R);
   Dec(R.B.Y);
@@ -1420,7 +1420,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
     Exit;
 
 db:
-    if  (W <> nil) and not W^.Valid(0) then
+    if  (W <> nil) and not W.Valid(0) then
       begin
       W.Free;
       Exit;
@@ -1440,7 +1440,7 @@ db:
            0));
     if W = nil then
       Exit;
-    if not (W^.Valid(cmValid)) then
+    if not (W.Valid(cmValid)) then
       W.Free
     else
       begin
@@ -1614,7 +1614,7 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
     else
       Desktop.GetExtent(R);
     W := PEditWindow.Create(R, FileName);
-    if  (W <> nil) and (W^.Valid(cmValid)) then
+    if  (W <> nil) and (W.Valid(cmValid)) then
       begin
       V := PEditWindow(W)^.Intern;
       FreeStr := V^.EditName;
@@ -2607,7 +2607,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       else
         begin
         TrashCan.Show;
-        TrashCan^.MakeFirst;
+        TrashCan.MakeFirst;
         TrashCan^.ImVisible := True;
         end;
     

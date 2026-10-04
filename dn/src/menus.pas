@@ -936,7 +936,7 @@ lHotkey:
                 if Size.Y = 1 then
                   Dec(R.A.X);
                 Target := TopMenu^.NewSubView(R, SubMenu, Self);
-                Result := Owner^.ExecView(Target);
+                Result := Owner.ExecView(Target);
                 Target.Free;
                 end;
               end
@@ -1067,7 +1067,7 @@ procedure TMenuView.HandleEvent(var Event: TEvent);
   procedure DoSelect;
     begin
     PutEvent(Event);
-    Event.Command := Owner^.ExecView(Self);
+    Event.Command := Owner.ExecView(Self);
     if  (Event.Command <> 0) and CommandEnabled(Event.Command) then
       begin
       Event.What := evCommand;

@@ -774,7 +774,7 @@ procedure RUN_IT;
     Lock;
     MenuBar.MakeFirst;
     Desktop.MakeFirst;
-    Clock^.MakeFirst;
+    Clock.MakeFirst;
     UnLock;
     end;
   

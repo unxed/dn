@@ -86,7 +86,7 @@ function TInputFName.Execute: Word;
   begin
   EndView := 0;
   repeat
-    Owner^.GetEvent(Event);
+    Owner.GetEvent(Event);
     if Event.What = evNothing then
       TinySlice;
     HandleEvent(Event);

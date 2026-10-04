@@ -2058,7 +2058,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             DrawView;
             PWindow(Owner).SelectNext(True);
             Event.InfoPtr := CalcInput;
-            CalcInput^.PutEvent(Event);
+            CalcInput.PutEvent(Event);
             ClearEvent(Event)
             end;
       end {case};

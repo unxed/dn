@@ -211,7 +211,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     Owner.MakeLocal(Event.Where, T);
     if T.X >= Owner^.Size.X-2 then
       begin
-      PWindow(Owner).Frame^.HandleEvent(Event);
+      PWindow(Owner).Frame.HandleEvent(Event);
       Exit;
       end;
     MakeLocal(Event.Where, T);
