@@ -318,3 +318,9 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 
 - `dn.cfg` is inside `dn.ini` now (the section `[Saved]`, a hex image: done 2026-10-04); open: a text key of every field of the records (`RegisterVar` for `StartupData`, `SystemData`, the presets of the panels...) instead of the image, so that a person can edit them; the migration from `dn.old` can be dropped later.
 - Unix: the per-user directory (`$XDG_CONFIG_HOME/dn`, else `~/.config/dn`) as the default place of the files that the program writes (now: next to the program, or `DN2`); DOS stays next to the program. A setting (`DN2` or a line in `dn.ini`) decides; the default is to be chosen by the owner.
+
+## Terminal protocols (2026-10-04)
+- Done in `tv` (see its README and DESIGN.md): OSC 52 (set; read from the outer terminal with `TV_OSC52_READ=1`; the query `?` in the embedded terminal), the win32 input mode inside (`VirtualKey`, `RepeatCount`, `Win32State`, `evKeyUp`;
+  `ESC [ ? 9001 h` of the program in the embedded terminal), far2l: notifications, titles of the F-keys, the exact cursor height, the palette. DN uses them: the key bar of the status line goes to the far2l terminal as the titles of F1..F12
+  (`menus.pas`, `TStatusLine.DrawSelect`), the end of copy, move and delete shows a desktop notification (`dnscreen.NotifyUser`; `DN_NOTIFY=0` switches it off).
+- Not done: the Kitty keyboard protocol flags (the next step: asked flags, the release and repeat events through `evKeyUp`), far2l images and drag and drop, DECRQM, the size of the window (`w`).
