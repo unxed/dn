@@ -1,0 +1,45 @@
+name: class-migration
+on:
+  workflow_dispatch:
+  push:
+    branches: ['classes/**']
+    paths:
+      - dn/**
+      - tv
+      - tools/gen-shim.py
+      - .github/workflows/class-migration.yml
+  pull_request:
+    paths:
+      - dn/**
+      - tv
+      - tools/gen-shim.py
+      - .github/workflows/class-migration.yml
+
+jobs:
+  focused-regressions:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Compiler
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+      - name: tv3 prerequisite gate
+        run: tv/tools/class-gate.sh
+      - name: Class release and profile persistence
+        shell: bash
+        run: |
+          test_work="$RUNNER_TEMP/dn-class-tests"
+          mkdir -p "$test_work/shims" "$test_work/units"
+          python3 tools/gen-shim.py dn/compat/shims/shims.map "$test_work/shims" tv/src
+          cd dn/tests
+          for name in t_objutil t_profile t_cfgstate; do
+            fpc -Mdelphi -Sh- -Rintel -Se300 -dDPMI32 -dLINUX \
+              -Fu../compat/linux -Fu../compat -Fu../archives -Fu../src \
+              -Fu"$test_work/shims" -Fu../../tv/src \
+              -Fi. -Fi../compat/shims -Fi../src \
+              -FU"$test_work/units" -FE"$test_work/units" "$name.pas"
+            "$test_work/units/$name"
+          done
+      - name: tv3 gate after compilation
+        run: tv/tools/class-gate.sh
