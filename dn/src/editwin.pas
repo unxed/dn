@@ -120,7 +120,7 @@ procedure LoadCommands;
       RegisterType(REditSaver);
     Registered := True;
     P := PEditSaver(LoadResource(dlgEditorCommands));
-    P^.Free;
+    P.Free;
     end;
   end;
 
@@ -140,11 +140,11 @@ constructor TEditWindow.Load(var S: TStream);
 R.Assign(1, 1, Size.X - 1, 2);
   MenuBar := PMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
-    MenuBar^.Locate(R);
+    MenuBar.Locate(R);
   Insert(MenuBar);
-  UpMenu := MenuBar^.Menu;
+  UpMenu := MenuBar.Menu;
 
-  PI := MenuBar^.Menu^.Items;
+  PI := MenuBar.Menu^.Items;
   while (PI <> nil) and (PI^.HelpCtx <> hcedOptions) do
     PI := PI^.Next;
   if  (PI <> nil) then
@@ -175,7 +175,7 @@ begin
  if not (Intern^.SmartPad or GetState(sfModal)) then
     begin
       GetBounds(TempBounds);
-      LastEditDeskSize := Desktop^.Size;
+      LastEditDeskSize := Desktop.Size;
     end;
 end;
 }
@@ -221,10 +221,10 @@ constructor TEditWindow.Create(R: TRect; FileName: String);
 R.Assign(1, 1, Size.X - 1, 2);
   MenuBar := PMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
-    MenuBar^.Locate(R);
+    MenuBar.Locate(R);
   Insert(MenuBar);
 
-  {MenuBar^.Options := MenuBar^.Options or ofPostProcess;}
+  {MenuBar.Options := MenuBar.Options or ofPostProcess;}
 R.Assign(1, 2, Size.X - 1, Size.Y - 1);
 
   Intern := New(PXFileEditor, Init(R,
@@ -233,7 +233,7 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
 
 
 
-  Pi := MenuBar^.Menu^.Items;
+  Pi := MenuBar.Menu^.Items;
   while (Pi <> nil) and (Pi^.HelpCtx <> hcedOptions) do
     Pi := Pi^.Next;
   if  (Pi <> nil) then

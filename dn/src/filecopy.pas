@@ -466,7 +466,7 @@ function AppendQuery(const S: String): Word;
   R.Assign(2, 4, D^.Size.X-2, 5);
   P := PStaticText.Create(R, ^C+S);
   D^.Insert(P);
-  AppendQuery := Desktop^.ExecView(D);
+  AppendQuery := Desktop.ExecView(D);
   end;
 
 function GetPercent(N: TSize): Str12;
@@ -675,18 +675,18 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     D^.Insert(P);
 
     MsgActive := True;
-    D^.SetData(AcceptAll);
+    D.SetData(AcceptAll);
     ObjChangeType(D, TypeOf(TOverriteDialog));
     if OldS >= NewS then
       D^.DisableCommands([cmSave]);
-    I := Desktop^.ExecView(D);
+    I := Desktop.ExecView(D);
     D^.EnableCommands([cmSave]);
     MsgActive := False;
     NewTimer(Timer, 0);
 
     if I <> cmCancel then
       begin
-      D^.GetData(AcceptAll);
+      D.GetData(AcceptAll);
       if  (AcceptAll and 1 = 1) then
         case I of
           cmYes:
@@ -1540,7 +1540,7 @@ lbStartWrite:
         ToWrite := ToWrite+ln;
         ToRead := ToRead+ln;
         end;
-      Info^.DrawView;
+      Info.DrawView;
       for I := 0 to Min(10, Info^.Lines^.Count-1) do
         Info^.Lines^.AtReplace(I, A[I]);
       end { DoRename };
@@ -1656,7 +1656,7 @@ lbStartWrite:
       S:=Cut(FName,52);
       R.A.X:=1; R.A.Y:=3; R.B.X:=53; R.B.Y:=4;
       D^.Insert(PStaticText.Create(R,^C+S));
-      Case Desktop^.ExecView(D) Of
+      Case Desktop.ExecView(D) Of
        cmOK: Goto 1;
        cmYes: begin SkipAllBad := True; Exit; end;
        cmNo: Exit;
@@ -1778,7 +1778,7 @@ PrepareResume:
     Info^.Write(3, ReadCount);
     //Dispatch;
     GrdClick := False;
-    {Info^.DrawView;}
+    {Info.DrawView;}
     ln := FileSize(ReadStream.F); {-$VOL}
     P := nil;
     repeat
@@ -2424,7 +2424,7 @@ qqqq:
     Info^.Top := GetString(dlFCMove)
   else
     Info^.Top := GetString(dlFCCopy);
-  Desktop^.Insert(Info);
+  Desktop.Insert(Info);
   Files^.ForEach(DoReset);
   if  ( (SystemData.Options shl 3) and ossRemoveCD_RO <> 0)
   then
@@ -2454,7 +2454,7 @@ qqqq:
     end;
   New(CopyQueue, Init(250, 100));
   Info^.Bottom := GetString(dlFC_Total)+FStr(ToDo)+GetString(dlBytes);
-  Info^.DrawView;
+  Info.DrawView;
   DrvC := Drv+64;
   if  (CopyOptions and cpoCheckFree <> 0) and (Files^.Count > 1)
     and (ToDoClusCopy > SysDiskFreeLongX(@PathBuffer))
@@ -2527,8 +2527,8 @@ qqqq:
 операциях стала делаться по таймеру, возникла проблема отрисовки
 результатов того, что произошло после последнего тика таймера.
 }
-    SourcePanel^.DrawView;
-    PFilePanelRoot(SourcePanel)^.InfoView^.DrawView;
+    SourcePanel.DrawView;
+    PFilePanelRoot(SourcePanel)^.InfoView.DrawView;
     end;
   
   if Flush then
@@ -2604,7 +2604,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
           (PFilePanelRoot(SourcePanel)^.Drive <> nil) and
           (PFilePanelRoot(SourcePanel)^.Drive^.DriveType = dtDisk) and
           (PFilePanelRoot(SourcePanel)^.
-            PanSetup^.Show.ColumnsMask and psShowDescript = 0)
+            PanSetup.Show.ColumnsMask and psShowDescript = 0)
       then
         PCheckBoxes(DirectLink[2])^.SetButtonState(cpoDesc, False);
       {/JO}
@@ -2779,7 +2779,7 @@ AK155. При этом то восстанавливалось зацикливание, то становилось
       (PFilePanelRoot(SourcePanel)^.Drive <> nil) and
       (PFilePanelRoot(SourcePanel)^.Drive^.DriveType = dtDisk) and
       (PFilePanelRoot(SourcePanel)^.
-        PanSetup^.Show.ColumnsMask and psShowDescript = 0)
+        PanSetup.Show.ColumnsMask and psShowDescript = 0)
   then
     CopyOpt := CopyOpt and not cpoDesc; {JO}
 

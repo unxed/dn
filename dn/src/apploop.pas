@@ -131,7 +131,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         end;
     evKeyDown:
       begin
-      {          if (DNKeyCode(Event) = kbAltQ) and Desktop^.GetState(sfFocused) then begin OpenSmartpad; ClearEvent(Event) end;}
+      {          if (DNKeyCode(Event) = kbAltQ) and Desktop.GetState(sfFocused) then begin OpenSmartpad; ClearEvent(Event) end;}
 {$IFDEF DNUTF8}
       { a character outside the code page has no key code, but it has the text (the editor puts it into the table of the document) }
       if (DNKeyCode(Event) = kbNoKey) and (Event.TextLength = 0) then
@@ -239,7 +239,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         if MacroRecord and (CurrentMacro <> nil) then
           CurrentMacro^.PutKey(DNKeyCode(Event));
         if  (StatusLine <> nil) then
-          StatusLine^.HandleEvent(Event);
+          StatusLine.HandleEvent(Event);
         end;
       end;
   end {case};
@@ -343,7 +343,7 @@ procedure MyApp.HandleEvent(var Event: TEvent);
   then
     if  (Event.Where.Y = 0) and (Event.Buttons and mbLeftButton <> 0)
     then
-      MenuBar^.HandleEvent(Event);
+      MenuBar.HandleEvent(Event);
   if Event.What <> evNothing then
     inherited HandleEvent(Event);
   case Event.What of

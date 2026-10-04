@@ -83,7 +83,7 @@ procedure UpdateARH(Arch: PARJArchive);
         A := nil;
         end;
       end;
-    P^.Free;
+    P.Free;
     end;
   CloseProfile;
   end { UpdateARH };
@@ -141,7 +141,7 @@ procedure SetupArchive(ArchCommand: Word);
       S: String;
       FreeByte: byte;
     begin
-    S := fReplace('~', '', CnvString(LookUpMenu(MenuBar^.Menu, ArcT,
+    S := fReplace('~', '', CnvString(LookUpMenu(MenuBar.Menu, ArcT,
              dfByCommand)^.Name));
     FreeByte := PosChar('-', S);
     if FreeByte > 0 then
@@ -205,11 +205,11 @@ procedure SetupArchive(ArchCommand: Word);
   D := PDialog(Application.ValidView(PDialog(LoadResource(dlgSetupArc))));
   if D = nil then
     goto Ex;
-  D^.SetData(DT);
+  D.SetData(DT);
   CndRpl;
-  W := Desktop^.ExecView(D);
+  W := Desktop.ExecView(D);
   if W = cmOK then
-    D^.GetData(DT);
+    D.GetData(DT);
   D.Free;
   if W <> cmOK then
     goto Ex;

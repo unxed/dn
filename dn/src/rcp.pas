@@ -654,7 +654,7 @@ procedure MakeEditorCommands;
     end;
   New(T, Init);
   StoreResource(T, dlgEditorCommands);
-  T^.Free;
+  T.Free;
   end { MakeEditorCommands };
 {-DataCompBoy-}
 
@@ -1224,7 +1224,7 @@ procedure ProcessDLGs;
     if ID = dlgSystemSetup then
       begin
       New(PCollection(DData.Drives.List), Init(0, 10));
-      D^.SetData(DData);
+      D.SetData(DData);
       end;
     D.Free;
     end { CompileDialog };

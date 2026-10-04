@@ -311,7 +311,7 @@ procedure TColorVGADialog.HandleEvent(var Event: TEvent);
       Exit;
     UpdateRGB := True;
     TL[I]^.Value := TS[I]^.Value;
-    TL[I]^.DrawView;
+    TL[I].DrawView;
 
     if {StartupData.Load and osuVGAmonoMix = 0}
       appPalette = apColor
@@ -341,9 +341,9 @@ procedure TColorVGADialog.HandleEvent(var Event: TEvent);
       begin
       {Focused}
       TV^.Color2Display := Focused;
-      TV^.DrawView;
+      TV.DrawView;
       Color^.Value := Focused;
-      Color^.DrawView;
+      Color.DrawView;
 
       Get_palette(SL[Focused], gc[1], gc[2], gc[3]);
 

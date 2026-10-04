@@ -1098,7 +1098,7 @@ procedure InsertCalendar;
   if Calend = nil then
     Application.InsertWindow(PCalendarWindow.Create)
   else
-    Calend^.Select;
+    Calend.Select;
   end;
 
 end.

@@ -236,7 +236,7 @@ constructor TGameWindow.Create;
     Gm: PGameView;
     Hi, Info: PGameInfo;
   begin
-  Desktop^.GetBounds(R);
+  Desktop.GetBounds(R);
   Vis := R.B.Y-R.A.Y - 4;
   if TetrisRec.S = 1 then
     Vis := Min(22, Vis) {Pentix}
@@ -470,7 +470,7 @@ procedure TGameView.ShowScores;
       end;
   PP := Stop;
   Stop := True;
-  Desktop^.ExecView(D);
+  Desktop.ExecView(D);
   Stop := PP;
   D.Free;
   end { TGameView.ShowScores };
@@ -521,7 +521,7 @@ procedure TGameView.NewGame;
   Level := StartLevel;
 
   if Info <> nil then
-    Info^.DrawView;
+    Info.DrawView;
 
   end { TGameView.NewGame };
 
@@ -654,7 +654,7 @@ function TGameView.MoveDown;
         Level := StartLevel;
       Delay := LevelDelay(Level);
       end;
-    Info^.DrawView;
+    Info.DrawView;
     Stop := not ValidMove(0, 0);
 {AK155 23-07-2004
 Зачем нужны эти DelayTics и почему они бывают разные - я не понял.
@@ -756,7 +756,7 @@ procedure TGameView.HandleEvent;
       end;
     HelpCtx := hcTetris+Byte(Pentix);
     NewGame;
-    Owner^.Redraw;
+    Owner.Redraw;
     Message(Application, evCommand, cmUpdateConfig, nil);
     end;
 
@@ -795,13 +795,13 @@ procedure TGameView.HandleEvent;
           if Level < 10 then
             Inc(Level);
           Delay := LevelDelay(Level);
-          Owner^.Redraw;
+          Owner.Redraw;
           CE
           end;
         cmTetrisPreview:
           begin
           Preview := not Preview;
-          Owner^.Redraw;
+          Owner.Redraw;
           CE
           end;
       end {case};
@@ -853,10 +853,10 @@ procedure TGameView.HandleEvent;
                 end;
               else {case}
                 if  (Char(Event.CharCode) > #0) and (CommandLine <> nil) then
-                  CommandLine^.HandleEvent(Event);
+                  CommandLine.HandleEvent(Event);
             end
           else if (Char(Event.CharCode) > #0) and (CommandLine <> nil) then
-            CommandLine^.HandleEvent(Event);
+            CommandLine.HandleEvent(Event);
       end {case};
   end {case};
   end { TGameView.HandleEvent };

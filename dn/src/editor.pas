@@ -397,9 +397,9 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         begin
         Modified := False;
         if PEditWindow(Owner)^.AInfo <> nil then
-          PEditWindow(Owner)^.AInfo^.DrawView;
+          PEditWindow(Owner)^.AInfo.DrawView;
         if PEditWindow(Owner)^.ABookLine <> nil then
-          PEditWindow(Owner)^.ABookLine^.DrawView; {-$VIV}
+          PEditWindow(Owner)^.ABookLine.DrawView; {-$VIV}
         end;
       JustSaved := False;
     until RPT;
@@ -636,9 +636,9 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         begin
         Modified := False;
         if PEditWindow(Owner)^.AInfo <> nil then
-          PEditWindow(Owner)^.AInfo^.DrawView;
+          PEditWindow(Owner)^.AInfo.DrawView;
         if PEditWindow(Owner)^.ABookLine <> nil then
-          PEditWindow(Owner)^.ABookLine^.DrawView; {-$VIV}
+          PEditWindow(Owner)^.ABookLine.DrawView; {-$VIV}
         end;
       JustSaved := False;
     until RPT;
@@ -971,7 +971,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     R.Assign(1, 1, 30, 10);
     New(P, Init(R));
     P^.Top := GetString(dlED_Print);
-    Desktop^.Insert(P);
+    Desktop.Insert(P);
     ClrIO;
     Cancel := False;
     for I := 1 to 1000 do
@@ -1020,7 +1020,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     S.Done;
     Message(Application, evCommand, cmFilePrint, @FName);
 1:
-    P^.Free;
+    P.Free;
     if Block then
       L.Free;
     end { Print };
@@ -1740,7 +1740,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       if Valid(cmClose) and (EditName <> '') then
         begin
         if Desktop <> nil then
-          Desktop^.Lock;
+          Desktop.Lock;
         if Application <> nil then
           begin
           {AK155}Application.InsertWindow(New(PFileWindow,
@@ -1753,7 +1753,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         ClearEvent(Event);
         Message(Owner, evCommand, cmClose, nil);
         if Desktop <> nil then
-          Desktop^.UnLock;
+          Desktop.UnLock;
         Exit;
         end;
     cmPrintBlock:

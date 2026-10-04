@@ -514,7 +514,7 @@ procedure DoIt(AOwner: Pointer; AFiles: PFilesCollection;
   R.Assign(1, 1, 26, 10);
   PInfo.Create(R);
   PInfo^.Top := GetString(dlImage);
-  Desktop^.Insert(PInfo);
+  Desktop.Insert(PInfo);
 
   CreateDirInheritance(ADestPath, False);
   for I := 0 to AFiles^.Count-1 do

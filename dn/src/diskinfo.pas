@@ -367,7 +367,7 @@ destructor TDiskInfo.Destroy;
   if DriveView <> nil then
     begin
     DriveView^.InfoPanel := nil;
-    DriveView^.Free;
+    DriveView.Free;
     end;
   inherited Destroy;
   end;

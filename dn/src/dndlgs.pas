@@ -233,7 +233,7 @@ procedure THexLine.HandleEvent(var Event: TEvent);
     begin
     CE;
     DrawView;
-    InputLine^.DrawView
+    InputLine.DrawView
     end;
 
   var
@@ -323,7 +323,7 @@ procedure THexLine.HandleEvent(var Event: TEvent);
                            (Pos(UpCase(Char(Event.CharCode)),
                         HexStr)-1) shl 4);
               InputLine^.Data^:= Copy(S, 1, InputLine^.MaxLen);
-              InputLine^.DrawView;
+              InputLine.DrawView;
               if Sec then
                 begin
                 Inc(CurX);
@@ -370,7 +370,7 @@ procedure THexLine.Draw;
       begin
       InputLine^.CurPos := CurX;
       InputLine^.FirstPos := DeltaX;
-      InputLine^.DrawView
+      InputLine.DrawView
       end;
   C := InputLine^.GetColorW(1);
   MoveChar(B, ' ', C, Size.X);
@@ -667,7 +667,7 @@ procedure TBookmark.FocusLink;
    i: integer;
    P: PPage;
   begin
-  Owner^.Lock;
+  Owner.Lock;
   Link^.Focus;
   MakeFirst;
   with PNotepad(Owner)^ do
@@ -676,7 +676,7 @@ procedure TBookmark.FocusLink;
     while Pointer(Page[ActivePage]) <> Pointer(Link) do
       Inc(ActivePage);
     end;
-  Owner^.UnLock;
+  Owner.UnLock;
   end;
 
 constructor TNotepad.Create(var Bounds: TRect; ATitle: TTitleStr;
@@ -749,7 +749,7 @@ procedure TNotepad.GetData(var Rec);
   l := 0;
   for i := 0 to NumPages-1 do
     begin
-    Page[i]^.GetData(Bytes(Rec)[l]);
+    Page[i].GetData(Bytes(Rec)[l]);
     Inc(l, Page[i]^.DataSize);
     end;
   end;
@@ -763,7 +763,7 @@ procedure TNotepad.SetData(var Rec);
   l := 0;
   for i := 0 to NumPages-1 do
     begin
-    Page[i]^.SetData(Bytes(Rec)[l]);
+    Page[i].SetData(Bytes(Rec)[l]);
     Inc(l, Page[i]^.DataSize);
     end;
   end;

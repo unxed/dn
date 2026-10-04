@@ -185,10 +185,10 @@ procedure SystemSetup;
         ));
   if D = nil then
     Exit;
-  W := Desktop^.ExecView(D);
+  W := Desktop.ExecView(D);
   if W <> cmCancel then
     begin
-    D^.GetData(Data);
+    D.GetData(Data);
     SystemData := PSysDialog(D)^.LocalData;
     Message(Application, evCommand, cmUpdateConfig, nil);
     end;
@@ -218,19 +218,19 @@ procedure InterfaceSetup;
         Dec(R.B.Y);
       if InterfaceData.Options and ouiHideCmdline = 0 then
         Dec(R.B.Y);
-      Desktop^.Locate(R);
+      Desktop.Locate(R);
       R.A.Y := R.B.Y;
       R.B.Y := R.A.Y+Byte(InterfaceData.Options and ouiHideCmdline = 0);
-      CommandLine^.Locate(R);
-      CommandLine^.SetState(sfVisible, InterfaceData.Options and
+      CommandLine.Locate(R);
+      CommandLine.SetState(sfVisible, InterfaceData.Options and
          ouiHideCmdline = 0);
       Message(Application, evCommand, cmUpdateConfig, nil);
       if InterfaceData.Options and ouiClock <> 0 then
         if not Clock^.GetState(sfVisible) then
-          Clock^.Show;
+          Clock.Show;
       if InterfaceData.Options and ouiClock = 0 then
         if Clock^.GetState(sfVisible) then
-          Clock^.Hide;
+          Clock.Hide;
       end;
   InterfaceDataOpt := InterfaceData.Options;
   SaveDnIniSettings(@InterfaceDataOpt);
@@ -289,10 +289,10 @@ procedure SaversSetup;
         ));
   if D = nil then
     Exit;
-  W := Desktop^.ExecView(D);
+  W := Desktop.ExecView(D);
   if W <> cmCancel then
     begin
-    D^.GetData(SaversData);
+    D.GetData(SaversData);
     Message(Application, evCommand, cmUpdateConfig, nil);
     end;
   D.Free;
@@ -475,7 +475,7 @@ procedure TCurrDriveInfo.Press(Item: Integer);
     Data: TSysData;
   begin
   inherited Press(Item);
-  Owner^.GetData(Data);
+  Owner.GetData(Data);
   PSysDialog(Owner)^.LocalData.Drives[Char(Byte('A')+Data.Drives.Focus)
   ] := Value;
   end;
@@ -574,7 +574,7 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
     case Event.Command of
       cmYes:
         begin
-        Owner^.GetData(LocalData);
+        Owner.GetData(LocalData);
         A := LocalData.Available.List;
         if A^.Count > 0 then
           begin
@@ -597,12 +597,12 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
           S := List;
           S^.AtFree(F);
           List := nil;
-          Owner^.Lock;
+          Owner.Lock;
           NewLisT(S);
           if  (F > 0) and (F >= List^.Count) then
             Dec(F);
           FocusItem(F);
-          Owner^.UnLock;
+          Owner.UnLock;
           end;
         ClearEvent(Event);
         end;

@@ -84,7 +84,7 @@ type
     PresetNum: Byte;
       {` На базе какого номера строились текущие настройки `}
     LFNLen, ExtLen: Byte;
-      {`2 Двоичные копии одноимённых строк из Panel^.PanSetup^.Show.
+      {`2 Двоичные копии одноимённых строк из Panel^.PanSetup.Show.
       Введены только для ускорения доступа. `}
     LFNLonger250: Boolean;
       {` Поле имени широкое и должно быть последним `}
@@ -353,10 +353,10 @@ procedure TFilePanelRoot.Awaken;
     then
       begin
       if not DriveLine^.GetState(sfVisible) then
-        DriveLine^.Show;
+        DriveLine.Show;
       end
     else if DriveLine^.GetState(sfVisible) then
-      DriveLine^.Hide;
+      DriveLine.Hide;
 *)
   end;
 
@@ -519,9 +519,9 @@ procedure TFilePanelRoot.RereadDir;
     PanelHeight: Integer; // Высота панели без строки заголовков колонок
 
   begin
-  PanelHeight := Size.Y-Byte((Pansetup^.Show.MiscOptions and 2) <> 0);
+  PanelHeight := Size.Y-Byte((Pansetup.Show.MiscOptions and 2) <> 0);
   
-  uLfn := PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0;
+  uLfn := PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0;
   
   Abort := False;
   OldDelta := Delta;
@@ -668,9 +668,9 @@ procedure TFilePanelRoot.RedrawPanelInfoDir;
   begin Drive^.lChDir(DirectoryName); if TypeOf(Drive^) = TypeOf(TDrive) then CurrentDirectory := DirectoryName; end;}
   DrawView;
   if InfoView <> nil then
-    InfoView^.DrawView;
+    InfoView.DrawView;
   if DirView <> nil then
-    DirView^.DrawView;
+    DirView.DrawView;
   if SortView <> nil then
     SortView^.SetState(sfVisible, (FMSetup.Show and fmsSortIndicator) <> 0);
       { испоьзуется, например, при загрузке десктора }
@@ -712,13 +712,13 @@ procedure TFilePanelRoot.ReadDirectory;
   Files := PFilesCollection(Drive^.GetDirectory(
          PanSetup^.FileMask, TotalInfo));
 
-//  if PanSetup^.Show.FreeSpaceInfo <> fseNotShow then
+//  if PanSetup.Show.FreeSpaceInfo <> fseNotShow then
     Drive^.GetFreeSpace(FreeSpace);
 
-  if (PanSetup^.Show.ColumnsMask and psShowDescript <> 0) or
+  if (PanSetup.Show.ColumnsMask and psShowDescript <> 0) or
      (FMSetup.Options and fmoAlwaysCopyDesc <> 0) or
      (PanSetup^.Sort.SortMode = psmDIZ) or
-     (PanSetup^.Show.PathDescrInfo <> fseNotShow)
+     (PanSetup.Show.PathDescrInfo <> fseNotShow)
   then
     Drive^.ReadDescrptions(Files);
 
@@ -761,7 +761,7 @@ procedure TFilePanelRoot.ReadDirectory;
     Message(Owner, evCommand, cmChangeTree, @DirectoryName);
 
   ScrollBar^.SetParams(ScrollBar^.Value, 0, Files^.Count-1,
-         (Size.Y-Byte((Pansetup^.Show.MiscOptions and 2) <> 0))
+         (Size.Y-Byte((Pansetup.Show.MiscOptions and 2) <> 0))
     * ( (Size.X+1) div LineLength), 1);
   if  (ActivePanel = @Self) and (Drive^.DriveType = dtDisk) then
     CurrentDirectory := DirectoryName
@@ -771,7 +771,7 @@ procedure TFilePanelRoot.ReadDirectory;
     Message(CommandLine, evCommand, cmRereadInfo, nil);
   Message(Owner, evCommand, cmRereadInfo, nil);
   if DriveLine <> nil then
-    DriveLine^.DrawView;
+    DriveLine.DrawView;
   ChkNoMem;
   end { TFilePanelRoot.ReadDirectory };
 {-DataCompBoy-}
@@ -807,7 +807,7 @@ procedure TFilePanelRoot.GetUserParams(var FileRec: PFileRec; var List: String; 
 
     {Make list}
     
-    uLfn := PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0;
+    uLfn := PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0;
     
     lAssignText(T, List);
     ClrIO;
@@ -1074,7 +1074,7 @@ WrongArc:
       AddSelected(Files^.At(I-1));
     DrawView;
     if InfoView <> nil then
-      InfoView^.DrawView;
+      InfoView.DrawView;
     end;
 
   procedure CountLen;
@@ -1114,7 +1114,7 @@ WrongArc:
     Abort := False;
     Recount;
     if InfoView <> nil then
-      InfoView^.DrawView;
+      InfoView.DrawView;
     end { CountLen };
 
   var
@@ -1216,7 +1216,7 @@ WrongArc:
       PF^.Selected := False;
       end;
     Recount;
-    Owner^.Redraw;
+    Owner.Redraw;
     end { SelecType };
 
   procedure SelectExt(S: Boolean; G1, G2: LongInt; Invert: Boolean);
@@ -1257,7 +1257,7 @@ WrongArc:
       SS := UpStrg(GetSName(PF^.FlName[uLfn]));
     Files^.ForEach(Sel);
     Recount;
-    Owner^.Redraw;
+    Owner.Redraw;
     end { SelectExt };
 
   procedure HandleCommand;
@@ -1304,7 +1304,7 @@ WrongArc:
       begin
       
       LongName := { В колонках LFN, и Alt _не_ нажат, или наоборот }
-        (PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0) = { Flash 23.05.2005 }
+        (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0) = { Flash 23.05.2005 }
         (ShiftState and kbAltShift = 0);
       if LongName then
         FreeStr := MakeNormName(PF^.Owner^, FreeStr)
@@ -1408,10 +1408,10 @@ WrongArc:
            and (UpStrg(S[1]) = UpStrg(DirectoryName[1]))
     then
       begin
-      if PanSetup^.Show.FreeSpaceInfo <> fseNotShow then
+      if PanSetup.Show.FreeSpaceInfo <> fseNotShow then
         Drive^.GetFreeSpace(FreeSpace);
       if InfoView <> nil then
-        InfoView^.DrawView;
+        InfoView.DrawView;
       end;
     end { _DoRereadDir };
   {-DataCompBoy-}
@@ -1484,7 +1484,7 @@ WrongArc:
       DecDrawDisabled;
       end;
     DriveLetter := Drive^.GetDriveLetter;
-    DriveLine^.DrawView;
+    DriveLine.DrawView;
     RedrawPanelInfoDir;
     end { _ChangeDrive };
 
@@ -1510,7 +1510,7 @@ WrongArc:
     MakeNoSlash(S);
     DoChange(S);
     DriveLetter := Drive^.GetDriveLetter;
-    DriveLine^.DrawView;
+    DriveLine.DrawView;
     end { _ChangeDrv };
 
   procedure _DoDirHistory;
@@ -1607,7 +1607,7 @@ WrongArc:
               if DriveLine <> nil then
                 PDriveLine(DriveLine)^.ShiftLetter(+1);
           end {case};
-          DriveLine^.DrawView;
+          DriveLine.DrawView;
           end;
         GetEvent(Event);
         if Event.What = evNothing then
@@ -1625,7 +1625,7 @@ WrongArc:
           Message(@Self, evCommand, cmChangeDrv, @DirectoryName);
           Drive^.SizeX := Size.X;
           DirectoryName := Drive^.GetDir;
-          DriveLine^.DrawView;
+          DriveLine.DrawView;
           Abort := False;
         end;
       CE;
@@ -1681,7 +1681,7 @@ WrongArc:
 *)
       if Copy(S, 1, 2) = '..' then
         
-        if PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0 then
+        if PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0 then
           if  (ShiftState and kbAltShift <> 0)
           then
             S := lfGetShortFileName(PF^.Owner^)+'\'
@@ -1695,7 +1695,7 @@ WrongArc:
         
       else if ShiftState and 3 <> 0 then
         
-        if PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0 then
+        if PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0 then
           if  (ShiftState and kbAltShift <> 0)
           then
             S := MakeNormName(lfGetShortFileName(PF^.Owner^), S)
@@ -1920,7 +1920,7 @@ WrongArc:
       
       PanelHeight: Integer; // Высота панели без строки заголовков колонок
     begin
-    PanelHeight := Size.Y-Byte((Pansetup^.Show.MiscOptions and 2) <> 0);
+    PanelHeight := Size.Y-Byte((Pansetup.Show.MiscOptions and 2) <> 0);
     case DNKeyCode(Event) of
       kbCtrlAltShift1, kbCtrlAltShift2, kbCtrlAltShift3,
       kbCtrlAltShift4, kbCtrlAltShift5, kbCtrlAltShift6,
@@ -1998,21 +1998,21 @@ WrongArc:
         begin
         GetParam((DNKeyCode(Event) shr 8)-(kbCtrl1 shr 8)+1
                   + ($10000*Byte(FullMenuPanelSetup)));
-        Owner^.Redraw;
+        Owner.Redraw;
         end;
       kbCtrlMinus:
         begin
         GetParam(12);
-        Owner^.Redraw;
+        Owner.Redraw;
         end;
       kbCtrlEqual:
         begin
         GetParam(11);
-        Owner^.Redraw;
+        Owner.Redraw;
         end;
       kbAltIns: {if ShiftState and kbCtrlShift <>0 then _CtrlIns else}
         begin
-        if  (PanSetup^.Show.ColumnsMask and psShowDescript = 0) and
+        if  (PanSetup.Show.ColumnsMask and psShowDescript = 0) and
             (FMSetup.Options and fmoAlwaysCopyDesc = 0)
             and (PF^.DIZ = nil)
         then
@@ -2092,7 +2092,7 @@ WrongArc:
           end; {-$VOL}
         if s <> '' then
           GotoSingle(s);
-        Owner^.Redraw;
+        Owner.Redraw;
         CE
         end;
       kbCtrlRight, kbCtrlLeft,
@@ -2151,26 +2151,26 @@ WrongArc:
           Dec(DeltaX);
           DrawView;
           if InfoView <> nil then
-            InfoView^.DrawView;
+            InfoView.DrawView;
           CE;
           end;
       kbRight:
         if Size.X+2 > LineLength then
           begin
           aaa := Delta;
-          Owner^.Lock;
+          Owner.Lock;
           ScrollBar^.SetValue(ScrollBar^.Value+PanelHeight);
           if aaa <> Delta then
             Delta := aaa+PanelHeight;
           CED;
-          Owner^.UnLock;
+          Owner.UnLock;
           end
         else if DeltaX < LineLength-Size.X-1 then
           begin
           Inc(DeltaX);
           DrawView;
           if InfoView <> nil then
-            InfoView^.DrawView;
+            InfoView.DrawView;
           CE;
           end;
       kbHome:
@@ -2179,7 +2179,7 @@ WrongArc:
         DeltaX := 0;
         OldDelta := -1;
         ScrollBar^.SetValue(0);
-        Owner^.Redraw
+        Owner.Redraw
         end;
       kbEnd:
         begin
@@ -2293,7 +2293,7 @@ WrongArc:
           if CurPos = ScrollBar^.Value then
             DrawView;
           if InfoView <> nil then
-            InfoView^.DrawView;
+            InfoView.DrawView;
           end;
       kbGrayPlus {, kbShiftGPlus}:
         begin
@@ -2413,7 +2413,7 @@ WrongArc:
     PSDEL: Byte;
     ColumnTitles: Boolean;
   begin { TFilePanelRoot.CommandHandle }
-  ColumnTitles := (Pansetup^.Show.MiscOptions and 2) <> 0;
+  ColumnTitles := (Pansetup.Show.MiscOptions and 2) <> 0;
   if Drive <> nil
   then
 //!    WasFull := Drive^.GetFullFlags = Drive^.Flags
@@ -2796,7 +2796,7 @@ WrongArc:
           begin
 
           ShortNameSearch :=
-            (PanSetup^.Show.ColumnsMask and psLFN_InColumns) = 0;
+            (PanSetup.Show.ColumnsMask and psLFN_InColumns) = 0;
 
           Drive^.DrvFindFile(GetSelection(@Self, False));
           CE
@@ -2806,7 +2806,7 @@ WrongArc:
           PanSetup^.FileMask := x_x;
           GotoFile(PString(Event.InfoPtr)^);
           CE;
-          Owner^.Select;
+          Owner.Select;
           Select;
           GlobalMessage(evCommand, cmRereadInfo, nil);
           end;
@@ -2874,7 +2874,7 @@ WrongArc:
                                          end;
                                         end;
                                       PosChanged := true;
-                                      if InfoView <> nil then InfoView^.DrawView;
+                                      if InfoView <> nil then InfoView.DrawView;
                                       CED; PosChanged := false;
                                       if (RepeatDelay <> 0) and QuickViewEnabled then
                                         NeedLocated := GetSTime;
@@ -2888,7 +2888,7 @@ WrongArc:
       MSelect := Event.Buttons and mbRightButton <> 0;
       MakeLocal(Event.Where, MPos);
       if 
-         (PanSetup^.Show.ColumnsMask and psLFN_InColumns = 0) or
+         (PanSetup.Show.ColumnsMask and psLFN_InColumns = 0) or
            { Ширина колонки короткого имени не меняется }
          
          ((MPos.X mod LineLength) <> LFNLen)
@@ -3014,7 +3014,7 @@ WrongArc:
                    if (LFNLen - (LineLength*psdel - MPos.X) > 5) and
                       (LineLength*psdel - MPos.X >=0) then
                     EXTLen:=LineLength*psdel - MPos.X;
-                   {Owner^.ReDraw;}
+                   {Owner.ReDraw;}
                    DrawView;
                    MouseEvent(Event, evMouseMove+evMouseUp);
                    MakeLocal(Event.Where, MPos);
@@ -3028,10 +3028,10 @@ WrongArc:
           if MPos.X-LineLength*PSDEL-EXTLen >= 5 then
             begin
             LFNLen := MPos.X div (PSDEL+1);
-            Pansetup^.Show.LFNLen := ItoS(LFNLen);
+            Pansetup.Show.LFNLen := ItoS(LFNLen);
             LineLength := CalcLength;
             end;
-          Owner^.Redraw;
+          Owner.Redraw;
           MouseEvent(Event, evMouseMove+evMouseUp);
           MakeLocal(Event.Where, MPos);
         until Event.What = evMouseUp;
@@ -3057,7 +3057,7 @@ procedure TFilePanelRoot.ChDir(Dir: String);
   DecDrawDisabled;
   DrawView;
   GlobalMessage(evCommand, cmRereadInfo, nil);
-  Owner^.Redraw;
+  Owner.Redraw;
   end;
 {-DataCompBoy-}
 
@@ -3095,7 +3095,7 @@ function TFilePanelRoot.CalcColPos(ColFlag: Word): Integer;
     i: TFileColNumber;
     L: Integer;
   begin
-  Flags := PanSetup^.Show.ColumnsMask;
+  Flags := PanSetup.Show.ColumnsMask;
   Result := 0;
   i := Low(TFileColNumber);
   while Flags <> 0 do
@@ -3134,7 +3134,7 @@ function TFilePanelRoot.CalcNameLength: Integer;
   begin
   Result := LFNLen;
   
-  uLfn := PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0;
+  uLfn := PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0;
   if not uLFN then
     Result := 12;
   
@@ -3173,7 +3173,7 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
   ExtNotExist := (W = 1) or (W >= Length(S));
   ThisExtLen := EXTLen;
   if EXTLen <> 0 then
-    case Pansetup^.Show.TabulateExt of
+    case Pansetup.Show.TabulateExt of
      0:
        ThisExtLen := 0;
      1:
@@ -3197,7 +3197,7 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
   
 
   if ((P^.Attr and Directory) <> 0) and
-    (Pansetup^.Show.NoTabulateDirExt <> 0)
+    (Pansetup.Show.NoTabulateDirExt <> 0)
   then
     begin
     ThisExtLen := 0;
@@ -3225,7 +3225,7 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
            │  БОЛЬШИМИ  │ 3
            │    авто    │ 4
            └────────────┘ }
-    case Pansetup^.Show.DirRegister of
+    case Pansetup.Show.DirRegister of
       1:
         OPT := OPT or flnLowCase;
       2:
@@ -3239,7 +3239,7 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
     end
   else
     begin { Аналогично }
-    case Pansetup^.Show.FileRegister of
+    case Pansetup.Show.FileRegister of
       1:
         OPT := OPT or flnLowCase;
       2:
@@ -3262,7 +3262,7 @@ procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean)
     i: TFileColNumber;
     L: Integer;
   begin
-  Flags := PanSetup^.Show.ColumnsMask;
+  Flags := PanSetup.Show.ColumnsMask;
   X := 0;
   if not LFNLonger250 then
     begin
@@ -3300,11 +3300,11 @@ procedure TFilePanelRoot.SetupPanelFromDrive;
   DriveLetter := Drive^.GetDriveLetter;
   PanSetup := @PanelSetupSet[dt2pc[Drive^.DriveType]];
   PInfoView(InfoView)^.CompileShowOptions;
-  LFNLen := SToI(PanSetup^.Show.LFNLen);
-  EXTLen := SToI(PanSetup^.Show.EXTLen);
+  LFNLen := SToI(PanSetup.Show.LFNLen);
+  EXTLen := SToI(PanSetup.Show.EXTLen);
   LFNLonger250 := (LFNLen >= 250)
     
-    and (PanSetup^.Show.ColumnsMask and psLFN_InColumns <> 0)
+    and (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0)
     ;
     {JO: если ширина колонки имени больше 250 символов,
      её показываем после остальных колонок}
@@ -3366,7 +3366,7 @@ procedure TFilePanelRoot.GetParam(i: Integer);
     Exit;
     end;
 
-  Owner^.Lock;
+  Owner.Lock;
   PrevPresetNum := PresetNum;
   PresetNum := NewPresetNum;
   if ShowOnly then
@@ -3390,7 +3390,7 @@ procedure TFilePanelRoot.GetParam(i: Integer);
     end;
   SetupPanelFromDrive;
   Rebound; { могли измениться и панели, и подвал; заодно и перерисуем всё }
-  Owner^.UnLock;
+  Owner.UnLock;
   end {TFilePanelRoot.GetParam};
 
 procedure TFilePanelRoot.Rebound;
@@ -3403,7 +3403,7 @@ procedure TFilePanelRoot.Rebound;
   ChangeBounds(R);
   SortView^.SetState(sfVisible, (FMSetup.Show and fmsSortIndicator) <> 0);
     { используется при смене видимости индикатора в setups.FMSetup }
-  Owner^.Redraw;
+  Owner.Redraw;
   end;
 
 function OtherFilePanel(P: PFilePanelRoot): PFilePanelRoot;

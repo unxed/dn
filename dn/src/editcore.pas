@@ -1377,7 +1377,7 @@ procedure TFileEditor.CalcMenu;
     SetM(EdOpt.SmartTab);
     end;
   GetCommands(GC);
-  PEditWindow(Owner)^.MenuBar^.SetCommands(GC);
+  PEditWindow(Owner)^.MenuBar.SetCommands(GC);
   SetCommands(GC);
   end { TFileEditor.CalcMenu };
 
@@ -1393,19 +1393,19 @@ procedure TFileEditor.SetState(AState: Word; Enable: Boolean);
     if GetState(sfActive+sfSelected) then
       begin
       if HScroll <> nil then
-        HScroll^.Show;
+        HScroll.Show;
       HScroll^.MakeFirst;
       if VScroll <> nil then
-        VScroll^.Show;
+        VScroll.Show;
       DrawView;
       EnableCommands([cmViewFile]);
       end
     else
       begin
       if HScroll <> nil then
-        HScroll^.Hide;
+        HScroll.Hide;
       if VScroll <> nil then
-        VScroll^.Hide;
+        VScroll.Hide;
       DrawView;
       end;
   { if (InfoL<>nil) then InfoL^.Draw;}
@@ -1450,8 +1450,8 @@ begin
   D := PFileDialog(Application.ValidView(New(PFileDialog,
         Init(Mask, Title, Name, Buttons, HistoryID))));
   if D = nil then Exit;
-  if B then D^.SetData(S);
-  if Desktop^.ExecView(D) <> cmCancel then
+  if B then D.SetData(S);
+  if Desktop.ExecView(D) <> cmCancel then
     begin
       S := D^.GetFileName;
       HistoryAdd(HistoryID, S);
@@ -1478,7 +1478,7 @@ procedure OpenEditor;
       fdOpenButton+fdHelpButton, hsEditOpen);
   if S = '' then
     Exit;
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   Application.InsertWindow(PEditWindow.Create(R, S));
   end;
 {-DataCompBoy-}
@@ -1614,8 +1614,8 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
   procedure _DrawViews;
     begin
     DrawView;
-    HScroll^.DrawView;
-    VScroll^.DrawView;
+    HScroll.DrawView;
+    VScroll.DrawView;
     end;
 
   begin { TFileEditor.Search }
@@ -1806,7 +1806,7 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
       VScroll^.Value := D.Y;
       if TimerExpired(Tmr) then
         begin
-        VScroll^.DrawView;
+        VScroll.DrawView;
         NewTimer(Tmr, 50);
         end;
       if  (D.Y-Pos.Y > Size.Y) then
@@ -1838,13 +1838,13 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
           I := 50;
           T.A.Y := Delta.Y-Pos.Y;
           MakeGlobal(T.A, T.A);
-          Desktop^.MakeLocal(T.A, T.A);
-          T.A.X := (Desktop^.Size.X-I) div 2;
+          Desktop.MakeLocal(T.A, T.A);
+          T.A.X := (Desktop.Size.X-I) div 2;
           T.B.X := T.A.X+I;
-          if  (T.A.Y <= (Desktop^.Size.Y) div 2) then
-            T.A.Y := (Desktop^.Size.Y+4) div 2
+          if  (T.A.Y <= (Desktop.Size.Y) div 2) then
+            T.A.Y := (Desktop.Size.Y+4) div 2
           else
-            T.A.Y := (Desktop^.Size.Y-18) div 2;
+            T.A.Y := (Desktop.Size.Y-18) div 2;
           T.B.Y := T.A.Y+8;
           J := MessageBoxRect(T, GetString(dlQueryReplace), nil,
               mfQuery+mfYesButton+mfAllButton+mfNoButton+mfCancelButton);
@@ -3250,7 +3250,7 @@ EndDel:
       end;
 
     if PI <> nil then
-      PI^.Free;
+      PI.Free;
 
     R.Free;
     if  (A <> 0) and (A <> $FFFF) then
@@ -3831,7 +3831,7 @@ EndDel:
     R.Assign(0, 0, 20, 7);
     New(Info, Init(R));
     Info^.Write(1, Copy(GetString(dlPleaseStandBy), 4, 255));
-    Desktop^.Insert(Info); (* X-Man *)
+    Desktop.Insert(Info); (* X-Man *)
     Abort := False;
 
     P := Delta.X+1;
@@ -3871,7 +3871,7 @@ EndDel:
 
     if Res = '' then
       begin
-      Info^.Hide;
+      Info.Hide;
       S := Copy(WorkString, Min4, Max4-Min4);
       if  (PosChar('.', S) = 0) then
         S := S+GetExt(EditName);
@@ -3889,7 +3889,7 @@ EndDel:
       PDNApplication(Application)^.EditFile(True, Res);
 
 Ex:
-    Info^.Free;
+    Info.Free;
     Abort := False;
     end { OpenFileAtCursor };
   {-DataCompBoy-}
@@ -4034,7 +4034,7 @@ Ex:
             if not Owner^.GetState(sfModal) then
               Exit;
             CE;
-            Owner^.Redraw;
+            Owner.Redraw;
             PEditWindow(Owner)^.ModalEnd := True;
             ClearEvent(Event);
             end;
@@ -4345,14 +4345,14 @@ Ex:
           else
             MISaveFileAs(@Self);
           CE;
-          Owner^.Redraw;
+          Owner.Redraw;
           end;
         cmSaveTextAs:
           begin
           ChangeLine;
           MISaveFileAs(@Self);
           CE;
-          Owner^.Redraw;
+          Owner.Redraw;
           end;
         cmBlockRead:
           begin
@@ -4668,7 +4668,7 @@ Ex:
         cmSwitchDrawMode:
           begin
           DrawMode := (DrawMode+1) mod 3;
-          Owner^.Redraw;
+          Owner.Redraw;
           LastDir := -1;
           CE;
           end;
@@ -4865,7 +4865,7 @@ Ex:
             begin
             if Owner <> nil then
               begin
-              Owner^.Select;
+              Owner.Select;
               ClearEvent(Event);
               end;
             end;
@@ -5064,7 +5064,7 @@ procedure OpenSmartpad;
       ScrollTo(0, FileLines^.Count-1);
       Pos.X := Delta.X-Size.X div 2;
       Pos.Y := Delta.Y-Size.Y div 2;
-      SmartWindow^.Redraw;
+      SmartWindow.Redraw;
       end;
     end { InsertInfo };
 
@@ -5081,7 +5081,7 @@ procedure OpenSmartpad;
   if  (SmartWindow <> nil) and SmartWindow^.GetState(sfModal) then
     Exit;
   PV := Application.TopView;
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   R.Grow(-2, -2);
   if  (SmartWindow <> nil) then
     begin
@@ -5089,14 +5089,14 @@ procedure OpenSmartpad;
     if  (PV <> Application) then
       begin
       {if PView(PV)^.Owner = Pointer(Desktop) then SmartWindow^.MakeFirst;}
-      Desktop^.Delete(SmartWindow);
-      Desktop^.ExecView(SmartWindow);
-      Desktop^.InsertBefore(SmartWindow, Desktop^.Last);
-      Desktop^.SetCurrent(PV, EnterSelect);
+      Desktop.Delete(SmartWindow);
+      Desktop.ExecView(SmartWindow);
+      Desktop.InsertBefore(SmartWindow, Desktop.Last);
+      Desktop.SetCurrent(PV, EnterSelect);
       {if PView(PV)^.Owner = Pointer(Desktop) then PView(PV)^.MakeFirst;}
       end
     else
-      SmartWindow^.Select;
+      SmartWindow.Select;
     Exit;
     end;
   New(SmartWindow, Init(R, 'SmartPad'));
@@ -5157,12 +5157,12 @@ procedure OpenSmartpad;
   InsertInfo;
   if  (PV <> Application) then
     begin
-    Desktop^.ExecView(SmartWindow);
-    SmartWindow^.Free;
+    Desktop.ExecView(SmartWindow);
+    SmartWindow.Free;
     SmartWindow := nil
     end
   else
-    Desktop^.Insert(SmartWindow);
+    Desktop.Insert(SmartWindow);
   end { OpenSmartpad };
 
 procedure OpenClipBoard; {-$VOL begin}
@@ -5178,29 +5178,29 @@ procedure OpenClipBoard; {-$VOL begin}
   then
     Exit;
   PV := Application.TopView;
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   if  (ClipboardWindow <> nil) then
     begin
     if  (PV <> Application) then
       begin
-      Desktop^.Delete(ClipboardWindow);
-      Desktop^.ExecView(ClipboardWindow);
-      Desktop^.InsertBefore(ClipboardWindow, Desktop^.Last);
-      Desktop^.SetCurrent(PV, EnterSelect);
+      Desktop.Delete(ClipboardWindow);
+      Desktop.ExecView(ClipboardWindow);
+      Desktop.InsertBefore(ClipboardWindow, Desktop.Last);
+      Desktop.SetCurrent(PV, EnterSelect);
       end
     else
-      ClipboardWindow^.Select;
+      ClipboardWindow.Select;
     Exit;
     end;
   New(ClipboardWindow, Init(R, 'Clipboard'));
   if  (PV <> Application) then
     begin
-    Desktop^.ExecView(ClipboardWindow);
-    ClipboardWindow^.Free;
+    Desktop.ExecView(ClipboardWindow);
+    ClipboardWindow.Free;
     ClipboardWindow := nil
     end
   else
-    Desktop^.Insert(ClipboardWindow);
+    Desktop.Insert(ClipboardWindow);
   end { OpenClipBoard }; {-$VOL end}
 
 end.

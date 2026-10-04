@@ -176,7 +176,7 @@ procedure TTable.SetData(var Data);
 begin
   SetCursor(Byte(Data) mod 32, Byte(Data) div 32);
   MessageL(Owner, evBroadcast, AsciiTableCommandBase + cmCharacterFocused, Cursor.X + 32 * Cursor.Y);
-  Owner^.Redraw;
+  Owner.Redraw;
 end;
 
 { --- TReport --- }
@@ -248,7 +248,7 @@ begin
   Control^.EventMask := $FFFF;
   Control^.BlockCursor;
   Insert(Control);
-  Control^.Select;
+  Control.Select;
   fASCIITable := True;
 end;
 
@@ -297,8 +297,8 @@ var
 
   function GetCH: Boolean;
   begin
-    W := Desktop^.ExecView(P);
-    P^.GetData(CharASCII);
+    W := Desktop.ExecView(P);
+    P.GetData(CharASCII);
     ClearEvent(E);
     E.What := evKeyDown;
     SetDNKeyCode(E, Byte(CharASCII));
@@ -310,14 +310,14 @@ var
 begin
   P := PASCIIChart.Create(R);
   P^.MoveTo(boundsASCII.X, boundsASCII.Y);
-  P^.SetData(CharASCII);
-  CR := Desktop^.Current;
+  P.SetData(CharASCII);
+  CR := Desktop.Current;
   while GetCH do
     ;
   boundsASCII := P^.Origin;
   P.Free;
   if CR <> nil then
-    CR^.Select;
+    CR.Select;
 end;
 
 end.

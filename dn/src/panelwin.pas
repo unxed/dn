@@ -762,10 +762,10 @@ procedure TDoubleWindow.SetMaxiState(P: PFilePanelRoot);
       сбрасываем в её настройках флаг максимизации. Выявление этой ситуации
       делается сравнением с PassivePanel, а не проверкой видимости,
       так как во время Load панель вполне может быть невидимой. }
-    with P.PanSetup^.Show do
+    with P.PanSetup.Show do
       MiscOptions := MiscOptions and not 1;
     end
-  else if ((P.PanSetup^.Show.MiscOptions and 1) <> 0) <>
+  else if ((P.PanSetup.Show.MiscOptions and 1) <> 0) <>
      PanelZoomed
   then
     ToggleViewMaxiState(P, not P.SelfNum);
@@ -983,7 +983,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
             end
           else
             begin { работа с файловой панелью }
-            with ActivePanel.PanSetup^.Show do
+            with ActivePanel.PanSetup.Show do
               MiscOptions := MiscOptions xor 1;
             SetMaxiState(ActivePanel);
             end;

@@ -1536,7 +1536,7 @@ function TMenuBox.Execute: Word;
     R.B.X := R2.B.X;
     end;
   SetBounds(R);
-  Owner^.Redraw;
+  Owner.Redraw;
   Result := inherited Execute;
   end { TMenuBox.Execute };
 

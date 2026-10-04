@@ -140,7 +140,7 @@ procedure MISaveFileAs(AED: PFileEditor);
       else
         PWindow(Owner)^.Title := NewStr(GetString(dlEditTitle)+' - '+
             (EditName));
-      Owner^.Redraw;
+      Owner.Redraw;
       Modified := False;
       MILockFile(AED);
       end;
@@ -172,7 +172,7 @@ procedure MIOpenFile(AED: PFileEditor);
         Exit;
         end;
       ScrollTo(0, 0);
-      Owner^.Redraw;
+      Owner.Redraw;
       end;
     end
   end { MIOpenFile };
@@ -301,7 +301,7 @@ procedure MISaveFile(AED: PFileEditor);
     Modified := False;
     JustSaved := True;
     LastSaveUndoTimes := UndoTimes; {piwamoto}
-    Owner^.Redraw;
+    Owner.Redraw;
     if not (SmartPad or ClipBrd) then
       FileChanged(EditName);
     if UpStrg(EditName) = UpStrg(MakeNormName(SourceDir, 'dn.ini')) then
@@ -686,7 +686,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
         FileName := '';
         FreeMem(B, FBufSize);
         S.Free;
-        Info^.Free;
+        Info.Free;
         Application.OutOfMemory;
         isValid := False;
         Exit
@@ -728,7 +728,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
       end;
     S.Free;
     FreeMem(B, FBufSize);
-    Info^.Free;
+    Info.Free;
     end
   end { MIReadBlock };
 {-DataCompBoy-}
@@ -872,7 +872,7 @@ procedure MIAwaken(AED: PFileEditor);
     ScrollTo(X, Y);
     Pos := XD;
     ChPosition := False;
-    Owner^.Redraw;
+    Owner.Redraw;
     end
   end { MIAwaken };
 

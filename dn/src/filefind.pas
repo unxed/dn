@@ -397,7 +397,7 @@ function FindFiles(var Files: PFilesCollection;
 
        {AK155 Показ длинных/коротких имён привести в соответствие с режимом
         поиска, то есть он будет таким же, как у родительской панели }
-        with PFilePanel(Pnl).PanSetup^.Show do
+        with PFilePanel(Pnl).PanSetup.Show do
           begin
           if ShortNameSearch then
             ColumnsMask := ColumnsMask and not psLFN_InColumns
@@ -1421,7 +1421,7 @@ function TFindDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize):
     S: String;
   begin
   
-  uLfn := PFilePanelRoot(Panel).PanSetup^.Show.
+  uLfn := PFilePanelRoot(Panel).PanSetup.Show.
     ColumnsMask and psLFN_InColumns <> 0;
   
 

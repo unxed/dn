@@ -731,7 +731,7 @@ procedure WriteBlock(Hint: String; S: PStream; C: PLineCollection
     CompressString(SST); {Cat: про последнюю строку тоже не забываем}
   S^.Write(SST[1], Length(SST));
   if PP <> nil then
-    PP^.Free;
+    PP.Free;
   end { WriteBlock };
 
 end.

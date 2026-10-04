@@ -277,14 +277,14 @@ procedure TDBScrollBar.HandleEvent(var Event: TEvent);
       if DBViewer^.Delta.Y <> Value then
         begin
         DBViewer^.Delta.Y := Value;
-        DBViewer^.DrawView;
+        DBViewer.DrawView;
         DBViewer^.Indicator^.Draw;
         end;
     sbHorizontal:
       if DBViewer^.Delta.X <> Value then
         begin
         DBViewer^.Delta.X := Value;
-        DBViewer^.DrawView;
+        DBViewer.DrawView;
         DBViewer^.Indicator^.Draw;
         end;
   end {case};
@@ -573,10 +573,10 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
 
   Data.List := DBFile^.Fields;
   Data.Focused := Delta.X;
-  D^.SetData(Data);
-  if Desktop^.ExecView(D) = cmOK then
+  D.SetData(Data);
+  if Desktop.ExecView(D) = cmOK then
     begin
-    D^.GetData(Data);
+    D.GetData(Data);
     if Delta.X <> Data.Focused then
       begin
       Delta.X := Data.Focused;
@@ -726,7 +726,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       MemoStream := nil;
       Exit
       end;
-    Desktop^.GetExtent(R);
+    Desktop.GetExtent(R);
     R.Grow(-2, -2);
     R.Assign(1, 1, 70, 20);
     D := New(PDialog, Init(R, GetString(dlDBViewViewMemo)));
@@ -752,7 +752,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     D := PDialog(Application.ValidView(D));
     if D = nil then
       Exit;
-    Desktop^.ExecView(D);
+    Desktop.ExecView(D);
     D.Free;
     end { ViewMemo };
   {-DataCompBoy-}
@@ -803,7 +803,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     New(V, Init(R));
     V^.Top := GetString(dlSearching)+' "'+Cut(SearchData.S, 40)+'"';
     V^.Write(1, GetString(dlPercentComplete));
-    Desktop^.Insert(V);
+    Desktop.Insert(V);
     Abort := False;
     NewTimer(T, 50);
     while ((CurRow < DBFile^.NumRec) and (SearchData.Direction <> 1)) or
@@ -845,7 +845,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
           Delta.Y := CurRow;
           Delta.X := CurFld;
           DrawView;
-          V^.Free;
+          V.Free;
           Exit;
           end;
         if SearchData.Direction = 1 then
@@ -862,7 +862,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       else
         Inc(CurRow);
       end;
-    V^.Free;
+    V.Free;
     if not Abort then
       ErrMsg(dlDBViewSearchNot);
     end { ContSearch };
@@ -1144,7 +1144,7 @@ redat:
             begin
             if Owner <> nil then
               begin
-              Owner^.Select; { Flash }
+              Owner.Select; { Flash }
               ClearEvent(Event);
               end;
             end;
@@ -1540,7 +1540,7 @@ constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
     I: Integer;
     s: String;
   begin
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   I := PosChar('|', FName);
   if I > 0 then
     begin

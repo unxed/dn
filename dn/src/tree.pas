@@ -549,7 +549,7 @@ function GetDirLen(Dir: String): TSize; {DataCompBoy}
   if DC = nil then
     Exit;
   if R then
-    Desktop^.ForEach(MakeReread);
+    Desktop.ForEach(MakeReread);
   I := FindDir(DC, Dir);
   if I < 0 then
     Exit;
@@ -709,8 +709,8 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
   S := '';
   D := PTreeDialog(Application.ValidView(D));
   if D <> nil then
-    if Desktop^.ExecView(D) = cmOK then
-      D^.GetData(S);
+    if Desktop.ExecView(D) = cmOK then
+      D.GetData(S);
   ChangeDir := S;
   end;
 
@@ -1235,7 +1235,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
     T.X := Size.X div 2;
     T.Y := 1;
     MakeGlobal(T, T);
-    Desktop^.MakeLocal(T, T);
+    Desktop.MakeLocal(T, T);
     S := SelectDrive(T.X, T.Y, CurPath[1], False);
     if S = '' then
       Exit;
@@ -1964,7 +1964,7 @@ procedure TTreeView.SetState(AState: Word; Enable: Boolean);
     if Owner^.GetState(sfActive) and GetState(sfSelected) then
       begin
       if ScrollBar <> nil then
-        ScrollBar^.Show;
+        ScrollBar.Show;
       if Parital then
         EnableCommands([cmCopyFiles, cmPanelErase, cmMoveFiles,
            cmPanelReread,
@@ -1975,7 +1975,7 @@ procedure TTreeView.SetState(AState: Word; Enable: Boolean);
     else
       begin
       if ScrollBar <> nil then
-        ScrollBar^.Hide;
+        ScrollBar.Hide;
       {EventMask := EventMask and (not evBroadcast);}
       DrawView
       end;
@@ -2105,7 +2105,7 @@ procedure THTreeView.SetState(AState: Word; Enable: Boolean);
 destructor THTreeView.Destroy;
   begin
   if Info <> nil then
-    Info^.Free;
+    Info.Free;
   inherited Destroy;
   end;
 

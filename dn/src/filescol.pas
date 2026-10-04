@@ -1315,7 +1315,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   else
     C := Default;
   Menu := NewMenu(Items);
-  Desktop^.GetExtent(R);
+  Desktop.GetExtent(R);
   {-$VIV start}
   X := X-(MaxL div 2);
   if  (X+MaxL+4) > R.B.X then
@@ -1349,7 +1349,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
     Menu^.Default := Items;
   P^.HelpCtx := hcSelectDrive+Byte(IncludeTemp = True);
 
-  N := Desktop^.ExecView(P);
+  N := Desktop.ExecView(P);
   P.Free;
   DisposeMenu(Menu);
   SelectDrive := '';
