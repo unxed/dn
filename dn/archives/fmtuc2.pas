@@ -70,6 +70,7 @@ type
 implementation
 
 uses
+  SysUtils,
   objutil, fileutil, basics, mainapp, DnExec, Commands, strutil, Messages,
   Dos, LFN, osdep
   ;

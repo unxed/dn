@@ -254,6 +254,7 @@ procedure PutInClipLong(const S: LongString);
 implementation
 
 uses
+  SysUtils,
   DNRun,
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
   DNHelp, DnIni, iniengine, cfgstate, DNErrLog, histories,
@@ -599,7 +600,7 @@ constructor TDNApplication.Create;
       if SystemData.Options and ossUseSysClip <> 0 then
         SyncClipOut {(false)};
       end;
-    FreeObject(LoadStream);
+    FreeAndNil(LoadStream);
     end;
   {-$VOL end}
 

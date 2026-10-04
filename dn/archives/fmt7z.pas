@@ -92,6 +92,7 @@ type
 
 implementation
 uses
+  SysUtils,
   basics, strutil, fileutil, Defines, objutil, Streams, Dos, DnExec, osdep
   ;
 
