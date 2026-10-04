@@ -69,8 +69,10 @@ w=$out/rcp.work; rm -rf "$w"; mkdir -p "$w/EXE.D32"
 cp "$src/rcpvpd.ini" "$w/RCPVPD.INI"; cp "$src/dnhelp.pas" "$w/DNHELP.PAS"; cp "$src/commands.pas" "$w/COMMANDS.PAS"; cp "$src/stdefine.inc" "$w/STDEFINE.INC"
 # the resource compiler is an old program: it asks for RESOURCE\ENGLISH (capitals) in its own directory; the repository has lower case
 for l in english russian ukrain; do u=$(echo $l | tr a-z A-Z); mkdir -p "$w/RESOURCE/$u"; cp "$src/resource/$l"/* "$w/RESOURCE/$u/"; done
-case "${DN_EXTRA:-}" in *-dDNUTF8*)      # DN inside in UTF-8 (the branch utf8-inside): the texts of the resources are UTF-8
-    for f in "$w"/RESOURCE/RUSSIAN/dn.dn? "$w"/RESOURCE/UKRAIN/dn.dn?; do iconv -f cp866 -t utf-8 "$f" > "$f.u8" && mv "$f.u8" "$f"; done ;;
+case "${DN_EXTRA:-}" in *-dDNUTF8*)      # DN inside in UTF-8: the UTF-8 resources are used as-is
+    : ;;
+*)      # The legacy DOS/code-page build still receives CP866 resources.
+    for f in "$w"/RESOURCE/RUSSIAN/dn.dn? "$w"/RESOURCE/UKRAIN/dn.dn?; do iconv -f utf-8 -t cp866 "$f" > "$f.cp866" && mv "$f.cp866" "$f"; done ;;
 esac
 if [ "$DN_TARGET" = dos ]; then
     cp "$DN_OBJ/rcp.exe" "$w/RCP.EXE"
@@ -89,8 +91,10 @@ th=$tmp/tvhc-o; mkdir -p "$th"
 fpc -Fu"$here/tv/src" -FU"$th" -FE"$th" -vew "$here/tv/tools/tvhc.pas" | grep -E "Error|Fatal" || true
 for l in english russian ukrain; do
     htx=$src/resource/$l/dnhelp.htx
-    case "${DN_EXTRA:-}" in *-dDNUTF8*)      # the help in UTF-8 as well (the text is CP866 in the sources)
-        if [ "$l" != english ]; then htx=$tmp/dnhelp-$l.htx; iconv -f cp866 -t utf-8 "$src/resource/$l/dnhelp.htx" > "$htx"; fi ;;
+    case "${DN_EXTRA:-}" in *-dDNUTF8*)      # the help is UTF-8 in the source and in DNUTF8 builds
+        : ;;
+    *)      # The legacy build consumes CP866 help.
+        htx=$tmp/dnhelp-$l.htx; iconv -f utf-8 -t cp866 "$src/resource/$l/dnhelp.htx" > "$htx" ;;
     esac
     "$th/tvhc" "$htx" "$out/$l.hlp" /4DN_OSP | sed 's|^|  |'
 done
