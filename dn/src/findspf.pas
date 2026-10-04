@@ -76,7 +76,7 @@ function RecursiveCheck(Name, pPath: String; DoMore: Boolean;
   DispatchEvents(Info, Abort);
   if Abort then
     Exit;
-  SC.Init($10, $10, False);
+  SC := TStringCollection.Create($10, $10, False);
   RecursiveCheck := '';
   SC.AtInsert(0, NewStr(pPath));
 
@@ -125,7 +125,7 @@ function RecursiveCheck(Name, pPath: String; DoMore: Boolean;
     lFindClose(SR);
   until SC.Count = 0;
 q:
-  SC.Done;
+  SC.Free;
   end { RecursiveCheck };
 {-DataCompBoy-}
 
