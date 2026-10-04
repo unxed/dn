@@ -300,11 +300,11 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
   SearchFileStr := -1;
   Count := 0;
   ClrIO;
-  OldPos := F^.GetPos;
-  L := F^.GetSize;
+  OldPos := F.GetPos;
+  L := F.GetSize;
   if L = 0 then
     goto LExit;
-  F^.Seek(Pos);
+  F.Seek(Pos);
   BufLen := $80000;
   {Cat: тут лучше с памятью не мелочиться, иначе сильно проигрываем в скорости}
   if BufLen > L then
@@ -313,7 +313,7 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
     BufLen := MaxAvail;
   if BufLen < Length(What) then
     begin
-    F^.Seek(OldPos);
+    F.Seek(OldPos);
     goto LExit;
     end;
   T := 0;
@@ -322,8 +322,8 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
   if Display then
     begin
     R.Assign(1, 1, 30, 9);
-    New(Info, Init(R));
-    Info^.Top := GetString(dlSearching)+' "'+Cut(SearchString.What, 40)
+    Info := TWhileView.Create(R);
+    Info.Top := GetString(dlSearching)+' "'+Cut(SearchString.What, 40)
       +'"';
     NewTimer(Tmr, 100);
     Inserted := False;
@@ -347,7 +347,7 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
       end
     else
       begin
-      NextPos := F^.GetPos;
+      NextPos := F.GetPos;
       J := BufLen;
       if J > L-I+BPos then
         J := i32(L-I+BPos);
@@ -355,8 +355,8 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
       end;
     if Display then
       begin
-      Info^.Write(1, StrGrd(L, I, 30, False));
-      Info^.Write(2, Percent(L, I));
+      Info.Write(1, StrGrd(L, I, 30, False));
+      Info.Write(2, Percent(L, I));
       if  (not Inserted) and TimerExpired(Tmr) then
         begin
         Desktop.Insert(Info);
@@ -365,8 +365,8 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
       if Inserted then
         DispatchEvents(Info, CancelSearch);
       end;
-    F^.Seek(NextPos);
-    F^.Read(Buf^[BPos], J-BPos);
+    F.Seek(NextPos);
+    F.Read(Buf^[BPos], J-BPos);
     T := J-BPos;
 1:
     if J <= 0 then
@@ -413,7 +413,7 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
         goto 1;
         end;
       FreeMem(Buf, BufLen);
-      F^.Seek(OldPos);
+      F.Seek(OldPos);
       SearchFileStr := NextPos-BPos+BufPos-1+StPos;
       goto LExit;
       end;
@@ -432,12 +432,12 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
     if I < L then
       Move(Buf^[J-BPos], Buf^[0], BPos);
   until (Back and (I < 0)) or
-    (not Back and ((I >= L) or (T <= 0) or (F^.GetPos >= F^.GetSize))) or
+    (not Back and ((I >= L) or (T <= 0) or (F.GetPos >= F.GetSize))) or
   CancelSearch;
   if CancelSearch then
     SearchFileStr := -2;
   FreeMem(Buf, BufLen);
-  F^.Seek(OldPos);
+  F.Seek(OldPos);
 LExit:
   if Info <> nil then
     Info.Free;
@@ -480,20 +480,20 @@ procedure TViewInfo.Draw;
     inherited Draw;
     Exit;
     end;
-  with Viewer^, Self do
+  with Viewer, Self do
     begin
-    Color := TWindow(Owner).Frame^.GetColorW(3);
+    Color := TWindow(Owner).Frame.GetColorW(3);
     Ch2 := #205;
     if not Owner.GetState(sfActive) then
       begin
-      Color := TWindow(Owner).Frame^.GetColorW(1);
+      Color := TWindow(Owner).Frame.GetColorW(1);
       MoveChar(B, #196, Color, Size.X);
       WriteLineC(0, 0, Size.X, 1, B);
       Exit;
       end
     else if Owner.GetState(sfDragging) then
       begin
-      Color := TWindow(Owner).Frame^.GetColorW(5);
+      Color := TWindow(Owner).Frame.GetColorW(5);
       Ch2 := #196;
       end;
     if ViewMode = vmHex then
@@ -573,7 +573,7 @@ procedure TViewInfo.HandleEvent(var Event: TEvent);
   if Viewer = nil then
     Exit;
   if  (Event.What = evMouseDown) then
-    with Viewer^ do
+    with Viewer do
       begin
       Self.MakeLocal(Event.Where, P);
       if  (ViewMode = vmHex) then
@@ -687,8 +687,7 @@ function TFileViewer.WriteModify;
     else
       Exit;
     end;
-  if  (TypeOf(Fl^) = TypeOf(TDOSStream))
-         or (TypeOf(Fl^) = TypeOf(TBufStream))
+  if  (Fl is TDOSStream) or (Fl is TBufStream)
   then
     begin
     Fl.Free;
@@ -712,8 +711,8 @@ function TFileViewer.WriteModify;
       end
     else
       begin
-      Fl^.Seek(FilePos);
-      Fl^.Write(Buf^, BufSize);
+      Fl.Seek(FilePos);
+      Fl.Write(Buf^, BufSize);
       end;
     if A <> 0 then
       begin
@@ -724,8 +723,8 @@ function TFileViewer.WriteModify;
     end
   else
     begin
-    Fl^.Seek(FilePos);
-    Fl^.Write(Buf^, BufSize);
+    Fl.Seek(FilePos);
+    Fl.Write(Buf^, BufSize);
     end;
   NeedAbort := False;
   if not Startup.AutoRefreshPanels then
@@ -800,7 +799,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
   {/JO}
 
   begin
-  TView.HandleEvent(Event);
+  inherited HandleEvent(Event);
   case Event.What of
     evCommand:
       case Event.Command of
@@ -974,7 +973,7 @@ procedure TDFileViewer.ChangeFile(FR: PFileRec);
       Fl := TMemoryStream.Create(1, 1024);
       Wrap := wmWords;
       end;
-    with Fl^ do
+    with Fl do
       begin
       Seek(0);
       Truncate;
@@ -983,7 +982,7 @@ procedure TDFileViewer.ChangeFile(FR: PFileRec);
     if (FR^.Diz <> nil) and (FR^.Diz^.DizText <> '') then
       begin
       S := FR^.Diz^.DizText;
-      Fl^.Write(S[1], Length(S));
+      Fl.Write(S[1], Length(S));
       end;
     ReadFile('', '', False);
 //    MakeLines;
@@ -1075,7 +1074,8 @@ procedure TFileViewer.Update;
     end;
   end;
 
-constructor TFileViewer.Create
+constructor TFileViewer.Create(const Bounds: TRect; AStream: TStream;
+  const AFileName, AVFileName: String; ASB: TView; Quick, Hex: Boolean);
   var
     C: Char;
   begin
@@ -1139,7 +1139,7 @@ destructor TFileViewer.Destroy;
   inherited Destroy;
   end;
 
-constructor TFileViewer.Load(S: TStream)
+constructor TFileViewer.Load(S: TStream);
   var
     FP: TFileSize;
   begin
@@ -1741,7 +1741,7 @@ function TFileViewer.ReadFile;
   {PZ end}
   ScrollEOF := (EditorDefaults.ViOpt and vbfScrollAfterEOF) <> 0;
   {AK155}
-  FileSize := Fl^.GetSize;
+  FileSize := Fl.GetSize;
   FilePos := 0;
   I := 1;
   NumLines := 1;
@@ -1749,7 +1749,7 @@ function TFileViewer.ReadFile;
     FileSize := 0;
   AdjustBuf;
   if SB <> nil then
-    PViewScroll(SB)^.MaxV := FileSize;
+    PViewScroll(SB).MaxV := FileSize;
   Seek(0);
   XDelta := 0;
   if  (UpStrg(VFileName) <> UpStrg(FileName)) then
@@ -1763,7 +1763,7 @@ function TFileViewer.ReadFile;
   XCoder.KeyMap := ProcessDefCodepage(DefCodePageView);
   if XCoder.KeyMap = kmNone then
     begin
-    CodePageDetector.Init;
+    CodePageDetector := TCodePageDetector.Create;
     CodePageDetector.CheckString(PChar(Buf), BufSize);
     XCoder.KeyMap := CodePageDetector.DetectedCodePage;
     XCoder.UseKeyMap;
@@ -1784,21 +1784,21 @@ procedure TFileViewer.SetState;
       if SB <> nil then
         begin
         SB.Show;
-        SB^.EventMask := $FFFF
+        SB.EventMask := $FFFF
         end;
       DrawView
       end
     else if SB <> nil then
       begin
       SB.Hide;
-      SB^.EventMask := 0;
+      SB.EventMask := 0;
       end;
     end;
   if  (Info <> nil) then
     if  (AState and sfDragging <> 0)
       or (AState and (sfSelected+sfActive) <> 0)
     then
-      Info^.Draw;
+      Info.Draw;
   end { TFileViewer.SetState };
 
 procedure TFileViewer.Seek(APos: TFileSize);
@@ -1807,7 +1807,7 @@ procedure TFileViewer.Seek(APos: TFileSize);
   begin
   if Buf = nil then
     Exit;
-  FileSize := Fl^.GetSize;
+  FileSize := Fl.GetSize;
   WriteModify;
   if APos < 0 then
     APos := 0;
@@ -1822,7 +1822,7 @@ procedure TFileViewer.Seek(APos: TFileSize);
     end;
   if APos+BufSize >= FileSize then
     FilePos := FileSize-BufSize;
-  Fl^.Seek(FilePos);
+  Fl.Seek(FilePos);
   if  (FileSize-FilePos < BufSize) then
     begin
     FreeMem(Buf, BufSize);
@@ -1836,7 +1836,7 @@ procedure TFileViewer.Seek(APos: TFileSize);
     BufPos := 0;
   if BufPos >= BufSize then
     BufPos := BufSize-1;
-  Fl^.Read(Buf^, BufSize);
+  Fl.Read(Buf^, BufSize);
   BreakOnStreamReadError;
   MakeLines;
   NewPos := FilePos+BufPos;
@@ -1974,7 +1974,7 @@ LineBegin:
 
 procedure TFileViewer.SaveToFile(FN: String);
   var
-    S: TDOSStream;
+    S: TStream;
     P: TView;
     W, L: Word;
     PS: Pointer;
@@ -1987,7 +1987,7 @@ procedure TFileViewer.SaveToFile(FN: String);
       (XCoder.KeyMap <> kmAscii) and
       (MessageBox(GetString(dlViewSaveXlat), nil,
         mfYesButton+mfNoButton+mfConfirmation) = cmYes);
-  S.Init(FN, stOpen);
+  S := TDosStream.Create(FN, stOpen);
   W := 0; {AK155: чтобы всегда была определена }
   if S.Status = stOK then
     begin
@@ -2001,44 +2001,44 @@ procedure TFileViewer.SaveToFile(FN: String);
 же самом файле. А нужно оно только для того, чтобы при перезаписи
 длинного файла коротким получить новую (меньшую) длину. Но это
 гораздо прямее достигается при помощи Truncate.
-            S.Done;
-            S.Init(FN, stCreate);
+            S.Free;
+            S := TDosStream.Create(FN, stCreate);
 /AK155}
       end
     else if W = cmOK then
       S.Seek(S.GetSize)
     else
       begin
-      S.Done;
+      S.Free;
       Exit
       end;
     end
   else
     begin {новый файл}
-    S.Done; {JO}
-    S.Init(FN, stCreate); {JO}
+    S.Free; {JO}
+    S := TDosStream.Create(FN, stCreate); {JO}
     end;
 
   if S.Status <> stOK then
     begin
-    S.Done;
+    S.Free;
     MessageBox(GetString(dlFBBNoWrite)+Cut(FN, 40), nil,
        mfError+mfOKButton);
     Exit
     end;
   P := _WriteMsg(^M^M^C+GetString(dlWritingFile));
-  Fl^.Seek(0);
+  Fl.Seek(0);
   BreakOnStreamReadError;
   if Xl then
     begin
     PS := GetMem(4096);
     if PS = nil then
       goto 2;
-    Sz := Fl^.GetSize;
-    while Fl^.GetPos < Sz do
+    Sz := Fl.GetSize;
+    while Fl.GetPos < Sz do
       begin
-      L := MinBufSize(Sz-Fl^.GetPos, 4096);
-      Fl^.Read(PS^, L);
+      L := MinBufSize(Sz-Fl.GetPos, 4096);
+      Fl.Read(PS^, L);
       BreakOnStreamReadError;
       XLatBuf(PS^, L, XCoder.XLatCP[ToAscii]);
       S.Write(PS^, L);
@@ -2047,10 +2047,10 @@ procedure TFileViewer.SaveToFile(FN: String);
     end
   else
 2:
-    S.CopyFrom(Fl^, Fl^.GetSize);
+    S.CopyFrom(Fl, Fl.GetSize);
   P.Free;
   S.Truncate; {AK155 на случай записи короткого файла поверх длинного}
-  S.Done;
+  S.Free;
   FN := GetPath(FN);
   MakeNoSlash(FN);
   if not Startup.AutoRefreshPanels then
@@ -2080,12 +2080,12 @@ function TFileViewer.BreakOnStreamReadError: Boolean;
   if Fl.Status <> stOK then
     begin
     if Fl.Status = stInitError then
-      MessFileNotOpen(FileName, Fl^.ErrorInfo)
+      MessFileNotOpen(FileName, Fl.ErrorInfo)
     else
-      MessFileNotRead(FileName, Fl^.ErrorInfo);
+      MessFileNotRead(FileName, Fl.ErrorInfo);
     BreakOnStreamReadError := True;
     E := eFileError.Create('TFileViewer stream read error');
-    E.RC := Fl^.ErrorInfo;
+    E.RC := Fl.ErrorInfo;
     { на самом деле это собщение и RC никому не нужны, но это может
       пригодиться, если не все вызовы BreakOnStreamReadError обложены
       try - except и исключение окажется фатальным}
@@ -2117,7 +2117,7 @@ procedure TFileViewer.SeekEof;
     begin
     if Pos < 0 then
       Exit;
-    if Pos+len >= Fl^.GetSize then
+    if Pos+len >= Fl.GetSize then
       Exit;
     end;
   if ViewMode = vmText then
@@ -2134,9 +2134,9 @@ procedure TFileViewer.SeekEof;
   i := WL mod 16;
   Owner.Lock;
   {AK155}
-  if TypeOf(Fl^) = TypeOf(TDOSStream) then
+  if Fl is TDOSStream then
     begin
-    with TDosStream(Fl)^ do
+    with TDosStream(Fl) do
       begin
       if  (Status <> stOK) then
         goto EndProc;
@@ -2318,7 +2318,6 @@ procedure TFileViewer.HandleEvent;
       SR: TViewSearch;
       R: TRect;
       P: TView;
-      PP: PInputline;
       I: Integer;
 
     begin
@@ -2377,8 +2376,8 @@ procedure TFileViewer.HandleEvent;
       Loaded := False;
       if SB <> nil then
         begin
-        PViewScroll(SB)^.MaxV := FileSize;
-        PViewScroll(SB)^.Value := FilePos+BufPos;
+        PViewScroll(SB).MaxV := FileSize;
+        PViewScroll(SB).Value := FilePos+BufPos;
         end;
       PViewScroll(SB).DrawView;
       end;
@@ -2440,7 +2439,7 @@ DoSave:
                 end;
               {if Desktop<>nil then Desktop.UnLock;}
               CE;
-              if  (Owner <> nil) and (TypeOf(Owner^) = TypeOf(TFileWindow))
+              if  (Owner <> nil) and (Owner is TFileWindow)
               then
                 Message(Owner, evCommand, cmClose, nil);
               end;
@@ -2646,9 +2645,9 @@ DoSave:
               { стать на начало строки, но так,
                  чтобы не сдвинуть вверх ползунок курсора }
               CountDown(1);
-              ScrollerPos := PViewScroll(SB)^.GetPartCode;
+              ScrollerPos := PViewScroll(SB).GetPartCode;
               CountUp(1);
-              if ScrollerPos <> PViewScroll(SB)^.GetPartCode then
+              if ScrollerPos <> PViewScroll(SB).GetPartCode then
                 CountDown(1);
               end;
             if Lines[Size.Y-1].Pos < 0 then
@@ -2867,7 +2866,7 @@ DoSave:
             DrawView;
             if BufPos = 0 then
               begin
-              PViewScroll(SB)^.Value := 0;
+              PViewScroll(SB).Value := 0;
               SB.DrawView;
               end;
             end;
@@ -3496,8 +3495,8 @@ procedure TFileViewer.CountUp;
           NewFilePos := 0;
         ReadLen := i32(FilePos-NewFilePos);
         Move(Buf^[0], Buf^[ReadLen], BufSize-ReadLen);
-        Fl^.Seek(NewFilePos);
-        Fl^.Read(Buf^, ReadLen);
+        Fl.Seek(NewFilePos);
+        Fl.Read(Buf^, ReadLen);
         BreakOnStreamReadError;
         FilePos := NewFilePos;
         BufPos := ReadLen;
@@ -3569,13 +3568,13 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   R.A.X := R.B.X;
   Inc(R.B.X);
   P := PViewScroll.Create(R);
-  P^.GrowMode := gfGrowHiX+gfGrowLoX+gfGrowHiY;
+  P.GrowMode := gfGrowHiX+gfGrowLoX+gfGrowHiY;
   Insert(P);
   GetExtent(R);
   R.Grow(-1, -1);
   PV := TFileViewer.Create(R, nil, FileName, VFileName, P, False, Hex);
   Insert(PV); {Вставить надо даже при ошибке для последующего контроля }
-  if not PV^.isValid then
+  if not PV.isValid then
     {AK155}
     Exit;
   GetExtent(R);
@@ -3584,7 +3583,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   Dec(R.B.X, 2);
   P := PViewInfo.Create(R, PV);
   Insert(P);
-  PV^.Info := P;
+  PV.Info := P;
   end { TFileWindow.Init };
 
 procedure TFileWindow.ChangeBounds(const Bounds: TRect);
