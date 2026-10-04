@@ -284,7 +284,7 @@ constructor TArvidDrive.Create(const AName: String);
   else
     Stream := New(PBufStream, Init(AName, stOpen, 2048));
 
-  if Stream^.Status <> stOK then
+  if Stream.Status <> stOK then
     begin
     GetAttr;
     if Attrb and ReadOnly <> 0 then
@@ -303,11 +303,11 @@ constructor TArvidDrive.Create(const AName: String);
       Stream := New(PBufStream, Init(Copy(AName, 1, i-1), stOpen, 2048))
     else
       Stream := New(PBufStream, Init(AName, stOpen, 2048));
-    if Stream^.Status <> stOK then
+    if Stream.Status <> stOK then
       goto 1;
     end;
-  Stream^.Read(AVT, SizeOf(AVT));
-  if Stream^.Status <> stOK then
+  Stream.Read(AVT, SizeOf(AVT));
+  if Stream.Status <> stOK then
     goto 1;
   if AVT.signature <> $50545641 {'AVTP'}
     then
@@ -451,15 +451,15 @@ constructor TArvidDrive.Load(S: TStream);
   S.Read(KillAfterUse, 1);
   Name := S.ReadStr;
   Stream := New(PBufStream, Init(Name^, stOpen, 2048));
-  if Stream^.Status <> stOK then
+  if Stream.Status <> stOK then
     begin
 1:
     Destroy;
     {      Drives.DriveLoadingError:=True;}
     Fail;
     end;
-  Stream^.Read(AVT, SizeOf(AVT));
-  if Stream^.Status <> stOK then
+  Stream.Read(AVT, SizeOf(AVT));
+  if Stream.Status <> stOK then
     goto 1;
   if AVT.signature <> $50545641 {'AVTP'}
     then
@@ -489,8 +489,8 @@ procedure TArvidDrive.RereadDirectory(S: String);
     begin
     Dispose(Stream, Done);
     Stream := New(PBufStream, Init(Name^, stOpen, 2048));
-    Stream^.Seek(0);
-    Stream^.Read(AVT, SizeOf(AVT));
+    Stream.Seek(0);
+    Stream.Read(AVT, SizeOf(AVT));
     SeekDirectory;
     end;
   end;
@@ -533,15 +533,15 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
     begin
     if Pos = 0 then
       Exit;
-    Stream^.Seek(Pos);
-    Stream^.Read(FC, SizeOf(FC));
+    Stream.Seek(Pos);
+    Stream.Read(FC, SizeOf(FC));
     if  (FC.Flags and AvtIsDir) <> 0 then
       begin
       FC2 := FC;
       FC.ChildOrSize := 0;
       end;
-    Nam := AvtCellName(FC, Stream^);
-    Desc := AvtCellDesc(FC, Stream^);
+    Nam := AvtCellName(FC, Stream);
+    Desc := AvtCellDesc(FC, Stream);
     if AvtNewFile(@Self, S2+Nam, Desc, (FC.Flags and AvtIsDir) <> 0,
          FC.ChildOrSize,
         FC.Time, FC.StartSector, FC.Attr) = 0
@@ -563,14 +563,14 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
           SetLength(S1, Length(S1)-1);
           SetLength(S2, Length(S2)-1);
           end;
-        Stream^.Seek(Pos);
-        Stream^.Read(FC, SizeOf(FC));
+        Stream.Seek(Pos);
+        Stream.Read(FC, SizeOf(FC));
         end;
-      Stream^.Seek(Pos);
-      Stream^.Read(FC, SizeOf(FC));
+      Stream.Seek(Pos);
+      Stream.Read(FC, SizeOf(FC));
       CopyTree(FC.LeftFileCell);
-      Stream^.Seek(Pos);
-      Stream^.Read(FC, SizeOf(FC));
+      Stream.Seek(Pos);
+      Stream.Read(FC, SizeOf(FC));
       CopyTree(FC.RightFileCell);
       end;
     end { CopyTree };
@@ -610,9 +610,9 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
     for I := 0 to AFiles^.Count-1 do
       begin
       PF := AFiles^.At(I);
-      Stream^.Seek( {Cat:warn}Round(PF^.PSize));
-      Stream^.Read(FC, SizeOf(FC));
-      Desc := AvtCellDesc(FC, Stream^);
+      Stream.Seek( {Cat:warn}Round(PF^.PSize));
+      Stream.Read(FC, SizeOf(FC));
+      Desc := AvtCellDesc(FC, Stream);
       S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
       S2 := MakeNormName(CopyDir, MkName(PF^.FlName[True], Mask));
       if Pos(S1, S2) = 1 then
@@ -625,8 +625,8 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
           begin {move}
           FC2 := FC;
           FC2.ChildOrSize := 0;
-          Stream^.Seek( {Cat:warn}Round(PF^.PSize));
-          Stream^.Write(FC2, SizeOf(FC2));
+          Stream.Seek( {Cat:warn}Round(PF^.PSize));
+          Stream.Write(FC2, SizeOf(FC2));
           AvtDelFile(@Self, S1);
           if AvtNewFile(@Self, S2, Desc, (FC.Flags and AvtIsDir) <> 0,
               FC.ChildOrSize, FC.Time, FC.StartSector, FC.Attr) = 0
@@ -660,8 +660,8 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
         end;
       end;
     P^.Free;
-    Stream^.Seek(0);
-    Stream^.Write(AVT, SizeOf(AVT));
+    Stream.Seek(0);
+    Stream.Write(AVT, SizeOf(AVT));
     Dispose(Stream, Done);
     Stream := New(PBufStream, Init(Name^, stOpen, 2048));
     GlobalMessage(evCommand, cmPanelReread, nil);
@@ -996,12 +996,12 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
     RealAttr := Attrb or Archive;
     end;
   Stream := New(PBufStream, Init(Name^, stOpen, 2048));
-  if Abort or (Stream^.Status <> stOK) then
+  if Abort or (Stream.Status <> stOK) then
     begin
     Err;
     goto 1
     end;
-  Stream^.Seek(PF^.DIZ^.Line);
+  Stream.Seek(PF^.DIZ^.Line);
   if filetype = avdTdr then
     TdrEditDescription(@Self, S, Nam, PF)
   else
@@ -1009,11 +1009,11 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
 1:
   ClrIO;
   Abort := False;
-  Stream^.Seek(0);
+  Stream.Seek(0);
   if filetype = avdAvt then
-    Stream^.Write(AVT, SizeOf(AVT))
+    Stream.Write(AVT, SizeOf(AVT))
   else
-    Stream^.Write(D, SizeOf(D));
+    Stream.Write(D, SizeOf(D));
   Dispose(Stream, Done);
   if RealAttr <> $FFFF then
     SetAttr(RealAttr);
@@ -1387,14 +1387,14 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         Stream := New(PBufStream, Init(FreeStr, stOpenRead, 2048));
         FreeStr := CurDir;
         CurDir := '';
-        if Stream^.Status <> stOK then
+        if Stream.Status <> stOK then
           begin
 1:
           ChangeUp(FreeStr);
           Exit;
           end;
-        Stream^.Read(Self.D, SizeOf(Self.D));
-        if Stream^.Status <> stOK then
+        Stream.Read(Self.D, SizeOf(Self.D));
+        if Stream.Status <> stOK then
           goto 1;
         end;
       CurDir := FreeStr;
