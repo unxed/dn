@@ -74,7 +74,7 @@ type
   PCalcWindow = ^TCalcWindow;
   TCalcWindow = class(TUniWindow)
     CalcView: PCalcView;
-    constructor Init(Bounds: TRect; AName: String); {DataCompBoy}
+    constructor Create(Bounds: TRect; AName: String); {DataCompBoy}
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -96,7 +96,7 @@ type
     ColWidth: array[Byte] of Byte;
     CurrentCalc, SearchPos, ErrorCell: TPoint;
     SName: PString; {DataCompBoy}
-    constructor Init(Bounds: TRect;
+    constructor Create(Bounds: TRect;
         AInfo: PCalcInput; ACellInfo: PInfoView;
         AHScroll, AVScroll: PScrollBar);
     destructor Done; virtual;
@@ -210,7 +210,7 @@ type
     Fields: PDbfFieldCollection;
     CurRecord: LongInt;
     EofFlag: Boolean;
-    constructor Init(FileName: FNameStr; Mode: Word; Size: SW_Word);
+    constructor Create(FileName: FNameStr; Mode: Word; Size: SW_Word);
     destructor Done; virtual;
     procedure AddField(const NameField: String; TypeField: Char;
         LenField: Integer; DecField: Integer);
@@ -301,7 +301,7 @@ function GetFileName(var FileName: String; Mask, Title, ALabel: String;
   if C <> cmCancel then
     S := D^.GetFileName;
   GetFileName := C;
-  Dispose(D, Done);
+  D.Free;
   
   FileName := lfGetLongFileName(S);
   
@@ -329,7 +329,7 @@ procedure TInfoView.Draw;
 {-------------------------      TCalcWindow      -------------------------}
 
 {-DataCompBoy-}
-constructor TCalcWindow.Init(Bounds: TRect; AName: String);
+constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   var
     R: TRect;
     P: PView;
@@ -339,7 +339,7 @@ constructor TCalcWindow.Init(Bounds: TRect; AName: String);
     AName := UntitledName
   else
     AName := lFExpand(AName);
-  TWindow.Init(Bounds, Cut(AName, Bounds.B.X-Bounds.A.X-12), 0);
+  inherited Create(Bounds, Cut(AName, Bounds.B.X-Bounds.A.X-12), 0);
   Options := Options or ofTileable;
   Flags := Flags or wfMaxi;
 
@@ -347,7 +347,7 @@ constructor TCalcWindow.Init(Bounds: TRect; AName: String);
   R.A.Y := 5;
   R.B.X := 7;
   R.B.Y := Size.Y-1;
-  P := New(PStaticText, Init(R, ''));
+  P := PStaticText.Create(R, '');
   P^.Options := P^.Options or ofFramed;
   P^.GrowMode := gfGrowHiY;
   Insert(P);
@@ -356,7 +356,7 @@ constructor TCalcWindow.Init(Bounds: TRect; AName: String);
   R.A.Y := 2;
   R.B.X := Size.X-1;
   R.B.Y := 4;
-  P := New(PStaticText, Init(R, ''));
+  P := PStaticText.Create(R, '');
   P^.Options := P^.Options or ofFramed;
   P^.GrowMode := gfGrowHiX;
   Insert(P);
@@ -374,13 +374,13 @@ constructor TCalcWindow.Init(Bounds: TRect; AName: String);
   Inc(R.A.Y);
   R.B.Y := R.A.Y+1;
   Inc(R.A.X, 7);
-  P := New(PCalcInput, Init(R, 240));
+  P := PCalcInput.Create(R, 240);
   P^.GrowMode := gfGrowHiX;
   P^.Options := P^.Options or ofSelectable;
   Insert(P);
 
   R.Assign(1, 2, 7, 4);
-  P1 := New(PInfoView, Init(R));
+  P1 := PInfoView.Create(R);
   PInfoView(P1)^.InfoStr := '';
   PInfoView(P1)^.InfoAttr := GetColorW(9);
   Insert(P1);
@@ -587,11 +587,11 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
 
 {-----------------------------    TCalcView     ---------------------------}
 
-constructor TCalcView.Init(Bounds: TRect; AInfo: PCalcInput; ACellInfo: PInfoView; AHScroll, AVScroll: PScrollBar);
+constructor TCalcView.Create(Bounds: TRect; AInfo: PCalcInput; ACellInfo: PInfoView; AHScroll, AVScroll: PScrollBar);
   var
     I, J: Integer;
   begin
-  TView.Init(Bounds);
+  inherited Create(Bounds);
   HelpCtx := hcSpreadSheet;
   HScroll := AHScroll;
   VScroll := AVScroll;
@@ -2207,13 +2207,13 @@ procedure TCalcView.CalcError(Index: TStrIdx);
 destructor TCalcView.Done;
   begin
   if Cells <> nil then
-    Dispose(Cells, Done);
+    Cells.Free;
   Cells := nil;
   if Q <> nil then
     Dispose(Q);
   Q := nil;
   DisposeStr(SName);
-  TView.Done;
+  inherited Destroy;
   end;
 
 function TCalcView.AskSave: Boolean;
@@ -2244,7 +2244,7 @@ procedure TCalcView.LoadSheet(FName: String);
   if Modified and not AskSave then
     Exit;
   if Cells <> nil then
-    Dispose(Cells, Done);
+    Cells.Free;
   Cells := nil;
   if  (FName = '') or (FName = UntitledName) then
     begin
@@ -2263,7 +2263,7 @@ procedure TCalcView.LoadSheet(FName: String);
   
   FName := lfGetLongFileName(lFExpand(FName));
   
-  S := New(PBufStream, Init(FName, stOpenRead, 2048));
+  S := PBufStream.Create(FName, stOpenRead, 2048);
   DisposeStr(SName);
   SName := NewStr(FName);
   if Owner <> nil then
@@ -2273,7 +2273,7 @@ procedure TCalcView.LoadSheet(FName: String);
     end;
   if S^.Status <> stOK then
     begin
-    Dispose(S, Done);
+    S.Free;
     New(Cells, Init(10, 10));
     FillChar(ColWidth, SizeOf(ColWidth), DefaultColWidth);
     //   Owner^.Redraw;
@@ -2282,7 +2282,7 @@ procedure TCalcView.LoadSheet(FName: String);
   S^.Read(ColWidth, SizeOf(ColWidth));
   { Cells := PCellCollection(S^.Get);}
   New(Cells, ShortLoad(S^));
-  Dispose(S, Done);
+  S.Free;
   if Cells = nil then
     begin
     ErrMsg(erInvalidFileFormat);
@@ -2321,9 +2321,9 @@ procedure TCalcView.SaveSheetAs;
   
   FName := lfGetLongFileName(lFExpand(FName));
   
-  S := New(PDosStream, Init(FName, stOpen));
+  S := PDosStream.Create(FName, stOpen);
   W := S^.Status;
-  Dispose(S, Done);
+  S.Free;
   if W = 0 then
     begin
     if Msg(dlFileExist, @PP, mfYesButton+mfNoButton+mfWarning) <> cmYes
@@ -2339,7 +2339,7 @@ procedure TCalcView.SaveSheetAs;
     Owner^.Redraw;
     end;
   {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner^.GetColorW(12));}
-  S := New(PBufStream, Init(FName, stCreate, 2048));
+  S := PBufStream.Create(FName, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   { S^.Put(Cells);}
   Cells^.ShortStore(S^);
@@ -2348,7 +2348,7 @@ procedure TCalcView.SaveSheetAs;
     Msg(dlCanNotWrite, @PP, mfError+mfOKButton);
     end;
   Modified := False;
-  Dispose(S, Done);
+  S.Free;
   FileChanged(FName);
   end { TCalcView.SaveSheetAs };
 {-DataCompBoy-}
@@ -2363,7 +2363,7 @@ procedure TCalcView.SaveSheet;
     Exit
     end;
   {PInfoView(CellInfo)^.SetInfo(' WORK ', Owner^.GetColorW(12));}
-  S := New(PBufStream, Init(SName^, stCreate, 2048));
+  S := PBufStream.Create(SName^, stCreate, 2048);
   S^.Write(ColWidth, SizeOf(ColWidth));
   {S^.Put(Cells);}
   Cells^.ShortStore(S^);
@@ -2371,7 +2371,7 @@ procedure TCalcView.SaveSheet;
     Msg(dlCanNotWrite, SName, mfError+mfOKButton)
   else
     Modified := False;
-  Dispose(S, Done);
+  S.Free;
   FileChanged(SName^);
   end;
 
@@ -2408,7 +2408,7 @@ procedure TCalcView.Copy;
     Y2 := Wrk;
     end;
   if CellClipboard <> nil then
-    Dispose(CellClipboard, Done);
+    CellClipboard.Free;
   CellClipboard := nil;
   New(CellClipboard, Init(10, 10));
   Cells^.ForRectangle(X1, Y1, X2, Y2, @ToClip);
@@ -2900,10 +2900,10 @@ procedure TDbfFieldCollection.FreeItem(Item: Pointer); {KV}
     Dispose(PDBFField(Item));
   end;
 
-constructor TDbaseWriter.Init(FileName: FNameStr; Mode: Word;
+constructor TDbaseWriter.Create(FileName: FNameStr; Mode: Word;
      Size: SW_Word); {KV}
   begin
-  inherited Init(FileName, Mode, Size);
+  inherited Create(FileName, Mode, Size);
   CurRecord := 0;
   EofFlag := False;
   New(Fields, Init(10, 10));
@@ -2916,7 +2916,7 @@ constructor TDbaseWriter.Init(FileName: FNameStr; Mode: Word;
 destructor TDbaseWriter.Done; {KV}
   begin
   if Fields <> nil then
-    Dispose(Fields, Done);
+    Fields.Free;
   Fields := nil;
   inherited Done;
   end;

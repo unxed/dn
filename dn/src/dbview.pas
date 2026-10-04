@@ -305,7 +305,7 @@ constructor TMemoStream.Create(AStream: PStream; Start, len: LongInt);
 
 destructor TMemoStream.Destroy;
   begin
-  Dispose(BaseStream, Done);
+  BaseStream.Free;
   BaseStream := nil;
   inherited Destroy;
   end;
@@ -366,7 +366,7 @@ procedure TMemoStream.Write(const Buf; Count: LongInt);
 {-DataCompBoy-}
 constructor TDBViewer.Create(R: TRect; const FName: String; var FileIsDBF: Boolean);
   begin
-  inherited Init(R);
+  inherited Create(R);
   KillAfterUse := TempFile <> '';
   Options := Options or ofSelectable;
   GrowMode := gfGrowHiX+gfGrowHiY;
@@ -429,7 +429,7 @@ function TDBViewer.Failed(var FileIsDBF: Boolean): Boolean;
       begin
       GetInfo(dlDBEmptyStruc);
       {     DisposeStr(SearchString);
-      Dispose(DBFile,Done); DBFile:=nil;
+      DBFile.Free; DBFile:=nil;
 }TempFile := '';
       if KillAfterUse then
         EraseTempFile(FileName^);
@@ -481,7 +481,7 @@ destructor TDBViewer.Destroy;
   if Buf <> nil then
     FreeMem(Buf, NumRec*DBFile^.RecLen);
   if DBFile <> nil then
-    Dispose(DBFile, Done);
+    DBFile.Free;
   DBFile := nil;
   {--- start -------- Eugeny Zvyagintzev ---- 07-08-2002 -----}
   if not (TottalExit or Exiting) and KillAfterUse then
@@ -552,7 +552,7 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
   D^.Insert(P);
 
   R.Assign(46, 3, 47, 13);
-  P := New(PScrollBar, Init(R));
+  P := PScrollBar.Create(R);
   P^.Options := P^.Options or ofPostProcess;
   D^.Insert(P);
 
@@ -583,7 +583,7 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
       DrawView;
       end;
     end;
-  Dispose(D, Done);
+  D.Free;
   end { TDBViewer.GetInfo };
 
 procedure TDBViewer.HandleEvent(var Event: TEvent);
@@ -665,16 +665,16 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       Xt[4] := 'T'
     else
       Xt := '.FPT';
-    MemoStream := New(PDosStream, Init(Dr+Nm+Xt, stOpenRead));
+    MemoStream := PDosStream.Create(Dr+Nm+Xt, stOpenRead);
     if  (MemoStream = nil) or (MemoStream^.Status <> stOK) then
       begin
       if MemoStream <> nil then
-        Dispose(MemoStream, Done);
-      MemoStream := New(PBufStream, Init(Dr+Nm+'.dbt', stOpenRead, 512));
+        MemoStream.Free;
+      MemoStream := PBufStream.Create(Dr+Nm+'.dbt', stOpenRead, 512);
       if  (MemoStream = nil) or (MemoStream^.Status <> stOK) then
         begin
         if MemoStream <> nil then
-          Dispose(MemoStream, Done);
+          MemoStream.Free;
         MemoStream := nil;
         Exit;
         end;
@@ -694,7 +694,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
           begin
           ErrMsg(dlDBViewNoMemo);
           if MemoStream <> nil then
-            Dispose(MemoStream, Done);
+            MemoStream.Free;
           MemoStream := nil;
           Exit;
           end;
@@ -719,10 +719,10 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
         end;
       end;
 
-    MemoStream := New(PMemoStream, Init(MemoStream, L, ML));
+    MemoStream := PMemoStream.Create(MemoStream, L, ML);
     if MemoStream^.Status <> stOK then
       begin
-      Dispose(MemoStream, Done);
+      MemoStream.Free;
       MemoStream := nil;
       Exit
       end;
@@ -733,12 +733,12 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     D^.Options := D^.Options or ofCentered;
 
     R.Assign(D^.Size.X-2, 2, D^.Size.X-1, D^.Size.Y-4);
-    PV := New(PViewScroll, Init(R));
+    PV := PViewScroll.Create(R);
     D^.Insert(PV);
     { TODO: palette CScrollBar of PV^. }
 
     R.Assign(2, 2, D^.Size.X-2, D^.Size.Y-4);
-    PV := New(PNFileViewer, Init(R, MemoStream, '', '', PV, False, False));
+    PV := PNFileViewer.Create(R, MemoStream, '', '', PV, False, False);
 
     D^.Insert(PV);
 
@@ -753,7 +753,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     if D = nil then
       Exit;
     Desktop^.ExecView(D);
-    Dispose(D, Done);
+    D.Free;
     end { ViewMemo };
   {-DataCompBoy-}
 
@@ -1160,7 +1160,7 @@ redat:
               begin
               if Buf <> nil then
                 FreeMem(Buf, NumRec*DBFile^.RecLen);
-              Dispose(DBFile, Done);
+              DBFile.Free;
               Buf := nil;
               DBFile := nil;
               end;
@@ -1550,13 +1550,13 @@ constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
   FName := lFExpand(FName);
   if I <= 0 then
     s := FName;
-  TWindow.Init(R, s, 0);
+  inherited Create(R, s, 0);
   RealName := s;
   Options := Options or ofTileable;
   Flags := Flags or wfMaxi;
   GetExtent(R);
   R.Grow(-1, -1);
-  P := New(PDBViewer, Init(R, FName, FileIsDBF));
+  P := PDBViewer.Create(R, FName, FileIsDBF);
   if P = nil then
     Fail;
   Insert(P);
@@ -1568,7 +1568,7 @@ constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
   { -------- Eugeny Zvyagintzev ---------}
   R.A.X := R.B.X;
   R.B.X := R.B.X+1;
-  VSB := New(PDBScrollBar, Init(R));
+  VSB := PDBScrollBar.Create(R);
   VSB^.MaxVal := P^.DBFile^.NumRec-1;
   VSB^.GrowMode := gfGrowLoX+gfGrowHiX+gfGrowHiY;
   VSB^.DBViewer := P;
@@ -1580,7 +1580,7 @@ constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
   R.A.X := R.A.X+49;
   R.B.X := R.B.X-2;
   R.A.Y := R.B.Y-1;
-  HSB := New(PDBScrollBar, Init(R));
+  HSB := PDBScrollBar.Create(R);
   HSB^.MaxVal := P^.DBFile^.NumFields-1;
   HSB^.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
   HSB^.DBViewer := P;
@@ -1592,7 +1592,7 @@ constructor TDBWindow.Create(const FName: String; var FileIsDBF: Boolean);
   R.B.X := 34;
   R.A.Y := Size.Y-1;
   R.B.Y := Size.Y;
-  P1 := New(PDBIndicator, Init(R));
+  P1 := PDBIndicator.Create(R);
   P1^.DBViewer := P;
   P1^.GrowMode := gfGrowLoY+gfGrowHiX+gfGrowHiY;
   Insert(P1);

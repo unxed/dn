@@ -66,7 +66,7 @@ type
   PIniSection = ^TIniSection;
   TIniSection = class(TCollection)
     TheName: PString;
-    constructor Init(const AName: String);
+    constructor Create(const AName: String);
     destructor Done; virtual;
     function GetIndexOf(Key: String): Integer;
     function Get(const Key: String): String;
@@ -85,7 +85,7 @@ type
   TIniFile = class(TCollection)
     Modified: Boolean;
     Name: PString;
-    constructor Init(FileName: String; var AStatus: Integer);
+    constructor Create(FileName: String; var AStatus: Integer);
     destructor Done; virtual;
     function Get(const Section, Key: String): String;
     procedure Put(const Section, Key, Value: String);
@@ -142,9 +142,9 @@ Failure:
 
 {                                INI Section                                 }
 {----------------------------------------------------------------------------}
-constructor TIniSection.Init(const AName: String);
+constructor TIniSection.Create(const AName: String);
   begin
-  inherited Init(5, 5);
+  inherited Create(5, 5);
   TheName := NewStr(AName);
   end;
 
@@ -189,7 +189,7 @@ constructor TIniSection.Load(var S: TStream);
   label
     Loop, Skip;
   begin
-  TCollection.Init(5, 5);
+  inherited Create(5, 5);
   Base := S.GetPos;
   Str := ReadString(S);
   if  (Str <> '') and (Str[1] = '[') and (Str[Length(Str)] = ']') then
@@ -366,12 +366,12 @@ function TIniSection.GetValueAt(const Index: Integer): String;
 
 {                                  INI File                                  }
 {----------------------------------------------------------------------------}
-constructor TIniFile.Init(FileName: String; var AStatus: Integer);
+constructor TIniFile.Create(FileName: String; var AStatus: Integer);
   var
     T: TBufStream;
     P: PIniSection;
   begin
-  inherited Init(5, 5);
+  inherited Create(5, 5);
   Name := NewStr(FileName);
   T.Init(FileName, stOpenRead, 512);
   if T.Status = stOK then

@@ -533,7 +533,7 @@ function TFileEditor.BlockFromClip(P: PCollection): PCollection;
   Result := P;
   if P = nil then
     Exit;
-  R := New(PLineCollection, Init(P^.Count+1, 10, True));
+  R := PLineCollection.Create(P^.Count+1, 10, True);
   for I := 0 to P^.Count-1 do
     begin
     L := P^.At(I);
@@ -589,7 +589,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
     dkUndo:
       begin
       if UndoInfo = nil then
-        UndoInfo := New(PDoCollection, Init(dkUndo));
+        UndoInfo := PDoCollection.Create(dkUndo);
       with iP^ do
         case What of
           udDelChar:
@@ -612,7 +612,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udDelLine:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             for I := 0 to Count-1 do
               P^.Lines^.Insert(NewLongStr(GetLine(P^.Where.Y+I)));
             UndoInfo^.Insert(P);
@@ -624,7 +624,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udDelBlock:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             if Lines^.Count > 0 then
               S := CnvString(Lines^.At(0))
             else
@@ -713,7 +713,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udReplaceBlock, udClearBlock:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             for I := Where.Y to Lines^.Count+Where.Y-1 do
               begin
               S := GetLine(I);
@@ -736,7 +736,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
     dkRedo:
       begin
       if RedoInfo = nil then
-        RedoInfo := New(PDoCollection, Init(dkRedo));
+        RedoInfo := PDoCollection.Create(dkRedo);
       with iP^ do
         case What of
           udDelChar:
@@ -759,14 +759,14 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsLine:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             P^.Lines^.Insert(NewLongStr(GetLine(P^.Where.Y)));
             P^.Lines^.Insert(NewLongStr(GetLine(P^.Where.Y+1)));
             RedoInfo^.Insert(P);
             end;
           udDelBlock:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             if Lines^.Count > 0 then
               S := CnvLongString(Lines^.At(0))
             else
@@ -796,7 +796,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsBlock, udFormatBlock:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             for I := 1 to Byte(Str^[2])*256+Byte(Str^[1]) do
               P^.Lines^.Insert(NewLongStr(GetLine(Delta.Y+I-1)));
             RedoInfo^.Insert(P);
@@ -827,7 +827,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udInsVertBlock:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             for I := 1 to Count do
               begin
               S := Copy(GetLine(I+Where.Y-1), Where.X+1, Width);
@@ -853,7 +853,7 @@ procedure TFileEditor.Convert4Do(iP: PUndoRec; DoKind: TDoKind);
             end;
           udReplaceBlock, udClearBlock:
             begin
-            P^.Lines := New(PLineCollection, Init(10, 10, True));
+            P^.Lines := PLineCollection.Create(10, 10, True);
             for I := Where.Y to Lines^.Count+Where.Y-1 do
               begin
               S := GetLine(I);
@@ -970,8 +970,8 @@ constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: PS
   else
     Line := FileName;
   {FileLines := GetCollector(3000, 100);}
-  FileLines := New(PLineCollection, Init(300, 1000, True)); {-SBlocks}
-  Macros := New(PCollection, Init(10, 10));
+  FileLines := PLineCollection.Create(300, 1000, True); {-SBlocks}
+  Macros := PCollection.Create(10, 10);
 
   MenuItemStr[True] := NewStr(GetString(dlMenuItemOn));
   MenuItemStr[False] := NewStr(GetString(dlMenuItemOff));
@@ -986,27 +986,27 @@ destructor TFileEditor.Destroy;
   
   if FileLines <> nil then
     begin
-    Dispose(FileLines, Done);
+    FileLines.Free;
     FileLines := nil;
     end;
   if UndoInfo <> nil then
     begin
-    Dispose(UndoInfo, Done);
+    UndoInfo.Free;
     UndoInfo := nil;
     end;
   if RedoInfo <> nil then
     begin
-    Dispose(RedoInfo, Done);
+    RedoInfo.Free;
     RedoInfo := nil;
     end;
   if Macros <> nil then
     begin
-    Dispose(Macros, Done);
+    Macros.Free;
     Macros := nil;
     end;
   if Locker <> nil then
     begin
-    Dispose(Locker, Done);
+    Locker.Free;
     Locker := nil;
     end;
   if SmartPad then
@@ -1031,11 +1031,11 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
   begin
   if not MemOK then
     begin
-    Dispose(UndoInfo, Done);
+    UndoInfo.Free;
     UndoInfo := nil
     end;
   if UndoInfo = nil then
-    UndoInfo := New(PDoCollection, Init(dkUndo));
+    UndoInfo := PDoCollection.Create(dkUndo);
   if RedoInfo <> nil then
     RedoInfo^.FreeAll;
   if UndoInfo^.Count > 0
@@ -1221,7 +1221,7 @@ procedure TFileEditor.StoreUndoInfo(What: Word; Where: TPoint; var Info);
         New(P);
         P^.What := What;
         P^.Where := Where;
-        P^.Lines := New(PLineCollection, Init(10, 10, True));
+        P^.Lines := PLineCollection.Create(10, 10, True);
         P^.Lines^.Insert(NewLongStr(LongString(Info)));
         P^.KeyMap := KeyMap; {-$VIV}
         UndoInfo^.Insert(P);
@@ -1456,7 +1456,7 @@ begin
       S := D^.GetFileName;
       HistoryAdd(HistoryID, S);
     end;
-  Dispose(D,Done);
+  D.Free;
 {$IFDEF DPMI32}
   GetFileNameDialog := lfGetLongFileName(S);
 {$ELSE}
@@ -1479,7 +1479,7 @@ procedure OpenEditor;
   if S = '' then
     Exit;
   Desktop^.GetExtent(R);
-  Application.InsertWindow(New(PEditWindow, Init(R, S)));
+  Application.InsertWindow(PEditWindow.Create(R, S));
   end;
 {-DataCompBoy-}
 
@@ -1507,7 +1507,7 @@ function TFileEditor.GetSelection: PCollection;
   MemEnough := True;
   if not (BlockVisible and ValidBlock) then
     Exit;
-  P := New(PLineCollection, Init(Mark.B.Y-Mark.A.Y+1, 5, True));
+  P := PLineCollection.Create(Mark.B.Y-Mark.A.Y+1, 5, True);
   for I := Mark.A.Y to Mark.B.Y do
     begin
     S := GetLine(I);
@@ -1998,7 +1998,7 @@ procedure TFileEditor.InsertBlock(ABlock: PCollection; SaveUndo: Boolean);
           S := ''
         else
           S := P^;
-        LL := New(PLineCollection, Init(ABlock^.Count, 10, True));
+        LL := PLineCollection.Create(ABlock^.Count, 10, True);
         if LL <> nil then
           begin
           for I := 0 to ABlock^.Count do
@@ -2806,13 +2806,13 @@ DelBlk:
         end;
 EndDel:
       if not InUse then
-        Dispose(Block, Done);
+        Block.Free;
       end;
 
     BlockOff;
     InsertBlock(CB, True);
     if CB <> ClipBoard then
-      Dispose(CB, Done);
+      CB.Free;
     ChangeLine;
     EnableMarking := True;
     end;
@@ -2823,7 +2823,7 @@ EndDel:
     begin
     ChangeLine;
     if  (ClipBoard <> nil) then
-      Dispose(ClipBoard, Done);
+      ClipBoard.Free;
     ClipBoard := BlockToClip(GetSelection);
     if SystemData.Options and ossUseSysClip <> 0 then
       SyncClipIn;
@@ -3252,7 +3252,7 @@ EndDel:
     if PI <> nil then
       PI^.Free;
 
-    Dispose(R, Done);
+    R.Free;
     if  (A <> 0) and (A <> $FFFF) then
       SetFileAttr(S, A);
 
@@ -3482,7 +3482,7 @@ EndDel:
       CB := BlockFromClip(ClipBoard);
       InsertBlock(CB, True);
       if CB <> ClipBoard then
-        Dispose(CB, Done);
+        CB.Free;
 
       ChangeLine;
       EnableMarking := True;
@@ -4224,7 +4224,7 @@ Ex:
             begin
             ChangeLine;
             InsertBlock(PC, True);
-            Dispose(PC, Done);
+            PC.Free;
             end;
           ChangeLine;
           end;
@@ -4246,7 +4246,7 @@ Ex:
             ChangeLine;
             DeleteBlock(False, GetSelection);
             InsertBlock(PC, True);
-            Dispose(PC, Done);
+            PC.Free;
             end;
           ChangeLine;
           end;

@@ -268,7 +268,7 @@ constructor TFilePanelRoot.Create(const Bounds: TRect; ADrive: Integer; AScrBar:
 
   if  (ADrive <= 0) or not ValidDrive(Char(ADrive+64)) then
     ADrive := 0;
-  Drive := New(PDrive, Init(ADrive, @Self));
+  Drive := PDrive.Create(ADrive, @Self);
 
   if Abort then
     Exit;
@@ -396,10 +396,10 @@ destructor TFilePanelRoot.Destroy;
     P: PDrive;
   begin
   if Files <> nil then
-    Dispose(Files, Done);
+    Files.Free;
   Files := nil;
   if Drive <> nil then
-    Dispose(Drive, Done);
+    Drive.Free;
   Drive := nil;
   if ActivePanel = @Self then
     begin
@@ -555,7 +555,7 @@ procedure TFilePanelRoot.RereadDir;
   RedrawPanelInfoDir;
   if Abort then
     begin
-    Dispose(Files, Done);
+    Files.Free;
     New(Files, Init(10, 10));
     Abort := False;
     Exit;
@@ -564,7 +564,7 @@ procedure TFilePanelRoot.RereadDir;
   NewDir := Drive^.GetRealDir;
   if Abort then
     begin
-    Dispose(Files, Done);
+    Files.Free;
     New(Files, Init(10, 10));
     Abort := False;
     Exit;
@@ -651,7 +651,7 @@ procedure TFilePanelRoot.RereadDir;
     end
   else
     Pos := 0;
-  Dispose(FC, Done);
+  FC.Free;
   ScrollBar^.SetValue(Pos);
   DecDrawDisabled;
   DirectoryName := NewDir;
@@ -703,7 +703,7 @@ procedure TFilePanelRoot.ReadDirectory;
   FreeSpace := '';
   if Files <> nil then
     begin
-    Dispose(Files, Done);
+    Files.Free;
 //JO: если нижележащего присвоения nil здесь не делать, то при вызове
 //    любого диалога изнутри Drive^.GetDirectory с большой вероятностью
 //    происходит падение после его закрытия
@@ -725,7 +725,7 @@ procedure TFilePanelRoot.ReadDirectory;
 
   
   if Files = nil then
-    Files := New(PFilesCollection, Init($10, $10));
+    Files := PFilesCollection.Create($10, $10);
   PFilesCollection(Files)^.Panel := @Self;
   SelNum := 0;
   SelectedLen := 0;
@@ -905,10 +905,10 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     New(PDr, Init(Byte(C)-64, @Self));
     if Abort then
       begin
-      Dispose(PDr, Done);
+      PDr.Free;
       Exit;
       end;
-    Dispose(Drive, Done);
+    Drive.Free;
     Drive := PDr;
     SetupPanelFromDrive;
     DeltaX := 0;
@@ -960,7 +960,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     then
       { переходим с панели поиска, списка и т.п. на диск }
       begin
-      Dispose(Drive, Done);
+      Drive.Free;
       New(Drive, Init(Byte(UpCase(Dr[1]))-64, @Self));
       end;
     {DirectoryName := GetNormPath(Dr);} {commented by AK155}
@@ -983,7 +983,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if (Drive^.DriveType = dtNet)
         and (Copy(DirectoryName, 1, 2) = '\\') then
       begin
-      Dispose(Drive, Done);
+      Drive.Free;
       New(Drive, Init($1B, @Self));
       Drive^.lChDir(DirectoryName);
       end;
@@ -999,7 +999,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if  (PathInside <> '') then
       begin
       Drv := nil;
-      Drv := New(PArcDrive, Init(FileName, FileName));
+      Drv := PArcDrive.Create(FileName, FileName);
       if Drv = nil then
         goto WrongArc;
       if Drive^.DriveType <> dtDisk then
@@ -1137,7 +1137,7 @@ WrongArc:
     if PDrive(Event.InfoPtr)^.DriveType in [dtDisk, dtNet, dtLink] then
       begin
       if Drive <> nil then
-        Dispose(Drive, Done);
+        Drive.Free;
       Drive := nil
       end;
     PDrive(Event.InfoPtr)^.Prev := Drive;
@@ -1280,7 +1280,7 @@ WrongArc:
     if FC <> nil then
       begin
       FC^.DeleteAll;
-      Dispose(FC, Done);
+      FC.Free;
       end;
     end { HandleCommand };
 
@@ -1447,7 +1447,7 @@ WrongArc:
     S := SelectDrive(MPos.X, MPos.Y, DriveLetter, True);
     if S = cTEMP_ then
       begin
-      Event.InfoPtr := New(PTempDrive, Init);
+      Event.InfoPtr := PTempDrive.Create;
       InsertDrive;
       Exit;
       end
@@ -1499,7 +1499,7 @@ WrongArc:
     CE;
     if S = cTEMP_ then
       begin
-      Event.InfoPtr := New(PTempDrive, Init);
+      Event.InfoPtr := PTempDrive.Create;
       InsertDrive;
       Exit;
       end
@@ -1528,10 +1528,10 @@ WrongArc:
       if FreeByte > 2 then
         begin
         Dr := nil;
-        Dr := New(PArcDrive, Init(S, S));
+        Dr := PArcDrive.Create(S, S);
         
         if Dr = nil then
-          Dr := New(PArvidDrive, Init(S));
+          Dr := PArvidDrive.Create(S);
         
         if Dr = nil then
           Exit;
@@ -1829,7 +1829,7 @@ WrongArc:
         Message(Owner, evCommand, cmChangeInactive, @S);
         Exit;
         end;
-      Dispose(Drive, Done);
+      Drive.Free;
       New(Drive, Init(Byte(S[1])-64, @Self));
       SetupPanelFromDrive;
       DeltaX := 0;
@@ -2342,7 +2342,7 @@ WrongArc:
         PDr := Drive;
         Drive := Drive^.Prev;
         PDr^.Prev := nil;
-        Dispose(PDr, Done);
+        PDr.Free;
         DeltaX := 0;
         Drive^.SizeX := Size.X;
         DirectoryName := Drive^.GetDir;
@@ -2370,7 +2370,7 @@ WrongArc:
     Drive := Event.InfoPtr;
     Drive^.Prev := PDr^.Prev;
     PDr^.Prev := nil;
-    Dispose(PDr, Done);
+    PDr.Free;
     RereadDir;
     CE;
     end;
@@ -2388,7 +2388,7 @@ WrongArc:
       UUDecode(FC);
       FC^.DeleteAll;
       end;
-    Dispose(FC, Done);
+    FC.Free;
     end;
   
 

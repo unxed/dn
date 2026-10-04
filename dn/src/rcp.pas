@@ -316,7 +316,7 @@ procedure ProcessDLs(Enable: Boolean);
       end
     else
       DLStream.Done;
-    Dispose(SLM, Done);
+    SLM.Free;
     end;
   ReRegisterType(RStringList);
   DLStream.Init(OutLngFileName, stOpenRead, 512);
@@ -606,7 +606,7 @@ procedure MakeColorDialog;
   New(D, Init(MakePalette(''), PP));
   D^.HelpCtx := hcColorDialog;
   StoreResource(D, dlgColors);
-  Dispose(D, Done);
+  D.Free;
   end { MakeColorDialog };
 {-DataCompBoy-}
 
@@ -694,7 +694,7 @@ procedure ProcessDLGs;
     begin
     D := MakeSaversDialog;
     StoreResource(D, dlgSaversSetup);
-    Dispose(D, Done);
+    D.Free;
     
     end;
 
@@ -768,9 +768,9 @@ procedure ProcessDLGs;
     begin
     PM := CompileStatus;
     R.Assign(0, 0, 80, 1);
-    StatusLine := New(PStatusLine, Init(R, PM));
+    StatusLine := PStatusLine.Create(R, PM);
     StoreResource(StatusLine, dlgStatusLine);
-    Dispose(StatusLine, Done);
+    StatusLine.Free;
     StatusLine := nil;
     end;
 
@@ -855,7 +855,7 @@ procedure ProcessDLGs;
     FillChar(R, SizeOf(R), 0);
     New(D, Init(R, CompileMenu(S)));
     StoreResource(D, ID);
-    Dispose(D, Done);
+    D.Free;
     end;
 
   procedure CompileDialog(S: String; IdToken: String);
@@ -978,14 +978,14 @@ procedure ProcessDLGs;
     procedure MakeCheckBoxes;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(PCheckBoxes, Init(R, GetItems));
+      PV := PCheckBoxes.Create(R, GetItems);
       D^.Insert(PV);
       end;
 
     procedure MakeDriveCheckBoxes;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(PCurrDriveInfo, Init(R, GetItems));
+      PV := PCurrDriveInfo.Create(R, GetItems);
       D^.Insert(PV);
       with PV^ do
         begin
@@ -997,14 +997,14 @@ procedure ProcessDLGs;
     procedure MakeRadioButtons;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(PRadioButtons, Init(R, GetItems));
+      PV := PRadioButtons.Create(R, GetItems);
       D^.Insert(PV);
       end;
 
     procedure MakeComboBox;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(PComboBox, Init(R, GetItems));
+      PV := PComboBox.Create(R, GetItems);
       D^.Insert(PV);
       end;
 
@@ -1043,7 +1043,7 @@ procedure ProcessDLGs;
         else
           Options := Options or GetID(B);
         end;
-      PV := New(PButton, Init(R, K, CmD, Flags));
+      PV := PButton.Create(R, K, CmD, Flags);
       PV^.Options := PV^.Options or Options;
       D^.Insert(PV);
       end { MakeButton };
@@ -1052,9 +1052,9 @@ procedure ProcessDLGs;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       if Mouse then
-        LastSB := New(PMouseBar, Init(R))
+        LastSB := PMouseBar.Create(R)
       else
-        LastSB := New(PScrollBar, Init(R));
+        LastSB := PScrollBar.Create(R);
       D^.Insert(LastSB);
       end;
 
@@ -1075,7 +1075,7 @@ procedure ProcessDLGs;
     procedure MakeParamText;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); PV := New(PParamText, Init(R, TkS[1], TkL[2])) end;
+      begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); PV := PParamText.Create(R, TkS[1], TkL[2]) end;
       D^.Insert(PV);
       end;
 
@@ -1128,7 +1128,7 @@ procedure ProcessDLGs;
       end
     else if IdToken = idNotepad then
       begin
-      begin TkS[1] := Token(S, I); TkL[2] := GetID(Token(S, I)); Notepad := New(PNotepad, Init(R, TkS[1], TkL[2])) end;
+      begin TkS[1] := Token(S, I); TkL[2] := GetID(Token(S, I)); Notepad := PNotepad.Create(R, TkS[1], TkL[2]) end;
       PNotepad(D) := Notepad; // всё будет вставляться в диалог
       end
     else {idDialog}
@@ -1226,7 +1226,7 @@ procedure ProcessDLGs;
       New(PCollection(DData.Drives.List), Init(0, 10));
       D^.SetData(DData);
       end;
-    Dispose(D, Done);
+    D.Free;
     end { CompileDialog };
   {-DataCompBoy-}
 
@@ -1273,16 +1273,16 @@ procedure ProcessDLGs;
   Line := 0;
   if IOResult <> 0 then
     Error('Could not open input file');
-  St := New(PBufStream, Init(OutDlgFileName, stCreate, 512));
+  St := PBufStream.Create(OutDlgFileName, stCreate, 512);
   if St^.Status <> stOK then
     begin
     Close(F.T);
-    Dispose(St, Done);
+    St.Free;
     EraseFile(OutDlgFileName);
     Error('Could not create output file '+OutDlgFileName);
     end;
 
-  TheRF := New(PIdxMaker, Init(St));
+  TheRF := PIdxMaker.Create(St);
   while not Eof(F.T) do
     begin
     Readln(F.T, S);
@@ -1316,10 +1316,10 @@ procedure ProcessDLGs;
     Halt(1);
 
   Writeln(#13'Writing ', OutDlgFileName);
-  Dispose(TheRF, Done);
+  TheRF.Free;
 
   IDs^.DeleteAll;
-  Dispose(IDs, Done);
+  IDs.Free;
   end { ProcessDLGs };
 {-DataCompBoy-}
 
@@ -1380,7 +1380,7 @@ procedure InitParser;
           Types^.Insert(New(PTypeHolder, Init(ReplaceChar(' ', #0,
                  S+' '), tmConst)))
         else if K = 'TYPE' then
-          Types^.Insert(New(PTypeHolder, Init(S, tmEnum)))
+          Types^.Insert(PTypeHolder.Create(S, tmEnum))
         else
           Error('Undefined keyword "'+K+'" in [Parser] section');
         end;
@@ -1486,7 +1486,7 @@ RegisterType(RStrListMaker);
 RegisterAll;
 RegisterType(REditSaver);
 
-New(Types, Init(10, 10));
+Types.Create(10, 10);
 InitParser;
 
 {-DataCompBoy-}
@@ -1542,7 +1542,7 @@ repeat
     ProcessDLGs;
     if LStringList <> nil then
       begin
-      Dispose(LStringList, Done);
+      LStringList.Free;
       LStringList := nil;
       end;
     DLStream.Done;
@@ -1553,5 +1553,5 @@ repeat
   else
     Break;
 until False;
-Dispose(Types, Done);
+Types.Free;
 end.

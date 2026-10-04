@@ -71,7 +71,7 @@ type
     Value: CReal;
     SResult: array[0..5] of String[40];
     CalcError: Boolean;
-    constructor Init(var R: TRect);
+    constructor Create(var R: TRect);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -107,9 +107,9 @@ uses
 исключило бы возможность загружать строку ввода из ресурса диалога и
 подменять ей тип на TCalcLine }
 
-constructor TIndicator.Init(var R: TRect);
+constructor TIndicator.Create(var R: TRect);
   begin
-  inherited Init(R);
+  inherited Create(R);
   EventMask := evBroadcast;
   CalcError := False;
   Value := 0;

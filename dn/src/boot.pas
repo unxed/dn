@@ -220,7 +220,7 @@ procedure DoStartup;
       CustomMask10 := F^.GetStr;
     if not F^.Eof then
       Archives := F^.GetStr;
-    Dispose(F, Done);
+    F.Free;
     end { ReadHighlite };
   {JO}
 

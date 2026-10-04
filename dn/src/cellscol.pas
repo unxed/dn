@@ -179,7 +179,7 @@ constructor TCellCollection.ShortLoad(var S: TStream);
   S.Read(ACount, SizeOf(AInt));
   S.Read(ALimit, SizeOf(AInt));
   S.Read(ADelta, SizeOf(AInt));
-  inherited Init(ALimit, ADelta);
+  inherited Create(ALimit, ADelta);
   SetLimit(ACount);
   for I := 0 to ACount-1 do
     AtInsert(I, GetItem(S));

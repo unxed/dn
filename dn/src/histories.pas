@@ -300,7 +300,7 @@ procedure StoreViewInfo(P: Pointer);
   if  (InterfaceData.Options and ouiTrackViewers = 0) or (P = nil) then
     Exit;
   if ViewHistory = nil then
-    ViewHistory := New(PViewHistoryCol, Init(30, 30));
+    ViewHistory := PViewHistoryCol.Create(30, 30);
   New(R);
 
   if TypeOf((TStreamable(P)^)) = TypeOf(TFileWindow) then
@@ -416,7 +416,7 @@ procedure StoreExtViewer(const FileName: String);
   then
     Exit;
   if ViewHistory = nil then
-    ViewHistory := New(PViewHistoryCol, Init(30, 30));
+    ViewHistory := PViewHistoryCol.Create(30, 30);
   New(R);
 
   with R^ do
@@ -450,7 +450,7 @@ procedure StoreEditInfo(P: Pointer);
   then
     Exit;
   if EditHistory = nil then
-    EditHistory := New(PEditHistoryCol, Init(30, 30));
+    EditHistory := PEditHistoryCol.Create(30, 30);
   New(R);
   with PFileEditor(E^.Intern)^, R^ do
     begin
@@ -507,7 +507,7 @@ procedure AddCommand(const LastCommand: String);
   if LastCommand <> '' then
     begin
     if CmdStrings = nil then
-      CmdStrings := New(PLineCollection, Init(40, 40, False));
+      CmdStrings := PLineCollection.Create(40, 40, False);
     for I := 0 to CmdStrings^.Count-1 do
       begin
       P := CmdStrings^.At(I);
@@ -540,8 +540,8 @@ procedure AddCommand(const LastCommand: String);
 {DataCompBoy
 procedure InitCommands;
 begin
- if CmdStrings <> nil then Dispose(CmdStrings,Done);
- CmdStrings := New(PLineCollection, Init(40, 10));
+ if CmdStrings <> nil then CmdStrings.Free;
+ CmdStrings := PLineCollection.Create(40, 10);
  StrModified := False;
  CurString := 0;
 end;
@@ -558,7 +558,7 @@ Message(CommandLine, evCommand, cmExecCommandLine, nil);
 /AK155}
   if  (CmdStrings <> nil) and (CmdStrings^.Count >= 50) then
     begin
-    M := New(PLineCollection, Init(50, 10, False));
+    M := PLineCollection.Create(50, 10, False);
     for I := 1 to 40 do
       begin
       if CmdStrings^.Count <= 0 then
@@ -566,7 +566,7 @@ Message(CommandLine, evCommand, cmExecCommandLine, nil);
       M^.AtInsert(0, CmdStrings^.At(CmdStrings^.Count-1));
       CmdStrings^.AtDelete(CmdStrings^.Count-1);
       end;
-    Dispose(CmdStrings, Done);
+    CmdStrings.Free;
     CmdStrings := M;
     end;
   S.Put(CmdStrings);
@@ -869,7 +869,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   S := lfGetLongFileName(S);
   
   if DirHistory = nil then
-    DirHistory := New(PLineCollection, Init(40, 40, False));
+    DirHistory := PLineCollection.Create(40, 40, False);
   if  (DriveType <> Integer(dtList)) and
       (DriveType <> Integer(dtFind)) and
       (DriveType <> Integer(dtArcFind)) and
@@ -912,7 +912,7 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): PDialog;
   D := PDialog(LoadResource(Dlg));
 
   R.Assign(D^.Size.X-3, 2, D^.Size.X-2, 13);
-  P := New(PScrollBar, Init(R));
+  P := PScrollBar.Create(R);
   D^.Insert(P);
 
   R.Assign(2, 2, D^.Size.X-3, 13);
@@ -938,7 +938,7 @@ procedure EditHistoryMenu;
   ClearHistories;
   LoadHistories; {AK155}
   if EditHistory = nil then
-    EditHistory := New(PEditHistoryCol, Init(30, 30));
+    EditHistory := PEditHistoryCol.Create(30, 30);
   {  if EditHistory^.Count = 0 then Exit;}
   D := GetDialog(dlgEditHistory, Pointer(P));
   P^.NewLisT(EditHistory);
@@ -947,7 +947,7 @@ procedure EditHistoryMenu;
     I := P^.Focused
   else
     I := -1;
-  Dispose(D, Done);
+  D.Free;
   if EditHistory^.Count = 0 then
     Exit; {Proverka, esli udalyali, zarazy:}
   if  (I >= 0) then
@@ -978,7 +978,7 @@ procedure ViewHistoryMenu;
   ClearHistories;
   LoadHistories; {AK155}
   if ViewHistory = nil then
-    ViewHistory := New(PViewHistoryCol, Init(30, 30));
+    ViewHistory := PViewHistoryCol.Create(30, 30);
   {  if ViewHistory^.Count = 0 then Exit;}
   D := GetDialog(dlgViewHistory, Pointer(P));
   P^.NewLisT(ViewHistory);
@@ -987,7 +987,7 @@ procedure ViewHistoryMenu;
     I := P^.Focused
   else
     I := -1;
-  Dispose(D, Done);
+  D.Free;
   if ViewHistory^.Count = 0 then
     Exit; {Proverim, esli udalyali, pa**y}
   if I >= 0 then
@@ -1022,7 +1022,7 @@ function DirHistoryMenu: String;
     end;
 
   if DirHistory = nil then
-    DirHistory := New(PLineCollection, Init(40, 40, False));
+    DirHistory := PLineCollection.Create(40, 40, False);
   {  if DirHistory^.Count = 0 then Exit;}
 
   D := GetDialog(dlgDirectoryHistory, Pointer(P));
@@ -1034,7 +1034,7 @@ function DirHistoryMenu: String;
   I := Desktop^.ExecView(D);
 
   DT.I := PListBox(P)^.Focused;
-  Dispose(D, Done);
+  D.Free;
   if I = cmOK then
     DirHistoryMenu := Copy(CnvString(DirHistory^.At(DT.I)), 2,
          MaxStringLength);
@@ -1055,7 +1055,7 @@ procedure CmdHistory;
   ClearHistories;
   LoadHistories; {AK155}
   if CmdStrings = nil then
-    CmdStrings := New(PLineCollection, Init(40, 40, False));
+    CmdStrings := PLineCollection.Create(40, 40, False);
 
   D := GetDialog(dlgCommandsHistory, Pointer(P));
 
@@ -1068,7 +1068,7 @@ procedure CmdHistory;
   I := Desktop^.ExecView(D);
 
   DT.I := PListBox(P)^.Focused;
-  Dispose(D, Done);
+  D.Free;
 
   if I = cmCancel then
     Exit;
@@ -1178,13 +1178,13 @@ procedure ClearHistories;
 procedure DoneHistories;
   begin
   if CmdStrings <> nil then
-    Dispose(CmdStrings, Done);
+    CmdStrings.Free;
   if DirHistory <> nil then
-    Dispose(DirHistory, Done);
+    DirHistory.Free;
   if EditHistory <> nil then
-    Dispose(EditHistory, Done);
+    EditHistory.Free;
   if ViewHistory <> nil then
-    Dispose(ViewHistory, Done);
+    ViewHistory.Free;
   end;
 {/Cat}
 

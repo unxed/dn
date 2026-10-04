@@ -440,7 +440,7 @@ function SearchFileStr( F: PStream; var XLAT: TXlat; const What: String; Pos: TF
   F^.Seek(OldPos);
 LExit:
   if Info <> nil then
-    Dispose(Info, Done);
+    Info.Free;
   Info := nil;
   end { SearchFileStr };
 
@@ -695,18 +695,18 @@ function TFileViewer.WriteModify;
     ClrIO;
     NeedAbort := True;
     A := 0;
-    Fl := New(PDosStream, Init(FileName, stOpen));
+    Fl := PDosStream.Create(FileName, stOpen);
     if not Abort and (Fl.Status <> stOK) then
       begin
       Fl.Free;
       A := GetFileAttr(FileName);
       SetFileAttr(FileName, A and not ReadOnly);
-      Fl := New(PDosStream, Init(FileName, stOpen));
+      Fl := PDosStream.Create(FileName, stOpen);
       end;
     if  (Fl.Status <> stOK) or (Abort) then
       begin
       Fl.Free;
-      Fl := New(PDosStream, Init(FileName, stOpenRead));
+      Fl := PDosStream.Create(FileName, stOpenRead);
       MessageBox(GetString(dlFBBNoWrite)+FileName, nil,
          mfError+mfOKButton);
       end
@@ -719,7 +719,7 @@ function TFileViewer.WriteModify;
       begin
       Fl.Free;
       SetFileAttr(FileName, A);
-      Fl := New(PDosStream, Init(FileName, stOpenRead));
+      Fl := PDosStream.Create(FileName, stOpenRead);
       end;
     end
   else
@@ -971,7 +971,7 @@ procedure TDFileViewer.ChangeFile(FR: PFileRec);
     begin
     if Fl = nil then
       begin
-      Fl := New(PMemoryStream, Init(1, 1024));
+      Fl := PMemoryStream.Create(1, 1024);
       Wrap := wmWords;
       end;
     with Fl^ do
@@ -1688,7 +1688,7 @@ function TFileViewer.ReadFile;
     Fl := nil;
     if FName = '' then
       Exit;
-    Fl := New(PDosStream, Init(FName, stOpenRead));
+    Fl := PDosStream.Create(FName, stOpenRead);
     end;
 
   { Если FName - имя каталога, то формируем буфер (без Stream) с
@@ -2327,7 +2327,7 @@ procedure TFileViewer.HandleEvent;
     D^.SetData(SearchString);
     I := Desktop^.ExecView(D);
     D^.GetData(SR);
-    Dispose(D, Done);
+    D.Free;
     if I = cmCancel then
       Exit;
     SearchString := SR;
@@ -3560,7 +3560,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
     end;
   R := LastViewerBounds;
   AdjustToDesktopSize(R, LastViewerDeskSize);
-  TWindow.Init(R, (VFileName),
+  inherited Create(R, (VFileName),
      0);
   Flags := Flags or wfMaxi;
   Options := Options or ofTileable;
@@ -3568,12 +3568,12 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   R.Grow(-1, -1);
   R.A.X := R.B.X;
   Inc(R.B.X);
-  P := New(PViewScroll, Init(R));
+  P := PViewScroll.Create(R);
   P^.GrowMode := gfGrowHiX+gfGrowLoX+gfGrowHiY;
   Insert(P);
   GetExtent(R);
   R.Grow(-1, -1);
-  PV := New(PFileViewer, Init(R, nil, FileName, VFileName, P, False, Hex));
+  PV := PFileViewer.Create(R, nil, FileName, VFileName, P, False, Hex);
   Insert(PV); {Вставить надо даже при ошибке для последующего контроля }
   if not PV^.isValid then
     {AK155}
@@ -3582,7 +3582,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   Inc(R.A.X);
   R.A.Y := R.B.Y-1;
   Dec(R.B.X, 2);
-  P := New(PViewInfo, Init(R, PV));
+  P := PViewInfo.Create(R, PV);
   Insert(P);
   PV^.Info := P;
   end { TFileWindow.Init };

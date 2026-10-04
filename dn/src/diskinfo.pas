@@ -302,7 +302,7 @@ procedure DispInfo(var Info: TDiskInfoRec);
     if FileSys <> nil then
       DisposeStr(FileSys); { Rainbow }
     if DirInfo <> nil then
-      Dispose(DirInfo, Done);
+      DirInfo.Free;
     if ClusterSize <> nil then
       DisposeStr(ClusterSize);
     end;
@@ -359,7 +359,7 @@ DriveView явно завершать нельзя - он будет завершён, как член
 и DN будети падать при закрытии менеджера.
   Чтобы избежать повторных завершений, снабжаем DriveView и DiskInfo
 взаимными ссылками, которые обнуляем при завершении адресата ссылки.
-См. также TDriveView.Done;
+См. также inherited Destroy;
 }
 destructor TDiskInfo.Destroy;
   begin
@@ -724,7 +724,7 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
     lFindClose(SR);
     end;
   DC^.FreeAll;
-  Dispose(DC, Done);
+  DC.Free;
   CountDirLen := L;
   end { CountDirLen };
 {-DataCompBoy-}
@@ -788,7 +788,7 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
     end;
 
   B.InfoFile := ifDirInfo;
-  B.DirInfo := New(PStringCollection, Init($10, $10, False));
+  B.DirInfo := PStringCollection.Create($10, $10, False);
   F := PTextReader.Create(MakeNormName(Dr, sDirinfo));
   if F = nil then
     begin
@@ -824,7 +824,7 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
       B.DirInfo^.AtInsert(B.DirInfo^.Count, NewStr(S));
       Inc(B.Limit.Y);
       end;
-    Dispose(F, Done);
+    F.Free;
     F := nil;
     end;
   GetSerFileSys(Dr[1], SerialNo, VolumeLabel, FileSys);

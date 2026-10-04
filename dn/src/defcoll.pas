@@ -56,7 +56,7 @@ uses
 type
   PDefCollection = ^TDefCollection;
   TDefCollection = class(TStringCollection)
-    constructor Init(ALimit, ADelta: LongInt); {Initialization }
+    constructor Create(ALimit, ADelta: LongInt); {Initialization }
     procedure ProceedFile(FName: String); {Read defines   }
     {from pascal-   }
     {style defines  }
@@ -85,11 +85,11 @@ uses
   Lfn, strutil, basics
   ;
 
-constructor TDefCollection.Init(ALimit, ADelta: LongInt);
+constructor TDefCollection.Create(ALimit, ADelta: LongInt);
   var
     i: LongInt;
   begin
-  inherited Init(ALimit, ADelta, False);
+  inherited Create(ALimit, ADelta, False);
   InComm := 0;
   SP := 0;
   DefStack[SP] := True;

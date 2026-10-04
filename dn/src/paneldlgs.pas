@@ -585,7 +585,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
       fc: PFilesCollection;
       i: Integer;
     begin
-    PC := New(PStringCollection, Init(20, 20, False));
+    PC := PStringCollection.Create(20, 20, False);
     fc := P^.Drive^.GetDirectory(x_x, ti);
     for i := 0 to fc^.Count-1 do
       with PFileRec(fc^.Items^[i])^ do
@@ -595,7 +595,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
         UpStr(S);
         PC^.Insert(NewStr(' *.' + S));
         end;
-    Dispose(fc, Done);
+    fc.Free;
     PC^.AtInsert(0, NewStr(' *.*'));
     end;
 
@@ -685,7 +685,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
       end
     else if Cmd = cmOK then
       GetMaskSelection := #20+IL^.Data^;
-    Dispose(D, Done);
+    D.Free;
     end { GetMaskSelection };
 
   procedure InS(const AAS: String);
@@ -750,7 +750,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
           Replace(';'+Copy(FileMask, 3, 5)+';', ';', S)
         else
           Replace(';- '+FileMask+';', ';', S);
-        C := New(PStringCollection, Init(4, 4, False));
+        C := PStringCollection.Create(4, 4, False);
         repeat
           i := PosChar(';', S);
           if i = 0 then
@@ -763,7 +763,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
         until False;
         FileMask := '';
         C^.ForEach(MakeMask);
-        Dispose(C, Done);
+        C.Free;
         if FileMask <> '' then
           FileMask := ';'+FileMask;
         if ClrPlus then
@@ -788,7 +788,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
       Delta := -1;
       end;
   until S[1] = #20;
-  Dispose(PC, Done);
+  PC.Free;
   P^.ChkNoMem;
   end { CM_AdvancedFilter };
 {------------------- CM_AdvancedFilter -----------------------}
@@ -935,7 +935,7 @@ procedure CM_CopyFiles(AFP: Pointer; MoveMode, Single: Boolean);
     Exit;
   P^.Drive^.CopyFiles(FC, P, MoveMode);
   FC^.DeleteAll;
-  Dispose(FC, Done);
+  FC.Free;
   end;
 
 {-DataCompBoy-}
@@ -1071,7 +1071,7 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
   DialRes := Desktop^.ExecView(D);
   if DialRes = cmCancel then
     begin
-    Dispose(D, Done);
+    D.Free;
     Exit
     end;
   D^.GetData(DT);
@@ -1125,7 +1125,7 @@ procedure CM_EraseFiles(AFP: Pointer; Single: Boolean);
     Exit;
   P^.Drive^.EraseFiles(FC);
   FC^.DeleteAll;
-  Dispose(FC, Done);
+  FC.Free;
   P^.RedrawPanelInfoDir;
   P^.SendLocated;
   end;
@@ -1150,7 +1150,7 @@ procedure CM_MakeList(AFP: Pointer);
     Exit;
   MakeListFile(P, FC);
   FC^.DeleteAll;
-  Dispose(FC, Done);
+  FC.Free;
   P^.RedrawPanelInfoDir;
   end { CM_MakeList };
 
@@ -1252,13 +1252,13 @@ CurTime1:
         end;
       cmCancel:
         begin
-        Dispose(Dlg, Done);
+        Dlg.Free;
         NotifyResume; {Cat}
         Exit;
         end;
     end {case};
     Dlg^.GetData(D);
-    Dispose(Dlg, Done);
+    Dlg.Free;
     NotifyResume; {Cat}
     end
   else
@@ -1320,7 +1320,7 @@ CurTime:
       {$IFNDEF OS2}
        Dlg^.EnableCommands([cmYes, cmNo]);
       {$ENDIF}
-       Dispose( Dlg, Done );
+       Dlg.Free;
        NotifyResume; {Cat}
        MessageKey(Application, kbDown);
        Message(Application, evCommand, cmSingleAttr, nil);
@@ -1332,7 +1332,7 @@ CurTime:
         
         Dlg^.EnableCommands([cmYes, cmNo]);
         
-        Dispose(Dlg, Done);
+        Dlg.Free;
         NotifyResume; {Cat}
         Exit;
         end;
@@ -1341,7 +1341,7 @@ CurTime:
     
     Dlg^.EnableCommands([cmYes, cmNo]);
     
-    Dispose(Dlg, Done);
+    Dlg.Free;
     D.C := {39}$FF;
     end;
 
@@ -1456,7 +1456,7 @@ CurTime:
     end;
 
   R.Assign(1, 1, 26, 8);
-  New(PInfo, Init(R));
+  PInfo.Create(R);
   PInfo^.Top := GetString(dlSetAttr);
   PInfo^.Bottom := '';
   PInfo^.SetState(sfShadow, True);
@@ -1580,7 +1580,7 @@ CurTime:
       end;
     end;
   Desktop^.Delete(PInfo);
-  Dispose(PInfo, Done);
+  PInfo.Free;
   if  (ActivePanel = P) and (P^.Drive^.DriveType = dtDisk)
   then
     CurrentDirectory := P^.DirectoryName;
@@ -1668,7 +1668,7 @@ procedure CM_CopyTemp(AFP: Pointer);
     Exit;
   GlobalEvent(evBroadcast, cmCopyToTemp, @C);
   FC^.DeleteAll;
-  Dispose(FC, Done);
+  FC.Free;
   end;
 
 {-DataCompBoy-}
@@ -1788,7 +1788,7 @@ type
   PDragger = ^TDragger;
   TDragger = class(TView)
     Text: PString;
-    constructor Init(R: TRect; AText: String);
+    constructor Create(R: TRect; AText: String);
     procedure Draw; virtual;
     destructor Done; virtual;
     end;
@@ -1811,7 +1811,7 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
   begin
   {Application.BFSpeed;}
   Desktop^.MakeLocal(P^, R.A);
-  Mover := New(PDragger, Init(R, Text));
+  Mover := PDragger.Create(R, Text);
   Desktop^.Insert(Mover);
   Desktop^.GetExtent(R);
   Event.Where := P^;
@@ -1830,15 +1830,15 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
     C^.Where := R.A;
     Message(Desktop^.FirstThat(ContainsMouse), evBroadcast, cmDropped, C);
     end;
-  Dispose(FC, Done);
+  FC.Free;
   end { DragMover };
 
-constructor TDragger.Init(R: TRect; AText: String);
+constructor TDragger.Create(R: TRect; AText: String);
   begin
   AText := ' '+AText+' ';
   R.B.X := R.A.X+Length(AText);
   R.B.Y := R.A.Y+1;
-  inherited Init(R);
+  inherited Create(R);
   Options := Options or ofTopSelect;
   Text := NewStr(AText);
   SetState(sfShadow, True);
@@ -2071,7 +2071,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     R.B.X := P^.Size.X+P^.Origin.X+1;
   if R.B.X-P^.Origin.X-P^.Size.X = 0 then
     Inc(R.B.X);
-  New(PIF, Init(R, 255));
+  PIF.Create(R, 255);
   PIF^.LC := #179;
   PIF^.RC := #179;
   if P^.Origin.X-R.A.X = 1 then
@@ -2124,7 +2124,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   if DlgRes <> cmCancel then
     begin
     HistoryAdd(hsRenameFil, S); { Flash 09-06-2003, AK155 21-08-2003 }
-    Dispose(PIF, Done);
+    PIF.Free;
     DoRenameSingle(PF, S, S2, DlgRes);
 (* AK155
     if DlgRes <> cmOK then
@@ -2285,7 +2285,7 @@ procedure CM_SortBy(AFP: Pointer);
     R.A.Y := R.B.Y-NumSortModes-1;
   R.B.X := R.A.X+100;
   R.B.Y := R.A.Y+100; {R.B := R.A;}
-  PV := New(PMenuBox, Init(R, Menu, nil));
+  PV := PMenuBox.Create(R, Menu, nil);
   PV^.HelpCtx := hcSortBy;
   while true do
     begin
@@ -2332,7 +2332,7 @@ procedure CM_SortBy(AFP: Pointer);
       RedrawPanelInfoDir;
       end;
     end;
-  Dispose(PV, Done);
+  PV.Free;
   DisposeMenu(Menu);
  {JO}
   OldSortCurPanTypeOnly := SortCurPanTypeOnly;
@@ -2621,7 +2621,7 @@ procedure CM_ChangeCase(AFP: Pointer);
   if ExecResource(dlgNameCase, ChangeNamesCaseOptions) = cmCancel then
     begin
     FC^.DeleteAll;
-    Dispose(FC, Done);
+    FC.Free;
     Exit;
     end;
 
@@ -2635,7 +2635,7 @@ procedure CM_ChangeCase(AFP: Pointer);
   then
     begin
     FC^.DeleteAll;
-    Dispose(FC, Done);
+    FC.Free;
     Exit;
     end;
 
@@ -2680,7 +2680,7 @@ procedure CM_ChangeCase(AFP: Pointer);
   MessageL(P, evCommand, cmPanelReread, 0);
   Info^.Free;
   FC^.DeleteAll;
-  Dispose(FC, Done);
+  FC.Free;
   end { CM_ChangeCase };
 
 function PanelSetupTag(const PSS: TPanelSetupSet;
@@ -2779,11 +2779,11 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
     R.A.Y := R.B.Y-N-2;
   R.B.X := R.A.X+100;
   R.B.Y := R.A.Y+100; {R.B := R.A;}
-  PV := New(PMenuBox, Init(R, Menu, nil));
+  PV := PMenuBox.Create(R, Menu, nil);
   PV^.HelpCtx := hcSelectPreset;
   Menu^.Default := SelectedItem;
   N := Desktop^.ExecView(PV);
-  Dispose(PV, Done);
+  PV.Free;
   DisposeMenu(Menu);
  {JO}
   OldFullMenuPanelSetup := FullMenuPanelSetup;

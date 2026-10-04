@@ -1340,7 +1340,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   if  (R.B.Y > MaxRY) then
     R.B.Y := MaxRY;
   {-$VIV end}
-  P := New(PMenuBox, Init(R, Menu, nil)); {-$VIV}
+  P := PMenuBox.Create(R, Menu, nil); {-$VIV}
   if  (C = '+') then
     Items := Lnk
   else
@@ -1350,7 +1350,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   P^.HelpCtx := hcSelectDrive+Byte(IncludeTemp = True);
 
   N := Desktop^.ExecView(P);
-  Dispose(P, Done);
+  P.Free;
   DisposeMenu(Menu);
   SelectDrive := '';
   if N > 1000 then

@@ -201,20 +201,20 @@ procedure WindowManager;
     end;
 
   begin { WindowManager }
-  New(PC, Init(10, 10));
+  PC.Create(10, 10);
   Desktop^.ForEach(InsView);
 (* AK155 Контроль на Count = 0 не нужен, так как если окон нет, то
 cmWindowManager задизейблена.
   if PC^.Count = 0 then
     begin
-    Dispose(PC, Done);
+    PC.Free;
     Exit
     end;
 *)
   D := PDialog(LoadResource(dlgWindowManager));
 
   R.Assign(D^.Size.X-13, 3, D^.Size.X-12, D^.Size.Y-2);
-  PV := New(PScrollBar, Init(R));
+  PV := PScrollBar.Create(R);
   PV^.Options := PV^.Options or ofPostProcess or ofSecurity;
   D^.Insert(PV);
 
@@ -265,7 +265,7 @@ while true do
       PV^.Free;
       DT.P := nil;
       D^.SetData(DT); {при этом NewList освободит PC }
-      New(PC, Init(10, 10));
+      PC.Create(10, 10);
       Desktop^.ForEach(InsView);
       if PC^.Count = 0 then
         Break;
@@ -276,8 +276,8 @@ while true do
       end;
     end
   end;
-  Dispose(D, Done);
-  Dispose(PC, Done);
+  D.Free;
+  PC.Free;
   end { WindowManager };
 
 end.

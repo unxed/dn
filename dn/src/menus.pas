@@ -937,7 +937,7 @@ lHotkey:
                   Dec(R.A.X);
                 Target := TopMenu^.NewSubView(R, SubMenu, @Self);
                 Result := Owner^.ExecView(Target);
-                Dispose(Target, Done);
+                Target.Free;
                 end;
               end
             else if (Action = DoSelect) and ((Flags and miDisabled) = 0) then

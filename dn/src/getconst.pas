@@ -72,7 +72,7 @@ type
   TTypeHolder = class(TSortedCollection)
     TypeID: String[10];
     Mode: TTypeMode;
-    constructor Init(ID: String; AMode: TTypeMode);
+    constructor Create(ID: String; AMode: TTypeMode);
     function Compare(P1, P2: Pointer): Integer; virtual;
     procedure Show;
     end;
@@ -81,7 +81,7 @@ type
     Name: String[30];
     l: LongInt;
     Mark: Byte;
-    constructor Init(AL: LongInt; const AName: String);
+    constructor Create(AL: LongInt; const AName: String);
     end;
 
 procedure ProcessFile(const FileName: String; Types: PValuesHolder);
@@ -164,14 +164,14 @@ procedure TValuesHolder.Show;
   ForEach(DoScan);
   end;
 
-constructor TTypeHolder.Init(ID: String; AMode: TTypeMode);
+constructor TTypeHolder.Create(ID: String; AMode: TTypeMode);
   begin
-  inherited Init(50, 50);
+  inherited Create(50, 50);
   TypeID := Copy(ID, 1, 10);
   Mode := AMode;
   end;
 
-constructor TLngWord.Init(AL: LongInt; const AName: String);
+constructor TLngWord.Create(AL: LongInt; const AName: String);
   begin
   Name := UpStrg(Copy(AName, 1, 30));
   l := AL;
@@ -491,7 +491,7 @@ StartType:
         ID := Ident(1);
         if ID <> '' then
           begin
-          CurrentType^.Insert(New(PLngWord, Init(TypeCount, ID)));
+          CurrentType^.Insert(PLngWord.Create(TypeCount, ID));
           Inc(TypeCount);
           if S[1] = ',' then
             begin

@@ -379,7 +379,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
   if not (C in ['A'..'Z']) then
     Exit;
   if DrvTrees[C].C <> nil then
-    Dispose(DrvTrees[C].C, Done);
+    DrvTrees[C].C.Free;
   DrvTrees[C].C := nil;
   TreeError := True;
   New(DC, Init(10, 10));
@@ -413,10 +413,10 @@ DRep:
         else
           P^.Size := 0;
       end;
-  Dispose(Info, Done);
+  Info.Free;
   if Abort then
     begin
-    Dispose(DC, Done);
+    DC.Free;
     DrvTrees[C].C := nil;
     TreeError := True;
     Exit;
@@ -561,7 +561,7 @@ procedure FreeTree(C: Char);
   C := UpCase(C);
   if not (C in ['A'..'Z']) then
     Exit;
-  Dispose(DrvTrees[C].C, Done);
+  DrvTrees[C].C.Free;
   DrvTrees[C].C := nil;
   end;
 
@@ -582,7 +582,7 @@ procedure TTreeReader.HandleEvent(var Event: TEvent);
         C := S[1];
         if  (C in ['A'..'Z']) and (DrvTrees[C].C <> nil) then
           begin
-          Dispose(DrvTrees[C].C, Done);
+          DrvTrees[C].C.Free;
           DrvTrees[C].C := nil;
           GlobalMessage(evCommand, cmFindTree, @C);
           if C = #0 then
@@ -832,7 +832,7 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
     Insert(Tree)
   else
     begin
-    Dispose(Tree, Done);
+    Tree.Free;
     Tree := nil;
     isValid := False;
     Exit;
@@ -899,7 +899,7 @@ constructor TTreeWindow.Create(const Bounds: TRect);
   GetExtent(R);
   R.Grow(-1, -1);
   Dec(R.B.Y, 2);
-  P := New(PTreePanel, Init(R, 0, True, S));
+  P := PTreePanel.Create(R, 0, True, S);
   Insert(P);
 
   GetExtent(R);
@@ -977,7 +977,7 @@ destructor TTreeView.Destroy;
   if DC <> nil then
     begin
     DC^.DeleteAll;
-    Dispose(DC, Done);
+    DC.Free;
     DC := nil;
     end;
   inherited Destroy;
@@ -1325,7 +1325,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
     D := DC^.At(ScrollBar^.Value);
     FC := MkFcFromDirRec(D, S);
     EraseFiles(FC);
-    Dispose(FC, Done);
+    FC.Free;
     lChDir(OldDir);
     ClrIO;
     end { EraseDir };
@@ -1841,7 +1841,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
   if DC <> nil then
     begin
     DC^.DeleteAll;
-    Dispose(DC, Done);
+    DC.Free;
     end;
   DC := GetDirCollection(CurPath[1], CountLen);
   isValid := not Abort;
@@ -1871,7 +1871,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
     D := CurPath;
     Delete(D, 1, 3);
     Dirs := DC;
-    DC := New(PDirCollection, Init(Dirs^.Count, 10));
+    DC := PDirCollection.Create(Dirs^.Count, 10);
     for I := 1 to Dirs^.Count do
       DC^.Insert(Dirs^.At(I-1));
     DrawDisabled := True;
@@ -1988,7 +1988,7 @@ procedure TTreeView.Reread(CountLen: Boolean);
   begin
   DrawDisabled := True;
   DC^.DeleteAll;
-  Dispose(DC, Done);
+  DC.Free;
   DC := nil;
   M := ScrollBar^.Value;
   LocateEnabled := False;
@@ -2035,7 +2035,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
     else
       RevertBar := False;
     CopyFiles(FC, nil, Event.Command = cmMoveFiles, 0);
-    Dispose(FC, Done);
+    FC.Free;
     FC := nil;
     lChDir(OldDir);
     GlobalMessage(evCommand, cmRereadInfo, nil);

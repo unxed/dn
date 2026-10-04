@@ -78,7 +78,7 @@ type
     BufSize: Word;
     BufCount: Word;
     PrintDevice: PDosStream;
-    constructor Init(var Bounds: TRect; AStatus: PView;
+    constructor Create(var Bounds: TRect; AStatus: PView;
          AScrollBar: PScrollBar);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
@@ -103,7 +103,7 @@ type
 
   PPMWindow = ^TPMWindow;
   TPMWindow = class(TDialog)
-    constructor Init(R: TRect);
+    constructor Create(R: TRect);
     end;
 
 const
@@ -139,18 +139,18 @@ function TStringCol.GetItem(var S: TStream): Pointer;
   GetItem := S.ReadStr;
   end;
 
-constructor TPMWindow.Init(R: TRect);
+constructor TPMWindow.Create(R: TRect);
   var
     P: PView;
     S: PView;
   begin
-  inherited Init(R, GetString(dlPManagerTitle));
+  inherited Create(R, GetString(dlPManagerTitle));
   Number := GetNum;
   R.Assign(Size.X-13, 1, Size.X-12, Size.Y-4);
-  P := New(PScrollBar, Init(R));
+  P := PScrollBar.Create(R);
   Insert(P);
   R.Assign(2, Size.Y-4, Size.X-14, Size.Y-2);
-  S := New(PPrintStatus, Init(R));
+  S := PPrintStatus.Create(R);
   Insert(S);
   R.Assign(2, 1, Size.X-13, Size.Y-4);
   P := New(PPrintManager, Init(R, S, PScrollBar(P)));
@@ -207,11 +207,11 @@ procedure TPrintStatus.Draw;
   WriteLineC(0, 1, Size.X, 1, B);
   end { TPrintStatus.Draw };
 
-constructor TPrintManager.Init(var Bounds: TRect; AStatus: PView; AScrollBar: PScrollBar);
+constructor TPrintManager.Create(var Bounds: TRect; AStatus: PView; AScrollBar: PScrollBar);
   var
     S: String;
   begin
-  inherited Init(Bounds, 1, AScrollBar);
+  inherited Create(Bounds, 1, AScrollBar);
   Options := Options or ofPostProcess;
   Status := AStatus;
   if Status <> nil then
@@ -299,7 +299,7 @@ function TPrintManager.SetDestination: Boolean;
     end;
 
   OldP := PrintDevice;
-  PrintDevice := New(PDosStream, Init(S, stCreate));
+  PrintDevice := PDosStream.Create(S, stCreate);
 
 //JO: для расшаренных сетевых принтеров статус не будет stOK, т.к.
 //    для них не работает SysFileSeek, вызываемая в TDOSStream.Init,
@@ -323,7 +323,7 @@ function TPrintManager.SetDestination: Boolean;
       and (SysFileIsDevice(PrintDevice^.Handle) and $FF = 0) then
     begin
     MessageBox(GetString(dlNotPrinter), nil, mfError+mfOKButton);
-    Dispose(PrintDevice, Done);
+    PrintDevice.Free;
     EraseByName(S);
     PrintDevice := OldP;
     if PrintDevice <> nil then
@@ -332,7 +332,7 @@ function TPrintManager.SetDestination: Boolean;
     end;
 
   if OldP <> nil then
-    Dispose(OldP, Done);
+    OldP.Free;
   OldP := nil;
   DisposeStr(OutName);
   OutName := NewStr(S);
@@ -348,7 +348,7 @@ constructor TPrintManager.Load(var S: TStream);
   OutName := S.ReadStr;
   S.Read(Paused, 1);
   S.Read(FilePos, 4);
-  PrintDevice := New(PDosStream, Init(OutName^, stCreate));
+  PrintDevice := PDosStream.Create(OutName^, stCreate);
   BufSize := MaxBufCount;
   GetMem(Buffer, BufSize);
   isValid := True;
@@ -387,10 +387,10 @@ destructor TPrintManager.Done;
   begin
   Printer := nil;
   if PrintStream <> nil then
-    Dispose(PrintStream, Done);
+    PrintStream.Free;
   PrintStream := nil;
   if PrintDevice <> nil then
-    Dispose(PrintDevice, Done);
+    PrintDevice.Free;
   PrintDevice := nil;
   if Buffer <> nil then
     FreeMem(Buffer, BufSize);
@@ -448,7 +448,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
             begin
             if  (Focused = 0) and (PrintStream <> nil) then
               begin
-              Dispose(PrintStream, Done);
+              PrintStream.Free;
               PrintStream := nil;
               InitPrinter;
               PrintStream := nil;
@@ -472,7 +472,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
 procedure TPrintManager.PrintFile(const FileName: String);
   begin
   if List = nil then
-    List := New(PStringCol, Init(10, 10));
+    List := PStringCol.Create(10, 10);
   
   List^.Insert(NewStr(lfGetLongFileName(FileName)));
   
@@ -574,7 +574,7 @@ procedure TPrintManager.Update;
     if  (PrintStream^.Status <> stOK) then
       MessageBox(GetString(dlCantPrintFile)+S, nil,
         mfError+mfOKButton);
-    Dispose(PrintStream, Done);
+    PrintStream.Free;
     PrintStream := nil;
     if InMask(GetName(S), '$DN????$.PRN') then
       EraseFile(S);
@@ -673,7 +673,7 @@ procedure PrintFile(const S: String);
   R.Assign(0, 0, 50, 9);
   if Printer = nil then
     begin
-    W := Application.ValidView(New(PPMWindow, Init(R)));
+    W := Application.ValidView(PPMWindow.Create(R));
     if W <> nil then
       begin
       W^.Hide;

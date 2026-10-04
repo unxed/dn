@@ -131,7 +131,7 @@ procedure MISaveFileAs(AED: PFileEditor);
       if EditName[Length(EditName)] = '.' then
         SetLength(EditName, Length(EditName)-1);
       WriteBlock(EditName, S, FileLines, EdOpt.ForcedCRLF, OptimalFill);
-      Dispose(S, Done);
+      S.Free;
       FileChanged(EditName);
       DisposeStr(PWindow(Owner)^.Title);
       if EditName = ''
@@ -205,13 +205,13 @@ procedure MISaveFile(AED: PFileEditor);
     if ClipBrd then
       begin {-$VOL begin}
       if ClipBoardStream <> nil then
-        Dispose(ClipBoardStream, Done);
+        ClipBoardStream.Free;
       ClipBoardStream := nil;
-      PC := New(PLineCollection, Init(100, 5, True));
+      PC := PLineCollection.Create(100, 5, True);
       for I := 0 to FileLines^.Count-1 do
         PC^.Insert(NewLongStr(CnvLongString(FileLines^.At(I))));
       CopyLines2Stream(PC, ClipBoardStream);
-      Dispose(PC, Done);
+      PC.Free;
       end
     else
       begin {-$VOL end}
@@ -277,14 +277,14 @@ procedure MISaveFile(AED: PFileEditor);
       if S^.Status <> stOK then
         begin
         CantWrite(EditName);
-        Dispose(S, Done);
+        S.Free;
         MILockFile(AED);
         if not (SmartPad or ClipBrd) then
           FileChanged(EditName);
         Exit;
         end;
       {/Cat}
-      Dispose(S, Done);
+      S.Free;
       lAssignFile(F, EditName);
       ClrIO;
       if  (OldAttr <> Archive) and (OldAttr <> $FFFF) then
@@ -363,13 +363,13 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
   with AED^ do
     begin
     if FileLines <> nil then
-      Dispose(FileLines, Done);
+      FileLines.Free;
     FileLines := nil;
     if UndoInfo <> nil then
-      Dispose(UndoInfo, Done);
+      UndoInfo.Free;
     UndoInfo := nil;
     if RedoInfo <> nil then
-      Dispose(RedoInfo, Done);
+      RedoInfo.Free;
     RedoInfo := nil;
     UndoTimes := 0;
     LastDir := -1; {DrawMode := 0;}
@@ -381,7 +381,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
     if Name = '' then
       begin
       {FileLines := GetCollector(1000, 100);}
-      FileLines := New(PLineCollection, Init(300, 1000, True));
+      FileLines := PLineCollection.Create(300, 1000, True);
       {-SBlocks}
       if ClipBrd then
         begin {-$VOL begin}
@@ -396,7 +396,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
               FileLines^.Insert(At(Count-1));
               AtDelete(Count-1);
               end;
-            Dispose(PC, Done);
+            PC.Free;
             end;
         end; {-$VOL end}
       if FileLines^.Count = 0 then
@@ -411,7 +411,7 @@ procedure MILoadFile(AED: PFileEditor; Name: String);
       if FileLines = nil then
         begin
         {FileLines := GetCollector(1000, 100);}
-        FileLines := New(PLineCollection, Init(300, 1000, True));
+        FileLines := PLineCollection.Create(300, 1000, True);
         {-SBlocks}
         FileLines^.Insert(NewLongStr(''));
         KeyMap := kmAscii;
@@ -612,21 +612,21 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
     ODOA := 0;
     OD := 0;
     OA := 0;
-    S := New(PBufStream, Init(FileName, stOpenRead, 1024));
+    S := PBufStream.Create(FileName, stOpenRead, 1024);
     if  (S^.Status <> stOK) then
       begin
       K := S^.ErrorInfo;
       isValid := (K = 2) or (K = 3) or (K = 110);
       if  (K <> 2) and (K <> 3) and (K <> 110) then
         MessFileNotOpen(FileName, K); {JO, AK155}
-      Dispose(S, Done);
+      S.Free;
       Exit
       end;
     if  (S^.GetSize > MemAvail-$4000)
     then
       begin
       Application.OutOfMemory;
-      Dispose(S, Done);
+      S.Free;
       FileName := '';
       isValid := False;
       Exit
@@ -634,7 +634,7 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
     B := GetMem(FBufSize);
     if B = nil then
       begin
-      Dispose(S, Done);
+      S.Free;
       FileName := '';
       Exit
       end;
@@ -681,11 +681,11 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
         (Lines^.Count > MaxCollectionSize)
       then
         begin
-        Dispose(Lines, Done);
+        Lines.Free;
         Lines := nil;
         FileName := '';
         FreeMem(B, FBufSize);
-        Dispose(S, Done);
+        S.Free;
         Info^.Free;
         Application.OutOfMemory;
         isValid := False;
@@ -722,11 +722,11 @@ function MIReadBlock(AED: PFileEditor; var FileName: String;
       begin
       {MIReadBlock := PStdCollector(Lines)^.Collection;}
       {PStdCollector(Lines)^.Collection := nil;}
-      {Dispose(Lines,Done); Lines:=nil;}
+      {Lines.Free; Lines:=nil;}
       MIReadBlock := PLineCollection(Lines); {-SBlocks}
       Lines := nil; {-SBlocks}
       end;
-    Dispose(S, Done);
+    S.Free;
     FreeMem(B, FBufSize);
     Info^.Free;
     end
@@ -740,7 +740,7 @@ procedure MILockFile(AED: PFileEditor);
     if EditorDefaults.EdOpt and ebfLck = 0 then
       Exit;
     if Locker <> nil then
-      Dispose(Locker, Done);
+      Locker.Free;
     Locker := New(PDosStream, Init(EditName, (stOpenRead and fmDeny) or
            fmDenyWrite));
     end
@@ -754,7 +754,7 @@ procedure MIUnLockFile(AED: PFileEditor);
       Exit;
     if Locker = nil then
       Exit; { на всякий случай }
-    Dispose(Locker, Done);
+    Locker.Free;
     Locker := nil;
     end
   end;
@@ -842,7 +842,7 @@ procedure MILoad(AED: PFileEditor; var S: TStream);
     S.Read(BlockVisible, SizeOf(BlockVisible)); {Cat}
     S.Read(EdOpt.ForcedCRLF, SizeOf(EdOpt.ForcedCRLF)); {Cat}
     isValid := True;
-    Macros := New(PCollection, Init(10, 10));
+    Macros := PCollection.Create(10, 10);
     LastDir := -1;
     MenuItemStr[True] := NewStr(GetString(dlMenuItemOn));
     MenuItemStr[False] := NewStr(GetString(dlMenuItemOff));

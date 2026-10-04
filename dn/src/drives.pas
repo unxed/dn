@@ -766,7 +766,7 @@ procedure PrepareDIZ(
   if Container <> '' then
     begin
     OpenFileList(Container);
-    Descriptions := New(PDIZCol, Init($10, $10));
+    Descriptions := PDIZCol.Create($10, $10);
     ReadFileList(DizNameProc, DizLineProc, DizEndProc);
     end;
   ClrIO;
@@ -853,7 +853,7 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): PFi
   Abort := False;
   NoMemory := False;
   TotalInfo := 0;
-  Files := New(PFilesCollection, Init($10, $20));
+  Files := PFilesCollection.Create($10, $20);
   Files^.Panel := Panel;
 
   {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
@@ -1026,7 +1026,7 @@ function TDrive.GetRealDir: String;
               D^.SetData(MM);
               Application.ExecView(D);
               D^.GetData(MM);
-              Dispose(D, Done);
+              D.Free;
               end;
             UpStr(MM.S);
             if ValidDrive(MM.S[1]) then
@@ -1059,7 +1059,7 @@ function TDrive.GetRealDir: String;
                 D^.SetData(MM);
                 Application.ExecView(D);
                 D^.GetData(MM);
-                Dispose(D, Done);
+                D.Free;
                 end;
               UpStr(MM.S);
               if ValidDrive(MM.S[1]) then
@@ -1194,8 +1194,8 @@ function TDrive.OpenDirectory(const Dir: String;
 
   begin { TDrive.OpenDirectory }
   NewTimer(tmr, 0);
-  Dirs := New(PStringCollection, Init($10, $10, False));
-  DirsToProcess := New(PStringCollection, Init($10, $10, False));
+  Dirs := PStringCollection.Create($10, $10, False);
+  DirsToProcess := PStringCollection.Create($10, $10, False);
 
   PI := WriteMsg(GetString(dlReadingList));
   New(Files, Init($10, $10));
@@ -1226,7 +1226,7 @@ function TDrive.OpenDirectory(const Dir: String;
   //     и в результате мы получаем сортировку дважды
   {Files^.Sort;}
 //используем '><' в качестве пpизнака ветви
-  PDrv := New(PFindDrive, Init('><'+Dir, Dirs, Files));
+  PDrv := PFindDrive.Create('><'+Dir, Dirs, Files);
   PDrv^.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
   end { TDrive.OpenDirectory };
@@ -1259,10 +1259,10 @@ procedure TDrive.DrvFindFile(FC: PFilesCollection);
     FindRec.AddChar := '';
   New(Files, Init($10, $10));
   Files^.SortMode := psmLongName;
-  Directories := New(PStringCollection, Init(30, 30, False));
+  Directories := PStringCollection.Create(30, 30, False);
   R.Assign(1, 1, 40, 10);
   Inc(SkyEnabled);
-  New(PInfo, Init(R));
+  PInfo.Create(R);
   PInfo^.Options := PInfo^.Options or ofSelectable or ofCentered;
   if FindRec.What = ''
   then
@@ -1276,7 +1276,7 @@ procedure TDrive.DrvFindFile(FC: PFilesCollection);
   BB := FindFiles(Files, Directories, FindRec, PInfo, FC, False);
   Desktop^.Delete(PInfo);
   Dec(SkyEnabled);
-  Dispose(PInfo, Done);
+  PInfo.Free;
   if  (BB and ffSeD2Lng) <> 0 then
     MessageBox(GetString(dlSE_Dir2Long), nil, mfWarning+mfOKButton);
   if  (BB and ffSeNotFnd) = BB then

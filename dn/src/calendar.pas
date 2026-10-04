@@ -34,7 +34,7 @@ type
     FDay: Byte;
     RomanEaster: integer;
     OrthodoxEaster: integer;
-    constructor Init(Bounds: TRect);
+    constructor Create(Bounds: TRect);
     constructor Load(var S: TStream);
     destructor Done; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -60,7 +60,7 @@ type
   PCalendarWindow = ^TCalendarWindow;
   TCalendarWindow = class(TWindow)
     CalendarView: PCalendarView;
-    constructor Init;
+    constructor Create;
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure Awaken; virtual;
     function GetTitle(MaxSize: integer): TTitleStr; virtual;
@@ -510,7 +510,7 @@ function WeekNumber(Day, Month, Year: word; SundayFirst: Boolean): word;
  *
  *****************************************************************)
 
-constructor TCalendarWindow.Init;
+constructor TCalendarWindow.Create;
   var
     R: TRect;
   begin
@@ -521,7 +521,7 @@ constructor TCalendarWindow.Init;
     SundayFirst := not ((UpStrg(ActiveLanguage) = 'RUSSIAN') or
           (UpStrg(ActiveLanguage) = 'UKRAIN'));
   R.Assign(1, 1, CalendarViewWidth+3, CalendarViewHeight+3);
-  inherited Init(R, GetString(dlcTitle), 0);
+  inherited Create(R, GetString(dlcTitle), 0);
   Options := Options or ofVersion20;
   GrowMode := 0;
   Flags := Flags and not (wfZoom+wfGrow) or (wfMove+wfClose);
@@ -529,7 +529,7 @@ constructor TCalendarWindow.Init;
   MoveTo(25, 7);
   GetExtent(R);
   R.Grow(-1, -1);
-  CalendarView := New(PCalendarView, Init(R));
+  CalendarView := PCalendarView.Create(R);
   Insert(CalendarView);
   Calend := @Self;
   HelpCtx := hcCalendar;
@@ -609,9 +609,9 @@ function TCalendarWindow.GetPalette: TPalette;
  *
  *****************************************************************)
 
-constructor TCalendarView.Init(Bounds: TRect);
+constructor TCalendarView.Create(Bounds: TRect);
   begin
-  inherited Init(Bounds);
+  inherited Create(Bounds);
   Options := Options or ofSelectable;
   EventMask := EventMask or evMouseAuto or evBroadcast;
   UpdTicks := 20;
@@ -1096,7 +1096,7 @@ procedure TCalendarView.YearChanged;
 procedure InsertCalendar;
   begin
   if Calend = nil then
-    Application.InsertWindow(New(PCalendarWindow, Init))
+    Application.InsertWindow(PCalendarWindow.Create)
   else
     Calend^.Select;
   end;
