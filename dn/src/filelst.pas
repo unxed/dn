@@ -126,7 +126,7 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
 
 procedure PrepareMakeListDialog(P: TDialog);
   begin
-  ObjChangeType(P, TypeOf(TMakeListDlg));
+  ObjChangeType(P, TClass(TMakeListDlg));
   end;
 
 function ParseAddress(Address: String; var Zone, Net, Node, Point: Word)
