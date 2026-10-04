@@ -1077,7 +1077,7 @@ procedure TArcDrive.ChangeUp(var S: String);
   Prev := nil;
   if KillAfterUse then
     EraseTempFile(ArcName);
-  Dispose(PDrive(@Self), Done);
+  Free;
   end { TArcDrive.ChangeUp };
 
 procedure TArcDrive.ChangeRoot;
