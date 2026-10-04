@@ -57,7 +57,6 @@ uses
   ;
 
 type
-  PPhoneCollection = ^TPhoneCollection;
   TPhoneCollection = class(TSortedCollection)
     constructor Create(ALimit, ADelta: LongInt);
     constructor Load(var S: TStream);
@@ -67,7 +66,6 @@ type
     procedure FreeItem(Item: Pointer); virtual;
     end;
 
-  PPhoneDir = ^TPhoneDir;
   TPhoneDir = class(TObject)
     Name: String[30];
     Memo1: PString;
@@ -81,7 +79,6 @@ type
     destructor Done; virtual;
     end;
 
-  PPhone = ^TPhone;
   TPhone = class(TObject)
     Name: String[30];
     Memo1: PString;
@@ -98,7 +95,7 @@ type
     GroupLabel, ItemLabel: TLabel;
     AlphaMode, SearchMode: Boolean;
     Phones: TCollection;
-    Active: PPhoneDir;
+    Active: TPhoneDir;
     Info: TDStringView;
     destructor Done; virtual;
     procedure HandleEvent(var Event: TEvent); virtual;
@@ -134,7 +131,7 @@ function CryptWith(Pass, S: String): String;
   end;
 
 var
-  PPH: PPhone;
+  PPH: TPhone;
 
 procedure PhoneBook(Manual: Boolean);
   var
@@ -144,6 +141,7 @@ procedure PhoneBook(Manual: Boolean);
     PL: TPhoneBox;
     PC: TCollection;
     S: TBufStream;
+    Stream: TStream;
     DT: record
       C: TCollection;
       n: Word;
@@ -154,7 +152,7 @@ procedure PhoneBook(Manual: Boolean);
 
   procedure DoSearchButton(P: TView);
     begin
-    if  (TypeOf(P^) = TypeOf(TButton)) then
+    if P is TButton then
       if TButton(P).Command = cmOK then
         EnterButton := TButton(P)
       else if TButton(P).Command = cmNo then
@@ -170,61 +168,60 @@ procedure PhoneBook(Manual: Boolean);
          or (DelSpaces(SS) = '')
     then
       Exit;
-    New(PPH, Init(SS, GetString(dlMD_Manual)+SS, '', ''));
+    PPH := TPhone.Create(SS, GetString(dlMD_Manual)+SS, '', '');
     end
   else
     begin
     D := TDialog(LoadResource(dlgPhoneBook));
     D.ForEach(DoSearchButton);
     ReturnButton.Hide;
-    PV := D^.StandardScrollBar(sbVertical+sbHandleKeyboard);
-    R.Assign(D^.Size.X-3, 3, D^.Size.X-2, 12);
+    PV := D.StandardScrollBar(sbVertical+sbHandleKeyboard);
+    R.Assign(D.Size.X-3, 3, D.Size.X-2, 12);
     PV.Locate(R);
 
-    R.Assign(2, 3, D^.Size.X-3, 12);
-    PL := New(TPhoneBox, Init(R, 1, TScrollBar(PV)));
-    PL^.Options := PL^.Options or ofPostProcess;
-    S.Init(SourceDir+'dn.phn', stOpenRead, 1024);
+    R.Assign(2, 3, D.Size.X-3, 12);
+    PL := TPhoneBox.Create(R, 1, TScrollBar(PV));
+    PL.Options := PL.Options or ofPostProcess;
+    S := TBufStream.Create(SourceDir+'dn.phn', stOpenRead, 1024);
     PC := nil;
     PC := TCollection(S.Get);
     if PC = nil then
       begin
       S.Reset;
       S.Seek(0);
-      PC := TCollection(New(PPhoneCollection, ShortLoad(S)));
+      Stream := S;
+      PC := TCollection(TPhoneCollection.ShortLoad(Stream));
       end;
-    S.Done;
+    S.Free;
     if PC = nil then
-      PC := PPhoneCollection.Create(10, 10);
+      PC := TPhoneCollection.Create(10, 10);
     PC.Pack;
-    PL^.Phones := PC;
-    PL^.Active := nil;
-    PL^.AlphaMode := False;
-    PL^.SearchMode := False;
-    PL^.NewLisT(PC);
+    PL.Phones := PC;
+    PL.Active := nil;
+    PL.AlphaMode := False;
+    PL.SearchMode := False;
+    PL.NewLisT(PC);
 
     D.Insert(PL);
     R.Assign(2, 2, 53, 3);
 
     {    PV := New(TLabel, Init(R, GetString(dlPhonesLabel),PL);}
-    PL^.GroupLabel := New(TLabel, Init(R, GetString(dlPhonesLabelGroup),
-           PL));
-    D.Insert(PL^.GroupLabel);
+    PL.GroupLabel := TLabel.Create(R, GetString(dlPhonesLabelGroup), PL);
+    D.Insert(PL.GroupLabel);
 
-    PL^.ItemLabel := New(TLabel, Init(R, GetString(dlPhonesLabelPhones),
-           PL));
-    PL^.ItemLabel.Hide;
-    D.Insert(PL^.ItemLabel);
+    PL.ItemLabel := TLabel.Create(R, GetString(dlPhonesLabelPhones), PL);
+    PL.ItemLabel.Hide;
+    D.Insert(PL.ItemLabel);
 
 
     D.Insert(PL);
     {D.Insert(PV);}
-    R.Assign(2, 12, D^.Size.X-2, 14);
+    R.Assign(2, 12, D.Size.X-2, 14);
     PV := TDStringView.Create(R);
     TDStringView(PV).S1 := '';
     TDStringView(PV).S2 := '';
     D.Insert(PV);
-    PL^.Info := TDStringView(PV);
+    PL.Info := TDStringView(PV);
 
     R.A.X := Desktop.ExecView(D);
     D.GetData(DT);
@@ -258,44 +255,45 @@ end;
 }
 procedure TPhoneBox.SetList(Alpha: Boolean);
   var
-    PC: PPhoneCollection;
+    PC: TPhoneCollection;
     S: TBufStream;
+    Stream: TStream;
 
   procedure DoPhones(Ph_: Pointer);
-  var Ph: PPhoneDir absolute Ph_;
+  var Ph: TPhoneDir absolute Ph_;
 
     procedure InsertPhone(P_: Pointer);
-    var P: PPhone absolute P_;
+    var P: TPhone absolute P_;
       var
-        PP: PPhoneDir;
+        PP: TPhoneDir;
         I: LongInt;
       begin
       if P <> nil then
         begin
-        FreeStr := UpStrg(P^.Name);
+        FreeStr := UpStrg(P.Name);
         if  (Length(FreeStr) = 2) and (FreeStr = '..') then
           Exit;
-        PP := PPhoneDir.Create('', FreeStr[1], '', '');
-        if PC^.Search(PP, I) then
+        PP := TPhoneDir.Create('', FreeStr[1], '', '');
+        if PC.Search(PP, I) then
           begin
           PP.Free;
-          PP := PC^.At(I);
+          PP := PC.At(I);
           end
         else
           PC.AtInsert(I, PP);
-        if PP^.Phones = nil then
-          PP^.Phones := PPhoneCollection.Create(10, 10);
-        TSortedCollection(PP^.Phones).Duplicates := True;
-        PP^.Phones.Insert(P);
+        if PP.Phones = nil then
+          PP.Phones := TPhoneCollection.Create(10, 10);
+        TSortedCollection(PP.Phones).Duplicates := True;
+        PP.Phones.Insert(P);
         end;
       end { InsertPhone };
 
     begin { DoPhones }
-    if  (Ph <> nil) and (Ph^.Phones <> nil)
-           and ((Ph^.Password = '') or (Ph^.Encrypted))
+    if  (Ph <> nil) and (Ph.Phones <> nil)
+           and ((Ph.Password = '') or (Ph.Encrypted))
     then
-      Ph^.Phones.ForEach(InsertPhone);
-    Ph^.Phones.DeleteAll;
+      Ph.Phones.ForEach(InsertPhone);
+    Ph.Phones.DeleteAll;
     end { DoPhones };
 
   begin { TPhoneBox.SetList }
@@ -305,23 +303,24 @@ procedure TPhoneBox.SetList(Alpha: Boolean);
     begin
     if Alpha then
       begin
-      PC := PPhoneCollection.Create(10, 10);
+      PC := TPhoneCollection.Create(10, 10);
       Phones.ForEach(DoPhones);
       end
     else
       begin
-      S.Init(SourceDir+'dn.phn', stOpenRead, 1024);
+      S := TBufStream.Create(SourceDir+'dn.phn', stOpenRead, 1024);
       PC := nil;
-      PC := PPhoneCollection(S.Get);
+      PC := TPhoneCollection(S.Get);
       if PC = nil then
         begin
         S.Reset;
         S.Seek(0);
-        PC := New(PPhoneCollection, ShortLoad(S));
+        Stream := S;
+        PC := TPhoneCollection.ShortLoad(Stream);
         end;
-      S.Done;
+      S.Free;
       if PC = nil then
-        PC := PPhoneCollection.Create(10, 10);
+        PC := TPhoneCollection.Create(10, 10);
       end;
     Phones.Free;
     Phones := PC;
@@ -340,14 +339,15 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       end;
     C: TCollection;
     Stream: TBufStream;
-    Ph: PPhone;
+    BaseStream: TStream;
+    Ph: TPhone;
 
-  function CheckPassword(Ph: PPhoneDir): Boolean;
+  function CheckPassword(Ph: TPhoneDir): Boolean;
     var
       S: String;
     begin
     CheckPassword := True;
-    if  (Ph^.Password = '') or Ph^.Encrypted then
+    if  (Ph.Password = '') or Ph.Encrypted then
       Exit;
     repeat
       S := '';
@@ -356,8 +356,8 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         CheckPassword := False;
         Exit
         end;
-    until Ph^.Password = S;
-    Ph^.Encrypted := True;
+    until Ph.Password = S;
+    Ph.Encrypted := True;
     end;
 
   procedure EditDirectory(Append: Boolean);
@@ -371,21 +371,21 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       R: TRect;
       P: TView;
       Idx: TDlgIdx;
-      Ph: PPhoneDir;
+      Ph: TPhoneDir;
       {      PC: TCollection;}
     begin
     FillChar(Dt, SizeOf(Dt), 0);
     if not Append then
       begin
-      Ph := List^.At(Focused);
+      Ph := List.At(Focused);
       if not CheckPassword(Ph) then
         Exit;
-      Dt.Name := Ph^.Name;
-      Dt.Password := Ph^.Password;
-      if Ph^.Memo1 <> nil then
-        Dt.Memo1 := Ph^.Memo1^;
-      if Ph^.Memo2 <> nil then
-        Dt.Memo2 := Ph^.Memo2^;
+      Dt.Name := Ph.Name;
+      Dt.Password := Ph.Password;
+      if Ph.Memo1 <> nil then
+        Dt.Memo1 := Ph.Memo1^;
+      if Ph.Memo2 <> nil then
+        Dt.Memo2 := Ph.Memo2^;
       Idx := dlgEditDirectory;
       end
     else
@@ -396,20 +396,19 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
 
     C := List;
     if C = nil then
-      C := PPhoneCollection.Create(10, 10);
+      C := TPhoneCollection.Create(10, 10);
     List := nil;
     R.A.X := Focused;
     if Append then
-      C.Insert(New(PPhoneDir, Init(Dt.Password, Dt.Name, Dt.Memo1,
-             Dt.Memo2)))
+      C.Insert(TPhoneDir.Create(Dt.Password, Dt.Name, Dt.Memo1, Dt.Memo2))
     else
       begin
-      Ph^.Name := Dt.Name;
-      Ph^.Password := Dt.Password;
-      DisposeStr(Ph^.Memo1);
-      Ph^.Memo1 := NewStr(Dt.Memo1);
-      DisposeStr(Ph^.Memo2);
-      Ph^.Memo2 := NewStr(Dt.Memo2);
+      Ph.Name := Dt.Name;
+      Ph.Password := Dt.Password;
+      DisposeStr(Ph.Memo1);
+      Ph.Memo1 := NewStr(Dt.Memo1);
+      DisposeStr(Ph.Memo2);
+      Ph.Memo2 := NewStr(Dt.Memo2);
       C.AtDelete(Focused);
       TSortedCollection(C).Search(Ph, Focused);
       C.AtInsert(Focused, Ph);
@@ -418,13 +417,16 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     NewLisT(C);
     FocusItem(R.A.X);
     Owner.UnLock;
-    Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
+    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
     Phones := C;
-    if Phones^.Count > 16380 then
+    if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
-      PPhoneCollection(Phones)^.ShortStore(Stream);
-    Stream.Done;
+      begin
+      BaseStream := Stream;
+      TPhoneCollection(Phones).ShortStore(BaseStream);
+      end;
+    Stream.Free;
     end { EditDirectory };
 
   procedure EditNumber(Append: Boolean);
@@ -442,14 +444,14 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     FillChar(DT, SizeOf(DT), 0);
     if not Append then
       begin
-      Ph := List^.At(Focused);
-      DT.Name := Ph^.Name;
-      if Ph^.Number <> nil then
-        DT.Number := Ph^.Number^;
-      if Ph^.Memo1 <> nil then
-        DT.Memo1 := Ph^.Memo1^;
-      if Ph^.Memo2 <> nil then
-        DT.Memo2 := Ph^.Memo2^;
+      Ph := List.At(Focused);
+      DT.Name := Ph.Name;
+      if Ph.Number <> nil then
+        DT.Number := Ph.Number^;
+      if Ph.Memo1 <> nil then
+        DT.Memo1 := Ph.Memo1^;
+      if Ph.Memo2 <> nil then
+        DT.Memo2 := Ph.Memo2^;
       Idx := dlgEditNumber;
       end
     else
@@ -464,23 +466,26 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       Exit;
     C := List;
     if C = nil then
-      C := PPhoneCollection.Create(10, 10);
+      C := TPhoneCollection.Create(10, 10);
     List := nil;
     R.A.X := Focused;
-    if not Append and (C^.Count > Focused) then
+    if not Append and (C.Count > Focused) then
       C.AtFree(Focused);
-    C.Insert(PPhone.Create(DT.Number, DT.Name, DT.Memo1, DT.Memo2));
+    C.Insert(TPhone.Create(DT.Number, DT.Name, DT.Memo1, DT.Memo2));
     Owner.Lock;
     NewLisT(C);
     FocusItem(R.A.X);
     Owner.UnLock;
-    Active^.Phones := C;
-    Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
-    if Phones^.Count > 16380 then
+    Active.Phones := C;
+    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
-      PPhoneCollection(Phones)^.ShortStore(Stream);
-    Stream.Done;
+      begin
+      BaseStream := Stream;
+      TPhoneCollection(Phones).ShortStore(BaseStream);
+      end;
+    Stream.Free;
     end { EditNumber };
 
   procedure CopyDirectory;
@@ -490,51 +495,54 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         Password: String[15];
         Memo1, Memo2: String[50];
         end;
-      Ph, P1: PPhoneDir;
+      Ph, P1: TPhoneDir;
       I: Integer;
     begin
-    if  (List = nil) or (Focused >= List^.Count) then
+    if  (List = nil) or (Focused >= List.Count) then
       Exit;
     FillChar(Dt, SizeOf(Dt), 0);
-    Ph := List^.At(Focused);
+    Ph := List.At(Focused);
     if Ph = nil then
       Exit;
     if not CheckPassword(Ph) then
       Exit;
-    Dt.Name := Ph^.Name;
-    Dt.Password := Ph^.Password;
-    if Ph^.Memo1 <> nil then
-      Dt.Memo1 := Ph^.Memo1^;
-    if Ph^.Memo2 <> nil then
-      Dt.Memo2 := Ph^.Memo2^;
+    Dt.Name := Ph.Name;
+    Dt.Password := Ph.Password;
+    if Ph.Memo1 <> nil then
+      Dt.Memo1 := Ph.Memo1^;
+    if Ph.Memo2 <> nil then
+      Dt.Memo2 := Ph.Memo2^;
 
     C := List;
     if C = nil then
-      C := PPhoneCollection.Create(10, 10);
+      C := TPhoneCollection.Create(10, 10);
     List := nil;
     I := Focused;
 
-    P1 := PPhoneDir.Create(Dt.Password, Dt.Name, Dt.Memo1, Dt.Memo2);
-    P1^.Encrypted := False;
+    P1 := TPhoneDir.Create(Dt.Password, Dt.Name, Dt.Memo1, Dt.Memo2);
+    P1.Encrypted := False;
     C.Insert(P1);
     Owner.Lock;
     NewLisT(C);
     FocusItem(I);
     Owner.UnLock;
-    Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
+    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
     Phones := C;
-    if Phones^.Count > 16380 then
+    if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
-      PPhoneCollection(Phones)^.ShortStore(Stream);
-    Stream.Done;
+      begin
+      BaseStream := Stream;
+      TPhoneCollection(Phones).ShortStore(BaseStream);
+      end;
+    Stream.Free;
     end { CopyDirectory };
 
   procedure CopyPhones;
     var
       I: Integer;
     begin
-    if  (List = nil) or (Focused >= List^.Count) then
+    if  (List = nil) or (Focused >= List.Count) then
       Exit;
     if Active = nil then
       begin
@@ -542,34 +550,37 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       Exit
       end;
     FillChar(DT, SizeOf(DT), 0);
-    Ph := List^.At(Focused);
+    Ph := List.At(Focused);
     if Ph = nil then
       Exit;
-    DT.Name := Ph^.Name;
-    if Ph^.Number <> nil then
-      DT.Number := Ph^.Number^;
-    if Ph^.Memo1 <> nil then
-      DT.Memo1 := Ph^.Memo1^;
-    if Ph^.Memo2 <> nil then
-      DT.Memo2 := Ph^.Memo2^;
+    DT.Name := Ph.Name;
+    if Ph.Number <> nil then
+      DT.Number := Ph.Number^;
+    if Ph.Memo1 <> nil then
+      DT.Memo1 := Ph.Memo1^;
+    if Ph.Memo2 <> nil then
+      DT.Memo2 := Ph.Memo2^;
 
     C := List;
     if C = nil then
-      C := PPhoneCollection.Create(10, 10);
+      C := TPhoneCollection.Create(10, 10);
     List := nil;
     I := Focused;
-    C.Insert(PPhone.Create(DT.Number, DT.Name, DT.Memo1, DT.Memo2));
+    C.Insert(TPhone.Create(DT.Number, DT.Name, DT.Memo1, DT.Memo2));
     Owner.Lock;
     NewLisT(C);
     FocusItem(I);
     Owner.UnLock;
-    Active^.Phones := C;
-    Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
-    if Phones^.Count > 16380 then
+    Active.Phones := C;
+    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
-      PPhoneCollection(Phones)^.ShortStore(Stream);
-    Stream.Done;
+      begin
+      BaseStream := Stream;
+      TPhoneCollection(Phones).ShortStore(BaseStream);
+      end;
+    Stream.Free;
     end { CopyPhones };
 
   procedure CE;
@@ -579,16 +590,16 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
 
   procedure DialPhone;
     var
-      P: PPhone;
+      P: TPhone;
       W: TWindow;
     begin
     CE;
     if Focused = 0 then
       Exit;
-    if  (Active = nil) or (List = nil) or (List^.Count = 0) then
+    if  (Active = nil) or (List = nil) or (List.Count = 0) then
       Exit;
-    P := List^.At(Focused);
-    PPH.Create(P^.Number^, P^.Name, '', '');
+    P := List.At(Focused);
+    PPH.Create(P.Number^, P.Name, '', '');
     Owner.EndModal(cmDialPhone);
     end;
 
@@ -596,15 +607,15 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     var
       I: Integer;
       S: String;
-      PD: PPhoneDir;
-      P: PPhone;
+      PD: TPhoneDir;
+      P: TPhone;
     begin
     if Active = nil then
       begin
-      if List^.Count = 0 then
+      if List.Count = 0 then
         Exit;
 
-      PD := List^.At(Focused);
+      PD := List.At(Focused);
       if not CheckPassword(PD) then
         Exit;
 
@@ -623,31 +634,33 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
   *)
       Active := PD;
       List := nil;
-      NewLisT(PD^.Phones);
+      NewLisT(PD.Phones);
       if  (List = nil) then
         begin
-        C := PPhoneCollection.Create(10, 10);
-        C.Insert(New(PPhone, Init(' ', '..', GetString(dlPhonesUpDir),
-               '')));
+        C := TPhoneCollection.Create(10, 10);
+        C.Insert(TPhone.Create(' ', '..', GetString(dlPhonesUpDir), ''));
         Owner.Lock;
         NewLisT(C);
         Owner.UnLock;
-        Active^.Phones := C;
-        Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
-        if Phones^.Count > 16380 then
+        Active.Phones := C;
+        Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+        if Phones.Count > 16380 then
           Stream.Put(Phones)
         else
-          PPhoneCollection(Phones)^.ShortStore(Stream);
-        Stream.Done;
+          begin
+          BaseStream := Stream;
+          TPhoneCollection(Phones).ShortStore(BaseStream);
+          end;
+        Stream.Free;
         DrawView;
         Exit;
         end;
       TSortedCollection(List).Sort;
-      if  (PPhone(List^.At(0))^.Name <> '..') and (List^.Count > 0) then
+      if  (TPhone(List.At(0)).Name <> '..') and (List.Count > 0) then
         begin
-        P := New(PPhone, Init(' ', '..', GetString(dlPhonesUpDir), ''));
+        P := TPhone.Create(' ', '..', GetString(dlPhonesUpDir), '');
         List.AtInsert(0, P);
-        SetRange(List^.Count);
+        SetRange(List.Count);
         DrawView;
         end;
       {HideCursor;}
@@ -673,7 +686,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       SearchMode := False;
       List := nil;
       NewLisT(Phones);
-      FocusItem(Phones^.IndexOf(Active));
+      FocusItem(Phones.IndexOf(Active));
       Active := nil;
       {HideCursor;}
       end;
@@ -682,31 +695,31 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
 
   procedure SearchPhone;
     var
-      PC: PPhoneCollection;
+      PC: TPhoneCollection;
       S: String;
 
     procedure SearchDir(Ph_: Pointer);
-    var Ph: PPhoneDir absolute Ph_;
+    var Ph: TPhoneDir absolute Ph_;
       procedure DoPhone(P_: Pointer);
-      var P: PPhone absolute P_;
+      var P: TPhone absolute P_;
         var
           I: Integer;
         begin
         if  (P <> nil)
-                 and ((Pos(S, UpStrg(P^.Name)) <> 0) or (Pos(S,
-                   UpStrg(P^.Number^)) <> 0))
+                 and ((Pos(S, UpStrg(P.Name)) <> 0) or (Pos(S,
+                   UpStrg(P.Number^)) <> 0))
         then
           PC.Insert(P);
         end;
       begin
-      if  (Ph <> nil) and (Ph^.Phones <> nil)
-             and ((Ph^.Password = '') or (Ph^.Encrypted))
+      if  (Ph <> nil) and (Ph.Phones <> nil)
+             and ((Ph.Password = '') or (Ph.Encrypted))
       then
-        Ph^.Phones.ForEach(DoPhone);
+        Ph.Phones.ForEach(DoPhone);
       end;
 
     begin { SearchPhone }
-    if  (Phones = nil) or (Phones^.Count = 0) then
+    if  (Phones = nil) or (Phones.Count = 0) then
       Exit;
     S := '';
     if InputBox(GetString(dlPB_SearchPhone),
@@ -715,9 +728,9 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       Exit;
     UpStr(S);
     PC.Create(10, 10);
-    PC^.Duplicates := True;
+    PC.Duplicates := True;
     Phones.ForEach(SearchDir);
-    if PC^.Count = 0 then
+    if PC.Count = 0 then
       begin
       MessageBox(GetString(dlPB_NoFind), nil, mfError+mfOKButton);
       Exit;
@@ -731,9 +744,8 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     SearchMode := True;
     List := nil;
     if Active = nil then
-      Active := Phones^.At(Focused);
-    PC.AtInsert(0, New(PPhone, Init(' ', '..', GetString(dlPhonesUpDir),
-           '')));
+      Active := Phones.At(Focused);
+    PC.AtInsert(0, TPhone.Create(' ', '..', GetString(dlPhonesUpDir), ''));
     NewLisT(PC);
     HideCursor;
     EnterButton.Hide;
@@ -747,7 +759,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       F: TTextReader;
       S: String;
       P: String;
-      Ph: PPhone;
+      Ph: TPhone;
       C: Char;
       I, J, K, M: Integer;
       PV: TView;
@@ -779,9 +791,9 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
           if S <> '' then
             begin
             Ph.Create(P, S, '', '');
-            if Active^.Phones = nil then
-              Active^.Phones := PPhoneCollection.Create(10, 10);
-            Active^.Phones.Insert(Ph);
+            if Active.Phones = nil then
+              Active.Phones := TPhoneCollection.Create(10, 10);
+            Active.Phones.Insert(Ph);
             Inc(M);
             end;
           Break;
@@ -809,10 +821,10 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       end;
     PV := WriteMsg(GetString(dlPB_Working));
     Fr := True;
-    while not F^.Eof do
+    while not F.Eof do
       begin
       UpdateWriteView(PV);
-      S := F^.GetStr;
+      S := F.GetStr;
       if S <> '' then
         begin
         if Fr and (S[1] = '|') then
@@ -832,14 +844,17 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     MessageBox(^C+ItoS(M)+GetString(dlPB_CnvReport), nil,
        mfInformation+mfOKButton);
     List := nil;
-    NewLisT(Active^.Phones);
+    NewLisT(Active.Phones);
     F.Free;
-    Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
-    if Phones^.Count > 16380 then
+    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
-      PPhoneCollection(Phones)^.ShortStore(Stream);
-    Stream.Done;
+      begin
+      BaseStream := Stream;
+      TPhoneCollection(Phones).ShortStore(BaseStream);
+      end;
+    Stream.Free;
     end { ImportPhones };
 
   procedure CopyItem;
@@ -899,7 +914,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
           end;
         cmOK, cmNo:
           begin
-          if  (EnterButton^.State and sfVisible) = 0 then
+          if  (EnterButton.State and sfVisible) = 0 then
             Focused := 0;
           EnterDir;
           CE
@@ -912,7 +927,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
           end;
         cmEditPhone:
           begin
-          if List^.Count > 0 then
+          if List.Count > 0 then
             if not AlphaMode or SearchMode then
               if not ((Active <> nil) and (Focused = 0)) then
                 EditNumber(False);
@@ -926,7 +941,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         cmDeletePhone:
           begin
           CE;
-          if  (List = nil) or (List^.Count = 0) then
+          if  (List = nil) or (List.Count = 0) then
             Exit;
           if AlphaMode or SearchMode then
             Exit;
@@ -938,26 +953,29 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
                  mf2YesButton+mfNoButton+mfConfirmation) <> cmYes
             then
               Exit;
-            if not CheckPassword(List^.At(Focused)) then
+            if not CheckPassword(List.At(Focused)) then
               Exit;
             end
-          else if (List^.Count > 0) and
+          else if (List.Count > 0) and
               (MessageBox(GetString(dlPhoneDeleteQuery), nil,
                 mfYesButton+mfNoButton+mfConfirmation) <> cmYes)
           then
             Exit;
-          if  (List <> nil) and (Focused < List^.Count) then
+          if  (List <> nil) and (Focused < List.Count) then
             begin
             List.AtFree(Focused);
-            SetRange(List^.Count);
+            SetRange(List.Count);
             DrawView;
             end;
-          Stream.Init(SourceDir+'dn.phn', stCreate, 1024);
-          if Phones^.Count > 16380 then
+          Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+          if Phones.Count > 16380 then
             Stream.Put(Phones)
           else
-            PPhoneCollection(Phones)^.ShortStore(Stream);
-          Stream.Done;
+            begin
+            BaseStream := Stream;
+            TPhoneCollection(Phones).ShortStore(BaseStream);
+            end;
+          Stream.Free;
           end;
       end {case};
     evKeyDown:
@@ -984,23 +1002,23 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   if WasBroad then
     begin
-    if  (Info <> nil) and (List <> nil) and (List^.Count > 0) then
+    if  (Info <> nil) and (List <> nil) and (List.Count > 0) then
       begin
-      Ph := List^.At(Focused);
-      if Ph^.Memo1 <> nil then
-        Info^.S1 := Ph^.Memo1^
+      Ph := List.At(Focused);
+      if Ph.Memo1 <> nil then
+        Info.S1 := Ph.Memo1^
       else
-        Info^.S1 := '';
-      if Ph^.Memo2 <> nil then
-        Info^.S2 := Ph^.Memo2^
+        Info.S1 := '';
+      if Ph.Memo2 <> nil then
+        Info.S2 := Ph.Memo2^
       else
-        Info^.S2 := '';
+        Info.S2 := '';
       Info.DrawView;
       end
     else if Info <> nil then
       begin
-      Info^.S1 := '';
-      Info^.S2 := '';
+      Info.S1 := '';
+      Info.S2 := '';
       Info.DrawView;
       end;
     end;
@@ -1041,18 +1059,18 @@ destructor TPhoneBox.Done;
     Info.Free;
   Info := nil;
 
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TPhoneBox.GetText(Item: LongInt; MaxLen: Integer): String;
   var
     S: String;
-    P: PPhone;
+    P: TPhone;
   begin
-  P := List^.At(Item);
-  S := AddSpace(P^.Name, 30);
-  if TypeOf(P^) = TypeOf(TPhone) then
-    S := S+'  '+AddSpace(P^.Number^, 23);
+  P := List.At(Item);
+  S := AddSpace(P.Name, 30);
+  if P is TPhone then
+    S := S+'  '+AddSpace(P.Number^, 23);
   GetText := S;
   end;
 
@@ -1064,8 +1082,7 @@ constructor TPhoneCollection.Create(ALimit, ADelta: LongInt);
 
 constructor TPhoneCollection.Load(var S: TStream);
   begin
-  if not inherited Load(S) then
-    Fail;
+  inherited Load(S);
   Duplicates := True;
   Sort;
   end;
@@ -1079,15 +1096,15 @@ procedure TPhoneCollection.ShortStore(var S: TStream);
     TCount, TLimit, TDelta: AInt;
   procedure DoPutItem(P: Pointer);
     begin
-    if TypeOf((TStreamable(P)^)) = TypeOf(TPhone) then
+    if TObject(P) is TPhone then
       begin
       S.Write(VObjType, 2);
-      PPhone(P)^.Store(S);
+      TPhone(P).Store(S);
       end
-    else if TypeOf((TStreamable(P)^)) = TypeOf(TPhoneDir) then
+    else if TObject(P) is TPhoneDir then
       begin
       S.Write(VObjType2, 2);
-      PPhoneDir(P)^.Store(S);
+      TPhoneDir(P).Store(S);
       end;
     end;
   begin
@@ -1120,9 +1137,9 @@ constructor TPhoneCollection.ShortLoad(var S: TStream);
     begin
     S.Read(q, 2);
     if q = otPhone then
-      AtInsert(I, New(PPhone, Load(S)))
+      AtInsert(I, TPhone.Load(S))
     else if q = otPhoneDir then
-      AtInsert(I, New(PPhoneDir, Load(S)))
+      AtInsert(I, TPhoneDir.Load(S))
     else
       Break;
     end;
@@ -1132,10 +1149,10 @@ constructor TPhoneCollection.ShortLoad(var S: TStream);
 
 function TPhoneCollection.Compare(P1, P2: Pointer): Integer;
   begin
-  if PPhone(P1)^.Name = PPhone(P2)^.Name then
+  if TPhone(P1).Name = TPhone(P2).Name then
     Compare := 0
-  else if (PPhone(P1)^.Name = '..')
-       or (PPhone(P1)^.Name < PPhone(P2)^.Name)
+  else if (TPhone(P1).Name = '..')
+       or (TPhone(P1).Name < TPhone(P2).Name)
   then
     Compare := -1
   else
@@ -1144,7 +1161,7 @@ function TPhoneCollection.Compare(P1, P2: Pointer): Integer;
 
 procedure TPhoneCollection.FreeItem(Item: Pointer);
   var
-    PP: PPhone;
+    PP: TPhone;
   begin
   PP := Item;
   if Item <> nil then
@@ -1182,7 +1199,7 @@ destructor TPhone.Done;
   DisposeStr(Number);
   DisposeStr(Memo1);
   DisposeStr(Memo2);
-  inherited Done;
+  inherited Destroy;
   end;
 
 constructor TPhoneDir.Create(const APassword, AName, AMemo1, AMemo2: String);
@@ -1197,10 +1214,10 @@ constructor TPhoneDir.Create(const APassword, AName, AMemo1, AMemo2: String);
 
 procedure CryptCol(Col: TCollection; Pass: String);
   procedure CryptPhone(P_: Pointer);
-  var P: PPhone absolute P_;
+  var P: TPhone absolute P_;
     begin
     if P <> nil then
-      with P^ do
+      with P do
         begin
         Name := CryptWith(Pass, Name);
         if Number <> nil then
@@ -1234,7 +1251,7 @@ constructor TPhoneDir.Load(var S: TStream);
     begin
     S.Status := stOK;
     S.Seek(Q);
-    Phones := TCollection(New(PPhoneCollection, ShortLoad(S)));
+    Phones := TCollection(TPhoneCollection.ShortLoad(S));
     end;
   if Phones <> nil then
     CryptCol(Phones, Password);
@@ -1253,10 +1270,10 @@ procedure TPhoneDir.Store(var S: TStream);
   if Phones <> nil then
     CryptCol(Phones, Password);
   if Phones <> nil then
-    if Phones^.Count > 16380 then
+    if Phones.Count > 16380 then
       S.Put(Phones)
     else
-      PPhoneCollection(Phones)^.ShortStore(S);
+      TPhoneCollection(Phones).ShortStore(S);
   if Phones <> nil then
     CryptCol(Phones, Password);
   end;
@@ -1268,7 +1285,7 @@ destructor TPhoneDir.Done;
   if Phones <> nil then
     Phones.Free;
   Phones := nil;
-  inherited Done;
+  inherited Destroy;
   end;
 
 end.
