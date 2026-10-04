@@ -318,8 +318,6 @@ const
 
 function NewItem(Name, Param: TMenuStr; KeyCode: LongInt; Command: Word;
     AHelpCtx: Word; Next: PMenuItem): PMenuItem;
-  const
-    T: TView = nil;
   var
     P: PMenuItem;
   begin
@@ -330,7 +328,7 @@ function NewItem(Name, Param: TMenuStr; KeyCode: LongInt; Command: Word;
     P^.Name := NewStr(Name);
     P^.Command := Command;
     P^.Flags := miParam;
-    if not T^.MenuEnabled(Command) then {-$VOL}
+    if not Application.MenuEnabled(Command) then {-$VOL}
       P^.Flags := miDisabled;
     P^.KeyCode := KeyCode;
     P^.HelpCtx := AHelpCtx;
@@ -582,10 +580,10 @@ q:
       Mouse: TPoint;
       R: TRect;
     begin
-    if  (ParentMenu <> nil) and (ParentMenu^.Size.Y = 1) then
+    if  (ParentMenu <> nil) and (ParentMenu.Size.Y = 1) then
       begin
       ParentMenu.MakeLocal(E.Where, Mouse);
-      ParentMenu^.GetItemRect(ParentMenu^.Current, R);
+      ParentMenu.GetItemRect(ParentMenu.Current, R);
       MouseInOwner := R.Contains(Mouse);
       end
     else
@@ -597,8 +595,8 @@ q:
       P: TMenuView;
     begin
     P := ParentMenu;
-    while (P <> nil) and not P^.MouseInView(E.Where) do
-      P := P^.ParentMenu;
+    while (P <> nil) and not P.MouseInView(E.Where) do
+      P := P.ParentMenu;
     MouseInMenus := P <> nil;
     end;
 
@@ -607,8 +605,8 @@ q:
       P: TMenuView;
     begin
     P := Self;
-    while P^.ParentMenu <> nil do
-      P := P^.ParentMenu;
+    while P.ParentMenu <> nil do
+      P := P.ParentMenu;
     TopMenu := P;
     end;
 
@@ -815,7 +813,7 @@ lEnter:
                   но в других случаях он может оказаться корячей клавишей
                   (например, в меню выбора дисков)}
                 if  (ParentMenu <> nil) and
-                    (ParentMenu^.Current.Flags and
+                    (ParentMenu.Current.Flags and
                          miAllowChangeDefault <> 0)
                 then
                   begin
@@ -836,7 +834,7 @@ lEnter:
                 else
                   begin
                   Action := DoReturn;
-                  if  (ParentMenu = nil) or (ParentMenu^.Size.Y <> 1)
+                  if  (ParentMenu = nil) or (ParentMenu.Size.Y <> 1)
                   then
                     ClearEvent(E);
                   end;
@@ -845,7 +843,7 @@ lEnter:
                 begin
                 Action := DoReturn;
                 Result := 0;
-                if  (ParentMenu = nil) or (ParentMenu^.Size.Y <> 1) then
+                if  (ParentMenu = nil) or (ParentMenu.Size.Y <> 1) then
                   ClearEvent(E);
                 end;
               else {case}
@@ -857,13 +855,13 @@ lHotkey:
                   Ch := Char(E.CharCode)
                 else
                   Target := TopMenu;
-                P := Target^.FindItem(Ch);
+                P := Target.FindItem(Ch);
                 if  (Target = Self) and (P = nil)
                 then
                   P := FindItem(Drivers.GetAltChar(DNKeyCode(E) and $FFFF00));
                 if P = nil then
                   begin
-                  P := TopMenu^.HotKey(DNKeyCode(E));
+                  P := TopMenu.HotKey(DNKeyCode(E));
                   if  (P <> nil) and CommandEnabled(P^.Command) then
                     begin
                     Result := P^.Command;
@@ -879,7 +877,7 @@ lHotkey:
                   Current := P;
                   end
                 else if (ParentMenu <> Target)
-                     or (ParentMenu^.Current <> P)
+                     or (ParentMenu.Current <> P)
                 then
                   Action := DoReturn;
                 end;
@@ -897,7 +895,7 @@ lHotkey:
           else
             begin
             Action := DoReturn;
-            if  (ParentMenu = nil) or (ParentMenu^.Size.Y <> 1) then
+            if  (ParentMenu = nil) or (ParentMenu.Size.Y <> 1) then
               ClearEvent(E);
             end;
           {if ParentMenu <> nil then Action := DoReturn;}
@@ -935,7 +933,7 @@ lHotkey:
                 R.B := Owner.Size;
                 if Size.Y = 1 then
                   Dec(R.A.X);
-                Target := TopMenu^.NewSubView(R, SubMenu, Self);
+                Target := TopMenu.NewSubView(R, SubMenu, Self);
                 Result := Owner.ExecView(Target);
                 Target.Free;
                 end;
@@ -943,9 +941,9 @@ lHotkey:
             else if (Action = DoSelect) and ((Flags and miDisabled) = 0) then
               begin
               if (ParentMenu <> nil) and
-                (ParentMenu^.Current.Flags and miExecDefault <> 0)
+                (ParentMenu.Current.Flags and miExecDefault <> 0)
               then
-                ParentItem := ParentMenu^.Current
+                ParentItem := ParentMenu.Current
               else
                 ParentItem := nil;
               Result := Command;
@@ -967,7 +965,7 @@ lHotkey:
     В этом случае смена умолчания - только пробелом, да и то
     только при наличии разрешения (miAllowChangeDefault) }
     if (ParentMenu = nil) or
-       (ParentMenu^.Current.Flags and miExecDefault = 0)
+       (ParentMenu.Current.Flags and miExecDefault = 0)
     then
       Menu^.Default := Current;
     Current := nil;
@@ -1018,13 +1016,13 @@ function TMenuView.GetHelpCtx: Word;
 Loop:
   if C = nil then
     Exit;
-  if  (C^.Current <> nil) and (C^.Current.HelpCtx <> hcNoContext) then
+  if  (C.Current <> nil) and (C.Current.HelpCtx <> hcNoContext) then
     begin
-    GetHelpCtx := C^.Current.HelpCtx;
+    GetHelpCtx := C.Current.HelpCtx;
     Exit;
     end;
-  GetHelpCtx := C^.HelpCtx;
-  C := C^.ParentMenu;
+  GetHelpCtx := C.HelpCtx;
+  C := C.ParentMenu;
   goto Loop;
   end;
 
@@ -1432,7 +1430,7 @@ procedure TMenuBox.Draw;
         FrameLine(10);
         MoveCStr(B[3], P^.Name^, Color);
         if (P = Menu.Default) and (ParentMenu <> nil) and
-          (ParentMenu^.Current.Flags and miExecDefault <> 0)
+          (ParentMenu.Current.Flags and miExecDefault <> 0)
         then { помечаем алмазиком пункт, который выполняется по
           Enter на пункте родительского меню }
           MoveChar(B[2], #4, Byte(Color), 1);
@@ -1864,7 +1862,7 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
     end { ItemMouseIsIn: };
 
   begin { TStatusLine.HandleEvent }
-  TView.HandleEvent(Event);
+  inherited HandleEvent(Event);
   case Event.What of
     evMouseDown:
       begin
@@ -1989,7 +1987,7 @@ procedure TStatusLine.Update;
   begin
   P := TopView;
   if P <> nil then
-    H := P^.GetHelpCtx
+    H := P.GetHelpCtx
   else
     H := hcNoContext;
   if  (HelpCtx <> H) or (OldKbdState <> ShiftState) then
