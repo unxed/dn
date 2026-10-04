@@ -176,6 +176,18 @@ class ClassCaretsTest(unittest.TestCase):
         )
         self.assertIn(b"D.Panel", self.convert(source))
 
+    def test_nearest_declaration_wins_across_routines(self):
+        source = (
+            b"type TInputLine = class end;\n"
+            b"  TFileRec = record X: Integer; end;\n"
+            b"  PFileRec = ^TFileRec;\n"
+            b"procedure Inp(P: TInputLine); begin with P^ do; end;\n"
+            b"procedure Use; var P: PFileRec; begin P^.X := 1; end;\n"
+        )
+        out = self.convert(source)
+        self.assertIn(b"with P do", out)
+        self.assertIn(b"P^.X", out)
+
     def test_same_unit_string_field_does_not_shadow_class_field(self):
         source = (
             b"type TView = class\n"
