@@ -3946,6 +3946,7 @@ See also {Dialog box elements:DialogItems}
 │                   a columns number, and Rows is a rows
 │                   number in console
 │
+
 │{Temporary directory:_} - The name and path of directory, in which
 │                       the temporary files will be placed
 │
