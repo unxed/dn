@@ -254,7 +254,7 @@ uses
   DNRun,
 {$ENDIF}
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
-  DNHelp, DnIni, iniengine, cfgstate, histories,
+  DNHelp, DnIni, iniengine, cfgstate, DNErrLog, histories,
   VideoMan, panelwin, Messages, HistList, FileFind,
   
   Phones, 
@@ -706,6 +706,7 @@ destructor TDNApplication.Done;
   if ProbeINI(INItime, INIsize) then
     WriteIniCache(INItime, INIsize);
 {/JO}
+  DNTrace('Done: Unload ' + ItoS(StartupData.Unload));
   if  (StartupData.Unload and osuAutosave <> 0)
   then
     SaveRealDsk
@@ -1235,6 +1236,7 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
   begin { TDNApplication.SaveDesktop }
   ClrIO;
   S := New(PBufStream, Init(FileName, stCreate, 2048));
+  DNTrace('SaveDesktop ' + FileName + ' status ' + ItoS(S^.Status));
   if (S^.Status = stOK) then
     begin
     S^.Write(DskSign.Sign[1], DskSign.SignLen);

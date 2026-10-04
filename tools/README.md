@@ -40,6 +40,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-linux-menus.py` | opens every item of every menu, reports what died | by hand |
 | `dn-win-smoke.py` | the Windows build on a real console (ConPTY via pywinpty) | dn-windows |
 | `dn-tour.sh` | the same tour of the DOS build in DOSBox-X | by hand |
+| `dn-dos-input.py` | the DOS build in DOSBox-X on a virtual X display (Xvfb): a real X pointer through INT 33h (menu, double click, status line), a normal exit (autosave of the desktop, the saved setup) | by hand |
 | `showcase-dosbox.sh` | builds and runs the DOS demo of `tv/` in DOSBox-X | by hand |
 | `render-dump.py` | renders a text screen dump of the DOS backend into an image | tv |
 
