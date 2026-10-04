@@ -1240,11 +1240,11 @@ procedure InitQuickSearch(Panel: TView);
   LastSuccessPos := 1;
   QuickSearch := True;
   QSPanel := Panel;
-  with TFilePanelRoot(QSPanel)^ do
+  with TFilePanelRoot(QSPanel) do
     begin
     SaveHelpCtx := HelpCtx;
     HelpCtx := hcQuickSearch;
-    InfoView^.Draw; { Чтобы появилась маска из одной звёздочки }
+    InfoView.Draw; { Чтобы появилась маска из одной звёздочки }
     end;
   end;
 
@@ -1253,7 +1253,7 @@ procedure StopQuickSearch;
   if QuickSearch then
     begin
     QuickSearch := False;
-    with QSPanel^ do
+    with QSPanel do
       HelpCtx := SaveHelpCtx;
     end;
   end;
@@ -1345,7 +1345,7 @@ function CompareFiles(const N1, N2: String): Boolean;
   const
     BufSize = 2048;
   var
-    S1, S2: TDOSStream;
+    S1, S2: TStream;
     B1, B2: Pointer;
     B: Boolean;
     I: LongInt;
@@ -1354,13 +1354,13 @@ function CompareFiles(const N1, N2: String): Boolean;
   B := False;
   B1 := nil;
   B2 := nil;
-  S1.Init(N1, stOpenRead);
+  S1 := TDosStream.Create(N1, stOpenRead);
   if S1.Status <> stOK then
     begin
-    S1.Done;
+    S1.Free;
     Exit
     end;
-  S2.Init(N2, stOpenRead);
+  S2 := TDosStream.Create(N2, stOpenRead);
   if  (S2.Status <> stOK) or (S1.GetSize <> S2.GetSize) then
     goto Finish;
   B1 := GetMem(BufSize);
@@ -1392,8 +1392,8 @@ Finish:
     FreeMem(B1, BufSize);
   if B2 <> nil then
     FreeMem(B2, BufSize);
-  S1.Done;
-  S2.Done;
+  S1.Free;
+  S2.Free;
   end { CompareFiles };
 
 procedure MakeSlash(var S: String);
