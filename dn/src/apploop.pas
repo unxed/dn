@@ -118,9 +118,9 @@ procedure MyApp.GetEvent(var Event: TEvent);
   then
     begin
     Event.What := evKeyDown;
-    SetDNKeyCode(Event, CurrentMacro^.Keys^[MacroKey]);
+    SetDNKeyCode(Event, CurrentMacro.Keys^[MacroKey]);
     Inc(MacroKey);
-    MacroPlaying := MacroKey < CurrentMacro^.Count;
+    MacroPlaying := MacroKey < CurrentMacro.Count;
     end;
   case Event.What of
     evNothing:
@@ -237,7 +237,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
       if  (Event.What = evKeyDown) then
         begin
         if MacroRecord and (CurrentMacro <> nil) then
-          CurrentMacro^.PutKey(DNKeyCode(Event));
+          CurrentMacro.PutKey(DNKeyCode(Event));
         if  (StatusLine <> nil) then
           StatusLine.HandleEvent(Event);
         end;

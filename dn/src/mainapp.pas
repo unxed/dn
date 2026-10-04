@@ -353,7 +353,7 @@ begin
         begin
           TraceView(PGroup(Desktop.Current).Current);
           if PGroup(Desktop.Current).Current.Size.Y = 1 then
-            DNTrace('as input line: maxlen ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current)^.MaxLen) + ' curpos ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current)^.CurPos) + ' data [' + TInputLine(PGroup(Desktop.Current).Current)^.Data^ + ']');
+            DNTrace('as input line: maxlen ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current).MaxLen) + ' curpos ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current).CurPos) + ' data [' + TInputLine(PGroup(Desktop.Current).Current).Data^ + ']');
         end;
     except
       DNTrace('(the top view of the desktop is not a window)');
@@ -362,7 +362,7 @@ begin
     V := Desktop.Last;
     if V <> nil then
       repeat
-        V := V^.Next;
+        V := V.Next;
         TraceView(V);
       until V = Desktop.Last;
     if MenuBar <> nil then

@@ -808,7 +808,7 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     procedure DoSkip;
       begin
       while (iQueue < CopyQueue.Count-1)
-        and (TLine(CopyQueue.At(iQueue))^.Eof and eoEnd = 0)
+        and (TLine(CopyQueue.At(iQueue)).Eof and eoEnd = 0)
       do
         Inc(iQueue);
       SkipRequested := iQueue >= CopyQueue.Count-1;
@@ -1934,10 +1934,10 @@ FileRead:
     procedure DoCopyDirectory(P_: Pointer);
     var P: TDirName absolute P_;
       begin
-      if P^.CopyIt then
-        CopyDirectory(P^.DOld, P^.DNew, P^.Own)
-      else if P^.Own <> nil then
-{!RLN}        CopyShortString(GetName(P^.DOld), P^.Own^.FlName[True]);
+      if P.CopyIt then
+        CopyDirectory(P.DOld, P.DNew, P.Own)
+      else if P.Own <> nil then
+{!RLN}        CopyShortString(GetName(P.DOld), P.Own^.FlName[True]);
    { Это на случай, если стоим как раз на этом каталоге. Чтобы
    при перечитывании каталога курсор ушёл на новое имя,
    а не остался на старой позиции.
@@ -1951,9 +1951,9 @@ FileRead:
     for I := 0 to Files.Count-1 do
       begin
       P := Files.At(I);
-      S := MakeNormName(P^.Owner^, P^.FlName[True]);
-      if P^.Attr and Directory = 0 then
-        CopyFile(S, '', P, P^.Size, PackedDate(P), P^.Attr);
+      S := MakeNormName(P.Owner^, P.FlName[True]);
+      if P.Attr and Directory = 0 then
+        CopyFile(S, '', P, P.Size, PackedDate(P), P.Attr);
       if Abort or CopyCancel then
         Exit;
       end;
@@ -2214,7 +2214,7 @@ TrueCopy:
     var P: TDirName absolute P_;
       begin
       Inc(FrPos);
-      NoCheck := not P^.Check;
+      NoCheck := not P.Check;
       end;
 
     function IsNetworkPath(const Path: String): Boolean; {KV}
@@ -2253,21 +2253,21 @@ TryGetInfo:
     for I := 0 to Files.Count-1 do
       begin
       P := Files.At(I);
-      if P^.Attr and Directory <> 0 then
+      if P.Attr and Directory <> 0 then
         begin
         FrPos := Dirs.Count;
         
-        CopyI(CopyDir, MakeNormName(P^.Owner^, P^.FlName[True]),
-            MkName(P^.FlName[True]), P, True, P^.Attr and $3FFF);
+        CopyI(CopyDir, MakeNormName(P.Owner^, P.FlName[True]),
+            MkName(P.FlName[True]), P, True, P.Attr and $3FFF);
 
         if not (Abort or CopyCancel)
-          and (P^.DIZ <> nil)
+          and (P.DIZ <> nil)
           and (CopyOptions and cpoDesc <> 0)
         then
           begin
           
             begin
-            ExportDiz(KillDescrOf, MkName(P^.FlName[True]), P^.DIZ, CopyDir);
+            ExportDiz(KillDescrOf, MkName(P.FlName[True]), P.DIZ, CopyDir);
 //            {каталоги!!!}ImportDIZ(LowStrg(P^.FlName[CondLfn]),
 //                 MkName(P^.FlName[CondLfn]), P^.DIZ, P^.Owner)
             end
@@ -2277,14 +2277,14 @@ TryGetInfo:
         end
       else
         begin
-        ToDo := ToDo+P^.Size;
-        if  (CopyDir[1] <> P^.Owner^[1]) or (CopyOptions and cpoMove = 0)
+        ToDo := ToDo+P.Size;
+        if  (CopyDir[1] <> P.Owner^[1]) or (CopyOptions and cpoMove = 0)
         then
           begin
-          ToDoCopy := ToDoCopy+P^.Size;
-          if P^.Size > 0 then
+          ToDoCopy := ToDoCopy+P.Size;
+          if P.Size > 0 then
             begin
-            ToDoClusCopyTemp := P^.Size div BytesPerCluster;
+            ToDoClusCopyTemp := P.Size div BytesPerCluster;
             ToDoClusCopy := ToDoClusCopy+
                 ( {Round}(ToDoClusCopyTemp)+
                 Byte( {Round}(ToDoClusCopyTemp)-ToDoClusCopyTemp <> 0)
@@ -2303,15 +2303,15 @@ TryGetInfo:
       PD := Dirs.FirstThat(NoCheck);
       if PD = nil then
         Break;
-      CopyF(PD^.DNew, PD^.DOld, PD^.CopyIt, PD^.Attr and $3FFF0);
+      CopyF(PD.DNew, PD.DOld, PD.CopyIt, PD.Attr and $3FFF0);
       {JO EAs - dirs }
-      if PD^.CopyIt then
+      if PD.CopyIt then
         begin
         
         {Cat SAs - dirs }
         
         end;
-      PD^.Check := True;
+      PD.Check := True;
     until False;
     Info.Write(5, '');
     end { MakeDirectories };

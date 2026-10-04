@@ -639,8 +639,8 @@ function TPktList.GetText(Item: LongInt; MaxLen: LongInt): String;
     Pc: TPktObj;
     s1, s2, s3: String;
   begin
-  Pc := List^.At(Item);
-  Pc^.GetMsgInfo(FromUser, ToUser, Subj, Date);
+  Pc := List.At(Item);
+  Pc.GetMsgInfo(FromUser, ToUser, Subj, Date);
   s1 := just(FromUser, 26, 2);
   s2 := just(ToUser, 26, 2);
   s3 := just(Subj, 26, 2);
@@ -677,17 +677,17 @@ constructor TPktListDialog.Create(FName: String; C: TPktCol);
   GrowMode := gfGrowHiX+gfGrowHiY;
   View := StandardScrollBar(sbVertical+sbHandleKeyboard);
   EventMask := $FFFF;
-  Inc(View^.Origin.Y);
-  Dec(View^.Size.Y);
+  Inc(View.Origin.Y);
+  Dec(View.Size.Y);
   Insert(View);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y);
   lb := New(TPktList, Init(R, 1, TScrollBar(View)));
-  lb^.Options := lb^.Options+ofFramed;
+  lb.Options := lb.Options+ofFramed;
   Insert(lb);
-  lb^.NewLisT(C);
-  lb^.SetRange(C^.Count);
+  lb.NewLisT(C);
+  lb.SetRange(C.Count);
   R.Assign(2, 1, 8, 2);
   View := TLabel.Create(R, '~From~', nil);
   Insert(View);
@@ -708,12 +708,12 @@ function PktHeaderDlg(AText: String): TDialog;
   begin
   R.Assign(13, 6, 66, 17);
   Dialog := New(TDialog, Init(R, GetString(dlPktHeader)));
-  with Dialog^ do
+  with Dialog do
     begin
     Options := Options+ofCenterX+ofCenterY;
     R.Assign(20, 8, 32, 10);
     View := TButton.Create(R, 'Ok', cmOK, bfDefault);
-    View^.Options := View^.Options+ofCenterX;
+    View.Options := View.Options+ofCenterX;
     Insert(View);
     R.Assign(2, 1, 51, 8);
     View := TStaticText.Create(R, AText);
@@ -751,24 +751,24 @@ procedure TPktListDialog.HandleEvent(var Event: TEvent);
     case DNKeyCode(Event) of
       kbEnter, kbF3:
         begin
-        Pc := lb^.List^.At(lb^.Focused);
+        Pc := lb.List.At(lb.Focused);
         if Pc = nil then
           Exit;
         New(Buf);
-        Pc^.GetMsgTxt(Buf, M);
-        s1 := Pc^.Fu^;
-        s2 := Pc^.Tu^;
-        s3 := Pc^.Su^;
-        s4 := Pc^.DT^;
-        D := New(TPktMsgViewer, Init(Buf, s1, s2, s3, s4, lb^.Focused+1,
-               lb^.List^.Count,
-              Pc^.FA, Pc^.TA));
+        Pc.GetMsgTxt(Buf, M);
+        s1 := Pc.Fu^;
+        s2 := Pc.Tu^;
+        s3 := Pc.Su^;
+        s4 := Pc.DT^;
+        D := New(TPktMsgViewer, Init(Buf, s1, s2, s3, s4, lb.Focused+1,
+               lb.List.Count,
+              Pc.FA, Pc.TA));
         Dispose(Buf);
         Desktop.ExecView(D);
         D.Free;
         end;
       kbF2:
-        ViewPktHeader(lb^.List^.Count);
+        ViewPktHeader(lb.List.Count);
     end {case};
   inherited HandleEvent(Event);
   end { TPktListDialog.HandleEvent };
@@ -908,15 +908,15 @@ constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
   inherited Create(R, GetString(dlViewMsg));
   Options := Options or ofCentered;
   VS := StandardScrollBar(sbVertical+sbHandleKeyboard);
-  Inc(VS^.Origin.Y, 5);
-  Dec(VS^.Size.Y, 5);
+  Inc(VS.Origin.Y, 5);
+  Dec(VS.Size.Y, 5);
   Insert(VS);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
   EventMask := $FFFF;
   FV := TLineViewer.Create(R, nil, VS, Buf);
-  FV^.Options := FV^.Options or ofFramed;
+  FV.Options := FV.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
   S := '~Msg~  :'+just(ItoS(MsgN), 5, 1)+'/'+just(ItoS(AllMsg), 5, 2)
@@ -1017,7 +1017,7 @@ procedure TPktMsgViewer.SaveAsText;
     end;
   InitSysError;
   Area := '';
-  FV^.FileLines.ForEach(FindArea);
+  FV.FileLines.ForEach(FindArea);
   Writeln(F, GetString(dlLine));
   Writeln(F, 'AREA: '+Area);
   Writeln(F, PS1^);
@@ -1025,7 +1025,7 @@ procedure TPktMsgViewer.SaveAsText;
   Writeln(F, Ps3^);
   Writeln(F, Ps4^);
   Writeln(F, GetString(dlLine));
-  FV^.FileLines.ForEach(WriteFile);
+  FV.FileLines.ForEach(WriteFile);
   System.Close(F);
   end { TPktMsgViewer.SaveAsText };
 
@@ -1051,27 +1051,27 @@ constructor TMsgViewerDlg.Create(FName: String);
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
   VS := StandardScrollBar(sbVertical+sbHandleKeyboard);
-  Inc(VS^.Origin.Y, 5);
-  Dec(VS^.Size.Y, 5);
+  Inc(VS.Origin.Y, 5);
+  Dec(VS.Size.Y, 5);
   Insert(VS);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
   FV := TMsgViewer.Create(R, nil, VS, FName);
-  FV^.Options := FV^.Options or ofFramed;
+  FV.Options := FV.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
   Lb1 := New(TLabel, Init(R,
-         '~Msg~  :Private '+Spaces(30)+'~Date~ :'+FV^.Date^, nil));
+         '~Msg~  :Private '+Spaces(30)+'~Date~ :'+FV.Date^, nil));
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
-  Lb2 := TLabel.Create(R, '~From~ :'+FV^.FromUser^, nil);
+  Lb2 := TLabel.Create(R, '~From~ :'+FV.FromUser^, nil);
   Insert(Lb2);
   R.Assign(1, 3, 79, 4);
-  Lb3 := TLabel.Create(R, '~To  ~ :'+FV^.ToUser^, nil);
+  Lb3 := TLabel.Create(R, '~To  ~ :'+FV.ToUser^, nil);
   Insert(Lb3);
   R.Assign(1, 4, 79, 5);
-  Lb4 := TLabel.Create(R, '~Subj~ :'+FV^.Subj^, nil);
+  Lb4 := TLabel.Create(R, '~Subj~ :'+FV.Subj^, nil);
   Insert(Lb4);
   SelectNext(False);
   CurMsg := NewStr(FName);
@@ -1187,14 +1187,14 @@ procedure TMsgViewerDlg.GotoMsg;
   FV.Free;
   VS := StandardScrollBar(sbVertical+sbHandleKeyboard);
   EventMask := $FFFF;
-  Inc(VS^.Origin.Y, 5);
-  Dec(VS^.Size.Y, 5);
+  Inc(VS.Origin.Y, 5);
+  Dec(VS.Size.Y, 5);
   Insert(VS);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y, 5);
   FV := TMsgViewer.Create(R, nil, VS, CurMsg^);
-  FV^.Options := FV^.Options or ofFramed;
+  FV.Options := FV.Options or ofFramed;
   Insert(FV);
   Lb1.Free;
   Lb1 := nil;
@@ -1207,16 +1207,16 @@ procedure TMsgViewerDlg.GotoMsg;
   R.Assign(1, 1, 79, 2);
   if FV <> nil then
     Lb1 := New(TLabel, Init(R,
-           '~Msg  ~:Private '+Spaces(30)+'~Date~ :'+FV^.Date^, nil));
+           '~Msg  ~:Private '+Spaces(30)+'~Date~ :'+FV.Date^, nil));
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
-  Lb2 := TLabel.Create(R, '~From ~:'+FV^.FromUser^, nil);
+  Lb2 := TLabel.Create(R, '~From ~:'+FV.FromUser^, nil);
   Insert(Lb2);
   R.Assign(1, 3, 79, 4);
-  Lb3 := TLabel.Create(R, '~To   ~:'+FV^.ToUser^, nil);
+  Lb3 := TLabel.Create(R, '~To   ~:'+FV.ToUser^, nil);
   Insert(Lb3);
   R.Assign(1, 4, 79, 5);
-  Lb4 := TLabel.Create(R, '~Subj ~:'+FV^.Subj^, nil);
+  Lb4 := TLabel.Create(R, '~Subj ~:'+FV.Subj^, nil);
   Insert(Lb4);
   SelectNext(False);
   Redraw;
@@ -1261,12 +1261,12 @@ procedure TMsgViewerDlg.SaveAsText;
     +']'#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196
     +#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196
     +#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196);
-  Writeln(F, 'Msg  : Private '+Spaces(30)+'Date : '+FV^.Date^);
-  Writeln(F, 'From : '+FV^.FromUser^);
-  Writeln(F, 'To   : '+FV^.ToUser^);
-  Writeln(F, 'Subj : '+FV^.Subj^);
+  Writeln(F, 'Msg  : Private '+Spaces(30)+'Date : '+FV.Date^);
+  Writeln(F, 'From : '+FV.FromUser^);
+  Writeln(F, 'To   : '+FV.ToUser^);
+  Writeln(F, 'Subj : '+FV.Subj^);
   Writeln(F, GetString(dlLine));
-  FV^.FileLines.ForEach(WriteFile);
+  FV.FileLines.ForEach(WriteFile);
   System.Close(F);
   end { TMsgViewerDlg.SaveAsText };
 

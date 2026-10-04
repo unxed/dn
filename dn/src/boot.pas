@@ -198,28 +198,28 @@ procedure DoStartup;
     F := TTextReader.Create(SourceDir+'dnhgl.grp');
     if F = nil then
       Exit;
-    if not F^.Eof then
-      CustomMask1 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask2 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask3 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask4 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask5 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask6 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask7 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask8 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask9 := F^.GetStr;
-    if not F^.Eof then
-      CustomMask10 := F^.GetStr;
-    if not F^.Eof then
-      Archives := F^.GetStr;
+    if not F.Eof then
+      CustomMask1 := F.GetStr;
+    if not F.Eof then
+      CustomMask2 := F.GetStr;
+    if not F.Eof then
+      CustomMask3 := F.GetStr;
+    if not F.Eof then
+      CustomMask4 := F.GetStr;
+    if not F.Eof then
+      CustomMask5 := F.GetStr;
+    if not F.Eof then
+      CustomMask6 := F.GetStr;
+    if not F.Eof then
+      CustomMask7 := F.GetStr;
+    if not F.Eof then
+      CustomMask8 := F.GetStr;
+    if not F.Eof then
+      CustomMask9 := F.GetStr;
+    if not F.Eof then
+      CustomMask10 := F.GetStr;
+    if not F.Eof then
+      Archives := F.GetStr;
     F.Free;
     end { ReadHighlite };
   {JO}

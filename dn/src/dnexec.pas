@@ -429,7 +429,7 @@ function ExecExtFile(const ExtFName: String; UserParams: PUserParams;
   ExecExtFile := False;
   FileMode := $40;
   Local := True;
-  FName := UserParams^.Active^.FlName[True];
+  FName := UserParams^.Active.FlName[True];
 
   F := TTextReader.Create(ExtFName);
 
@@ -473,10 +473,10 @@ RepeatLocal:
   S := MakeString(S, UserParams, False, @S1);
   if S1 <> ''
   then
-    TempFile := '!'+S1+'|'+MakeNormName(UserParams^.Active^.Owner^, FName)
+    TempFile := '!'+S1+'|'+MakeNormName(UserParams^.Active.Owner^, FName)
   else if TempFile <> ''
   then
-    TempFile := MakeNormName(UserParams^.Active^.Owner^, FName);
+    TempFile := MakeNormName(UserParams^.Active.Owner^, FName);
   {if TempFile <> '' then SaveDsk;}
  
   if Abort then
@@ -487,13 +487,13 @@ RepeatLocal:
     Delete(S, 1, 1); {DelFC(S);}
   lGetDir(0, S1);
   
-  if UpStrg(MakeNormName(lfGetLongFileName(UserParams^.Active^.Owner^),
+  if UpStrg(MakeNormName(lfGetLongFileName(UserParams^.Active.Owner^),
          '.')) <>
     UpStrg(MakeNormName(S1, '.'))
   then
     begin
     DirToChange := S1;
-    lChDir(lfGetLongFileName(UserParams^.Active^.Owner^));
+    lChDir(lfGetLongFileName(UserParams^.Active.Owner^));
     end;
   
   ExecExtFile := True;
