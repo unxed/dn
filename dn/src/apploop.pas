@@ -53,7 +53,7 @@ interface
 uses
    {Cat}
   DNUtil, Drivers, Views,
-  timeutil, Defines, baseobjs
+  timeutil, Defines, objutil
   ;
 
 type

@@ -19,7 +19,7 @@
 |---|---|
 | `src/` | исходники DN (Pascal): программа, панели, редактор, просмотрщик; тексты ресурсов (`RESOURCE/`), `rcpvpd.ini` |
 | `archives/` | по юниту на формат архива (`arc_*.pas`: zip, rar, 7z, tar...) |
-| `compat/` | среда, которую ждёт код DN: слой Virtual Pascal (`osdep`...), Borland-юниты поверх `tv/` (`drivers`, `baseobjs` (was `baseobjs`)), слой DPMI32 (`realmode`, один юнит); `compat/linux/` — замены юнитов для сборок не под DOS (`country_.pas`) |
+| `compat/` | среда, которую ждёт код DN: слой Virtual Pascal (`osdep`...), Borland-юниты поверх `tv/` (`drivers`, `objutil` (was `baseobjs`)), слой DPMI32 (`realmode`, один юнит); `compat/linux/` — замены юнитов для сборок не под DOS (`country_.pas`) |
 | `data/` | данные, которые DN читает при работе (таблицы кодовых страниц, палитры, настройки по умолчанию) |
 | `compat/shims/` | описание того, что DN берёт из `tv/` (юниты-прокладки генерирует `tools/gen-shim.py`) |
 | `tests/` | тесты наших юнитов (`t_*.pas`; `tools/dn-test.sh`) |

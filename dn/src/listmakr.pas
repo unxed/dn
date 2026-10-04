@@ -9,7 +9,7 @@ unit ListMakr;
 interface
 
 uses
-  Defines, baseobjs, Streams, DNStrL, ObjType;
+  Defines, objutil, Streams, DNStrL, ObjType;
 
 type
   PStrListMaker = ^TStrListMaker;

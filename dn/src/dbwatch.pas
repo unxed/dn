@@ -70,7 +70,7 @@ unit DBWatch;
 interface
 
 uses
-  Collect, baseobjs, Streams, Defines
+  Collect, objutil, Streams, Defines
   ;
 
 type

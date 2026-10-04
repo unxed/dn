@@ -62,7 +62,7 @@ uses
   Startup, Lfn, Messages, Defines, FilesCol, fileutil, strutil, UserMenu,
   basics, HistList, Commands, mainapp, DNUtil, Tree, Views, Drivers, Drives
   {, dnfuncs} {надо вставлять до Dos}
-  , Dos, Dialogs, baseobjs
+  , Dos, Dialogs, objutil
   , fileerrors, panelroot
   ;
 type

@@ -51,7 +51,7 @@ unit editwin;
 interface
 
 uses
-  Defines, Streams, baseobjs, editcore, Menus, editundo, UniWin
+  Defines, Streams, objutil, editcore, Menus, editundo, UniWin
   ;
 
 type

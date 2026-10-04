@@ -112,7 +112,7 @@ uses
   {    копирование описаний }
   
 
-  , panelsetup, Lfn, uselfn, Streams, Drivers, baseobjs, Dialogs
+  , panelsetup, Lfn, uselfn, Streams, Drivers, objutil, Dialogs
   , Strings;
 
 const

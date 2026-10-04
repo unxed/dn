@@ -52,7 +52,7 @@ unit RStrings;
 interface
 
 uses
-  Defines, baseobjs, Streams, linepos, Commands
+  Defines, objutil, Streams, linepos, Commands
   ;
 
 type

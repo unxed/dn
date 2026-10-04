@@ -52,7 +52,7 @@ unit Phones;
 interface
 
 uses
-  Defines, baseobjs, Streams, Drivers, Dialogs, Menus,
+  Defines, objutil, Streams, Drivers, Dialogs, Menus,
   Views, DNStdDlg, Collect, StrView
   ;
 

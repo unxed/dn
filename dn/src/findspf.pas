@@ -58,7 +58,7 @@ function FindFileWithSPF(pFileName: String; Info: PWhileView): String;
 implementation
 
 uses
-  Lfn, baseobjs, Collect,
+  Lfn, objutil, Collect,
   Commands, mainapp,
   Dos, basics, strutil, fileutil, Messages, DnIni
   ;

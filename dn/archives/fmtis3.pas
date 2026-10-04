@@ -50,7 +50,7 @@ unit fmtis3; {IS3}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, baseobjs, Streams
+  Archiver, basics, strutil, Defines, objutil, Streams
   ;
 
 type

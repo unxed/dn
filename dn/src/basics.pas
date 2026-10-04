@@ -55,7 +55,7 @@ interface
 uses
   Dos,
   Strings,
-  baseobjs, Lfn {DataCompBoy}
+  objutil, Lfn {DataCompBoy}
   , Defines, Streams
   ;
 

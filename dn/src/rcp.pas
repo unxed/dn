@@ -65,7 +65,7 @@ program RCP;
 {file                                                                 }
 
 uses
-  Lfn, Collect, Drivers, Dos, Defines, baseobjs, Streams, basics,
+  Lfn, Collect, Drivers, Dos, Defines, objutil, Streams, basics,
   strutil, fileutil,
   RStrings, GetConst, Menus, Commands, Setups, DNHelp, Views, mainapp,
    Startup,

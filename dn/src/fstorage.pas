@@ -51,7 +51,7 @@ unit FStorage;
 interface
 
 uses
-  baseobjs, Streams, Defines, FilesCol
+  objutil, Streams, Defines, FilesCol
   ;
 
 type

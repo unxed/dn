@@ -52,7 +52,7 @@ interface
 
 uses
   uselfn,
-  Views, Defines, baseobjs, Streams, Collect
+  Views, Defines, objutil, Streams, Collect
   ;
 
 const

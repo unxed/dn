@@ -67,7 +67,7 @@ type
 implementation
 
 uses
-  baseobjs, fileutil, basics, mainapp, DnExec, Commands, strutil, Messages,
+  objutil, fileutil, basics, mainapp, DnExec, Commands, strutil, Messages,
   Dos
   ;
 
