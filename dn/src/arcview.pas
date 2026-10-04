@@ -1056,17 +1056,17 @@ procedure TArcDrive.ChangeUp(var S: String);
     Exit;
   if Prev = nil then
     begin
-    New(Prev, Init(0, Panel));
+    Prev := PDrive.Create(0, Panel);
     if Prev = nil then
       Exit;
     {Prev.Owner := Owner;}
     end;
-  PFilePanel(Panel)^.Drive := Prev;
-  if TypeOf(Prev^) = TypeOf(TDrive) then
+  PFilePanel(Panel).Drive := Prev;
+  if Prev is TDrive then
     Prev.lChDir(GetPath(VArcName));
   {piwamoto: VArcName is a feature, not a bug :-)}
   if  (Prev.DriveType = dtDisk) and
-      (PView(Panel)^.GetState(sfSelected+sfActive))
+      (PView(Panel).GetState(sfSelected+sfActive))
   then
     ActivePanel := Panel;
   GlobalMessage(evCommand, cmRereadInfo, nil);
@@ -1405,11 +1405,11 @@ TryAgain:
   else
     begin
     { перекидываем файлы из временного подкаталога в каталог назначения}
-    PV := New(PUserWindow, Init);
+    PV := PUserWindow.Create;
     Desktop.Insert(PV);
     CopyDirContent(TempExtrDir+SCurDir, ExtrDir, True,
        (Options and 4 <> 0));
-    PV^.Free;
+    PV.Free;
     { удаляем временный каталог со всем, что в нём осталось}
     SetLength(TempExtrDir, Length(TempExtrDir)-1);
     S := GetPath(TempExtrDir);
@@ -1419,8 +1419,8 @@ TryAgain:
         
         0, 0, 0, 0, Directory,
         @S);
-    New(FCT, Init(1, 1));
-    FCT^.AtInsert(0, FRT);
+    FCT := PFilesCollection.Create(1, 1);
+    FCT.AtInsert(0, FRT);
     OldConfirms := Confirms;
     Confirms := 0;
     LFN.lChDir(S);
@@ -1428,8 +1428,8 @@ TryAgain:
     LFN.lChDir(DirToChange);
     DirToChange := '';
     Confirms := OldConfirms;
-    FCT^.DeleteAll;
-    Dispose(FCT, Done);
+    FCT.DeleteAll;
+    FCT.Free;
     if Inhr > 0 then
       begin
       ExtrDir := '>' + ExtrDir; //признак перечитывания подкаталогов в ветви
@@ -1573,10 +1573,10 @@ procedure TArcDrive.EraseFiles(AFiles: PCollection);
     S := Cut(ArcName, 40);
     MessageBox(GetString(dlArcMsg4)+S, nil, mfError+mfOKButton);
     ChangeUp(CurDir);
-    PFilePanel(O)^.ReadDirectory;
+    PFilePanel(O).ReadDirectory;
     end
   else
-    PFilePanel(O)^.RereadDir;
+    PFilePanel(O).RereadDir;
   end { TArcDrive.EraseFiles };
 {-DataCompBoy-}
 
@@ -1666,7 +1666,7 @@ procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
            (AType.GetID = arcAIN) or
            (AType.GetID = arc7Z) then
           begin
-          PFilePanel(Panel)^.ForceReading := True;
+          PFilePanel(Panel).ForceReading := True;
           end;
         
         O := Panel;
@@ -1675,7 +1675,7 @@ procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
           CurDir := '';
           ChangeUp(CurDir);
           end;
-        PFilePanel(O)^.RereadDir;
+        PFilePanel(O).RereadDir;
         end;
   end {case};
   end { TArcDrive.HandleCommand };
@@ -1707,7 +1707,7 @@ function ArcViewer(AName, VAName: String): Boolean;
     PathInside := '';
   {/JO}
   ArcViewer := False;
-  P := New(PArcDrive, Init(AName, VAName));
+  P := PArcDrive.Create(AName, VAName);
   if Abort then
     begin
     ArcViewer := True;
@@ -1723,7 +1723,7 @@ function ArcViewer(AName, VAName: String): Boolean;
     Xt := UpStrg(GetExt(AName));
     if  (Xt = '.TDR') or (Xt = '.AVT')
     then
-      P := New(PArvidDrive, Init(AName));
+      P := PArvidDrive.Create(AName);
     if P = nil then
       
       Exit;
@@ -1734,7 +1734,7 @@ function ArcViewer(AName, VAName: String): Boolean;
   Desktop.HandleEvent(E);
   if E.What <> evNothing then
     begin
-    Dispose(P, Done);
+    P.Free;
     Exit;
     end
   else
@@ -1746,7 +1746,7 @@ function ArcViewer(AName, VAName: String): Boolean;
       SetLength(PathInside, Length(PathInside)-2);
     if  (GetPath(PathInside) <> '\') then
       begin
-      P^.lChDir(Copy(GetPath(PathInside), 2, 255));
+      P.lChDir(Copy(GetPath(PathInside), 2, 255));
       Message(Application, evCommand, cmPanelReread, nil);
       end;
     end;
@@ -1871,8 +1871,8 @@ function TArcDrive.OpenDirectory(const Dir: String;
         Inc(MemReq, SizeOf(TFileRec));
         Inc(MemReq, Length(PDir^+Name)+2);
         end;
-      if Dirs^.IndexOf(PDir) = -1 then
-        Dirs^.Insert(PDir);
+      if Dirs.IndexOf(PDir) = -1 then
+        Dirs.Insert(PDir);
       Fils.AtInsert(Fils.Count, FR);
       {JO: добавляем каталоги}
       if PutDirs and (Length(Files.LastDir) > L) then
@@ -1894,8 +1894,8 @@ function TArcDrive.OpenDirectory(const Dir: String;
                 0, ArcDate, 0, 0, $80 or Directory, PDir);
             Inc(MemReq, SizeOf(TFileRec));
             Inc(MemReq, Length(PDir^+DrName)+2);
-            if Dirs^.IndexOf(PDir) = -1 then
-              Dirs^.Insert(PDir);
+            if Dirs.IndexOf(PDir) = -1 then
+              Dirs.Insert(PDir);
             if Fils.Search(FR, I) then
               DelFileRec(FR)
             else
@@ -2017,8 +2017,8 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
               _USize, Date, 0, 0, Attr, PDir);
           Inc(MemReq, SizeOf(TFileRec));
           Inc(MemReq, Length(PDir^+Name)+2);
-          if Dirs^.IndexOf(PDir) = -1 then
-            Dirs^.Insert(PDir);
+          if Dirs.IndexOf(PDir) = -1 then
+            Dirs.Insert(PDir);
           Fils.AtInsert(Fils.Count, FR);
           end;
         {JO: добавляем каталоги}
@@ -2049,8 +2049,8 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
                   0, ArcDate, 0, 0, $80 or Directory, PDir);
               Inc(MemReq, SizeOf(TFileRec));
               Inc(MemReq, Length(PDir^+DrName)+2);
-              if Dirs^.IndexOf(PDir) = -1 then
-                Dirs^.Insert(PDir);
+              if Dirs.IndexOf(PDir) = -1 then
+                Dirs.Insert(PDir);
               if Fils.Search(FR, I) then
                 DelFileRec(FR)
               else
