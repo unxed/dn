@@ -113,7 +113,7 @@ procedure MISaveFileAs(AED: TFileEditor);
   
   {/Cat}
 
-  with AED^ do
+  with AED do
     begin
     FileName := GetFileNameDialog(x_x, GetString(dlSaveFileAs),
         GetString(dlSaveFileAsName),
@@ -153,7 +153,7 @@ procedure MIOpenFile(AED: TFileEditor);
   var
     FileName: String;
   begin
-  with AED^ do
+  with AED do
     begin
     FileName := GetFileNameDialog(x_x, GetString(dlOpenFile),
         GetString(dlOpenFileName),
@@ -199,7 +199,7 @@ procedure MISaveFile(AED: TFileEditor);
   
   {/Cat}
 
-  with AED^ do
+  with AED do
     begin
     MIUnLockFile(AED);
     if ClipBrd then
@@ -208,8 +208,8 @@ procedure MISaveFile(AED: TFileEditor);
         ClipBoardStream.Free;
       ClipBoardStream := nil;
       PC := TLineCollection.Create(100, 5, True);
-      for I := 0 to FileLines^.Count-1 do
-        PC.Insert(NewLongStr(CnvLongString(FileLines^.At(I))));
+      for I := 0 to FileLines.Count-1 do
+        PC.Insert(NewLongStr(CnvLongString(FileLines.At(I))));
       CopyLines2Stream(PC, ClipBoardStream);
       PC.Free;
       end
@@ -261,7 +261,7 @@ procedure MISaveFile(AED: TFileEditor);
         lChangeFileName(EditName, Dr+Nm+'.BAK');
         ClrIO;
         end;
-      New(S, Init(EditName, stCreate, 4096));
+      S := TBufStream.Create(EditName, stCreate, 4096);
       if S = nil then
         begin
         MILockFile(AED);
@@ -274,7 +274,7 @@ procedure MISaveFile(AED: TFileEditor);
       кроме того, добавил вызов FileChanged - в случае неуспешной записи
       содержимое файла может поменяться}
       WriteBlock(EditName, S, FileLines, EdOpt.ForcedCRLF, OptimalFill);
-      if S^.Status <> stOK then
+      if S.Status <> stOK then
         begin
         CantWrite(EditName);
         S.Free;
@@ -326,14 +326,14 @@ procedure ScanDocU8(AED: TFileEditor);
     P: PLongString;
     Ok: Boolean;
   begin
-  with AED^ do
+  with AED do
     begin
     TabNatural(DocTab);
     DocU8 := False;
     Ok := True;
-    for I := 0 to FileLines^.Count-1 do
+    for I := 0 to FileLines.Count-1 do
       begin
-      P := FileLines^.At(I);
+      P := FileLines.At(I);
       if (P <> nil) and not TabSee(DocTab, P^) then
         begin
         Ok := False;
@@ -360,7 +360,7 @@ procedure MILoadFile(AED: TFileEditor; Name: String);
     PC: TCollection; {-$VOL}
     
   begin
-  with AED^ do
+  with AED do
     begin
     if FileLines <> nil then
       FileLines.Free;
@@ -389,7 +389,7 @@ procedure MILoadFile(AED: TFileEditor; Name: String);
         PC := nil;
         CopyStream2Lines(ClipBoardStream, PC);
         if PC <> nil then
-          with PC^ do
+          with PC do
             begin
             while Count > 0 do
               begin
@@ -399,7 +399,7 @@ procedure MILoadFile(AED: TFileEditor; Name: String);
             PC.Free;
             end;
         end; {-$VOL end}
-      if FileLines^.Count = 0 then
+      if FileLines.Count = 0 then
         FileLines.Insert(NewLongStr(''))
       end
     else
@@ -512,7 +512,7 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
     begin
     if KeyMapDetecting then
       CodePageDetector.CheckString(PChar(B), J);
-    with AED^ do
+    with AED do
       begin
       TS := TabStep;
       InChar := PChar(B);
@@ -602,27 +602,27 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
     ep: Boolean;
     tmr: TEventTimer;
   begin { MIReadBlock }
-  with AED^ do
+  with AED do
     begin
     MIReadBlock := nil;
     Abort := False;
-    CodePageDetector.Init;
+    CodePageDetector := TCodePageDetector.Create;
     KeyMap := ProcessDefCodepage(DefCodePage);
     KeyMapDetecting := (KeyMap = kmNone);
     ODOA := 0;
     OD := 0;
     OA := 0;
     S := TBufStream.Create(FileName, stOpenRead, 1024);
-    if  (S^.Status <> stOK) then
+    if  (S.Status <> stOK) then
       begin
-      K := S^.ErrorInfo;
+      K := S.ErrorInfo;
       isValid := (K = 2) or (K = 3) or (K = 110);
       if  (K <> 2) and (K <> 3) and (K <> 110) then
         MessFileNotOpen(FileName, K); {JO, AK155}
       S.Free;
       Exit
       end;
-    if  (S^.GetSize > MemAvail-$4000)
+    if  (S.GetSize > MemAvail-$4000)
     then
       begin
       Application.OutOfMemory;
@@ -640,8 +640,8 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
       end;
     Info := nil;
     I := 0;
-    FFSize := i32(S^.GetSize);
-    Lines := New(TLineCollection, Init(1000 + (FFSize div 20), 1000, True));
+    FFSize := i32(S.GetSize);
+    Lines := TLineCollection.Create(1000 + (FFSize div 20), 1000, True);
     {-$VOL begin}
     if EditorDefaults.EdOpt and ebfTRp = 0
     then
@@ -655,9 +655,9 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
     if TabStep > 100 then
       TabStep := 100;
     {-$VOL end}
-    S^.Seek(0);
+    S.Seek(0);
     I := 0;
-    FFSize := i32(S^.GetSize);
+    FFSize := i32(S.GetSize);
     LCount := 1;
     ep := False;
     NewTimer(tmr, 150);
@@ -669,7 +669,7 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
     while I < FFSize do
       begin
       UpdateWriteView(Info);
-      S^.Read(B^, J);
+      S.Read(B^, J);
       if TimerExpired(tmr) then
         begin
         NewTimer(tmr, 150);
@@ -677,8 +677,8 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
           Info := WriteMsg(^M^M^C+GetString(dlReadingFile));
         ep := ESC_Pressed;
         end;
-      if  (S^.Status <> stOK) or ep or Abort or (MemAvail < $4000) or
-        (Lines^.Count > MaxCollectionSize)
+      if  (S.Status <> stOK) or ep or Abort or (MemAvail < $4000) or
+        (Lines.Count > MaxCollectionSize)
       then
         begin
         Lines.Free;
@@ -691,13 +691,13 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
         isValid := False;
         Exit
         end;
-      if  (B^[J] = 13) and (S^.GetPos < S^.GetSize) then
+      if  (B^[J] = 13) and (S.GetPos < S.GetSize) then
         begin
         Dec(J);
-        S^.Seek(S^.GetPos-1);
+        S.Seek(S.GetPos-1);
         end;
       SearchLines;
-      I := i32(S^.GetPos){!!s};
+      I := i32(S.GetPos){!!s};
       if FFSize-I > FBufSize then
         J := FBufSize
       else
@@ -735,20 +735,20 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
 
 procedure MILockFile(AED: TFileEditor);
   begin
-  with AED^ do
+  with AED do
     begin
     if EditorDefaults.EdOpt and ebfLck = 0 then
       Exit;
     if Locker <> nil then
       Locker.Free;
-    Locker := New(TDosStream, Init(EditName, (stOpenRead and fmDeny) or
-           fmDenyWrite));
+    Locker := TDosStream.Create(EditName, (stOpenRead and fmDeny) or
+           fmDenyWrite);
     end
   end;
 
 procedure MIUnLockFile(AED: TFileEditor);
   begin
-  with AED^ do
+  with AED do
     begin
     if EditorDefaults.EdOpt and ebfLck = 0 then
       Exit;
@@ -761,7 +761,7 @@ procedure MIUnLockFile(AED: TFileEditor);
 
 procedure MIStore(AED: TFileEditor; var S: TStream);
   begin
-  with AED^ do
+  with AED do
     begin
     PutPeerViewPtr(S, HScroll);
     PutPeerViewPtr(S, VScroll);
@@ -798,7 +798,7 @@ procedure MILoad(AED: TFileEditor; var S: TStream);
   var
     SS: PString;
   begin
-  with AED^ do
+  with AED do
     begin
     GetPeerViewPtr(S, HScroll);
     GetPeerViewPtr(S, VScroll);
@@ -857,10 +857,10 @@ procedure MIAwaken(AED: TFileEditor);
     _KeyMap: TKeyMap;
     _ForcedCrLf: TCRLF;
   begin
-  with AED^ do
+  with AED do
     begin
-    X := HScroll^.Value;
-    Y := VScroll^.Value;
+    X := HScroll.Value;
+    Y := VScroll.Value;
     XD := Pos;
     Hi := EdOpt.HiLite;
     _KeyMap := KeyMap; {Cat}
