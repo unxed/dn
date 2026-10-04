@@ -231,7 +231,7 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
         MakeScrollBar(sbVertical+sbHandleKeyboard), FileName));
 
-  {FreeObject(Intern);}
+
 
   Pi := MenuBar^.Menu^.Items;
   while (Pi <> nil) and (Pi^.HelpCtx <> hcedOptions) do

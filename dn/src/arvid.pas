@@ -241,6 +241,7 @@ var
 
 implementation
 uses
+  SysUtils,
   basics, fileutil, strutil, filepanel, Commands, Startup, mainapp,
   Drivers, Messages, Dialogs, FileFind, DNUtil, FileCopy, keymap,
   ArvidAvt, ArvidTdr

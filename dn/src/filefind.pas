@@ -222,6 +222,7 @@ var
 
 implementation
 uses
+  SysUtils,
   Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos, Messages, HistList, Commands, panelroot, filepanel
   , FViewer, editcore,
   Tree, timeutil, DNUtil, keymap, {!!}CmdLine, histories,
@@ -744,7 +745,7 @@ function FindFiles(var Files: PFilesCollection;
         ArcDirs.Free;
         CtrlBreakHit := False;
 NotArchive:
-        FreeObject(ArcFile);
+        FreeAndNil(ArcFile);
         end; {конец поиска в архиве}
       {/JO}
       if  (MAvail <= MemReq) then
@@ -1804,12 +1805,12 @@ procedure TFindDrive.UseFile(P: PFileRec; Command: Word);
     ArcFile := TBufStream.Create(OwnArc, stOpenRead, 512);
     if  (ArcFile = nil) or (ArcFile.Status <> stOK) then
       begin
-      FreeObject(ArcFile); {Abort := true;}
+      FreeAndNil(ArcFile); {Abort := true;}
       Exit;
       end;
     SkipSFX;
     AType := DetectArchive;
-    FreeObject(ArcFile);
+    FreeAndNil(ArcFile);
     if AType = nil then
       Exit;
 
