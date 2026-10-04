@@ -1,0 +1,25 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            00:24:59a
+x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
+║       Name       │       Name       │║║       Name       │       Name       │▲
+║TEMP              │                   ║║TEMP              │                   ■
+║╔═[■]═══════════════════════════════ Copy ═══════════════════════════════════╗▒
+║║  Copy directory TEMP to                                                    ║▒
+║║  TEMP                                                                   ▐↓▌║▒
+║║                                                                            ║▒
+║║  All files with the same names:                                            ║▒
+║║  ( ) Overwrite                       [ ] Check free disk space             ║▒
+║║  ( ) Append                          [ ] Verify disk writes                ║▒
+║║  ( ) Resume                          [X] Copy descriptions                 ║▒
+║║  ( ) Skip                            [ ] Remove source files               ║▒
+║║  ( ) Refresh                                                               ║▒
+║║  (•) Ask the action                                                        ║▒
+║║                                                                            ║▒
+║║                    OK   ▄  Cancel ▄   Tree  ▄   Help  ▄                    ║▒
+║║                  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀                    ║▒
+║╚════════════════════════════════════════════════════════════════════════════╝▒
+║                  │                   ║║                  │                   ▼
+║──────────────────┴───────────────────║║──────────────────┴───────────────────║
+║TEMP             4,096 10/04/26  0:24a║║TEMP             4,096 10/04/26  0:24a║
+└[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
+C:\>                                                                            
+ F1 Help  F10 Tree                                                              

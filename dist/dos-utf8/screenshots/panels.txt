@@ -1,0 +1,25 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            00:24:20a
+x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
+║       Name       │       Name       │║║       Name       │       Name       │▲
+║TEMP              │                   ║║TEMP              │                   ■
+║ENGLISH       DLG │                   ║║ENGLISH       DLG │                   ▒
+║RUSSIAN       DLG │                   ║║RUSSIAN       DLG │                   ▒
+║UKRAIN        DLG │                   ║║UKRAIN        DLG │                   ▒
+║CWSDPMI       EXE │                   ║║CWSDPMI       EXE │                   ▒
+║DN            EXE │                   ║║DN            EXE │                   ▒
+║ENGLISH       HLP │                   ║║ENGLISH       HLP │                   ▒
+║RUSSIAN       HLP │                   ║║RUSSIAN       HLP │                   ▒
+║UKRAIN        HLP │                   ║║UKRAIN        HLP │                   ▒
+║DN            INI │                   ║║DN            INI │                   ▒
+║ENGLISH       LNG │                   ║║ENGLISH       LNG │                   ▒
+║RUSSIAN       LNG │                   ║║RUSSIAN       LNG │                   ▒
+║UKRAIN        LNG │                   ║║UKRAIN        LNG │                   ▒
+║CWSDPMI       SWP │                   ║║CWSDPMI       SWP │                   ▒
+║DNERR         TXT │                   ║║DNERR         TXT │                   ▒
+║OUT           TXT │                   ║║OUT           TXT │                   ▒
+║                  │                   ║║                  │                   ▼
+║──────────────────┴───────────────────║║──────────────────┴───────────────────║
+║TEMP             4,096 10/04/26  0:24a║║TEMP             4,096 10/04/26  0:24a║
+└[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
+C:\>                                                                            
+ F1 Help  F2 User  F3 View  F4 Edit  F5 Copy  F6 Ren  F7 MkDir  F8 Del  F10 Menu

@@ -1,0 +1,25 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            00:24:28a
+ ┌─────────────────────────────────┐ ══╗x════════════════ C:\ ═════════════[↕]═╗
+ │ About...                        │  │║║       Name       │       Name       │▲
+ │ Refresh display                 │   ║║TEMP              │                   ■
+ │ Screen rest                     │   ║║ENGLISH       DLG │                   ▒
+ │ Change language         Alt-F12 │   ║║RUSSIAN       DLG │                   ▒
+ ├─────────────────────────────────┤   ║║UKRAIN        DLG │                   ▒
+ │ Screen grabber    Shift-Alt-Ins │   ║║CWSDPMI       EXE │                   ▒
+ │ User screen              Alt-F5 │   ║║DN            EXE │                   ▒
+ │ Output window            Ctrl-O │   ║║ENGLISH       HLP │                   ▒
+ │ SmartPad (TM)             Alt-Q │   ║║RUSSIAN       HLP │                   ▒
+ │ Show Clipboard                  │   ║║UKRAIN        HLP │                   ▒
+ │ Trashcan on/off                 │   ║║DN            INI │                   ▒
+ │ Execute OS command              │   ║║ENGLISH       LNG │                   ▒
+ ├─────────────────────────────────┤   ║║RUSSIAN       LNG │                   ▒
+ │ EGA/VGA lines         Shift-F10 │   ║║UKRAIN        LNG │                   ▒
+ │ Custom video mode 1     Alt-F10 │   ║║CWSDPMI       SWP │                   ▒
+ │ Custom video mode 2    Ctrl-F10 │   ║║DNERR         TXT │                   ▒
+ │ Change Screen  Mode  Shift-F12  │   ║║OUT           TXT │                   ▒
+ ├─────────────────────────────────┤   ║║                  │                   ▼
+ │ Game                     Alt-F9 │ ──║║──────────────────┴───────────────────║
+ └─────────────────────────────────┘ 4a║║TEMP             4,096 10/04/26  0:24a║
+└[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
+C:\>                                                                            
+ F1 Help                                                                        

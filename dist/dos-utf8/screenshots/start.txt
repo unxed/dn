@@ -1,0 +1,25 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            00:24:13a
+x═[■]════════════ C:\ ═════════════════╗x════════════════ C:\ ═════════════[↕]═╗
+║       Name       │       Name       │║║       Name       │       Name       │▲
+║TEMP              │                   ║║TEMP              │                   ■
+║ENGLISH       DLG │╔═[■]══════════ Warning ═══════════════╗                   ▒
+║RUSSIAN       DLG │║                                      ║                   ▒
+║UKRAIN        DLG │║                                      ║                   ▒
+║CWSDPMI       EXE │║           DN/2 Open Source           ║                   ▒
+║DN            EXE │║        Version 2.14 beta/DOS,        ║                   ▒
+║ENGLISH       HLP │║   Compiled 2026-10-04 00:22:12 UTC   ║                   ▒
+║RUSSIAN       HLP │║               (df0cca2)              ║                   ▒
+║UKRAIN        HLP │║         http://www.dnosp.ru/         ║                   ▒
+║DN            INI │║                                      ║                   ▒
+║ENGLISH       LNG │║  Based on: Dos Navigator Open Source ║                   ▒
+║RUSSIAN       LNG │║                1.51.08               ║                   ▒
+║UKRAIN        LNG │║                  OK   ▄              ║                   ▒
+║CWSDPMI       SWP │║                ▀▀▀▀▀▀▀▀              ║                   ▒
+║DNERR         TXT │╚══════════════════════════════════════╝                   ▒
+║OUT           TXT │                   ║║OUT           TXT │                   ▒
+║                  │                   ║║                  │                   ▼
+║──────────────────┴───────────────────║║──────────────────┴───────────────────║
+║TEMP             4,096 10/04/26  0:24a║║TEMP             4,096 10/04/26  0:24a║
+└[ C Z * ]═════════════════════════════╝╚[ C Z * ]════════════════════════════─┘
+C:\>                                                                            
+ F1 Help                                                                        

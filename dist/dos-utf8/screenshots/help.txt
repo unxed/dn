@@ -1,0 +1,25 @@
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window            00:24:45a
+x──────────────── C:\ ─────────────────┐x──────────────── C:\ ─────────────────┐
+│       Name       │       Name       │││       Name       │       Name       ││
+│TEMP          ╔═[■]═════════════════ Help ═════════════════[↑]═╗              │
+│ENGLISH       ║ ┌────────────                                  ▲              │
+│RUSSIAN       ║ │ File panel █                                 ■              │
+│UKRAIN        ║ └▄▄▄▄▄▄▄▄▄▄▄▄█                                 ▒              │
+│CWSDPMI       ║                                                ▒              │
+│DN            ║    File panel - is the main panel of the File  ▒              │
+│ENGLISH       ║ manager. You can work with both files and      ▒              │
+│RUSSIAN       ║ directories, and perform both individual or    ▒              │
+│UKRAIN        ║ group operations. You can set up each panel in ▒              │
+│DN            ║ Options|Panel.                                 ▒              │
+│ENGLISH       ║                                                ▒              │
+│RUSSIAN       ║    One can also set up the view of the current ▒              │
+│UKRAIN        ║ panel from the menu                            ▒              │
+│CWSDPMI       ║ Panel|Select appearance preset... (Alt-"-").   ▒              │
+│DNERR         ║ Or just use the hotkeys Ctrl-(1..9,0) for      ▒              │
+│OUT           ║ presets.                                       ▒              │
+│              ║    Under Windows you can see long or short     ▼              │
+│──────────────└─◄▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓►─┘──────────────│
+│TEMP             4,096 10/04/26  0:24a││TEMP             4,096 10/04/26  0:24a│
+└[ C Z * ]─────────────────────────────┘└[ C Z * ]─────────────────────────────┘
+C:\>                                                                            
+ F1 Help                                                                        

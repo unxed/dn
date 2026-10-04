@@ -1,30 +1,30 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                23:18:48
-x───────── C:\tmp\dntour-11yn1kuq\work ──────────┐x───────── C:\tmp\dntour-11yn1kuq\work ──────────┐
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                05:35:14
+x───────── C:\tmp\dntour-m3nozaqu\work ──────────┐x───────── C:\tmp\dntour-m3nozaqu\work ──────────┐
 │       Name       │       Name       │       Nam││       Name       │       Name       │       Nam│
-│..                │                  │          ││..                ││                  ││        │
-│c             dat │                  │          ││c             dat ││                  ││        │
-│a             txt │     ╔═[■]═════════════════ Help ═════════════════[↑]═╗              ││        │
-│b             txt │     ║ ┌────────────                                  ▲              ││        │
-│                  │     ║ │ File panel █                                 ■              ││        │
-│                  │     ║ └▄▄▄▄▄▄▄▄▄▄▄▄█                                 ▒              ││        │
-│                  │     ║                                                ▒              ││        │
-│                  │     ║    File panel - is the main panel of the File  ▒              ││        │
-│                  │     ║ manager. You can work with both files and      ▒              ││        │
-│                  │     ║ directories, and perform both individual or    ▒              ││        │
-│                  │     ║ group operations. You can set up each panel in ▒              ││        │
-│                  │     ║ Options|Panel.                                 ▒              ││        │
-│                  │     ║                                                ▒              ││        │
-│                  │     ║    One can also set up the view of the current ▒              ││        │
-│                  │     ║ panel from the menu                            ▒              ││        │
-│                  │     ║ Panel|Select appearance preset... (Alt-"-").   ▒              ││        │
-│                  │     ║ Or just use the hotkeys Ctrl-(1..9,0) for      ▒              ││        │
-│                  │     ║ presets.                                       ▒              ││        │
-│                  │     ║    Under Windows you can see long or short     ▼              ││        │
-│                  │     └─◄▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓►─┘              ││        │
-│                  │                  │          ││                  ││                  ││        │
-│                  │                  │          ││                  ││                  ││        │
-│──────────────────┴──────────────────┴──────────││──────────────────┴┴──────────────────┴┴────────│
+│..                ││                  ││        ││..                ││                  ││        │
+│c             dat ││                  ││        ││c             dat ││                  ││        │
+│a             txt ││    ╔═[■]═════════════════ Help ═════════════════[↑]═╗              ││        │
+│b             txt ││    ║ ┌────────────                                  ▲              ││        │
+│                  ││    ║ │ File panel █                                 ■              ││        │
+│                  ││    ║ └▄▄▄▄▄▄▄▄▄▄▄▄█                                 ▒              ││        │
+│                  ││    ║                                                ▒              ││        │
+│                  ││    ║    File panel - is the main panel of the File  ▒              ││        │
+│                  ││    ║ manager. You can work with both files and      ▒              ││        │
+│                  ││    ║ directories, and perform both individual or    ▒              ││        │
+│                  ││    ║ group operations. You can set up each panel in ▒              ││        │
+│                  ││    ║ Options|Panel.                                 ▒              ││        │
+│                  ││    ║                                                ▒              ││        │
+│                  ││    ║    One can also set up the view of the current ▒              ││        │
+│                  ││    ║ panel from the menu                            ▒              ││        │
+│                  ││    ║ Panel|Select appearance preset... (Alt-"-").   ▒              ││        │
+│                  ││    ║ Or just use the hotkeys Ctrl-(1..9,0) for      ▒              ││        │
+│                  ││    ║ presets.                                       ▒              ││        │
+│                  ││    ║    Under Windows you can see long or short     ▼              ││        │
+│                  ││    └─◄▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓►─┘              ││        │
+│                  ││                  ││        ││                  ││                  ││        │
+│                  ││                  ││        ││                  ││                  ││        │
+│──────────────────┴┴──────────────────┴┴────────││──────────────────┴┴──────────────────┴┴────────│
 │..            <UP--DIR>  0.00.80 17:17          ││..            <UP--DIR>  0.00.80 17:17          │
 └[ C * ]─────────────────────────────────────────┘└[ C * ]─────────────────────────────────────────┘
-C:\tmp\dntour-11yn1kuq\work>
+C:\tmp\dntour-m3nozaqu\work>
  F1 Help

@@ -1,5 +1,5 @@
-  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                23:19:22
-x═[■]═════ C:\tmp\dntour-t859tasc\work ══════════╗x═════════ C:\tmp\dntour-t859tasc\work ══════[↕]═╗
+  ♦  File  Disk  Utilities  Panel  Manager  Options  Window                                05:35:48
+x═[■]═════ C:\tmp\dntour-2txthvhf\work ══════════╗x═════════ C:\tmp\dntour-2txthvhf\work ══════[↕]═╗
 ║       Name       │       Name       │       Nam║║       Name       │       Name       │       Nam▲
 ║..                │                  │          ║║..                ││                  ││        ■
 ║c             dat │                  │          ║║c             dat ││                  ││        ▒
@@ -26,5 +26,5 @@ x═[■]═════ C:\tmp\dntour-t859tasc\work ═════════
 ║──────────────────┴──────────────────┴──────────║║──────────────────┴┴──────────────────┴┴────────║
 ║..            <UP--DIR>  0.00.80 17:17          ║║..            <UP--DIR>  0.00.80 17:17          ║
 └[ C * ]═════════════════════════════════════════╝╚[ C * ]════════════════════════════════════════─┘
-C:\tmp\dntour-t859tasc\work>
+C:\tmp\dntour-2txthvhf\work>
  F1 Help  F10 Tree
