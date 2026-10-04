@@ -255,10 +255,10 @@ function TDriveView.GetText(MaxWidth: Integer): String;
     Share: String;
     P: TFilePanelRoot;
   begin
-  P := TFilePanelRoot(PDiskInfo(Panel)^.OtherPanel);
+  P := TFilePanelRoot(TDiskInfo(Panel).OtherPanel);
   if P = nil then
     Exit;
-  Result := P^.DirectoryName;
+  Result := P.DirectoryName;
   L := Max(2, GetShareEnd(Result));
   SetLength(Result, L);
   if L = 2 then
@@ -277,7 +277,7 @@ function TDriveView.GetText(MaxWidth: Integer): String;
 destructor TDriveView.Destroy;
   begin
   if InfoPanel <> nil then
-    InfoPanel^.DriveView := nil;
+    InfoPanel.DriveView := nil;
   inherited Destroy;
   end;
 
@@ -311,7 +311,6 @@ procedure DispInfo(var Info: TDiskInfoRec);
 
 constructor TDiskInfo.Load(S: TStream);
   begin
-  inherited Create;
   inherited Load(S);
   S.Read(Delta, SizeOf(Delta));
   GetPeerViewPtr(S, DriveView);
@@ -337,17 +336,17 @@ procedure TDiskInfo.InsertDriveView;
   var
     R: TRect;
   begin
-  if TFilePanelRoot(OtherPanel).Drive^.DriveType <> dtDisk then
+  if TFilePanelRoot(OtherPanel).Drive.DriveType <> dtDisk then
     Exit;
     { Такой анализ очень некрасив, лучше было бы виртуализировать
     заголовок инфо-панели, как виртуализировано её содержимое }
 
   R.Assign(0, Origin.Y-1, 0, Origin.Y);
-    { По Y - на рамку, а с X DriveView^.Draw разбирается каждый раз }
-  New(DriveView, Init(R));
-  DriveView^.Panel := Self;
+    { По Y - на рамку, а с X DriveView.Draw разбирается каждый раз }
+  DriveView := TDriveView.Create(R);
+  DriveView.Panel := Self;
   Owner.Insert(DriveView);
-  DriveView^.Panel := Self;
+  DriveView.Panel := Self;
   end;
 
 { При явном закрытии панели информации, например, при повторном Ctrl-L,
@@ -366,7 +365,7 @@ destructor TDiskInfo.Destroy;
   DispInfo(Info);
   if DriveView <> nil then
     begin
-    DriveView^.InfoPanel := nil;
+    DriveView.InfoPanel := nil;
     DriveView.Free;
     end;
   inherited Destroy;
@@ -376,7 +375,7 @@ procedure TDiskInfo.SetState(AState: Word; Enable: Boolean);
   begin
   inherited SetState(AState, Enable);
   if (DriveView <> nil) and ((AState and sfSelected) <> 0) then
-    DriveView^.Draw;
+    DriveView.Draw;
   end;
 
 function TDiskInfo.GetPalette: TPalette;
@@ -392,8 +391,8 @@ procedure TDiskInfo.ReadData;
   begin
   DispInfo(Info);
   Abort := False;
-  with TFilePanelRoot(OtherPanel)^ do
-    Drive^.GetDirInfo(Info);
+  with TFilePanelRoot(OtherPanel) do
+    Drive.GetDirInfo(Info);
   Delta.Assign(0, 0);
   end;
 
@@ -536,7 +535,7 @@ procedure TDiskInfo.Draw;
 
   begin { TDiskInfo.Draw }
   if DriveView <> nil then
-    DriveView^.Draw;
+    DriveView.Draw;
   C := (GetColorW(1) shl 8) or (GetColorW(2) and 255);
   Y := 0;
   CC := False;
@@ -590,7 +589,7 @@ procedure TDiskInfo.Draw;
   if  (Y > 0)
        and ((DriveInfoData ) and fdiDIZ <>
        0) and
-      (Info.DirInfo <> nil) and (Info.DirInfo^.Count > 0)
+      (Info.DirInfo <> nil) and (Info.DirInfo.Count > 0)
   then
     begin
     if Owner <> nil then
@@ -618,9 +617,9 @@ procedure TDiskInfo.Draw;
     Wrt(FreeStr);
     C := (GetColorW(1) shl 8) or (GetColorW(2) and 255);
     CC := True;
-    for X := Delta.Y to Info.DirInfo^.Count-1 do
+    for X := Delta.Y to Info.DirInfo.Count-1 do
       begin
-      WrtTxt(Copy(CnvString(Info.DirInfo^.At(X)), Delta.X, MaxStringLength));
+      WrtTxt(Copy(CnvString(Info.DirInfo.At(X)), Delta.X, MaxStringLength));
       if Y > Size.Y then
         Break;
       end;
@@ -638,7 +637,7 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
     Tmr: TEventTimer;
     L: TSize;
     SR: lSearchRec;
-    DC: PDirCol;
+    DC: TDirCol;
   begin
   NewTimer(Tmr, 50);
   ClusterLen := 0;
@@ -646,12 +645,12 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
   NumFiles := 0;
   NumDirs := 0;
 
-  New(DC, Init($10, $10, False));
+  DC := TDirCol.Create($10, $10, False);
   DC.Insert(NewStr(Dir));
   Abort := False;
-  while DC^.Count > 0 do
+  while DC.Count > 0 do
     begin
-    FreeStr := PString(DC^.At(0))^;
+    FreeStr := PString(DC.At(0))^;
     DC.AtFree(0);
     if Abort then
       Break;
@@ -816,12 +815,12 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
   B.Limit.Y := 0;
   if F <> nil then
     begin
-    while not F^.Eof and (B.DirInfo^.Count < 100) do
+    while not F.Eof and (B.DirInfo.Count < 100) do
       begin
-      S := F^.GetStr;
+      S := F.GetStr;
       if Length(S) > B.Limit.X then
         B.Limit.X := Length(S);
-      B.DirInfo.AtInsert(B.DirInfo^.Count, NewStr(S));
+      B.DirInfo.AtInsert(B.DirInfo.Count, NewStr(S));
       Inc(B.Limit.Y);
       end;
     F.Free;
