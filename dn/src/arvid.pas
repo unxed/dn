@@ -1081,8 +1081,8 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     LastLv := 0;
     LP := D.DirTableOfs;
     repeat
-      St^.Seek(LP);
-      St^.Read(DD, SizeOf(DD));
+      St.Seek(LP);
+      St.Read(DD, SizeOf(DD));
       if DD.Level = 0 then
         if Lv0 then
           Break
@@ -1111,10 +1111,10 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         begin
         if SDesc and (DD.Description <> 0) then
           begin
-          St^.Seek(D.DescTableOfs+DD.Description-1);
+          St.Seek(D.DescTableOfs+DD.Description-1);
           {Cat:warn AnsiString}
-          St^.Read(FreeStr, 2);
-          St^.Read(FreeStr[1], Length(FreeStr));
+          St.Read(FreeStr, 2);
+          St.Read(FreeStr[1], Length(FreeStr));
           UpStr(FreeStr);
           end
         else
@@ -1132,22 +1132,22 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
         end;
       if not OOM then
         begin
-        St^.Seek(D.FileTableOfs+LongInt(DD.Files)*SizeOf(TTdrFileCell));
+        St.Seek(D.FileTableOfs+LongInt(DD.Files)*SizeOf(TTdrFileCell));
         for I := 1 to DD.NumFiles do
           begin
-          St^.Read(FF, SizeOf(FF));
+          St.Read(FF, SizeOf(FF));
           SS := FF.Name;
           Insert('.', SS, 9);
           if InSpaceFilter(SS, DT.Mask) then
             begin
             if SDesc and (FF.Description <> 0) then
               begin
-              J := i32(St^.GetPos);
-              St^.Seek(D.DescTableOfs+FF.Description-1);
+              J := i32(St.GetPos);
+              St.Seek(D.DescTableOfs+FF.Description-1);
               {Cat:warn AnsiString}
-              St^.Read(FreeStr, 2);
-              St^.Read(FreeStr[1], Length(FreeStr));
-              St^.Seek(J);
+              St.Read(FreeStr, 2);
+              St.Read(FreeStr[1], Length(FreeStr));
+              St.Seek(J);
               UpStr(FreeStr);
               end
             else
@@ -1178,14 +1178,14 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     begin
     if L = 0 then
       Exit;
-    St0^.Seek(L);
-    St0^.Read(AA0, SizeOf(AA0));
-    if St0^.Status <> stOK then
+    St0.Seek(L);
+    St0.Read(AA0, SizeOf(AA0));
+    if St0.Status <> stOK then
       Exit;
     AvtSearchInStream(AA0.LeftFileCell);
-    St0^.Seek(L);
-    St0^.Read(AA0, SizeOf(AA0));
-    if St0^.Status <> stOK then
+    St0.Seek(L);
+    St0.Read(AA0, SizeOf(AA0));
+    if St0.Status <> stOK then
       Exit;
     if AA0.Flags and AvtIsDir <> 0 then
       begin
@@ -1193,7 +1193,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       WasDir := False;
       SaveLP := LP;
       LP := L;
-      dr := dr+AvtCellName(AA0, St0^)+'\';
+      dr := dr+AvtCellName(AA0, St0)+'\';
       AvtSearchInStream(AA0.ChildOrSize);
       WasDir := SaveWasDir;
       LP := SaveLP;
@@ -1203,11 +1203,11 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       end
     else
       begin
-      S0 := AvtCellName(AA0, St0^);
+      S0 := AvtCellName(AA0, St0);
       if InSpaceFilter(S0, DT.Mask) then
         begin
         if SDesc then
-          FreeStr := UpStrg(AvtCellDesc(AA0, St0^));
+          FreeStr := UpStrg(AvtCellDesc(AA0, St0));
         if  (not SDesc or (Pos(DT.Text, FreeStr) > 0)) and
             ( (DT.o and 1 = 0) or
               (AA0.Time <= DateBefore) and (AA0.Time >= DateAfter) and
@@ -1224,9 +1224,9 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
           end;
         end;
       end;
-    St0^.Seek(L);
-    St0^.Read(AA0, SizeOf(AA0));
-    if St0^.Status <> stOK then
+    St0.Seek(L);
+    St0.Read(AA0, SizeOf(AA0));
+    if St0.Status <> stOK then
       Exit;
     AvtSearchInStream(AA0.RightFileCell);
     end { AvtSearchInStream };
@@ -1238,8 +1238,8 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     begin
     WasTape := False;
     dr := '\';
-    St^.Seek(0);
-    St^.Read(AA, SizeOf(AA));
+    St.Seek(0);
+    St.Read(AA, SizeOf(AA));
     if AA.signature = $50545641 {'AVTP'} then
       begin
       St0 := St;
@@ -1248,8 +1248,8 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       end
     else
       begin
-      St^.Seek(0);
-      St^.Read(DD, SizeOf(DD));
+      St.Seek(0);
+      St.Read(DD, SizeOf(DD));
       if DD.PosTableLen <> 4656 then
         Exit;
       if DD.FileTableOfs <> SizeOf(TTdrHeader) then
@@ -1285,7 +1285,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       begin
       New(St, Init(MakeNormName(GetPath(Name^), SR.Name), stOpenRead,
            2048));
-      if St^.Status = stOK then
+      if St.Status = stOK then
         begin
         SearchInStream(St, SR.Name);
         end;
@@ -1299,7 +1299,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       begin
       New(St, Init(MakeNormName(GetPath(Name^), SR.Name), stOpenRead,
            2048));
-      if St^.Status = stOK then
+      if St.Status = stOK then
         begin
         SearchInStream(St, SR.Name);
         end;
