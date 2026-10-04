@@ -204,10 +204,10 @@ procedure FreeLastUnmarked(C: TCollection);
     end;
 
   begin
-  if  (C = nil) or (C^.Count < 1) then
+  if  (C = nil) or (C.Count < 1) then
     Exit;
-  I := C^.Count;
-  if C^.LastThat(IsThat) <> nil then
+  I := C.Count;
+  if C.LastThat(IsThat) <> nil then
     C.AtFree(I);
   end;
 
@@ -303,16 +303,16 @@ procedure StoreViewInfo(P: Pointer);
     ViewHistory := PViewHistoryCol.Create(30, 30);
   New(R);
 
-  if TypeOf((TStreamable(P)^)) = TypeOf(TFileWindow) then
-    with TFileViewer(Viewer^.Current)^, R^ do
+  if TView(P).ClassType = TFileWindow then
+    with TFileViewer(Viewer.Current), R^ do
       begin
       if VFileName = '' then
         goto Q;
       
       FName := NewStr(' '+lfGetLongFileName(VFileName)); {DataCompBoy}
       
-      fOrigin := Viewer^.Origin;
-      fSize := Viewer^.Size;
+      fOrigin := Viewer.Origin;
+      fSize := Viewer.Size;
       fDeskSize := Desktop.Size;
       if Filtr then
         fViewMode := ViewMode
@@ -342,17 +342,17 @@ fBufPos: AWord оно может не помещаться. Но, с друго�
       XCoder.ToHistory(fKeyMap, fToAscii, fCodeTag);
       end
        {-DataCompBoy-}
-  else if TypeOf((TStreamable(P)^)) = TypeOf(TDBWindow) then
-    with DBView^, R^ do
+  else if TView(P).ClassType = TDBWindow then
+    with DBView.P, R^ do
       begin
-      if DBView^.RealName = '' then
+      if DBView.RealName = '' then
         goto Q;
-      FName := NewStr(' '+DBView^.RealName);
+      FName := NewStr(' '+DBView.RealName);
       fOrigin := Origin;
       fSize := Size;
       fDeskSize := Desktop.Size;
       fViewMode := vmDB;
-      with P^ do
+    with DBView.P do
         begin
         fdDelta := Delta;
         fdPos := Pos;
@@ -361,16 +361,16 @@ fBufPos: AWord оно может не помещаться. Но, с друго�
       end
       
       
-  else if TypeOf((TStreamable(P)^)) = TypeOf(TCalcWindow) then
-    with SSView^, R^ do
+  else if TView(P).ClassType = TCalcWindow then
+    with SSView.CalcView, R^ do
       begin
       
-      FName := NewStr(' '+lfGetLongFileName(CnvString(CalcView^.SName)));
+      FName := NewStr(' '+lfGetLongFileName(CnvString(SName)));
       
       fOrigin := Origin;
       fSize := Size;
       fDeskSize := Desktop.Size;
-      with CalcView^ do
+      with SSView.CalcView do
         begin
         if ShowSeparators then
           fViewMode := vmSpreadSL {AK155}
@@ -394,15 +394,15 @@ Q:
   {-DataCompBoy-}
   if R <> nil then
     begin
-    I := ViewHistory^.IndexOf(R);
+    I := ViewHistory.IndexOf(R);
     if I >= 0 then
       begin
-      R^.FName^[1] := PViewRecord(ViewHistory^.At(I))^.FName^[1];
+      R^.FName^[1] := PViewRecord(ViewHistory.At(I))^.FName^[1];
       ViewHistory.AtFree(I);
       end;
     ViewHistory.AtInsert(0, R);
     end;
-  if ViewHistory^.Count > MaxEditHistorySize then
+  if ViewHistory.Count > MaxEditHistorySize then
     FreeLastUnmarked(ViewHistory);
   SaveHistories; {AK155}
   end { StoreViewInfo };
@@ -426,14 +426,14 @@ procedure StoreExtViewer(const FileName: String);
     
     fViewMode := vmExternal;
     end;
-  I := ViewHistory^.IndexOf(R);
+  I := ViewHistory.IndexOf(R);
   if I >= 0 then
     begin
-    R^.FName^[1] := PViewRecord(ViewHistory^.At(I))^.FName^[1];
+    R^.FName^[1] := PViewRecord(ViewHistory.At(I))^.FName^[1];
     ViewHistory.AtFree(I);
     end;
   ViewHistory.AtInsert(0, R);
-  if ViewHistory^.Count > MaxEditHistorySize then
+  if ViewHistory.Count > MaxEditHistorySize then
     FreeLastUnmarked(ViewHistory);
   end { StoreExtViewer };
 
@@ -446,13 +446,13 @@ procedure StoreEditInfo(P: Pointer);
 
   begin
   if  (InterfaceData.Options and ouiTrackEditors = 0) or
-      (TFileEditor(E^.Intern).EditName = '')
+      (TFileEditor(E.Intern).EditName = '')
   then
     Exit;
   if EditHistory = nil then
     EditHistory := PEditHistoryCol.Create(30, 30);
   New(R);
-  with TFileEditor(E^.Intern)^, R^ do
+  with TFileEditor(E.Intern), R^ do
     begin
     
     FName := NewStr(' '+lfGetLongFileName(EditName)); {DataCompBoy}
@@ -486,14 +486,14 @@ procedure StoreEditInfo(P: Pointer);
     fSmartTab := EdOpt.SmartTab;
     { Flash <<< }
     end;
-  I := EditHistory^.IndexOf(R);
+  I := EditHistory.IndexOf(R);
   if I >= 0 then
     begin
-    R^.FName^[1] := PViewRecord(EditHistory^.At(I))^.FName^[1];
+    R^.FName^[1] := PViewRecord(EditHistory.At(I))^.FName^[1];
     EditHistory.AtFree(I);
     end;
   EditHistory.AtInsert(0, R);
-  if EditHistory^.Count > MaxEditHistorySize then
+  if EditHistory.Count > MaxEditHistorySize then
     FreeLastUnmarked(EditHistory);
   SaveHistories; {AK155}
   end { StoreEditInfo };
@@ -508,9 +508,9 @@ procedure AddCommand(const LastCommand: String);
     begin
     if CmdStrings = nil then
       CmdStrings := TLineCollection.Create(40, 40, False);
-    for I := 0 to CmdStrings^.Count-1 do
+    for I := 0 to CmdStrings.Count-1 do
       begin
-      P := CmdStrings^.At(I);
+      P := CmdStrings.At(I);
       if Copy(CnvString(P), 2, MaxStringLength) = LastCommand then
         begin
         CmdStrings.AtDelete(I);
@@ -521,11 +521,11 @@ procedure AddCommand(const LastCommand: String);
     CmdStrings.Insert(NewStr(' '+LastCommand));
 1:
     I := 0;
-    while (CmdStrings^.Count > 50) and
-        (I < CmdStrings^.Count)
+    while (CmdStrings.Count > 50) and
+        (I < CmdStrings.Count)
     do
       begin
-      FreeStr := CnvString(CmdStrings^.At(I));
+      FreeStr := CnvString(CmdStrings.At(I));
       if FreeStr[1] <> '+' then
         begin
         {if LastTHistPos > I then Dec(LastTHistPos);}
@@ -556,15 +556,15 @@ procedure SaveCommands(var S: TStream);
 делает ровно ничего (см. cmdline.pas, поиск по cmExecCommandLine)
 Message(CommandLine, evCommand, cmExecCommandLine, nil);
 /AK155}
-  if  (CmdStrings <> nil) and (CmdStrings^.Count >= 50) then
+  if  (CmdStrings <> nil) and (CmdStrings.Count >= 50) then
     begin
     M := TLineCollection.Create(50, 10, False);
     for I := 1 to 40 do
       begin
-      if CmdStrings^.Count <= 0 then
+      if CmdStrings.Count <= 0 then
         Break;
-      M.AtInsert(0, CmdStrings^.At(CmdStrings^.Count-1));
-      CmdStrings.AtDelete(CmdStrings^.Count-1);
+      M.AtInsert(0, CmdStrings.At(CmdStrings.Count-1));
+      CmdStrings.AtDelete(CmdStrings.Count-1);
       end;
     CmdStrings.Free;
     CmdStrings := M;
@@ -594,7 +594,7 @@ procedure LoadCommands(var S: TStream);
   ViewHistory := TCollection(S.Get);
 
   if CmdStrings <> nil then
-    CurString := CmdStrings^.Count
+    CurString := CmdStrings.Count
   else
     CurString := 0;
   {AK155 Перерисовка комстроки не нужна, а очистка даже мешает}
@@ -609,11 +609,11 @@ procedure LoadCommands(var S: TStream);
 function GetCommand(Idx: Integer): String;
   begin
   GetCommand := '';
-  if  (CmdStrings = nil) or (CmdStrings^.Count <= Idx)
-         or (CmdStrings^.At(Idx) = nil)
+  if  (CmdStrings = nil) or (CmdStrings.Count <= Idx)
+         or (CmdStrings.At(Idx) = nil)
   then
     Exit;
-  GetCommand := Copy(PString(CmdStrings^.At(Idx))^, 2, MaxStringLength);
+  GetCommand := Copy(PString(CmdStrings.At(Idx))^, 2, MaxStringLength);
   end;
 
 type
@@ -641,9 +641,9 @@ function TTHistList.IsSelected(I: LongInt): Boolean;
 function TTHistList.ItemStr(I: LongInt): PString;
   begin
   if EVHistory then
-    ItemStr := PEditRecord(List^.At(I))^.FName
+    ItemStr := PEditRecord(List.At(I))^.FName
   else
-    ItemStr := List^.At(I);
+    ItemStr := List.At(I);
   end;
 
 function TTHistList.GetText(Item: LongInt; MaxLen: Integer): String;
@@ -704,10 +704,10 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
     I := Focused;
     repeat
       Inc(I, D);
-      if  (I < 0) or (I >= List^.Count) or (ItemStr(I)^[1] <> ' ') then
+      if  (I < 0) or (I >= List.Count) or (ItemStr(I)^[1] <> ' ') then
         Break;
     until False;
-    if  (I >= 0) and (I < List^.Count) then
+    if  (I >= 0) and (I < List.Count) then
       begin
       FocusItem(I);
       DrawView
@@ -718,11 +718,11 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
     var
       P: Pointer;
     begin
-    with List^ do
+    with List do
       begin
-      P := Items^[i];
-      Items^[i] := Items^[i+1];
-      Items^[i+1] := P;
+      P := At(i);
+      AtPut(i, At(i+1));
+      AtPut(i+1, P);
       end;
     DrawView;
     end;
@@ -742,7 +742,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
       kbDel:
         goto 1;
       kbShiftDown:
-        if {(ShiftState and 3 <> 0) and}(Focused < List^.Count-1) then
+        if {(ShiftState and 3 <> 0) and}(Focused < List.Count-1) then
           SwapItems(Focused);
       kbShiftUp:
         if {(ShiftState and 3 <> 0) and}(Focused > 0) then
@@ -767,9 +767,9 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
       cmOK:
         begin
         ClearEvent(Event);
-        if Focused >= List^.Count then
+        if Focused >= List.Count then
           Exit;
-        FreeStr := fDelLeft(fDelRight(Copy(CnvString(List^.At(Focused)),
+        FreeStr := fDelLeft(fDelRight(Copy(CnvString(List.At(Focused)),
                  2, 255))); {-$VIV}
         {DataCompBoy}
         if InputBox(GetString(dlEditHistory),
@@ -777,8 +777,8 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
            <> cmOK
         then
           Exit;
-        Insert(Copy(CnvString(List^.At(Focused)), 1, 1), FreeStr, 1);
-        List^.AtReplace(Focused, NewStr(FreeStr));
+        Insert(Copy(CnvString(List.At(Focused)), 1, 1), FreeStr, 1);
+        List.AtReplace(Focused, NewStr(FreeStr));
         DrawView;
         end;
       cmYes: { удаление }
@@ -794,7 +794,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
                   его удалять бесполезно: он опять вставится, но при этом
                   собьет нумерацию элементов }
             end;
-          if Focused >= List^.Count then
+          if Focused >= List.Count then
             Exit;
           if Copy(CnvString(ItemStr(Focused)), 1, 1) = '+' then
             begin
@@ -809,20 +809,20 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
           then
             Dec(CurString);
           List.AtFree(Focused);
-          SetRange(List^.Count);
+          SetRange(List.Count);
           DrawView;
           end;
 
        cmNo: {встать на}
           begin
           ClearEvent(Event);
-          if Focused >= List^.Count then
+          if Focused >= List.Count then
             Exit;
           if (Dlg = dlgDirectoryHistory) then
-            DirToGo := Copy(CnvString(List^.At(Focused)), 2,
+            DirToGo := Copy(CnvString(List.At(Focused)), 2,
                             MaxStringLength)
           else
-            DirToGo := Copy(PViewRecord(List^.At(Focused))^.FName^, 2,
+            DirToGo := Copy(PViewRecord(List.At(Focused))^.FName^, 2,
                             MaxStringLength);
           MakeNoSlash(DirToGo);
           Message(ActivePanel, evCommand, cmStandAt, @DirToGo);
@@ -886,16 +886,16 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
       AddStr(S, '\');
     end;
   I := -1;
-  P := DirHistory^.FirstThat(IsThat);
+  P := DirHistory.FirstThat(IsThat);
   if P <> nil then
     DirHistory.AtDelete(I)
   else
     P := NewStr(' '+S);
   if P <> nil then
     DirHistory.AtInsert(0, P);
-  if DirHistory^.Count > MaxDirHistorySize then
+  if DirHistory.Count > MaxDirHistorySize then
     begin
-    P := DirHistory^.LastThat(IsThis);
+    P := DirHistory.LastThat(IsThis);
     if P <> nil then
       DirHistory.Free(P);
     end;
@@ -911,13 +911,13 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): TDialog;
   begin
   D := TDialog(LoadResource(Dlg));
 
-  R.Assign(D^.Size.X-3, 2, D^.Size.X-2, 13);
+  R.Assign(D.Size.X-3, 2, D.Size.X-2, 13);
   P := TScrollBar.Create(R);
   D.Insert(P);
 
-  R.Assign(2, 2, D^.Size.X-3, 13);
-  L := New(PTHistList, Init(R, 1, TScrollBar(P)));
-  L^.Dlg := Dlg; {AK155: см. TTHistList.HandleEvent, cmYes }
+  R.Assign(2, 2, D.Size.X-3, 13);
+  L := TTHistList.Create(R, 1, TScrollBar(P));
+  L.Dlg := Dlg; {AK155: см. TTHistList.HandleEvent, cmYes }
   D.Insert(L);
   List := L;
 
@@ -939,20 +939,20 @@ procedure EditHistoryMenu;
   LoadHistories; {AK155}
   if EditHistory = nil then
     EditHistory := PEditHistoryCol.Create(30, 30);
-  {  if EditHistory^.Count = 0 then Exit;}
+  {  if EditHistory.Count = 0 then Exit;}
   D := GetDialog(dlgEditHistory, Pointer(P));
-  P^.NewLisT(EditHistory);
-  P^.EVHistory := True;
+  P.NewLisT(EditHistory);
+  P.EVHistory := True;
   if Desktop.ExecView(D) = cmOK then
-    I := P^.Focused
+    I := P.Focused
   else
     I := -1;
   D.Free;
-  if EditHistory^.Count = 0 then
+  if EditHistory.Count = 0 then
     Exit; {Proverka, esli udalyali, zarazy:}
   if  (I >= 0) then
     begin
-    if  (PViewRecord(EditHistory^.At(I))^.FName = nil) then
+    if  (PViewRecord(EditHistory.At(I))^.FName = nil) then
       Exit;
     {A eto tak, na vsyakiy sluchay proverka, esli eto ne DPMI :}
     TDNApplication(Application).EditFile(
@@ -960,7 +960,7 @@ procedure EditHistoryMenu;
       {AK155 28.09.2002:
              это чтобы через историю всегда вызывался внутренний
              редактор, поскольку вызов внешнего в историю не попадает}
-      Copy(PViewRecord(EditHistory^.At(I))^.FName^, 2, MaxStringLength));
+      Copy(PViewRecord(EditHistory.At(I))^.FName^, 2, MaxStringLength));
     end;
   end { EditHistoryMenu };
 
@@ -979,23 +979,23 @@ procedure ViewHistoryMenu;
   LoadHistories; {AK155}
   if ViewHistory = nil then
     ViewHistory := PViewHistoryCol.Create(30, 30);
-  {  if ViewHistory^.Count = 0 then Exit;}
+  {  if ViewHistory.Count = 0 then Exit;}
   D := GetDialog(dlgViewHistory, Pointer(P));
-  P^.NewLisT(ViewHistory);
-  P^.EVHistory := True;
+  P.NewLisT(ViewHistory);
+  P.EVHistory := True;
   if Desktop.ExecView(D) = cmOK then
-    I := P^.Focused
+    I := P.Focused
   else
     I := -1;
   D.Free;
-  if ViewHistory^.Count = 0 then
+  if ViewHistory.Count = 0 then
     Exit; {Proverim, esli udalyali, pa**y}
   if I >= 0 then
     begin
-    if  (PViewRecord(ViewHistory^.At(I))^.FName = nil) then
+    if  (PViewRecord(ViewHistory.At(I))^.FName = nil) then
       Exit; {Ku :}
     TDNApplication(Application).ViewFile(False, True, {AK155}
-      Copy(PViewRecord(ViewHistory^.At(I))^.FName^, 2, MaxStringLength));
+      Copy(PViewRecord(ViewHistory.At(I))^.FName^, 2, MaxStringLength));
     end;
   end { ViewHistoryMenu };
 
@@ -1023,12 +1023,12 @@ function DirHistoryMenu: String;
 
   if DirHistory = nil then
     DirHistory := TLineCollection.Create(40, 40, False);
-  {  if DirHistory^.Count = 0 then Exit;}
+  {  if DirHistory.Count = 0 then Exit;}
 
   D := GetDialog(dlgDirectoryHistory, Pointer(P));
 
   TListBox(P).NewLisT(DirHistory);
-  if DirHistory^.Count > 1 then
+  if DirHistory.Count > 1 then
     TListBox(P).Focused := 1;
 
   I := Desktop.ExecView(D);
@@ -1036,7 +1036,7 @@ function DirHistoryMenu: String;
   DT.I := TListBox(P).Focused;
   D.Free;
   if I = cmOK then
-    DirHistoryMenu := Copy(CnvString(DirHistory^.At(DT.I)), 2,
+    DirHistoryMenu := Copy(CnvString(DirHistory.At(DT.I)), 2,
          MaxStringLength);
   end { DirHistoryMenu: };
 
@@ -1060,10 +1060,10 @@ procedure CmdHistory;
   D := GetDialog(dlgCommandsHistory, Pointer(P));
 
   TListBox(P).NewLisT(CmdStrings);
-  TListBox(P).FocusItem(CmdStrings^.Count-1);
-  PTHistList(P)^.CommandHistory := True;
-  if CmdStrings^.Count > 0 then
-    TListBox(P).FocusItem(CmdStrings^.Count-1);
+  TListBox(P).FocusItem(CmdStrings.Count-1);
+  PTHistList(P).CommandHistory := True;
+  if CmdStrings.Count > 0 then
+    TListBox(P).FocusItem(CmdStrings.Count-1);
 
   I := Desktop.ExecView(D);
 
@@ -1088,10 +1088,10 @@ const
   {-DataCompBoy-}
 procedure LoadHistories;
   var
-    S: TBufStream;
+    S: TStream;
     A: AWord;
   begin
-  S.Init(SourceDir+'dn'+HistNameSuffix+'.his', stOpenRead, 2048);
+  S := TBufStream.Create(SourceDir+'dn'+HistNameSuffix+'.his', stOpenRead, 2048);
   if S.Status = stOK then
     begin
     S.Read(FreeStr[1], Length(HistoryFileSign));
@@ -1104,17 +1104,17 @@ procedure LoadHistories;
     else
       MessageBox('Can''t load histories!', nil, mfOKButton);
     end;
-  S.Done;
+  S.Free;
   end { LoadHistories };
 {-DataCompBoy-}
 
 {-DataCompBoy-}
 procedure SaveHistories;
   var
-    S: TBufStream;
+    S: TStream;
     A: AWord;
   begin
-  S.Init(SourceDir+'dn'+HistNameSuffix+'.his', stCreate, 2048);
+  S := TBufStream.Create(SourceDir+'dn'+HistNameSuffix+'.his', stCreate, 2048);
   if S.Status = stOK then
     begin
     FreeStr := HistoryFileSign;
@@ -1122,7 +1122,7 @@ procedure SaveHistories;
     HistoryStore(S);
     SaveCommands(S);
     end;
-  S.Done;
+  S.Free;
   end;
 {-DataCompBoy-}
 
@@ -1137,9 +1137,9 @@ procedure ClearHistories;
       Exit;
     C.Pack;
     i := 0;
-    while i < C^.Count do
+    while i < C.Count do
       begin
-      FreeStr := CnvString(C^.At(i));
+      FreeStr := CnvString(C.At(i));
       if FreeStr[1] = ' ' then
         C.AtFree(i)
       else
@@ -1153,9 +1153,9 @@ procedure ClearHistories;
       Exit;
     C.Pack;
     i := 0;
-    while i < C^.Count do
+    while i < C.Count do
       begin
-      FreeStr := CnvString(PEditRecord(C^.At(i))^.FName);
+      FreeStr := CnvString(PEditRecord(C.At(i))^.FName);
       if FreeStr[1] = ' ' then
         C.AtFree(i)
       else
