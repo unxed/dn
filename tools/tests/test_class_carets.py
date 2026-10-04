@@ -135,6 +135,20 @@ class ClassCaretsTest(unittest.TestCase):
         out = self.convert(source, libraries=[library, source])
         self.assertIn(b"P^.X", out)
 
+    def test_same_unit_string_field_does_not_shadow_class_field(self):
+        source = (
+            b"type TView = class\n"
+            b"    DriveLine: TView;\n"
+            b"  end;\n"
+            b"  TDriveLine = class(TView)\n"
+            b"    DriveLine: String[29];\n"
+            b"  end;\n"
+            b"begin\n"
+            b"  DriveLine^.Show;\n"
+            b"end.\n"
+        )
+        self.assertIn(b"DriveLine.Show", self.convert(source))
+
     def test_local_record_pointer_shadows_class_field_name(self):
         library = (
             b"type TView = class\n"

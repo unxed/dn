@@ -92,26 +92,34 @@ def collect_typed_names(sources, class_names, fields_only=False):
     """Return (class_typed_names, non_class_typed_names).
 
     fields_only: only fields inside `class ... end` (safe for global use).
-    otherwise: fields, vars and parameters (for the rewritten file).
-    Local non-class declarations shadow class field names of the same spelling.
+    otherwise: class fields plus vars/parameters of the rewritten file.
+    Non-class vars/parameters shadow class field names of the same spelling.
+    Non-class fields of other types in the same unit do not, because they
+    belong to a different Self.
     """
     class_typed = set()
     other_typed = set()
     skip_before = {
         b"function", b"constructor", b"destructor", b"property", b"procedure",
     }
+    aggregate_starts = {b"class", b"record", b"object"}
     for data in sources:
         ts = tokens(data)
         class_depth = 0
+        aggregate_depth = 0
         i = 0
         while i < len(ts):
             word = ts[i].text.lower()
-            if word == b"class" and i + 1 < len(ts):
+            if word in aggregate_starts and i + 1 < len(ts):
                 following = ts[i + 1].text.lower()
                 if following not in (b"of", b";"):
-                    class_depth += 1
-            elif word == b"end" and class_depth:
-                class_depth -= 1
+                    aggregate_depth += 1
+                    if word == b"class":
+                        class_depth += 1
+            elif word == b"end" and aggregate_depth:
+                if class_depth and class_depth == aggregate_depth:
+                    class_depth -= 1
+                aggregate_depth -= 1
 
             if ts[i].text == b":":
                 # `:=` is assignment, not a declaration.
@@ -130,9 +138,10 @@ def collect_typed_names(sources, class_names, fields_only=False):
                     continue
                 j = type_token_after_colon(ts, i)
                 if class_type_end(ts, j, class_names) is not None:
-                    class_typed.update(names)
-                else:
-                    # Pointer/record/other locals shadow class field names.
+                    if (not fields_only) or class_depth:
+                        class_typed.update(names)
+                elif not fields_only and aggregate_depth == 0:
+                    # Vars/params only: pointer/record locals shadow class fields.
                     if j < len(ts) and (is_ident(ts[j]) or ts[j].text == b"^"):
                         other_typed.update(names)
             i += 1
