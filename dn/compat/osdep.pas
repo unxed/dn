@@ -115,6 +115,12 @@ var
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
 
+{$IFDEF GO32V2}
+var
+  { the UTF-8 build for DOS: the provider DOS-UTF8/NAMES is on, the names to and from the DOS are UTF-8 (see DosNamesInit in the initialization) }
+  DosNamesUtf8: Boolean = False;
+{$ENDIF}
+
 var
   { the text screen of the program that started DN (16-bit cells: character + attribute), copied before the application takes
     the screen over: the "user screen" of DN (Ctrl-O, Alt-F5) and what is seen after the exit }
@@ -720,9 +726,29 @@ begin
   dosmemget($40, $50, SysStartCursor, 2);
 end;
 
+{$IFDEF DNUTF8}
+{ The UTF-8 build for DOS: the names of the files are UTF-8 inside DN, so the DOS must give and take them in UTF-8: the provider DOS-UTF8/NAMES of AMIS (go2dos,
+  DOSBox-X with the patches) is switched on for this process (UTF8NAMES.md of go2dos). Without the provider the names are what the DOS gives (the bytes of the code page:
+  shown as such, since invalid UTF-8 is taken as the code page by tv/; a new name typed with characters outside ASCII is then wrong): DN_DOS_UTF8_NAMES=0 leaves it so. }
+procedure DosNamesInit;
+var
+  Mux: Byte;
+begin
+  DosNamesUtf8 := False;
+  if GetEnvironmentVariable('DN_DOS_UTF8_NAMES') = '0' then
+    Exit;
+  if AmisFind('DOS-UTF8', 'NAMES   ', Mux) then
+    DosNamesUtf8 := AmisSetEncoding(Mux, 65001);
+  DNTrace('DOS UTF-8 names: ' + BoolToStr(DosNamesUtf8, True));
+end;
+{$ENDIF}
+
 initialization
   GrabStartScreen;
   DosInit;
+{$IFDEF DNUTF8}
+  DosNamesInit;
+{$ENDIF}
 finalization
   DosDone;
 {$ENDIF}

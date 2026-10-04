@@ -118,7 +118,7 @@ our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not 
 
 0. **Without building:** `dist/dos/` holds a ready DOS version (`dn.exe`, the resources, the DPMI host `cwsdpmi.exe`, the license texts,
    `screenshots/`): mount the directory in DOSBox-X and run `dn` (see `dist/dos/README.TXT`). It is updated by the script
-   `tools/dn-dist.sh` at noticeable changes; it is built from the commit named in the message of the `dist` commit.
+   `tools/dn-dist.sh` at noticeable changes (`dist/dos`: the code page inside, any DOS; `dist/dos-utf8`: UTF-8 inside, asks the DOS for UTF-8 names and clipboard); it is built from the commit named in the message of the `dist` commit.
 
 5. **Try it by hand:** the directory `out/dos/` is a ready set for DOS (`dn.exe`, `cwsdpmi.exe`, `*.dlg`, `*.lng`):
    mount it in DOSBox-X (`mount c out/dos`, `c:`, `dn`) or copy it to a machine with DOS.

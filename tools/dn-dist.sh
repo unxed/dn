@@ -4,7 +4,8 @@
 # the binary is in git). usage: tools/dn-dist.sh   (the same environment as tools/build.sh dos: DN_PREFIX or DN_CROSS+DN_LINK)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
-dist=$here/dist/dos
+# DN_DIST_SUFFIX=-utf8 with DN_UTF8=1 makes dist/dos-utf8: the build with UTF-8 inside (it asks the DOS for UTF-8 names and clipboard: go2dos, DOSBox-X with the patches; its resources are in UTF-8)
+dist=$here/dist/dos${DN_DIST_SUFFIX:-}
 if [ -n "${DN_PREFIX:-}" ]; then : "${DN_LINK:=$DN_PREFIX}"; fi
 : "${DN_LINK:?set DN_PREFIX or DN_LINK}"
 tmp=${TMPDIR:-/tmp}; work=$tmp/dn-dist; rm -rf "$work"; mkdir -p "$work" "$dist/screenshots"
@@ -44,4 +45,12 @@ scen copy 6 "011B,3F00"
 scen viewer 8 "011B,5000,5000,5000,5000,3D00"
 scen editor 24 "011B,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,3E00"
 ( cd "$dist" && sha256sum dn.exe *.dlg *.lng *.hlp cwsdpmi.exe > SHA256SUMS.TXT )
-echo "dist/dos is made: $(ls "$dist" | wc -l) files"
+if [ -n "${DN_DIST_SUFFIX:-}" ]; then
+    cat > "$dist/README.TXT" <<'EOT'
+DN with UTF-8 inside for DOS (the build DN_UTF8=1). It asks the DOS for the UTF-8 names of files (AMIS DOS-UTF8/NAMES) and the UTF-8 text of the clipboard
+(DOS-UTF8/CLIPBRD): go2dos, DOSBox-X with the patches (docs/patches of the repository unxed/dn, dn/TODO-later.md). On a DOS without them the names are what the DOS
+gives (the bytes of the code page; a name typed with other characters than ASCII is wrong) and the clipboard goes through the code page: use the plain build (dist/dos) there.
+DN_DOS_UTF8_NAMES=0 does not ask for the names, TV_DOS_UTF8_CLIP=0 not for the clipboard.
+EOT
+fi
+echo "dist/dos${DN_DIST_SUFFIX:-} is made: $(ls "$dist" | wc -l) files"
