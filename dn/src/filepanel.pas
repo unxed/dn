@@ -948,7 +948,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
       if S = '..' then
         Exit;
       end;
-    New(FC, Init(1, 100));
+    FC := TFilesCollection.Create(1, 100);
     FC.Insert(CopyFileRec(Panel.Files.At(Panel.ScrollBar.Value)));
     if P.X < Length(S) then
       Dec(P.X);
@@ -964,7 +964,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
     begin
     if Panel.SelNum = 0 then
       Exit;
-    New(FC, Init(Panel.SelNum, 100));
+    FC := TFilesCollection.Create(Panel.SelNum, 100);
     for I := 1 to Panel.Files.Count do
       begin
       PF := Panel.Files.At(I-1); {DataCompBoy}
@@ -984,7 +984,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
     with Panel.Files do
       begin
       N := Count-Start;
-      New(FC, Init(N, 100));
+      FC := TFilesCollection.Create(N, 100);
       for I := Start to N+Start-1 do
         FC.AtInsert(FC.Count, CopyFileRec(PFileRec(At(I))));
       end;
@@ -1274,7 +1274,7 @@ function MakePathDecr(IV: PInfoView): Boolean;
     if Panel.Drive.ColAllowed[psnShowDir] then
       begin { Показ пути }
       if  (PF <> nil) and (PF^.Owner <> nil) then
-        S2 := (PF^.Owner);
+        S2 := (PF^.Owner^);
       Mask := psShowDir;
       end
     else
@@ -1924,7 +1924,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             end
           else if ScrollBar.Value < Files.Count then
             PString(Event.InfoPtr)^:= PFileRec
-                (Files.At(ScrollBar.Value))^.Owner;
+                (Files.At(ScrollBar.Value))^.Owner^;
           ClearEvent(Event);
           end;
         cmKillUsed:
