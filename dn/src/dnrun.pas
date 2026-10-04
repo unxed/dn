@@ -13,12 +13,16 @@ interface
 uses
   TvVt;
 
+{ A command line of DN for the shell of the system: the paths C:\dir\name become /dir/name, the other bytes UTF-8 (the code of DN: see CmdToOs in the unit). }
+function CmdToOs(const S: string): string;
+
 var
   UserScr: TVtEmu;             { the screen of the user: what the commands drew (zeroed until the first command) }
 {$ENDIF}
 
 procedure RunExternal(const CmdLine: String);
 var
+  QuietRun: Boolean = False;         { set for the calls of DN itself (an archiver asked for a list: ExecStringRR with RR = False): the pause "Process ended" only when the status is not 0 }
   RestartPending: Boolean = False;   { set by the command that restarts DN (change of the language, Restart): the program starts itself again after the shutdown }
 { Starts DN again (the same program, the same parameters): Unix replaces the process (exec), else the new one runs and the old one ends after it. Called by dn.pas after the shutdown. }
 procedure RestartSelf;
@@ -36,6 +40,36 @@ uses
 function CurDir: AnsiString;
 begin
   Result := GetCurrentDir;
+end;
+
+{ The command line of DN goes to the shell of the system: the paths of DN (C:\dir\name, after a blank, a quote or a sign of the shell; up to the closing
+  quote if there is one) become the paths of the system, the other bytes the text of the system (UTF-8). Without it an archiver got
+  "7z l C:\tmp\a.7z >C:\tmp\!!!DN!!!.TMP" and the shell ate the backslashes. }
+function CmdToOs(const S: string): string;
+var
+  I, J: Integer;
+  Q: Boolean;
+begin
+  Result := '';
+  I := 1;
+  while I <= Length(S) do
+  begin
+    if (I + 2 <= Length(S)) and (UpCase(S[I]) in ['A'..'Z']) and (S[I + 1] = ':') and (S[I + 2] in ['\', '/'])
+      and ((I = 1) or (S[I - 1] in [' ', '"', '''', '>', '<', '=', '|', ';', '(', '&'])) then
+    begin
+      Q := (I > 1) and (S[I - 1] = '"');
+      J := I + 2;
+      while (J <= Length(S)) and (not Q or (S[J] <> '"')) and (Q or not (S[J] in [' ', '"', '''', '>', '<', '|', ';', '&', ')'])) do
+        Inc(J);
+      Result := Result + SysOsPath(Copy(S, I, J - I));
+      I := J;
+    end
+    else
+    begin
+      Result := Result + SysNameToOs(S[I]);
+      Inc(I);
+    end;
+  end;
 end;
 {$ENDIF}
 
@@ -164,9 +198,12 @@ begin
   begin
     { the pause: DN_RUN_PAUSE 0 never, 1 always (default), 2 when the status is not 0 }
     P := 1;
+    if QuietRun then
+      P := 2;
     if GetEnvironmentVariable('DN_RUN_PAUSE') = '0' then P := 0
+    else if GetEnvironmentVariable('DN_RUN_PAUSE') = '1' then P := 1
     else if GetEnvironmentVariable('DN_RUN_PAUSE') = '2' then P := 2;
-    VtRunScreen(UserScr, '/bin/sh', ['sh', '-c', SysNameToOs(CmdLine)], '', CurDir + '$ ' + SysNameToOs(CmdLine), P);
+    VtRunScreen(UserScr, '/bin/sh', ['sh', '-c', CmdToOs(CmdLine)], '', CurDir + '$ ' + CmdToOs(CmdLine), P);
     Exit;
   end;
 {$ENDIF}

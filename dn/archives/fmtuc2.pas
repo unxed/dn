@@ -70,7 +70,7 @@ implementation
 
 uses
   objutil, fileutil, basics, mainapp, DnExec, Commands, strutil, Messages,
-  Dos, LFN
+  Dos, LFN, osdep
   ;
 
 { ----------------------------- UC2 ------------------------------------}
@@ -216,7 +216,7 @@ procedure TUC2Archive.GetFile;
       Exit;
       end;
     EraseFile(S);
-    System.Assign(ListFile, ListFileName);
+    System.Assign(ListFile, SysOsPath(ListFileName));
     System.Reset(ListFile);
     end;
   FileInfo.Last := 0;

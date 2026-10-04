@@ -219,8 +219,8 @@ procedure TZIPArchive.GetFile;
     FileInfo.USize := HCF.OriginalSize;
     FileInfo.PSize := HCF.CompressedSize;
     if (HCF.ExtraField <> 0) and
-       (HCF.OriginalSize = $FFFFFFFF) and
-       (HCF.CompressedSize = $FFFFFFFF) then
+       (HCF.OriginalSize = (-1 { $FFFFFFFF })) and
+       (HCF.CompressedSize = (-1 { $FFFFFFFF })) then
       begin {search for Zip64 extended information extra field}
         FP := ArcFile^.GetPos;
         ArcFile^.Read(ExtraFieldHeader, SizeOf(ExtraFieldHeader));

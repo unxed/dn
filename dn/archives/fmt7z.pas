@@ -91,7 +91,7 @@ type
 
 implementation
 uses
-  basics, strutil, fileutil, Defines, objutil, Streams, Dos, DnExec
+  basics, strutil, fileutil, Defines, objutil, Streams, Dos, DnExec, osdep
   ;
 
 { --- 7-Zip implemented by piwamoto --- }
@@ -107,8 +107,14 @@ constructor TS7ZArchive.Init;
   FreeStr := SourceDir+DNARC;
   TObject.Init;
 
+  { the name of the program in the system where the names of files are case sensitive (archiver.ini can give another) }
+{$IFDEF UNIX}
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, '7z'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, '7z'));
+{$ELSE}
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, '7Z'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, '7Z'));
+{$ENDIF}
 
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
   ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
@@ -182,7 +188,7 @@ procedure TS7ZArchive.GetFile;
     ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
     S := UnPacker^+' l '+SquashesName(ArcFileName)+' >'+ListFileName;
     ExecStringRR(S, '', False);
-    System.Assign(ListFile, ListFileName);
+    System.Assign(ListFile, SysOsPath(ListFileName));
     System.Reset(ListFile);
     repeat
       if Eof(ListFile) then
@@ -191,7 +197,7 @@ procedure TS7ZArchive.GetFile;
         Exit;
         end;
       Readln(ListFile, S);
-    until (S <> '') and (S[1] = '-');
+    until (S <> '') and (Copy(S, 1, 5) = '-----'); { 7-Zip 9.x and later print the block of the properties of the archive that starts with the line '--' before the table }
     end;
   Readln(ListFile, S);
   if (Length(S) < 54) or (S[1] = '-') then

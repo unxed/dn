@@ -572,7 +572,7 @@ function IS3Detect: Boolean;
   begin
   IS3Detect := False;
   ArcFile^.Read(ID, SizeOf(ID));
-  if ID = $8C655D13
+  if ID = (-1939514093 { $8C655D13 })
   then
     IS3Detect := True
   else
@@ -617,7 +617,7 @@ function ZOODetect: Boolean;
   begin
   ZOODetect := False;
   ArcFile^.Read(ID, SizeOf(ID));
-  if  (ArcFile^.Status = stOK) and (ID = $FDC4A7DC) then
+  if  (ArcFile^.Status = stOK) and (ID = (-37443620 { $FDC4A7DC })) then
     begin
     ArcFile^.Read(ArcPos, SizeOf(ArcPos));
     ZOODetect := True;
@@ -679,7 +679,7 @@ Function S7ZDetect: Boolean;
   begin
   S7ZDetect := False;
   ArcFile^.Read(ID, SizeOf(ID));
-  if (ArcFile^.Status = stOK) and (ID = $AFBC7A37)
+  if (ArcFile^.Status = stOK) and (ID = (-1346602441 { $AFBC7A37 }))
     then S7ZDetect := True
     else ArcFile^.Seek(ArcPos);
   end;

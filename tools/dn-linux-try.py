@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Runs the Linux build of DN in a pty with a list of keys and shows the screen and DN.ERR: for reproducing a crash.
 usage: tools/dn-linux-try.py OUTDIR 'F7 newdir ENTER ...' [--cols N --rows N]   (names as in tools/dn-linux-tour.py; other words are typed)
+ARC=1 adds the archives 0arc.zip and 1arc.7z.
 The directory `work` (a.txt b.txt c.txt, sub/deep, dst/, big.txt, link.txt, ro.txt) is made in a temp directory, DN starts in it."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -44,6 +45,10 @@ def main():
             open(os.path.join(w, n), 'w').write('file ' + n + '\n')
         open(os.path.join(w, 'sub', 'in.txt'), 'w').write('inner\n')
         open(os.path.join(w, 'big.txt'), 'w').write(''.join('line %d of the big file\n' % i for i in range(5000)))
+        if os.environ.get('ARC'):      # ARC=1: archives (zip, 7z) of the files of the directory, named 0arc.*: the first files of the panel
+            import subprocess
+            subprocess.run(['zip', '-q', '0arc.zip', 'a.txt', 'b.txt'], cwd=w)
+            subprocess.run(['7z', 'a', '-bd', '-bso0', '1arc.7z', 'a.txt', 'b.txt'], cwd=w)
         t = PtyTerm(['./dn'], cols, rows, cwd=w, exe=os.path.join(d, 'dn'))
         t.pump(1.5, 6)
         t.send('\x1b', 0.5)

@@ -223,7 +223,9 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
   
   
   SaveDsk;
+  DNRun.QuietRun := not RR;
   DNRun.RunExternal(S);
+  DNRun.QuietRun := False;
   
   fExec := False;
   {AK155, Cat: чтобы комстрока и меню не налазили на вывод}
