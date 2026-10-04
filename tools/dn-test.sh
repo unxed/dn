@@ -3,6 +3,15 @@
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 . "$here/tools/need-tv.sh"
+
+# The migration is complete only when the legacy type spelling is absent from
+# the repository sources.  Keep the pattern split so this check does not match
+# its own implementation.
+if rg -i -n --hidden -g '!.git/**' -g '!build/**' -g '!tv/**' 'obj[e]ct' "$here"; then
+    echo "SOURCE GATE FAIL: legacy type spelling is still present" >&2
+    exit 1
+fi
+
 w=${DN_TEST_WORK:-$here/build/dn-tests}; mkdir -p "$w/shims" "$w/obj"
 python3 "$here/tools/gen-shim.py" "$here/dn/compat/shims/shims.map" "$w/shims" "$here/tv/src" >/dev/null
 fail=0
