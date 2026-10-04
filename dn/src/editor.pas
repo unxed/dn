@@ -182,7 +182,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         if SearchData.Dir = 0 then
           Search(0, 0)
         else
-          Search(MaxLongStringLength, FileLines^.Count-1)
+          Search(MaxLongStringLength, FileLines.Count-1)
       else
         Search(Delta.X, Delta.Y)
         
@@ -205,9 +205,9 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       Marking := False;
       BlockVisible := False;
       UnMark := True;
-      if  (UndoInfo = nil) or (UndoInfo^.Count = 0) then
+      if  (UndoInfo = nil) or (UndoInfo.Count = 0) then
         Exit;
-      P := UndoInfo^.At(UndoInfo^.Count-1);
+      P := UndoInfo.At(UndoInfo.Count-1);
       if  (P^.Where.X <> Delta.X) or (P^.Where.Y <> Delta.Y) then
         begin
         ScrollTo(P^.Where.X, P^.Where.Y);
@@ -335,7 +335,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           Delete(S, Delta.X+1, Byte(P^.Str^[1]));
           Insert(Copy(P^.Str^, 2, MaxLongStringLength), S, Delta.X+1);
           ModifyLine(Delta.Y, S, False);
-          with UndoInfo^ do
+          with UndoInfo do
             RPT := (P^.What <> udReplaceAll) or (Count <= 1)
                    or (PUndoRec(At(Count-2))^.What <> udReplaceAll);
           end;
@@ -357,10 +357,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           end;
         udReplaceBlock, udClearBlock:
           begin
-          for I := Delta.Y to P^.Lines^.Count+Delta.Y-1 do
+          for I := Delta.Y to P^.Lines.Count+Delta.Y-1 do
             begin
             S := GetLine(I);
-            PS := P^.Lines^.At(I-Delta.Y);
+            PS := P^.Lines.At(I-Delta.Y);
             if PS <> nil then
               S1 := PS^
             else
@@ -375,11 +375,11 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         udDelLine:
           begin
           J := 0;
-          while P^.Lines^.Count > 0 do
+          while P^.Lines.Count > 0 do
             begin
-            KeyMapAtInsert(P^.Where.Y, P^.Lines^.At(P^.Lines^.Count-1));
+            KeyMapAtInsert(P^.Where.Y, P^.Lines.At(P^.Lines.Count-1));
             {-$VIV}
-            P^.Lines.AtDelete(P^.Lines^.Count-1);
+            P^.Lines.AtDelete(P^.Lines.Count-1);
             Inc(J);
             end;
           for L := 1 to 9 do
@@ -390,7 +390,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       end {case};
       WorkModified := False;
       ChangeLine;
-      UndoInfo.AtFree(UndoInfo^.Count-1);
+      UndoInfo.AtFree(UndoInfo.Count-1);
       Dec(UndoTimes);
       Modified := True;
       if not JustSaved and (UndoTimes = LastSaveUndoTimes) then
@@ -421,9 +421,9 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       Marking := False;
       BlockVisible := False;
       UnMark := True;
-      if  (RedoInfo = nil) or (RedoInfo^.Count = 0) then
+      if  (RedoInfo = nil) or (RedoInfo.Count = 0) then
         Exit;
-      P := RedoInfo^.At(RedoInfo^.Count-1);
+      P := RedoInfo.At(RedoInfo.Count-1);
       if  (P^.Where.X <> Delta.X) or (P^.Where.Y <> Delta.Y) then
         begin
         ScrollTo(P^.Where.X, P^.Where.Y); {Exit;}
@@ -460,17 +460,17 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           end;
         udInsLine:
           begin
-          if P^.Lines^.Count > 0 then
+          if P^.Lines.Count > 0 then
             begin
-            ModifyLine(P^.Where.Y, CnvLongString(P^.Lines^.At(0)), False);
+            ModifyLine(P^.Where.Y, CnvLongString(P^.Lines.At(0)), False);
             P^.Lines.AtDelete(0);
             end;
           J := 0;
-          while P^.Lines^.Count > 0 do
+          while P^.Lines.Count > 0 do
             begin
-            KeyMapAtInsert(P^.Where.Y+P^.Lines^.Count,
-                 P^.Lines^.At(P^.Lines^.Count-1));
-            P^.Lines.AtDelete(P^.Lines^.Count-1);
+            KeyMapAtInsert(P^.Where.Y+P^.Lines.Count,
+                 P^.Lines.At(P^.Lines.Count-1));
+            P^.Lines.AtDelete(P^.Lines.Count-1);
             Inc(J);
             end;
           for L := 1 to 9 do
@@ -487,9 +487,9 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           if VertBlock then
             if InsertMode then
               begin
-              for I := 0 to P^.Lines^.Count-1 do
+              for I := 0 to P^.Lines.Count-1 do
                 begin
-                S := CnvLongString(P^.Lines^.At(I));
+                S := CnvLongString(P^.Lines.At(I));
                 S1 := GetLine(P^.Where.Y+I);
                 Delete(S1, P^.Where.X+1, Length(S));
                 ModifyLine(P^.Where.Y+I, S1, False);
@@ -499,7 +499,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
               InsertBlock(P^.Lines, False)
           else
             begin
-            J := P^.Lines^.Count-1;
+            J := P^.Lines.Count-1;
             for I := 0 to J do
               FileLines.AtFree(P^.Where.Y);
             Inc(J);
@@ -507,7 +507,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
               if MarkPos[L].Y >= P^.Where.Y then
                 Dec(MarkPos[L].Y, J);
             if J > 0 then
-              S := CnvLongString(P^.Lines^.At(0))
+              S := CnvLongString(P^.Lines.At(0))
             else
               S := '';
             KeyMapAtInsert(P^.Where.Y, NewLongStr(S));
@@ -523,10 +523,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           begin
           FileLines.AtFree(Delta.Y);
           J := -1;
-          while P^.Lines^.Count > 0 do
+          while P^.Lines.Count > 0 do
             begin
-            KeyMapAtInsert(Delta.Y, P^.Lines^.At(P^.Lines^.Count-1));
-            P^.Lines.AtDelete(P^.Lines^.Count-1);
+            KeyMapAtInsert(Delta.Y, P^.Lines.At(P^.Lines.Count-1));
+            P^.Lines.AtDelete(P^.Lines.Count-1);
             Inc(J);
             end;
           for L := 1 to 9 do
@@ -588,7 +588,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           Delete(S, Delta.X+1, Byte(P^.Str^[1]));
           Insert(Copy(P^.Str^, 2, MaxLongStringLength), S, Delta.X+1);
           ModifyLine(Delta.Y, S, False);
-          with RedoInfo^ do
+          with RedoInfo do
             RPT := (P^.What <> udReplaceAll) or (Count <= 1)
                    or (PUndoRec(At(Count-2))^.What <> udReplaceAll);
           end;
@@ -601,10 +601,10 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           end;
         udReplaceBlock, udClearBlock:
           begin
-          for I := Delta.Y to P^.Lines^.Count+Delta.Y-1 do
+          for I := Delta.Y to P^.Lines.Count+Delta.Y-1 do
             begin
             S := GetLine(I);
-            S1 := CnvLongString(P^.Lines^.At(I-Delta.Y));
+            S1 := CnvLongString(P^.Lines.At(I-Delta.Y));
             Delete(S, Delta.X+1, Length(S1));
             if Length(S) < Delta.X+1 then
               S := S+LongStrg(' ', Delta.X+1-Length(S));
@@ -629,7 +629,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
 
       WorkModified := False;
       ChangeLine;
-      RedoInfo.AtFree(RedoInfo^.Count-1);
+      RedoInfo.AtFree(RedoInfo.Count-1);
       Inc(UndoTimes);
       Modified := True;
       if not JustSaved and (UndoTimes = LastSaveUndoTimes) then
@@ -794,7 +794,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
               I := 1;
             end;
           j := EdOpt.LeftSide;
-          if P^.Count = 0 then
+          if P.Count = 0 then
             j := EdOpt.InSide;
           Left := LongStrg(' ', j)+Left;
           end;
@@ -818,7 +818,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       LongDelDoubles('  ', S);
       if  (S <> '') and (S[1] = ' ') then
         Delete(S, 1, 1); {DelFC(S);}
-      if N-1 < FileLines^.Count then
+      if N-1 < FileLines.Count then
         MS := GetLine(N+1)
       else
         MS := '';
@@ -843,13 +843,13 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       Exit;
     ChangeLine;
     {if UndoInfo <> nil then UndoInfo.FreeAll; Inc(UndoTimes);}
-    New(P, Init((Mark.B.Y-Mark.A.Y+1)*2, 10, True));
+    P := TLineCollection.Create((Mark.B.Y-Mark.A.Y+1)*2, 10, True);
     for I := Mark.A.Y to Mark.B.Y-Integer(Mark.B.X = 0) do
       P.Insert(NewLongStr(GetLine(I)));
     TP.Y := Mark.A.Y;
     TP.X := 0;
     StoreUndoInfo(udDelBlock, TP, P);
-    New(P, Init((Mark.B.Y-Mark.A.Y+1)*2, 10, True));
+    P := TLineCollection.Create((Mark.B.Y-Mark.A.Y+1)*2, 10, True);
     if P = nil then
       Exit;
     Left := '';
@@ -906,16 +906,16 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       FileLines.AtFree(Delta.Y);
     Q := LG-Mark.A.Y;
     Mark.A.X := 0;
-    Mark.B.Y := Mark.A.Y+P^.Count;
+    Mark.B.Y := Mark.A.Y+P.Count;
     Mark.B.X := 0;
-    S := Char(Lo(P^.Count))+Char(Hi(P^.Count));
+    S := Char(Lo(P.Count))+Char(Hi(P.Count));
     StoreUndoInfo(udFormatBlock, TP, S);
-    while P^.Count > 0 do
+    while P.Count > 0 do
       {-$VIV}
       begin
       Dec(Q);
-      KeyMapAtInsert(Delta.Y, P^.At(P^.Count-1));
-      P.AtDelete(P^.Count-1);
+      KeyMapAtInsert(Delta.Y, P.At(P.Count-1));
+      P.AtDelete(P.Count-1);
       end;
     if Q > 0 then
       for L := 1 to 9 do
@@ -959,7 +959,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       end
     else
       L := FileLines;
-    LL[1] := L^.Count;
+    LL[1] := L.Count;
     FormatStr(M, GetString(dlED_PrintQuery), LL);
     if MessageBox(M, nil, mfYesNoConfirm) <> cmYes
     then
@@ -969,8 +969,8 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       Exit;
       end;
     R.Assign(1, 1, 30, 10);
-    New(P, Init(R));
-    P^.Top := GetString(dlED_Print);
+    P := TWhileView.Create(R);
+    P.Top := GetString(dlED_Print);
     Desktop.Insert(P);
     ClrIO;
     Cancel := False;
@@ -983,25 +983,25 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       lFindClose(SR);
       end;
     lFindClose(SR);
-    S.Init(FName, stCreate);
+    S := TDOSStream.Create(FName, stCreate);
     if S.Status <> stOK then
       begin
-      S.Done;
+      S.Free;
       {Cat:warn}
       PS := @FName;
       Msg(erCantCreateFile, @PS, mfError+mfOKButton);
       goto 1;
       end;
-    P^.Write(1, GetString(dlED_Printed));
-    for I := 0 to L^.Count-1 do
+    P.Write(1, GetString(dlED_Printed));
+    for I := 0 to L.Count-1 do
       begin
-      PS := L^.At(I);
-      P^.Write(2, Copy(LongStrg(#219, ((I+1)*25) div
-             L^.Count)+LongStrg(#177, 25), 1, 25));
+      PS := L.At(I);
+      P.Write(2, Copy(LongStrg(#219, ((I+1)*25) div
+             L.Count)+LongStrg(#177, 25), 1, 25));
       LL[1] := I+1;
-      LL[2] := L^.Count+1;
+      LL[2] := L.Count+1;
       FormatStr(M, GetString(dlED_PrintLine), LL);
-      P^.Write(3, M);
+      P.Write(3, M);
       if PS = nil then
         M := ''
       else
@@ -1017,7 +1017,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       M := #12;
       S.Write(M[1], 1);
       end;
-    S.Done;
+    S.Free;
     Message(Application, evCommand, cmFilePrint, @FName);
 1:
     P.Free;
@@ -1116,13 +1116,13 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
          while Cmpr(S,Ln(J)) do Dec(J);
          if I <= J then
          begin
-          {if I <> J then FileLines^.SwapItems(I, J);}
+          {if I <> J then FileLines.SwapItems(I, J);}
            if I <> J then               {-SBlocks}
              begin                      {-SBlocks}
-               P1 := FileLines^.At(I);  {-SBlocks}
-               P2 := FileLines^.At(J);  {-SBlocks}
-               FileLines^.AtPut(I, P2); {-SBlocks}
-               FileLines^.AtPut(J, P1); {-SBlocks}
+               P1 := FileLines.At(I);  {-SBlocks}
+               P2 := FileLines.At(J);  {-SBlocks}
+               FileLines.AtPut(I, P2); {-SBlocks}
+               FileLines.AtPut(J, P1); {-SBlocks}
              end;                       {-SBlocks}
            Inc(I);
            Dec(J);
@@ -1166,18 +1166,18 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           S := ln(i);
           if Cmpr(S, ln(i-step)) then
             begin
-            x := FileLines^.At(i);
+            x := FileLines.At(i);
             j := i-step;
             repeat
-              P1 := FileLines^.At(j); {-SBlocks}
-              FileLines^.AtPut(j+step, P1);
+              P1 := FileLines.At(j); {-SBlocks}
+              FileLines.AtPut(j+step, P1);
               if j <= L+step-1 then
                 goto 1;
               j := j-step;
             until Cmpr(ln(j), S);
             j := j+step;
 1:
-            FileLines^.AtPut(j, x);
+            FileLines.AtPut(j, x);
             end;
           end;
         end;
@@ -1284,9 +1284,9 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     function DoFind(P_: Pointer): Boolean;
     var P: PEditMacros absolute P_;
       begin
-      if UpStrg(P^.Name^) = UpCase(Event.InfoChar) then
+      if UpStrg(P.Name^) = UpCase(Event.InfoChar) then
         begin
-        P^.Play(Self);
+        P.Play(Self);
         DoFind := True;
         end
       else
@@ -1296,7 +1296,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     begin
     if Event.InfoChar < #32 then
       Inc(Event.InfoChar, 64);
-    Macros^.FirstThat(DoFind);
+    Macros.FirstThat(DoFind);
     end;
 
   procedure SelectMacro;
@@ -1321,7 +1321,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
         C := '<>'; {-$VIV}
     end {case};
     FreeLongStr := WorkString;
-    while (LastY < FileLines^.Count) do
+    while (LastY < FileLines.Count) do
       begin
       while LastX < Length(FreeLongStr) do
         begin
@@ -1443,7 +1443,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       WasBreak, DoStore, MakeExit: Boolean;
     begin
     GetPrevWordViv := False;
-    if  (FromPos.Y > FileLines^.Count-1) or (FromPos.Y < 0) then
+    if  (FromPos.Y > FileLines.Count-1) or (FromPos.Y < 0) then
       Exit;
     Buf := '';
     S := GetLine(FromPos.Y);
@@ -1512,7 +1512,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       WasBreak, DoStore, MakeExit: Boolean;
     begin
     GetNextWordViv := False;
-    if  (FromPos.Y > FileLines^.Count-1) or (FromPos.Y < 0) then
+    if  (FromPos.Y > FileLines.Count-1) or (FromPos.Y < 0) then
       Exit;
     Buf := '';
     S := GetLine(FromPos.Y);
@@ -1562,7 +1562,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           Inc(FromPos.Y);
           FromPos.X := 0;
           WasBreak := True;
-          if FromPos.Y > FileLines^.Count-1 then
+          if FromPos.Y > FileLines.Count-1 then
             MakeExit := True
           else if not MakeExit then
             S := GetLine(FromPos.Y);
@@ -1648,7 +1648,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       begin
       SyncClipIn;
       if ClipBoardStream <> nil then
-        ClipBoardStream^.Seek(Positive(ClipBoardStream^.GetPos-1));
+        ClipBoardStream.Seek(Positive(ClipBoardStream.GetPos-1));
       CopyLines2Stream(ClipBoard, ClipBoardStream);
       end;
     cmSyncClipOut:
@@ -1743,8 +1743,8 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
           Desktop.Lock;
         if Application <> nil then
           begin
-          {AK155}Application.InsertWindow(New(TFileWindow,
-              Init(EditName, EditName, False)));
+          {AK155}Application.InsertWindow(TFileWindow.Create(
+              EditName, EditName, False));
           Message(Application, evCommand, cmViewText,
             @EditName);
           MessageL(Application, evCommand, cmScrollBarChanged,
