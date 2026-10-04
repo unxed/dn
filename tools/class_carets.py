@@ -170,7 +170,44 @@ def find_open_paren(ts, close_index):
     return None
 
 
-def caret_is_class_deref(ts, caret_index, class_names, class_vars):
+def decl_type_is_class(ts, name_index, class_names):
+    """If ts[name_index] is in `Name[, Name2]: Type`, return whether Type is a class."""
+    j = name_index + 1
+    while j + 1 < len(ts) and ts[j].text == b"," and is_ident(ts[j + 1]):
+        j += 2
+    if j >= len(ts) or ts[j].text != b":":
+        return None
+    if j + 1 < len(ts) and ts[j + 1].text == b"=":
+        return None
+    return class_type_end(ts, type_token_after_colon(ts, j), class_names) is not None
+
+
+def aggregate_depths(ts):
+    depths = [0] * len(ts)
+    depth = 0
+    starts = {b"class", b"record", b"object"}
+    for i, tok in enumerate(ts):
+        word = tok.text.lower()
+        if word in starts and i + 1 < len(ts) and ts[i + 1].text.lower() not in (b"of", b";"):
+            depth += 1
+        depths[i] = depth
+        if word == b"end" and depth:
+            depth -= 1
+    return depths
+
+
+def nearest_name_is_class(ts, caret_index, name, class_names, field_vars, depths):
+    """Nearest preceding var/param declaration wins; else class fields."""
+    for i in range(caret_index - 1, -1, -1):
+        if depths[i] or ts[i].text.lower() != name or not is_ident(ts[i]):
+            continue
+        declared = decl_type_is_class(ts, i, class_names)
+        if declared is not None:
+            return declared
+    return name in field_vars
+
+
+def caret_is_class_deref(ts, caret_index, class_names, field_vars, depths):
     if caret_index <= 0 or ts[caret_index].text != b"^":
         return False
     nxt = caret_index + 1
@@ -187,18 +224,19 @@ def caret_is_class_deref(ts, caret_index, class_names, class_vars):
         return open_paren is not None and type_name_before(ts, open_paren, class_names)
 
     if is_ident(ts[prev]):
-        return ts[prev].text.lower() in class_vars
+        return nearest_name_is_class(
+            ts, caret_index, ts[prev].text.lower(), class_names, field_vars, depths
+        )
     return False
 
 
 def caret_removals(data, class_names, field_vars):
     ts = tokens(data)
-    local_class, local_other = collect_typed_names([data], class_names, fields_only=False)
-    names = (field_vars | local_class) - local_other
+    depths = aggregate_depths(ts)
     return [
         (tok.start, tok.end, b"")
         for i, tok in enumerate(ts)
-        if tok.text == b"^" and caret_is_class_deref(ts, i, class_names, names)
+        if tok.text == b"^" and caret_is_class_deref(ts, i, class_names, field_vars, depths)
     ]
 
 
