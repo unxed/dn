@@ -190,7 +190,7 @@ constructor TDoCollection.Create(ReOrUn_do: TDoKind); {-$VOL}
 
 { TInfoLine }
 
-constructor TInfoLine.Create(var R: TRect);
+constructor TInfoLine.Create(const R: TRect);
   begin
   inherited Create(R);
   EventMask := evMouseDown;
@@ -227,7 +227,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     else if (T.X > 21) and (T.X < 25) then
       Event.Command := cmSwitchBlock
     else if (T.X > 26) and (T.X < 31) then
-      case P^.EdOpt.ForcedCRLF of
+      case P.EdOpt.ForcedCRLF of
         cfCRLF:
           Event.Command := cmEditLfMode;
         cfLF:
@@ -245,7 +245,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
       begin
       BookMark := T.X-38;
       if  (Event.Buttons and mbRightButton <> 0) or
-          (not P^.MarkPos[Event.InfoByte].EqualsXY(-1, -1))
+          (not P.MarkPos[Event.InfoByte].EqualsXY(-1, -1))
       then
         with Event do
           begin
@@ -260,8 +260,8 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
         Event.What := evNothing;
       end
     else if (T.X = 47) then
-      with TFileEditor(Owner.Current)^ do
-        ScrollTo(0, FileLines^.Count) {AK155}
+      with TFileEditor(Owner.Current) do
+        ScrollTo(0, FileLines.Count) {AK155}
     else
       Event.What := evNothing;
     if Event.What <> evNothing then
@@ -288,21 +288,21 @@ procedure TInfoLine.Draw;
     begin
     if Owner.GetState(sfDragging)
     then
-      Color := TWindow(Owner).Frame^.GetColorW(5)
+      Color := TWindow(Owner).Frame.GetColorW(5)
     else
-      Color := TWindow(Owner).Frame^.GetColorW(2);
+      Color := TWindow(Owner).Frame.GetColorW(2);
     Ch2 := #196;
     end
   else
     begin
-    Color := TWindow(Owner).Frame^.GetColorW(3);
+    Color := TWindow(Owner).Frame.GetColorW(3);
     Ch2 := #205;
     end;
   if not Owner.GetState(sfActive) then
     SetLength(S, 0)
   else
     begin
-    with P^ do
+    with P do
       begin
       X := Delta.X+1;
       Y := Delta.Y+1;
@@ -311,52 +311,52 @@ procedure TInfoLine.Draw;
       else
         C := #0;
       end;
-    CharNum := Byte(KeyMapDescr[P^.KeyMap].XLatCP^[FromAscii][C]);
-    if P^.Modified then
+    CharNum := Byte(KeyMapDescr[P.KeyMap].XLatCP^[FromAscii][C]);
+    if P.Modified then
       S := #15+Ch2
     else
       S := Ch2+Ch2;
     S := S+SStr(Y, 5, Ch2)+':'+SSt2(X, 4, Ch2)
         +Ch2+'['+SStr(CharNum, 3, '0')+'·'+Hex2(CharNum)+']'+Ch2;
     {-$VIV}
-    if P^.DrawMode = 1 then
+    if P.DrawMode = 1 then
       S := S+'{┼'
-    else if P^.DrawMode = 2 then
+    else if P.DrawMode = 2 then
       S := S+'{╬'
-    else if P^.VertBlock then
+    else if P.VertBlock then
       S := S+'('#18
     else
       S := S+'('#29;
-    if P^.DrawMode = 0 then
-      if P^.OptimalFill then
+    if P.DrawMode = 0 then
+      if P.OptimalFill then
         S := S+'F)'
       else
         S := S+')═'
-    else if P^.OptimalFill then
+    else if P.OptimalFill then
       S := S+'F}'
     else
       S := S+'}═';
 
-    if P^.EdOpt.ForcedCRLF = cfNone then
+    if P.EdOpt.ForcedCRLF = cfNone then
       begin
-      P^.EdOpt.ForcedCRLF := cfNone;
+      P.EdOpt.ForcedCRLF := cfNone;
       for qwe := 0 to EditorDefaults.NewLine do
-        P^.EdOpt.ForcedCRLF := Succ(P^.EdOpt.ForcedCRLF);
+        P.EdOpt.ForcedCRLF := Succ(P.EdOpt.ForcedCRLF);
       end;
-    if P^.EdOpt.ForcedCRLF = cfCR then
+    if P.EdOpt.ForcedCRLF = cfCR then
       S := S+Ch2+Ch2+'Cr'+Ch2
-    else if P^.EdOpt.ForcedCRLF = cfLF then
+    else if P.EdOpt.ForcedCRLF = cfLF then
       S := S+Ch2+Ch2+'Lf'+Ch2
-    else if P^.EdOpt.ForcedCRLF = cfCRLF then
+    else if P.EdOpt.ForcedCRLF = cfCRLF then
       S := S+Ch2+'CrLf'
     else
       S := S+Ch2+'::::';
-    S := S+Ch2+KeyMapDescr[P^.KeyMap].Tag+Ch2;
+    S := S+Ch2+KeyMapDescr[P.KeyMap].Tag+Ch2;
     if FastBookmark then
       begin
       S := S+Ch2+'<'; {-$VIV 20.05.99--}
       for X := 1 to 9 do
-        if not P^.MarkPos[X].EqualsXY(-1, -1)
+        if not P.MarkPos[X].EqualsXY(-1, -1)
         then
           S := S+Char(X+48)
         else
@@ -385,7 +385,7 @@ procedure TBookmarkLine.Draw;
     begin
     IsMarker := #0;
     for I := 1 to 9 do
-      if P^.MarkPos[I].Y = pLine then
+      if P.MarkPos[I].Y = pLine then
         begin
         IsMarker := Char(I+48);
         Break;
@@ -403,14 +403,14 @@ procedure TBookmarkLine.Draw;
     begin
     if Owner.GetState(sfDragging)
     then
-      Col := TWindow(Owner).Frame^.GetColorW(5)
+      Col := TWindow(Owner).Frame.GetColorW(5)
     else
-      Col := TWindow(Owner).Frame^.GetColorW(2);
+      Col := TWindow(Owner).Frame.GetColorW(2);
     Ch := #179;
     end
   else
     begin
-    Col := TWindow(Owner).Frame^.GetColorW(3);
+    Col := TWindow(Owner).Frame.GetColorW(3);
     Ch := #186;
     end;
   if not ShowBookmarks then
@@ -421,7 +421,7 @@ procedure TBookmarkLine.Draw;
     end;
   for I := 0 to Size.Y do
     begin
-    Mrk := IsMarker(P^.Pos.Y+I);
+    Mrk := IsMarker(P.Pos.Y+I);
     if Mrk = #0 then
       MoveChar(B, Ch, Col, 1) {SYR}
     else
@@ -430,7 +430,7 @@ procedure TBookmarkLine.Draw;
     end;
   end { TBookmarkLine.Draw };
 
-constructor TAttrBufStream.Create(FileName: String; Mode, Size: Word);
+constructor TAttrBufStream.Create(const FileName: String; Mode, Size: Word);
   begin
   inherited Create(FileName, Mode, Size);
   OldAttr := $FFFF;
@@ -446,7 +446,7 @@ destructor TAttrBufStream.Destroy;
 {-DataCompBoy-}
 function CheckForOver(Name: String): TStream; {<editfile.001>}
   var
-    S: PAttrBufStream;
+    S: TAttrBufStream;
     F: lFile;
     W: Word;
     L: array[0..0] of PtrInt;
@@ -509,10 +509,10 @@ function CheckForOver(Name: String): TStream; {<editfile.001>}
     W := $FFFF;
     Attr := Archive
     end;
-  New(S, Init(Name, stOpen, 4096));
+  S := TAttrBufStream.Create(Name, stOpen, 4096);
   if S = nil then
     Exit;
-  if Abort or (S^.Status = stOK) then
+  if Abort or (S.Status = stOK) then
     begin
     if W = $FFFF then
       OverQuery;
@@ -521,14 +521,14 @@ function CheckForOver(Name: String): TStream; {<editfile.001>}
         begin
         if Attr and ReadOnly <> 0 then
           begin
-          S^.OldAttr := Attr;
-          lAssignFile(S^.F, lFileNameOf(F));
+          S.OldAttr := Attr;
+          lAssignFile(S.F, lFileNameOf(F));
           end;
         case W of
           cmYes:
-            S^.Truncate;
+            S.Truncate;
           cmOK:
-            S^.Seek(S^.GetSize);
+            S.Seek(S.GetSize);
         end {case};
         CheckForOver := S;
         end;
@@ -557,8 +557,8 @@ function CheckForOver(Name: String): TStream; {<editfile.001>}
 что-то более осмысленное, чем то, что тут имеется сейчас. }
   if EditorDefaults.EdOpt and ebfCBF <> 0 then
     CreateBackup;
-  New(S, Init(Name, stCreate, 4096));
-  if Abort or (S = nil) or (S^.Status <> stOK) then
+  S := TAttrBufStream.Create(Name, stCreate, 4096);
+  if Abort or (S = nil) or (S.Status <> stOK) then
     begin
     CantWrite(Name);
     S.Free;
@@ -707,10 +707,10 @@ procedure WriteBlock(Hint: String; S: TStream; C: TLineCollection
   if  (S = nil) or (C = nil) then
     Exit;
   PP := WriteMsg(^M^M^C+GetString(dlWritingFile));
-  while not Abort and (S^.Status = stOK) and (I < C^.Count) do
+  while not Abort and (S.Status = stOK) and (I < C.Count) do
     begin
     UpdateWriteView(PP);
-    P := C^.At(I-1);
+    P := C.At(I-1);
     if P <> nil then
       {JO} {!!!}
       SST := P^+CrLf
@@ -718,18 +718,18 @@ procedure WriteBlock(Hint: String; S: TStream; C: TLineCollection
       SST := CrLf; {JO}
     if AOptimalFill then
       CompressString(SST);
-    S^.Write(SST[1], Length(SST));
+    S.Write(SST[1], Length(SST));
     Inc(I);
     end;
   {HintString := '';}Application.Idle;
-  P := C^.At(I-1);
+  P := C.At(I-1);
   if P <> nil then
     SST := P^
   else
     SST := '';
   if AOptimalFill then
     CompressString(SST); {Cat: про последнюю строку тоже не забываем}
-  S^.Write(SST[1], Length(SST));
+  S.Write(SST[1], Length(SST));
   if PP <> nil then
     PP.Free;
   end { WriteBlock };
