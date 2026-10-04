@@ -11,8 +11,8 @@ class ClassCaretsTest(unittest.TestCase):
     def convert(self, source, libraries=None):
         libs = libraries or [source]
         class_names = library_classes(libs)
-        class_vars = collect_class_vars(libs, class_names)
-        return rewrite(source, class_names, class_vars)[0]
+        field_vars = collect_class_vars(libs, class_names, fields_only=True)
+        return rewrite(source, class_names, field_vars)[0]
 
     def test_removes_caret_after_class_field(self):
         source = (
@@ -103,6 +103,69 @@ class ClassCaretsTest(unittest.TestCase):
             b"end.\n"
         )
         self.assertIn(b"Files.Count", self.convert(source))
+
+    def test_comma_field_list(self):
+        source = (
+            b"type TView = class\n"
+            b"    InfoView, DriveLine, SortView: TView;\n"
+            b"  end;\n"
+            b"begin\n"
+            b"  DriveLine^.Show;\n"
+            b"  InfoView^.Show;\n"
+            b"end.\n"
+        )
+        out = self.convert(source)
+        self.assertIn(b"DriveLine.Show", out)
+        self.assertIn(b"InfoView.Show", out)
+
+    def test_foreign_param_name_does_not_mark_record_pointer(self):
+        library = (
+            b"type TView = class end;\n"
+            b"procedure Helper(P: TView); begin end;\n"
+        )
+        source = (
+            b"type TRec = record X: Integer; end;\n"
+            b"  PRec = ^TRec;\n"
+            b"  TView = class end;\n"
+            b"var P: PRec;\n"
+            b"begin\n"
+            b"  P^.X := 1;\n"
+            b"end.\n"
+        )
+        out = self.convert(source, libraries=[library, source])
+        self.assertIn(b"P^.X", out)
+
+    def test_local_record_pointer_shadows_class_field_name(self):
+        library = (
+            b"type TView = class\n"
+            b"    P: TView;\n"
+            b"  end;\n"
+        )
+        source = (
+            b"type TRec = record X: Integer; end;\n"
+            b"  PRec = ^TRec;\n"
+            b"  TView = class\n"
+            b"    P: TView;\n"
+            b"  end;\n"
+            b"var P: PRec;\n"
+            b"begin\n"
+            b"  P^.X := 1;\n"
+            b"end.\n"
+        )
+        out = self.convert(source, libraries=[library, source])
+        self.assertIn(b"P^.X", out)
+
+    def test_assignment_is_not_a_declaration(self):
+        source = (
+            b"type TView = class\n"
+            b"    Drive: TView;\n"
+            b"  end;\n"
+            b"begin\n"
+            b"  Drive := nil;\n"
+            b"  Drive^.Show;\n"
+            b"end.\n"
+        )
+        self.assertIn(b"Drive.Show", self.convert(source))
 
 
 if __name__ == "__main__":
