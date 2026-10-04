@@ -13,7 +13,8 @@ from pathlib import Path
 
 
 TEXT_SUFFIXES = {
-    ".inc", ".lpr", ".md", ".pas", ".pp", ".py", ".sh", ".txt", ".htx",
+    ".dnl", ".dnr", ".htx", ".inc", ".lpr", ".md", ".pas", ".pp", ".py",
+    ".sh", ".txt",
 }
 DEFAULT_ROOTS = ("dn", "tv")
 SKIP_PARTS = {".git", "build", "dist", "out", "__pycache__"}

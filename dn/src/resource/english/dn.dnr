@@ -101,7 +101,7 @@ ColorDialog
          ColorItem 'List selected',     59,
          ColorItem 'List divider',      60,
          ColorItem 'Information panel',  61,
-    ColorGroup 'ÀÄÄTree',
+    ColorGroup 'â””â”€â”€Tree',
          ColorItem 'Normal tree',        104,
          ColorItem 'Normal nodes',       105,
          ColorItem 'Selected node',      106,
@@ -124,7 +124,7 @@ ColorDialog
          ColorItem 'Frame icons',       82,
          ColorItem 'Scroll bar page',   83,
          ColorItem 'Scroll bar icons',  84,
-    ColorGroup 'ÃÄÄFile Panel',
+    ColorGroup 'â”œâ”€â”€File Panel',
          ColorItem 'Normal text',        85,
          ColorItem 'Selected text',      87,
          ColorItem 'Normal cursor',      88,
@@ -133,7 +133,7 @@ ColorDialog
          ColorItem 'Directory active',   90,
          ColorItem 'Directory passive',  91,
          ColorItem 'Column title',  165,
-    ColorGroup '³  ÃÄHighlight',
+    ColorGroup 'â”‚  â”œâ”€Highlight',
          ColorItem 'Directories',    172,
          ColorItem 'Executables',    173,
          ColorItem 'Archives',       174,
@@ -147,11 +147,11 @@ ColorDialog
          ColorItem 'Custom 8',       194,
          ColorItem 'Custom 9',       195,
          ColorItem 'Custom 10',      196,
-    ColorGroup '³  ÃÄDrive Line',
+    ColorGroup 'â”‚  â”œâ”€Drive Line',
          ColorItem 'Drive letters',  186,
          ColorItem 'Drive selected', 188,
          ColorItem 'Frame',          187,
-    ColorGroup '³  ÀÄInfo',
+    ColorGroup 'â”‚  â””â”€Info',
          ColorItem 'Current file',       119,
          ColorItem 'Selected text',      120,
          ColorItem 'Selected numbers',   121,
@@ -160,8 +160,8 @@ ColorDialog
          ColorItem 'Free space text',    124,
          ColorItem 'Free space numbers', 125,
          ColorItem 'Long file name',     130,
-         ColorItem 'ÀÄ common part',     131,
-    ColorGroup 'ÃÄÄTree',
+         ColorItem 'â””â”€ common part',     131,
+    ColorGroup 'â”œâ”€â”€Tree',
          ColorItem 'Normal tree',        94,
          ColorItem 'Normal nodes',       95,
          ColorItem 'Selected node',      96,
@@ -170,10 +170,10 @@ ColorDialog
          ColorItem 'Selected passive',    99,
          ColorItem 'Selected def. passive',  100,
          ColorItem 'Info box',  101,
-    ColorGroup 'ÃÄÄQuick View',
+    ColorGroup 'â”œâ”€â”€Quick View',
          ColorItem 'Normal text',         92,
          ColorItem 'Selected text',       93,
-    ColorGroup 'ÀÄÄDisk Info',
+    ColorGroup 'â””â”€â”€Disk Info',
          ColorItem 'Normal text',         103,
          ColorItem 'Highlighted text',    102,
     ColorGroup 'Trash Can',
@@ -188,7 +188,7 @@ ColorDialog
          ColorItem 'Scroll bar icons',  116,
          ColorItem 'Normal text',       117,
          ColorItem 'Selected text',     118,
-    ColorGroup 'ÀÄÄHighlight',
+    ColorGroup 'â””â”€â”€Highlight',
          ColorItem 'Comments',              199,
          ColorItem 'Symbols',               200,
          ColorItem 'Strings',               201,
@@ -204,7 +204,7 @@ ColorDialog
          ColorItem 'Scroll bar icons',  75,
          ColorItem 'Normal text',       76,
          ColorItem 'Selected text',     77,
-    ColorGroup 'ÃÄÄHighlight',
+    ColorGroup 'â”œâ”€â”€Highlight',
          ColorItem 'Comments',              164,
          ColorItem 'Symbols',               189,
          ColorItem 'Strings',               190,
@@ -215,7 +215,7 @@ ColorDialog
          ColorItem 'Cur. line comments',    184,
          ColorItem 'Current line selected', 183,
          ColorItem 'Current column',        185,
-    ColorGroup 'ÀÄÄMenu',
+    ColorGroup 'â””â”€â”€Menu',
          ColorItem 'Normal',            64,
          ColorItem 'Disabled',          65,
          ColorItem 'Shortcut',          66,
@@ -233,7 +233,7 @@ ColorDialog
          ColorItem 'Selected text',     160,
          ColorItem 'Sector title',      161,
          ColorItem 'Edit line',         162,
-    ColorGroup 'ÀÄÄMenu',
+    ColorGroup 'â””â”€â”€Menu',
          ColorItem 'Normal',            147,
          ColorItem 'Disabled',          148,
          ColorItem 'Shortcut',          149,
@@ -776,7 +776,7 @@ STATUSLINE
       StatusItem '', kbF1, cmHelp,
 ;{BASE}
       StatusItem '~'#26'~ Moving', kbNoKey, cmNo,
-      StatusItem '~ÄÙ~ Done', kbNoKey, cmNo,
+      StatusItem '~â”€â”˜~ Done', kbNoKey, cmNo,
       StatusItem '~Esc~ Cancel', kbNoKey, cmNo,
 ;{SHIFT}
       StatusItem ':~'#26'~ Resize', kbNoKey, cmNo,
@@ -1638,7 +1638,7 @@ STATUSLINE
   StatusDef hcAsciiChart, hcAsciiChart,
      StatusItem '~F1~ Help', kbF1, cmHelp,
      StatusItem '~Esc~ Close', kbEsc, cmClose,
-     StatusItem '~à®¡¥«~ Insert', kbSpace, cmYes,
+     StatusItem '~ĞŸÑ€Ğ¾Ğ±ĞµĞ»~ Insert', kbSpace, cmYes,
      StatusItem '~Enter~ Insert and close', kbEnter, cmOK,
      StatusItem '+~Enter~ Insert', kbCtrlEnter, cmYes,
 
@@ -2545,7 +2545,7 @@ END
 
 DIALOG dlgMakeList, 69, 20, 'Make List File'
     HELPCTX hcMakeListFile
-    Label -1, 4, 'ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶'
+    Label -1, 4, 'â•Ÿâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¢'
 #1  InputLine 14, 2, 64, 3, 255, hsMakeList
     Label 2, 2, '~F~ile name', ofPostProcess, ofPreProcess
     InputLine 14, 6, 64, 7, 255, hsMakeListHeader
@@ -2655,7 +2655,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'File Panel appearance'
       ITEM 'Always long'
       ITEM 'Do not display'
     END
-    Label 31, 3, ' ÀÄ Name', ofPostProcess, ofPreProcess
+    Label 31, 3, ' â””â”€ Name', ofPostProcess, ofPreProcess
 
 #2  ComboBox 52, 4, 72, 5
       ITEM 'Do not display'
@@ -3163,7 +3163,7 @@ DIALOG dlgCalcFormat, 28, 18, 'Precision'
    InputLine 7, 12, 11, 13, 2, 0
    Label 1, 12, '~T~IME', ofPostProcess, ofPreProcess
    StaticText 12, 12, 26, 13, 'fractal digits'
-   Button 3,15,13,17, '~Š~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+   Button 3,15,13,17, 'Ğ~Ğš~', cmOK, bfDefault, ofPostProcess, ofPreProcess
    Button 15,15,25,17, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
 END
 
@@ -3455,23 +3455,23 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
       ITEM 'Centered'
       ITEM 'At right side'
     END
-    Label 35, 8, ' ÃÄ Place', ofPostProcess, ofPreProcess
+    Label 35, 8, ' â”œâ”€ Place', ofPostProcess, ofPreProcess
     ComboBox 52, 9, 73, 10
       ITEM 'Left part and ext.'
       ITEM 'Right part'
       ITEM 'Left part'
     END
-    Label 35, 9, ' ÃÂ Show', ofPostProcess, ofPreProcess
+    Label 35, 9, ' â”œâ”¬ Show', ofPostProcess, ofPreProcess
   CheckBoxes 69, 10, 73, 11, ofPostProcess, ofPreProcess
     ITEM ''
   END
-  Label 35, 10, ' ³ÀIf not fully shown anywhere'
+  Label 35, 10, ' â”‚â””If not fully shown anywhere'
     ComboBox 52, 11, 73, 12
       ITEM 'Do not highlight'
       ITEM 'Highlight'
       ITEM 'Do not show'
     END
-    Label 35, 11, ' ÀÄ Common part', ofPostProcess, ofPreProcess
+    Label 35, 11, ' â””â”€ Common part', ofPostProcess, ofPreProcess
 
 ; TagChar
     InputLine 46, 12, 49, 13, 1, 0
@@ -3506,7 +3506,7 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
       ITEM 'Tree'
       ITEM 'Absent'
       END
-    Label 42, 17, 'ÀÄ Left panel', ofPostProcess, ofPreProcess
+    Label 42, 17, 'â””â”€ Left panel', ofPostProcess, ofPreProcess
 
     Button 37, 19, 47, 21, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 47, 19, 57, 21, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
@@ -3664,7 +3664,7 @@ DIALOG dlgAdvancedCOMSetup, 45, 15, 'Advanced Port Setup'
       ITEM '~D~TR/DSR'
     END
     Label 6, 10, 'Hardware', ofPostProcess, ofPreProcess
-    StaticText 10, 9, 28, 10, 'ÚÄ Flow Control Ä¿'
+    StaticText 10, 9, 28, 10, 'â”Œâ”€ Flow Control â”€â”'
     CheckBoxes 19, 11, 33, 13, ofPostProcess, ofPreProcess
       ITEM '~X~on/Xoff'
     END
@@ -4717,12 +4717,12 @@ DIALOG dlgChScreenMode, 34, 12, 'Change Screen Mode'
       ITEM '~6~ 80 x 60 '
       ITEM '~C~ustom:'
     END
-    StaticText 16, 2, 17, 3, '³'
-    StaticText 16, 3, 17, 4, '³'
-    StaticText 16, 4, 17, 5, '³'
-    StaticText 16, 5, 17, 6, '³'
-    StaticText 16, 6, 17, 7, '³'
-    StaticText 16, 7, 17, 8, '³'
+    StaticText 16, 2, 17, 3, 'â”‚'
+    StaticText 16, 3, 17, 4, 'â”‚'
+    StaticText 16, 4, 17, 5, 'â”‚'
+    StaticText 16, 5, 17, 6, 'â”‚'
+    StaticText 16, 6, 17, 7, 'â”‚'
+    StaticText 16, 7, 17, 8, 'â”‚'
     InputLine 18, 4, 23, 5, 3, 0
     InputLine 26, 4, 31, 5, 3, 0
     StaticText 24, 4, 25, 5, 'x'
@@ -4746,7 +4746,7 @@ DIALOG dlgSetExportCsvFormat, 46, 16, 'CSV Export Format'
       ITEM 'As calculated value'
     END
     Label 3, 8, '~F~ormula format:', ofPostProcess, ofPreProcess
-    Button 11, 13, 21, 15, '~Š~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button 11, 13, 21, 15, 'Ğ~Ğš~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 25, 13, 35, 15, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
 END
 ;KV
@@ -4758,7 +4758,7 @@ DIALOG dlgDBFGoto, 41, 9, 'Go to row/column'
     Label 3, 2, '~R~ow number', ofPostProcess, ofPreProcess
     InputLine 17, 4, 35, 5, 10, hsDBFGotoCol
     Label 3, 4, '~C~olumn name', ofPostProcess, ofPreProcess
-    Button  9, 6, 19, 8, '~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button  9, 6, 19, 8, 'Ğ~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 19, 6, 29, 8, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
     Button 29, 6, 39, 8, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
