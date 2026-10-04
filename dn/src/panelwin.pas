@@ -198,11 +198,11 @@ constructor TDoubleWindow.Create(const Bounds: TRect; ANumber, ADrive: Integer);
     isValid := True;
   case FMSetup.LeftPanelType of
     fdoInfoDrive:
-      Message(@Self, evCommand, cmDiskInfo, nil);
+      Message(Self, evCommand, cmDiskInfo, nil);
     fdoTreeFrive:
-      Message(@Self, evCommand, cmDirTree, nil);
+      Message(Self, evCommand, cmDirTree, nil);
     fdoRightOnly:
-      Message(@Self, evCommand, cmHideLeft, nil);
+      Message(Self, evCommand, cmHideLeft, nil);
   end {case};
   end { TDoubleWindow.Init };
 
@@ -553,7 +553,7 @@ procedure TDoubleWindow.SwitchView(dtType: Byte);
   Lock;
 
   if PanelZoomed then
-    Message(@Self, evCommand, cmMaxi, nil);
+    Message(Self, evCommand, cmMaxi, nil);
       { При PanelZoomed может потребоваться SwitchView только если
        максимизированная панель - файловая. То есть это что-то вроде
        Ctrl-Q при максимизированной панели. Чтобы было где открывать
@@ -580,7 +580,7 @@ procedure TDoubleWindow.SwitchView(dtType: Byte);
   if NonFilePanelType <> dtType then
     begin
     NonFilePanelType := 0;
-    V := PanelConstructor[dtType](R1, @self, Panel[not N].FilePanel);
+    V := PanelConstructor[dtType](R1, Self, Panel[not N].FilePanel);
     if V = nil then
       goto Ex;
     NonFilePanel := N;
@@ -970,7 +970,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
             GetBounds(OldBounds);
             GetBounds(OldPanelBounds);
             if (Size.X < Desktop.Size.X) or PanelZoomed then
-              Message(@Self, evCommand, cmMaxi, nil);
+              Message(Self, evCommand, cmMaxi, nil);
             end;
           { Flash 05-02-2004 <<< }
           end;

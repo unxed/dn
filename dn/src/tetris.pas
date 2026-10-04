@@ -383,7 +383,7 @@ constructor TGameView.Create;
   inherited Create(R);
   Options := Options or ofFramed or ofSelectable or ofPreProcess;
   EventMask := $FFFF;
-  Game := @Self;
+  Game := Self;
   Delay := 30;
   with TetrisRec do
     begin
@@ -423,7 +423,7 @@ constructor TGameView.Create;
       S.Free;
       end;
   NewGame;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   end { TGameView.Init };
 
 (*
@@ -480,8 +480,8 @@ constructor TGameView.Load(var S: TStream);
   inherited Load(S);
   GetPeerViewPtr(S, Info);
   S.Read(Glass, SizeOf(Self)-SizeOf(TView)-SizeOf(PView));
-  Game := @Self;
-  RegisterToBackground(@Self);
+  Game := Self;
+  RegisterToBackground(Self);
   end;
 
 procedure TGameView.Store(var S: TStream);

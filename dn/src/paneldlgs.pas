@@ -1908,7 +1908,7 @@ procedure CM_Dropped(AFP, EI: Pointer);
   else
     RevertBar := False;
   MPos := PCopyRec(EI)^.Where;
-  P^.MakeLocal(MPos, MPos);
+  P.MakeLocal(MPos, MPos);
   ColumnTitles := (P^.Pansetup.Show.MiscOptions and 2) <> 0;
   I := P^.Delta+(MPos.X div P^.LineLength)
         *(P^.Size.Y-Byte(ColumnTitles))
@@ -2273,7 +2273,7 @@ procedure CM_SortBy(AFP: Pointer);
   W := 16;
   Desktop.GetExtent(R);
   R.A := P^.Origin;
-  P^.Owner^.MakeGlobal(R.A, R.A);
+  P^.Owner.MakeGlobal(R.A, R.A);
   Desktop.MakeLocal(R.A, R.A);
   if R.A.X < 0 then
     R.A.X := 0
@@ -2434,7 +2434,7 @@ procedure CM_MakeDir(AFP: Pointer);
       end;
     end;
   if J >= 0 then
-    P^.ScrollBar^.SetValue(J);
+    P^.ScrollBar.SetValue(J);
   P^.RedrawPanelInfoDir;
   end { CM_MakeDir };
 {-DataCompBoy-}
@@ -2767,7 +2767,7 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
   W := 15;
   Desktop.GetExtent(R);
   R.A := P^.Origin;
-  P^.Owner^.MakeGlobal(R.A, R.A);
+  P^.Owner.MakeGlobal(R.A, R.A);
   Desktop.MakeLocal(R.A, R.A);
   if R.A.X < 0 then
     R.A.X := 0

@@ -1333,13 +1333,13 @@ redat:
         MakeLocal(Event.Where, P);
         if MouseInView(Event.Where) then
           if P.X < Size.X div 4 then
-            MessageKey(@Self, kbLeft)
+            MessageKey(Self, kbLeft)
           else if P.X >= (Size.X*3) div 4 then
-            MessageKey(@Self, kbRight)
+            MessageKey(Self, kbRight)
           else if P.Y < Size.Y div 2 then
-            MessageKey(@Self, kbUp)
+            MessageKey(Self, kbUp)
           else
-            MessageKey(@Self, kbDown)
+            MessageKey(Self, kbDown)
       until not MouseEvent(Event, evMouseMove+evMouseAuto);
       RepeatDelay := RD;
       CE
@@ -1387,7 +1387,7 @@ procedure TDBViewer.Draw;
        and (VerticalScrollBar^.Value <> Delta.Y)
   then
     begin
-    VerticalScrollBar^.SetValue(Delta.Y);
+    VerticalScrollBar.SetValue(Delta.Y);
     if Indicator <> nil then
       Indicator^.Draw;
     end;
@@ -1395,7 +1395,7 @@ procedure TDBViewer.Draw;
        and (HorizontalScrollBar^.Value <> Delta.X)
   then
     begin
-    HorizontalScrollBar^.SetValue(Delta.X);
+    HorizontalScrollBar.SetValue(Delta.X);
     if Indicator <> nil then
       Indicator^.Draw;
     end;
@@ -1641,7 +1641,7 @@ procedure TDBWindow.SetState(AState: Word; Enable: Boolean);
 
 destructor TDBWindow.Destroy;
   begin
-  StoreViewInfo(@Self);
+  StoreViewInfo(Self);
   inherited Destroy;
   end;
 

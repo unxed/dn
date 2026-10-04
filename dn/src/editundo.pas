@@ -208,7 +208,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   if Event.What = evMouseDown then
     begin
-    Owner^.MakeLocal(Event.Where, T);
+    Owner.MakeLocal(Event.Where, T);
     if T.X >= Owner^.Size.X-2 then
       begin
       PWindow(Owner).Frame^.HandleEvent(Event);

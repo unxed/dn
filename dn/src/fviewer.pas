@@ -1020,7 +1020,7 @@ procedure THFileViewer.ChangeBounds(const Bounds: TRect);
     R := Bounds;
     R.A.X := R.B.X;
     Inc(R.B.X);
-    SB^.SetBounds(R)
+    SB.SetBounds(R)
     end
   end;
 
@@ -1035,7 +1035,7 @@ procedure TFileViewer.ChangeBounds;
     MakeLines;
   DrawView;
   { if Info <> nil then
-  begin R := Bounds; R.A.Y := R.B.Y - 1; Dec(R.B.X, 2); Info^.SetBounds(R) end}
+  begin R := Bounds; R.A.Y := R.B.Y - 1; Dec(R.B.X, 2); Info.SetBounds(R) end}
   end;
 
 {AK155
@@ -2889,7 +2889,7 @@ DoSave:
                 Dec(Cur.X)
               else
                 begin
-                MessageKey(@Self, kbUp);
+                MessageKey(Self, kbUp);
                 if  (BufPos+FilePos <> 0) then
                   Cur.X := Lines[Cur.Y].len*2+9;
                 end;
@@ -2925,7 +2925,7 @@ DoSave:
              if ViewMode = vmAsm then
               begin
               if Cur.X >= Lines[Cur.Y].len*2+9 then
-                MessageKey(@Self, kbDown)
+                MessageKey(Self, kbDown)
               else
                 Inc(Cur.X);
               DrawView;
@@ -3111,7 +3111,7 @@ NotKb:
                           Buf^[P.X] := (Buf^[P.X] and $F) or (I shl 4);
                         if ViewMode = vmAsm then
                           MakeLines; {JO}
-                        MessageKey(@Self, kbRight);
+                        MessageKey(Self, kbRight);
                         CE
                         end;
                       end
@@ -3121,7 +3121,7 @@ NotKb:
                       Event.CharCode := Byte(XCoder.XLatCP[FromAscii][Char(Event.CharCode)]);
                       Char(Buf^[Cur.X+Cur.Y*HexPos+BufPos])
                          := Char(Event.CharCode);
-                      MessageKey(@Self, kbRight);
+                      MessageKey(Self, kbRight);
                       CE
                       end;
                     end;
@@ -3142,13 +3142,13 @@ NotKb:
             RepeatDelay := 6-Round((I/(Size.Y shr 1))*6);
             AutoRepeat := RepeatDelay;
             if P.X < Size.X div 4 then
-              MessageKey(@Self, kbLeft)
+              MessageKey(Self, kbLeft)
             else if P.X >= (Size.X*3) div 4 then
-              MessageKey(@Self, kbRight)
+              MessageKey(Self, kbRight)
             else if P.Y < Size.Y div 2 then
-              MessageKey(@Self, kbUp)
+              MessageKey(Self, kbUp)
             else
-              MessageKey(@Self, kbDown)
+              MessageKey(Self, kbDown)
             end
           else
             RepeatDelay := 0;

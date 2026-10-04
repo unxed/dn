@@ -584,7 +584,7 @@ q:
     begin
     if  (ParentMenu <> nil) and (ParentMenu^.Size.Y = 1) then
       begin
-      ParentMenu^.MakeLocal(E.Where, Mouse);
+      ParentMenu.MakeLocal(E.Where, Mouse);
       ParentMenu^.GetItemRect(ParentMenu^.Current, R);
       MouseInOwner := R.Contains(Mouse);
       end
@@ -606,7 +606,7 @@ q:
     var
       P: PMenuView;
     begin
-    P := @Self;
+    P := Self;
     while P^.ParentMenu <> nil do
       P := P^.ParentMenu;
     TopMenu := P;
@@ -851,14 +851,14 @@ lEnter:
               else {case}
                 begin
 lHotkey:
-                Target := @Self;
+                Target := Self;
                 Ch := Drivers.GetAltChar(DNKeyCode(E));
                 if Ch = #0 then
                   Ch := Char(E.CharCode)
                 else
                   Target := TopMenu;
                 P := Target^.FindItem(Ch);
-                if  (Target = @Self) and (P = nil)
+                if  (Target = Self) and (P = nil)
                 then
                   P := FindItem(Drivers.GetAltChar(DNKeyCode(E) and $FFFF00));
                 if P = nil then
@@ -870,7 +870,7 @@ lHotkey:
                     Action := DoReturn;
                     end
                   end
-                else if Target = @Self then
+                else if Target = Self then
                   begin
                   if Size.Y = 1 then
                     AutoSelect := True;
@@ -935,7 +935,7 @@ lHotkey:
                 R.B := Owner^.Size;
                 if Size.Y = 1 then
                   Dec(R.A.X);
-                Target := TopMenu^.NewSubView(R, SubMenu, @Self);
+                Target := TopMenu^.NewSubView(R, SubMenu, Self);
                 Result := Owner^.ExecView(Target);
                 Target.Free;
                 end;
@@ -1013,7 +1013,7 @@ function TMenuView.GetHelpCtx: Word;
   label
     Loop;
   begin
-  C := @Self;
+  C := Self;
   GetHelpCtx := hcNoContext;
 Loop:
   if C = nil then
@@ -1067,7 +1067,7 @@ procedure TMenuView.HandleEvent(var Event: TEvent);
   procedure DoSelect;
     begin
     PutEvent(Event);
-    Event.Command := Owner^.ExecView(@Self);
+    Event.Command := Owner^.ExecView(Self);
     if  (Event.Command <> 0) and CommandEnabled(Event.Command) then
       begin
       Event.What := evCommand;
@@ -1292,9 +1292,9 @@ procedure TMenuBar.GetItemRect(Item: PMenuItem; var R: TRect);
 
 function TMenuBar.Execute: Word;
   begin
-  Message(Owner, evCommand, cmMenuOn, @Self);
+  Message(Owner, evCommand, cmMenuOn, Self);
   Result := inherited Execute;
-  Message(Owner, evCommand, cmMenuOff, @Self);
+  Message(Owner, evCommand, cmMenuOff, Self);
   end;
 
 { TMenuBox }
@@ -1508,7 +1508,7 @@ function TMenuBox.Execute: Word;
       end;
     end;
   GetBounds(R);
-  Owner^.GetExtent(R2); {new begin}
+  Owner.GetExtent(R2); {new begin}
   if Options and ofCenterX <> 0 then
     begin
     R.A.X := (R2.B.X-R2.A.X-W) div 2;

@@ -2044,7 +2044,7 @@ constructor TTempDrive.Load(S: TStream);
    Files := PFilesCollection.Create($10, $10);
    Files.SortMode := psmLongName;
    Files.Duplicates := False;
-{  Files.Owner := @Self;}
+{  Files.Owner := Self;}
    for Q2:=0 to Q do Files.AtInsert(Q2, LoadFileRecOwn(S, Dirs));
   end else begin
    NewTemp;

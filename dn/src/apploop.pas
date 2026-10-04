@@ -321,7 +321,7 @@ procedure MyApp.Idle;
       begin
       CtrlWas := False;
       {if DelSpaces(CmdLine.Str) = '' then}
-      Message(@Self, evCommand, cmTouchFile, nil);
+      Message(Self, evCommand, cmTouchFile, nil);
       end;
 
   IdleWas := True;

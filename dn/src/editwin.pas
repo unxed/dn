@@ -170,8 +170,8 @@ R.Assign(1, 1, Size.X - 1, 2);
 var rr: TRect;
 begin
  inherited ChangeBounds(R);
- Intern^.HScroll^.GetBounds(rr); RR.B.X:=Size.X - 2;
- Intern^.HScroll^.SetBounds(rr);
+ Intern^.HScroll.GetBounds(rr); RR.B.X:=Size.X - 2;
+ Intern^.HScroll.SetBounds(rr);
  if not (Intern^.SmartPad or GetState(sfModal)) then
     begin
       GetBounds(TempBounds);

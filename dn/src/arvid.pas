@@ -312,10 +312,10 @@ constructor TArvidDrive.Create(const AName: String);
     goto 1;
   if AVT.signature <> $50545641 {'AVTP'}
     then
-    if not TdrInit(@Self) then
+    if not TdrInit(Self) then
       goto 1
     else
-  else if not AvtInit(@Self) then
+  else if not AvtInit(Self) then
     goto 1;
   Name := NewStr(lFExpand(AName));
   DriveType := dtArvid;
@@ -330,16 +330,16 @@ constructor TArvidDrive.Create(const AName: String);
   SeekDirectory;
   if ArvidDrives = nil then
     ArvidDrives := PCollection.Create($100, $100);
-  ArvidDrives.Insert(@Self);
+  ArvidDrives.Insert(Self);
   AddToDirectoryHistory(Name^+':'+CurDir, Integer(DriveType));
   end { TArvidDrive.Init };
 
 procedure TArvidDrive.SeekDirectory;
   begin
   if filetype = avdTdr then
-    TdrSeekDirectory(@Self)
+    TdrSeekDirectory(Self)
   else
-    AvtSeekDirectory(@Self);
+    AvtSeekDirectory(Self);
   end;
 
 procedure TArvidDrive.Kill;
@@ -369,9 +369,9 @@ function TArvidDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize)
   AllFiles := (FileMask = x_x) or (FileMask = '*');
 
   if filetype = avdTdr then
-    TdrGetDirectory(@Self, CurDirPos, FC, FileMask)
+    TdrGetDirectory(Self, CurDirPos, FC, FileMask)
   else
-    AvtGetDirectory(@Self, CurDirPos, FC, FileMask);
+    AvtGetDirectory(Self, CurDirPos, FC, FileMask);
 
   if CurDir = '' then
     P := Name
@@ -388,7 +388,7 @@ destructor TArvidDrive.Destroy;
   begin
   if ArvidDrives <> nil then
     begin
-    ArvidDrives.Delete(@Self);
+    ArvidDrives.Delete(Self);
     if ArvidDrives.Count = 0 then
       ArvidDrives.Free;
     ArvidDrives := nil;
@@ -464,15 +464,15 @@ constructor TArvidDrive.Load(S: TStream);
     goto 1;
   if AVT.signature <> $50545641 {'AVTP'}
     then
-    if not TdrInit(@Self) then
+    if not TdrInit(Self) then
       goto 1
     else
-  else if not AvtInit(@Self) then
+  else if not AvtInit(Self) then
     goto 1;
   SeekDirectory;
   if ArvidDrives = nil then
     ArvidDrives := PCollection.Create($100, $100);
-  ArvidDrives.Insert(@Self);
+  ArvidDrives.Insert(Self);
   end { TArvidDrive.Load };
 
 procedure TArvidDrive.Store(S: TStream);
@@ -543,7 +543,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
       end;
     Nam := AvtCellName(FC, Stream);
     Desc := AvtCellDesc(FC, Stream);
-    if AvtNewFile(@Self, S2+Nam, Desc, (FC.Flags and AvtIsDir) <> 0,
+    if AvtNewFile(Self, S2+Nam, Desc, (FC.Flags and AvtIsDir) <> 0,
          FC.ChildOrSize,
         FC.Time, FC.StartSector, FC.Attr) = 0
     then
@@ -628,12 +628,12 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
           FC2.ChildOrSize := 0;
           Stream.Seek( {Cat:warn}Round(PF^.PSize));
           Stream.Write(FC2, SizeOf(FC2));
-          AvtDelFile(@Self, S1);
-          if AvtNewFile(@Self, S2, Desc, (FC.Flags and AvtIsDir) <> 0,
+          AvtDelFile(Self, S1);
+          if AvtNewFile(Self, S2, Desc, (FC.Flags and AvtIsDir) <> 0,
               FC.ChildOrSize, FC.Time, FC.StartSector, FC.Attr) = 0
           then
             begin
-            AvtNewFile(@Self, S1, Desc, (FC.Flags and AvtIsDir) <> 0,
+            AvtNewFile(Self, S1, Desc, (FC.Flags and AvtIsDir) <> 0,
               FC.ChildOrSize, FC.Time, FC.StartSector, FC.Attr);
             MessageBox(GetString(dlFBBOver1)+S2, nil, mfError+mfOKButton);
             end;
@@ -645,7 +645,7 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
             FC2 := FC;
             FC.ChildOrSize := 0;
             end;
-          if AvtNewFile(@Self, S2, Desc, (FC.Flags and AvtIsDir) <> 0,
+          if AvtNewFile(Self, S2, Desc, (FC.Flags and AvtIsDir) <> 0,
               FC.ChildOrSize, FC.Time, FC.StartSector, FC.Attr) = 0
           then
             begin
@@ -741,17 +741,17 @@ procedure TArvidDrive.CopyFiles(AFiles: PCollection; Own: PView; MoveMode: Boole
 { CopyFilesInto(AFiles: PCollection; Own: PView; MoveMode: Boolean); virtual;}
 procedure TArvidDrive.CopyFilesInto(AFiles: PCollection; Own: PView; MoveMode: Boolean);
   begin
-  AvtCopyFilesInto(@Self, AFiles, Own, MoveMode);
+  AvtCopyFilesInto(Self, AFiles, Own, MoveMode);
   end;
 
 procedure TArvidDrive.EraseFiles(AFiles: PCollection);
   begin
-  AvtEraseFiles(@Self, AFiles);
+  AvtEraseFiles(Self, AFiles);
   end;
 
 procedure TArvidDrive.MakeDir;
   begin
-  AvtMakeDir(@Self)
+  AvtMakeDir(Self)
   end;
 
 function TArvidDrive.isUp: Boolean;
@@ -1004,9 +1004,9 @@ procedure TArvidDrive.EditDescription(PF: PFileRec);
     end;
   Stream.Seek(PF^.DIZ^.Line);
   if filetype = avdTdr then
-    TdrEditDescription(@Self, S, Nam, PF)
+    TdrEditDescription(Self, S, Nam, PF)
   else
-    AvtEditDescription(@Self, S, Nam);
+    AvtEditDescription(Self, S, Nam);
 1:
   ClrIO;
   Abort := False;
@@ -1475,9 +1475,9 @@ procedure TArvidDrive.GetDirLength(PF: PFileRec);
   SeekDirectory;
   P := WriteMsg(GetString(dlPleaseStandBy));
   if filetype = avdTdr then
-    TdrCalcTotal(@Self, CurDirPos, LL)
+    TdrCalcTotal(Self, CurDirPos, LL)
   else
-    AvtCalcTotal(@Self, CurDirPos, LL);
+    AvtCalcTotal(Self, CurDirPos, LL);
   P.Free;
   PF^.Size := LL;
   PF^.Attr := PF^.Attr or $80;

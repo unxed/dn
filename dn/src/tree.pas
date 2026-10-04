@@ -1126,7 +1126,7 @@ procedure TTreeView.CollapseBranch(N: Integer);
       Inc(L);
       end;
     end;
-  ScrollBar^.SetParams(ScrollBar^.Value, 0, DC^.Count-1, DC^.Count, 1);
+  ScrollBar.SetParams(ScrollBar^.Value, 0, DC^.Count-1, DC^.Count, 1);
   end { TTreeView.CollapseBranch };
 
 procedure TTreeView.HandleEvent(var Event: TEvent);
@@ -1185,9 +1185,9 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
     SearchForMask := False;
     if QSMask[1] = '\' then
       begin
-      ScrollBar^.SetValue(0);
+      ScrollBar.SetValue(0);
       SearchForMask := True;
-      InitQuickSearch(@Self);
+      InitQuickSearch(Self);
       Exit;
       end;
     I := ScrollBar^.Value+Delta;
@@ -1215,7 +1215,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       if I = ScrollBar^.Value then
         DrawView
       else
-        ScrollBar^.SetValue(I);
+        ScrollBar.SetValue(I);
       end;
     end { SearchForMask };
 
@@ -1286,7 +1286,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       I := FindDir(S);
       if I < 0 then
         I := 0;
-      ScrollBar^.SetParams(I, 0, DC^.Count-1, DC^.Count, 1);
+      ScrollBar.SetParams(I, 0, DC^.Count-1, DC^.Count, 1);
       DrawView;
       end;
     end { ExpandBranches };
@@ -1334,7 +1334,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
   procedure QuickChange(const SS: String);
     begin
     if SS <> '' then
-      Message(@Self, evCommand, cmChangeTree, @SS);
+      Message(Self, evCommand, cmChangeTree, @SS);
     end;
 
   var
@@ -1373,7 +1373,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
             Char(Event.InfoPtr^) := #0;
         cmRevert:
           begin
-          ScrollBar^.SetValue(CurNum);
+          ScrollBar.SetValue(CurNum);
           CurPtr := DC^.At(ScrollBar^.Value);
           Message(Owner, evBroadcast, cmDirChanged, @CurPath);
           CE
@@ -1448,7 +1448,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           CurNum := Tree.FindDir(Dirs, CurPath);
           I := FindDir(CurPath);
           if I >= 0 then
-            ScrollBar^.SetValue(I);
+            ScrollBar.SetValue(I);
           LocateEnabled := True;
           CE;
           DrawView;
@@ -1515,7 +1515,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
             else
               begin
               DoQuickSearch(DNKeyCode(Event));
-              ScrollBar^.SetValue(0);
+              ScrollBar.SetValue(0);
               SearchForMask(0);
               DrawView;
               CE
@@ -1536,10 +1536,10 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
                     Exit;
                   PD := DC^.At(ScrollBar^.Value);
                   end;
-                ScrollBar^.SetValue(ScrollBar^.Value+1);
+                ScrollBar.SetValue(ScrollBar^.Value+1);
                 if Parital and (PD^.Attr and trExpanded = 0) then
                   CollapseBranch(PDirRec(DC^.At(CurPos))^.Number);
-                InitQuickSearch(@Self);
+                InitQuickSearch(Self);
                 DrawView;
                 Exit;
                 end;
@@ -1549,11 +1549,11 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
               end
             else
               begin
-              InitQuickSearch(@Self);
+              InitQuickSearch(Self);
               DoQuickSearch(DNKeyCode(Event));
               SearchForMask(0);
               if QSMask = '\' then
-                InitQuickSearch(@Self);
+                InitQuickSearch(Self);
               end;
             CE;
             end;
@@ -1564,7 +1564,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
         cmPanelReread,
         cmPanelMkDir,
         cmChangeDrive:
-          Message(@Self, evCommand, Event.Command, nil);
+          Message(Self, evCommand, Event.Command, nil);
         cmTreeChanged:
           begin
           if  (Dirs <> nil)
@@ -1603,7 +1603,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           if ReflectCopyDirection
           then
             RevertBar := not (Message(Desktop, evBroadcast,
-                   cmIsRightPanel, @Self) <> nil)
+                   cmIsRightPanel, Self) <> nil)
           else
             RevertBar := False;
           CopyFiles(PCopyRec(Event.InfoPtr)^.FC,
@@ -1636,8 +1636,8 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
             (MP.X <= PD^.Level*3+3+Delta.X)
         then
           begin
-          ScrollBar^.SetValue(MP.Y+Delta.Y);
-          MessageKey(@Self, $3920);
+          ScrollBar.SetValue(MP.Y+Delta.Y);
+          MessageKey(Self, $3920);
           while MouseEvent(Event, evMouseAuto+evMouseMove) do
             ;
           end
@@ -1647,7 +1647,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           begin
           if ((Event.EventFlags and 2) <> 0) and not Parital then
             begin
-            ScrollBar^.SetValue(MP.Y+Delta.Y);
+            ScrollBar.SetValue(MP.Y+Delta.Y);
             Message(Owner, evCommand, cmOK, nil);
             CE
             end;
@@ -1657,7 +1657,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           repeat
             MakeLocal(Event.Where, MP);
             if  (MP.X > 0) and (MP.X < Size.X) then
-              ScrollBar^.SetValue(MP.Y+Delta.Y);
+              ScrollBar.SetValue(MP.Y+Delta.Y);
           until not MouseEvent(Event, evMouseAuto+evMouseMove);
           MouseTracking := False;
           SendLocated;
@@ -1890,7 +1890,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
     Delta.Y := 0;
     Delta.X := 0;
     Lv := CurNum;
-    ScrollBar^.SetParams(Lv, 0, DC^.Count-1, DC^.Count, 1);
+    ScrollBar.SetParams(Lv, 0, DC^.Count-1, DC^.Count, 1);
     Lv := ScrollBar^.Value;
     if Lv < 0 then
       Lv := 0;
@@ -1999,7 +1999,7 @@ procedure TTreeView.Reread(CountLen: Boolean);
     if I < 0 then
       I := M;
     LocateEnabled := True;
-    ScrollBar^.SetValue(I);
+    ScrollBar.SetValue(I);
     DrawDisabled := False;
     DrawView;
     end;
@@ -2030,7 +2030,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
     FC := MkFcFromDirRec(D, S);
     if ReflectCopyDirection
     then
-      RevertBar := (Message(Desktop, evBroadcast, cmIsRightPanel, @Self)
+      RevertBar := (Message(Desktop, evBroadcast, cmIsRightPanel, Self)
            <> nil)
     else
       RevertBar := False;
@@ -2083,13 +2083,13 @@ procedure THTreeView.ChangeBounds(const Bounds: TRect);
   R.A.Y := R.B.Y;
   Inc(R.B.Y, 2);
   if Info <> nil then
-    Info^.SetBounds(R);
+    Info.SetBounds(R);
   if ScrollBar <> nil then
     begin
     R := NewBounds;
     R.A.X := R.B.X;
     Inc(R.B.X);
-    ScrollBar^.SetBounds(R)
+    ScrollBar.SetBounds(R)
     end
   end;
 

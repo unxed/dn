@@ -880,19 +880,19 @@ constructor TFileEditor.Load(S: TStream);
   begin
   inherited Load(S);
   {/Cat}
-  MILoad(@Self, S);
+  MILoad(Self, S);
   
   end;
 
 procedure TFileEditor.Store(S: TStream);
   begin
   inherited Store(S);
-  MIStore(@Self, S);
+  MIStore(Self, S);
   end;
 
 procedure TFileEditor.Awaken;
   begin
-  MIAwaken(@Self);
+  MIAwaken(Self);
   end;
 
 function TFileEditor.GetPalette: TPalette;
@@ -1415,9 +1415,9 @@ procedure TFileEditor.SetState(AState: Word; Enable: Boolean);
 procedure TFileEditor.ScrollTo(DeltaX, DeltaY: LongInt);
   begin
   if HScroll <> nil then
-    HScroll^.SetValue(DeltaX);
+    HScroll.SetValue(DeltaX);
   if VScroll <> nil then
-    VScroll^.SetValue(DeltaY);
+    VScroll.SetValue(DeltaY);
   end;
 
 {-DataCompBoy-}
@@ -1492,9 +1492,9 @@ procedure TFileEditor.ChangeBounds(const R: TRect);
 procedure TFileEditor.SetLimits;
   begin
   if HScroll <> nil then
-    HScroll^.SetParams(Delta.X, 0, MaxLongStringLength, 1, 1);
+    HScroll.SetParams(Delta.X, 0, MaxLongStringLength, 1, 1);
   if VScroll <> nil then
-    VScroll^.SetParams(Delta.Y, 0, FileLines^.Count-1, Size.Y, 1);
+    VScroll.SetParams(Delta.Y, 0, FileLines^.Count-1, Size.Y, 1);
   end;
 
 function TFileEditor.GetSelection: PCollection;
@@ -1549,7 +1549,7 @@ function TFileEditor.Valid(Command: Word): Boolean;
   if  (SmartPad or ClipBrd) then
     begin
     if Modified then
-      Message(@Self, evCommand, cmSaveText, nil);
+      Message(Self, evCommand, cmSaveText, nil);
     PEditWindow(Owner)^.ModalEnd := True;
     Exit;
     end;
@@ -1568,7 +1568,7 @@ function TFileEditor.Valid(Command: Word): Boolean;
            mfWarning+mfYesNoCancel);
       if I = cmYes
       then
-        Message(@Self, evCommand, cmSaveText, nil)
+        Message(Self, evCommand, cmSaveText, nil)
       else if I = cmNo then
         Modified := False;
       V := not ((I = cmCancel) or (I = cmYes) and Modified);
@@ -3055,7 +3055,7 @@ EndDel:
     if S = '' then
       Exit;
     S := lFExpand(S);
-    P := MIReadBlock(@Self, S, False);
+    P := MIReadBlock(Self, S, False);
     if not isValid then
       begin
       isValid := True;
@@ -3365,15 +3365,15 @@ EndDel:
     StoreUndoInfo(udFormatBlock, TP, S);
     if Delta.X >= Length(WorkString) then
       begin
-      VScroll^.SetParams(LastY+1, 0, FileLines^.Count-1, Size.Y, 1);
+      VScroll.SetParams(LastY+1, 0, FileLines^.Count-1, Size.Y, 1);
       if OldX > 0 then
-        HScroll^.SetValue(EdOpt.LeftSide);
-      HScroll^.SetValue(EdOpt.LeftSide+OldX);
+        HScroll.SetValue(EdOpt.LeftSide);
+      HScroll.SetValue(EdOpt.LeftSide+OldX);
       end
     else
       begin
       VScroll^.SetRange(0, FileLines^.Count-1);
-      HScroll^.SetValue(Delta.X);
+      HScroll.SetValue(Delta.X);
       end;
     DrawView;
     end { SplitString };
@@ -3438,7 +3438,7 @@ EndDel:
       if  (not EdOpt.AutoWrap or (LastX < EdOpt.RightSide))
            and (LastX < MaxLongStringLength)
       then
-        HScroll^.SetValue(LastX+1)
+        HScroll.SetValue(LastX+1)
       else if LastX < MaxLongStringLength then
         SplitString
       else
@@ -4030,7 +4030,7 @@ Ex:
             begin
             ChangeLine;
             if Modified then
-              MISaveFile(@Self);
+              MISaveFile(Self);
             if not Owner^.GetState(sfModal) then
               Exit;
             CE;
@@ -4059,13 +4059,13 @@ Ex:
               ( (LastX = 0) or (WorkString[LastX] in BreakChars))
           then
           else
-            Message(@Self, evCommand, cmWordLeft, nil);
+            Message(Self, evCommand, cmWordLeft, nil);
           if  (LastY <> Delta.Y) or (Delta.X < Length(WorkString))
                and (WorkString[Delta.X+1] in BreakChars)
             or (Delta.X >= Length(WorkString))
           then
             begin
-            Message(@Self, evCommand, cmWordRight, nil);
+            Message(Self, evCommand, cmWordRight, nil);
             end;
           Mark.A := Delta;
           Mark.B := Delta;
@@ -4217,8 +4217,8 @@ Ex:
           PC := GetSelection;
           if PC = nil then
             begin
-            Message(@Self, evCommand, cmCopy, nil);
-            Message(@Self, evCommand, cmPaste, nil);
+            Message(Self, evCommand, cmCopy, nil);
+            Message(Self, evCommand, cmPaste, nil);
             end
           else
             begin
@@ -4237,9 +4237,9 @@ Ex:
           PC := GetSelection;
           if PC = nil then
             begin
-            Message(@Self, evCommand, cmCopy, nil);
+            Message(Self, evCommand, cmCopy, nil);
             DeleteBlock(False, GetSelection);
-            Message(@Self, evCommand, cmPaste, nil);
+            Message(Self, evCommand, cmPaste, nil);
             end
           else
             begin
@@ -4314,11 +4314,11 @@ Ex:
             begin
             i := AskSave;
             if i = cmYes then
-              Message(@Self, evCommand, cmSaveText, nil);
+              Message(Self, evCommand, cmSaveText, nil);
             if i = cmCancel then
               Exit;
             end;
-          MIOpenFile(@Self);
+          MIOpenFile(Self);
           Exit;
           end;
         cmInsertOn, cmInsertOff:
@@ -4341,16 +4341,16 @@ Ex:
           begin
           ChangeLine;
           if EditName <> '' then
-            MISaveFile(@Self)
+            MISaveFile(Self)
           else
-            MISaveFileAs(@Self);
+            MISaveFileAs(Self);
           CE;
           Owner.Redraw;
           end;
         cmSaveTextAs:
           begin
           ChangeLine;
-          MISaveFileAs(@Self);
+          MISaveFileAs(Self);
           CE;
           Owner.Redraw;
           end;
@@ -4476,7 +4476,7 @@ Ex:
           begin
           UnMark := True;
           Dec(Pos.Y, Size.Y);
-          VScroll^.SetValue(Delta.Y-Size.Y);
+          VScroll.SetValue(Delta.Y-Size.Y);
           DrawView;
           CE
           end;
@@ -4484,7 +4484,7 @@ Ex:
           begin
           UnMark := True;
           Inc(Pos.Y, Size.Y);
-          VScroll^.SetValue(Delta.Y+Size.Y);
+          VScroll.SetValue(Delta.Y+Size.Y);
           DrawView;
           CE
           end;
@@ -4716,23 +4716,23 @@ Ex:
         {JO: по Ctrl-Alt-Shift-цифра переходим к закладкам с пометкой текста}
         {    от текущего места до закладки                                  }
         kbCtrlAltShift1:
-          Message(@Self, evCommand, cmGoToMarker1, nil);
+          Message(Self, evCommand, cmGoToMarker1, nil);
         kbCtrlAltShift2:
-          Message(@Self, evCommand, cmGoToMarker2, nil);
+          Message(Self, evCommand, cmGoToMarker2, nil);
         kbCtrlAltShift3:
-          Message(@Self, evCommand, cmGoToMarker3, nil);
+          Message(Self, evCommand, cmGoToMarker3, nil);
         kbCtrlAltShift4:
-          Message(@Self, evCommand, cmGoToMarker4, nil);
+          Message(Self, evCommand, cmGoToMarker4, nil);
         kbCtrlAltShift5:
-          Message(@Self, evCommand, cmGoToMarker5, nil);
+          Message(Self, evCommand, cmGoToMarker5, nil);
         kbCtrlAltShift6:
-          Message(@Self, evCommand, cmGoToMarker6, nil);
+          Message(Self, evCommand, cmGoToMarker6, nil);
         kbCtrlAltShift7:
-          Message(@Self, evCommand, cmGoToMarker7, nil);
+          Message(Self, evCommand, cmGoToMarker7, nil);
         kbCtrlAltShift8:
-          Message(@Self, evCommand, cmGoToMarker8, nil);
+          Message(Self, evCommand, cmGoToMarker8, nil);
         kbCtrlAltShift9:
-          Message(@Self, evCommand, cmGoToMarker9, nil);
+          Message(Self, evCommand, cmGoToMarker9, nil);
 
         {AK155 27-12-2003
            CtrlUp, kbCtrlShiftUp  скроллируют текст с сохранением
@@ -4895,7 +4895,7 @@ Ex:
       LineMarking := False;
       if ((Event.EventFlags and 2) <> 0) then
         begin
-        Message(@Self, evCommand, cmMarkWord, nil);
+        Message(Self, evCommand, cmMarkWord, nil);
         CE;
         Exit;
         end;
@@ -5119,7 +5119,7 @@ procedure OpenSmartpad;
     R.Assign(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X,
        P^.fOrigin.Y+P^.fSize.Y);
     AdjustToDesktopSize(R, P^.fDeskSize);
-    SmartWindow^.Locate(R);
+    SmartWindow.Locate(R);
     with V^, P^ do
       begin
       MarkPos := fMarks;

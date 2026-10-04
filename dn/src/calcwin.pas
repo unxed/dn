@@ -365,7 +365,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   R.Grow(-1, -1);
   R.B.Y := R.A.Y+1;
   P := PView(LoadResource(dlgWkzMenuBar));
-  P^.Locate(R);
+  P.Locate(R);
   P^.GrowMode := gfGrowHiX;
   Insert(P);
 
@@ -439,7 +439,7 @@ procedure TCalcWindow.HandleEvent(var Event: TEvent);
 
 destructor TCalcWindow.Done;
   begin
-  StoreViewInfo(@Self);
+  StoreViewInfo(Self);
   inherited Done;
   end;
 
@@ -600,7 +600,7 @@ constructor TCalcView.Create(Bounds: TRect; AInfo: PCalcInput; ACellInfo: PInfoV
   EventMask := $FFFF;
   CalcInput := AInfo;
   CellInfo := ACellInfo;
-  PCalcInput(CalcInput)^.CalcView := @Self;
+  PCalcInput(CalcInput)^.CalcView := Self;
   FocusEvent.What := evNothing;
   FillChar(ColWidth, SizeOf(ColWidth), DefaultColWidth);
   Marking := False;
@@ -611,8 +611,8 @@ constructor TCalcView.Create(Bounds: TRect; AInfo: PCalcInput; ACellInfo: PInfoV
   Delta.Y := 0;
   Cur := Delta;
   Mark := Cur;
-  HScroll^.SetParams(0, 0, 255, 1, 1);
-  VScroll^.SetParams(0, 0, MaxCellY-1, Size.Y-3, 1);
+  HScroll.SetParams(0, 0, 255, 1, 1);
+  VScroll.SetParams(0, 0, MaxCellY-1, Size.Y-3, 1);
   SName := nil;
   end { TCalcView.Init };
 
@@ -808,14 +808,14 @@ procedure TCalcView.Draw;
     begin
     J := Cur.Y;
     Cur.Y := 0;
-    VScroll^.SetValue(Delta.Y+J);
+    VScroll.SetValue(Delta.Y+J);
     Exit
     end;
   if Cur.X < 0 then
     begin
     J := Cur.X;
     Cur.X := 0;
-    HScroll^.SetValue(Delta.X+J);
+    HScroll.SetValue(Delta.X+J);
     Exit
     end;
   CurPos.X := Delta.X+Cur.X;
@@ -879,7 +879,7 @@ procedure TCalcView.Draw;
     begin
     J := Cur.X-NumC+1;
     Cur.X := NumC-1;
-    HScroll^.SetValue(Delta.X+J);
+    HScroll.SetValue(Delta.X+J);
     Delta.X := HScroll^.Value;
     Exit;
     end;
@@ -1960,8 +1960,8 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
           Cur.Y := 0;
           Cur.X := 0;
           SetMark;
-          HScroll^.SetValue(0);
-          VScroll^.SetValue(0);
+          HScroll.SetValue(0);
+          VScroll.SetValue(0);
           DrawView;
           ClearEvent(Event);
           Exit
@@ -1997,10 +1997,10 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             Dec(Cur.X);
             Inc(MaxX);
             end;
-          VScroll^.SetValue(MaxY-Size.Y+3);
+          VScroll.SetValue(MaxY-Size.Y+3);
           Delta.Y := VScroll^.Value;
           Cur.Y := MaxY-Delta.Y;
-          HScroll^.SetValue(MaxX);
+          HScroll.SetValue(MaxX);
           Delta.X := HScroll^.Value;
           SetMark;
           DrawView;
@@ -2201,7 +2201,7 @@ procedure TCalcView.CalcError(Index: TStrIdx);
     S := S+^M^C+GetString(CalcErrMess)+err;
     EvalueError := False;
     end;
-  c := MessageBox(S, @Self, {mfYesNoCancel}mfYesButton+mfError);
+  c := MessageBox(S, Self, {mfYesNoCancel}mfYesButton+mfError);
   end;
 
 destructor TCalcView.Done;
@@ -2663,7 +2663,7 @@ function TCalcView.CalcEval(const s: String; var Value: CReal): Boolean;
   var
     R: CReal;
   begin
-  R := Evalue(System.Copy(s, 2, MaxStringLength), @self);
+  R := Evalue(System.Copy(s, 2, MaxStringLength), Self);
   if EvalueError then
     begin
     CalcError(erInvalidFormula);
@@ -2710,7 +2710,7 @@ procedure TCalcView.ReCalc(Full: Boolean);
           без флага coFormula для формул, включающих только константные
           операнды. То, что TSort не воспринимал их, как формулы, не
           страшно, так как от других ячеек они не зависят. }
-          Value := Evalue(System.Copy(S, 2, 255), @self);
+          Value := Evalue(System.Copy(S, 2, 255), Self);
           Options := Options or coValue;
           end
         else
@@ -2739,7 +2739,7 @@ procedure TCalcView.GotoCell(Cell: String);
   BlockDraw := True;
   Delta.X := X;
   Delta.Y := Y-(Size.Y-2) div 2;
-  VScroll^.SetValue(Delta.Y);
+  VScroll.SetValue(Delta.Y);
   Delta.Y := VScroll^.Value;
   Cur.X := 0;
   Cur.Y := Y-Delta.Y;
@@ -2757,7 +2757,7 @@ procedure TCalcView.GotoCell(Cell: String);
     Dec(Cur.X);
     Inc(Delta.X)
     end;
-  HScroll^.SetValue(Delta.X);
+  HScroll.SetValue(Delta.X);
   BlockDraw := False;
   Mark.X := Cur.X+Delta.X;
   Mark.Y := Cur.Y+Delta.Y;

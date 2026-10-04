@@ -553,7 +553,7 @@ procedure SetScrMode(Mode: Word);
     if Mode = ScreenMode then
       goto Ex;
     GetExtent(R1);
-    Clock^.GetBounds(A);
+    Clock.GetBounds(A);
     if not SetScreenMode(Mode) then
       begin
       SetBlink(CurrentBlink);
@@ -576,7 +576,7 @@ procedure SetScrMode(Mode: Word);
     else
       A.B.X := A.A.X+7;
     A.B.Y := A.A.Y+1;
-    Clock^.Locate(A);
+    Clock.Locate(A);
     SetBlink(CurrentBlink);
     if  (StartupData.Load and osuResetPalette <> 0) and VGASystem
     then
