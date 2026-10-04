@@ -1050,20 +1050,20 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
   procedure Add(P: Pointer; const Name: String);
     begin
     if FindList = nil then
-      New(FindList, Init($100, $100));
-    if OOM or (not MemOK) or (MaxAvail < (FindList^.Count+$200)*4) then
+      FindList := PCollection.Create($100, $100);
+    if OOM or (not MemOK) or (MaxAvail < (FindList.Count+$200)*4) then
       begin
       Dispose(TStreamable(P), Done);
       OOM := True;
       Exit;
       end;
     if not WasTape then
-      FindList^.Insert(New(PFindObject, Init(Name)));
+      FindList.Insert(New(PFindObject, Init(Name)));
     if not WasDir then
-      FindList^.Insert(New(PFindDir, Init(dr, LP)));
+      FindList.Insert(New(PFindDir, Init(dr, LP)));
     WasTape := True;
     WasDir := True;
-    FindList^.Insert(P);
+    FindList.Insert(P);
     end;
 
   procedure TdrSearchInStream(St: PStream; var D: TTdrHeader;
@@ -1341,7 +1341,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
 
     R.A.X := 0;
     if  (FindList <> nil) then
-      FindList^.ForEach(DoCount);
+      FindList.ForEach(DoCount);
 
     FreeStr := FStr(R.A.X)+GetString(dlFilesFound);
     R.Assign(1, 13, 1+Length(FreeStr), 14);
@@ -1360,17 +1360,17 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
     if R.A.X = cmNo then
       FreeObject(FindList);
 
-    if  (R.A.X = cmOK) and (FindList <> nil) and (FindList^.Count > 0)
+    if  (R.A.X = cmOK) and (FindList <> nil) and (FindList.Count > 0)
     then
       begin
-      F := FindList^.At(R.A.Y);
+      F := FindList.At(R.A.Y);
       if F = nil then
         Exit;
       FreeStr := '';
       R.B.X := R.A.Y;
       while R.B.X >= 0 do
         begin
-        F := FindList^.At(R.B.X);
+        F := FindList.At(R.B.X);
         if  (F^.TT = ttDir) and (FreeStr = '') then
           FreeStr := CnvString(F^.Text);
         if  (F^.TT = ttTape) then
@@ -1401,7 +1401,7 @@ procedure TArvidDrive.DrvFindFile(FC: PFilesCollection);
       if CurDir[1] = '\' then
         Delete(CurDir, 1, 1); {DelFC(CurDir);}
       SeekDirectory;
-      F := FindList^.At(R.A.Y);
+      F := FindList.At(R.A.Y);
       if F^.TT = ttFile then
         FreeStr := MakeNormName(FreeStr, CnvString(PFindFile(F)^.Name));
       Message(Panel, evCommand, cmFindGotoFile, @FreeStr);
