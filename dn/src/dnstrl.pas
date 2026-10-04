@@ -67,7 +67,7 @@ type
   PStrIndex = ^TStrIndex;
 
   TStringList = class;
-  TStringList = class(TObject)
+  TStringList = class(TStreamable)
   private
     Index: PStrIndex;
     IndexSize: AWord;

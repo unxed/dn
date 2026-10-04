@@ -71,7 +71,7 @@ type
     TypeID: String[10];
     Mode: TTypeMode;
     constructor Create(ID: String; AMode: TTypeMode);
-    function Compare(P1, P2: Pointer): Integer; virtual;
+    function Compare(P1, P2: Pointer): Integer; override;
     procedure Show;
     end;
 
