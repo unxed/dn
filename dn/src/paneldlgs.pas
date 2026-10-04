@@ -633,7 +633,7 @@ procedure CM_AdvancedFilter(AFP: Pointer);
         { Чтобы привести кнопки в нужные состояния, см. TFilterLine }
       if not SelectFilterLine then
         begin
-        Dlg^.SelectNext(False);
+        Dlg.SelectNext(False);
         end;
       MakeDialog := Dlg;
       end;
@@ -1943,7 +1943,7 @@ procedure CM_Dropped(AFP, EI: Pointer);
     Ev.What := evBroadcast;
     Ev.Command := cmUnArchive;
     Ev.InfoPtr := EI;
-    PCopyRec(EI)^.Owner^.HandleEvent(Ev);
+    PCopyRec(EI)^.Owner.HandleEvent(Ev);
     if Ev.What = evNothing then
       Exit;
     end;
@@ -2135,7 +2135,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
       Event^.What := evKeyDown;
       SetDNKeyCode(Event^, DlgRes);
       Event^.InfoPtr := nil;
-      P^.PutEvent(Event^);
+      P.PutEvent(Event^);
       end;
 *)
     end

@@ -1011,7 +1011,7 @@ procedure ProcessDLGs;
     procedure MakePage;
       begin
       if InPage then
-        Page^.SelectNext(False);
+        Page.SelectNext(False);
       Page := Notepad^.NewPage((Token(S, i)));
       end;
 
@@ -1124,7 +1124,7 @@ procedure ProcessDLGs;
     if ID = dlgSystemSetup then
       begin
       D := New(PSysDialog, Init(R, Token(S, I)));
-      D^.Awaken;
+      D.Awaken;
       end
     else if IdToken = idNotepad then
       begin
@@ -1182,9 +1182,9 @@ procedure ProcessDLGs;
         else if IsThis(idDriveCheckBox) then
           MakeDriveCheckBoxes
         else if IsThis(idSelectForward) then
-          D^.SelectNext(False)
+          D.SelectNext(False)
         else if IsThis(idSelectBack) then
-          D^.SelectNext(True)
+          D.SelectNext(True)
         else if IsThis(idRadioButtons) then
           MakeRadioButtons
         else if IsThis(idComboBox) then
@@ -1204,7 +1204,7 @@ procedure ProcessDLGs;
           if not inPage then
             Break;
           inPage := False;
-          Page^.SelectNext(False);
+          Page.SelectNext(False);
           PNotepad(D) := Notepad;
           end
         else if (S <> '') and (S[1] <> ';') then
@@ -1219,7 +1219,7 @@ procedure ProcessDLGs;
           PV^.Options := PV^.Options or GetID(Token(S, I));
         end;
       end;
-    D^.SelectNext(False);
+    D.SelectNext(False);
     StoreResource(D, ID);
     if ID = dlgSystemSetup then
       begin

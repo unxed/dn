@@ -485,7 +485,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
       begin
       Selected := C-1600;
       Draw;
-//      Owner^.SelectNext(False);
+//      Owner.SelectNext(False);
       end;
     ClearEvent(Event);
     end;
@@ -629,7 +629,7 @@ SelectPage:
          ActivePage := i;
          with Page[i]^ do
            begin
-           Bookmark^.MakeFirst;
+           Bookmark.MakeFirst;
            Show;
            Select;
            end;

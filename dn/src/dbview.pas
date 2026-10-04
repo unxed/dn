@@ -565,7 +565,7 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
   P^.Options := P^.Options or ofCenterX;
   D.Insert(P);
 
-  D^.SelectNext(False);
+  D.SelectNext(False);
 
   D := PDialog(Application.ValidView(D));
   if D = nil then
@@ -747,7 +747,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     PV^.Options := PV^.Options or ofCenterX;
     D.Insert(PV);
 
-    D^.SelectNext(False);
+    D.SelectNext(False);
 
     D := PDialog(Application.ValidView(D));
     if D = nil then

@@ -1294,7 +1294,7 @@ procedure RereadDirectory(Dir: String);
     Event.What := evCommand;
     Event.Command := cmRereadDir;
     Event.InfoPtr := @Dir;
-    View^.HandleEvent(Event);
+    View.HandleEvent(Event);
     end;
 
   begin

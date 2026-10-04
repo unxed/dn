@@ -260,7 +260,7 @@ while true do
     end;
   if Cmd = cmNo then { "Close" }
     begin
-    if PV^.Valid(cmClose) then
+    if PV.Valid(cmClose) then
       begin
       PV.Free;
       DT.P := nil;
