@@ -209,14 +209,14 @@ const
 
   dlAbout = #13#3'DN/2 Open Source'+
   #13#3'Version %s, %s'+
-  #13#3'http://www.dnosp.ru/'#13+
-  #13#3'Based on: '+
+  #13#3'https://github.com/unxed/dn'#13+
+  #13#3'Based on '+
   'Dos Navigator Open Source 1.51.08'#13+
   
-  #3'http://www.dnosp.ru'+
+  #3'https://github.com/unxed/dn'+
   #13+
-  #13#3'Thanks to fPrint (UK) Ltd for copy of VP'+
-  #13#3'http://www.vpascal.com'#13
+  #13#3''+
+  #13#3''#13
   +#13#13
   {#3'Based on Dos Navigator' +
   #13#3'Copyright (C) 1991-99 RIT Research Labs'#13#13};
