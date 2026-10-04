@@ -651,7 +651,7 @@ procedure FilesCopy(Files: PCollection; SourcePanel: PView;
     else
       L2 := PredSpace(L2, Length(L1));
     D := PDialog(LoadResource(dlgOverwriteQuery));
-    D^.GetExtent(R);
+    D.GetExtent(R);
     R.Grow(-1, -1);
     Inc(R.A.Y);
     D^.Options := D^.Options or ofCentered;

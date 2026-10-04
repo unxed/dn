@@ -1184,14 +1184,14 @@ Err:
         Inc(R.A.X, 3)
       else
         Dec(R.B.X, 3);
-    Clock^.Locate(R);
+    Clock.Locate(R);
     {S^.Read(ArcFlags, 4);}
     
     if TrashCan^.ImVisible then
       begin
       TrashCan.Show;
       S^.Read(R, SizeOf(R));
-      TrashCan^.Locate(R)
+      TrashCan.Locate(R)
       end;
     
     if PreserveMenuPositions then
@@ -1219,7 +1219,7 @@ Err:
       R.Assign(Size.X-10, 0, Size.X, 1)
     else
       R.Assign(Size.X-7, 0, Size.X, 1);
-    Clock^.Locate(R);
+    Clock.Locate(R);
     end;
   S.Free;
   ActivateView(Desktop.Current);
@@ -1264,14 +1264,14 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
     S^.Write(TempBounds, SizeOf(TempBounds));
     S^.Write(TrashCan^.ImVisible, 1); 
     S^.Put(KeyMacroses);
-    Clock^.GetBounds(R);
+    Clock.GetBounds(R);
     if R.A.X > (ScreenWidth shr 1) then
       R.A.X := R.B.X-10
     else
       R.B.X := R.A.X+10;
     S^.Write(R, SizeOf(R));
     
-    TrashCan^.GetBounds(R);
+    TrashCan.GetBounds(R);
     if TrashCan^.ImVisible then
       S^.Write(R, SizeOf(R));
     
@@ -1467,7 +1467,7 @@ db:
           P^.fOrigin.X+P^.fSize.X,
           P^.fOrigin.Y+P^.fSize.Y);
         AdjustToDesktopSize(R, P^.fDeskSize);
-        W^.Locate(R);
+        W.Locate(R);
         with V^, P^ do
           begin
           if (fPos > FileSize) or { Flash }
@@ -1633,7 +1633,7 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
         R.Assign(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X,
            P^.fOrigin.Y+P^.fSize.Y);
         AdjustToDesktopSize(R, P^.fDeskSize);
-        W^.Locate(R);
+        W.Locate(R);
         with V^, P^ do
           begin
           if (InterfaceData.Options and ouiStoreEditorPosition <> 0)
@@ -2817,7 +2817,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmGetTeam:
       if Desktop.TopView^.HelpCtx = hcAboutDialog then
         begin
-        Desktop.TopView^.GetExtent(R);
+        Desktop.TopView.GetExtent(R);
         R.Grow(-1, -2);
         Dec(R.B.Y, 2);
         TeamView.Create(R);

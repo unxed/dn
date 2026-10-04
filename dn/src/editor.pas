@@ -1286,7 +1286,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       begin
       if UpStrg(P^.Name^) = UpCase(Event.InfoChar) then
         begin
-        P^.Play(@Self);
+        P^.Play(Self);
         DoFind := True;
         end
       else

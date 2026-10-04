@@ -659,7 +659,7 @@ procedure TPage.Store(var S: TStream);
 constructor TBookmark.Create(var Bounds: TRect; AText: String; ALink: PView);
   begin
   inherited Create(Bounds, AText, ALink);
-  PPage(ALink)^.Bookmark := @Self;
+  PPage(ALink)^.Bookmark := Self;
   end;
 
 procedure TBookmark.FocusLink;

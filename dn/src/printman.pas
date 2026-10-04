@@ -215,8 +215,8 @@ constructor TPrintManager.Create(var Bounds: TRect; AStatus: PView; AScrollBar: 
   Options := Options or ofPostProcess;
   Status := AStatus;
   if Status <> nil then
-    PPrintStatus(Status)^.Print := @Self;
-  Printer := @Self;
+    PPrintStatus(Status)^.Print := Self;
+  Printer := Self;
   BufSize := MaxBufCount;
   GetMem(Buffer, BufSize);
   LockUpdate := 0;
@@ -227,7 +227,7 @@ constructor TPrintManager.Create(var Bounds: TRect; AStatus: PView; AScrollBar: 
     Exit;
   isValid := True;
   Paused := False;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   end;
 
 function TPrintManager.SetDestination: Boolean;
@@ -370,8 +370,8 @@ constructor TPrintManager.Load(var S: TStream);
   FileLen := PrintStream^.GetSize;
   PrintStream^.Seek(FilePos);
   {PrintStream := nil;}
-  Printer := @Self;
-  RegisterToBackground(@Self);
+  Printer := Self;
+  RegisterToBackground(Self);
   end { TPrintManager.Load };
 
 procedure TPrintManager.Store(var S: TStream);

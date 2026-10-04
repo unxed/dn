@@ -199,7 +199,7 @@ constructor TDriveLine.Create(const R: TRect; APanel: PFilePanel);
   CharDelta := 1;
   LogDrvMap := SysGetValidDrives;
   UpdTicks := 3000;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   end;
 
 constructor TDriveLine.Load(S: TStream);
@@ -209,7 +209,7 @@ constructor TDriveLine.Load(S: TStream);
   CharDelta := 1;
   GetPeerViewPtr(S, Panel);
   UpdTicks := 3000;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   end;
 
 procedure TDriveLine.MakeDriveLine;
@@ -575,9 +575,9 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
       EnableCommands(PanelCommands);
   if  (AState and sfSelected <> 0) and Enable then
     begin
-    ActivePanel := @Self;
+    ActivePanel := Self;
     if Owner <> nil then { nil бывает во время Load }
-      PassivePanel := OtherFilePanel(@Self);
+      PassivePanel := OtherFilePanel(Self);
     end;
   if  (AState and sfFocused and State <> 0) then
     if Enable then
@@ -783,7 +783,7 @@ Scroll:
     if  (UpStrg(OldDirectory[1]) <> UpStrg(DirectoryName[1]))
          and (OldDirectory <> '')
     then
-      ScrollBar^.SetValue(0);
+      ScrollBar.SetValue(0);
     PosChanged := False;
     DecDrawDisabled;
     OldDirectory := DirectoryName;
@@ -1584,7 +1584,7 @@ procedure TInfoView.CompileShowOptions;
   var
     Y, i: Word;
   begin
-  if @Self = nil then
+  if Self = nil then
     Exit;
   FillChar(ElNumber, SizeOf(ElNumber), 0);
   with Panel^.PanSetup.Show do
@@ -1648,7 +1648,7 @@ procedure TInfoView.Draw;
     I := 0;
     while True do
       begin
-      if LineMaker[Y][I](@Self) then
+      if LineMaker[Y][I](Self) then
         Break;
       inc(I);
       end;
@@ -1833,7 +1833,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
            QSMaskPlusStar)
       then
         begin
-        ScrollBar^.SetValue(I);
+        ScrollBar.SetValue(I);
         Exit;
         end;
       Inc(I);
@@ -2002,7 +2002,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           end
         else
           begin
-          InitQuickSearch(@Self);
+          InitQuickSearch(Self);
           QSLastSuccessPos := LastSuccessPos;
           end;
         if  (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254) then
@@ -2058,12 +2058,12 @@ GotoKb:
             if  ( (CmdLine.Str = '') and (FMSetup.Options and fmoDelErase
                    <> 0))
             then
-              Message(@Self, evCommand, cmPanelErase, nil);
+              Message(Self, evCommand, cmPanelErase, nil);
           kbShiftDel:
             if  ( (CmdLine.Str = '') and (FMSetup.Options and fmoDelErase
                    <> 0))
             then
-              Message(@Self, evCommand, cmSingleDel, nil);
+              Message(Self, evCommand, cmSingleDel, nil);
           { Flash >>> }
           kbCtrlHome:
             begin
@@ -2083,7 +2083,7 @@ GotoKb:
             begin
             CE;
             OldDelta := -1;
-            ScrollBar^.SetValue(0);
+            ScrollBar.SetValue(0);
             Owner.Redraw
             end;
           { Flash <<< }
@@ -2091,7 +2091,7 @@ GotoKb:
             begin
             CE;
             OldDelta := -1;
-            ScrollBar^.SetValue(Files^.Count-1)
+            ScrollBar.SetValue(Files^.Count-1)
             end;
           kbUp, kbDown, kbCtrlUp, kbCtrlDown, kbCtrlShiftUp,
            kbCtrlShiftDown, kbUpUp, kbDownUp
@@ -2134,7 +2134,7 @@ GotoKb:
                   end;
                 Dec(SelNum, 1-2*Integer(PF^.Selected));
                 end;
-              ScrollBar^.SetValue(CurPos+1);
+              ScrollBar.SetValue(CurPos+1);
               if CurPos = ScrollBar^.Value then
                 DrawView;
               if InfoView <> nil then

@@ -64,7 +64,7 @@ constructor TUserSaver.Load(var S: TStream);
     I: Byte;
   begin
   inherited Load(S);
-  DataSaver := @Self;
+  DataSaver := Self;
   S.Read(SSize, 4*SizeOf(AInt)+SizeOf(Boolean));
   if UserScreen <> nil then
     FreeMem(UserScreen, UserScreenSize);

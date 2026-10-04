@@ -531,7 +531,7 @@ constructor TCalendarWindow.Create;
   R.Grow(-1, -1);
   CalendarView := PCalendarView.Create(R);
   Insert(CalendarView);
-  Calend := @Self;
+  Calend := Self;
   HelpCtx := hcCalendar;
   end { TCalendarWindow.Init };
 
@@ -587,7 +587,7 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
 procedure TCalendarWindow.Awaken;
   begin
   inherited Awaken;
-  Calend := @Self;
+  Calend := Self;
   end;
 
 destructor TCalendarWindow.Done;
@@ -615,7 +615,7 @@ constructor TCalendarView.Create(Bounds: TRect);
   Options := Options or ofSelectable;
   EventMask := EventMask or evMouseAuto or evBroadcast;
   UpdTicks := 20;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   YearChanged;
   CurDate;
   DrawView;
@@ -631,7 +631,7 @@ constructor TCalendarView.Load(var S: TStream);
   CurMonth := Lo(m);
   CurDay := Lo(d);
   UpdTicks := 20;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   S.Read(Year, SizeOf(Year));
   S.Read(Month, SizeOf(Month));
   S.Read(FDay, SizeOf(FDay));

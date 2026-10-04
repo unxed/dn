@@ -180,7 +180,7 @@ constructor TTeamView.Create(const R: TRect);
   inherited Create(R);
   UpdTicks := 500;
   Options := Options or ofPreProcess;
-  RegisterToBackground(@Self);
+  RegisterToBackground(Self);
   end;
 
 procedure TTeamView.Draw;
@@ -345,9 +345,9 @@ procedure TDiskInfo.InsertDriveView;
   R.Assign(0, Origin.Y-1, 0, Origin.Y);
     { По Y - на рамку, а с X DriveView^.Draw разбирается каждый раз }
   New(DriveView, Init(R));
-  DriveView^.Panel := @Self;
+  DriveView^.Panel := Self;
   Owner.Insert(DriveView);
-  DriveView^.Panel := @Self;
+  DriveView^.Panel := Self;
   end;
 
 { При явном закрытии панели информации, например, при повторном Ctrl-L,

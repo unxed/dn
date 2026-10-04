@@ -179,7 +179,7 @@ procedure PhoneBook(Manual: Boolean);
     ReturnButton.Hide;
     PV := D^.StandardScrollBar(sbVertical+sbHandleKeyboard);
     R.Assign(D^.Size.X-3, 3, D^.Size.X-2, 12);
-    PV^.Locate(R);
+    PV.Locate(R);
 
     R.Assign(2, 3, D^.Size.X-3, 12);
     PL := New(PPhoneBox, Init(R, 1, PScrollBar(PV)));
@@ -677,7 +677,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       Active := nil;
       {HideCursor;}
       end;
-    Message(@self, evBroadcast, cmValid, nil);
+    Message(Self, evBroadcast, cmValid, nil);
     end { EnterDir };
 
   procedure SearchPhone;

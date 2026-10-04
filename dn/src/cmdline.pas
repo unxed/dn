@@ -476,9 +476,9 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
           begin
           if P.X < (Size.X-Min(Length(Dir), 50)) div 2
           then
-            MessageKey(@Self, kbLeft)
+            MessageKey(Self, kbLeft)
           else
-            MessageKey(@Self, kbRight);
+            MessageKey(Self, kbRight);
           CE2;
           end
         else
@@ -614,8 +614,8 @@ EndLFN:
 я не понял, поэтому сделал по-простому. В ритлабовском DN
 шатания тоже были, но вызывалось, вроде, правильно.
                          StrModified := True;
-                         MessageKey(@Self, kbDown);
-                         MessageKey(@Self, kbUp);
+                         MessageKey(Self, kbDown);
+                         MessageKey(Self, kbUp);
 }
             AddCommand(Str);
             CurString := CmdStrings.Count;
@@ -634,17 +634,17 @@ EndLFN:
             end;
           ^J:
             begin
-            MessageKey(@Self, kbEnter);
+            MessageKey(Self, kbEnter);
             CE
             end;
           ^A:
             begin
-            MessageKey(@Self, kbCtrlLeft);
+            MessageKey(Self, kbCtrlLeft);
             CE
             end;
           ^F:
             begin
-            MessageKey(@Self, kbCtrlRight);
+            MessageKey(Self, kbCtrlRight);
             CE
             end;
           #32..#126, #128..#255:
@@ -807,7 +807,7 @@ EndLFN:
                 begin
                 GetFromClip(S);
                 if S <> '' then
-                  Message(@Self, evCommand, cmInsertName, @S);
+                  Message(Self, evCommand, cmInsertName, @S);
                 CE2;
                 end
                 {else

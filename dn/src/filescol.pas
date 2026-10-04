@@ -1602,7 +1602,7 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
   H := nil;
   if SortMode = psmUnsorted then
     begin
-    New(H, Init(@Self));
+    New(H, Init(Self));
     if H.HT <> nil then
       Exit; //! Наверно, памяти мало, сообщить бы об этом
     @IsDupe := @IsUnsortedDupe;
