@@ -63,11 +63,12 @@ type
   { It may be used to implement indexed logfiles }
   { Of course, these lines must not contain      }
   { strings with "=" or starting with "[".       }
-  PIniSection = ^TIniSection;
+  TIniSection = class;
+  PIniSection = TIniSection;
   TIniSection = class(TCollection)
     TheName: PString;
     constructor Create(const AName: String);
-    destructor Done; virtual;
+    destructor Destroy; override;
     function GetIndexOf(Key: String): Integer;
     function Get(const Key: String): String;
     procedure Put(const Key, Value: String; var Modified: Boolean);
@@ -81,12 +82,13 @@ type
     end;
 
   { Collection of TIniSections }
-  PIniFile = ^TIniFile;
+  TIniFile = class;
+  PIniFile = TIniFile;
   TIniFile = class(TCollection)
     Modified: Boolean;
     Name: PString;
     constructor Create(FileName: String; var AStatus: Integer);
-    destructor Done; virtual;
+    destructor Destroy; override;
     function Get(const Section, Key: String): String;
     procedure Put(const Section, Key, Value: String);
     function GetSection(Section: String): PIniSection;
@@ -221,7 +223,7 @@ Skip:
 
   if S.GetPos = Base then
     begin
-    inherited Done;
+    inherited Destroy;
     Fail
     end;
   end { TIniSection.Load };
@@ -257,9 +259,9 @@ procedure TIniSection.Store(var S: TStream);
   S.Write(CrLf, SizeOf(CrLf));
   end;
 
-destructor TIniSection.Done;
+destructor TIniSection.Destroy;
   begin
-  inherited Done;
+  inherited Destroy;
   DisposeStr(TheName);
   end;
 
@@ -368,48 +370,48 @@ function TIniSection.GetValueAt(const Index: Integer): String;
 {----------------------------------------------------------------------------}
 constructor TIniFile.Create(FileName: String; var AStatus: Integer);
   var
-    T: TBufStream;
+    T: TStream;
     P: PIniSection;
   begin
   inherited Create(5, 5);
   Name := NewStr(FileName);
-  T.Init(FileName, stOpenRead, 512);
+  T := TBufStream.Create(FileName, stOpenRead, 512);
   if T.Status = stOK then
     repeat
-      P := New(PIniSection, Load(T));
+      P := TIniSection.Load(T);
       if P <> nil
       then
         Insert(P);
     until P = nil;
   AStatus := T.Status;
-  T.Done;
+  T.Free;
   end;
 
-destructor TIniFile.Done;
+destructor TIniFile.Destroy;
   var
-    T: TBufStream;
+    T: TStream;
   procedure DoPutItem(P_: Pointer);
   var P: PIniSection absolute P_;
     begin
     if P <> nil then
-      P^.Store(T);
+      P.Store(T);
     end;
   begin
   if Modified then
     begin
-    T.Init(PStr2Str(Name), stCreate, 512);
+    T := TBufStream.Create(PStr2Str(Name), stCreate, 512);
     ForEach(DoPutItem);
-    T.Done;
+    T.Free;
     end;
   DisposeStr(Name);
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TIniFile.GetSection(Section: String): PIniSection;
   function Search(P_: Pointer): Boolean;
   var P: PIniSection absolute P_;
     begin
-    Search := UpStrg(P^.Name) = Section
+    Search := UpStrg(P.Name) = Section
     end;
   begin
   UpStr(Section);
@@ -423,7 +425,7 @@ function TIniFile.Get(const Section, Key: String): String;
   P := GetSection(Section);
   if P <> nil
   then
-    Get := P^.Get(Key)
+    Get := P.Get(Key)
   else
     Get := ''
   end;
@@ -435,11 +437,11 @@ procedure TIniFile.Put(const Section, Key, Value: String);
   P := GetSection(Section);
   if P = nil then
     begin
-    New(P, Init(Key));
+    P := TIniSection.Create(Key);
     Insert(P);
     Modified := True;
     end;
-  P^.Put(Key, Value, Modified);
+  P.Put(Key, Value, Modified);
   end;
 
 end.
