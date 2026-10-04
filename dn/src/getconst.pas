@@ -100,7 +100,7 @@ function TValuesHolder.GetType(ID: String): TTypeHolder;
   function LookForType(P_: Pointer): Boolean;
   var P: TTypeHolder absolute P_;
     begin
-    LookForType := P^.TypeID = Id;
+    LookForType := P.TypeID = Id;
     end;
   begin
   GetType := FirstThat(LookForType);
@@ -112,16 +112,16 @@ function TValuesHolder.GetValue(S: String; var Complete: Boolean): LongInt;
     function DoScan(P_: Pointer): Boolean;
     var P: TLngWord absolute P_;
       begin
-      if P^.Name = S then
+      if P.Name = S then
         begin
-        GetValue := P^.l;
+        GetValue := P.l;
         DoScan := True;
         end
       else
         DoScan := False
       end;
     begin
-    DoScanValue := P^.FirstThat(DoScan) <> nil;
+    DoScanValue := P.FirstThat(DoScan) <> nil;
     end;
   begin
   UpStr(S);
@@ -132,7 +132,7 @@ procedure TTypeHolder.Show;
   procedure DoScan(P_: Pointer);
   var P: TLngWord absolute P_;
     begin
-    Writeln(P^.Name, '=', P^.l);
+    Writeln(P.Name, '=', P.l);
     end;
   begin
   ForEach(DoScan);
@@ -140,9 +140,9 @@ procedure TTypeHolder.Show;
 
 function TTypeHolder.Compare(P1, P2: Pointer): Integer;
   begin
-  if TLngWord(P1)^.Name > TLngWord(P2)^.Name then
+  if TLngWord(P1).Name > TLngWord(P2).Name then
     Compare := 1
-  else if TLngWord(P1)^.Name < TLngWord(P2)^.Name then
+  else if TLngWord(P1).Name < TLngWord(P2).Name then
     Compare := -1
   else
     Compare := 0;
@@ -153,8 +153,8 @@ procedure TValuesHolder.Show;
   procedure DoScan(P_: Pointer);
   var P: TTypeHolder absolute P_;
     begin
-    Writeln('TYPE ', P^.TypeID);
-    Writeln(Strg(#196, 5+Length(P^.TypeID)));
+    Writeln('TYPE ', P.TypeID);
+    Writeln(Strg(#196, 5+Length(P.TypeID)));
     P.Show;
     end;
   begin
@@ -263,7 +263,7 @@ Loop:
             V := V+S[I]
           else
             begin
-            W := Types^.GetValue(V, Complete);
+            W := Types.GetValue(V, Complete);
             if not Complete then
               begin
               Writeln('Undefined variable ', V);
@@ -320,11 +320,11 @@ Loop:
   function LookForType(P_: Pointer): Boolean;
   var P: TTypeHolder absolute P_;
     begin
-    LookForType := (Mode = pmConst) and (P^.Mode = tmConst) and
-        (Pos(Copy(Id, 1, 2)+#0, P^.TypeID) > 0)
+    LookForType := (Mode = pmConst) and (P.Mode = tmConst) and
+        (Pos(Copy(Id, 1, 2)+#0, P.TypeID) > 0)
       or
-        (Mode = pmStartType) and (P^.Mode = tmEnum) and
-        (UpStrg(Id) = UpStrg(P^.TypeID));
+        (Mode = pmStartType) and (P.Mode = tmEnum) and
+        (UpStrg(Id) = UpStrg(P.TypeID));
     end;
   {DataCompBoy
   function DelDblSpc( S: String ): String;
@@ -431,7 +431,7 @@ StartType:
             Continue;
             end;
           ID := Ident(1);
-          P := Types^.FirstThat(LookForType);
+          P := Types.FirstThat(LookForType);
           if P = nil then
             Continue;
           Eq := Pos('=', S);
@@ -447,7 +447,7 @@ StartType:
       pmStartType:
         begin
         ID := Ident(1);
-        CurrentType := Types^.FirstThat(LookForType);
+        CurrentType := Types.FirstThat(LookForType);
         if CurrentType = nil then
           begin
           if Pos(')', S) > 0 then

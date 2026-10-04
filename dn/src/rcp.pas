@@ -184,14 +184,14 @@ procedure ProcessDLs(Enable: Boolean);
   function DoSeekID(P_: Pointer): Boolean;
   var P: TLngWord absolute P_;
     begin
-    DoSeekID := P^.Name = S1
+    DoSeekID := P.Name = S1
     end;
   procedure DoTest(P_: Pointer);
   var P: TLngWord absolute P_;
     begin
-    if P^.Mark = 0 then
+    if P.Mark = 0 then
       begin
-      Writeln('Unresolved identifier "'+P^.Name+'"');
+      Writeln('Unresolved identifier "'+P.Name+'"');
       Fail := True;
       end;
     end;
@@ -273,7 +273,7 @@ procedure ProcessDLs(Enable: Boolean);
   begin { ProcessDLs }
   if Enable then
     begin
-    DLs := Types^.GetType(tidDLs);
+    DLs := Types.GetType(tidDLs);
     New(SLM, Init($FFF0, $280));
     lAssignText(F, LngFileName);
     lResetText(F);
@@ -290,13 +290,13 @@ procedure ProcessDLs(Enable: Boolean);
         SetLength(S1, Length(S1)-1);
       if  (S1 = '') or (S1[1] = ';') then
         Continue;
-      P := DLs^.FirstThat(DoSeekID);
+      P := DLs.FirstThat(DoSeekID);
       if P = nil then
         Error('Unknown identifier "'+GetWord(S, 1)+'"');
-      if P^.Mark = 1 then
+      if P.Mark = 1 then
         Error('Duplicate identifier "'+GetWord(S, 1)+'"');
-      SLM^.Put(P^.l, MakeStr(S));
-      P^.Mark := 1;
+      SLM.Put(P.l, MakeStr(S));
+      P.Mark := 1;
       end;
     Close(F.T);
     Fail := False;
@@ -436,20 +436,20 @@ procedure StoreResource(P: TStreamable; Id: TDlgIdx);
   function HaveThisID(P_: Pointer): Boolean;
   var P: TLngWord absolute P_;
     begin
-    HaveThisID := TDlgIdx(P^.l) = Id
+    HaveThisID := TDlgIdx(P.l) = Id
     end;
   begin
-  W := DLGs^.FirstThat(HaveThisID);
+  W := DLGs.FirstThat(HaveThisID);
   if W = nil then
     Error('*ERROR*: Index #'+ItoS(Word(Id))+' out of range.');
-  if  (TheRF^.Empty(TDlgIdx(Id))) and (W^.Mark = 0)
+  if  (TheRF.Empty(TDlgIdx(Id))) and (W.Mark = 0)
   then
     if P <> nil then
-      TheRF^.Put(P, TDlgIdx(Id))
+      TheRF.Put(P, TDlgIdx(Id))
     else
   else
-    Error(#13'*ERROR*: Duplicate definition for "'+W^.Name+'"');
-  W^.Mark := 1;
+    Error(#13'*ERROR*: Duplicate definition for "'+W.Name+'"');
+  W.Mark := 1;
   end;
 
 var
@@ -469,9 +469,9 @@ function GetID(const S: String): LongInt;
     SetLength(FreeStr, Length(FreeStr)-1);
   DelRight(FreeStr);
   T.Init(0, FreeStr);
-  if IDs^.Search(@T, I) then
+  if IDs.Search(@T, I) then
     begin
-    GetID := TLngWord(IDs^.At(I))^.L;
+    GetID := TLngWord(IDs.At(I)).L;
     end
   else
     begin
@@ -674,9 +674,9 @@ procedure ProcessDLGs;
       SetLength(FreeStr, Length(FreeStr)-1);
     DelRight(FreeStr);
     T.Init(0, FreeStr);
-    if IDs^.Search(@T, L) then
+    if IDs.Search(@T, L) then
       begin
-      GetID := TLngWord(IDs^.At(L))^.L;
+      GetID := TLngWord(IDs.At(L)).L;
       end
     else
       begin
@@ -849,9 +849,9 @@ procedure ProcessDLGs;
     I := Length(idMenu);
     FreeStr := Token(S, I);
     T.Init(0, FreeStr);
-    if not DLGs^.Search(@T, J) then
+    if not DLGs.Search(@T, J) then
       Error('Unknown Resource ID - '+T.Name);
-    ID := TDlgIdx(TLngWord(DLGs^.At(J))^.l);
+    ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
     FillChar(R, SizeOf(R), 0);
     New(D, Init(R, CompileMenu(S)));
     StoreResource(D, ID);
@@ -931,7 +931,7 @@ procedure ProcessDLGs;
       New(P, Init(R, B, PV));
       D.Insert(P);
       while i < Length(S) do
-        P^.Options := P^.Options or GetID(Token(S, i));
+        P.Options := P.Options or GetID(Token(S, i));
       end;
 
     {-DataCompBoy-}
@@ -987,7 +987,7 @@ procedure ProcessDLGs;
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TCurrDriveInfo.Create(R, GetItems);
       D.Insert(PV);
-      with PV^ do
+      with PV do
         begin
         Options := Options or ofPostProcess;
         EventMask := evBroadcast+evCommand+evKeyDown+evMouseDown;
@@ -1044,7 +1044,7 @@ procedure ProcessDLGs;
           Options := Options or GetID(B);
         end;
       PV := TButton.Create(R, K, CmD, Flags);
-      PV^.Options := PV^.Options or Options;
+      PV.Options := PV.Options or Options;
       D.Insert(PV);
       end { MakeButton };
 
@@ -1090,7 +1090,7 @@ procedure ProcessDLGs;
       New(P, Init(R, GetID(Token(S, i))));
       D.Insert(P);
       while i < Length(S) do
-        P^.Options := P^.Options or GetID(Token(S, i));
+        P.Options := P.Options or GetID(Token(S, i));
       end;
 
     var
@@ -1117,9 +1117,9 @@ procedure ProcessDLGs;
     InPage := False;
     FreeStr := Token(S, I);
     T.Init(0, FreeStr);
-    if not DLGs^.Search(@T, J) then
+    if not DLGs.Search(@T, J) then
       Error('Unknown Resource ID: '+T.Name);
-    ID := TDlgIdx(TLngWord(DLGs^.At(J))^.l);
+    ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
     begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R.Assign(0, 0, TkL[1], TkL[2]) end;
     if ID = dlgSystemSetup then
       begin
@@ -1133,7 +1133,7 @@ procedure ProcessDLGs;
       end
     else {idDialog}
       New(D, Init(R, Token(S, I)));
-    D^.Options := D^.Options or ofCentered;
+    D.Options := D.Options or ofCentered;
     while not Eof(F.T) do
       begin
       Readln(F.T, S);
@@ -1161,9 +1161,9 @@ procedure ProcessDLGs;
         else if IsThis(idHelpCtx) then
           begin
           if PV = nil then
-            D^.HelpCtx := GetID(Token(S, I))
+            D.HelpCtx := GetID(Token(S, I))
           else
-            PV^.HelpCtx := GetID(Token(S, I))
+            PV.HelpCtx := GetID(Token(S, I))
           end
         else if IsThis(idLabel) then
           MakeLabel
@@ -1211,12 +1211,12 @@ procedure ProcessDLGs;
           Error('Unknown identifier in line '+ItoS(Line));
         if nDirectLink <> 0 then
           begin { запоминание прямой ссылки на текущий объект }
-          if D^.DirectLink[nDirectLink] <> nil then
+          if D.DirectLink[nDirectLink] <> nil then
             Error('Direct Link Label redefined in line '+ItoS(Line));
-          D^.DirectLink[nDirectLink] := PV;
+          D.DirectLink[nDirectLink] := PV;
           end;
         while I < Length(S) do
-          PV^.Options := PV^.Options or GetID(Token(S, I));
+          PV.Options := PV.Options or GetID(Token(S, I));
         end;
       end;
     D.SelectNext(False);
@@ -1240,9 +1240,9 @@ procedure ProcessDLGs;
     procedure DoCheck(P_: Pointer);
     var P: TLngWord absolute P_;
       begin
-      if P^.Mark <> 1 then
+      if P.Mark <> 1 then
         begin
-        Writeln('Unresolved identifier "', P^.Name, '"');
+        Writeln('Unresolved identifier "', P.Name, '"');
         FailCheck := True;
         end;
       end;
@@ -1253,17 +1253,17 @@ procedure ProcessDLGs;
 
   {-DataCompBoy-}
   begin { ProcessDLGs }
-  DLGs := Types^.GetType(tidDLGs);
+  DLGs := Types.GetType(tidDLGs);
   New(IDs, Init('', tmConst));
-  tP := Types^.GetType(tidCommands);
+  tP := Types.GetType(tidCommands);
   tP.ForEach(DoInsert);
-  tP := Types^.GetType(tidHelpCtx);
+  tP := Types.GetType(tidHelpCtx);
   tP.ForEach(DoInsert);
-  tP := Types^.GetType(tidHistory);
+  tP := Types.GetType(tidHistory);
   tP.ForEach(DoInsert);
-  tP := Types^.GetType(tidKbdconst);
+  tP := Types.GetType(tidKbdconst);
   tP.ForEach(DoInsert);
-  tP := Types^.GetType(tidOptions);
+  tP := Types.GetType(tidOptions);
   tP.ForEach(DoInsert);
 
   Writeln('Reading ', dlgFileName);
@@ -1274,7 +1274,7 @@ procedure ProcessDLGs;
   if IOResult <> 0 then
     Error('Could not open input file');
   St := TBufStream.Create(OutDlgFileName, stCreate, 512);
-  if St^.Status <> stOK then
+  if St.Status <> stOK then
     begin
     Close(F.T);
     St.Free;
@@ -1339,7 +1339,7 @@ procedure CleanupTypes;
     procedure DoUnmark(P_: Pointer);
     var P: TLngWord absolute P_;
       begin
-      P^.Mark := 0
+      P.Mark := 0
       end;
     begin
     P.ForEach(DoUnmark);
@@ -1369,12 +1369,12 @@ procedure InitParser;
   Sec := INI.GetSection('Parser');
   if Sec <> nil then
     begin
-    for I := 0 to Sec^.Count-1 do
+    for I := 0 to Sec.Count-1 do
       begin
-      K := UpStrg(Sec^.GetKeyAt(I));
+      K := UpStrg(Sec.GetKeyAt(I));
       if K <> '' then
         begin
-        S := Sec^.GetValueAt(I);
+        S := Sec.GetValueAt(I);
         DelDoubles('  ', S);
         if K = 'CONST' then
           Types.Insert(New(TTypeHolder, Init(ReplaceChar(' ', #0,
@@ -1424,7 +1424,7 @@ end;
 
 procedure Store_REditSaver(P: TStreamable; var S: TStream);
 begin
-  TEditSaver(P)^.Store(S);
+  TEditSaver(P).Store(S);
 end;
 
 procedure SetStreamRecs_rcp;

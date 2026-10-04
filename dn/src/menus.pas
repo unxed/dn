@@ -862,9 +862,9 @@ lHotkey:
                 if P = nil then
                   begin
                   P := TopMenu.HotKey(DNKeyCode(E));
-                  if  (P <> nil) and CommandEnabled(P^.Command) then
+                  if  (P <> nil) and CommandEnabled(P.Command) then
                     begin
-                    Result := P^.Command;
+                    Result := P.Command;
                     Action := DoReturn;
                     end
                   end
@@ -915,7 +915,7 @@ lHotkey:
     then
       begin
       if Current <> nil then
-        with Current^ do
+        with Current do
           if Name <> nil then
             if Flags and miSubmenu <> 0 then
               begin

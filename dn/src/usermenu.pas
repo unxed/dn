@@ -278,7 +278,7 @@ function MakeString(S: String; UserParams: PUserParams;
   
 
   if UserParams^.Active <> nil then
-    DA := TDate4(UserParams^.Active^.FDate);
+    DA := TDate4(UserParams^.Active.FDate);
   if UserParams^.Passive <> nil then
     DP := TDate4(UserParams^.Passive^.FDate);
 
@@ -290,14 +290,14 @@ function MakeString(S: String; UserParams: PUserParams;
       ts := '' {KSNK}
     else
       begin
-      if UserParams^.Active^.TType = ttUpDir
+      if UserParams^.Active.TType = ttUpDir
       then
         ts := MakeNormName
-            (lfGetShortFileName(UserParams^.Active^.Owner^), '')
+            (lfGetShortFileName(UserParams^.Active.Owner^), '')
       else
         ts := MakeNormName(GetPath(lfGetShortFileName(MakeNormName(
-                  UserParams^.Active^.Owner^,
-                   UserParams^.Active^.FlName[False]))), '');
+                  UserParams^.Active.Owner^,
+                   UserParams^.Active.FlName[False]))), '');
       end;
     if HandleTildes then
       Replace('~', #0'~', ts);
@@ -318,13 +318,13 @@ function MakeString(S: String; UserParams: PUserParams;
       ts := '' {KSNK}
     else
 
-     if UserParams^.Active^.TType = ttUpDir
+     if UserParams^.Active.TType = ttUpDir
     then
-      ts := MakeNormName(UserParams^.Active^.Owner^, '')
+      ts := MakeNormName(UserParams^.Active.Owner^, '')
     else
       ts := MakeNormName(GetPath(MakeNormName(
-              UserParams^.Active^.Owner^,
-               UserParams^.Active^.FlName[True])), '');
+              UserParams^.Active.Owner^,
+               UserParams^.Active.FlName[True])), '');
     if HandleTildes then
       Replace('~', #0'~', ts);
     Replace('$', #4, ts);
@@ -392,7 +392,7 @@ function MakeString(S: String; UserParams: PUserParams;
       if UserParams^.Active = nil then
         ts := '' {KSNK}
       else
-        ts := GetAttrStr(UserParams^.Active^.Attr);
+        ts := GetAttrStr(UserParams^.Active.Attr);
       Replace(#5'A', ts, S);
       Replace(#5'a', ts, S);
       end;
@@ -401,11 +401,11 @@ function MakeString(S: String; UserParams: PUserParams;
       begin
       if UserParams^.Active = nil then
         ts := '' {KSNK}
-      else if UserParams^.Active^.Attr and Directory <> 0
+      else if UserParams^.Active.Attr and Directory <> 0
       then
         ts := ''
       else
-        ts := ZtoS(UserParams^.Active^.PSize);
+        ts := ZtoS(UserParams^.Active.PSize);
       Replace(#5'C', ts, S);
       Replace(#5'c', ts, S);
       end;
@@ -428,7 +428,7 @@ function MakeString(S: String; UserParams: PUserParams;
         ts := '' {KSNK}
       else
         ts := ItoS
-                  (Round(((UserParams^.Active^.PSize/UserParams^.Active^.
+                  (Round(((UserParams^.Active.PSize/UserParams^.Active.
                   Size)*100)+0.5))+'%';
       Replace(#5'R', ts, S);
       Replace(#5'r', ts, S);
@@ -438,11 +438,11 @@ function MakeString(S: String; UserParams: PUserParams;
       begin
       if UserParams^.Active = nil then
         ts := '' {KSNK}
-      else if UserParams^.Active^.Attr and Directory <> 0
+      else if UserParams^.Active.Attr and Directory <> 0
       then
         ts := ''
       else
-        ts := ZtoS(UserParams^.Active^.Size);
+        ts := ZtoS(UserParams^.Active.Size);
       Replace(#5'S', ts, S);
       Replace(#5's', ts, S);
       end;
@@ -463,7 +463,7 @@ function MakeString(S: String; UserParams: PUserParams;
       if UserParams^.Active = nil then
         ts := '' {KSNK}
       else
-        ts := DizFirstLine(UserParams^.Active^.DIZ);
+        ts := DizFirstLine(UserParams^.Active.DIZ);
       if HandleTildes then
         Replace('~', #0'~', ts);
       Replace('$', #4, ts);
@@ -589,7 +589,7 @@ function MakeString(S: String; UserParams: PUserParams;
     if UserParams^.Active = nil then
       ts := '' {KSNK}
     else
-      ts := UserParams^.Active^.FlName[False];
+      ts := UserParams^.Active.FlName[False];
     NameAndExt(HandleTildes, ts, '!', S);
     end;
 
@@ -608,7 +608,7 @@ function MakeString(S: String; UserParams: PUserParams;
     if UserParams^.Active = nil then
       ts := '' {KSNK}
     else
-      ts := UserParams^.Active^.FlName[True];
+      ts := UserParams^.Active.FlName[True];
     NameAndExt(HandleTildes, ts, '#', S);
     end;
 
