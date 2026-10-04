@@ -484,11 +484,11 @@ function TArcDrive.ReadArchive: Boolean;
         P.Write(1, GetString(dlPercentComplete));
         Desktop.Insert(P);
         end;
-      P^.Write(2,
+      P.Write(2,
          Copy(Strg(#219, 25 div Trunc(Ln / (ArcFile.GetPos+1))) +
            Strg(#177, 25),
          1, 25));
-      P^.Write(3, ItoS(Files.Files)+GetString(dlFilesFound));
+      P.Write(3, ItoS(Files.Files)+GetString(dlFilesFound));
       NewTimer(T, 300);
       end;
     AType.GetFile;
@@ -620,12 +620,12 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
     MAvail: LongInt;
   begin
   ReadArchive; {AK155 26-11-2002}
-  AFiles := New(PFilesCollection, Init($10, $10));
+  AFiles := PFilesCollection.Create($10, $10);
   {FD := New(PFilesCollection, Init($40, $10));}
   PFilesCollection(AFiles).Panel := Panel;
   GetDirectory := AFiles;
   CheckSlashDot(CurDir);
-  FD := New(PFilesCollection, Init($40, $10));
+  FD := PFilesCollection.Create($40, $10);
   TTL := 0;
   TPL := 0;
   {GetDirectory := AFiles;}AllFiles := (FileMask = x_x)
@@ -1841,9 +1841,9 @@ function TArcDrive.OpenDirectory(const Dir: String;
     MAvail: LongInt;
   begin
   NewTimer(tmr, 0);
-  Dirs := New(PStringCollection, Init($10, $10, False));
+  Dirs := PStringCollection.Create($10, $10, False);
   PI := WriteMsg(GetString(dlReadingList));
-  New(Fils, Init($10, $10));
+  Fils := PFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
@@ -1913,7 +1913,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
     end;
   PI.Free;
 //используем '><' в качестве пpизнака ветви
-  PDrv := New(PFindDrive, Init('><'+Dir, Dirs, Fils));
+  PDrv := PFindDrive.Create('><'+Dir, Dirs, Fils);
   PDrv.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
   end { TArcDrive.OpenDirectory };
@@ -1980,9 +1980,9 @@ procedure TArcDrive.DrvFindFile(FC: PFilesCollection);
       Attr := Attr or ReadOnly;
     end;
 
-  Dirs := New(PStringCollection, Init($10, $10, False));
+  Dirs := PStringCollection.Create($10, $10, False);
   PI := WriteMsg(^M^M^C+GetString(dlSearching)+'...');
-  New(Fils, Init($10, $10));
+  Fils := PFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
