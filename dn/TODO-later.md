@@ -313,5 +313,5 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 
 ## The files of the settings (from the refactoring, 2026-10-04)
 
-- `dn.cfg` (binary dump of the records of the dialogs) into `dn.ini` (text): needs a text form (RegisterVar) for each record (`StartupData`, `SystemData`, the presets of the panels...); then `dn.cfg` is read only for the migration.
+- `dn.cfg` is inside `dn.ini` now (the section `[Saved]`, a hex image: done 2026-10-04); open: a text key of every field of the records (`RegisterVar` for `StartupData`, `SystemData`, the presets of the panels...) instead of the image, so that a person can edit them; the migration from `dn.old` can be dropped later.
 - Unix: the per-user directory (`$XDG_CONFIG_HOME/dn`, else `~/.config/dn`) as the default place of the files that the program writes (now: next to the program, or `DN2`); DOS stays next to the program. A setting (`DN2` or a line in `dn.ini`) decides; the default is to be chosen by the owner.

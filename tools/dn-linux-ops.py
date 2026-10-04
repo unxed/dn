@@ -315,7 +315,10 @@ def main():
         check(dsk_cwd(t).endswith('sub>'), 'autosave desktop: the panel is in sub before the exit', t.text())
         dsk_quit(t)
         check(os.path.isfile(os.path.join(dd, 'dn.dsk')), 'autosave desktop: dn.dsk is written at Alt-X')
-        check(os.path.isfile(os.path.join(dd, 'dn.cfg')), 'autosave desktop: the option itself is saved (DN.CFG)')
+        ini = os.path.join(dd, 'dn.ini')
+        check(os.path.isfile(ini) and '[Saved]' in open(ini, errors='replace').read() and 'Size=' in open(ini, errors='replace').read(),
+              'autosave desktop: the option itself is saved (the section [Saved] of dn.ini)')
+        check(not os.path.isfile(os.path.join(dd, 'dn.cfg')), 'there is no separate dn.cfg any more')
         t = dsk_start()
         check(dsk_cwd(t).endswith('sub>'), 'autosave desktop: the next start restores the panel directory (sub)', t.text())
         dsk_quit(t)
