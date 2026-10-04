@@ -53,11 +53,11 @@ uses
   Defines, objutil, Dialogs, Collect
   ;
 
+type
   TFindObject = class;
   TFindDir = class;
   TFindFile = class;
   TFindBox = class;
-type
   PFindObject = TFindObject;
   TFindObject = class(TObject)
     Text: PString;
