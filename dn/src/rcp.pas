@@ -274,7 +274,7 @@ procedure ProcessDLs(Enable: Boolean);
   if Enable then
     begin
     DLs := Types.GetType(tidDLs);
-    New(SLM, Init($FFF0, $280));
+    SLM := TStrListMaker.Create($FFF0, $280);
     lAssignText(F, LngFileName);
     lResetText(F);
     if IOResult <> 0 then
@@ -303,27 +303,27 @@ procedure ProcessDLs(Enable: Boolean);
     DLs.ForEach(DoTest);
     if Fail then
       Halt(1);
-    DLStream.Init(OutLngFileName, stCreate, 512);
+    DLStream := TBufStream.Create(OutLngFileName, stCreate, 512);
     if DLStream.Status <> stOK then
       Error('Cannot create file '+OutLngFileName);
     Writeln('Writing ', OutLngFileName);
-    DLStream.Put(SLM);
+    SLM.Store(DLStream);
     if DLStream.Status <> stOK then
       begin
-      DLStream.Done;
+      DLStream.Free;
       EraseFile(OutLngFileName);
       Error('Error writing file '+OutLngFileName);
       end
     else
-      DLStream.Done;
+      DLStream.Free;
     SLM.Free;
     end;
   ReRegisterType(RStringList);
-  DLStream.Init(OutLngFileName, stOpenRead, 512);
+  DLStream := TBufStream.Create(OutLngFileName, stOpenRead, 512);
   LStringList := TStringList(DLStream.Get);
   if  (LStringList = nil) and Enable then
     begin
-    DLStream.Done;
+    DLStream.Free;
     EraseFile(OutLngFileName);
     Error('Error reading file '+OutLngFileName);
     end;
@@ -385,7 +385,7 @@ const
   TheRF: TIdxMaker = nil;
 
 var
-  D: PColorDialog;
+  D: TColorDialog;
   PL, PP: PColorGroup;
   PI: PColorItem;
   i: LongInt;
@@ -398,7 +398,8 @@ var
   EditCommands: array[1..MaxCommands] of TEditCommand;
 
 type
-  TEditSaver = class(TObject)
+  TEditSaver = class(TStreamable)
+    constructor Create;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;
@@ -410,6 +411,11 @@ constructor TEditSaver.Load(var S: TStream);
   begin
   S.Read(NumCommands, SizeOf(NumCommands));
   S.Read(EditCommands, SizeOf(TEditCommand)*NumCommands);
+  end;
+
+constructor TEditSaver.Create;
+  begin
+  inherited Create;
   end;
 
 procedure TEditSaver.Store(var S: TStream);
@@ -468,7 +474,7 @@ function GetID(const S: String): LongInt;
   if S[Length(S)] = ',' then
     SetLength(FreeStr, Length(FreeStr)-1);
   DelRight(FreeStr);
-  T.Init(0, FreeStr);
+  T := TLngWord.Create(0, FreeStr);
   if IDs.Search(@T, I) then
     begin
     GetID := TLngWord(IDs.At(I)).L;
@@ -603,8 +609,8 @@ procedure MakeColorDialog;
       else
         Error('Unknown identifier in line '+ItoS(Line));
     end;
-  New(D, Init(MakePalette(''), PP));
-  D^.HelpCtx := hcColorDialog;
+  D := TColorDialog.Create(MakePalette(''), PP);
+  D.HelpCtx := hcColorDialog;
   StoreResource(D, dlgColors);
   D.Free;
   end { MakeColorDialog };
@@ -614,7 +620,7 @@ procedure MakeColorDialog;
 procedure MakeEditorCommands;
   var
     I, J: LongInt;
-    T: ^TEditSaver;
+    T: TEditSaver;
 
   procedure MakeCommand;
     begin
@@ -652,7 +658,7 @@ procedure MakeEditorCommands;
       else
         Error('Unknown identifier in line '+ItoS(Line));
     end;
-  New(T, Init);
+  T := TEditSaver.Create;
   StoreResource(T, dlgEditorCommands);
   T.Free;
   end { MakeEditorCommands };
@@ -673,7 +679,7 @@ procedure ProcessDLGs;
     if S[Length(S)] = ',' then
       SetLength(FreeStr, Length(FreeStr)-1);
     DelRight(FreeStr);
-    T.Init(0, FreeStr);
+    T := TLngWord.Create(0, FreeStr);
     if IDs.Search(@T, L) then
       begin
       GetID := TLngWord(IDs.At(L)).L;
@@ -848,12 +854,12 @@ procedure ProcessDLGs;
     begin
     I := Length(idMenu);
     FreeStr := Token(S, I);
-    T.Init(0, FreeStr);
+    T := TLngWord.Create(0, FreeStr);
     if not DLGs.Search(@T, J) then
       Error('Unknown Resource ID - '+T.Name);
     ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
     FillChar(R, SizeOf(R), 0);
-    New(D, Init(R, CompileMenu(S)));
+    D := TMenuBar.Create(R, CompileMenu(S));
     StoreResource(D, ID);
     D.Free;
     end;
@@ -861,8 +867,8 @@ procedure ProcessDLGs;
   procedure CompileDialog(S: String; IdToken: String);
     var
       D: TDialog;
-      Notepad: PNotepad;
-      Page: PPage;
+      Notepad: TNotepad;
+      Page: TPage;
       R: TRect;
       I: LongInt;
       J: LongInt;
@@ -879,29 +885,29 @@ procedure ProcessDLGs;
 
     procedure MakeInputLine;
       var
-        P: PHistory;
+        P: THistory;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
-      PV := New(PInputline, Init(R, GetID(Token(S, i))));
+      PV := TInputLine.Create(R, GetID(Token(S, i)));
       D.Insert(PV);
       j := GetID(Token(S, i));
       if j > 0 then
         begin
         R.A.X := R.B.X;
         R.B.X := R.A.X+3;
-        New(P, Init(R, PInputline(PV), j));
+        P := THistory.Create(R, TInputLine(PV), j);
         D.Insert(P);
         end;
       end;
 
     procedure MakeLongInputLine;
       var
-        P: PHistory;
+        P: THistory;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
-      PV := New(PLongInputline, Init(R, GetID(Token(S, i))));
+      PV := TLongInputLine.Create(R, GetID(Token(S, i)));
       D.Insert(PV);
       j := GetID(Token(S, i));
       if j > 0 then
@@ -913,7 +919,7 @@ procedure ProcessDLGs;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
-      PV := New(PHexLine, Init(R, PInputline(PV)));
+      PV := THexLine.Create(R, TInputLine(PV));
       D.Insert(PV);
       end;
     {-DataCompBoy-}
@@ -928,7 +934,7 @@ procedure ProcessDLGs;
       R.B.Y := R.A.Y+1;
       B := Token(S, i);
       R.B.X := R.A.X+2+CStrLen(B);
-      New(P, Init(R, B, PV));
+      P := TLabel.Create(R, B, PV);
       D.Insert(P);
       while i < Length(S) do
         P.Options := P.Options or GetID(Token(S, i));
@@ -1004,7 +1010,7 @@ procedure ProcessDLGs;
     procedure MakeComboBox;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := PComboBox.Create(R, GetItems);
+      PV := TComboBox.Create(R, GetItems);
       D.Insert(PV);
       end;
 
@@ -1012,7 +1018,7 @@ procedure ProcessDLGs;
       begin
       if InPage then
         Page.SelectNext(False);
-      Page := Notepad^.NewPage((Token(S, i)));
+      Page := Notepad.NewPage((Token(S, i)));
       end;
 
     procedure MakeButton;
@@ -1061,14 +1067,14 @@ procedure ProcessDLGs;
     procedure MakeListBox;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(TListBox, Init(R, GetID(Token(S, i)), LastSB));
+      PV := TListBox.Create(R, GetID(Token(S, i)), LastSB);
       D.Insert(PV);
       end;
 
     procedure MakeStaticText;
       begin
       begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
-      PV := New(TStaticText, Init(R, Token(S, i)));
+      PV := TStaticText.Create(R, Token(S, i));
       D.Insert(PV);
       end;
 
@@ -1087,7 +1093,7 @@ procedure ProcessDLGs;
       R.B.X := R.A.X+1;
       R.A.Y := GetID(Token(S, i));
       R.B.X := R.A.X+1;
-      New(P, Init(R, GetID(Token(S, i))));
+      P := TColorPoint.Create(R, GetID(Token(S, i)));
       D.Insert(P);
       while i < Length(S) do
         P.Options := P.Options or GetID(Token(S, i));
@@ -1116,23 +1122,23 @@ procedure ProcessDLGs;
     LastSB := nil;
     InPage := False;
     FreeStr := Token(S, I);
-    T.Init(0, FreeStr);
+    T := TLngWord.Create(0, FreeStr);
     if not DLGs.Search(@T, J) then
       Error('Unknown Resource ID: '+T.Name);
     ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
     begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R.Assign(0, 0, TkL[1], TkL[2]) end;
     if ID = dlgSystemSetup then
       begin
-      D := New(TSysDialog, Init(R, Token(S, I)));
+      D := TSysDialog.Create(R, Token(S, I));
       D.Awaken;
       end
     else if IdToken = idNotepad then
       begin
-      begin TkS[1] := Token(S, I); TkL[2] := GetID(Token(S, I)); Notepad := PNotepad.Create(R, TkS[1], TkL[2]) end;
-      PNotepad(D) := Notepad; // всё будет вставляться в диалог
+      begin TkS[1] := Token(S, I); TkL[2] := GetID(Token(S, I)); Notepad := TNotepad.Create(R, TkS[1], TkL[2]) end;
+      D := Notepad; // всё будет вставляться в диалог
       end
     else {idDialog}
-      New(D, Init(R, Token(S, I)));
+      D := TDialog.Create(R, Token(S, I));
     D.Options := D.Options or ofCentered;
     while not Eof(F.T) do
       begin
@@ -1193,7 +1199,7 @@ procedure ProcessDLGs;
           begin
           MakePage;
           inPage := True;
-          PPage(D) := Page;
+          D := Page;
           end
         else if IsThis(idButton) then
           MakeButton
@@ -1205,7 +1211,7 @@ procedure ProcessDLGs;
             Break;
           inPage := False;
           Page.SelectNext(False);
-          PNotepad(D) := Notepad;
+          D := Notepad;
           end
         else if (S <> '') and (S[1] <> ';') then
           Error('Unknown identifier in line '+ItoS(Line));
@@ -1223,7 +1229,7 @@ procedure ProcessDLGs;
     StoreResource(D, ID);
     if ID = dlgSystemSetup then
       begin
-      New(TCollection(DData.Drives.List), Init(0, 10));
+      DData.Drives.List := TLineCollection.Create(0, 10, False);
       D.SetData(DData);
       end;
     D.Free;
@@ -1254,7 +1260,7 @@ procedure ProcessDLGs;
   {-DataCompBoy-}
   begin { ProcessDLGs }
   DLGs := Types.GetType(tidDLGs);
-  New(IDs, Init('', tmConst));
+  IDs := TTypeHolder.Create('', tmConst);
   tP := Types.GetType(tidCommands);
   tP.ForEach(DoInsert);
   tP := Types.GetType(tidHelpCtx);
@@ -1377,8 +1383,8 @@ procedure InitParser;
         S := Sec.GetValueAt(I);
         DelDoubles('  ', S);
         if K = 'CONST' then
-          Types.Insert(New(TTypeHolder, Init(ReplaceChar(' ', #0,
-                 S+' '), tmConst)))
+          Types.Insert(TTypeHolder.Create(ReplaceChar(' ', #0,
+                 S+' '), tmConst))
         else if K = 'TYPE' then
           Types.Insert(TTypeHolder.Create(S, tmEnum))
         else
@@ -1407,19 +1413,14 @@ Same:
     CutWord := S;
   end;
 
-type
-  PR_RStringList = ^DNStrL.TStringList;
-
 function Build_RStringList(var S: TStream): TStreamable;
 begin
-  Result := TStreamable(New(PR_RStringList, Load(S)));
+  Result := TStreamable(DNStrL.TStringList.Load(S));
 end;
-
-type
 
 function Build_REditSaver(var S: TStream): TStreamable;
 begin
-  Result := TStreamable(New(TEditSaver, Load(S)));
+  Result := TStreamable(TEditSaver.Load(S));
 end;
 
 procedure Store_REditSaver(P: TStreamable; var S: TStream);
@@ -1430,10 +1431,10 @@ end;
 procedure SetStreamRecs_rcp;
 begin
 
-  RStringList.VmtLink := PtrUInt(TypeOf(DNStrL.TStringList));
+  RStringList.VmtLink := PtrUInt(System.TClass(DNStrL.TStringList));
   RStringList.Load := @Build_RStringList;
 
-  REditSaver.VmtLink := PtrUInt(TypeOf(TEditSaver));
+  REditSaver.VmtLink := PtrUInt(System.TClass(TEditSaver));
   REditSaver.Load := @Build_REditSaver;
 
   REditSaver.Store := @Store_REditSaver;
@@ -1473,7 +1474,7 @@ then
   
   
   Writeln('Using config file RCPVP'+FreeStr[1]+'.INI');
-  INI.Init('RCPVP'+FreeStr[1]+'.INI', INIs);
+  INI := TIniFile.Create('RCPVP'+FreeStr[1]+'.INI', INIs);
   if INIs <> stOK then
     Error('File RCPVP'+FreeStr[1]+'.INI not found.');
   end
@@ -1485,11 +1486,11 @@ RegisterType(RStrListMaker);
 RegisterAll;
 RegisterType(REditSaver);
 
-Types.Create(10, 10);
+Types := TValuesHolder.Create(10, 10);
 InitParser;
 
 {-DataCompBoy-}
-DefineParser.Init($10, $10);
+DefineParser := TDefCollection.Create($10, $10);
 LList := INI.Get('Controls', 'Defines');
 repeat
   Lng := GetWord(LList, 1);
@@ -1544,7 +1545,7 @@ repeat
       LStringList.Free;
       LStringList := nil;
       end;
-    DLStream.Done;
+    DLStream.Free;
     ReRegisterType(RStrListMaker);
     CleanupTypes;
     LList := CutWord(LList, 1);

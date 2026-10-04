@@ -915,7 +915,7 @@ lHotkey:
     then
       begin
       if Current <> nil then
-        with Current do
+        with Current^ do
           if Name <> nil then
             if Flags and miSubmenu <> 0 then
               begin
