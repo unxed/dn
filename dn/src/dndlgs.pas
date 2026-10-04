@@ -811,7 +811,7 @@ procedure TBookmark.Draw;
     C: Char;
   begin
   TextColor := GetColorW($0301);
-  LineColor := Owner^.GetColorW(2);
+  LineColor := Owner.GetColorW(2);
   with FrameC[Light] do
     begin
     { Снять заусенец на правом верхнем углу верхней неактивной закладки }

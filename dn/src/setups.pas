@@ -465,7 +465,7 @@ procedure TCurrDriveInfo.HandleEvent(var Event: TEvent);
     SetData(W);
     end
   else if (Event.What = evKeyDown) and (Char(Event.CharCode) = ' ')
-         and (TypeOf(Owner^.Current^) = TypeOf(TListBox))
+         and (TypeOf(Owner.Current^) = TypeOf(TListBox))
   then
     Press(0);
   end;

@@ -209,7 +209,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
   if Event.What = evMouseDown then
     begin
     Owner.MakeLocal(Event.Where, T);
-    if T.X >= Owner^.Size.X-2 then
+    if T.X >= Owner.Size.X-2 then
       begin
       PWindow(Owner).Frame.HandleEvent(Event);
       Exit;
@@ -240,7 +240,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
     else if (T.X > 31) and (T.X < 35) then
       Event.Command := cmSwitchKeyMapping
     else if (T.X = 37) then
-      PFileEditor(Owner^.Current).ScrollTo(0, 0) {AK155}
+      PFileEditor(Owner.Current).ScrollTo(0, 0) {AK155}
     else if FastBookmark and ((T.X > 37) and (T.X < 47)) then
       begin
       BookMark := T.X-38;
@@ -260,7 +260,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
         Event.What := evNothing;
       end
     else if (T.X = 47) then
-      with PFileEditor(Owner^.Current)^ do
+      with PFileEditor(Owner.Current)^ do
         ScrollTo(0, FileLines^.Count) {AK155}
     else
       Event.What := evNothing;
@@ -284,9 +284,9 @@ procedure TInfoLine.Draw;
     B: TDrawBuffer;
   begin
   P := PFileEditor(PEditWindow(Owner)^.Intern);
-  if Owner^.GetState(sfDragging) or not Owner^.GetState(sfActive) then
+  if Owner.GetState(sfDragging) or not Owner.GetState(sfActive) then
     begin
-    if Owner^.GetState(sfDragging)
+    if Owner.GetState(sfDragging)
     then
       Color := PWindow(Owner).Frame^.GetColorW(5)
     else
@@ -298,7 +298,7 @@ procedure TInfoLine.Draw;
     Color := PWindow(Owner).Frame^.GetColorW(3);
     Ch2 := #205;
     end;
-  if not Owner^.GetState(sfActive) then
+  if not Owner.GetState(sfActive) then
     SetLength(S, 0)
   else
     begin
@@ -399,9 +399,9 @@ procedure TBookmarkLine.Draw;
 
   begin { TBookmarkLine.Draw }
   P := PFileEditor(PEditWindow(Owner)^.Intern);
-  if Owner^.GetState(sfDragging) or not Owner^.GetState(sfActive) then
+  if Owner.GetState(sfDragging) or not Owner.GetState(sfActive) then
     begin
-    if Owner^.GetState(sfDragging)
+    if Owner.GetState(sfDragging)
     then
       Col := PWindow(Owner).Frame^.GetColorW(5)
     else

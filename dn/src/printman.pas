@@ -594,7 +594,7 @@ procedure TPrintManager.Update;
     begin
     if  (List = nil) or (List^.Count < 1) then
       begin
-      if not Owner^.GetState(sfDragging) then
+      if not Owner.GetState(sfDragging) then
         Owner.Free;
       Exit;
       end;

@@ -190,7 +190,7 @@ procedure TTeamView.Draw;
     I: Integer;
     C: Word;
   begin
-  C := Owner^.GetColorW($0807);
+  C := Owner.GetColorW($0807);
   MoveChar(B, ' ', C, Size.X);
   S := GetString(dlTeamAll);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
@@ -594,7 +594,7 @@ procedure TDiskInfo.Draw;
   then
     begin
     if Owner <> nil then
-      C := Owner^.GetColorW(1+Byte(Owner^.GetState(sfActive)));
+      C := Owner.GetColorW(1+Byte(Owner.GetState(sfActive)));
     FillChar(FreeStr[1], Size.X, 196);
     SetLength(FreeStr, Size.X);
     case Info.InfoFile of

@@ -2815,14 +2815,14 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       ToggleCmdLine;
 
     cmGetTeam:
-      if Desktop.TopView^.HelpCtx = hcAboutDialog then
+      if Desktop.TopView.HelpCtx = hcAboutDialog then
         begin
         Desktop.TopView.GetExtent(R);
         R.Grow(-1, -2);
         Dec(R.B.Y, 2);
         TeamView.Create(R);
         PGroup(Desktop.TopView).Insert(TeamView);
-        Desktop.TopView^.HelpCtx := hcTeam;
+        Desktop.TopView.HelpCtx := hcTeam;
         end;
     cmQuit:
       begin
@@ -2897,7 +2897,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         end;
 
       if (ModalCount <> 0) or MenuActive or
-         Desktop.Current^.GetState(sfDragging)
+         Desktop.Current.GetState(sfDragging)
       then
         begin { исполняем и уничтожаем модальный хелп }
         ExecView(HelpWnd);

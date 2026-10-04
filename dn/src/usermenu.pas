@@ -214,7 +214,7 @@ procedure TUserView.HandleEvent(var Event: TEvent);
               Event.Command := cmPostHideRight;
             PutEvent(Event);
             end;
-          if Owner^.GetState(sfSelected) then
+          if Owner.GetState(sfSelected) then
             Message(Owner, evCommand, cmClose, nil)
           else
             PView(Event.InfoPtr^) := Owner;

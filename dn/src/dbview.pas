@@ -1502,8 +1502,8 @@ procedure TDBIndicator.Draw;
     DBViewer^.Delta.Y := 0;
   if DBViewer^.Delta.X > DBViewer^.DBFile^.NumFields-1 then
     DBViewer^.Delta.X := DBViewer^.DBFile^.NumFields-1;
-  if Origin.Y <> Owner^.Size.Y-1 then
-    MoveTo(Origin.X, Owner^.Size.Y-1);
+  if Origin.Y <> Owner.Size.Y-1 then
+    MoveTo(Origin.X, Owner.Size.Y-1);
   PFR := DBViewer^.DBFile^.GetFieldRec(DBViewer^.Delta.X);
   if  (State and sfDragging <> 0) or (State and sfActive = 0) then
     C := 196
@@ -1516,7 +1516,7 @@ procedure TDBIndicator.Draw;
   Replace(' ', Char(C), S1);
   S := S+Char(C)+'['+PFR^.Who+' '+S1;
   S := S+Char(C)+DBViewer^.XCoder.CodeTag;
-  S := Copy(S, 1, Owner^.Size.X-4);
+  S := Copy(S, 1, Owner.Size.X-4);
   if Byte(S[0]) <> Size.X then
     begin
     GrowTo(Byte(S[0]), 1);

@@ -4031,7 +4031,7 @@ Ex:
             ChangeLine;
             if Modified then
               MISaveFile(Self);
-            if not Owner^.GetState(sfModal) then
+            if not Owner.GetState(sfModal) then
               Exit;
             CE;
             Owner.Redraw;

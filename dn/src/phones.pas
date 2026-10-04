@@ -589,7 +589,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       Exit;
     P := List^.At(Focused);
     PPH.Create(P^.Number^, P^.Name, '', '');
-    Owner^.EndModal(cmDialPhone);
+    Owner.EndModal(cmDialPhone);
     end;
 
   procedure EnterDir;

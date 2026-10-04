@@ -512,10 +512,10 @@ procedure TExtSelList.SetState(AState: Word; Enable: Boolean);
   begin
   if Enable and (Astate and sfSelected <> 0) then
     begin
-    Owner^.EnableCommands([cmYes, cmNo]);
+    Owner.EnableCommands([cmYes, cmNo]);
     OkButton^.MakeDefault(False);
     AddButton^.MakeDefault(True);
-    Owner^.DisableCommands([cmOK]);
+    Owner.DisableCommands([cmOK]);
     end;
   inherited SetState(AState, Enable);
   end;
@@ -533,10 +533,10 @@ procedure TFilterLine.SetState(AState: Word; Enable: Boolean);
   begin
   if Enable and (Astate and sfSelected <> 0) then
     begin
-    Owner^.EnableCommands([cmOK]);
+    Owner.EnableCommands([cmOK]);
     AddButton^.MakeDefault(False);
     OkButton^.MakeDefault(True);
-    Owner^.DisableCommands([cmYes, cmNo]);
+    Owner.DisableCommands([cmYes, cmNo]);
     end;
   inherited SetState(AState, Enable);
   end;
@@ -1649,7 +1649,7 @@ procedure CM_SetShowParms(AFP: Pointer);
       Drive^.ReadDescrptions(Files);;
     GetBounds(R);
     R.A.Y := 1;
-    R.B.Y := Owner^.Size.Y-1;
+    R.B.Y := Owner.Size.Y-1;
     ChangeBounds(R);
     Owner.Redraw;
     end;

@@ -353,7 +353,7 @@ begin
       if (Desktop.Current <> nil) and (PGroup(Desktop.Current).Current <> nil) then
         begin
           TraceView(PGroup(Desktop.Current).Current);
-          if PGroup(Desktop.Current).Current^.Size.Y = 1 then
+          if PGroup(Desktop.Current).Current.Size.Y = 1 then
             DNTrace('as input line: maxlen ' + IntToStr(PInputLine(PGroup(Desktop.Current).Current)^.MaxLen) + ' curpos ' + IntToStr(PInputLine(PGroup(Desktop.Current).Current)^.CurPos) + ' data [' + PInputLine(PGroup(Desktop.Current).Current)^.Data^ + ']');
         end;
     except

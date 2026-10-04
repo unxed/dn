@@ -3399,7 +3399,7 @@ procedure TFilePanelRoot.Rebound;
   begin
   GetBounds(R);
   R.A.Y := 1;
-  R.B.Y := Owner^.Size.Y-1;
+  R.B.Y := Owner.Size.Y-1;
   ChangeBounds(R);
   SortView^.SetState(sfVisible, (FMSetup.Show and fmsSortIndicator) <> 0);
     { используется при смене видимости индикатора в setups.FMSetup }

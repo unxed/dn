@@ -457,8 +457,8 @@ procedure StoreEditInfo(P: Pointer);
     
     FName := NewStr(' '+lfGetLongFileName(EditName)); {DataCompBoy}
     
-    fOrigin := Owner^.Origin;
-    fSize := Owner^.Size;
+    fOrigin := Owner.Origin;
+    fSize := Owner.Size;
     fDeskSize := Desktop.Size;
     fMarks := MarkPos;
     fBlockStart := Mark.A;
