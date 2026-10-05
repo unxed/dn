@@ -7,9 +7,28 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
-Current gate status: **OPEN**. Compare the latest object-based DN against the
-latest class-based DN, recording each exact revision and TV submodule. The
-older distribution artifact (`dist/`) is **not** a substitute comparator.
+Current gate status: **OPEN**. Do **not** claim CLOSED until the full
+**local** accept matrix is green. Compare the latest object-based DN against
+the latest class-based DN, recording each exact revision and TV submodule.
+The older distribution artifact (`dist/`) is **not** a substitute comparator.
+
+**Verification priority (2026-10-05):** local runs of
+`tools/dn-linux-accept.py` (and focused `tools/dn-linux-*.py`) are the
+primary evidence path. GitHub Actions (`dn-accept` shards) is congested —
+optional corroboration only; see `docs/CI-SERIAL.md`. Push is optional.
+
+### Evidence already landed (gate still OPEN)
+
+| Item | SHA / note |
+|---|---|
+| #6 startup redraw + About residue | `7572d73`; regressions `dn-linux-startup.py` / `dn-linux-about.py` |
+| Accept harness harden (FAST settle) | `ad9c4f7`; `dn-accept` green on that SHA historically |
+| Archives xz / F5 smoke | `5f02362` — ALL OK locally |
+| ZIP listing charset | `27de843` |
+| `ChLngId` ShortString / `PShortString` | `88c19f8` |
+| Classic `CColor` (Yes button) | `b57025b` |
+
+These close specific rows; they do **not** close the gate.
 
 ## Hard gate (owner, 2026-10-05) — bitwise, all functions
 
@@ -20,7 +39,7 @@ post-success stages live in `docs/POST-CLASS-WORK.md`.
 **Comparator:** last object-based revision vs last class-based revision (exact
 SHAs + TV/TV3 pins), same fixtures, same terminal size/locale, same scripted
 actions. Rebuild both for the run; do not reuse stale binaries as the
-authority.
+authority. Prefer a full local accept matrix over waiting for CI.
 
 **Coverage:** every scenario of every user-visible function — menus and nested
 menus, panels, file ops, archives, tools, dialogs, startup/teardown, keyboard /
@@ -157,15 +176,17 @@ and `dn.err` or exception output.
 | Panels | Switch, drive, directory, manager-new, select, sort, filter, view mode | core PASS | core PASS | **pass** (tab/alt-F1/alt-F10/ctrl-L/R/ins/plus) |
 | File operations | View, edit, copy, move, rename, delete, attributes, cancel/error paths | core PASS | core PASS | **pass** (F3–F8 + F5 cancel) |
 | Archives | Enter/leave, list, nested (`.tar.gz`…), F3/F4/F5, error paths; ZIP charset (`docs/ZIP-CHARSET.md`); matrix (`docs/ARCHIVE-MATRIX.md`) | core zip Enter | core zip Enter | core PASS; full archive matrix still open |
+| Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
+| Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
+| Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |
 
 Harness: `tools/dn-linux-accept.py OBJECT_OUT CLASS_OUT` — shared work tree, full
 `Screen.cells` + cursor compare (menu-bar clock + digit/time noise masked), core
 scenarios + every top-menu cell (`menu_M_N`). Object baseline: DN `b4916b8` + TV
-`521d064`. **Core result 2026-10-05:** `SUMMARY pass=32 fail=0`. Gate still
-**OPEN** until the full menu grid and remaining areas finish.
-| Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
-| Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
-| Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |
+`521d064`. Harness harden `ad9c4f7`. **Core result 2026-10-05:**
+`SUMMARY pass=32 fail=0` (reconfirm locally on current `main`). Gate still
+**OPEN** until the full local menu grid and remaining areas finish — CI green
+alone does not close the gate.
 
 The matrix must include every user-visible action, not just one representative
 per feature: every item in every top-level and nested menu, each default and
