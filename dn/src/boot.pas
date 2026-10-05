@@ -820,6 +820,7 @@ procedure RUN_IT;
   R.Assign(0, 0, ScreenWidth, ScreenHeight);
   MyApplication.ChangeBounds(R);
   MyApplication.Draw;
+  ReadScreenCells; { issue #6: sync the 16-bit copy that WriteScreenCells outputs; otherwise a stale copy overwrites the panels }
   TraceStartupState('after-initial-draw');
   WriteScreenCells(0, ScreenWidth * ScreenHeight);
   
