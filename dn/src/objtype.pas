@@ -269,7 +269,7 @@ const
   otLinker = 20301;
   otLinkDrive = 20302;
 
-  { --- Objects }
+  { --- Collections }
 
   otCollection = 50;
   otStringCollection = 51;

@@ -89,7 +89,7 @@ procedure ToggleCommandLine(OnOff: Boolean);
 procedure AdjustToDesktopSize(var R: TRect; OldDeskSize: TPoint);
 
 var
-  { the same variables as in TvApp (the objects there are the same) }
+  { the same variables as in TvApp (the instances there are the same) }
   Application: TProgram absolute TvApp.Application;
   Desktop: TDesktop absolute TvApp.DeskTop;
   { the menu bar and the status line of DN (the unit Menus of DN, not those of tv/); set by InitMenuBar and InitStatusLine
