@@ -10,8 +10,8 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Item | State |
 |---|---|
 | Gate | **CLOSED** on last behavior-verified SHA `1f51f75` (2026-10-06) |
-| Whole-tree class syntax gate | **PASS** on DN `8f3057f`: strict scan of all 185 tracked Pascal files; no exclusions; no object-dialect construction/disposal idioms |
-| Bootstrap provenance | **PASS** on DN `8f3057f`; `dn` run `37386669632` reproduced pinned baseline byte-for-byte; `layout` run `37386669509` passed |
+| Whole-tree class syntax gate | **PASS locally** on the disk-backend candidate: strict scan of all 189 tracked Pascal files; no exclusions; exact-SHA CI pending |
+| Bootstrap provenance | **PASS** on DN `8f3057f`; `dn` run `37386669632` reproduced pinned baseline byte-for-byte; `layout` run `37386669509` passed; re-run on candidate |
 | Core accept | **32/32 PASS** (historical) |
 | Full matrix | **177/177 PASS** on exact SHA `1f51f75` (12 shards; GitHub run `37387363591`; object DN `b4916b8` + TV `521d064` vs class DN + TV3 `a06dd31`) |
 | Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |

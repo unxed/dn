@@ -351,7 +351,7 @@ Rep:
         then
           begin
           {Cat:warn}
-          wr := DiskFree(dr2);
+          wr := SysDiskFreeLong(dr2);
           if  (wr = 0) or (PartWrt = PartSize) then
             goto 1
           else
