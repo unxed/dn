@@ -66,8 +66,10 @@ behavior is ambiguous (hard gate still applies globally).
       (`tools/dn-linux-archives.py`).
 - [x] Nested `.tar.gz`/`.tgz` enter without AV; listing shows `inside.txt` (TGZ: panel).
 - [ ] F3/F4 from inside archive does not hang (timeout-bounded test).
-- [ ] Autotests in CI for at least zip, 7z, tar, tar.gz + one extract/view path.
-- [ ] Peers still open: `.tar.bz2` / `.tar.xz`, zip-in-zip, plain `.gz`, F5 extract.
+- [x] Autotests in CI for zip, 7z, tar, tgz, tar.gz Enter/leave
+      (`dn-linux` / `linux64-utf8` → `tools/dn-linux-archives.py`).
+- [ ] Peers still open: `.tar.bz2` / `.tar.xz`, zip-in-zip, plain `.gz`, F5 extract;
+      F3/F4 hang-bounded smoke.
 
 Related: Unix packer defaults (`fmtzip`/`fmttar`/`fmt7z`…), ZIP charset
 (`docs/ZIP-CHARSET.md`), object/class gate
