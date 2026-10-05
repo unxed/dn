@@ -122,6 +122,13 @@ These rows keep the gate **OPEN**. They are separate from issue #6 startup
 redraw (blank panels / About residue), though desktop restore may share
 stream/LoadDesktop failure modes with other serialization bugs.
 
+## UI observations (2026-10-05)
+
+| Observation | Class vs object / `dist` | Notes |
+|---|---|---|
+| Nested top-menu submenu opens overlapping the parent box (not to the right) | **Same on `dist` and class** (shared `menus.pas` placement: below item, same X) | **Not a class regression.** Recorded as UX/acceptance geometry; change only with deliberate tests |
+| Default **Yes** button looks red/magenta | Class uses `CColorOsp`; object baseline used classic `CColor` (cyan default) | User wants classic DN colors; palette switch is an acceptance decision and will move many cells |
+
 ## Required comparison
 
 For both builds, use the same clean temporary tree, absolute run path, terminal size, locale,
