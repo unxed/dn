@@ -35,9 +35,9 @@ type
     OrthodoxEaster: integer;
     constructor Create(Bounds: TRect);
     constructor Load(var S: TStream);
-    destructor Done; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Draw; virtual;
+    destructor Destroy; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
     procedure Store(var S: TStream);
     procedure NextYear;
     procedure PrevYear;
@@ -59,11 +59,11 @@ type
   TCalendarWindow = class(TWindow)
     CalendarView: TCalendarView;
     constructor Create;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Awaken; virtual;
-    function GetTitle(MaxSize: integer): TTitleStr; virtual;
-    destructor Done; virtual;
-    function GetPalette: TPalette; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Awaken; override;
+    function GetTitle(MaxSize: integer): TTitleStr; override;
+    destructor Destroy; override;
+    function GetPalette: TPalette; override;
     end;
 
 procedure InsertCalendar;
@@ -588,7 +588,7 @@ procedure TCalendarWindow.Awaken;
   Calend := Self;
   end;
 
-destructor TCalendarWindow.Done;
+destructor TCalendarWindow.Destroy;
   begin
   Calend := nil;
   inherited Destroy;
@@ -638,7 +638,7 @@ constructor TCalendarView.Load(var S: TStream);
   DrawView;
   end;
 
-destructor TCalendarView.Done;
+destructor TCalendarView.Destroy;
   begin
   inherited Destroy;
   end;
