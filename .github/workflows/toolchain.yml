@@ -37,7 +37,7 @@ jobs:
       - name: Compile hello for go32v2
         run: |
           mkdir -p out
-          ~/fpc-go32v2/bin/fpc-go32v2 -FEout tests/dos/hello.pas
+          "${{ runner.temp }}/fpc-go32v2/bin/fpc-go32v2" -FEout tests/dos/hello.pas
           file out/hello.exe
       - name: DPMI host (CWSDPMI, not committed)
         run: |
