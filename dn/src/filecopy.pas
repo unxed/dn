@@ -56,11 +56,11 @@ uses
 
 type
   PCopyRec = ^TCopyRec;
-    {2` Используется для D&D в InfoPtr информации к событию `}
+    {2` Used for D&D of event info into InfoPtr `}
   TCopyRec = record
     FC: TFilesCollection;
-    Owner: TView;  // панель, из которой тащили
-    Where: TPoint; // где бросили (глобальные координаты)
+    Owner: TView;  // panel we dragged from
+    Where: TPoint; // where we dropped (global coordinates)
     end;
     {`}
 
@@ -81,22 +81,22 @@ function CopyDialog(var CopyDir: String; var Mask: String;
     var CopyPrn: Boolean; {var Inheread: Byte;}
     MoveMode: Boolean; Files: TCollection;
     FromTemp: Byte; SourcePanel: TView; Link: Boolean): Boolean;
-  { Если диалог завершился удачно и not CopyPrn, то CopyDir
-   заведомо не пуста, притом в конце обязательно есть '\'.}
+  { If the dialog ended successfully and not CopyPrn, then CopyDir
+   is surely non-empty, and there is always a '\' at the end.}
 
 procedure CopyDirContent(Source, Destination: String;
     MoveMode, Forced: Boolean); {JO}
 
 procedure CloseWriteStream;
   {` AK155 20.06.2007
-    Эта процедура вызывается при аварийном завершении. Она нужна,
-    чтобы, если завершение произошло во время записи, установить
-    файлу фактически записанный размер, а не полный размер,
-    который устанавливается в начале записи.
-    Оставлять полный размер плохо, так как это, во-первых, неправда,
-    а во-вторых, под Win NT программа может закрываться очень долго
-    для большого файла, так как система зачем-то заполняет нулями
-    всю недописанную часть. `}
+    This procedure is called on abnormal termination. It is needed
+    so that if termination happened during writing, the file gets
+    the actually written size, not the full size
+    that is set at the start of writing.
+    Leaving the full size is bad because, first, it is untrue,
+    and second, under Win NT the program may close very slowly
+    for a large file, because the system for some reason fills with zeros
+    the entire unwritten part. `}
 
 implementation
 uses
@@ -108,8 +108,8 @@ uses
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
   , fileerrors
-  , panelroot {JO: TFilePanelRoot нужен чтобы делать недоступным }
-  {    копирование описаний }
+  , panelroot {JO: TFilePanelRoot is needed to make description }
+  {    copying unavailable }
   
 
   , panelsetup, Lfn, uselfn, Streams, Drivers, objutil, Dialogs
@@ -119,19 +119,19 @@ const
   Marked = $4000;
   Copied = $8000;
     { AK155 28/11/05.
-       Биты Marked и Copied записывается в Attr файловой записи,
-    если файл (каталог) надо перемещать, и когда он успешно перемещён.
-    Кое-где эти быты пишутся независимо от того, copy или move, но
-    в случае copy они нигде не анализируются.
-    Использовались только в одном месте, для обновления файлов дерева
-    и для перечитывания каталогов. Работа с файлами дерева выброшена.
-       Раньше эти магические константы тихо использовалась прямо
-    в цифровом виде, и смысл этого был совершенно непонятен. Хуже
-    того, $8000 использовалась (filepanel) ещё и для отметки того,
-    что размер каталога известен, что могло приводить к путанице.
-       Теперь для размера каталога бит атрибута не используется,
-    а когда длина неизвестна, просто пишется длина -1, а не 0
-    (см. filescol.pas, TFileRec.Size). }
+       Marked and Copied bits are written into the file record Attr
+    if the file (directory) must be moved, and when it has been moved successfully.
+    Somewhere these bits are written regardless of copy or move, but
+    in the copy case they are never analyzed.
+    They were used only in one place, for updating tree files
+    and for rereading directories. Work with tree files was removed.
+       Previously these magic constants were quietly used directly
+    in numeric form, and the meaning was completely unclear. Worse,
+    $8000 was also used (filepanel) to mark that
+    the directory size is known, which could cause confusion.
+       Now for directory size the attribute bit is not used,
+    and when the length is unknown, length -1 is simply written, not 0
+    (see filescol.pas, TFileRec.Size). }
 
 const
   cpmOverwrite = 0;
@@ -248,7 +248,7 @@ procedure BeepAftercopy;
   var
     C: Char;
   begin
-{AK155 Зачем?  DelayTics(1); }
+{AK155 Why?  DelayTics(1); }
   for C := 'A' to 'D' do
     begin
     SysBeepEx {PlaySound}(1259, 55);
@@ -315,19 +315,19 @@ var
   ToDo, ToDoCopy, ToDoClusCopy: TSize;
   ToDoClusCopyTemp: TSize;
   MemBuf: PByteArray;
-    { буфер копирования }
+    { copy buffer }
   MemBufPos, MemBufSize: Longint;
   WriteStream: lFile;
 
 type
   TLine = class(TObject)
-    { Элемент CopyQueue}
+    { CopyQueue element}
     Owner: PFileRec;
     OldName: PString;
     NewName: PString;
-    Size: TSize; // длина файла
+    Size: TSize; // file length
     Date: LongInt;
-    len: Word; // длина блока, который будем читать
+    len: Word; // length of the block we will read
     Eof: Byte;
     Attr: Byte;
     constructor Create(var ALen: LongInt; AOwner: Pointer;
@@ -488,7 +488,7 @@ procedure TOverriteDialog.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
   if (Event.What = evCommand) and (Event.Command = cmSave) then
-     begin { кнопка "Продолжить" }
+     begin { "Continue" button }
      EndModal(Event.Command);
      ClearEvent(Event);
      end;
@@ -524,7 +524,7 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     IOR: Integer;
     SSS: String;
     TargetDirName: String;
-    PathBuffer: array[0..255] of Char; {целевой каталог}
+    PathBuffer: array[0..255] of Char; {target directory}
     RC: LongInt;
     CondLfn: TUseLFN; {JO}
 
@@ -767,11 +767,11 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
       I_LW: Byte;
 
     procedure RewriteWriteStrem;
-      {Открыть WriteStrem и установить его окончательный размер.
-       Размер устанавливается для уменьшения фрагментации и
-       ускорения.
-         InOutres отражает результат открытия, а результат
-       установки размера не анализируется.}
+      {Open WriteStrem and set its final size.
+       Size is set to reduce fragmentation and
+       speed things up.
+         InOutres reflects the open result, and the size-set
+       result is not analyzed.}
       begin
       lReWriteFile(WriteStream, 1);
       SysFileSetSize(FileRec(WriteStream.F).Handle, CompToFSize(P.Size));
@@ -782,11 +782,11 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
         OldAttr: Word;
       begin
       {AK155 2-02-2002
-Раньше наличие файла проверялось  при помощи lResetFile, что не
-вполне корректно. На CD RW под RSJ и, кажется, на некоторых сетевых дисках,
-эта операция приводит к созданию файла и ложному запросу о перезаписи
-файла. Более того, при отрицательном ответе созданный файл остается
-(с нулевой длиной). Проверка при помощи lGetFAttr более чистая.
+Previously file existence was checked via lResetFile, which is not
+entirely correct. On CD RW under RSJ and, it seems, on some network disks,
+this operation creates a file and a false overwrite prompt.
+Moreover, on a negative answer the created file remains
+(with zero length). Checking via lGetFAttr is cleaner.
 }
       if CopyMode <> cpmOverwrite then
         begin
@@ -975,7 +975,7 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
           ;
         if P.Eof and eoStart <> 0 then
           begin
-2: { Сюда попадаем, в частности, при переименование файла с одинаковым именем }
+2: { We get here, in particular, when renaming a file with the same name }
           ExAttr := $FFFF;
           Wrote := 0;
           Info.Write(5,
@@ -1297,7 +1297,7 @@ DoRewrite:
                   Break;
                 else {case}
                   begin
-                  CopyCancel := True; {вместо NoWrite}
+                  CopyCancel := True; {instead of NoWrite}
                   ForceDispatch;
                   Break;
                   end;
@@ -1405,7 +1405,7 @@ lbStartWrite:
           if CopyOptions and cpoFromTemp <> 0 then
             RemoveFromTemp(P.Owner);
           if CopyOptions and cpoMove <> 0 then
-            {move выделенных; по F6 на файле сюда не попадаем. }
+            {move of selected; via F6 on a file we do not get here. }
             begin
             Info.Write(6, GetString(dlDeletingSource));
             DeleteDiz(P.Owner);
@@ -1447,21 +1447,21 @@ lbStartWrite:
       DosErrorCode := 0;
       RnFl(S1, S2);
       if DosErrorCode = 17 {NOT_SAME_DEVICE} then
-        Exit;  { AK155 14.03.2006 фактически код 17
-          я сумел получить только под OS/2 }
+        Exit;  { AK155 14.03.2006 actually code 17
+          I only managed to get under OS/2 }
       if DosErrorCode in [5, 80, 183] then
           { AK155 14.03.2006
-            Код 80 (FILE_EXISTS) бывает, например, под NT 4 при
-          "переименовании" между фактически разными сетевыми путями,
-          когда на целевом устройстве файл есть. Если его удалить,
-          то "переименование" проходит, хотя фактически это копирование
-          и удаление. Хорошо ли это - непонятно, так как выполняется
-          системная функция независимо от настроек DN.
-            А при "переименовании" между каталогами одного диска под NT
-          получается код 183 (ALREADY_EXISTS). Интересно, в чём
-          глубокая разница между FILE_EXISTS и ALREADY_EXISTS?
-            Под OS/2 кода 183 как бы нет, но при совпадении имени на
-          сетевом виндовом диске получается 183 даже под OS/2. }
+            Code 80 (FILE_EXISTS) happens, for example, under NT 4 when
+          "renaming" between actually different network paths,
+          when the file exists on the target device. If it is deleted,
+          then "renaming" succeeds, though actually it is copy
+          and delete. Whether that is good is unclear, because a
+          system function runs independently of DN settings.
+            And when "renaming" between directories of one disk under NT
+          we get code 183 (ALREADY_EXISTS). Interestingly, what is
+          the deep difference between FILE_EXISTS and ALREADY_EXISTS?
+            Under OS/2 code 183 sort of does not exist, but when the name matches on
+          a network Windows disk we get 183 even under OS/2. }
         begin
         lAssignFile(F, S2);
         ClrIO;
@@ -1471,7 +1471,7 @@ lbStartWrite:
         RnFl(S1, S2);
         end;
       if DosErrorCode in [5, 183] then
-        begin {AK155 Смысл этого блока мне непонятен }
+        begin {AK155 The meaning of this block is unclear to me }
         lAssignFile(F, S1);
         lGetFAttr(F, W);
         lSetFAttr(F, Archive);
@@ -1520,16 +1520,16 @@ lbStartWrite:
           then
             DeleteDiz(Own);
           end;
-        {сюда никаких копирований EA вставлять не надо}
+        {no EA copying should be inserted here}
 
         
         Own^.FlName[False] := GetName(lfGetShortFileName(NName));
         
 {!RLN}        CopyShortString(GetName(NName), Own^.FlName[True]);
         //         ReplaceLongName(Own, {$IFDEF OS2}GetName{$ENDIF}(NName));
-   { Это на случай если стоим как раз на этом имени.
-   Чтобы при перечитывании каталога курсор ушёл на новое имя,
-   а не остался на старой позиции }
+   { This is in case we are standing right on this name.
+   So that when the directory is reread the cursor goes to the new name,
+   and does not stay at the old position }
         if  (SourcePanel <> nil) then
           Message(SourcePanel, evCommand, cmCopyUnselect, Own);
         ToWrite := ToWrite+ln;
@@ -1562,7 +1562,7 @@ lbStartWrite:
       end;
 
     begin { CopyFile }
-    {JO: !!! не копируем файлы найденные в архивах  }
+    {JO: !!! do not copy files found in archives  }
     {if PathFoundInArc(FName) then Exit;}
     {/JO}
     if CopyPrn then
@@ -1573,13 +1573,13 @@ lbStartWrite:
       S1 := lFExpand(FName); {Cat}
       S2 := lFExpand(NName); {Cat}
       S2[1] := '';
-      {Cat: теперь имя начинается с ":\", поэтому
-        дальше процедуре будет казаться, что файл назначения (а на
-        самом деле устройство) располагается на другом диске, поэтому
-        вместо переименования будет использоваться копирование с
-        удалением источника. Однако, нет полной гарантии, что имя
-        устройства с полным путём, да ещё и с таким обозначением диска,
-        будет нормально воспринято системой}
+      {Cat: now the name starts with ":\", so
+        further on the procedure will think that the destination file (which is actually
+        a device) is on another disk, so
+        instead of rename, copy with
+        source deletion will be used. However, there is no full guarantee that the device
+        name with a full path, and moreover with such a drive letter,
+        will be accepted normally by the system}
       end
     else
       begin
@@ -1671,12 +1671,12 @@ lbStartWrite:
         begin}
     {--- finish -------- Eugeny Zvyagintzev ----------------------------------}
 
-    {AK155 чтобы можно было файлы и каталоги копировать на nul и другие
-устройства, чуть ниже вставлено 3 анализа CopyPrn. }
+    {AK155 so that files and directories can be copied to nul and other
+devices, 3 CopyPrn analyses are inserted a bit below. }
     ClrIO;
     EOF := eoStart or eoCheck;
     if not CopyPrn then
-      {AK155 на устройстве незачем искать файлы}
+      {AK155 no need to look for files on a device}
       begin
       lFindFirst(S2, AnyFileDir, SR); {JO}
       DEr := (DosError <> 0);
@@ -1686,7 +1686,7 @@ lbStartWrite:
       begin
       EOF := eoStart;
       Was := SR.FullSize;
-      if not CopyPrn {AK155: для одиночного файла} and (SR.SR.Attr and
+      if not CopyPrn {AK155: for a single file} and (SR.SR.Attr and
            Directory <> 0)
       then
         begin
@@ -1754,7 +1754,7 @@ PrepareResume:
     {       end;} {Eugeny Zvyagintzev}
     if  (CopyOptions and cpoMove <> 0) and (EOF and eoAppend = 0) and
         (S1[1] = S2[1])
-          {AK155: для сетевых путей '\'='\'. Но, может, это и хорошо.}
+          {AK155: for network paths '\'='\'. But maybe that is fine.}
     then
       begin
       ClrIO;
@@ -1763,8 +1763,8 @@ PrepareResume:
       DoRename;
       if DosErrorCode <> 17 {NOT_SAME_DEVICE} then
         Exit;
-      { То, что казалось одним устройством, оказалось разными, и move
-       не прошло. Пробуем по-другому: скопировать и удалить.}
+      { What seemed one device turned out to be different ones, and move
+       failed. Try another way: copy and delete.}
       CopyCancel := False;
       lResetFile(ReadStream, 1);
       end;
@@ -1785,7 +1785,7 @@ PrepareResume:
         WW := Round(ln-Rd);
       P := TLine.Create(WW, Own, FName, NName, ln, Dtt, Attr, EOF);
       if P = nil then
-        begin { исчерпан буфер }
+        begin { buffer exhausted }
         ReadProgress;
         MaxWrite;
         if SkipRequested then
@@ -1805,9 +1805,9 @@ FileRead:
         end;
 
       {AK155}
-//      {$IFNDEF DPMI32} {AK155 28.06.2007 в DPMI32 int24 не проявляется }
-      { Под OS/2 и Win32 не вызывается, как в ДОС, обработчик критических ошибок,
- так что надо самим анализировать результат и вызывать обработчик }
+//      {$IFNDEF DPMI32} {AK155 28.06.2007 under DPMI32 int24 does not show up }
+      { Under OS/2 and Win32 the critical-error handler is not called as in DOS,
+ so we must analyze the result ourselves and call the handler }
       I := IOResult;
       if I <> 0 then
         begin
@@ -1821,7 +1821,7 @@ FileRead:
           goto FileRead;
         if I = 4 then
           begin
-          _Tmr.ExpireMSecs := GetCurMSec-1; // сделать таймер истекшим
+          _Tmr.ExpireMSecs := GetCurMSec-1; // make the timer expired
           CtrlBreakHit := True;
           goto FileRead;
           end;
@@ -1853,8 +1853,8 @@ FileRead:
       P.EOF := EOF;
       if WW <> J then
         begin
-        {AK155 А здесь надо бы проанализировать IOResult
-               и выдать вразумительное сообщение! }
+        {AK155 And here we ought to analyze IOResult
+               and give a clear message! }
         CopyCancel := True;
         Break;
         end;
@@ -1878,7 +1878,7 @@ FileRead:
      or SkipRequested; {-$VOL}
     if P <> nil then
       begin
-      P.Free; // выскочили по Break после Init, но до Insert
+      P.Free; // jumped out via Break after Init but before Insert
       P := nil;
       end;
 
@@ -1938,12 +1938,12 @@ FileRead:
         CopyDirectory(P.DOld, P.DNew, P.Own)
       else if P.Own <> nil then
 {!RLN}        CopyShortString(GetName(P.DOld), P.Own^.FlName[True]);
-   { Это на случай, если стоим как раз на этом каталоге. Чтобы
-   при перечитывании каталога курсор ушёл на новое имя,
-   а не остался на старой позиции.
-     А nil бывает, например, на подкаталогах при переименовании
-   объемлющего каталога по F6 при погашенной другой панели.
-   При этом, кстати, P^.OldName^ =  P^.NewName^. }
+   { This is in case we are standing right on this directory. So that
+   when the directory is reread the cursor goes to the new name,
+   and does not stay at the old position.
+     And nil happens, for example, on subdirectories when renaming
+   the enclosing directory via F6 with the other panel hidden.
+   By the way, then P^.OldName^ =  P^.NewName^. }
       end;
 
     begin
@@ -1983,11 +1983,11 @@ FileRead:
       KillDescrOf: PFlName;
       
 
-    procedure CopyI(Dest{Целевой каталог},
-        Source{ полное старое имя }: String;
-        Name: String;  {Новое имя}
-        o: PFileRec; {тут, вроде, то же самое, что и в Source,
-          но бывает o=nil}
+    procedure CopyI(Dest{Target directory},
+        Source{ full old name }: String;
+        Name: String;  {New name}
+        o: PFileRec; {here, seems, the same as in Source,
+          but o=nil happens}
         CopyIt: Boolean;
         Attr: Byte);
       label 1, 2, TrueCopy;
@@ -2025,12 +2025,12 @@ FileRead:
       if  (o <> nil) and (CopyOptions and cpoMove <> 0)
            and (SSS[1] = q[1])
       then
-        begin { Переименование каталога }
+        begin { Directory rename }
         ClrIO;
         RnFl(SSS, q);
         if DosErrorCode in [5, 80, 183] then
-          begin {Возможно, целевой каталог есть, но пустой. Тогда
-             его можно удалить и переименование всё-таки проделать }
+          begin {Possibly the target directory exists but is empty. Then
+             it can be deleted and the rename can still be done }
           LFN.lRmDir(q);
           ClrIO;
           RnFl(SSS, q);
@@ -2042,9 +2042,9 @@ FileRead:
           end;
         if DosErrorCode in [5, 17, 80, 183] then
           goto TrueCopy;
-            { Целевой каталог есть, и непустой, либо переименование
-              невозможно в принципе. Так что будем честно копировать
-              и удалять. }
+            { The target directory exists and is non-empty, or rename
+              is impossible in principle. So we will honestly copy
+              and delete. }
         CopyIt := False;
         o^.Attr := o^.Attr or Copied;
         if DosErrorCode <> 0 then
@@ -2067,22 +2067,22 @@ FileRead:
 
 
 (*
-{! Так копировать LFN нельзя! Длины могут отличаться. Надо ли вообще
- копировать новое длинное имя - надо разобраться. Похоже, что не надо.
- Это ведь запись исходного каталога, а не приёмного. А короткое имя
- вообще надо не копировать, а запрашивать, оно ведь может оказаться
- совсем другим. Так что пока что прибиваю пересылку имён. Вроде,
- ни на что не повлияло.
-   Проанализировал подробнее. Это переименование нафиг не нужно.
- Данная файловая запись используется тут только для того, чтобы передать
- её в cmCopyUnselect, а там она служит только для сравнения имён. Кстати,
- абсурд редкий. Просматривается вся коллекция на предмет совпадения имени
- с переданной записью. И, поскольку эта запись является одним из элементов
- коллекции, то совпадение происходит при сравнении её с самой сабой. Так
- что старое имя точно годится, а вот новое, наверно, может и к глюкам
- приводить, если это новое имя совпадает с уже имевшимся. Притом всё это
- нужно только для красивой перерисвоки панеленй и подвала по мере
- копирования. А потом всё равно панель перечитывается.}
+{! Must not copy LFN this way! Lengths may differ. Whether we need at all
+ to copy the new long name - need to figure out. Seems we do not.
+ This is a source-directory record, not the destination one. And the short name
+ should not be copied at all but queried, because it may turn out
+ completely different. So for now I am killing name transfer. Seems
+ it affected nothing.
+   Analyzed in more detail. This rename is completely unneeded.
+ This file record is used here only to pass
+ it to cmCopyUnselect, and there it only serves for name comparison. By the way,
+ rare absurdity. The whole collection is scanned for a name match
+ with the passed record. And since this record is one of the collection
+ elements, a match happens when comparing it with itself. So
+ the old name is surely fine, while the new one may perhaps lead to glitches
+ if this new name matches an already existing one. And all this
+ is needed only for pretty redraw of panels and footer as
+ copying proceeds. And then the panel is reread anyway.}
         {$IFDEF DualName}
         o^.FlName[False] := GetName
                 (lfGetShortFileName(MakeNormName(GetPath(Source), Name)));
@@ -2093,12 +2093,12 @@ FileRead:
         if SourcePanel <> nil then
           Message(SourcePanel, evCommand, cmCopyUnselect, o);
         KillDescrOf := @o^.FlName;
-          { При переименовании каталога описание со старым именем
-           надо прибивать }
+          { When renaming a directory the description with the old name
+           must be removed }
         goto 1;
         end
       else
-        begin { Копирование каталога }
+        begin { Directory copy }
 TrueCopy:
         CopyIt := True;
         ClrIO;
@@ -2109,8 +2109,8 @@ TrueCopy:
             JJ := SetFileAttr(q, Attr and not Directory)
           end;
         KillDescrOf := nil;
-          { При копировании каталога описание со старым именем
-            прибивать не надо }
+          { When copying a directory the description with the old name
+            need not be removed }
         end;
       if Abort then
         begin
@@ -2144,10 +2144,10 @@ TrueCopy:
       if Dest[Length(Dest)] = '.' then
         SetLength(Dest, Length(Dest)-1);
       ClrIO;
-      {AK155 Зачем нужен этот кусок - не сразу понятно. Ведь, вроде,
- все это уже сделано в CopyI. Но на самом деле это таки нужно для
- подкаталогов. Конечно, прямее было бы только для подкаталогов это
- и делать, но так тоже ничего - лишняя операция только одна }
+      {AK155 Why this piece is needed is not immediately clear. Seems
+ all this is already done in CopyI. But actually it is needed for
+ subdirectories. Of course it would be more direct to do this only for
+ subdirectories, but this way is also fine - only one extra operation }
       if not CopyPrn then
         begin
         CheckMkDir(Dest);
@@ -2185,12 +2185,12 @@ TrueCopy:
         if not CopyCancel then
           lFindNext(SR);
         end;
-      {AK155 Если при копировании каталога или выделенных файлов
- возникает ошибка чтения, то надо выдать сообщение, а не
- просто молча прекратить копирование. Но цикл нормально
- завершается, когда больше нет файлов, при этом под всеми
- операционками DosError=18. Ошибка 3 возникает на каталоге,
- кторый был успешно перемещён целиком.
+      {AK155 If when copying a directory or selected files
+ a read error arises, a message must be shown, not
+ simply silently stop copying. But the loop ends normally
+ when there are no more files, and under all
+ OSes DosError=18 then. Error 3 arises on a directory
+ that was successfully moved as a whole.
  }
       if  (DosError = 18 {ERROR_NO_MORE_FILES}) or
           (DosError = 3 {PATH_NOT_FOUND})
@@ -2202,7 +2202,7 @@ TrueCopy:
         if Source[2] = ':' then
           Drive := Byte(Source[1]);
         SysErrorFunc(DosError, Drive-Byte('A'));
-        {при этом будет установлен Abort}
+        {Abort will be set then}
         end;
       {/AK155}
       lFindClose(SR);
@@ -2237,7 +2237,7 @@ TrueCopy:
       end;
 
     if CopyPrn or (S[1] = '\') then
-      FreeSpc := 0 // устройство или сетевой адрес
+      FreeSpc := 0 // device or network address
     else
       begin
 TryGetInfo:
@@ -2268,7 +2268,7 @@ TryGetInfo:
           
             begin
             ExportDiz(KillDescrOf, MkName(P.FlName[True]), P.DIZ, CopyDir);
-//            {каталоги!!!}ImportDIZ(LowStrg(P^.FlName[CondLfn]),
+//            {directories!!!}ImportDIZ(LowStrg(P^.FlName[CondLfn]),
 //                 MkName(P^.FlName[CondLfn]), P^.DIZ, P^.Owner)
             end
             
@@ -2299,7 +2299,7 @@ TryGetInfo:
     repeat
       FrPos := -1;
       if Abort then
-        Break; {AK155 Abort может установить SysErrorFunc}
+        Break; {AK155 Abort may be set by SysErrorFunc}
       PD := Dirs.FirstThat(NoCheck);
       if PD = nil then
         Break;
@@ -2331,8 +2331,8 @@ TryGetInfo:
         end;
 
       begin
-      {Cat: раньше следующий кусок выполнялся только для успешно скопированных
-      каталогов, т.е. (P^.Attr and Copied <> 0), а надо бы перечитывать все}
+      {Cat: previously the next piece ran only for successfully copied
+      directories, i.e. (P^.Attr and Copied <> 0), but all should be reread}
       if P^.Attr and Marked = 0 then
         begin
         SSS := CnvString(P^.Owner);
@@ -2350,7 +2350,7 @@ TryGetInfo:
     procedure DoReread(P_: Pointer);
     var P: PString absolute P_;
       begin
-      RereadDirectory('>'+P^); //'>' - признак перечитывания подкаталогов
+      RereadDirectory('>'+P^); //'>' - flag for rereading subdirectories
       end;
 
     begin { __Remove }
@@ -2425,11 +2425,11 @@ qqqq:
     begin
     for C := 'A' to 'Z' do
       if  (C in CD_Drives)
-        and ((GetDriveTypeNew(C) <> dtnCDRom) // чтобы зря не дёргать диск
-//JO: нам здесь важна проверка именно на тип файловой системы,
-//    а не на тип устройства, т.к. именно на CDFS все файлы имеют
-//    атрибут "read-only", который нужно снимать при копировании,
-//    а например для UDF такой необходимости нет
+        and ((GetDriveTypeNew(C) <> dtnCDRom) // so as not to spin the disk for nothing
+//JO: here what matters is checking the filesystem type,
+//    not the device type, because specifically on CDFS all files have
+//    the "read-only" attribute which must be cleared when copying,
+//    while for UDF for example there is no such need
              or (GetFSString(C) <> 'CDFS')) then
           CD_Drives := CD_Drives-[C];
     end
@@ -2464,7 +2464,7 @@ qqqq:
     ClrIO;
     if (StopDlgData and 1) <> 0 then
       begin
-      CopyCancel := False; // чтобы произошла запись
+      CopyCancel := False; // so that writing happens
       MaxWrite;
       end;
     Close(ReadStream.F);
@@ -2510,16 +2510,16 @@ qqqq:
       end;
   SSS := Copy(lFExpand(CopyDir), 1, InhR);
   if  (InhR <> 0) and RR then
-    RereadDirectory('>'+SSS); //'>' - признак перечитывания подкаталогов
+    RereadDirectory('>'+SSS); //'>' - flag for rereading subdirectories
   if SourcePanel <> nil then
     begin
-    { Nil бывает, например, в случае разархивирования по F4 из панели
-    архива. Наверно, просто поставить такое условие - неправильно, а надо
-    бы таки добраться до подвала и перерисовать его, но я не сумел
-    добраться. 17.01.2005}
-    {AK155 10.01.2005 После того, как перерисовка панелей при групповых
-операциях стала делаться по таймеру, возникла проблема отрисовки
-результатов того, что произошло после последнего тика таймера.
+    { Nil happens, for example, when unpacking via F4 from an archive
+    panel. Probably just putting such a condition is wrong, and we ought
+    to reach the footer and redraw it, but I could not
+    reach it. 17.01.2005}
+    {AK155 10.01.2005 After panel redraw during group
+operations started being done on a timer, a problem arose of drawing
+the results of what happened after the last timer tick.
 }
     SourcePanel.DrawView;
     TFilePanelRoot(SourcePanel).InfoView.DrawView;
@@ -2547,7 +2547,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
   var
     PF: PFileRec;
     D: TDialog;
-    P, P1, P2: TView; {JO: P2 - чекбоксы}
+    P, P1, P2: TView; {JO: P2 - checkboxes}
     R: TRect;
     S, S1, S4: String;
     DT: record
@@ -2668,7 +2668,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
   if CopyDirName <> '' then
     S4 := CopyDirName;
   if MoveMode and (S4 = cTEMP_) then
-    S4 := ''; // Move на TEMP: не бывает
+    S4 := ''; // Move to TEMP: never happens
   CopyDirName := '';
   if S4 <> '' then
     begin
@@ -2693,7 +2693,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
       C := S3[1]
     else
       C := GetCurDrive;
-    {Cat:warn могут быть проблемы с сетевыми путями}
+    {Cat:warn there may be problems with network paths}
     if  SystemData.Drives[C] and ossVerify <> 0  then
       WW1 := WW1 or cpoVerify
     else
@@ -2705,7 +2705,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
     end;
 
   if not SkipCopyDialog then
-    begin {AK155 6-12-2001. Собрал до кучи всю работу с диалогом }
+    begin {AK155 6-12-2001. Gathered all dialog work together }
     @PreExecuteDialog := @PrepareDialog;
     if ExecResource(dlgCopyDialog, DT) = cmCancel then
       Exit;
@@ -2719,24 +2719,23 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
   DelRight(S);
   DelLeft(S); {AK155}
   {AK155 22-12-2002
-   Следующий странный фрагмент посвящен, прежде всего, борьбе с
-завуалированной эквивалентностью целевого каталога исходному
-(при копировании каталога). Без этого при существующей реализации
-копирования каталогов при наличии такой эквивалентности на диске
-возникает зацикленная структура каталогов. Например, попробуйте
-закомментировать этот кусок, стать на каталог D, нажать F5 и ввести
-'D.' или 'D.\.\' . Лучше делать это на RAM-диске :)
-Плохо также, когда задается дурацкий вопрос о перезаписи при
-копировании файла типа 'f' в 'f..'
-   С другой стороны, точки и слэши могут встречаться во вполне
-осмысленных сочетаниях типа '..' (ввести руками, чтобы скопировать
-вовне) или D:\D\..\file.ext (D&D одиночного файла на '..') или
-D:\D\.. (D&D нескольких файлов на '..')
-   К этому вопросу прикладывали руки многие, в частности, JO, Cat,
-AK155. При этом то восстанавливалось зацикливание, то становилось
-невозможным какое-то осмысленное копирование. Данная коррекция
-вызвана тем, что в b09 перестал работать D&D одиночного файла
-на точечки UpDir.
+   The following strange fragment is devoted primarily to fighting
+veiled equivalence of the target directory to the source
+(when copying a directory). Without this, with the existing directory-copy
+implementation, such equivalence on disk produces a cyclic
+directory structure. For example, try commenting out this piece,
+stand on directory D, press F5 and enter 'D.' or 'D.\.\' . Better do it
+on a RAM disk :)
+It is also bad when a silly overwrite question is asked when
+copying a file like 'f' to 'f..'
+   On the other hand, dots and slashes may appear in quite
+meaningful combinations like '..' (type by hand to copy
+outward) or D:\D\..\file.ext (D&D of a single file onto '..') or
+D:\D\.. (D&D of several files onto '..')
+   Many hands touched this issue, in particular JO, Cat,
+AK155. At times cycling was restored, at times some meaningful
+copying became impossible. This correction was caused by the fact
+that in b09 D&D of a single file onto UpDir dots stopped working.
 }
   SSS := S; {AK155 02-01-2003}
   I := Length(S);
@@ -2755,12 +2754,12 @@ AK155. При этом то восстанавливалось зациклив�
     end;
   {/AK155 22-12-2002}
 
-  {AK155 02-01-2003 В результате коррекции от 22-12-2002 получалось
-обрезание последней '\', что приводило, например, к невозможности
-скопировать в корень диска ('C:\' превращалось в 'C:' и получалось
-копирование в текущий каталог). Востановление '\' сделано через ':=',
-а не через 'SetLength(S,I+1)', чтобы не закладывать мину на возможный
-будущий переход от ShortString к AnsiString }
+  {AK155 02-01-2003 As a result of the 22-12-2002 correction the last
+'\' was trimmed, which led, for example, to inability to
+copy into the disk root ('C:\' became 'C:' and we got
+copying into the current directory). Restoring '\' is done via ':=',
+not via 'SetLength(S,I+1)', so as not to plant a mine for a possible
+future move from ShortString to AnsiString }
   if  (Length(SSS) > I) and (SSS[I+1] = '\') then
     S := Copy(SSS, 1, I+1);
   {/AK155 02-01-2003}
@@ -2821,11 +2820,11 @@ AK155. При этом то восстанавливалось зациклив�
         if Abort then
           Exit;
         {/AK155
-     Если  при  копировании/перемещении  нескольких  файлов в строке
-ввода  ввести  несуществующее  имя,  и  не  ввести флажок дополнения
-(append),  то первый файл копировался в это имя, а все последующие -
-тоже  в  него, что есть явный абсурд. Теперь в этом случае создается
-каталог с введенным именем и файлы копируются в него.
+     If when copying/moving several files you enter a non-existent
+name in the input line and do not set the append checkbox,
+then the first file was copied to that name, and all subsequent ones -
+also into it, which is clear absurdity. Now in this case a directory
+with the entered name is created and files are copied into it.
 }
         if IsDummyDir(S) or (not DEr and (SR.SR.Attr and Directory <> 0))
         then
@@ -2866,8 +2865,8 @@ AK155. При этом то восстанавливалось зациклив�
   then
     begin
     if SysFileIsDevice(hFile) and $FF <> 0 then
-      {AK155: 'and $FF' необходимо, так как хелп к SysFileIsDevice
-            неправдивый; см. хелп к DosQueryHType}
+      {AK155: 'and $FF' is necessary because the SysFileIsDevice help
+            is untruthful; see the DosQueryHType help}
       I := 1;
     SysFileClose(hFile);
     end;

@@ -61,11 +61,11 @@ uses
 type
   TFilePanelRoot = class;
 
-  {` Базовый тип файловой панели }
+  {` Base type of a file panel }
   TFilePanelRoot = class(TView)
     isValid, MSelect, SelectFlag, Loaded, ChangeLocked: Boolean;
-    SelfNum: Boolean; // Фактически - TPanelNum;
-      {` Какая это панель: правая или левая `}
+    SelfNum: Boolean; // Actually - TPanelNum;
+      {` Which panel this is: right or left `}
     InfoView, DirView, DriveLine, SortView: TView;
     Delta, OldDelta, OldPos, DeltaX: LongInt;
     Files: TFilesCollection;
@@ -78,20 +78,20 @@ type
     TotalInfo: TSize;
     FreeSpace: String[50];
     PanelSetupSet: TPanelSetupSet;
-      {` Блок текущих настроей для всех типов панелей `}
+      {` Block of current settings for all panel types `}
     PanSetup: PPanelSetup;
-      {` Указывает внутрь PanelSetupSet на блок текущего типа панели `}
+      {` Points inside PanelSetupSet to the block of the current panel type `}
     PresetNum: Byte;
-      {` На базе какого номера строились текущие настройки `}
+      {` Based on which number the current settings were built `}
     LFNLen, ExtLen: Byte;
-      {`2 Двоичные копии одноимённых строк из Panel^.PanSetup.Show.
-      Введены только для ускорения доступа. `}
+      {`2 Binary copies of same-named strings from Panel^.PanSetup.Show.
+      Introduced only to speed up access. `}
     LFNLonger250: Boolean;
-      {` Поле имени широкое и должно быть последним `}
+      {` The name field is wide and must be last `}
     DriveLetter: Char;
-      {` Для выбора обозначения диска в линейке дисков и меню дисков;
-        Обычно это Drive^.GetDriveLetter, но в процессе перемещении по полосе
-        дисков может временно быть и другое. `}
+      {` For choosing the disk letter in the disk bar and disk menu;
+        Usually this is Drive^.GetDriveLetter, but while moving along the disk
+        bar it may temporarily be something else. `}
     PrevPresetNum: Byte;
     PrevPanelSetupSet: TPanelSetupSet;
 
@@ -101,7 +101,7 @@ type
     LastCurPos: TPoint;
     SelectedInfoInDividerMin, SelectedInfoInDividerMax: Word; {AK155}
     TotalInfoInDividerMin, TotalInfoInDividerMax: Word; {AK155}
-      {` Кординаты для D&D `}
+      {` Coordinates for D&D `}
     _Tmr1: TEventTimer;
     constructor Create(const Bounds: TRect; ADrive: Integer;
          AScrBar: PMyScrollBar);
@@ -117,94 +117,94 @@ type
     procedure ReadDirectory;
     procedure RereadDir;
     procedure RedrawPanelInfoDir; virtual; {<panelroot.001>}
-      {` Перерисовать панель, подвал и заголовок. Полоса дисков
-      не перерисовывается `}
+      {` Redraw the panel, footer and header. The disk bar
+      is not redrawn `}
     procedure SendLocated;
-     {` Уведомление другой (нефайловой) панели об удержании
-      курсора на файле. Используется для QView и DizView`}
+     {` Notify another (non-file) panel about holding
+      the cursor on a file. Used for QView and DizView`}
     procedure IncDrawDisabled;
     procedure DecDrawDisabled;
     procedure ChkNoMem;
     procedure ChDir(Dir: String);
     procedure SetState(AState: Word; Enable: Boolean); override;
     procedure Reorder;
-      {` Пересортировать файлы в соответствии с текущими (изменившимися)
-      установками сортировки `}
+      {` Re-sort files according to the current (changed)
+      sort settings `}
     function CalcColPos(ColFlag: Word): Integer;
-      {` Подсчитать позицию последней из колонок, отмеченных в ColFlag.
-       Колонка имени и вертикальная линия после неё в счёт позиции
-       не входят. Например, CalcColPos(psnSize)=0. `}
+      {` Calculate the position of the last of the columns marked in ColFlag.
+       The name column and the vertical line after it do not enter
+       the position count. For example, CalcColPos(psnSize)=0. `}
     function CalcLengthWithoutName: Integer;
     function CalcNameLength: Integer;
     function CalcLength: Integer;
     procedure FormatName(P: PFileRec; var S: String; var L: Integer);
-     {` Сформировать строку имени для колонки, L - фактическая ширина
-       (может быть не LFNLen, а 12, если под DualName установлен
-       показ коротких имён) `}
+     {` Form the name string for the column, L - actual width
+       (may be not LFNLen but 12 if under DualName short-name
+       display is set) `}
     procedure GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean); virtual;
-     {` Записать в заранее заполненный буфер B в нужные места Draw-код
-        разделителя колонок (SC). Используется для формирования
-        пустых элементов панели и для соединения разделителя
-        с вертикальными линиями колонок `}
+     {` Write into the pre-filled buffer B at the needed places the Draw-code
+        of the column separator (SC). Used for forming
+        empty panel elements and for joining the separator
+        with vertical column lines `}
     procedure GetParam(i: Integer);
-      {` Загрузить настройки (обычно) из пресета.
-         Собственно номер находится в младших 4 разрядах i. Если в
-      старших разрядах есть что-то ненулевое - настройки загружаются
-      полностью, если одни нули - загружается только секция Show
-      (но для всех классов панелей).
-         Если номер 1..10, то это номер пресета. Настройки и
-      старый номер пресета запоминаются перед загрузкой.
-         Если номер равен 11, то всё аналоагично, но настройки
-      загружаются не из пресета, а из другой панели.
-         Если номер равен 12, то меняются местами настройки
-      текущая и запомненная.
-         Когда задана загрузка только вида и текущая настройка вида
-      совпадает по содержанию с той, которая должна быть загружена,
-      вместо этой бессмысленной загрузки вызывается меню загрузки пресета.
-         См. также CM_ToggleShowMode.
+      {` Load settings (usually) from a preset.
+         The actual number is in the low 4 bits of i. If the
+      high bits have something non-zero - settings are loaded
+      fully; if they are all zeros - only the Show section is loaded
+      (but for all panel classes).
+         If the number is 1..10, that is the preset number. Settings and
+      the old preset number are remembered before loading.
+         If the number is 11, everything is analogous, but settings
+      are loaded not from a preset but from the other panel.
+         If the number is 12, the current and remembered
+      settings are swapped.
+         When only view load is requested and the current view setting
+      matches in content the one that should be loaded,
+      instead of this pointless load the preset-load menu is called.
+         See also CM_ToggleShowMode.
       `}
     procedure Rebound;
     procedure SetupPanelFromDrive;
-      {` После смены Drive принять к использованию секцию настроек,
-      соответствующюю классу нового Drive  `}
+      {` After Drive change, take into use the settings section
+      corresponding to the class of the new Drive  `}
     procedure AddSelected(PF: PFileRec);
-      {` Если PF^ выделен, он учитывается в SelNum, SelectedLen, PackedLen`}
+      {` If PF^ is selected, it is counted in SelNum, SelectedLen, PackedLen`}
     end;
   {`}
 
   {                                                                        }
   { WARNING: The following vars are mirrored in filepanel.PAS via ABSOLUTEs! }
-  { Это был комментарий Cat. Если б он ещё и объяснил, зачем это нужно.
-    Я этот фокус выкинул, вроде, хуже не стало. Так что отбой.}
+  { That was a Cat comment. If only he had also explained why this is needed.
+    I threw this trick out; seems nothing got worse. So cancel.}
 
 const
   ActivePanel: TFilePanelRoot = nil;
-    {` Указатель на активную файловую панель активного менеджера.
-     Устанавливается в TFilePanel.SetState, так что вне этого метода
-     значение этой переменной всегда корректно.`}
+    {` Pointer to the active file panel of the active manager.
+     Set in TFilePanel.SetState, so outside this method
+     the value of this variable is always correct.`}
   PassivePanel: TFilePanelRoot = nil;
-    {` Указатель на пассивную файловую панель активного менеджера.
-    см. ActivePanel. `}
+    {` Pointer to the passive file panel of the active manager.
+    see ActivePanel. `}
   CtrlWas: Boolean = False;
-    {` Был зажат Ctrl вместе со стрелками. Используется для ускоренного
-    просмотра файлов в панели (типа Ctrl-Up, Up, отпустить Ctrl.
-    Интересно, что аналогичное слежение за отпусканием Ctrl при
-    перемещении по полосе дисков делается при помощи цикла с опросом
-    события, см. обработку kbCtrlLeft `}
+    {` Ctrl was held together with arrows. Used for accelerated
+    file viewing in the panel (like Ctrl-Up, Up, release Ctrl).
+    Interestingly, similar watching for Ctrl release when
+    moving along the disk bar is done with a loop polling
+    the event, see kbCtrlLeft handling `}
   DirsToChange: array[0..9] of PString = (nil, nil, nil, nil, nil, nil,
      nil, nil, nil, nil);
   QuickSearch: Boolean = False;
-  {AK155 5-01-2002. До этого было такое поле
-в TFilePanelRoot и в Tree.TTreeView. Поскольку по логике использования
-QuickSearch может быть только один, естественным решением является
-глобальная переменная, а от ее размазывания по объектам ничего, кроме
-глюков быть не может. Поводом для превращения этих поле в глобальную
-переменную послужило желание проанализировать ее в TCommandLine.Update }
+  {AK155 5-01-2002. Before that there was such a field
+in TFilePanelRoot and in Tree.TTreeView. Since by usage logic
+there can be only one QuickSearch, the natural solution is a
+global variable, and smearing it across objects can give nothing but
+glitches. The reason for turning these fields into a global
+variable was the wish to analyze it in TCommandLine.Update }
 
-//JO: не делаем сортировку в TFilePanelRoot.ReadDirectory
-//    значение True задаётся в процедурах поиска чтобы не сортировать
-//    панель с результатами поиска; важно следить, чтобы на выходе из
-//    процедуры всегда было значение False
+//JO: we do not sort in TFilePanelRoot.ReadDirectory
+//    True is set in search procedures so as not to sort
+//    the panel with search results; important to ensure that on exit from
+//    the procedure the value is always False
   RereadNoSort: Boolean  = False;
 
 var
@@ -321,14 +321,14 @@ constructor TFilePanelRoot.Load(S: TStream);
   OldDelta := -1;
   PosChanged := False;
   S.Read(ForceReading, 1);
-//JO: 11-05-2006 - закомментаpенные ниже стpоки были ещё в pитлабовской
-//    веpсии; Для чего это нужно - не вполне понятно, но их наличие
-//    поpождает такой застаpелый глюк: пpи загpузке панели поиска или ветви
-//    у файла, котоpый является текущим, почему-то путь заменяется на
-//    значение Drive^.CurDir; После закомментаpивания никаких глюков или
-//    дополнительных тоpмозов на пеpвый взгляд не замечено, а учитывая, что
-//    в констpуктоpе Init значение Files не инициализиpуется, то можно его
-//    не инициализиpовать и в Load
+//JO: 11-05-2006 - the lines commented out below were still in the RIT Labs
+//    version; What they are for is not entirely clear, but their presence
+//    causes this long-standing glitch: when loading a find panel or branch
+//    for the file that is current, somehow the path is replaced with
+//    the value of Drive^.CurDir; After commenting out, no glitches or
+//    extra slowdowns are noticeable at first glance, and given that
+//    in the Init constructor Files is not initialized, it can also
+//    be left uninitialized in Load
 { Files := PFilesCollection(S.Get);
   if Files <> nil then
     for I := 0 to Files^.Count-1 do
@@ -344,7 +344,7 @@ constructor TFilePanelRoot.Load(S: TStream);
 procedure TFilePanelRoot.Awaken;
   begin
   SetupPanelFromDrive;
- {! AK155 27.04.05 И без всего ниженаписанного нормально работает }
+ {! AK155 27.04.05 And without everything written below it works fine }
 (*
   RereadDir;
   if  (DriveLine <> nil) then
@@ -381,7 +381,7 @@ procedure TFilePanelRoot.Store(S: TStream);
   S.Write(Delta, 2);
   S.Write(ForceReading, 1);
  {PFilesCollection(Files).Selected := ScrollBar^.Value;
-  S.Put(Files);} //JO: 11-05-2006 - см. комментаpий к TFilePanelRoot.Load;
+  S.Put(Files);} //JO: 11-05-2006 - see the comment to TFilePanelRoot.Load;
   end { TFilePanelRoot.Store };
 
 function TFilePanelRoot.Valid(Command: Word): Boolean;
@@ -405,14 +405,14 @@ destructor TFilePanelRoot.Destroy;
     begin
     ActivePanel := nil;
     PassivePanel := nil;
-    { панели уничтожаются только обе сразу, так что эти указатели
-    можно очистить за один раз }
+    { panels are destroyed only both at once, so these pointers
+    can be cleared in one go }
     end;
   inherited Destroy;
   end;
 
 procedure TFilePanelRoot.SetState(AState: Word; Enable: Boolean);
-   {По существу это используется при смене на нефайловую панель и обратно}
+   {Essentially this is used when switching to a non-file panel and back}
   var
     SortEn: Boolean;
   begin
@@ -453,15 +453,15 @@ procedure TFilePanelRoot.ChangeBounds(const Bounds: TRect);
     end;
   if InfoView <> nil then
     begin
-    if Loaded then { Без этого InfoView^.Draw может зациклиться }
+    if Loaded then { Without this InfoView^.Draw may loop }
       LineLength := CalcLength;
     TInfoView(InfoView).CompileShowOptions;
-      { При этом определится InfoView^.Size.Y }
+      { Along with that InfoView^.Size.Y will be determined }
     InfoViewHeight := InfoView.Size.Y;
     R := NewBounds;
     R.A.Y := R.B.Y-InfoViewHeight;
-    InfoView.SetBounds(R); {Тут может быть изменение Size.X}
-    { Перерисоваться InfoView^ еще успеет, и опять таки, обычно, не один раз}
+    InfoView.SetBounds(R); {Here Size.X may change}
+    { InfoView^ will still have time to redraw, and again, usually more than once}
     Dec(NewBounds.B.Y, InfoViewHeight);
     end;
   SetBounds(NewBounds);
@@ -516,7 +516,7 @@ procedure TFilePanelRoot.RereadDir;
     BB: Boolean;
     TF: TFileRec;
     WasLoaded, B: Boolean;
-    PanelHeight: Integer; // Высота панели без строки заголовков колонок
+    PanelHeight: Integer; // Panel height without the column-headers line
 
   begin
   PanelHeight := Size.Y-Byte((Pansetup.Show.MiscOptions and 2) <> 0);
@@ -551,7 +551,7 @@ procedure TFilePanelRoot.RereadDir;
     end;
   ClrIO;
   Loaded := False;
-(* AK155 Зачем бы мог понадобиться этот кусок - непонятно
+(* AK155 Why this piece might have been needed - unclear
   RedrawPanelInfoDir;
   if Abort then
     begin
@@ -619,7 +619,7 @@ procedure TFilePanelRoot.RereadDir;
               begin
               l := TFileRecFixedSize+Length(PP^.FlName[True]);
               Move(PP^, TF, l);
-              TF.UsageCount := 1; { заведомо P^.UsageCount=1 }
+              TF.UsageCount := 1; { surely P^.UsageCount=1 }
               P^.UsageCount := PP^.UsageCount;
               Move(P^, PP^, l);
               Move(TF, P^, l);
@@ -673,7 +673,7 @@ procedure TFilePanelRoot.RedrawPanelInfoDir;
     DirView.DrawView;
   if SortView <> nil then
     SortView.SetState(sfVisible, (FMSetup.Show and fmsSortIndicator) <> 0);
-      { испоьзуется, например, при загрузке десктора }
+      { used, for example, when loading a desktop }
   end;
 
 {-DataCompBoy-}
@@ -684,7 +684,7 @@ procedure TFilePanelRoot.ReadDirectory;
   if  (Owner <> nil) and
       (TDoubleWindow(Owner).NonFilePanelType = dtQView)
   then
-    NeedLocated := GetSTime; {чтобы сменить показ каталога}
+    NeedLocated := GetSTime; {to change directory display}
   LineLength := CalcLength;
   Drive.Panel := Self;
   case Drive.DriveType of
@@ -704,9 +704,9 @@ procedure TFilePanelRoot.ReadDirectory;
   if Files <> nil then
     begin
     Files.Free;
-//JO: если нижележащего присвоения nil здесь не делать, то при вызове
-//    любого диалога изнутри Drive^.GetDirectory с большой вероятностью
-//    происходит падение после его закрытия
+//JO: if the nil assignment below is not done here, then when calling
+//    any dialog from inside Drive^.GetDirectory there is a high chance
+//    of a crash after closing it
     Files := nil;
     end;
   Files := TFilesCollection(Drive.GetDirectory(
@@ -736,17 +736,17 @@ procedure TFilePanelRoot.ReadDirectory;
     SM := psmUnsorted;
   TFilesCollection(Files).SortMode := SM;
 
-  { Бывает сортировка по описаниям, поэтому Sort надо делать
-  после ReadDescrptions }
+  { There can be sorting by descriptions, so Sort must be done
+  after ReadDescrptions }
   if SM <> psmUnsorted then
     Files.Sort;
   if Abort then
     Exit;
 
   Files.DelDuplicates(TotalInfo);
-    { Дупы возможны после поиска в панели списка с обходом
-      подкаталогов, если файлы из подкаталогов присутствовали
-      и на верхнем уровне тоже.}
+    { Dupes are possible after a search in a list panel with subdirectory
+      traversal, if files from subdirectories were present
+      at the top level too.}
 
   if DriveState and dsInvalid > 0 then
     Exit;
@@ -797,13 +797,13 @@ procedure TFilePanelRoot.GetUserParams(var FileRec: PFileRec; var List: String; 
     else
       S := '';
     List := SwpDir+'$dn'+ItoS(DNNumber)+S+'.lst';
-    {JO: вот здесь - очень спорный момент. Раньше список в виндовой версии       }
-    {    создавался по коротким именам, теперь - по тем, которые видно. И то,    }
-    {    и другое - спорное решение, в идеале в формате dn.mnu , dn.xrn и прочих }
-    {    местах, где этот список используется должна быть явная возможность      }
-    {    указать, по каким именам создаётся список, но сейчас её нет             }
-    {    (используются только макросы %1 и %2 для активной и пассивной панели    }
-    {    соответственно)                                                         }
+    {JO: here is a very debatable point. Previously the list in the Windows version       }
+    {    was built by short names, now - by those that are visible. Both                }
+    {    are debatable decisions; ideally in the dn.mnu, dn.xrn format and other        }
+    {    places where this list is used there should be an explicit ability             }
+    {    to specify by which names the list is built, but there is none now             }
+    {    (only macros %1 and %2 for the active and passive panel                        }
+    {    respectively are used)                                                         }
 
     {Make list}
     
@@ -863,7 +863,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
       Dec(A);
       if UpStrg(PFileRec(Files.At(A))^.FlName[True]) = Name then
         Break;
-      {AK155 странно, почему тут сравнивается только длинное имя. }
+      {AK155 strange why only the long name is compared here. }
       end;
     IncDrawDisabled;
     OldDirectory := DirectoryName;
@@ -937,10 +937,10 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if ChangeLocked then
       Exit;
 
-    {JO: дабы перейти к найденному файлу в архиве из панели поиска}
+    {JO: so as to go to the found file in an archive from the find panel}
     PathInside := FileName;
     if PathInside[2] = ':' then
-      PathInside[2] := ';'; {JO: меняем двоеточие не важно на что }
+      PathInside[2] := ';'; {JO: replace the colon with anything }
     I := PosChar(':', PathInside);
     if I > 0 then
       begin
@@ -958,7 +958,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if ((Dr[2] = ':') or (Copy(Dr, 1, 2) = '\\'))
          and not (Drive.DriveType in [dtDisk, dtLink, dtArc])
     then
-      { переходим с панели поиска, списка и т.п. на диск }
+      { switch from find panel, list etc. to disk }
       begin
       Drive.Free;
       Drive := TDrive.Create(Byte(UpCase(Dr[1]))-64, Self);
@@ -969,7 +969,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     DeltaX := 0;
     DirectoryName := Drive.GetDir;
     Drive.lChDir(Dr); {AK155, was Drive^.lChDir(DirectoryName);}
-{JO: не перечитываем сетевой каталог, из которого не вышли}
+{JO: do not reread a network directory we have not left}
     if (Drive.DriveType = dtNet)
        and (DirectoryName = Drive.GetDir) then
       begin
@@ -979,7 +979,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
 {/JO}
     DriveLetter := Drive.GetDriveLetter;
     DirectoryName := Drive.GetDir;
-{JO: переходим с панельки Network на шару}
+{JO: switch from the Network panel to a share}
     if (Drive.DriveType = dtNet)
         and (Copy(DirectoryName, 1, 2) = '\\') then
       begin
@@ -995,7 +995,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     AddToDirectoryHistory(DirectoryName, Integer(Drive.DriveType));
     DecDrawDisabled;
 
-    {JO: переходим к найденному файлу в архиве}
+    {JO: go to the found file in an archive}
     if  (PathInside <> '') then
       begin
       Drv := nil;
@@ -1101,15 +1101,15 @@ WrongArc:
     if  (PF = nil) then
       Exit;
     if (PF^.TType = ttUpDir) then
-      Files.ForEach(DoCount) // в том числе и отмеченные
+      Files.ForEach(DoCount) // including selected ones
     else
-      begin // отмеченные и текущий каталог
+      begin // selected ones and the current directory
       if (SelNum <> 0) then
         Files.ForEach(DoSelCount);
       if (PF^.Attr and Directory <> 0) and (PF^.Size < 0) then
         Drive.GetDirLength(PF)
       else if SelNum = 0 then
-        Exit; // отмеченных нет, а этот и так известен
+        Exit; // there are no selected ones, and this one is already known anyway
       end;
     Abort := False;
     Recount;
@@ -1296,14 +1296,14 @@ WrongArc:
     if  (ShiftState and kbAltShift <> 0) then
       ExecLFN := ExecLFN xor InvLFN;
     FreeStr := PF^.FlName[ExecLFN];
-    {Cat: в DN/2 не надо добавлять точку в конце имени}
+    {Cat: in DN/2 need not add a dot at the end of the name}
     (*
    if PosChar('.', FreeStr) = 0 then AddStr(FreeStr, '.');
 *)
     if  (ShiftState and (kbLeftShift+kbRightShift) <> 0) then
       begin
       
-      LongName := { В колонках LFN, и Alt _не_ нажат, или наоборот }
+      LongName := { In LFN columns, and Alt is _not_ pressed, or vice versa }
         (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0) = { Flash 23.05.2005 }
         (ShiftState and kbAltShift = 0);
       if LongName then
@@ -1391,7 +1391,7 @@ WrongArc:
     begin
     S := CnvString(Event.InfoPtr);
     S1 := S;
-    if S[1] = '>' then //признак перечитывания подкаталогов в ветви
+    if S[1] = '>' then // flag for rereading subdirectories in a branch
       S := Copy(S, 2, MaxStringLength);
     MakeNoSlash(S);
     I := Length(S);
@@ -1426,7 +1426,7 @@ WrongArc:
       HistoryAdd(Event.InfoByte, S);
     end;
 
-{ Смена диска через меню Alt-F1/F2 }
+{ Change disk via Alt-F1/F2 menu }
   procedure _ChangeDrive;
     var
       S: String;
@@ -1563,10 +1563,10 @@ WrongArc:
           end;
         if Drive.DriveType <> dtDisk then
           ReplaceDrive(S[1]);
-        {JO: раньше при переходе к списку из истории каталогов текущий }
-        {    каталог не менялся и, соответственно, список не находил   }
-        {    файлов, находящихся в его каталоге. Для исправления этого }
-        {    нижележащая строка                                        }
+        {JO: previously when going to a list from directory history the current }
+        {    directory did not change and accordingly the list did not find     }
+        {    files that were in its directory. To fix this                      }
+        {    the line below                                                     }
         Drive.lChDir(GetPath(S));
 
         Message(Self, evCommand, cmInsertDrive, TFindDrive.Create(S))
@@ -1673,7 +1673,7 @@ WrongArc:
       if  (ShiftState and kbAltShift <> 0) then
         ExecLFN := ExecLFN xor InvLFN;
       S := PF^.FlName[ExecLFN];
-      {Cat: в DN/2 не надо добавлять точку в конце имени}
+      {Cat: in DN/2 need not add a dot at the end of the name}
       (*
     if (PF^.Attr and Directory = 0) and
        (PosChar('.', S) = 0) then AddStr(S, '.');
@@ -1800,9 +1800,9 @@ WrongArc:
       begin
       if Drive.DriveType = dtArcFind
       then
-//JO: смысл громоздкой конструкции внизу - выделить путь к архиву из
-//    Owner'а UpFile (т.е. точечек '..') панели найденного в архиве и
-//    присоединить к нему путь к файлу внутри данного архива
+//JO: the point of the bulky construct below is to extract the path to the archive from
+//    the Owner of UpFile (i.e. the '..' dots) of the found-in-archive panel and
+//    append to it the path to the file inside this archive
         S := MakeNormName(
           Copy(TFindDrive(Drive).UpFile^.Owner^, 1, Pos(':',
            Copy(TFindDrive(Drive).UpFile^.Owner^, 3, MaxStringLength))+2)
@@ -1810,7 +1810,7 @@ WrongArc:
       else
         S := MakeNormName(PF^.Owner^, PF^.FlName[uLfn]);
       (*
-{JO: переходим к найденному файлу в архиве}
+{JO: go to the found file in an archive}
       if PathFoundInArc(PF^.Owner^) and
           ArcViewer(S, S, FreeByte) then
             begin
@@ -1860,14 +1860,14 @@ WrongArc:
     if  (PF^.Attr and Directory = 0) then
       begin
       if not ArcViewer(S, S) then
-        {AK155: по CtrlPgDn входим в архив}
+        {AK155: with CtrlPgDn we enter an archive}
         _Enter
       else if PathFoundInArc(S) then
-        {JO: переходим к найденному файлу в архиве    }
+        {JO: go to the found file in an archive    }
         GotoSingle(PF^.FlName[True]);
       end
     else
-      begin { Входим в каталог }
+      begin { Enter a directory }
       S := MakeNormName(S, '.');
       GotoFile(S);
       end;
@@ -1917,7 +1917,7 @@ WrongArc:
       
       CondLfn: TUseLFN; {JO}
       
-      PanelHeight: Integer; // Высота панели без строки заголовков колонок
+      PanelHeight: Integer; // Panel height without the column-headers line
     begin
     PanelHeight := Size.Y-Byte((Pansetup.Show.MiscOptions and 2) <> 0);
     case DNKeyCode(Event) of
@@ -2038,7 +2038,7 @@ WrongArc:
       kbUp, kbDown, kbUpUp, kbDownUp:
         begin
         CtrlWas := ShiftState and kbCtrlShift <> 0;
-           {AK155 IMHO это место недостижимо, так как событие съедает
+           {AK155 IMHO this place is unreachable, because the event is eaten by
            TFilePanel }
         end;
       kbCtrlR:
@@ -2073,7 +2073,7 @@ WrongArc:
         begin
         if  (Drive.DriveType = dtDisk) then
           begin
-          {JO: сохраняем в S имя каталога верхнего уровня для текущего}
+          {JO: save in S the top-level directory name for the current}
           s := Drive.CurDir+'\';
           l := GetRootStart(s)+1;
           s := Copy(s, l, PosChar('\', Copy(s, l, MaxStringLength))-1);
@@ -2121,7 +2121,7 @@ WrongArc:
           Recount;
           CE;
           end;
-      { Flash 23.05.2005: Добавлено взятие короткого имени с путём }
+      { Flash 23.05.2005: Added taking short name with path }
       kbCtrlIns, kbCtrlShiftIns, kbCtrlAltIns, kbCtrlAltShiftIns:
         {if ShiftState and kbCtrlShift<>0 then}_CtrlIns;
       kbCtrlEnter, kbCtrlShiftEnter, kbCtrlAltEnter:
@@ -2507,8 +2507,8 @@ WrongArc:
         cmEraseGroup:
           EraseGroup;
         cmFindTree:
-          (* {fmiDirLen упраздняется, так что ничего не остаётся.
-              А с самой cmFindTree тоже надо бы разобраться }
+          (* {fmiDirLen is abolished, so nothing remains.
+              And cmFindTree itself should also be figured out }
           if  (Drive^.DriveType = dtDisk) and
               (PanelFlags and fmiDirLen <> 0) and
               (Char(Event.InfoPtr^) = DirectoryName[1])
@@ -2851,9 +2851,9 @@ WrongArc:
             CE;
             end;
 
-        (*AK155 19-06-2002. Такого, вроде, не бывает никогда. Почти идентичный
-кусок есть в filepanel, так он действительно работает. И если тот кусок
-закоментарить, то DN глючит, но сюда управление все равно не попадает.
+        (*AK155 19-06-2002. Something like this never happens, it seems. An almost identical
+piece is in filepanel, and that one actually works. And if that piece
+is commented out, DN glitches, but control still never gets here.
                  cmScrollBarChanged: if ScrollBar = Event.InfoPtr then begin
                                       if MSelect then
                                         begin
@@ -2887,11 +2887,11 @@ WrongArc:
       MakeLocal(Event.Where, MPos);
       if 
          (PanSetup.Show.ColumnsMask and psLFN_InColumns = 0) or
-           { Ширина колонки короткого имени не меняется }
+           { Short-name column width does not change }
          
          ((MPos.X mod LineLength) <> LFNLen)
       then
-        begin { D&D файла }
+        begin { File D&D }
         if  (MPos.Y = 0) and ColumnTitles then
           begin
           LastRDelay := RepeatDelay;
@@ -3020,7 +3020,7 @@ WrongArc:
                   CE;
                  end*)
       else
-        begin { Изменение мышью ширины колонки "Имя" }
+        begin { Changing "Name" column width with the mouse }
         PSDEL := MPos.X div LineLength;
         repeat
           if MPos.X-LineLength*PSDEL-EXTLen >= 5 then
@@ -3065,17 +3065,17 @@ procedure TFilePanelRoot.Reorder;
     ScrollBarValue: LongInt;
   begin
   if Files = nil then
-    Exit; //AK155 на всякий случай; бывает ли nil - не знаю
+    Exit; //AK155 just in case; whether nil happens - I do not know
   Files.SortMode := PanSetup^.Sort.SortMode;
   if PanSetup^.Sort.SortMode = psmUnsorted then
-    RereadDir { Несортированный - это такой, как читается с диска;
-      но поскольку первоначальный порядок мы уже потеряли, надо
-      перечитать заново }
+    RereadDir { Unsorted is as read from disk;
+      but since we already lost the original order, must
+      reread anew }
   else
     begin
     ScrollBarValue := ScrollBar.Value;
     if ScrollBarValue >= Files.Count then
-      Exit; { AK155 IMHO так бывает только как 0 >= 0 }
+      Exit; { AK155 IMHO this only happens as 0 >= 0 }
     Cur := Files.At(ScrollBarValue);
     Files.Sort;
     for ScrollBarValue := 0 to Files.Count-1 do
@@ -3109,9 +3109,9 @@ function TFilePanelRoot.CalcColPos(ColFlag: Word): Integer;
         Result := MaxViewWidth;
         Exit;
         end;
-      if L = -2 then {время}
+      if L = -2 then {time}
         L := 7-CountryInfo.TimeFmt;
-          {для 24-часового формата - 6, для 12-часового - 7}
+          {for 24-hour format - 6, for 12-hour - 7}
       Inc(Result, L);
       end;
     Flags := Flags shr 1;
@@ -3159,12 +3159,12 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
   if P^.Selected and (Startup.FMSetup.TagChar[1] <> ' ') then
     OPT := OPT+flnSelected;
 
-{Табулировать расширение
+{Tabulate extension
  ┌──────────────────────────┐
- │         Никогда          │ 0
- │      Если оно есть       │ 1
- │  Если оно не помещается  │ 2
- │          Всегда          │ 3
+ │         Never            │ 0
+ │      If it exists        │ 1
+ │  If it does not fit      │ 2
+ │          Always          │ 3
  └──────────────────────────┘
 }
   W := PosLastDot(S);
@@ -3217,11 +3217,11 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
   if P^.Attr and Directory <> 0 then
     begin
 {          ┌────────────┐
-Регистр им │  кАк еСТь  │ 0
-  Каталого │   малыми   │ 1
-  .......  │ С большой  │ 2
-           │  БОЛЬШИМИ  │ 3
-           │    авто    │ 4
+Name case │  aS iS      │ 0
+  of dirs │   lower     │ 1
+  .......  │ Capitalized │ 2
+           │  UPPER      │ 3
+           │    auto     │ 4
            └────────────┘ }
     case Pansetup.Show.DirRegister of
       1:
@@ -3236,7 +3236,7 @@ procedure TFilePanelRoot.FormatName(P: PFileRec; var S: String; var L: Integer);
     end {case};
     end
   else
-    begin { Аналогично }
+    begin { Similarly }
     case Pansetup.Show.FileRegister of
       1:
         OPT := OPT or flnLowCase;
@@ -3276,9 +3276,9 @@ procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean)
       L := FileColWidht[i];
       if L = -1 then
         Exit;
-      if L = -2 then {время}
+      if L = -2 then {time}
         L := 7-CountryInfo.TimeFmt;
-          {для 24-часового формата - 6, для 12-часового - 7}
+          {for 24-hour format - 6, for 12-hour - 7}
       if L <> 0 then
         begin
         inc(X, L);
@@ -3304,9 +3304,9 @@ procedure TFilePanelRoot.SetupPanelFromDrive;
     
     and (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0)
     ;
-    {JO: если ширина колонки имени больше 250 символов,
-     её показываем после остальных колонок}
-  if Owner <> nil { nil бывает во время Load } then
+    {JO: if the name column width is more than 250 characters,
+     show it after the other columns}
+  if Owner <> nil { nil happens during Load } then
     TDoubleWindow(Owner).SetMaxiState(Self);
   end;
 
@@ -3316,7 +3316,7 @@ procedure TFilePanelRoot.AddSelected(PF: PFileRec);
   if Selected then
     begin
     if Size > 0 then
-      begin { у каталога с неизвестным размером Size=-1}
+      begin { for a directory with unknown size Size=-1}
       SelectedLen := SelectedLen + Size;
       PackedLen := PackedLen + PSize;
       end;
@@ -3337,15 +3337,15 @@ procedure TFilePanelRoot.GetParam(i: Integer);
   ShowOnly := (i and not $0F) = 0;
   PC := dt2pc[Drive.DriveType];
   case NewPresetNum of
-   1..10: { Пресет }
+   1..10: { Preset }
     NewSetupSet := PanSetupPreset[NewPresetNum];
-   11: { Другая панель }
+   11: { Other panel }
     begin
     P := OtherFilePanel(Self);
     NewSetupSet := P.PanelSetupSet;
     NewPresetNum := P.PresetNum;
     end;
-   else {12, Откат }
+   else {12, Rollback }
     begin
     NewSetupSet := PrevPanelSetupSet;
     NewPresetNum := PrevPresetNum;
@@ -3354,13 +3354,13 @@ procedure TFilePanelRoot.GetParam(i: Integer);
   if ShowOnly and MemEqual(PanelSetupSet[PC].Show, NewSetupSet[PC].Show,
        SizeOf(TPanelShowSetup))
   then
-    begin { Задана загрузка вида, совпадающего с текущим }
+    begin { View load matching the current one is requested }
     if not MenuOnError or (NewPresetNum <> PresetNum) then
       PresetNum := NewPresetNum
     else
       CM_SelectColumn(Self);
-      { Тут возможна рекурсия, но её глубина ограничена усердием
-      пользователя в нажимании одного и того же }
+      { Recursion is possible here, but its depth is limited by the user's
+      diligence in pressing the same thing }
     Exit;
     end;
 
@@ -3387,7 +3387,7 @@ procedure TFilePanelRoot.GetParam(i: Integer);
       Reorder;
     end;
   SetupPanelFromDrive;
-  Rebound; { могли измениться и панели, и подвал; заодно и перерисуем всё }
+  Rebound; { both panels and the footer may have changed; redraw everything while at it }
   Owner.UnLock;
   end {TFilePanelRoot.GetParam};
 
@@ -3400,7 +3400,7 @@ procedure TFilePanelRoot.Rebound;
   R.B.Y := Owner.Size.Y-1;
   ChangeBounds(R);
   SortView.SetState(sfVisible, (FMSetup.Show and fmsSortIndicator) <> 0);
-    { используется при смене видимости индикатора в setups.FMSetup }
+    { used when changing indicator visibility in setups.FMSetup }
   Owner.Redraw;
   end;
 
