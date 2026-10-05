@@ -91,8 +91,8 @@ type
     lb: TPktList;
     constructor Create(FName: String; C: TPktCol);
     destructor Done; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function GetPalette: TPalette; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    function GetPalette: TPalette; override;
     end;
 
   TLineViewer = class(TScroller)
@@ -121,8 +121,8 @@ type
          MsgN: Word; AllMsg: Word;
         FA, TA: TNetAddr);
     destructor Done; virtual;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure SaveAsText;
     end;
 
@@ -132,8 +132,8 @@ type
     FV: TMsgViewer;
     constructor Create(FName: String);
     destructor Done; virtual;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure GotoMsg;
     procedure SaveAsText;
     end;
