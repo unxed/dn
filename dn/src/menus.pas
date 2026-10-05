@@ -173,7 +173,7 @@ type
     constructor Create(var Bounds: TRect; AMenu: PMenu);
     destructor Destroy; override;
     procedure Draw; override;
-    procedure GetItemRect(Item: PMenuItem; var R: TRect); virtual;
+    procedure GetItemRect(Item: PMenuItem; var R: TRect); override;
     function Execute: Word; override;
     end;
 
@@ -195,7 +195,7 @@ type
     constructor Create(var Bounds: TRect; AMenu: PMenu;
         AParentMenu: TMenuView);
     procedure Draw; override;
-    procedure GetItemRect(Item: PMenuItem; var R: TRect); virtual;
+    procedure GetItemRect(Item: PMenuItem; var R: TRect); override;
     function Execute: Word; override;
     function RightExpand: Boolean; virtual;
     function LeftCollapse: Boolean; virtual;
@@ -1107,7 +1107,7 @@ GrayPlus, GrayMinus, F2, F10, F11, F12 }
             end;
           end;
       evCommand:
-        if Event.Command = cmMenu then
+        if (Event.Command = cmMenu) or (Event.Command = cmMainMenu) then
           DoSelect;
       evBroadcast:
         if Event.Command = cmCommandSetChanged then

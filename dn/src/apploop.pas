@@ -240,6 +240,15 @@ procedure MyApp.GetEvent(var Event: TEvent);
           CurrentMacro.PutKey(DNKeyCode(Event));
         if  (StatusLine <> nil) then
           StatusLine.HandleEvent(Event);
+        { F10 opens DN's menu bar.  Keep this explicit fallback because
+          the status-line view is not the owner of the menu command. }
+        if (Event.What = evKeyDown) and
+           ((DNKeyCode(Event) = kbF10) or (Event.ScanCode = Hi(kbF10))) then
+          begin
+          Event.What := evCommand;
+          Event.Command := cmMenu;
+          Event.InfoPtr := nil;
+          end;
         end;
       end;
   end {case};
