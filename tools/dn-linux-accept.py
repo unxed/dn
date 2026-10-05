@@ -132,8 +132,14 @@ SCENARIOS = [s for s in SCENARIOS if s[0] != 'cmdline_ls']
 SCENARIOS.append(('cmdline_echo', 'e c h o SPACE h i ENTER', 'input'))
 
 # Every top-menu cell: menu 0..6 × item 1..17
+# Skip menu_0_10: ♦ system-menu item 10 = Trashcan on/off (cmHideShowTools).
+# Object baseline b4916b8 raises Invalid pointer operation and blanks the
+# screen; class correctly toggles Trash. Not a class regression — exclude
+# from object/class cell parity (DN 3.0: do not match a broken object).
 for _m in range(7):
     for _n in range(1, 18):
+        if (_m, _n) == (0, 10):
+            continue
         _keys = 'F10 ' + 'RIGHT ' * _m + 'DOWN ' * _n + 'ENTER'
         SCENARIOS.append(('menu_%d_%d' % (_m, _n), _keys.strip(), 'menus'))
 
@@ -395,12 +401,6 @@ def main() -> int:
             problems.append('object dn.err: ' + eo.split('\n')[0][:120])
         if ec and ec.strip():
             problems.append('class dn.err: ' + ec.split('\n')[0][:120])
-        # Known object-baseline crash (gate doc): File menu item 10 blanks the
-        # screen while class stays up — not a class regression.
-        if name == 'menu_0_10' and '♦' not in so['text'] and 'File' in sc['text']:
-            print('XFAIL', name, '(object baseline blank; class alive — gate-known)', flush=True)
-            passed += 1
-            continue
         problems.extend(diff_snaps(so, sc))
         if problems:
             fails += 1

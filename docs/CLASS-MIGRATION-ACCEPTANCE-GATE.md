@@ -69,8 +69,10 @@ The corrected 24-scenario PTY tour completed on earlier builds, but it did not
 exercise every action or provide a reproducible exact-cell comparison for
 every checkpoint. A separate full menu-cell probe exposed actionable
 differences: at menu item `(0,4)` the class build raised an access violation
-where the object build completed normally; at `(0,10)` the object build ended
-with a pointer-operation fatal error while the class build remained on screen.
+where the object build completed normally; at `(0,10)` (♦ system menu,
+Trashcan on/off / `cmHideShowTools`) the object build ended with an Invalid
+pointer operation while the class build showed Trash correctly. The accept
+harness excludes `menu_0_10` from the menu grid for that object-only crash.
 Changing language also raised an access violation in the class build. The
 language-menu crash was traced to interpreting a `TStringCollection`
 ShortString item as an AnsiString. A diagnostic-only ShortString correction
