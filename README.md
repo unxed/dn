@@ -34,6 +34,11 @@ that calls `tools/build.sh` and installs the binary plus resources under
 `$(PREFIX)/lib/dn` with a small wrapper in `$(PREFIX)/bin/dn` (`PREFIX` defaults to
 `/usr/local`; `DESTDIR` is honoured). Example: `make && sudo make install`.
 
+The installed wrapper (when started as root) may check GitHub Releases every tenth
+run and stage an update for the next launch (`tools/dn-autoupdate.sh`, issue #4).
+Turn off with `DN_AUTOUPDATE=0` or `touch /var/lib/dn/disabled`. Needs a published
+`linux64` release asset from issue #1.
+
 You need: `fpc` 3.2.x (check with `fpc -iV`; on Debian/Ubuntu `sudo apt install fp-compiler fp-units-rtl`), `python3`, `git`. Nothing else (no Lazarus, no libraries).
 
     git clone --recurse-submodules https://github.com/unxed/dn && cd dn     # tv/ is the submodule unxed/tv; the scripts fetch it themselves if you forgot
