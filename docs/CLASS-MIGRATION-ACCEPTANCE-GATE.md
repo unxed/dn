@@ -4,59 +4,54 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
-Current gate status: **OPEN**. The classic baseline was identified as
-`unxed/dn` `backup/before-history-rewrite-2026-10-03` and builds successfully
-with the classic `unxed/tv` `main` revision `c9bb5c4`. Initial identical PTY
-checks for startup/exit and top-level menu rendering have been run against
-that baseline and the current build; the complete matrix is still pending.
-The full `dn-linux-tour.py` run was stopped because its first baseline scenario
-did not return; this is recorded as an acceptance-runner failure, not as a
-passing result. Direct targeted PTY checks for baseline startup/exit and menu
-rendering did return successfully.
-The first bitwise startup/menu comparison found a **FAIL**: 2722 cell states
-differ, including foreground/background attributes (for example, baseline
-background index 6 versus class-build background index 2). Investigation
-traced this to a palette revision: the classic binary uses the older
-red/magenta OSP table, while the class source explicitly installs the newer
-dark-gray/cyan/yellow DN table in `dn/src/mainapp.pas`. `TvColors` and
-`TvAnsi` behavior is unchanged. This is not permission to ignore the
-difference: the final comparison must use an object baseline built with the
-same intended palette revision, or preserve the old palette in the class
-build if classic visual compatibility is the requirement.
+Current gate status: **OPEN**. Earlier comparisons against the archived
+pre-rewrite DN/TV pair used a different product revision and are not the
+object-to-class acceptance baseline. Use only the exact object and class
+revisions recorded below; do not treat earlier palette, About-text, or startup
+cell counts as accepted evidence.
 
-## Latest reproducible smoke result (2026-10-05)
+## Current controlling result (2026-10-05)
 
-Compared object DN `10763d65d091fc8525599a45c155be228c1bb8b6` (classic TV
-`c9bb5c4d0d87e73382ebdd48c117f4c29e1ae9e5`) with class DN
-`0c4e839100fe482ff31a842e0028045b9fd3eda0` (TV3 `5e5bf1120770c5da44aa1f75fe5677d621037775`),
-using the same absolute run directory, 100x30 PTY, English resources, `LANG=C`,
-and identical panel fixture. The check used `PtyTerm.screen.cells`, not its
-text-only view.
+The object baseline for acceptance is DN `b4916b874989d7b35660d02cf935dc5f0db7a656`
+with its recorded TV submodule `521d06479198789deeaa6fda287236ca83ba4051`.
+The current class build is DN `33674fed7829124fbd3230440faf3075c45eb9f6`
+with TV3 `ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3`. Both binaries must be
+rebuilt from these exact source revisions with identical build metadata and
+fixtures. The earlier comparison against DN `10763d65d091fc8525599a45c155be228c1bb8b6`
+and TV `c9bb5c4d0d87e73382ebdd48c117f4c29e1ae9e5` used the wrong object
+baseline and is not acceptance evidence; its reported differences are
+superseded, not waived.
 
-The first startup checkpoint is **FAIL**: 140 cell states differ, all text
-cells (including the ticking clock); the visible About text identifies object
-DN as `2.14 beta/DPMI32` and class DN as `2.20 alpha/Linux x86_64`, with
-different build revision/date text as well. After the same Enter key, the
-object build closes the startup dialog while the class build still displays
-its Warning/About text. That checkpoint is also **FAIL**: 637 differing
-cells, including 346 attribute-only differences. Enter, Space, or Escape
-individually did not clear the class warning from the captured screen; after
-Escape, F7 followed by creating a directory did work and the subsequent
-redraw cleared the warning. This points to a redraw/output mismatch rather
-than proving that the dialog continues to consume input. The class screen also
-emits `?` where the object screen emits several box/marker glyphs.
+The corrected 24-scenario PTY tour completed on both builds, but it did not
+exercise every action or provide a reproducible exact-cell comparison for
+every checkpoint. A separate full menu-cell probe exposed actionable
+differences, including an access violation when changing language in the
+class build and a different outcome for one menu action. The class-side
+language-menu crash was traced to interpreting a `TStringCollection` short
+string as an AnsiString; a diagnostic-only ShortString correction avoided
+that crash in one probe, but is not yet an accepted source fix. The menu
+matrix and the rest of the action matrix therefore remain **OPEN**.
 
-These are observed compatibility failures, not exclusions or approved
-normalizations. The identical-run smoke is not yet a reusable full acceptance
-harness, and no matrix row is promoted to pass by this probe. Keep the gate
-**OPEN**; diagnose the input/dialog and glyph differences, then compare every
-matrix action with cursor, all cell attributes, process result, and side
-effects captured.
+Startup/panel regressions to reproduce and fix:
+
+* Closing the About dialog on first launch consistently leaves its image
+  visible over the panels.
+* On some clean starts the panels are not drawn until opening a menu causes a
+  redraw. Treat this as intermittent: run at least 100 fresh starts, capture
+  the screen before opening any menu, and require zero missing-panel trials.
+* For the About residue, capture the screen immediately before opening About,
+  while About is open, and immediately after closing it; all prior panel cells
+  must be restored on every trial.
+
+These are hard failures, not approved normalizations. No action-matrix row is
+promoted to pass by a smoke tour or a diagnostic-only source copy. Keep the
+gate **OPEN** until the exact object and class builds have replayed every
+user-visible action and all checkpoints match.
 
 ## Required comparison
 
-For both builds, use the same clean temporary tree, terminal size, locale,
-resource files, and key sequence. Compare the terminal state, not a
+For both builds, use the same clean temporary tree, absolute run path, terminal size, locale,
+resource files, build metadata, and key sequence. Compare the terminal state, not a
 text-only rendering: every cell must match exactly as
 `(Unicode cell contents, foreground color, background color, style/attribute)`,
 including blank cells and the cursor position/visibility. A differing
@@ -75,6 +70,11 @@ and `dn.err` or exception output.
 | Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
 | Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
 | Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |
+
+The matrix must include every user-visible action, not just one representative
+per feature: every item in every top-level and nested menu, each default and
+cancel path, and every supported keyboard, mouse, and command-line route.
+Repeat clean startup 100 times and require zero missing-panel trials.
 
 The text view printed by `Screen.lines()` is only diagnostic and cannot pass
 this gate. The acceptance harness must compare the complete `Screen.cells`
