@@ -5,6 +5,12 @@ GitHub immediately after it is created.
 
 ## Required gates
 
+- **Object vs class bitwise acceptance (hard stop):** last object-based DN vs
+  last class-based DN, every scenario of every function, full cells (glyph,
+  fg/bg, attributes), cursor, process result, side effects. Mismatch → fix,
+  do not advance. Details: `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`.
+  **After** that gate PASSes only: English / refactor / platform split /
+  broader tests — `docs/POST-CLASS-WORK.md`.
 - The class-migrated TV3 tree has a case-insensitive whole-tree scan for
   `obj[e]ct`, including ignored files and binary build caches; Git metadata is
   excluded. Keep compiler output outside the scanned tree.
