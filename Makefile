@@ -18,6 +18,7 @@ all:
 install: all
 	install -d $(LIBDIR) $(BINDIR)
 	install -m 755 $(OUT)/dn $(LIBDIR)/dn
+	install -m 755 tools/dn-autoupdate.sh $(LIBDIR)/dn-autoupdate.sh
 	# Resources must sit next to the binary (or behind DNDLG); see mainapp.pas OpenResourceStream.
 	-cp -a $(OUT)/*.dlg $(OUT)/*.lng $(OUT)/*.hlp $(LIBDIR)/
 	if [ -d $(OUT)/xlt ]; then cp -a $(OUT)/xlt $(LIBDIR)/; fi
@@ -25,6 +26,11 @@ install: all
 	  '#!/bin/sh' \
 	  'LIB=$(PREFIX)/lib/dn' \
 	  'export DNDLG=$$LIB' \
+	  'export DN_LIB=$$LIB' \
+	  '# Issue #4: optional root auto-update (DN_AUTOUPDATE=0 to disable).' \
+	  'if [ -x "$$LIB/dn-autoupdate.sh" ]; then' \
+	  '  "$$LIB/dn-autoupdate.sh" || true' \
+	  'fi' \
 	  'exec "$$LIB/dn" "$$@"' > $(BINDIR)/dn
 	chmod 755 $(BINDIR)/dn
 
