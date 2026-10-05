@@ -299,6 +299,13 @@ procedure TCommandLine.SetDirShape;
 
 procedure TCommandLine.QueryCursorVisible; {AK155}
   begin
+  { The command line can receive one last update while the desktop is
+    being torn down.  Do not dereference the global owner in that phase. }
+  if Desktop = nil then
+    begin
+    CursorMustBeVisible := False;
+    Exit;
+    end;
   CursorMustBeVisible :=
       (State and sfDisabled = 0) and not QuickSearch and
       ( (Desktop.Current = nil)
