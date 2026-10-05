@@ -75,71 +75,30 @@ pointer operation while the class build showed Trash correctly. The accept
 harness excludes `menu_0_10` from the menu grid for that object-only crash.
 Changing language also raised an access violation in the class build. The
 language-menu crash was traced to interpreting a `TStringCollection`
-ShortString item as an AnsiString. A diagnostic-only ShortString correction
-avoided that crash in one probe, but is not an accepted source fix. A
-repository-wide search found other `PString(Collection.At(...))` patterns in
-`dnutil.pas`, `paneldlgs.pas`, `printman.pas`, `histories.pas`, `eraser.pas`,
-`diskinfo.pas`, and `filefind.pas`; they require type-by-type review before
-any fix is accepted.
+ShortString item as an AnsiString (`System.PString` after `uses SysUtils`).
+`ChLngId` in `dnutil.pas` now reads items via `PShortString` (same typed fix
+as `DoExecFile`). Repository-wide `PString(Collection.At(...))` peers in
+`paneldlgs.pas`, `printman.pas`, `histories.pas`, `eraser.pas`, `diskinfo.pas`,
+and `filefind.pas` were reviewed type-by-type: they store ShortStrings and
+already resolve to `Defines.PString` / `pstring_bind`, so they were left
+unchanged.
 
-The user clarified that there are two mutually exclusive startup states. On a
-first/virgin run, About appears while panels are already drawn; closing it
-leaves the About image over the panels. This is reproduced against the exact
-object/class pair above, one fresh run per build: object `0/1` residue trials,
-class `1/1`. On a later run (with `dn.ini`), About does not appear; the user
-reports that some self-built starts show a blank purple panel area until a
-menu triggers drawing, while `dist` does not.
+Startup redraw ([issue #6](https://github.com/unxed/dn/issues/6)) is **fixed
+functionally**. Both virgin About residue and configured blank panels shared
+one cause: after `MyApplication.Draw`, `WriteScreenCells` flushed a stale
+16-bit cell copy (`Drivers.ScreenBuffer`) over the panels. Fix in
+`dn/src/boot.pas`: `ReadScreenCells` immediately after the startup draw
+(`7572d73`); under `-dDNUTF8` skip the follow-up `WriteScreenCells`
+(`ab9ebd8`) so UTF-8 names are not replaced with `?`.
 
-The configured-run discrepancy was reproduced in a controlled, ready-
-synchronized PTY pair using the same absolute working path, terminal size
-`100x30`, no About dialog, and identical saved `dn.ini` SHA-256
-`1a9b0b2b63ba27eb9324c3a09587ac337426756e174ba77f60ef05a8ab52ad9f`:
-
-* Object DN `b4916b874989d7b35660d02cf935dc5f0db7a656`, TV
-  `521d06479198789deeaa6fda287236ca83ba4051`, binary SHA-256
-  `8508cf5535cde1705aba33f83043caddc89dafdddef147a9d34068a619056b40`:
-  four panel headers before input.
-* Latest class build from DN `7eaca15be92b86e69fb43a830029ed4e9e92a8e2`,
-  TV3 `ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3`, binary SHA-256
-  `6e057566920a7d47dad45174203eeb5af407d86704b0d90555c76802c132d552`:
-  zero panel headers before input.
-* After the same `F10`, `Right` sequence both showed four headers; neither
-  displayed About, and the config hash was unchanged after each run.
-
-Ten consecutive fresh object/class pairs reproduced the configured-startup
-mismatch in all ten runs: the object build showed the panels before input and
-the class build showed a blank purple work area; the same `F10`, `Right`
-sequence made panels appear in both. Thus the reported symptom is stable, not
-intermittent. This confirms the behavioral mismatch, not full cell parity.
-Full-screen snapshots still differ after the menu action and require a
-controlled diagnosis of glyph/color/attribute differences. An earlier
-self-build/`dist` check
-used each binary's own configuration and is not controlled evidence. The
-distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4` from `df0cca2`
-predates classes and is not the migration comparator. A prior 100-start
-attempt sampled before UI readiness and is invalid.
-Source searches found redraw/draw entry points in `mainapp.pas`,
-`panelroot.pas`, `paneldlgs.pas`, and `menus.pas`, but have not isolated either
-root cause. Keep the virgin-run About residue and configured-run self-build
-startup blank as separate test cases; both are hard failures.
-
-Startup/panel regressions to reproduce and fix:
-
-* Closing the About dialog on first launch consistently leaves its image
-  visible over the panels.
-* The configured-run blank-panel state is mutually exclusive with first-run
-  About. Compare the latest object-based baseline with the latest class build
-  using the same configured `dn.ini`, work path, terminal dimensions, and
-  environment. The supplied `dist` predates classes and is not the comparator.
-  The symptom reproduced in 10/10 fresh controlled pairs. Retain repeated
-  regression checks, capture complete cells before input, then replay the same
-  menu input and capture again. Require zero missing-panel trials and exact
-  object/class parity.
-* For the About residue, capture the screen immediately before opening About,
-  while About is open, and immediately after closing it; all prior panel cells
-  must be restored on every trial. Initial evidence: exact-pair fresh-start
-  probe, object `0/1` residue trials, class `1/1`; expand to a repeatable
-  regression series and complete full-cell comparisons.
+Pre-fix evidence (for the record): with shared `dn.ini` SHA-256
+`1a9b0b2b63ba27eb9324c3a09587ac337426756e174ba77f60ef05a8ab52ad9f`, terminal
+`100x30`, object `b4916b8` showed panels before input in 10/10 pairs while
+class `7eaca15` showed a blank purple area; F10+Right revealed panels on both.
+Post-fix: class and object gate binaries show panels before input and after
+F10+Right (5/5 each); virgin Esc leaves panels. Regression:
+`tools/dn-linux-startup.py`. Full-cell object/class parity (glyph/color/attrs)
+remains open under this gate and is separate from the blank-panel symptom.
 
 The acceptance harness itself previously mishandled `CSI ? 1049 h/l`: it
 did not save and restore the primary-screen cells, attributes, and cursor.
@@ -165,7 +124,8 @@ Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
 | `Ctrl+O` user/command screen | **fixed** on class (`a14015a` / tv3 `396fb86`) — was Fatal Error / Access violation | pass | was `dn.err` `0058BDD2`; cause nil `UserScr` before first command |
 | Autosave desktop second start (`dn.dsk` + Preserve directory) | **fixed** — was SIGSEGV / banner-only; `TFilePanelRoot.Store` again uses `S.Put(Drive)` | pass — restores `…/sub>` | Local PTY: first quit writes `dn.dsk`; second start alive with preserved `sub>` prompt |
 
-`F4` / `Ctrl+O` / autosave-desktop are fixed on class; the gate remains **OPEN** for issue #6 startup redraw (blank panels / About residue) and the full object/class matrix.
+`F4` / `Ctrl+O` / autosave-desktop / issue #6 startup redraw are fixed on class;
+the gate remains **OPEN** for the full object/class matrix (including cell parity).
 
 ## UI observations (2026-10-05)
 
