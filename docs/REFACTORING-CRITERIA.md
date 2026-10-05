@@ -29,13 +29,14 @@ open-ended cleanup, Safe Pascal adoption, or “better than OSP” product work
 
 ### A. Orientation (newcomer can find code)
 
-- [ ] `dn/FILES.md` lists every `dn/src/*.pas` unit with a one-line role (no
-      “(?)” leftovers for entry points).
-- [ ] Remaining opaque archive names that a newcomer hits in the first hour
+- [x] `dn/FILES.md` lists every `dn/src/*.pas` unit with a one-line role (no
+      “(?)” leftovers for entry points). *(2026-10-05: remaining-units index;
+      entry points already in the main tables.)*
+- [x] Remaining opaque archive names that a newcomer hits in the first hour
       have either a rename **or** an explicit “keep name / see FILES.md”
       line: `boot`, `mainapp`, `filepanel`/`panelroot`, `filescol`, `drives`,
-      `cmdline`, `editcore`, `dnutil`.
-- [ ] `tools/README.md` stays the single table for build/test scripts
+      `cmdline`, `editcore`, `dnutil`. *(Already renamed; roles in FILES.md.)*
+- [x] `tools/README.md` stays the single table for build/test scripts
       (already done; keep it true when adding scripts).
 
 ### B. Naming debt that still blocks reading
