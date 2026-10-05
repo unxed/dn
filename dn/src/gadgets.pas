@@ -278,9 +278,9 @@ procedure TClockView.HandleEvent(var Event: TEvent);
     R: TRect;
   begin
   P := Size;
-  Application.GetBounds(R);
   if Event.What = evMouseDown then
     begin
+    Application.GetBounds(R);
     
     if ((Event.EventFlags and 2) <> 0) then
       begin
