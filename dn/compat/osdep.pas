@@ -135,7 +135,7 @@ var
 implementation
 
 uses
-  SysUtils, Dos, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
+  SysUtils, Dos, OSDisk, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
 {$IFDEF GO32V2}, go32, TvDos{$ENDIF}
 {$IFDEF UNIX}, BaseUnix, Unix{$ENDIF}
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
@@ -621,45 +621,25 @@ end;
 
 { --- disks -------------------------------------------------------------------- }
 
-{ the number of the drive of a path (1 = A), 0 when the path has no drive }
-function DriveOfPath(Path: PChar): Byte;
-begin
-  Result := 0;
-  if (Path <> nil) and (Path[0] <> #0) and (Path[1] = ':') then
-    if UpCase(Path[0]) in ['A'..'Z'] then
-      Result := Ord(UpCase(Path[0])) - Ord('A') + 1;
-end;
-
 function SysDiskFreeLongX(Path: PChar): TQuad;
 begin
-  Result := DiskFree(DriveOfPath(Path));
+  Result := OSDisk.DiskFreeByPath(Path);
 end;
 
 function SysDiskSizeLongX(Path: PChar): TQuad;
 begin
-  Result := DiskSize(DriveOfPath(Path));
+  Result := OSDisk.DiskSizeByPath(Path);
 end;
 
 function SysDiskFreeLong(Drive: Byte): TQuad;
 begin
-  Result := DiskFree(Drive);
+  Result := OSDisk.DiskFreeByNumber(Drive);
 end;
 
 function SysGetValidDrives: LongWord;
-{$IF DEFINED(GO32V2) OR DEFINED(WINDOWS)}
-var
-  I: Integer;
 begin
-  Result := 0;
-  for I := 1 to 26 do
-    if DiskSize(I) <> -1 then
-      Result := Result or (LongWord(1) shl (I - 1));
+  Result := OSDisk.ValidDiskMap;
 end;
-{$ELSE}
-begin
-  Result := 1 shl 2;           { one disk, C: (as in tv/: systems without drive letters) }
-end;
-{$ENDIF}
 
 { --- the system --------------------------------------------------------------- }
 
