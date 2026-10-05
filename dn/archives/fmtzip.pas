@@ -100,7 +100,7 @@ var
 
 implementation
 uses
-  keymap, FViewer
+  keymap, FViewer, zipcharset
   ;
 
 { ----------------------------- ZIP ------------------------------------}
@@ -221,16 +221,80 @@ function TZIPArchive.GetSign: TStr4;
   GetSign := sigZIP;
   end;
 
+{ Apply zipcharset.DecodeText to FileInfo.FName; Extra may be empty. }
+procedure ZipApplyNameDecode(var Name: String; GenFlags, VersionMade: AWord;
+     const Extra: RawByteString);
+  var
+    Raw: RawByteString;
+    Dec: AnsiString;
+    PackOS: Byte;
+    PackVer: Word;
+    IsUTF8: Boolean;
+    N: Integer;
+  begin
+  if Length(Name) = 0 then
+    Exit;
+  SetString(Raw, @Name[1], Length(Name));
+  IsUTF8 := (GenFlags and $800) <> 0;
+  PackOS := Byte(VersionMade shr 8);
+  PackVer := VersionMade and $FF;
+  Dec := DecodeText(Raw, IsUTF8, PackOS, PackVer, Extra, False);
+  if Length(Dec) > 255 then
+    SetLength(Dec, 255);
+  N := Length(Dec);
+  SetLength(Name, N);
+  if N > 0 then
+    Move(Dec[1], Name[1], N);
+  end;
+
+{ Read ExtraField bytes; fill Zip64 sizes when markers are $FFFFFFFF. }
+procedure ZipReadExtra(ExtraLen: AWord; NeedZip64: Boolean;
+     var USize, PSize: TFileSize; out Extra: RawByteString);
+  var
+    ExtraFieldHeader: record
+                       HeaderID: AWord;
+                       DataSize: AWord;
+                      end;
+    Pos0: TFileSize;
+  begin
+  Extra := '';
+  if ExtraLen = 0 then
+    Exit;
+  SetLength(Extra, ExtraLen);
+  ArcFile.Read(Extra[1], ExtraLen);
+  if not NeedZip64 then
+    Exit;
+  Pos0 := 1;
+  while Length(Extra) - Pos0 + 1 >= 4 do
+    begin
+    ExtraFieldHeader.HeaderID := Byte(Extra[Pos0]) or
+      (Byte(Extra[Pos0 + 1]) shl 8);
+    ExtraFieldHeader.DataSize := Byte(Extra[Pos0 + 2]) or
+      (Byte(Extra[Pos0 + 3]) shl 8);
+    Inc(Pos0, 4);
+    if ExtraFieldHeader.DataSize > Length(Extra) - Pos0 + 1 then
+      Break;
+    if ExtraFieldHeader.HeaderID = 1 then
+      begin
+      if ExtraFieldHeader.DataSize >= 8 then
+        Move(Extra[Pos0], USize, 8);
+      if ExtraFieldHeader.DataSize >= 16 then
+        Move(Extra[Pos0 + 8], PSize, 8);
+      Break;
+      end;
+    Inc(Pos0, ExtraFieldHeader.DataSize);
+    end;
+  end;
+
 {JO} {piwamoto}
 procedure TZIPArchive.GetFile;
   var
     P: TZIPLocalHdr;
     HCF: TZIPCentralFileRec;
     FP, FPP: TFileSize;
-    ExtraFieldHeader: record
-                       HeaderID: AWord;
-                       DataSize: AWord;
-                      end;
+    Extra: RawByteString;
+    NameLen: AWord;
+    NeedZip64: Boolean;
 
   label 1;
   begin
@@ -248,29 +312,27 @@ procedure TZIPArchive.GetFile;
       Exit;
       end;
     ArcFile.Read(HCF.VersionMade, SizeOf(HCF)-SizeOf(HCF.Id));
-    if HCF.FNameLength > 255 then
-      HCF.FNameLength := 255;
-    SetLength(FileInfo.FName, HCF.FNameLength);
-    ArcFile.Read(FileInfo.FName[1], HCF.FNameLength);
+    NameLen := HCF.FNameLength;
+    if NameLen > 255 then
+      NameLen := 255;
+    SetLength(FileInfo.FName, NameLen);
+    ArcFile.Read(FileInfo.FName[1], NameLen);
+    { skip unread name bytes when FNameLength was clamped }
+    if HCF.FNameLength > NameLen then
+      ArcFile.Seek(ArcFile.GetPos + (HCF.FNameLength - NameLen));
     FileInfo.Last := 0;
     FileInfo.Attr := (HCF.GeneralPurpose and 1)*Hidden;
     FileInfo.Date := HCF.LastModDate;
     FileInfo.USize := HCF.OriginalSize;
     FileInfo.PSize := HCF.CompressedSize;
-    if (HCF.ExtraField <> 0) and
+    NeedZip64 := (HCF.ExtraField <> 0) and
        (HCF.OriginalSize = (-1 { $FFFFFFFF })) and
-       (HCF.CompressedSize = (-1 { $FFFFFFFF })) then
-      begin {search for Zip64 extended information extra field}
-        FP := ArcFile.GetPos;
-        ArcFile.Read(ExtraFieldHeader, SizeOf(ExtraFieldHeader));
-        if ExtraFieldHeader.HeaderID = 1 then
-          begin
-            ArcFile.Read(FileInfo.USize, 8);
-            ArcFile.Read(FileInfo.PSize, 8);
-          end;
-        ArcFile.Seek(FP);
-      end;
-    ArcFile.Seek(ArcFile.GetPos+HCF.ExtraField+HCF.FileCommLength);
+       (HCF.CompressedSize = (-1 { $FFFFFFFF }));
+    ZipReadExtra(HCF.ExtraField, NeedZip64, FileInfo.USize, FileInfo.PSize,
+      Extra);
+    ZipApplyNameDecode(FileInfo.FName, HCF.GeneralPurpose, HCF.VersionMade,
+      Extra);
+    ArcFile.Seek(ArcFile.GetPos+HCF.FileCommLength);
     end
   else {CentralDirRecPresent}
     begin
@@ -293,14 +355,20 @@ procedure TZIPArchive.GetFile;
       FileInfo.Last := 2;
       Exit;
       end;
-    if P.FNameLength > 255 then
-      P.FNameLength := 255;
-    ArcFile.Read(FileInfo.FName[1], P.FNameLength);
-    SetLength(FileInfo.FName, P.FNameLength);
+    NameLen := P.FNameLength;
+    if NameLen > 255 then
+      NameLen := 255;
+    ArcFile.Read(FileInfo.FName[1], NameLen);
+    SetLength(FileInfo.FName, NameLen);
+    if P.FNameLength > NameLen then
+      ArcFile.Seek(ArcFile.GetPos + (P.FNameLength - NameLen));
     FileInfo.Last := 0;
     FileInfo.Attr := (P.GeneralPurpose and 1)*Hidden;
     FileInfo.Date := P.LastModDate;
-    FP := ArcFile.GetPos+P.ExtraField+P.CompressedSize;
+    { local header has no creator OS; VersionMade low = Extract version, OS=0 }
+    ZipReadExtra(P.ExtraField, False, FileInfo.USize, FileInfo.PSize, Extra);
+    ZipApplyNameDecode(FileInfo.FName, P.GeneralPurpose, P.Extract, Extra);
+    FP := ArcFile.GetPos+P.CompressedSize;
     if  ( (P.GeneralPurpose and 8) <> 0) and (P.CompressedSize = 0) then
       begin
       FPP := FP;
