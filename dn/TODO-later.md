@@ -58,28 +58,28 @@ it (user screen, screen savers) and writes back with SysTvShowBuf. The user scre
 (VPSysLow grabs it at the start). Not done: the characters above 255 / combined ones of tv/ become '?' in the copy; the copy is
 converted at every idle even when nobody reads it (cheap: 2000 cells).
 
-## Справка (tvhc/TvHelp)
-- `.hlp` занимает 400-460 КБ из-за индекса: он плоский (массив позиций по номеру контекста), а в справке DN номера доходят до
-  ~49000 (и `_`=65535). Хранить индекс разреженным (отсортированные пары) — формат наш, менять можно; пока не мешает.
-- Формат `.htx` выведен из исходника оригинального `tvhc` (в архиве `angelbbs_DosNavigator`; он только читался, код не
-  переносился) и проверен сверкой: номера тем совпадают с `dnhelp.pas` из архива для всех общих имён (в самих `.pas` из архива
-  встречаются имена, которых нет в `.htx`: версии файлов разные).
-- Строки справки ограничены 255 символами (`ShortString` в `GetLine`); абзац — 4095 байт (как в оригинале).
-- Окно справки — 50x18 как в Borland; настройка размера — позже (вынести в настройку).
+## Help (tvhc/TvHelp)
+- `.hlp` is 400-460 KB because of the index: it is flat (an array of positions by context number), and in DN help the numbers go up to
+  ~49000 (and `_`=65535). Storing a sparse index (sorted pairs) — the format is ours, can be changed; it does not hurt for now.
+- The `.htx` format was derived from the source of the original `tvhc` (in the archive `angelbbs_DosNavigator`; it was only read, the code was not
+  ported) and checked by cross-check: topic numbers match `dnhelp.pas` from the archive for all shared names (in the `.pas` files from the archive
+  there are names that are not in `.htx`: the file versions differ).
+- Help lines are limited to 255 characters (`ShortString` in `GetLine`); a paragraph is 4095 bytes (as in the original).
+- The help window is 50x18 as in Borland; size configuration — later (move into a setting).
 
-## go2dos: что нужно от хоста для UTF-8 в DOS (предложения владельцу go2dos)
-- Буфер обмена: сейчас WinOldAp только OEM (`CF_TEXT`/`CF_OEMTEXT`, `docs/DOS-EXTENSIONS.md` §3). Нужен режим UTF-8 по образцу
-  `DOS-UTF8/NAMES` (выбор кодировки процессом) или формат `CF_UNICODETEXT` в UTF-8.
-- Экран и клавиатура: в спецификации go2dos остаются OEM; честный UTF-8 экрана и ввода — отдельное расширение (когда понадобится).
+## go2dos: what is needed from the host for UTF-8 in DOS (proposals to the go2dos owner)
+- Clipboard: WinOldAp is OEM-only for now (`CF_TEXT`/`CF_OEMTEXT`, `docs/DOS-EXTENSIONS.md` §3). A UTF-8 mode like
+  `DOS-UTF8/NAMES` (encoding chosen by the process) or a `CF_UNICODETEXT` format in UTF-8 is needed.
+- Screen and keyboard: in the go2dos specification they stay OEM; honest UTF-8 of the screen and input is a separate extension (when needed).
 
-## Linux: известные огрехи (2026-10-02)
-- Имена файлов в UTF-8 показываются как байты в кодовой странице (мусор вместо «файл.txt»): решается переходом на UTF-8 внутри DN (PLAN, п. 4).
-- Файлы с точки (`.hidden`) и битые символические ссылки в панели не видны: `FindFirst` их отдаёт (кроме битых ссылок), значит скрывает сам DN
-  (проверить настройку панели «скрытые файлы» и сравнение `Name[1] = '.'` в разборе каталога); права и ссылки Unix в `Attr` не показываются.
-- Пути выглядят как DOS (`C:\home\you`): диск C: — корень файловой системы; показывать Unix-пути — после перехода на UTF-8.
-- Регистр: имена, которых нет на диске в том регистре, что просит DN, ищутся без учёта регистра (`SysOsPath`); два файла, различающихся
-  регистром, DN различить не сможет.
-- Заставка «Warning» (beta) при каждом старте: Esc закрывает.
+## Linux: known glitches (2026-10-02)
+- UTF-8 file names are shown as bytes in the code page (garbage instead of "file.txt"): solved by moving to UTF-8 inside DN (PLAN, item 4).
+- Dot files (`.hidden`) and broken symbolic links are not visible in the panel: `FindFirst` returns them (except broken links), so DN itself hides them
+  (check the panel setting "hidden files" and the comparison `Name[1] = '.'` in the directory parse); Unix permissions and links are not shown in `Attr`.
+- Paths look like DOS (`C:\home\you`): drive C: is the root of the file system; show Unix paths after the move to UTF-8.
+- Case: names that are not on disk in the case DN asks for are looked up without regard to case (`SysOsPath`); two files that differ only by
+  case, DN will not be able to tell apart.
+- The "Warning" (beta) splash at every start: Esc closes it.
 
 ## Symbolic links (Linux), 2026-10-02
 - `SysFindFirst/Next` mark a found symbolic link with `SysLinkAttr` ($40, the DOS bit of a device that a search never gives) and the
@@ -122,52 +122,52 @@ Count/Compare (reading the directories of `/` takes ~20 s, Esc stops it), File >
   were read before are in the page of the host until the next reading); the DOS build takes the page from DOS (TvDos), not from the locale.
 - **ZIP names/comments (2026-10-05):** listing decode landed (`dn/lib/localecp` + `dn/lib/zipcharset` + `fmtzip`). Remaining: Win ACP/OEMCP, multi-byte CPs, comment UI — `docs/ZIP-CHARSET.md`.
 
-## XLT рядом с программой (найдено при сборке под Windows)
+## XLT next to the program (found while building for Windows)
 
-DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладка по умолчанию) рядом с программой (`SourceDir`). Раньше их нигде не клали,
-и при старте печаталось «Error in country setups» (на Linux его скрывал альтернативный экран; таблица смены раскладки не строилась).
-Теперь `tools/build.sh` кладёт `dn/data/XLT` рядом с `dn`/`dn.exe`, dist-скрипты тоже; тест `tools/dn-linux-ops.py` проверяет, что ошибки нет.
-Остальное из `dn/data` (`COLORS`, `DN.FLG`) пока не используется: проверить, нужно ли оно, когда дойдём до настроек цветов.
+DN looks for the tables `XLT\*.xlt` (incl. `ru441.xlt`, the default layout) next to the program (`SourceDir`). They were not placed anywhere before,
+and at start it printed "Error in country setups" (on Linux the alternate screen hid it; the layout-switch table was not built).
+Now `tools/build.sh` puts `dn/data/XLT` next to `dn`/`dn.exe`, the dist scripts too; the test `tools/dn-linux-ops.py` checks that there is no error.
+The rest of `dn/data` (`COLORS`, `DN.FLG`) is unused so far: check whether it is needed when we get to the color settings.
 
 ## Windows (win64/win32)
 
-- Сборка: `tools/build-fpc-windows.sh`, `tools/build.sh win64|win32`, `tools/dn-win-dist.sh`; CI: workflow `dn-windows` (кросс-сборка на Linux,
-  запуск на `windows-latest` через ConPTY: `tools/dn-win-smoke.py`). Терминальный слой — `tv/src/tvtermos.pas` (консоль Windows в режиме
-  VT, ввод через ReadConsoleInputW → байты UTF-8 → общий разбор `TvTermIO`), поверх тот же `TvUnix`, что и на Linux.
-- Имена файлов: сейчас — байты системной (ANSI) кодовой страницы как есть; перекодирование ANSI↔OEM (`CharToOemBuff`/`OemToCharBuff`) и
-  `GetOEMCP` → `TvLocale` ещё не сделаны (сделаем вместе с этапом UTF-8: имена целиком в UTF-8 через `...W`-функции API).
-- Wine (Linux Mint, 2026-10-03, сообщение владельца): с VT-выводом экран пустой, виден обрывки последовательностей (консоль wine VT не обрабатывает).
-  Поэтому по умолчанию режим консоли (`tv/src/tvtermos.pas`, блок «the console mode»): последовательности `TvAnsi` разбираются на месте
-  (CUP, CHA, CUU/D/F/B, ED, EL, SGR с приведением цвета к 16, режимы 25 и 1000/1002/1006, форма курсора) и рисуются `WriteConsoleOutputW`
-  в собственный буфер экрана; клавиши и мышь консоли переводятся в те же последовательности, что шлёт терминал. `DN_WIN_OUTPUT=vt` — старый режим.
-  Wine (сообщение владельца): серый фон панелей двух оттенков, области меняются. Буфер ячеек в порядке (атрибут `8B` у всех ячеек панелей, `TV_CONDUMP=файл` пишет
-  буфер в файл для проверки), терминал wine теряет яркий фон (`ESC[100m`) у части ячеек. Обход: на wine фон без бита яркости (чёрный вместо тёмно-серого);
-  `DN_WIN_BRIGHT_BG=1` возвращает как есть, `=0` включает обход на настоящей Windows. Палитра DN сама использует фон 8 (`dnpalet.pas`).
-  Не сделано в этом режиме: цвета с оттенками (всё к 16), символы вне BMP (`?`), жирный/подчёркнутый стиль, ширина CJK проверена только по таблице TvUtf8.
-- Не проверено на Windows: изменение размера окна, мышь, вставка из буфера (bracketed paste), запуск команды (`SysRunShell` через `COMSPEC`).
+- Build: `tools/build-fpc-windows.sh`, `tools/build.sh win64|win32`, `tools/dn-win-dist.sh`; CI: workflow `dn-windows` (cross-build on Linux,
+  run on `windows-latest` via ConPTY: `tools/dn-win-smoke.py`). The terminal layer is `tv/src/tvtermos.pas` (Windows console in VT mode,
+  input via ReadConsoleInputW → UTF-8 bytes → shared parse `TvTermIO`), on top of the same `TvUnix` as on Linux.
+- File names: for now — the bytes of the system (ANSI) code page as-is; ANSI↔OEM recoding (`CharToOemBuff`/`OemToCharBuff`) and
+  `GetOEMCP` → `TvLocale` are not done yet (to be done together with the UTF-8 stage: names entirely in UTF-8 through the `...W` API functions).
+- Wine (Linux Mint, 2026-10-03, owner report): with VT output the screen is empty, fragments of sequences are visible (the wine console does not handle VT).
+  So by default the console mode (`tv/src/tvtermos.pas`, block "the console mode"): `TvAnsi` sequences are parsed in place
+  (CUP, CHA, CUU/D/F/B, ED, EL, SGR with color reduced to 16, modes 25 and 1000/1002/1006, cursor shape) and drawn with `WriteConsoleOutputW`
+  into its own screen buffer; console keys and mouse are turned into the same sequences the terminal sends. `DN_WIN_OUTPUT=vt` — the old mode.
+  Wine (owner report): grey panel backgrounds of two shades, the areas change. The cell buffer is fine (attribute `8B` on all panel cells, `TV_CONDUMP=file` writes
+  the buffer to a file for checking), the wine terminal loses the bright background (`ESC[100m`) on some cells. Workaround: on wine a background without the bright bit (black instead of dark grey);
+  `DN_WIN_BRIGHT_BG=1` restores as-is, `=0` enables the workaround on real Windows. DN's own palette uses background 8 (`dnpalet.pas`).
+  Not done in this mode: colors with shades (everything to 16), characters outside the BMP (`?`), bold/underline style, CJK width checked only against the TvUtf8 table.
+- Not checked on Windows: window resize, mouse, paste from the clipboard (bracketed paste), running a command (`SysRunShell` via `COMSPEC`).
 
-## UTF-8 внутри DN: что осталось (ветка utf8-inside, 2026-10-03)
+## UTF-8 inside DN: what remains (branch utf8-inside, 2026-10-03)
 
-- Регистр и сортировка: `UpStr`, `LowStr`, `UpCase`, `UpStrg`, таблицы `UpCaseArray`/`ABCSortXlat` рассчитаны на однобайтную страницу; на UTF-8 портят
-  кириллицу (байты 0xA0..0xAF превращаются в 0x80..0x8F). Нужны UTF-8-версии (Latin-1, кириллица, греческий; позже таблицы Unicode).
-- 16-битные буферы (`WriteLineW`/`WriteBufW`: `dblwnd`, `dbview`, `gauge`, `calc`, `ed2`, `idlers`, `calendar`): `drivers.pas` (`MoveStr`/`MoveCStr` в слово-буфер) переводит UTF-8
-  в байты текущей кодовой страницы (`LegacyText`): символы, которых в странице нет (CJK, иврит...), остаются сырыми байтами и видны мусором. Календарь исправлен отдельно
-  (дни недели режутся по символам). Остальные такие места проверить глазами (прогресс копирования с длинным именем, DBF, заставка).
+- Case and sorting: `UpStr`, `LowStr`, `UpCase`, `UpStrg`, the tables `UpCaseArray`/`ABCSortXlat` are built for a single-byte page; on UTF-8 they corrupt
+  Cyrillic (bytes 0xA0..0xAF become 0x80..0x8F). UTF-8 versions are needed (Latin-1, Cyrillic, Greek; Unicode tables later).
+- 16-bit buffers (`WriteLineW`/`WriteBufW`: `dblwnd`, `dbview`, `gauge`, `calc`, `ed2`, `idlers`, `calendar`): `drivers.pas` (`MoveStr`/`MoveCStr` into a word buffer) converts UTF-8
+  into the bytes of the current code page (`LegacyText`): characters that the page lacks (CJK, Hebrew...) stay as raw bytes and show as garbage. The calendar was fixed separately
+  (weekdays are cut by characters). Check the other such places by eye (copy progress with a long name, DBF, splash).
 
-- Ширина (`DNUtf8`): в панелях/диалогах/календаре широкие знаки (CJK) занимают две колонки, комбинируемые — ноль (прокси: `Utf8ToProxy`, `FF` — вторая половина широкого). В редакторе строка — по байту на знак: широкий знак там считается за одну колонку, выравнивание и курсор с ним поедут; в `StrCols` ширина считается, но места, которые считают `Length`, а не `StrCols`, не проверялись.
-- Быстрый поиск в панели: Ctrl-S (двойной Alt на терминалах невозможен) + кириллица работает в UTF-8 сборке (`DoQuickSearch`, `DNKeyCode` дополняет Ctrl+буква скан-кодом, как в DN). Alt+буква: см. `HotKeyAlt`; Alt+буква как старт поиска в панели на терминале не проверялся.
-- Рамка `x` вместо `╔` в левом верхнем углу панелей: есть и в DOS-сборке (старый дефект рисования рамки панелей), к UTF-8 не относится.
-- Сборка: FPC не пересобирает юнит при смене только `-d`, поэтому у режима `-dDNUTF8` свой каталог объектов (`tools/dn-env.sh`, суффикс `-utf8`); иначе обычная и UTF-8 сборки
-  смешивали юниты (в UTF-8 сборке `Utf8Enabled` оказывался `False`, подвал панели показывал «╨Ъ╨░╤В…»).
-- Редактор (`microed.pas`) считает позицию, выделение и сдвиг экрана в байтах строки, а не в символах: Shift+Right ×6 по «Привет, мир» выделяет «При» (6 байт), курсор и
-  горизонтальная прокрутка на строках с кириллицей смещены. Варианты: (а) позиции в символах (правка всех мест `Pos.X`, `Delta.X`, `Copy`); (б) строки редактора хранить
-  «прокси» (`DNUtf8`: один байт на символ, таблица символов на документ до 127 разных), преобразовывая при чтении и записи файла, отрисовке и буфере обмена. (б) быстрее, но
-  не годится для текстов с большим алфавитом (CJK). Решить и сделать отдельным этапом.
-- Буфер обмена: DN → терминал (OSC 52, `TV_CLIPBOARD=0` выключает; на консоли Linux не отправляется), Windows — системный буфер (`CF_UNICODETEXT`, `TvTermOs`); чтение
-  буфера терминала не делается (в большинстве терминалов запрещено), вставка идёт через bracketed paste. Перекодировка OEM↔UTF-8 на границе только в режиме без `-dDNUTF8`
-  (DOS и старый режим); в режиме UTF-8 строки DN уже UTF-8.
-- Windows: данные не перекодируются, нужна только передача имён в `...W`-API (UTF-8 в DN ↔ UTF-16 в системе). Проверить в CI файлами с именами вне ANSI-страницы:
-  `SetMultiByteFileSystemCodePage(CP_UTF8)` в RTL FPC; юнит `Dos` может звать ANSI-варианты API напрямую.
+- Width (`DNUtf8`): in panels/dialogs/calendar wide characters (CJK) take two columns, combining ones take zero (proxy: `Utf8ToProxy`, `FF` — the second half of a wide one). In the editor a line is one byte per character: a wide character there counts as one column, alignment and the cursor will drift with it; in `StrCols` the width is counted, but the places that use `Length` rather than `StrCols` were not checked.
+- Quick search in the panel: Ctrl-S (double Alt is impossible on terminals) + Cyrillic works in the UTF-8 build (`DoQuickSearch`, `DNKeyCode` adds a scan code to Ctrl+letter, as in DN). Alt+letter: see `HotKeyAlt`; Alt+letter as the start of a panel search on a terminal was not checked.
+- Frame `x` instead of `╔` in the top-left corner of the panels: present in the DOS build too (an old defect of drawing the panel frame), unrelated to UTF-8.
+- Build: FPC does not rebuild a unit when only `-d` changes, so the `-dDNUTF8` mode has its own object directory (`tools/dn-env.sh`, suffix `-utf8`); otherwise the plain and UTF-8 builds
+  mixed units (in the UTF-8 build `Utf8Enabled` was `False`, the panel footer showed mojibake (UTF-8 bytes misread as OEM)).
+- The editor (`microed.pas`) counts position, selection and screen shift in bytes of the line, not in characters: Shift+Right ×6 on the Cyrillic "Hello, world" selects the first 3 characters (6 bytes), the cursor and
+  horizontal scroll on lines with Cyrillic are offset. Options: (a) positions in characters (edit every `Pos.X`, `Delta.X`, `Copy` site); (b) store editor lines as
+  "proxy" (`DNUtf8`: one byte per character, a character table per document of up to 127 distinct ones), converting on file read/write, draw and clipboard. (b) is faster, but
+  does not work for texts with a large alphabet (CJK). Decide and do as a separate stage.
+- Clipboard: DN → terminal (OSC 52, `TV_CLIPBOARD=0` switches it off; not sent on the Linux console), Windows — the system clipboard (`CF_UNICODETEXT`, `TvTermOs`); reading
+  the terminal clipboard is not done (forbidden in most terminals), paste goes through bracketed paste. OEM↔UTF-8 conversion at the border only in the mode without `-dDNUTF8`
+  (DOS and the old mode); in UTF-8 mode DN strings are already UTF-8.
+- Windows: data is not recoded, only passing names into the `...W` API is needed (UTF-8 in DN ↔ UTF-16 in the system). Check in CI with files whose names are outside the ANSI page:
+  `SetMultiByteFileSystemCodePage(CP_UTF8)` in the FPC RTL; the `Dos` unit may call the ANSI API variants directly.
 
 ## Editor: typing characters outside the code page (2026-10-03)
 - In a UTF-8 file a typed character that the code page has not takes a free frame cell of the table of the document (`TabTyped`, `DocTab.Used`).
@@ -228,7 +228,7 @@ DN ищет таблицы `XLT\*.xlt` (в т.ч. `ru441.xlt`, раскладк�
 - **Not known:** who zeroes `00F9:0000`. A `gdb` watchpoint (the first dword of the header becoming 0) did not fire in one run. Candidates: DN (a write through its DOS transfer buffer `tb_segment`/`dpmi32`),
   the stub or CWSDPMI, or the emulator. To find out: a watchpoint set from the start of the run, or a check of what `tb_segment` is in DN; the known odd thing of the same kind is `ShadowCount` (a variable that had a wrong
   value at the start of the program under DOSBox-X, `dpmi32.pas`). Until it is known a bug of DN cannot be excluded.
-- Checked (2026-10-03): `master` + the guard + the patches of `docs/patches/`, `lfn = true`, `utf8 file names = true`: `dist/dos` DN starts and draws the panels; the file "дом 世界.txt" is **in the panel** as
+- Checked (2026-10-03): `master` + the guard + the patches of `docs/patches/`, `lfn = true`, `utf8 file names = true`: `dist/dos` DN starts and draws the panels; the file "dom 世界.txt" is **in the panel** as
   `{U+0434}{U+043E}{U+043C} {U+4E16}{U+754C}.txt` (cut by the column with the `►` mark; without the option it is hidden). Not yet tried on it: copy, view, rename, delete in DN.
 - With the apt package 2024.03.01 and `lfn = true`, DN shows the long names (the column cuts them with the `►` mark; the panel is in the 8.3 width). Files whose names the code page lacks are hidden
   (no `utf8 file names`, that option is only in the patched DOSBox-X): to be tried with DN now that it runs under `master`.
@@ -331,7 +331,7 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
   `-silent` forces the dummy video driver of SDL, so it is not used there); the pointer is a real X pointer (XTest through `ctypes`), DOSBox-X turns it into INT 33h, so the real mouse path of `TvDos` is exercised.
 - Checked: a click on a menu item, a double click on a directory, a click on a key of the status line (INT 33h works); the autosave of the desktop on DOS (`dn.dsk` is written at File -> Exit -> "Yes", the next start
   restores the directory of the panel; the "Alt-X" of the harness DNKEYS did not exit: DN asks "Do you wish to quit?" and the key `A2D00` does not reach it as Alt-X); the settings of the dialogs survive a restart
-  (the section `[Saved]` of `dn.ini`). The UTF-8 build with the provider `DOS-UTF8/NAMES`: the file "дом 世界.txt" is in the panel (shown as `?` where the code page of the DOS screen has no glyph).
+  (the section `[Saved]` of `dn.ini`). The UTF-8 build with the provider `DOS-UTF8/NAMES`: the file "dom 世界.txt" is in the panel (shown as `?` where the code page of the DOS screen has no glyph).
 - Not driven: the button "Save setup" of the panel setup dialogs (the presets of the panels) and the view of Cyrillic names with `chcp 866`; a hung emulator can write a huge file: always `timeout -k`.
 
 ## Colors of the buttons (2026-10-04)
