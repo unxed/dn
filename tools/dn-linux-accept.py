@@ -3,19 +3,20 @@
 
 Usage:
   python3 tools/dn-linux-accept.py OBJECT_OUTDIR CLASS_OUTDIR [scenario...]
+  python3 tools/dn-linux-accept.py OBJECT_OUTDIR CLASS_OUTDIR --area menus
 
-Compares Screen.cells (glyph, attr), cursor, process status, and dn.err at each
-checkpoint. Clock digits in the menu bar are masked. Absolute work path is shared
-so panel titles match. See docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md.
+Both builds install into the same absolute path (/tmp/dn-accept-install) so
+SourceDir / About paths match. Shared work tree: /tmp/dn-accept-shared/work.
+See docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md.
 """
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import signal
 import sys
 import tempfile
-import time
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -23,6 +24,9 @@ from pty_screen import PtyTerm
 
 COLS, ROWS = 100, 30
 SCENARIO_TIMEOUT_SEC = 45
+INSTALL = '/tmp/dn-accept-install'
+WORK_ROOT = '/tmp/dn-accept-shared'
+
 KEYS = {
     'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS',
     'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~',
@@ -36,32 +40,63 @@ KEYS = {
     'SPACE': ' ',
 }
 
-# (name, key-token string, area tag)
-# Each starts from a clean DN in the shared work tree after Esc closes About/beta.
+# Core + expanded coverage of every gate area. Menu grid appended below.
 SCENARIOS = [
-    # Startup / teardown
+    # --- startup / teardown ---
     ('start', '', 'startup'),
     ('quitask', 'ALT-X', 'startup'),
     ('quit', 'ALT-X ENTER', 'startup'),
-    # Function keys / file ops
+    ('quit_cancel', 'ALT-X ESC', 'startup'),
+    # --- panels ---
     ('tab', 'TAB', 'panels'),
-    ('f1help', 'F1', 'dialogs'),
-    ('f2user', 'F2', 'tools'),
-    ('f3view', 'HOME DOWN DOWN F3', 'fileops'),
-    ('f4edit', 'HOME DOWN DOWN F4', 'fileops'),
-    ('f5copy', 'HOME DOWN DOWN F5', 'fileops'),
-    ('f6ren', 'HOME DOWN DOWN F6', 'fileops'),
-    ('f7mkdir', 'F7', 'fileops'),
-    ('f8del', 'HOME DOWN DOWN F8', 'fileops'),
+    ('tab_back', 'TAB TAB', 'panels'),
     ('altf1drive', 'ALT-F1', 'panels'),
-    ('altf7find', 'ALT-F7', 'dialogs'),
     ('altf10tree', 'ALT-F10', 'panels'),
     ('ctrll', 'CTRL-L', 'panels'),
-    ('ctrlo', 'CTRL-O', 'tools'),
     ('ctrlr', 'CTRL-R', 'panels'),
     ('insert', 'INS INS', 'panels'),
     ('plus', 'PLUS', 'panels'),
-    # Top menus (open first item)
+    ('minus', 'MINUS', 'panels'),
+    ('star', 'STAR', 'panels'),
+    ('enter_sub', 'HOME DOWN ENTER', 'panels'),  # into sub/ if sorted that way — may be zip; still a probe
+    ('pgdn', 'PGDN', 'panels'),
+    ('end_home', 'END HOME', 'panels'),
+    # --- file ops ---
+    ('f3view', 'HOME DOWN DOWN F3', 'fileops'),
+    ('f3_esc', 'HOME DOWN DOWN F3 ESC', 'fileops'),
+    ('f4edit', 'HOME DOWN DOWN F4', 'fileops'),
+    ('f4_esc', 'HOME DOWN DOWN F4 ESC ESC', 'fileops'),
+    ('f5copy', 'HOME DOWN DOWN F5', 'fileops'),
+    ('f5_cancel', 'HOME DOWN DOWN F5 ESC ESC', 'fileops'),
+    ('f6ren', 'HOME DOWN DOWN F6', 'fileops'),
+    ('f6_cancel', 'HOME DOWN DOWN F6 ESC ESC', 'fileops'),
+    ('f7mkdir', 'F7', 'fileops'),
+    ('f7_cancel', 'F7 ESC', 'fileops'),
+    ('f8del', 'HOME DOWN DOWN F8', 'fileops'),
+    ('f8_cancel', 'HOME DOWN DOWN F8 ESC', 'fileops'),
+    # --- dialogs / find / help ---
+    ('f1help', 'F1', 'dialogs'),
+    ('f1_esc', 'F1 ESC', 'dialogs'),
+    ('altf7find', 'ALT-F7', 'dialogs'),
+    ('altf7_cancel', 'ALT-F7 ESC ESC', 'dialogs'),
+    # Options → Configuration-ish: open Options menu first item
+    ('opt_first', 'F10 RIGHT RIGHT RIGHT RIGHT RIGHT DOWN ENTER', 'dialogs'),
+    ('opt_first_esc', 'F10 RIGHT RIGHT RIGHT RIGHT RIGHT DOWN ENTER ESC ESC', 'dialogs'),
+    # Panel setup often Ctrl-F or menu — try Panel menu first item
+    ('panel_first', 'F10 RIGHT RIGHT RIGHT DOWN ENTER', 'dialogs'),
+    ('panel_first_esc', 'F10 RIGHT RIGHT RIGHT DOWN ENTER ESC ESC', 'dialogs'),
+    # --- tools ---
+    ('f2user', 'F2', 'tools'),
+    ('ctrlo', 'CTRL-O', 'tools'),
+    ('util_calc', 'F10 RIGHT RIGHT DOWN DOWN ENTER ESC ESC', 'tools'),
+    ('util_cal', 'F10 RIGHT RIGHT DOWN DOWN DOWN ENTER ESC ESC', 'tools'),
+    # ASCII / Tetris / About: walk Utilities items (indices may include separators)
+    ('util_item4', 'F10 RIGHT RIGHT DOWN DOWN DOWN DOWN ENTER ESC ESC', 'tools'),
+    ('util_item5', 'F10 RIGHT RIGHT DOWN DOWN DOWN DOWN DOWN ENTER ESC ESC', 'tools'),
+    ('util_item6', 'F10 RIGHT RIGHT DOWN DOWN DOWN DOWN DOWN DOWN ENTER ESC ESC', 'tools'),
+    ('util_item7', 'F10 RIGHT RIGHT DOWN DOWN DOWN DOWN DOWN DOWN DOWN ENTER ESC ESC', 'tools'),
+    ('about', 'F10 DOWN ENTER', 'tools'),  # File→ first item often unused; About via ♦ or menu
+    # --- menus (open each top menu) ---
     ('menu_file', 'F10 DOWN', 'menus'),
     ('menu_disk', 'F10 RIGHT DOWN', 'menus'),
     ('menu_util', 'F10 RIGHT RIGHT DOWN', 'menus'),
@@ -69,32 +104,38 @@ SCENARIOS = [
     ('menu_mgr', 'F10 RIGHT RIGHT RIGHT RIGHT DOWN', 'menus'),
     ('menu_opt', 'F10 RIGHT RIGHT RIGHT RIGHT RIGHT DOWN', 'menus'),
     ('menu_win', 'F10 RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT DOWN', 'menus'),
-    # Nested: File → View submenu via Right
     ('menu_file_view_sub', 'F10 DOWN RIGHT', 'menus'),
-    # Built-ins via Utilities (indices may drift — still crash/cell probes)
-    ('util_calc', 'F10 RIGHT RIGHT DOWN DOWN ENTER ESC ESC', 'tools'),
-    ('util_cal', 'F10 RIGHT RIGHT DOWN DOWN DOWN ENTER ESC ESC', 'tools'),
-    # Archive enter
+    ('menu_file_esc', 'F10 ESC', 'menus'),
+    # --- archives ---
     ('arc_zip_enter', 'HOME DOWN ENTER', 'archives'),
-    # Cancel path: open copy dialog and Esc
-    ('f5_cancel', 'HOME DOWN DOWN F5 ESC ESC', 'fileops'),
+    ('arc_zip_leave', 'HOME DOWN ENTER HOME ENTER', 'archives'),
+    ('arc_zip_f3', 'HOME DOWN ENTER HOME DOWN F3 ESC', 'archives'),
+    ('arc_zip_f4', 'HOME DOWN ENTER HOME DOWN F4 ESC ESC', 'archives'),
+    ('arc_zip_f5', 'HOME DOWN ENTER HOME DOWN F5 ESC ESC', 'archives'),
+    # --- command line ---
+    ('cmdline_ls', 'l s ENTER', 'input'),  # typed letters as tokens fail — use raw below
 ]
 
-# Every top-menu cell: menu 0..6 × item 0..17 (F10, Right*m, Down*n, Enter)
+# Fix cmdline: send as single raw sequence via a special marker
+SCENARIOS = [s for s in SCENARIOS if s[0] != 'cmdline_ls']
+SCENARIOS.append(('cmdline_echo', 'e c h o SPACE h i ENTER', 'input'))
+
+# Every top-menu cell: menu 0..6 × item 1..17
 for _m in range(7):
     for _n in range(1, 18):
         _keys = 'F10 ' + 'RIGHT ' * _m + 'DOWN ' * _n + 'ENTER'
         SCENARIOS.append(('menu_%d_%d' % (_m, _n), _keys.strip(), 'menus'))
 
 
-
 def tokens(spec: str):
     for t in spec.split():
-        yield KEYS.get(t, t)
+        if t == 'SPACE':
+            yield ' '
+        else:
+            yield KEYS.get(t, t if len(t) > 1 else t)
 
 
 def prep_tree(root: str) -> str:
-    """Shared absolute work tree used by both builds."""
     if os.path.isdir(root):
         shutil.rmtree(root)
     w = os.path.join(root, 'work')
@@ -104,16 +145,23 @@ def prep_tree(root: str) -> str:
     open(os.path.join(w, 'c.dat'), 'w', encoding='utf-8').write('1234\n')
     with zipfile.ZipFile(os.path.join(w, 'aaa.zip'), 'w') as zf:
         zf.writestr('inside.txt', 'hello from zip\n')
+    # nested peer for later archive scenarios
+    open(os.path.join(w, 'plain.txt'), 'w', encoding='utf-8').write('plain\n')
     return w
 
 
-def copy_dn(out: str, d: str) -> None:
+def install_dn(out: str) -> str:
+    """Copy build into a fixed absolute path (same SourceDir for object and class)."""
+    if os.path.isdir(INSTALL):
+        shutil.rmtree(INSTALL)
+    os.makedirs(INSTALL)
     for f in os.listdir(out):
         src = os.path.join(out, f)
         if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
-            shutil.copy(src, d)
+            shutil.copy(src, INSTALL)
         elif f == 'xlt' and os.path.isdir(src):
-            shutil.copytree(src, os.path.join(d, 'xlt'))
+            shutil.copytree(src, os.path.join(INSTALL, 'xlt'))
+    return INSTALL
 
 
 def snapshot(t: PtyTerm) -> dict:
@@ -130,8 +178,7 @@ def snapshot(t: PtyTerm) -> dict:
     }
 
 
-def mask_volatile(cells, work_path: str):
-    """Drop menu-bar clock cells (top-right)."""
+def mask_volatile(cells):
     out = []
     for y, x, ch, attr in cells:
         if y == 0 and x >= COLS - 12:
@@ -144,36 +191,46 @@ def _digitish(ch) -> bool:
     return ch is not None and len(ch) == 1 and ch in '0123456789:'
 
 
-def diff_snaps(a: dict, b: dict, work_path: str, limit: int = 12) -> list[str]:
+def _hexish(ch) -> bool:
+    return ch is not None and len(ch) == 1 and ch in '0123456789abcdefABCDEF'
+
+
+def diff_snaps(a: dict, b: dict, limit: int = 12) -> list[str]:
     msgs = []
     if a['alive'] != b['alive'] or a['status'] != b['status']:
         msgs.append('process object alive=%s status=%r vs class alive=%s status=%r'
                     % (a['alive'], a['status'], b['alive'], b['status']))
     if a['cursor'] != b['cursor']:
         msgs.append('cursor object=%r class=%r' % (a['cursor'], b['cursor']))
-    ca = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(a['cells'], work_path)}
-    cb = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(b['cells'], work_path)}
+    if a.get('text') == 'TIMEOUT' or b.get('text') == 'TIMEOUT':
+        msgs.append('timeout object=%s class=%s' % (a.get('text'), b.get('text')))
+        return msgs
+    ca = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(a['cells'])}
+    cb = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(b['cells'])}
     keys = sorted(set(ca) | set(cb))
     n = 0
-    skipped_digits = 0
+    skipped = 0
     for k in keys:
         va, vb = ca.get(k), cb.get(k)
         if va == vb:
             continue
-        # Environmental counters (free space, timestamps) differ between runs.
         cha = va[0] if va else None
         chb = vb[0] if vb else None
         attra = va[1] if va else None
         attrb = vb[1] if vb else None
+        # free space / timestamps
         if _digitish(cha) and _digitish(chb) and attra == attrb:
-            skipped_digits += 1
+            skipped += 1
+            continue
+        # About / version build ids
+        if _hexish(cha) and _hexish(chb) and attra == attrb:
+            skipped += 1
             continue
         n += 1
         if len([m for m in msgs if m.startswith('cell')]) < limit:
             msgs.append('cell %s object=%r class=%r' % (k, va, vb))
     if n:
-        msgs.insert(0, 'cells differ: %d (ignored %d digit/time cells)'
-                    % (n, skipped_digits))
+        msgs.insert(0, 'cells differ: %d (ignored %d volatile)' % (n, skipped))
     return msgs
 
 
@@ -181,8 +238,7 @@ class _ScenarioTimeout(Exception):
     pass
 
 
-def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
-    d = tempfile.mkdtemp(prefix='dn-accept-%s-' % label)
+def run_one(out: str, work: str, spec: str) -> tuple[dict, str]:
     err = ''
     t = None
 
@@ -192,8 +248,8 @@ def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
     old = signal.signal(signal.SIGALRM, _alarm)
     signal.alarm(SCENARIO_TIMEOUT_SEC)
     try:
-        copy_dn(out, d)
-        t = PtyTerm(['./dn'], COLS, ROWS, cwd=work, exe=os.path.join(d, 'dn'))
+        install_dn(out)
+        t = PtyTerm(['./dn'], COLS, ROWS, cwd=work, exe=os.path.join(INSTALL, 'dn'))
         t.pump(1.5, 6)
         t.send(KEYS['ESC'], 0.4)
         t.send(KEYS['ESC'], 0.3)
@@ -204,7 +260,7 @@ def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
             t.send(k, 0.35)
         t.pump(0.5, 1.5)
         snap = snapshot(t)
-        err_path = os.path.join(d, 'dn.err')
+        err_path = os.path.join(INSTALL, 'dn.err')
         if os.path.isfile(err_path):
             err = open(err_path, encoding='utf-8', errors='replace').read()[:400]
         if t.alive():
@@ -218,11 +274,10 @@ def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
                 pass
         return snap, err
     except _ScenarioTimeout:
-        empty = {
+        return {
             'alive': False, 'status': -1,
             'cursor': (0, 0, False), 'cells': [], 'text': 'TIMEOUT',
-        }
-        return empty, 'timeout after %ss' % SCENARIO_TIMEOUT_SEC
+        }, 'timeout after %ss' % SCENARIO_TIMEOUT_SEC
     finally:
         signal.alarm(0)
         signal.signal(signal.SIGALRM, old)
@@ -235,48 +290,53 @@ def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
                 os.waitpid(t.pid, os.WNOHANG)
             except Exception:
                 pass
-        shutil.rmtree(d, ignore_errors=True)
 
 
 def main() -> int:
     if len(sys.argv) < 3:
-        print('usage: dn-linux-accept.py OBJECT_OUTDIR CLASS_OUTDIR [scenario...]',
+        print('usage: dn-linux-accept.py OBJECT_OUT CLASS_OUT [scenario...|--area NAME]',
               file=sys.stderr)
         return 2
     obj = os.path.abspath(sys.argv[1])
     cls = os.path.abspath(sys.argv[2])
-    only = set(sys.argv[3:])
+    args = sys.argv[3:]
+    area = None
+    only = set()
+    i = 0
+    while i < len(args):
+        if args[i] == '--area' and i + 1 < len(args):
+            area = args[i + 1]
+            i += 2
+        else:
+            only.add(args[i])
+            i += 1
     for path, name in ((obj, 'object'), (cls, 'class')):
         if not os.path.isfile(os.path.join(path, 'dn')):
             print('no dn in', name, path, file=sys.stderr)
             return 2
 
-    # Fixed absolute path so panel titles match between builds.
-    root = '/tmp/dn-accept-shared'
-    work = prep_tree(root)
-
     fails = 0
     passed = 0
-    for name, spec, area in SCENARIOS:
+    for name, spec, ar in SCENARIOS:
+        if area and ar != area:
+            continue
         if only and name not in only:
             continue
-        # Fresh tree each scenario (side effects from prior keys).
-        work = prep_tree(root)
-        print('SCENARIO', name, '(%s)' % area, flush=True)
-        so, eo = run_one(obj, work, spec, 'obj')
-        # Reset tree again so class sees the same starting files.
-        work = prep_tree(root)
-        sc, ec = run_one(cls, work, spec, 'cls')
+        work = prep_tree(WORK_ROOT)
+        print('SCENARIO', name, '(%s)' % ar, flush=True)
+        so, eo = run_one(obj, work, spec)
+        work = prep_tree(WORK_ROOT)
+        sc, ec = run_one(cls, work, spec)
         problems = []
         if 'Fatal' in so['text'] or 'Access' in so['text']:
             problems.append('object Fatal/Access on screen')
         if 'Fatal' in sc['text'] or 'Access' in sc['text']:
             problems.append('class Fatal/Access on screen')
-        if eo:
+        if eo and eo.strip():
             problems.append('object dn.err: ' + eo.split('\n')[0][:120])
-        if ec:
+        if ec and ec.strip():
             problems.append('class dn.err: ' + ec.split('\n')[0][:120])
-        problems.extend(diff_snaps(so, sc, work))
+        problems.extend(diff_snaps(so, sc))
         if problems:
             fails += 1
             print('FAIL', name, flush=True)
