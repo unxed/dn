@@ -19,6 +19,11 @@ on:
       - tools/dn-linux-accept.py
       - .github/workflows/dn-accept.yml
 
+# One accept matrix per ref — newer pushes cancel older runs (runner budget).
+concurrency:
+  group: dn-accept-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   OBJECT_DN_SHA: b4916b874989d7b35660d02cf935dc5f0db7a656
   OBJECT_TV_SHA: 521d06479198789deeaa6fda287236ca83ba4051

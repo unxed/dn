@@ -1,0 +1,6 @@
+# CI push lock — subagents MUST NOT git push or gh workflow run.
+# Parent serializes pushes. See docs/CI-SERIAL.md.
+# Status: locked (parent-owned)
+LOCKED=1
+OWNER=parent
+UPDATED=2026-10-05T15:52:00Z

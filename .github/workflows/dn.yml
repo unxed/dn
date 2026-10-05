@@ -14,6 +14,10 @@ on:
       - .github/workflows/dn.yml
   pull_request:
 
+concurrency:
+  group: dn-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   audit:
     runs-on: ubuntu-24.04
