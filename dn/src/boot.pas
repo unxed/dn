@@ -76,7 +76,7 @@ uses
   dirwatch, realmode, 
   Tree
   , filetype, panelsetup
-  , osdep, cfgstate, palettes;
+  , osdep, dnscreen, cfgstate, palettes;
 
 {AK155 Мало проверить, что имя временного каталога непусто, надо
 еще проверить, что он существует, и что в нем можно создавать и
@@ -776,6 +776,9 @@ procedure RUN_IT;
     Clock.MakeFirst;
     UnLock;
     end;
+  MyApplication.Buffer := ScreenBuffer;
+  MyApplication.Draw;
+  WriteScreenCells(0, ScreenWidth * ScreenHeight);
   
   w95QuitInit; {Gimly}
   
