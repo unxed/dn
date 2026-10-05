@@ -24,6 +24,35 @@ difference: the final comparison must use an object baseline built with the
 same intended palette revision, or preserve the old palette in the class
 build if classic visual compatibility is the requirement.
 
+## Latest reproducible smoke result (2026-10-05)
+
+Compared object DN `10763d65d091fc8525599a45c155be228c1bb8b6` (classic TV
+`c9bb5c4d0d87e73382ebdd48c117f4c29e1ae9e5`) with class DN
+`0c4e839100fe482ff31a842e0028045b9fd3eda0` (TV3 `5e5bf1120770c5da44aa1f75fe5677d621037775`),
+using the same absolute run directory, 100x30 PTY, English resources, `LANG=C`,
+and identical panel fixture. The check used `PtyTerm.screen.cells`, not its
+text-only view.
+
+The first startup checkpoint is **FAIL**: 140 cell states differ, all text
+cells (including the ticking clock); the visible About text identifies object
+DN as `2.14 beta/DPMI32` and class DN as `2.20 alpha/Linux x86_64`, with
+different build revision/date text as well. After the same Enter key, the
+object build closes the startup dialog while the class build still displays
+its Warning/About text. That checkpoint is also **FAIL**: 637 differing
+cells, including 346 attribute-only differences. Enter, Space, or Escape
+individually did not clear the class warning from the captured screen; after
+Escape, F7 followed by creating a directory did work and the subsequent
+redraw cleared the warning. This points to a redraw/output mismatch rather
+than proving that the dialog continues to consume input. The class screen also
+emits `?` where the object screen emits several box/marker glyphs.
+
+These are observed compatibility failures, not exclusions or approved
+normalizations. The identical-run smoke is not yet a reusable full acceptance
+harness, and no matrix row is promoted to pass by this probe. Keep the gate
+**OPEN**; diagnose the input/dialog and glyph differences, then compare every
+matrix action with cursor, all cell attributes, process result, and side
+effects captured.
+
 ## Required comparison
 
 For both builds, use the same clean temporary tree, terminal size, locale,
@@ -54,4 +83,3 @@ matrix and cursor state at the same checkpoints.
 Status values are `pass`, `fail`, or `not applicable`; an untested row is not
 acceptable. Any rendering difference, wrong menu position, missing dispatch,
 changed side effect, crash, or teardown error keeps the gate open.
-
