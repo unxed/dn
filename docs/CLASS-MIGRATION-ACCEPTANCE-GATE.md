@@ -17,8 +17,13 @@ rendering did return successfully.
 ## Required comparison
 
 For both builds, use the same clean temporary tree, terminal size, locale,
-resource files, and key sequence. Record the rendered screen, exit status,
-side effects in the input tree, and `dn.err` or exception output.
+resource files, and key sequence. Compare the terminal state, not a
+text-only rendering: every cell must match exactly as
+`(Unicode cell contents, foreground color, background color, style/attribute)`,
+including blank cells and the cursor position/visibility. A differing
+foreground or background is a failure even when the visible text matches.
+Record the exact cell snapshots, exit status, side effects in the input tree,
+and `dn.err` or exception output.
 
 | Area | Actions | Object baseline | Class build | Comparison |
 |---|---|---|---|---|
@@ -31,6 +36,10 @@ side effects in the input tree, and `dn.err` or exception output.
 | Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
 | Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
 | Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |
+
+The text view printed by `Screen.lines()` is only diagnostic and cannot pass
+this gate. The acceptance harness must compare the complete `Screen.cells`
+matrix and cursor state at the same checkpoints.
 
 Status values are `pass`, `fail`, or `not applicable`; an untested row is not
 acceptable. Any rendering difference, wrong menu position, missing dispatch,
