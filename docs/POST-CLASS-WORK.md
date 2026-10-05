@@ -32,6 +32,7 @@ so resources stay loadable.
 - **Before** any large refactor: write and publish explicit **done criteria**
   (what “readable/maintainable enough” means for this tree: naming, file
   layout, dead code, module boundaries, complexity caps, test expectations).
+- Criteria (on `main`): [`REFACTORING-CRITERIA.md`](REFACTORING-CRITERIA.md).
 - Refactor only against those criteria; no open-ended tidy pass.
 - Behaviour must stay locked to the already-passed object/class gate (or a
   refreshed same-gate run after each risky batch).

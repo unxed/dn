@@ -122,6 +122,9 @@ right after a clipboard permission prompt (far2l/OSC); once after (or instead
 of) running a command on the embedded console. Both Access Violation; no
 reliable repro yet. Suspect event/focus state after clipboard ask and after
 `ExecCommandLine` / shell return — track under shared bugs until caught.
+PTY attempts 2026-10-05 (plain F4, Ctrl/Shift-Ins→F4, Alt-Q→F4, cmdline
+`ls`/`echo`, Ctrl-O ± command): **0/8** AV in `out/dn` UTF-8 build; still open
+under real far2l clipboard permission UI.
 
 Startup redraw ([issue #6](https://github.com/unxed/dn/issues/6)) is **fixed
 functionally**. Both virgin About residue and configured blank panels shared
