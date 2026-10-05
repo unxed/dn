@@ -197,8 +197,8 @@ type
     procedure Draw; override;
     procedure GetItemRect(Item: PMenuItem; var R: TRect); override;
     function Execute: Word; override;
-    function RightExpand: Boolean; virtual;
-    function LeftCollapse: Boolean; virtual;
+    function RightExpand: Boolean; override;
+    function LeftCollapse: Boolean; override;
     end;
 
   { TMenuPopup object }
