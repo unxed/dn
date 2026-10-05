@@ -5,6 +5,17 @@ Last updated: 2026-10-05
 Product frame for this work: **DN 3.0** — stable port, minimal interventions;
 deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 
+## Status snapshot (2026-10-05, afternoon)
+
+| Item | State |
+|---|---|
+| Gate | **OPEN** |
+| Core accept (`dn-linux-accept.py`) | **32/32 PASS** (startup, panels, F3–F8, menus open, util calc/cal, zip Enter) |
+| Full menu grid `menu_M_N` | In progress; first File items show real diffs / object blank on some Enter |
+| Full functional matrix | Harness expanded (dialogs/tools/archives/input); not green yet |
+| Classic palette | Class on `CColor` (not OSP) |
+| Archives nested | `.tgz`/`.tar.bz2` Enter OK; F5/CI peers still open |
+
 ## Working agreement
 
 - DN and TV3 work is on `main`; no migration feature branches are in use.
