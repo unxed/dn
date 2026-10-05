@@ -10,6 +10,8 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Item | State |
 |---|---|
 | Gate | **CLOSED** on last behavior-verified SHA `06259f5` (2026-10-06) |
+| Whole-tree class syntax gate | **PASS** on DN `8f3057f`: strict scan of all 185 tracked Pascal files; no exclusions; no object-dialect construction/disposal idioms |
+| Bootstrap provenance | **PASS** on DN `8f3057f`; `dn` run `37386669632` reproduced pinned baseline byte-for-byte; `layout` run `37386669509` passed |
 | Core accept | **32/32 PASS** (historical) |
 | Full matrix | **177/177 PASS** on exact SHA `06259f5` (12 shards; GitHub run `37383488177`; object DN `b4916b8` + TV `521d064` vs class DN + TV3 `a06dd31`) |
 | Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |
@@ -101,17 +103,13 @@ invalid and not counted. The configured blank-panel mismatch (10/10 before
 
 ## Remaining work, in order
 
-1. Verify the class gate with no exclusions (`CLASS_GATE_STRICT=1`) and exact
-   baseline bootstrap reproduction after the historical Pascal inputs are
-   retrieved from the pinned baseline commit; current local tests pass, new
-   GitHub workflow is pending on this documentation/source change.
-2. Keep full object/class parity closed at 177/177 on `06259f5`; rerun after
+1. Keep full object/class parity closed at 177/177 on `06259f5`; rerun after
    any UI, drawing, events, resources, or stream changes. Any mismatch blocks
    later stages; shared bugs must still be fixed.
-3. Stage 3 platform separation is next, based on the corrected current-layout
-   plan in `docs/REFACTORING-CRITERIA.md` and `docs/POST-CLASS-WORK.md`.
-4. Stage 4 adds the minimally decent Linux/DOS/Windows tests, after stage 3.
-5. Track remaining product tests separately: `docs/ZIP-CHARSET.md`,
+2. Stage 3 platform separation is next; its current code map and done criteria
+   are in `docs/PLATFORM-SEPARATION.md`.
+3. Stage 4 adds the minimally decent Linux/DOS/Windows tests, after stage 3.
+4. Track remaining product tests separately: `docs/ZIP-CHARSET.md`,
    `docs/ARCHIVE-MATRIX.md`, and optional `PKTVIEW` runtime coverage.
 
 ## Recorded issue and administrative commits
@@ -119,8 +117,8 @@ invalid and not counted. The configured blank-panel mismatch (10/10 before
 GitHub issue [#6](https://github.com/unxed/dn/issues/6) tracked the
 panel-redraw symptoms; functional fix is on `main`.
 
-Evidence commits already on DN `main` (local HEAD is authoritative; push
-optional per `docs/CI-SERIAL.md`):
+Evidence commits already on DN `main` (every commit is pushed immediately;
+verify the remote ref and exact-SHA Actions results):
 
 - `7572d73` — `ReadScreenCells` after startup draw (issue #6); About/startup
   regressions `tools/dn-linux-startup.py` / `dn-linux-about.py`.
