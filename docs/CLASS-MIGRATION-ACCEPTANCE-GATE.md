@@ -42,20 +42,30 @@ one fresh run per build: after the same Escape key, the object build removed
 the dialog and restored the panels (0/1 residue trials), while the class build
 left the About image visible over the panels (1/1). This confirms the reported
 regression but is only an initial reproduction, not a complete regression
-test. The other reported discrepancy—panels sometimes absent on clean start
-until a menu triggers redraw—remains intermittent and has not yet been
-reproduced in a controlled trial series. A source search found redraw/draw
-entry points in `mainapp.pas`, `panelroot.pas`, `paneldlgs.pas`, and `menus.pas`;
-it has not isolated the responsible path. Both are hard failures, not accepted
+test. A separate startup-rendering discrepancy is now scoped more precisely:
+the user reports that an intermittently blank panel area occurs in a
+self-built branch binary, but does not occur in the distributed `dist`
+binary. User-provided screenshots show the blank self-build screen and the
+panels appearing after opening the File menu. This has not yet been reproduced
+in a controlled comparison; record separate trials for the exact source build
+and its intended `dist` comparator, including both before and after the same
+menu input. Do not silently combine this build-variant issue with the
+reproducible About-close residue. A source search found redraw/draw entry
+points in `mainapp.pas`, `panelroot.pas`, `paneldlgs.pas`, and `menus.pas`; it
+has not isolated the responsible path. Both are hard failures, not accepted
 normalizations.
 
 Startup/panel regressions to reproduce and fix:
 
 * Closing the About dialog on first launch consistently leaves its image
   visible over the panels.
-* On some clean starts the panels are not drawn until opening a menu causes a
-  redraw. Treat this as intermittent: run at least 100 fresh starts, capture
-  the screen before opening any menu, and require zero missing-panel trials.
+* The user reports intermittent blank panels in a self-built branch binary,
+  but not in `dist`; screenshots show that opening File causes panels to
+  appear. Run at least 100 fresh starts of each exact comparator binary
+  (recording source revision, build flags, and `dist` artifact identity),
+  capture the screen before input, then replay the same menu input and capture
+  again. Require zero missing-panel trials for the accepted class build and
+  exact parity with its object/distribution comparator.
 * For the About residue, capture the screen immediately before opening About,
   while About is open, and immediately after closing it; all prior panel cells
   must be restored on every trial. Initial evidence: exact-pair fresh-start
