@@ -181,6 +181,8 @@ procedure TKeyMacros.Play;
   var
     N: Integer;
   begin
+  if Application = nil then
+    Exit;
   N := 0;
   while N < Count do
     begin
@@ -280,6 +282,11 @@ procedure TClockView.HandleEvent(var Event: TEvent);
   P := Size;
   if Event.What = evMouseDown then
     begin
+    if Application = nil then
+      begin
+      ClearEvent(Event);
+      Exit;
+      end;
     Application.GetBounds(R);
     
     if ((Event.EventFlags and 2) <> 0) then
@@ -527,7 +534,8 @@ procedure PrintFiles(Files: TCollection; Own: TView);
       begin
       S := MakeNormName(PF^.Owner^, PF^.FlName[True]);
       Message(Own, evCommand, cmCopyUnselect, PF);
-      Message(Application, evCommand, cmFilePrint, @S);
+      if Application <> nil then
+        Message(Application, evCommand, cmFilePrint, @S);
       end;
     end;
   end { PrintFiles };

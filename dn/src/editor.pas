@@ -73,7 +73,7 @@ uses
 
 type
   TSortCollection = class(TSortedCollection)
-    function Compare(Key1, Key2: Pointer): Integer; virtual;
+    function Compare(Key1, Key2: Pointer): Integer; override;
     end;
 
 var
@@ -940,7 +940,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       E: TEvent;
       PS: PLongString;
       Cancel: Boolean;
-      LL: array[1..3] of LongInt;
+      LL: array[1..3] of PtrInt;
       SR: lSearchRec;
       FName: String;
     label 1;

@@ -980,7 +980,7 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       I: Integer;
       MM, DD, YY: Word;
       II, N1, N2, N3: Word;
-      LL: array[0..3] of LongInt;
+      LL: array[0..3] of PtrInt;
       FldLen: AWord; { Kirill }
 
     procedure StoreField;

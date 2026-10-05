@@ -58,7 +58,7 @@ uses
 
 type
   TStringCol = class(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
+    procedure FreeItem(P: Pointer); override;
     procedure PutItem(var S: TStream; P: Pointer); virtual;
     function GetItem(var S: TStream): Pointer; virtual;
     end;
@@ -82,20 +82,20 @@ type
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     function PrintBuffer(Num: Word): Boolean;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure PrintFile(const FileName: String);
     function SetDestination: Boolean;
     function GetStatus: Byte;
     procedure InitPrinter;
-    function Valid(C: Word): Boolean; virtual;
-    procedure Update; virtual;
+    function Valid(C: Word): Boolean; override;
+    procedure Update; override;
     destructor Destroy; override;
     end;
 
 
   TPrintStatus = class(TView)
     Print: TPrintManager;
-    procedure Draw; virtual;
+    procedure Draw; override;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;

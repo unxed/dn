@@ -202,7 +202,7 @@ type
 
   TDbfFieldCollection = class(TCollection)
     {KV}
-    procedure FreeItem(Item: Pointer); virtual;
+    procedure FreeItem(Item: Pointer); override;
     end;
 
   TDbaseWriter = class(TBufStream)

@@ -60,8 +60,8 @@ type
    Execute. Цвета палитры (C) заносятся в CM_RenameSingleL}
   TInputFName = class(TInputLine)
     EndView: Word;
-    function Execute: Word; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    function Execute: Word; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
   TColorPoint = class(TView)
@@ -69,7 +69,7 @@ type
     constructor Create(var ABounds: TRect; AColor: Byte);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream); virtual;
-    procedure Draw; virtual;
+    procedure Draw; override;
     end;
 
 implementation
