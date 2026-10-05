@@ -1,8 +1,10 @@
 # What is in which file of `dn/src`
 
-The names are the DOS names of the archive (8 characters), so the name often says little. This is a map for a newcomer: the files that you meet first,
-what each holds and the main types in it (`T…` classes are `object` types of Turbo Vision style). It is not complete; "(?)" marks what was guessed
-from a name and not checked: fix it when you know. The class of every file by origin is in [`PROVENANCE.md`](PROVENANCE.md).
+The names are often the old DOS archive names (8 characters), so the name
+says little. This is the newcomer map: role of each unit and the main types.
+Every `dn/src/*.pas` unit appears below (grouped tables + “Remaining units”
+index). "(?)" marks a detail that was not fully verified. Origin class of
+each file: [`PROVENANCE.md`](PROVENANCE.md).
 
 ## How `dn/` is laid out (since 2026-10-03)
 
@@ -50,9 +52,9 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `filecopy.pas` | copy, move, delete (the engine and the dialogs) |
 | `tree.pas` | the directory tree |
 | `lfn.pas` | long file names (DOS: the services of Windows 95; elsewhere: thin) |
-| `filediz.pas` | the descriptions of files (`descript.ion`, `files.bbs`) (?) |
+| `filediz.pas` | file descriptions (`descript.ion`, `files.bbs`) |
 | `fstorage.pas` | the storage of directories (a hash of the names of directories) |
-| `diskinfo.pas`, `diskimg.pas` | the information about a disk; disk images (?) |
+| `diskinfo.pas`, `diskimg.pas` | disk information panels; disk-image helpers |
 
 ## The names of the files (a rule, 2026-10-04) and which file holds what
 All names are lower case (the sources, the directories, the files that the program reads and writes, `dist/`): the Linux file systems tell `DN.INI` from `dn.ini`, DOS does not care, and one case is enough. The names stay 8.3 where the program writes them (DOS).
@@ -136,9 +138,50 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `compat/country.pas` (was `country_`; DOS), `compat/linux/country.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `resource/*` → `*.LNG`, `*.DLG`) |
 
+## Remaining units (full index)
+
+Units not already named in the tables above. One line each so the tree has
+no silent gaps (post-class criterion A).
+
+| File | What it holds |
+|---|---|
+| `archread.pas` | reading archive member streams for viewers / extract |
+| `archset.pas` | archiver setup dialogs and `ARCHIVER.INI` editing |
+| `arvidtdr.pas` | Arvid tape drive low-level (historic) |
+| `asciitab.pas` | ASCII table dialog (Borland-style replacement) |
+| `colors.pas` | Colors dialog, highlight groups, Window Manager list |
+| `dbwatch.pas` | DBF viewer field / watch helpers |
+| `defcoll.pas` | definition collections used while building resources |
+| `dirwatch.pas` | directory-change watch stub (all targets) |
+| `dnhelp.pas` | help context IDs and help wiring for DN |
+| `dnstddlg.pas` | standard file-name dialogs (`GetFileNameDialog` / menu stub) |
+| `eraser.pas` | erase-files engine used by panels |
+| `fileerrors.pas` | file I/O error messages (was `errmess`) |
+| `filelst.pas` | file-list helpers for dialogs and histories |
+| `filetype.pas` | file-type / extension classification for panels |
+| `findobj.pas` | find-object UI pieces for file find |
+| `hash.pas` | hash-table helpers (file collections, etc.) |
+| `helpfile.pas` | help file reader (Borland help format glue) |
+| `helpkern.pas` | help kernel / topic navigation |
+| `inifiles.pas` | generic INI parse helpers under `iniengine` |
+| `listmakr.pas` | string-list maker used by the resource toolchain |
+| `messages.pas` | message boxes / `ErrMsg` wrappers over `tv/` |
+| `objtype.pas` | stream object-type numbers (`ot*`) for DN classes |
+| `pktview.pas` | FidoNet `.pkt` viewer |
+| `rstrings.pas` | resource string index glue |
+| `strview.pas` | string viewer widget |
+| `timeutil.pas` | time helpers (was `xtime`; `GetCurMSec`, etc.) |
+| `titleset.pas` | window title stack / set helpers |
+| `uniwin.pas` | generic / user window types |
+| `uselfn.pas` | LFN-related constants (was `files`) |
+| `usersavr.pas` | user screen / output window savers |
+| `uue2inc.pas` | uue decode / mail include tools |
+| `version.pas` | version and build stamp strings |
+| `winclp.pas` | system clipboard bridge via `TvClip` |
+
 ## Where to look for what (the first hour)
 * A key does not work → `apploop.pas` (the loop), then the `HandleEvent` of the view that has the focus; the key codes are in `commands.pas`.
 * A panel draws wrong → `filepanel.pas` `TFilePanel.Draw` (the partial redraw is in the same procedure: after a cursor move only two lines are drawn).
-* A name is cut or padded wrong → `advance.pas` `FormatLongName` (and `dnutf8.pas` for the columns).
+* A name is cut or padded wrong → `basics.pas` / `fileutil.pas` `FormatLongName` (and `dnutf8.pas` for the columns).
 * The editor → `editcore.pas` (everything is one byte per column; `DocTab` in `dnutf8.pas` makes it UTF-8).
 * A command is run → `dnexec.pas` → `dnrun.pas` → `tv/src/tvvtrun.pas`.
