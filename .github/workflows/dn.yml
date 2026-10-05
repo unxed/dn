@@ -67,6 +67,6 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
       - name: Build and run the tests
         run: tools/dn-test.sh
