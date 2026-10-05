@@ -50,24 +50,24 @@ Those faults appear only on class self-builds; pre-class `dist` does not show
 them on the same actions. The historical checkout `/home/unxed/dev/dn` is
 evidence/build input only, not the publication target.
 
-## Open GitHub issue
+## GitHub issue #6 (startup redraw)
 
-[unxed/dn#6 — Исправить перерисовку панелей при запуске](https://github.com/unxed/dn/issues/6)
-
-Issue #6 tracks the two mutually exclusive startup states below. It requires
-the latest object-based and latest class-based builds to use the same settings,
-working path, terminal and action sequence; the pre-class `dist` binary is
-explicitly excluded as the migration comparator.
+[unxed/dn#6](https://github.com/unxed/dn/issues/6) — **fixed and closed**.
+Root cause: after startup `MyApplication.Draw`, `WriteScreenCells` flushed a
+stale 16-bit cell copy over the panels. Fix: `ReadScreenCells` immediately
+after the draw (`7572d73`); skip the follow-up `WriteScreenCells` under
+`-dDNUTF8` (`ab9ebd8`). Regression: `tools/dn-linux-startup.py`. Full-cell
+object/class parity remains an open gate item, not this symptom.
 
 ## Reproduction and verification ledger
 
 | Check | Evidence so far | State |
 |---|---|---|
-| Virgin first launch: About image remains after close | User reports stable symptom. One exact-pair probe on object `b4916b8` and class `33674fe`: object 0/1 residue trials, class 1/1. Reconfirm on latest class source `7eaca15`. | Open; add repeatable full-cell test |
-| Configured launch (`dn.ini`): blank panels until menu | Ten controlled ready-synchronized 100x30 PTY pairs used the same working path and identical `dn.ini` (SHA-256 `1a9b0b2b63ba27eb9324c3a09587ac337426756e174ba77f60ef05a8ab52ad9f`). In all 10 pairs latest object `b4916b8` displayed panels before input; latest class `7eaca15` displayed a blank purple area. Both displayed panels after identical F10+Right. Object binary SHA-256 `8508cf5535cde1705aba33f83043caddc89dafdddef147a9d34068a619056b40`; class binary `6e057566920a7d47dad45174203eeb5af407d86704b0d90555c76802c132d552`. This is a stable mismatch. Exact full-cell parity remains unverified; post-menu captures still differ. | Stable failure reproduced 10/10; root cause open |
+| Virgin first launch: About image remains after close | Same stale-copy path as configured blank panels. After `ReadScreenCells` post-draw: Esc on About leaves panels (class+object PTY, 2026-10-05). | Fixed with #6 (`7572d73`); full-cell parity still open |
+| Configured launch (`dn.ini`): blank panels until menu | Was 10/10 blank on class `7eaca15` vs panels on object `b4916b8` (shared ini SHA-256 `1a9b0b2b…`). After fix: class+object 5/5 show panels before input and after F10+Right on gate binaries. | Fixed (`7572d73`/`ab9ebd8`); `tools/dn-linux-startup.py` |
 | Class-vs-`dist` diagnostic | `dist` appears to draw panels before menu, but per-build saved `dn.ini` files differed; this is not controlled causal or acceptance evidence. User confirmed `dist` predates classes. | Excluded from the controlling comparator |
 | PTY alternate-screen restoration | Fixed in `133f3d4`; two focused tests cover cell/attribute/cursor restore and repeated transitions. Whole tool suite passed 34 tests. | Verified harness fix; not a DN behavior fix |
-| Pascal string collection representations | A class language-menu fault was traced to interpreting a `TStringCollection` ShortString item as AnsiString. A repository search found analogous `PString(Collection.At(...))` in `dnutil.pas`, `paneldlgs.pas`, `printman.pas`, `histories.pas`, `eraser.pas`, `diskinfo.pas`, and `filefind.pas`. | Open; inspect each type and add/test only confirmed fixes |
+| Pascal string collection representations | Language menu / `ChLngId` read `TStringCollection` ShortString items via `PString` while `System.PString` (^AnsiString) was visible after `uses SysUtils`. Audited all `PString(….At(…))` sites: only `dnutil` `ChLngId` was a confirmed mismatch (same class as `cmExecFile`); peers store ShortStrings and already resolve to `Defines.PString` or `pstring_bind`. | Fixed: `PShortString` in `ChLngId`; peers left unchanged after type review |
 | Case-insensitive `object` tree audit | Initial inventory search `rg -uuu --text -i -l object . -g '!.git/**'` listed 348 paths, including docs, bootstrap, tests and compiled output. | Newly registered subtask; full contextual audit not started |
 | `F4` internal editor AV (class only) | Fixed: `Build_REditSaver`/`Store_REditSaver` now match `TLoadProc`/`TStoreProc` (stream by value). | Fixed on class self-build; object/class parity still required |
 | `Ctrl+O` user screen AV (class only) | Fixed: nil-check `UserScr` before `.Cols`; `VtShowScreen` guards nil (`tv3` `396fb86`). | Fixed on class self-build; content parity after a command still open |
@@ -82,11 +82,8 @@ explicitly excluded as the migration comparator.
 | Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | **Partial:** `.tgz`/`.tar.gz` Enter+list OK (`fmttgz`); fixtures + `dn-linux-archives.py` Enter/leave green. Open: F3/F4/F5, peers, CI — `docs/ARCHIVE-MATRIX.md` / PLAN 4c |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
-invalid and not counted. A valid comparison waits for a visible readiness
-marker, uses equivalent non-virgin configuration, captures every screen cell
-(glyph, foreground, background, style), cursor and process result, then replays
-the exact same action. The configured-launch mismatch has since reproduced in
-10/10 ready-synchronized object/class pairs and is stable, not intermittent.
+invalid and not counted. The configured blank-panel mismatch (10/10 before
+`7572d73`) is fixed; remaining gate work is full-cell object/class parity.
 
 ## Remaining work, in order
 
@@ -107,18 +104,20 @@ the exact same action. The configured-launch mismatch has since reproduced in
    2. Refactoring for readability (publish done-criteria first)
    3. Separate and formalize platform-dependent code
    4. Expand tests to a minimally decent level (incl. Linux / DOS / Windows)
-4. Until the gate PASSes, also keep chasing known open matrix rows: virgin
-   About residue, configured blank panels (#6), palette/UX notes that are
-   acceptance decisions, ZIP charset (`docs/ZIP-CHARSET.md`), archive
-   matrix (`docs/ARCHIVE-MATRIX.md`), etc.
+4. Until the gate PASSes, also keep chasing known open matrix rows:
+   full-cell object/class parity, ZIP charset (`docs/ZIP-CHARSET.md`),
+   archive matrix (`docs/ARCHIVE-MATRIX.md`), etc. Startup blank panels /
+   About residue (#6) are fixed functionally.
 
 ## Recorded issue and administrative commits
 
-GitHub issue [#6](https://github.com/unxed/dn/issues/6) is the tracker for the
-panel-redraw symptoms and their acceptance evidence.
+GitHub issue [#6](https://github.com/unxed/dn/issues/6) tracked the
+panel-redraw symptoms; functional fix is on `main`.
 
 Relevant pushed commits on DN `main`:
 
+- `7572d73` — `ReadScreenCells` after startup draw (issue #6).
+- `ab9ebd8` — skip post-draw `WriteScreenCells` under `-dDNUTF8`.
 - `133f3d4` — repair/test PTY primary-screen restoration.
 - `d00a7f3` — record exact object/class acceptance baseline and reported panel
   symptoms.

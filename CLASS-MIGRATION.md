@@ -86,13 +86,15 @@ It supplements the full workflows and does not waive either final tree gate.
   With `-dDNUTF8`, `ReadScreenCells` maps multi-byte cells to `'?'` in the
   copy, so the post-draw `WriteScreenCells` must not run (UTF-8 panel names
   would otherwise show as `?????` until Ctrl-R).
-- Regression test: the `dn-linux-ops.py` autosave-desktop check
-  (`dsk_cwd` right after the start, no F10/Right) fails without the fix.
+- Regression: `tools/dn-linux-startup.py` (shared `dist/linux64/dn.ini`,
+  panels before any key, then F10+Right). The `dn-linux-ops.py`
+  autosave-desktop `dsk_cwd` check also fails without the fix.
 - Open: full cell comparison object/class (colours, several symbols) is not
   closed; the 100-run acceptance is not done. Autosave-desktop second-start
   SIGSEGV is fixed (`S.Put(Drive)` in `TFilePanelRoot.Store`).
-- Analogues to check (not done): other `Draw` followed by `WriteScreenCells`
-  without `ReadScreenCells`: `dn.pas:130`, `videoman.pas:447`.
+- Analogues reviewed, not the same bug: `dn.pas:130` (fatal-error screen) and
+  `videoman.pas:447` (`DoneVideo` restoring the user screen) write intentional
+  buffers, not a post-`Draw` stale copy.
 
 ## Class-only runtime crashes (recorded 2026-10-05)
 
