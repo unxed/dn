@@ -41,6 +41,15 @@ gate. Use the full `Screen.cells` (or equivalent) matrix.
 object was wrong and fix with owner agreement) → re-run the failing scenarios.
 No “close enough”, no skipping to post-class work.
 
+**Shared bugs (owner, 2026-10-05):** the comparator is *last object-based* vs
+*last class-based*. If **both** builds show the **same** wrong UI, side effect,
+or crash for a scenario, that is **not** preserved legacy — **fix it** on the
+class line (and backport to the object baseline when that tree is still
+maintained for the gate). Do **not** leave defective behavior just because the
+object revision had it before the migration. Record the fix in the regression
+checklist; re-run the scenario on both builds when the object tree is still
+used for acceptance.
+
 ## Current controlling result (2026-10-05)
 
 The latest object baseline identified so far is DN

@@ -83,6 +83,8 @@ the exact same action. The configured-launch mismatch has since reproduced in
    class-based DN — all functions, all scenarios, bitwise cell compare
    (glyph + fg/bg + attrs + cursor + process + side effects). Spec:
    `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`. Mismatch → fix; do not proceed.
+   Same wrong output on **both** object and class → still fix (shared-bugs rule
+   in the gate doc); parity is not an excuse to keep defects.
 3. Only after the gate PASSes — post-class stages in order
    (`docs/POST-CLASS-WORK.md`):
    1. English (comments, docs, user strings / hardcode)
