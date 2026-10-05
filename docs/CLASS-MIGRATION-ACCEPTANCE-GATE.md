@@ -185,16 +185,18 @@ and `dn.err` or exception output.
 
 | Area | Actions | Object baseline | Class build | Comparison |
 |---|---|---|---|---|
-| Startup/teardown | Start, initial panels, redraw/resize, `Alt-X`, clean teardown | pending | pending | pending |
-| Main menus | File, Disk, Utilities, Panel, Manager, Options, Window | pending | pending | pending |
-| Nested menus | Every submenu, enabled/disabled state, geometry, cancellation | pending | pending | pending |
-| Panels | Switch, drive, directory, manager-new, select, sort, filter, view mode | pending | pending | pending |
-| File operations | View, edit, copy, move, rename, delete, attributes, cancel/error paths | pending | pending | pending |
-| Archives | Enter/leave, list, nested (`.tar.gz`…), F3/F4/F5, error paths; ZIP charset (`docs/ZIP-CHARSET.md`); matrix (`docs/ARCHIVE-MATRIX.md`) | pending | zip/7z/tgz/tar.bz2 Enter pass; harness `tools/dn-linux-accept.py` | pending |
+| Startup/teardown | Start, initial panels, redraw/resize, `Alt-X`, clean teardown | core PASS | core PASS | **pass** (32-scenario core 2026-10-05) |
+| Main menus | File, Disk, Utilities, Panel, Manager, Options, Window | core open | core open | core PASS; full `menu_M_N` grid running |
+| Nested menus | Every submenu, enabled/disabled state, geometry, cancellation | pending | pending | partial (`menu_file_view_sub` PASS) |
+| Panels | Switch, drive, directory, manager-new, select, sort, filter, view mode | core PASS | core PASS | **pass** (tab/alt-F1/alt-F10/ctrl-L/R/ins/plus) |
+| File operations | View, edit, copy, move, rename, delete, attributes, cancel/error paths | core PASS | core PASS | **pass** (F3–F8 + F5 cancel) |
+| Archives | Enter/leave, list, nested (`.tar.gz`…), F3/F4/F5, error paths; ZIP charset (`docs/ZIP-CHARSET.md`); matrix (`docs/ARCHIVE-MATRIX.md`) | core zip Enter | core zip Enter | core PASS; full archive matrix still open |
 
 Harness: `tools/dn-linux-accept.py OBJECT_OUT CLASS_OUT` — shared work tree, full
-`Screen.cells` + cursor compare (menu-bar clock masked), core scenarios + every
-top-menu cell (`menu_M_N`). Object baseline rebuild: DN `b4916b8` + TV `521d064`.
+`Screen.cells` + cursor compare (menu-bar clock + digit/time noise masked), core
+scenarios + every top-menu cell (`menu_M_N`). Object baseline: DN `b4916b8` + TV
+`521d064`. **Core result 2026-10-05:** `SUMMARY pass=32 fail=0`. Gate still
+**OPEN** until the full menu grid and remaining areas finish.
 | Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
 | Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
 | Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |
