@@ -53,8 +53,8 @@ uses osdep, dnscreen;
 
 var
   ScreenMirror: Pointer;
-   {` Выводимая информаци сравнивается с содержимым, и, если всё совпадает,
-    вывод в консоль не производится. См. Views._vp.ShowBuffer `}
+   {` Output is compared with the buffer contents; if identical,
+    nothing is written to the console. See Views._vp.ShowBuffer `}
 
 procedure DetectVideo;
 
@@ -280,7 +280,7 @@ procedure SetCrtData;
   begin
   GetScreenMode(@SrcSize, True);
 (*
-  {AK155 при SrcSize.Y=300 (w2k, wXP) DN падает}
+  {AK155 with SrcSize.Y=300 (w2k, wXP) DN crashes}
   if  (SrcSize.Y > 100) or (SrcSize.X*SrcSize.Y*2 > 32768) then
     begin
     SysTVSetScrMode(3);
@@ -356,7 +356,7 @@ function SetVideoMode(Mode: Word): Boolean;
     sm80x60:
       Rows := 60;
     $140A..$FFFE:
-      begin {минимальный размер окна 20x10, меньше просто нет смысла}
+      begin {minimum window size 20x10; smaller makes no sense}
       Rows := Lo(Mode);
       Cols := Hi(Mode);
       if Rows < 10 then
@@ -366,9 +366,9 @@ function SetVideoMode(Mode: Word): Boolean;
 
 {
 piwamoto: current mode == target mode
-VPSYSD32.SetScreenSize всегда чистит экран при смене видеорежима и делает
-кучу проверок, что тормозит и не нужно нам в случае если размер экрана до
-запуска DN и его рабочий размер совпадают
+VPSYSD32.SetScreenSize always clears the screen on mode change and runs
+many checks, which is slow and unnecessary when the pre-DN screen size
+matches the working size
 }
   if (Rows = ScreenHeight) and (Cols = ScreenWidth)
     then Exit;
@@ -380,10 +380,10 @@ VPSYSD32.SetScreenSize всегда чистит экран при смене в
       ScreenHeight := Rows;
       ScreenWidth := Cols;
       ScreenMode := Mode;
-      {AK155 Число видеострок курсора зависит от видеорежима, а в окне - еще и
-от операционки. Но сразу после установки режима курсор прижат к нижнему
-краю знакоместа, так что lo(Drivers.CursorLines) равно максимальному
-номеру видеостроки знака. Это используется при изменениях вида курсора.}
+      {AK155 Cursor scan-line count depends on the video mode, and in a window
+also on the OS. Right after setting the mode the cursor sits at the bottom
+of the cell, so lo(Drivers.CursorLines) is the max scan-line index.
+Used when changing cursor shape.}
       Drivers.CursorLines := GetCursorSize;
       {/AK155}
       end;
@@ -437,7 +437,7 @@ procedure InitVideo;
 procedure DoneVideo;
   begin
   FillChar(ScreenBuffer^, ScreenWidth*ScreenHeight*2, 0);
-  {JO: нужно, чтобы куски панелей не "линяли" в UserScreen}
+  {JO: so panel pieces do not "bleed" into UserScreen}
   if UserScreen <> nil then
     Move(UserScreen^, ScreenBuffer^, UserScreenSize);
   FreeMem(UserScreen, UserScreenSize); {Cat}
@@ -450,8 +450,8 @@ procedure DoneVideo;
     WordRec(OldCursorPos).Hi := ScreenHeight-1; {KV}
   if WordRec(OldCursorPos).Lo > ScreenWidth-1 then
     WordRec(OldCursorPos).Lo := ScreenWidth-1; {KV}
-  {JO: под OS/2 после смены видеорежима GetCursorXY даёт нулевые координаты}
-  {    как с этим бороться - пока не знаю                                   }
+  {JO: under OS/2 after a mode change GetCursorXY returns zero coordinates}
+  {    how to fix this — unknown yet                                       }
   if OldCursorPos <> 0 then
     MoveCursorTo(WordRec(OldCursorPos).Lo, WordRec(OldCursorPos).Hi);
   {KV}

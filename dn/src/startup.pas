@@ -99,7 +99,7 @@ const
   Security: Boolean = True;
   ConfigModified: Boolean = False;
   SkyDelay: Byte = 1;
-  CmdExt: String[4] = '.CMD'; {расширение командных файлов}
+  CmdExt: String[4] = '.CMD'; {command-file extension}
 
 type
 
@@ -162,16 +162,16 @@ type
     end;
 
   TFMSetup = record
-    Options: Word; // Поведение
+    Options: Word; // Behaviour
     Quick: Word;
     LRCtrlInDriveLine: Word;
-    Show: Word;    // Внешний вид
+    Show: Word;    // Appearance
     LFN_Wrap: Word; {Combo}
     LFN_Cut: Word; {Combo}
     LFN_Autohide: Word; {Checkbox[1]}
     LFN_Difference: Word; {Combo}
-    TagChar: String[1]; // Если не нужен, то TagChar[1]= ' ';
-    RestChar: String[1]; // RestChar[1] всегда корректен
+    TagChar: String[1]; // If unused, TagChar[1]= ' ';
+    RestChar: String[1]; // RestChar[1] is always valid
     DIZ: String[250];
     NewPanelPreset: Word;
     LeftPanelType: Word;
@@ -240,8 +240,8 @@ var
 
 const
   ChangeNamesCaseOptions: TNamesCaseOptions = (Name: 0; ext: 0); {JO}
-  {было Longint и делилось на два Word,}
-  {но это не годится для 32-битной платформы}
+  {was Longint split into two Words,}
+  {but that does not work on a 32-bit platform}
   ComareDirsOptions: TComareDirsOptions = (o: 3; FMask: '*.*'; S: 0);
   UUDecodeOptions: AWord = 3;
 
@@ -308,7 +308,7 @@ const
     TagChar: #251;
     RestChar: #16;
     DIZ: 'descript.ion;uselfn.bbs';
-    NewPanelPreset: 2; {нумерация от нуля, то есть 2 - это как Ctrl-3}
+    NewPanelPreset: 2; {zero-based, so 2 means Ctrl-3}
     LeftPanelType: fdoDriveDrive
     );
 

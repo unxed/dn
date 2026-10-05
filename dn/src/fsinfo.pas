@@ -4,7 +4,7 @@
 {$I STDEFINE.INC}
 
 {Cat
-   04/12/2001 - в WinNT поддерживается копирование Security Attributes
+   04/12/2001 - WinNT supports copying Security Attributes
 }
 
 unit fsinfo;
@@ -21,14 +21,14 @@ function GetBytesPerCluster(Path: PChar): LongInt;
 
 function GetFileAges(S: String; var Age_LWr, Age_Cr, Age_LAc: LongInt)
   : LongInt;
-  {JO: возвращает время и дату последней модификации (Age_LWr),                   }
-  {    время и дату создания (Age_Cr) и время и дату последнего доступа (Age_LAc) }
-  {    файла по хэндлу файла (Handle), принимает значение кода ошибки             }
+  {JO: returns last-write time/date (Age_LWr),                                  }
+  {    creation time/date (Age_Cr) and last-access time/date (Age_LAc)           }
+  {    of a file by handle; returns an error code                               }
 function SetFileAges(S: String; Age_LWr, Age_Cr, Age_LAc: LongInt)
   : LongInt;
-  {JO: устанавливает время и дату последней модификации (Age_LWr),                }
-  {    время и дату создания (Age_Cr) и время и дату последнего доступа (Age_LAc) }
-  {    файла по хэндлу файла (Handle), принимает значение кода ошибки             }
+  {JO: sets last-write time/date (Age_LWr),                                     }
+  {    creation time/date (Age_Cr) and last-access time/date (Age_LAc)           }
+  {    of a file by handle; returns an error code                               }
 
 procedure GetSerFileSys(Drive: Char; var SerialNo: Longint;
   var VolLab, FileSys: String);
@@ -112,7 +112,7 @@ function GetFileAges(S: String; var Age_LWr, Age_Cr, Age_LAc: LongInt)
   Assign(f, SysOsPath(S));
   Reset(f, 1);
   GetFTime(f, Age_LWr);
-{ Тут неплохо бы вставить чтение Age_Cr и Age_LAc через Win95 LFN API}
+{ Would be good to read Age_Cr and Age_LAc via Win95 LFN API here}
   Age_Cr := 0;
   Age_LAc := 0;
   Close(f);
@@ -132,7 +132,7 @@ function SetFileAges(S: String; Age_LWr, Age_Cr, Age_LAc: LongInt)
   Assign(f, SysOsPath(S));
   Reset(f, 1);
   SetFTime(f, Age_LWr);
-{ Тут неплохо бы вставить запись Age_Cr и Age_LAc через Win95 LFN API}
+{ Would be good to write Age_Cr and Age_LAc via Win95 LFN API here}
   Close(f);
   FileMode := SaveMode;
   Result := 0;
@@ -167,8 +167,8 @@ function GetFSString(Drive: Char): String; {AK155}
   //we don't check errors for Novell compatibility
   //Mem[segdossyslow32] filled with zeros for catching errors
   MemGet(segdossyslow32, DiskInfo.InfoLevel, SizeOf(DiskInfo));
-  {В ДОС-сессиях OS/2 и WinNT поле FS дополняется #0, а в голом ДОС
-  (PC DOS 7, MS DOS 7.*) - пробелами. }
+  {In OS/2 and WinNT DOS sessions the FS field is padded with #0; in bare DOS
+  (PC DOS 7, MS DOS 7.*) — with spaces. }
   Result := fDelRight(fReplace(#0, ' ', StrPas(DiskInfo.FileSystem)));
   end;
 
@@ -183,8 +183,8 @@ function GetShare(Drive: Char): String; {AK155}
   with Regs do
     begin
     AH_ := $60; // CANONICALIZE FILENAME OR PATH
-    DS_ := segdossyslow16; SI_ := 0; // исходное имя
-    ES_ := segdossyslow16; DI_ := 4; // результат
+    DS_ := segdossyslow16; SI_ := 0; // source name
+    ES_ := segdossyslow16; DI_ := 4; // result
     intr_realmode(Regs, $21);
     Result := MemStr(segdossyslow32+4);
     if (Length(Result) <> 0) and (Result[1] = Drive) then

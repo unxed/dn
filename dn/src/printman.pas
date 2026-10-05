@@ -119,7 +119,7 @@ implementation
 uses
   Startup, DNHelp, mainapp, Messages
   , basics, strutil, fileutil
-  , osdep {для Open_Access_ReadOnly}
+  , osdep {for Open_Access_ReadOnly}
   , LFN 
   ;
 
@@ -276,15 +276,15 @@ function TPrintManager.SetDestination: Boolean;
 
   S1 := S + #0;
 
-  //JO: чтобы не нагадить в какой-либо файл на диске
+  //JO: so as not to trash some file on disk
   if RPrinterSetup.Device in [10,11] then
     if LFN.SysFileOpen(@S1[1],
        Open_Access_ReadOnly or open_share_DenyNone, hFile) = 0
     then
       begin
       if SysFileIsDevice(hFile) and $FF = 0 then
-        //AK155: 'and $FF' необходимо, так как хелп к SysFileIsDevice
-        //       неправдивый; см. хелп к DosQueryHType
+        //AK155: 'and $FF' is required because the SysFileIsDevice help
+        //       is wrong; see DosQueryHType help
         NotDev := True;
       SysFileClose(hFile);
       end;
@@ -300,10 +300,10 @@ function TPrintManager.SetDestination: Boolean;
   OldP := PrintDevice;
   PrintDevice := TDosStream.Create(S, stCreate);
 
-//JO: для расшаренных сетевых принтеров статус не будет stOK, т.к.
-//    для них не работает SysFileSeek, вызываемая в TDOSStream.Init,
-//    что тем не менее не мешает производить на них запись. Ситуацию
-//    можно отловить по коду ошибки 87 (проверено по крайней мере под Win XP)
+//JO: shared network printers will not get stOK, because
+//    SysFileSeek (called from TDOSStream.Init) fails for them,
+//    yet writing still works. Catch this via error code 87
+//    (verified at least under Win XP)
   if (PrintDevice.Status <> stOK)
       and (PrintDevice.ErrorInfo = 87) then
     PrintDevice.Status := stOK;
@@ -352,7 +352,7 @@ constructor TPrintManager.Load(var S: TStream);
   GetMem(Buffer, BufSize);
   isValid := True;
 
-//JO: см. комментарий к TPrintManager.SetDestination;
+//JO: see comment on TPrintManager.SetDestination;
   if (PrintDevice.Status <> stOK)
       and (PrintDevice.ErrorInfo = 87) then
     PrintDevice.Status := stOK;
@@ -482,8 +482,8 @@ procedure TPrintManager.PrintFile(const FileName: String);
   end;
 
 procedure TPrintManager.InitPrinter;
-//JO: под многозадачками принтер инициализировать не надо;
-//    нужно будет переписать эту процедуру для DPMI32
+//JO: under multitaskers the printer need not be initialized;
+//    this procedure will need a rewrite for DPMI32
  {var
     Hndl: Word;}
   begin
@@ -517,7 +517,7 @@ asm
     mov al, ah
    @@1: }
 begin
-  Result := $90; //временно! Доделать!
+  Result := $90; //temporary! Finish later!
 end;
 
 function TPrintManager.PrintBuffer(Num: Word): Boolean;

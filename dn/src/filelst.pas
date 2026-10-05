@@ -61,17 +61,17 @@ implementation
 uses
   Startup, Lfn, Messages, Defines, FilesCol, fileutil, strutil, UserMenu,
   basics, HistList, Commands, mainapp, DNUtil, Tree, Views, Drivers, Drives
-  {, dnfuncs} {надо вставлять до Dos}
+  {, dnfuncs} {must be placed before Dos}
   , Dos, Dialogs, objutil
   , fileerrors, panelroot
   ;
 type
-  { Диалог создания списка файлов. В ресурсе должны быть
-  DirectLink на строку ввода имени файла (1) и строку ввода
-  шаблона строки файла (2) }
+  { Dialog to create a file list. Resource must have
+  DirectLink to the file-name input (1) and the
+  file-line template input (2) }
   TMakeListDlg = class(TDialog)
     procedure HandleEvent(var Event: TEvent); override;
-      { Для реакции на кнопки }
+      { To react to buttons }
     end;
 
 procedure InpLineReplace(P: TInputLine; const S: String);
@@ -109,8 +109,8 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
         Exit;
         end;
       cmOK:
-        begin { Не выпускаем с пустым именем списка или
-          с пустым шаблоном обработки файла }
+        begin { Do not leave with an empty list name or
+          an empty file-processing template }
         for i := 1 to 2 do
         if TInputLine(DirectLink[i]).Data^ = '' then
           begin
@@ -408,8 +408,8 @@ AddrError:
     begin
     P := Files.At(I-1);
     UPr.Active := P;
-    {AK155 23-09-2003: разотметка по одному файлу тормозит страшно при
-большом числе файлов
+    {AK155 23-09-2003: untagging one file at a time is terribly slow with
+many files
     Message(APP, evCommand, cmCopyUnselect, P);
 /AK155}
     BB := False;
@@ -457,9 +457,9 @@ AddrError:
       end;
     end;
   Close(T.T);
-  { AK155 23-09-2003 Теперь скопом снимаем всю отметку. Делать это надо
-обязательно до RereadDirectory, так как она страшно тормзит при большом
-числе отмеченных файлов. }
+  { AK155 23-09-2003 Now clear all tags at once. Must do this
+before RereadDirectory, which is terribly slow with many
+tagged files. }
   ClearSelection(APP, TFilePanelRoot(APP).Files);
   {/AK155}
   RereadDirectory(Dr);

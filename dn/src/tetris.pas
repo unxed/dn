@@ -48,10 +48,9 @@
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
 {Cat
-   05/10/2001 - переписал этот модуль так, чтобы при задании директивы
-   $DEFINE PLUGIN он компилировался в библиотеку, представляющую собой
-   плагин типа EventCatcher
-   28/01/2002 - в плагинном случае добавил регистрацию объектов
+   05/10/2001 - rewrote this unit so that with $DEFINE PLUGIN
+   it builds as an EventCatcher plugin library
+   28/01/2002 - in the plugin case added object registration
 }
 
 
@@ -65,12 +64,12 @@ uses
 
 
 const
-  Shi = 12; {Ширина стакана}
-  MaxVis = 22; {Максимальная высота стакана}
+  Shi = 12; {playfield width}
+  MaxVis = 22; {maximum playfield height}
   F = False;
   T = True;
 var
-  Vis: Integer;{Фактическая высота стакана}
+  Vis: Integer;{actual playfield height}
 
 type
 
@@ -344,7 +343,7 @@ procedure TGameInfo.Draw;
   MoveChar(B[Size.X-1], #217, C, 1);
   WriteLineC(0, 10, Size.X, 1, B);
 
-{ Для высокого пентикса - пустое место между следующей фигурой и кнопками }
+{ For tall pentix — gap between next piece and the buttons }
   MoveChar(B[0], ' ', C, Size.X);
   for I := 15 to Vis-5 do
     WriteLineC(0, I, Size.X, 1, B);
@@ -657,10 +656,9 @@ function TGameView.MoveDown;
     Info.DrawView;
     Stop := not ValidMove(0, 0);
 {AK155 23-07-2004
-Зачем нужны эти DelayTics и почему они бывают разные - я не понял.
-Их устранение никакого видимого глазу влияния не оказывает и
-загрузку процессора не меняет. Соответственно, переменная BB
-и вся работа с ней тоже исключены.
+Why these DelayTics exist and why they differ — unclear.
+Removing them has no visible effect and does not change
+CPU load. Variable BB and all work with it are gone too.
     if BB then
       timeutil.DelayTics(2)
     else

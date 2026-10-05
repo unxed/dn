@@ -9,27 +9,27 @@ uses
 type
 
   TXCoder = class;
-  {`2 Работа с перекодировками в просмотре, dbf и т.п.}
+  {`2 Recoding support in viewer, dbf, etc.}
   TXCoder = class(TObject)
     XLatCP: TXLatCP;
     KeyMap: TKeyMap;
-      {` KeyMap=kmXlat для кодировки, загруженной из xlt-файла`}
+      {` KeyMap=kmXlat for an encoding loaded from an xlt file`}
     MaxCodeTagLen: Byte;
-      {` Максимальная длина CodeTag. Не более 8.`}
+      {` Maximum CodeTag length. At most 8.`}
     CodeTag: Str8;
-      {` Обозначение кодировки для индикации в рамке.
-      Это имя предопределённой кодировки или имя файла загруженной
-      xlt-таблицы без пути `}
+      {` Encoding label shown in the frame.
+      Name of a predefined encoding or of a loaded
+      xlt table file without path `}
     constructor Create(AMaxCodeTagLen: Byte);
     constructor Load(S: TStream);
     procedure Store(S: TStream);
     procedure UseToAscii;
-      {` Настроить всё на kmXlat на основании XLatCP[ToAscii]`}
+      {` Set everything to kmXlat from XLatCP[ToAscii]`}
     procedure UseKeyMap;
-      {` Настроить всё на текущую KeyMap (kmAscii или более)`}
+      {` Set everything to the current KeyMap (kmAscii or higher)`}
     procedure LoadXlatTable;
     procedure NextXLat;
-      {` Переключение по кругу предопределённых кодировок `}
+      {` Cycle through predefined encodings `}
     procedure FromHistory(fKeyMap: TKeyMap;
       fToAscii: TXLat; fCodeTag: Str8);
     procedure ToHistory(var fKeyMap: TKeyMap;

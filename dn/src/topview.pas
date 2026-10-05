@@ -8,24 +8,24 @@ uses
 
 type
   TTopView = class;
-  {`2 Базовый тип для текста, выводимого в заголовке панели. }
+  {`2 Base type for text shown in the panel title. }
   TTopView = class(TView)
-    Panel: TView; //фактически -  TFilePanel
+    Panel: TView; //actually TFilePanel
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure Draw; override;
-      {` Текст центрируется, не перекрывая элемент управления окна
-      менеджера `}
+      {` Text is centered without overlapping the manager
+      window control `}
     function GetPalette: TPalette; override;
     function GetText(MaxWidth: Integer): String; virtual;
-      {` Этот метод обязательно должен быть перекрыт `}
+      {` This method must be overridden `}
     end;
   {`}
 
   TSortView = class;
-    {`2 Индикация текущей сортировки панели буковкой в левом верхнем углу `}
+    {`2 Current panel sort indicated by a letter in the top-left corner `}
   TSortView = class(TView)
-    Panel: TView; //фактически -  TFilePanel;
+    Panel: TView; //actually TFilePanel;
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure Draw; override;
@@ -76,9 +76,9 @@ procedure TTopView.Draw;
   begin
   Right := TDoubleWindow(Owner).Panel[pRight].AnyPanel = Panel;
   Width := Panel.Size.X - 4 - Ord(Right);
-    {4 - это ширина элемента управления (номера окна в левой панели
-     и кнопки максимизации в правой панели. Для правой панели ещё
-     один символ - это пробел между индикатором сортировки и TopView }
+    {4 is the width of the control (window number on the left panel
+     and maximize button on the right). For the right panel one more
+     character is the space between the sort indicator and TopView }
   if Width < 1 then
     Exit;
   S := GetText(Width);
@@ -89,16 +89,16 @@ procedure TTopView.Draw;
   Dec(R.A.Y);
   D := (Width - StrCols(S) + 4) div 2;
   if D >= 4 then
-    Inc(R.A.X, D) { пока можно, центрируем без учёта асимметрии }
-  else if Right then { правая панель, прижимаем к кнопке максимизации }
+    Inc(R.A.X, D) { while possible, center ignoring asymmetry }
+  else if Right then { right panel, pin to the maximize button }
     inc(R.A.X, Width - StrCols(S) + 1)
-  else { левая панель, прижимаем к номеру окна }
+  else { left panel, pin to the window number }
     inc(R.A.X, 4);
   R.B.X := R.A.X + StrCols(S);
   GetBounds(OldR);
   if not MemEqual(R, OldR, SizeOf(R)) then
     begin
-    Locate(R); { Тут будет рекурсия, поэтому второй раз рисовать не надо }
+    Locate(R); { This will recurse, so do not draw a second time }
     Exit;
     end;
   C := GetColorW(1);
@@ -136,7 +136,7 @@ procedure TSortView.Draw;
     R.B.X := R.A.X;
     Dec(R.A.X);
     R.B.Y := R.A.Y + 1;
-    Locate(R); // тут будет рекурсия, которая и нарисует
+    Locate(R); // this will recurse and do the draw
     Exit;
     end;
   SortSetup := @TFilePanelRoot(Panel).PanSetup^.Sort;

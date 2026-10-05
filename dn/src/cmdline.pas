@@ -328,16 +328,16 @@ procedure TCommandLine.Update;
   begin
   QueryCursorVisible;
   if  (CursorMustBeVisible <> PrevCmdLineCursorVisible)
-    { есть повод для работы }
+    { there is work to do }
     and (State and (sfDisabled or sfVisible) <> sfVisible)
-    { но не надо гасить чужой курсор }
+    { but do not hide someone else's cursor }
     then
     ResetCursor;
   PrevCmdLineCursorVisible := CursorMustBeVisible;
   if not CursorMustBeVisible then
     Exit;
 
-  { А теперь делаем, чтобы курсор действиельно имел нужный вид }
+  { Now make the cursor actually look as required }
   GetCursorXY(A1, A2);
   GetCursorType(CursorStartScanLine, CursorEndScanLine, CursorVisible);
   if
@@ -354,9 +354,9 @@ procedure TCommandLine.Update;
   P.Y := 0;
   MakeGlobal(P, P);
   //AK155  BB := not Overwrite  xor (InterfaceData.Options and ouiBlockInsertCursor <> 0);
-  {AK155 вызовы программ установки режимов курсора безобидны под OS/2,
-но под Win32 приводят к мерзкому миганию курсора. Поэтому я попытался
-не вызывать их без надобности. 18.10.2001 }
+  {AK155 cursor-mode setup calls are harmless under OS/2,
+but under Win32 cause nasty cursor flicker. So I try
+not to call them unless needed. 18.10.2001 }
   if  (OldOverwrite <> Ord(Overwrite)) or not CursorVisible
   then
     begin
@@ -505,7 +505,7 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
           if InterfaceData.Options and ouiHideCmdline = 0 then
             begin
             S := String(Event.InfoPtr^);
-            {AK155: обработка длинных имен с пробелами.}
+            {AK155: handling long names with spaces.}
             if  (CurX > 0) and not (Str[CurX] in Separators)
               {and not (S[1] = '"')}
               then
@@ -545,7 +545,7 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
                   Dec(l, 1);
                   Dec(ls, 1);
                   Dec(CurX, 2);
-                  goto EndLFN; { чтобы не обрабатывать конец S}
+                  goto EndLFN; { so as not to process the end of S}
                   end;
                 end
               else if s1 = '\"' then
@@ -614,11 +614,10 @@ EndLFN:
             begin
             if DelSpaces(Str) = '' then
               Exit;
-            {AK155: Шатания, которые здесь были (Up-Down), приводили
-у тому, что после выполнения команды по Ctrl-E вызывалась из
-истории не эта команда, а предыдущая. В чем смысл,
-я не понял, поэтому сделал по-простому. В ритлабовском DN
-шатания тоже были, но вызывалось, вроде, правильно.
+            {AK155: The Up-Down wobbling that was here caused
+the previous history command to be fetched after Ctrl-E
+instead of the one just run. Unclear why; I simplified.
+RIT Labs DN also wobbled but seemed to fetch correctly.
                          StrModified := True;
                          MessageKey(Self, kbDown);
                          MessageKey(Self, kbUp);
@@ -692,7 +691,7 @@ EndLFN:
                   Inc(LineType);
                 while (not (OS2exec or Win32exec)
                        and (LineType in [ltWindow, ltFullScreen]))
-                     //под виндой в F/S из комстpоки не запустишь
+                     //under Windows you cannot launch F/S from the command line
                      or (Win32exec and (LineType = ltFullScreen))
                 do
                 if (DNKeyCode(Event) = kbAltShiftSlash)

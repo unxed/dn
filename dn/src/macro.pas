@@ -493,12 +493,11 @@ destructor TMacroString.Destroy;
 
 {---------------------------- EditDOSEnvironment -----------------------------}
 
-//JO: 29-01-2005 - поддеpжка значений пеpеменных окpужения
-//                 длиной более 255 символов
-//Пpим.: в настоящий момент попытка использовать стpоку ввода длиной более
-//       18517 символов пpиводит к падению DN/2. Пока на всякий случай
-//       огpаничил длину стpоки ввода 16383 символами (см. dn.dnr, pесуpсы
-//       диалога dlgEditEnvironment)
+//JO: 29-01-2005 - support for environment variable values
+//                 longer than 255 characters
+//Note: currently an input line longer than 18517 characters
+//       crashes DN/2. For safety the input line is limited to
+//       16383 characters (see dn.dnr, dlgEditEnvironment resources)
 type
   TDOSVar = class;
   TDOSVar = class(TObject)
@@ -521,12 +520,12 @@ type
   { TDOSVar }
 
 constructor TDOSVar.Create(P: PChar; NameLen, ValueLen: Longint);
-   {P - определение одной переменной окружения вида 'LANG=ru_RU',
-    #0 в конце не гарантируется.
-    Hапример, для 'LANG=ru_RU' будет NameLen=4, ValueLen=5 }
+   {P - one environment variable definition like 'LANG=ru_RU',
+    trailing #0 is not guaranteed.
+    E.g. for 'LANG=ru_RU' NameLen=4, ValueLen=5 }
   begin
   inherited Create;
-  { Тут несподручно вызывать NewStr, поэтоу дин. строку формируем сами }
+  { NewStr is inconvenient here, so we build the dynamic string ourselves }
   GetMem(Name, NameLen+1);
   SetLength(Name^, NameLen);
   if NameLen > 0 then
@@ -776,10 +775,10 @@ procedure EditDOSEnvironment(Env: PByteArray);
         n2 := I;
       Inc(I)
       end;
-// JO: имя пеpеменной окpужения не может быть длиннее 255 символов,
-//     по кpайней меpе мне такие извpаты неизвестны. Так что если
-//     что-то такое стpанное встpетится (что пpактически маловеpоятно),
-//     то pазумнее будет такую пеpеменную окpужения пpосто пpоигноpиpовать
+// JO: an environment variable name cannot be longer than 255 characters,
+//     at least such oddities are unknown to me. So if something that
+//     strange appears (practically unlikely), it is wiser to simply
+//     ignore that environment variable
     if (n1 <> n2) and (n2 - n1 < 255) then
       PC.Insert(TDOSVar.Create(PChar(Env) + n1, n2-n1, I-n2-1));
     Inc(I);

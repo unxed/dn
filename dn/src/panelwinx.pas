@@ -90,7 +90,7 @@ procedure TXDoubleWindow.SetState(AState: Word; Enable: Boolean);
     if Enable then
       begin
       Current.SetState(sfSelected, True);
-        // чтобы установились ActivePanel и PassivePanel
+        // so that ActivePanel and PassivePanel are set
       EnableCommands(DblWndCommands)
       end
     else
@@ -161,11 +161,10 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
     evCommand:
       case Event.Command of
         cmChangeDirectory:
-          begin {AK155 Это сообщение реально можно получить ТОЛЬКО
-            от дерева, поэтому сравнение с dtTree, мягко говоря,
-            неожиданное, работает правильно. Но, конечно, надо
-            вместо этого трюкачества организовать в дереве прямой
-            вызов ChDir панели }
+          begin {AK155 This message can really come ONLY
+            from the tree, so comparing with dtTree is, to put it mildly,
+            unexpected, but works. Of course, instead of this trickery
+            the tree should call the panel ChDir directly }
           Panel[Selected[NonFilePanelType <> dtTree]].
             FilePanel.HandleEvent(Event);
           Exit;

@@ -174,10 +174,9 @@ procedure EraseFiles(Files: TCollection);
       Over := cmYes;
     end;
 
-  {AK155 При отказе (DOSDelDir=false) Params.RC возвращает код
-завершения неудачной операции, если причина отказа - ошибка
-операции с файлом или каталогом. При посторонних причинах отказа
-(например, Abort) будет Params.RC=0}
+  {AK155 On failure (DOSDelDir=false) Params.RC returns the
+exit code of the failed operation if the cause was a file/dir
+error. For unrelated refusals (e.g. Abort) Params.RC=0}
   function DosDelDir: Boolean;
     var
       DC: PDirCol;
@@ -410,7 +409,7 @@ TryDel:
   for I := 1 to Files.Count do
     begin
     PF := Files.At(I-1);
-    {JO: файлы, найденные в архивах нельзя удалить из панели поиска}
+    {JO: files found in archives cannot be deleted from the search panel}
     if PathFoundInArc(PF^.Owner^) then
       Continue;
     {/JO}
@@ -508,8 +507,8 @@ DeleteDirDIZ:
     
     PInfo.Free;
 
-  {Cat: Во-первых, совершенно непонятно, зачем перечитывать _все_ диски
-      Во-вторых, такой способ не работает с сетевыми путями}
+  {Cat: First, unclear why reread _all_ drives
+      Second, this does not work with network paths}
   (*
   DrivesSet := [];
   for I := 0 to Files.Count-1 do
@@ -524,7 +523,7 @@ DeleteDirDIZ:
       end;
 *)
   RereadCollection := TStringCollection.Create(32, 32, False);
-  {сортированная, без повторов}
+  {sorted, no duplicates}
   for I := 0 to Files.Count-1 do
     begin
     RereadCollection.Insert(PFileRec(Files.At(I))^.Owner);
@@ -540,7 +539,7 @@ DeleteDirDIZ:
     begin
     PS := RereadCollection.At(I);
     if S <> Copy(PS^, 1, Length(S)) then
-      {если уже перечитали вышележащий каталог, то этот перечитывать не надо}
+      {if a parent directory was already reread, skip this one}
       begin
       S := PS^;
       if S[1] <> '>' then

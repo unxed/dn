@@ -545,16 +545,15 @@ function CheckForOver(Name: String): TStream; {<editfile.001>}
   if Abort then
     Exit;
 {AK155 13/03/2006
-  Полезность CreateBackup очень сомнительна. Сюда можно попасть
-только если при открытии с stOpen получился Status <> 0, что, скорее
-всего, обозначает, что файла нет, то есть Backup не нужен. Из других
-причин Status <> 0 приходит в голову только нехватка памяти на буфер.
-Так в этом случае надо не бэкап создавать, а что-то с памятью
-придумывать, поскольку при открытии с stCreate памяти опять таки
-не хватит, но пользователю мы этого не скажем, и, более того,
-можно, наверно, упасть в CantWrite или не выдать никакого сообщения.
-  Так что лучше бы проанализировать причину Status <> 0 и сделать
-что-то более осмысленное, чем то, что тут имеется сейчас. }
+  Usefulness of CreateBackup is doubtful. We only reach here if
+opening with stOpen gave Status <> 0, which usually means the file
+is missing, so Backup is unnecessary. The other Status <> 0 cause
+that comes to mind is out-of-memory for the buffer — then we should
+not create a backup but deal with memory, because stCreate will also
+fail to allocate, yet we will not tell the user, and may even hit
+CantWrite or show nothing.
+  Better to analyse why Status <> 0 and do something more sensible
+than what is here now. }
   if EditorDefaults.EdOpt and ebfCBF <> 0 then
     CreateBackup;
   S := TAttrBufStream.Create(Name, stCreate, 4096);
@@ -577,10 +576,10 @@ procedure WriteBlock(Hint: String; S: TStream; C: TLineCollection
     SST: LongString;
     P: PLongString;
 
-    {Cat: эта процедура теперь умеет работать с длинными строками
-      и находится в модуле strutil}
+    {Cat: this procedure now handles long strings
+      and lives in unit strutil}
     (*
-  procedure CompressString; {та, кот. при сохранении файла}
+  procedure CompressString; {the one used when saving the file}
   var PP: Pointer;
       TSt: Integer;
   begin
@@ -728,7 +727,7 @@ procedure WriteBlock(Hint: String; S: TStream; C: TLineCollection
   else
     SST := '';
   if AOptimalFill then
-    CompressString(SST); {Cat: про последнюю строку тоже не забываем}
+    CompressString(SST); {Cat: do not forget the last line either}
   S.Write(SST[1], Length(SST));
   if PP <> nil then
     PP.Free;
