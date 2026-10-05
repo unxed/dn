@@ -105,6 +105,23 @@ promoted to pass by a smoke tour or a diagnostic-only source copy. Keep the
 gate **OPEN** until the exact object and class builds have replayed every
 user-visible action and all checkpoints match.
 
+## Newly recorded class-only crashes (2026-10-05)
+
+Observed on class self-builds only; pre-class `dist` does not show them.
+User evidence: self-build `1380622` (`2026-10-05 11:21:22 UTC`),
+`/home/unxed/dev/dn/out/linux64/dn.err` addresses `00534B61` and `0058BDD2`.
+Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
+
+| Action | Class self-build | `dist` (pre-class) | Evidence |
+|---|---|---|---|
+| `F4` open internal editor | **fail** — Fatal Error / Access violation | pass | `dn.err` addr `00534B61`; PTY source location `editwin.pas` `TEditSaver.Load` line 102 (`dlgEditorCommands`) |
+| `Ctrl+O` user/command screen | **fail** — Fatal Error / Access violation | pass | `dn.err` addr `0058BDD2`; PTY source location `tvvt.pas` `TVtEmu.Cols` line 309 |
+| Autosave desktop second start (`dn.dsk` + Preserve directory) | **fail** — process dies (local status `-11` / SIGSEGV) before `>` prompt; CI `dsk_cwd` IndexError | pass — restores `…/sub>` | First session writes `dn.dsk`/`dn.ini`; second start shows banner only, no `dn.err` |
+
+These rows keep the gate **OPEN**. They are separate from issue #6 startup
+redraw (blank panels / About residue), though desktop restore may share
+stream/LoadDesktop failure modes with other serialization bugs.
+
 ## Required comparison
 
 For both builds, use the same clean temporary tree, absolute run path, terminal size, locale,
