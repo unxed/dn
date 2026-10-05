@@ -93,7 +93,7 @@ type
     Number: Integer;
     DirName: TFlName;
     Dummy: array[1..SizeOf(ShortString)-SizeOf(TShortName)] of Char;
-    {см. комментарий к TFileRec}
+    {see comment on TFileRec}
     end;
 
   TTreeView = class;
@@ -155,14 +155,14 @@ type
     destructor Destroy; override;
     end;
 
-  TDTreeInfoView = class; { дерево в диалоге }
+  TDTreeInfoView = class; { tree in a dialog }
   TDTreeInfoView = class(TTreeInfoView)
     function GetPalette: TPalette; override;
     end;
 
   THTreeView = class;
 
-   {`2 панель дерева с подвалом `}
+   {`2 tree panel with footer `}
   THTreeView = class(TTreePanel)
     Info: TView;
     constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
@@ -186,30 +186,30 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String; {DataCompBoy}
 procedure CheckMkDir(const Path: String);
  {` MkDir and check result AK155 `}
 procedure MakeDirectory;
- {` Создать каталог(и) в диалоге. Фактически, это TDrive.MakeDir.
-  В введённой строке можнт быть несколько каталогов, разделённых
-  точками с запятой.
-  Имя первого созданного каталог с полным путём без слэша помещается в
-  переменную CreatedDir. Если каталог не создался - CreatedDir=''.
-  Переменная CreatedDir используется в ARVIDAVT.PAS, и подозреваю, что
-  в каком-то другом смысле. `}
+ {` Create director(y/ies) in a dialog. Essentially this is TDrive.MakeDir.
+  The entered string may contain several directories separated
+  by semicolons.
+  The name of the first created directory with full path without slash is placed in
+  CreatedDir. If the directory was not created - CreatedDir=''.
+  CreatedDir is used in ARVIDAVT.PAS, and I suspect
+  in some other sense. `}
 procedure FreeTree(C: Char);
 function GetDirLen(Dir: String): TSize; {DataCompBoy}
 function CreateDirInheritance(var S: String; Confirm: Boolean): Byte;
-  {` Создать каталог любой вложенности. S разворачивается при
-   помощи lFExpand и дополняется '\' в конце, и это значение
-   остаётся после вызова.
-     Результат - длина пути (то есть подстроки S) каталога, в
-   котором находится самый внешний созданный каталог (без слэша).
-   Например, если s='C:\TEMP\AAA\BBB' и каталог C:\TEMP существовал,
-   а C:\TEMP\AAA был создан, то результат - 7. Смысл этого в том,
-   что если C:\TEMP открыт на какой-то панели, то эту панель надо
-   перечитать, чтобы на ней появился AAA.
-     Если каталоги не создавались - результат 0. `}
+  {` Create a directory of any nesting. S is expanded with
+   lFExpand and appended with '\' at the end, and that value
+   remains after the call.
+     Result is the path length (i.e. substring of S) of the directory that
+   contains the outermost created directory (without slash).
+   E.g. if s='C:\TEMP\AAA\BBB' and C:\TEMP existed,
+   and C:\TEMP\AAA was created, the result is 7. The point is that
+   if C:\TEMP is open on some panel, that panel must
+   be reread so AAA appears on it.
+     If no directories were created - result is 0. `}
 
 const
   CreatedDir: String = '';
-    {` Результат MakeDirectory `}
+    {` MakeDirectory result `}
   TreeError: Boolean = False;
 
   CHTreeView = #15#16#17#18#19#20#21;
@@ -371,7 +371,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
 
     {-DataCompBoy-}
   begin { ReadTree }
-  {Cat:warn надо добавить вывод дерева для сетевых путей}
+  {Cat:warn need to add tree display for network paths}
   NewTimer(Tmr, 1);
   C := UpCase(C);
   if not (C in ['A'..'Z']) then
@@ -605,15 +605,15 @@ Start:
   lMkDir(Path);
   rc := IOResult;
   {AK155 29-05-2002
-При создании существующего каталога (что не есть ошибка)
-под OS/2 rc=5, а под WinNT - rc=183.
-При создании каталога на CD (что есть ошибка)
-под OS/2 rc=19, а под WinNT - rc=5.
-Как оно будет под Win9x или DPMI - тоже еще вопрос.
-Поэтому проще и аккуратнее проверить фактическое наличие, а не
-анализировать rc }
+When creating an existing directory (which is not an error)
+under OS/2 rc=5, and under WinNT rc=183.
+When creating a directory on a CD (which is an error)
+under OS/2 rc=19, and under WinNT rc=5.
+How it behaves under Win9x or DPMI is also an open question.
+So it is simpler and safer to check actual presence rather than
+analyze rc }
   if not PathExist(Path) then
-    (*  if (rc <> 0) and (rc <> 5 {каталог уже существует}) {$IFDEF Win32} and (rc <> 183) {$ENDIF} then*)
+    (*  if (rc <> 0) and (rc <> 5 {directory already exists}) {$IFDEF Win32} and (rc <> 183) {$ENDIF} then*)
     begin
     if SysErrorFunc(rc, Byte(Path[1])-Byte('A')) = 1 then
       goto Start;
@@ -675,16 +675,16 @@ procedure MakeDirectory;
     B := CreateDirInheritance(S1, False);
     if Abort or (IOResult <> 0) then
       Exit;
-    SetLength(S1, Length(S1)-1); // удалить слэш
+    SetLength(S1, Length(S1)-1); // remove slash
     if CreatedDir = '' then
       CreatedDir := S1;
-    { определение каталога для перечитывания }
+    { determine the directory to reread }
     if B > 0 then
       SetLength(S1, B)
     else
       begin
       lFSplit(S1, S1, Nm, XT);
-      SetLength(S1, Length(S1)-1); // удалить слэш
+      SetLength(S1, Length(S1)-1); // remove slash
       end;
     RereadDirectory(S1);
     GlobalMessage(evCommand, cmRereadTree, @Dr);
@@ -1403,7 +1403,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
         cmChangeTree:
           begin
           if PString(Event.InfoPtr)^[2] <> ':' then
-            {Cat:warn могут быть проблемы с сетевыми путями}
+            {Cat:warn there may be problems with network paths}
             begin
             CE;
             Exit;
@@ -1773,10 +1773,10 @@ procedure TTreeView.Draw;
       if CurPos = Idx then
         begin
         MoveStr(B[K+Length(S)], {' '#0+}Q {+#0' '}, CC);
-        {JO: зачем нужна была эта оторочка имён нулями - тайна,}
+        {JO: why names were padded with zeros is a mystery,}
         if QuickSearch then
-          {    покрытая мраком, но из-за неё каталоги в панели}
-          begin {    оторочены мерзкими точечками или чем ещё похуже}
+          {    shrouded in darkness, but because of it directories in the panel}
+          begin {    are edged with nasty dots or something worse}
           ShowCursor;
           NormalCursor;
           SetCursor(K+Length(S)+LastSuccessPos-1, I-1)
@@ -2092,7 +2092,7 @@ procedure THTreeView.ChangeBounds(const Bounds: TRect);
     end
   end;
 
-{ AK155 10.06.05. Подвал надо прятать и показывать вместе с панелью }
+{ AK155 10.06.05. The footer must be hidden and shown together with the panel }
 procedure THTreeView.SetState(AState: Word; Enable: Boolean);
   begin
   inherited SetState(AState, Enable);
@@ -2129,19 +2129,19 @@ function CreateDirInheritance(var S: String; Confirm: Boolean): Byte;
     Exit;
   while I < Length(S) do
     begin
-    J := I;  // указывает на '\' перед началом имени на очередном уровне
+    J := I;  // points to '\' before the start of the name at the next level
     repeat
       Inc(I);
     until (S[I] = '\');
-     // I указывает на первый символ за концом имени
-    M := Copy(S, 1, I-1); // полный путь очередного уровня
+     // I points to the first character past the end of the name
+    M := Copy(S, 1, I-1); // full path of the next level
     ClrIO;
     lFindFirst(M, AnyFileDir, SR); {JO}
     lFindClose(SR);
     if Abort then
       Exit;
     if DosError <> 0 then
-      begin // каталог не найден, надо создавать
+      begin // directory not found, need to create
       if Confirm and (Confirms and cfCreateSubdir <> 0) then
         begin
         if  (MessageBox(GetString(dlQueryCreateDir)+Cut(S, 40)+' ?',
@@ -2153,8 +2153,8 @@ function CreateDirInheritance(var S: String; Confirm: Boolean): Byte;
       CheckMkDir(M);
       if Abort then
         Exit;
-      // Каталог создан успешно
-      if Result = 0 then // это был первый созданный каталог
+      // Directory created successfully
+      if Result = 0 then // this was the first created directory
         Result := J-1;
       end;
     end;
