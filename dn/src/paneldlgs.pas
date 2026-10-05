@@ -488,21 +488,21 @@ type
 
    { Диалог фильтра }
   TFilterDialog = class(TShowDialog)
-    function OwnDataAddress(P: PPanelSetup): Pointer; virtual;
-    destructor Done; virtual;
+    function OwnDataAddress(P: PPanelSetup): Pointer; override;
+    destructor Destroy; override;
     end;
 
    { Список расширений }
   TExtSelList = class(TSelectList)
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    function DataSize: Integer; virtual;
-    procedure GetData(var Rec); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    function DataSize: Integer; override;
+    procedure GetData(var Rec); override;
       { Чтобы список не участвовал в GetData - SetData}
     end;
 
    { Строка ввода фильтра }
   TFilterLine = class(TInputLine)
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     end;
 
 procedure TExtSelList.SetState(AState: Word; Enable: Boolean);
@@ -543,7 +543,7 @@ function TFilterDialog.OwnDataAddress(P: PPanelSetup): Pointer;
   Result := @P^.FileMask;
   end;
 
-destructor TFilterDialog.Done;
+destructor TFilterDialog.Destroy;
   begin
   EnableCommands([cmOK, cmYes, cmNo]);
   inherited Destroy;
@@ -1786,8 +1786,8 @@ type
   TDragger = class(TView)
     Text: PString;
     constructor Create(R: TRect; AText: String);
-    procedure Draw; virtual;
-    destructor Done; virtual;
+    procedure Draw; override;
+    destructor Destroy; override;
     end;
 
 procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
@@ -1851,7 +1851,7 @@ procedure TDragger.Draw;
   WriteLineC(0, 0, Size.X, Size.Y, B);
   end;
 
-destructor TDragger.Done;
+destructor TDragger.Destroy;
   begin
   DisposeStr(Text);
   inherited Destroy;
@@ -2342,7 +2342,7 @@ procedure CM_SortBy(AFP: Pointer);
 
 type
   TSortDialog = class(TShowDialog)
-    function OwnDataAddress(P: PPanelSetup): Pointer; virtual;
+    function OwnDataAddress(P: PPanelSetup): Pointer; override;
     end;
 
 function TSortDialog.OwnDataAddress(P: PPanelSetup): Pointer;

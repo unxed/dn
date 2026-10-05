@@ -76,8 +76,8 @@ type
     LastDay: Byte;
     DX, DY, DDX: Integer;
     constructor Create;
-    procedure Draw; virtual;
-    procedure Update; virtual;
+    procedure Draw; override;
+    procedure Update; override;
     end;
 
 const
@@ -97,8 +97,8 @@ type
     NumSkyStars: Integer;
     CommonDelay: Byte;
     constructor Create;
-    procedure Draw; virtual;
-    procedure Update; virtual;
+    procedure Draw; override;
+    procedure Update; override;
     procedure InitStar(Index: Integer);
     end;
 
@@ -111,8 +111,8 @@ type
     Rest, Clr: Byte; {JO}
     dH, dM, dS, dSS: Word;
     constructor Create;
-    procedure Update; virtual;
-    procedure Draw; virtual;
+    procedure Update; override;
+    procedure Draw; override;
     destructor Destroy; override;
     end;
 

@@ -18,10 +18,10 @@ type
     CheckIO: Boolean;
     isValid: Boolean;
     constructor Create(ACheck: Boolean);
-    destructor Done; virtual;
+    destructor Destroy; override;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    function Valid(Command: Word): Boolean; virtual;
+    function Valid(Command: Word): Boolean; override;
     end;
 
 procedure InsertUserSaver(ACheck: Boolean);
@@ -81,11 +81,11 @@ constructor TUserSaver.Load(var S: TStream);
     Msg(dlErrorsOccurred, nil, mfWarning+mfOKButton);
   end;
 
-destructor TUserSaver.Done;
+destructor TUserSaver.Destroy;
   begin
   if Screen <> nil then
     FreeMem(Screen, SSize);
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TUserSaver.Store(var S: TStream);
