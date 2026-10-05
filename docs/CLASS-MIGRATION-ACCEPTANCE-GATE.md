@@ -114,8 +114,8 @@ Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
 
 | Action | Class self-build | `dist` (pre-class) | Evidence |
 |---|---|---|---|
-| `F4` open internal editor | **fail** — Fatal Error / Access violation | pass | `dn.err` addr `00534B61`; PTY source location `editwin.pas` `TEditSaver.Load` line 102 (`dlgEditorCommands`) |
-| `Ctrl+O` user/command screen | **fail** — Fatal Error / Access violation | pass | `dn.err` addr `0058BDD2`; PTY source location `tvvt.pas` `TVtEmu.Cols` line 309 |
+| `F4` open internal editor | **fixed** on class (`a14015a`) — was Fatal Error / Access violation | pass | was `dn.err` `00534B61`; cause `var S` stream callbacks in `editwin.pas` |
+| `Ctrl+O` user/command screen | **fixed** on class (`a14015a` / tv3 `396fb86`) — was Fatal Error / Access violation | pass | was `dn.err` `0058BDD2`; cause nil `UserScr` before first command |
 | Autosave desktop second start (`dn.dsk` + Preserve directory) | **fail** — process dies (local status `-11` / SIGSEGV) before `>` prompt; CI `dsk_cwd` IndexError | pass — restores `…/sub>` | First session writes `dn.dsk`/`dn.ini`; second start shows banner only, no `dn.err` |
 
 These rows keep the gate **OPEN**. They are separate from issue #6 startup
