@@ -58,11 +58,11 @@ const
   MaxLongStringLength = 1048575;
 
 const
-  {Cat: переделал все коды клавиш по следующему единому принципу:
+  {Cat: reworked all key codes by the following unified principle:
         kbNNNN = $XXYYZZ
-        XX - флажки сдвигов: 3 - Shift, 4 - Ctrl, 8 - Alt
-        YY - скан-код клавиши
-        ZZ - символьный код клавиши
+        XX - shift flags: 3 - Shift, 4 - Ctrl, 8 - Alt
+        YY - key scan code
+        ZZ - key character code
 }
 
   kbESC = $00011B;
@@ -641,7 +641,7 @@ const
   kbAtrlAltMenuSuxx = $0CEE00;
   kbCtrlAltShiftMenuSuxx = $0FEE00;
 
-  { псевдо-коды }
+  { pseudo-codes }
 
   kbNoKey = $000000;
   kbShortCut = $F0FFFF;
@@ -651,7 +651,7 @@ const
   kbDownUp = $00FE00;
   kbUpUp = $00FF00;
 
-  { дублирующиеся имена }
+  { duplicate names }
 
   kbAltCtrlSqBracketL = kbCtrlAltSqBracketL;
   kbAltCtrlSqBracketR = kbCtrlAltSqBracketR;
@@ -712,20 +712,20 @@ const
 
 const
   kbRightShift = $0001;
-    {` Нажат правый Shift `}
+    {` Right Shift is pressed `}
   kbLeftShift = $0002;
-    {` Нажат левый Shift `}
+    {` Left Shift is pressed `}
   kbCtrlShift = $0004;
-    {` Нажат Ctrl `}
+    {` Ctrl is pressed `}
   kbAltShift = $0008;
-    {` Нажат Alt `}
+    {` Alt is pressed `}
   kbScrollState = $0010;
   kbNumState = $0020;
   kbCapsState = $0040;
   kbInsState = $0080;
 
   kbAnyShift = $000F;
-    {` Нажат любой Shift, Alt или Ctrl `}
+    {` Any Shift, Alt or Ctrl is pressed `}
 
   { ViewMode constants }
   vmText = 0;
@@ -736,7 +736,7 @@ const
   vmExternal = 32;
   vmDB = 100;
   vmSpread = 101;
-  vmSpreadSL = 111; {AK155: это с линиями между колонками}
+  vmSpreadSL = 111; {AK155: this is with lines between columns}
   vmPKT = 102;
   vmMSG = 103;
 
@@ -949,9 +949,9 @@ const
   fmoPreserveDesc = $0200;
   fmoKillContainer = $0400;
   fmoAlwaysCopyDesc = $0800;
-  fmoAutorefreshDriveLine = $1000; // вместо ini  AutoRefreshDriveLine=1
-  fmoAutorefreshPanels = $2000; // вместо ini  AutoRefreshPanels=1
-  fmoDescrByShortNames = $4000; // вместо ini DescrByShortNames
+  fmoAutorefreshDriveLine = $1000; // instead of ini  AutoRefreshDriveLine=1
+  fmoAutorefreshPanels = $2000; // instead of ini  AutoRefreshPanels=1
+  fmoDescrByShortNames = $4000; // instead of ini DescrByShortNames
 
   { L(R) Ctrl in DriveLine }
   fdlNoDifference = 0;
@@ -992,8 +992,8 @@ const
 
 type
   TFileColNumber =
-    {` Номер колонки в описательных массивах;
-    колонка имени в нумерацию не входит.
+    {` Column number in the descriptive arrays;
+    the name column is not included in the numbering.
      }
    (psnShowSize,
     psnShowPacked,
@@ -1175,8 +1175,8 @@ const
   cmSwitchHiLine = 12158;
   cmSwitchHiColumn = 12159;
 
-{ Каждая команда перекодировки строки должна иметь код меньше, чем
-  cmUpcaseBlock, см. TFileEditor.ChangeBlockCase}
+{ Each string recoding command must have a code less than
+  cmUpcaseBlock, see TFileEditor.ChangeBlockCase}
   cmUpString = 12160;
   cmLowString = 12161;
   cmCapString = 12162;
@@ -1197,8 +1197,8 @@ const
   cmSwitchBrackets = 12176;
   cmBracketPair = 12177;
 
-{ Каждая команда перекодировки строки должна иметь код меньше, чем
-  cmUpcaseBlock, см. TFileEditor.ChangeBlockCase}
+{ Each string recoding command must have a code less than
+  cmUpcaseBlock, see TFileEditor.ChangeBlockCase}
   cmUpcaseBlock = 12178;
   cmLowcaseBlock = 12179;
   cmCapitalizeBlock = 12180;
@@ -1275,7 +1275,7 @@ const
   cmInsertName = 10301;
   cmInfoPresent = 10302;
   cmGetDirName = 10303;
-    {` Команда панели - дать путь к каталогу панели `}
+    {` Panel command - give the path to the panel directory `}
 //  cmLocalReread = 10304;
   cmDlgNotFound = 10305;
 
@@ -1511,7 +1511,7 @@ const
   cmUserMenu = 3026;
   cmLocalMenuFileEdit = 3027;
   cmGetName = 3028;
-    {` Команда окна и панели - дать текст для списка окон `}
+    {` Window and panel command - give text for the window list `}
   cmPhoneBook = 3030;
   cmStoreColors = 3031;
   cmLoadColors = 3032;
@@ -1731,11 +1731,11 @@ const
   NumSortModes = 8;
 
   { Sort commands }
-   {AK155: коды команд в этой секции должны идти подряд
-    и их порядок должен соответствовать порядку констант
-    dlSortName и далее, а также psmLongName и далее.
-    И этот порядок должен соответствовать порядку чекбоксов
-    в диалоге настроек сортировки. См. также CM_SortBy }
+   {AK155: command codes in this section must be consecutive
+    and their order must match the order of constants
+    dlSortName and following, and also psmLongName and following.
+    And this order must match the order of checkboxes
+    in the sort settings dialog. See also CM_SortBy }
   cmSortName = 13000;
   cmSortExt = 13001;
   cmSortSize = 13002;
@@ -1760,19 +1760,19 @@ const
   psmDIZ = 6;
   psmUnsorted = 7;
 
-{//JO: ниже идут специальные значения, которые TFilesCollection.SortMode
- //    принимает перед использованием метода TFilesCollection.FileCompare}
-  fcmCompSize = 1; {сравнить размер файлов}
-  fcmCompTime = 2; {сравнить дату и время файлов}
-  fcmCompAttr = 4; {сравнить атрибуты файлов}
-  fcmCompContent = 8; {сравнить содержимое файлов}
-  fcmCaseSensitive = 16; {регистрочувствительное сравнение имён файлов}
-  fcmPreciseCompare = 32; {сравнение всего сразу для групповых операций}
+{//JO: below are special values that TFilesCollection.SortMode
+ //    takes before using TFilesCollection.FileCompare}
+  fcmCompSize = 1; {compare file sizes}
+  fcmCompTime = 2; {compare file date and time}
+  fcmCompAttr = 4; {compare file attributes}
+  fcmCompContent = 8; {compare file contents}
+  fcmCaseSensitive = 16; {case-sensitive file name comparison}
+  fcmPreciseCompare = 32; {compare everything at once for group operations}
 
-  psfOwnerFirst = 1; {JO: сортировать сначала пути к файлам}
-  psfSortByType = 2; {JO: сортировать сначала по группе}
-  psfInverted = 4; {JO: сортировать в обратном порядке}
-  psfDirsByName = 8; {JO: сортировать каталоги всегда по имени}
+  psfOwnerFirst = 1; {JO: sort file paths first}
+  psfSortByType = 2; {JO: sort by group first}
+  psfInverted = 4; {JO: sort in reverse order}
+  psfDirsByName = 8; {JO: always sort directories by name}
 
   { Groups of files placed to the top during panel sorting }
   upsNone = 0;
@@ -1817,7 +1817,7 @@ const
   cmSwitch = 31000;
 
   cmPlugins = 32000; {Cat}
-  {..........занято..........} {Cat}
+  {..........occupied..........} {Cat}
   cmPluginsEnd = 65000; {Cat}
 
   { Help Contexts }
@@ -1877,9 +1877,9 @@ type
 
 type
   TStrIdx = (
-    {Cat: эти индексы поставлены в начало списка, чтобы в будущем не возникало
-      несоответствий индексов ресурсов, когда файлы DN.EXE и PLUGMAN.DLL
-      взяты из разных версий ДН-а}
+    {Cat: these indices are placed at the start of the list so that later there are no
+      mismatches of resource indices when DN.EXE and PLUGMAN.DLL
+      are taken from different DN versions}
     dlPlugins0,
     dlPlugins1,
     dlPlugins2,
@@ -2112,7 +2112,7 @@ type
     dlChangeDir,
     dlSetAttr,
 
-    dlSortName, {AK155: порядок в этой секции менять нельзя! См. CM_SortBy }
+    dlSortName, {AK155: order in this section must not be changed! See CM_SortBy }
     dlSortExt,
     dlSortSize,
     dlSortDate,

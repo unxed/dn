@@ -59,10 +59,10 @@ uses
   ;
 
 const
-  MaxILines = 200; { максимальный индекс масива Lines }
+  MaxILines = 200; { maximum index of the Lines array }
   MaxWrapW = 1023;
-  { максимальная ширина для заворачивания
-    строк в режиме unwrap }
+  { maximum wrap width for
+    lines in unwrap mode }
 
 type
   PComp = ^TFileSize;
@@ -71,7 +71,7 @@ type
 
   TViewScroll = class;
   TViewScroll = class(TView)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is exposed via the plugin model; change with extreme care!}
     MaxV, Value: TFileSize;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
@@ -86,7 +86,7 @@ type
   TFileViewer = class;
 
   TFileViewer = class(TView)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is exposed via the plugin model; change with extreme care!}
     Filtr: Boolean;
     NoEdit: Boolean;
     FileName: String; {DataCompBoy}
@@ -97,8 +97,8 @@ type
     XDelta, ViewMode, HexPos: AInt;
     SearchActive: Boolean;
     SearchResultVisible: Boolean; {AK155}
-    PrevSearchDir: Boolean; {Эта переменная принимается во внимание
-      только при SearchResultVisible }
+    PrevSearchDir: Boolean; {This variable is considered
+      only when SearchResultVisible }
     SearchX: TFileSize;
     SB: TView;
     Wrap: Byte; {DataCompBoy}
@@ -116,7 +116,7 @@ type
     BufLines: AInt;
     KillAfterUse, isValid, QuickView, Loaded, HexEdit, BufModified:
      Boolean;
-    FakeKillAfterUse: Boolean; {временная пустышка}
+    FakeKillAfterUse: Boolean; {temporary stub}
     Filter: Byte;
     XCoder: TXCoder;
     MarkPos: TFPosArray;
@@ -157,7 +157,7 @@ type
 
   THFileViewer = class;
 
-    {`2 Просмотр, который вставляется не в окно, а в панель менеджера`}
+    {`2 A viewer inserted not into a window but into the manager panel`}
   THFileViewer = class(TFileViewer)
     procedure ChangeBounds(const Bounds: TRect); override;
     function GetPalette: TPalette; override;
@@ -180,7 +180,7 @@ type
 
   TNFileViewer = class;
 
-    {`IMHO просмотр memo в dbf`}
+    {`IMHO viewing a memo in a dbf`}
   TNFileViewer = class(TFileViewer)
     function GetPalette: TPalette; override;
     end;
@@ -221,7 +221,7 @@ const
   cmChangeValue = 9990;
   SearchString: TViewSearch = (What: ''; Opts: 0; Dir: 0);
 
-  {Cat: порядок переменных не менять, сохраняются подряд в DSK-файл}
+  {Cat: do not change variable order; they are saved contiguously in the DSK file}
 
 var
   LastViewerBounds: TRect;
@@ -229,18 +229,18 @@ var
   LastEditDeskSize: TPoint {= (X:0;Y:0)};
 
 function SearchFileStr(
- {` Поиск строки в уже открытом файле }
-    F: TStream; // Собственно файл
+ {` Search for a string in an already open file }
+    F: TStream; // The file itself
     var XLAT: TXlat;
-      { перекодировка из кодировки файла в ASCII. Если
-      not CaseSensitive - то одновременно и перевод на верхний регистр}
+      { recode from the file encoding to ASCII. If
+      not CaseSensitive - also convert to uppercase at the same time}
     const What: String;
-      { в ASCII. Для not CaseSensitive регистр What не критичен }
-    Pos: TFileSize; // точка старта
+      { in ASCII. For not CaseSensitive the case of What does not matter }
+    Pos: TFileSize; // start point
     CaseSensitive,
-    Display, // отображать информацию о ходе поиска
+    Display, // show search progress info
     WholeWords, Back,
-    AllCP, // если AllCP, то XLAT игнорируется
+    AllCP, // if AllCP, XLAT is ignored
     IsRegExp: Boolean): TFileSize;
  {`}
 
@@ -304,7 +304,7 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
     goto LExit;
   F.Seek(Pos);
   BufLen := $80000;
-  {Cat: тут лучше с памятью не мелочиться, иначе сильно проигрываем в скорости}
+  {Cat: better not skimp on memory here, or we lose a lot of speed}
   if BufLen > L then
     BufLen := i32(L);
   if BufLen > MaxAvail then
@@ -841,9 +841,9 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
             Value := 0
           else
             {Value := MaxV * (SP-1) div (Size.Y-3) + 1;}
-            {JO: точности вычисления с Longint для очень больших файлов недостаточно}
+            {JO: Longint precision is not enough for very large files}
             Value := GetPrecValue; {JO}
-          {AK155: скроллер уже нарисован и еще дважды будет нарисован }
+          {AK155: the scroller is already drawn and will be drawn twice more }
           {                DrawView; }
           Message(Owner, evCommand, cmScrollBarChanged, @Value);
           Exit;
@@ -910,7 +910,7 @@ function TViewScroll.GetPartCode: LongInt;
     Val1 := Value;
     Max1 := MaxV;
     {GetPartCode := 1+((Size.Y-3)*Value) div MaxV}
-    {JO: точности вычисления с Longint для очень больших файлов недостаточно}
+    {JO: Longint precision is not enough for very large files}
     GetPartCode := 1+Round(((Size.Y-3)*Val1)/Max1);
     end;
   {/JO}
@@ -992,11 +992,11 @@ procedure TDFileViewer.HandleEvent(var Event: TEvent);
   begin
   if (Event.What = evCommand) and (Event.Command = cmFileEdit) then
     begin
-   {! AK155 10.01.05 Команда перехода в редактор в панели просмотра
-    описаний - штука, наверно, осмысленная. Надо бы таки
-    действительно вызвать редактор в этом же окне, подсунув ему
-    этот же MemoryStream. Но сейчас нет времени это делать,
-    поэтому пока Alt-E будет просто игнорироваться. }
+   {! AK155 10.01.05 The jump-to-editor command in the description
+    viewer panel is probably sensible. We should actually
+    open the editor in this same window and feed it
+    this same MemoryStream. But there is no time for that now,
+    so for now Alt-E will simply be ignored. }
     ClearEvent(Event);
     end
   else
@@ -1036,9 +1036,9 @@ procedure TFileViewer.ChangeBounds;
   end;
 
 {AK155
-   Обеспечить буфер подходящего размера. Этот размер не
-превосходит размера файла. Прежний буфер, если он был
-не такого размера, освобождается }
+   Ensure a buffer of a suitable size. That size does not
+exceed the file size. The previous buffer, if it was
+not that size, is freed }
 procedure TFileViewer.AdjustBuf;
   var
     NewBufSize: LongInt;
@@ -1055,7 +1055,7 @@ procedure TFileViewer.AdjustBuf;
   end;
 
 {AK155
-   Автодочитывание файла, если на экране виден его конец }
+   Auto-reread the file if its end is visible on screen }
 procedure TFileViewer.Update;
   begin
   inherited Update;
@@ -1068,7 +1068,7 @@ procedure TFileViewer.Update;
   then
     begin
     SeekEof;
-    NewTimer(UpdateViewTmr, 500); { обновлять 2 раза в секунду }
+    NewTimer(UpdateViewTmr, 500); { update twice per second }
     end;
   end;
 
@@ -1110,8 +1110,8 @@ constructor TFileViewer.Create(const Bounds: TRect; AStream: TStream;
     on E: eFileError do
       Exit;
   end;
-  {AK155 Это для автодочитывания файла с изменяющейся длиной,
-    см. Update }
+  {AK155 This is for auto-rereading a file with changing length,
+    see Update }
   NewTimer(UpdateViewTmr, 500);
   RegisterToBackground(Self);
   {/AK155}
@@ -1175,8 +1175,8 @@ constructor TFileViewer.Load(S: TStream);
     except
       on E: eFileError do
         ;
-      {AK155 так бывает, например, при перезапуске DN
-       с запомненным просмотром на отсутствующей дискете }
+      {AK155 this happens e.g. when restarting DN
+       with a remembered viewer on a missing floppy }
     end;
     end;
   end { TFileViewer.Load };
@@ -1221,7 +1221,7 @@ procedure XDumpStr(var S: String; var B; Addr: Int64; Count: Integer;
     end;
   end { XDumpStr };
 
-{ размер поля табуляции }
+{ tab field size }
 function GetTabSize: Word;
   var
     TS: Word;
@@ -1259,11 +1259,11 @@ procedure TFileViewer.Draw;
     D: XCHGData; {GRM!}
     
     SearchLineNum: Integer;
-    {номер строки на экране с найденным тестом или -1 }
+    {screen line number with the found text, or -1 }
     SearchTextStart: Word;
-    {X-координата в окне начала этого текста }
+    {X-coordinate in the window of the start of that text }
     ExpandTabs: Boolean;
-    { Табуляции заменять на пробелы }
+    { Replace tabs with spaces }
   var
     W, W2, W3: Integer;
     WDH: Integer;
@@ -1276,20 +1276,20 @@ procedure TFileViewer.Draw;
   if  (Buf = nil) and not QuickView and
     not (VFileName = ' ')
     {AK155 11-01-2004
-      бывает в просмотре dbf при просмотре memo, когда memo-файл то ли
-      пустой, то ли битый. VFileName = ' ' - это внешний поток и при
-      нормальной работе , вроде, не должно быть Buf = nil}
+      happens in dbf view when viewing a memo, when the memo file is either
+      empty or corrupt. VFileName = ' ' means an external stream and during
+      normal operation Buf should not be nil}
     then
     begin
     ReadFile(FileName, VFileName, True);
     BufPos := 0;
     MakeLines;
     end
-    (* {AK155 11-01-2003 эти бредовые проверки, вероятно, когда-то
-        служили для компенсации  последствий каких-то багов.
-        Но после того, как BufSize стал не $8000, а поболее, они
-        стали в прежнем виде вредны, а обновлять их не хочется,
-        так как самих багов, наверно, уже давно нет}
+    (* {AK155 11-01-2003 these crazy checks probably once
+        compensated for the effects of some bugs.
+        But after BufSize became larger than $8000 they
+        became harmful as-is, and there is no desire to update them,
+        since the bugs themselves are probably long gone}
   else
   if (BufPos < 0) or (BufPos > BufSize + 20000) or
      (BufPos > 65000) then
@@ -1534,8 +1534,8 @@ procedure TFileViewer.Draw;
       ExposedLine := 0;
       EnableCommands([cmUnWrap]);
       {ak155        HideCursor;}
-      { возможный сдвиг XDelta, чтобы стал виден найденный текст,
-и определение его X-позиции (с учетом табуляций) для будущей раскраски }
+      { possibly shift XDelta so the found text becomes visible,
+and determine its X-position (accounting for tabs) for later highlighting }
       SearchLineNum := -1;
       if SearchActive then
         begin
@@ -1578,7 +1578,7 @@ procedure TFileViewer.Draw;
           begin
           ExposedLine := I;
 
-          {-DataCompBoy: Expand tabs...-} {AK155: и применить фильтр }
+          {-DataCompBoy: Expand tabs...-} {AK155: and apply the filter }
           W := 0;
           for M := Lines[I].Pos to Lines[I].Pos+Lines[I].len-1 do
             begin
@@ -1604,8 +1604,8 @@ procedure TFileViewer.Draw;
             XLatBuf(S[1], Length(S), XCoder.XLatCP[ToAscii]);
             if XCoder.KeyMap <> kmAscii then
               CpBytesToUtf8(S, 1); { UTF-8 inside: the text that went through a table is of the code page; the text with no table is shown as UTF-8 }
-            {Cat: фильтр перенесён сюда - он должен быть использован
-      уже после применения таблицы перекодировки}
+            {Cat: the filter was moved here - it must be applied
+      after the recoding table}
             case Filter of
               1:
                 for W := 1 to Length(S) do
@@ -1640,7 +1640,7 @@ procedure TFileViewer.Draw;
 
           end;
         if I = SearchLineNum then
-          { раскраска найденного текста }
+          { highlight the found text }
           MoveColor(B[SearchTextStart], Length(SearchString.What), CC[2]);
         WriteLineC(0, I, Size.X, 1, B[0]);
         end;
@@ -1689,9 +1689,9 @@ function TFileViewer.ReadFile;
     Fl := TDosStream.Create(FName, stOpenRead);
     end;
 
-  { Если FName - имя каталога, то формируем буфер (без Stream) с
-текстовыми данными о содержимом каталога. Это используется в QuickView,
-если куросор стоит на каталоге AK155}
+  { If FName is a directory name, build a buffer (no Stream) with
+text data about the directory contents. Used in QuickView
+when the cursor is on a directory AK155}
   ReadDir := True;
   I := Length(FName);
   if Copy(FName, I-2, 3) = '\..' then
@@ -1701,12 +1701,12 @@ function TFileViewer.ReadFile;
     end
   else if (I = 2) and (FileName[2] = ':') then
     DirString := FileName
-      {так бывает, например, при перезапуске
-     DN с запомненным состоянием с Branch в корне диска }
+      {this happens e.g. when restarting
+     DN with a remembered Branch state at the drive root }
   else if (FileName = ' ') or not IsDir(FileName) then
-    {Cat: проверка на пробел нужна, т.к. IsDir вернёт для него True, что нас
-        не устраивает, поскольку пробел означает использование просмотрщика
-        не для конкретного файла, а для заданного конструктору потока}
+    {Cat: the space check is needed because IsDir returns True for it, which we
+        do not want, since a space means the viewer is used
+        not for a specific file but for a stream passed to the constructor}
     ReadDir := False;
   if ReadDir then
     begin
@@ -1722,11 +1722,11 @@ function TFileViewer.ReadFile;
     GetMem(Buf, 100);
     Move(DirString[1], Buf^, Length(DirString));
     MakeLines;
-    Fl.Status := stOK; { сбрасываем stInitError }
+    Fl.Status := stOK; { clear stInitError }
     Exit;
     end;
   BreakOnStreamReadError;
-  {см. panelroot, TFilePanelRoot.SendLocated;}
+  {see panelroot, TFilePanelRoot.SendLocated;}
 
   (*  if (not ExistFile(FName) or isDir(FName)) and
      (FName <> '') and (FName <> ' ') then begin ReadFile:=false; Exit; end;
@@ -1986,19 +1986,19 @@ procedure TFileViewer.SaveToFile(FN: String);
       (MessageBox(GetString(dlViewSaveXlat), nil,
         mfYesButton+mfNoButton+mfConfirmation) = cmYes);
   S := TDosStream.Create(FN, stOpen);
-  W := 0; {AK155: чтобы всегда была определена }
+  W := 0; {AK155: so it is always defined }
   if S.Status = stOK then
     begin
     PS := @FN;
     W := MessageBox(GetString(dlED_OverQuery)
         , @PS, mfYesButton+mfCancelButton+mfAppendButton+mfWarning);
     if W = cmYes then
-      begin {существующий файл}
-      {AK155 Это переоткрытие приводит под OS/2 к тяжелой
-ошибке при попытке сохранить перекодированный текст в том
-же самом файле. А нужно оно только для того, чтобы при перезаписи
-длинного файла коротким получить новую (меньшую) длину. Но это
-гораздо прямее достигается при помощи Truncate.
+      begin {existing file}
+      {AK155 This reopen causes a severe OS/2
+error when trying to save recoded text into the
+same file. It is only needed so that overwriting
+a long file with a short one gets the new (smaller) length. But that
+is achieved much more directly with Truncate.
             S.Free;
             S := TDosStream.Create(FN, stCreate);
 /AK155}
@@ -2012,7 +2012,7 @@ procedure TFileViewer.SaveToFile(FN: String);
       end;
     end
   else
-    begin {новый файл}
+    begin {new file}
     S.Free; {JO}
     S := TDosStream.Create(FN, stCreate); {JO}
     end;
@@ -2047,7 +2047,7 @@ procedure TFileViewer.SaveToFile(FN: String);
 2:
     S.CopyFrom(Fl, Fl.GetSize);
   P.Free;
-  S.Truncate; {AK155 на случай записи короткого файла поверх длинного}
+  S.Truncate; {AK155 in case a short file is written over a long one}
   S.Free;
   FN := GetPath(FN);
   MakeNoSlash(FN);
@@ -2069,7 +2069,7 @@ procedure TFileViewer.SeekBof;
   end;
 
 {AK155}
-{ Выдача сообщения, закрытие окна и возбуждение исключения }
+{ Show a message, close the window, and raise an exception }
 function TFileViewer.BreakOnStreamReadError: Boolean;
   var
     E: eFileError;
@@ -2084,13 +2084,13 @@ function TFileViewer.BreakOnStreamReadError: Boolean;
     BreakOnStreamReadError := True;
     E := eFileError.Create('TFileViewer stream read error');
     E.RC := Fl.ErrorInfo;
-    { на самом деле это собщение и RC никому не нужны, но это может
-      пригодиться, если не все вызовы BreakOnStreamReadError обложены
-      try - except и исключение окажется фатальным}
+    { actually this message and RC are needed by nobody, but it may
+      help if not all BreakOnStreamReadError calls are wrapped in
+      try - except and the exception turns out fatal}
 
-    { При QuickView просмотрщик вставлен не в самостоятельное окно,
-а прямо в менеджер файлов, так что при QuickView закрывать владельца
-не просто не нужно, а недопустимо }
+    { In QuickView the viewer is not in a standalone window
+but directly in the file manager, so closing the owner in QuickView
+is not just unnecessary but forbidden }
     if  (Owner <> nil) and not QuickView then
       Owner.Free;
     isValid := False;
@@ -2143,7 +2143,7 @@ procedure TFileViewer.SeekEof;
       SysFileSeek(Handle, 0, 2, StreamSize);
       FileSize := StreamSize;
       if FileSize < OldFileSize then
-        begin { Файл сжался }
+        begin { The file shrank }
         if Position > FileSize then
           Position := StreamSize;
         end;
@@ -2170,7 +2170,7 @@ procedure TFileViewer.SeekEof;
   else
     begin
     BufPos := BufSize;
-    {AK155: Зачем качать на 3 строки туда-сюда, непонятно. Для глюков?
+    {AK155: Why scroll 3 lines back and forth is unclear. For bugs?
    CountUp(Size.Y+3);
    CountDown(3);}
     CountUp(Size.Y); {AK155}
@@ -2274,8 +2274,8 @@ procedure TFileViewer.HandleEvent;
       SearchX := FilePos+BufPos;
     Backward := (SearchString.Dir = 1) xor Reverse;
     if SearchResultVisible and (Backward <> PrevSearchDir)
-    then { смена направления поиска: надо пропустить
-          текст, только что найденный в другом направлении }
+    then { search direction change: must skip
+          the text just found in the other direction }
       begin
       if Backward then
         SearchX := SearchX - length(SearchString.What)
@@ -2331,7 +2331,7 @@ procedure TFileViewer.HandleEvent;
     {AK155}
     SearchX := FilePos+Lines[0].Pos;
     if SR.Dir = 1 then
-      begin {назад}
+      begin {backward}
       I := Size.Y-1;
       while (I <> 0) and (Lines[I].Pos < 0) do
         Dec(I);
@@ -2640,8 +2640,8 @@ DoSave:
             Seek(PComp(Event.InfoPtr)^);
             if  (ViewMode = vmText) and (Event.InfoLong <> 0) then
               begin
-              { стать на начало строки, но так,
-                 чтобы не сдвинуть вверх ползунок курсора }
+              { move to the start of the line, but so
+                 as not to shift the cursor slider upward }
               CountDown(1);
               ScrollerPos := TViewScroll(SB).GetPartCode;
               CountUp(1);
@@ -2978,10 +2978,10 @@ KBCheck:
                 else
                   begin
                   case DNKeyCode(Event) of
-                 //JO: поскольку хоткеи Ctr-цифра в OS/2 не работают без
-                 //    специального патча, котоpый может быть не у всех
-                 //    - введены дополнительные хоткеи Ctrl-Alt-Shift-цифра
-                 //    для перехода к закладкам
+                 //JO: since Ctrl-digit hotkeys under OS/2 do not work without
+                 //    a special patch that not everyone may have
+                 //    - extra Ctrl-Alt-Shift-digit hotkeys were added
+                 //    for jumping to bookmarks
                     
                     kbAlt1:
                       Event.Command := cmPlaceMarker1;
@@ -3190,8 +3190,8 @@ procedure TFileViewer.DoHighlite
     end;
   end { TFileViewer.DoHighlite };
 
-{AK155 05.2001 Процедура CountDown почти полностью переписана;
-части, соотвествующие vmAsm, собраны до кучи, но не проверялись}
+{AK155 05.2001 CountDown was almost completely rewritten;
+the vmAsm-related parts were gathered together but not tested}
 
 procedure TFileViewer.CountDown;
   
@@ -3296,15 +3296,15 @@ procedure TFileViewer.CountUp;
 
   {AK155}
   procedure ScrollUp;
-    { Поиск в буфере начала предыдущей строчки для показа
-  (режим TextView, с учетом Wrap и Size.X).
- Вход: NextLineStart - текущее начало строки в буфере
-   (_после_ маркера типа CR LF, если он есть);
- Выход: LineStart - начало предыдущей строки;
-        LineEnd - ее конец (на маркере, если он есть;
-                  обычно LineEnd=NextLineStart-1).
- Если при поиске начала упираемся в начало буфера, то читать предыдущий
- файл не пытаемся, а просто возвращаем LineStart=0. }
+    { Search the buffer for the start of the previous display line
+  (TextView mode, accounting for Wrap and Size.X).
+ Input: NextLineStart - current line start in the buffer
+   (_after_ a CR LF-style marker, if any);
+ Output: LineStart - start of the previous line;
+         LineEnd - its end (on the marker, if any;
+                   usually LineEnd=NextLineStart-1).
+ If searching for the start hits the buffer start, we do not try to
+ read more of the file; we simply return LineStart=0. }
 
     var
       I, M, W: LongInt;
@@ -3316,7 +3316,7 @@ procedure TFileViewer.CountUp;
     LineStart := LineEnd;
     if LineEnd <= 0 then
       Exit;
-    { Пропуск маркера конца }
+    { Skip the end marker }
     if  (LineEnd > 0) then
       begin
       c1 := Buf^[LineEnd-1];
@@ -3332,9 +3332,9 @@ procedure TFileViewer.CountUp;
         end;
       end;
 
-    { Поиска начала строки в буфере. Ограничиться шириной экрана
-  прямо сейчас нельзя, так как правильный учет табуляций возможен
-  только при просмотре от самого начала строки.}
+    { Search for the line start in the buffer. Limiting to screen width
+  right now is not possible, because correct tab accounting is only
+  possible when scanning from the very start of the line.}
     LineStart := LineEnd;
     while (LineStart > 0) and not (Buf^[LineStart-1] in [$0D, $0A]) do
       begin
@@ -3342,12 +3342,12 @@ procedure TFileViewer.CountUp;
         begin
         if Wrap = wmNone then
           Exit;
-        { Так бывает при просмотре файла без CR и LF. В этом
-         случае границы строк чисто условные, так что нет никакого
-         смысла сканировать на неизвестную глубину назад, а потом
-         снова сканировать вперед, нарезая на куски максимальной
-         длины. Так что теперь просто ищем от текущей точки назад
-         начало экранной строки.}
+        { This happens when viewing a file with no CR or LF. In that
+         case line boundaries are purely conventional, so there is no
+         point scanning an unknown distance backward and then
+         scanning forward again, cutting into max-length chunks.
+         So now we simply search backward from the current point
+         for the start of the screen line.}
         LineStart := LineEnd;
         W := MaxX;
         while W > 0 do
@@ -3363,7 +3363,7 @@ procedure TFileViewer.CountUp;
             Exit;
           if  (Char(Buf^[LineStart-1])) in BreakChars then
             Exit;
-          { граница экранной строки лежит внутри слова }
+          { the screen-line boundary lies inside a word }
           I := LineStart;
           Inc(LineStart, 2);
           while LineStart < LineEnd do
@@ -3372,18 +3372,18 @@ procedure TFileViewer.CountUp;
               Exit;
             Inc(LineStart);
             end;
-          LineStart := I; { ну очень длинное слово }
+          LineStart := I; { a really long word }
           end;
         Exit;
         end;
       Dec(LineStart);
       end;
 
-    { Сейчас LineStart - настоящее начало строчки в буфере. Но с учетом wrap
-   она может разделиться на несколько строчек экрана. Ниже это проверяется
-   и в качестве LineStart возвращается начало последней из них. }
+    { Now LineStart is the real line start in the buffer. But with wrap
+   it may split into several screen lines. Below that is checked
+   and LineStart returns the start of the last of them. }
 
-    M := LineStart; { M - кандидат на конец строки }
+    M := LineStart; { M - candidate for the end of the line }
     W := 0;
     while M < LineEnd-1 do
       begin
@@ -3393,14 +3393,14 @@ procedure TFileViewer.CountUp;
       if W <= MaxX then
         Inc(M)
       else
-        begin { нужен разрез строки }
+        begin { a line split is needed }
         if Wrap = wmWords then
-          begin { вернуться до границы слова }
+          begin { go back to the word boundary }
           I := M;
           while I > LineStart do
             begin
             if Char(Buf^[I-1]) in BreakChars then
-              begin { граница слова найдена }
+              begin { word boundary found }
               M := I;
               Break;
               end;
@@ -3408,7 +3408,7 @@ procedure TFileViewer.CountUp;
             end;
           end;
         LineStart := M;
-        W := 0; { выполнили разрез }
+        W := 0; { split done }
         end;
       end;
     end { ScrollUp };
@@ -3417,13 +3417,13 @@ procedure TFileViewer.CountUp;
   begin { TFileViewer.CountUp }
   if Buf = nil then
     Exit;
-  (* {AK155 11-01-2003 эти бредовые проверки, вероятно, когда-то
-        служили для компенсации  последствий каких-то багов.
-        Но после того, как BufSize стал не $8000, а поболее, они
-        стали в прежнем виде вредны, а обновлять их не хочется,
-        так как самих багов, наверно, уже давно нет}
+  (* {AK155 11-01-2003 these crazy checks probably once
+        compensated for the effects of some bugs.
+        But after BufSize became larger than $8000 they
+        became harmful as-is, and there is no desire to update them,
+        since the bugs themselves are probably long gone}
   if BufPos > 65000 then
-    begin BufPos := 0; MakeLines; end; {AK155: IMHO так не бывает}
+    begin BufPos := 0; MakeLines; end; {AK155: IMHO that never happens}
 *)
   NextLineStart := BufPos;
   
@@ -3437,7 +3437,7 @@ procedure TFileViewer.CountUp;
   for N := 1 to ANumber do
     begin
     if  (NextLineStart <= 0) and (FilePos <= 0) then
-      Break; { уже стоим в начале, двигаться некуда }
+      Break; { already at the start, nowhere to move }
 1:
     {GRM!}
     case ViewMode of
@@ -3458,17 +3458,16 @@ procedure TFileViewer.CountUp;
     end {case};
     {GRM!}
     if  (ViewMode = vmText) and (LineEnd = Lines[0].Pos) and
-        (LineEnd <> 0) {AK155 такое бывает в самом начале буфера}
+        (LineEnd <> 0) {AK155 this happens at the very start of the buffer}
       and (Lines[0].len+Lines[0].Pos-LineStart <= MaxX)
-      {AK155 > MaxWrapW бывает при просмотре файла без CR и LF }
+      {AK155 > MaxWrapW happens when viewing a file with no CR or LF }
       then
       begin
-      {AK155 При переходе от Hex/Dump к Text начало первой строчки
-  экрана могло оказаться не началом строки в буфере. В момент смены
-  режима на настоящее начало строки скакать было нехорошо,
-  чтобы переключение режима не сбивало позицию, а сейчас надо
-  таки перейти к настоящему началу строки. Реально такое
-  может быть только при I=1 }
+      {AK155 When switching from Hex/Dump to Text the start of the first
+  screen line may not be a buffer line start. Jumping to the real
+  line start at mode-switch time was bad, so mode switching would
+  not disturb the position; now we do need to move to the real
+  line start. In practice that can only happen when I=1 }
       Inc(Lines[0].len, Lines[0].Pos-LineStart);
       Lines[0].Pos := LineStart;
       BufPos := LineStart;
@@ -3477,17 +3476,17 @@ procedure TFileViewer.CountUp;
       {/AK155}
       begin
       if (LineStart > 0) and (LineStart < BufSize) then
-        BufPos := LineStart { нормальное начало строки }
+        BufPos := LineStart { normal line start }
       else if FilePos = 0 then
-        begin { начало файла }
+        begin { start of file }
         if BufPos = 0 then
-          Exit; { и так уже были в начале }
-        BufPos := 0; { нормальное начало строки }
+          Exit; { we were already at the start }
+        BufPos := 0; { normal line start }
         end
       else
         begin
-        { начало буфера не в начале файла: сдвинуться по файлу
-              на полбуфера и повторить поиск начала строки }
+        { buffer start is not at file start: move through the file
+              by half a buffer and retry finding the line start }
         NewFilePos := FilePos-(BufSize div 2);
         if NewFilePos < 0 then
           NewFilePos := 0;
@@ -3571,7 +3570,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
   GetExtent(R);
   R.Grow(-1, -1);
   PV := TFileViewer.Create(R, nil, FileName, VFileName, P, False, Hex);
-  Insert(PV); {Вставить надо даже при ошибке для последующего контроля }
+  Insert(PV); {Must insert even on error for later checking }
   if not PV.isValid then
     {AK155}
     Exit;
