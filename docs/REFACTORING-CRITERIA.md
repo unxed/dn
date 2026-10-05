@@ -43,14 +43,17 @@ open-ended cleanup, Safe Pascal adoption, or “better than OSP” product work
 
 From `dn/TODO-refactoring.md` candidates, **in 3.0 this stage only**:
 
-- [ ] No new files with trailing `_`, digit-only suffixes, or duplicate
+- [x] No new files with trailing `_`, digit-only suffixes, or duplicate
       near-names (`foo` / `foo2`) without an owner-approved exception in
-      `TODO-refactoring.md`.
-- [ ] Outstanding rename families that are already half-done are finished
+      `TODO-refactoring.md`. *(Audit 2026-10-05: no `*_` / `arc_*` in
+      `dn/src` or `dn/archives`. Digits only in format ids like `fmtbs2`,
+      `fmtbz2`, and `dnutf8` — keep.)*
+- [x] Outstanding rename families that are already half-done are finished
       **or** explicitly parked with owner names in `TODO-refactoring.md`
-      (do not leave half-renamed pairs).
-- [ ] Archive format units under `dn/archives/` keep the directory as the
-      namespace; no new `arc_` prefixes.
+      (do not leave half-renamed pairs). *(Main families already done per
+      TODO-refactoring “Done”; no half-renamed pairs in tree.)*
+- [x] Archive format units under `dn/archives/` keep the directory as the
+      namespace; no new `arc_` prefixes. *(All `fmt*.pas`.)*
 
 Out of scope for this stage (post-3.0 / TODO-later unless owner moves them):
 
