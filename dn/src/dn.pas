@@ -135,7 +135,7 @@ except
     Writeln(E.Message);
     if GetLocationInfo(ExceptAddr, FileName, LineNo) <> nil then
       Writeln('Source location: '+FileName+' line ', LineNo);
-    Writeln('Please report to RU.SHELL.DN'^M^J+
+    Writeln('Please report to https://github.com/unxed/dn'^M^J+
       '( file '+SourceDir+' )'^M^J^M^J+
       'Press any key...');
 {$I-}
