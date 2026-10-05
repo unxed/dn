@@ -717,14 +717,18 @@ procedure TGameView.MakeTime;
   begin
   if Stop then
     Exit;
-  LastT := GetCurMSec*10;
+  { Wall-clock ms. Old DN compared GetCurMSec*10 to LevelDelay (*200);
+    that is the same gate as (elapsed_ms > Delay/10), but LongInt*10 overflows
+    after ~2.5 days of uptime and the piece falls every Idle. Objects and
+    classes share LevelDelay — do not retune it here. }
+  LastT := GetCurMSec;
   end;
 
 procedure TGameView.Update;
   begin
   if Stop then
     Exit;
-  if GetCurMSec*10 > LastT+Delay then
+  if Cardinal(GetCurMSec) - Cardinal(LastT) > Cardinal(Delay div 10) then
     begin
     MoveDown;
     MakeTime
@@ -777,6 +781,7 @@ procedure TGameView.HandleEvent;
           begin
           NewGame;
           Stop := False;
+          MakeTime;
           DrawView;
           CE
           end;
