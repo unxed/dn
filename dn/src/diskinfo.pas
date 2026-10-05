@@ -60,7 +60,7 @@ type
     Title: PString;
     Dir: PString;
     Files: PString;
-    Free: PString; { см. TDrive.GetFreeSpace }
+    Free: PString; { see TDrive.GetFreeSpace }
     Total: PString;
     VolumeID: PString;
     SerialNo: PString; { Rainbow }
@@ -78,14 +78,14 @@ type
     Info: TDiskInfoRec;
     Delta: TPoint;
     OtherPanel: TView{TFilePanelRoot};
-      { Файловая панель, с которой связана данная панель информации }
+      { File panel this info panel is linked to }
     DriveView: TDriveView;
-      { Диск/шара в верхней рамке. См. InsertDriveView и Done }
+      { Drive/share in the upper frame. See InsertDriveView and Done }
     constructor Create(R: TRect; Panel: TView{TFilePanelRoot});
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure InsertDriveView;
-      { Для инфо о диске создать DriveView и вставить в Owner }
+      { For disk info create DriveView and insert into Owner }
     procedure ReadData;
     procedure HandleEvent(var Event: TEvent); override;
     function GetPalette: TPalette; override;
@@ -101,16 +101,16 @@ type
     end;
 
 function CountDirLen(const Dir: String; Recurse: Boolean;
-{` Подсчёт числа файлов (NumFiles) и их суммарного размера (Result)
-без захода в подкаталоги. NumFiles включает в себя и каталоги тоже.
-ClusterLen - суммарное занятое место (с учётом хвостов кластеров).
-  Вызывает GetDrInfo, так что все выходные переменные GetDrInfo
-также будут определены }
+{` Count files (NumFiles) and their total size (Result)
+without descending into subdirectories. NumFiles includes directories too.
+ClusterLen - total occupied space (including cluster tails).
+  Calls GetDrInfo, so all GetDrInfo output variables
+will also be defined }
     var ClusterLen: TSize; var NumFiles, NumDirs: Integer): TSize;
 {`}
 
 procedure GetDrInfo(CurDir: String);
-{` Определяет FreeSpc, TotalSpc, BytesPerCluster`}
+{` Determines FreeSpc, TotalSpc, BytesPerCluster`}
 
 procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
 
@@ -146,11 +146,11 @@ const
 
 var
   FreeSpc, TotalSpc: TSize;
-  {` Общий размер диска и свободное место на нём. Определяются для
-  полного пути каталога (в т.ч. сетевого), софтлинки NTFS отслеживаются.`}
+  {` Total disk size and free space on it. Determined for
+  the full directory path (incl. network); NTFS soft links are followed.`}
   BytesPerCluster: LongInt;
-  {` Определяется для корня диска или сетевого пути. Софтлинки
-  не отслеживаются. `}
+  {` Determined for the drive root or network path. Soft links
+  are not followed. `}
 
 implementation
 uses
@@ -259,10 +259,10 @@ function TDriveView.GetText(MaxWidth: Integer): String;
   L := Max(2, GetShareEnd(Result));
   SetLength(Result, L);
   if L = 2 then
-    begin { Буква диска. Не сетевого ли?}
+    begin { Drive letter. Is it network?}
     Share := GetShare(Result[1]);
     if Share <> '' then
-      Result := Result + ' ' + Share; { Таки сетевой }
+      Result := Result + ' ' + Share; { Indeed network }
     end;
   if Length(Result) > MaxWidth then
     begin
@@ -335,27 +335,27 @@ procedure TDiskInfo.InsertDriveView;
   begin
   if TFilePanelRoot(OtherPanel).Drive.DriveType <> dtDisk then
     Exit;
-    { Такой анализ очень некрасив, лучше было бы виртуализировать
-    заголовок инфо-панели, как виртуализировано её содержимое }
+    { Such analysis is very ugly; it would be better to virtualize
+    the info-panel header the way its contents are virtualized }
 
   R.Assign(0, Origin.Y-1, 0, Origin.Y);
-    { По Y - на рамку, а с X DriveView.Draw разбирается каждый раз }
+    { On Y - onto the frame, and DriveView.Draw handles X each time }
   DriveView := TDriveView.Create(R);
   DriveView.Panel := Self;
   Owner.Insert(DriveView);
   DriveView.Panel := Self;
   end;
 
-{ При явном закрытии панели информации, например, при повторном Ctrl-L,
-DriveView тоже надо закрывать явно. А при завершении менеджера
-DriveView явно завершать нельзя - он будет завершён, как член
-группы менеджера. При этом в каком порядке будут завершаться DriveView
-и DiskInfo - неизвестно. А если после неявного освобожения DriveView
-попытаться завершить и явно тоже, это будет ошибка обращения к памяти
-и DN будети падать при закрытии менеджера.
-  Чтобы избежать повторных завершений, снабжаем DriveView и DiskInfo
-взаимными ссылками, которые обнуляем при завершении адресата ссылки.
-См. также inherited Destroy;
+{ On explicit close of the info panel, e.g. on repeated Ctrl-L,
+DriveView must also be closed explicitly. But when the manager
+terminates, DriveView must not be terminated explicitly - it will be terminated as a member
+of the manager group. And the order in which DriveView
+and DiskInfo will terminate is unknown. And if after implicit freeing of DriveView
+one also tries to terminate it explicitly, that will be a memory access error
+and DN will crash when closing the manager.
+  To avoid repeated terminations, we give DriveView and DiskInfo
+mutual references which we clear when the referent is destroyed.
+See also inherited Destroy;
 }
 destructor TDiskInfo.Destroy;
   begin
@@ -495,7 +495,7 @@ procedure TDiskInfo.Draw;
     Inc(Y);
     end;
 
-  procedure Wrt_(S: String); {временно!!!}
+  procedure Wrt_(S: String); {temporary!!!}
     var
       I: Integer;
     begin
@@ -538,7 +538,7 @@ procedure TDiskInfo.Draw;
   then
     begin
     XWrt(Info.Title, fdiTitle);
-    {временно!!!}
+    {temporary!!!}
     if  (Info.Dir <> nil) and (DriveInfoData and fdiTitle <> 0) then
       Wrt_(Cut(Info.Dir^, Size.X));
     XWrt(Info.Files, fdiTotals);
@@ -624,8 +624,8 @@ procedure TDiskInfo.Draw;
   end { TDiskInfo.Draw };
 
 {-DataCompBoy-}
-{AK155: NumFiles включает в себя NumDirs, то есть число
-чисто файлов равно NumFiles-NumDirs}
+{AK155: NumFiles includes NumDirs, so the number
+of files alone is NumFiles-NumDirs}
 function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize; var NumFiles, NumDirs: Integer): TSize;
   var
     Tmr: TEventTimer;
@@ -669,7 +669,7 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
     DosError := 0;
     Abort := False;
 
-    GetDrInfo(Dir); { Ради BytesPerCluster }
+    GetDrInfo(Dir); { For BytesPerCluster }
     if Abort then
       Exit;
     lFindFirst(MakeNormName(FreeStr, x_x), AnyFileDir, SR); {JO}

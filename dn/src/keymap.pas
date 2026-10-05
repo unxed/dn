@@ -57,8 +57,8 @@ uses
 type
   TKeyMap = (kmXlat, kmNone, kmAscii, kmAnsi,
     kmKoi8r, km5, km6, km7, km8, km9);
-  {`kmXlat и kmNone должны быть перед kmAscii, а
-  остальные - после kmAscii`}
+  {`kmXlat and kmNone must come before kmAscii, and
+  the rest after kmAscii`}
 
 type
   PCodeConv = ^TCodeConv;
@@ -68,9 +68,9 @@ type
 
 var
   RollKeyMap: array[TKeyMap] of TKeyMap;
-  {` Код следующий по кругу встроенной таблицы `}
+  {` Code of the next built-in table in round-robin order `}
   MaxKeyMap: TKeyMap;
-  {` Максимальный номер установленной перекодировочной таблицы.`}
+  {` Maximum number of an installed code-conversion table.`}
 
 type
   {(c) SeYKo}
@@ -84,47 +84,47 @@ type
 
 const
   ToUpAscii = 0;
-    {` Индекс для TXLatCP - перекодировка в ASCII c
-    переводом на верхний регистр. Испоьзуется при регистронезависимом
-    поиске. (0 = ord(False))`}
+    {` Index for TXLatCP - convert to ASCII with
+    uppercase mapping. Used for case-insensitive
+    search. (0 = ord(False))`}
   ToAscii = 1;
-    {` Индекс для TXLatCP - перекодировка в ASCII. (1 = ord(True))`}
+    {` Index for TXLatCP - convert to ASCII. (1 = ord(True))`}
   FromAscii = 2;
-    {` Индекс для TXLatCP, перекодировка из ASCII`}
+    {` Index for TXLatCP, convert from ASCII`}
 
 type
   PXlatCP = ^TXLatCP;
   TXlatCP = array[0..2] of TXLat;
 
   TKeyMapDescr = record
-    {` Описатель кодировки}
+    {` Codepage descriptor}
     Tag: string[3];
-      {` Обозначение для показа в рамке окна. Обязательно буквы
-      только английские только на верхнем регистре!
-      См. ProcessDefCodepage `}
+      {` Label shown in the window frame. Must be
+      English letters only, uppercase only!
+      See ProcessDefCodepage `}
     XlatCP: PXlatCP;
     end;
     {`}
 
 var
   ToggleCaseArray: TXlat;
-    {` Переворот регистра в ASCII, типа "cAPS lOCK" <-> "Caps Lock"`}
+    {` Case flip in ASCII, like "cAPS lOCK" <-> "Caps Lock"`}
   LayoutConvXlat: TXLat;
-    {` Исправление раскладки
-  Для случая двух раскладок клавиатуры (например, 866 и 850)
-  перекодирует каждый символ в такой, какой был бы введен с той
-  же клавиши в другой раскладке.
-  Определяется xlt-файлом, заданным ini-переменной KbdToggleLayout `}
+    {` Layout correction
+  For the case of two keyboard layouts (e.g. 866 and 850)
+  remaps each character to what would have been typed from the
+  same key in the other layout.
+  Defined by an xlt file set by the KbdToggleLayout ini variable `}
 
   ABCSortXlat: TXLat;
-    {' Таблица весов для алфавитной сортировки; без одинаковых весов '}
+    {' Weight table for alphabetical sort; no equal weights '}
 
   DosXlatCP: TXLatCP absolute UpCaseArray;
   WinXlatCP: TXLatCP;
 
 const
   KeyMapDescr: array[TKeyMap] of TKeyMapDescr =
-   {`Встроенные кодировки `}
+   {`Built-in codepages `}
     ((Tag: 'DOS'; XlatCP: @DosXlatCP) //kmXlat
     ,(Tag: 'DOS'; XlatCP: @DosXlatCP) //kmNone
     ,(Tag: 'DOS'; XlatCP: @DosXlatCP) //kmAscii
@@ -140,44 +140,44 @@ const
 function ProcessDefCodepage(DefCodepageS: String): TKeyMap;
 
 procedure NullXLAT(var X: TXlat);
-  {` Заполнить отждественную перекодировку `}
+  {` Fill identity conversion `}
 
 procedure AcceptToAscii(var XLatCP: TXLatCP);
-  {` В XLatCP на основе готовой таблицы [ToAscii] заполнить остальные `}
+  {` In XLatCP, based on the ready [ToAscii] table, fill the rest `}
 
 function ReadXlt(FN: string; var N: Integer): PCodeConv;
-  {` Прочитать xlt-файл. Память под результат резервируется.
-  N - длина прочитанного файла. Если прочитать не удалось,
-  результат nil, а N = 0 `}
+  {` Read an xlt file. Memory for the result is allocated.
+  N - length of the file read. If reading failed,
+  result is nil and N = 0 `}
 
 procedure ConvToXlat(Conv: PCodeConv; L: Integer; var Xlat: TXLat);
-  {` Преобразование PCodeConv длиной L в Xlat. Начальное заполнение
-  XLat должна сделать вызывающая программа. Conv освобождается.`}
+  {` Convert PCodeConv of length L into Xlat. Initial fill of
+  XLat must be done by the caller. Conv is freed.`}
 
 function BuildCodeTable(const S: string; var XlatCP: TXLatCP): Boolean;
-  {` Строится XlatCP для кодировки S. S может представлять собой
-  либо число (тогда это номер кодовой страницы), либо имя
-  xlt-файла. Если имя файла не содержит пути (распознаётся по '\'),
-  то файл ищется в стандартном XLT-каталоге. Результат - успех. `}
+  {` Builds XlatCP for codepage S. S may be either
+  a number (then it is a codepage number) or an
+  xlt file name. If the file name has no path (detected by '\'),
+  the file is sought in the standard XLT directory. Result is success. `}
 
 function BuildABCSortXlat(const FN: string): Boolean;
-  {` Строится ABCSortXlat для кодировки FN. FN может представлять собой
-  либо число (тогда это номер кодовой страницы), либо имя
-  xlt-файла. Если имя файла не содержит пути (распознаётся по '\'),
-  то файл ищется в стандартном XLT-каталоге.
-  Если FN='' ил ошибка, то ABCSortXlat - тождественная перекодировка.
-  Результат - успех.
-  !! Внимание: в настоящий момент (04.05.2005) реализован только
-     xlt-вариант FN.
+  {` Builds ABCSortXlat for codepage FN. FN may be either
+  a number (then it is a codepage number) or an
+  xlt file name. If the file name has no path (detected by '\'),
+  the file is sought in the standard XLT directory.
+  If FN='' or on error, ABCSortXlat is the identity conversion.
+  Result is success.
+  !! Note: at present (04.05.2005) only the
+     xlt variant of FN is implemented.
   `}
 
 function BuildLayoutConvXlat(const FN: string): Boolean;
-  {` Строится LayoutConvXlat для кодировки FN. FN может представлять собой
-  либо число (тогда это номер кодовой страницы), либо имя
-  xlt-файла. Если имя файла не содержит пути (распознаётся по '\'),
-  то файл ищется в стандартном XLT-каталоге.
-  Если FN='', то LayoutConvXlat - тождественная перекодировка.
-  Результат - успех.
+  {` Builds LayoutConvXlat for codepage FN. FN may be either
+  a number (then it is a codepage number) or an
+  xlt file name. If the file name has no path (detected by '\'),
+  the file is sought in the standard XLT directory.
+  If FN='', LayoutConvXlat is the identity conversion.
+  Result is success.
   `}
 
 procedure XLatStr(var S: String; const XLat: TXLat);
@@ -185,28 +185,28 @@ procedure XLatStr(var S: String; const XLat: TXLat);
 procedure XLatBuf(var B; Len: Integer; const XTable: TXLat);
 
 procedure FreeCodetables;
-  {`Уничтожение всех таблиц, кроме ASCII. При построении таблиц
-  необходимо соблюдать порядок вызова функций: FreeCodetables,
-  BuildWinCodeTable, InitCodeTables. Только при таком порядке
-  значение MaxKeyMap будет корректным, не будет оставаться мусора
-  в куче и не будет адресации через nil`}
+  {`Destroy all tables except ASCII. When building tables
+  the call order must be: FreeCodetables,
+  BuildWinCodeTable, InitCodeTables. Only with this order
+  will MaxKeyMap be correct, no garbage left
+  on the heap, and no nil addressing`}
 
 function BuildWinCodeTable(S: string): Boolean;
-  {` Обработка виндовой кодовой страницы. S должен иметь имеет вид
-  837 'win866r.xlt'. См. также FreeCodetables`}
+  {` Handle a Windows codepage. S must look like
+  837 'win866r.xlt'. See also FreeCodetables`}
 
 function InitCodeTables(CodeTables: string): Boolean;
-  {` Обработка ini-переменной CodeTables. Состоит из разделённых
-  пробелами элементов вида KOI:837 или вида KOI:koi8-r.xlt `}
+  {` Handle the CodeTables ini variable. Consists of space-separated
+  items of the form KOI:837 or KOI:koi8-r.xlt `}
 
 procedure OemToCharSt(var OemS: String); {JO}
-  {` Перевод из DOS в WIN `}
+  {` Convert from DOS to WIN `}
 procedure CharToOemSt(var CharS: String); {JO}
-  {` Перевод из WIN в DOS `}
+  {` Convert from WIN to DOS `}
 function OemToCharStr(const OemS: String): String;
-  {` Перевод из DOS в WIN `}
+  {` Convert from DOS to WIN `}
 function CharToOemStr(const CharS: String): String;
-  {` Перевод из WIN в DOS `}
+  {` Convert from WIN to DOS `}
 
 implementation
   uses
@@ -281,10 +281,10 @@ function ProcessDefCodepage(DefCodepageS: String): TKeyMap;
     i: Integer;
     k: TKeyMap;
   begin
-{ Хочется написать UpStr(DefCodepageS), но лучше этого не делать, так
-как это создаёт жуткую закрутку ссылок между модулями через strutil.
-и, главное, работает с какой-то заранее неизвестной UpCaseArray.
-Поскольку параметры в dn.ini все английские, делаем просто:}
+{ Tempting to write UpStr(DefCodepageS), but better not to, since
+that creates a nasty circular dependency between modules via strutil.
+and, more importantly, it uses some UpCaseArray that is unknown in advance.
+Since all dn.ini parameters are English, we simply do:}
   for i := 1 to Length(DefCodepageS) do
     DefCodepageS[i] := System.UpCase(DefCodepageS[i]);
 
@@ -292,7 +292,7 @@ function ProcessDefCodepage(DefCodepageS: String): TKeyMap;
     Result := kmNone
   else
     begin
-    Result := kmAscii; // на случай некорректного значения
+    Result := kmAscii; // in case of an invalid value
     for k := Succ(kmAscii) to MaxKeyMap do
       if DefCodepageS = KeyMapDescr[k].Tag then
         begin
@@ -334,11 +334,11 @@ procedure AcceptToAscii(var XLatCP: TXLatCP);
   var
     C: Char;
   begin
-{ Таблица ToAscii бывает не обратимой однозначно. Например,
-под WinNT построение перевода через юникод приводит к
-перекодировкам в "похожие", символы вроде копипайта в 'C'.
-Но "правильные" коды всегда меньше "похожих", поэтому обращение
-таблицы надо делать не от #00 к #$FF, а наоборот. }
+{ The ToAscii table is not always uniquely invertible. For example,
+under WinNT building the mapping via Unicode leads to
+remapping into "similar" characters like copyright into 'C'.
+But the "correct" codes are always less than the "similar" ones, so
+the table must be inverted from #$FF down to #00, not the other way. }
   FillChar(XLatCP[FromAscii], SizeOf(TXLat), '?');
   for C := High(TXLat) downto Low(TXLat) do
     begin
@@ -430,7 +430,7 @@ procedure InitUpcase;
   begin
   QueryUpcaseTable;
   NullXLAT(LowCaseArray);
-{см. комментарий к AcceptToAscii}
+{see the comment on AcceptToAscii}
   for C := High(TXlat) downto Low(TXlat) do
     if UpCaseArray[C] <> C then
       LowCaseArray[UpCaseArray[C]] := C;
@@ -471,7 +471,7 @@ function BuildCodeTable(const S: string; var XlatCP: TXLatCP): Boolean;
   if Err = 0 then
     Result := QueryToAscii(CP, XlatCP[ToAscii])
   else
-    begin { должно быть имя xlt-файла}
+    begin { must be an xlt file name}
     NullXLAT(XlatCP[ToAscii]);
     Conv := ReadXlt(S, L);
     if Conv <> nil then
@@ -525,7 +525,7 @@ function InitCodeTables(CodeTables: string): Boolean;
     b: Boolean;
   begin
   Result := False;
-  CodeTables := CodeTables + ' '; // Для Pos(' ');
+  CodeTables := CodeTables + ' '; // For Pos(' ');
   while CodeTables <> '' do
     begin
     l1 := Pos(':', CodeTables);
@@ -594,6 +594,6 @@ function CharToOemStr(const CharS: String): String;
 begin
 NullXLAT(NullXlatTable);
 NullXlatTable1 := NullXlatTable;
-FreeCodetables; {Это безопасно, так как MaxKeyMap сейчас нулевой }
+FreeCodetables; {This is safe because MaxKeyMap is currently zero }
 GetSysCountryInfo; InitUpcase;
 end.

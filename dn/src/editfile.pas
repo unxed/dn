@@ -267,12 +267,12 @@ procedure MISaveFile(AED: TFileEditor);
         MILockFile(AED);
         Exit;
         end;
-      {Cat: раньше почему-то проверка статуса происходила в этом месте,
-      т.е. считалось, что если поток создан успешно, то и записан
-      он также успешно, что неверно (например, когда место на диске
-      заканчивается); теперь проверка осуществляется после записи блока
-      кроме того, добавил вызов FileChanged - в случае неуспешной записи
-      содержимое файла может поменяться}
+      {Cat: previously the status check somehow happened at this point,
+      i.e. it was assumed that if the stream was created successfully, then it was also
+      written successfully, which is wrong (for example when disk space
+      runs out); now the check is done after writing the block;
+      also added a FileChanged call - on a failed write
+      the file contents may change}
       WriteBlock(EditName, S, FileLines, EdOpt.ForcedCRLF, OptimalFill);
       if S.Status <> stOK then
         begin
@@ -385,7 +385,7 @@ procedure MILoadFile(AED: TFileEditor; Name: String);
       {-SBlocks}
       if ClipBrd then
         begin {-$VOL begin}
-        {Cat:warn лишние переприсваивания}
+        {Cat:warn redundant reassignments}
         PC := nil;
         CopyStream2Lines(ClipBoardStream, PC);
         if PC <> nil then
@@ -442,7 +442,7 @@ procedure MILoadFile(AED: TFileEditor; Name: String);
       Name := lFExpand(Name);
     EditName := Name;
     DisposeStr(TWindow(Owner).Title);
-    {Cat:warn а не бред ли это?}
+    {Cat:warn isn't this nonsense?}
     if '*^&'+EditName = TempFile then
       begin
       EditName := '';
@@ -486,7 +486,7 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
     B: ^ByteArray;
     I: LongInt;
     FFSize: LongInt; {!!s}
-    J: LongInt; // длина прочитанного в буфер куска
+    J: LongInt; // length of the chunk read into the buffer
     K: LongInt;
     LCount: LongInt;
     Lines: TLineCollection {PCollector}; {-SBlocks}
@@ -496,15 +496,15 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
     CodePageDetector: TCodePageDetector;
     OD, OA, ODOA: LongInt;
 
-{AK155  15-02-2006 Полностью переписал, выкинув ассемблер и исправив
-   ошибку в развороте табуляции в конце промежуточного буфера. }
+{AK155  15-02-2006 Completely rewritten, dropping assembler and fixing
+   a bug in tab expansion at the end of the intermediate buffer. }
   procedure SearchLines;
     var
       L: LongInt;
       MMM: array[0..1124] of Char;
-        // промежуточный буфер, чтобы не дёргать зря AnsiString
-      TS: LongInt; // ширина табуляции
-      i: Integer; // заполнение MMM
+        // intermediate buffer so as not to thrash AnsiString needlessly
+      TS: LongInt; // tab width
+      i: Integer; // filling MMM
       InChar, BufEnd: PChar;
       C: Char;
     label
@@ -518,13 +518,13 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
       InChar := PChar(B);
       BufEnd := PChar(B)+J;
       while True do
-        begin { цикл строк; выход - катапультирование по концу буфера }
+        begin { line loop; exit - bail out at end of buffer }
         i := 0;
-        while True do { цикл символов; выход по разделителю строк или
-            катапультирование по концу буфера }
+        while True do { character loop; exit on line separator or
+            bail out at end of buffer }
           begin
           if InChar = BufEnd then
-            begin // катапультирование по концу буфера
+            begin // bail out at end of buffer
             if i <> 0 then
               begin
               L := Length(ST);
@@ -553,13 +553,13 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
              Break;
              end;
           end {case};
-          { Запись символа в промежуточный буфер }
+          { Write character into the intermediate buffer }
           if (C <> #$09) or (TS = 0) then
-            begin { Просто запись символа }
+            begin { Just write the character }
             MMM[i] := C;
             inc(i);
-            { Анализируем переполнение промежуточного буфера. В конце
-              буфера оставляем резерв на максимальный размер TabStep}
+            { Check intermediate buffer overflow. At the end
+              of the buffer leave a reserve for the maximum TabStep size}
             if i > SizeOf(MMM)-101 then
               begin
               L := Length(ST);
@@ -569,8 +569,8 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
               end;
             end
           else
-            begin { Замена табуляции пробелами. Тут переполнение
-              буфера не анализируем, хватит запаса (см. выше). }
+            begin { Replace tab with spaces. Here buffer overflow
+              is not checked; the reserve is enough (see above). }
             L := (i div TS + 1)*TS;
             while i <> L do
               begin
@@ -587,7 +587,7 @@ function MIReadBlock(AED: TFileEditor; var FileName: String;
           Move(MMM, ST[L+1], i);
           end;
 
-{!! Отбрасывание хвостовых пробелов. Надо сделать опциональным }
+{!! Strip trailing spaces. Should be made optional }
         if (ST <> '') and (ST[Length(ST)] = ' ') then
           LongDelRight(ST);
 
@@ -753,7 +753,7 @@ procedure MIUnLockFile(AED: TFileEditor);
     if EditorDefaults.EdOpt and ebfLck = 0 then
       Exit;
     if Locker = nil then
-      Exit; { на всякий случай }
+      Exit; { just in case }
     Locker.Free;
     Locker := nil;
     end

@@ -66,7 +66,7 @@ type
     fDeskSize: TPoint;
     fViewMode: AInt;
     fKeyMap: TKeyMap;
-    fToAscii: TXLat; // нужно только при fKeyMap = kmXlat
+    fToAscii: TXLat; // needed only when fKeyMap = kmXlat
     fCodeTag: Str8;
     case Byte of
       0: (fPos: Int64;
@@ -173,8 +173,8 @@ const
 
 var
   HistNameSuffix: string;
-    {` Добавки к имени файла истории. Например, если эта переменная имеет
-       значение 'Wrk', то для истории будет использован файл DNWrk.HIS `}
+    {` Suffixes for the history file name. For example, if this variable has
+       the value 'Wrk', then the history will use the file DNWrk.HIS `}
 
 implementation
 uses
@@ -185,7 +185,7 @@ uses
   Idlers,
   
   FViewer, CmdLine, panelsetup, editcore
-  , panelroot {для ActivePanel}
+  , panelroot {for ActivePanel}
   , calcwin 
   ;
 
@@ -317,10 +317,10 @@ procedure StoreViewInfo(P: Pointer);
       else
         fViewMode := ViewMode or vmInternal;
 
-      {AK155 25-03-2003 После того, как BufPos стало longint, в
-fBufPos: AWord оно может не помещаться. Но, с другой стороны,
-непонятно, зачем вообще разделять запоминание FilePos и BufPos.
-Работают же закладки без такого разделения.  }
+      {AK155 25-03-2003 After BufPos became longint, it may not fit into
+fBufPos: AWord. But on the other hand,
+it is unclear why remember FilePos and BufPos separately at all.
+Bookmarks work without such a split.  }
       (*
      fPos      := FilePos;
      fBufPos   := BufPos;
@@ -550,8 +550,8 @@ procedure SaveCommands(var S: TStream);
     S1, S2: String;
     M: TCollection;
   begin
-  {AK155 зачем это Message - непонятно. Выполнение пустой команды
-делает ровно ничего (см. cmdline.pas, поиск по cmExecCommandLine)
+  {AK155 why this Message - unclear. Executing an empty command
+does exactly nothing (see cmdline.pas, search for cmExecCommandLine)
 Message(CommandLine, evCommand, cmExecCommandLine, nil);
 /AK155}
   if  (CmdStrings <> nil) and (CmdStrings.Count >= 50) then
@@ -595,7 +595,7 @@ procedure LoadCommands(var S: TStream);
     CurString := CmdStrings.Count
   else
     CurString := 0;
-  {AK155 Перерисовка комстроки не нужна, а очистка даже мешает}
+  {AK155 Command-line redraw is not needed, and clearing even gets in the way}
   (*
  StrModified := False;
  if CommandLine <> nil then CommandLine.DrawView;
@@ -730,7 +730,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
   begin { TTHistList.HandleEvent }
   if  (Event.What = evKeyDown) and (List <> nil) then
     case DNKeyCode(Event) of
-      kbCtrlEnter: {AK155: делаем как у всех: CtrlEnter = Drop}
+      kbCtrlEnter: {AK155: do as everyone else: CtrlEnter = Drop}
         begin
         EndModal(cmYes);
         ClearEvent(Event);
@@ -778,7 +778,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
         List.AtReplace(Focused, NewStr(FreeStr));
         DrawView;
         end;
-      cmYes: { удаление }
+      cmYes: { delete }
 1:
           begin
           ClearEvent(Event);
@@ -787,9 +787,9 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
             MessageBox(GetString(dlHistDelCurDir), nil, mfOKButton);
             {John_SW}
             Exit;
-            {AK155: 0 - это текущий каталог,
-                  его удалять бесполезно: он опять вставится, но при этом
-                  собьет нумерацию элементов }
+            {AK155: 0 is the current directory;
+                  deleting it is useless: it will be inserted again, but will
+                  scramble the item numbering }
             end;
           if Focused >= List.Count then
             Exit;
@@ -810,7 +810,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
           DrawView;
           end;
 
-       cmNo: {встать на}
+       cmNo: {go to}
           begin
           ClearEvent(Event);
           if Focused >= List.Count then
@@ -824,7 +824,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
           MakeNoSlash(DirToGo);
           Message(ActivePanel, evCommand, cmStandAt, @DirToGo);
           DrawView;
-          EndModal(cmCancel); //Не важно, какая команда, главное завершить
+          EndModal(cmCancel); //Does not matter which command, the point is to finish
           end;
 
     end {case};
@@ -861,7 +861,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   if  (S = '') or ((S[2] <> ':') and ((S[1] <> '\') or (S[2] <> '\')))
   then
     Exit;
-  {Cat: добавил проверку на сетевые пути}
+  {Cat: added a check for network paths}
   
   S := lfGetLongFileName(S);
   
@@ -914,7 +914,7 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): TDialog;
 
   R.Assign(2, 2, D.Size.X-3, 13);
   L := TTHistList.Create(R, 1, TScrollBar(P));
-  L.Dlg := Dlg; {AK155: см. TTHistList.HandleEvent, cmYes }
+  L.Dlg := Dlg; {AK155: see TTHistList.HandleEvent, cmYes }
   D.Insert(L);
   List := L;
 
@@ -955,8 +955,8 @@ procedure EditHistoryMenu;
     TDNApplication(Application).EditFile(
       SystemData.Options and ossEditor <> 0,
       {AK155 28.09.2002:
-             это чтобы через историю всегда вызывался внутренний
-             редактор, поскольку вызов внешнего в историю не попадает}
+             so that history always invokes the internal
+             editor, since an external editor call is not recorded in history}
       Copy(PViewRecord(EditHistory.At(I))^.FName^, 2, MaxStringLength));
     end;
   end { EditHistoryMenu };

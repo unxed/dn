@@ -77,9 +77,9 @@ type
     procedure ShortStore(var S: TStream);
     procedure FreeItem(Item: Pointer); override;
     function NewCellRec(ACol, ARow: AInt; const A_S: String): PCellrec;
-    { создать запись }
+    { create a record }
     function NewItem(ACol, ARow: AInt; const A_S: String): PCellrec;
-    { создать запись и поместить ее в коллекцию }
+    { create a record and put it into the collection }
     function ReplaceItem
         (ACol: Byte; ARow: AInt; const A_S: String): PCellrec;
     function Get(Col: Byte; Row: AInt): PCellrec;
@@ -91,7 +91,7 @@ type
     function Compare(K1, K2: Pointer): Integer; override;
     function TSort(var Start: Integer): Boolean; {AK155}
     procedure ForRectangle(AX: Byte; AY: AInt; {AK155}
-        BX: Byte; BY: AInt; Action: Pointer); {см. комментарий к телу!}
+        BX: Byte; BY: AInt; Action: Pointer); {see the comment at the body!}
     end;
 
  Real = Double; 
@@ -288,9 +288,9 @@ function TCellCollection.ReplaceItem
     end;
   end { TCellCollection.ReplaceItem };
 
-{ Для совместимости файла wkz со старыми версиями DN, выводится
-значение, притом Real, а не CReal (с контролем переполнения).
-Для нынешней версии значения в файле не нужны.}
+{ For wkz file compatibility with older DN versions, the value is written
+as Real, not CReal (with overflow checking).
+For the current version the values in the file are not needed.}
 
 procedure TCellCollection.PutItem(var S: TStream; Item: Pointer);
   var
@@ -382,9 +382,9 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
     PoolUnit = 5;
   var
     QLink: PAWordArray;
-    {У Кнута есть еще Count, как синоним QLink, но мы будем писать везде QLink}
+    {Knuth also has Count as a synonym for QLink, but we will write QLink everywhere}
     QLinkSize: LongInt;
-    Top: PAWordArray; {Top^[0] не используем}
+    Top: PAWordArray; {Top^[0] is unused}
     TopSize: LongInt;
     SucPool: PSucPool;
     PoolCount: LongInt;
@@ -450,8 +450,8 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
     end { RegisterPrev };
 
   begin {TCellCollection.TSort}
-  { Топологическая сортировка. См. Д.Кнут, т.1, 2.3.2.}
-  P := 0; { инициализация SucPool}
+  { Topological sort. See D. Knuth, vol.1, 2.3.2.}
+  P := 0; { initialize SucPool}
   N := Count;
   QLinkSize := (N+1)*SizeOf(QLink^[0]);
   QLink := GetMem(QLinkSize);
@@ -476,7 +476,7 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
         while Scan(c2) do
           begin
           if op = 1 then
-            begin {обработка c1:c2}
+            begin {handle c1:c2}
             c1 := c2;
             Scan(c2);
             if GetCellCoord(c1, SR1.Col, SR1.Row)
@@ -498,7 +498,7 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
             Scan(c1);
             end
           else
-            begin {обработка c2}
+            begin {handle c2}
             if GetCellCoord(c2, SR.Col, SR.Row) then
               RegisterPrev;
             c1 := c2;
@@ -514,7 +514,7 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
     if QLink^[k] = 0 then
       begin
       QLink^[R] := k;
-      R := k; {в книге ошибочно написано P вместо R}
+      R := k; {the book erroneously writes P instead of R}
       end;
   F := QLink^[0];
 
@@ -552,14 +552,14 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
   FreeMem(SucPool, PoolCount*SizeOf(SucPool^[1]));
   end { TCellCollection.TSort };
 
-{  То ли в VP ошибка, то ли я чего-то не понимаю, но если переменные,
-которые экспортируются из вызывающей программы в программу Action^,
-описывать в вызывающей программе обычным образом, то есть как стековые,
-то доступ к ним в Action^ иногда получается некорректным. То же самое
-относится к ссылкам на поля self, если вызывающая программа - метод.
-Возможно, дело в глубине вложенности процедур. Радикальным средством
-борьбы с этим глюком является использование в Action^ только
-статических переменных. AK155}
+{  Either there is a bug in VP, or I misunderstand something, but if variables
+exported from the calling program into Action^
+are declared in the calling program in the usual way, i.e. as stack vars,
+then access to them in Action^ is sometimes incorrect. The same
+applies to references to self fields when the calling program is a method.
+Possibly it is due to procedure nesting depth. A radical remedy
+against this glitch is to use in Action^ only
+static variables. AK155}
 procedure TCellCollection.ForRectangle(AX: Byte; AY: AInt;
     BX: Byte; BY: AInt; Action: Pointer);
   type
@@ -607,13 +607,13 @@ function GetCellCoord(S: String; var X: Byte; var Y: AInt): Boolean;
   while (I <= Length(S)) and (S[I] >= 'A') and (S[I] <= 'Z') do
     Inc(I);
 
-  {код колонки - с j по i исключительно}
+  {column code - from j to i exclusive}
   if I = J+1 then
     X := Byte(S[J])-Byte('A')
   else if I = J+2 then
     X := (Byte(S[J])-(Byte('A')-1))*26+Byte(S[J+1])-Byte('A')
   else
-    Exit; {допускается только 1 или 2 буквы}
+    Exit; {only 1 or 2 letters are allowed}
 
   if S[I] = '@' then
     Inc(I);

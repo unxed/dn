@@ -68,10 +68,10 @@ const
 
 type
   TComboBox = class(TView)
-    Selected: Word; // текущий номер варианта (нумерация от 1)
-    Count: Word; { не отрывать от Selected! См. Load,Store}
+    Selected: Word; // current option number (numbering from 1)
+    Count: Word; { do not separate from Selected! See Load,Store}
     Menu: PMenu;
-    Items: array[1..10] of PMenuItem; // прямые ссылки в меню
+    Items: array[1..10] of PMenuItem; // direct references into the menu
     constructor Create(var Bounds: TRect; AStrings: PSItem);
     procedure BuildMenu(AStrings: PSItem);
     destructor Destroy; override;
@@ -99,7 +99,7 @@ type
 
 
   TParamText = class(TStaticText)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is exposed in the plugin model; change with extreme care!}
     ParamCount: AInt;
     ParamList: Pointer;
     constructor Create(var Bounds: TRect; const AText: String;
@@ -112,7 +112,7 @@ type
     end;
 
   TBookmark = class(TLabel)
-    {` Закладка страницы блокнота со страницами TNotepas }
+    {` Notebook page bookmark with TNotepas pages }
     constructor Create(var Bounds: TRect; AText: String; ALink: TView);
     procedure Draw; override;
     procedure FocusLink; virtual;
@@ -121,7 +121,7 @@ type
   TPage = class(TDialog)
     Bookmark: TBookmark;
     PrevPage: TPage;
-      { циклический список }
+      { circular list }
     procedure InitFrame; override;
     procedure HandleEvent(var Event: TEvent); override;
     function GetPalette: TPalette; override;
@@ -137,7 +137,7 @@ type
     {<dialogs.001>}
   TNotepad = class(TDialog)
     Page: array[0..9] of TPage;
-    BookmarkStart: integer; { X-коррдината левой линии закладок }
+    BookmarkStart: integer; { X-coordinate of the left bookmark line }
     ActivePage: Integer;
     NumPages: Integer;
     constructor Create(var Bounds: TRect; ATitle: TTitleStr;
@@ -460,10 +460,10 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
       MB: TMenuBox;
       C: Word;
     begin
-{ Меню-список открываем поверх строки, совмещая строку
-и соответствующий пункт меню. Меню вставляем в приложение, так
-как если его вставлять в диалог, то в некоторых палитрах цвета
-получаются очень странные.
+{ Open the menu-list over the line, aligning the line
+with the corresponding menu item. Insert the menu into the application,
+because if inserted into the dialog, in some palettes the colors
+look very strange.
 }
     R.Assign(-2,-Selected,0,0);
     MakeGlobal(R.A, R.A);
@@ -489,7 +489,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
   case Event.What of
     evMouseDown:
       begin
-      Select; { Вместо TView.HandleEvent }
+      Select; { Instead of TView.HandleEvent }
       OpenList;
       end;
     evKeyDown:
@@ -514,7 +514,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
           end;
 
 (*
-        kbDown, kbUp: { протез навигации стрелками }
+        kbDown, kbUp: { arrow-navigation prosthetic }
           begin
           PGroup(Owner).SelectNext(DNKeyCode(Event) = kbUp);
           ClearEvent(Event);
@@ -528,7 +528,7 @@ procedure TComboBox.HandleEvent(var Event: TEvent);
             OpenList;
       end {case};
   end {case};
-//  inherited HandleEvent делать больше нечего }
+//  inherited HandleEvent nothing more to do }
   end { TComboBox.HandleEvent };
 
 function TComboBox.DataSize: Integer;
@@ -538,12 +538,12 @@ function TComboBox.DataSize: Integer;
 
 procedure TComboBox.GetData(var Rec);
   begin
-  Word(Rec) := Selected-1; // совместимость с TRadioButtons
+  Word(Rec) := Selected-1; // compatibility with TRadioButtons
   end;
 
 procedure TComboBox.SetData(var Rec);
   begin
-  Selected := Word(Rec)+1; // совместимость с TRadioButtons
+  Selected := Word(Rec)+1; // compatibility with TRadioButtons
   DrawView;
   end;
 
@@ -555,7 +555,7 @@ constructor TComboBox.Load(var S: TStream);
     P: PString;
   begin
   inherited Load(S);
-  S.Read(Selected, 2*SizeOf(Word)); // включая Count
+  S.Read(Selected, 2*SizeOf(Word)); // including Count
   Menu := NewMenu(nil);
   PLastItem := @Menu^.Items;
   for i := 1 to Count do
@@ -576,7 +576,7 @@ procedure TComboBox.Store(var S: TStream);
     i: Integer;
   begin
   inherited Store(S);
-  S.Write(Selected, 2*SizeOf(Selected)); // включая Count
+  S.Write(Selected, 2*SizeOf(Selected)); // including Count
   for i := 1 to Count do
     S.WriteStr(Items[i]^.Name);
   end;
@@ -788,10 +788,10 @@ procedure TNotepadFrame.FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Int
 
 const
   FrameC: array[boolean] of record
-       H: Char; // горизонтальная линия
-       C0,  // верхние углы (слева и справа)
-       C1,  // вертикальные линии
-       C2:  // нижние углы
+       H: Char; // horizontal line
+       C0,  // upper corners (left and right)
+       C1,  // vertical lines
+       C2:  // lower corners
          array[1..2] of char;
        end =
     ((H: #$C4; C0: (#$C7, #$B4); C1: (#$BA, #$B3); C2: (#$C7, #$D9) ),
@@ -809,7 +809,7 @@ procedure TBookmark.Draw;
   LineColor := Owner.GetColorW(2);
   with FrameC[Light] do
     begin
-    { Снять заусенец на правом верхнем углу верхней неактивной закладки }
+    { Remove burr on the upper-right corner of the upper inactive bookmark }
     if not Light and (Origin.Y = 1) then
       C := #$C9
     else

@@ -1,8 +1,8 @@
 {AK155 = Alexey Korop, 2:461/155@fidonet}
 
 unit panelsetup;
-  { типы и переменные, связанные с файловыми панелями и
-    вставленными в них дисками }
+  { types and variables related to file panels and
+    drives inserted into them }
 
 {$I stdefine.inc}
 
@@ -13,7 +13,7 @@ uses
 
 type
   TPanelShowSetup = record
-  {` Блок данных диалога настроек вида панели dlgPanelShowSetup }
+  {` Data block for the panel view settings dialog dlgPanelShowSetup }
     ColumnsMask: Word; {Checkbox[11]}
     DirRegister: Word; {Combo}
     FileRegister: Word; {Combo}
@@ -36,7 +36,7 @@ type
   {`}
 
   TPanelSortSetup = record
-  {` Блок данных диалога настроек сортировки панели dlgPanelSortSetup }
+  {` Data block for the panel sort settings dialog dlgPanelSortSetup }
     SortMode: Word;
     SortFlags: Word;
     Ups: array[1..4] of Word;
@@ -45,7 +45,7 @@ type
   {`}
 
   PPanelSetup = ^TPanelSetup;
-  {`2 Блок настроек панели }
+  {`2 Panel settings block }
   TPanelSetup = record
     Show: TPanelShowSetup;
     Sort: TPanelSortSetup;
@@ -54,11 +54,11 @@ type
   {`}
 
   TPanelClass = (pcDisk, pcList, pcArc, pcArvid);
-    {` Классы файловых панелей, для каждого из которых имеется
-     свой блок настроек типа TPanelSetup `}
+    {` File panel classes, each of which has
+     its own settings block of type TPanelSetup `}
 
   PPanelSetupSet = ^TPanelSetupSet;
-    {`2 полный набор настроек для всех классов панелей }
+    {`2 full set of settings for all panel classes }
   TPanelSetupSet = array[TPanelClass] of TPanelSetup;
   {`}
 
@@ -67,39 +67,39 @@ type
 
 var
   PanSetupPreset: array[1..10] of TPanelSetupSet;
-    {` 10 блоков настроек, которые выбираются по Ctrl-цифра `}
+    {` 10 settings blocks selected via Ctrl-digit `}
 
 const
   dt2pc: array[TDriveType] of TPanelClass =
     (pcDisk, pcDisk, pcList, pcList, pcList, pcList,
      pcArc, pcDisk, pcDisk, pcArvid);
 
-const // Значения
+const // Values
 
   cfnTypeOther = 0;
-    {` Значение CurFileNameType "Не такое, как в панели" `}
+    {` CurFileNameType value "Not the same as in the panel" `}
   cfnAlwaysLong = 1;
 
   cfnHide = cfnAlwaysLong+1;
-    {` Значение CurFileNameType "Не показывать" `}
+    {` CurFileNameType value "Do not show" `}
 
 type
   TFileColWidht = array[TFileColNumber] of ShortInt;
-    {` Ширина колонок (кроме имени).
-      Для колонок неограниченной ширины (путь, описание) ширина -1.
-      Для колонки времени, ширина которой зависит от установок страны,
-    ширина искусственно -2 (фактически - 6 при 24-часовом и 7 при
-    12-часовом формате).
-      Необходима согласованность:
-       - порядка значений в этом массиве,
-       - битовых масок вроде psShowDescript,
-       - работы функций, формирующих соответствующие строки в колонках
+    {` Column widths (except name).
+      For unlimited-width columns (path, description) width is -1.
+      For the time column, whose width depends on country settings,
+    width is artificially -2 (actually 6 for 24-hour and 7 for
+    12-hour format).
+      Consistency is required:
+       - of the order of values in this array,
+       - of bit masks like psShowDescript,
+       - of the functions that form the corresponding strings in columns
          (GetFull, MakeDate, FileSizeStr).
-      Это обозначает также, что все однотипные колонки (даты и времена)
-    имеют одинаковую ширину.
+      This also means that all same-type columns (dates and times)
+    have the same width.
      `}
   TFileColAllowed = array [TFileColNumber] of Boolean;
-    {` Допустимость колонок для данного типа панели `}
+    {` Whether columns are allowed for the given panel type `}
 
 const
   FileColWidht: TFileColWidht =
@@ -118,12 +118,12 @@ const
   );
 
 procedure DefaultInit;
-{` Мне было лень выписывать структурные константы со всеми
-настройками всех режимов, поэтому я перетащил сюда старые настроки
-колонок в виде вспомогательной констаны, а заполнение пресетов
-сделал программой DefaultInit. Сейчас она вызывается только при
-инициализации, но при случае можно будет сделать её вызов по
-(новой) команде "Восстановить умолчания". `}
+{` I was too lazy to write out structured constants with all
+settings of all modes, so I dragged the old column
+settings here as an auxiliary constant, and filled the presets
+with the DefaultInit program. Now it is called only at
+initialization, but eventually its call could be made via
+(a new) "Restore defaults" command. `}
 
 implementation
 
@@ -219,14 +219,14 @@ procedure DefaultInit;
         Show.LFNLen := ColumnsDefaults[pc][i].LFNLen;
         Show.ExtLen := ColumnsDefaults[pc][i].ExtLen;
         if Show.ColumnsMask <> 0 then
-          Show.MiscOptions := 2; { заголовки колонок }
+          Show.MiscOptions := 2; { column headers }
 
-        Show.TabulateExt := 3; {Всегда}
+        Show.TabulateExt := 3; {Always}
         Show.FilterInfo := fseInDivider;
         Show.ShowCurFile := 1;
         Show.SelectedInfo := fseInDivider;
         Sort.SortMode := psmLongExt;
-        Sort.CompareMethod := 2; { на нижнем регистре }
+        Sort.CompareMethod := 2; { lowercase }
         Sort.Ups[1] := upsDirs;
         end;
   end;
