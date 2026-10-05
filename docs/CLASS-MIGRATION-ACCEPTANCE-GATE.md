@@ -38,10 +38,13 @@ cells (including the ticking clock); the visible About text identifies object
 DN as `2.14 beta/DPMI32` and class DN as `2.20 alpha/Linux x86_64`, with
 different build revision/date text as well. After the same Enter key, the
 object build closes the startup dialog while the class build still displays
-its Warning/About dialog. That checkpoint is also **FAIL**: 637 differing
-cells, including 346 attribute-only differences. Repeating Enter, Space, or
-Escape individually did not dismiss the class dialog in the probe. The class
-screen also emits `?` where the object screen emits several box/marker glyphs.
+its Warning/About text. That checkpoint is also **FAIL**: 637 differing
+cells, including 346 attribute-only differences. Enter, Space, or Escape
+individually did not clear the class warning from the captured screen; after
+Escape, F7 followed by creating a directory did work and the subsequent
+redraw cleared the warning. This points to a redraw/output mismatch rather
+than proving that the dialog continues to consume input. The class screen also
+emits `?` where the object screen emits several box/marker glyphs.
 
 These are observed compatibility failures, not exclusions or approved
 normalizations. The identical-run smoke is not yet a reusable full acceptance
