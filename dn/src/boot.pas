@@ -66,7 +66,7 @@ uses
    {Cat}
   
   
-  basics, strutil, fileutil, envutil, os2sess,
+  SysUtils, basics, strutil, fileutil, envutil, os2sess,
   Startup, dlgrecs, Defines, Streams,
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
@@ -74,7 +74,7 @@ uses
   apploop, editcore, ArchSet, linepos, RegAll, DnExec, histories, Menus,
    VideoMan, timeutil,
   dirwatch, realmode, 
-  Tree, TvScreen
+  Tree, TvScreen, DNErrLog
   , filetype, panelsetup
   , osdep, dnscreen, cfgstate, palettes;
 
@@ -82,6 +82,39 @@ uses
 еще проверить, что он существует, и что в нем можно создавать и
 уничтожать файлы. Побочным эффектом этой функции является обязательное
 наличие '\' в конце s }
+procedure TraceStartupGroup(const Stage, Name: String; Group: TGroup);
+var
+  V, FirstView: TView;
+begin
+  if GetEnv('DNDUMP') = '' then
+    Exit;
+  if Group = nil then
+  begin
+    DNTrace(Stage + ' ' + Name + ': nil');
+    Exit;
+  end;
+  DNTrace(Stage + ' ' + Name + ': group=' + IntToHex(PtrUInt(Group), 8) + ' last=' +
+    IntToHex(PtrUInt(Group.Last), 8) + ' current=' + IntToHex(PtrUInt(Group.Current), 8) + ' buffer=' +
+    IntToHex(PtrUInt(Group.Buffer), 8) + ' lock=' + IntToStr(Group.LockFlag));
+  FirstView := Group.First;
+  V := FirstView;
+  while V <> nil do
+  begin
+    DNTrace(Stage + ' ' + Name + ' child=' + V.ClassName + ' ptr=' + IntToHex(PtrUInt(V), 8) + ' origin=' +
+      IntToStr(V.Origin.X) + ',' + IntToStr(V.Origin.Y) + ' size=' + IntToStr(V.Size.X) + 'x' +
+      IntToStr(V.Size.Y) + ' state=' + IntToHex(V.State, 4) + ' exposed=' + BoolToStr(V.Exposed, True));
+    V := V.NextView;
+    if V = FirstView then
+      Break;
+  end;
+end;
+
+procedure TraceStartupState(const Stage: String);
+begin
+  TraceStartupGroup(Stage, 'application', MyApplication);
+  TraceStartupGroup(Stage, 'desktop', Desktop);
+end;
+
 function BadTemp(var s: String): Boolean;
   var
     f: file;
@@ -659,6 +692,7 @@ procedure RUN_IT;
   var
     Ev: TEvent;
     R: TRect;
+    PanelQuery: Pointer;
     
     Regs: real_mode_call_structure_typ;
     
@@ -726,6 +760,7 @@ procedure RUN_IT;
 
   (* InitLFNCol; *)
   MyApplication := MyApp.Create;
+  TraceStartupState('after-application-create');
 
   if RunFirst then
     ShowIniErrors;
@@ -737,9 +772,13 @@ procedure RUN_IT;
     EraseFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
   if RunFirst then
     begin
-    if  (Message(MyApplication, evBroadcast, cmLookForPanels, nil) = nil)
+    PanelQuery := Message(MyApplication, evBroadcast, cmLookForPanels, nil);
+    TraceStartupState('after-panel-query');
+    DNTrace('startup panel-query result=' + IntToHex(PtrUInt(PanelQuery), 8));
+    if PanelQuery = nil
     then
       Message(MyApplication, evCommand, cmFirstTimePanel, nil);
+    TraceStartupState('after-first-panel-command');
 
     FreeStr[1] := Char(FindParam('/P'));
     if  (FreeStr[1] > #0) then
@@ -781,6 +820,7 @@ procedure RUN_IT;
   R.Assign(0, 0, ScreenWidth, ScreenHeight);
   MyApplication.ChangeBounds(R);
   MyApplication.Draw;
+  TraceStartupState('after-initial-draw');
   WriteScreenCells(0, ScreenWidth * ScreenHeight);
   
   w95QuitInit; {Gimly}
