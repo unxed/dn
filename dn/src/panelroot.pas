@@ -371,7 +371,7 @@ procedure TFilePanelRoot.Store(S: TStream);
   if  (ActivePanel <> Self) or (Drive.DriveType <> dtDisk)
     or (StartupData.Unload and osuPreserveDir <> 0)
   then
-    Drive.Store(S)
+    S.Put(Drive)
   else
     S.Put(nil);
   S.Write(PresetNum, SizeOf(PresetNum));

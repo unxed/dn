@@ -57,9 +57,10 @@ explicitly excluded as the migration comparator.
 | Case-insensitive `object` tree audit | Initial inventory search `rg -uuu --text -i -l object . -g '!.git/**'` listed 348 paths, including docs, bootstrap, tests and compiled output. | Newly registered subtask; full contextual audit not started |
 | `F4` internal editor AV (class only) | Fixed: `Build_REditSaver`/`Store_REditSaver` now match `TLoadProc`/`TStoreProc` (stream by value). | Fixed on class self-build; object/class parity still required |
 | `Ctrl+O` user screen AV (class only) | Fixed: nil-check `UserScr` before `.Cols`; `VtShowScreen` guards nil (`tv3` `396fb86`). | Fixed on class self-build; content parity after a command still open |
-| Autosave desktop second-start crash (class only) | After enabling Autosave Desktop + Preserve directory, writing `dn.dsk`, and restarting: class self-build dies before a `>` prompt. Local PTY second start: process status `-11` (SIGSEGV), banner only, no `dn.err`. Peer pointers (`DirView`/`SortView`/`DriveLine`/`InfoView`) resolve to `Self` (the file panel), causing infinite `SetState` recursion. CI `dn-linux-ops.py` then hits `IndexError` in `dsk_cwd`. `dist/linux64` restores `…/sub>` on the same harness. | Open; class-only; root cause narrowed to peer-view fixups |
+| Autosave desktop second-start crash (class only) | Fixed: `TFilePanelRoot.Store` must `S.Put(Drive)` (migration had `Drive.Store(S)`, omitting the stream type id and desyncing Load). Peer fixups pointing at `Self` were a symptom. Local PTY: second start alive with preserved `…/sub>`. | Fixed on class self-build; keep ops autosave gate |
 | Nested submenu geometry (inside parent, not to the right) | User: dropdown submenus feel positioned inside the parent menu. Code places the child below the item at the same X (`menus.pas`). Same on object sources and on `dist` PTY — **not a class regression**. | Documented; UX/acceptance note, not migration-only |
 | Yes/default button red–magenta | User: Yes is red, counter-intuitive; want classic DN colors. Class default palette is `CColorOsp` (jaroslaw); classic table is `CColor` (cyan default). Object baseline used `CColor`; class kept `CColorOsp` in `0c4e839`. | Open; restore classic palette for acceptance unless OSP look is explicit |
+| ZIP single-byte name/comment charset | Owner: decode 1:1 (incl. bugs) via [zipcharset](https://github.com/unxed/zipcharset) + [localecp](https://github.com/unxed/localecp); locale→CP as reusable subproject | Specified in `docs/ZIP-CHARSET.md` / PLAN 4b; not implemented |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. A valid comparison waits for a visible readiness
@@ -70,10 +71,9 @@ the exact same action. The configured-launch mismatch has since reproduced in
 
 ## Remaining work, in order
 
-1. Fix the three class-only hard crashes newly recorded below (`F4` editor
-   command load, `Ctrl+O` user-screen VT access, autosave-desktop second-start
-   SIGSEGV); keep `dist` as a negative control only, and still compare against
-   the last object-based baseline for acceptance.
+1. `F4`, `Ctrl+O`, and autosave-desktop second-start are fixed on class; keep
+   `dist` as a negative control only, and still compare against the last
+   object-based baseline for acceptance.
 2. On the last object-based baseline and latest class build, reproduce the
    virgin About-close residue with full cell snapshots before, during and
    after the dialog; locate/fix it and search all analogous dialog-close and
