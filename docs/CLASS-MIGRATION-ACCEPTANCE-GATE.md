@@ -48,8 +48,9 @@ menu triggers drawing, while `dist` does not.
 The latter was reproduced once with the user's current binary variants and
 same PTY size/input: self-build `out/linux64/dn`, build `1f0a63d`, SHA-256
 `97f102cb466842bf6a0453ad5d83412a47ba06f2f427bf9578a62adc11a3cb7a`, had no
-panel headers before menu input and six afterward; `dist/linux64/dn`, whose
-embedded build identifies `df0cca2`, SHA-256
+panel headers before menu input and six afterward; `dist/linux64/dn`, published
+by distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4` from source
+`df0cca2`, SHA-256
 `e88ec6c324801bc394e9665095f705c452f5c34b7ec2ffa1363c80f58542a41d`, had six
 headers before menu input. This is a one-trial classification based on panel
 headers, not full-cell acceptance evidence. A prior 100-start attempt sampled
