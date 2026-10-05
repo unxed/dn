@@ -35,7 +35,7 @@ procedure NotifyUser(const Text: String);
 implementation
 
 uses
-  SysUtils, TvSys, TvCell, TvColors, TvScreen{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
+  SysUtils, TvSys, TvCell, TvColors, TvScreen, TvUtf8, TvCodePg{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
 
 { --- the screen ---------------------------------------------------------------- }
 
@@ -44,6 +44,31 @@ const
 
 var
   CellCopy: array of Word;
+
+{ TvText stores high code-page bytes as UTF-8 in the cell (DrawOneImpl). The 16-bit
+  copy needs the OEM byte: take it from a one-byte cell, else decode the UTF-8 and
+  map through the current page (else '?'). Without this, WriteScreenCells after
+  ReadScreenCells replaces panel names like Größe with '?'. }
+function CellToBiosChar(const Ch: TScreenCharacter): Byte;
+var
+  S: ShortString;
+  CP: LongWord;
+  Used: Integer;
+  B: Byte;
+begin
+  if ScIsWideTrail(Ch) then
+    Exit(Ord(' '));
+  if ScLength(Ch) = 1 then
+    Exit(Ch.Text[0]);
+  S := ScText(Ch);
+  if (Length(S) > 0) and Utf8Decode(@S[1], Length(S), CP, Used) and (Used = Length(S)) then
+  begin
+    B := CpFromUnicode(CP);
+    if B <> 0 then
+      Exit(B);
+  end;
+  Result := Ord('?');
+end;
 
 function GetScreenMode(Size: PSysPoint; Flag: Boolean): Word;
 begin
@@ -74,10 +99,8 @@ begin
   C := ScreenBuffer;
   for I := 0 to N - 1 do
   begin
-    if (C <> nil) and (ScLength(C^.Character) = 1) then
-      CellCopy[I] := C^.Character.Text[0] or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
-    else if C <> nil then
-      CellCopy[I] := Ord('?') or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
+    if C <> nil then
+      CellCopy[I] := CellToBiosChar(C^.Character) or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
     else
       CellCopy[I] := $0720;
     if C <> nil then

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """The single-byte code page of DN by the locale of the host (TvLocale): the names of files are shown in the page that goes with LANG.
+OEM / DN_UTF8=0 builds only: a UTF-8-inside binary shows every script and is skipped.
 usage: tools/dn-linux-locale.py OUTDIR   (OUTDIR: the result of tools/build.sh linux|linux64)"""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -14,7 +15,8 @@ CASES = [  # LANG, extra env, names that must be seen, names that must not be se
 ]
 fails = 0
 out = os.path.abspath(sys.argv[1])
-for lang, extra, want, notwant in CASES:
+
+def run_case(lang, extra, want, notwant):
     d = tempfile.mkdtemp(prefix='dnloc-')
     try:
         for f in os.listdir(out):
@@ -24,19 +26,32 @@ for lang, extra, want, notwant in CASES:
         for n in ('Größe', 'Привет'):
             os.makedirs(os.path.join(w, n))
         open(os.path.join(w, 'Ünï.txt'), 'w').close()
-        env = {'LANG': lang}
+        # PtyTerm inherits the runner env: a set LC_ALL (e.g. C.UTF-8 or en_US.UTF-8)
+        # would win over LANG in TvLocale.HostOemCodePage. Clear the locale vars first;
+        # cases may put LC_CTYPE back via `extra` (see C.UTF-8 below).
+        env = {'LC_ALL': '', 'LC_CTYPE': '', 'LANG': lang}
         env.update(extra)
         t = PtyTerm(['./dn'], 100, 30, env=env, cwd=w, exe=os.path.join(d, 'dn'))
         t.pump(1.5, 6)
         t.send('\x1b', 0.5)
         text = t.text()
         t.close(0.3)
-        ok = all(x in text for x in want) and not any(x in text for x in notwant)
-        print(('PASS ' if ok else 'FAIL ') + '%s %s' % (lang, extra or ''))
-        if not ok:
-            fails += 1
-            print(text)
+        return text
     finally:
         shutil.rmtree(d, ignore_errors=True)
+
+# UTF-8-inside build: under de_DE both German and Cyrillic names stay visible (no OEM filter).
+_probe = run_case('de_DE.UTF-8', {}, ['Größe'], ['Привет'])
+if 'Größe' in _probe and 'Привет' in _probe:
+    print('SKIP UTF-8-inside build (OEM locale filter N/A)')
+    sys.exit(0)
+
+for lang, extra, want, notwant in CASES:
+    text = run_case(lang, extra, want, notwant)
+    ok = all(x in text for x in want) and not any(x in text for x in notwant)
+    print(('PASS ' if ok else 'FAIL ') + '%s %s' % (lang, extra or ''))
+    if not ok:
+        fails += 1
+        print(text)
 print('ALL OK' if not fails else '%d FAILED' % fails)
 sys.exit(1 if fails else 0)
