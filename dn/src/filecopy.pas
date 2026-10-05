@@ -108,8 +108,8 @@ uses
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
   , fileerrors
-  , panelroot {JO: TFilePanelRoot is needed to make description }
-  {    copying unavailable }
+  , panelroot {JO: TFilePanelRoot is needed to make unavailable }
+  {    copying of descriptions }
   
 
   , panelsetup, Lfn, uselfn, Streams, Drivers, objutil, Dialogs
