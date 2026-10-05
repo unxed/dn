@@ -7,6 +7,10 @@ Last updated: 2026-10-05
 - DN and TV3 work is on `main`; no migration feature branches are in use.
 - Use the system `gh` authenticated as `unxed`. Push every commit to GitHub
   immediately; verify the remote ref after publishing.
+- For GitHub issues, send Markdown with real line breaks (for example through
+  `gh issue edit --body-file -` and a quoted here-document), not escaped `\\n`
+  text. Read the issue back with `gh issue view --json body` and verify the
+  stored newlines and Markdown structure after every create/edit.
 - Keep changes small and atomic. Before a regex or potentially destructive
   bulk edit, create and publish a checkpoint. If the transformation is wrong,
   restore that checkpoint rather than repairing individual fallout.
