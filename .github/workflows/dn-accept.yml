@@ -1,0 +1,147 @@
+name: dn-accept
+# Object vs class acceptance gate (full UI click-through). Builds both baselines
+# once, then runs tools/dn-linux-accept.py in parallel shards on GitHub runners.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - dn/**
+      - tv/**
+      - tools/build.sh
+      - tools/dn-env.sh
+      - tools/dn-linux-accept.py
+      - tools/pty_screen.py
+      - .github/workflows/dn-accept.yml
+  pull_request:
+    paths:
+      - dn/**
+      - tv/**
+      - tools/dn-linux-accept.py
+      - .github/workflows/dn-accept.yml
+
+env:
+  OBJECT_DN_SHA: b4916b874989d7b35660d02cf935dc5f0db7a656
+  OBJECT_TV_SHA: 521d06479198789deeaa6fda287236ca83ba4051
+  DN_ACCEPT_FAST: '1'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout class (HEAD)
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          path: class
+      - name: Checkout object baseline
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.OBJECT_DN_SHA }}
+          submodules: true
+          path: object
+      - name: Pin object TV submodule
+        run: |
+          git -C object/tv fetch --depth 1 origin ${{ env.OBJECT_TV_SHA }} || true
+          git -C object/tv checkout -f ${{ env.OBJECT_TV_SHA }}
+          echo "object DN=$(git -C object rev-parse HEAD) TV=$(git -C object/tv rev-parse HEAD)"
+          echo "class  DN=$(git -C class rev-parse HEAD) TV=$(git -C class/tv rev-parse HEAD)"
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+      - name: Build class DN
+        working-directory: class
+        run: tools/build.sh linux64 out/linux64-gate
+      - name: Build object DN
+        working-directory: object
+        run: tools/build.sh linux64 out/linux64-gate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dn-accept-bins
+          path: |
+            class/out/linux64-gate/dn
+            class/out/linux64-gate/*.LNG
+            class/out/linux64-gate/*.DLG
+            class/out/linux64-gate/*.HLP
+            class/out/linux64-gate/xlt/**
+            object/out/linux64-gate/dn
+            object/out/linux64-gate/*.LNG
+            object/out/linux64-gate/*.DLG
+            object/out/linux64-gate/*.HLP
+            object/out/linux64-gate/xlt/**
+          if-no-files-found: error
+
+  accept:
+    needs: build
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dn-accept-bins
+          path: bins
+      - name: Layout bins
+        run: |
+          mkdir -p out/object out/class
+          # artifact keeps directory prefixes from upload
+          cp -a bins/object/out/linux64-gate/. out/object/
+          cp -a bins/class/out/linux64-gate/. out/class/
+          chmod +x out/object/dn out/class/dn
+          ls -la out/object out/class
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3
+      - name: Acceptance shard ${{ matrix.shard }}/12
+        run: |
+          DN_ACCEPT_FAST=1 python3 tools/dn-linux-accept.py out/object out/class \
+            --shard ${{ matrix.shard }}/12 | tee accept-shard-${{ matrix.shard }}.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: accept-shard-${{ matrix.shard }}
+          path: accept-shard-${{ matrix.shard }}.log
+
+  summarize:
+    needs: accept
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: accept-shard-*
+          merge-multiple: true
+          path: logs
+      - name: Merge shard summaries
+        run: |
+          set -e
+          pass=0; fail=0
+          echo "## Shard logs" > summary.md
+          for f in logs/accept-shard-*.log; do
+            echo "### $(basename "$f")" >> summary.md
+            if grep -q '^SUMMARY ' "$f"; then
+              line=$(grep '^SUMMARY ' "$f" | tail -1)
+              echo "$line" >> summary.md
+              p=$(echo "$line" | sed -n 's/.*pass=\([0-9]*\).*/\1/p')
+              q=$(echo "$line" | sed -n 's/.*fail=\([0-9]*\).*/\1/p')
+              pass=$((pass+p)); fail=$((fail+q))
+            else
+              echo "MISSING SUMMARY" >> summary.md
+              fail=$((fail+1))
+            fi
+            echo '```' >> summary.md
+            { grep -E '^(FAIL|XFAIL) ' "$f" || true; } >> summary.md
+            echo '```' >> summary.md
+          done
+          echo "TOTAL pass=$pass fail=$fail" | tee -a summary.md
+          echo "TOTAL pass=$pass fail=$fail"
+          test "$fail" -eq 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: accept-summary
+          path: |
+            summary.md
+            logs/**
