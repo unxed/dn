@@ -951,7 +951,6 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       {PC := GetSelection;}
       {if PC = nil then Exit;}
       {L := PStdCollector.Create(10);}
-      {Dispose(PStdCollector(L)^.Collection, Done);}
       {PStdCollector(L)^.Collection := PC;}
       {PStdCollector(L)^.Count := PC^.Count;}
       L := TLineCollection(GetSelection); {-SBlocks}

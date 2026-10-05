@@ -4,9 +4,8 @@
 Blocking: the keyword `object` in the code of a tracked Pascal file (.pas .pp .inc .dpr .lpr), i.e. `T = object(TView)`,
 `packed object`; comments, string literals, other words (TFindObject, ExceptObject) and non-Pascal files are not looked at.
 Not blocking (printed as a count): the old construction idioms `New(T, Init(...))`, `Dispose(P, Done)`;
-CLASS_GATE_STRICT=1 makes them blocking.
-CLASS_GATE_EXCLUDE: path prefixes separated by ':' that are not scanned. Default `bootstrap/`: the record of how the first
-tree came to be (CI job `bootstrap` reproduces the baseline commit from it), not live code. An empty value scans everything.
+CLASS_GATE_STRICT=1 makes them blocking. CLASS_GATE_EXCLUDE optionally lists path prefixes separated by ':'; the default
+is empty so every tracked Pascal source, including bootstrap inputs, is checked.
 usage: tools/class-gate.py [ROOT]     exit: 0 pass, 1 found, 2 the scan could not be done"""
 import os
 import re
@@ -77,7 +76,7 @@ def scan(root, exclude, strict):
 
 def main():
     root = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    exclude = [p for p in os.environ.get('CLASS_GATE_EXCLUDE', 'bootstrap/').split(':') if p]
+    exclude = [p for p in os.environ.get('CLASS_GATE_EXCLUDE', '').split(':') if p]
     strict = os.environ.get('CLASS_GATE_STRICT', '') not in ('', '0')
     try:
         found, idioms, files = scan(root, exclude, strict)

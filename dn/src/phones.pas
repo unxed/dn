@@ -205,7 +205,6 @@ procedure PhoneBook(Manual: Boolean);
     D.Insert(PL);
     R.Assign(2, 2, 53, 3);
 
-    {    PV := New(TLabel, Init(R, GetString(dlPhonesLabel),PL);}
     PL.GroupLabel := TLabel.Create(R, GetString(dlPhonesLabelGroup), PL);
     D.Insert(PL.GroupLabel);
 

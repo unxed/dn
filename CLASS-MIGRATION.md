@@ -19,17 +19,19 @@ GitHub immediately after it is created.
   `obj[e]ct`, including ignored files and binary build caches; Git metadata is
   excluded. Keep compiler output outside the scanned tree.
 - The DN gate is `tools/class-gate.sh` (`tools/class-gate.py`, run by
-  `tools/dn-test.sh`, tests in `tools/tests/test_class_gate.py`). It is
+  `tools/dn-test.sh` and the `dn` GitHub Actions workflow, tests in
+  `tools/tests/test_class_gate.py`). It is
   blocking on the keyword `object` in the code of every tracked Pascal file
   (`.pas`, `.pp`, `.inc`, `.dpr`, `.lpr`): an old `T = object(...)` or
   `packed object` type. Comments, string literals, other words
   (`TFindObject`, `ExceptObject`), documentation and non-Pascal files are
   not matched: they are not a programming-style question. `CLASS_GATE_EXCLUDE`
-  (default `bootstrap/`, the record of how the first tree came to be, which
-  CI job `bootstrap` reproduces; an empty value scans everything) sets the
-  paths that are not scanned. The old construction idioms `New(T, Init(...))`
+  optionally sets path prefixes to skip; the default is empty so every tracked
+  Pascal source is scanned. Historical bootstrap inputs are read from the
+  pinned `bootstrap/BASELINE` commit by `bootstrap/run.sh` and are not
+  duplicated in the current tree. The old construction idioms `New(T, Init(...))`
   and `Dispose(P, Done)` are printed as a count; `CLASS_GATE_STRICT=1` makes
-  them blocking (the final acceptance should run it). This replaces the earlier
+  them blocking and is enabled in CI. This replaces the earlier
   whole-tree substring scan for `object`, which also failed on prose,
   comments and names, and so hid the real result.
 - Classes use their semantic `T...` names, direct member access, `Create`, `Destroy`
@@ -61,17 +63,16 @@ GitHub immediately after it is created.
 
 ## Remaining implementation work
 
-- Remove class-reference aliases in tv3 and DN and update their consumers.
-- Complete construction, destruction, direct member access and overrides in DN.
-- Replace resource retyping with subclass construction by the resource loader.
-- Bring the complete DN tree through its spelling gate, including build output.
-- Remove the old construction idioms that `tools/class-gate.sh` counts
-  (`New(T, Init(...))` in `dn/src/pktview.pas`), then run it with
-  `CLASS_GATE_STRICT=1` and with `CLASS_GATE_EXCLUDE=` for acceptance.
-- Verify native and DOS tv3 checks, then the supported DN builds, full
-  object/class parity and runtime tests.
-- Publish only to `main`; the previous branch/PR integration step has already
-  been completed and is not part of the remaining work.
+- Verify the all-tracked-source Pascal gate and byte-identical bootstrap
+  reproduction on the commit that removes duplicate historical inputs.
+- Keep the object/class parity gate closed at its latest exact comparison
+  (`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`); rerun it after UI, drawing,
+  event, resource, or stream changes.
+- Stage 3 platform separation is next; stage 4 broader Linux/DOS/Windows tests
+  follows it. See `docs/POST-CLASS-WORK.md` and the accepted criteria in
+  `docs/REFACTORING-CRITERIA.md`.
+- Optional `PKTVIEW` now compiles with class APIs, but still needs dedicated
+  packet fixtures and runtime tests before it can be enabled.
 
 The `class-migration` workflow checks the current focused regression tests.
 It supplements the full workflows and does not waive either final tree gate.

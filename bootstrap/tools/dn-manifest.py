@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """Writes the manifest of the origin of the files of dn/src (dn/PROVENANCE.md) or checks that it is up to date.
-Classes: OURS (our files: bootstrap/new, dn/compat/linux, new files after the first commit: MIT), CARVED (the classes of DN itself
+Classes: OURS (our files from the pinned bootstrap baseline, dn/compat/linux, new files after the first commit: MIT), CARVED (the classes of DN itself
 cut out of the files that are excluded as a whole: RIT code), RIT (the notice of DN OSP in the head of the file), CONTRIB (a contributor of
 DN OSP is named in the head: Cat, JO, AK155...: part of the public DN OSP release, no license of its own), NONE (upstream, no notice: part
 of the public DN OSP release).
 usage: dn-manifest.py [--check]   (from the root of the repository)"""
-import os, re, sys
+import os, re, subprocess, sys
 
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 srcdirs = [os.path.join(root, 'dn', d) for d in ('src', 'archives', 'compat')]   # the sources of DN by role (dn/FILES.md)
 ours = set()
-for d in (os.path.join(root, 'bootstrap', 'new'), os.path.join(root, 'dn', 'compat', 'linux')):
+baseline = next(line.strip() for line in open(os.path.join(root, 'bootstrap', 'BASELINE'), encoding='utf-8')
+                if line.strip() and not line.startswith('#'))
+r = subprocess.run(['git', '-C', root, 'ls-tree', '-r', '--name-only', baseline, '--', 'bootstrap/new'],
+                   capture_output=True, text=True, check=True)
+ours.update(os.path.basename(p).lower() for p in r.stdout.splitlines() if p != 'bootstrap/new/.gitkeep')
+for d in (os.path.join(root, 'dn', 'compat', 'linux'),):
     for f in os.listdir(d):
         if f != '.gitkeep':
             ours.add(f.lower())

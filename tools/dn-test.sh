@@ -3,7 +3,7 @@
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 . "$here/tools/need-tv.sh"
-"$here/tools/class-gate.sh"
+CLASS_GATE_STRICT=1 "$here/tools/class-gate.sh"
 
 w=${DN_TEST_WORK:-$here/build/dn-tests}; mkdir -p "$w/shims" "$w/obj"
 python3 "$here/tools/gen-shim.py" "$here/dn/compat/shims/shims.map" "$w/shims" "$here/tv/src" >/dev/null

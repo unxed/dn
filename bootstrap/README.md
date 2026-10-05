@@ -13,7 +13,8 @@ anyone can download the same archive, run `bootstrap/run.sh`, and get a tree byt
     bootstrap/run.sh [DIR]            # default build/bootstrap: result DIR/src and DIR/data
     diff -r build/bootstrap/src dn/src    # empty (on the baseline commit from bootstrap/BASELINE)
 
-Needs: `sh`, `python3`, `unrar` (`.rar` archive), `curl`, `patch`. Offline: `DN_LOCAL_TREE=<unpacked archive>`.
+Needs: `sh`, `git` (history containing the pinned baseline commit), `python3`, `unrar` (`.rar` archive), `curl`, `patch`.
+Offline: `DN_LOCAL_TREE=<unpacked archive>`.
 
 ## Where the sources come from
 
@@ -48,8 +49,11 @@ The archive is not stored in the repository. Only what is listed below is taken 
    reason): conditional compilation via `tree.env` (`tools/ifdef-strip.py`: OS/2 and Win32 branches removed; `LINUX` kept for
    the compiler), move to the new TV (names, signatures, palettes), VP vs FPC differences (`Word` is 32-bit in VP, argument
    evaluation order, 32-bit assembler → Pascal), paths (`SysOsPath`), `FormatStr` parameter slots (`PtrInt`).
-8. **Our new files** (`new/`): replacements for excluded units (`dnapp`, `drivers`, `memory`, `messages`, `dnstddlg`, `asciitab`,
-   `listmakr`...), system layer (`vpsyslow`, `vputils`, `use16`), adapters to `tv/`. This is our code (MIT).
+8. **Our new files**: replacements for excluded units (`dnapp`, `drivers`, `memory`, `messages`, `dnstddlg`, `asciitab`,
+   `listmakr`...), system layer (`vpsyslow`, `vputils`, `use16`), adapters to `tv/`. The exact inputs are read with `git archive`
+   from `bootstrap/new` in the commit named by `bootstrap/BASELINE`; they are not duplicated in the current working tree.
+   This preserves byte-identical baseline reconstruction without keeping old object-dialect Pascal sources in the class-migrated
+   checkout. The repository history must contain the pinned commit (CI fetches full history). These are our files (MIT).
 9. **Lowercase names** (FPC on a case-sensitive filesystem looks for `unit.pas`), **unit aliases** from `vpc.cfg`
    (`-ALFN=LFNVP`).
 10. **What goes into the repository**: `*.pas`, `*.inc`, `rcpvpd.ini`, `read.me`, and the `RESOURCE` directory (dialog, string,
@@ -89,5 +93,5 @@ job `bootstrap` (`bootstrap/run.sh`, compare to `dn/src`).
 | `upstream.env`, `tree.env` | archive URL and sha256; conditional-compilation policy |
 | `exclude.list`, `carve.list` | what we skip; what we carve from excluded files |
 | `patches/`, `rewrite/`, `edits/` | patches, rewritten spots, mechanical edits |
-| `new/` | our files |
+| `BASELINE` | commit with the historical bootstrap inputs and the exact `dn/src` / `dn/data` output |
 | `tools/` | tools: carve, rewrite, `ifdef-strip`, reachability, provenance (`dn-provenance`, `dn-manifest`), Virtual Pascal API notes (`vp-api`, `api-*`) |

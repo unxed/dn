@@ -100,7 +100,7 @@ _(Fill when a criterion is deferred with owner OK.)_
 |---|---|---|
 | Intermittent F4-after-clipboard / console AVs | No reliable PTY repro (2026-10-05 attempts: F4, Ctrl/Shift-Ins, Alt-Q, cmdline, Ctrl-O — 0/8 AV) | When reproduced or under far2l clipboard prompt |
 | Safe Pascal style | Explicitly after 3.0 / separate track | Post-3.0 |
-| `tvtermos` physical split | **Plan (stage 3):** split `tv/src/tvtermos.pas` into (1) `tvtermunix.pas` — termios / PTY / OSC / far2l hooks; (2) `tvtermwin.pas` — Win32 console / ConPTY; (3) keep a thin `tvtermos.pas` as the unit DN `uses` that re-exports the active target. VT interpret for console mode should call `TvVt` instead of a private copy. No behaviour change; proof = existing `tv` pty tests + DN linux/win smoke. | Stage 3 implementation |
+| `TvTermOs` physical split | **Plan (stage 3):** split the current `tv/src/tvtermos.pas` (`unit TvTermOs`) into Unix OS calls (termios, poll, ioctl, signals) and Win32 console/ConPTY calls; keep `TvTermOs` as the stable facade imported by `TvUnix` and the clipboard demo. Reuse `TvVt` for Windows VT interpretation instead of keeping its private `ConFeed` parser. Keep the shared `TvUnix` terminal protocol/dispatch portable. No behaviour change; proof = existing TV PTY tests + DN Linux/Windows smoke. | Stage 3 implementation |
 
 ## How to use this file
 

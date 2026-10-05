@@ -18,7 +18,15 @@ eval file=\$${name}_FILE
 OUT=${1:-$here/build/bootstrap}
 mkdir -p "$OUT"; OUT=$(cd "$OUT" && pwd)
 out=$OUT/work
-rm -rf "$out" "$OUT/src" "$OUT/data"; mkdir -p "$out"
+new_inputs=$OUT/bootstrap-inputs
+baseline=$(grep -v '^#' "$boot/BASELINE" | tail -1)
+git -C "$here" cat-file -e "$baseline:bootstrap/new/.gitkeep" || {
+    echo "bootstrap: the commit $baseline from bootstrap/BASELINE is not available; fetch the repository history" >&2
+    exit 2
+}
+rm -rf "$out" "$OUT/src" "$OUT/data" "$new_inputs"; mkdir -p "$out" "$new_inputs"
+git -C "$here" archive "$baseline" bootstrap/new | tar -x -C "$new_inputs"
+new_inputs=$new_inputs/bootstrap/new
 if [ -n "${DN_LOCAL_TREE:-}" ]; then
     src="$DN_LOCAL_TREE"
 else
@@ -43,7 +51,7 @@ if [ -f "$boot/carve.list" ]; then
 fi
 # the units of the system: DN OSP keeps the units that differ between the systems in LIB.D32 (DOS, 32-bit), LIB.OLF, LIB.WLF
 # (events, files, country_, fltl, fnotify...): those of BOOT_LIB_DIR go to the root of the tree, the others are dropped.
-# VPSYSD32.PAS is the Virtual Pascal runtime (not DN code): our vpsyslow.pas (bootstrap/new) takes its place.
+# VPSYSD32.PAS is the Virtual Pascal runtime (not DN code): our vpsyslow.pas (the baseline's bootstrap inputs) takes its place.
 if [ -n "${BOOT_LIB_DIR:-}" ]; then
     ld=$(ls "$out" | grep -i "^$BOOT_LIB_DIR\$" | head -1)
     if [ -n "$ld" ]; then
@@ -93,11 +101,12 @@ for e in "$boot"/edits/*.py; do
     find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 python3 "$e" | sed 's|^.*/||; s|^|  edit '"$(basename "$e")"': |'
 done
 
-# our new files (bootstrap/new): the replacements of the excluded units and the adapters
-if [ -d "$boot/new" ]; then
-    (cd "$boot/new" && find . -type f ! -name .gitkeep) | while read -r f; do
-        mkdir -p "$out/$(dirname "$f")"; cp "$boot/new/$f" "$out/$f"; echo "  new: $f"; done
+# our new files: exact inputs are read from the commit in bootstrap/BASELINE, not duplicated in the current tree
+if [ -d "$new_inputs" ]; then
+    (cd "$new_inputs" && find . -type f ! -name .gitkeep) | while read -r f; do
+        mkdir -p "$out/$(dirname "$f")"; cp "$new_inputs/$f" "$out/$f"; echo "  new: $f"; done
 fi
+rm -rf "$OUT/bootstrap-inputs"
 # the names of the units in lower case (FPC on a case-sensitive file system looks for unit.pas and UNIT.PAS only,
 # not for TopView_.PAS)
 for f in "$out"/*.[Pp][Aa][Ss]; do
