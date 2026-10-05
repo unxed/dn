@@ -1825,7 +1825,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       S: String;
     begin
     Desktop.GetExtent(R);
-    S[1] := #0;
+    S := #0;
     if ChDrive then
       begin
       S := SelectDrive(R.A.X+(R.B.X-R.A.X) div 2, R.A.Y, #0, False);
