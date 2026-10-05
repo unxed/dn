@@ -3,9 +3,10 @@
 Status: **in progress** (owner report 2026-10-05; nested `.tgz`/`.tar.gz` Enter fixed 2026-10-05)  
 Depends on: plain zip/7z Enter already fixed (`override` on `fmt*` + drive hierarchy).
 
-**Done so far:** Unix `fmttgz` lists tar-in-gzip members (gunzip + tar headers; GNU `tar`
-defaults for pack/unpack). Fixture generator `tools/gen-archive-fixtures.py` + PTY
-smoke `tools/dn-linux-archives.py` (zip / 7z / tar / tgz / tar.gz Enter+leave).
+**Done so far:** Unix `fmttgz` lists tar-in-gzip members; `fmtbz2` lists tar-in-bzip2
+(`.tar.bz2`). Fixture generator `tools/gen-archive-fixtures.py` + PTY smoke
+`tools/dn-linux-archives.py` (zip / 7z / tar / tgz / tar.gz / tar.bz2 / zip-in-zip
+Enter+leave; F3/F4 hang-bounded on zip/tgz/tar.bz2).
 
 ## Symptoms (user)
 
@@ -65,11 +66,12 @@ behavior is ambiguous (hard gate still applies globally).
 - [x] Click-through / PTY covers zip, 7z, tar, tgz, tar.gz Enter+leave on class Linux
       (`tools/dn-linux-archives.py`).
 - [x] Nested `.tar.gz`/`.tgz` enter without AV; listing shows `inside.txt` (TGZ: panel).
-- [ ] F3/F4 from inside archive does not hang (timeout-bounded test).
-- [x] Autotests in CI for zip, 7z, tar, tgz, tar.gz Enter/leave
+- [x] F3/F4 from inside archive does not hang (timeout-bounded in
+      `tools/dn-linux-archives.py` for zip / tgz / tar.bz2).
+- [x] Autotests in CI for zip, 7z, tar, tgz, tar.gz, tar.bz2 Enter/leave (+ F3/F4)
       (`dn-linux` / `linux64-utf8` → `tools/dn-linux-archives.py`).
-- [ ] Peers still open: `.tar.bz2` / `.tar.xz`, zip-in-zip, plain `.gz`, F5 extract;
-      F3/F4 hang-bounded smoke.
+- [ ] Peers still open: `.tar.xz` (no xz detector yet), F5 extract smoke;
+      plain `.gz` already lists stem via TGZ.
 
 Related: Unix packer defaults (`fmtzip`/`fmttar`/`fmt7z`…), ZIP charset
 (`docs/ZIP-CHARSET.md`), object/class gate

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PTY smoke tests for DN archive enter/leave (class Linux / UTF-8 build).
+"""PTY smoke tests for DN archive enter/leave and F3/F4 (class Linux / UTF-8).
 
 Usage:
   python3 tools/dn-linux-archives.py OUTDIR
@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
@@ -24,6 +25,8 @@ KEYS = {
     'DOWN': '\x1b[B',
     'UP': '\x1b[A',
     'ALT-X': '\x1bx',
+    'F3': '\x1bOR',
+    'F4': '\x1bOS',
 }
 
 
@@ -69,6 +72,27 @@ def quit_dn(t: PtyTerm) -> None:
         pass
 
 
+def open_archive(t: PtyTerm, name: str, expect_member: str, title_hint: str) -> str:
+    t.pump(1.5, 6)
+    t.send(KEYS['ESC'], 0.3)
+    t.send(KEYS['HOME'], 0.15)
+    t.send(KEYS['DOWN'], 0.2)
+    t.send(KEYS['ENTER'], 2.0)
+    scr = t.text()
+    check(t.alive(), '%s: alive after Enter' % name, scr)
+    check('Fatal' not in scr and 'Access' not in scr,
+          '%s: Enter no Fatal' % name, scr)
+    check(
+        expect_member.lower() in scr.lower(),
+        '%s: member %r visible' % (name, expect_member),
+        scr,
+    )
+    if title_hint:
+        check(title_hint in scr,
+              '%s: panel title has %r' % (name, title_hint), scr)
+    return scr
+
+
 def enter_archive(
     dn_out: str,
     fixture_dir: str,
@@ -83,29 +107,64 @@ def enter_archive(
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
-        t.send(KEYS['ESC'], 0.3)
-        t.send(KEYS['HOME'], 0.15)
-        t.send(KEYS['DOWN'], 0.2)
-        t.send(KEYS['ENTER'], 2.0)
-        scr = t.text()
-        check(t.alive(), '%s: alive after Enter' % name, scr)
-        check('Fatal' not in scr and 'Access' not in scr,
-              '%s: Enter no Fatal' % name, scr)
-        check(
-            expect_member.lower() in scr.lower(),
-            '%s: member %r visible' % (name, expect_member),
-            scr,
-        )
-        if title_hint:
-            check(title_hint in scr,
-                  '%s: panel title has %r' % (name, title_hint), scr)
-        # Leave via ..
+        open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['ENTER'], 1.0)
         scr2 = t.text()
         check('Fatal' not in scr2 and 'Access' not in scr2,
               '%s: leave no Fatal' % name, scr2)
+        quit_dn(t)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
+def view_edit_smoke(
+    dn_out: str,
+    fixture_dir: str,
+    name: str,
+    expect_member: str,
+    title_hint: str,
+    key: str,
+    label: str,
+    timeout: float = 8.0,
+) -> None:
+    d = tempfile.mkdtemp(prefix='dn-arc-op-')
+    try:
+        copy_dn(dn_out, d)
+        w = os.path.join(d, 'work')
+        os.makedirs(w)
+        shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
+        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        open_archive(t, name, expect_member, title_hint)
+        t.send(KEYS['HOME'], 0.15)
+        t.send(KEYS['DOWN'], 0.2)
+        t0 = time.time()
+        t.send(key, 2.0)
+        while time.time() - t0 < timeout:
+            if not t.alive():
+                break
+            scr = t.text()
+            if 'Fatal' in scr or 'Access' in scr:
+                break
+            if 'hello' in scr.lower() or expect_member.lower() in scr.lower():
+                # content or viewer chrome present; treat as opened
+                if label == 'F3' or 'hello' in scr.lower():
+                    break
+            time.sleep(0.2)
+            t.pump(0.2, 1)
+        elapsed = time.time() - t0
+        scr = t.text()
+        check(t.alive(), '%s/%s: alive' % (name, label), scr)
+        check('Fatal' not in scr and 'Access' not in scr,
+              '%s/%s: no Fatal' % (name, label), scr)
+        check(elapsed < timeout, '%s/%s: no hang (%.1fs)' % (name, label, elapsed), scr)
+        check(
+            'hello' in scr.lower() or expect_member.lower() in scr.lower(),
+            '%s/%s: opened content/chrome' % (name, label),
+            scr,
+        )
+        t.send(KEYS['ESC'], 0.6)
+        t.send(KEYS['ESC'], 0.4)
         quit_dn(t)
     finally:
         shutil.rmtree(d, ignore_errors=True)
@@ -128,6 +187,8 @@ def main() -> int:
             ('simple.tar', 'inside', 'TAR:'),
             ('simple.tgz', 'inside', 'TGZ:'),
             ('simple.tar.gz', 'inside', 'TGZ:'),
+            ('simple.tar.bz2', 'inside', 'BZ2:'),
+            ('outer.zip', 'inner', 'ZIP:'),
         ]
         for name, member, title in cases:
             if name not in names:
@@ -135,6 +196,18 @@ def main() -> int:
                 continue
             print('CASE', name, flush=True)
             enter_archive(out, fix, name, member, title)
+        for name, member, title in (
+            ('simple.zip', 'inside', 'ZIP:'),
+            ('simple.tgz', 'inside', 'TGZ:'),
+            ('simple.tar.bz2', 'inside', 'BZ2:'),
+        ):
+            if name not in names:
+                print('SKIP', name, 'F3/F4 (not generated)', flush=True)
+                continue
+            print('CASE', name, 'F3', flush=True)
+            view_edit_smoke(out, fix, name, member, title, KEYS['F3'], 'F3')
+            print('CASE', name, 'F4', flush=True)
+            view_edit_smoke(out, fix, name, member, title, KEYS['F4'], 'F4')
         print('ALL OK', flush=True)
         return 0
     finally:
