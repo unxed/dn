@@ -142,7 +142,7 @@ type
     procedure Seek(APos: TFileSize);
     procedure MakeLines; virtual;
     procedure SaveToFile(FN: String);
-    function Valid(Command: Word): Boolean; virtual;
+    function Valid(Command: Word): Boolean; override;
     procedure ChangeBounds(const Bounds: TRect); override;
     function GetPalette: TPalette; override;
     procedure DoHighlite(var B: TScreenCell; const S: String; const Attr: String);
@@ -167,7 +167,7 @@ type
 
     {`2 Quick View`}
   TQFileViewer = class(THFileViewer)
-    procedure ChangeFile(FR: PFileRec); virtual;
+    procedure ChangeFile(FR: PFileRec); override;
     end;
 
   TDFileViewer = class;
@@ -175,7 +175,7 @@ type
     {`2 Description View`}
   TDFileViewer = class(THFileViewer)
     procedure HandleEvent(var Event: TEvent); override;
-    procedure ChangeFile(FR: PFileRec); virtual;
+    procedure ChangeFile(FR: PFileRec); override;
     end;
 
   TNFileViewer = class;
