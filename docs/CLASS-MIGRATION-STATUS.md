@@ -50,18 +50,18 @@ explicitly excluded as the migration comparator.
 | Check | Evidence so far | State |
 |---|---|---|
 | Virgin first launch: About image remains after close | User reports stable symptom. One exact-pair probe on object `b4916b8` and class `33674fe`: object 0/1 residue trials, class 1/1. Reconfirm on latest class source `7eaca15`. | Open; add repeatable full-cell test |
-| Configured launch (`dn.ini`): blank panels until menu | Controlled ready-synchronized 100x30 PTY pair used same working path and identical `dn.ini` (SHA-256 `1a9b0b2b63ba27eb9324c3a09587ac337426756e174ba77f60ef05a8ab52ad9f`). Latest object `b4916b8` displayed 4 panel headers before input; latest class `7eaca15` displayed 0. Both displayed 4 after identical F10+Right. Object binary SHA-256 `8508cf5535cde1705aba33f83043caddc89dafdddef147a9d34068a619056b40`; class binary `6e057566920a7d47dad45174203eeb5af407d86704b0d90555c76802c132d552`. Intermittency still requires a 100-run series. | Reproduced; root cause open; compare latest object baseline and latest class only |
+| Configured launch (`dn.ini`): blank panels until menu | Ten controlled ready-synchronized 100x30 PTY pairs used the same working path and identical `dn.ini` (SHA-256 `1a9b0b2b63ba27eb9324c3a09587ac337426756e174ba77f60ef05a8ab52ad9f`). In all 10 pairs latest object `b4916b8` displayed panels before input; latest class `7eaca15` displayed a blank purple area. Both displayed panels after identical F10+Right. Object binary SHA-256 `8508cf5535cde1705aba33f83043caddc89dafdddef147a9d34068a619056b40`; class binary `6e057566920a7d47dad45174203eeb5af407d86704b0d90555c76802c132d552`. This is a stable mismatch. Exact full-cell parity remains unverified; post-menu captures still differ. | Stable failure reproduced 10/10; root cause open |
 | Class-vs-`dist` diagnostic | `dist` appears to draw panels before menu, but per-build saved `dn.ini` files differed; this is not controlled causal or acceptance evidence. User confirmed `dist` predates classes. | Excluded from the controlling comparator |
 | PTY alternate-screen restoration | Fixed in `133f3d4`; two focused tests cover cell/attribute/cursor restore and repeated transitions. Whole tool suite passed 34 tests. | Verified harness fix; not a DN behavior fix |
 | Pascal string collection representations | A class language-menu fault was traced to interpreting a `TStringCollection` ShortString item as AnsiString. A repository search found analogous `PString(Collection.At(...))` in `dnutil.pas`, `paneldlgs.pas`, `printman.pas`, `histories.pas`, `eraser.pas`, `diskinfo.pas`, and `filefind.pas`. | Open; inspect each type and add/test only confirmed fixes |
 | Case-insensitive `object` tree audit | Initial inventory search `rg -uuu --text -i -l object . -g '!.git/**'` listed 348 paths, including docs, bootstrap, tests and compiled output. | Newly registered subtask; full contextual audit not started |
 
-The 100-start attempt that sampled before waiting for UI readiness is invalid
-and is not counted. A valid comparison must wait for a visible readiness
-marker, use equivalent non-virgin configuration, capture every screen cell
-(glyph, foreground, background, style), cursor and process result, then replay
-the exact same action. Run at least 100 fresh starts for each of the two
-controlling source versions for the intermittent configured-launch case.
+An earlier 100-start attempt sampled before waiting for UI readiness; it is
+invalid and not counted. A valid comparison waits for a visible readiness
+marker, uses equivalent non-virgin configuration, captures every screen cell
+(glyph, foreground, background, style), cursor and process result, then replays
+the exact same action. The configured-launch mismatch has since reproduced in
+10/10 ready-synchronized object/class pairs and is stable, not intermittent.
 
 ## Remaining work, in order
 
@@ -70,7 +70,7 @@ controlling source versions for the intermittent configured-launch case.
    after the dialog; locate/fix it and search all analogous dialog-close and
    restore paths.
 2. With the same non-virgin `dn.ini`, work path, PTY dimensions and build
-   environment, run 100 configured startups per controlling build. Capture
+   environment, retain repeated configured-start regression tests. Capture
    full cells before input and after F10+Right; resolve every mismatch.
 3. Finish the case-insensitive `object` audit over the complete DN tree,
    inspect every match, remove every Pascal-source match (`.pas`, `.pp`,

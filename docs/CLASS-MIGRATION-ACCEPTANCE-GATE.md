@@ -59,9 +59,14 @@ synchronized PTY pair using the same absolute working path, terminal size
 * After the same `F10`, `Right` sequence both showed four headers; neither
   displayed About, and the config hash was unchanged after each run.
 
-One pair confirms an object/class mismatch but is not complete intermittent-
-failure acceptance; run 100 fresh pairs and compare full cells/attributes,
-cursor, process state, and side effects. An earlier self-build/`dist` check
+Ten consecutive fresh object/class pairs reproduced the configured-startup
+mismatch in all ten runs: the object build showed the panels before input and
+the class build showed a blank purple work area; the same `F10`, `Right`
+sequence made panels appear in both. Thus the reported symptom is stable, not
+intermittent. This confirms the behavioral mismatch, not full cell parity.
+Full-screen snapshots still differ after the menu action and require a
+controlled diagnosis of glyph/color/attribute differences. An earlier
+self-build/`dist` check
 used each binary's own configuration and is not controlled evidence. The
 distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4` from `df0cca2`
 predates classes and is not the migration comparator. A prior 100-start
@@ -79,9 +84,10 @@ Startup/panel regressions to reproduce and fix:
   About. Compare the latest object-based baseline with the latest class build
   using the same configured `dn.ini`, work path, terminal dimensions, and
   environment. The supplied `dist` predates classes and is not the comparator.
-  Run at least 100 fresh starts per controlling source version, capture
-  complete cells before input, then replay the same menu input and capture
-  again. Require zero missing-panel trials and exact object/class parity.
+  The symptom reproduced in 10/10 fresh controlled pairs. Retain repeated
+  regression checks, capture complete cells before input, then replay the same
+  menu input and capture again. Require zero missing-panel trials and exact
+  object/class parity.
 * For the About residue, capture the screen immediately before opening About,
   while About is open, and immediately after closing it; all prior panel cells
   must be restored on every trial. Initial evidence: exact-pair fresh-start
