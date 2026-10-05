@@ -234,8 +234,7 @@ uses
   , panelsetup, Math
   ;
 
-type
-  PString = Defines.PString;
+{$I manual/pstring_bind.inc}
 
 const
   LowMemSize = $6000; {Local setting}

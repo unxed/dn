@@ -248,9 +248,7 @@ uses
   , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}, Math
   , osdep;
 
-type
-  PString = Defines.PString;
-
+{$I manual/pstring_bind.inc}
 
 constructor TArvidDrive.Create(const AName: String);
   var
