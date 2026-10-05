@@ -44,8 +44,8 @@
 //  (including the GNU Public Licence).
 //
 //////////////////////////////////////////////////////////////////////////}
-{JO, AK155: 27.11.2002 - добавили раскрытие архивов в ветвь по Ctrl-H}
-{JO:  1.12.2002 - добавил поиск файлов внутри архива}
+{JO, AK155: 27.11.2002 - added expanding archives into a branch via Ctrl-H}
+{JO:  1.12.2002 - added file search inside an archive}
 {$I STDEFINE.INC}
 
 unit ArcView;
@@ -62,15 +62,15 @@ type
   TArcDrive = class;
 
   TArcDrive = class(TDrive)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is exposed via the plugin model; change with extreme care!}
     ArcName: String; {DataCompBoy}
     VArcName: String; {JO}
     AType: TARJArchive;
     Files: TDirStorage;
     KillAfterUse: Boolean;
-    FakeKillAfterUse: Boolean; {временная пустышка}
+    FakeKillAfterUse: Boolean; {temporary stub}
     ArcDate: LongInt;
-    ArcSize: TFileSize; {сохраняются вместе}
+    ArcSize: TFileSize; {saved together}
     ForceRescan: Boolean;
     Password: String;
     constructor Create(const AName, VAName: String); overload;
@@ -86,20 +86,20 @@ type
          const FileMask: String;
         var TotalInfo: TSize): TFilesCollection; override;
     function Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
-    {JO:  выделил список файлов в командной строке или путь к               }
-    {     файлу-списку в отдельный параметр Lst;                            }
-    {     параметр B должен быть False, если используем                     }
-    {     файл-список или разархивируем одиночный файл не прибегая к списку }
-    {     и True, если используем список в командной строке                 }
+    {JO:  extracted the command-line file list or the path to               }
+    {     a list file into a separate Lst parameter;                        }
+    {     parameter B must be False if we use                               }
+    {     a list file, or extract a single file without using a list        }
+    {     and True if we use a list on the command line                     }
 
     procedure UseFile(P: PFileRec; Command: Word); override;
     {DataCompBoy}
     function MakeListFile(PC: TCollection; UseUnp: Boolean;
          var B: Boolean): AnsiString;
-    {JO:  параметр UseUnp указывает, будем использовать полученный      }
-    {     список файлов для распаковщика (True), или паковщика (False); }
-    {     переменная В возвращает, был ли создан фписок в               }
-    {     командной строке (True) или в файле-списке (False)            }
+    {JO:  UseUnp selects whether the resulting                          }
+    {     file list is for the unpacker (True) or the packer (False);   }
+    {     variable B returns whether the list was created on            }
+    {     the command line (True) or in a list file (False)             }
 
     procedure CopyFiles(AFiles: TCollection; Own: TView;
          MoveMode: Boolean); override;
@@ -157,8 +157,8 @@ uses
   osdep, Eraser,
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
   Arvid, timeutil, VideoMan, DnExec, FileFind
-  , UserMenu {JO: для скрывания панелей при разархивировании }
-  , fmtzip {JO: для CentralDirRecPresent}
+  , UserMenu {JO: for hiding panels while extracting }
+  , fmtzip {JO: for CentralDirRecPresent}
 
   , panelsetup, panelroot, dirwatch, Drivers
   , Lfn, uselfn, Tree, Dos, histories, HistList, filepanel
@@ -331,7 +331,7 @@ constructor TArcDrive.Load(S: TStream);
   {S.Read(VArcName[0],1); S.Read(VArcName[1],Length(VArcName));}
   {/Cat}
   S.Read(FakeKillAfterUse, 1);
-  {временно}
+  {temporary}
   KillAfterUse := False;
   S.ReadStrV(Password);
   {S.Read(Password[0],1); S.Read(Password[1],Length(Password));}
@@ -341,15 +341,15 @@ constructor TArcDrive.Load(S: TStream);
   ArcFileName := ArcName;
   VArcFileName := VArcName;
   Files := TDirStorage(S.Get);
-    { AK155 Данные о файлах надо прочитать из потока независио
-    от того, будет ли найден сам архив и надо ли его перечитывать,
-    иначе собьётся дальнейшее чтение потока }
+    { AK155 File data must be read from the stream regardless
+    of whether the archive itself is found and whether it needs rereading,
+    otherwise further stream reading will get out of sync }
   lFindFirst(ArcName, AnyFileDir, SR); {JO}
   lFindClose(SR);
   if DosError <> 0 then
     goto Failure;
   if  (ArcDate <> SR.SR.Time) or (ArcSize <> SR.SR.Size) then
-    begin {архив изменился, надо его перечитывать заново}
+    begin {archive changed, must reread it}
     CurDir := '\';
     ReadArchive;
     end
@@ -423,8 +423,8 @@ function TArcDrive.ReadArchive: Boolean;
     T: TEventTimer;
     SR: lSearchRec;
   begin
-  {AK155 26-11-2002 Перечитываем архив тогда и только тогда, когда
- у него изменилась дата/время или длина }
+  {AK155 26-11-2002 Reread the archive if and only if
+ its date/time or length has changed }
   lFindFirst(ArcName, AnyFileDir, SR);
   lFindClose(SR);
   if  (ArcDate = SR.SR.Time) and (ArcSize = SR.SR.Size) then
@@ -633,9 +633,9 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
        or (FileMask = '*');
   FD.SortMode := psmLongName; {<sort141.001>}
   Files.ResetPointer('');
-  {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
-  {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
-  {    доступный изначально объём                                              }
+  {JO: first determine available memory once, then as we go}
+  {    track how much memory demand grows and whether it has exceeded         }
+  {    the originally available amount                                         }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
   while not Files.Last and Files.GetNextFile and (MAvail > MemReq) do
@@ -832,9 +832,9 @@ TryAgain:
         Unp := Copy(Unp, 1, PosChar(';', Unp)-1);
       end;
     { Flash 21-01-2004
-          Директорию нужно запоминать на том диске, где находится
-          временный каталог. А на том, где лежит архив
-          с просматриваемым файлом, она запомнится в любом случае. }
+          The directory must be remembered on the drive that holds
+          the temporary folder. On the drive that holds the archive
+          with the viewed file, it will be remembered anyway. }
     LFN.lChDir(Copy(TempDir, 1, 2));
     lGetDir(0, DirToChange);
     LFN.lChDir(TempDir);
@@ -884,12 +884,12 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
     Msg(dlArcMsg8, @L, mfOKButton or mfError);
     end;
 
-  {AK155 20/12/2001 Если под Win32 пытаться в отладчике прошагать
-эту функцию, то получается полная блокировка клавиатуры и мыши
-сразу на входе (даже с begin сойти не получается).
-Этот эффект исчезает, если параметр AnsiString заменить на String.
-Под OS/2 все шагается без проблем. Интересно, чей это глюк -
-виндового отладчика или виндовой RTL? Хорошо, если первое. }
+  {AK155 20/12/2001 If under Win32 you try to step through
+this function in the debugger, keyboard and mouse lock up completely
+on entry (you cannot even leave begin).
+The effect goes away if the AnsiString parameter is replaced with String.
+Under OS/2 stepping works fine. Whose bug is this -
+the Windows debugger or the Windows RTL? Hopefully the former. }
   begin { TArcDrive.Exec }
   Exec := True;
   S := Prg+' '+Cmd;
@@ -901,7 +901,7 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
       CmdLineLim := 120;
       ListLineLim := CmdLineLim-Length(Prg+Cmd)-7;
       CmdLineOK := False;
-      SS1 := Lst; {для перестраховки}
+      SS1 := Lst; {just in case}
       I1 := 1;
       repeat
         ClrIO;
@@ -936,7 +936,7 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
           end;
         for J := 1 to Length(SS1) do
           if SS1[J] = #$14 then
-            SS1[J] := #$20; {JO: заменяем временный символ на пробелы}
+            SS1[J] := #$20; {JO: replace the temporary character with spaces}
         Writeln(T.T, '@'+S+' '+SS1);
       until CmdLineOK;
       Write(T.T, '@del '+EX);
@@ -957,27 +957,27 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
   DoneSysError;
   DoneEvents;
   DoneVideo;
-  {AK155 Под OS/2, во-первых, PATH обычно не умещается
-    в 255 символов, во-вторых, нет проблем с памятью,
-    в третьих архиватор может оказаться ДОСовым.
-    Так что пускай PATH просматривает cmd.exe, а мы не
-    будем заниматься самодеятельностью }
-  {AK155, дописано позже, чем комментарий к OS/2.
-    Под Win32 тоже не следует заниматься самодеятельностью.
-    Во-первых, мы отдаем консоль в каком-то не таком состоянии,
-    так что консольный rar не может вводить с клавиатуры.
-    Во-вторых, стОило ли работать с ansistring, чтобы потом вызвать
+  {AK155 Under OS/2, first, PATH usually does not fit
+    in 255 characters; second, there is no memory shortage;
+    third, the archiver may be a DOS one.
+    So let cmd.exe walk PATH, and we will not
+    reinvent that ourselves }
+  {AK155, added later than the OS/2 comment.
+    Under Win32 we also should not reinvent this ourselves.
+    First, we leave the console in a bad state,
+    so console rar cannot take keyboard input.
+    Second, was it worth using ansistring only to then call
     Dos.Exec?}
   if B then
     begin
-    {JO: разбираем ту часть командной строки, которая содержит список файлов    }
-    {    на куски удобоваримой для командного процессора длины                  }
+    {JO: split the part of the command line that holds the file list           }
+    {    into chunks of a length the command processor can handle               }
     
     CmdLineLim := 95;
     
     ListLineLim := CmdLineLim-Length(Prg+Cmd)-7;
     CmdLineOK := False;
-    SS1 := Lst; {для перестраховки}
+    SS1 := Lst; {just in case}
     repeat
       if Length(Lst) >= ListLineLim then
         begin
@@ -996,12 +996,12 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
         end;
       for J := 1 to Length(SS1) do
         if SS1[J] = #$14 then
-          SS1[J] := #$20; {JO: заменяем временный символ на пробелы}
+          SS1[J] := #$20; {JO: replace the temporary character with spaces}
       // DelDoubles('  ', S);{files can have 2 spaces in names}
       // AnsiDelDoubles('  ', SS1);
-      {JO: AnsiExec - процедура из модуля DNExec , которая }
-      {    используется вместо DOS.Exec и в качестве       }
-      {    коммандлайна использует строку типа Ansistring  }
+      {JO: AnsiExec - a DNExec unit routine that }
+      {    replaces DOS.Exec and uses an Ansistring        }
+      {    as the command line                             }
       SwapVectors;
       AnsiExec(GetEnv('COMSPEC'), '/c '+S+' '+SS1+' ');
       DE := DosError;
@@ -1031,8 +1031,8 @@ function TArcDrive.Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
     else {case}
       StdMsg8;
   end {case};
-  // JO: закомментарил, т.к. теперь после разархивирования идёт копирование
-  //     через временный каталог и после его удаления панель перечитывается
+  // JO: commented out, because after extraction we now copy
+  //     via a temp directory and reread the panel after deleting it
   { GlobalMessage(evCommand, cmPanelReread, nil);
   GlobalMessage(evCommand, cmRereadInfo, nil);}
   
@@ -1103,7 +1103,7 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
       Result := '';
       Exit;
       end;
-    S[2] := ';'; {JO: реально не важно на что меняем, лишь бы не ':'}
+    S[2] := ';'; {JO: what we replace with does not really matter, as long as it is not ':'}
     Result := Copy(S, PosChar(':', S)+1, MaxStringLength);
     end;
 
@@ -1127,14 +1127,14 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
                or (Copy(S1, Length(S1)-2, 3) = '/..')
         then
           SetLength(S1, Length(S1)- {2}3); {JO}
-        {JO: нужен ли слэш в конце каталогов - вопрос спорный,          }
-        {    но похоже его отсутствие нигде не мешает, а наличие        }
-        {    вводит RAR в заблуждение, если не использовать файл-список;}
-        {    в дальейшем не исключено, что для каких-то архиваторов     }
-        {    потребуется сделать соотв. опцию;                          }
-        {    zip работает нормально и с тем, и с другим                 }
+        {JO: whether directories need a trailing slash is debatable,     }
+        {    but its absence seems harmless, while its presence         }
+        {    confuses RAR unless a list file is used;                   }
+        {    later some archivers may need                              }
+        {    a corresponding option;                                    }
+        {    zip works fine either way                                  }
 
-        {JO:  используем символ #$14 для временного разделения имён файлов}
+        {JO:  use #$14 as a temporary separator between file names}
         if B then
           S := S+#$14+SquashesName(S1)
         else
@@ -1171,7 +1171,7 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
   for I := 0 to PC.Count-1 do
     begin
     PF := PC.At(I);
-    {JO: проверка для разархивирования из панели поиска в архивах}
+    {JO: check for extracting from the archive search panel}
     if PathFoundInArc(PF^.Owner^) then
       S1 := MakeNormName(GetArcOwn(PF^.Owner^), PF^.FlName[True])
     else
@@ -1179,7 +1179,7 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
     if S1[1] in ['\', '/'] then
       Delete(S1, 1, 1); {DelFC(S1);}
 
-    {JO:  используем символ #$14 для временного разделения имён файлов}
+    {JO:  use #$14 as a temporary separator between file names}
     if PF^.Attr and Directory = 0
     then
       if B then
@@ -1243,7 +1243,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
     if AType.UseLFN then
       
       lFSplit(VArcName, ExtrDir, Nm, Xt)
-      {JO: для распаковки по F4 архивов, просмотренных через фильтр}
+      {JO: for F4 unpack of archives viewed through a filter}
       
     else
       lFSplit(lfGetShortFileName(ArcName), ExtrDir, Nm, Xt)
@@ -1270,14 +1270,14 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
       end;
     end;
 
-//JO: если извлекаем без сохpанения путей, то файлы внутpи вpеменного
-//    подкаталога оказываются без сохpанения стpуктуpы каталогов, котоpая
-//    была внутpи аpхива
+//JO: if extracting without preserving paths, files inside the temporary
+//    subdirectory end up without the directory structure that
+//    existed inside the archive
   if (Options and 1) = 0 then
     SCurDir := '';
 
   {JO}
-  // проверяем, содержит ли каталог назначения файлы
+  // check whether the destination directory contains files
   DosError := 0;
   lFindFirst(MakeNormName(ExtrDir, x_x), AnyFileDir, SR); {JO}
   if IsDummyDir(SR.FullName) then
@@ -1285,8 +1285,8 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
   if IsDummyDir(SR.FullName) then
     lFindNext(SR);
   lFindClose(SR);
-  // для разархивирования на дискеты и тестирования не используем
-  // временный подкаталог
+  // for extracting to floppies and for testing we do not use
+  // a temporary subdirectory
   if  ( (Options and 8) = 0) or ((Options and 2) <> 0) or
       ( (DosError <> 0) and (SCurDir = ''))
   then
@@ -1296,7 +1296,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
     end
   else
     begin
-    { даём имя временному подкаталогу в каталоге назначения}
+    { name the temporary subdirectory under the destination }
     DNN := DNNumber;
     while True do
       begin
@@ -1329,7 +1329,7 @@ TryAgain:
       
       if ExecResource(dlgSetPassword, Password) <> cmOK then
         Exit;
-    { Flash >>> } {JO: взял код Flash из Arcview.TArcDrive.UseFile }
+    { Flash >>> } {JO: took Flash's code from Arcview.TArcDrive.UseFile }
     if CheckForSpaces(Password) then
       S := ' '+CnvString(AType.Garble)+Password+' '
     else
@@ -1361,7 +1361,7 @@ TryAgain:
       (CnvString(AType.ForceMode) <> '')
   then
     S := S+CnvString(AType.ForceMode)+' ';
-  S := S+SCr; {установка пути внутpи аpхива}
+  S := S+SCr; {set the path inside the archive}
   S := ExtrChar+' '+S+ArchiveName;
   Unp := CnvString(AType.UnPacker);
   if  (AType.GetID = arcRAR) and (PosChar(';', Unp) > 0) then
@@ -1373,14 +1373,14 @@ TryAgain:
     end;
   Inhr := CreateDirInheritance(ExtrDir, True);
   CreateDirInheritance(TempExtrDir, False);
-  //JO: если каталог назначения не создался (напpимеp, если диск доступен
-  //    только на чтение), то нет смысла и вызывать аpхиватоp
+  //JO: if the destination directory was not created (e.g. if the drive is
+  //    read-only), there is no point calling the archiver
   if not PathExist(TempExtrDir) then
     Exit;
   { Flash 21-01-2004
-    Директорию нужно запоминать на том диске, где находится
-    временный каталог. А на том, где лежит архив
-    с просматриваемым файлом, она запомнится в любом случае. }
+    The directory must be remembered on the drive that holds
+    the temporary folder. On the drive that holds the archive
+    with the viewed file, it will be remembered anyway. }
   LFN.lChDir(Copy(TempExtrDir,1,2));
   lGetDir(0, DirToChange);
   LFN.lChDir(TempExtrDir);
@@ -1398,20 +1398,20 @@ TryAgain:
     begin
     LFN.lChDir(DirToChange);
     DirToChange := '';
-    ExtrDir := '>' + ExtrDir; //признак перечитывания подкаталогов в ветви
+    ExtrDir := '>' + ExtrDir; // flag to reread subdirectories in the branch
     GlobalMessage(evCommand, cmPanelReread, @ExtrDir);
     GlobalMessage(evCommand, cmRereadInfo, nil);
     Exit;
     end
   else
     begin
-    { перекидываем файлы из временного подкаталога в каталог назначения}
+    { move files from the temporary subdirectory to the destination }
     PV := TUserWindow.Create;
     Desktop.Insert(PV);
     CopyDirContent(TempExtrDir+SCurDir, ExtrDir, True,
        (Options and 4 <> 0));
     PV.Free;
-    { удаляем временный каталог со всем, что в нём осталось}
+    { delete the temporary directory with whatever remains in it }
     SetLength(TempExtrDir, Length(TempExtrDir)-1);
     S := GetPath(TempExtrDir);
     FRT := NewFileRec(GetName(TempExtrDir),
@@ -1433,7 +1433,7 @@ TryAgain:
     FCT.Free;
     if Inhr > 0 then
       begin
-      ExtrDir := '>' + ExtrDir; //признак перечитывания подкаталогов в ветви
+      ExtrDir := '>' + ExtrDir; // flag to reread subdirectories in the branch
       GlobalMessage(evCommand, cmPanelReread, @ExtrDir);
       GlobalMessage(evCommand, cmRereadInfo, nil);
       end;
@@ -1475,14 +1475,14 @@ procedure TArcDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean
     Exit;
     end;
   {JO}
-  // пpовеpяем, находится ли диск в списке дисков, на котоpые надо
-  // pазаpхивиpовать не чеpез вpеменный подкаталог (по умолчанию A: и B:)
+  // check whether the drive is in the list of drives that must be
+  // extracted without a temporary subdirectory (default A: and B:)
   if  (DT.S <> '') and (Length(DT.S) >= 2) then
     begin
     if DT.S[2] = ':' then
       DDr := UpCase(DT.S[1])
     else
-      DDr := #1; {любой символ не входящий в 'A'..'Z'}
+      DDr := #1; {any character not in 'A'..'Z'}
     end
   else
     begin
@@ -1631,8 +1631,8 @@ procedure TArcDrive.HandleCommand(Command: Word; InfoPtr: Pointer);
       CDir: String;
       Opts: Byte;
     begin
-    // JO: пpовеpяем, находится ли диск в списке дисков, на котоpые надо
-    //     pазаpхивиpовать не чеpез вpеменный подкаталог (по умолчанию A: и B:)
+    // JO: check whether the drive is in the list of drives that must be
+    //     extracted without a temporary subdirectory (default A: and B:)
     lGetDir(0, CDir);
     if  (UpCase(CDir[1]) in ['A'..'Z']) and
         (SystemData.Drives[UpCase(CDir[1])] and ossUnarcToDirectly <> 0)
@@ -1694,10 +1694,10 @@ function ArcViewer(AName, VAName: String): Boolean;
     I: Byte;
     PathInside: String;
   begin
-  {JO: дабы перейти к найденному файлу в архиве из панели поиска}
+  {JO: so we can jump to the found file in the archive from the search panel}
   PathInside := AName;
   if PathInside[2] = ':' then
-    PathInside[2] := ';'; {JO: меняем двоеточие не важно на что }
+    PathInside[2] := ';'; {JO: replace the colon with anything }
   I := PosChar(':', PathInside);
   if I > 0 then
     begin
@@ -1715,9 +1715,9 @@ function ArcViewer(AName, VAName: String): Boolean;
     Exit;
     end;
   { AK155 21-06-2002
-    Если файл не прочитался в качестве архива, то он и любым другим
-    спосбом не прочитается, так что ArcViewer берет ответственность
-    на себя, чтобы во вьювере не продолжать бессмысленные попытки. }
+    If the file could not be read as an archive, no other method
+    will read it either, so ArcViewer takes responsibility
+    to stop pointless further attempts in the viewer. }
   if P = nil then
     begin
     
@@ -1740,7 +1740,7 @@ function ArcViewer(AName, VAName: String): Boolean;
     end
   else
     ArcViewer := True;
-  {JO: переходим к найденному файлу в архиве}
+  {JO: jump to the found file in the archive}
   if PathInside <> '' then
     begin
     if Copy(PathInside, Length(PathInside)-1, 2) = '\.' then
@@ -1849,9 +1849,9 @@ function TArcDrive.OpenDirectory(const Dir: String;
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
   l := Length(Root);
-  {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
-  {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
-  {    доступный изначально объём                                              }
+  {JO: first determine available memory once, then as we go}
+  {    track how much memory demand grows and whether it has exceeded         }
+  {    the originally available amount                                         }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
   while not Files.Last and Files.GetNextFile and (MAvail > MemReq)
@@ -1875,7 +1875,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
       if Dirs.IndexOf(PDir) = -1 then
         Dirs.Insert(PDir);
       Fils.AtInsert(Fils.Count, FR);
-      {JO: добавляем каталоги}
+      {JO: add directories}
       if PutDirs and (Length(Files.LastDir) > L) then
         begin
         LDir := Files.LastDir;
@@ -1903,7 +1903,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
               Fils.AtInsert(I, FR);
             end;
         until Length(LDir) <= L;
-        end; {конец добавления каталогов}
+        end; {end of directory addition}
       if TimerExpired(tmr) then
         begin
         NewTimer(tmr, 50);
@@ -1913,7 +1913,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
       end;
     end;
   PI.Free;
-//используем '><' в качестве пpизнака ветви
+// use '><' as the branch marker
   PDrv := TFindDrive.Create('><'+Dir, Dirs, Fils);
   PDrv.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
@@ -1942,8 +1942,8 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
   begin
   NewTimer(tmr, 0);
   FindRec.AddChar := '';
-//JO: поскольку ArcFindRec по absolute совмещена с FindRec,
-//    то после вызова диалога можно использовать просто FindRec
+//JO: since ArcFindRec shares storage with FindRec via absolute,
+//    after the dialog we can just use FindRec
   if ExecResource(dlgArcFileFind, ArcFindRec) = cmCancel then
     Exit;
   ConfigModified := True;
@@ -1988,9 +1988,9 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
   Files.ResetPointer('');
   Root := UpStrg(CurDir)+'\';
   L := Length(Root);
-  {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
-  {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
-  {    доступный изначально объём                                              }
+  {JO: first determine available memory once, then as we go}
+  {    track how much memory demand grows and whether it has exceeded         }
+  {    the originally available amount                                         }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
   while not Files.Last and Files.GetNextFile and (MAvail > MemReq)
@@ -2022,7 +2022,7 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
             Dirs.Insert(PDir);
           Fils.AtInsert(Fils.Count, FR);
           end;
-        {JO: добавляем каталоги}
+        {JO: add directories}
         if Length(Files.LastDir) > L then
           begin
           LDir := Files.LastDir;
@@ -2034,9 +2034,9 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
             DrName := Copy(LDir, I+1, MaxStringLength);
             SetLength(LDir, I);
             if  (DrName <> '')
-              //JO: всё равно для каталогов дата и атрибуты показываются
-              //    весьма условно, размер равен нулю, так что при расширенном
-              //    поиске каталоги только мешают
+              //JO: for directories date and attributes are shown
+              //    only approximately anyway, size is zero, so in advanced
+              //    search directories only get in the way
               and (FindRec.Options and ffoAdvanced = 0)
               and ((FindRec.Options and ffoRecursive <> 0) or
                   (Root = UpStrg(LDir)))
@@ -2058,7 +2058,7 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
                 Fils.AtInsert(I, FR);
               end;
           until Length(LDir) <= L;
-          end; {конец добавления каталогов}
+          end; {end of directory addition}
         if TimerExpired(tmr) then
           begin
           NewTimer(tmr, 50);
@@ -2071,7 +2071,7 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
   PI.Free;
   if Fils.Count > 0 then
     begin
-//используем '<>' в качестве пpизнака панели поиска
+// use '<>' as the search-panel marker
     PDrv := TFindDrive.Create('<>'+FindRec.Mask,
           Dirs, Fils);
     PDrv.AMask := NewStr(FindRec.Mask);

@@ -56,33 +56,33 @@ uses
 
 type
   TPanelDescr = record
-  {` Описатель одной (из двух) панелей }
-    AnyPanel: TView; // если на этой панели что-то видно - то именно это.
-    FilePanel: TFilePanel; { Файловая панель. Имеется всегда, но,
-      возможно, скрыта, чтобы показать нефайловую.
-      Если видна файловая панель, то AnyPanel = FilePanel }
-    PanelType: Byte; // тип AnyPanel
-    Drive: Byte; // для FilePanel
+  {` Descriptor of one (of two) panels }
+    AnyPanel: TView; // if something is visible on this panel - it is this.
+    FilePanel: TFilePanel; { File panel. Always present, but
+      may be hidden to show a non-file panel.
+      If the file panel is visible, then AnyPanel = FilePanel }
+    PanelType: Byte; // AnyPanel type
+    Drive: Byte; // for FilePanel
     end;
   {`}
 
   TPanelNum = boolean;
-  {` Ссылка на одну из двух панелй; для наглядности определны
-  также константы pLeft и pRight. Значения этого типа служат
-  для ответа на вопрос "которая", например, ими индексирутся
+  {` Reference to one of the two panels; for clarity constants
+  pLeft and pRight are also defined. Values of this type answer
+  the question "which one", e.g. they index
   TDoubleWindow.Panel.
   `}
 
 const
-  pLeft = false; // для TPanelNum
-  pRight = true; // для TPanelNum
+  pLeft = false; // for TPanelNum
+  pRight = true; // for TPanelNum
 
 
 type
   TSeparator = class;
-  {`2 Вертикальный разделитель между панелями. Имитирует левую линию
-  рамки правой панели и правую линию рамки левой панели (на самом
-  деле панели рамок не имеют вообще.) }
+  {`2 Vertical separator between panels. Mimics the left border
+  line of the right panel and the right border line of the left panel (in
+  reality the panels have no borders at all.) }
   TSeparator = class(TView)
     OldX, OldW: AInt;
     constructor Create(const R: TRect; AH: Integer);
@@ -94,20 +94,20 @@ type
   {`}
 
   TDoubleWindow = class;
-  {`2 Двухпанельный менеджер.}
+  {`2 Dual-panel manager.}
   TDoubleWindow = class(TWindow)
-    Separator: TSeparator; // вертикальный между панелями
+    Separator: TSeparator; // vertical between panels
     Panel: array[TPanelNum] of TPanelDescr;
     OldBounds: TRect;
     OldPanelBounds: TRect;
     NonFilePanelType: Byte;
-      {`тип нефайловой панели; 0, если таковой нет`}
+      {`non-file panel type; 0 if there is none`}
     NonFilePanel: TPanelNum;
-      {`Которая из панелей нефайловая; мусор, если обе файловые `}
+      {`Which panel is non-file; garbage if both are file panels `}
     PanelZoomed: Boolean;
-      {` Одна из панелей максимизирована `}
+      {` One of the panels is maximized `}
     SinglePanel: Boolean;
-      {` Была ли панель до максимизации единственной `}
+      {` Whether the panel was the only one before maximization `}
     isValid: Boolean;
     constructor Create(const Bounds: TRect; ANumber, ADrive: Integer);
     procedure InitPanel(N: TPanelNum; R: TRect);
@@ -115,23 +115,23 @@ type
     constructor Load(S: TStream);
     procedure Store(S: TStream);
     procedure SwitchView(dtType: Byte);
-      {`Сделать неактивную панель указанного типа, если сейчас у
-      неё другой тип; а если именно такой - то сделать панель
-      файловой`}
+      {`Make the inactive panel of the given type if it currently has
+      a different type; and if it is already that type - make the panel
+      a file panel`}
     function Valid(C: Word): Boolean; override;
     procedure ChangeBounds(const Bounds: TRect); override;
     procedure HandleCommand(var Event: TEvent);
       {`panelwin`}
     procedure SwitchPanel(N: TPanelNum);
-      {`скрыть/показать панель`}
+      {`hide/show panel`}
     procedure ChangeDrv(N: TPanelNum);
-      {`сменить диск с диалогом (Alt-F1/F2)`}
+      {`change drive with dialog (Alt-F1/F2)`}
     procedure SetMaxiState(P: TFilePanelRoot);
-      {` Установить состояние максимизированности активной файловой
-        панели в соответствии с её настройкой `}
+      {` Set the maximized state of the active file
+        panel according to its settings `}
     procedure ToggleViewMaxiState(P: TView; Other: TPanelNum);
-      {` Инвертировать состояние максимизированности активной панели
-        (возможно, нефайловой). Номер другой панели - Other `}
+      {` Invert the maximized state of the active panel
+        (possibly non-file). Other panel number is Other `}
     end;
     {`}
 
@@ -421,18 +421,18 @@ procedure TDoubleWindow.Store(S: TStream);
 
 const
   VScrollRect: TRect = (A:(X:1;Y:1);B:(X:2;Y:5));
-    {Существенно, что B.X-A.X = 1, то есть вертикальный.
-    Остальное не важно.}
+    {Essential that B.X-A.X = 1, i.e. vertical.
+    The rest does not matter.}
 
-{ Создание вертикального скроллбара для панели просмотра }
+{ Create a vertical scrollbar for the view panel }
 function MakeVScroll: TViewScroll;
   begin
   Result := TViewScroll.Create(VScrollRect);
   Result.Options := Result.Options or ofPostProcess;
   end;
 
-{ Контроль свежесозданной нефайловой панели P; при ошибках будет P=nil }
-function ValidVP(var P: TView; S: TView {скроллбар}): Boolean;
+{ Validate newly created non-file panel P; on errors P=nil }
+function ValidVP(var P: TView; S: TView {scrollbar}): Boolean;
   begin
   Result := False;
   if (S = nil) or (P = nil) or not P.Valid(0) then
@@ -456,7 +456,7 @@ procedure InsertView(var P: TView; S: TView; Manager: TDoubleWindow);
       end;
   end;
 
-{ Построители нефайловых панелей }
+{ Non-file panel builders }
 
 function InsertQView(R1: TRect;
     Manager: TDoubleWindow; Other: TFilePanelRoot): TView;
@@ -488,7 +488,7 @@ function InsertTree(R1: TRect;
   begin
   S := PMyScrollBar.Create(VScrollRect);
   S.Options := S.Options or ofPostProcess;
-  { Область делим по вертикали между подвалом (2 строки) и деревом}
+  { Split the area vertically between the footer (2 lines) and the tree}
   Dec(R1.B.Y, 2);
   Result := THTreeView.Create(R1, 0, False, S);
   if ValidVP(Result, S) then
@@ -514,7 +514,7 @@ function InsertInfo(R1: TRect;
   Manager.Insert(Result);
   TDiskInfo(Result).InsertDriveView;
   TDiskInfo(Result).ReadData;
-  // Это надо делать после Insert
+  // This must be done after Insert
   end { InsertTree };
 
 
@@ -522,10 +522,10 @@ type
   TPanelConstructor = function(R1: TRect;
     Manager: TDoubleWindow; Other: TFilePanelRoot): TView;
 
-{ В этот массив кто угодно (плагин, к примеру) может добавить свой
-элемент вместо любого nil, после чего этот новый тип нефайловой панели
-можно будет без проблем включать-выключать через SwitchView по
-соответствующеу номеру.}
+{ Anyone (a plugin, for example) can add their
+element into this array in place of any nil, after which this new non-file panel type
+can be switched on/off via SwitchView by the
+corresponding number without problems.}
 
 const
   PanelConstructor: array[dtInfo..10] of TPanelConstructor =
@@ -552,20 +552,20 @@ procedure TDoubleWindow.SwitchView(dtType: Byte);
 
   if PanelZoomed then
     Message(Self, evCommand, cmMaxi, nil);
-      { При PanelZoomed может потребоваться SwitchView только если
-       максимизированная панель - файловая. То есть это что-то вроде
-       Ctrl-Q при максимизированной панели. Чтобы было где открывать
-       нефайловую панель, максимизацию надо убрать. }
+      { With PanelZoomed, SwitchView may be needed only if
+       the maximized panel is a file panel. That is something like
+       Ctrl-Q with a maximized panel. To have somewhere to open
+       a non-file panel, maximization must be removed. }
 
   Selected := Panel[pRight].AnyPanel.GetState(sfSelected);
   N := not Selected;
   VisibleN := Panel[N].AnyPanel.GetState(sfVisible);
   Panel[N].AnyPanel.GetBounds(R1);
 
-  { Если нефайловая панель была - ее надо в любом случае уничтожить.
-Если она была, и притом именно типа dtType, то надо будет восстановить
-файловую панель; в остальных случаях создать панель dtType. Если её
-не было, надо погасить файловую панель}
+  { If a non-file panel existed - it must be destroyed in any case.
+If it existed and was exactly of type dtType, then restore
+the file panel; otherwise create a dtType panel. If there was none,
+hide the file panel}
   with Panel[N].AnyPanel do
     begin
     if not VisibleN then
@@ -639,7 +639,7 @@ procedure TDoubleWindow.InitInterior;
     end;
   end { TDoubleWindow.InitInterior };
 
-{ Скрыть/показать панель }
+{ Hide/show panel }
 procedure TDoubleWindow.SwitchPanel(N: TPanelNum);
   var
     R, RN: TRect;
@@ -653,24 +653,24 @@ procedure TDoubleWindow.SwitchPanel(N: TPanelNum);
   GetBounds(R);
   ThisPanel := Panel[N].AnyPanel;
   if ThisPanel.GetState(sfVisible) then
-    begin // скрыть
+    begin // hide
     OldBounds := R;
     NewXBound := Separator.Origin.X+R.A.X+1;
-    if N then {скрываем правую}
+    if N then {hiding the right}
       R.B.X := NewXBound
-      { Если ширина менеджера стала меньше MinWinSize.X, то
-      ChangeBounds расширит окно вправо, что и требуется}
-    else {скрываем левую}
+      { If the manager width became less than MinWinSize.X, then
+      ChangeBounds will expand the window to the right, as required}
+    else {hiding the left}
       begin
       R.A.X := NewXBound;
       if R.B.X-R.A.X < MinWinSize.X then
         R.A.X := R.B.X - MinWinSize.X;
-        { А тут надо расширять влево, так что делаем это сами }
+        { Here we need to expand leftward, so we do it ourselves }
       end;
     ThisPanel.Hide;
     end
   else
-    begin // показать
+    begin // show
     ThisPanel.Show;
     R.A.X := OldBounds.A.X;
     R.B.X := OldBounds.B.X;
@@ -685,7 +685,7 @@ procedure TDoubleWindow.SwitchPanel(N: TPanelNum);
   UnLock;
   end { TDoubleWindow.SwitchPanel };
 
-{ Смена диска через меню Alt-F1/F2 }
+{ Change drive via Alt-F1/F2 menu }
 procedure TDoubleWindow.ChangeDrv(N: TPanelNum);
   var
     R, R1: TRect;
@@ -755,11 +755,11 @@ procedure TDoubleWindow.SetMaxiState(P: TFilePanelRoot);
     Other: TPanelNum;
   begin
   if PanelZoomed and (P = PassivePanel) then
-    begin { Попытка максимизировать пассивную панель, когда активная уже
-      максимизирована. В этом случае не максимизируем её, а наоборот,
-      сбрасываем в её настройках флаг максимизации. Выявление этой ситуации
-      делается сравнением с PassivePanel, а не проверкой видимости,
-      так как во время Load панель вполне может быть невидимой. }
+    begin { Attempt to maximize the passive panel when the active one is already
+      maximized. In this case we do not maximize it, but instead
+      clear the maximize flag in its settings. Detecting this situation
+      is done by comparing with PassivePanel, not by checking visibility,
+      because during Load the panel may well be invisible. }
     with P.PanSetup.Show do
       MiscOptions := MiscOptions and not 1;
     end
@@ -773,7 +773,7 @@ procedure TDoubleWindow.ToggleViewMaxiState(P: TView; Other: TPanelNum);
   begin
   Lock;
   if not PanelZoomed then
-    begin { Максимизировать }
+    begin { Maximize }
     SinglePanel := not Panel[Other].AnyPanel.GetState(sfVisible);
     if not SinglePanel then
       SwitchPanel(Other);
@@ -782,10 +782,10 @@ procedure TDoubleWindow.ToggleViewMaxiState(P: TView; Other: TPanelNum);
     PanelZoomed := True;
     end
   else
-    begin { Убрать максимизацию }
+    begin { Remove maximization }
     if SinglePanel then
-      Hide; {AK155 Почему-то без этого не стираются
-        остатки распахнутой панели }
+      Hide; {AK155 For some reason without this the remnants
+        of the expanded panel are not erased }
     ChangeBounds(OldPanelBounds);
     Show;
     PanelZoomed := False;
@@ -807,8 +807,8 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
     ClearEvent(Event)
     end;
 
-  { Является ли Selected панель файловой, то есть можно ли к ней цеплять
-   нефайловую панель }
+  { Whether the Selected panel is a file panel, i.e. whether a non-file
+   panel can be attached to it }
   function isFilePanel: Boolean;
     begin
     result := (NonFilePanelType = 0) or (Selected <> NonFilePanel);
@@ -830,8 +830,8 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
     CE;
     end;
 
-  { Сдвиг разделителя вправо (D=1) или влево (D=-1). Если
-  нажат Shift - то на целую файловую колонку }
+  { Move the separator right (D=1) or left (D=-1). If
+  Shift is pressed - by a whole file column }
   procedure SeparatorMove(D: Integer);
     var
       X: Integer;
@@ -842,9 +842,9 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
       begin
       if ShiftState and (kbLeftShift+kbRightShift) <> 0 then
         begin
-        { При сдвиге на ширину файловой колонку надо выбрать панель,
-        из которй брать эту самую ширину. Берём активную, если она
-        файловая, или другую, если активная - нефайловая.}
+        { When shifting by a file-column width, choose the panel
+        from which to take that width. Take the active one if it is
+        a file panel, or the other if the active one is non-file.}
         N := Selected xor (Panel[Selected].PanelType <> dtPanel);
         D := D*Panel[N].FilePanel.LineLength;
         end;
@@ -941,7 +941,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           Panel[Selected].FilePanel.ChDir(PString(Event.InfoPtr)^);
           CE;
           end;
-        cmChangeDrv: {комстрока типа C: или *: }
+        cmChangeDrv: {command line like C: or *: }
           begin
           Event.What := evCommand;
           Panel[Selected].FilePanel.HandleEvent(Event);
@@ -976,11 +976,11 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           begin
           CE;
           if (NonFilePanelType <> 0) and (NonFilePanel = Selected) then
-            begin { работа с нефайловой панелью }
+            begin { work with non-file panel }
             ToggleViewMaxiState(Panel[Selected].AnyPanel, not Selected);
             end
           else
-            begin { работа с файловой панелью }
+            begin { work with file panel }
             with ActivePanel.PanSetup.Show do
               MiscOptions := MiscOptions xor 1;
             SetMaxiState(ActivePanel);
@@ -992,7 +992,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           K := (55-Length(PString(Event.InfoPtr)^)) div 2;
           for N := pLeft to pRight do
             begin
-            S := '??'; // на случай, если окно не обработает cmGetName
+            S := '??'; // in case the window does not handle cmGetName
             Message(Panel[N].AnyPanel, evCommand, cmGetName, @S);
             PString(Event.InfoPtr)^:= PString(Event.InfoPtr)^+
               Cut((S),K);
@@ -1001,7 +1001,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
             end;
           CE
           end;
-        cmPostHideRight, cmPostHideLeft: {Ctrl-F1/F2 из UserScreen}
+        cmPostHideRight, cmPostHideLeft: {Ctrl-F1/F2 from UserScreen}
           begin
           N := Event.Command = cmPostHideRight;
           if not Visible[N] then
@@ -1013,7 +1013,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
             SwitchPanel(not N);
           CE
           end;
-        cmChangeInactive: {в панели поиска Shift-Enter }
+        cmChangeInactive: {in search panel Shift-Enter }
           begin
           Event.Command := cmFindGotoFile;
           with Panel[not Selected] do

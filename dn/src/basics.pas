@@ -72,17 +72,17 @@ const
   NameFormatChar: array[TNameFormatMode] of Char =
     ('.', #176, #177, #178);
 
-(*  flnPreferName = 1;  { Не табулированное расширение;
-        при этом всегда ExtSize = 0}
-  flnHardExtArea = 2; { Табулировать расширение
-        при этом всегда ExtSize <> 0}
-{  flnUseCutChar = 8; Он всегда нужен }
+(*  flnPreferName = 1;  { Non-tabulated extension;
+        in this case always ExtSize = 0}
+  flnHardExtArea = 2; { Tabulate extension
+        in this case always ExtSize <> 0}
+{  flnUseCutChar = 8; It is always needed }
 *)
-  flnPreserveExt = 1; { если при нетабулированном показе расширение
-    целиком не помещается, то сохранить ExtSize символов для
-    поля расширения (включая символ обрезки)}
-  flnAutoHideDot = 4; { Заменять точку перед расширением на пробел;
-    бывает только при ExtSize <> 0}
+  flnPreserveExt = 1; { if in non-tabulated display the extension
+    does not fit entirely, keep ExtSize characters for
+    the extension field (including the truncation character)}
+  flnAutoHideDot = 4; { Replace the dot before the extension with a space;
+    only occurs when ExtSize <> 0}
   flnHighlight = 16;
   flnUpCase = 32;
   flnLowCase = 64;
@@ -126,7 +126,7 @@ type
 
 type
   TCountryInfo = record
-    {`Данные для диалога настроек страны }
+    {`Data for the country settings dialog }
     DateFmt: Word; {Radiobuttons}
       {`0:MM-DD-YY, 1: DD-MM-YY, 2: YY-MM-DD`}
     TimeFmt: Word; {Radiobuttons}
@@ -159,7 +159,7 @@ const
   opDV = 8; { DesqView }
   opWNT = 16; { Win NT & Win y2k }
   opDPMI32 = 32; { DPMI32 }
-  {Cat: нечто среднее между DOS и Win32, поэтому отдельно от DOS}
+  {Cat: something between DOS and Win32, hence separate from DOS}
 
   Abort: Boolean = False;
 
@@ -179,35 +179,35 @@ function MemAdjust(L: LongInt): LongInt;
 procedure FillWord(var B; Count, W: Word);
 procedure LocateCursor(X, Y: Byte);
 procedure TinySlice;
-  {` Отдача системе кванта времени. Эта процедура вызывается из
-  цикла событий TGroup.Execute, а стало быть, в любой ситуации,
-  когда работает Desktop или диалог. Если же кто-то сам крутит
-  цикл (например, с GetEvent), то он сам должен и TinySlice вызывать,
-  если нужно. Пример того, как это делается, см. в TView.MouseEvent `}
+  {` Yield a time slice to the system. This procedure is called from
+  the TGroup.Execute event loop, and thus in any situation
+  where Desktop or a dialog is running. If someone runs their own
+  loop (e.g. with GetEvent), they must call TinySlice themselves
+  when needed. See TView.MouseEvent for an example of how this is done `}
 
 function FormatLongName(Name: String; Size, ExtSize: Byte;
-  {` Форматировать длинное имя под общую длину Size, в том числе
-  под табулированное расширение - ExtSize.
-    Отдельные биты Options задают особенности форматирования (константы
-  с именами вроде flnHighlight.
-    FormatMode определяет символ, выводимый вместо точки.}
+  {` Format a long name to total length Size, including
+  tabulated extension - ExtSize.
+    Individual Options bits set formatting features (constants
+  named like flnHighlight.
+    FormatMode defines the character shown instead of the dot.}
      Options: Word;
     FormatMode: TNameFormatMode): String; (* X-Man *)
     {`}
-{ Переменные FormatLongName, остаточные значения которых могут
-  представлять интерес: }
+{ FormatLongName variables whose residual values may
+  be of interest: }
 var
   flnNLength: Integer;
-    {` После FormatLongName длина собственно имени, без обрезания `}
+    {` After FormatLongName the length of the name itself, without truncation `}
   flnNSize: Integer;
-    {` После FormatLongName  длина имени после обрезания `}
+    {` After FormatLongName the length of the name after truncation `}
   flnDotPos: Integer;
-    {` После FormatLongName  результирующая позиция точки (если
-      не табулируем) или последнего пробела перед полем расширения
-      (если табулируем) `}
+    {` After FormatLongName the resulting dot position (if
+      not tabulating) or the last space before the extension field
+      (if tabulating) `}
   flnPanelName: String;
-    {` После FormatLongName отформатированное имя (без добавочных
-      символов управления подсветкой `}
+    {` After FormatLongName the formatted name (without extra
+      highlight control characters `}
 
 const
   BreakChars: set of Char = [',', ' ', '[', ']', '{', '}', '(', ')',
@@ -235,28 +235,28 @@ var
   FreeStr: String;
   FreeLongStr: LongString;
   InterfaceStr: String;
-    {` Статическая строка для передачи данных между программами.
-    Использовать её без крайней необходимости не следует. `}
+    {` Static string for passing data between routines.
+    Should not be used unless strictly necessary. `}
   DNNumber: Byte;
 
-  {Cat: порядок переменных не менять, иначе будут проблемы с плагинами}
+  {Cat: do not change variable order, or there will be plugin problems}
 
 var
   {-DataCompBoy-}
   StartupDir: String;
-    {` Каталог, откуда вызван DN.EXE. С '\' в конце `}
+    {` Directory from which DN.EXE was started. With '\' at the end `}
   SourceDir: String;
-    {` Каталог, где лежат конфиги и истории. С '\' в конце.
-      Управляется Env-переменной DN2. `}
+    {` Directory where configs and histories live. With '\' at the end.
+      Controlled by the DN2 env variable. `}
   TempDir: String;
-    {` Временный каталог. С '\' в конце `}
+    {` Temporary directory. With '\' at the end `}
   TempFile: String;
   TempFileSWP: String; {JO}
   LngFile: String;
   SwpDir: String;
-    {` Каталог для врменных командных файлов и списков,
-    а в DPMI32 - для свопа на время выполнения внешней программы.
-    С '\' в конце. Управляется Env-переменной DNSWAP и ключиком /S. `}
+    {` Directory for temporary command files and lists,
+    and under DPMI32 - for swap while an external program runs.
+    With '\' at the end. Controlled by the DNSWAP env variable and the /S switch. `}
   {-DataCompBoy-}
 const
   DirToChange: String = ''; {DataCompBoy}
@@ -272,7 +272,7 @@ const
 
 const
   CountryInfo: TCountryInfo =
-    {`Статическая переменная; всегда корректно заполнена`}
+    {`Static variable; always correctly filled`}
    (DateFmt: 0;
     TimeFmt: 0;
     DateSep: '.';
@@ -462,10 +462,10 @@ destructor TTextReader.Destroy;
   end;
 {-DataCompBoy-}
 
-{AK155 19.05.05 Все динамические PString заменил на стековые String.
-Я сомневаюсь в полезности этих PString даже в 16bit версии,
-а в 32bit - это совершенно лишнее.
-   А также ввёл пару мелких оптимизаций и добавил комментариев.}
+{AK155 19.05.05 Replaced all dynamic PString with stack String.
+I doubt these PString were useful even in the 16bit version,
+and in 32bit they are completely redundant.
+   Also introduced a couple of small optimizations and added comments.}
 function FormatLongNameB(Name: String; Size, ExtSize: Byte;
      Options: Word;
     FormatMode: TNameFormatMode): String;
@@ -475,18 +475,18 @@ function FormatLongNameB(Name: String; Size, ExtSize: Byte;
     PSize, ESize: Integer; {PathSize, ExtensionSize}
     P, N, E: String; { Path, Name, Extension }
     EFlag, i: Byte;
-    Hi: Boolean; { признак того, что данный сим}
-    Hi1, Hi2, Hi3: Integer; { Позиции, которые должны быть выдедены цветом.
-      Hi1 - символ обрезки пути (подозреваю, что реально не нужен,
-        так как путь никогда не бывает вместе с цветом);
-      Hi2 - символ отметки файла или обрезки имени перед расширением;
-      Hi3 - символ обрезки на правом конце поля.
+    Hi: Boolean; { flag that this char}
+    Hi1, Hi2, Hi3: Integer; { Positions that should be highlighted.
+      Hi1 - path truncation character (suspect it is not really needed,
+        since a path never appears together with color);
+      Hi2 - file mark character or name truncation before extension;
+      Hi3 - truncation character at the right end of the field.
       }
     l: Integer;
   label
     MakeResult;
   begin { FormatLongName }
-  if (Name = '..') or (Name = '.' {бывает внутри чужих архивов}) then
+  if (Name = '..') or (Name = '.' {happens inside foreign archives}) then
     begin
     Result := AddSpace(Name, Size);
     Exit;
@@ -511,23 +511,23 @@ function FormatLongNameB(Name: String; Size, ExtSize: Byte;
     end;
   flnNLength := Length(N);
   flnNSize := flnNLength;
-  ESize := Length(E); { уже без точки }
+  ESize := Length(E); { already without the dot }
   EFlag := Byte(ESize > 0);
 
   if Options and flnPreserveExt <> 0 then
     begin
     l := (Length(N) + Min(3, Length(P)));
-      { сколько хочется на путь и имя при максимальной обрезке пути }
-    if (Size - l > ESize) { Расширение помещается } or
-       (l < Size-ExtSize) { Имя не нужно обрезать }
+      { how much is wanted for path and name with maximal path truncation }
+    if (Size - l > ESize) { Extension fits } or
+       (l < Size-ExtSize) { Name need not be truncated }
     then
-      ExtSize := 0 { Не табулируем }
+      ExtSize := 0 { Do not tabulate }
     else if ESize < ExtSize then
-      ExtSize := ESize; { Табулируем, но минимизируем обрезку имени }
+      ExtSize := ESize; { Tabulate, but minimize name truncation }
     end;
 
   if (ExtSize <> 0) and (ESize > ExtSize) then
-    begin { Обрезка расширения при табулированном показе }
+    begin { Truncate extension in tabulated display }
     ESize := ExtSize;
     Hi3 := Size;
     end;
@@ -536,14 +536,14 @@ function FormatLongNameB(Name: String; Size, ExtSize: Byte;
   if PSize >= Length(P) then
     PSize := Length(P)
   else
-    begin { Обрезка пути }
+    begin { Truncate path }
     P[PSize] := FMSetup.RestChar[1];
     Hi1 := PSize
     end;
 
-  {  Обрезка расширения при нетабулированном показе.
-  Её нельзя объединить с обрезкой имени, так как в позицию последней
-  точки может заноситься признак скрытого-системного файла.}
+  {  Truncate extension in non-tabulated display.
+  It cannot be merged with name truncation, because the position of the last
+  dot may receive a hidden/system file indicator.}
   if (ExtSize <> 0) then
     i := ExtSize+1
   else
@@ -554,9 +554,9 @@ function FormatLongNameB(Name: String; Size, ExtSize: Byte;
     if ESize < Length(E) then
       Hi3 := Size;
     end;
-  { Сейчас i - ширина поля расширения, включая позицию точки }
+  { Now i is the extension field width, including the dot position }
 
-  { Обрезка имени }
+  { Truncate name }
   flnNSize := Min(Length(N), Max(1, Size-i-PSize));
 
   FillChar(flnPanelName[1], Size, ' ');
@@ -564,9 +564,9 @@ function FormatLongNameB(Name: String; Size, ExtSize: Byte;
     flnDotPos := PSize+flnNSize+1
   else
     flnDotPos := Size-ExtSize;
-  { Сейчас flnDotPos - это позиция точки, если она в пределах поля,
-    либо Size+1, если точка выходит за поле из-за слишком длинного
-    имени в режиме без табуляции расширений }
+  { Now flnDotPos is the dot position if it is within the field,
+    or Size+1 if the dot goes beyond the field due to a too-long
+    name in non-tabulated extension mode }
   for i := 1 to PSize do
     flnPanelName[i] := P[i];
   for i := 1 to flnNSize do
@@ -577,28 +577,28 @@ function FormatLongNameB(Name: String; Size, ExtSize: Byte;
      ((Options and flnAutoHideDot = 0) and (ESize <> 0))
   then
     flnPanelName[flnDotPos] := NameFormatChar[FormatMode];
-      { Занесение признака атрибутов или восстановление точки.
-        Если позиция точки вне поля (то есть будет обрезка), то атрибуты
-        не будут индицироваться. Может, это и неправильно, но так
-        было всегда.}
+      { Store attribute indicator or restore the dot.
+        If the dot position is outside the field (i.e. truncation), attributes
+        will not be indicated. Maybe that is wrong, but that is
+        how it always was.}
   if flnNSize < Length(N) then
-    begin { Обрезка имени }
+    begin { Truncate name }
     Hi2 := PSize+flnNSize + byte(flnDotPos <= Size);
-      {Если позиция точки индицируется, то обрезку ставим вместо неё, а
-      если нет - приходится обрезать на 1 символ больше }
+      {If the dot position is shown, put truncation in its place, and
+      if not - have to truncate 1 character more }
     flnPanelName[Hi2] := FMSetup.RestChar[1];
     end;
-  if Hi3 <> 0 then {Обрезка расширения. Она может на самом деле
-      обрезать имя, если показ нетабулированный. В этом случае отметка
-      (если он есть) должна лечь поверх обрезки, поэтому
-      данный фрагмент должен стоять до занесения символа отметки. }
+  if Hi3 <> 0 then {Truncate extension. It may actually
+      truncate the name if display is non-tabulated. In that case the mark
+      (if any) must overlay the truncation, so
+      this fragment must come before storing the mark character. }
     flnPanelName[Hi3] := FMSetup.RestChar[1];
   if (Options and flnSelected) <> 0 then
-    begin { Отметка }
+    begin { Mark }
     Hi2 := flnDotPos - byte(flnDotPos > Size);
-      {Если позиция точки индицируется, то отметку ставим вместо неё, а
-      если нет - на последний индицируемый символ. Обрезка при этом
-      подавляется }
+      {If the dot position is shown, put the mark in its place, and
+      if not - on the last displayed character. Truncation is then
+      suppressed }
     flnPanelName[Hi2] := FMSetup.TagChar[1];
     end;
 
@@ -606,9 +606,9 @@ MakeResult:
   Result := '';
   if  (Options and flnPadRight) = 0 then
     DelRight(flnPanelName);
-{AK155 13.05.2005 Здесь, и в конце подпрограммы, тильды добавляются,
-а в GetFull с ними ведётся борьба при помощи кода цвета. Проще не
-добавлять и не бороться.
+{AK155 13.05.2005 Here, and at the end of the routine, tildes are added,
+and in GetFull they are fought with a color code. Simpler not to
+add them and not to fight.
   if  ( (Options and flnSelected) <> 0) and
       ( (Options and flnHighlight) <> 0)
   then
@@ -617,7 +617,7 @@ MakeResult:
 
   for i := 1 to Length(flnPanelName) do
     begin
-    Hi := { признак того, что данный символ надо подсветить }
+    Hi := { flag that this character must be highlighted }
        ( (Options and flnHighlight) <> 0) and
        ( (i = Hi1) or (i = Hi2) or (i = Hi3));
     if Hi then
@@ -625,9 +625,9 @@ MakeResult:
     if  (flnPanelName[i] = '~') and ((Options and flnHandleTildes) <> 0) then
       AddStr(Result, #0);
     AddStr(Result, flnPanelName[i]);
-    {AK155: зачем этот второй #0 - придумать не смог, поэтому убрал его.
-А относительно первого #0 догадался, что он должен обеспечивать
-отрисовку тильды. И внес соответствующую коррекцию в
+    {AK155: why this second #0 - could not figure out, so removed it.
+As for the first #0, figured it should ensure
+tilde drawing. And made the corresponding correction in
 drivers._vp.MoveCStr. 06.01.2001}
     {
           if (flnPanelName[i]='~') and ((Options and flnHandleTildes)<>0)
@@ -637,7 +637,7 @@ drivers._vp.MoveCStr. 06.01.2001}
     if Hi then
       AddStr(Result, '~');
     end;
-{AK155 13.05.2005 - см. выше
+{AK155 13.05.2005 - see above
   if  ( (Options and flnSelected) <> 0) and
       ( (Options and flnHighlight) <> 0)
   then
@@ -698,9 +698,9 @@ function GetMeMemoStream: TStream; {-$VOL begin}
     Pos: LongInt;
   begin
   S := TMemoryStream.Create(2048, 2048);
-  {Cat: а теперь запишем туда единичку, чтобы другие глупые процедуры,     }
-  {     которые читают из потока то, что они туда не записывали, считали,  }
-  {     что наш поток содержит длинные строки                              }
+  {Cat: and now write a one there so that other silly routines,            }
+  {     which read from the stream what they did not write, think          }
+  {     that our stream contains long strings                              }
   S.Seek(0);
   S.Write(_1, 1);
   S.Seek(0);
@@ -748,9 +748,9 @@ procedure TinySlice;
   
 //  give_up_cpu_time;
 //piwamoto: it crashes under W2K, so i get code from DN OSP
-{AK155 Под OS/2 int $28 разгрузки процессора не даёт, а
- int $2f (DPMI Idle) - даёт. Вероятно, для DPMI32 int $2f
- неприменимо. Так что оставил безусловно DPMI Idle}
+{AK155 Under OS/2 int $28 does not unload the CPU, but
+ int $2f (DPMI Idle) does. Probably for DPMI32 int $2f
+ is not applicable. So left DPMI Idle unconditionally}
   
   end;
 
@@ -767,7 +767,7 @@ OS2exec := (opSys and opOS2 <> 0) and
         ( (Hi(DosVersion) >= 30) or
           ( (Hi(DosVersion) >= 10) and (GetEnv('OS2COMSPEC') <> ''))
         )));
-Win32exec := opSys and opWin <> 0; {для NT пока не работает}
+Win32exec := opSys and opWin <> 0; {does not work for NT yet}
 
 
 
