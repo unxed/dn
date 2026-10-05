@@ -56,7 +56,7 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3 p7zip-full
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3 p7zip-full
       - name: Build DN (one command; UTF-8 inside is the default)
         run: tools/build.sh linux64 out/dn
       - name: File operations in a pty (and the UTF-8 checks)

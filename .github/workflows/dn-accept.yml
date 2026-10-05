@@ -46,7 +46,7 @@ jobs:
           echo "object DN=$(git -C object rev-parse HEAD) TV=$(git -C object/tv rev-parse HEAD)"
           echo "class  DN=$(git -C class rev-parse HEAD) TV=$(git -C class/tv rev-parse HEAD)"
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
       - name: Build class DN
         working-directory: class
         run: tools/build.sh linux64 out/linux64-gate
@@ -117,9 +117,15 @@ jobs:
       - name: Merge shard summaries
         run: |
           set -e
+          shopt -s nullglob
           pass=0; fail=0
           echo "## Shard logs" > summary.md
-          for f in logs/accept-shard-*.log; do
+          logs=(logs/accept-shard-*.log)
+          if [ ${#logs[@]} -eq 0 ]; then
+            echo "NO SHARD LOGS" | tee -a summary.md
+            exit 1
+          fi
+          for f in "${logs[@]}"; do
             echo "### $(basename "$f")" >> summary.md
             if grep -q '^SUMMARY ' "$f"; then
               line=$(grep '^SUMMARY ' "$f" | tail -1)
@@ -136,7 +142,6 @@ jobs:
             echo '```' >> summary.md
           done
           echo "TOTAL pass=$pass fail=$fail" | tee -a summary.md
-          echo "TOTAL pass=$pass fail=$fail"
           test "$fail" -eq 0
       - uses: actions/upload-artifact@v4
         if: always()
