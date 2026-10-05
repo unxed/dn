@@ -24,7 +24,10 @@ for lang, extra, want, notwant in CASES:
         for n in ('Größe', 'Привет'):
             os.makedirs(os.path.join(w, n))
         open(os.path.join(w, 'Ünï.txt'), 'w').close()
-        env = {'LANG': lang}
+        # PtyTerm inherits the runner env: a set LC_ALL (e.g. C.UTF-8 or en_US.UTF-8)
+        # would win over LANG in TvLocale.HostOemCodePage. Clear the locale vars first;
+        # cases may put LC_CTYPE back via `extra` (see C.UTF-8 below).
+        env = {'LC_ALL': '', 'LC_CTYPE': '', 'LANG': lang}
         env.update(extra)
         t = PtyTerm(['./dn'], 100, 30, env=env, cwd=w, exe=os.path.join(d, 'dn'))
         t.pump(1.5, 6)
