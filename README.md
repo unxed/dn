@@ -23,6 +23,11 @@ Our new code, which is not part of the RIT Labs source files and their descendan
 
 ## Build DN with your own fpc
 
+For the common Linux habit `make` / `make install` there is a laconic root `Makefile`
+that calls `tools/build.sh` and installs the binary plus resources under
+`$(PREFIX)/lib/dn` with a small wrapper in `$(PREFIX)/bin/dn` (`PREFIX` defaults to
+`/usr/local`; `DESTDIR` is honoured). Example: `make && sudo make install`.
+
 You need: `fpc` 3.2.x (check with `fpc -iV`; on Debian/Ubuntu `sudo apt install fp-compiler fp-units-rtl`), `python3`, `git`. Nothing else (no Lazarus, no libraries).
 
     git clone --recurse-submodules https://github.com/unxed/dn && cd dn     # tv/ is the submodule unxed/tv; the scripts fetch it themselves if you forgot
