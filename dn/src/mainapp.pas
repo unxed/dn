@@ -733,8 +733,11 @@ initialization
 {$ENDIF}
   CommandHiddenHook := @CommandHidden;
   ListBoxOwnsList := False;       { DN: the owner of the list disposes it }
-  { the palettes of DN (DNPalet: carved from the archive) replace those of tv/ }
-  SystemColors[apColor] := palettes.CColor;
+  { Keep the object-era default palette during the class migration.  The
+    newer palette is intentionally retained in palettes.pas, but changing
+    it here would make the class build differ from the working object build
+    in every screen cell's foreground/background attributes. }
+  SystemColors[apColor] := palettes.CColorOsp;
   SystemColors[apBlackWhite] := palettes.CBlackWhite;
   SystemColors[apMonochrome] := palettes.CMonochrome;
   CColor := SystemColors[apColor];

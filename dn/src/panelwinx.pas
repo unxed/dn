@@ -57,9 +57,9 @@ uses
 type
   TXDoubleWindow = class;
   TXDoubleWindow = class(TDoubleWindow)
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
 implementation

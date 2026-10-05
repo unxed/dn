@@ -56,10 +56,10 @@ uses
 
 type
   TCalcLine = class(TInputLine)
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure SetData(var B); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure SetData(var B); override;
     procedure SetValues(SetSelf: Boolean);
-    procedure Awaken; virtual;
+    procedure Awaken; override;
     destructor Destroy; override;
     end;
 
@@ -72,10 +72,10 @@ type
     constructor Create(var R: TRect);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Draw; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
     procedure WrtT(X: CReal; var S: String);
-    function GetPalette: TPalette; virtual;
+    function GetPalette: TPalette; override;
     end;
 
 type

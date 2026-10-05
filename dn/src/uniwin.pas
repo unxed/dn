@@ -59,22 +59,22 @@ type
 
   TUniWindow = class(TWindow)
     {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
-    function GetPalette: TPalette; virtual;
+    function GetPalette: TPalette; override;
     function MakeScrollBar(AOptions: Word): TScrollBar;
-    procedure InitFrame; virtual;
+    procedure InitFrame; override;
     function ReactOnCmd: Boolean; virtual;
     end;
 
   { TEditScrollBar }
 
   TEditScrollBar = class(TScrollBar)
-    function GetPalette: TPalette; virtual;
+    function GetPalette: TPalette; override;
     end;
 
   { TEditFrame }
 
   TEditFrame = class(TFrame)
-    function GetPalette: TPalette; virtual;
+    function GetPalette: TPalette; override;
     end;
 
 const
