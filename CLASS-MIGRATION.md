@@ -99,8 +99,9 @@ Self-build only; absent on pre-class `dist`. Details live in
 - `Ctrl+O`: **fixed** — nil-check `UserScr`; `VtShowScreen` guards nil (`tv3` `396fb86`).
 - Autosave desktop restore: **fixed** — `TFilePanelRoot.Store` uses `S.Put(Drive)` again (was `Drive.Store(S)`).
 - Plain zip/7z Enter: **fixed** (fmt + drive `override`); nested/compound archives and ops matrix still **open** (`docs/ARCHIVE-MATRIX.md`).
-- Failed archive ctor: **fixed** — `Destroy; Fail` → `Fail` only (`arcview`/`arvid`).
-- Enter on non-exec file (`cmExecFile`): **open** class-only AV (was easy to confuse with zip Enter in PTY).
+- Failed archive ctor: **fixed** — `Destroy; Fail` → `Fail` only (`arcview`/`arvid`, `b9a6153`).
+- UTF-8 panel names at startup: **fixed** — no post-draw `WriteScreenCells` on `DNUTF8` (`ab9ebd8`).
+- Enter on non-exec file (`cmExecFile`): **open** class-only AV (PTY often selected `zzz.txt` beside `aaa.zip` — not zip Enter; see checklist).
 
 ## UI notes (not all are class regressions)
 
