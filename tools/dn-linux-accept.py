@@ -18,6 +18,7 @@ import shutil
 import signal
 import sys
 import tempfile
+import time
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -31,6 +32,11 @@ _SETTLE_KEY = 0.22 if _FAST else 0.35
 _SETTLE_ENTER = 0.5 if _FAST else 0.8
 _SETTLE_AFTER = 0.5 if _FAST else 0.8
 _PUMP_AFTER = 1.5 if _FAST else 2.5
+# Menu grid under FAST: slightly longer key settle + ready/stable waits (CI flakes).
+_SETTLE_KEY_MENU = 0.32 if _FAST else 0.35
+_SETTLE_ENTER_MENU = 0.7 if _FAST else 0.8
+_SETTLE_AFTER_MENU = 0.7 if _FAST else 0.8
+_PUMP_AFTER_MENU = 2.0 if _FAST else 2.5
 INSTALL = '/tmp/dn-accept-install-%d' % os.getpid()
 WORK_ROOT = '/tmp/dn-accept-shared-%d' % os.getpid()
 
@@ -195,10 +201,55 @@ def snapshot(t: PtyTerm) -> dict:
     }
 
 
-def mask_volatile(cells):
+def _menu_bar_ready(text: str) -> bool:
+    """True when the top menu bar has been painted (startup / redraw settled)."""
+    row0 = text.split('\n')[0] if text else ''
+    return ('File' in row0 and 'Disk' in row0) or ('♦' in row0 and 'File' in row0)
+
+
+def _top_left_csi_garbage(t: PtyTerm) -> bool:
+    """True when (0,0)..(0,3) are literal '^[' (ESC caret residue), not menu-bar paint."""
+    row = t.screen.cells[0]
+    chars = ''.join((row[x][0] or ' ') for x in range(4))
+    return chars == '^[^['
+
+
+def wait_menu_bar(t: PtyTerm, timeout: float = 3.0) -> bool:
+    end = time.time() + timeout
+    while time.time() < end:
+        t.pump(0.12, 0.4)
+        if _menu_bar_ready(t.text()) and not _top_left_csi_garbage(t):
+            return True
+    return _menu_bar_ready(t.text()) and not _top_left_csi_garbage(t)
+
+
+def settle_snapshot(t: PtyTerm, quiet: float = 0.2, limit: float = 2.5) -> None:
+    """Pump until the screen text is unchanged across two quiet intervals (or limit)."""
+    end = time.time() + limit
+    prev = None
+    while time.time() < end:
+        t.pump(quiet, quiet + 0.5)
+        # ESC caret residue at origin: keep reading until the menu bar repaints.
+        if _top_left_csi_garbage(t):
+            prev = None
+            continue
+        cur = t.text()
+        if cur == prev:
+            return
+        prev = cur
+
+
+def mask_volatile(cells, text: str = '', csi_topleft: bool = False):
     out = []
+    # Change Screen Mode: Custom cols/rows are String[3]; trailing byte after
+    # ItoS(ScreenHeight) ("30") is often uninitialized heap — object/class differ.
+    screen_mode = 'change screen mode' in text.lower()
     for y, x, ch, attr in cells:
         if y == 0 and x >= COLS - 12:
+            continue
+        if csi_topleft and y == 0 and x < 4:
+            continue
+        if screen_mode and 10 <= y <= 13 and 50 <= x <= 70:
             continue
         out.append((y, x, ch, attr))
     return out
@@ -229,6 +280,11 @@ def _version_rows(text: str) -> set[int]:
     return rows
 
 
+def _csi_topleft_residue(text: str) -> bool:
+    row0 = text.split('\n')[0] if text else ''
+    return len(row0) >= 4 and row0[:4] == '^[^[' and 'File' in row0
+
+
 def diff_snaps(a: dict, b: dict, limit: int = 12) -> list[str]:
     msgs = []
     if a['alive'] != b['alive'] or a['status'] != b['status']:
@@ -240,8 +296,12 @@ def diff_snaps(a: dict, b: dict, limit: int = 12) -> list[str]:
         msgs.append('timeout object=%s class=%s' % (a.get('text'), b.get('text')))
         return msgs
     skip_rows = _version_rows(a.get('text', '')) | _version_rows(b.get('text', ''))
-    ca = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(a['cells']) if y not in skip_rows}
-    cb = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(b['cells']) if y not in skip_rows}
+    ta, tb = a.get('text', ''), b.get('text', '')
+    csi_tl = _csi_topleft_residue(ta) or _csi_topleft_residue(tb)
+    ca = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(a['cells'], ta, csi_tl)
+          if y not in skip_rows}
+    cb = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(b['cells'], tb, csi_tl)
+          if y not in skip_rows}
     keys = sorted(set(ca) | set(cb))
     n = 0
     skipped = 0
@@ -277,9 +337,14 @@ class _ScenarioTimeout(Exception):
     pass
 
 
-def run_one(out: str, work: str, spec: str) -> tuple[dict, str]:
+def run_one(out: str, work: str, spec: str, area: str = '') -> tuple[dict, str]:
     err = ''
     t = None
+    menuish = area == 'menus' or spec.strip().startswith('F10')
+    sk = _SETTLE_KEY_MENU if menuish else _SETTLE_KEY
+    se = _SETTLE_ENTER_MENU if menuish else _SETTLE_ENTER
+    sa = _SETTLE_AFTER_MENU if menuish else _SETTLE_AFTER
+    pa = _PUMP_AFTER_MENU if menuish else _PUMP_AFTER
 
     def _alarm(_signum, _frame):
         raise _ScenarioTimeout('timeout')
@@ -293,11 +358,18 @@ def run_one(out: str, work: str, spec: str) -> tuple[dict, str]:
         t.send(KEYS['ESC'], 0.4)
         t.send(KEYS['ESC'], 0.3)
         t.pump(0.5, 1.5)
+        # Do not drive menus until the bar is real — FAST CI otherwise snapshots
+        # ESC/CSI residue at (0,0) (`^[^[`) against a settled peer.
+        wait_menu_bar(t, 3.0 if _FAST else 4.0)
         for k in tokens(spec):
             if not t.alive():
                 break
-            t.send(k, _SETTLE_ENTER if k == '\r' else _SETTLE_KEY)
-        t.pump(_SETTLE_AFTER, _PUMP_AFTER)
+            t.send(k, se if k == '\r' else sk)
+        t.pump(sa, pa)
+        settle_snapshot(t, 0.18 if _FAST else 0.25, 2.5 if _FAST else 3.5)
+        if _top_left_csi_garbage(t):
+            wait_menu_bar(t, 2.0)
+            settle_snapshot(t, 0.2, 2.0)
         snap = snapshot(t)
         err_path = os.path.join(INSTALL, 'dn.err')
         if os.path.isfile(err_path):
@@ -389,9 +461,9 @@ def main() -> int:
     for name, spec, ar in selected:
         work = prep_tree(WORK_ROOT)
         print('SCENARIO', name, '(%s)' % ar, flush=True)
-        so, eo = run_one(obj, work, spec)
+        so, eo = run_one(obj, work, spec, ar)
         work = prep_tree(WORK_ROOT)
-        sc, ec = run_one(cls, work, spec)
+        sc, ec = run_one(cls, work, spec, ar)
         problems = []
         if 'Fatal' in so['text'] or 'Access' in so['text']:
             problems.append('object Fatal/Access on screen')
