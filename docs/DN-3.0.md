@@ -1,79 +1,83 @@
-# DN 3.0 — ближайшая продуктовая веха
+# DN 3.0 — nearest product milestone
 
-Зафиксировано владельцем (2026-10-05). Это **рамка приоритетов** для всей текущей
-работы в `main`: что входит в 3.0, что сознательно откладывается, и какие
-исключения разрешены.
+Fixed by the owner (2026-10-05). This is the **priority frame** for all current
+work on `main`: what belongs in 3.0, what is deliberately deferred, and which
+exceptions are allowed.
 
-## Цель 3.0
+## Goal of 3.0
 
-**Мажорная версия 3.0** = стабильный перенос DOS Navigator на новый стек:
+**Major version 3.0** = a stable port of DOS Navigator onto the new stack:
 
-- DN на Free Pascal;
-- собственный TV (`tv/`, перевод magiblot/tvision);
-- объектная модель классов (завершённая class-migration с acceptance gate);
-- поддерживаемые платформы сборки/дыма, которые уже в плане (Linux, DOS и т.д.);
-- поведение, сопоставимое с последним рабочим object-baseline там, где gate это
-  требует; общие баги object+class чиним (см. Shared bugs в
+- DN on Free Pascal;
+- our own TV (`tv/`, a translation of magiblot/tvision);
+- the class object model (completed class migration with acceptance gate);
+- the build/smoke platforms already in the plan (Linux, DOS, and so on);
+- behaviour comparable to the last working object baseline where the gate
+  requires it; shared object+class bugs are fixed (see Shared bugs in
   `CLASS-MIGRATION-ACCEPTANCE-GATE.md`).
 
-3.0 — это **завершение актуализации старого кода**, а не «новый файловый менеджер».
-Пока 3.0 не закрыта, развитие продукта подчинено этой вехе.
+3.0 is **finishing the modernization of the old code**, not “a new file manager”.
+Until 3.0 is closed, product development is subordinate to this milestone.
 
-Текущая строка версии в дереве (`2.20 alpha` и т.п.) — промежуточная метка
-сборки; номер **3.0** — целевой продуктовый релиз после стабилизации переноса.
+The version string in the tree (`2.20 alpha` and similar) is an intermediate
+build label; the number **3.0** is the target product release after the port
+stabilizes.
 
-## Принцип: минимальные вмешательства
+## Principle: minimal interventions
 
-Всё, что делается ради 3.0, должно быть:
+Everything done for 3.0 must be:
 
-1. **Необходимым** для сборки, запуска, паритета с baseline, закрытия
-   class-only регрессий, CI/gate, или для явных исключений ниже.
-2. **Минимальным** по объёму: чиним причину, не переписываем подсистемы «заодно».
-3. **Отделённым** от дальнейшего развития: новые фичи, рефакторинг «для красоты»,
-   смена UX по умолчанию, крупные архитектурные перестройки — **не в потоке 3.0**,
-   а после закрытия вехи (или в явно помеченных исключениях).
+1. **Necessary** for build, run, baseline parity, closing class-only
+   regressions, CI/gate, or the explicit exceptions below.
+2. **Minimal** in scope: fix the cause; do not rewrite subsystems “while we are
+   here”.
+3. **Separated** from further development: new features, refactoring “for
+   beauty”, default UX changes, large architectural rewrites — **not in the
+   3.0 stream**, but after the milestone closes (or in explicitly marked
+   exceptions).
 
-Практическое следствие для агентов и контрибьюторов:
+Practical consequence for agents and contributors:
 
-- Сначала: краши, gate object↔class, архивы/UTF-8/платформенный дым, документирование
-  регрессий — см. `CLASS-MIGRATION.md`, `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`,
+- First: crashes, object↔class gate, archives/UTF-8/platform smoke, documenting
+  regressions — see `CLASS-MIGRATION.md`, `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`,
   `docs/ARCHIVE-MATRIX.md`.
-- После зелёного hard gate: `docs/POST-CLASS-WORK.md` (английский, читаемость,
-  разделение платформенного кода) — всё ещё про **доведение переноса**, не про
-  новый продукт.
-- Идеи «сделать лучше, чем OSP» без нужды для 3.0 → `dn/TODO-later.md` (или
-  отдельный пост-3.0 backlog), не в текущий цикл.
+- After a green hard gate: `docs/POST-CLASS-WORK.md` (English, readability,
+  platform-code separation) — still about **finishing the port**, not a new
+  product.
+- Ideas to “make it better than OSP” without need for 3.0 → `dn/TODO-later.md`
+  (or a separate post-3.0 backlog), not the current cycle.
 
-Это продолжает дух решения из `PLAN.md` («первая версия — оригинал с минимумом
-изменений»), но на уровне **продуктового релиза 3.0**: цель — стабильный новый
-стек, а не расширение функциональности.
+This continues the spirit of the decision in `PLAN.md` (“first version — the
+original with minimal changes”), but at the level of **product release 3.0**:
+the goal is a stable new stack, not expanding functionality.
 
-## Исключения (можно делать до/внутри 3.0)
+## Exceptions (allowed before/inside 3.0)
 
-Владелец явно разрешает работу над фичами, нужными **лично ему**, даже если они
-выходят за «минимальный порт»:
+The owner explicitly allows work on features needed **personally**, even when
+they go beyond a “minimal port”:
 
-| Исключение | Смысл |
+| Exception | Meaning |
 |---|---|
-| **Режим совместимости с Far по UX** | Поведение/привычки Far (по согласованным пунктам), не ломая DN-baseline там, где gate требует паритета; предпочтительно за флагом/режимом, а не тихой сменой умолчаний. |
-| **Продвинутые протоколы ввода с клавиатуры** | Kitty / win32 input mode / связанные расширения терминала в `tv/` и проводка в DN. |
-| **Продвинутый буфер обмена** | OSC 52, far2l clipboard и родственные пути в `tv/` / DN. |
+| **Far UX compatibility mode** | Far behaviour/habits (on agreed points), without breaking DN baseline where the gate requires parity; preferably behind a flag/mode, not a quiet default change. |
+| **Advanced keyboard input protocols** | Kitty / win32 input mode / related terminal extensions in `tv/` and wiring into DN. |
+| **Advanced clipboard** | OSC 52, far2l clipboard and related paths in `tv/` / DN. |
 
-Эти исключения — часть дорожной карты `tv/` и Linux UX; их не считать «лишним
-рефакторингом». Они **не** открывают дверь произвольным новым фичам DN.
+These exceptions are part of the `tv/` and Linux UX roadmap; do not treat them
+as “extra refactoring”. They do **not** open the door to arbitrary new DN
+features.
 
-Всё остальное «хочется» — после 3.0 или в TODO-later, пока владелец не расширит
-список исключений здесь же.
+Everything else that is “nice to have” — after 3.0 or in TODO-later, until the
+owner extends the exception table here.
 
-## Как читать остальные документы
+## How to read the other documents
 
-| Документ | Роль относительно 3.0 |
+| Document | Role relative to 3.0 |
 |---|---|
-| `PLAN.md` | Исторический план вех порта (TV, DOS, UTF-8, платформы). |
-| `CLASS-MIGRATION.md` + acceptance gate | Hard stop внутри 3.0: object↔class. |
-| `docs/POST-CLASS-WORK.md` | Работы сразу после gate, всё ещё в рамках стабилизации переноса. |
-| `dn/TODO-later.md` | Отложено за пределы минимального порта / 3.0. |
-| Этот файл | **Продуктовая рамка:** что такое 3.0 и что в неё не входит. |
+| `PLAN.md` | Historical port milestone plan (TV, DOS, UTF-8, platforms). |
+| `CLASS-MIGRATION.md` + acceptance gate | Hard stop inside 3.0: object↔class. |
+| `docs/POST-CLASS-WORK.md` | Work right after the gate, still within stabilizing the port. |
+| `dn/TODO-later.md` | Deferred beyond the minimal port / 3.0. |
+| This file | **Product frame:** what 3.0 is and what is outside it. |
 
-При конфликте «сделать красиво» vs «закрыть 3.0» побеждает закрытие 3.0
-(кроме таблицы исключений выше).
+On conflict between “make it nice” and “close 3.0”, closing 3.0 wins (except
+the exception table above).

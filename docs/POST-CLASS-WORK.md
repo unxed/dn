@@ -3,12 +3,11 @@
 Still inside **DN 3.0** (stabilize the port). Not a green light for arbitrary
 new product features — see [`DN-3.0.md`](DN-3.0.md).
 
-Owner order (2026-10-05). **Do not start this work while the object/class
-acceptance gate is open.** The gate is documented in
-`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`: last object-based DN vs last
-class-based DN, every scenario of every function, full cell compare
-(glyph + foreground + background + attributes/styles + cursor + process
-side effects). Any mismatch → fix, do not proceed here.
+Owner order (2026-10-05). The object/class acceptance gate **CLOSED** on
+2026-10-05 (local full matrix 174/174; see
+`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`). This file is the ordered work
+after that close. Re-open / re-run the gate if a risky batch breaks
+object↔class parity; do not skip stages below.
 
 When object and class **both** show the same bug, fix it anyway — see
 **Shared bugs** in `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md` (do not treat

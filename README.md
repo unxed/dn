@@ -43,7 +43,7 @@ How all this was done and what pitfalls were met (a guide for whoever repeats th
 What next: edit `dn/src` (the DN sources); the library `tv/` is a separate repository ([unxed/tv](https://github.com/unxed/tv), a submodule here): a change to it is made and tested *there*, then `git -C tv pull && git add tv` moves the pointer here. Run `tools/build.sh linux64` again (a few seconds); checks:
 `tools/dn-test.sh` (unit tests of DN), `python3 tools/dn-linux-ops.py out/linux64` (F5/F6/F7/F8/F4 and a command on real files in a pty), `DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/linux64` (the same plus the UTF-8 checks), `DN_UTF8=0 tools/build.sh linux64 out/old && python3 tools/dn-linux-locale.py out/old` (the code page by the locale: for the old build only),
 the TV tests: item 1 below. For i386 Linux and DOS you need cross compilers (`tools/build-fpc-i386-linux.sh`, `tools/build-fpc-go32v2.sh`), see `dn/README.md`.
-Before a PR: `tools/check-layout.sh` and the audit gate (`dn/README.md`, section "Правила работы", the working rules).
+Before a PR: `tools/check-layout.sh` and the audit gate (`dn/README.md`, section "Working rules").
 
 The separation rules (checked by `tools/check-layout.sh` in CI):
 

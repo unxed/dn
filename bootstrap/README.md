@@ -1,93 +1,93 @@
-# bootstrap/: как получено дерево `dn/src`
+# bootstrap/: how the `dn/src` tree was obtained
 
-**Это запись о том, откуда взялся первый коммит с работающим кодом DN, и способ повторить его.** После этого коммита
-`dn/src` меняется обычными коммитами и PR; `bootstrap/` в ежедневной работе не нужен и не правится (кроме случая «нашли,
-что в первый коммит попало лишнее»: см. ниже). Собрать DN можно, не запуская `bootstrap/` вообще: `tools/build.sh`.
+**This is a record of where the first commit with working DN code came from, and a way to repeat it.** After that commit
+`dn/src` changes with ordinary commits and PRs; `bootstrap/` is not needed in day-to-day work and is not edited (except when
+something extra landed in the first commit: see below). You can build DN without running `bootstrap/` at all: `tools/build.sh`.
 
-Зачем это нужно: код DN происходит только из публичных источников и без кода Borland. Этот путь можно проверить:
-любой может скачать тот же архив, выполнить `bootstrap/run.sh` и получить дерево, побайтно равное закоммиченному
-`dn/src` на момент первого коммита (коммит из `bootstrap/BASELINE`).
+Why this exists: DN code comes only from public sources and without Borland code. The path is checkable:
+anyone can download the same archive, run `bootstrap/run.sh`, and get a tree byte-identical to the committed
+`dn/src` at the first-commit moment (the commit in `bootstrap/BASELINE`).
 
-## Короткий путь
+## Short path
 
-    bootstrap/run.sh [КАТАЛОГ]            # по умолчанию build/bootstrap: результат КАТАЛОГ/src и КАТАЛОГ/data
-    diff -r build/bootstrap/src dn/src    # пусто (на базовом коммите из bootstrap/BASELINE)
+    bootstrap/run.sh [DIR]            # default build/bootstrap: result DIR/src and DIR/data
+    diff -r build/bootstrap/src dn/src    # empty (on the baseline commit from bootstrap/BASELINE)
 
-Нужны: `sh`, `python3`, `unrar` (архив `.rar`), `curl`, `patch`. Без сети: `DN_LOCAL_TREE=<распакованный архив>`.
+Needs: `sh`, `python3`, `unrar` (`.rar` archive), `curl`, `patch`. Offline: `DN_LOCAL_TREE=<unpacked archive>`.
 
-## Откуда исходники
+## Where the sources come from
 
-| Что | Значение |
+| What | Value |
 |---|---|
-| Источник | DN OSP 2.14 (Dos Navigator Open Source, RIT Research Labs и участники) |
-| Адрес | `bootstrap/upstream.env` (архив `dn2s214.rar` с `dnosp.com`, через Wayback Machine) |
-| Проверка | sha256 из `upstream.env`; `fetch.sh` скачивает и сверяет (при расхождении останавливается) |
-| Запасной | DN 1.51 (`dn151src.zip` с `download.ritlabs.com`), та же запись в `upstream.env`; в первом коммите не использован |
+| Source | DN OSP 2.14 (Dos Navigator Open Source, RIT Research Labs and contributors) |
+| Address | `bootstrap/upstream.env` (archive `dn2s214.rar` from `dnosp.com`, via Wayback Machine) |
+| Check | sha256 from `upstream.env`; `fetch.sh` downloads and verifies (stops on mismatch) |
+| Fallback | DN 1.51 (`dn151src.zip` from `download.ritlabs.com`), same entry in `upstream.env`; not used in the first commit |
 
-В репозиторий архив не кладётся. Из архива берётся только то, что перечислено ниже.
+The archive is not stored in the repository. Only what is listed below is taken from it.
 
-## Шаги (`run.sh`, по порядку)
+## Steps (`run.sh`, in order)
 
-1. **Скачать и распаковать** (`fetch.sh`, sha256). Исходники — в каталоге архива, где больше всего `.pas`.
-2. **Вырезать классы DN из файлов, которые целиком исключаются** (`carve.list`, `tools/dn-carve.py`): в `DIALOGS.PAS` и
-   других лежат рядом классы Borland TV и собственные классы DN (`TComboBox`, `TStringList`, `T_BWSelector`...). Свои классы
-   DN вырезаются в новые юниты (`DNDlgs`, `DNStrL`, `DNColor`), остальное исключается. Так же вырезаются палитры DN (`DNPalet`: таблицы цветов программы, это данные DN).
-3. **Юниты системы** (`tree.env`: `BOOT_LIB_DIR=LIB.D32`): DN OSP держит юниты, различающиеся по системам, в `LIB.D32`
-   (DOS, 32 бита), `LIB.OLF`, `LIB.WLF`. Берётся `LIB.D32`, остальные каталоги выбрасываются. `VPSYSD32.PAS` — среда
-   выполнения Virtual Pascal, не код DN: вместо неё наш `vpsyslow.pas`.
-4. **Исключения** (`exclude.list`, 55 записей, у каждой причина): (а) файлы, код которых происходит от Borland (юниты
-   Turbo Vision: их заменяет `tv/`); (б) среда Virtual Pascal; (в) 19 файлов участников DN OSP (интерфейс плагинов DN/2,
-   адаптеры OS/2 PM), которые не нужны ни одной нашей сборке (недостижимы по `uses`: `tools/dn-reach.py`) и в заголовках
-   которых нет лицензии. Список (а) строит `tools/gen-exclude.py` по отчёту аудита (`audit/`): файл исключается, если у него
-   `raw% > 10` или самая длинная цепочка совпадений с Borland не меньше 48 токенов.
-5. **Патчи** (`patches/series`): сейчас пусто — всё делается правками ниже.
-6. **Переписанные места** (`rewrite/*.rw`, `tools/dn-rewrite.py`): места внутри остающихся файлов, где аудит нашёл цепочки,
-   совпадающие с Borland (например, `TParamText` в `DNDlgs`). Заменяются нашим текстом; в git остаётся только наш текст.
-   Каждый `.rw` называет файл, границы области и sha1 заменяемого (если архив другой — стоп).
-7. **Механические правки** (`edits/`: `*.sh`, затем `*.sed`, затем `*.py`; внутри — по порядку имён; в каждой названа
-   причина): условная компиляция по `tree.env` (`tools/ifdef-strip.py`: ветки OS/2 и Win32 убираются; `LINUX` остаётся для
-   компилятора), переход на новый TV (имена, сигнатуры, палитры), различия VP и FPC (`Word` 32 бита в VP, порядок вычисления
-   аргументов, 32-битный ассемблер → Pascal), пути (`SysOsPath`), слоты параметров `FormatStr` (`PtrInt`).
-8. **Наши новые файлы** (`new/`): замены исключённых юнитов (`dnapp`, `drivers`, `memory`, `messages`, `dnstddlg`, `asciitab`,
-   `listmakr`...), слой системы (`vpsyslow`, `vputils`, `use16`), адаптеры к `tv/`. Это наш код (MIT).
-9. **Имена в нижнем регистре** (FPC на файловой системе с регистром ищет `unit.pas`), **псевдонимы юнитов** из `vpc.cfg`
+1. **Download and unpack** (`fetch.sh`, sha256). Sources are in the archive directory that has the most `.pas` files.
+2. **Carve DN classes out of files that are excluded as wholes** (`carve.list`, `tools/dn-carve.py`): `DIALOGS.PAS` and
+   others hold Borland TV classes next to DN’s own (`TComboBox`, `TStringList`, `T_BWSelector`...). DN’s own classes
+   are carved into new units (`DNDlgs`, `DNStrL`, `DNColor`); the rest is excluded. DN palettes are carved the same way (`DNPalet`: program colour tables — DN data).
+3. **System units** (`tree.env`: `BOOT_LIB_DIR=LIB.D32`): DN OSP keeps system-specific units in `LIB.D32`
+   (DOS, 32-bit), `LIB.OLF`, `LIB.WLF`. `LIB.D32` is taken; the other directories are dropped. `VPSYSD32.PAS` is the
+   Virtual Pascal runtime, not DN code: our `vpsyslow.pas` replaces it.
+4. **Exclusions** (`exclude.list`, 55 entries, each with a reason): (a) files whose code comes from Borland (Turbo Vision
+   units: replaced by `tv/`); (b) the Virtual Pascal environment; (c) 19 DN OSP contributor files (DN/2 plugin interface,
+   OS/2 PM adapters) that no build of ours needs (unreachable by `uses`: `tools/dn-reach.py`) and whose headers
+   have no license. List (a) is built by `tools/gen-exclude.py` from the audit report (`audit/`): a file is excluded if
+   `raw% > 10` or the longest Borland match chain is at least 48 tokens.
+5. **Patches** (`patches/series`): currently empty — everything is done by the edits below.
+6. **Rewritten spots** (`rewrite/*.rw`, `tools/dn-rewrite.py`): places inside remaining files where the audit found
+   chains matching Borland (for example `TParamText` in `DNDlgs`). Replaced with our text; only our text stays in git.
+   Each `.rw` names the file, region bounds, and sha1 of the replaced text (if the archive differs — stop).
+7. **Mechanical edits** (`edits/`: `*.sh`, then `*.sed`, then `*.py`; within each — name order; each states a
+   reason): conditional compilation via `tree.env` (`tools/ifdef-strip.py`: OS/2 and Win32 branches removed; `LINUX` kept for
+   the compiler), move to the new TV (names, signatures, palettes), VP vs FPC differences (`Word` is 32-bit in VP, argument
+   evaluation order, 32-bit assembler → Pascal), paths (`SysOsPath`), `FormatStr` parameter slots (`PtrInt`).
+8. **Our new files** (`new/`): replacements for excluded units (`dnapp`, `drivers`, `memory`, `messages`, `dnstddlg`, `asciitab`,
+   `listmakr`...), system layer (`vpsyslow`, `vputils`, `use16`), adapters to `tv/`. This is our code (MIT).
+9. **Lowercase names** (FPC on a case-sensitive filesystem looks for `unit.pas`), **unit aliases** from `vpc.cfg`
    (`-ALFN=LFNVP`).
-10. **Выбор файлов в репозиторий**: `*.pas`, `*.inc`, `rcpvpd.ini`, `read.me` и каталог `RESOURCE` (тексты диалогов, строк,
-    справки на трёх языках) → `dn/src`; данные DN (`EXE.D32`: таблицы кодовых страниц, палитры, настройки по умолчанию) →
-    `dn/data`. Бинарники архива (`DN.COM`, значки), скрипты сборки VP и старые копии юнитов не берутся.
+10. **What goes into the repository**: `*.pas`, `*.inc`, `rcpvpd.ini`, `read.me`, and the `RESOURCE` directory (dialog, string,
+    and help texts in three languages) → `dn/src`; DN data (`EXE.D32`: code-page tables, palettes, defaults) →
+    `dn/data`. Archive binaries (`DN.COM`, icons), VP build scripts, and old unit copies are not taken.
 
-(С 2026-10-03 каталоги `dn/` разложены по ролям: `dn/src-linux/` стал `dn/compat/linux/`, `dn/shims/` — `dn/compat/shims/`, юниты слоя VP и форматы архивов вынесены в `dn/compat/` и `dn/archives/`; bootstrap
-воспроизводит первый коммит `dn/src`, как он был, а не нынешнюю раскладку.) Добавлено после bootstrap без правки его скриптов: `dn/src-linux/country_.pas` (замена юнита для Linux: таблица
-заглавных букв CP866, умолчания), `dn/shims/` (описание того, что DN берёт из `tv/`: юниты-прокладки генерируются
+(Since 2026-10-03 the `dn/` directories are laid out by role: `dn/src-linux/` became `dn/compat/linux/`, `dn/shims/` — `dn/compat/shims/`, VP-layer units and archive formats moved to `dn/compat/` and `dn/archives/`; bootstrap
+still reproduces the first-commit `dn/src` as it was, not the current layout.) Added after bootstrap without editing its scripts: `dn/src-linux/country_.pas` (Linux unit replacement: CP866 uppercase table,
+defaults), `dn/shims/` (description of what DN takes from `tv/`: shim units generated by
 `tools/gen-shim.py`).
 
-## Ворота аудита (юридическая проверка)
+## Audit gate (legal check)
 
-Код Borland не коммитится никогда. Перед первым коммитом (и в CI для каждого PR, workflow `audit`) на `dn/src` запускается
-`audit/xclone.py`: дословные цепочки из 24 токенов сравниваются с эталоном Borland (BP 7.0, он скачивается по ссылке, проверяется
-sha256 и в репозиторий не попадает: `audit/fetch_reference.sh`). **Порог: `raw% <= 10` и `maxrun < 48` для каждого файла.**
-На базовом коммите: 176 файлов, `raw` 0,4 %, превышений нет. Что искали и нашли, в отчётах `audit/reports/`.
+Borland code is never committed. Before the first commit (and in CI on every PR, workflow `audit`) `audit/xclone.py` runs on `dn/src`:
+verbatim 24-token chains are compared to the Borland reference (BP 7.0, downloaded by URL, sha256-checked,
+not stored in the repo: `audit/fetch_reference.sh`). **Threshold: `raw% <= 10` and `maxrun < 48` for every file.**
+On the baseline commit: 176 files, `raw` 0.4 %, no exceedances. What was searched and found: reports in `audit/reports/`.
 
-## Лицензии
+## Licenses
 
-Файлы архива сохраняют заголовки RIT Labs (их нельзя убирать и менять: `dn/LICENSE.md`). Что есть что — `dn/PROVENANCE.md`
-(создаётся `bootstrap/tools/dn-manifest.py`). Наши файлы — MIT (`LICENSE`). Файлы участников DN OSP, у которых в заголовке нет
-лицензии и которые вошли в тот же публичный выпуск (класс «Contributors» и «Upstream without a notice» в манифесте),
-берутся как часть выпуска; это место, о котором стоит спросить владельца проекта (`PLAN.md`).
+Archive files keep RIT Labs headers (must not be removed or changed: `dn/LICENSE.md`). What is what — `dn/PROVENANCE.md`
+(created by `bootstrap/tools/dn-manifest.py`). Our files are MIT (`LICENSE`). DN OSP contributor files with no license
+in the header that were part of the same public release (manifest classes “Contributors” and “Upstream without a notice”)
+are taken as part of the release; that is something to ask the project owner about (`PLAN.md`).
 
-## Что делать, если в первый коммит попало лишнее
+## If something extra landed in the first commit
 
-Правится `bootstrap/` (исключение, `.rw` или правка), `bootstrap/run.sh` пересобирает дерево, изменение переносится в `dn/src`
-обычным коммитом, в `bootstrap/BASELINE` дописывается коммит, где `dn/src` снова равно выводу `run.sh`. Проверка воспроизводимости в CI: workflow `dn`,
-job `bootstrap` (`bootstrap/run.sh`, сравнение с `dn/src`).
+Edit `bootstrap/` (exclusion, `.rw`, or edit), rebuild the tree with `bootstrap/run.sh`, carry the change into `dn/src`
+with an ordinary commit, and append to `bootstrap/BASELINE` the commit where `dn/src` again matches `run.sh` output. Reproducibility check in CI: workflow `dn`,
+job `bootstrap` (`bootstrap/run.sh`, compare to `dn/src`).
 
-## Устройство каталога
+## Directory layout
 
-| Путь | Что |
+| Path | What |
 |---|---|
-| `run.sh`, `fetch.sh` | запуск, скачивание |
-| `upstream.env`, `tree.env` | адрес и sha256 архива; политика условной компиляции |
-| `exclude.list`, `carve.list` | что не берём; что вырезаем из исключённых файлов |
-| `patches/`, `rewrite/`, `edits/` | патчи, переписанные места, механические правки |
-| `new/` | наши файлы |
-| `tools/` | инструменты: вырезание, переписывание, `ifdef-strip`, достижимость, происхождение (`dn-provenance`, `dn-manifest`), описание API Virtual Pascal (`vp-api`, `api-*`) |
+| `run.sh`, `fetch.sh` | run, download |
+| `upstream.env`, `tree.env` | archive URL and sha256; conditional-compilation policy |
+| `exclude.list`, `carve.list` | what we skip; what we carve from excluded files |
+| `patches/`, `rewrite/`, `edits/` | patches, rewritten spots, mechanical edits |
+| `new/` | our files |
+| `tools/` | tools: carve, rewrite, `ifdef-strip`, reachability, provenance (`dn-provenance`, `dn-manifest`), Virtual Pascal API notes (`vp-api`, `api-*`) |
