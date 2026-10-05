@@ -7,6 +7,10 @@ class-based DN, every scenario of every function, full cell compare
 (glyph + foreground + background + attributes/styles + cursor + process
 side effects). Any mismatch → fix, do not proceed here.
 
+When object and class **both** show the same bug, fix it anyway — see
+**Shared bugs** in `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md` (do not treat
+pre-migration wrong behaviour as acceptable parity).
+
 ## 1. English
 
 Translate to English:

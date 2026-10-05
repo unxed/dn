@@ -27,6 +27,9 @@ procedure Utf8UpStr(var S: String);
 procedure Utf8LowStr(var S: String);
   {` The case of a UTF-8 string, character by character (a byte that is not UTF-8 stays as it is). `}
 
+procedure Utf8CapFirst(var S: String);
+  {` The first character of S in upper case (UTF-8); the rest is unchanged. `}
+
 procedure CpBytesToUtf8(var S: String; From: Integer);
   {` The bytes $80 and up of S from the position From on are the bytes of the current code page: they become UTF-8 (one character each, so the
   columns do not change). Used for a text that DN has put through a code table; does nothing without -dDNUTF8. `}
@@ -236,6 +239,32 @@ procedure Utf8UpStr(var S: String);
 procedure Utf8LowStr(var S: String);
   begin
   Utf8Case(S, False);
+  end;
+
+procedure Utf8CapFirst(var S: String);
+  var
+    Cp, Cp2: LongWord;
+    Used, N, I: Integer;
+    Buf: array[0..7] of Byte;
+    Tail: String;
+  begin
+  if Length(S) = 0 then
+    Exit;
+  if Byte(S[1]) < $80 then
+    begin
+    S[1] := Chr(CpUpper(Byte(S[1])));
+    Exit;
+    end;
+  if Utf8Decode(@S[1], Length(S), Cp, Used) then
+    begin
+    Cp2 := CpUpper(Cp);
+    N := Utf8Encode(Cp2, @Buf[0]);
+    Tail := Copy(S, Used + 1, MaxInt);
+    S := '';
+    for I := 0 to N - 1 do
+      S := S + Chr(Buf[I]);
+    S := S + Tail;
+    end;
   end;
 
 procedure CpBytesToUtf8(var S: String; From: Integer);

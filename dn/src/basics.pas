@@ -651,9 +651,27 @@ function FormatLongName(Name: String; Size, ExtSize: Byte;
 {$IFDEF DNUTF8}
   var
     Tab: String;
+    P, N, E: String;
+    Opt: Word;
   begin
+  { Case on the real UTF-8 name: FormatLongNameB would call UpStr/LowStr on the proxy and break it. }
+  Opt := Options;
+  if (Opt and flnUpCase) <> 0 then
+    Utf8UpStr(Name)
+  else if (Opt and (flnLowCase or flnCapitalCase)) <> 0 then
+    Utf8LowStr(Name);
+  if (Opt and flnCapitalCase) <> 0 then
+    begin
+    lFSplit(Name, P, N, E);
+    if Length(N) > 0 then
+      begin
+      Utf8CapFirst(N);
+      Name := P + N + E;
+      end;
+    end;
+  Opt := Opt and not (flnUpCase or flnLowCase or flnCapitalCase);
   Name := Utf8ToProxy(Name, Tab);
-  Result := ProxyToUtf8(FormatLongNameB(Name, Size, ExtSize, Options, FormatMode), Tab);
+  Result := ProxyToUtf8(FormatLongNameB(Name, Size, ExtSize, Opt, FormatMode), Tab);
   end;
 {$ELSE}
   begin
