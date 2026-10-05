@@ -87,7 +87,8 @@ It supplements the full workflows and does not waive either final tree gate.
   copy, so the post-draw `WriteScreenCells` must not run (UTF-8 panel names
   would otherwise show as `?????` until Ctrl-R).
 - Regression: `tools/dn-linux-startup.py` (shared `dist/linux64/dn.ini`,
-  panels before any key, then F10+Right). The `dn-linux-ops.py`
+  panels before any key, then F10+Right); `tools/dn-linux-about.py` (no
+  `dn.ini`, Esc and Enter clear About without residue). The `dn-linux-ops.py`
   autosave-desktop `dsk_cwd` check also fails without the fix.
 - Open: full cell comparison object/class (colours, several symbols) is not
   closed; the 100-run acceptance is not done. Autosave-desktop second-start
