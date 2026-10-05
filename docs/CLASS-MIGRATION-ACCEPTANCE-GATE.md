@@ -170,7 +170,7 @@ Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
 | Observation | Class vs object / `dist` | Notes |
 |---|---|---|
 | Nested top-menu submenu opens overlapping the parent box (not to the right) | **Same on `dist` and class** (shared `menus.pas` placement: below item, same X) | **Not a class regression.** Recorded as UX/acceptance geometry; change only with deliberate tests |
-| Default **Yes** button looks red/magenta | Class uses `CColorOsp`; object baseline used classic `CColor` (cyan default) | User wants classic DN colors; palette switch is an acceptance decision and will move many cells |
+| Default **Yes** button looks red/magenta | Was class `CColorOsp` vs object `CColor` | **Switched class to classic `CColor`** (owner 2026-10-05) for acceptance parity |
 
 ## Required comparison
 
@@ -190,7 +190,11 @@ and `dn.err` or exception output.
 | Nested menus | Every submenu, enabled/disabled state, geometry, cancellation | pending | pending | pending |
 | Panels | Switch, drive, directory, manager-new, select, sort, filter, view mode | pending | pending | pending |
 | File operations | View, edit, copy, move, rename, delete, attributes, cancel/error paths | pending | pending | pending |
-| Archives | Enter/leave, list, nested (`.tar.gz`…), F3/F4/F5, error paths; ZIP charset (`docs/ZIP-CHARSET.md`); matrix (`docs/ARCHIVE-MATRIX.md`) | pending | zip/7z Enter pass; nested/ops **open** | pending |
+| Archives | Enter/leave, list, nested (`.tar.gz`…), F3/F4/F5, error paths; ZIP charset (`docs/ZIP-CHARSET.md`); matrix (`docs/ARCHIVE-MATRIX.md`) | pending | zip/7z/tgz/tar.bz2 Enter pass; harness `tools/dn-linux-accept.py` | pending |
+
+Harness: `tools/dn-linux-accept.py OBJECT_OUT CLASS_OUT` — shared work tree, full
+`Screen.cells` + cursor compare (menu-bar clock masked), core scenarios + every
+top-menu cell (`menu_M_N`). Object baseline rebuild: DN `b4916b8` + TV `521d064`.
 | Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
 | Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
 | Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |

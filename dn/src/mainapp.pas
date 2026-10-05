@@ -737,7 +737,9 @@ initialization
     newer palette is intentionally retained in palettes.pas, but changing
     it here would make the class build differ from the working object build
     in every screen cell's foreground/background attributes. }
-  SystemColors[apColor] := palettes.CColorOsp;
+  { Classic DN palette for acceptance (owner 2026-10-05): cyan default Yes,
+    not OSP jaroslaw red/magenta CColorOsp. }
+  SystemColors[apColor] := palettes.CColor;
   SystemColors[apBlackWhite] := palettes.CBlackWhite;
   SystemColors[apMonochrome] := palettes.CMonochrome;
   CColor := SystemColors[apColor];
