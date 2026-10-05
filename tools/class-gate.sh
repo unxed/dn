@@ -1,10 +1,6 @@
 #!/bin/sh
-# The class migration gate: the legacy type spelling must be absent from the tracked tree.
+# The class migration gate: the old Pascal `object` dialect must be absent from the tracked Pascal sources.
+# What exactly is checked, and the settings (CLASS_GATE_EXCLUDE, CLASS_GATE_STRICT): tools/class-gate.py
 set -eu
 here=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
-
-if git -C "$here" grep -I -n -i 'obj[e]ct' -- .; then
-    echo "CLASS GATE FAIL: legacy type spelling is still present" >&2
-    exit 1
-fi
-echo "dn class gate: PASS"
+exec python3 "$here/tools/class-gate.py" "$here"
