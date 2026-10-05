@@ -69,13 +69,13 @@ type
 
   TRegLabel = class(TLabel)
     Value: Word;
-    procedure Draw; virtual;
+    procedure Draw; override;
     end;
 
   TColorView = class(TView)
     Color2Display: Byte;
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
   TColorVGADialog = class(TDialog)
@@ -87,7 +87,7 @@ type
     Color: TRegLabel;
 
     constructor Create;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
 procedure TColorView.HandleEvent(var Event: TEvent);

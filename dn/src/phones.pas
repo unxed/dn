@@ -62,8 +62,8 @@ type
     constructor Load(var S: TStream);
     constructor ShortLoad(var S: TStream);
     procedure ShortStore(var S: TStream);
-    function Compare(P1, P2: Pointer): Integer; virtual;
-    procedure FreeItem(Item: Pointer); virtual;
+    function Compare(P1, P2: Pointer): Integer; override;
+    procedure FreeItem(Item: Pointer); override;
     end;
 
   TPhoneDir = class(TObject)
@@ -76,7 +76,7 @@ type
     constructor Create(const APassword, AName, AMemo1, AMemo2: String);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
   TPhone = class(TObject)
@@ -87,7 +87,7 @@ type
     constructor Create(const ANumber, AName, AMemo1, AMemo2: String);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
 
@@ -97,8 +97,8 @@ type
     Phones: TCollection;
     Active: TPhoneDir;
     Info: TDStringView;
-    destructor Done; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    destructor Destroy; override;
+    procedure HandleEvent(var Event: TEvent); override;
     function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
     function GetKey(const S: String): Pointer; virtual;
     procedure SetList(Alpha: Boolean);
@@ -1047,7 +1047,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
 
   end { TPhoneBox.HandleEvent };
 
-destructor TPhoneBox.Done;
+destructor TPhoneBox.Destroy;
   begin
   { if (List <> nil) and (List <> Phones) }
   {                  then List.DeleteAll;}
@@ -1194,7 +1194,7 @@ procedure TPhone.Store(var S: TStream);
   S.WriteStr(Memo2);
   end;
 
-destructor TPhone.Done;
+destructor TPhone.Destroy;
   begin
   DisposeStr(Number);
   DisposeStr(Memo1);
@@ -1278,7 +1278,7 @@ procedure TPhoneDir.Store(var S: TStream);
     CryptCol(Phones, Password);
   end;
 
-destructor TPhoneDir.Done;
+destructor TPhoneDir.Destroy;
   begin
   DisposeStr(Memo1);
   DisposeStr(Memo2);

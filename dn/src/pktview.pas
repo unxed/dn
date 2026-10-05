@@ -74,13 +74,13 @@ type
     procedure GetMsgInfo(var FromUser, ToUser, Subj, Date: String);
     {!}
     procedure GetMsgTxt(var Buffer: PCharArray; var MsgLen: SmallWord);
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
   TPktCol = class(TCollection)
     FName: PString;
     constructor Create(PktFile: String);
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
   TPktList = class(TListBox)
@@ -90,7 +90,7 @@ type
   TPktListDialog = class(TDialog)
     lb: TPktList;
     constructor Create(FName: String; C: TPktCol);
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure HandleEvent(var Event: TEvent); override;
     function GetPalette: TPalette; override;
     end;
@@ -100,7 +100,7 @@ type
     isValid: Boolean;
     constructor Create(var Bounds: TRect;
          AHScrollBar, AVScrollBar: TScrollBar; Buffer: PCharArray);
-    destructor Done; virtual;
+    destructor Destroy; override;
     procedure Draw; virtual;
     procedure InitCol(Buffer: PCharArray);
     procedure SetState(AState: LongInt; Enable: Boolean); virtual;
@@ -111,7 +111,7 @@ type
     FromUser, ToUser, Date, Subj: PString;
     constructor Create(var Bounds: TRect;
          AHScrollBar, AVScrollBar: TScrollBar; FName: String);
-    destructor Done; virtual;
+    destructor Destroy; override;
     end;
 
   TPktMsgViewer = class(TDialog)
@@ -120,7 +120,7 @@ type
     constructor Create(Buf: PCharArray; S1, S2, S3, S4: String;
          MsgN: Word; AllMsg: Word;
         FA, TA: TNetAddr);
-    destructor Done; virtual;
+    destructor Destroy; override;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure SaveAsText;
@@ -131,7 +131,7 @@ type
     CurMsg: PString;
     FV: TMsgViewer;
     constructor Create(FName: String);
-    destructor Done; virtual;
+    destructor Destroy; override;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure GotoMsg;
@@ -490,7 +490,7 @@ procedure TPktObj.GetMsgInfo(var FromUser, ToUser, Subj, Date: String);
   Date := DT^;
   end;
 
-destructor TPktObj.Done;
+destructor TPktObj.Destroy;
   begin
   DisposeStr(Tu);
   DisposeStr(Fu);
@@ -502,7 +502,7 @@ destructor TPktObj.Done;
     KillAfterUse := False;
     TempFile := '';
     end;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TPktObj.GetMsgTxt(var Buffer: PCharArray; var MsgLen: Word);
@@ -545,10 +545,10 @@ procedure TPktObj.GetMsgTxt(var Buffer: PCharArray; var MsgLen: Word);
   F.Done;
   end { TPktObj.GetMsgTxt };
 
-destructor TPktCol.Done;
+destructor TPktCol.Destroy;
   begin
   DisposeStr(FName);
-  inherited Done;
+  inherited Destroy;
   end;
 
 var
@@ -647,10 +647,10 @@ function TPktList.GetText(Item: LongInt; MaxLen: LongInt): String;
   GetText := s1+s2+s3;
   end;
 
-destructor TPktListDialog.Done;
+destructor TPktListDialog.Destroy;
   begin
   lb.Free;
-  inherited Done;
+  inherited Destroy;
   end;
 
 const
@@ -784,7 +784,7 @@ constructor TLineViewer.Create(var Bounds: TRect; AHScrollBar,
   TLineViewer.InitCol(Buffer);
   end;
 
-destructor TLineViewer.Done;
+destructor TLineViewer.Destroy;
   begin
   FileLines.Free;
   inherited Destroy;
@@ -879,7 +879,7 @@ constructor TMsgViewer.Create(var Bounds: TRect; AHScrollBar,
   Limit.Y := FileLines^.Count;
   end;
 
-destructor TMsgViewer.Done;
+destructor TMsgViewer.Destroy;
   begin
   DisposeStr(FromUser);
   DisposeStr(ToUser);
@@ -891,7 +891,7 @@ destructor TMsgViewer.Done;
     KillAfterUse := False;
     TempFile := '';
     end;
-  inherited Done;
+  inherited Destroy;
   end;
 
 constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
@@ -949,14 +949,14 @@ function TPktMsgViewer.GetPalette: TPalette;
   GetPalette := MakePalette(Pal);
   end;
 
-destructor TPktMsgViewer.Done;
+destructor TPktMsgViewer.Destroy;
   begin
   DisposeStr(PS1);
   DisposeStr(Ps2);
   DisposeStr(Ps3);
   DisposeStr(Ps4);
   FV.Free;
-  inherited Done;
+  inherited Destroy;
   end;
 
 procedure TPktMsgViewer.SaveAsText;
@@ -1343,7 +1343,7 @@ procedure TMsgViewerDlg.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   end { TMsgViewerDlg.HandleEvent };
 
-destructor TMsgViewerDlg.Done;
+destructor TMsgViewerDlg.Destroy;
   begin
   FV.Free;
   Lb1.Free;
@@ -1351,7 +1351,7 @@ destructor TMsgViewerDlg.Done;
   Lb3.Free;
   Lb4.Free;
   DisposeStr(CurMsg);
-  inherited Done;
+  inherited Destroy;
   end;
 
 function TestDiap(Value, Min, Max: Word): Boolean;
