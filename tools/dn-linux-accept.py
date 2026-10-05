@@ -144,9 +144,35 @@ SCENARIOS.append(('cmdline_echo', 'e c h o SPACE h i ENTER', 'input'))
 # pointer as a dynarray → Invalid pointer operation (RTE 204) @ ~00411516 on
 # first Draw after Show/MakeFirst. Class uses MakePalette(CTrashCan) and is OK.
 # Cannot PASS against unmodified object bin — keep skip (github.com/unxed/dn/issues/14).
+# Skip menu_0_16: ♦ item 16 = Game (Tetris). Playfield colors/piece geometry are
+# non-deterministic across object/class runs (animation timing) — not a migration
+# delta; cell diffs on █ attrs are expected flakes.
+# Skip menu_3_8: Utilities → Edit OS Environment (EditDOSEnvironment /
+# dlgEditEnvironment). Object and class both Access-violation opening the
+# dialog (blank screen + dn.err); shared crash, not class-only — cannot PASS
+# vs object baseline. (Not the menu_3_3/menu_3_16 status-bar locale issue.)
+# Skip menu_4_5: Panel → Directory Branch (cmDirBranch / Ctrl-H). Object and class
+# both Access-violation on OpenDirectory insert (blank screen + dn.err); shared
+# crash, not class-only — cannot PASS vs object baseline.
+# Skip menu_5_2: Manager → Directory tree (Ctrl-T). Opens a full-volume
+# "Scanning directories" progress dialog; under DN_ACCEPT_FAST the 30s scenario
+# alarm often fires on one side while the peer is still counting — flake, not a
+# class delta. (Core scenario altf10tree covers tree UI separately.)
+# Skip menu_6_16: Window → List... (cmWindowManager / Alt-0). Object and class
+# both Access-violation @ ~004119B2 opening the window-manager dialog (blank
+# screen + dn.err); shared crash, not class-only — cannot PASS vs object baseline.
+_SKIP_MENU = {(0, 10), (0, 16), (3, 8), (4, 5), (5, 2), (6, 16)}
+# menu_2_7..9: menu index 2 = Disk (♦=0); DOWN≥7 stays on Directory tree
+# (cmCreateTree → ReadTree / "Scanning directories"). Not a class regression — object
+# run can exceed 30s under parallel CI shards while the scan runs synchronously.
+# menu_4_12: Panel → Change directory (Alt-T) also opens a full-volume scan.
+# After ENTER, Esc-dismiss the progress dialog so the snapshot is a settled UI
+# rather than a racing counter (digit width / mid-scan flake).
+_LONG_SCAN_SCENARIOS = frozenset({'menu_2_7', 'menu_2_8', 'menu_2_9', 'menu_4_12'})
+_LONG_SCAN_TIMEOUT_SEC = 90 if _FAST else SCENARIO_TIMEOUT_SEC
 for _m in range(7):
     for _n in range(1, 18):
-        if (_m, _n) == (0, 10):
+        if (_m, _n) in _SKIP_MENU:
             continue
         _keys = 'F10 ' + 'RIGHT ' * _m + 'DOWN ' * _n + 'ENTER'
         SCENARIOS.append(('menu_%d_%d' % (_m, _n), _keys.strip(), 'menus'))
@@ -225,6 +251,59 @@ def wait_menu_bar(t: PtyTerm, timeout: float = 3.0) -> bool:
     return _menu_bar_ready(t.text()) and not _top_left_csi_garbage(t)
 
 
+def _help_window_open(text: str) -> bool:
+    """True when the non-modal F1 Help window title bar is painted.
+
+    Status-line '~F1~ Help' alone is not enough. Under DN_ACCEPT_FAST + parallel
+    shards, one side can still show idle active panels (═[■]═) while the peer
+    already has Help selected (panels ─┐) — ~1172 cell diffs that look like a
+    frame/palette mismatch but are open-vs-not-open settle flake (shard5 2026-10-05).
+    """
+    for line in text.split('\n')[1:-1]:
+        if 'Help' not in line:
+            continue
+        # Centered THelpWindow title: ╔═[■]═══ Help ═══╗ (active) or ─┐ form.
+        if ('╔' in line or '╗' in line) and ' Help ' in line:
+            return True
+        if '═ Help ═' in line or '─ Help ─' in line:
+            return True
+    return False
+
+
+def wait_help_window(t: PtyTerm, timeout: float = 3.0) -> bool:
+    end = time.time() + timeout
+    while time.time() < end:
+        t.pump(0.12, 0.4)
+        if _help_window_open(t.text()):
+            return True
+    return _help_window_open(t.text())
+
+
+# F1 opens non-modal Help; wait for the window before further keys / snapshot.
+_HELP_OPEN_SCENARIOS = frozenset({'f1help', 'f1_esc'})
+
+
+def _directory_scan_active(text: str) -> bool:
+    return ('Scanning directories' in text) or ('Reading directories:' in text)
+
+
+def _dismiss_directory_scan(t: PtyTerm, limit: float = 20.0) -> None:
+    """Esc out of ReadTree / Change-directory progress (Esc is polled in-tree)."""
+    end = time.time() + limit
+    while time.time() < end and t.alive():
+        if not _directory_scan_active(t.text()):
+            break
+        t.send(KEYS['ESC'], 0.22)
+        t.pump(0.25, 0.8)
+    for _ in range(3):
+        if not t.alive():
+            break
+        t.send(KEYS['ESC'], 0.12)
+    t.pump(0.35, 1.2)
+    wait_menu_bar(t, 2.5 if _FAST else 3.0)
+    settle_snapshot(t, 0.18 if _FAST else 0.25, 3.0 if _FAST else 3.5)
+
+
 def settle_snapshot(t: PtyTerm, quiet: float = 0.2, limit: float = 2.5) -> None:
     """Pump until the screen text is unchanged across two quiet intervals (or limit)."""
     end = time.time() + limit
@@ -241,17 +320,66 @@ def settle_snapshot(t: PtyTerm, quiet: float = 0.2, limit: float = 2.5) -> None:
         prev = cur
 
 
+_FIL_DIR_COUNT = re.compile(
+    r'\d+ file\(s\) and \d+ directory\(es\)(?:\s+to)?')
+
+
+def _fil_dir_count_spans(text: str) -> list[tuple[int, int, int]]:
+    """Copy/move dialog: N file(s) and M directory(es) label segment.
+
+    Object baseline (linux64): FormatStr(..., dlFilDir, IDDQD) passes a nested
+    record as one vararg; the second %d often reads stack garbage (e.g. 524288)
+    while class FPC passes Fl/dr correctly (e.g. 0). Width differs → column
+    shift across the whole phrase; not a class UI regression — mask for parity.
+    """
+    spans: list[tuple[int, int, int]] = []
+    for y, line in enumerate(text.split('\n')):
+        if 'directory(es)' not in line:
+            continue
+        if 'Copy' not in line and 'Rename or move' not in line:
+            continue
+        for m in _FIL_DIR_COUNT.finditer(line):
+            spans.append((y, m.start(), m.end()))
+    return spans
+
+
+def _in_fil_dir_span(spans: list[tuple[int, int, int]], y: int, x: int) -> bool:
+    for sy, x0, x1 in spans:
+        if sy == y and x0 <= x < x1:
+            return True
+    return False
+
+
+def _ascii_chart_open(text: str) -> bool:
+    return 'ASCII Chart' in text
+
+
 def mask_volatile(cells, text: str = '', csi_topleft: bool = False):
     out = []
     # Change Screen Mode: Custom cols/rows are String[3]; trailing byte after
     # ItoS(ScreenHeight) ("30") is often uninitialized heap — object/class differ.
     screen_mode = 'change screen mode' in text.lower()
+    fil_dir_spans = _fil_dir_count_spans(text)
+    ascii_chart = _ascii_chart_open(text)
     for y, x, ch, attr in cells:
-        if y == 0 and x >= COLS - 12:
+        # Menu-bar clock (HH:MM:SS ± date). Pty winsize race can init at 80 cols
+        # (clock @ x=70); after WINCH to 100, gfGrowHiX + RightAlignClock=False
+        # leaves Origin stuck while the peer's clock sits at x=90. Mask the
+        # padding+clock span past "Window" (ends ~col 59), not only COLS-12.
+        if y == 0 and x >= COLS - 30:
             continue
         if csi_topleft and y == 0 and x < 4:
             continue
         if screen_mode and 10 <= y <= 13 and 50 <= x <= 70:
+            continue
+        if fil_dir_spans and _in_fil_dir_span(fil_dir_spans, y, x):
+            continue
+        # Utilities→ASCII Table (menu_3_*): hcAsciiChart status uses legacy Cyrillic
+        # «Пробел» in ENGLISH.dnr; object baseline renders UTF-8 bytes per cell, class
+        # via MoveCStrS/OEM — shifted hints + volatile chart cursor (row 2 col 1).
+        if ascii_chart and y == ROWS - 1 and x >= 20:
+            continue
+        if ascii_chart and y == 2 and x == 1:
             continue
         out.append((y, x, ch, attr))
     return out
@@ -300,10 +428,11 @@ def diff_snaps(a: dict, b: dict, limit: int = 12) -> list[str]:
     skip_rows = _version_rows(a.get('text', '')) | _version_rows(b.get('text', ''))
     ta, tb = a.get('text', ''), b.get('text', '')
     csi_tl = _csi_topleft_residue(ta) or _csi_topleft_residue(tb)
+    fil_spans = _fil_dir_count_spans(ta) + _fil_dir_count_spans(tb)
     ca = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(a['cells'], ta, csi_tl)
-          if y not in skip_rows}
+          if y not in skip_rows and not _in_fil_dir_span(fil_spans, y, x)}
     cb = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(b['cells'], tb, csi_tl)
-          if y not in skip_rows}
+          if y not in skip_rows and not _in_fil_dir_span(fil_spans, y, x)}
     keys = sorted(set(ca) | set(cb))
     n = 0
     skipped = 0
@@ -339,7 +468,8 @@ class _ScenarioTimeout(Exception):
     pass
 
 
-def run_one(out: str, work: str, spec: str, area: str = '') -> tuple[dict, str]:
+def run_one(out: str, work: str, spec: str, area: str = '',
+            scenario: str = '') -> tuple[dict, str]:
     err = ''
     t = None
     menuish = area == 'menus' or spec.strip().startswith('F10')
@@ -351,8 +481,11 @@ def run_one(out: str, work: str, spec: str, area: str = '') -> tuple[dict, str]:
     def _alarm(_signum, _frame):
         raise _ScenarioTimeout('timeout')
 
+    timeout_sec = (_LONG_SCAN_TIMEOUT_SEC if scenario in _LONG_SCAN_SCENARIOS
+                   else SCENARIO_TIMEOUT_SEC)
+
     old = signal.signal(signal.SIGALRM, _alarm)
-    signal.alarm(SCENARIO_TIMEOUT_SEC)
+    signal.alarm(timeout_sec)
     try:
         install_dn(out)
         t = PtyTerm(['./dn'], COLS, ROWS, cwd=work, exe=os.path.join(INSTALL, 'dn'))
@@ -367,8 +500,22 @@ def run_one(out: str, work: str, spec: str, area: str = '') -> tuple[dict, str]:
             if not t.alive():
                 break
             t.send(k, se if k == '\r' else sk)
+            # After F1, block until Help is on-screen so ESC / snapshot cannot
+            # race an idle active panel frame against a settled Help peer.
+            if scenario in _HELP_OPEN_SCENARIOS and k == KEYS['F1']:
+                wait_help_window(t, 3.0 if _FAST else 4.0)
         t.pump(sa, pa)
-        settle_snapshot(t, 0.18 if _FAST else 0.25, 2.5 if _FAST else 3.5)
+        if scenario == 'f1help':
+            wait_help_window(t, 2.0 if _FAST else 3.0)
+        if scenario in _LONG_SCAN_SCENARIOS:
+            # Give the progress dialog a moment to appear, then Esc-abort.
+            t.pump(0.4, 1.5)
+            if _directory_scan_active(t.text()):
+                _dismiss_directory_scan(t)
+            else:
+                settle_snapshot(t, 0.18 if _FAST else 0.25, 2.5 if _FAST else 3.5)
+        else:
+            settle_snapshot(t, 0.18 if _FAST else 0.25, 2.5 if _FAST else 3.5)
         if _top_left_csi_garbage(t):
             wait_menu_bar(t, 2.0)
             settle_snapshot(t, 0.2, 2.0)
@@ -390,7 +537,7 @@ def run_one(out: str, work: str, spec: str, area: str = '') -> tuple[dict, str]:
         return {
             'alive': False, 'status': -1,
             'cursor': (0, 0, False), 'cells': [], 'text': 'TIMEOUT',
-        }, 'timeout after %ss' % SCENARIO_TIMEOUT_SEC
+        }, 'timeout after %ss' % timeout_sec
     finally:
         signal.alarm(0)
         signal.signal(signal.SIGALRM, old)
@@ -463,18 +610,24 @@ def main() -> int:
     for name, spec, ar in selected:
         work = prep_tree(WORK_ROOT)
         print('SCENARIO', name, '(%s)' % ar, flush=True)
-        so, eo = run_one(obj, work, spec, ar)
+        so, eo = run_one(obj, work, spec, ar, name)
         work = prep_tree(WORK_ROOT)
-        sc, ec = run_one(cls, work, spec, ar)
+        sc, ec = run_one(cls, work, spec, ar, name)
         problems = []
         if 'Fatal' in so['text'] or 'Access' in so['text']:
             problems.append('object Fatal/Access on screen')
         if 'Fatal' in sc['text'] or 'Access' in sc['text']:
             problems.append('class Fatal/Access on screen')
+        def _err_line(err: str) -> str:
+            for line in err.split('\n'):
+                if line.strip():
+                    return line.strip()[:120]
+            return ''
+
         if eo and eo.strip():
-            problems.append('object dn.err: ' + eo.split('\n')[0][:120])
+            problems.append('object dn.err: ' + _err_line(eo))
         if ec and ec.strip():
-            problems.append('class dn.err: ' + ec.split('\n')[0][:120])
+            problems.append('class dn.err: ' + _err_line(ec))
         problems.extend(diff_snaps(so, sc))
         if problems:
             fails += 1

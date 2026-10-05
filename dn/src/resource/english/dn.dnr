@@ -1638,7 +1638,7 @@ STATUSLINE
   StatusDef hcAsciiChart, hcAsciiChart,
      StatusItem '~F1~ Help', kbF1, cmHelp,
      StatusItem '~Esc~ Close', kbEsc, cmClose,
-     StatusItem '~Пробел~ Insert', kbSpace, cmYes,
+     StatusItem '~Space~ Insert', kbSpace, cmYes,
      StatusItem '~Enter~ Insert and close', kbEnter, cmOK,
      StatusItem '+~Enter~ Insert', kbCtrlEnter, cmYes,
 

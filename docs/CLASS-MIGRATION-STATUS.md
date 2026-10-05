@@ -15,6 +15,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Accept harness | Hardened `ad9c4f7` (menu FAST settle flakes); `dn-accept` green on that SHA historically |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
 | Known object crash | ♦ Trashcan (`cmHideShowTools` / `menu_0_10`): object `TTrashCan.GetPalette`=`@CTrashCan` vs dynarray `TPalette` → RTE 204; class `MakePalette` OK — skip kept ([#14](https://github.com/unxed/dn/issues/14)) |
+| Accept skips (harness) | Also skip `menu_0_16` (♦ Game/Tetris — animation flake), `menu_4_5` (Panel → Directory Branch — AV on **both** object and class), `menu_5_2` (Manager → Directory tree — full-volume scan times out under `DN_ACCEPT_FAST`) |
 | Classic palette | Class on `CColor` (`b57025b`) |
 | Startup / About | [#6](https://github.com/unxed/dn/issues/6) fixed (`7572d73`); regressions `tools/dn-linux-startup.py` / `dn-linux-about.py` |
 | Archives xz / F5 | Local ALL OK (`5f02362`) |
@@ -92,6 +93,7 @@ object/class parity remains an open gate item, not this symptom.
 | Enter non-exec (`cmExecFile`) AV | Fixed: `System.PString` (^AnsiString) hid `Defines.PString` after `uses SysUtils`; bind + `PShortString` in `DoExecFile`. | Fixed on class self-build |
 | Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | **Partial:** `.tgz`/`.tar.gz` Enter+list OK (`fmttgz`); fixtures + `dn-linux-archives.py` Enter/leave green. `.tar.xz`/`.txz` + F5 extract smoke ALL OK locally (`5f02362`). Open: remaining F3/F4/F5 peers, full compound matrix — `docs/ARCHIVE-MATRIX.md` / PLAN 4c. Prefer local re-runs; CI optional |
 | Accept harness settle flakes | Menu scenarios could flake on FAST settle timing under load | Hardened (`ad9c4f7`); `dn-accept` green on that SHA historically. Re-run full matrix **locally** to close the gate |
+| F1 Help accept flake | Parallel FAST: object still idle active panels (`═[■]`) vs class Help open (panels `─┐`) — ~1172 cells, looks like frame/palette | Harness waits for Help title after F1 (`f1help`/`f1_esc`); class `THelpWindow`/`CHelpWindow` unchanged |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. The configured blank-panel mismatch (10/10 before
