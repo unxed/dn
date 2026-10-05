@@ -1,16 +1,24 @@
 # Class migration
 
-Work stays in `classes/tv-classes` in tv3 and `classes/tv3-dependency` in DN.
-DN is integrated through one PR after the migration passes its final checks.
-Every commit is pushed immediately to its corresponding GitHub branch.
+Both repositories are worked on directly in `main`. Every commit is pushed to
+GitHub immediately after it is created.
 
 ## Required gates
 
-- Before changing DN, run `tv/tools/class-gate.sh` against its pinned tv3 checkout.
-  It must report no case-insensitive matches for `obj[e]ct` in the whole working
-  tree, including ignored files and binary build caches. Git metadata is excluded.
-- DN must satisfy the same whole-tree condition before merging. Scanning tracked
-  text alone is insufficient. Compiler output belongs outside the scanned source tree.
+- The class-migrated TV3 tree has a case-insensitive whole-tree scan for
+  `obj[e]ct`, including ignored files and binary build caches; Git metadata is
+  excluded. Keep compiler output outside the scanned tree.
+- Before DN class-migration acceptance, search the complete tree case-insensitively
+  for `object`, including ignored files and generated/binary files, and inspect
+  every match. No Pascal `object`-dialect construction may remain anywhere.
+- Audit the complete DN tree case-insensitively for the substring `object` and
+  inspect every match. No Pascal `object`-dialect construction may remain in
+  any file. Hard textual sub-gate: zero `object` substring matches in Pascal
+  source files (`.pas`, `.pp`, `.inc`, and other Pascal compilation units),
+  including comments and string literals; remove incidental mentions there
+  too. Review non-Pascal matches and classify them as documentation, test
+  fixtures, generated output, or genuine migration residue. Keep compiler
+  products/caches outside the tree when they would otherwise create hits.
 - Classes use their semantic `T...` names, direct member access, `Create`, `Destroy`
   and `Free` or `FreeAndNil`. An alias carrying an old pointer/type name is not a
   completed migration. Actual pointers to records and scalar data remain pointers.
@@ -36,7 +44,7 @@ Every commit is pushed immediately to its corresponding GitHub branch.
    transformations, improve the conversion tool, and remove redundant checks.
 6. GitHub Actions results are authoritative only for their exact commit and a
    terminal successful run. Required full builds and runtime checks must pass
-   before either migration branch is merged.
+   before the migration is accepted as complete.
 
 ## Remaining implementation work
 
@@ -44,8 +52,13 @@ Every commit is pushed immediately to its corresponding GitHub branch.
 - Complete construction, destruction, direct member access and overrides in DN.
 - Replace resource retyping with subclass construction by the resource loader.
 - Bring the complete DN tree through its spelling gate, including build output.
-- Verify native and DOS tv3 checks, then the supported DN builds and runtime tests.
-- Merge tv3, update the reviewed DN dependency pin, and merge the single DN PR.
+- Complete the case-insensitive whole-tree `object` audit; remove all
+  Pascal-source matches and verify that no legacy Pascal object-dialect
+  constructs remain elsewhere in the tree.
+- Verify native and DOS tv3 checks, then the supported DN builds, full
+  object/class parity and runtime tests.
+- Publish only to `main`; the previous branch/PR integration step has already
+  been completed and is not part of the remaining work.
 
 The `class-migration` workflow checks the current focused regression tests.
 It supplements the full workflows and does not waive either final tree gate.

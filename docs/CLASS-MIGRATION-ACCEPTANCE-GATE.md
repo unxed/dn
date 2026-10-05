@@ -55,9 +55,10 @@ by distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4` from source
 headers before menu input. This was only a diagnostic trial: the binaries used
 their own saved `dn.ini` files, so it is not a controlled causal comparison.
 Because this `dist` predates the class migration, do not use it as the
-comparator for this defect; test only the latest class build with its
-configured-run settings. A prior 100-start attempt sampled before UI readiness
-and is invalid; a valid class-build-only 100-start series remains pending.
+comparator. Compare the latest object-based baseline with the latest class
+build using the same configured-run settings. A prior 100-start attempt
+sampled before UI readiness and is invalid; a valid object/class 100-start
+series remains pending.
 Source searches found redraw/draw entry points in `mainapp.pas`,
 `panelroot.pas`, `paneldlgs.pas`, and `menus.pas`, but have not isolated either
 root cause. Keep the virgin-run About residue and configured-run self-build
@@ -68,11 +69,12 @@ Startup/panel regressions to reproduce and fix:
 * Closing the About dialog on first launch consistently leaves its image
   visible over the panels.
 * The configured-run blank-panel state is mutually exclusive with first-run
-  About. For this reported defect, use only the latest class build and its
-  configured `dn.ini`; the supplied `dist` is from before class migration and
-  is not a comparator. Run at least 100 fresh starts, capture complete cells
-  before input, then replay the same menu input and capture again. Require zero
-  missing-panel trials on the accepted class build.
+  About. Compare the latest object-based baseline with the latest class build
+  using the same configured `dn.ini`, work path, terminal dimensions, and
+  environment. The supplied `dist` predates classes and is not the comparator.
+  Run at least 100 fresh starts per controlling source version, capture
+  complete cells before input, then replay the same menu input and capture
+  again. Require zero missing-panel trials and exact object/class parity.
 * For the About residue, capture the screen immediately before opening About,
   while About is open, and immediately after closing it; all prior panel cells
   must be restored on every trial. Initial evidence: exact-pair fresh-start
