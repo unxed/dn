@@ -21,6 +21,12 @@ The repository holds two independent projects with different licenses and one sh
 
 Our new code, which is not part of the RIT Labs source files and their descendants, is under MIT, like magiblot's ([`LICENSE`](LICENSE)).
 
+## Releases
+
+Push a tag `v*` (for example `v0.1.0-alpha`). The `release` workflow builds the
+linux64 DN and attaches `dn-<tag>-linux64.tar.gz` (binary plus dialog/language/help
+files) to a GitHub Release. Other platforms will follow in later steps of issue #1.
+
 ## Build DN with your own fpc
 
 For the common Linux habit `make` / `make install` there is a laconic root `Makefile`
