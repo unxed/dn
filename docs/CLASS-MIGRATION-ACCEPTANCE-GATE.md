@@ -71,8 +71,11 @@ every checkpoint. A separate full menu-cell probe exposed actionable
 differences: at menu item `(0,4)` the class build raised an access violation
 where the object build completed normally; at `(0,10)` (♦ system menu,
 Trashcan on/off / `cmHideShowTools`) the object build ended with an Invalid
-pointer operation while the class build showed Trash correctly. The accept
-harness excludes `menu_0_10` from the menu grid for that object-only crash.
+pointer operation while the class build showed Trash correctly. Root cause:
+object `TTrashCan.GetPalette` returns `@CTrashCan` against TV’s dynarray
+`TPalette` (`MapColor` → RTE 204); class uses `MakePalette(CTrashCan)`.
+Tracked in [#14](https://github.com/unxed/dn/issues/14). The accept harness
+excludes `menu_0_10` — cannot PASS on the unmodified object baseline binary.
 Changing language also raised an access violation in the class build. The
 language-menu crash was traced to interpreting a `TStringCollection`
 ShortString item as an AnsiString (`System.PString` after `uses SysUtils`).
