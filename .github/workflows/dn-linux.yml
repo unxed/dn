@@ -26,7 +26,7 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
       - name: Build DN (one command, DN_UTF8=0 is the old one with the code page inside)
         run: DN_UTF8=0 tools/build.sh linux64 out/dn
       - name: Tour in a pty
@@ -72,7 +72,7 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
       - name: Build DN (one command, native)
         run: tools/build.sh linux64 out/dn
       - name: Tour in a pty
@@ -89,7 +89,7 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl make git binutils python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc make git binutils python3
       - name: Cross compiler cache
         id: cache
         uses: actions/cache@v4
