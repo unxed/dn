@@ -78,10 +78,9 @@ uses
   , filetype, panelsetup
   , osdep, dnscreen, cfgstate, palettes;
 
-{AK155 Мало проверить, что имя временного каталога непусто, надо
-еще проверить, что он существует, и что в нем можно создавать и
-уничтожать файлы. Побочным эффектом этой функции является обязательное
-наличие '\' в конце s }
+{AK155 Checking that the temp directory name is non-empty is not enough:
+also check that it exists and that files can be created and deleted in it.
+Side effect: s always ends with '\' }
 procedure TraceStartupGroup(const Stage, Name: String; Group: TGroup);
 var
   V, FirstView: TView;
@@ -133,7 +132,7 @@ function BadTemp(var s: String): Boolean;
     begin
     Close(f);
     Erase(f);
-    { Под Win NT бывает и так, что создать файл можно, а удалить - нет}
+    { Under Win NT it can happen that create works but delete does not}
     if IOResult = 0 then
       BadTemp := False;
     end;
@@ -298,8 +297,8 @@ procedure DoStartup;
     procedure SSkip;
       begin
       S.Seek(S.GetPos + L);
-//JO: пытаться сделать локализацию нижележащего сообщения бесполезно,
-//    т.к. оно выдаётся до загрузки языковых установок
+//JO: localizing the message below is pointless,
+//    it is shown before language settings are loaded
       WriteLn('Local error in config file, ID =  ' + ItoS(ID));
       end;
 
@@ -472,7 +471,7 @@ procedure DoStartup;
             end
           else SSkip;
         cfgFFindOptions:
-          if SizeOf(Word)*2 = L then {см. сохранение соотв. структуры}
+          if SizeOf(Word)*2 = L then {see saving of the matching structure}
             SRead(FileFind.FindRec.Options) else SSkip;
         cfgTetrisRec:
           if SizeOf(TetrisRec) = L then SRead(TetrisRec) else SSkip;
@@ -500,7 +499,7 @@ procedure DoStartup;
           end;
         cfgUUEData:
           if SizeOf(UUDecodeOptions) +
-            SizeOf(TUUEncodeData) = L then {см. сохранение соотв. структуры}
+            SizeOf(TUUEncodeData) = L then {see saving of the matching structure}
               SRead(UUDecodeOptions) else SSkip;
         cfgTermDefaults:
           if SizeOf(TerminalDefaults) = L then
@@ -609,12 +608,11 @@ procedure DoStartup;
       INItime, INIsize: LongInt;
     begin
     if ProbeINI(INItime, INIsize) then
-      begin {ini есть}
-      if (not ReadIniCache(INItime, INIsize)) {не удалось пpочесть файл-кэш}
-//JO: нижележащее условие - нет конфига, или сменилась его веpсия -
-//    с наибольшей веpоятностью говоpит о том, что DN новой веpсии
-//    только что установлен, и читать кэш ini-файла в такой ситуации
-//    нежелательно
+      begin {ini exists}
+      if (not ReadIniCache(INItime, INIsize)) {failed to read the cache file}
+//JO: the condition below — no config, or its version changed —
+//    most likely means a new DN version was just installed, and
+//    reading the ini cache in that situation is undesirable
         or Virgin then
         begin
         LoadDnIniSettings;
@@ -624,7 +622,7 @@ procedure DoStartup;
       CopyIniVarsToCfgVars;
       end
     else
-      SaveDnIniSettings(nil); {создаем ini}
+      SaveDnIniSettings(nil); {create ini}
     DoneIniEngine;
     end { ReadIni };
 
@@ -788,7 +786,7 @@ procedure RUN_IT;
 {JO}
     if Virgin then
       begin
-      ConfigModified := True; {создаём новый конфиг}
+      ConfigModified := True; {create a new config}
       Message(MyApplication, evCommand, cmAbout, nil);
       end;
 {/JO}

@@ -51,8 +51,8 @@
 program DN;
 
 
-{Cat: методы поддержки плагинов поменялись, поэтому этот кусок
-      закомментировал; прежний код убивать пока жалко}
+{Cat: plugin support methods changed, so this chunk
+      is commented out; keeping the old code for now}
 
 uses
 
@@ -104,8 +104,8 @@ ReturnNilIfGrowHeapFails := True;
 
 try
   {Init09Handler;}
-  {Cat: проверяем на выходе, сколько памяти скушалось
-      создаём лог, куда будут записываться все вызовы методов Load и Store}
+  {Cat: on exit, check how much memory was used;
+      create a log of all Load and Store method calls}
   begin
  
   RUN_IT;
@@ -117,9 +117,9 @@ try
 except
   on E: EControlC do
     begin
-    {Фактически это никакой не Ctrl-C, а Close через кнопку,
-       или системное меню, или системный список задач. А Ctrl-Crek, Ctrl-C
-       обрабатываются в killer и сюда не попадают.}
+    {This is not really Ctrl-C, but Close via the button,
+       system menu, or task list. Ctrl-Break / Ctrl-C
+       are handled in killer and never reach here.}
     CloseWriteStream;
     end;
   on E: Exception do

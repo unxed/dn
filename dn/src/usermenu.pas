@@ -59,7 +59,7 @@ var
   QuickExecExternalStr: String;
 
 function QuickExecExternal(N: Integer): Boolean;
-  {` Исполнитель программ быстрого запуска (типа Ctr-F1).
+  {` Runner for quick-launch programs (e.g. Ctrl-F1).
     N=ScanCode-Hi(kbCtrlF1)+1`}
 function ExecUserMenu(DoGlobal: Boolean): Boolean;
 procedure ScreenGrabber(ShowMessage: Boolean);
@@ -125,7 +125,7 @@ constructor TUserWindow.Create;
            StandardScrollBar(sbHorizontal+sbHandleKeyboard),
         StandardScrollBar(sbVertical+sbHandleKeyboard)));
   ClearPositionalEvents := False;
-    { пусть единообразно обработается в mainapp }
+    { let mainapp handle it uniformly }
   end;
 
 procedure TUserWindow.CalcBounds(var Bounds: TRect; Delta: TPoint);
@@ -257,17 +257,17 @@ procedure NameAndExt(HandleTildes: Boolean;
   end;
 
 {-DataCompBoy-}
-{AK155 Тут была куча обкладываний строк символом #0,
-непонятно зачем нужными. В ритлабовском DN этого не было,
-так что я убрал, а вставил замену в именах файлов '~' на #0'~'
-(см. MoveCStr в drivers._vp)}
+{AK155 There used to be lots of padding strings with #0,
+for unclear reasons. RIT Labs DN did not have that,
+so I removed it and instead replace '~' in file names with #0'~'
+(see MoveCStr in drivers._vp)}
 
 function MakeString(S: String; UserParams: PUserParams;
      HandleTildes: Boolean; TM: PString): String;
   var
     ts: String;
     tz: String;
-    DA, DP: TDate4; { дата файла в активной и пассивной панели }
+    DA, DP: TDate4; { file date in the active and passive panels }
   begin
   {  if HandleTildes then zs:=#0 else zs:='';}
   Replace('!!', #1, S);

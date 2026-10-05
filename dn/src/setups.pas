@@ -105,14 +105,14 @@ type
   
 
 procedure SetupCountryInfo;
-  {` Диалог настоек страны `}
+  {` Country settings dialog `}
 function ApplyCodetables: Integer;
-  {` Применить настройки кодировок из CountryInfo. Результат:
-     0 - нет ошибок,
-     1 - ошибка в KbdToggleLayout
-     2 - ошибка в ABCSortTable,
-     3 - ошибка в WinCodeTable,
-     4 - ошибка в Codetables,
+  {` Apply encoding settings from CountryInfo. Result:
+     0 - no errors,
+     1 - error in KbdToggleLayout
+     2 - error in ABCSortTable,
+     3 - error in WinCodeTable,
+     4 - error in Codetables,
      `}
 procedure DoFMSetup;
 procedure DriveInfoSetup;
@@ -130,7 +130,7 @@ function MakeSaversDialog: TDialog;
 
 const
   CodeErrMessage: array[1..4] of TStrIdx =
- {`AK155 12.01.2004 Собщения об ошибках перекодировочных настроек.}
+ {`AK155 12.01.2004 Messages about recoding-settings errors.}
    (dlLayoutErr, dlSortError, dlWinErr, dlCodetablesErr);
    {`}
 
@@ -314,7 +314,7 @@ function ApplyCodetables: Integer;
       ABCSortTable := '0';
     Val(ABCSortTable, CP, Err);
     if (Err = 0) and QueryABCSort(CP, ABCSortXlat) then
-      begin { запрос таблицы у ОС удовлетворён }
+      begin { OS table request succeeded }
       end
     else if not BuildABCSortXlat(ABCSortTable) then
       begin
@@ -369,7 +369,7 @@ TryDialog:
   if C <> cmOK then
     begin
     CountryInfo := SaveCountryInfo;
-     // CountryInfo мог измениться по cmYes
+     // CountryInfo may have changed on cmYes
     ApplyCodetables;
     Exit;
     end;
@@ -392,7 +392,7 @@ procedure DoFMSetup;
   if (Startup.FMSetup.RestChar = '') or
      (Startup.FMSetup.RestChar[1] = ' ')
   then
-    Startup.FMSetup.RestChar := #16; { символа обрезки не может не быть }
+    Startup.FMSetup.RestChar := #16; { truncation character must always exist }
   Message(Application, evCommand, cmUpdateConfig, nil);
   GlobalMessage(evCommand, cmReboundPanel, nil);
 

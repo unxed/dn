@@ -96,14 +96,13 @@ uses
   ;
 
 { AK155 19/10/2006
- TCalcLine и TIndicator ориентированы на использование внутри диалога
-калькулятора. У этого диалога DirectLink[1] должен ссылаться на строку
-ввода, DirectLink[2] - на блок радиокнопок выбора представления
-результата, а DirectLink[3] в ресурсе не определён, но в программе
-используется для ссылки на индикатор (PIndicator) из строки ввода.
-Включать поле с такой ссылкой прямо в TCalcLine неудобно, так как это
-исключило бы возможность загружать строку ввода из ресурса диалога и
-подменять ей тип на TCalcLine }
+ TCalcLine and TIndicator are meant for use inside the calculator
+dialog. That dialog's DirectLink[1] must point to the input line,
+DirectLink[2] to the radio buttons for result format, and DirectLink[3]
+is undefined in the resource but used in code as a link to the
+indicator (PIndicator) from the input line. Putting such a field
+directly into TCalcLine would prevent loading the input line from the
+dialog resource and replacing its type with TCalcLine }
 
 constructor TIndicator.Create(var R: TRect);
   begin

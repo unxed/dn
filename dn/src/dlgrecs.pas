@@ -45,10 +45,10 @@
 //
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
-{AK155  3.06.2007 Для уменьшения циклических ссылок между модулями
- бывший dlgrecs.pas разбит на два маодуля: dlgrecs.pas и dlgrecs.pas,
- при том первый из них содержит бОьшую часть того на что ссылаются
- другие модулиЮ но имеет почти пустой uses-список }
+{AK155  3.06.2007 To reduce circular unit references,
+ former dlgrecs.pas was split into two modules: dlgrecs.pas and dlgrecs.pas,
+ the first holding most of what other units reference
+ but with an almost empty uses list }
 
 unit dlgrecs;
 
@@ -60,7 +60,7 @@ uses
 
 type
 
-  {Cat: выкинул, т.к. TTextCollection = TLineCollection}
+  {Cat: removed, because TTextCollection = TLineCollection}
   (*
   PTextCollection =^TTextCollection;
   TTextCollection = class( TCollection )
@@ -129,7 +129,7 @@ while SourceDir[Length(SourceDir)] <> '\' do
   SetLength(SourceDir, Length(SourceDir)-1);
 StartupDir := SourceDir;
 {SourceDir := Dos.GetEnv('DN')}
-{Cat: заменил DNVP на DN2 - так намного логичнее}
+{Cat: replaced DNVP with DN2 — much more logical}
 (*
   if ExistDir(Dos.GetEnv('DNVP')) or (Dos.GetEnv('DNVP')='') then
       SourceDir := Dos.GetEnv('DNVP')

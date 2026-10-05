@@ -66,11 +66,10 @@ const
   { DO NOT CHANGE THIS LINE }iniparamblock_START: TBlockMarker = ();
   { ------------------------------ PLACE ALL INI VARIABLES BELOW }
 
-  {Cat: Внимание!!!
-      При добавлении новых переменных необходимо соответствующим
-      образом изменять структуру TIniVars в модуле Vars
-      Добавлять новые переменные обязательно в конец - для
-      совместимости со старыми версиями плагинов}
+  {Cat: Attention!!!
+      When adding new variables, update TIniVars in unit Vars
+      accordingly. Always append new variables at the end —
+      for compatibility with older plugin versions}
 
   { NOTE! }
   { To declare a short string that must have fixed length add at least }
@@ -240,9 +239,9 @@ const
   {}StartupDataUnload: LongInt = 65535; {StartupData.Unload}
   {}ConfirmsOpt: LongInt = 65535; {Confirms}
   {}NonVIOScreenMode: LongInt = 65535; {JO}
-  {последний видеорежим в полноэкранной сессии}
+  {last video mode in a full-screen session}
   {}VIOScreenMode: LongInt = 65535; {JO}
-  {последний видеорежим в оконной сессии}
+  {last video mode in a windowed session}
   {,'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`~~~~~~~~~~~~`,}
   {;                   This is end of parameters definitions                       ;}
   { '._____________________________________________________________________________'}

@@ -908,9 +908,9 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
       DBFile.Seek(CurRec);
       DBFile.BaseFile.Read(p^[0],DBFile.RecLen);
       DBFile.Seek(CurRec);   { TBufStream bug ? }
-      DBFile.Seek(CurRec+1); { если перед этим не сделать Seek(CurRec),        }
-                              { то позиционирование идёт на один байт дальше    }
-                              { чем нужо. Почему - так и не понял. Особенность. }
+      DBFile.Seek(CurRec+1); { without Seek(CurRec) first,                    }
+                              { positioning goes one byte further              }
+                              { than needed. Why — never figured out. Quirk.   }
       DBFile.BaseFile.Write(p^[0], DBFile.RecLen);
       dec(CurRec);
     end;
@@ -1017,11 +1017,11 @@ procedure TDBViewer.HandleEvent(var Event: TEvent);
     P := GetRecord(Delta.Y);
     FldLen := PFR^.len;
     if FldLen > 252 then
-      { Больше чем 252 нельзя, иначе будет вылетать  }
+      { More than 252 is not allowed or it will crash }
       FldLen := 252; { Kirill }
-    { Здесь необходимо вывести предупреждение }
-    { о том, что будут отредактированы только }
-    { первые 252 символа длинного поля.       }
+    { Must warn here                          }
+    { that only the first 252 characters of   }
+    { a long field will be edited.            }
     Move(P[PFR^.Pos], S[1], FldLen);
     S[0] := Char(FldLen); { Kirill }
     if PFR^.Who <> 'D' then

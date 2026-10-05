@@ -1135,7 +1135,7 @@ procedure ProcessDLGs;
     else if IdToken = idNotepad then
       begin
       begin TkS[1] := Token(S, I); TkL[2] := GetID(Token(S, I)); Notepad := TNotepad.Create(R, TkS[1], TkL[2]) end;
-      D := Notepad; // всё будет вставляться в диалог
+      D := Notepad; // everything will be inserted into the dialog
       end
     else {idDialog}
       D := TDialog.Create(R, Token(S, I));
@@ -1146,8 +1146,8 @@ procedure ProcessDLGs;
       S := DefineParser.ProceedStr2(S);
       Inc(Line);
 
-      { Разбор метки прямой ссылки вида #1 .. #9, строго с первой позиции}
-      nDirectLink := 0; // 0 - метки нет
+      { Parse a direct-link label #1 .. #9, strictly from position 1}
+      nDirectLink := 0; // 0 - no label
       if (Length(S) >= 2) and (S[1] = '#') and (S[2] in ['1'..'9']) then
         begin
         nDirectLink := Byte(S[2]) - Byte('0');
@@ -1216,7 +1216,7 @@ procedure ProcessDLGs;
         else if (S <> '') and (S[1] <> ';') then
           Error('Unknown identifier in line '+ItoS(Line));
         if nDirectLink <> 0 then
-          begin { запоминание прямой ссылки на текущий объект }
+          begin { remember a direct link to the current object }
           if D.DirectLink[nDirectLink] <> nil then
             Error('Direct Link Label redefined in line '+ItoS(Line));
           D.DirectLink[nDirectLink] := PV;
@@ -1450,12 +1450,12 @@ Writeln('Copyright(C) 1995 AxoN(R)Soft');
 {Cat}
 {/Cat}
 
-{Cat: выбираем, какой конфигурационный файл использовать:
-      - если в командной строке O или OS2 - RCPVPO.INI
-      - если в командной строке W или W32 - RCPVPW.INI
-      - если в командной строке D или D32 - RCPVPD.INI
-      - если командная строка пуста - конфигурационный файл,
-      соответствующий системе, для которой скомпилирован RCP.EXE}
+{Cat: choose which config file to use:
+      - command line O or OS2 → RCPVPO.INI
+      - command line W or W32 → RCPVPW.INI
+      - command line D or D32 → RCPVPD.INI
+      - empty command line → the config file for the
+      system RCP.EXE was compiled for}
 
 FreeStr := ParamStr(1);
 UpStr(FreeStr);

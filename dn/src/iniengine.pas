@@ -50,10 +50,10 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 unit iniengine;
-{AK155  3.06.2007 Для уменьшения циклических ссылок между модулями
- бывший dnini.pas разбит на два маодуля: dnini.pas и iniengine.pas,
- при том первый из них содержит бОьшую часть того на что ссылаются
- другие модулиЮ но имеет почти пустой uses-список }
+{AK155  3.06.2007 To reduce circular unit references,
+ former dnini.pas was split into two modules: dnini.pas and iniengine.pas,
+ the first holding most of what other units reference
+ but with an almost empty uses list }
 
 interface
 
@@ -73,7 +73,7 @@ function ProbeINI(var INItime, INIsize: LongInt): Boolean;
 procedure ShowIniErrors;
 procedure ClearIniErrors;
 
-{JO: 21-04-2005 - кэш INI в отдельном файле}
+{JO: 21-04-2005 - INI cache in a separate file}
 procedure WriteIniCache(INItime, INIsize: LongInt);
 function ReadIniCache(INItime, INIsize: LongInt): Boolean;
 {/JO}
@@ -694,7 +694,7 @@ function ProbeINI(var INItime, INIsize: LongInt): Boolean;
     begin
     ProbeINI := True;
     INItime := SR.SR.Time;
-    INIsize := 0; {AK155 на случай DPMI, где Size: longint}
+    INIsize := 0; {AK155 for DPMI, where Size is Longint}
     Move(SR.SR.Size, INIsize, SizeOf(INIsize)); {AK155 Size: comp}
     end
   else

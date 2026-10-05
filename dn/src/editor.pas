@@ -57,7 +57,7 @@ uses
 type
 
   TXFileEditor = class(TFileEditor)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is in the plugin model; change with extreme care!}
     function HandleCommand(var Event: TEvent): Boolean; virtual;
     end;
 
@@ -1083,11 +1083,9 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       Tmr: TEventTimer;
       Cmpr: function (const l, R: LongString): Boolean;
 
-      {AK155 QuickSort имеет существенный недостаток: при равных
-ключах он может переставлять строки. Поэтому я заменил его на
-метод Шелла, который этого недостака не имеет. По быстродействию
-разницы особой не будет: при числе элементов до 20000 Шелл если
-и проигрывает, то не сильно.}
+      {AK155 QuickSort has a serious flaw: with equal keys it can
+reorder lines. So I replaced it with Shell sort, which does not.
+Speed is similar: up to ~20000 elements Shell loses little if at all.}
       (*
    procedure QuickSort(L, R: LongInt);
    var
@@ -1223,7 +1221,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
              Mark.B.X-Mark.A.X));
       if S <> '' then
         begin
-        EvalueError := False; {??? в .11 этой строки нет}
+        EvalueError := False; {??? this line is absent in .11}
         R := Evalue(S, nil);
         if not EvalueError then
           begin
@@ -1784,7 +1782,7 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
       FlushWorkString;
       KeyMap := RollKeyMap[KeyMap];
       HandleCommand := True;
-      WorkString := GetLine(Delta.Y); { Прочитать в новой кодировке }
+      WorkString := GetLine(Delta.Y); { Reread in the new encoding }
       end;
   end {case};
   end { TXFileEditor.HandleCommand };
