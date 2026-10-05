@@ -20,8 +20,8 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Accept skips (harness) | `menu_0_16` (♦ Game/Tetris animation), `menu_3_8` (Edit OS Environment — live env), `menu_5_2` (Manager Directory tree scan). Re-enabled: `menu_4_5` Branch, `menu_6_16` Colors |
 | Classic palette | Class on `CColor` (`b57025b`) |
 | Startup / About | [#6](https://github.com/unxed/dn/issues/6) fixed (`7572d73`); regressions `tools/dn-linux-startup.py` / `dn-linux-about.py` |
-| F5 file-copy ownership | Fixed with `TLineQueue` (`3bc0d0f`); `f5_f6_f8` parity scenario and all Linux ops pass on `06259f5` |
-| Archives xz / F5 | Local ALL OK (`5f02362`); GitHub Linux archive matrix green on `06259f5` |
+| F5 file-copy ownership | Fixed with `TLineQueue` (`3bc0d0f`); `f5_f6_f8` parity scenario and all Linux ops pass on `1f51f75` |
+| Archives xz / F5 | Local ALL OK (`5f02362`); GitHub Linux archive matrix green on `1f51f75` |
 | ZIP charset | Listing path `27de843` |
 | `ChLngId` | `PShortString` (`88c19f8`) |
 
@@ -92,8 +92,8 @@ object/class parity remains an open gate item, not this symptom.
 | UTF-8 panel names `?????` until Ctrl-R | `ab9ebd8`: post-startup `WriteScreenCells` skipped on `-dDNUTF8` (16-bit copy maps multi-byte cells to `?`). `DN_OPS_UTF8=1` dn-linux-ops green. | Fixed on class UTF-8 build |
 | Enter non-exec (`cmExecFile`) AV | Fixed: `System.PString` (^AnsiString) hid `Defines.PString` after `uses SysUtils`; bind + `PShortString` in `DoExecFile`. | Fixed on class self-build |
 | Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | **Partial:** `.tgz`/`.tar.gz` Enter+list OK (`fmttgz`); fixtures + `dn-linux-archives.py` Enter/leave green. `.tar.xz`/`.txz` + F5 extract smoke ALL OK locally (`5f02362`). Open: remaining F3/F4/F5 peers, full compound matrix — `docs/ARCHIVE-MATRIX.md` / PLAN 4c. Linux archive workflow is preferred exact-SHA evidence |
-| F5 copy queue ownership | `CopyQueue` contained `TLine` classes but freed entries as `TFileCopyRec`, causing an AV immediately after copy | `dn/src/filecopy.pas` | **Fixed** (`3bc0d0f`) | `TLineQueue.FreeItem` frees each class; strict collection/ownership search clean; new `f5_f6_f8` parity scenario PASS; linux ops all green on SHA `06259f5` | Keep F5→F6→F8 check in ops and acceptance suites |
-| Accept harness settle flakes | Menu scenarios could flake on FAST settle timing under load | Hardened (`ad9c4f7`); current full 177/177 acceptance is terminal green on exact SHA `06259f5` |
+| F5 copy queue ownership | `CopyQueue` contained `TLine` classes but freed entries as `TFileCopyRec`, causing an AV immediately after copy | `dn/src/filecopy.pas` | **Fixed** (`3bc0d0f`) | `TLineQueue.FreeItem` frees each class; strict collection/ownership search clean; new `f5_f6_f8` parity scenario PASS; linux ops all green on SHA `1f51f75` | Keep F5→F6→F8 check in ops and acceptance suites |
+| Accept harness settle flakes | Menu scenarios could flake on FAST settle timing under load | Hardened (`ad9c4f7`); current full 177/177 acceptance is terminal green on exact SHA `1f51f75` |
 | F1 Help accept flake | Parallel FAST: object still idle active panels (`═[■]`) vs class Help open (panels `─┐`) — ~1172 cells, looks like frame/palette | Harness waits for Help title after F1 (`f1help`/`f1_esc`); class `THelpWindow`/`CHelpWindow` unchanged |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is

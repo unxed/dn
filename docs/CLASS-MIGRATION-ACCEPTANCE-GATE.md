@@ -81,7 +81,7 @@ used for acceptance.
 The last object baseline used is DN
 `b4916b874989d7b35660d02cf935dc5f0db7a656` with TV
 `521d06479198789deeaa6fda287236ca83ba4051`. The class build used for the latest
-full result is DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` with TV3
+full result is DN `1f51f75677ae19ccb13c4d9071dedb3f7177f87e` with TV3
 `a06dd31`. Both were rebuilt with matching UTF-8 mode and fixtures. Earlier trials against
 `33674fed7829124fbd3230440faf3075c45eb9f6` or the much older
 `10763d65d091fc8525599a45c155be228c1bb8b6` do not replace this comparison.
