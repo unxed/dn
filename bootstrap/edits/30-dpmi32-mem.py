@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler, DOS target. Virtual Pascal sees the memory below 1 MB as a flat array
+"""reason: (d) the modern compiler, DOS target. Virtual Pascal sees the memory below 1 MB as a flat array
 Mem[linear] and gives pointers to it; under go32v2 that memory is not in the data segment. In lfnvp.pas and
 fltl.pas the VP style access (Mem[linear], Ptr(linear)) is replaced by MemGet/MemPut/MemFill/MemStr of our
 Dpmi32; in doslow.pas the pointer to the area of real-mode calls is a block of the program that Dpmi32

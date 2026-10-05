@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. regall.pas names classes with the qualifier of their unit (`DblWnd.TFoo`) and
+"""reason: (d) the modern compiler. regall.pas names classes with the qualifier of their unit (`DblWnd.TFoo`) and
 does not use all of those units (in VP the units of the program are known everywhere). The units of the tree that it names
 are added to its uses clause of the implementation.
 usage: 101-regall-uses.py FILE...   (all the .pas of the tree)"""

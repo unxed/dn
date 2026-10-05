@@ -1,4 +1,4 @@
-# reason: (д) the modern compiler. Comp of VP became Int64 (edit 82); `/` on Comp gave a real that was rounded when it was
+# reason: (d) the modern compiler. Comp of VP became Int64 (edit 82); `/` on Comp gave a real that was rounded when it was
 # assigned to a Comp, in FPC it is Extended, which is not assigned to Int64: integer division in filecopy.pas.
 s/N := (N\*100)\/ToDo;/N := (N*100) div ToDo;/
 s/Time := ((2\*ToDo-ToRead-ToWrite)\*CopyElapsedTime)\/(ToRead+ToWrite);/Time := ((2*ToDo-ToRead-ToWrite)*CopyElapsedTime) div (ToRead+ToWrite);/

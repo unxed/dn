@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. Hex8Lo of advance1.pas is a routine in the assembler of VP (`mov dx,[word ptr L+2]`: parameters
+"""reason: (d) the modern compiler. Hex8Lo of advance1.pas is a routine in the assembler of VP (`mov dx,[word ptr L+2]`: parameters
 by name inside brackets), which FPC does not take. The same in Pascal: 8 hexadecimal digits of a LongInt.
 usage: 110-hex8.py FILE...   (all the .pas of the tree)"""
 import re, sys, os

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. Virtual Pascal's Word has 32 bits: getconst.pas (the constants of Commands.pas for the
+"""reason: (d) the modern compiler. Virtual Pascal's Word has 32 bits: getconst.pas (the constants of Commands.pas for the
 resource compiler) keeps and sums the values in Word, and the key codes (kbAltX = $082D00) must not be cut to 16 bits
 (see 118-keycode-long.sed). LongInt for the values. usage: 119-getconst-long.py FILE...   (acts on getconst.pas only)"""
 import sys, os, re

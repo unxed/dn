@@ -145,14 +145,14 @@ function TAINArchive.GetSign: TStr4;
   end;
 
 {
-Модуль настраивался на ain 2.2
+Module was tuned for ain 2.2
 
-Для файлов с не очень длинными именами формат однострочный.
-В этом же примере видно 'решение' проблемы y2k
+For files with not-too-long names the format is single-line.
+This same example shows the 'solution' to the y2k problem
 
 TEMP\WINL                   5883  18.01.101  20:35:50
 
-Для файлов с более длинными именами формат двухстрочный:
+For files with longer names the format is two-line:
 
 TEMP\KBM35012\KMBR.BIN
                              338  20.08.97  20:43:38
@@ -165,7 +165,7 @@ procedure TAINArchive.GetFile;
     s: String;
   begin
   if TextRec(ListFile).Handle = 0 then
-    begin { первый вызов: вызов архиватора для вывода оглавления }
+    begin { first call: invoke the archiver to list the table of contents }
     FileInfo.Last := 2;
     ArcFile.Close;
     ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
@@ -184,7 +184,7 @@ procedure TAINArchive.GetFile;
     System.Reset(ListFile);
     if IOResult <> 0 then
       Exit;
-    { Пропуск шапки и чтение первой строки файлов }
+    { Skip the header and read the first file line }
     repeat
       if Eof(ListFile) then
         Exit;
@@ -213,9 +213,9 @@ procedure TAINArchive.GetFile;
     end;
   FileInfo.Last := 0;
 
-  { чтение данных об очередном файле}
+  { read data for the next file}
   if l = 0 then
-    begin { длина и прочее в следующей строке }
+    begin { length and the rest are on the next line }
     FileInfo.FName := s;
     Readln(ListFile, s);
     end

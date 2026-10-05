@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler / (б) the target. The DPMI32 build of DN ends the application and gives the command to the
+"""reason: (d) the modern compiler / (b) the target. The DPMI32 build of DN ends the application and gives the command to the
 loader DN.COM (DOS), which is not part of this build: DN died ("Halt(1)") when a program was started. The branch of the other
 targets keeps the application alive: this edit makes ExecStringRR of dnexec.pas run the command through DNRun.RunExternal
 (dn/new) and go on with the common tail (redraw; the re-start of the video, the events and the memory is removed). usage: 121-exec-dos.py FILE...   (acts on dnexec.pas only)"""

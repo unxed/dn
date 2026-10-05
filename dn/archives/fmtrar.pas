@@ -80,14 +80,14 @@ type
     Reserved2: LongInt;
     end;
   // HeadFags:
-  // $01 - Атрибут тома (том многотомного архива)
-  // $02 - Присутствует архивный комментарий
-  // $04 - Атрибут блокировки архива
-  // $08 - Атрибут непрерывного (solid) архива
-  // $10 - Новая схема именования томов ('volname.partN.rar')
-  // $20 - Присутствует информация об авторе или электронная подпись (AV)
-  // $40 - Присутствует информация для восстановления
-  // $80 - Заголовки блоков зашифрованы
+  // $01 - Volume attribute (volume of a multi-volume archive)
+  // $02 - Archive comment is present
+  // $04 - Archive lock attribute
+  // $08 - Solid archive attribute
+  // $10 - New volume naming scheme ('volname.partN.rar')
+  // $20 - Author information or authenticity verification (AV) is present
+  // $40 - Recovery information is present
+  // $80 - Block headers are encrypted
 
 var
   RAR2: Boolean;
@@ -214,36 +214,36 @@ type
     Attr: LongInt;
     end;
   // HeadFlags:
-  // $01 - файл продолжается из предыдущего тома
-  // $02 - файл продолжается в следующем томе
-  // $04 - файл зашифрован паролем
-  // $08 - присутствует комментарий файла
-  // $10 - используется информация из предыдущих файлов
-  //       (флаг непрерывности) (для RAR 2.0 и старше)
+  // $01 - file continues from previous volume
+  // $02 - file continues in next volume
+  // $04 - file is password-encrypted
+  // $08 - file comment is present
+  // $10 - information from previous files is used
+  //       (solid flag) (for RAR 2.0 and later)
   //
-  //       биты 7 6 5 (для RAR 2.0 и выше):
-  //            0 0 0    - размер словаря   64 Кб
-  // $20        0 0 1    - размер словаря  128 Кб
-  // $40        0 1 0    - размер словаря  256 Кб
-  // $60        0 1 1    - размер словаря  512 Кб
-  // $80        1 0 0    - размер словаря 1024 Кб
-  // $A0        1 0 1    - размер словаря 2048 KB
-  // $C0        1 1 0    - размер словаря 4096 KB
-  // $E0        1 1 1    - файл является каталогом
+  //       bits 7 6 5 (for RAR 2.0 and later):
+  //            0 0 0    - dictionary size   64 KB
+  // $20        0 0 1    - dictionary size  128 KB
+  // $40        0 1 0    - dictionary size  256 KB
+  // $60        0 1 1    - dictionary size  512 KB
+  // $80        1 0 0    - dictionary size 1024 KB
+  // $A0        1 0 1    - dictionary size 2048 KB
+  // $C0        1 1 0    - dictionary size 4096 KB
+  // $E0        1 1 1    - file is a directory
   //
-  // $100 - присутствуют поля HIGH_PACK_SIZE и HIGH_UNP_SIZE.
-  //        Эти поля используются только для архивирования очень больших файлов
-  //        (больше 2 Гб), для файлов меньшего объема эти поля отсутствуют
-  // $200 - FILE_NAME содержит имена в обычном формате и в Unicode,
-  //        разделённые нулём. В этом случае поле NAME_SIZE равно длине
-  //        обычного имени плюс длина имени в формате Unicode плюс 1
-  // $400 - после имени файла в заголовке находится 8 дополнительных байт,
-  //        которые необходимы для увеличения надёжности шифрования ("соль")
-  // $800 - флаг версии. Это старая версия файла, номер
-  //        версии добавлен к имени файла как ';n'
-  // $8000 - этот бит всегда установлен, так как общий размер
-  //         блока HEAD_SIZE + PACK_SIZE (и плюс HIGH_PACK_SIZE,
-  //         если установлен бит 0x100)
+  // $100 - HIGH_PACK_SIZE and HIGH_UNP_SIZE fields are present.
+  //        These fields are used only when archiving very large files
+  //        (over 2 GB); for smaller files these fields are absent
+  // $200 - FILE_NAME contains names in both normal and Unicode format,
+  //        separated by a null. In this case NAME_SIZE equals the length
+  //        of the normal name plus the Unicode name length plus 1
+  // $400 - after the file name in the header there are 8 extra bytes
+  //        needed to improve encryption reliability ("salt")
+  // $800 - version flag. This is an old version of the file; the version
+  //        number is appended to the file name as ';n'
+  // $8000 - this bit is always set, because the total size of the
+  //         block is HEAD_SIZE + PACK_SIZE (plus HIGH_PACK_SIZE
+  //         if bit 0x100 is set)
 
 procedure TRARArchive.GetFile;
   var

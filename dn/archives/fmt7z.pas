@@ -48,24 +48,24 @@
 //  Version history:
 //
 //  2005.02.07 ported from DN OSP 4.9.0 by Max Piwamoto
-{  15.02.2005 AK155: Мелкие коррекции.
-    * ExecAnsiString приводил к порче экрана DN, заменён на ExecStringRR.
-    * В TS7ZArchive.GetFile в связи с AnsiString выплыло несколько
-      некоректностей вроде S[1] для пустой строки. Исправил.
-    * Приформирование в конце строки '\' для каталогов - это неправильно
-      (надо сначала удалить проблелы) и не нужно (это будет сделано
-      позже по FileInfo.Attr = Directory. Приводило к появлению
-      фантомных каталогов с пробелами в конце (7z 4.11). Убрал.
-    * Сделал переформатирование.
-    - Вижу глюки с поиском извне. Если в filefind снять запрет на поиск в
-      7z-архивах, то поиск почти работает, но из панели поиска переход
-      на любой файл внутри 7z-архива приводит при выходе из архива к
-      Sharing violation (при удалении файла в Done). Если проигнорировать
-      - всё работает нормально.
-      Кроме того, поиск иногда (или всегда?) показывает файл, который
-      на самом деле находится в другом архиве.
-      Источник проблем IMHO в том, что файл списка слишком долго держится
-      открытым.
+{  15.02.2005 AK155: Minor corrections.
+    * ExecAnsiString caused DN screen corruption; replaced with ExecStringRR.
+    * In TS7ZArchive.GetFile, several incorrectnesses related to AnsiString
+      surfaced, such as S[1] on an empty string. Fixed.
+    * Appending '\' at the end of the string for directories is wrong
+      (must trim spaces first) and unnecessary (that will be done
+      later based on FileInfo.Attr = Directory). It caused phantom
+      directories with trailing spaces (7z 4.11). Removed.
+    * Reformatted the code.
+    - Seeing glitches with external search. If the filefind ban on searching
+      inside 7z archives is lifted, search almost works, but navigating from
+      the search panel to any file inside a 7z archive causes a Sharing
+      violation on exit from the archive (when deleting the file in Done).
+      If ignored, everything works normally.
+      Also, search sometimes (or always?) shows a file that actually
+      resides in a different archive.
+      The source of the problems IMHO is that the list file is kept open
+      too long.
 }
 //
 //////////////////////////////////////////////////////////////////////////}
@@ -183,10 +183,10 @@ procedure TS7ZArchive.GetFile;
     S: AnsiString;
   begin
   if TextRec(ListFile).Handle = 0 then
-    begin { первый вызов: вызов архиватора для вывода оглавления }
+    begin { first call: invoke the archiver to list the table of contents }
     FreeAndNil(ArcFile);
-    {AK155 если архив не закрыть, то архиватор
-      выдаёт sharing violation }
+    {AK155 if the archive is not closed, the archiver
+      raises a sharing violation }
     ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
     S := UnPacker^+' l '+SquashesName(ArcFileName)+' >'+ListFileName;
     ExecStringRR(S, '', False);

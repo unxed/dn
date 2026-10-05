@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. In Virtual Pascal the types SmallWord, SmallInt... of the system layer are
+"""reason: (d) the modern compiler. In Virtual Pascal the types SmallWord, SmallInt... of the system layer are
 visible in every unit; in FPC they come with our VPSysLow. A unit that names SmallWord and does not use
 VPSysLow gets it in the uses clause of its interface.
 usage: 22-smallword.py FILE...   (all the .pas of the tree)"""

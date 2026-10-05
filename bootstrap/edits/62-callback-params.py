@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (a) the new TV, (д) the modern compiler. The routines that DN passes to FirstThat/LastThat/ForEach
+"""reason: (a) the new TV, (d) the modern compiler. The routines that DN passes to FirstThat/LastThat/ForEach
 (declared inside the caller) take a typed pointer (PMacroCommand, PDOSVar...); Turbo Pascal does not check that.
 The procedure variable that tv/ takes has a parameter of the type Pointer (of a collection) or PView (of a
 group), and FPC wants the types to be the same. The parameter is renamed and a variable of the declared type

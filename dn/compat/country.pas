@@ -9,15 +9,15 @@ uses
   Defines;
 
 procedure GetSysCountryInfo;
-  {` Заполняет CountryInfo (basics) данными от системы `}
+  {` Fills CountryInfo (basics) with data from the system `}
 
 procedure QueryUpcaseTable;
-  {` Для текущей кодовой страницы запрашивается у ОС таблица перекодировки
-  на верхний регистр. Результат - UpCaseArray `}
+  {` For the current code page, requests from the OS the uppercase
+  conversion table. Result is UpCaseArray `}
 
 function QueryToAscii(CP: Word; var ToAscii: TXLat): Boolean;
-  {` Для кодовой страницы CP запрашивается у ОС таблица перекодировки
-  из CP в текущую кодовую страницу`}
+  {` For code page CP, requests from the OS the conversion table
+  from CP to the current code page`}
 
 function QueryABCSort(CP: Word; var ABCSortXlat: TXLat): Boolean;
 
@@ -89,7 +89,7 @@ procedure GetSysCountryInfo;
     end;
   end;
 
-{Заглушка!}
+{Stub!}
 function QueryToAscii(CP: word; var ToAscii: TXLat): Boolean;
   begin
   NullXlat(ToAscii);
@@ -97,7 +97,7 @@ function QueryToAscii(CP: word; var ToAscii: TXLat): Boolean;
 
 function QueryABCSort(CP: Word; var ABCSortXlat: TXLat): Boolean;
   begin
-  Result := False; //!! Пока не реализовано (04.09.2005)
+  Result := False; //!! Not implemented yet (04.09.2005)
   end;
 
 end.
