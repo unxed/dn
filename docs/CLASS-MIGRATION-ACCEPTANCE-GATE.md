@@ -97,11 +97,13 @@ object `TTrashCan.GetPalette` returns `@CTrashCan` against TV’s dynarray
 Tracked in [#14](https://github.com/unxed/dn/issues/14). The accept harness
 excludes `menu_0_10` — cannot PASS on the unmodified object baseline binary.
 Additional harness exclusions (not class-only regressions): `menu_0_16` (♦ Game /
-Tetris playfield animation), `menu_4_5` (Panel → Directory Branch — Access
-violation on both object and class), `menu_5_2` (Manager → Directory tree —
-full-volume scan exceeds `DN_ACCEPT_FAST` scenario timeout). `menu_2_7`–`menu_2_9`
-(Disk → Directory tree via `cmCreateTree`; same scan, 90s scenario alarm under
-`DN_ACCEPT_FAST`). Changing language
+Tetris playfield animation), `menu_3_8` (Utilities → Edit OS Environment — AV on
+both), `menu_4_5` (Panel → Directory Branch — Access violation on both object and
+class), `menu_5_2` (Manager → Directory tree — full-volume scan exceeds
+`DN_ACCEPT_FAST` scenario timeout), `menu_6_16` (Window → List… — AV on both).
+Long-scan scenarios (`menu_2_7`–`menu_2_9` Disk Directory tree; `menu_4_12` Panel →
+Change directory) use a longer alarm and Esc-dismiss of the “Scanning directories”
+progress dialog before snapshot. Changing language
 also raised an access violation in the class build. The
 language-menu crash was traced to interpreting a `TStringCollection`
 ShortString item as an AnsiString (`System.PString` after `uses SysUtils`).
