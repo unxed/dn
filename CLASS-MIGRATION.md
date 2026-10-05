@@ -78,7 +78,10 @@ It supplements the full workflows and does not waive either final tree gate.
   `ReadScreenCells`; after the startup `MyApplication.Draw` the copy was stale
   (empty start), so configured starts showed a blank field and virgin starts
   kept the About image. Fix: `ReadScreenCells` right after the startup draw
-  (`boot.pas`).
+  (`boot.pas`), then `WriteScreenCells` for the legacy 16-bit build only.
+  With `-dDNUTF8`, `ReadScreenCells` maps multi-byte cells to `'?'` in the
+  copy, so the post-draw `WriteScreenCells` must not run (UTF-8 panel names
+  would otherwise show as `?????` until Ctrl-R).
 - Regression test: the `dn-linux-ops.py` autosave-desktop check
   (`dsk_cwd` right after the start, no F10/Right) fails without the fix.
 - Open: full cell comparison object/class (colours, several symbols) is not

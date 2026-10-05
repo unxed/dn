@@ -822,7 +822,10 @@ procedure RUN_IT;
   MyApplication.Draw;
   ReadScreenCells; { issue #6: sync the 16-bit copy that WriteScreenCells outputs; otherwise a stale copy overwrites the panels }
   TraceStartupState('after-initial-draw');
+{$IFNDEF DNUTF8}
   WriteScreenCells(0, ScreenWidth * ScreenHeight);
+{$ENDIF}
+  { With DNUTF8, WriteScreenCells would push the 16-bit copy back through CellFromBIOS and replace UTF-8 cells with '?'. }
   
   w95QuitInit; {Gimly}
   
