@@ -140,7 +140,7 @@ procedure TIdxMaker.Put(Item: TStreamable; Key: TDlgIdx);
   TempStream.Put(Item);
   if TempStream.Status <> stOK then
     begin
-    Writeln('Cannot write object #', Integer(Key));
+    Writeln('Cannot write entry #', Integer(Key));
     Halt(2);
     end;
   end;
