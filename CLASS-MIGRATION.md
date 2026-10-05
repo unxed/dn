@@ -8,17 +8,20 @@ GitHub immediately after it is created.
 - The class-migrated TV3 tree has a case-insensitive whole-tree scan for
   `obj[e]ct`, including ignored files and binary build caches; Git metadata is
   excluded. Keep compiler output outside the scanned tree.
-- Before DN class-migration acceptance, search the complete tree case-insensitively
-  for `object`, including ignored files and generated/binary files, and inspect
-  every match. No Pascal `object`-dialect construction may remain anywhere.
-- Audit the complete DN tree case-insensitively for the substring `object` and
-  inspect every match. No Pascal `object`-dialect construction may remain in
-  any file. Hard textual sub-gate: zero `object` substring matches in Pascal
-  source files (`.pas`, `.pp`, `.inc`, and other Pascal compilation units),
-  including comments and string literals; remove incidental mentions there
-  too. Review non-Pascal matches and classify them as documentation, test
-  fixtures, generated output, or genuine migration residue. Keep compiler
-  products/caches outside the tree when they would otherwise create hits.
+- The DN gate is `tools/class-gate.sh` (`tools/class-gate.py`, run by
+  `tools/dn-test.sh`, tests in `tools/tests/test_class_gate.py`). It is
+  blocking on the keyword `object` in the code of every tracked Pascal file
+  (`.pas`, `.pp`, `.inc`, `.dpr`, `.lpr`): an old `T = object(...)` or
+  `packed object` type. Comments, string literals, other words
+  (`TFindObject`, `ExceptObject`), documentation and non-Pascal files are
+  not matched: they are not a programming-style question. `CLASS_GATE_EXCLUDE`
+  (default `bootstrap/`, the record of how the first tree came to be, which
+  CI job `bootstrap` reproduces; an empty value scans everything) sets the
+  paths that are not scanned. The old construction idioms `New(T, Init(...))`
+  and `Dispose(P, Done)` are printed as a count; `CLASS_GATE_STRICT=1` makes
+  them blocking (the final acceptance should run it). This replaces the earlier
+  whole-tree substring scan for `object`, which also failed on prose,
+  comments and names, and so hid the real result.
 - Classes use their semantic `T...` names, direct member access, `Create`, `Destroy`
   and `Free` or `FreeAndNil`. An alias carrying an old pointer/type name is not a
   completed migration. Actual pointers to records and scalar data remain pointers.
@@ -52,9 +55,9 @@ GitHub immediately after it is created.
 - Complete construction, destruction, direct member access and overrides in DN.
 - Replace resource retyping with subclass construction by the resource loader.
 - Bring the complete DN tree through its spelling gate, including build output.
-- Complete the case-insensitive whole-tree `object` audit; remove all
-  Pascal-source matches and verify that no legacy Pascal object-dialect
-  constructs remain elsewhere in the tree.
+- Remove the old construction idioms that `tools/class-gate.sh` counts
+  (`New(T, Init(...))` in `dn/src/pktview.pas`), then run it with
+  `CLASS_GATE_STRICT=1` and with `CLASS_GATE_EXCLUDE=` for acceptance.
 - Verify native and DOS tv3 checks, then the supported DN builds, full
   object/class parity and runtime tests.
 - Publish only to `main`; the previous branch/PR integration step has already
