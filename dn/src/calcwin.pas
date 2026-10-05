@@ -79,7 +79,7 @@ type
     constructor Create(Bounds: TRect; AName: String); {DataCompBoy}
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     destructor Destroy; override;
     end;
 
@@ -106,11 +106,11 @@ type
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
 
-    procedure Draw; virtual;
-    function Valid(Command: Word): Boolean; virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure Draw; override;
+    function Valid(Command: Word): Boolean; override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     function GetCellValue(const S: String): Boolean;
     {S - имя ячейки; результат - в evaluator.Res}
     function GetFuncValue(S: String): Boolean;
@@ -138,15 +138,15 @@ type
     CalcView: TCalcView;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
   TInfoView = class(TView)
     InfoStr: String;
     InfoAttr: Byte;
     procedure SetInfo(S: String; Attr: Byte);
-    procedure Draw; virtual;
+    procedure Draw; override;
     end;
 
 function GetFileName(var FileName: String; Mask, Title, ALabel: String;
