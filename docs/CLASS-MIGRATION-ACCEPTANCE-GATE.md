@@ -13,6 +13,11 @@ The full `dn-linux-tour.py` run was stopped because its first baseline scenario
 did not return; this is recorded as an acceptance-runner failure, not as a
 passing result. Direct targeted PTY checks for baseline startup/exit and menu
 rendering did return successfully.
+The first bitwise startup/menu comparison also found a **FAIL**: 2722 cell
+states differ, including foreground/background attributes (for example,
+baseline background index 6 versus class-build background index 2). The
+text/geometry is similar, but this is still a gate failure until the palette
+provenance is resolved.
 
 ## Required comparison
 
