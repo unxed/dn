@@ -709,7 +709,6 @@ destructor TDNApplication.Destroy;
   if ProbeINI(INItime, INIsize) then
     WriteIniCache(INItime, INIsize);
 {/JO}
-  DNTrace('Done: Unload ' + ItoS(StartupData.Unload));
   if  (StartupData.Unload and osuAutosave <> 0)
   then
     SaveRealDsk
@@ -1239,7 +1238,6 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
   begin { TDNApplication.SaveDesktop }
   ClrIO;
   S := TBufStream.Create(FileName, stCreate, 2048);
-  DNTrace('SaveDesktop ' + FileName + ' status ' + ItoS(S.Status));
   if (S.Status = stOK) then
     begin
     S.Write(DskSign.Sign[1], DskSign.SignLen);

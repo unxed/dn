@@ -564,43 +564,52 @@ end;
 
 { --- cells of tv/ ---------------------------------------------------------------- }
 
-{ a TDrawBuffer of tv/ laid over the memory of the cells (no memory of its own); Capacity is as large as the caller can mean }
-procedure Over(var B: TvDrawBuf.TDrawBuffer; var First);
-begin
-  B.Data := @First;
-  B.Capacity := MaxInt div 64;
-end;
-
 procedure MoveColor(var Buf: TScreenCell; Num: Word; Attr: Byte);
 var
-  B: TvDrawBuf.TDrawBuffer;
+  I: Integer;
+  P: PScreenCell;
 begin
-  Over(B, Buf);
-  B.MoveChar(0, 0, AttrFromBIOS(Attr), Num);
+  P := @Buf;
+  for I := 0 to Num - 1 do
+  begin
+    P^.Attribute := AttrFromBIOS(Attr);
+    Inc(P);
+  end;
 end;
 
 procedure MoveBuf(var Dest: TScreenCell; var Source; Attr: Byte; Count: Word);
 var
-  B: TvDrawBuf.TDrawBuffer;
+  S: String;
 begin
-  Over(B, Dest);
-  B.MoveBuf(0, @Source, AttrFromBIOS(Attr), Count);
+  if Count = 0 then
+    Exit;
+  SetLength(S, Count);
+  Move(Source, S[1], Count);
+  MoveStr(Dest, S, Attr);
 end;
 
 procedure MoveChar(var Dest: TScreenCell; C: Char; Attr: Byte; Count: LongInt);
 var
-  B: TvDrawBuf.TDrawBuffer;
+  I: Integer;
+  P: PScreenCell;
 begin
-  Over(B, Dest);
-  B.MoveChar(0, Ord(C), AttrFromBIOS(Attr), Count);
+  P := @Dest;
+  for I := 0 to Count - 1 do
+  begin
+    ScInitChar(P^.Character, Ord(C));
+    P^.Attribute := AttrFromBIOS(Attr);
+    Inc(P);
+  end;
 end;
 
 procedure MoveStr(var Dest: TScreenCell; const Str: String; Attr: Byte);
 var
   B: TvDrawBuf.TDrawBuffer;
 begin
-  Over(B, Dest);
+  B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
   B.MoveStrS(0, Str, AttrFromBIOS(Attr), Length(Str));
+  Move(B.Data^, Dest, Length(Str) * SizeOf(TScreenCell));
+  B.Free;
 end;
 
 procedure MoveCStr(var Dest: TScreenCell; const Str: String; Attrs: Word);
@@ -608,10 +617,12 @@ var
   B: TvDrawBuf.TDrawBuffer;
   P: TAttrPair;
 begin
-  Over(B, Dest);
+  B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
   P.Lo := AttrFromBIOS(Attrs and $FF);
   P.Hi := AttrFromBIOS(Attrs shr 8);
   B.MoveCStrS(0, Str, P, Length(Str));
+  Move(B.Data^, Dest, Length(Str) * SizeOf(TScreenCell));
+  B.Free;
 end;
 
 procedure MoveColor(var Buf: array of TScreenCell; Num: Word; Attr: Byte);
