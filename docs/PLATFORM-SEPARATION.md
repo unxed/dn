@@ -19,8 +19,10 @@ First extraction landed: Linux command-line path/encoding conversion moved
 from `DNRun` to the stable `osdep` facade as `SysCommandLineToOs`; its six
 command-path regression checks remain in `t_dnrun`. Local proof before commit:
 `tools/dn-test.sh` PASS (12 programs), `tools/build.sh linux64` PASS for legacy
-and `DN_UTF8=1` variants. Full object/class parity is still a hard gate for
-this commit; no next behavior-sensitive extraction starts until it passes.
+and `DN_UTF8=1` variants. Exact-SHA CI `1f51f75` then passed all 177 object/class
+acceptance scenarios (`37387363591`), Linux (`37387361374`), Windows
+(`37387362011`), `dn` (`37387362801`), and layout (`37387361710`). No mismatch
+was introduced; this extraction is closed.
 
 The inventory is deliberately limited to the first extraction families; the
 presence of `Dos` in historical DN units alone does not mean that every caller

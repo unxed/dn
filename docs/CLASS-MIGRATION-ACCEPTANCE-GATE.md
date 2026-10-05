@@ -7,15 +7,15 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
-Current behavioral gate status: **CLOSED** for DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` + TV3 `a06dd31` (2026-10-06). The whole-tree class-syntax and bootstrap-provenance gates are also green on current DN `8f3057f` (`dn` run `37386669632`; `layout` run `37386669509`); those changes do not alter DN runtime sources.
+Current behavioral gate status: **CLOSED** for DN `1f51f75677ae19ccb13c4d9071dedb3f7177f87e` + TV3 `a06dd31` (2026-10-06). The all-tree class-syntax and bootstrap-provenance gates passed on DN `8f3057f`; the platform-facade extraction was then re-verified on `1f51f75` with no object/class mismatch.
 
-**Closing evidence (exact SHA):** 12-shard `dn-accept` run
-[`37383488177`](https://github.com/unxed/dn/actions/runs/37383488177):
+**Latest closing evidence (exact SHA):** 12-shard `dn-accept` run
+[`37387363591`](https://github.com/unxed/dn/actions/runs/37387363591):
 **177/177 PASS**, including `f5_f6_f8`; `dn-linux` run
-[`37383488040`](https://github.com/unxed/dn/actions/runs/37383488040),
-`dn-windows` run [`37383488261`](https://github.com/unxed/dn/actions/runs/37383488261),
-layout run [`37383487968`](https://github.com/unxed/dn/actions/runs/37383487968),
-and `dn` audit run [`37383487991`](https://github.com/unxed/dn/actions/runs/37383487991)
+[`37387361374`](https://github.com/unxed/dn/actions/runs/37387361374),
+`dn-windows` run [`37387362011`](https://github.com/unxed/dn/actions/runs/37387362011),
+layout run [`37387361710`](https://github.com/unxed/dn/actions/runs/37387361710),
+and `dn` audit run [`37387362801`](https://github.com/unxed/dn/actions/runs/37387362801)
 all completed successfully on that same SHA. The object binary was rebuilt
 from DN `b4916b8` + TV `521d064`; the class build used TV3 `a06dd31`. The
 harness compares full `Screen.cells` + cursor (with documented masks/skips).
@@ -24,7 +24,7 @@ harness compares full `Screen.cells` + cursor (with documented masks/skips).
 
 | Item | SHA / note |
 |---|---|
-| Full object/class accept matrix | **177/177 PASS**, 12 shards, exact SHA `06259f5`, run `37383488177` (2026-10-06) |
+| Full object/class accept matrix | **177/177 PASS**, 12 shards, exact SHA `1f51f75`, run `37387363591` (2026-10-06); repeated after the `osdep` facade extraction |
 | #6 startup redraw + About residue | `7572d73`; regressions green |
 | Accept harness harden (masks, long-scan, help wait) | `606cca3` (+ earlier settle fixes) |
 | F1 Help open-vs-idle settle | `wait_help_window` for `f1help`/`f1_esc` |
@@ -199,8 +199,8 @@ error immediately after F5. Local evidence: class ops passes 32/32 with
 builds in UTF-8 mode. The repo-wide `FreeItem`/collection search and queue
 search confirms there are no remaining `TCopyCollection`/`PFileCopyRec`
 references, and the queue's only insertions are `TLine` instances. The fix is
-verified by the full **177/177** run on `06259f5` (run `37383488177`) and green
-Linux ops on that exact SHA (run `37383488040`).
+verified by the full **177/177** run on `1f51f75` (run `37387363591`) and green
+Linux ops on that exact SHA (run `37387361374`).
 
 ## UI observations (2026-10-05)
 
@@ -239,7 +239,7 @@ Harness: `tools/dn-linux-accept.py OBJECT_OUT CLASS_OUT` — shared work tree, f
 scenarios + every top-menu cell (`menu_M_N`). Object baseline: DN `b4916b8` + TV
 `521d064`. Harness harden `ad9c4f7`. **Core result 2026-10-05:**
 `SUMMARY pass=32 fail=0` (historical). **Full matrix 2026-10-05:**
-`pass=177 fail=0` (12 shards, `dn-accept` run `37383488177` on `06259f5`) —
+`pass=177 fail=0` (12 shards, `dn-accept` run `37387363591` on `1f51f75`) —
 gate **CLOSED**. All required GitHub workflows for that SHA reached terminal
 success.
 
