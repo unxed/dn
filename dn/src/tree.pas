@@ -2099,11 +2099,12 @@ procedure THTreeView.SetState(AState: Word; Enable: Boolean);
      Info.SetState(sfVisible, Enable);
   end;
 
-{ AK155 26-01-2003. Раньше Info не освобождалось вообще }
 destructor THTreeView.Destroy;
   begin
-  if Info <> nil then
-    Info.Free;
+  { Info is a peer view owned by the containing panel group (see
+    TPanelManager.Create); the group disposes all of its children.  Do not
+    free a peer here, or the group can retain a dangling child link. }
+  Info := nil;
   inherited Destroy;
   end;
 
