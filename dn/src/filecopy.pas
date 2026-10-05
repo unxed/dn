@@ -162,20 +162,6 @@ type
     XName, Name: PString;
     end;
 
-  PFileCopyRec = ^TFileCopyRec;
-  TFileCopyRec = record
-    Name: PString;
-    Attr: Byte;
-    Size: TSize;
-    Dir: PDir;
-    Owner: PFileRec;
-    DIZ: PDiz;
-    end;
-
-  TCopyCollection = class(TCollection)
-    procedure FreeItem(P: Pointer); override;
-    end;
-
   TDirCollection = class(TSortedCollection)
     procedure FreeItem(P: Pointer); override;
     function Compare(P1, P2: Pointer): Integer; override;
@@ -190,16 +176,6 @@ function MaxAvail: LongInt;
   begin
   MaxAvail := MemAdjust(Defines.MaxAvail);
   end;
-
-{-DataCompBoy-}
-procedure TCopyCollection.FreeItem(P: Pointer);
-  begin
-  if  (P <> nil) and (PFileCopyRec(P)^.Name <> nil) then
-    DisposeStr(PFileCopyRec(P)^.Name);
-  if P <> nil then
-    Dispose(PFileCopyRec(P));
-  end;
-{-DataCompBoy-}
 
 procedure TDirCollection.FreeItem(P: Pointer);
   begin
@@ -337,6 +313,10 @@ type
     destructor Destroy; override;
     end;
 
+  TLineQueue = class(TCollection)
+    procedure FreeItem(Item: Pointer); override;
+    end;
+
   TDirName = class(TObject)
     OldName, NewName: PString;
     Check: Boolean;
@@ -419,6 +399,12 @@ destructor TLine.Destroy;
   DisposeStr(PString(NewName));
   DisposeStr(PString(OldName));
   inherited Destroy;
+  end;
+
+procedure TLineQueue.FreeItem(Item: Pointer);
+  begin
+  if Item <> nil then
+    TLine(Item).Free;
   end;
 
 procedure TLine.PrepareToWrite;
@@ -506,7 +492,8 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     SkipAllBad: Boolean;
     ToRead, ToWrite: TSize;
     CopyStartTime, CopyElapsedTime: LongInt; {John_SW 30-06-2005}
-    CopyQueue, Dirs: TCollection;
+    CopyQueue: TLineQueue;
+    Dirs: TCollection;
     iQueue: Integer;
     CurOldName, CurNewName: String;
     CurDate: LongInt;
@@ -2446,7 +2433,7 @@ qqqq:
     Application.OutOfMemory;
     goto 1;
     end;
-  CopyQueue := TCopyCollection.Create(250, 100);
+  CopyQueue := TLineQueue.Create(250, 100);
   Info.Bottom := GetString(dlFC_Total)+FStr(ToDo)+GetString(dlBytes);
   Info.DrawView;
   DrvC := Drv+64;

@@ -65,6 +65,8 @@ def main():
         key('F5'); key('newdir'); key('ENTER', 1.2)
         check(os.path.isfile(os.path.join(w, 'newdir', 'a.txt')) and os.path.isfile(os.path.join(w, 'a.txt')),
               'F5: a.txt is copied into newdir, the original stays', t.text())
+        check(t.alive() and 'Access violation' not in t.text() and 'Fatal' not in t.text(),
+              'F5: copy returns without a fatal error', t.text())
         if os.path.isfile(os.path.join(w, 'newdir', 'a.txt')):
             check(open(os.path.join(w, 'newdir', 'a.txt')).read() == 'first\n', 'F5: the copy has the same content')
 

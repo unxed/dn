@@ -86,6 +86,7 @@ SCENARIOS = [
     ('f5copy', 'HOME DOWN DOWN F5', 'fileops'),
     ('f5_cancel', 'HOME DOWN DOWN F5 ESC ESC', 'fileops'),
     ('f6ren', 'HOME DOWN DOWN F6', 'fileops'),
+    ('f5_f6_f8', 'F7 newdir ENTER HOME DOWN DOWN DOWN F5 sub ENTER DOWN F6 sub ENTER F8 ENTER', 'fileops'),
     ('f6_cancel', 'HOME DOWN DOWN F6 ESC ESC', 'fileops'),
     ('f7mkdir', 'F7', 'fileops'),
     ('f7_cancel', 'F7 ESC', 'fileops'),
