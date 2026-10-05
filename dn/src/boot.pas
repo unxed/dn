@@ -660,6 +660,7 @@ procedure RUN_IT;
     
   var
     Ev: TEvent;
+    R: TRect;
     
     Regs: real_mode_call_structure_typ;
     
@@ -777,6 +778,8 @@ procedure RUN_IT;
     UnLock;
     end;
   MyApplication.Buffer := ScreenBuffer;
+  R.Assign(0, 0, ScreenWidth, ScreenHeight);
+  MyApplication.ChangeBounds(R);
   MyApplication.Draw;
   WriteScreenCells(0, ScreenWidth * ScreenHeight);
   

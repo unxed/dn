@@ -1238,7 +1238,7 @@ procedure TMenuBar.Draw;
   CSelect := GetColorW($0604);
   CNormDisabled := GetColorW($0202);
   CSelDisabled := GetColorW($0505);
-  MoveChar(B, ' ', Byte(CNormal), Size.X);
+  MoveChar(B[0], ' ', Byte(CNormal), Size.X);
   if Menu <> nil then
     begin
     X := 1;
@@ -1717,7 +1717,7 @@ procedure TStatusLine.DrawSelect(Selected: PStatusItem);
   CSelect := GetColorW($0604);
   CNormDisabled := GetColorW($0202);
   CSelDisabled := GetColorW($0505);
-  MoveChar(B, ' ', Byte(CNormal), Size.X);
+  MoveChar(B[0], ' ', Byte(CNormal), Size.X);
   for FJ := 0 to 11 do
     FTitles[FJ] := '';
   T := Items;

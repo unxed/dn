@@ -138,11 +138,10 @@ constructor TProgram.Create;
 var
   R: TRect;
 begin
-  DNTrace('TProgram.Init');
   Application := Self;
   InitScreen;
   R.Assign(0, 0, ScreenWidth, ScreenHeight);
-  TvViews.TGroup.Create(R);
+  TGroup(Self).Create(R);
   State := sfVisible or sfSelected or sfFocused or sfModal or sfExposed;
   Options := 0;
   Buffer := TvScreen.ScreenBuffer;
@@ -161,7 +160,6 @@ begin
   if MenuBar <> nil then
     MenuBar.GrowTo(MenuBar.Size.X, 1);
   NewTimer(IdleSecs, 0);
-  DNTrace('TProgram.Init: done, size=' + IntToStr(Size.X) + 'x' + IntToStr(Size.Y));
 end;
 
 { As TProgram.Done of DN: the menu, the status line and the desktop are disposed first and Application is nil before the group
@@ -208,8 +206,6 @@ begin
     if ((Event.What and evKeyDown) <> 0) or
        (((Event.What and evMouseDown) <> 0) and StatusLine.MouseInView(Event.Where)) then
       StatusLine.HandleEvent(Event);
-  if Event.What = evKeyDown then
-    DNTrace('key ' + IntToHex(Event.KeyCode, 4) + ' shift ' + IntToHex(Event.ControlKeyState, 4));
   { the state of the shift keys is that of keyboard and mouse events: the field is not set in the messages (commands, broadcasts) }
   if (Event.What and (evKeyDown or evMouse)) <> 0 then
   begin
@@ -381,23 +377,14 @@ end;
 
 procedure TProgram.Idle;
 begin
-  if not IdleSeen then
-    DNTrace('first Idle');
-  IdleSeen := True;
-  Inc(IdleCount);
   inherited Idle;
   if Drivers.ScreenBuffer <> nil then
     ReadScreenCells;               { the copy of the screen that DN reads }
   if StatusLine <> nil then
   begin
     StatusLine.Update;
-    if IdleCount < 4 then
-      DNTrace('idle ' + IntToStr(IdleCount) + ': status help ctx ' + IntToStr(StatusLine.HelpCtx) + ' top help ctx ' +
-        IntToStr(StatusLine.TopView.GetHelpCtx) + ' items ' + IntToHex(PtrUInt(StatusLine.Items), 8) + ' defs ' +
-        IntToHex(PtrUInt(StatusLine.Defs), 8));
   end;
   RunBackground;
-  CheckScreenDump;
 end;
 
 procedure TProgram.InitCommandLine;
@@ -550,16 +537,12 @@ var
   D: TDialog;
 begin
   Result := cmCancel;
-  DNTrace('ExecResource ' + IntToStr(Ord(Key)));
   D := LoadDialog(Key);
-  DNTrace('ExecResource: loaded ' + IntToHex(PtrUInt(D), 8));
   if D = nil then
     Exit;
   if Assigned(PreExecuteDialog) then
     PreExecuteDialog(D);
-  DNTrace('ExecResource: executing');
   Result := ExecDialog(D, Data);
-  DNTrace('ExecResource: done ' + IntToStr(Result));
   D.Free;
   PreExecuteDialog := nil;
 end;
@@ -761,6 +744,4 @@ initialization
   CColor := SystemColors[apColor];
   CBlackWhite := SystemColors[apBlackWhite];
   CMonochrome := SystemColors[apMonochrome];
-finalization
-  DumpAtExit;
 end.
