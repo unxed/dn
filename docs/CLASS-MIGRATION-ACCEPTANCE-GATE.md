@@ -13,11 +13,16 @@ The full `dn-linux-tour.py` run was stopped because its first baseline scenario
 did not return; this is recorded as an acceptance-runner failure, not as a
 passing result. Direct targeted PTY checks for baseline startup/exit and menu
 rendering did return successfully.
-The first bitwise startup/menu comparison also found a **FAIL**: 2722 cell
-states differ, including foreground/background attributes (for example,
-baseline background index 6 versus class-build background index 2). The
-text/geometry is similar, but this is still a gate failure until the palette
-provenance is resolved.
+The first bitwise startup/menu comparison found a **FAIL**: 2722 cell states
+differ, including foreground/background attributes (for example, baseline
+background index 6 versus class-build background index 2). Investigation
+traced this to a palette revision: the classic binary uses the older
+red/magenta OSP table, while the class source explicitly installs the newer
+dark-gray/cyan/yellow DN table in `dn/src/mainapp.pas`. `TvColors` and
+`TvAnsi` behavior is unchanged. This is not permission to ignore the
+difference: the final comparison must use an object baseline built with the
+same intended palette revision, or preserve the old palette in the class
+build if classic visual compatibility is the requirement.
 
 ## Required comparison
 
