@@ -7,7 +7,7 @@ procedure PrepareExtCollection;
 
 const
   Executables: String = 'exe;bat;com';
-  {JO: дополнительные расширения для поиска в архивах}
+  {JO: extra extensions for archive search}
   AddArchives: String =
    'exe;com';
   Archives: String =
@@ -185,7 +185,7 @@ procedure PutExtFilter(Filter: string; T: Integer);
         MZ[i] := '0';
     l := i-1;
     if ExtCollection.Search(@MZ, i) then
-      { дублирование: такого быть не должно }
+      { duplication: this must not happen }
     else
       begin
       New(P);

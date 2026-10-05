@@ -59,7 +59,7 @@ type
 
 
   TEditWindow = class(TUniWindow)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is in the plugin model; change with extreme care!}
     AInfo: TInfoLine;
     ABookLine: TBookmarkLine;
     Intern: TFileEditor;
@@ -71,9 +71,9 @@ type
     //    procedure ChangeBounds(const R: TRect); virtual;
     procedure Store(var S: TStream);
 {AK155 04/04/2006
-  Execute нигде не используется, и зачем он нужен - непонятно.
-  Вероятно, введён на случай модального окна редактора, только
-  вряд ли такое может понадобиться кому-то.
+  Execute is unused anywhere; unclear why it is needed.
+  Probably added for a modal editor window, but
+  that is unlikely to be needed by anyone.
     function Execute: Word; override;
 }
     procedure SetState(AState: Word; Enable: Boolean); virtual;

@@ -58,7 +58,7 @@ uses
 
 type
   MyApp = class(TDNApplication)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is in the plugin model; change with extreme care!}
     procedure HandleEvent(var Event: TEvent); override;
     procedure GetEvent(var Event: TEvent); override;
     procedure Idle; override;
@@ -264,7 +264,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         cmNavyLinkSetup,
         cmQuit:
           HandleCommand(Event);
-        {Cat: проверяем, не пора ли запускать плагины - EventCatcher-ы}
+        {Cat: check whether it is time to run EventCatcher plugins}
         
         {/Cat}
       end {case};

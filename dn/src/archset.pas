@@ -132,7 +132,7 @@ procedure SetupArchive(ArchCommand: Word);
       {/JO}
       
       UseLFN: Word; {Checkbox}
-      {нужен в DOS и W32-версиях}
+      {needed in DOS and W32 builds}
       
       end;
 

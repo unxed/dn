@@ -133,7 +133,7 @@ procedure SetHighlightGroups;
     end;
   PrepareExtCollection;
   Message(Application, evCommand, cmUpdateConfig, nil);
- {JO: перечитываем группы для всех панелей}
+ {JO: reread groups for all panels}
   GlobalMessage(evCommand, cmUpdateHighlight, nil);
   end { SetHighlightGroups };
 
@@ -201,8 +201,8 @@ procedure WindowManager;
   begin { WindowManager }
   PC := TWindowCol.Create(10, 10);
   Desktop.ForEach(InsView);
-(* AK155 Контроль на Count = 0 не нужен, так как если окон нет, то
-cmWindowManager задизейблена.
+(* AK155 Count = 0 check is unnecessary: if there are no windows,
+cmWindowManager is disabled.
   if PC.Count = 0 then
     begin
     PC.Free;
@@ -247,7 +247,7 @@ cmWindowManager задизейблена.
 while true do
   begin
   Cmd := Desktop.ExecView(D);
-  D.GetData(DT); { Теперь DT.P = PC }
+  D.GetData(DT); { Now DT.P = PC }
   PV := TView(DT.P.At(DT.n));
   if Cmd = cmCancel then
     Break;
@@ -262,7 +262,7 @@ while true do
       begin
       PV.Free;
       DT.P := nil;
-      D.SetData(DT); {при этом NewList освободит PC }
+      D.SetData(DT); {NewList will free PC }
       PC.Create(10, 10);
       Desktop.ForEach(InsView);
       if PC.Count = 0 then

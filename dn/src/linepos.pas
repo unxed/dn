@@ -59,11 +59,11 @@ procedure MakeCRCTable;
 function GetLineNumberForOffset(const FName: String; Offset: LongInt)
   : LongInt;
 function GetOffsetForLineNumber
-  {` При установке номера, превышающего размер файла, результат -1.
-   Эта функция правильно работает, если разделитель строк - Lf или
-   CrLf. А голый Cr в качестве разделителя она не понимает, то есть
-   выдаст -1.
-     Ни анализа IOResult в процессе, ни ClrIO в конце не делается. }
+  {` If the line number exceeds the file size, result is -1.
+   This function works correctly when the line separator is Lf or
+   CrLf. A bare Cr as separator is not understood, i.e.
+   it returns -1.
+     No IOResult checks during, and no ClrIO at the end. }
     (const FName: String; LineNm: LongInt): LongInt;
   {`}
 

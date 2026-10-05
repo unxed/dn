@@ -174,7 +174,7 @@ type
   TArvidDrive = class;
 
   TArvidDrive = class(TDrive)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is in the plugin model; change with extreme care!}
     Name: PString;
     Stream: TStream;
     CurFile: LongInt;
@@ -245,7 +245,7 @@ uses
   basics, fileutil, strutil, filepanel, Commands, Startup, mainapp,
   Drivers, Messages, Dialogs, FileFind, DNUtil, FileCopy, keymap,
   ArvidAvt, ArvidTdr
-  , panelsetup, FindObj{ не забыть прибить вместе с Арвидом}, Math
+  , panelsetup, FindObj{ remove together with Arvid}, Math
   , osdep;
 
 {$I manual/pstring_bind.inc}
@@ -778,7 +778,7 @@ procedure TArvidDrive.ChangeUp(var S: String);
     end;
   TFilePanel(Panel).Drive := Prev;
   Prev.lChDir(Prev.CurDir);
-{AK155 Если GetState(sfSelected+sfActive), то и так ActivePanel = Panel
+{AK155 If GetState(sfSelected+sfActive), then ActivePanel = Panel anyway
   if  (Prev.DriveType = dtDisk) and
       (TView(Panel).GetState(sfSelected+sfActive))
   then

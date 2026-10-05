@@ -144,7 +144,7 @@ procedure LongCopy(Fn1: String);
     wl: Byte;
     d, Fn2: String;
     n, x: String;
-    PathBuffer: array[0..255] of Char; {целевой каталог}
+    PathBuffer: array[0..255] of Char; {target directory}
     nhd: NHdr;
     ohd: OHdr absolute nhd;
     PInfo: TWhileView;
@@ -510,7 +510,7 @@ Rep:
     else
       D := TDialog(LoadResource(dlgSplitFile));
 
-    // Строка 1 в диалоге должна быть пустой - туда вставляется имя файла
+    // Dialog line 1 must be empty — the file name is inserted there
     R.Assign(0, 1, Length(aa)+Length(aaa), 2);
     P := TStaticText.Create(R, aa+aaa);
     P.Options := P.Options or ofCenterX;

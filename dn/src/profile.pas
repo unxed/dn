@@ -129,7 +129,7 @@ function OpenFile(FileName: PChar; Mode: Longint): Boolean;
   Result := True;
   if  (CurFileName = nil) or (FileName = nil) or
       (StrIComp(CurFileName, FileName) <> 0) or
-      (Mode and not CurMode <> 0) { т.е. смена с stOpenRead на stOpen }
+      (Mode and not CurMode <> 0) { i.e. change from stOpenRead to stOpen }
   then
     begin
     CloseFile;

@@ -55,9 +55,9 @@ uses
   ;
 
 type
-   { строка быстрого переименования (Alt-F6). Она исполняется прямо
-   в менедждере, без объемлющего диалога, поэтому имеет свой метод
-   Execute. Цвета палитры (C) заносятся в CM_RenameSingleL}
+   { quick-rename line (Alt-F6). It runs directly
+   in the manager, without an enclosing dialog, so it has its own
+   Execute method. Palette colors (C) go into CM_RenameSingleL}
   TInputFName = class(TInputLine)
     EndView: Word;
     function Execute: Word; override;
