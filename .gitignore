@@ -11,3 +11,4 @@ out/
 tv/tests/tvhc-o/
 tv/tests/t_*
 !tv/tests/t_*.pas
+.ci-push-secret
