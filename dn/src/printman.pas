@@ -184,7 +184,7 @@ procedure TPrintStatus.Draw;
   begin
   S1 := '';
   C := GetColorW($0102);
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   if  (Print.Paused) or (Print.List = nil) or (Print.List.Count = 0)
   then
     S := GetString(dlPrintingPaused)
@@ -199,10 +199,10 @@ procedure TPrintStatus.Draw;
           1, Size.X-6) +
         ' ~' + Percent(Print.FilePos+1, Print.FileLen+1);
     end;
-  MoveCStr(B, '~'+S+'~', C);
+  MoveCStr(B[0], '~'+S+'~', C);
   WriteLineC(0, 0, Size.X, 1, B);
-  MoveChar(B, ' ', C, Size.X);
-  MoveCStr(B, S1, C);
+  MoveChar(B[0], ' ', C, Size.X);
+  MoveCStr(B[0], S1, C);
   WriteLineC(0, 1, Size.X, 1, B);
   end { TPrintStatus.Draw };
 

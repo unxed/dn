@@ -322,7 +322,7 @@ procedure TInfoView.Draw;
   var
     B: TDrawBuffer;
   begin
-  MoveChar(B, ' ', InfoAttr, Size.X);
+  MoveChar(B[0], ' ', InfoAttr, Size.X);
   MoveStr(B[Size.X-Length(InfoStr)], InfoStr, InfoAttr);
   WriteLineC(0, 0, Size.X, 1, B);
   end;
@@ -841,9 +841,9 @@ procedure TCalcView.Draw;
     Y2 := 4095;
   SetLength(EmptyLine, Size.X);
   FillChar(EmptyLine[1], Size.X, ' ');
-  MoveChar(B, ' ', C1, Size.X);
+  MoveChar(B[0], ' ', C1, Size.X);
   BC[6].C := #$B3;
-  MoveChar(B1, #$C4, C1, Size.X);
+  MoveChar(B1[0], #$C4, C1, Size.X);
   SetCellChar(B1[6], $C5);
   NumC := 0;
   I := 7;
@@ -900,11 +900,11 @@ procedure TCalcView.Draw;
 
   for I := 0 to Size.Y-2 do
     begin
-    MoveChar(B, ' ', C2, Size.X);
+    MoveChar(B[0], ' ', C2, Size.X);
     if Delta.Y+I <= VScroll.MaxVal then
       begin
       Str((Delta.Y+I+1): 5, S);
-      MoveStr(B, S, C1);
+      MoveStr(B[0], S, C1);
       L := 7;
       for J := 0 to Min(NumC-1, 255-Delta.X) do
         begin

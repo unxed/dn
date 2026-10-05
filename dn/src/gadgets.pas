@@ -205,8 +205,8 @@ procedure THeapView.Draw;
   OldMem := MemAvail;
   Attr := GetColorW(2);
   Str(OldMem, Text);
-  MoveChar(Row, ' ', Attr, Size.X);
-  MoveStr(Row, Text, Attr);
+  MoveChar(Row[0], ' ', Attr, Size.X);
+  MoveStr(Row[0], Text, Attr);
   WriteLineC(0, 0, Size.X, 1, Row);
   end;
 procedure THeapView.Update;
@@ -253,9 +253,9 @@ procedure TClockView.Draw;
   begin
   Size.Y := 1;
   C := GetColorW(1);
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   if MacroRecord then
-    MoveStr(B, '>MACRO<', C)
+    MoveStr(B[0], '>MACRO<', C)
   else
     begin
     if  (RightAlignClock = True) and
@@ -267,7 +267,7 @@ procedure TClockView.Draw;
       GrowTo(Length(TimeStr), 1);
       Exit
       end;
-    MoveStr(B, TimeStr, C);
+    MoveStr(B[0], TimeStr, C);
     end;
   WriteLineC(0, 0, Size.X, 1, B);
   end { TClockView.Draw };
@@ -445,11 +445,11 @@ procedure TTrashCan.Draw;
   else
     Index := 1;
   Attr := GetColorW(Index);
-  MoveStr(Row, #209#209#216#209#209, Attr);
+  MoveStr(Row[0], #209#209#216#209#209, Attr);
   WriteLineC(0, 0, Size.X, 1, Row);
-  MoveStr(Row, GetString(dlTrashCaption), Attr);
+  MoveStr(Row[0], GetString(dlTrashCaption), Attr);
   WriteLineC(0, 1, Size.X, 1, Row);
-  MoveStr(Row, #192#193#193#193#217, Attr);
+  MoveStr(Row[0], #192#193#193#193#217, Attr);
   WriteLineC(0, 2, Size.X, 1, Row);
   end;
 

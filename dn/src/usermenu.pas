@@ -184,7 +184,7 @@ procedure TUserView.Draw;
   begin
   for I := 0 to Size.Y-1 do
     begin
-    MoveChar(B, ' ', 07, MaxViewWidth);
+    MoveChar(B[0], ' ', 07, MaxViewWidth);
     if I+Delta.Y < UserScreenSize div (UserScreenWidth*2)
     then
       WordsToCells(B[0], PAWordArray(UserScreen)^[(I+Delta.Y)*UserScreenWidth],

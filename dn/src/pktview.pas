@@ -810,7 +810,7 @@ procedure TLineViewer.Draw;
 
   for I := 0 to Size.Y-1 do
     begin
-    MoveChar(B, ' ', CNormal, Size.X);
+    MoveChar(B[0], ' ', CNormal, Size.X);
     if Delta.Y+I < FileLines^.Count then
       begin
       P := FileLines^.At(Delta.Y+I);
@@ -832,7 +832,7 @@ procedure TLineViewer.Draw;
         System.Delete(S, 1, 1);
         Color := WorkStrColor;
         end;
-      MoveStr(B, S, Color);
+      MoveStr(B[0], S, Color);
       end;
     WriteLineC(0, I, Size.X, 1, B);
     end;

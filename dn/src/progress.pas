@@ -154,8 +154,8 @@ procedure TPercentGauge.Draw;
   Attr := GetColorW(1);
   Percent := SolveForY(CurValue, MaxValue);
   FormatStr(Text, '%-3d%%', Percent);
-  MoveChar(Row, ' ', Attr, Size.X);
-  MoveStr(Row, Text, Attr);
+  MoveChar(Row[0], ' ', Attr, Size.X);
+  MoveStr(Row[0], Text, Attr);
   WriteLineC(0, 0, Size.X, Size.Y, Row);
   end;
 
@@ -185,8 +185,8 @@ procedure TBarGauge.Draw;
   Filled := SolveForX(SolveForY(CurValue, MaxValue), Size.X);
   if Filled > Size.X then
     Filled := Size.X;
-  MoveChar(Row, #176, Attr, Size.X);
-  MoveChar(Row, #178, Attr, Filled);
+  MoveChar(Row[0], #176, Attr, Size.X);
+  MoveChar(Row[0], #178, Attr, Filled);
   WriteLineC(0, 0, Size.X, Size.Y, Row);
   end;
 procedure TWhileView.InsBut;
@@ -430,13 +430,13 @@ procedure TWhileView.Draw;
     end;
   C1 := GetColorW(2+Byte(GetState(sfDragging)));
   C2 := GetColorW(7);
-  MoveChar(B, #205, C1, Size.X);
+  MoveChar(B[0], #205, C1, Size.X);
   if Top <> '' then
     MoveStr(B[(Size.X-Length(Top)) div 2-1], ' '+Top+' ', C1);
   B1[0].C := #201;
   B1[Size.X-1].C := #187;
   WriteLineC(0, 0, Size.X, 1, B);
-  MoveChar(B, #205, C1, Size.X);
+  MoveChar(B[0], #205, C1, Size.X);
   if Bottom <> '' then
     MoveStr(B[(Size.X-Length(Bottom)) div 2-1], ' '+Bottom+' ', C1);
   B1[0].C := #200;

@@ -1847,7 +1847,7 @@ procedure TDragger.Draw;
     C: Word;
   begin
   C := $3B30;
-  MoveStr(B, Text^, C);
+  MoveStr(B[0], Text^, C);
   WriteLineC(0, 0, Size.X, Size.Y, B);
   end;
 

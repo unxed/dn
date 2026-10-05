@@ -163,7 +163,7 @@ procedure TSSaver.Draw;
   var
     B: TDrawBuffer;
   begin
-  MoveChar(B, ' ', 07, Size.X);
+  MoveChar(B[0], ' ', 07, Size.X);
   WriteLineC(0, 0, Size.X, Size.Y, B);
   end;
 
@@ -227,7 +227,7 @@ procedure TStarSkySaver.Draw;
     I, K: Integer;
     W: Word;
   begin
-  MoveChar(B, ' ', $07, Size.X);
+  MoveChar(B[0], ' ', $07, Size.X);
   WriteLineC(0, 0, Size.X, Size.Y, B);
   if ScreenHeight*2 > ScreenWidth then
     K := 1
@@ -434,7 +434,7 @@ procedure TClockSaver.Draw;
     B, BB: TDrawBuffer;
     I: Integer;
   begin
-  MoveChar(BB, ' ', $07, Size.X);
+  MoveChar(BB[0], ' ', $07, Size.X);
   for I := 0 to Size.Y-1 do
     if I <> Y
     then
@@ -467,7 +467,7 @@ procedure TClockSaver.Update;
     dM := M;
     dS := S;
     dSS := SS;
-    MoveChar(B, ' ', $07, 5);
+    MoveChar(B[0], ' ', $07, 5);
     WriteLineC(X, Y, 5, 1, B);
     Inc(X, DX);
     Inc(Y, DY);

@@ -2117,10 +2117,10 @@ procedure TFileEditor.Draw;
         begin
         if  (X2 > Size.X) then
           X2 := Size.X;
-        MoveColor(B, X2, BC);
+        MoveColor(B[0], X2, BC);
         end
       else
-        MoveColor(B, Size.X, BC);
+        MoveColor(B[0], Size.X, BC);
       end;
     end { DrawBlock };
 
@@ -2234,7 +2234,7 @@ procedure TFileEditor.Draw;
         C := CC[1];
         BC := CC[2];
         end;
-    MoveChar(B, ' ', C, Size.X);
+    MoveChar(B[0], ' ', C, Size.X);
     if A < FileLines.Count then
       begin
       if WM or (A <> Delta.Y) then
@@ -2246,7 +2246,7 @@ procedure TFileEditor.Draw;
       for J := 0 to (Size.X-1) div 64 do
         MoveStr(B[J*64], TabToUtf8(DocTab, Copy(S, Pos.X+1+J*64, Min(64, Size.X-J*64))), C);
 {$ELSE}
-      MoveStr(B, Copy(S, Pos.X+1, Size.X), C);
+      MoveStr(B[0], Copy(S, Pos.X+1, Size.X), C);
 {$ENDIF}
       if EdOpt.HiLite then
         begin

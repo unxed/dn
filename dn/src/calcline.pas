@@ -265,7 +265,7 @@ procedure TIndicator.Draw;
 
   procedure Wrt(N: Integer);
     begin
-    MoveChar(B, ' ', C, Size.X);
+    MoveChar(B[0], ' ', C, Size.X);
     MoveStr(B[Size.X-Length(S)-1], S, C);
     WriteLineC(0, N, Size.X, 1, B);
     SResult[N] := S;
@@ -275,7 +275,7 @@ procedure TIndicator.Draw;
   C := GetColorW(1);
   if CalcError then
     begin
-    MoveChar(B, ' ', C, Size.X);
+    MoveChar(B[0], ' ', C, Size.X);
     WriteLineC(0, 0, Size.X, 2, B);
     WriteLineC(0, 3, Size.X, 3, B);
     S := GetString(CalcErrMess)+GetErrOp(L);

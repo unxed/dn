@@ -596,8 +596,10 @@ begin
   P := @Dest;
   for I := 0 to Count - 1 do
   begin
-    ScInitChar(P^.Character, Ord(C));
-    P^.Attribute := AttrFromBIOS(Attr);
+    if C <> #0 then
+      ScInitChar(P^.Character, Ord(C));
+    if Attr <> 0 then
+      P^.Attribute := AttrFromBIOS(Attr);
     Inc(P);
   end;
 end;
@@ -605,10 +607,12 @@ end;
 procedure MoveStr(var Dest: TScreenCell; const Str: String; Attr: Byte);
 var
   B: TvDrawBuf.TDrawBuffer;
+  N: Integer;
 begin
   B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
-  B.MoveStrS(0, Str, AttrFromBIOS(Attr), Length(Str));
-  Move(B.Data^, Dest, Length(Str) * SizeOf(TScreenCell));
+  N := B.MoveStrS(0, Str, AttrFromBIOS(Attr), Length(Str));
+  if N > 0 then
+    Move(B.Data^, Dest, N * SizeOf(TScreenCell));
   B.Free;
 end;
 
@@ -616,12 +620,14 @@ procedure MoveCStr(var Dest: TScreenCell; const Str: String; Attrs: Word);
 var
   B: TvDrawBuf.TDrawBuffer;
   P: TAttrPair;
+  N: Integer;
 begin
   B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
   P.Lo := AttrFromBIOS(Attrs and $FF);
   P.Hi := AttrFromBIOS(Attrs shr 8);
-  B.MoveCStrS(0, Str, P, Length(Str));
-  Move(B.Data^, Dest, Length(Str) * SizeOf(TScreenCell));
+  N := B.MoveCStrS(0, Str, P, Length(Str));
+  if N > 0 then
+    Move(B.Data^, Dest, N * SizeOf(TScreenCell));
   B.Free;
 end;
 

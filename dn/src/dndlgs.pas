@@ -367,7 +367,7 @@ procedure THexLine.Draw;
       InputLine.DrawView
       end;
   C := InputLine.GetColorW(1);
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   S := Copy(InputLine.Data^, DeltaX+1, MaxStringLength);
   S := Copy(DumpStr(S[1], 0, 16, 0), 12, Length(S)*3);
   SetCursor(1+3*(CurX-DeltaX)+Byte(Sec), 0);

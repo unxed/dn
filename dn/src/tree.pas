@@ -714,6 +714,8 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
 
 destructor TTreeInfoView.Destroy;
   begin
+  if Tree <> nil then
+    THTreeView(Tree).Info := nil;
   inherited Destroy;
   end;
 
@@ -774,10 +776,10 @@ procedure TTreeInfoView.Draw;
   if Loaded then
     MakeDown;
   Loaded := False;
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   MoveStr(B[1], Cut(Tree.CurPath, Size.X), C);
   WriteLineC(0, 0, Size.X, 1, B);
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   MoveStr(B[1], Down, C);
   WriteLineC(0, 1, Size.X, 1, B);
   end;
@@ -1724,7 +1726,7 @@ procedure TTreeView.Draw;
     end;
   for I := 1 to Size.Y do
     begin
-    MoveChar(B, ' ', C1, 200);
+    MoveChar(B[0], ' ', C1, 200);
     Idx := I+Delta.Y-1;
     if Idx < DC.Count then
       begin
@@ -2101,8 +2103,10 @@ procedure THTreeView.SetState(AState: Word; Enable: Boolean);
 destructor THTreeView.Destroy;
   begin
   { Info is a peer view owned by the containing panel group (see
-    TPanelManager.Create); the group disposes all of its children.  Do not
-    free a peer here, or the group can retain a dangling child link. }
+    TPanelManager.Create); the group disposes all of its children.  Break
+    the back-pointer before the group can dispose this view. }
+  if Info <> nil then
+    TTreeInfoView(Info).Tree := nil;
   Info := nil;
   inherited Destroy;
   end;

@@ -131,13 +131,13 @@ procedure TColorView.Draw;
     B: TDrawBuffer;
     I, J, C: Byte;
   begin
-  {  MoveChar(B,' ',  Color2Display shl 4, Size.X);
+  {  MoveChar(B[0],' ',  Color2Display shl 4, Size.X);
       WriteLineC(0, 0, Size.X, Size.Y, B);
      }
-  MoveChar(B, ' ', $70, Size.X);
+  MoveChar(B[0], ' ', $70, Size.X);
   for I := 0 to Size.Y do
     begin
-    MoveChar(B, ' ', Color2Display shl 4, Size.X);
+    MoveChar(B[0], ' ', Color2Display shl 4, Size.X);
     if  (I > 0) and (I < 5) then
       for J := 0 to 3 do
         begin
