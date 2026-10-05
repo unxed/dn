@@ -341,11 +341,11 @@ begin
     { the focused control of the window on top of the desktop, if that is a group (a test aid; the top view may be a menu, which
       is not a group: the access violation is taken, the trace must not kill the program) }
     try
-      if (Desktop.Current <> nil) and (PGroup(Desktop.Current).Current <> nil) then
+      if (Desktop.Current <> nil) and (TGroup(Desktop.Current).Current <> nil) then
         begin
-          TraceView(PGroup(Desktop.Current).Current);
-          if PGroup(Desktop.Current).Current.Size.Y = 1 then
-            DNTrace('as input line: maxlen ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current).MaxLen) + ' curpos ' + IntToStr(TInputLine(PGroup(Desktop.Current).Current).CurPos) + ' data [' + TInputLine(PGroup(Desktop.Current).Current).Data^ + ']');
+          TraceView(TGroup(Desktop.Current).Current);
+          if TGroup(Desktop.Current).Current.Size.Y = 1 then
+            DNTrace('as input line: maxlen ' + IntToStr(TInputLine(TGroup(Desktop.Current).Current).MaxLen) + ' curpos ' + IntToStr(TInputLine(TGroup(Desktop.Current).Current).CurPos) + ' data [' + TInputLine(TGroup(Desktop.Current).Current).Data^ + ']');
         end;
     except
       DNTrace('(the top view of the desktop is not a window)');
