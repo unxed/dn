@@ -9,6 +9,10 @@ Current gate status: **OPEN**. The classic baseline was identified as
 with the classic `unxed/tv` `main` revision `c9bb5c4`. Initial identical PTY
 checks for startup/exit and top-level menu rendering have been run against
 that baseline and the current build; the complete matrix is still pending.
+The full `dn-linux-tour.py` run was stopped because its first baseline scenario
+did not return; this is recorded as an acceptance-runner failure, not as a
+passing result. Direct targeted PTY checks for baseline startup/exit and menu
+rendering did return successfully.
 
 ## Required comparison
 
