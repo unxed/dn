@@ -193,12 +193,16 @@ confirmed class-only discrepancy for the legacy-codepage Linux ops flow;
 the default UTF-8 class failure is reproduced too, but needs a same-mode
 object run before claiming parity status for that build mode.
 
-The 174-scenario accept matrix is therefore **reopened**. Fix the queue item
-ownership and add a regression that asserts the application remains alive
-after F5, then completes F6-move → F8-delete. Search all custom collection
-construction sites for a mismatch between stored item types and `FreeItem`.
-Re-run object and class ops under matching build modes, then repeat the full
-bitwise acceptance matrix before closing the gate.
+The accept matrix is **reopened** pending the fix's full run. The queue now
+uses `TLineQueue.FreeItem` to free each `TLine`; the unused record-owning
+`TCopyCollection` was removed. `tools/dn-linux-ops.py` now checks for a fatal
+error immediately after F5. Local evidence: class ops passes 32/32 with
+`DN_UTF8=0` and 42/42 with UTF-8; the object build passes 31/31 with
+`DN_UTF8=0`; the new `f5_f6_f8` object/class scenario passes 1/1 with both
+builds in UTF-8 mode. The repo-wide `FreeItem`/collection search and queue
+search confirms there are no remaining `TCopyCollection`/`PFileCopyRec`
+references, and the queue's only insertions are `TLine` instances.
+The full matrix must pass on the fix SHA before this gate can close.
 
 ## UI observations (2026-10-05)
 
