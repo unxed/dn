@@ -25,12 +25,26 @@ superseded, not waived.
 The corrected 24-scenario PTY tour completed on both builds, but it did not
 exercise every action or provide a reproducible exact-cell comparison for
 every checkpoint. A separate full menu-cell probe exposed actionable
-differences, including an access violation when changing language in the
-class build and a different outcome for one menu action. The class-side
-language-menu crash was traced to interpreting a `TStringCollection` short
-string as an AnsiString; a diagnostic-only ShortString correction avoided
-that crash in one probe, but is not yet an accepted source fix. The menu
-matrix and the rest of the action matrix therefore remain **OPEN**.
+differences: at menu item `(0,4)` the class build raised an access violation
+where the object build completed normally; at `(0,10)` the object build ended
+with a pointer-operation fatal error while the class build remained on screen.
+Changing language also raised an access violation in the class build. The
+language-menu crash was traced to interpreting a `TStringCollection`
+ShortString item as an AnsiString. A diagnostic-only ShortString correction
+avoided that crash in one probe, but is not an accepted source fix. A
+repository-wide search found other `PString(Collection.At(...))` patterns in
+`dnutil.pas`, `paneldlgs.pas`, `printman.pas`, `histories.pas`, `eraser.pas`,
+`diskinfo.pas`, and `filefind.pas`; they require type-by-type review before
+any fix is accepted.
+
+The user additionally reported two panel-rendering discrepancies, which are
+recorded as user-observed and still require reproduction against the exact
+build pair: closing About on first launch consistently leaves the dialog
+image over the panels; and on some clean starts panels are initially absent
+until opening a menu triggers redraw. The latter is intermittent. The source
+search found redraw/draw entry points in `mainapp.pas`, `panelroot.pas`,
+`paneldlgs.pas`, and `menus.pas`; it has not isolated the responsible path.
+These reports are hard failures, not accepted normalizations.
 
 Startup/panel regressions to reproduce and fix:
 
@@ -42,6 +56,12 @@ Startup/panel regressions to reproduce and fix:
 * For the About residue, capture the screen immediately before opening About,
   while About is open, and immediately after closing it; all prior panel cells
   must be restored on every trial.
+
+The acceptance harness itself previously mishandled `CSI ? 1049 h/l`: it
+did not save and restore the primary-screen cells, attributes, and cursor.
+`tools/pty_screen.py` and its regression tests now cover the alternate-screen
+transition. This is a harness correction only; it does not resolve or waive
+any DN rendering discrepancy.
 
 These are hard failures, not approved normalizations. No action-matrix row is
 promoted to pass by a smoke tour or a diagnostic-only source copy. Keep the
