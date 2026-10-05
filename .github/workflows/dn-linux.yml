@@ -18,6 +18,11 @@ on:
       - .github/workflows/dn-linux.yml
   pull_request:
 
+# One linux matrix per ref — newer pushes cancel older runs (runner budget).
+concurrency:
+  group: dn-linux-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   linux64:
     runs-on: ubuntu-24.04
