@@ -714,7 +714,6 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
 
 destructor TTreeInfoView.Destroy;
   begin
-  THTreeView(Tree).Info := nil;
   inherited Destroy;
   end;
 
