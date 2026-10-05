@@ -37,35 +37,39 @@ repository-wide search found other `PString(Collection.At(...))` patterns in
 `diskinfo.pas`, and `filefind.pas`; they require type-by-type review before
 any fix is accepted.
 
-The startup About residue is now reproduced against the exact pair above, with
-one fresh run per build: after the same Escape key, the object build removed
-the dialog and restored the panels (0/1 residue trials), while the class build
-left the About image visible over the panels (1/1). This confirms the reported
-regression but is only an initial reproduction, not a complete regression
-test. A separate startup-rendering discrepancy is now scoped more precisely:
-the user reports that an intermittently blank panel area occurs in a
-self-built branch binary, but does not occur in the distributed `dist`
-binary. User-provided screenshots show the blank self-build screen and the
-panels appearing after opening the File menu. This has not yet been reproduced
-in a controlled comparison; record separate trials for the exact source build
-and its intended `dist` comparator, including both before and after the same
-menu input. Do not silently combine this build-variant issue with the
-reproducible About-close residue. A source search found redraw/draw entry
-points in `mainapp.pas`, `panelroot.pas`, `paneldlgs.pas`, and `menus.pas`; it
-has not isolated the responsible path. Both are hard failures, not accepted
-normalizations.
+The user clarified that there are two mutually exclusive startup states. On a
+first/virgin run, About appears while panels are already drawn; closing it
+leaves the About image over the panels. This is reproduced against the exact
+object/class pair above, one fresh run per build: object `0/1` residue trials,
+class `1/1`. On a later run (with `dn.ini`), About does not appear; the user
+reports that some self-built starts show a blank purple panel area until a
+menu triggers drawing, while `dist` does not.
+
+The latter was reproduced once with the user's current binary variants and
+same PTY size/input: self-build `out/linux64/dn`, build `1f0a63d`, SHA-256
+`97f102cb466842bf6a0453ad5d83412a47ba06f2f427bf9578a62adc11a3cb7a`, had no
+panel headers before menu input and six afterward; `dist/linux64/dn`, whose
+embedded build identifies `df0cca2`, SHA-256
+`e88ec6c324801bc394e9665095f705c452f5c34b7ec2ffa1363c80f58542a41d`, had six
+headers before menu input. This is a one-trial classification based on panel
+headers, not full-cell acceptance evidence. A prior 100-start attempt sampled
+before UI readiness and is invalid; a valid 100-start series remains pending.
+Source searches found redraw/draw entry points in `mainapp.pas`,
+`panelroot.pas`, `paneldlgs.pas`, and `menus.pas`, but have not isolated either
+root cause. Keep the virgin-run About residue and configured-run self-build
+startup blank as separate test cases; both are hard failures.
 
 Startup/panel regressions to reproduce and fix:
 
 * Closing the About dialog on first launch consistently leaves its image
   visible over the panels.
-* The user reports intermittent blank panels in a self-built branch binary,
-  but not in `dist`; screenshots show that opening File causes panels to
-  appear. Run at least 100 fresh starts of each exact comparator binary
-  (recording source revision, build flags, and `dist` artifact identity),
-  capture the screen before input, then replay the same menu input and capture
-  again. Require zero missing-panel trials for the accepted class build and
-  exact parity with its object/distribution comparator.
+* The configured-run blank-panel state is mutually exclusive with first-run
+  About: use the same non-virgin `dn.ini` condition for self-build and `dist`.
+  Run at least 100 fresh starts of each exact comparator binary (record source
+  revision, build flags, and `dist` artifact identity), capture complete
+  cells before input, then replay the same menu input and capture again.
+  Require zero missing-panel trials for the accepted class build and exact
+  parity with its object/distribution comparator.
 * For the About residue, capture the screen immediately before opening About,
   while About is open, and immediately after closing it; all prior panel cells
   must be restored on every trial. Initial evidence: exact-pair fresh-start
