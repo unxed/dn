@@ -139,9 +139,11 @@ SCENARIOS.append(('cmdline_echo', 'e c h o SPACE h i ENTER', 'input'))
 
 # Every top-menu cell: menu 0..6 × item 1..17
 # Skip menu_0_10: ♦ system-menu item 10 = Trashcan on/off (cmHideShowTools).
-# Object baseline b4916b8 raises Invalid pointer operation and blanks the
-# screen; class correctly toggles Trash. Not a class regression — exclude
-# from object/class cell parity (DN 3.0: do not match a broken object).
+# Object b4916b8+TV521d064: TTrashCan.GetPalette returns @CTrashCan (legacy
+# PString) while TPalette is already array of TColorAttr; MapColor treats the
+# pointer as a dynarray → Invalid pointer operation (RTE 204) @ ~00411516 on
+# first Draw after Show/MakeFirst. Class uses MakePalette(CTrashCan) and is OK.
+# Cannot PASS against unmodified object bin — keep skip (github.com/unxed/dn/issues/14).
 for _m in range(7):
     for _n in range(1, 18):
         if (_m, _n) == (0, 10):
