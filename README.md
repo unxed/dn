@@ -4,6 +4,12 @@ A port of DOS Navigator to Free Pascal.
 
 ![](https://raw.githubusercontent.com/unxed/dn/refs/heads/main/.github/assets/screenshot.png)
 
+## Status
+
+**Alpha.** The port runs on Windows, Linux and DOS (UTF-8 under DOS needs a patched DOSBox-X for now). The codebase is being moved from the old Pascal object model to classes so the project can keep evolving; reliability is roughly where the pre-migration tree was, not worse by intent, but crashes and hangs are still possible — treat data carefully. The in-app About box says alpha for the same reason.
+
+When a stretch of real use goes by without crash/hang reports, the label moves to beta. Feature gaps that are already known (for example archive browsing) are tracked in issues and will be fixed after the class migration settles.
+
 The repository holds two independent projects with different licenses and one shared toolset:
 
 | Directory | What it is | License | Where the code comes from |
