@@ -8,20 +8,20 @@
  
 
  
-  {$DEFINE USESYSUTILS}   {Cat: если хочется подключать модуль SysUtils или использовать механизм исключений; в плагинной версии ни на что не влияет}
-  {.$DEFINE PLUGIN}        {Cat: плагинская версия}
-  {.$DEFINE COLORER}       {Cat: плагин Colorer - может использоваться и не в плагинской версии тоже}
-  {$DEFINE USELONGSTRING}  {Cat: использование длинных строк кое-где (в частности, в редакторе)}
-  {.$DEFINE USEANSISTRING} {Cat: использование длинных строк везде ($H+); уже компилируется,     }
-                           {     но ещё не работает; доделаю, если будет нужно, что вряд ли  ;-) }
-  { !!  при изменении этого параметра ресурсы получаются несовместимыми  !! }
+  {$DEFINE USESYSUTILS}   {Cat: if you want to include the SysUtils unit or use exceptions; in the plugin version this has no effect}
+  {.$DEFINE PLUGIN}        {Cat: plugin version}
+  {.$DEFINE COLORER}       {Cat: Colorer plugin - may also be used outside the plugin version}
+  {$DEFINE USELONGSTRING}  {Cat: use long strings in some places (in particular, in the editor)}
+  {.$DEFINE USEANSISTRING} {Cat: use long strings everywhere ($H+); already compiles,     }
+                           {     but does not work yet; I'll finish it if needed, which is unlikely  ;-) }
+  { !!  when this parameter is changed, resources become incompatible  !! }
  
 
 
  
-   {Cat: проверяем на выходе и пишем в лог, сколько памяти скушалось и в каком месте}
-  {.$DEFINE LOGOBJLOADSTORE} {Cat: пишем в лог все вызовы методов Load и Store}
-  {$DEFINE SHOWRC} {Cat: добавлять ли к сообщениям об ошибках числовые коды ошибок (RC)}
+   {Cat: on exit check and write to the log how much memory was consumed and where}
+  {.$DEFINE LOGOBJLOADSTORE} {Cat: write all Load and Store method calls to the log}
+  {$DEFINE SHOWRC} {Cat: whether to append numeric error codes (RC) to error messages}
  
 
 
@@ -49,14 +49,14 @@
   {$DEFINE DualName}
  
  
-  {$DEFINE STRINGLFN} {включает более быстрый, но жрущий много памяти алгоритм работы с виндовыми LFN}
+  {$DEFINE STRINGLFN} {enables a faster but memory-hungry algorithm for Windows LFN}
  
- {$DEFINE VPBETA}     {включает создание DN.ERR при критических ошибках}
-                      {влияет на вариант подключения dn2cat.dll в виндовой плагинной версии}
- {.$DEFINE OldCollection} {старые ассемблерные методы *Collection}
- {$DEFINE NoCallspcb} {внимание! конфиги версий, скомпилённых с и без NoCallspcb несовместимы!}
- {$DEFINE EAOP}       {операции с Extended Attributes в OS/2}
-                      {операции с Security Attributes в WinNT}
+ {$DEFINE VPBETA}     {enables creation of DN.ERR on critical errors}
+                      {affects how dn2cat.dll is linked in the Windows plugin version}
+ {.$DEFINE OldCollection} {old assembler *Collection methods}
+ {$DEFINE NoCallspcb} {warning! configs of versions compiled with and without NoCallspcb are incompatible!}
+ {$DEFINE EAOP}       {Extended Attributes operations in OS/2}
+                      {Security Attributes operations in WinNT}
  
  {$Use32+}
  {$DEFINE QSORT}
@@ -65,8 +65,8 @@
  {$DEFINE PrintManager}
  {$DEFINE Printer}
  {$DEFINE PrintFromEditor}
- {.$DEFINE PKTVIEW} {нормально компилится и работает, но надо ли}
- {$DEFINE DisAsm}  {нормально компилится и работает, но надо ли}
+ {.$DEFINE PKTVIEW} {compiles and works fine, but do we need it}
+ {$DEFINE DisAsm}  {compiles and works fine, but do we need it}
  {$DEFINE PHONES}
  {$DEFINE ARVID}
  {.$DEFINE NETINFO}

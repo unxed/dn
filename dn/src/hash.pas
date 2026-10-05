@@ -9,49 +9,49 @@ type
   THashTable = array[0..0] of THashIndex;
 
   THash = class;
-  {`2 Хеш-таблица, добавочная к коллекции. Создаётся после
-  заполнения коллекции, так как требует знания окончательного
-  числа элементов. Используется для очень быстрого поиска
-  элемента в коллекции, обычно несортированной.
-     Для разрешения коллизий используется рехеширование,
-  поэтому переполнение хеш-таблицы абсолютно недопустимо,
-  а почти полное заполнение весьма нежелательно.
-    Размер хеш-таблицы - степень 2, превышающая число элементов
-  на 10% или более. Если при создании для такой таблицы не
-  хватит памяти, после Init будет HT=nil.
+  {`2 Hash table, auxiliary to a collection. Created after
+  the collection is filled, since it requires knowing the final
+  number of elements. Used for very fast search
+  of an element in a collection, usually unsorted.
+     Collisions are resolved by rehashing,
+  so hash-table overflow is absolutely inadmissible,
+  and nearly full occupancy is highly undesirable.
+    Hash-table size is a power of 2 exceeding the number of elements
+  by 10% or more. If there is not enough memory to create such a table,
+  after Init HT=nil.
   `}
   THash = class(TObject)
     HT: ^THashTable;
-      {` Хеш-таблица.
-      Содержит индексы в Items^ или EmptyIndex (свободные) `}
+      {` Hash table.
+      Contains indices into Items^ or EmptyIndex (free) `}
     Count: Integer;
-      {` Число элементов HT`}
+      {` Number of HT elements`}
     Items: PItemList;
-      {` Копия Items коллекции `}
+      {` Copy of the collection Items `}
     hf: integer;
-      {` Индекс в HT, 0..Count-1 `}
+      {` Index into HT, 0..Count-1 `}
     RehashStep: integer;
-      {` Шаг рехеширования последнего поиска. Рехеширование
-      делается прибавлением этого шага по модулю размена HT.
-      Шаг должен быть взаимно прост с Count, то есть, поскольку
-      Count - степень двойки, RehashStep должен быть нечётным `}
+      {` Rehash step of the last search. Rehashing
+      is done by adding this step modulo HT size.
+      The step must be coprime with Count, i.e., since
+      Count is a power of two, RehashStep must be odd `}
     procedure Hash(Item: Pointer); virtual;
-      {` На основании содержимого Item^ вычисляется стартовый
-      хеш-индекс hf и шаг рехеширования RehashStep.
-      Этот метод обязательно надо перекрыть.`}
+      {` Based on Item^ contents, compute the starting
+      hash index hf and the rehash step RehashStep.
+      This method must be overridden.`}
     function Equal(Item1, Item2: Pointer): Boolean; virtual;
-      {` Совпадают ли ключи Item1^ и Item2^.
-      Этот метод обязательно надо перекрыть. `}
+      {` Whether keys Item1^ and Item2^ match.
+      This method must be overridden. `}
     constructor Create(BaseColl: TCollection);
-      {` резервирование памяти под HT^ и очистка HT `}
+      {` allocate memory for HT^ and clear HT `}
     function GetHashIndex(Item: Pointer; var N: THashIndex): Boolean;
-      {` Поиск элемента в хеш-таблице.
-      Если найден (результат True) N - индекс в HT.
-      Если не найден  (результат False) N - индекс в HT, куда
-      его надо записать. `}
+      {` Search for an element in the hash table.
+      If found (result True) N is the index in HT.
+      If not found (result False) N is the index in HT where
+      it should be written. `}
     function AddItem(CollIndex: Integer): Boolean;
-      {` Запись в хеш-таблицу нового элемента Items^[CollIndex]^.
-      Результат False, если элемент c таким ключом уже есть `}
+      {` Write a new element Items^[CollIndex]^ into the hash table.
+      Result False if an element with such a key already exists `}
     destructor Destroy; override;
     end;
 
@@ -66,7 +66,7 @@ constructor THash.Create(BaseColl: TCollection);
     MinCount: Integer;
   begin
   inherited Create;
-  MinCount := BaseColl.Count * 11 div 10; // запас 10%
+  MinCount := BaseColl.Count * 11 div 10; // 10% reserve
   Count := 1024;
   while Count < MinCount do
     Count := Count*2;
@@ -103,17 +103,17 @@ function THash.GetHashIndex(Item: Pointer; var N: THashIndex): Boolean;
     if N = EmptyIndex then
       begin
       Result := False;
-      Break; { не нашли }
+      Break; { not found }
       end;
     if Equal(Item, Items^[N]) then
       begin
       Result := True;
-      Break; { нашли }
+      Break; { found }
       end;
-    { рехеширование }
+    { rehash }
     hf := (hf + RehashStep) mod Count;
     end;
-  { не нашли }
+  { not found }
   end;
 
 function THash.AddItem(CollIndex: Integer): Boolean;

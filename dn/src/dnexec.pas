@@ -54,11 +54,11 @@ uses
   ;
 
 procedure ExecString(const S: AnsiString; const WS: String);
-  {` Выполнить строку S^ через командный процессор. WS, если она
-  не пуста, выводится на экран перед вызовом ком. процессора `}
+  {` Execute string S^ via the command processor. WS, if not
+  empty, is written to the screen before calling the cmd. processor `}
 procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
-{JO:  отличается от ExecString наличием булевской переменной RR, которая}
-{     указывает, перечитывать панель после выполнения или нет           }
+{JO:  differs from ExecString by the boolean RR, which}
+{     indicates whether to reread the panel after execution or not           }
 
 function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
 {DataCompBoy}
@@ -69,7 +69,7 @@ procedure ExecFile(const FileName: String); {DataCompBoy}
 procedure AnsiExec(const Path: String; const ComLine: AnsiString); {JO}
 
 const
-  fExec: Boolean = False; {выполняется внешняя программа}
+  fExec: Boolean = False; {an external program is running}
 
 implementation
 
@@ -82,13 +82,13 @@ uses DNRun,
   VideoMan, osdep, dnscreen, timeutil,
   
   Startup, UserMenu, Messages, Strings, filetype, TitleSet
-   {AK155 для перерисовки иконки}
+   {AK155 for redrawing the icon}
   ;
 
 {JO}
-{ AnsiExec - аналог DOS.Exec , который в качестве }
-{ коммандлайна использует строку типа Ansistring }
-{ и соответственно не имеет ограничения в 255 символов}
+{ AnsiExec - analogue of DOS.Exec that uses }
+{ an Ansistring as the command line }
+{ and thus has no 255-character limit}
 procedure AnsiExec(const Path: String; const ComLine: AnsiString);
   var
     PathBuf: array[0..255] of Char;
@@ -103,7 +103,7 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
   DosError := SysExecute(StrPCopy(PathBuf, Path), PChar(Ans1), nil,
       ExecFlags = efAsync, nil, -1, -1, -1);
 
-//  освобождаем каталог
+//  free the directory
   if ActiveDir[2] = ':' then
     ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
 
@@ -112,19 +112,19 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
 {/JO}
 
 {AK155 30-12-2001
-Это попытка определить тип вызываемой программы, чтобы GUI-программу
-вызывать без ожидания завершения, а все прочие - с ожиданием.
-Если расширение не указано, то никаких попыток распознать GUI-программу
-не делается. В частности не производится, поиск по переменной окружения
-Path, так как это трудно сделать не криво. Например, если запускается
-некая prog, то неправильно искать в путях файл prog.exe. Может случиться,
-что найдем, а где-то раньше, например, в текущем каталоге, есть prog.com
-или prog.cmd, а мы его вызовем, будто он GUI. Кстати, Far глючит именно
-так. Запишите в текщий каталог notepad.cmd и введите в комстроке notepad.
-А потом нажмите Enter  на этом самом notepad.cmd.
+This is an attempt to determine the type of the program being called, so that a GUI program
+is invoked without waiting for completion, and all others with waiting.
+If no extension is given, no attempt is made to recognize a GUI program.
+In particular, no search of the Path environment variable is done,
+because it is hard to do without being crooked. For example, if some
+prog is launched, it is wrong to search the paths for prog.exe. It may happen
+that we find it, while somewhere earlier, e.g. in the current directory, there is prog.com
+or prog.cmd, and we would call it as if it were GUI. By the way, Far glitches exactly
+like that. Put notepad.cmd in the current directory and type notepad on the command line.
+Then press Enter on that very notepad.cmd.
 }
-{Результат - код подсистемы для Win32 PE, или 100 для Win16 NE,
- или 0 для прочих }
+{Result - subsystem code for Win32 PE, or 100 for Win16 NE,
+ or 0 for others }
 function Win32Program(const S: String): SmallWord;
   const
     PETag = $00004550; {'PE'#0#0}
@@ -171,7 +171,7 @@ function Win32Program(const S: String): SmallWord;
     Assign(f, SysOsPath(RealName));
     Reset(f, 1);
     if IOResult <> 0 then
-      Exit; {вообще-то, так быть не должно, раз мы ее нашли}
+      Exit; {in general this should not happen, since we found it}
     end;
   Seek(f, $3C);
   BlockRead(f, NewExeOffs, 2, l);
@@ -228,7 +228,7 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
   DNRun.QuietRun := False;
   
   fExec := False;
-  {AK155, Cat: чтобы комстрока и меню не налазили на вывод}
+  {AK155, Cat: so the command line and menu do not overlap the output}
   GetCursorXY(X, Y);
   if InterfaceData.Options and ouiHideStatus = 0 then
     Inc(Y);
@@ -256,13 +256,13 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
   {JO}
   if RR then
     begin
-    ActDir1 := '>' + ActiveDir; //признак перечитывания подкаталогов в ветви
+    ActDir1 := '>' + ActiveDir; //flag to reread subdirectories in the branch
     GlobalMessage(evCommand, cmPanelReread, @ActDir1);
     GlobalMessage(evCommand, cmRereadInfo, nil);
     end;
   {/JO}
 
-  {AK155 без этого курсор комстроки не становится на место}
+  {AK155 without this the command-line cursor does not go back into place}
   
   {/AK155}
   end { ExecStringRR };
@@ -296,7 +296,7 @@ function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
   UserParam.Active := FileRec;
   FName := FileRec^.FlName[True];
   {lGetDir(0, ActiveDir);}
-  {Cat:warn закомментировал это в процессе отлова багов, но надо будет проверить, не добавил ли новых}
+  {Cat:warn commented this out while hunting bugs, but need to check whether new ones were introduced}
   SearchExt := False;
   Local := True;
   f := TTextReader.Create('dn.ext');
@@ -461,8 +461,8 @@ RepeatLocal:
   Delete(S, 1, Succ(Length(S1)));
   F.Free;
 
-  // AK155 27/08/05 Поскольку DN/2 не завершается при выполнении
-  // внешней команды, то и незачем проверять Valid(cmQuit)
+  // AK155 27/08/05 Since DN/2 does not terminate when executing
+  // an external command, there is no need to check Valid(cmQuit)
   if not Application.Valid(cmQuit) then
     begin
     Exit;
@@ -538,7 +538,7 @@ procedure ExecFile(const FileName: String);
       MessageKey(CommandLine, kbDown);
       Exit;
       end;
-    {AK155, см. dnutil.ExecCommandLine}
+    {AK155, see dnutil.ExecCommandLine}
     S := '';
     CommandLine.SetData(S);
     {/AK155}

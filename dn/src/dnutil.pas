@@ -47,8 +47,8 @@
 {$I STDEFINE.INC}
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
-{JO: этот дефайн позволяет при загрузке новой палитры принудительно сделать }
-{    цвета диалога сообщений об ошибках стандартными                        }
+{JO: this define forces error message dialog colors to the defaults }
+{    when loading a new palette                                             }
 {.$DEFINE ForceErrPal}
 
 unit DNUtil;
@@ -71,7 +71,7 @@ const
   HelpWnd: THelpWindow = nil;
   HelpInUse: Boolean = False;
   RunMenu: Boolean = False;
-    {`Признак автовыпадения меню ([X] Auto run User Menu)`}
+    {`Auto-drop menu flag ([X] Auto run User Menu)`}
   IdleCounter: Word = 0;
   StartTicks: Word = 0;
   NullStr: Byte = 0;
@@ -90,7 +90,7 @@ type
   TDNApplication = class;
 
   TDNApplication = class(TApplication)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is exposed in the plugin model; change with extreme care!}
     IdleClick: TEventTimer;
     IdleEvt: TEvent;
     TreeReader: TTreeReader;
@@ -132,18 +132,18 @@ function w95QuitCheck: Boolean; {Gimly}
 procedure w95QuitCancel;
 
 procedure ClearSelection(AFP: Pointer {TFilePanelRoot};
-    FC: Pointer {PFilesCollection - файлы к разотметке });
+    FC: Pointer {PFilesCollection - files to unmark });
 
 const
   w95locked: Boolean = False; {Gimly}
 
 const
-// Идентификаторы блоков dn.cfg, соответствующих структурам данных
-// различных диалогов настройки. При изменении размера или структуры
-// таких блоков желательно давать им новый идентификатор во избежание
-// неправильной интерпретации старых версий dn.cfg. Новые идентификаторы
-// во избежание путаницы следует помещать в конец данного списка,
-// а неиспользуемые - оставлять закомментированными на старом месте
+// Identifiers of dn.cfg blocks corresponding to data structures
+// of various settings dialogs. When changing the size or structure
+// of such blocks it is desirable to give them a new identifier to avoid
+// misinterpreting old versions of dn.cfg. New identifiers
+// should be placed at the end of this list to avoid confusion,
+// and unused ones left commented out in their old place
   cfgMouseData = 3;
   cfgInterfaceData = 4;
   cfgSaversData = 5;
@@ -243,13 +243,13 @@ procedure SaveDsk;
 
 
 procedure GetFromClip(var S: String);
-  {` Взять строку из буфера обмена. Если в буфере пусто - будет '' `}
+  {` Get a string from the clipboard. If the clipboard is empty - returns '' `}
 procedure GetFromClipLong(var S: LongString);
-  {` Взять строку из буфера обмена. Если в буфере пусто - будет '' `}
+  {` Get a string from the clipboard. If the clipboard is empty - returns '' `}
 procedure PutInClip(const S: String);
-  {` Положить строку в буфера обмена и в его историю `}
+  {` Put a string into the clipboard and its history `}
 procedure PutInClipLong(const S: LongString);
-  {` Положить строку в буфера обмена и в его историю `}
+  {` Put a string into the clipboard and its history `}
 
 implementation
 
@@ -335,10 +335,10 @@ const
   dskTempContents = 6;
   dskTempContents2 = 7;
 
-  {Cat:warn потенциально глюкавое место: нельзя читать в память больше, чем
-          туда может поместиться; кроме того, нежелательно одной операцией
-          читать несколько подряд расположенных переменных - это у нас в
-          исходнике они подряд, а компилятор может думать иначе}
+  {Cat:warn potentially buggy place: must not read into memory more than
+          can fit there; also undesirable to read several consecutive
+          variables in one operation - in our source they are consecutive,
+          but the compiler may think otherwise}
 
 constructor TDataSaver.Load(S: TStream);
   var
@@ -672,7 +672,7 @@ procedure SaveDsk;
     begin
    
     if StartDir <> '' then
-      StartDir := '<' + StartDir; {помечаем, что StartDir нужно сохpанить}
+      StartDir := '<' + StartDir; {mark that StartDir must be preserved}
    
     TDNApplication(Application).SaveDesktop
       (SwpDir+'dn'+ItoS(DNNumber)+'.swp');
@@ -721,10 +721,10 @@ destructor TDNApplication.Destroy;
   
     ;
   {AK155 SaveHistories;}
-  {все запоминалось по ходу дела, притом с чтением,}
-  {а теперь можно только напортить}
+  {everything was saved along the way, and with reading,}
+  {and now one can only mess it up}
   SaveHistories;
-  {JO: пока вернул назад, а то история совсем не запоминается}
+  {JO: reverted for now, otherwise history is not saved at all}
   HideCommandLine := (CommandLine <> nil)
        and not CommandLine.GetState(sfVisible);
   B := $8000 or (Byte(HideCommandLine));
@@ -847,7 +847,7 @@ procedure WriteConfig;
   StoreBlock(cfgDefaultArchiverMode, DefaultArcMode,
        SizeOf(DefaultArcMode));
   StoreBlock(cfgExtractOptions, UnarchiveOpt, SizeOf(UnarchiveOpt));
-  {JO: два раза???}
+  {JO: twice???}
   StoreBlock(cfgChangeCaseOptions, ChangeNamesCaseOptions,
        SizeOf(ChangeNamesCaseOptions));
   StoreBlock(cfgAppPalette, appPalette, SizeOf(appPalette));
@@ -921,8 +921,8 @@ procedure TDNApplication.LoadDesktop(var S: TStream);
           P.Show;
         end;
     until { P = nil;}S.GetPos = S.GetSize;
-    {AK155: P = nil бывает, например, при невозможности открыть
-      запомненный просмотр; это не повод терять все остальные настройки }
+    {AK155: P = nil happens e.g. when a remembered view cannot be opened;
+      that is no reason to lose all other settings }
     end;
   P := Desktop.Current;
   if P <> nil then
@@ -1044,9 +1044,9 @@ procedure TDNApplication.ProcessTempFile(TFStr: String);
       Event.InfoPtr := @TempFile;
       PutEvent(Event);
       end;
-{AK155 27-10-2004 Убрал очистку RunMenu, поскольку единственный
-её результат - это глюк, заключающийся в том, что автовыпадение
-меню перестаёт работать после просмотра файла из архива
+{AK155 27-10-2004 Removed clearing RunMenu, since its only
+effect was a bug where auto-drop menu stops working after
+viewing a file from an archive
     RunMenu := False;
 }
     end;
@@ -1106,8 +1106,8 @@ Err:
       ProcessTempFile(PJ^);
     if PJ <> nil then begin FreeMem(PJ, Length(PJ^)+1); PJ := nil; end;
 
-//JO: 31-05-2006 - процедура перекидывания файлов из временного
-//                 подкаталога после запуска архиватора
+//JO: 31-05-2006 - procedure to move files from the temporary
+//                 subdirectory after running the archiver
     PJ := PString(PAnsiString(S.ReadStr));
     if  (PJ <> nil) and (PJ^ <> '') and (Pos('|', PJ^) > 0)  then
       begin
@@ -1122,14 +1122,14 @@ Err:
       SCurDir := Copy(TempExtrDir, Pos('|', TempExtrDir)+1,
                       MaxStringLength);
       TempExtrDir := Copy(TempExtrDir, 1, Pos('|', TempExtrDir)-1);
-    { перекидываем файлы из временного подкаталога в каталог назначения}
+    { move files from the temporary subdirectory to the destination directory}
       PV := TUserWindow.Create;
       Desktop.Insert(PV);
       SetLength(TempExtrDir, Length(TempExtrDir)-1);
       Str1 := GetPath(TempExtrDir);
       CopyDirContent(TempExtrDir+'\'+SCurDir, Str1, True, ForceMod);
       PV.Free;
-    { удаляем временный каталог со всем, что в нём осталось}
+    { delete the temporary directory with everything left in it}
       FRT := NewFileRec(GetName(TempExtrDir),
         GetName(TempExtrDir),
         0, 0, 0, 0, Directory,
@@ -1140,7 +1140,7 @@ Err:
       Confirms := 0;
       lGetDir(0, DirToChange);
       LFN.lChDir(Str1);
-      if ActiveDir[2] = ':' then {освобождаем каталог}
+      if ActiveDir[2] = ':' then {release the directory}
         ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
       Eraser.EraseFiles(FCT);
       LFN.lChDir(DirToChange);
@@ -1151,7 +1151,7 @@ Err:
       end;
     if PJ <> nil then begin FreeMem(PJ, Length(PJ^)+1); PJ := nil; end;
 
-//JO: 8-06-2006 - восстанавливаем стаpтовый каталог
+//JO: 8-06-2006 - restore the start directory
     PJ := PString(PAnsiString(S.ReadStr));
     if  (PJ <> nil) and (PJ^ <> '') then
       begin
@@ -1175,7 +1175,7 @@ Err:
       R.B.Y := R.A.Y+OldDskSize.Y;
       Desktop.ChangeBounds(R);
       end;
-    {LoadDesktop(S);} {Cat: перенёс в самый конец}
+    {LoadDesktop(S);} {Cat: moved to the very end}
     S.Read(TempBounds, SizeOf(TempBounds));
     {S.Read(ArcBounds, SizeOf(TempBounds));}
     S.Read(TrashCan.ImVisible, 1); 
@@ -1199,8 +1199,8 @@ Err:
     if PreserveMenuPositions then
       LoadMenuDefaults(MenuBar.Menu, S);
     LoadDesktop(S);
-    // JO: нижележащий кусок должен _обязательно_ быть _после_ LoadDesktop,
-    //     иначе размер панелей не подстраивается под видеорежим
+    // JO: the block below must _definitely_ be _after_ LoadDesktop,
+    //     otherwise panel sizes will not adjust to the video mode
     if BB then
       begin
       R.Assign(0, Byte(InterfaceData.Options and ouiHideMenu = 0),
@@ -1247,12 +1247,12 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
     S.WriteStr(@DirToChange);
    
     S.WriteStr(@TempFile);
-    S.WriteStr(@DirToMoveContent); //каталог назначения пpи pазаpхивиpовании
-                                    //чеpез вpеменный подкаталог
+    S.WriteStr(@DirToMoveContent); //destination directory when extracting
+                                    //via a temporary subdirectory
     if StartDir[1] = '<' then
       begin
       System.Delete(StartDir, 1, 1);
-      S.WriteStr(@StartDir); //каталог, из котоpого DN/2 был запущен
+      S.WriteStr(@StartDir); //directory from which DN/2 was started
       end
     else
       S.WriteStr(@NullStr);
@@ -1261,7 +1261,7 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
     S.Write(Size, SizeOf(Size));
     S.Write(Desktop.Size, SizeOf(Size));
     StoreIndexes(S);
-    {StoreDesktop(S);} {Cat: перенёс в самый конец}
+    {StoreDesktop(S);} {Cat: moved to the very end}
     S.Write(TempBounds, SizeOf(TempBounds));
     S.Write(TrashCan.ImVisible, 1); 
     S.Put(KeyMacroses);
@@ -1426,8 +1426,8 @@ db:
       W.Free;
       Exit;
       end;
-    {    StoreViewInfo(W);  AK155: сохранять бессмысленно (еще нечего)
-        и излишне (сохранит Done) }
+    {    StoreViewInfo(W);  AK155: saving is pointless (nothing yet)
+        and redundant (Done will save) }
     InsertWindow(W);
     SpecialIntView := True;
     end { SpecialIntView: };
@@ -1510,7 +1510,7 @@ db:
       J := PosChar(';', FileName);
       if J > 0 then
         SetLength(FileName, J-1);
-      {AK155 удалить номер версии файла в uc2-архиве }
+      {AK155 remove the file version number in a uc2 archive }
       end;
     end;
   FileName := lFExpand(FileName);
@@ -1537,10 +1537,10 @@ db:
     Exit;
     end;
 
-  { Логика выбора просмотра такая:
-  по F3 (not AltExt) - согласно dn.vwr, затем специальный внутренний, затем текстовый;
-  по Alt-F3 (AltExt) - согласно dnalt.vwr, затем текстовый;
-  по Alt-Shift-F3 (это вообще не здесь) - безусловно текстовый. }
+  { View selection logic:
+  on F3 (not AltExt) - per dn.vwr, then special internal, then text;
+  on Alt-F3 (AltExt) - per dnalt.vwr, then text;
+  on Alt-Shift-F3 (not here at all) - unconditionally text. }
 
   if not NoExtFile and
     ExecExtFile(ExtFileName[AltExt], @up, dlLoadingViewer)
@@ -1574,7 +1574,7 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
 
   label ex;
   begin
-  {JO: редактирование найденных в архиве файлов из панели поиска не предусмотрено}
+  {JO: editing files found in an archive from the search panel is not supported}
   if PathFoundInArc(FileName) then
     Exit;
   {/JO}
@@ -2181,10 +2181,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         if PathExist(S) then
           begin
           S[1] := UpCase(S[1]); {Cat}
-            {AK155 Под NT назначение маленькой буквы проходит буквально,
-              после чего в комстроке тоже индицируется маленькая буква,
-              что смешно, и начинает глючить перемещение по полосе дисков,
-              что уже не смешно. }
+            {AK155 Under NT assigning a lowercase letter is taken literally,
+              after which the command line also shows a lowercase letter,
+              which is funny, and drive-bar navigation starts glitching,
+              which is no longer funny. }
           Message(ActivePanel, evCommand, cmChangeDirectory, @S);
           end;
         SD := '';
@@ -2203,13 +2203,13 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     
     if TryRunSession(S) then
       Exit;
-    {AK155 очистка комстроки нужна всегда, поэтому она вынесена в общую         }
-    {      часть. Очищать лучше перед выполнением, а не после, так как в        }
-    {      ExecString она запоминается и восстанавливается. Аналогичная вставка }
-    {      сделана в dnexec.ExecFile.RunCommand                                 }
-    {JO:  перенёс очистку комстроки после TryRunSession, так как иначе оно      }
-    {     не срабатывает, и при запуске набранного в коммандлайне не            }
-    {     получается запустить в отдельной сессии                               }
+    {AK155 clearing the command line is always needed, so it is in the shared  }
+    {      part. Better to clear before execution, not after, because in        }
+    {      ExecString it is saved and restored. A similar insert                }
+    {      was made in dnexec.ExecFile.RunCommand                               }
+    {JO:  moved command-line clear after TryRunSession, otherwise it            }
+    {     does not work, and launching what was typed on the command line       }
+    {     cannot start in a separate session                                    }
     SD := '';
     CommandLine.SetData(SD);
     CommandLine.DrawView;
@@ -2698,7 +2698,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     {cmViewFilter: ViewFile(true, true, CnvString(Event.InfoPtr));}
     cmViewFilter:
       ViewFile(False, True, CnvString(Event.InfoPtr));
-    {JO для распознания фильтрованных файлов как архивов}
+    {JO for recognizing filtered files as archives}
     cmIntFileView:
       ViewFile(True, False, CnvString(Event.InfoPtr));
     cmIntFileEdit:
@@ -2875,12 +2875,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       P1:=Desktop.Current;
       if P1 = TView(HelpWnd) then
         Exit;
-        { Такое может быть только при работе граббера на окне хелпа,
-         так как иначе окно хелпа (если оно есть, и Current)
-         захватит cmHelp и выдаст Help on Help, а сюда управление
-         просто не попадёт }
+        { This can only happen when the grabber runs on the help window,
+         because otherwise the help window (if present and Current)
+         would capture cmHelp and show Help on Help, and control
+         would never get here }
       if  (not HelpInUse) or (HelpWnd = nil) or not IsOnDesktop(HelpWnd) then
-        begin { создаём окно хелпа }
+        begin { create the help window }
         HelpStrm := TDosStream.Create(SourceDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked});
         if (HelpStrm.Status <> stOK) and (SourceDir<> StartupDir)
         then
@@ -2903,10 +2903,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
           end;
         end
       else
-        begin { используем существующее окно хелпа }
+        begin { use the existing help window }
         Lock;
         HelpWnd.GotoContext(GetHelpCtx);
-        Desktop.Delete(HelpWnd); { это может изменить Current}
+        Desktop.Delete(HelpWnd); { this may change Current}
         Desktop.Current := P1;
         Unlock;
         end;
@@ -2914,12 +2914,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       if (ModalCount <> 0) or MenuActive or
          Desktop.Current.GetState(sfDragging)
       then
-        begin { исполняем и уничтожаем модальный хелп }
+        begin { execute and destroy the modal help }
         ExecView(HelpWnd);
         HelpWnd.Free;
         end
       else
-        begin { вставляем немодальный хелп-долгожитель }
+        begin { insert a long-lived non-modal help }
         Desktop.Insert(HelpWnd);
         HelpInUse := True;
         end;
@@ -3002,7 +3002,7 @@ procedure ClearSelection(AFP: Pointer; FC: Pointer);
     end;
   end;
 
-{Cat: переписал для поддержки длинных строк в Clipboard-е}
+{Cat: rewritten to support long strings in the Clipboard}
 procedure GetFromClip(var S: String);
   begin
   if SystemData.Options and ossUseSysClip <> 0 then
