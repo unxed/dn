@@ -2,6 +2,9 @@
 
 Last updated: 2026-10-05
 
+Product frame for this work: **DN 3.0** — stable port, minimal interventions;
+deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
+
 ## Working agreement
 
 - DN and TV3 work is on `main`; no migration feature branches are in use.

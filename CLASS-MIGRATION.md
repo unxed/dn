@@ -1,5 +1,9 @@
 # Class migration
 
+Part of the **DN 3.0** milestone: a stable port to the new stack with minimal
+interventions. Product framing (what 3.0 includes, what is deferred, Far UX /
+keyboard / clipboard exceptions): [`docs/DN-3.0.md`](docs/DN-3.0.md).
+
 Both repositories are worked on directly in `main`. Every commit is pushed to
 GitHub immediately after it is created.
 

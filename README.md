@@ -46,7 +46,9 @@ The separation rules (checked by `tools/check-layout.sh` in CI):
 5. Borland sources are never committed; CI downloads the audit reference by a link and
    checks the sha256 (`audit/fetch_reference.sh`).
 
-The work plan: [`PLAN.md`](PLAN.md). The design of TV: [`tv/DESIGN.md`](tv/DESIGN.md).
+The work plan: [`PLAN.md`](PLAN.md). Product milestone **DN 3.0** (stable port to the new
+stack; minimal changes; what is deferred): [`docs/DN-3.0.md`](docs/DN-3.0.md).
+The design of TV: [`tv/DESIGN.md`](tv/DESIGN.md).
 
 A table "script -> what it does -> which workflow calls it": `tools/README.md`.
 
