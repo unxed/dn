@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. Pascal of Borland and VP lets the implementation of a routine or of a
+"""reason: (d) the modern compiler. Pascal of Borland and VP lets the implementation of a routine or of a
 method repeat nothing: `procedure TFoo.Bar;`, `function Baz;` (the parameters and the result type are those
 of the declaration). FPC wants them repeated. This edit copies the parameters and the result type from the
 declaration (the interface part of the unit or the object type) into such headers.

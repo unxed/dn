@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler, (г) the target. The routines of the assembler of Virtual Pascal (`assembler;` with
+"""reason: (d) the modern compiler, (g) the target. The routines of the assembler of Virtual Pascal (`assembler;` with
 {$USES}/{&Frame-}, parameters by name, @Result) do not run in FPC: it does not save the registers (EBX, ESI, EDI) that VP
 saved and does not build the frame the same way; the first run of the program in DOSBox-X died of that. The routines are
 written in Pascal (they are small: strings, checksums, bytes), the calls of DN loader/Windows 9x/DOS (INT 2Fh, INT 21h) go

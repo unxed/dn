@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. VP evaluates the arguments of a call left to right, FPC right to left; rcp.pas (the resource
+"""reason: (d) the modern compiler. VP evaluates the arguments of a call left to right, FPC right to left; rcp.pas (the resource
 compiler) reads a token stream with calls like `R.Assign(GetID(Token(S,i)), GetID(Token(S,i)), ...)` and so depends on the order.
 Each such statement (two or more `Token(S, i)` in it) becomes `begin T1 := ...; T2 := ...; stmt(T1, T2) end` with the
 temporaries in the order of reading. usage: 117-arg-order.py FILE...   (acts on rcp.pas only)"""

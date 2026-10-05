@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. In VP the units Strings and Dos are known to every unit (`Strings.StrPCopy`,
+"""reason: (d) the modern compiler. In VP the units Strings and Dos are known to every unit (`Strings.StrPCopy`,
 `Dos.FindFirst`); in FPC a unit that names them must use them. The unit is added to the uses clause of the
 implementation (or a new one is made).
 usage: 96-qualifier-uses.py FILE...   (all the .pas of the tree)"""

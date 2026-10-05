@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) building with FPC. Virtual Pascal (and Delphi) allow a routine with its body in the
+"""reason: (d) building with FPC. Virtual Pascal (and Delphi) allow a routine with its body in the
 interface section (`function Bit(N: Word): Word; inline; begin ... end;`); FPC does not. The body is moved
 to the implementation section (after its uses clause), the interface keeps the header; the directive
 `inline;` is dropped. Only routines at the left margin are taken (the methods of objects have no bodies

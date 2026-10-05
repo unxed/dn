@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the Linux build: DN names its files as DOS does ("C:\\DIR\\FILE.EXT", any case). The calls of the system that take a
+"""reason: (d) the Linux build: DN names its files as DOS does ("C:\\DIR\\FILE.EXT", any case). The calls of the system that take a
 name get it through SysOsPath (vpsyslow.pas): on Unix the drive letter is dropped, "\\" is "/", the case is found; elsewhere it
 returns the name as it is, so the same source serves the DOS build.
 usage: 99a-os-paths.py FILE.pas..."""

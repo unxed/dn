@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. VP accepts a field of a record as the counter of a for loop (`for R.B.X := ...`);
+"""reason: (d) the modern compiler. VP accepts a field of a record as the counter of a for loop (`for R.B.X := ...`);
 FPC wants a simple variable. The three loops (arvid.pas, cellscol.pas) become while loops over the same field; the
 Break of arvid leaves the field at the value of the loop, as before.
 usage: 84-for-field.py FILE...   (all the .pas of the tree)"""

@@ -195,9 +195,9 @@ procedure TUC2Archive.GetFile;
     NextRecord;
   begin { TUC2Archive.GetFile }
   if TextRec(ListFile).Handle = 0 then
-    begin { первый вызов: вызов архиватора для вывода оглавления }
-    FreeAndNil(ArcFile); {AK155 если архив не закрыть, то архиватор
-      выдаёт sharing violation }
+    begin { first call: invoke the archiver to list the table of contents }
+    FreeAndNil(ArcFile); {AK155 if the archive is not closed, the archiver
+      raises a sharing violation }
     ListFileName := MakeNormName(TempDir, '!!!DN!!!.TMP');
     S := '/C '
       
@@ -222,7 +222,7 @@ procedure TUC2Archive.GetFile;
     System.Reset(ListFile);
     end;
   FileInfo.Last := 0;
-  { чтение данных об очередном файле}
+  { read data for the next file}
 NextRecord:
   repeat
     System.Readln(ListFile, S);
@@ -264,7 +264,7 @@ NextRecord:
     if S <> '0' then
       begin
       if not AllVersion then
-        begin { игнорируем этот файл }
+        begin { ignore this file }
         repeat
           Readln(ListFile, S);
         until S[7] = 'A';
@@ -282,7 +282,7 @@ NextRecord:
     System.Readln(ListFile, S);
     if S[7] = 'C' then
       System.Readln(ListFile, S); {CHECK=...}
-    { uc 2.0 этой строки не формирует }
+    { uc 2.0 does not produce this line }
     ReadDTA;
     end
   else

@@ -1,4 +1,4 @@
-# reason: (д) the modern compiler. fviewer.pas calls SysFileSeek of VPSysLow without naming the unit (in VP the unit
+# reason: (d) the modern compiler. fviewer.pas calls SysFileSeek of VPSysLow without naming the unit (in VP the unit
 # comes with Streams) and raises an exception at an address (ReturnAddr: VP).
 s/^  Lfn, Dos, Commands, DNHelp, Advance1, Advance2, U_KeyMap\([ \t\r]*\)$/  Lfn, Dos, VPSysLow, Commands, DNHelp, Advance1, Advance2, U_KeyMap\1/
 s/raise E At ReturnAddr;/raise E;/

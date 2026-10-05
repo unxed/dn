@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. MemEqual of advance1.pas is a routine in the assembler of VP (the parameters by name in the
+"""reason: (d) the modern compiler. MemEqual of advance1.pas is a routine in the assembler of VP (the parameters by name in the
 instructions, the registers of the frame); the same in Pascal.
 usage: 112-memequal.py FILE...   (all the .pas of the tree)"""
 import re, sys, os

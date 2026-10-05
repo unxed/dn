@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) building with FPC. A routine with a one-line body in the interface section
+"""reason: (d) building with FPC. A routine with a one-line body in the interface section
 (`procedure NotifyInit; inline; begin end;`, VP/Delphi style) is split: the interface keeps the header, the
 implementation gets the header and the body (the multi-line bodies are moved by 20-interface-bodies.py).
 usage: 21-oneline-bodies.py FILE...   (all the .pas of the tree)"""

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reason: (д) the modern compiler. VP lets a for loop change its variable (`Inc(j); Break;`); FPC does not.
+"""reason: (d) the modern compiler. VP lets a for loop change its variable (`Inc(j); Break;`); FPC does not.
 In filediz.pas the changed value is never read (j is assigned again before it is used), so the statement goes.
 In decoder.pas (IPrefixes) `i := 255` restarts the scan (the Byte counter wraps to 0): a while loop with Inc(i).
 In tetris.pas the loop that looks for a bad entry of the table of scores (and then resets all of them in an inner loop
