@@ -60,10 +60,10 @@ type
   TFilePanel = class;
 
   TFilePanel = class(TFilePanelRoot)
-    procedure Draw; virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function GetPalette: TPalette; virtual;
+    procedure Draw; override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    procedure HandleEvent(var Event: TEvent); override;
+    function GetPalette: TPalette; override;
     procedure DrawTop(var B: TScreenCell); virtual;
     end;
 
@@ -93,7 +93,7 @@ type
     procedure Compile(Value: Word;
       FullProc, BriefProc: TFooterProc);
     procedure CompileShowOptions;
-    procedure Draw; virtual;
+    procedure Draw; override;
     {AK155: Этот метод нагружен двумя важными побочными эффектами:
         он в соответствии с настройками устанавливает свой Size.Y и
         заполняет DnD координатами строк, из которых возможен D&D.
@@ -101,14 +101,14 @@ type
         второе в HandleEvent}
     constructor Load(S: TStream);
     procedure Store(S: TStream);
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
   TDirView = class;
   TDirView = class(TTopView)
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function GetText(MaxWidth: Integer): String; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    function GetText(MaxWidth: Integer): String; override;
     end;
 
   TDriveLine = class;
@@ -121,13 +121,13 @@ type
     LogDrvMap: LongInt; {Cat}
     constructor Create(const R: TRect; APanel: TFilePanel);
     procedure MakeDriveLine;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Draw; virtual;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
     constructor Load(S: TStream);
     procedure Store(S: TStream);
     procedure Refresh; {Cat}
-    procedure Update; virtual;
+    procedure Update; override;
      {` AK155 18.03.2005 Раньше настройка автообновления строки дисков
      срабатывала только при загрузке. Это было вызвано тем, что
      при смене этой настройки сложно "со стороны" включить полосы дисков

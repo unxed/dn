@@ -108,10 +108,10 @@ type
     constructor Load(S: TStream);
     procedure Store(S: TStream);
     destructor Destroy; override;
-    procedure Awaken; virtual;
+    procedure Awaken; override;
     procedure CommandHandle(var Event: TEvent);
-    procedure ChangeBounds(const Bounds: TRect); virtual;
-    function Valid(Command: Word): Boolean; virtual;
+    procedure ChangeBounds(const Bounds: TRect); override;
+    function Valid(Command: Word): Boolean; override;
     procedure GetUserParams(var FileRec: PFileRec; var List: String;
          BuildList: Boolean);
     procedure ReadDirectory;
@@ -126,7 +126,7 @@ type
     procedure DecDrawDisabled;
     procedure ChkNoMem;
     procedure ChDir(Dir: String);
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     procedure Reorder;
       {` Пересортировать файлы в соответствии с текущими (изменившимися)
       установками сортировки `}
