@@ -2739,7 +2739,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmShowOutput:
 {$IFDEF LINUX}
       { the screen of the commands that DN ran (TvVtRun): Ctrl-O shows it }
-      if UserScr.Cols > 0 then
+      if (UserScr <> nil) and (UserScr.Cols > 0) then
         ShowUserScreen
       else
 {$ENDIF}
