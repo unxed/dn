@@ -31,7 +31,10 @@ free-space, total-space, drive-number, and drive-map behavior through the
 facade. Local tests and Linux legacy/UTF-8 builds pass; exact-SHA Linux,
 Windows, DOS, and object/class parity are pending for this candidate. The DOS
 toolchain workflow is extended to compile the complete DN target so this
-backend has a real target-build check.
+backend has a real target-build check. Its first run exposed one remaining
+hello-program step hard-coded to the previous toolchain directory; the
+workflow now uses the same `runner.temp` prefix for cache, toolchain, hello,
+and DN compilation, and must be re-run on the fix SHA.
 
 The inventory is deliberately limited to the first extraction families; the
 presence of `Dos` in historical DN units alone does not mean that every caller
