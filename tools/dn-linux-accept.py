@@ -144,24 +144,14 @@ SCENARIOS.append(('cmdline_echo', 'e c h o SPACE h i ENTER', 'input'))
 # pointer as a dynarray → Invalid pointer operation (RTE 204) @ ~00411516 on
 # first Draw after Show/MakeFirst. Class uses MakePalette(CTrashCan) and is OK.
 # Cannot PASS against unmodified object bin — keep skip (github.com/unxed/dn/issues/14).
-# Skip menu_3_8: Utilities → Edit OS Environment. Crash fixed (InitEnvironment +
-# empty-value TDOSVar); still skipped because the dialog lists live process env
-# vars — names/order differ across runs and object vs class process environments,
-# so full-cell compare flakes (not a class-migration delta).
-# Skip menu_0_16: ♦ item 16 = Game (Tetris). Playfield colors/piece geometry are
-# non-deterministic across object/class runs (animation timing) — not a migration
-# delta; cell diffs on █ attrs are expected flakes.
-# Skip menu_4_5: Panel → Directory Branch (cmDirBranch / Ctrl-H). Object and class
-# both Access-violation on OpenDirectory insert (blank screen + dn.err); shared
-# crash, not class-only — cannot PASS vs object baseline.
-# Skip menu_5_2: Manager → Directory tree (Ctrl-T). Opens a full-volume
-# "Scanning directories" progress dialog; under DN_ACCEPT_FAST the 30s scenario
-# alarm often fires on one side while the peer is still counting — flake, not a
-# class delta. (Core scenario altf10tree covers tree UI separately.)
-# Skip menu_6_16: Window → List... (cmWindowManager / Alt-0). Object and class
-# both Access-violation @ ~004119B2 opening the window-manager dialog (blank
-# screen + dn.err); shared crash, not class-only — cannot PASS vs object baseline.
-_SKIP_MENU = {(0, 10), (0, 16), (3, 8), (4, 5), (5, 2), (6, 16)}
+# Skip menu_0_10: Trash Can (object vs class palette — see issues/14).
+# Skip menu_0_16: ♦ Game/Tetris — non-deterministic animation frames.
+# Skip menu_3_8: Edit OS Environment — live process env differs across runs.
+# Skip menu_5_2: Manager → Directory tree (Ctrl-T) — full-volume scan flake under
+# DN_ACCEPT_FAST (altf10tree covers tree UI separately).
+# menu_4_5 Directory Branch and menu_6_16 Options→Colors were shared AVs; fixed
+# (filescol DelDuplicates/SameFile; Colors TPalette + ColorSel stream Load/Store).
+_SKIP_MENU = {(0, 10), (0, 16), (3, 8), (5, 2)}
 # menu_2_7..9: menu index 2 = Disk (♦=0); DOWN≥7 stays on Directory tree
 # (cmCreateTree → ReadTree / "Scanning directories"). Not a class regression — object
 # run can exceed 30s under parallel CI shards while the scan runs synchronously.

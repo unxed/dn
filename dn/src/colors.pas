@@ -61,7 +61,7 @@ procedure SetHighlightGroups;
 type
 
   TWindowList = class(TListBox)
-    function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
+    function GetText(Item, MaxLen: Integer): ShortString; override;
     end;
 
   TWindowCol = class(TCollection)
@@ -139,14 +139,27 @@ procedure SetHighlightGroups;
 
 procedure ChangeColors;
   var
-    CurPal: String;
+    CurPal: TPalette;
+    S: ShortString;
+    I, N: Integer;
   begin
-  CurPal := SystemColors[appPalette];
+  { Class TV stores palettes as TPalette (dynamic array). The Colors
+    dialog's DataSize/GetData/SetData use TPalette; passing a ShortString
+    made SetData's Copy(TPalette(Rec)) treat string bytes as a dynarray
+    pointer and AV in fpc_dynarray_copy (menu_6_16 / Options→Colors). }
+  CurPal := MakePalette(SystemColors[appPalette]);
   if ExecResource(dlgColors, CurPal) <> cmCancel then
     begin
-    SystemColors[appPalette] := CurPal;
+    N := PaletteSize(CurPal);
+    if N > 255 then
+      N := 255;
+    SetLength(S, N);
+    for I := 1 to N do
+      S[I] := Char(AttrToBIOS(CurPal[I]));
+    SystemColors[appPalette] := S;
     Application.Redraw; { Redraw application with new palette }
     end;
+  CurPal := nil;
   if VGASystem then
     GetPalette(VGA_palette);
   end;
@@ -155,7 +168,7 @@ procedure TWindowCol.FreeItem(Item: Pointer);
   begin
   end;
 
-function TWindowList.GetText(Item: LongInt; MaxLen: Integer): String;
+function TWindowList.GetText(Item, MaxLen: Integer): ShortString;
   var
     S: String;
     P: TView;
@@ -163,11 +176,13 @@ function TWindowList.GetText(Item: LongInt; MaxLen: Integer): String;
   P := List.At(Item);
   S := GetString(dlUnknownWindowType);
   Message(P, evCommand, cmGetName, @S);
-  if TWindow(P).Number in [1..9]
+  if (P is TWindow) and (TWindow(P).Number in [1..9])
   then
-    GetText := Char($30+TWindow(P).Number)+' '+S
+    Result := Char($30+TWindow(P).Number)+' '+S
   else
-    GetText := '  '+S;
+    Result := '  '+S;
+  if Length(Result) > MaxLen then
+    SetLength(Result, MaxLen);
   end;
 
 procedure WindowManager;

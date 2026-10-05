@@ -2027,7 +2027,9 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     S := TDosStream.Create(FN, stCreate);
     if S.Status = 0 then
       begin
-      S.WriteStr(PStr(GetPalette));
+      { GetPalette returns TPalette (dynarray); .pal files store the
+        BIOS string form kept in SystemColors. }
+      S.WriteStr(@SystemColors[appPalette]);
       StoreIndexes(S);
       vId := $50414756; { VGAP }
       S.Write(vId, SizeOf(vId));
