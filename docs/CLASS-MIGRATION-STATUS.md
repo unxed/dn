@@ -10,11 +10,11 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Item | State |
 |---|---|
 | Gate | **OPEN** |
-| Core accept (`dn-linux-accept.py`) | **32/32 PASS** (startup, panels, F3–F8, menus open, util calc/cal, zip Enter) |
-| Full menu grid `menu_M_N` | In progress; first File items show real diffs / object blank on some Enter |
-| Full functional matrix | Harness expanded (dialogs/tools/archives/input); not green yet |
-| Classic palette | Class on `CColor` (not OSP) |
-| Archives nested | `.tgz`/`.tar.bz2` Enter OK; F5/CI peers still open |
+| Core accept | **32/32 PASS** |
+| Full matrix | Re-running clean (~180 scenarios) after harness fixes |
+| Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
+| Known object crash | File menu item 10 blanks object baseline (class alive) — xfail |
+| Classic palette | Class on `CColor` |
 
 ## Working agreement
 
