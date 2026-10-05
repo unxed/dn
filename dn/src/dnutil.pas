@@ -1965,18 +1965,20 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   procedure MessageBoxAbout;
     var
-      D: array[1..3] of PAnsiString;
+      S: String;
+      I: Integer;
     begin
     
-    D[1] := PAnsiString(NewStr(VersionName));
-    D[2] := PAnsiString(NewStr(VersionRev));
-    D[3] := PAnsiString(NewStr(VersionDate));
-    MessageBox2(dlAbout, ^C'Based on Dos Navigator'#13+
+    S := dlAbout;
+    I := Pos('%s', S);
+    if I > 0 then begin System.Delete(S, I, 2); System.Insert(VersionName, S, I); end;
+    I := Pos('%s', S);
+    if I > 0 then begin System.Delete(S, I, 2); System.Insert(VersionRev, S, I); end;
+    I := Pos('%s', S);
+    if I > 0 then begin System.Delete(S, I, 2); System.Insert(VersionDate, S, I); end;
+    MessageBox(S + ^C'Based on Dos Navigator'#13+
   ^C'Copyright (C) 1991-99 RIT Research Labs'#13#13+
-  ^C'This product is a FREEWARE', @D, nil, mfAbout+mfOKButton);
-    FreeMem(D[1], Length(D[1]^) + 1);
-    FreeMem(D[2], Length(D[2]^) + 1);
-    FreeMem(D[3], Length(D[3]^) + 1);
+  ^C'This product is a FREEWARE', nil, mfAbout+mfOKButton);
     
     end;
 
