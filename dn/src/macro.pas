@@ -529,10 +529,12 @@ constructor TDOSVar.Create(P: PChar; NameLen, ValueLen: Longint);
   { Тут несподручно вызывать NewStr, поэтоу дин. строку формируем сами }
   GetMem(Name, NameLen+1);
   SetLength(Name^, NameLen);
-  Move((P)^, Name^[1], NameLen);
+  if NameLen > 0 then
+    Move(P^, Name^[1], NameLen);
 
   SetLength(Value, ValueLen);
-  StrLCopy(@Value[1], P+NameLen+1, ValueLen)
+  if ValueLen > 0 then
+    Move((P + NameLen + 1)^, Value[1], ValueLen);
   end;
 
 destructor TDOSVar.Destroy;
@@ -693,7 +695,15 @@ procedure EditDOSEnvironment(Env: PByteArray);
       end;
     begin
     D := TDialog(LoadResource(dlgEditEnvironment));
+    if D = nil then
+      Exit;
     Control := D.FirstThat(IsButton);
+    if Control = nil then
+      begin
+      D.Free;
+      D := nil;
+      Exit;
+      end;
 
     R.A.X := Control.Origin.X-1;
     R.B.X := R.A.X+1;
@@ -752,6 +762,8 @@ procedure EditDOSEnvironment(Env: PByteArray);
   var
     n1, n2: Longint;
   begin { EditDOSEnvironment }
+  if Env = nil then
+    Exit;
   PC := TCollection.Create(10, 10);
 
   I := 0;
