@@ -11,16 +11,18 @@ so panel titles match. See docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md.
 from __future__ import annotations
 
 import os
-import re
 import shutil
+import signal
 import sys
 import tempfile
+import time
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
 COLS, ROWS = 100, 30
+SCENARIO_TIMEOUT_SEC = 45
 KEYS = {
     'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS',
     'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~',
@@ -172,46 +174,65 @@ def diff_snaps(a: dict, b: dict, work_path: str, limit: int = 12) -> list[str]:
     if n:
         msgs.insert(0, 'cells differ: %d (ignored %d digit/time cells)'
                     % (n, skipped_digits))
-    elif skipped_digits:
-        msgs.append('note: ignored %d digit/time cells' % skipped_digits)
     return msgs
+
+
+class _ScenarioTimeout(Exception):
+    pass
 
 
 def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
     d = tempfile.mkdtemp(prefix='dn-accept-%s-' % label)
     err = ''
     t = None
+
+    def _alarm(_signum, _frame):
+        raise _ScenarioTimeout('timeout')
+
+    old = signal.signal(signal.SIGALRM, _alarm)
+    signal.alarm(SCENARIO_TIMEOUT_SEC)
     try:
         copy_dn(out, d)
         t = PtyTerm(['./dn'], COLS, ROWS, cwd=work, exe=os.path.join(d, 'dn'))
-        t.pump(1.8, 8)
-        # Close About / beta / leftover dialogs; then idle so the command line settles.
-        t.send(KEYS['ESC'], 0.5)
+        t.pump(1.5, 6)
         t.send(KEYS['ESC'], 0.4)
-        t.pump(0.8, 2)
+        t.send(KEYS['ESC'], 0.3)
+        t.pump(0.5, 1.5)
         for k in tokens(spec):
             if not t.alive():
                 break
-            t.send(k, 0.4)
-        t.pump(0.6, 2)
+            t.send(k, 0.35)
+        t.pump(0.5, 1.5)
         snap = snapshot(t)
         err_path = os.path.join(d, 'dn.err')
         if os.path.isfile(err_path):
             err = open(err_path, encoding='utf-8', errors='replace').read()[:400]
         if t.alive():
-            t.send(KEYS['ESC'], 0.2)
-            t.send(KEYS['ESC'], 0.2)
-            t.send(KEYS['ALT-X'], 0.3)
-            t.send(KEYS['ENTER'], 0.4)
+            for _ in range(3):
+                t.send(KEYS['ESC'], 0.15)
+            t.send(KEYS['ALT-X'], 0.25)
+            t.send(KEYS['ENTER'], 0.35)
             try:
-                t.close(1.5)
+                t.close(1.0)
             except Exception:
                 pass
         return snap, err
+    except _ScenarioTimeout:
+        empty = {
+            'alive': False, 'status': -1,
+            'cursor': (0, 0, False), 'cells': [], 'text': 'TIMEOUT',
+        }
+        return empty, 'timeout after %ss' % SCENARIO_TIMEOUT_SEC
     finally:
-        if t is not None and t.alive():
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old)
+        if t is not None:
             try:
                 os.kill(t.pid, 9)
+            except Exception:
+                pass
+            try:
+                os.waitpid(t.pid, os.WNOHANG)
             except Exception:
                 pass
         shutil.rmtree(d, ignore_errors=True)
