@@ -9,11 +9,11 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 
 | Item | State |
 |---|---|
-| Gate | **CLOSED** on last behavior-verified SHA `06259f5` (2026-10-06) |
+| Gate | **CLOSED** on last behavior-verified SHA `1f51f75` (2026-10-06) |
 | Whole-tree class syntax gate | **PASS** on DN `8f3057f`: strict scan of all 185 tracked Pascal files; no exclusions; no object-dialect construction/disposal idioms |
 | Bootstrap provenance | **PASS** on DN `8f3057f`; `dn` run `37386669632` reproduced pinned baseline byte-for-byte; `layout` run `37386669509` passed |
 | Core accept | **32/32 PASS** (historical) |
-| Full matrix | **177/177 PASS** on exact SHA `06259f5` (12 shards; GitHub run `37383488177`; object DN `b4916b8` + TV `521d064` vs class DN + TV3 `a06dd31`) |
+| Full matrix | **177/177 PASS** on exact SHA `1f51f75` (12 shards; GitHub run `37387363591`; object DN `b4916b8` + TV `521d064` vs class DN + TV3 `a06dd31`) |
 | Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
 | Known object crash | ♦ Trashcan (`cmHideShowTools` / `menu_0_10`): object `TTrashCan.GetPalette`=`@CTrashCan` vs dynarray `TPalette` → RTE 204; class `MakePalette` OK — skip kept ([#14](https://github.com/unxed/dn/issues/14)) |
@@ -51,7 +51,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Role | DN | Turbo Vision | Use |
 |---|---|---|---|
 | Last object-based baseline | `b4916b874989d7b35660d02cf935dc5f0db7a656` | `521d06479198789deeaa6fda287236ca83ba4051` | Required behavioral comparator |
-| Current class source used for latest full parity | DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` | TV3 `a06dd31` | 177/177 acceptance + exact-SHA Linux/Windows CI green |
+| Current class source used for latest full parity | DN `1f51f75677ae19ccb13c4d9071dedb3f7177f87e` | TV3 `a06dd31` | 177/177 acceptance + exact-SHA Linux/Windows CI green |
 | Older distributed binary | distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4`, built from `df0cca2` | pre-class distribution | Context only; do not substitute for the last object-based baseline |
 
 The user-reported self-build Fatal Errors are from
@@ -99,11 +99,11 @@ object/class parity remains an open gate item, not this symptom.
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. The configured blank-panel mismatch (10/10 before
 `7572d73`) is fixed. Full-cell object/class parity most recently passed
-177/177 on `06259f5`.
+177/177 on `1f51f75`.
 
 ## Remaining work, in order
 
-1. Keep full object/class parity closed at 177/177 on `06259f5`; rerun after
+1. Keep full object/class parity closed at 177/177 on `1f51f75`; rerun after
    any UI, drawing, events, resources, or stream changes. Any mismatch blocks
    later stages; shared bugs must still be fixed.
 2. Stage 3 platform separation is next; its current code map and done criteria
