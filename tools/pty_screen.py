@@ -38,6 +38,7 @@ class Screen:
         self.attr = (None, None, 0)         # fg, bg, style
         self.cursor_visible = True
         self.alt = False
+        self.primary = None
         self.log = []                        # the private modes that were set (for the tests)
 
     def put(self, ch):
@@ -140,11 +141,20 @@ class Screen:
                 if final == 'h':
                     self.log.append(('h', p))
                     if p == 25: self.cursor_visible = True
-                    if p == 1049: self.alt = True
+                    if p == 1049 and not self.alt:
+                        self.primary = (self.cells, self.x, self.y, self.attr, self.cursor_visible)
+                        self.cells = [[(' ', None)] * self.cols for _ in range(self.rows)]
+                        self.x = self.y = 0
+                        self.attr = (None, None, 0)
+                        self.alt = True
                 elif final == 'l':
                     self.log.append(('l', p))
                     if p == 25: self.cursor_visible = False
-                    if p == 1049: self.alt = False
+                    if p == 1049 and self.alt:
+                        self.alt = False
+                        if self.primary is not None:
+                            self.cells, self.x, self.y, self.attr, self.cursor_visible = self.primary
+                            self.primary = None
             return
         if priv:
             return
