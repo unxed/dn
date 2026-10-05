@@ -1,684 +1,684 @@
-# dn: DOS Navigator на Free Pascal и Turbo Vision, переведённом с magiblot/tvision
+# dn: DOS Navigator on Free Pascal and Turbo Vision, translated from magiblot/tvision
 
-Цель: DOS Navigator без кода Borland из коммерческого BP7, собранный Free Pascal на
-собственном TV. Этот TV — перевод на Pascal C++-библиотеки magiblot/tvision, которая
-восходит к C++ TV 2.0, опубликованному самим Borland. Сначала DOS с длинными именами (LFN)
-и системным буфером обмена, затем UTF-8 в DN и бэкенды под разные ОС, затем unxed/go2dos.
+Goal: DOS Navigator without Borland code from commercial BP7, built with Free Pascal on
+our own TV. This TV is a Pascal translation of the magiblot/tvision C++ library, which
+goes back to C++ TV 2.0 published by Borland itself. First DOS with long file names (LFN)
+and the system clipboard, then UTF-8 in DN and backends for different OSes, then unxed/go2dos.
 
-**Первичная цель (вехи 0–5):** DN на нашем TV собирается FPC под DOS (go32v2) и работает
-с LFN и системным буфером обмена там, где эта DOS их поддерживает. Ворота аудита в CI зелёные.
+**Primary goal (milestones 0–5):** DN on our TV builds with FPC for DOS (go32v2) and works
+with LFN and the system clipboard where that DOS supports them. Audit gates in CI are green.
 
-**Ближайший продуктовый релиз — DN 3.0:** стабильный перенос на новый стек (FPC + наш TV +
-classes), с минимальными вмешательствами в логику OSP. Дальнейшее развитие фич — строго
-после этой вехи. Исключения (Far UX, продвинутый ввод/буфер обмена): см.
+**Nearest product release — DN 3.0:** a stable port to the new stack (FPC + our TV +
+classes), with minimal interventions in OSP logic. Further feature work — strictly
+after this milestone. Exceptions (Far UX, advanced input/clipboard): see
 [`docs/DN-3.0.md`](docs/DN-3.0.md).
 
-Как работаем: коммиты идут прямо в `main`. Сборка и проверки — в GitHub Actions. Каждая
-веха разбита на небольшие сессии, результат каждой можно пощупать. **Исходники Borland в
-репозиторий не кладём никогда:** CI скачивает эталон по ссылке, сверяет sha256 и
-распаковывает во временный каталог (`audit/fetch_reference.sh`). Отчёты о сторонних
-проектах в репозиторий тоже не кладём.
+How we work: commits go straight to `main`. Builds and checks are in GitHub Actions. Each
+milestone is split into small sessions, and each session's result can be tried hands-on.
+**Borland sources never go into the repository:** CI downloads the reference by URL,
+checks sha256, and unpacks into a temporary directory (`audit/fetch_reference.sh`).
+Reports about third-party projects are also not committed to the repository.
 
-## Источники
+## Sources
 
-- magiblot/tvision: https://github.com/magiblot/tvision (на 2026-10-01 — `b4831e2`).
-  Лицензия: отказ от гарантий Borland плюс MIT (`COPYRIGHT`). Происхождение проверено:
+- magiblot/tvision: https://github.com/magiblot/tvision (as of 2026-10-01 — `b4831e2`).
+  License: Borland disclaimer plus MIT (`COPYRIGHT`). Provenance verified:
   `research/2026-10-01-magiblot-provenance.md`.
-- Опубликованный Borland выпуск TV 2.0: https://github.com/FSharpCSharp/TurboVision
-  (распакованный `tv.zip`); сам `tv.zip`: http://www.sigala.it/sergio/tvision/borland/tv.zip,
+- Published Borland TV 2.0 release: https://github.com/FSharpCSharp/TurboVision
+  (unpacked `tv.zip`); `tv.zip` itself: http://www.sigala.it/sergio/tvision/borland/tv.zip,
   https://web.archive.org/web/20170708213734/http://www.sigala.it/sergio/tvision/borland/tv.zip;
-  страница исходников Sergio Sigala: http://www.sigala.it/sergio/tvision/resources.html#sources.
-  Импорт magiblot «Version 2.0» совпадает с ним по коду во всех 201 файле.
-- Порт SET 2.0.3 (GPL, для сверки происхождения magiblot):
+  Sergio Sigala sources page: http://www.sigala.it/sergio/tvision/resources.html#sources.
+  The magiblot "Version 2.0" import matches it by code in all 201 files.
+- SET 2.0.3 port (GPL, for checking magiblot provenance):
   http://old-dos.ru/dl.php?id=9393, sha256
   `34d27cffff01d0b38b199c035d040bb2b3e88c41935f63d9828dd4db033471ac`.
-- **DN OSP 2.14** (Virtual Pascal) — база нашего DN (решение 10):
+- **DN OSP 2.14** (Virtual Pascal) — the base for our DN (decision 10):
   https://web.archive.org/web/20220202202636/http://www.dnosp.com/files/dn2/dn2s214.rar
-  (sha256 закреплён в `dn/upstream.env`; это тот же состав, что мы разбирали раньше: 210 файлов, 751658 токенов).
-- DN 1.51 от RIT (BP7), запасной вариант и для сравнения:
+  (sha256 pinned in `dn/upstream.env`; same contents we examined earlier: 210 files, 751658 tokens).
+- DN 1.51 from RIT (BP7), fallback and for comparison:
   https://web.archive.org/web/20250406173244/https://download.ritlabs.com/dn/dn151src.zip
-- Эталон Borland для аудита (BP 7.0 + обновление 7.01), sha256
+- Borland reference for audit (BP 7.0 + 7.01 update), sha256
   `1ba6251209ae4a56a4f6ce5926bff0eca815ea53a3dd5f57f779d52d1e1dc2fc`:
   http://old-dos.ru/dl.php?id=9670
   https://web.archive.org/web/20231211134715if_/http://old-dos.ru/dl.php?id=9670
-  Исходники Drivers, Menus и TextView в нём отсутствуют.
+  Drivers, Menus, and TextView sources are absent from it.
 
-## Лицензии
+## Licenses
 
-- Код DN — под лицензией DN. Перелицензировать его нельзя (лицензия DN из публичного выпуска);
-  мы и не перелицензируем.
-- `tv/` (перевод magiblot/tvision) — под той же лицензией, что апстрим: отказ от гарантий
-  Borland плюс MIT. Перевод — производная работа, уведомления сохраняем.
-- В одном бинарнике: DN (BSD-подобная), TV (MIT), RTL FPC (LGPL с исключением для
-  статической линковки). Конфликта нет: ни одна из лицензий не требует перелицензировать
-  чужой код. Копировать код между `dn/` и `tv/` нельзя: у них разные лицензии.
-- В `tv/` два вида файлов: переведённые из magiblot (отказ от гарантий Borland + MIT magiblot)
-  и написанные для порта (MIT, `tv/LICENSE`). Вид указан в заголовке каждого юнита.
-  Решение о лицензии MIT для наших дополнений принял я, чтобы у пакета была одна понятная
-  лицензия; см. «Открытые вопросы».
+- DN code is under the DN license. It cannot be relicensed (the DN license from the public release);
+  and we do not relicense it.
+- `tv/` (translation of magiblot/tvision) — under the same license as upstream: Borland disclaimer
+  plus MIT. The translation is a derivative work; notices are preserved.
+- In one binary: DN (BSD-like), TV (MIT), FPC RTL (LGPL with a static linking exception).
+  No conflict: none of the licenses requires relicensing someone else's code. Code must not be
+  copied between `dn/` and `tv/`: they have different licenses.
+- In `tv/` there are two kinds of files: translated from magiblot (Borland disclaimer + magiblot MIT)
+  and written for the port (MIT, `tv/LICENSE`). The kind is stated in each unit's header.
+  I chose the MIT license for our additions so the package has one clear license; see
+  "Open questions".
 
-## Решения (2026-10-01)
+## Decisions (2026-10-01)
 
-1. **TV — перевод magiblot/tvision на FPC, пакет `tv/`** (подтверждено unxed 2026-10-01).
-   Переводим только библиотеку: `source/tvision`, `source/platform`, `include/tvision` без
-   `compat/`. `examples/` (tvdemo, tvhc и др.) не переводим: это не часть опубликованного
-   выпуска TV. Free Vision, исходный TV из DN и попытки dn* не используются как источник
-   кода. Почему: `research/2026-10-01-provenance.md`, `research/2026-10-01-magiblot-provenance.md`.
-2. **API — в стиле Pascal TV,** под то, что использует DN: объекты `object`, `TView.HandleEvent`,
-   константы `cm*`/`kb*`, `New(P, Init)`. Реализация следует C++-коду magiblot. Каждый юнит
-   `tv/` в заголовке указывает, из каких файлов и какого коммита magiblot он переведён.
-3. **Строки в TV — UTF-8 с первого дня** (так устроен magiblot). Однобайтные строки DN
-   (на DOS — в OEM-кодировке) TV принимает так: невалидный UTF-8 трактуется как символы
-   кодовой страницы. У magiblot это CP437, у нас **кодовая страница — настройка**
-   (по умолчанию 866 или активная кодовая страница DOS). Так DN работает без переделок,
-   а в вехе 6 переходит на UTF-8.
-4. **Бэкенды:**
-   - DOS (VRAM/int 10h, int 16h, int 33h, WinOldAp int 2Fh) и бэкенд в памяти для тестов
-     пишем сами;
-   - Unix/Windows — перевод слоя платформы magiblot (`source/platform`: ANSI, far2l, kitty,
-     OSC 52, консоль Win32).
-5. **Ворота аудита в CI:**
-   - `dn/` сравнивается с эталоном Borland строго: `raw% ≤ 2` и `maxrun < 48` на файл;
-   - в `tv/` совпадения с Pascal-TV Borland естественны (тот же автор и та же архитектура),
-     поэтому там допустимы только процедуры, у которых в заголовке юнита указан источник
-     в magiblot. Пороги калибруем на первых файлах.
-6. **Подозрительные файлы DN** (`scroller`, `HELPKERN`, `helpfile`, `DNAPP`, `DNStdDlg`,
-   `messages`, `gauge(s)`, `asciitab`, `listmakr`, `COLLECT`, `streams`, `tvhc`, частично
-   `FVIEWER`) заменяем аналогом из `tv/` (в библиотеке magiblot есть справка, StdDlg,
-   MsgBox, скроллер, коллекции и потоки) или переписываем процедуры с совпадениями.
-   ASCII-таблица, индикаторы и компилятор справки (`tvhc`) в библиотеку не входят — их
-   пишем сами. Переписываем по
-   спецификации поведения, без кода. Сессия, которая пишет код, исходник Borland не видит.
+1. **TV — a translation of magiblot/tvision to FPC, package `tv/`** (confirmed by unxed 2026-10-01).
+   We translate only the library: `source/tvision`, `source/platform`, `include/tvision` without
+   `compat/`. We do not translate `examples/` (tvdemo, tvhc, etc.): that is not part of the published
+   TV release. Free Vision, the original TV from DN, and dn* attempts are not used as a source
+   of code. Why: `research/2026-10-01-provenance.md`, `research/2026-10-01-magiblot-provenance.md`.
+2. **API — in Pascal TV style,** matching what DN uses: `object` objects, `TView.HandleEvent`,
+   `cm*`/`kb*` constants, `New(P, Init)`. The implementation follows magiblot's C++ code. Each
+   `tv/` unit header states which magiblot files and which commit it was translated from.
+3. **Strings in TV — UTF-8 from day one** (as magiblot is built). DN's single-byte strings
+   (on DOS — in OEM encoding) are accepted by TV as follows: invalid UTF-8 is treated as code-page
+   characters. Magiblot uses CP437; for us the **code page is a setting**
+   (default 866 or the active DOS code page). This way DN works without rework,
+   and in milestone 6 it moves to UTF-8.
+4. **Backends:**
+   - DOS (VRAM/int 10h, int 16h, int 33h, WinOldAp int 2Fh) and an in-memory backend for tests
+     we write ourselves;
+   - Unix/Windows — translation of magiblot's platform layer (`source/platform`: ANSI, far2l, kitty,
+     OSC 52, Win32 console).
+5. **Audit gates in CI:**
+   - `dn/` is compared to the Borland reference strictly: `raw% ≤ 2` and `maxrun < 48` per file;
+   - in `tv/`, matches with Borland's Pascal TV are natural (same author and same architecture),
+     so only procedures whose unit header cites a magiblot source are allowed there. Thresholds
+     are calibrated on the first files.
+6. **Suspicious DN files** (`scroller`, `HELPKERN`, `helpfile`, `DNAPP`, `DNStdDlg`,
+   `messages`, `gauge(s)`, `asciitab`, `listmakr`, `COLLECT`, `streams`, `tvhc`, partially
+   `FVIEWER`) are replaced with analogues from `tv/` (the magiblot library has help, StdDlg,
+   MsgBox, scroller, collections, and streams) or matching procedures are rewritten.
+   The ASCII table, gauges, and the help compiler (`tvhc`) are not in the library — we
+   write them ourselves. We rewrite from a behavior specification, without code. The session
+   that writes code does not see the Borland source.
 
-7. **TV и DN — два независимых проекта** (2026-10-02, по указанию unxed): разные лицензии,
-   код между ними не копируется. `tv/` не знает о `dn/` и использует только свои юниты и
-   RTL; `dn/` использует TV только как пакет. Проверяет `tools/check-layout.sh`
-   (workflow `layout`): допустимые `uses` в `tv/`, пометка происхождения в каждом юните,
-   отсутствие упоминаний `dn/` в `tv/`, отсутствие файлов `tv/` в `dn/`. Каталог `tv/`
-   самодостаточен (README, LICENSE, свой DESIGN, свои тесты) и при желании выносится в
-   отдельный репозиторий вместе с историей (`git subtree split`).
-8. **Код DN происходит только из публично доступных источников** (2026-10-02, по указанию
-   unxed): выпуски DN (OSP 2.14, запасной — RIT 1.51) и наш новый код. Чужие репозитории
-   с прежними попытками портирования источником кода не служат, и ссылок на них в этом
-   репозитории и его истории нет.
-9. **Исходников DN в репозитории нет — только то, что позволяет воспроизвести наше дерево**
-   (2026-10-02, по указанию unxed): адрес и sha256 публичного архива (`dn/upstream.env`),
-   список исключаемых файлов (`dn/exclude.list`: заменены новым TV или переписаны — их код
-   Borland-происхождения не хранится нигде), серия патчей по чистым файлам (`dn/patches/`),
-   наши новые файлы (`dn/new/`) и скрипты (`tools/dn-fetch.sh`, `tools/dn-materialize.sh`).
-   Дерево DN получается так: скачать архив, проверить sha256, распаковать, удалить
-   исключённые, применить патчи, добавить новые файлы. Патчи касаются только файлов,
-   прошедших ворота аудита, так что в их контексте нет кода Borland. Вся история изменений
-   DN — это история патчей. Каталога `upstream/` и копии DN в git нет.
-10. **Первая версия — оригинал с минимумом изменений** (2026-10-02, по указанию unxed). Поверх
-   публичного кода DN OSP 2.14 допустимы только: (а) переход на лицензионно чистый новый
-   TV (`tv/`); (б) UTF-8, если API есть в DOS, где работаем; (в) LFN; (г) системный буфер
-   обмена; (д) сборка современным компилятором (FPC). Остальное — рефакторинг, улучшения,
-   исправления чужих ошибок — не делаем в первой версии, а записываем в список в репозитории
-   (`dn/TODO-later.md`). Так остаётся максимум проверенного временем оригинального кода.
-   Каждый патч серии помечен причиной (а–д); патч без причины не принимается.
+7. **TV and DN are two independent projects** (2026-10-02, per unxed direction): different licenses,
+   code is not copied between them. `tv/` does not know about `dn/` and uses only its own units and
+   the RTL; `dn/` uses TV only as a package. Checked by `tools/check-layout.sh`
+   (workflow `layout`): allowed `uses` in `tv/`, provenance mark in each unit,
+   no mentions of `dn/` in `tv/`, no `tv/` files in `dn/`. The `tv/` directory
+   is self-contained (README, LICENSE, its own DESIGN, its own tests) and can be extracted into
+   a separate repository with history if desired (`git subtree split`).
+8. **DN code comes only from publicly available sources** (2026-10-02, per unxed direction):
+   DN releases (OSP 2.14, fallback — RIT 1.51) and our new code. Third-party repositories
+   with prior porting attempts are not a source of code, and there are no links to them in this
+   repository or its history.
+9. **There are no DN sources in the repository — only what is needed to reproduce our tree**
+   (2026-10-02, per unxed direction): the public archive URL and sha256 (`dn/upstream.env`),
+   the list of excluded files (`dn/exclude.list`: replaced by the new TV or rewritten — their
+   Borland-origin code is not stored anywhere), a series of patches on clean files (`dn/patches/`),
+   our new files (`dn/new/`), and scripts (`tools/dn-fetch.sh`, `tools/dn-materialize.sh`).
+   The DN tree is obtained as follows: download the archive, check sha256, unpack, remove
+   excluded files, apply patches, add new files. Patches touch only files that passed the
+   audit gates, so their context has no Borland code. The entire history of DN changes
+   is the history of patches. There is no `upstream/` directory and no copy of DN in git.
+10. **The first version is the original with minimal changes** (2026-10-02, per unxed direction). On top of
+   public DN OSP 2.14 code, only the following are allowed: (a) switch to a license-clean new
+   TV (`tv/`); (b) UTF-8, if the API exists on the DOS we run on; (c) LFN; (d) system clipboard;
+   (e) build with a modern compiler (FPC). Everything else — refactoring, improvements,
+   fixing others' bugs — we do not do in the first version, and we record it in a list in the repository
+   (`dn/TODO-later.md`). This keeps the maximum of time-tested original code.
+   Each patch in the series is marked with a reason (a–e); a patch without a reason is not accepted.
 
-11. **Из публичных архивов берём только код RIT и его прямых потомков в DN OSP**
-   (2026-10-02, по указанию unxed). Куски кода Borland и Virtual Pascal (и чужой код других
-   правообладателей) выбрасываем и создаём заново целиком, если только они не доступны под
-   заведомо совместимой лицензией. Весь «обвес» вокруг кода RIT и его продолжения в OSP
-   (адаптеры, замены, тесты, скрипты, сборка) — наш. Это версия 1.0; потом, возможно, перепишем и
-   код RIT, осовременим его, но сейчас — так (остальное владелец проекта ещё обдумывает).
-   Следствия: (1) список исключений — не только «над порогом аудита» (код Borland), а всё, что не
-   RIT/OSP: `tools/dn-provenance.py` классифицирует файлы дерева по заметке об авторских правах
-   (RIT/OSP, Borland, VP, чужой автор, без заметки) — результат разбираем вручную; (2) своё
-   заменяем «с тем же именем и API» в `dn/new` (`vpsyslow`, `defines`, `views`...); (3) файлы OSP
-   с пометкой участников проекта (Cat, JO, AK155 — «Contribution to DN/2 OSP project») считаем
-   потомками DN OSP; файлы с чужой заметкой (regexp — P. Ziemian, eaoper — A. Trunov) —
-   исключаем.
+11. **From public archives we take only RIT code and its direct descendants in DN OSP**
+   (2026-10-02, per unxed direction). Chunks of Borland and Virtual Pascal code (and third-party code of other
+   rights holders) we discard and recreate entirely, unless they are available under
+   a clearly compatible license. All "scaffolding" around RIT code and its continuation in OSP
+   (adapters, replacements, tests, scripts, build) is ours. This is version 1.0; later we may rewrite
+   the RIT code too and modernize it, but for now — this way (the rest the project owner is still considering).
+   Consequences: (1) the exclusion list is not only "above the audit threshold" (Borland code), but everything that is not
+   RIT/OSP: `tools/dn-provenance.py` classifies tree files by copyright notice
+   (RIT/OSP, Borland, VP, third-party author, no notice) — the result is reviewed manually; (2) our own
+   replacements go "with the same name and API" into `dn/new` (`vpsyslow`, `defines`, `views`...); (3) OSP files
+   marked by project participants (Cat, JO, AK155 — "Contribution to DN/2 OSP project") we treat as
+   DN OSP descendants; files with a third-party notice (regexp — P. Ziemian, eaoper — A. Trunov) —
+   we exclude.
 
-## Раскладка репозитория
+## Repository layout
 
-| Каталог | Что | Лицензия |
+| Directory | What | License |
 |---|---|---|
-| `tv/` | перевод magiblot/tvision, свои бэкенды, демо, тесты | Borland disclaimer + MIT (переведённое), MIT (наше) |
-| `dn/` | DN: адрес и sha256 публичного архива, список исключений, патчи, наши новые файлы (сами исходники DN не хранятся); лицензия DN | DN |
-| `spec/` | спецификации поведения для переписываемых мест DN | — |
-| `tests/` | тесты DN (тесты TV лежат в `tv/tests`) | — |
-| `audit/` | детектор, загрузка эталона, отчёты по DN; `audit/ref/` не коммитится | — |
-| `tools/` | сборка тулчейна, запуск в DOSBox-X, проверка раскладки | — |
-| `research/` | исследования | — |
+| `tv/` | translation of magiblot/tvision, our backends, demos, tests | Borland disclaimer + MIT (translated), MIT (ours) |
+| `dn/` | DN: public archive URL and sha256, exclusion list, patches, our new files (DN sources themselves are not stored); DN license | DN |
+| `spec/` | behavior specifications for rewritten DN places | — |
+| `tests/` | DN tests (TV tests live in `tv/tests`) | — |
+| `audit/` | detector, reference download, DN reports; `audit/ref/` is not committed | — |
+| `tools/` | toolchain build, DOSBox-X runs, layout check | — |
+| `research/` | research | — |
 
 ---
 
-## Веха 0. Детектор и измерения — готово (2026-10-01)
+## Milestone 0. Detector and measurements — done (2026-10-01)
 
-`audit/xclone.py`, `audit/runs.py`, `audit/fetch_reference.sh`, отчёты по DN 1.51 и DN OSP.
+`audit/xclone.py`, `audit/runs.py`, `audit/fetch_reference.sh`, reports for DN 1.51 and DN OSP.
 
-## Веха 1. Тулчейн и CI — готово (2026-10-01)
+## Milestone 1. Toolchain and CI — done (2026-10-01)
 
-Готово: кросс-компилятор FPC → go32v2, `hello` запускается в DOSBox-X без экрана
-(`research/2026-10-01-toolchain.md`, workflow `toolchain`). Готово также: workflow `audit` (эталон Borland качается в CI,
-самотест детектора). DPMI-хост для распространения: CWSDPMI r7 (GPL или без исходников при
-соблюдении условий, см. `research/2026-10-01-toolchain.md`). Ворота аудита по `dn/` и
-`tv/` включим, когда там появится код. Скриншот
-экрана DOSBox-X сделаем с демо TV в вехе 2.
+Done: FPC → go32v2 cross-compiler, `hello` runs in DOSBox-X without a screen
+(`research/2026-10-01-toolchain.md`, workflow `toolchain`). Also done: workflow `audit` (Borland reference is fetched in CI,
+detector self-test). DPMI host for distribution: CWSDPMI r7 (GPL or without sources if
+conditions are met, see `research/2026-10-01-toolchain.md`). Audit gates for `dn/` and
+`tv/` will be enabled when there is code there. A screenshot of the
+DOSBox-X screen will be made with the TV demo in milestone 2.
 
-- `toolchain.yml` (готово): FPC 3.2.2 из исходников, кросс-компиляция под i386-go32v2
-  с binutils DJGPP.
-- go32v2 вне Windows нужен DPMI-хост: CWSDPMI или HDPMI32. Выбрать, сверив лицензии
-  на распространение.
-- `hello.pas` под go32v2 в DOSBox-X без экрана, скриншот артефактом. FreeDOS в QEMU —
-  тем же workflow или позже.
-- `audit.yml`: `fetch_reference.sh` (`unrar` из apt); `dn.yml`: дерево DN из публичного архива, отчёт аудита и ворота.
+- `toolchain.yml` (done): FPC 3.2.2 from sources, cross-compilation for i386-go32v2
+  with DJGPP binutils.
+- Outside Windows, go32v2 needs a DPMI host: CWSDPMI or HDPMI32. Choose after checking licenses
+  for redistribution.
+- `hello.pas` for go32v2 in DOSBox-X without a screen, screenshot as an artifact. FreeDOS in QEMU —
+  same workflow or later.
+- `audit.yml`: `fetch_reference.sh` (`unrar` from apt); `dn.yml`: DN tree from the public archive, audit report and gates.
 
-Готово, когда: оба workflow зелёные, скриншот hello из DOSBox-X лежит в артефактах.
+Done when: both workflows are green, the hello screenshot from DOSBox-X is in the artifacts.
 
-## Веха 2. Пилот TV (2–4 сессии)
+## Milestone 2. TV pilot (2–4 sessions)
 
-Переводим минимальный срез magiblot: геометрия и коллекции, ячейка экрана и `TDrawBuffer`
-(UTF-8, ширина, кодовая страница), `TView`, `TGroup`, `TFrame`, `TWindow`, `TMenuBar`,
-`TStatusLine`, `TProgram`/`TApplication`, очередь событий. Бэкенды: в памяти (тесты) и DOS.
+We translate a minimal slice of magiblot: geometry and collections, screen cell and `TDrawBuffer`
+(UTF-8, width, code page), `TView`, `TGroup`, `TFrame`, `TWindow`, `TMenuBar`,
+`TStatusLine`, `TProgram`/`TApplication`, event queue. Backends: in-memory (tests) and DOS.
 
-Перед переводом проверяем на коротком примере, как FPC уживается с юнитами `{$H+}`
-(TV) и `{$H-}`/`{$mode tp}` (DN) и с наследованием `object` из чужого юнита.
+Before translating, we check on a short example how FPC coexists with `{$H+}` units
+(TV) and `{$H-}`/`{$mode tp}` (DN) and with `object` inheritance from a foreign unit.
 
-Готово, когда: тесты на бэкенде в памяти зелёные (дамп экрана), а демо — меню и окно —
-работает в DOSBox-X (скриншот). **Это первое, что можно пощупать.**
+Done when: tests on the in-memory backend are green (screen dump), and the demo — menu and window —
+works in DOSBox-X (screenshot). **This is the first thing that can be tried hands-on.**
 
-## Веха 3. TV под нужды DN (N сессий)
+## Milestone 3. TV for DN's needs (N sessions)
 
-- `spec/api-usage.md` генерируется скриптом: какие объекты, методы и поля TV используют
-  обе базы DN. Это граница объёма перевода.
-- Переводим остальное нужное: диалоги, строка ввода, списки, скроллер, окна сообщений,
-  файловые диалоги, история, валидаторы, справка (`helpbase`, `tvhc`), выбор цветов,
-  потоки и ресурсы в объёме, нужном DN.
-- На каждую порцию — тесты и демо.
+- `spec/api-usage.md` is generated by a script: which TV objects, methods, and fields both
+  DN bases use. This is the translation scope boundary.
+- We translate the rest that is needed: dialogs, input line, lists, scroller, message boxes,
+  file dialogs, history, validators, help (`helpbase`, `tvhc`), color selection,
+  streams and resources to the extent DN needs.
+- For each portion — tests and a demo.
 
-### Состояние вехи 3 (2026-10-02)
+### Milestone 3 status (2026-10-02)
 
-Готово и зелёное (native + DOS в `tv.yml`; таблица юнитов и решения — `tv/DESIGN.md`):
-ядро и вид (`TvViews`, `TvWindow`, `TvApp`, `TvMenus`), диалоги (`TvDialog`, `TvMsgBox`),
-`TvInput`, `TvValid`, `TvCluster` (чекбоксы, радиокнопки), `TvList` (`TListViewer`,
-`TListBox`), `TvHist` (история), `TvFiles` (поиск с LFN, пути, коллекции),
-`TvFileDlg` (`TFileDialog`, `TSortedListBox` и др.), `TvChDir` (`TChDirDialog`),
-`TvColorSel` (`TColorDialog` и селекторы), `TvTextView` (`TTerminal`),
-бэкенды `TvMem`, `TvDos`.
+Done and green (native + DOS in `tv.yml`; unit table and decisions — `tv/DESIGN.md`):
+core and view (`TvViews`, `TvWindow`, `TvApp`, `TvMenus`), dialogs (`TvDialog`, `TvMsgBox`),
+`TvInput`, `TvValid`, `TvCluster` (checkboxes, radio buttons), `TvList` (`TListViewer`,
+`TListBox`), `TvHist` (history), `TvFiles` (LFN search, paths, collections),
+`TvFileDlg` (`TFileDialog`, `TSortedListBox`, etc.), `TvChDir` (`TChDirDialog`),
+`TvColorSel` (`TColorDialog` and selectors), `TvTextView` (`TTerminal`),
+backends `TvMem`, `TvDos`.
 
-Справка сделана (`tv/src/tvhelp.pas` — перевод `helpbase/help` magiblot; `tv/tools/tvhc.pas` — наш компилятор `.htx`→`.hlp`;
-в DN `HelpKern/HelpFile` — только имена). Осталось в вехе 3: потоки и ресурсы для видов (`Load`/`Store` у виджетов),
-`TProgram`-мелочи по результатам `spec/api-usage.md`. Адаптеры под API DN — в `dn/new`.
+Help is done (`tv/src/tvhelp.pas` — translation of magiblot `helpbase/help`; `tv/tools/tvhc.pas` — our `.htx`→`.hlp` compiler;
+in DN `HelpKern/HelpFile` — names only). Remaining in milestone 3: streams and resources for views (widget `Load`/`Store`),
+`TProgram` odds and ends from `spec/api-usage.md` results. DN API adapters — in `dn/new`.
 
-Как писать тесты (чтобы не повторять ошибки):
-- имя теста ≤ 8 символов (`t_clust`, не `t_cluster`): DOS собирает `NAME.EXE`;
-- сравнения с буфером и `AnsiString` в главном блоке держат временные строки до конца
-  программы — выносите в функцию, иначе проверка «память не течёт» ложно срабатывает;
-- в DOS имена файлов приходят в верхнем регистре, без LFN — только 8.3; пути в диалоге
-  смены каталога без буквы диска; для тестов с файлами — `Quiet`/`HeapBase`/`HeapMark`
-  из `tv/tests/testlib.inc` (прогрев и метки кучи, печатаются при падении);
-- каждый неудачный `FindFirst` надо закрывать `FindClose` (RTL go32v2 держит запись LFN);
-- DOS-шаг CI прогоняет все тесты и печатает компактный отчёт `--- t_xxx`; локально DOS
-  не запускается (CWSDPMI не скачивается через прокси), только кросс-компиляция.
+How to write tests (to avoid repeating mistakes):
+- test name ≤ 8 characters (`t_clust`, not `t_cluster`): DOS builds `NAME.EXE`;
+- comparisons with a buffer and `AnsiString` in the main block keep temporary strings until the end of
+  the program — move them into a function, otherwise the "no memory leak" check false-fires;
+- on DOS, file names come in upper case; without LFN — only 8.3; paths in the change-directory dialog
+  have no drive letter; for file tests — `Quiet`/`HeapBase`/`HeapMark`
+  from `tv/tests/testlib.inc` (heap warmup and marks, printed on failure);
+- every failed `FindFirst` must be closed with `FindClose` (go32v2 RTL keeps an LFN record);
+- the CI DOS step runs all tests and prints a compact `--- t_xxx` report; locally DOS
+  does not run (CWSDPMI is not downloaded through the proxy), only cross-compilation.
 
-### Покрытие API DN (2026-10-02)
+### DN API coverage (2026-10-02)
 
-`tools/api-coverage.py` сверяет имена, которые чистый код DN берёт у заменяемых юнитов
-(`spec/dn-boundary-dnosp214.md`), с идентификаторами `tv/src`; отчёт —
-`spec/api-coverage-2026-10-02.txt`. Грубо: 62 % имён и **84 % употреблений** уже есть в `tv/`.
-Недостающее — это очередь адаптеров в `dn/new`: расширения DN (`GetPeerViewPtr`,
+`tools/api-coverage.py` compares names that clean DN code takes from replaceable units
+(`spec/dn-boundary-dnosp214.md`) with identifiers in `tv/src`; the report is
+`spec/api-coverage-2026-10-02.txt`. Roughly: 62% of names and **84% of usages** are already in `tv/`.
+What is missing is an adapter queue in `dn/new`: DN extensions (`GetPeerViewPtr`,
 `PutPeerViewPtr`, `GetSubViewPtr`, `PutSubViewPtr`, `RegisterToBackground`, `PVideoBuf`,
 `ReadStrV`, `GlobalMessage`, `ExecResource`, `LoadResource`, `PString`/`PLongString`...),
-а не работа над самим `tv/`. Совпадение по имени — не гарантия того же поведения: проверяет
-сборка (веха 4).
+not work on `tv/` itself. A name match is not a guarantee of the same behavior: that is checked
+by the build (milestone 4).
 
-## Веха 4. DN на нашем TV (N сессий)
+## Milestone 4. DN on our TV (N sessions)
 
-- База: DN OSP 2.14 (решение 10). Дерево воспроизводится скриптами (решение 9):
-  `tools/dn-fetch.sh` (скачивание и sha256), `tools/dn-materialize.sh` (исключения, патчи,
-  новые файлы), workflow `dn.yml` (то же в CI, аудит дерева, сборка).
-- Что надо исправить для FPC, выясняем по ошибкам компилятора и записываем в
-  `research/dn-port-lessons.md`; каждое исправление — патч с причиной «д».
-- Расширения DN, которые были в его TV-юнитах, переносим поверх `tv/`: наследники, хуки.
-  Процедуры DN без совпадений с Borland переносим как есть, с совпадениями — переписываем.
-- **DN OSP — проект Virtual Pascal** (подробности и цифры пробы — `research/dn-port-lessons.md`):
-  всё, что завязано на VP (`vputils`, `vpsyslow`, `files`, `dpmi32df`, `lfnvp`, `-A`-подмены, ветки
-  `OS2`/`WIN32`/`DPMI32`), адаптируем под FPC своими юнитами в `dn/new` (API по вызовам в DN,
-  без копирования кода vpascal.com) и патчами «д». Это основная работа вехи 4 до первой сборки.
-- Подозрительные файлы DN — по решению 6. Сначала DN собирается и работает под Linux
-  на бэкенде в памяти и терминале, потом go32v2.
+- Base: DN OSP 2.14 (decision 10). The tree is reproduced by scripts (decision 9):
+  `tools/dn-fetch.sh` (download and sha256), `tools/dn-materialize.sh` (exclusions, patches,
+  new files), workflow `dn.yml` (same in CI, tree audit, build).
+- What needs fixing for FPC we discover from compiler errors and record in
+  `research/dn-port-lessons.md`; each fix is a patch with reason "e".
+- DN extensions that lived in its TV units we port on top of `tv/`: descendants, hooks.
+  DN procedures without Borland matches we port as-is; those with matches we rewrite.
+- **DN OSP is a Virtual Pascal project** (details and probe numbers — `research/dn-port-lessons.md`):
+  everything tied to VP (`vputils`, `vpsyslow`, `files`, `dpmi32df`, `lfnvp`, `-A` substitutions, `OS2`/`WIN32`/`DPMI32`
+  branches) we adapt for FPC with our own units in `dn/new` (API from DN call sites,
+  without copying vpascal.com code) and "e" patches. This is the main work of milestone 4 until the first build.
+- Suspicious DN files — per decision 6. First DN builds and runs under Linux
+  on the in-memory and terminal backends, then go32v2.
 
-Готово, когда: `dn/` собирается без файлов, не прошедших ворота, `audit.yml` зелёный по `dn/`.
+Done when: `dn/` builds without files that failed the gates, `audit.yml` is green for `dn/`.
 
-## Веха 5а (ранняя). Работа под DOSBox-X с однобайтной кодировкой по локали хоста
+## Milestone 5a (early). Running under DOSBox-X with a single-byte encoding per host locale
 
-Решение владельца проекта (2026-10-02): раньше честного UTF-8 в DOS (веха 5, go2dos) выпускаем
-версию, которая работает под DOSBox-X и переводит текст в однобайтную кодировку, которую DOS
-выбрал по локали хоста (DOSBox-X ставит страницу по настройке `country`/раскладке).
+Project owner decision (2026-10-02): before honest UTF-8 on DOS (milestone 5, go2dos) we ship
+a version that works under DOSBox-X and converts text to the single-byte encoding that DOS
+chose from the host locale (DOSBox-X sets the page from the `country`/layout setting).
 
-- `TvDos` берёт активную страницу DOS (`INT 21h AX=6601h`) и выбирает таблицу `TvCodePg`;
-  известны OEM-страницы 437 737 775 850 852 855 857 858 860 861 862 863 864 865 866 869
-  (`tools/gen-codepage.py`); неизвестная — 437.
-- Весь текст внутри — UTF-8; в видеопамять, из клавиатуры, из буфера обмена (CF_OEMTEXT) и
-  из имён файлов он переводится на границе с DOS через эту таблицу. Символ, которого нет в
-  странице, показывается как `?` (при выводе на экран — как есть в странице).
-- Showcase для DOSBox-X: `tools/showcase-dosbox.sh` собирает `tv/demo/tvdemo.pas` и запускает
-  его; такой же запуск делает CI (артефакт `dos-demo`).
-- Готово, когда: демо и (позже) DN под DOSBox-X показывают текст на страницах 437/866/850/852,
-  и проверка в CI есть минимум для двух страниц.
+- `TvDos` takes the active DOS page (`INT 21h AX=6601h`) and picks a `TvCodePg` table;
+  known OEM pages 437 737 775 850 852 855 857 858 860 861 862 863 864 865 866 869
+  (`tools/gen-codepage.py`); unknown — 437.
+- All text inside is UTF-8; into video memory, from the keyboard, from the clipboard (CF_OEMTEXT), and
+  from file names it is converted at the DOS boundary via this table. A character not present in
+  the page is shown as `?` (on screen output — as it is in the page).
+- Showcase for DOSBox-X: `tools/showcase-dosbox.sh` builds `tv/demo/tvdemo.pas` and runs
+  it; CI does the same run (artifact `dos-demo`).
+- Done when: the demo and (later) DN under DOSBox-X show text on pages 437/866/850/852,
+  and CI has a check for at least two pages.
 
-## Веха 5. DOS: LFN и буфер обмена — **первичная цель**
+## Milestone 5. DOS: LFN and clipboard — **primary goal**
 
-- LFN — `LFNSupport` RTL go32v2 (int 21h, 71xxh), без него 8.3.
-- Буфер обмена: WinOldAp, в DN 1.51 он уже есть (`WINCLP.PAS`, кода Borland в нём нет).
-  Есть ли он, определяем вызовом 1700h; если нет, работает внутренний буфер.
-- Расширения хоста go2dos (спецификация — `docs/DOS-EXTENSIONS.md` в unxed/go2dos, находятся
-  через AMIS, `INT 2Dh`, перебором AH=00h..FFh с AL=00h): `DOS-UTF8/NAMES` (AL=10h, BX=65001 —
-  имена файлов `71xx` в UTF-8 для вызывающего процесса, без перекодировки в OEM; короткие
-  имена только ASCII, детям при запуске передавать короткое имя), `DOS-HOST/TEXTWIN`
-  (AL=10h размер окна, AL=11h BL=1 — событие изменения размера: слово FF00h в буфере
-  клавиатуры), `DOS-HOST/HOSTEXEC` (запуск команд хоста, по умолчанию выключено).
-  Где провайдера нет (DOSBox-X, FreeDOS), работаем как раньше: кодовая страница OEM.
-  Экран и клавиатура в этих расширениях остаются в OEM (честный UTF-8 экрана в спецификации
-  go2dos пока нет) — не придумываем, сверяем со спецификацией перед реализацией.
-- Матрица проверки: DOSBox-X (CI), FreeDOS + DOSLFN (QEMU), DOS-окно Windows XP через
-  `vmlab` из `unxed/sandbox`, go2dos (когда будет 386 + DPMI). Там же проверяем, поддерживает
-  ли NTVDM WinOldAp.
+- LFN — go32v2 RTL `LFNSupport` (int 21h, 71xxh); without it, 8.3.
+- Clipboard: WinOldAp; in DN 1.51 it already exists (`WINCLP.PAS`, no Borland code in it).
+  Whether it exists is determined by call 1700h; if not, the internal buffer is used.
+- go2dos host extensions (spec — `docs/DOS-EXTENSIONS.md` in unxed/go2dos, discovered
+  via AMIS, `INT 2Dh`, by scanning AH=00h..FFh with AL=00h): `DOS-UTF8/NAMES` (AL=10h, BX=65001 —
+  `71xx` file names in UTF-8 for the calling process, without OEM conversion; short
+  names ASCII only; when launching children, pass the short name), `DOS-HOST/TEXTWIN`
+  (AL=10h window size, AL=11h BL=1 — resize event: word FF00h in the keyboard
+  buffer), `DOS-HOST/HOSTEXEC` (run host commands, disabled by default).
+  Where there is no provider (DOSBox-X, FreeDOS), we work as before: OEM code page.
+  Screen and keyboard in these extensions remain OEM (honest screen UTF-8 is not yet in the
+  go2dos spec) — we do not invent; we check the spec before implementing.
+- Test matrix: DOSBox-X (CI), FreeDOS + DOSLFN (QEMU), Windows XP DOS window via
+  `vmlab` from `unxed/sandbox`, go2dos (when there is 386 + DPMI). There we also check
+  whether NTVDM supports WinOldAp.
 
-Готово, когда: DN открывает каталог с длинными именами и копирует такой файл, а буфер
-обмена работает там, где DOS его поддерживает. Выпускаем альфу.
+Done when: DN opens a directory with long names and copies such a file, and the clipboard
+works where DOS supports it. We ship an alpha.
 
-## Веха 6. UTF-8 в DN и бэкенды для других ОС
+## Milestone 6. UTF-8 in DN and backends for other OSes
 
-- Режим `utf8` для панелей, строки ввода, редактора и просмотрщика (бинарный режим
-  просмотрщика сохраняется). Имена файлов перекодируем на границе с ФС.
-- В DOS честный UTF-8 без перевода в однобайтные кодировки требует API хоста go2dos
-  (веха 5: `DOS-UTF8/NAMES`, `DOS-HOST/TEXTWIN`). Когда делаем порты для других ОС, этот
-  слой платформы заменяем нативными вызовами самой ОС (Win32 Unicode API, POSIX с UTF-8).
-- Перевод слоя платформы magiblot: терминал (far2l, kitty, OSC 52), консоль Win32.
-- Цели сборки в CI: linux (x86_64, aarch64), FreeBSD, macOS, win32/win64, go32v2.
+- `utf8` mode for panels, input line, editor, and viewer (binary viewer mode
+  is preserved). File names are converted at the FS boundary.
+- On DOS, honest UTF-8 without conversion to single-byte encodings requires the go2dos host API
+  (milestone 5: `DOS-UTF8/NAMES`, `DOS-HOST/TEXTWIN`). When we do ports for other OSes, this
+  platform layer is replaced with native OS calls (Win32 Unicode API, POSIX with UTF-8).
+- Translation of magiblot's platform layer: terminal (far2l, kitty, OSC 52), Win32 console.
+- CI build targets: linux (x86_64, aarch64), FreeBSD, macOS, win32/win64, go32v2.
 
-## Веха 7. unxed/go2dos и showcase
+## Milestone 7. unxed/go2dos and showcase
 
-В go2dos пока нет 386 и DPMI (ядро 8086/80186, реальный режим; `docs/DESIGN.md` там называет
-защищённый режим и DPMI отдельным большим этапом). До их появления DOS-версию проверяем во
-FreeDOS и DOSBox-X. Когда в go2dos появится 32-битный DPMI, подключаем его DOS-расширения.
-Эмулятор x86 с защищённым режимом 386 на чистом Go быстрый поиск не нашёл (2026-10-01).
+go2dos does not yet have 386 and DPMI (8086/80186 kernel, real mode; `docs/DESIGN.md` there calls
+protected mode and DPMI a separate large stage). Until they appear, we test the DOS version in
+FreeDOS and DOSBox-X. When go2dos gets 32-bit DPMI, we wire up its DOS extensions.
+A fast search found no pure-Go x86 emulator with 386 protected mode (2026-10-01).
 
-**Showcase** (требование владельца проекта): когда DOS-версия готова, нужен способ реально
-её погонять под go2dos: скрипт `tools/showcase-go2dos.sh` собирает go2dos и наш
-go32v2-билд (демо `tv/demo`, потом DN), кладёт рядом DPMI-хост и запускает; такой же прогон —
-отдельным заданием CI, как `e2e-vc` у go2dos. Пока в go2dos нет 386, скрипт делает то же
-в DOSBox-X; общий каркас готовим заранее.
+**Showcase** (project owner requirement): when the DOS version is ready, there must be a way to actually
+run it under go2dos: script `tools/showcase-go2dos.sh` builds go2dos and our
+go32v2 build (demo `tv/demo`, then DN), places a DPMI host next to it, and runs it; the same run —
+as a separate CI job, like go2dos `e2e-vc`. While go2dos has no 386, the script does the same
+in DOSBox-X; we prepare the shared scaffold in advance.
 
 ---
 
-## Открытые вопросы
+## Open questions
 
-- ~~**Исключённые аудитом файлы DN (38).**~~ Решено (2026-10-02, «Продолжаем»): два класса. Файл остаётся, если
-  `raw% <= 10` (с 2026-10-02; было 6) и нет совпавшего отрезка >= 48 токенов; совпавшие отрезки заменяются нашим текстом правками `dn/rewrite/*.rw`
-  (`tools/dn-rewrite.py`: якорные строки + sha1 заменяемого, сам заменяемый текст в git не попадает). Остальные (29 файлов:
+- ~~**DN files excluded by audit (38).**~~ Resolved (2026-10-02, "Continue"): two classes. A file stays if
+  `raw% <= 10` (since 2026-10-02; was 6) and there is no matched run >= 48 tokens; matched runs are replaced with our text via `dn/rewrite/*.rw` edits
+  (`tools/dn-rewrite.py`: anchor lines + sha1 of the replaced text; the replaced text itself does not go into git). The rest (29 files:
   `scroller`, `DNAPP`, `DNStdDlg`, `helpfile`, `HELPKERN`, `listmakr`, `asciitab`, `edwin`, `strview`, `memory`...) —
-  шимы на tv/ или наш код в `dn/new`. Вернулись: `FVIEWER`, `calendar` (с правками), `advance6`, `usersavr`, `TopView_`,
-  `version`, `colorvga`, `filetype`. Аудит дерева после правок (`tools/dn-materialize.sh` + `audit/xclone.py`) не должен
-  показывать файлов за воротами (шаг CI «Files over the gate»).
+  shims onto tv/ or our code in `dn/new`. Returned: `FVIEWER`, `calendar` (with edits), `advance6`, `usersavr`, `TopView_`,
+  `version`, `colorvga`, `filetype`. Tree audit after edits (`tools/dn-materialize.sh` + `audit/xclone.py`) must not
+  show files over the gate (CI step "Files over the gate").
 
-- Лицензия наших дополнений в `tv/` (`TvSys`, `TvMem`, `TvDos`, `TvMouse`-часть и тесты):
-  я поставил MIT с «the authors of the dn project» (`tv/LICENSE`). Подтвердите или
-  назовите другое имя правообладателя.
-- Какой выпуск брать базой: сейчас DN OSP 2.14 (решение 10); сверим с DN 1.51 по результатам
-  первого прогона `dn.yml` (число файлов, доля кода Borland, наличие LFN и буфера обмена).
-- Выносить ли `tv/` в отдельный репозиторий сейчас или после вехи 4.
+- License for our additions in `tv/` (`TvSys`, `TvMem`, `TvDos`, part of `TvMouse`, and tests):
+  I set MIT with "the authors of the dn project" (`tv/LICENSE`). Confirm or
+  name another copyright holder.
+- Which release to take as the base: currently DN OSP 2.14 (decision 10); we will compare with DN 1.51 after the
+  first `dn.yml` run (file count, Borland code share, presence of LFN and clipboard).
+- Whether to extract `tv/` into a separate repository now or after milestone 4.
 
-Закрыто: В1 (эталон — по ссылке выше), В2 (go2xp → go2dos), В3 (FV не используем),
-В8 (основа TV — перевод magiblot, подтверждено), В9 (импорт magiblot сверен с
-опубликованным выпуском по зеркалу FSharpCSharp; сверку с самим `tv.zip` можно
-повторить в CI),
-В4 (лицензия DN для DN), В5 (пробная сборка обеих баз, веха 4), В6 (FreeDOS/DOSBox-X,
-go2dos позже), В7 (коммиты в `main`).
+Closed: Q1 (reference — at the URL above), Q2 (go2xp → go2dos), Q3 (we do not use FV),
+Q8 (TV base — magiblot translation, confirmed), Q9 (magiblot import verified against
+the published release via the FSharpCSharp mirror; verification against `tv.zip` itself can
+be repeated in CI),
+Q4 (DN license for DN), Q5 (trial build of both bases, milestone 4), Q6 (FreeDOS/DOSBox-X,
+go2dos later), Q7 (commits to `main`).
 
-## Сомнения и риски
+## Doubts and risks
 
-- Borland опубликовал C++ TV без явной лицензии; это самый сильный из доступных вариантов,
-  но не открытая лицензия. Заимствований из GPL-порта SET в библиотеке magiblot
-  не найдено (`research/2026-10-01-magiblot-provenance.md`).
-- Неизвестно, насколько удобно ложится C++ (шаблоны, перегрузка, множественное
-  наследование `TStreamable`) на `object` FPC. Проверяем пилотом в вехе 2.
-- Кросс-тулчейн go32v2 на CI-раннере не проверен (веха 1).
-- Скачивание эталона с web.archive не проверено: из сессии он недоступен. Распаковку и
-  выборку проверил на локальной копии (72 файла).
-- Архив — solid RAR3, `unar` и `7z` его не распаковывают, нужен `unrar`.
-- Порог детектора взят по фону чистого кода; его надо откалибровать.
-- В `unxed/go2dos` есть папка `dn/` (`audit`, `detectors`, `specs`), её я не смотрел.
-
-
-## Заметка: каталоги целей в архиве DN OSP (2026-10-02)
-
-В `dn2s214.rar` юниты, зависящие от системы, лежат по каталогам целей: `LIB.D32` (DOS, DPMI32 — наша цель), `LIB.OLF` (OS/2),
-`LIB.WLF` (Win32); `EXE.D32`, `EXE.OLF`, `EXE.WLF` — готовые каталоги программы. При сборке форка под другие ОС: `DN_LIB_DIR` в
-`dn/target.env` (`tools/dn-materialize.sh` кладёт юниты цели в корень дерева, остальные `LIB.*` отбрасывает), свой слой вместо
-`VPSYSxxx` (`dn/new`) и соответствующие правки (`DN_DEFINES`).
+- Borland published C++ TV without an explicit license; this is the strongest available option,
+  but not an open license. No borrowings from the GPL SET port were found in the magiblot library
+  (`research/2026-10-01-magiblot-provenance.md`).
+- Unknown how well C++ (templates, overloading, multiple
+  inheritance of `TStreamable`) maps onto FPC `object`. We check with the milestone 2 pilot.
+- The go32v2 cross-toolchain on the CI runner is unverified (milestone 1).
+- Downloading the reference from web.archive is unverified: it is unavailable from the session. Unpack and
+  sample selection were checked on a local copy (72 files).
+- The archive is solid RAR3; `unar` and `7z` do not unpack it; `unrar` is required.
+- The detector threshold was taken from the background of clean code; it needs calibration.
+- In `unxed/go2dos` there is a `dn/` folder (`audit`, `detectors`, `specs`); I have not looked at it.
 
 
-## Состояние на 2026-10-02 (ночь) и оценка пути до DOSBox-X
+## Note: target directories in the DN OSP archive (2026-10-02)
 
-- Собирается (кросс-компилятор go32v2, `DN_CROSS=... tools/dn-try.sh dn.pas`): **128 из 131** достижимых от `dn.pas` юнитов; не
-  собираются `dn1` (идёт), `colorvga` и сам `dn.pas`. Все юниты `tv/` и все тесты `tv/` и `dn/tests` проходят.
-- «Собирается» не значит «работает»: заглушки — хранители экрана, `GetFileNameMenu`, палитры DN,
+In `dn2s214.rar`, system-dependent units live in target directories: `LIB.D32` (DOS, DPMI32 — our target), `LIB.OLF` (OS/2),
+`LIB.WLF` (Win32); `EXE.D32`, `EXE.OLF`, `EXE.WLF` — ready program directories. When building a fork for other OSes: `DN_LIB_DIR` in
+`dn/target.env` (`tools/dn-materialize.sh` places target units at the tree root and discards other `LIB.*`), our own layer instead of
+`VPSYSxxx` (`dn/new`), and corresponding edits (`DN_DEFINES`).
+
+
+## Status as of 2026-10-02 (night) and estimate of the path to DOSBox-X
+
+- Builds (go32v2 cross-compiler, `DN_CROSS=... tools/dn-try.sh dn.pas`): **128 of 131** units reachable from `dn.pas`; not
+  building: `dn1` (in progress), `colorvga`, and `dn.pas` itself. All `tv/` units and all `tv/` and `dn/tests` tests pass.
+- "Builds" does not mean "works": stubs — screen savers, `GetFileNameMenu`, DN palettes,
   `wfMaxi/cmMaxi`, `TaggedDataOnly`, `OpenResource/ExecResource/LoadResource`.
-- Оценка пути до «DN запускается в DOSBox-X, показывает панели, меню и основные диалоги работают» — **около 40%** (разброс ±15):
-  ядро `tv/` ~100% (15% веса); компиляция слоя DN ~95% (25%); линковка go32v2 (размер, внешние символы, инлайн-асм) 0%
-  (15%); ресурсы — `rcp`, `DN.RES` из `RESOURCE/*/dn.dnr`, загрузка диалогов и меню через потоки (~165 классов) ~5% (25%);
-  запуск и поведение (клавиши, видео, LFN, палитры, панели) 0% (20%). Самый рискованный участок — ресурсы и запуск.
-- Ближайшие шаги: `dn1`, `colorvga`, `dn.pas`; линковка; `rcp` собрать нативно и получить `DN.RES`; `LoadResource`; первый запуск в
-  DOSBox-X (CI); дальше по списку заглушек.
+- Estimate of the path to "DN runs in DOSBox-X, shows panels, menu and main dialogs work" — **about 40%** (spread ±15):
+  `tv/` core ~100% (15% weight); DN layer compilation ~95% (25%); go32v2 linking (size, external symbols, inline asm) 0%
+  (15%); resources — `rcp`, `DN.RES` from `RESOURCE/*/dn.dnr`, loading dialogs and menus via streams (~165 classes) ~5% (25%);
+  run and behavior (keys, video, LFN, palettes, panels) 0% (20%). The riskiest stretch is resources and run.
+- Next steps: `dn1`, `colorvga`, `dn.pas`; linking; build `rcp` natively and get `DN.RES`; `LoadResource`; first run in
+  DOSBox-X (CI); then down the stub list.
 
-## Архитектура: слои, дублирование, совместимость API (предложено 2026-10-02, не сделано)
+## Architecture: layers, duplication, API compatibility (proposed 2026-10-02, not done)
 
-Цели: (а) не держать два варианта одного и того же в `tv/` и в DN; (б) `tv/` пригоден для портирования другого старого
-паскалевского софта (API Borland TV 2.0, по возможности совместим и с Free Vision FPC); (в) `tv/` остаётся близким к API и
-коду magiblot, чтобы новые правки оттуда переносились легко. Что для этого разумно:
+Goals: (a) not keep two variants of the same thing in `tv/` and in DN; (b) `tv/` is suitable for porting other old
+Pascal software (Borland TV 2.0 API, preferably also compatible with FPC Free Vision); (c) `tv/` stays close to magiblot's API and
+code so new fixes from there transfer easily. What is reasonable for that:
 
-1. **Три слоя вместо двух.** `tv/` — ядро: семантика magiblot + паскалевские имена, только то, что нужно всем. Новый `tvcompat/` —
-   уровень совместимости с Borland/VP (то, что сейчас делают `tools/gen-shim.py` + `dn/new/manual/*.inc`: юниты `Views`, `Dialogs`,
-   `Menus`, `App`, `Drivers`, `MsgBox`, `StdDlg`, `Objects`, `Memory`, `Validate`, `HistList`, `ColorSel`; 16-битные клетки
-   `TDrawBuffer`, ключи `kb*` как LongInt, `PPalette`/`GetPalette^`, `PString`-заголовки, профили `Word` 16/32 бита). Это отдельный
-   продукт под MIT, не знающий о DN, с тестами и критерием: программа для BP7/Free Vision компилируется без правок. `dn/` — только
-   то, что принадлежит DN (RIT-код из архива, скрипты, правки, вырезанные классы).
-2. **Расширения DN, которые сейчас лежат в ядре `tv/`** (`TDialog.DirectLink`, `TScrollBar.Step/ForceScroll`, `TInputLine.LC/RC/C`,
-   `TView.MenuEnabled`, `TDosStream.Position/StreamSize`, `ModalCount`, хуки и др.) разобрать по классам: общий хук, годный всем
-   (остаётся в ядре, с комментарием и записью в `tv/DESIGN.md`); совместимость с Borland (переезжает в `tvcompat`, где это
-   подкласс или адаптер); только DN (в `dn/`). Подклассы работают, пока реестр потоков и фабрики (`InitFrame`,
-   `StandardScrollBar`, загрузчик ресурсов) создают нужный тип; там, где подкласс не годится, остаётся хук в ядре.
-3. **Дубликаты подсистем** — решать по одному, начав с меню: у DN своё `menus.pas` (RIT) рядом с `TvMenus`, в программе будут две
-   системы меню. Разумнее реализовать функции DN (`Flags`, `Param`, исполняемый подпункт, пункт по умолчанию) в `TvMenus`
-   нашим текстом и убрать `menus.pas` из дерева. Похоже для `TInputLine` DN (поле `Data` строкой, `MaxLen` LongInt, `ofSecurity`),
-   коллекций (`Collect.inc` дублирует `tvobjs`) и потоков. Лицензия: код DN (RIT) нельзя перелицензировать и в MIT-`tv/`
-   его не переносим; полезное обобщаем своим текстом по поведению (читать оригинал можно, копировать нельзя), классы
-   DN, не нужные никому кроме DN (`TComboBox`, `THexLine`, `TNotepad`...), остаются вырезкой в `dn/`.
-4. **Синхронизация с magiblot.** Таблица «файл C++ → юнит Pascal» (она уже есть в заголовках юнитов) + `tools/tv-upstream-diff.py`:
-   по новым коммитам magiblot показывает, какие юниты затронуты; + `tv/UPSTREAM-DELTA.md` — список осознанных отступов от
-   оригинала (уже разбросан по `DESIGN.md`, собрать в одно место, каждое с тестом).
-5. **Приёмка совместимости:** локально (без публикации чужого кода) собрать TVDEMO Borland и примеры Free Vision через `tvcompat`;
-   в CI — свои тесты API-совместимости (по документации BP7 TV 2.0).
+1. **Three layers instead of two.** `tv/` — core: magiblot semantics + Pascal names, only what everyone needs. New `tvcompat/` —
+   Borland/VP compatibility layer (what `tools/gen-shim.py` + `dn/new/manual/*.inc` do now: units `Views`, `Dialogs`,
+   `Menus`, `App`, `Drivers`, `MsgBox`, `StdDlg`, `Objects`, `Memory`, `Validate`, `HistList`, `ColorSel`; 16-bit cells
+   `TDrawBuffer`, `kb*` keys as LongInt, `PPalette`/`GetPalette^`, `PString` headers, `Word` 16/32-bit profiles). This is a separate
+   MIT product that does not know about DN, with tests and a criterion: a BP7/Free Vision program compiles without edits. `dn/` — only
+   what belongs to DN (RIT code from the archive, scripts, edits, cut-out classes).
+2. **DN extensions that currently sit in the `tv/` core** (`TDialog.DirectLink`, `TScrollBar.Step/ForceScroll`, `TInputLine.LC/RC/C`,
+   `TView.MenuEnabled`, `TDosStream.Position/StreamSize`, `ModalCount`, hooks, etc.) classify by kind: a common hook useful to all
+   (stays in the core, with a comment and an entry in `tv/DESIGN.md`); Borland compatibility (moves to `tvcompat`, where it is
+   a subclass or adapter); DN-only (into `dn/`). Subclasses work while the stream registry and factories (`InitFrame`,
+   `StandardScrollBar`, resource loader) create the needed type; where a subclass does not fit, a core hook remains.
+3. **Subsystem duplicates** — resolve one by one, starting with menus: DN has its own `menus.pas` (RIT) next to `TvMenus`; the program will have two
+   menu systems. More sensible: implement DN features (`Flags`, `Param`, executable submenu item, default item) in `TvMenus`
+   in our own text and remove `menus.pas` from the tree. Similar for DN `TInputLine` (`Data` as a string field, `MaxLen` LongInt, `ofSecurity`),
+   collections (`Collect.inc` duplicates `tvobjs`), and streams. License: DN (RIT) code cannot be relicensed and must not be moved
+   into MIT-`tv/`; useful behavior we generalize in our own text (reading the original is allowed, copying is not); DN classes
+   nobody but DN needs (`TComboBox`, `THexLine`, `TNotepad`...) stay as cut-outs in `dn/`.
+4. **Sync with magiblot.** A "C++ file → Pascal unit" table (already in unit headers) + `tools/tv-upstream-diff.py`:
+   for new magiblot commits shows which units are affected; + `tv/UPSTREAM-DELTA.md` — a list of deliberate departures from
+   the original (already scattered across `DESIGN.md`; gather in one place, each with a test).
+5. **Compatibility acceptance:** locally (without publishing third-party code) build Borland TVDEMO and Free Vision examples via `tvcompat`;
+   in CI — our own API-compatibility tests (against BP7 TV 2.0 documentation).
 
-Порядок: пункты 4 и 2 дёшевы и полезны сразу (после первого запуска DN); пункт 1 — когда DN впервые запустится (чтобы не
-перекраивать на лету); пункт 3 — по одному дубликату, меню первым. Ничего из этого не блокирует вехи 4–5.
+Order: items 4 and 2 are cheap and useful immediately (after DN's first run); item 1 — when DN first runs (so we do not
+restructure on the fly); item 3 — one duplicate at a time, menus first. None of this blocks milestones 4–5.
 
-## Правила ведения (2026-10-02)
+## Operating rules (2026-10-02)
 
-- `README.md`, раздел «Как потестить то, что уже готово», обновляется в том же коммите, что меняет способ проверки или
-  то, что можно увидеть (скрипты, команды, состояние: что работает, что падает).
+- `README.md`, section "How to try what is already ready", is updated in the same commit that changes how to check or
+  what can be seen (scripts, commands, status: what works, what fails).
 
-## Рефакторинг шаг за шагом (решение владельца, 2026-10-03)
+## Step-by-step refactoring (owner decision, 2026-10-03)
 
-Исходное дерево было «чёрт ногу сломит» — важно было просто запустить. Теперь есть рабочий продукт, к которому могут подключаться другие, его надо делать понятнее
-(имена файлов, раскладка кода по файлам, имена сущностей). Полный рефакторинг — слишком большая задача, а тормозить на нём не хочется. Правило: **после каждого
-крупного шага разработки (как UTF-8, встроенный терминал) делаем один шаг рефакторинга — самое горящее в этом направлении**, отдельным коммитом, без смены поведения
-(тесты те же, зелёные до и после). Кандидаты собираем в `dn/TODO-refactoring.md` (там же отметки, что сделано); новые находки дописываем по ходу, но не
-отвлекаемся на них вне очередного шага.
+The original tree was a mess — the important thing was just to get it running. Now there is a working product others can join, and it needs to be made clearer
+(file names, how code is laid out across files, entity names). A full refactor is too large a task, and we do not want to stall on it. Rule: **after each
+major development step (like UTF-8, embedded terminal) we do one refactoring step — the most urgent in that direction**, as a separate commit, without behavior change
+(same tests, green before and after). Candidates are collected in `dn/TODO-refactoring.md` (with marks of what is done); new findings are appended along the way, but we do not
+get distracted by them outside the next scheduled step.
 
-Шаги:
-- после UTF-8 (2026-10-03): результаты сборки не в каталогах исходников (`.o`/`.ppu` в `tv/src`, `dn/src` и `tv/tests` попадали в манифест и мешали глазу) — тесты tv и dn собираются в
-  отдельный каталог (`tools/tv-test.sh`, как `tools/dn-test.sh`).
-- после встроенного терминала (2026-10-03): карта «файл → что в нём» для новичка, `dn/FILES.md` (переименования — решить отдельно, см. `dn/TODO-refactoring.md`).
+Steps:
+- after UTF-8 (2026-10-03): build outputs not in source directories (`.o`/`.ppu` in `tv/src`, `dn/src`, and `tv/tests` were landing in the manifest and cluttering the eye) — tv and dn tests build into
+  a separate directory (`tools/tv-test.sh`, like `tools/dn-test.sh`).
+- after the embedded terminal (2026-10-03): a "file → what is in it" map for newcomers, `dn/FILES.md` (renames — decide separately, see `dn/TODO-refactoring.md`).
 
-## Рефакторинг объектного API в составе текущей миграции (решение владельца, 2026-10-04)
+## Object API refactoring as part of the current migration (owner decision, 2026-10-04)
 
-Имя `PObject` было временным совместимым слоем: в `tv3` оно означало ссылку на
-экземпляр класса, а не указатель на старый Pascal `object`. Чтобы не накапливать
-технический долг, этот слой убирается сейчас, в рамках той же миграции.
+The name `PObject` was a temporary compatibility layer: in `tv3` it meant a reference to a
+class instance, not a pointer to an old Pascal `object`. To avoid accumulating
+technical debt, this layer is removed now, within the same migration.
 
-В `tv3` потоковый API использует `TObject` напрямую (`TStream.Get`, `TStream.Put`,
-`TLoadProc`, `TStoreProc`), а зависимые объявления и вызовы DN переводятся на тот же
-тип. Это не отдельный проект и не бесплатная косметика: работа входит в текущий объём,
-оформляется атомарными коммитами и проверяется полными наборами тестов `tv3` и DN до
-создания PR.
+In `tv3` the stream API uses `TObject` directly (`TStream.Get`, `TStream.Put`,
+`TLoadProc`, `TStoreProc`), and dependent DN declarations and call sites are moved to the same
+type. This is not a separate project and not free cosmetics: the work is in the current scope,
+done as atomic commits, and verified with full `tv3` and DN test suites before
+opening a PR.
 
-## Хвост плана: комментарии и документацию на английский (добавлено 2026-10-02)
+## Plan tail: comments and documentation into English (added 2026-10-02)
 
-Перевести **все комментарии во всех исходниках и все файлы md** (включая, но не ограничиваясь, `tv/`, `dn/new`,
-заголовки наших скриптов; а для воспроизводимого дерева DN —
-комментарии в правках `dn/edits`, `dn/rewrite`, `dn/patches`) на английский. Причина: проект собирается и под DOS, и под другие
-ОС, а русские комментарии в DOS-кодировке (cp866) и в UTF-8 вместе держать нельзя. Делается в самом конце, когда код устоялся
-(чтобы не мешать слияниям с upstream и не раздувать диффы), отдельными коммитами по каталогам; перевод комментариев не меняет
-код (проверка: двоичный образ юнитов без отладочной информации не меняется). Сам DN из архива (`build/dn`) в git не хранится;
-его комментарии на русском (cp866) остаются в дереве как есть, пока нет решения по ним (открытый вопрос: переводить ли их
-программно при материализации).
+Translate **all comments in all sources and all md files** (including but not limited to `tv/`, `dn/new`,
+headers of our scripts; and for the reproducible DN tree —
+comments in edits `dn/edits`, `dn/rewrite`, `dn/patches`) into English. Reason: the project builds for both DOS and other
+OSes, and Russian comments in DOS encoding (cp866) and UTF-8 cannot be kept together. Done at the very end, when the code has settled
+(so as not to interfere with upstream merges and not to inflate diffs), in separate commits per directory; translating comments does not change
+code (check: unit binary image without debug info does not change). DN itself from the archive (`build/dn`) is not stored in git;
+its Russian comments (cp866) stay in the tree as-is until there is a decision about them (open question: whether to translate them
+programmatically at materialization).
 
-**Сделано (2026-10-03):** `README.md` и `tv/README.md` переведены на английский (ссылка на раздел «Правила работы» в `dn/README.md` осталась по его
-русскому заголовку, пока тот не переведён). Осталось: `PLAN.md`, `bootstrap/README.md`, `dn/TODO-later.md` (часть), `dn/README.md`, комментарии в исходниках.
+**Done (2026-10-03):** `README.md` and `tv/README.md` translated into English (the link to the "Working rules" section in `dn/README.md` still uses its
+Russian heading until that is translated). Remaining: `PLAN.md`, `bootstrap/README.md`, `dn/TODO-later.md` (part), `dn/README.md`, comments in sources.
 
-**Добавлено в план (2026-10-03, владелец): полный перевод на английский всего содержимого `tv` и `sp`** (та же работа, те же правила: в конце, отдельными коммитами по каталогам, код не меняется):
-- **`unxed/tv`:** `DESIGN.md` (405 строк; `README.md` уже переведён), комментарии во всех `.pas`/`.inc`/скриптах: `src/`, `tests/`, `demo/`, `dostests/`, `tools/`, а также тексты сообщений тестов.
-  Проверка: бинарные образы юнитов без отладочной информации не меняются; все тесты `tv/tests` и `dostests` дают прежний результат.
-- **`unxed/sp`:** `SPEC.md` (648 строк), `README.md`, `DN-ADOPTION.md`, `fpc-utf8/README.md`, комментарии в `safe.pas`, `safethreads.pas`, `tests/*.pas`, `tests/run.sh`, `.github/workflows/ci.yml`.
-  Для `SPEC.md` это ещё и пользовательская цена: спецификация прикладывается к промптам, а английский текст надёжнее для моделей и читается вне русскоязычного круга; карточку правил (§0) переводить первой.
-  Проверка: `tests/run.sh` и CI зелёные, `safe.pas`/`safethreads.pas` собираются в те же бинарники без отладочной информации (комментарии не влияют на код); имена идентификаторов и тексты сообщений `SAFE-S*`/`SAFE-R*` уже английские и не меняются.
-  Порядок: `SPEC.md` §0 и §2 → `README.md` → остальной `SPEC.md` → комментарии в коде → `DN-ADOPTION.md`.
+**Added to the plan (2026-10-03, owner): full English translation of all content in `tv` and `sp`** (same work, same rules: at the end, separate commits per directory, code unchanged):
+- **`unxed/tv`:** `DESIGN.md` (405 lines; `README.md` already translated), comments in all `.pas`/`.inc`/scripts: `src/`, `tests/`, `demo/`, `dostests/`, `tools/`, and also test message texts.
+  Check: unit binary images without debug info do not change; all `tv/tests` and `dostests` tests give the same result.
+- **`unxed/sp`:** `SPEC.md` (648 lines), `README.md`, `DN-ADOPTION.md`, `fpc-utf8/README.md`, comments in `safe.pas`, `safethreads.pas`, `tests/*.pas`, `tests/run.sh`, `.github/workflows/ci.yml`.
+  For `SPEC.md` this is also a user-facing cost: the specification is attached to prompts, and English text is more reliable for models and readable outside the Russian-speaking circle; translate the rules card (§0) first.
+  Check: `tests/run.sh` and CI green; `safe.pas`/`safethreads.pas` build to the same binaries without debug info (comments do not affect code); `SAFE-S*`/`SAFE-R*` identifier names and message texts are already English and do not change.
+  Order: `SPEC.md` §0 and §2 → `README.md` → rest of `SPEC.md` → code comments → `DN-ADOPTION.md`.
 
-## Safe Pascal как стиль кода DN (предложено владельцем 2026-10-03)
+## Safe Pascal as DN's coding style (proposed by owner 2026-10-03)
 
-Концепция и план перевода DN (этапы S0–S10 по RUP, замер нарушений, идеи из Zig, сомнения) переехали в отдельный репозиторий
-**[unxed/sp](https://github.com/unxed/sp)**: `SPEC.md` (спецификация), `safe.pas` (библиотека, MIT), `DN-ADOPTION.md` (этот план). Статус шагов ведётся там.
-Кратко: решение владельца (2026-10-03) — переводить DN на этот стиль финальным шагом рефакторинга или раньше; порядок «(в) безопасный новый код рядом со старым → (а) расширить на `object` → (б) `class` как запасной»;
-сначала S1 (`tools/safe-census.py` в этом репозитории, счётчик нарушений S1–S4, S9 по `dn/src` и `tv/src`), S2 (`safe.pas` в `dn/third_party/` с записью в `dn/PROVENANCE.md`).
-Замер на 2026-10-03: `object` 230/75 против `class` 1/0 (dn/tv); `New(` 843/103, `Dispose(` 421/39, `GetMem` 45/25.
+The concept and plan for converting DN (stages S0–S10 per RUP, measuring violations, ideas from Zig, doubts) moved to a separate repository
+**[unxed/sp](https://github.com/unxed/sp)**: `SPEC.md` (specification), `safe.pas` (library, MIT), `DN-ADOPTION.md` (this plan). Step status is tracked there.
+Briefly: owner decision (2026-10-03) — convert DN to this style as a final refactoring step or earlier; order "(c) safe new code next to old → (a) extend to `object` → (b) `class` as fallback";
+first S1 (`tools/safe-census.py` in this repository, S1–S4, S9 violation counter over `dn/src` and `tv/src`), S2 (`safe.pas` in `dn/third_party/` with an entry in `dn/PROVENANCE.md`).
+Measurement as of 2026-10-03: `object` 230/75 vs `class` 1/0 (dn/tv); `New(` 843/103, `Dispose(` 421/39, `GetMem` 45/25.
 
-## Где остановились (конец сессии 2026-10-03) и с чего продолжать
+## Where we stopped (end of session 2026-10-03) and where to continue
 
-**Состояние:** всё закоммичено и запушено. `dn` (`main`): CI зелёный на последних коммитах; `dist/` всех шести целей пересобран с исправлением загрузки рабочего стола (`8f4f379`, `6361988`).
-DOSBox-X (форк `unxed/dosbox-x`): ветки `claude/amis-utf8-clipboard`, `claude/utf8-names` (PR #6632, CI ждёт разрешения мейнтейнера на запуск), `claude/fix-extdevice-loop` (исправление зависания
-`DOS_CheckExtDevice`; PR #6634 открыт владельцем). [`unxed/sp`](https://github.com/unxed/sp) (v0.5, MIT; раньше `safe-pascal/` в `unxed/sandbox`, PR #4): её ведёт и другой диалог, перед правкой подтянуть `main`.
+**State:** everything committed and pushed. `dn` (`main`): CI green on latest commits; `dist/` for all six targets rebuilt with the desktop load fix (`8f4f379`, `6361988`).
+DOSBox-X (fork `unxed/dosbox-x`): branches `claude/amis-utf8-clipboard`, `claude/utf8-names` (PR #6632, CI waiting for maintainer approval to run), `claude/fix-extdevice-loop` (hang fix for
+`DOS_CheckExtDevice`; PR #6634 opened by owner). [`unxed/sp`](https://github.com/unxed/sp) (v0.5, MIT; formerly `safe-pascal/` in `unxed/sandbox`, PR #4): another chat also works on it; pull `main` before editing.
 
-**Что сделано за сессию (кратко):** aarch64; UTF-8 имена и буфер обмена go2dos и DOSBox-X (AMIS); DN-DOS под DOSBox-X `master` (зависание было в эмуляторе); исправление `TGroup.GetSubViewPtr` (загрузка рабочего стола);
-English для `README.md` и `tv/README.md`; Safe Pascal: порядок S0–S10 выше, лицензия MIT, спецификация v0.5 и таблица целей.
+**What was done in the session (briefly):** aarch64; UTF-8 names and clipboard for go2dos and DOSBox-X (AMIS); DN-DOS under DOSBox-X `master` (hang was in the emulator); `TGroup.GetSubViewPtr` fix (desktop load);
+English for `README.md` and `tv/README.md`; Safe Pascal: S0–S10 order above, MIT license, v0.5 specification and goals table.
 
-**Что делать дальше, по порядку:**
-Порядок уточнён владельцем 2026-10-03 (вечер):
-1. **Владельцу:** PR исправления цикла открыт (joncampbell123/dosbox-x#6634); у #6632 CI ждёт разрешения мейнтейнера; в описание #6632 дописать оговорку «Windows часть не проверялась» (текст в `docs/patches/dosbox-x-pr-utf8-names.md`).
-2. **Сейчас: остаток по DOS** — **экран пользователя после внешней программы** и **мышь**; затем опция «сохранять стол при выходе» (Options -> Startup) и «Save setup». Сохранение и загрузка стола уже проверены и исправлены.
-3. **Расширенные протоколы терминала** (пункт 9 списка выше): поднято выше Safe Pascal — делается быстрее и сразу проверяется руками (OSC 52, kitty keyboard, win32 input mode, bracketed paste, расширения far2l).
-!!! Этот пункт касается и взаимодействия dn со внешним терминалом, и взаимодействия запущенного в его встроенном терминале приложения с этим терминалом.
-4. **DN для DOS с `utf8 file names`:** копирование, просмотр, переименование, удаление таких файлов в DN. Отображение уже такое, как хочет владелец: символы, которые есть в кодовой странице DOS, показываются как есть, в `{U+XXXX}`
-   превращаются только остальные (проверено с CP437, где кириллицы нет; проверить с CP866: «дом» должно быть видно буквами, а `世界` — как `{U+4E16}{U+754C}`).
-5. **Safe Pascal для DN:** шаги S1–S10 (раздел выше), начиная с `tools/safe-census.py`.
-6. **UTF-8 в DOS через наш DOS и `COMMAND.COM`** (нужно, не горит): go2dos и наш `COMMAND.COM` пользуются UTF-8 API (`DOS-UTF8/NAMES`, `CLIPBRD`), DN для DOS — тоже (сейчас DOS-сборка DN остаётся на кодовой странице);
-   на DOS без провайдера — конверсия имён на границе.
-7. **Хвост плана:** английский для `PLAN.md`, `bootstrap/README.md`, `dn/README.md`, части `dn/TODO-later.md`; затем комментарии в исходниках; полный перевод `unxed/tv` и `unxed/sp` (см. «Хвост плана» выше).
+**What to do next, in order:**
+Order clarified by owner 2026-10-03 (evening):
+1. **Owner:** cycle-fix PR opened (joncampbell123/dosbox-x#6634); for #6632 CI awaits maintainer approval; add a caveat to #6632 description "Windows part not tested" (text in `docs/patches/dosbox-x-pr-utf8-names.md`).
+2. **Now: remaining DOS work** — **user screen after an external program** and **mouse**; then the "save desktop on exit" option (Options -> Startup) and "Save setup". Desktop save and load already verified and fixed.
+3. **Extended terminal protocols** (item 9 of the list above): raised above Safe Pascal — done faster and checked by hand immediately (OSC 52, kitty keyboard, win32 input mode, bracketed paste, far2l extensions).
+!!! This item covers both DN interaction with an external terminal, and interaction of an application launched in its embedded terminal with that terminal.
+4. **DN for DOS with `utf8 file names`:** copy, view, rename, delete such files in DN. Display is already as the owner wants: characters present in the DOS code page are shown as-is; only the rest become `{U+XXXX}`
+   (verified with CP437, which has no Cyrillic; check with CP866: "dom" should be visible as letters, and `世界` — as `{U+4E16}{U+754C}`).
+5. **Safe Pascal for DN:** steps S1–S10 (section above), starting with `tools/safe-census.py`.
+6. **UTF-8 on DOS via our DOS and `COMMAND.COM`** (needed, not urgent): go2dos and our `COMMAND.COM` use the UTF-8 API (`DOS-UTF8/NAMES`, `CLIPBRD`); DN for DOS — too (currently the DN DOS build stays on the code page);
+   on DOS without a provider — name conversion at the boundary.
+7. **Plan tail:** English for `PLAN.md`, `bootstrap/README.md`, `dn/README.md`, part of `dn/TODO-later.md`; then comments in sources; full translation of `unxed/tv` and `unxed/sp` (see "Plan tail" above).
 
-**История `unxed/dn`, `unxed/sp` и `unxed/tv` переписана (2026-10-03, владелец).** `dn` и `sp`: во все коммиты Claude добавлен соавтор Ivan Sorokin (хеши изменились, содержимое и даты те же; ветка `utf8-inside` переписана вместе с `main`);
-`tv`: вместо одной заливки «Initial upload» восстановлена история каталога `tv/` из `dn` (95 коммитов до `dn` b8f2bd1 + коммит с пояснением), содержимое файлов то же.
-Старое состояние сохранено в ветках `backup/before-history-rewrite-2026-10-03` всех трёх репозиториев (их удаляет владелец, когда все клоны пересинхронизированы: из сессий Claude удаление веток недоступно). **Если у вас есть старый клон `dn`, `sp` или `tv`: не делайте `git pull`/merge
-(старая и новая история склеятся с дублями), а `git fetch origin && git reset --hard origin/main`** (неотправленное сначала сохраните отдельно).
-Новые коммиты в этих репозиториях подписывать так же: `Co-Authored-By: Claude ...` и `Co-Authored-By: Ivan Sorokin <ivan.sorokin.tech@gmail.com>`.
+**History of `unxed/dn`, `unxed/sp`, and `unxed/tv` was rewritten (2026-10-03, owner).** `dn` and `sp`: Ivan Sorokin co-author added to all Claude commits (hashes changed, contents and dates the same; branch `utf8-inside` rewritten together with `main`);
+`tv`: instead of a single "Initial upload" dump, the history of the `tv/` directory from `dn` was restored (95 commits up to `dn` b8f2bd1 + a clarifying commit), file contents the same.
+Old state preserved in branches `backup/before-history-rewrite-2026-10-03` of all three repositories (the owner deletes them when all clones are resynced: deleting branches from Claude sessions is unavailable). **If you have an old clone of `dn`, `sp`, or `tv`: do not `git pull`/merge
+(old and new history will glue together with duplicates); instead `git fetch origin && git reset --hard origin/main`** (save unpushed work separately first).
+New commits in these repositories should be signed the same way: `Co-Authored-By: Claude ...` and `Co-Authored-By: Ivan Sorokin <ivan.sorokin.tech@gmail.com>`.
 
-**Как продолжить на новой машине:** кросс-компиляторы собираются скриптами `tools/build-fpc-*.sh` (префиксы нужны переменным `DN_PREFIX`, `DN_LINUX`, `DN_AARCH64`, `DN_WIN`, `DN_WIN32`; см. `tools/README.md` и `tools/dn-env.sh`), DOSBox-X для CI берётся из apt
-(2024.03.01: DN-DOS на нём работает; на свежем `master` нужна защита из `claude/fix-extdevice-loop`). Все временные каталоги этой сессии (`/tmp`, scratchpad) эфемерны; ничего нужного в них не осталось.
+**How to continue on a new machine:** cross-compilers are built by `tools/build-fpc-*.sh` scripts (prefixes needed by variables `DN_PREFIX`, `DN_LINUX`, `DN_AARCH64`, `DN_WIN`, `DN_WIN32`; see `tools/README.md` and `tools/dn-env.sh`); DOSBox-X for CI comes from apt
+(2024.03.01: DN-DOS works on it; on fresh `master` the guard from `claude/fix-extdevice-loop` is needed). All temporary directories from this session (`/tmp`, scratchpad) are ephemeral; nothing needed remains in them.
 
-## Линуксовый шоукейс: разбор dn2l и план (2026-10-02)
+## Linux showcase: dn2l analysis and plan (2026-10-02)
 
-**Исходные факты** (разбор `unxed/dn2l`, рабочая копия; у нас она не хранится):
-- DN OSP на Линукс уже собирали (dn2l: Virtual Pascal с Linux-таргетом `vpsyslnx`, потом `pe2elf`). Значит, ядро DN
-  от DOS/OS/2 не зависит: из 179 общих `.pas/.inc` файлов dn2l изменён 104, но суммарно около 1100 изменённых строк
-  (без `uucode.pas` и переименования `collect`→`objects`). Правки по виду: `\`→`/` в путях, заглушки видео
-  (`SetBlink`, палитра VGA, `VGASystem`), отключённый буфер обмена Windows, переименования юнитов (`DnIni_p`→`DnInip`,
-  `Collect`→`Objects`, `U_KeyMap`→`UKeyMap`), `inline` на самостоятельных функциях, проверки на пустые имена, мелочь.
-- **Что нам можно брать из dn2l:** только код, который unxed написал с нуля (скрипты `linux/init.sh`, `dn_.sh`, таблица
-  CP866→UTF-8, если понадобится; сами таблицы у нас уже есть в `TvCodePg`), и *карту мест*, где Linux что-то ломает.
-  **Нельзя:** правки существующего кода RIT/OSP (серая зона), файлы VP RTL и патчи к ним (`vpsyslnx.patch`, `sysutils.patch`),
-  чужие новые файлы (`arch*.pas` и др. не из архива 2.14: происхождение неясно). Все Linux-правки дерева DN пишем сами,
-  в нашем механизме `dn/edits` (отдельный подкаталог/суффикс цели) и `LIB.LINUX` (`DN_LIB_DIR`), как и для DOS.
-- У TV (`tv/`) бэкенды: память и DOS; терминального (Unix) бэкенда нет (`DESIGN.md`: «`source/platform` для Unix и Win32 —
-  веха 6»). Это главная недостающая вещь для Линукса.
+**Source facts** (analysis of `unxed/dn2l`, working copy; we do not keep it):
+- DN OSP for Linux was already built (dn2l: Virtual Pascal with Linux target `vpsyslnx`, then `pe2elf`). So the DN core
+  does not depend on DOS/OS/2: of 179 shared `.pas/.inc` files dn2l changed 104, but in total about 1100 changed lines
+  (excluding `uucode.pas` and the `collect`→`objects` rename). Edits by kind: `\`→`/` in paths, video stubs
+  (`SetBlink`, VGA palette, `VGASystem`), disabled Windows clipboard, unit renames (`DnIni_p`→`DnInip`,
+  `Collect`→`Objects`, `U_KeyMap`→`UKeyMap`), `inline` on standalone functions, empty-name checks, trivia.
+- **What we may take from dn2l:** only code that unxed wrote from scratch (`linux/init.sh`, `dn_.sh` scripts, CP866→UTF-8 table
+  if needed; we already have the tables themselves in `TvCodePg`), and a *map of places* where Linux breaks something.
+  **Must not:** edits to existing RIT/OSP code (gray zone), VP RTL files and patches to them (`vpsyslnx.patch`, `sysutils.patch`),
+  third-party new files (`arch*.pas` and others not from the 2.14 archive: provenance unclear). All Linux edits to the DN tree we write ourselves,
+  in our `dn/edits` mechanism (separate target subdirectory/suffix) and `LIB.LINUX` (`DN_LIB_DIR`), as for DOS.
+- TV (`tv/`) backends: memory and DOS; there is no terminal (Unix) backend (`DESIGN.md`: "`source/platform` for Unix and Win32 —
+  milestone 6"). This is the main missing piece for Linux.
 
-**Решение владельца (2026-10-02): первая цель — 386 (i386-linux), не x86_64.** DN написан под 32-битный VP: указатели в записях данных, `LongInt(P)`,
-`Integer` = 32 бита, размеры записей диалогов (`TSysData`), стримы с указателями. Под x86_64 это надо чинить по всему
-дереву; под i386-linux почти ничего. FPC собирает i386-linux статически (без libc), 32-битный ELF запускается на 64-битном
-Linux. Кросс-компилятор делаем так же, как для go32v2 (`tools/build-fpc-go32v2.sh` → общий скрипт). x86_64/aarch64 —
-после шоукейса, отдельным заданием (поиск 32-битных допущений: у нас уже есть `tools/ifdef-strip.py`, `dn-probe.sh`).
+**Owner decision (2026-10-02): first target — 386 (i386-linux), not x86_64.** DN was written for 32-bit VP: pointers in data records, `LongInt(P)`,
+`Integer` = 32 bits, dialog record sizes (`TSysData`), streams with pointers. Under x86_64 this must be fixed across the whole
+tree; under i386-linux almost nothing. FPC builds i386-linux statically (without libc); a 32-bit ELF runs on 64-bit
+Linux. We make the cross-compiler the same way as for go32v2 (`tools/build-fpc-go32v2.sh` → shared script). x86_64/aarch64 —
+after the showcase, as a separate task (search for 32-bit assumptions: we already have `tools/ifdef-strip.py`, `dn-probe.sh`).
 
-**Итерации** (каждая даёт то, что можно запустить; оценки в сессиях, первая — самая надёжная):
-1. *TV на терминале Linux* (1–2) — **сделано 2026-10-02** (`TvTermIO`, `TvAnsi`, `TvUnix`, тесты `t_termio`, `t_ansi`, pty-тест `tv/tests/pty`, демо `tvdemo` на Linux; без ncurses: простые клавиши разбираем сами; не сделано: OSC 52, Ctrl+Z, far2l, GPM). **Решение владельца (2026-10-02): терминальный бэкенд не изобретаем, переводим из
-   magiblot/tvision** (`source/platform`: unix/linux-консоль, разбор ввода, мышь, вывод ячеек, far2l/kitty, OSC 52), как и
-   остальной TV, с теми же правилами (заголовок юнита называет файлы magiblot, MIT + отказ от гарантий Borland, `tv/COPYRIGHT.magiblot`).
-   В `tv/DESIGN.md` добавить строки соответствия; тесты через pty (`script`/`python pty`: подали байты, сравнили экран),
-   `tv/demo` в CI с текстовым «скриншотом». Без DN.
-2. *DN собирается под i386-linux* (2–3). `dn-probe.sh` уже считает, сколько юнитов берёт FPC нативно: идём по ошибкам,
-   пишем `LIB.LINUX` (наши `vpsyslow`, `lfn`, `dpmi32`-заглушки, `dnexec` без загрузчика DN.COM, `killer`, `fnotify`),
-   правки путей: `\`→`/` в литералах путей (список мест берём из своего поиска по дереву, не из dn2l), буквы дисков —
-   один «диск» `/`. Результат: `dn` линкуется.
-3. *Запуск и панели* (1–2). Старт: каталоги конфигурации (`~/.dn`), ресурсы `.DLG/.LNG` (rcp под Linux собирается тем же
-   `dn-run.sh`, только без DOSBox-X), две панели на `/` или `$HOME`, меню, строка статуса. Английский язык первым (ASCII).
-   Результат — скриншот в README, как для DOS.
-4. *Рабочий файловый менеджер* (3+). Хождение по каталогам, F-клавиши, просмотрщик и редактор, копирование; права и
-   ссылки Unix (`Attr` в `TFileRec`); имена файлов UTF-8 на границе с ФС; русский (cp866 в ресурсах → UTF-8 при загрузке).
-5. *Шоукейс в CI*: задание, которое собирает, запускает `dn` в `tmux`/pty, шлёт набор клавиш и сохраняет текстовый
-   скриншот артефактом; `tools/dn-run.sh` получает режим `linux`.
+**Iterations** (each yields something runnable; estimates in sessions; the first is the most reliable):
+1. *TV on a Linux terminal* (1–2) — **done 2026-10-02** (`TvTermIO`, `TvAnsi`, `TvUnix`, tests `t_termio`, `t_ansi`, pty test `tv/tests/pty`, demo `tvdemo` on Linux; no ncurses: we parse simple keys ourselves; not done: OSC 52, Ctrl+Z, far2l, GPM). **Owner decision (2026-10-02): we do not invent the terminal backend; we translate it from
+   magiblot/tvision** (`source/platform`: unix/linux console, input parsing, mouse, cell output, far2l/kitty, OSC 52), like the
+   rest of TV, with the same rules (unit header names magiblot files, MIT + Borland disclaimer, `tv/COPYRIGHT.magiblot`).
+   Add correspondence rows to `tv/DESIGN.md`; tests via pty (`script`/`python pty`: fed bytes, compared screen),
+   `tv/demo` in CI with a text "screenshot". Without DN.
+2. *DN builds for i386-linux* (2–3). `dn-probe.sh` already counts how many units native FPC takes: we follow errors,
+   write `LIB.LINUX` (our `vpsyslow`, `lfn`, `dpmi32` stubs, `dnexec` without DN.COM loader, `killer`, `fnotify`),
+   path edits: `\`→`/` in path literals (place list from our own tree search, not from dn2l), drive letters —
+   one "drive" `/`. Result: `dn` links.
+3. *Run and panels* (1–2). Start: config directories (`~/.dn`), `.DLG/.LNG` resources (rcp under Linux builds with the same
+   `dn-run.sh`, only without DOSBox-X), two panels on `/` or `$HOME`, menu, status line. English language first (ASCII).
+   Result — a screenshot in the README, as for DOS.
+4. *Working file manager* (3+). Walking directories, F-keys, viewer and editor, copy; Unix permissions and
+   links (`Attr` in `TFileRec`); UTF-8 file names at the FS boundary; Russian (cp866 in resources → UTF-8 on load).
+5. *Showcase in CI*: a job that builds, runs `dn` in `tmux`/pty, sends a key set, and saves a text
+   screenshot as an artifact; `tools/dn-run.sh` gets a `linux` mode.
 
-**Общее с DOS** (делаем один раз, чтобы не расходиться): слой `dn/new` (`vpsyslow` поверх `TvSys`, `dnapp`, `drivers`,
-`messages`), правки совместимости (порядок вычисления аргументов, упаковка записей, `ListBoxOwnsList`, `TProgram.Draw`).
-Что специфично для DOS: `TvDos`, `dpmi32`, `intr_realmode`, LFN. Решение о границе — по `{$IFDEF GO32V2}` внутри `dn/new`
-или отдельными файлами в `LIB.*`; предпочитаем отдельные файлы.
+**Shared with DOS** (do once so we do not diverge): `dn/new` layer (`vpsyslow` on top of `TvSys`, `dnapp`, `drivers`,
+`messages`), compatibility edits (argument evaluation order, record packing, `ListBoxOwnsList`, `TProgram.Draw`).
+What is DOS-specific: `TvDos`, `dpmi32`, `intr_realmode`, LFN. Boundary decision — by `{$IFDEF GO32V2}` inside `dn/new`
+or separate files in `LIB.*`; we prefer separate files.
 
-**Риски/вопросы:** (1) путь и диски: насколько глубоко DN привязан к буквам дисков (`Drives`, `DiskInfo`, `SelectDrive`);
-(2) копирование/архиваторы запускают внешние программы через `dnexec`: на первое время выключить; (3) `x86_64`: измеримый
-объём допущений на 32 бита (после шоукейса); (4) терминалы: какие сочетания клавиш доходят (Ctrl/Alt/F-клавиши) —
-вопрос к `TvUnix`, опора на kitty-протокол клавиатуры как необязательный режим.
+**Risks/questions:** (1) path and drives: how deeply DN is tied to drive letters (`Drives`, `DiskInfo`, `SelectDrive`);
+(2) copy/archivers launch external programs via `dnexec`: disable for now; (3) `x86_64`: measurable
+volume of 32-bit assumptions (after the showcase); (4) terminals: which key combinations get through (Ctrl/Alt/F-keys) —
+a question for `TvUnix`; rely on the kitty keyboard protocol as an optional mode.
 
-Приоритеты: DOS-версию до «можно ходить по панелям» довести первой (идёт), итерацию 1 Linux можно делать параллельно, потому
-что она не зависит от DN.
+Priorities: bring the DOS version to "can walk the panels" first (in progress); Linux iteration 1 can run in parallel because
+it does not depend on DN.
 
-**Встроенная командная строка / пользовательский экран (решение владельца, 2026-10-02):** переписать на Pascal
-[magiblot/tvterm](https://github.com/magiblot/tvterm) (эмулятор терминала как вид Turbo Vision на базе pty) и использовать
-его вместо встроенной командной строки DN и «экрана пользователя» (Ctrl+O) на Unix. Перед началом проверить: лицензию и
-зависимости tvterm (какая библиотека разбора VT-последовательностей и как она лицензирована; если С-библиотека — решаем:
-переписывать её тоже или брать готовую по FFI), состав API TV, который tvterm использует (должен совпадать с нашим `tv/`),
-способ запуска оболочки (pty: `forkpty` через `BaseUnix`). Новый юнит — в `tv/` (`TvTerm`, MIT, перевод с названием файлов
-tvterm в заголовке); подключение к DN — через `dn/new` (замена `CmdLine`/`ShowUserScreen` для цели Linux). Не раньше итерации 4.
-Для DOS командная строка остаётся родной (DN запускает программы и показывает пользовательский экран через DOS).
+**Embedded command line / user screen (owner decision, 2026-10-02):** rewrite into Pascal
+[magiblot/tvterm](https://github.com/magiblot/tvterm) (terminal emulator as a Turbo Vision view on top of pty) and use
+it instead of DN's embedded command line and "user screen" (Ctrl+O) on Unix. Before starting, check: tvterm license and
+dependencies (which VT sequence parsing library and how it is licensed; if a C library — decide:
+rewrite it too or take a ready one via FFI), the set of TV API that tvterm uses (must match our `tv/`),
+how the shell is launched (pty: `forkpty` via `BaseUnix`). New unit — in `tv/` (`TvTerm`, MIT, translation with tvterm file names
+in the header); wiring into DN — via `dn/new` (replace `CmdLine`/`ShowUserScreen` for the Linux target). Not before iteration 4.
+For DOS the command line stays native (DN launches programs and shows the user screen via DOS).
 
 
 
-> **Раскладка с 2026-10-02 (решение владельца):** исходники DN лежат в git (`dn/src`), дальше работа — обычные коммиты и PR.
-> Всё, что связано с получением дерева из публичного архива (адрес и sha256, исключения, переписанные места, правки, наши
-> файлы, инструменты), — в `bootstrap/` (запись и способ воспроизвести: `bootstrap/README.md`; `bootstrap/BASELINE` — коммит с деревом
-> первого коммита, CI сверяет вывод `bootstrap/run.sh` с ним). Сборка одной командой: `tools/build.sh linux64|linux|dos`.
-> Происхождение файлов: `dn/PROVENANCE.md`; лицензии: `LICENSE`, `dn/LICENSE.md`. Старые описания (решения 9–10, `dn-materialize.sh`,
-> `dn/new`, `dn/target.env` и т. п.) выше и в `research/` — история: читайте их как «как это было до переноса».
-> Открытый вопрос владельцу: файлы участников DN OSP (Cat, JO, AK155) без собственной лицензии в заголовке, вошедшие в тот же
-> публичный выпуск (`dn/PROVENANCE.md`, классы Contributors и Upstream without a notice); не нужные сборкам 19 файлов убраны из дерева.
+> **Layout since 2026-10-02 (owner decision):** DN sources live in git (`dn/src`); further work is ordinary commits and PRs.
+> Everything related to obtaining the tree from the public archive (URL and sha256, exclusions, rewritten places, edits, our
+> files, tools) is in `bootstrap/` (record and how to reproduce: `bootstrap/README.md`; `bootstrap/BASELINE` — the commit with the tree
+> of the first commit; CI compares `bootstrap/run.sh` output to it). Build with one command: `tools/build.sh linux64|linux|dos`.
+> File provenance: `dn/PROVENANCE.md`; licenses: `LICENSE`, `dn/LICENSE.md`. Older descriptions (decisions 9–10, `dn-materialize.sh`,
+> `dn/new`, `dn/target.env`, etc.) above and in `research/` are history: read them as "how it was before the move".
+> Open question for the owner: DN OSP participant files (Cat, JO, AK155) without their own license in the header, that entered the same
+> public release (`dn/PROVENANCE.md`, Contributors and Upstream without a notice classes); 19 files not needed by builds were removed from the tree.
 
-## Ближайшие задачи по порядку (2026-10-02, порядок уточнён владельцем)
+## Nearest tasks in order (2026-10-02, order clarified by owner)
 
-Что уже есть: DN под DOS (go32v2, DOSBox-X) и под i386-linux в терминале (панели, меню, диалоги, справка; обход `tools/dn-linux-tour.py`).
+What already exists: DN under DOS (go32v2, DOSBox-X) and under i386-linux in a terminal (panels, menu, dialogs, help; tour `tools/dn-linux-tour.py`).
 
-1. **Linux i386 до «можно ходить»** (итерации 3–4 плана Linux): пройти тур без падений, выход по Alt-X, F3/F4/F5–F8 на настоящих
-   файлах Linux, права и ссылки в панелях, имена UTF-8 на границе с файловой системой, `ESC`-задержка и клавиши в разных терминалах.
-   Скриншот и сборка в `dist/linux/`.
-2. **CI для Linux:** задание, которое собирает кросс-компилятор (`tools/build-fpc-i386-linux.sh`, кэш), `dn` и гоняет тур в pty.
-2a. **Проход по базовым функциям до x86_64** (требование владельца 2026-10-02: ручная проверка показала, что копирование и калькулятор
-   падают): по списку — копирование (в другую панель, несколько файлов, каталоги, перезапись, перенос), удаление, переименование,
-   создание каталога, просмотр (F3: текст, hex, большой файл), редактор (F4: ввод, поиск, замена, блоки, сохранение), поиск файлов
-   (Alt-F7), калькулятор, дерево каталогов, сравнение, выбор файлов (Ins, +, -, *), быстрый поиск, сортировка, режимы панелей, меню
-   всех пунктов (каждый пункт хотя бы открывается без падения), диалоги настроек. Каждое падение — воспроизведение в pty-тесте
-   (`tools/dn-linux-ops.py`) и исправление; список пройденного — в `dn/TODO-later.md`.
-3. **Сборка под x86_64 Linux** (решение владельца: 386 первой; рабочий задел уже есть — `DN_ARCH=x86_64`, `dn/edits/x64`):
-   - сначала измерить: `tools/dn-probe-linux.sh` для нативного `fpc` (сколько юнитов собирается без правок);
-   - 32-битные допущения: `LongInt(Pointer)` и записи с указателями в потоках/диалогах (`TSysData`), ассемблер `-Rintel` на
-     32-битных регистрах (под x86_64 — `NOASM` и Pascal-версии), размеры записей, `VmtLink`, `Move(…, SizeOf(указателя))`;
-   - формат файлов (`DN.INI`, `.DLG`, истории) не должен зависеть от битности: `rcp` и DN читают то, что писал i386;
-   - в CI — второй набор и тот же pty-тур.
-4. **UTF-8 внутри DN** (сразу после x86_64; если уже сделано к тому времени — проверка и закрытие): внутренние строки DN — UTF-8.
-   Где граница с системой и нужна ли на ней перекодировка:
+1. **Linux i386 to "can walk"** (Linux plan iterations 3–4): complete the tour without crashes, exit via Alt-X, F3/F4/F5–F8 on real
+   Linux files, permissions and links in panels, UTF-8 names at the filesystem boundary, `ESC` delay and keys in different terminals.
+   Screenshot and build in `dist/linux/`.
+2. **CI for Linux:** a job that builds the cross-compiler (`tools/build-fpc-i386-linux.sh`, cache), `dn`, and runs the tour in pty.
+2a. **Walk through basic functions before x86_64** (owner requirement 2026-10-02: manual check showed copy and calculator
+   crash): by list — copy (to another panel, multiple files, directories, overwrite, move), delete, rename,
+   create directory, view (F3: text, hex, large file), editor (F4: input, search, replace, blocks, save), file search
+   (Alt-F7), calculator, directory tree, compare, file selection (Ins, +, -, *), quick search, sort, panel modes, menu
+   of all items (each item at least opens without crashing), settings dialogs. Every crash — reproduce in a pty test
+   (`tools/dn-linux-ops.py`) and fix; list of what passed — in `dn/TODO-later.md`.
+3. **Build for x86_64 Linux** (owner decision: 386 first; working head start already exists — `DN_ARCH=x86_64`, `dn/edits/x64`):
+   - first measure: `tools/dn-probe-linux.sh` for native `fpc` (how many units build without edits);
+   - 32-bit assumptions: `LongInt(Pointer)` and records with pointers in streams/dialogs (`TSysData`), `-Rintel` assembler on
+     32-bit registers (under x86_64 — `NOASM` and Pascal versions), record sizes, `VmtLink`, `Move(…, SizeOf(pointer))`;
+   - file format (`DN.INI`, `.DLG`, histories) must not depend on bitness: `rcp` and DN read what i386 wrote;
+   - in CI — a second set and the same pty tour.
+4. **UTF-8 inside DN** (right after x86_64; if already done by then — verify and close): DN internal strings are UTF-8.
+   Where the system boundary is and whether conversion is needed on it:
 
-   | Цель | файлы (имена) | экран и клавиатура | буфер обмена |
+   | Target | files (names) | screen and keyboard | clipboard |
    |---|---|---|---|
-   | Linux | нативный UTF-8, перекодировки нет | UTF-8 терминала, перекодировки нет | OSC 52 / системный, UTF-8, перекодировки нет |
-   | DOS + go2dos | **API go2dos `DOS-UTF8/NAMES`** (`INT 2Dh` AL=10h, BX=65001: вызовы `71xx` берут и отдают UTF-8; короткие имена — ASCII): DN передаёт UTF-8 как есть, перекодировки нет | OEM (в go2dos экран и клавиатура остаются OEM): `TvDos` перекодирует через кодовую страницу | WinOldAp `INT 2Fh AH=17h`: формат CF_TEXT/CF_OEMTEXT, на проводе **OEM**: перекодируем. **Нужно расширение go2dos** — режим UTF-8 буфера обмена по образцу `DOS-UTF8/NAMES` (предложение владельцу go2dos; до него — OEM) |
-   | DOS без go2dos (DOSBox-X, FreeDOS) | перекодируем на границе: UTF-8 ↔ однобайтная страница, выбранная DOS по локали (веха 5а: `TvCodePg`) | как выше | как выше (WinOldAp, OEM) |
+   | Linux | native UTF-8, no conversion | terminal UTF-8, no conversion | OSC 52 / system, UTF-8, no conversion |
+   | DOS + go2dos | **go2dos API `DOS-UTF8/NAMES`** (`INT 2Dh` AL=10h, BX=65001: `71xx` calls take and return UTF-8; short names — ASCII): DN passes UTF-8 as-is, no conversion | OEM (in go2dos screen and keyboard remain OEM): `TvDos` converts via the code page | WinOldAp `INT 2Fh AH=17h`: CF_TEXT/CF_OEMTEXT format, on the wire **OEM**: we convert. **go2dos extension needed** — UTF-8 clipboard mode modeled on `DOS-UTF8/NAMES` (proposal to go2dos owner; until then — OEM) |
+   | DOS without go2dos (DOSBox-X, FreeDOS) | convert at the boundary: UTF-8 ↔ single-byte page chosen by DOS from locale (milestone 5a: `TvCodePg`) | as above | as above (WinOldAp, OEM) |
 
-   **Порядок работ по п. 4 (решение владельца 2026-10-02: сначала имена файлов; 160 файлов DN, ~1900 мест `Length`/`Copy`, ~300 `UpCase`/`UpStrg`,
-   24 файла с `TDrawBuffer`, 106 вызовов `WriteBufW`/`WriteLineW`).** Строки DN остаются `ShortString`, в них лежит UTF-8 там, где это включено;
-   перекодировка CP866↔UTF-8 для имён (заглушка в `vpsyslow.pas`, `DN_NAME_CONV`) уходит, когда имена станут UTF-8 внутри.
-   - **4.1 Широкая ячейка.** Новый тип строки отрисовки `TWideRow` (ячейка `LongWord`: байт символа страницы, байт атрибута BIOS,
-     в старших 16 битах код символа Unicode, если он есть) и методы `WriteBufX`/`WriteLineX` в `tv/` (старые `WriteBufW`/`WriteLineW` на `Word` остаются:
-     вызовы с неизвестным типом буфера не ломаются молча); `MoveStrU`/`MoveCStrU` в `drivers.pas` разбирают UTF-8 и кладут символы в такую строку.
-     Первым на широкие ячейки переводится вывод имён в панелях файлов (`flpanel`, `filespan`).
-   - **4.2 Имена файлов в UTF-8 внутри.** `FindFirst` отдаёт имена как есть, `SysOsPath` ничего не меняет; ширина колонок и обрезка имён по `TvUtf8.CharWidth`
-     (двойная ширина — две ячейки); сортировка и регистр по Unicode (`Country_`, таблицы для кириллицы и латиницы, затем остальное).
-   - **4.3 Строки ввода и редакторы.** Курсор, удаление, выделение по символам; вставка и буфер обмена без перекодировки.
-   - **4.4 Ресурсы, справка, сообщения.** Тексты `RESOURCE` в UTF-8 (`rcp` читает и CP866, и UTF-8), справка (`tvhc`), строки в коде; DOS без go2dos —
-     перекодировка на границе (п. 4, таблица).
-   Каждый шаг — отдельная итерация с тестом (`dn/tests`, `tools/dn-linux-ops.py`) и записью в `dn/TODO-later.md` о том, что осталось.
-   **Состояние (2026-10-03, ветка влита в `main`; сборка `DN_EXTRA=-dDNUTF8 tools/build.sh linux64`, по умолчанию режим выключен):**
-   сделано: 4.1 клетки `TScreenCell`; 4.2 имена без перекодировки, ширины и выравнивание по символам (`dn/src/dnutf8.pas`), заголовки, меню, командная строка, 16-битные буферы
-   (UTF-8 → кодовая страница при записи в слово-буфер), регистр и сортировка UTF-8; 4.3 строки ввода (`tv/`); 4.4 ресурсы и справка в UTF-8 (iconv при сборке, `tvhc`);
-   4.5 просмотрщик (F3/F8, hex); Alt+кириллица (горячие буквы меню и диалогов: `HotMatches`, `UpCaseCp`, `HotKeyAlt`); системный буфер обмена (`winclp.pas` через `TvClip`: OSC 52 в
-   `TvUnix`, `CF_UNICODETEXT` в `TvTermOs`; перекодирование OEM↔UTF-8 только без `-dDNUTF8`); редактор по символам (таблица документа `DocTab`: внутренние байты как в CP866, редкие
-   символы в свободных ячейках; файл остаётся UTF-8; поиск/замена, блоки, регистр блока). Проверки: `tools/dn-linux-ops.py` с `DN_OPS_UTF8=1` (CI: job `linux64-utf8`), `dn/tests`, `tv/tests`.
-   Быстрый поиск в панели: Ctrl-S + кириллица. Редактор: набор любых символов клавиатуры (в UTF-8-файле символ вне CP866 получает свободную ячейку таблицы документа `DocTab`, занятые текстом ячейки не отдаются). Режим по умолчанию на Linux (`DN_UTF8=0` — старая сборка); `dist/linux64` и `dist/linux` пересобраны. **Осталось:** ширина CJK и комбинируемых знаков в редакторе (в панелях, диалогах и т. п. сделано: широкий знак — два байта прокси, `FF` — вторая половина, комбинируемый знак живёт в ячейке своей буквы);
-   DBF-просмотр и прочие места, проверить диалоги на русском глазами; Windows: сделано — имена файлов через широкие API (`vpsyslow` ставит UTF-8 для имён RTL), проверено в CI на настоящей Windows (имена `Привет`, `αβγ`, F7 с русским именем), режим по умолчанию там тоже (`DN_UTF8=0` — старая сборка)
-   DOS остаётся на кодовой странице; удаление заглушки `DN_NAME_CONV`.
+   **Work order for item 4 (owner decision 2026-10-02: file names first; 160 DN files, ~1900 `Length`/`Copy` sites, ~300 `UpCase`/`UpStrg`,
+   24 files with `TDrawBuffer`, 106 `WriteBufW`/`WriteLineW` calls).** DN strings remain `ShortString`, holding UTF-8 where that is enabled;
+   CP866↔UTF-8 conversion for names (stub in `vpsyslow.pas`, `DN_NAME_CONV`) goes away when names become UTF-8 inside.
+   - **4.1 Wide cell.** New draw-row type `TWideRow` (cell `LongWord`: code-page character byte, BIOS attribute byte,
+     Unicode character code in the upper 16 bits if present) and `WriteBufX`/`WriteLineX` methods in `tv/` (old `WriteBufW`/`WriteLineW` on `Word` remain:
+     calls with an unknown buffer type do not break silently); `MoveStrU`/`MoveCStrU` in `drivers.pas` parse UTF-8 and put characters into such a row.
+     First to wide cells: name output in file panels (`flpanel`, `filespan`).
+   - **4.2 File names in UTF-8 inside.** `FindFirst` returns names as-is; `SysOsPath` changes nothing; column widths and name clipping by `TvUtf8.CharWidth`
+     (double width — two cells); sort and case by Unicode (`Country_`, tables for Cyrillic and Latin, then the rest).
+   - **4.3 Input lines and editors.** Cursor, delete, selection by characters; paste and clipboard without conversion.
+   - **4.4 Resources, help, messages.** `RESOURCE` texts in UTF-8 (`rcp` reads both CP866 and UTF-8), help (`tvhc`), strings in code; DOS without go2dos —
+     conversion at the boundary (item 4, table).
+   Each step is a separate iteration with a test (`dn/tests`, `tools/dn-linux-ops.py`) and a note in `dn/TODO-later.md` about what remains.
+   **Status (2026-10-03, branch merged into `main`; build `DN_EXTRA=-dDNUTF8 tools/build.sh linux64`, mode off by default):**
+   done: 4.1 `TScreenCell` cells; 4.2 names without conversion, widths and alignment by characters (`dn/src/dnutf8.pas`), headers, menus, command line, 16-bit buffers
+   (UTF-8 → code page when writing into a word buffer), UTF-8 case and sort; 4.3 input lines (`tv/`); 4.4 resources and help in UTF-8 (iconv at build, `tvhc`);
+   4.5 viewer (F3/F8, hex); Alt+Cyrillic (menu and dialog hot letters: `HotMatches`, `UpCaseCp`, `HotKeyAlt`); system clipboard (`winclp.pas` via `TvClip`: OSC 52 in
+   `TvUnix`, `CF_UNICODETEXT` in `TvTermOs`; OEM↔UTF-8 conversion only without `-dDNUTF8`); character-based editor (document table `DocTab`: internal bytes as in CP866, rare
+   characters in free cells; file stays UTF-8; search/replace, blocks, block case). Checks: `tools/dn-linux-ops.py` with `DN_OPS_UTF8=1` (CI: job `linux64-utf8`), `dn/tests`, `tv/tests`.
+   Quick search in panel: Ctrl-S + Cyrillic. Editor: typing any keyboard characters (in a UTF-8 file a character outside CP866 gets a free document-table `DocTab` cell; cells occupied by text are not given away). Default mode on Linux (`DN_UTF8=0` — old build); `dist/linux64` and `dist/linux` rebuilt. **Remaining:** CJK and combining-mark width in the editor (in panels, dialogs, etc. done: wide mark — two proxy bytes, `FF` — second half, combining mark lives in its letter's cell);
+   DBF viewer and other places; check Russian dialogs by eye; Windows: done — file names via wide APIs (`vpsyslow` sets UTF-8 for RTL names), verified in CI on real Windows (names `Privet` / Russian greeting, `αβγ`, F7 with a Russian name), default mode there too (`DN_UTF8=0` — old build)
+   DOS stays on the code page; remove the `DN_NAME_CONV` stub.
 
-   Общее: границы с системой — единственные места перекодировки; в `dn/new` свои `UpCase`/сортировка для UTF-8 (`Country_`),
-   ширина символов — `TvUtf8.CharWidth`. Спецификация go2dos — `docs/DOS-EXTENSIONS.md` §3 (буфер), §5 (имена); сверяем перед
-   реализацией, ничего не придумываем.
-5. **Русский в Linux:** экран пользователя и встроенная командная строка (`TvTerm` по magiblot/tvterm), русские ресурсы и справка
-   в UTF-8 (после п. 4 это в основном проверка).
-6. **Остаток по DOS:** сохранение и восстановление состояния (`DN.INI`, рабочий стол, истории), экран программы после запуска
-   внешней программы, проверка мыши руками.
-7. Дальше: aarch64 (**сделано 2026-10-03**: `tools/build-fpc-aarch64-linux.sh`, `tools/build.sh aarch64`, `dist/aarch64`; проверено под `qemu-aarch64-static`: tv 40 тестов, tour, ops 25/35; CI: `linux-aarch64` на `ubuntu-24.04-arm` и матрица `tv`); macOS для TV (сборка под Windows win64/win32 сделана 2026-10-03, `dn/TODO-later.md`, «Windows»); go2dos как витрина (веха 7), LFN и буфер обмена для DOS (веха 5); перевод
-   комментариев на английский (хвост плана).
-8. **Встроенный терминал** (субпроект на базе `tv/`, по [magiblot/tvterm](https://github.com/magiblot/tvterm), как в far2l и F4): окно с терминалом
-   (эмулятор VT, pty), командная строка DN выполняет команды в нём, вывод остаётся на экране DN. Пока его нет (сделано 2026-10-02):
-   команда командной строки и запуск программы по Enter отдают терминал оболочке (`SysRunShell`: экран приложения скрывается,
-   `/bin/sh -c`, Enter — назад в DN, экран рисуется заново); в DOS — прежний `COMMAND.COM`.
-   **Разбор tvterm (2026-10-03):** tvterm — MIT (`COPYRIGHT`), ~3100 строк C++ (`source/tvterm-core`: `pty.cc` 513, `vtermemu.cc` 744, `termview.cc` 340,
-   `termctrl.cc` 328, `termwnd.cc` 168 + заголовки) поверх **libvterm** (C, MIT; в tvterm — форк magiblot) и tvision. **Решение:** libvterm не берём по FFI
-   (сборка одним `fpc`, без C), а пишем эмулятор на Pascal сами (`TvVt`, MIT, по описанию управляющих последовательностей xterm; ячейки — `TScreenCell` из `TvCell`:
-   широкие знаки, нулевой ширины, 24-битный цвет уже есть). Итерации: 8.1 `TvVt` (**сделано 2026-10-03**: `tv/src/tvvt.pas`, тест `tv/tests/t_vt.pas`, 76 проверок) — эмулятор без ввода-вывода (разбор UTF-8/CSI/OSC/DEC-режимы,
-   экран и запасной экран, прокрутка и область, история) + тесты; 8.2 `TvPty` (**сделано 2026-10-03** для Linux: `tv/src/tvpty.pas`, тест `tv/tests/t_pty.pas`, 16 проверок; pty через `/dev/ptmx` и ioctl без libc, fork/exec, размер, ожидание ребёнка; другие Unix — через `posix_openpt`, позже);
-   8.3 `TvVtKeys` + `TvVtView` (**сделано 2026-10-03** без выделения мышью: клавиши и мышь → байты, 48 проверок `t_vtkeys`; вид рисует ячейки, история Shift-PgUp/колесо, размер, OSC 52, вставка в скобках; демо `tv/demo/tvterm.pas`, pty-тест `tv/tests/pty/test_tvterm.py`, 13 проверок); 8.4 подключение к DN (Ctrl-O, командная строка): 8.4a `TvVtRun` (**сделано 2026-10-03**: программа на весь экран приложения через эмулятор, экран пользователя остаётся: `VtRunScreen`, `VtShowScreen`; pty-тест `test_vtrun.py`, 8 проверок), 8.4b склейка в `dnrun.pas` и Ctrl-O (**сделано 2026-10-03**: команда командной строки идёт через `VtRunScreen`, `UserScr` — экран пользователя, Ctrl-O и Esc на пустой командной строке показывают его; настройки `DN_EMBED_TERM=0`, `DN_RUN_PAUSE=0|1|2`; проверка в `dn-linux-ops.py`);
-   8.5 Windows (ConPTY) — по желанию.
-9. **Расширенные протоколы терминала** (проверить и довести в TV, DN и tvterm всё, что умеет magiblot/tvision): OSC 52 (буфер обмена),
-   kitty keyboard protocol, win32 input mode, bracketed paste, расширения far2l. Внутренний формат события клавиатуры (`TEvent.KeyDown`)
-   хорошо бы расширить так, чтобы он хранил всё, что передаёт win32 input mode (код виртуальной клавиши, скан-код, символ, состояние
-   управляющих клавиш, счётчик повторов, нажатие/отпускание). Если это окажется долго — в самый конец списка (перед пунктами 10–11).
-10. **Графический бэкенд** (как у far2l: окно со шрифтом вместо терминала; в самом конце). Выбор: **fpGUI** (чистый Pascal, собирается
-    одним `fpc` без Lazarus и IDE, зависимости: Xlib/GDI/Cocoa и FreeType, без тяжёлых библиотек), а не LCL (тянет Lazarus и виджетсет).
-    Запасной вариант, если fpGUI не подойдёт: прямые вызовы X11/Win32/Cocoa и своя отрисовка сетки символов. Бэкенд кладёт в `TvScreen`
-    ячейки как терминальные, рисует их шрифтом, отдаёт события клавиатуры и мыши (в том числе с полным набором клавиш и юникодом).
-11. **Перенос текстового IDE Free Pascal на нашу `tv/`** (отдельный субпроект после всего остального; сейчас IDE стоит на Free Vision):
-    поднять удобство (системный буфер обмена, все привычные сочетания клавиш), добавить юникод. Опирается на п. 9 (клавиатура, буфер
-    обмена) и на UTF-8 из п. 4.
+   Shared: system boundaries are the only conversion places; in `dn/new` our own `UpCase`/sort for UTF-8 (`Country_`),
+   character width — `TvUtf8.CharWidth`. go2dos specification — `docs/DOS-EXTENSIONS.md` §3 (clipboard), §5 (names); we check before
+   implementing; we invent nothing.
+5. **Russian on Linux:** user screen and embedded command line (`TvTerm` per magiblot/tvterm), Russian resources and help
+   in UTF-8 (after item 4 this is mostly verification).
+6. **Remaining DOS work:** save and restore state (`DN.INI`, desktop, histories), program screen after launching
+   an external program, manual mouse check.
+7. Next: aarch64 (**done 2026-10-03**: `tools/build-fpc-aarch64-linux.sh`, `tools/build.sh aarch64`, `dist/aarch64`; verified under `qemu-aarch64-static`: tv 40 tests, tour, ops 25/35; CI: `linux-aarch64` on `ubuntu-24.04-arm` and `tv` matrix); macOS for TV (win64/win32 Windows build done 2026-10-03, `dn/TODO-later.md`, "Windows"); go2dos as showcase (milestone 7), LFN and clipboard for DOS (milestone 5); translate
+   comments into English (plan tail).
+8. **Embedded terminal** (subproject on top of `tv/`, per [magiblot/tvterm](https://github.com/magiblot/tvterm), as in far2l and F4): a window with a terminal
+   (VT emulator, pty); DN's command line runs commands in it; output stays on the DN screen. While it does not exist (done 2026-10-02):
+   a command-line command and launching a program with Enter hand the terminal to the shell (`SysRunShell`: application screen is hidden,
+   `/bin/sh -c`, Enter — back to DN, screen redrawn); on DOS — the previous `COMMAND.COM`.
+   **tvterm analysis (2026-10-03):** tvterm is MIT (`COPYRIGHT`), ~3100 lines of C++ (`source/tvterm-core`: `pty.cc` 513, `vtermemu.cc` 744, `termview.cc` 340,
+   `termctrl.cc` 328, `termwnd.cc` 168 + headers) on top of **libvterm** (C, MIT; in tvterm — magiblot fork) and tvision. **Decision:** we do not take libvterm via FFI
+   (build with a single `fpc`, no C); we write the emulator in Pascal ourselves (`TvVt`, MIT, from the xterm control-sequence description; cells — `TScreenCell` from `TvCell`:
+   wide marks, zero-width, 24-bit color already present). Iterations: 8.1 `TvVt` (**done 2026-10-03**: `tv/src/tvvt.pas`, test `tv/tests/t_vt.pas`, 76 checks) — emulator without I/O (UTF-8/CSI/OSC/DEC-mode parsing,
+   screen and alternate screen, scroll and region, history) + tests; 8.2 `TvPty` (**done 2026-10-03** for Linux: `tv/src/tvpty.pas`, test `tv/tests/t_pty.pas`, 16 checks; pty via `/dev/ptmx` and ioctl without libc, fork/exec, size, wait for child; other Unix — via `posix_openpt`, later);
+   8.3 `TvVtKeys` + `TvVtView` (**done 2026-10-03** without mouse selection: keys and mouse → bytes, 48 checks `t_vtkeys`; view draws cells, history Shift-PgUp/wheel, size, OSC 52, bracketed paste; demo `tv/demo/tvterm.pas`, pty test `tv/tests/pty/test_tvterm.py`, 13 checks); 8.4 wiring into DN (Ctrl-O, command line): 8.4a `TvVtRun` (**done 2026-10-03**: full-screen application program via the emulator; user screen remains: `VtRunScreen`, `VtShowScreen`; pty test `test_vtrun.py`, 8 checks), 8.4b glue in `dnrun.pas` and Ctrl-O (**done 2026-10-03**: command-line command goes through `VtRunScreen`, `UserScr` — user screen; Ctrl-O and Esc on an empty command line show it; settings `DN_EMBED_TERM=0`, `DN_RUN_PAUSE=0|1|2`; check in `dn-linux-ops.py`);
+   8.5 Windows (ConPTY) — optional.
+9. **Extended terminal protocols** (check and finish in TV, DN, and tvterm everything magiblot/tvision can do): OSC 52 (clipboard),
+   kitty keyboard protocol, win32 input mode, bracketed paste, far2l extensions. The internal keyboard event format (`TEvent.KeyDown`)
+   would preferably be extended so it stores everything win32 input mode passes (virtual key code, scan code, character, modifier
+   state, repeat count, press/release). If that turns out long — to the very end of the list (before items 10–11).
+10. **Graphical backend** (as in far2l: a window with a font instead of a terminal; at the very end). Choice: **fpGUI** (pure Pascal, builds
+    with a single `fpc` without Lazarus and IDE; dependencies: Xlib/GDI/Cocoa and FreeType, no heavy libraries), not LCL (pulls Lazarus and a widgetset).
+    Fallback if fpGUI does not fit: direct X11/Win32/Cocoa calls and our own character-grid drawing. The backend puts into `TvScreen`
+    cells like terminal ones, draws them with a font, delivers keyboard and mouse events (including a full key set and Unicode).
+11. **Port Free Pascal's text IDE onto our `tv/`** (separate subproject after everything else; currently the IDE sits on Free Vision):
+    raise convenience (system clipboard, all familiar key combinations), add Unicode. Relies on item 9 (keyboard, clipboard)
+    and on UTF-8 from item 4.
 
-## Проблемы от пользователя, найденные при пробе сборки 2.20 alpha (2026-10-04) — по порядку
+## User-reported problems found while trying the 2.20 alpha build (2026-10-04) — in order
 
-Список записан до работы над пунктами (по просьбе владельца). Отмечать `[x]` по мере выполнения. Пересборка дистрибутива (`dist/`) — после пунктов 1–5, по слову владельца ("рано собирать").
+The list was recorded before work on the items (at the owner's request). Mark `[x]` as done. Rebuild of the distribution (`dist/`) — after items 1–5, on the owner's word ("too early to build").
 
-1. [x] (в коде исправлено, ждёт проверки владельцем) **Командная строка: при вводе кириллицы артефакты** (пример: «проверка» → «п▯ое…»; сбой после «в» и «а»). Причина (по коду, ещё не проверена на экране): в сборке с UTF-8 внутри (`DNUTF8`) `cmdline.pas` кладёт в строку байт `Event.CharCode` (cp866), а строка трактуется как UTF-8; байты вроде `E0` (а) и `A2` (в) вместе дают «допустимую» последовательность UTF-8 и рисуются мусором. Исправление: вставлять UTF-8-текст события (`Event.Text`), курсор, Backspace, Delete, прокрутку и клик мышью вести по символам, а не по байтам. Поле ввода «Make directory» уже исправлено (tv `TInputLine`, `InputLineOem`).
-2. [ ] **Проверить все остальные места ввода на ту же ошибку** (`Char(Event.CharCode)` в строках UTF-8): быстрый поиск в панели (`filepanel.pas`, `DoQuickSearch`), быстрый поиск в дереве (`tree.pas`), `dndlgs.pas`, калькулятор (`calcwin.pas`), горячие буквы меню (`menus.pas`), `paneldlgs.pas`, поиск и hex-правка в просмотрщике (`fviewer.pas`), `tetris.pas`, `phones.pas`, редактор (`editcore.pas` — там уже есть ветка для `Event.Text`). Каждое место — либо проверено и записано как «верно», либо исправлено. Проверено по коду: быстрый поиск панели и дерева (`DoQuickSearch` уже переводит байт кодовой страницы в UTF-8: `CpCharToUtf8`) — верно; командная строка — исправлена (п. 1). Осталось просмотреть: поле ввода калькулятора (`calcwin.pas:2054`), `dndlgs.pas:306–337`, `paneldlgs.pas:158–180`, поиск в просмотрщике (`fviewer.pas`), ввод фразы поиска в редакторе.
-3. [ ] **Цвета: календарь** — выбранный день (`80`, чёрный на тёмно-сером) и «сегодня+выбранный» (`89`) нечитаемы. Сделано в этом коммите: `3F` и `31` (как у выбранной кнопки). Остальное: **пройти по коду и палитрам** и привести к тому же виду все «активные» элементы, где остались другие оттенки: записи палитры `80/81` (193, 194, 196), `08` (224, 235, 242), синие фоны в хвосте `default.pal` (269…307), цвета, зашитые в код (`$1F`, `$70` и т.п. в `cmdline.pas` и др.). Правило: активный/выбранный элемент = `3F` (белый на бирюзовом, как фон пути в заголовке панели).
-4. [x] (в коде исправлено, ждёт проверки владельцем) **Архивы: в них не заходит** (Enter на zip и 7z — «ничего», в `PATH` программы есть). Причины, найденные воспроизведением в песочнице (`ARC=1 tools/dn-linux-try.py`): (а) **`TView.ClearEvent` стирал код клавиши** — `InfoPtr` перекрыл `KeyCode`, когда в `TEvent` добавились поля win32-режима; Enter на архиве проверяет клавишу после очистки события (исправлено в `tv`, тест в `t_views`); (б) подписи 7z, IS3, ZOO сравнивались как `LongInt = $AFBC7A37` — в FPC такая константа положительная и сравнение всегда ложно (исправлено в `archdet.pas`, `archiver.pas`, `fmtzoo.pas`, `fmtzip.pas`); (в) вывод 7-Zip 9.x+ начинается с блока свойств со строкой `--`, разбор оглавления принимал её за разделитель таблицы (`fmt7z.pas`); (г) имя программы по умолчанию `7Z` — на Linux регистр важен: `7z` (`fmt7z.pas`); (д) командная строка уходила в оболочку с путями DN (`C:\tmp\…`, оболочка съедала обратные косые) — `DNRun.CmdToOs` переводит пути (тест `t_dnrun`); временный файл оглавления открывался по пути DN — `SysOsPath` (`fmt7z`, `fmtain`, `fmtuc2`); (е) вызовы архиваторов самим DN (`ExecStringRR` с RR = False) не должны ждать Enter: пауза «Process ended» только при коде ≠ 0 (`DNRun.QuietRun`).
-4a. [x] (частично) **Архивы на Linux, продолжение**: дефолты Unix для zip/unzip (Info-ZIP), `rar`, `tar`, `7z` по far2l multiarc; Windows PKZIP/RAR/TAR. Class: `fmt*.pas` + drive `override`; PTY Enter на `aaa.zip`/`aaa.7z` показывает `inside.txt`. Дополнительно: `Destroy; Fail` → `Fail` в `TArcDrive`/`TArvidDrive`. Отдельный class-only AV: Enter на неисполняемый файл (`cmExecFile` / `ansistr_to_shortstr`) — не путать с входом в zip. F3/F5 extract/add ещё не в acceptance.
-4b. [x] **ZIP: кодировка однобайтных имён/комментариев** (listing decode landed; gaps in docs/ZIP-CHARSET.md) (уточнение владельца 2026-10-05). Логика **1:1 с точностью до бага** с [unxed/zipcharset](https://github.com/unxed/zipcharset) (эвристики ZIP + Unicode extra `0x7075`/`0x6375`) и [unxed/localecp](https://github.com/unxed/localecp) (OEM/ANSI по локали хоста). Не «улучшать» эвристики. Определение кодировки по локали — вынести в **отдельный переиспользуемый субпроект** (чтобы могли пользоваться и другие); поверх него — слой как у `zipcharset` для `fmtzip`. Спека: `docs/ZIP-CHARSET.md`.
-4c. [~] **Матрица архивов: вложенные и типовые форматы + автотесты** (владелец 2026-10-05).
-   **Сделано 2026-10-05:** `.tgz`/`.tar.gz` Enter+листинг на Unix (`fmttgz`: gunzip +
-   tar headers; GNU `tar` в defaults); фикстуры `tools/gen-archive-fixtures.py`; PTY
-   Enter/leave `tools/dn-linux-archives.py` (zip/7z/tar/tgz/tar.gz). **Осталось:**
-   F3/F4/F5 из архива (без зависания), peers (`.tar.bz2`/`.tar.xz`, zip-in-zip),
-   проводка в CI. Спека: `docs/ARCHIVE-MATRIX.md`.
-5. [x] (в коде исправлено, ждёт проверки владельцем) **«Change language» (смена языка) не работает**: вместо смены языка на экране терминала повторяется «[ Process ended (000): Press Enter ]» после приглашения оболочки (то есть DN запускает внешний процесс с пустой командой, три раза подряд); язык не меняется. Скриншот владельца 2026-10-04 08:36. Нужно: найти в коде, что вызывает пункт меню (команда смены языка, `dnutil.pas`/`mainapp.pas`/`setups.pas`), почему он идёт в `ExecCommand`/запуск оболочки, и исправить. Причина: `ExecString('', '')` (в оригинале — перезапуск через загрузчик DN.COM) на Linux запускает оболочку с пустой командой. Теперь `cmRestart` и смена языка выставляют `DNRun.RestartPending` и завершают DN (`EndModal(cmQuit)`: рабочий стол сохраняется как при выходе), `dn.pas` после остановки вызывает `DNRun.RestartSelf` (Unix: `execve` той же программы с теми же параметрами; Windows и DOS: `ExecuteProcess`, старый процесс ждёт и заканчивается после нового). Проверить смену языка на трёх языках (английский, русский, украинский) и сохранение выбора в `dn.ini`.
-6. [x] (tv `tvvtrun.pas`) После «[ Process ended (…): Press Enter ]» нет перевода строки — добавлен.
-7. [ ] **Дистрибутив**: пересобрать `dist/` (все цели + dos-utf8) из чистого клона после пунктов 1–5, закоммитить, запушить.
-8. [x] Версия «2.20 alpha»; в окне «О программе» строки `Build <хэш>` и `Compiled <дата>` (без скобок) — сделано (`f2a8892`).
-9. [x] Заметка компилятора `macro.pas(210,5) Note: Local variable "Error" not used` — убрана лишняя переменная.
-10. [x] Активные поля диалогов, которые были синими (выделенный текст поля ввода, стрелка истории, элементы списка, полоса прокрутки) — бирюзовые `3F`, как кнопка (`f2a8892`; оттенки подобраны по скриншоту, с эталонами не сверены).
+1. [x] (fixed in code, awaiting owner verification) **Command line: artifacts when typing Cyrillic** (example: Russian "proverka" → garbled "p<box>oe…"; break after "v" and "a"). Cause (from code, not yet verified on screen): in a build with UTF-8 inside (`DNUTF8`) `cmdline.pas` puts byte `Event.CharCode` (cp866) into the string, and the string is treated as UTF-8; bytes like `E0` (a) and `A2` (v) together form a "valid" UTF-8 sequence and draw as garbage. Fix: insert the event's UTF-8 text (`Event.Text`); drive cursor, Backspace, Delete, scroll, and mouse click by characters, not bytes. The "Make directory" input field is already fixed (tv `TInputLine`, `InputLineOem`).
+2. [ ] **Check all other input sites for the same bug** (`Char(Event.CharCode)` in UTF-8 strings): panel quick search (`filepanel.pas`, `DoQuickSearch`), tree quick search (`tree.pas`), `dndlgs.pas`, calculator (`calcwin.pas`), menu hot letters (`menus.pas`), `paneldlgs.pas`, search and hex edit in the viewer (`fviewer.pas`), `tetris.pas`, `phones.pas`, editor (`editcore.pas` — already has a branch for `Event.Text`). Each site — either verified and recorded as "correct", or fixed. Verified by code: panel and tree quick search (`DoQuickSearch` already converts a code-page byte to UTF-8: `CpCharToUtf8`) — correct; command line — fixed (item 1). Still to review: calculator input field (`calcwin.pas:2054`), `dndlgs.pas:306–337`, `paneldlgs.pas:158–180`, viewer search (`fviewer.pas`), editor search-phrase input.
+3. [ ] **Colors: calendar** — selected day (`80`, black on dark gray) and "today+selected" (`89`) are unreadable. Done in this commit: `3F` and `31` (like a selected button). Rest: **walk the code and palettes** and bring all "active" elements that still have other shades to the same look: palette entries `80/81` (193, 194, 196), `08` (224, 235, 242), blue backgrounds in the `default.pal` tail (269…307), colors hard-coded in code (`$1F`, `$70`, etc. in `cmdline.pas` and others). Rule: active/selected element = `3F` (white on teal, like the path background in the panel header).
+4. [x] (fixed in code, awaiting owner verification) **Archives: cannot enter them** (Enter on zip and 7z — "nothing"; programs are on `PATH`). Causes found by sandbox reproduction (`ARC=1 tools/dn-linux-try.py`): (a) **`TView.ClearEvent` erased the key code** — `InfoPtr` overwrote `KeyCode` when win32-mode fields were added to `TEvent`; Enter on an archive checks the key after clearing the event (fixed in `tv`, test in `t_views`); (b) 7z, IS3, ZOO signatures compared as `LongInt = $AFBC7A37` — in FPC such a constant is positive and the comparison is always false (fixed in `archdet.pas`, `archiver.pas`, `fmtzoo.pas`, `fmtzip.pas`); (c) 7-Zip 9.x+ output starts with a properties block containing the string `--`; listing parse took it for a table separator (`fmt7z.pas`); (d) default program name `7Z` — on Linux case matters: `7z` (`fmt7z.pas`); (e) the command line went to the shell with DN paths (`C:\tmp\…`, the shell ate backslashes) — `DNRun.CmdToOs` converts paths (test `t_dnrun`); listing temp file was opened by a DN path — `SysOsPath` (`fmt7z`, `fmtain`, `fmtuc2`); (f) archiver calls by DN itself (`ExecStringRR` with RR = False) must not wait for Enter: "Process ended" pause only when exit code ≠ 0 (`DNRun.QuietRun`).
+4a. [x] (partial) **Archives on Linux, continued**: Unix defaults for zip/unzip (Info-ZIP), `rar`, `tar`, `7z` per far2l multiarc; Windows PKZIP/RAR/TAR. Class: `fmt*.pas` + drive `override`; PTY Enter on `aaa.zip`/`aaa.7z` shows `inside.txt`. Additionally: `Destroy; Fail` → `Fail` in `TArcDrive`/`TArvidDrive`. Separate class-only AV: Enter on a non-executable file (`cmExecFile` / `ansistr_to_shortstr`) — do not confuse with entering a zip. F3/F5 extract/add not yet in acceptance.
+4b. [x] **ZIP: encoding of single-byte names/comments** (listing decode landed; gaps in docs/ZIP-CHARSET.md) (owner clarification 2026-10-05). Logic **1:1 including bugs** with [unxed/zipcharset](https://github.com/unxed/zipcharset) (ZIP heuristics + Unicode extra `0x7075`/`0x6375`) and [unxed/localecp](https://github.com/unxed/localecp) (OEM/ANSI by host locale). Do not "improve" the heuristics. Locale encoding detection — extract into a **separate reusable subproject** (so others can use it too); on top of it — a layer like `zipcharset` for `fmtzip`. Spec: `docs/ZIP-CHARSET.md`.
+4c. [~] **Archive matrix: nested and typical formats + automated tests** (owner 2026-10-05).
+   **Done 2026-10-05:** `.tgz`/`.tar.gz` Enter+listing on Unix (`fmttgz`: gunzip +
+   tar headers; GNU `tar` in defaults); fixtures `tools/gen-archive-fixtures.py`; PTY
+   Enter/leave `tools/dn-linux-archives.py` (zip/7z/tar/tgz/tar.gz). **Remaining:**
+   F3/F4/F5 from archive (without hang), peers (`.tar.bz2`/`.tar.xz`, zip-in-zip),
+   CI wiring. Spec: `docs/ARCHIVE-MATRIX.md`.
+5. [x] (fixed in code, awaiting owner verification) **"Change language" does not work**: instead of changing the language, the terminal screen repeats "[ Process ended (000): Press Enter ]" after the shell prompt (i.e. DN launches an external process with an empty command, three times in a row); language does not change. Owner screenshot 2026-10-04 08:36. Need: find in code what the menu item calls (language-change command, `dnutil.pas`/`mainapp.pas`/`setups.pas`), why it goes into `ExecCommand`/shell launch, and fix. Cause: `ExecString('', '')` (in the original — restart via DN.COM loader) on Linux launches a shell with an empty command. Now `cmRestart` and language change set `DNRun.RestartPending` and quit DN (`EndModal(cmQuit)`: desktop is saved as on exit); after stop `dn.pas` calls `DNRun.RestartSelf` (Unix: `execve` of the same program with the same arguments; Windows and DOS: `ExecuteProcess`, old process waits and ends after the new one). Verify language change on three languages (English, Russian, Ukrainian) and that the choice is saved in `dn.ini`.
+6. [x] (tv `tvvtrun.pas`) After "[ Process ended (…): Press Enter ]" there is no newline — added.
+7. [ ] **Distribution**: rebuild `dist/` (all targets + dos-utf8) from a clean clone after items 1–5, commit, push.
+8. [x] Version "2.20 alpha"; in the About box, lines `Build <hash>` and `Compiled <date>` (without brackets) — done (`f2a8892`).
+9. [x] Compiler note `macro.pas(210,5) Note: Local variable "Error" not used` — removed unused variable.
+10. [x] Active dialog fields that were blue (selected input-field text, history arrow, list items, scrollbar) — teal `3F`, like a button (`f2a8892`; shades chosen from a screenshot, not compared to references).
 
-## Жёсткий гейт class-migration и что после (владелец, 2026-10-05)
+## Hard class-migration gate and what comes after (owner, 2026-10-05)
 
-**Сейчас (пока гейт OPEN):** чинить class-сборку. Компаратор — последняя **объектная** vs последняя **классовая** ревизия DN (не `dist/`). Прогон **всех сценариев всех функций**; сравнение **побитово по клеткам**: глиф, цвет текста, цвет фона, атрибуты, курсор, статус процесса, побочные эффекты. Не совпало → гейт не пройден → чинить, дальше не идём. Спека: `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`, сводка `CLASS-MIGRATION.md`, статус `docs/CLASS-MIGRATION-STATUS.md`.
+**Now (while the gate is OPEN):** fix the class build. Comparator — latest **object** vs latest **class** DN revision (not `dist/`). Run **all scenarios of all functions**; compare **cell-by-cell bitwise**: glyph, text color, background color, attributes, cursor, process status, side effects. Mismatch → gate not passed → fix; do not go further. Spec: `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`, summary `CLASS-MIGRATION.md`, status `docs/CLASS-MIGRATION-STATUS.md`.
 
-**Только после полного PASS гейта** (порядок зафиксирован, не переставлять), см. `docs/POST-CLASS-WORK.md`:
+**Only after a full PASS of the gate** (order fixed, do not reorder), see `docs/POST-CLASS-WORK.md`:
 
-1. **Английский:** русские комментарии; документация; пользовательские строки и хардкод.
-2. **Рефакторинг** читаемости и сопровождаемости — **сначала** сформулировать и зафиксировать критерии завершения, потом рефакторить.
-3. **Платформозависимый код** — отделить и корректно оформить (Linux / DOS / Windows).
-4. **Тесты** — расширить покрытие до минимально приличного уровня, в т.ч. спецификой Linux, DOS, Windows.
+1. **English:** Russian comments; documentation; user-facing strings and hardcode.
+2. **Refactoring** for readability and maintainability — **first** formulate and fix completion criteria, then refactor.
+3. **Platform-dependent code** — separate and document correctly (Linux / DOS / Windows).
+4. **Tests** — expand coverage to a minimally decent level, including Linux, DOS, Windows specifics.
 
-Прочее, что уже записано отдельно: `dn/TODO-later.md` (Save setup на DOS, граница UTF-8 без провайдера, far2l: картинки и перетаскивание, Kitty: флаги 4/16, ключи dn.cfg и профиль пользователя, цвет строки ввода `9f` против чёрного в эталонах).
+Other items already recorded separately: `dn/TODO-later.md` (Save setup on DOS, UTF-8 boundary without a provider, far2l: pictures and drag-and-drop, Kitty: flags 4/16, dn.cfg keys and user profile, input-line color `9f` vs black in references).
