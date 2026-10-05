@@ -60,7 +60,7 @@ uses
   
   fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, fmttar,
   fmtzxz, fmtqrk, fmtain, fmtchz, fmthap, fmtis3, fmtsqz,
-  fmtuc2, fmtufa, fmtzoo, fmttgz, fmt7z,  fmtbz2,
+  fmtuc2, fmtufa, fmtzoo, fmttgz, fmt7z,  fmtbz2, fmtxz,
   
   
   Arvid,
@@ -151,6 +151,8 @@ RAINArchiver : TStreamRec = (ObjType: otAINArchiver; VmtLink: 0; Load: nil; Stor
 RS7ZArchiver : TStreamRec = (ObjType: otS7ZArchiver; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     { Arc_BZ2 }
 RBZ2Archiver : TStreamRec = (ObjType: otBZ2Archiver; VmtLink: 0; Load: nil; Store: nil; Next: nil);
+    { Arc_XZ }
+RXZArchiver : TStreamRec = (ObjType: otXZArchiver; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     
     { Archiver }
 RARJArchiver : TStreamRec = (ObjType: otARJArchiver; VmtLink: 0; Load: nil; Store: nil; Next: nil);
@@ -389,6 +391,7 @@ procedure RegisterAll;
     RegisterType(RAINArchiver);
     RegisterType(RS7ZArchiver);
     RegisterType(RBZ2Archiver);
+    RegisterType(RXZArchiver);
     RegisterType(RARJArchiver);
     RegisterType(RFileInfo);
     RegisterType(RArcDrive);
@@ -848,6 +851,16 @@ end;
 procedure Store_RBZ2Archiver(P: TStreamable; S: TStream);
 begin
   fmtbz2.TBZ2Archive(P).Store(S);
+end;
+
+function Build_RXZArchiver(S: TStream): TStreamable;
+begin
+  Result := TStreamable(fmtxz.TXZArchive.Load(S));
+end;
+
+procedure Store_RXZArchiver(P: TStreamable; S: TStream);
+begin
+  fmtxz.TXZArchive(P).Store(S);
 end;
 
 function Build_RARJArchiver(S: TStream): TStreamable;
@@ -2302,6 +2315,11 @@ begin
   RBZ2Archiver.Load := @Build_RBZ2Archiver;
 
   RBZ2Archiver.Store := @Store_RBZ2Archiver;
+
+  RXZArchiver.VmtLink := PtrUInt(System.TClass(fmtxz.TXZArchive));
+  RXZArchiver.Load := @Build_RXZArchiver;
+
+  RXZArchiver.Store := @Store_RXZArchiver;
 
   RARJArchiver.VmtLink := PtrUInt(System.TClass(Archiver.TARJArchive));
   RARJArchiver.Load := @Build_RARJArchiver;

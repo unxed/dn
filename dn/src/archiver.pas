@@ -203,10 +203,12 @@ const
   sig7Z  {: TStr4} = '7Z:';
   arcBZ2 = 26;
   sigBZ2 {: TStr4} = 'BZ2:';
+  arcXZ = 27;
+  sigXZ {: TStr4} = 'XZ:';
   
   arcUNK = 255; {UNKNOWN Archiver}
 
-  NumSupportedArchs = 27;
+  NumSupportedArchs = 28;
 
   PPacker: PChar = 'Packer';
   PUnPacker: PChar = 'Unpacker';
