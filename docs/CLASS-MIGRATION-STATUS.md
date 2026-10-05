@@ -13,7 +13,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Core accept | **32/32 PASS** |
 | Full matrix | **Delegated to GitHub Actions** (`.github/workflows/dn-accept.yml`, 12 shards) |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
-| Known object crash | File menu item 10 blanks object baseline (class alive) — xfail |
+| Known object crash | ♦ menu Trashcan on/off (`cmHideShowTools`, was `menu_0_10`): object Invalid pointer operation; class OK — excluded from accept grid |
 | Classic palette | Class on `CColor` |
 
 ## Working agreement
