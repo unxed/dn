@@ -74,14 +74,14 @@ type
     Items: array[1..10] of PMenuItem; // прямые ссылки в меню
     constructor Create(var Bounds: TRect; AStrings: PSItem);
     procedure BuildMenu(AStrings: PSItem);
-    destructor Done; virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    procedure Draw; virtual;
-    function GetPalette: TPalette; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function DataSize: Integer; virtual;
-    procedure GetData(var Rec); virtual;
-    procedure SetData(var Rec); virtual;
+    destructor Destroy; override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    procedure Draw; override;
+    function GetPalette: TPalette; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    function DataSize: Integer; override;
+    procedure GetData(var Rec); override;
+    procedure SetData(var Rec); override;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;
@@ -93,8 +93,8 @@ type
     constructor Create(R: TRect; AInputLine: TInputLine);
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Draw; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
     end;
 
 
@@ -105,16 +105,16 @@ type
     constructor Create(var Bounds: TRect; const AText: String;
         AParamCount: AInt);
     constructor Load(var S: TStream);
-    function DataSize: Integer; virtual;
-    procedure GetText(var S: String); virtual;
-    procedure SetData(var Rec); virtual;
+    function DataSize: Integer; override;
+    procedure GetText(var S: String); override;
+    procedure SetData(var Rec); override;
     procedure Store(var S: TStream);
     end;
 
   TBookmark = class(TLabel)
     {` Закладка страницы блокнота со страницами TNotepas }
     constructor Create(var Bounds: TRect; AText: String; ALink: TView);
-    procedure Draw; virtual;
+    procedure Draw; override;
     procedure FocusLink; virtual;
     end;
 
@@ -122,16 +122,16 @@ type
     Bookmark: TBookmark;
     PrevPage: TPage;
       { циклический список }
-    procedure InitFrame; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function GetPalette: TPalette; virtual;
+    procedure InitFrame; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    function GetPalette: TPalette; override;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;
 
   TPageFrame = class(TView)
-    function GetPalette: TPalette; virtual;
-    procedure Draw; virtual;
+    function GetPalette: TPalette; override;
+    procedure Draw; override;
     end;
 
     {<dialogs.001>}
@@ -143,11 +143,11 @@ type
     constructor Create(var Bounds: TRect; ATitle: TTitleStr;
       ABookmarkStart: integer);
     function NewPage(const ATitle: String): TPage;
-    procedure InitFrame; virtual;
+    procedure InitFrame; override;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
-    procedure GetData(var Rec); virtual;
-    procedure SetData(var Rec); virtual;
+    procedure GetData(var Rec); override;
+    procedure SetData(var Rec); override;
     end;
 
   TNotepadFrame = class(TFrame)
@@ -417,7 +417,7 @@ procedure TComboBox.BuildMenu(AStrings: PSItem);
     end;
   end;
 
-destructor TComboBox.Done;
+destructor TComboBox.Destroy;
   begin
   DisposeMenu(Menu);
   inherited Destroy;
