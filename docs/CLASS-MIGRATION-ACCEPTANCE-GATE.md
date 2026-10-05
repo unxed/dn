@@ -37,14 +37,17 @@ repository-wide search found other `PString(Collection.At(...))` patterns in
 `diskinfo.pas`, and `filefind.pas`; they require type-by-type review before
 any fix is accepted.
 
-The user additionally reported two panel-rendering discrepancies, which are
-recorded as user-observed and still require reproduction against the exact
-build pair: closing About on first launch consistently leaves the dialog
-image over the panels; and on some clean starts panels are initially absent
-until opening a menu triggers redraw. The latter is intermittent. The source
-search found redraw/draw entry points in `mainapp.pas`, `panelroot.pas`,
-`paneldlgs.pas`, and `menus.pas`; it has not isolated the responsible path.
-These reports are hard failures, not accepted normalizations.
+The startup About residue is now reproduced against the exact pair above, with
+one fresh run per build: after the same Escape key, the object build removed
+the dialog and restored the panels (0/1 residue trials), while the class build
+left the About image visible over the panels (1/1). This confirms the reported
+regression but is only an initial reproduction, not a complete regression
+test. The other reported discrepancy—panels sometimes absent on clean start
+until a menu triggers redraw—remains intermittent and has not yet been
+reproduced in a controlled trial series. A source search found redraw/draw
+entry points in `mainapp.pas`, `panelroot.pas`, `paneldlgs.pas`, and `menus.pas`;
+it has not isolated the responsible path. Both are hard failures, not accepted
+normalizations.
 
 Startup/panel regressions to reproduce and fix:
 
@@ -55,7 +58,9 @@ Startup/panel regressions to reproduce and fix:
   the screen before opening any menu, and require zero missing-panel trials.
 * For the About residue, capture the screen immediately before opening About,
   while About is open, and immediately after closing it; all prior panel cells
-  must be restored on every trial.
+  must be restored on every trial. Initial evidence: exact-pair fresh-start
+  probe, object `0/1` residue trials, class `1/1`; expand to a repeatable
+  regression series and complete full-cell comparisons.
 
 The acceptance harness itself previously mishandled `CSI ? 1049 h/l`: it
 did not save and restore the primary-screen cells, attributes, and cursor.
