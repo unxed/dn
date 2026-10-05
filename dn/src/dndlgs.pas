@@ -172,7 +172,8 @@ constructor TParamText.Load(var S: TStream);
 
 function TParamText.DataSize: Integer;
   begin
-  Result := ParamCount * SizeOf(LongInt);
+  { FormatStr consumes pointer-sized parameter slots on 64-bit builds. }
+  Result := ParamCount * SizeOf(PtrInt);
   end;
 
 procedure TParamText.GetText(var S: String);
