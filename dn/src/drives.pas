@@ -65,12 +65,12 @@ const
 type
   TDrive = class;
 
-{`2 Вспомогательный объект, вставляемый в файловую панель.
-  Содержит особенности, специфические для типа панели (диск,
-  архив и т.п. Используется, в частности, для отрисовки строк
-  файловой панели.`}
+{`2 Helper object inserted into a file panel.
+  Holds features specific to the panel type (disk,
+  archive, etc.). Used in particular for drawing
+  file panel rows.`}
   TDrive = class(TStreamable)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is in the plugin model; change with extreme care!}
     Panel: Pointer{TFilePanelRoot};
     Prev: TDrive;
     DriveType: TDriveType;
@@ -79,8 +79,8 @@ type
     NoMemory: Boolean;
     SizeX: LongInt;
     ColAllowed: TFileColAllowed;
-      {` Зависит от типа панели; введен на всякий случай для
-      облегчения будущего ввода новых типов панелей. `}
+      {` Depends on the panel type; introduced just in case to
+      make future new panel types easier. `}
     
     constructor Create(ADrive: Byte; AOwner: Pointer);
     constructor Load(S: TStream);
@@ -103,21 +103,21 @@ type
     function GetRealName: String; virtual;
     function GetInternalName: String; virtual;
     procedure GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word); virtual;
-     {` Сформировать в буфере B элемент файловой панели для файла
-      P в цвете С с Draw-кодом разделителя колонок Sc (цвет
-      разделителя может отличаться от цвета файла).
-        Этот метод работает для всех стандартных классов
-      панелей. А виртуальным он сделан на всякий случай. `}
+     {` Form in buffer B a file panel item for file
+      P in color C with Draw-code of column separator Sc (the
+      separator color may differ from the file color).
+        This method works for all standard panel
+      classes. It is virtual just in case. `}
     procedure MakeTop(var S: String); virtual;
-     {` Сформировать (раскрашенную) строку заголовков колонок.
-     Этот метод действительно перекрывается в разных классах
-     панелей. `}
+     {` Form a (colored) column header string.
+     This method is actually overridden in different panel
+     classes. `}
     procedure RereadDirectory(S: String); virtual; {DataCompBoy}
     procedure GetDown(var B: TScreenCell; C: Word; P: PFileRec;
         var LFN_inCurFileLine: Boolean); virtual;
-      {` Сформировать строку текущего файла для подвала
-      в буфере B цветом С. LFN_inCurFileLine показывает,
-      показано ли при этом длинное имя, притом полностью. `}
+      {` Form the current-file footer string
+      in buffer B with color C. LFN_inCurFileLine shows
+      whether the long name was shown, and fully. `}
     procedure HandleCommand(Command: Word; InfoPtr: Pointer); virtual;
     procedure GetDirInfo(var B: TDiskInfoRec); virtual;
     function GetRealDir: String; virtual;
@@ -134,7 +134,7 @@ type
     procedure DrvFindFile(FC: TFilesCollection); virtual;
     procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
     function GetDriveLetter: Char; virtual;
-      {` Для выбора обозначения диска в линейке дисков и меню дисков `}
+      {` For choosing a drive letter in the drive line and drive menu `}
     end;
 
 procedure RereadDirectory(Dir: String);
@@ -149,7 +149,7 @@ uses
   Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
   Dialogs, FileFind, panelroot, Filediz, CmdLine
   , timeutil, Messages, dirwatch, Dos
-  , progress {для TWhileView}, DnIni, basics, strutil, fileutil
+  , progress {for TWhileView}, DnIni, basics, strutil, fileutil
   ;
 
 const
@@ -158,7 +158,7 @@ const
 type
   {-DataCompBoy-}
   PDesc = ^TDesc;
-    {`2 Элемент TDIZCol }
+    {`2 TDIZCol element }
   TDesc = record
     Name: String;
     DIZText: LongString;
@@ -168,9 +168,9 @@ type
   {-DataCompBoy-}
 
   TDIZCol = class;
-    {`2 Коллекция описаний из файла описаний. Используется для
-    быстрого поиска описаний по имени при входе в каталог.
-    Имена запоминаются в коллекции на верхнем регистре. }
+    {`2 Collection of descriptions from a description file. Used for
+    fast lookup of descriptions by name when entering a directory.
+    Names are stored in the collection in upper case. }
   TDIZCol = class(TSortedCollection)
     procedure FreeItem(P: Pointer); override;
     function Compare(P1, P2: Pointer): Integer; override;
@@ -191,7 +191,7 @@ procedure TDIZCol.FreeItem(P: Pointer);
   begin
   if P <> nil then
     begin
-    PDesc(P)^.DIZText := ''; // освободить строку
+    PDesc(P)^.DIZText := ''; // free the string
     Dispose(PDesc(P));
     end;
   end;
@@ -291,7 +291,7 @@ procedure TDrive.ChangeRoot;
     I: Word;
     B: Boolean;
   begin
-  {Cat: проверяем на сетевой путь}
+  {Cat: check for a network path}
   if CurDir[1] = '\' then
     begin
     B := False;
@@ -324,9 +324,9 @@ procedure TDrive.ChangeRoot;
 {-DataCompBoy-}
 
 function FormatSizeCol(P: PFileRec): String;
-  { Сформировать колонку размера. Это может быть либо
-  действительно размер, либо обозначение каталога,
-  если его размер неизвестен }
+  { Form the size column. This may be either
+  an actual size, or a directory designation
+  if its size is unknown }
   begin
   with P^ do
     begin
@@ -353,7 +353,7 @@ procedure TDrive.MakeTop(var S: String);
     if not ColAllowed[i] then
       Flags := Flags and not (1 shl Ord(i));
     end;
-  { Теперь Flags содержит только допустимые для данного типа панели биты }
+  { Now Flags contains only bits allowed for this panel type }
   LFNLen := TFilePanelRoot(Panel).CalcNameLength;
   if not TFilePanelRoot(Panel).LFNLonger250 then
     begin
@@ -375,7 +375,7 @@ procedure TDrive.MakeTop(var S: String);
   else
     S := '';
   if Flags and psShowSize <> 0 then
-    S := S+GetString(dlTopSize); //! для dtArcDrive надо бы dlTopOriginal
+    S := S+GetString(dlTopSize); //! for dtArcDrive should be dlTopOriginal
   if Flags and psShowPacked <> 0 then
     S := S+GetString(dlTopPacked);
   if Flags and psShowRatio <> 0 then
@@ -456,7 +456,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     if not ColAllowed[i] then
       Flags := Flags and not (1 shl Ord(i));
     end;
-  { Теперь Flags содержит только допустимые для данного типа панели биты }
+  { Now Flags contains only bits allowed for this panel type }
 
   TFilePanelRoot(Panel).FormatName(P, NameString, NameLen);
   if P^.Selected then
@@ -517,7 +517,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
   FormatDateTime(psShowLADate, psShowLATime, P^.FDateLAcc, P^.YrLAcc);
 
   if TFilePanelRoot(Panel).LFNLonger250 then
-    begin { длинное имя в конце подавляет вывод комментария и пути }
+    begin { a long name at the end suppresses comment and path output }
     MoveCStr(PCellArray(@B)^[X], NameString, C);
     Exit;
     end;
@@ -601,7 +601,7 @@ procedure TDrive.lChDir(ADir: String);
     ClrIO;
     NeedAbort := True;
     ATestDir := lFExpand(ATestDir);
-    {Cat: проверяем на сетевой путь}
+    {Cat: check for a network path}
     if  (Length(ATestDir) > 2) and (ATestDir[1] = '\')
          and (ATestDir[2] = '\')
     then
@@ -715,20 +715,20 @@ procedure TDrive.UseFile(P: PFileRec; Command: Word);
   end;
 {-DataCompBoy-}
 
-{ Подготовка сортированной коллекции описаний, откуда описания будет
-удобно находить при считывании каталога. Используется ReadFileList}
+{ Prepare a sorted collection of descriptions from which descriptions will
+be easy to find while reading the directory. Used by ReadFileList}
 var
   Descriptions: TDIZCol;
   PD: PDesc;
   IgnoreDiz: Boolean;
 
 function DizNameProc(const N: string; TextStart: Integer): Boolean;
-  { Для ReadFileList. Занесение элемента коллекции и первой строки }
+  { For ReadFileList. Insert a collection element and the first line }
   var
     I: Integer;
   begin
   IgnoreDiz := Descriptions.Search(@N, I);
-    // Повторное описание игнорируем
+    // Ignore duplicate description
   if not IgnoreDiz then
     begin
     New(PD);
@@ -739,8 +739,8 @@ function DizNameProc(const N: string; TextStart: Integer): Boolean;
   end;
 
 procedure DizLineProc;
-  { Для ReadFileList. Добавление очередной строки прямо в элемент
-    коллекции}
+  { For ReadFileList. Append the next line directly into the
+    collection element}
   const
     CrLf: string[2] = #13#10;
   begin
@@ -749,13 +749,13 @@ procedure DizLineProc;
   end;
 
 function DizEndProc: Boolean;
-  { Для ReadFileList. Ничего делать не надо}
+  { For ReadFileList. Nothing to do}
   begin
   Result := False;
   end;
 
 procedure PrepareDIZ(
-  { Чтение контейнера описаний и создание коллекции описаний }
+  { Read the description container and create the description collection }
     const CurDir: String;
     var Container: String);
   begin
@@ -797,8 +797,8 @@ procedure TossDescriptions(
         P^.DIZ^.Container := PDizContainer;
         P^.DIZ^.Line := PD^.Line;
 //        PD^.DIZText := '';
-  {AnsiString память не тратят при копировании, поэтому можно не спешить
-  с освобождением и подождать до освобождения элемента коллекции }
+  {AnsiString does not spend memory on copying, so we need not hurry
+  to free and can wait until the collection element is freed }
         Break;
         end
       end;
@@ -833,7 +833,7 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): TFi
     MemReq: LongInt;
     MAvail: LongInt;
     SearchAttr: word;
-    PName: PString; //AK155 В SR имя для сравнения с маской
+    PName: PString; //AK155 In SR the name for mask comparison
   begin
   ClrIO;
   PName := @SR.FullName;
@@ -841,7 +841,7 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): TFi
   if (Panel <> nil) and
      ((TFilePanelRoot(Panel).PanSetup.Show.ColumnsMask
        and psLFN_InColumns) = 0)
-  then // в панели короткие имена
+  then // short names in the panel
     PName := @SR.SR.Name;
   
 
@@ -854,9 +854,9 @@ function TDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): TFi
   Files := TFilesCollection.Create($10, $20);
   Files.Panel := Panel;
 
-  {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
-  {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
-  {    доступный изначально объём                                              }
+  {JO: first determine available memory once, then along the way}
+  {    keep track of how memory requirements grow and whether they exceeded  }
+  {    the initially available amount                                              }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
 
@@ -935,7 +935,7 @@ procedure TDrive.GetDown(var B: TScreenCell; C: Word; P: PFileRec; var LFN_inCur
     S2 := ''
   else
     begin
-    NameWidht := 13 + CountryInfo.TimeFmt; // уместить 12-часовое время
+    NameWidht := 13 + CountryInfo.TimeFmt; // fit 12-hour time
     
     uLfn := TFilePanelRoot(Panel).PanSetup.Show.
       ColumnsMask and psLFN_InColumns <> 0;
@@ -1119,8 +1119,8 @@ function TDrive.OpenDirectory(const Dir: String;
     PI: TView;
     PDrv: TDrive;
     DirsToProcess: TCollection;
-      { несортированная коллекция, элементы которой создаются при помощи
-      NewStr и после использования переносятся в Dirs }
+      { unsorted collection whose elements are created with
+      NewStr and after use are moved into Dirs }
     Dirs: TStringCollection;
     Files: TFilesCollection;
     P: PString;
@@ -1129,13 +1129,13 @@ function TDrive.OpenDirectory(const Dir: String;
     MAvail: LongInt;
 
   procedure AddDirectory(S: String);
-    { добавить каталог в список для обработки }
+    { add directory to the processing list }
     begin
     if MAvail <= MemReq then
       Exit;
     MakeSlash(S);
     DirsToProcess.Insert(NewStr(S));
-    Inc(MemReq, SizeOf(ShortString)); //почему 255, а не что-то+length(S)?
+    Inc(MemReq, SizeOf(ShortString)); //why 255, and not something+length(S)?
     end;
 
   procedure ReadDir(Dr: PString);
@@ -1197,9 +1197,9 @@ function TDrive.OpenDirectory(const Dir: String;
 
   PI := WriteMsg(GetString(dlReadingList));
   Files := TFilesCollection.Create($10, $10);
-  {JO: сначала один pаз опpеделяем объём доступной памяти, а затем по ходу дела}
-  {    подсчтитываем насколько тpебования памяти pастут и не пpевысили ли они  }
-  {    доступный изначально объём                                              }
+  {JO: first determine available memory once, then along the way}
+  {    keep track of how memory requirements grow and whether they exceeded  }
+  {    the initially available amount                                              }
   MemReq := LowMemSize;
   MAvail := MaxAvail;
   AddDirectory(lFExpand(Dir));
@@ -1220,16 +1220,16 @@ function TDrive.OpenDirectory(const Dir: String;
     I := DirsToProcess.Count-1;
     end;
   PI.Free;
-  // JO: здесь сортировка не нужна, т.к. она делается в TFindDrive.GetDirectory
-  //     и в результате мы получаем сортировку дважды
+  // JO: sorting is not needed here, since it is done in TFindDrive.GetDirectory
+  //     and as a result we would sort twice
   {Files.Sort;}
-//используем '><' в качестве пpизнака ветви
+//use '><' as the branch flag
   PDrv := TFindDrive.Create('><'+Dir, Dirs, Files);
   PDrv.NoMemory := MAvail <= MemReq;
   OpenDirectory := PDrv;
   end { TDrive.OpenDirectory };
 
-{-DataCompBoy-} {JO - 31-03-2006 - сделал виртуальным методом TDrive}
+{-DataCompBoy-} {JO - 31-03-2006 - made it a virtual method of TDrive}
 procedure TDrive.DrvFindFile(FC: TFilesCollection);
   var
     PInfo: TWhileView;
@@ -1242,7 +1242,7 @@ procedure TDrive.DrvFindFile(FC: TFilesCollection);
 
   if ExecResource(dlgFileFind, FindRec) = cmCancel then
     Exit;
-  ConfigModified := True; {AK155 Не понял. При чём тут конфиг?!!}
+  ConfigModified := True; {AK155 Don't get it. What does the config have to do with it?!!}
   DelLeft(FindRec.Mask);
   DelRight(FindRec.Mask);
   if FindRec.Mask = '' then

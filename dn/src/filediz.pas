@@ -67,37 +67,37 @@ function GetDizPath(const Path: String; PreferedName: String): String;
 function CalcDPath(P: PDiz; Owen: PString): String;
 
 procedure ExportDiz(
-{` Внесение нового описания вместо старого, если оно было.
-  Из прежнего контейнера удаляются описания к именами FR^.FlName
-  и к OldName:, если оно задано.}
+{` Insert a new description in place of the old one, if any.
+  Descriptions for names FR^.FlName
+  and OldName:, if given, are removed from the previous container.}
   const OldName: PFlName;
-{` Имя, которое было раньше; используется при переименовании `}
+{` The name that was before; used when renaming `}
   const NewLongName: string;
-{` Данные о новом файле. Короткое имя может быть недостоверным.
-  Путь (Owner) используется только если не задан TargetPath.
-  Файл с таким длинным именем должен существовать (уже или ещё).
-  FR^.DIZ содержит то, что, собственно, нужно занести.
+{` Data about the new file. The short name may be unreliable.
+  Path (Owner) is used only if TargetPath is not set.
+  A file with this long name must exist (already or still).
+  FR^.DIZ holds what actually needs to be written.
 `}
   var NewDiz: PDiz;
   TargetPath: string
-{` Каталог, где находятся файл и контейнер описаний; если '', то
-  используется FR^.Owner `}
+{` Directory where the file and description container are; if '', then
+  FR^.Owner is used `}
 );
 {`}
 
 procedure DeleteDiz(FR: PFileRec);
 procedure GetDiz(FR: PFileRec);
- {` Обеспечить наличие DIZ, если это возможно `}
+ {` Ensure DIZ is present if possible `}
 procedure SetDescription(PF: PFileRec; DizOwner: String);
 function DizFirstLine(DIZ: PDiz): String;
-  {` Вернуть первую строку текста описания.
-   Если DIZ=nil - результат пустой `}
+  {` Return the first line of description text.
+   If DIZ=nil - result is empty `}
 
 function DizMaxLine(DIZ: PDiz): String;
-  {` Вернуть строку текста описания максимально возможной длины.
-  Многострочное описание дочитывать, заменяя CRLF и начальные
-  пробелы строк одним пробелом.
-   Если DIZ=nil - результат пустой `}
+  {` Return description text of the maximum possible length.
+  Read multi-line description further, replacing CRLF and leading
+  spaces of lines with a single space.
+   If DIZ=nil - result is empty `}
 
 function OpenFileList(const AConatainerPath: string): Boolean;
 procedure ReadFileList(ProcessDizName: TDizNameProc;
@@ -160,14 +160,14 @@ function GetDizPath(const Path: String; PreferedName: String): String;
   repeat
     if Result = '' then
       begin
-      Result := PreferedName; // файл придётся создавать
+      Result := PreferedName; // the file will have to be created
       Exit;
       end;
     Result := MakeNormName(Path, Result);
     if PreferedName = '' then
-      PreferedName := Result; // теперь это полный путь
+      PreferedName := Result; // now this is a full path
     if ExistFile(Result) then
-      Exit; // контейнер найден
+      Exit; // container found
     Inc(I);
     Result := GetPossibleDizOwner(I);
   until False;
@@ -231,8 +231,8 @@ procedure SetDescription(PF: PFileRec; DizOwner: String);
   if  (PF^.DIZ <> nil) then
     NewDIZ := PF^.DIZ^.DIZText;
   K := PosChar(#13, NewDIZ);
-  {JO: проверяем на наличие дополнительных строк.
-   Если есть - редактируем только первую строку.}
+  {JO: check for additional lines.
+   If any - edit only the first line.}
   if K = 0 then
     K := 255;
   S := Copy(NewDiz, 1, K-1);
@@ -256,7 +256,7 @@ procedure SetDescription(PF: PFileRec; DizOwner: String);
   end { SetDescription };
 {-DataCompBoy-}
 
-  { прочитать непустую строку (хвостовые пробелы отбрасываются)}
+  { read a non-empty line (trailing spaces are trimmed)}
 function ReadNextS: Boolean;
   var
     l: Integer;
@@ -310,15 +310,15 @@ procedure ReadFileList(ProcessDizName: TDizNameProc;
   begin
   while True do
     begin
-    { Обработка нового описания. LastDizLine уже прочитана.}
+    { Process the new description. LastDizLine is already read.}
     if (LastDizLine = '') or (LastDizLine[1] in [' ', #9, '>']) then
       goto ReadNextLine;
-    { игнорируем остаток
-         предыдущего многострочного описания }
+    { ignore the remainder
+         of the previous multi-line description }
 
     LS := Length(LastDizLine);
     if LastDizLine[1] = '"' then
-      {имя в кавычках - ищем вторую кавычку }
+      {name in quotes - look for the second quote }
       begin
       NameEnd := 0;
       for j := 2 to LS do
@@ -330,23 +330,23 @@ procedure ReadFileList(ProcessDizName: TDizNameProc;
       if NameEnd <= 2 then
         goto ReadNextLine;
       if NameEnd = LS then
-        goto ReadNextLine; { пустое описание никого не интересует }
+        goto ReadNextLine; { empty description is of no interest }
       N := Copy(LastDizLine, 2, NameEnd-2);
       end
     else
-      {имя не в кавычках - ищем пробел или Tab. При этом
-        благодаря DelRight после него что-то должно быть }
+      {name not in quotes - look for space or Tab. Then
+        thanks to DelRight there must be something after it }
       begin
       NameEnd := Pos(' ', LastDizLine);
       j := Pos(#9, LastDizLine);
       if  (j <> 0) and (j < NameEnd) then
-        NameEnd := j // заведомо не 0
+        NameEnd := j // definitely not 0
       else
         begin
         if NameEnd = 0 then
-          NameEnd := j; // может быть и 0
+          NameEnd := j; // may also be 0
         if NameEnd = 0 then
-          goto ReadNextLine; { пустое описание никого не интересует }
+          goto ReadNextLine; { empty description is of no interest }
         j := NameEnd;
         end;
       N := Copy(LastDizLine, 1, NameEnd-1);
@@ -354,11 +354,11 @@ procedure ReadFileList(ProcessDizName: TDizNameProc;
     UpStr(N);
     while (J <= Length(LastDizLine)) and (LastDizLine[J] = ' ') do
       inc(J);
-    ProcessDizName(N, J); {LastDizLine доступна}
+    ProcessDizName(N, J); {LastDizLine is available}
 
-    {AK155: Дочитываем многострочное описание.
-Признаком дополнительной строки является побел или Tab в начале,
-а также '>' в начале (uselfn.bbs в формате AllFix).}
+    {AK155: Read the rest of a multi-line description.
+An additional line is marked by a leading space or Tab,
+or by '>' at the start (uselfn.bbs in AllFix format).}
     while True do
       begin
       if not ReadNextS then
@@ -389,7 +389,7 @@ var
   GetDizText: LongString;
 
 function GetDizNameProc(const N: string; TextStart: Integer): Boolean;
-  { Для ReadFileList. Сравнение имени и приём первой строки }
+  { For ReadFileList. Compare name and accept the first line }
   var
     I: Integer;
     F: TUseLFN;
@@ -405,8 +405,8 @@ function GetDizNameProc(const N: string; TextStart: Integer): Boolean;
   end;
 
 procedure GetDizLineProc;
-  { Для ReadFileList. Добавление очередной строки прямо в элемент
-    коллекции}
+  { For ReadFileList. Append the next line directly into the
+    collection element}
   const
     CrLf: array[0..1] of char = #13#10;
   begin
@@ -415,7 +415,7 @@ procedure GetDizLineProc;
   end;
 
 function GetDizEndProc: Boolean;
-  { Для ReadFileList. Формирование признака завершения }
+  { For ReadFileList. Form the end marker }
   begin
   Result := GetDizFound;
   end;
@@ -426,9 +426,9 @@ procedure GetDiz(FR: PFileRec);
     Container: String;
     GetDizFull1: array[1..SizeOf(ShortString)+SizeOf(TShortName)] of Char;
     GetDizName1: TFlName absolute GetDizFull1;
-     { разместить Dummy после TFlName, как в TFileRec, в данном случае
-     нельзя, так как SmartLink попросту выбросит эту переменную, к которой
-     нет обращений. А в таком варианте (с absolute) память резервируется.}
+     { placing Dummy after TFlName as in TFileRec is not possible
+     here, because SmartLink would simply discard this variable which
+     has no references. With this variant (absolute) memory is reserved.}
   begin
   if FR^.DIZ <> nil then
     Exit;
@@ -451,10 +451,10 @@ procedure GetDiz(FR: PFileRec);
     end;
   end { GetDiz };
 
-{ Обновление описания файла в конейнере }
+{ Update the file description in the container }
 
 procedure SaveDizLineProc;
-  { Для ReadFileList }
+  { For ReadFileList }
   begin
   if not IgnoreDiz then
     begin
@@ -464,8 +464,8 @@ procedure SaveDizLineProc;
   end;
 
 function SaveDizNameProc(const N: string; TextStart: Integer): Boolean;
-  { Для ReadFileList. Сравнение имени; для данного имени пропуск описания,
-    для прочих - вывод первой строки }
+  { For ReadFileList. Compare name; for this name skip the description,
+    for others output the first line }
   var
     I: Integer;
     F: TUseLFN;
@@ -486,7 +486,7 @@ function SaveDizNameProc(const N: string; TextStart: Integer): Boolean;
   end;
 
 function SaveDizEndProc: Boolean;
-  { Для ReadFileList. Продолжать копирование }
+  { For ReadFileList. Continue copying }
   begin
   Result := False;
   IgnoreDiz := False;
@@ -498,8 +498,8 @@ procedure ExportDiz(
   var NewDiz: PDiz;
   TargetPath: String
   );
-{ Если в прежнем контейнере описание нашлось, то в новом оно
-будет под таким же (длинным или коротким) именем }
+{ If a description was found in the previous container, in the new one it
+will be under the same (long or short) name }
   var
     F: TUseLFN;
     ContainerFullName: String;
@@ -519,16 +519,16 @@ procedure ExportDiz(
   ContainerFullName := '';
   if NewDiz^.Container <> nil then
     ContainerFullName := GetName(NewDiz^.Container^);
-  { сейчас ContainerFullName - только имя (или пусто) }
+  { now ContainerFullName is only a name (or empty) }
   ContainerFullName := GetDizPath(TargetPath, ContainerFullName);
-  { А теперь - полный путь }
+  { And now - the full path }
   Assign(NewContainerFile, SysOsPath(TargetPath+'$DN'+ItoS(DNNumber)+'$.DIZ'));
   Rewrite(NewContainerFile);
   if IOResult <> 0 then
     begin
-    Exit; //! как-то не очень... Ошибку бы сообщить. И далее аналогично.
+    Exit; //! not great... Should report an error. And similarly below.}
     end;
-  LName := True; // по умолчанию - по длинным именам
+  LName := True; // by default - by long names
   CopyShortString(UpStrg(NewLongName), GetDizName1[True]);
 
   if (FMSetup.Options and fmoDescrByShortNames) <> 0 then
@@ -550,8 +550,8 @@ procedure ExportDiz(
     OldContainerAttr := Archive;
   if NewDiz^.DizText <> '' then
     begin
-    { Длинное имя восстановить, какое есть,
-     короткое имя - на нижний регистр }
+    { Restore the long name as is,
+     short name - to lower case }
     CopyShortString(NewLongName, GetDizName1[True]);
     
     LowStr(GetDizName1[False]);
@@ -575,7 +575,7 @@ procedure ExportDiz(
 
 procedure DeleteDiz(FR: PFileRec);
   begin
-  if (FR <> nil) {Бывает для подкаталога при F6 на каталоге}
+  if (FR <> nil) {Happens for a subdirectory on F6 on a directory}
     and (FR^.DIZ <> nil)
     and (FR^.DIZ^.DizText <> '')
   then
@@ -592,9 +592,9 @@ function CalcDPath(P: PDiz; Owen: PString): String;
     SR: lSearchRec;
   begin
   if  (P = nil) or (P^.Container = nil) then
-    {! Интересно, а может ли быть P^.Container=nil?
-     Такое бывает в arvidavt и arvidtdr, но они, мне кажется,
-     не могут обратиться к CalcDPath, так что это условие лишнее }
+    {! Interesting, can P^.Container be nil?
+     That happens in arvidavt and arvidtdr, but they, I think,
+     cannot call CalcDPath, so this condition is redundant }
     begin
     for I := 1 to 128 do
       begin

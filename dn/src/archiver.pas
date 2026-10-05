@@ -69,10 +69,10 @@ type
     Select: Boolean;
     Attr: AWord;
     USize, PSize: Int64;
-      {AK155: размер в архиве - такой, какой он есть,
-        и он может быть большим, даже если текущая плаформа
-        не поддерживает больших файлов. Поэтому тут надо
-        использовать именно Int64, а не TFileSize }
+      {AK155: size in the archive is as it is,
+        and it may be large even if the current platform
+        does not support large files. So here we must
+        use Int64 specifically, not TFileSize }
     Date: LongInt;
     end;
 
@@ -80,7 +80,7 @@ type
   TFInfo = record
     FName: String; {DataCompBoy}
     USize, PSize: Int64;
-      {AK155: см. выше }
+      {AK155: see above }
     Date: LongInt;
     Attr: Byte;
     Last: Byte;
@@ -264,9 +264,9 @@ procedure MakeArchive(S: String; Files: TCollection;
      MoveMode, AddToExisting: Boolean; Owner: Pointer);
 procedure UnarchiveFiles(const FName: String);
 procedure SkipSFX;
-  {` Устанавливает ArcPos на начало собственно архива.
-  Перед вызовом ArcFile^ должен быть уже открыт и позиционирован
-  на начало. После вызова позиция в ArcFile^ не определена `}
+  {` Sets ArcPos to the start of the archive proper.
+  Before the call ArcFile^ must already be open and positioned
+  at the beginning. After the call the position in ArcFile^ is undefined `}
 function _Cardinal(L: LongInt): Real; {piwamoto}
 function FromOct(S: String): TFileSize; {fixed by piwamoto}
 function CheckForSpaces(S: String): Boolean; { Flash }
@@ -283,9 +283,9 @@ uses
   ArcView, FileCopy, HistList, {FStorage,}Menus, ArchDet,
    {UserSavr,}DnIni, Messages,
   {JO}VideoMan, DnExec 
-  {/JO:  добавил для функции ArcExec}
-  , Eraser {JO: для разархивирования через временный подкаталог}
-  , UserMenu {JO: для скрывания панелей при разархивировании }
+  {/JO:  added for the ArcExec function}
+  , Eraser {JO: for extracting via a temporary subdirectory}
+  , UserMenu {JO: for hiding panels while extracting }
   , Dos, Drivers, profile, Tree
   , osdep;
 
@@ -607,7 +607,7 @@ function TARJArchive.GetSign: TStr4;
 procedure TARJArchive.GetFile;
   const
 
-    {  побитовые флаги для поля ARJ_Flags заголовка }
+    {  bit flags for the ARJ_Flags header field }
     GARBLED_FLAG = $01; // indicates passworded file
     OLD_SECURED_FLAG = $02;
     VOLUME_FLAG = $04; // continued file to next volume (file is split)
@@ -770,7 +770,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       begin
       ClrIO;
       {piwamoto.src.begin}
-      {JO:  используем символ #$14 для временного разделения имён файлов}
+      {JO:  use character #$14 for temporary separation of file names}
       if not ((PF^.Attr and Directory <> 0) and (D.Options and 1 = 0))
       then
         if B then
@@ -789,7 +789,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
         else
           S1 := GetShortRelPath(MakeNormName(SS, SR.SR.Name));
         
-        {JO:  используем символ #$14 для временного разделения имён файлов}
+        {JO:  use character #$14 for temporary separation of file names}
         if  (SR.SR.Attr and (Directory +VolumeID ) =
              0)
         then
@@ -853,7 +853,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
         S1 := GetShortRelPath(MakeNormName(PF^.Owner^, PF^.FlName[True]))
           
           ;
-      {JO:  используем символ #$14 для временного разделения имён файлов}
+      {JO:  use character #$14 for temporary separation of file names}
       if PF^.Attr and Directory = 0
       then
         if B then
@@ -866,11 +866,11 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       else if Arc.PutDirs then
         PutDir(S1)
       else {JO}
-        {для пустых каталогов надо обязательно подставлять имя без маски, иначе}
+        {for empty directories must supply the name without a mask, otherwise}
         begin
-        {архиваторы их игнорируют; для непустых каталогов такая подстановка приводит}
+        {archivators ignore them; for non-empty directories such substitution leads}
         ClrIO;
-        {с некоторыми архиваторами (ZIP) к тому, что файлы попадают в архив дважды}
+        {with some archivators (ZIP) to files being put into the archive twice}
         lFindFirst(MakeNormName(S1, x_x), AnyFileDir, SR);
         if IsDummyDir( SR.SR.Name )
         then
@@ -915,8 +915,8 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       end;
     end;
 
-  {JO: ввёл функцию ArcExec по аналогии с TArcDrive.Exec в Arcview для разбора}
-  {    длинной командной строки                                               }
+  {JO: introduced ArcExec by analogy with TArcDrive.Exec in Arcview for parsing}
+  {    a long command line                                               }
   function ArcExec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
     var
       S: String;
@@ -947,12 +947,12 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       Msg(dlArcMsg8, @L, mfOKButton or mfError);
       end;
 
-    {AK155 20/12/2001 Если под Win32 пытаться в отладчике прошагать
-  эту функцию, то получается полная блокировка клавиатуры и мыши
-  сразу на входе (даже с begin сойти не получается).
-  Этот эффект исчезает, если параметр AnsiString заменить на String.
-  Под OS/2 все шагается без проблем. Интересно, чей это глюк -
-  виндового отладчика или виндовой RTL? Хорошо, если первое. }
+    {AK155 20/12/2001 If under Win32 you try to step through
+  this function in the debugger, you get a full keyboard and mouse lock
+  right at entry (you cannot even step off begin).
+  This effect disappears if the AnsiString parameter is replaced with String.
+  Under OS/2 everything steps fine. Interesting whose bug this is -
+  the Windows debugger or the Windows RTL? Hopefully the former. }
     begin { ArcExec }
     ArcExec := True;
     S := Prg+' '+Cmd;
@@ -964,7 +964,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
         CmdLineLim := 120;
         ListLineLim := CmdLineLim-Length(Prg+Cmd)-7;
         CmdLineOK := False;
-        SS1 := Lst; {для перестраховки}
+        SS1 := Lst; {for safety}
         I1 := 1;
         repeat
           ClrIO;
@@ -999,7 +999,7 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
             end;
           for J := 1 to Length(SS1) do
             if SS1[J] = #$14 then
-              SS1[J] := #$20; {JO: заменяем временный символ на пробелы}
+              SS1[J] := #$20; {JO: replace the temporary character with spaces}
           Writeln(T.T, '@'+S+' '+SS1);
         until CmdLineOK;
         Write(T.T, '@del '+EX);
@@ -1016,27 +1016,27 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
     DoneSysError;
     DoneEvents;
     DoneVideo;
-    {AK155 Под OS/2, во-первых, PATH обычно не умещается
-      в 255 символов, во-вторых, нет проблем с памятью,
-      в третьих архиватор может оказаться ДОСовым.
-      Так что пускай PATH просматривает cmd.exe, а мы не
-      будем заниматься самодеятельностью }
-    {AK155, дописано позже, чем комментарий к OS/2.
-      Под Win32 тоже не следует заниматься самодеятельностью.
-      Во-первых, мы отдаем консоль в каком-то не таком состоянии,
-      так что консольный rar не может вводить с клавиатуры.
-      Во-вторых, стОило ли работать с ansistring, чтобы потом вызвать
+    {AK155 Under OS/2, firstly, PATH usually does not fit
+      in 255 characters; secondly, there is no memory problem;
+      thirdly the archivator may be a DOS one.
+      So let cmd.exe look through PATH, and we will not
+      do it ourselves }
+    {AK155, written later than the OS/2 comment.
+      Under Win32 we also should not do it ourselves.
+      Firstly, we leave the console in some odd state,
+      so console rar cannot read from the keyboard.
+      Secondly, was it worth working with ansistring only to then call
       Dos.Exec?}
     if B then
       begin
-      {JO: разбираем ту часть командной строки, которая содержит список файлов    }
-      {    на куски удобоваримой для командного процессора длины                  }
+      {JO: split the part of the command line that contains the file list    }
+      {    into chunks of a length digestible for the command processor                  }
       
       CmdLineLim := 95;
       
       ListLineLim := CmdLineLim-Length(Prg+Cmd)-7;
       CmdLineOK := False;
-      SS1 := Lst; {для перестраховки}
+      SS1 := Lst; {for safety}
       repeat
         if Length(Lst) >= ListLineLim then
           begin
@@ -1055,12 +1055,12 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
           end;
         for J := 1 to Length(SS1) do
           if SS1[J] = #$14 then
-            SS1[J] := #$20; {JO: заменяем временный символ на пробелы}
+            SS1[J] := #$20; {JO: replace the temporary character with spaces}
         DelDoubles('  ', S);
         AnsiDelDoubles('  ', SS1);
-        {JO: AnsiExec - процедура из модуля DNExec , которая }
-        {    используется вместо DOS.Exec и в качестве       }
-        {    коммандлайна использует строку типа Ansistring  }
+        {JO: AnsiExec - procedure from the DNExec unit, which }
+        {    is used instead of DOS.Exec and as       }
+        {    the command line uses an Ansistring  }
         SwapVectors;
         AnsiExec(GetEnv('COMSPEC'), '/c '+S+' '+SS1+' ');
         DE := DosError;
@@ -1090,9 +1090,9 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
       else {case}
         StdMsg8;
     end {case};
-//JO: подсовываем в качестве InfoPtr заведомо несуществующий путь
-//    из одного символа #22, чтобы не перечитывались панели производные
-//    от TFindDrive, т.к. в них после этой процедуры ничего не изменится
+//JO: pass as InfoPtr a deliberately nonexistent path
+//    of a single character #22, so that panels derived
+//    from TFindDrive are not reread, since nothing changes in them after this procedure
     GlobalMessage(evCommand, cmPanelReread, @NotAPath);
     GlobalMessage(evCommand, cmRereadInfo, nil);
     
@@ -1299,14 +1299,14 @@ procedure UnarchiveFiles(const FName: String);
   if  (Length(DT.S) > 3) and (DT.S[Length(DT.S)] <> '\') then
     DT.S := DT.S+'\';
   {JO}
-  // пpовеpяем, находится ли диск в списке дисков, на котоpые надо
-  // pазаpхивиpовать не чеpез вpеменный подкаталог (по умолчанию A: и B:)
+  // check whether the drive is in the list of drives onto which we
+  // extract without a temporary subdirectory (by default A: and B:)
   if  (DT.S <> '') and (Length(DT.S) >= 2) then
     begin
     if DT.S[2] = ':' then
       DDr := UpCase(DT.S[1])
     else
-      DDr := #1; {любой символ не входящий в 'A'..'Z'}
+      DDr := #1; {any character not in 'A'..'Z'}
     end
   else
     begin
@@ -1342,7 +1342,7 @@ TryAgain:
     ExtrDir := ExtrDir+'\';
 
   {JO}
-  // проверяем, содержит ли каталог назначения файлы
+  // check whether the destination directory contains files
   DosError := 0;
   lFindFirst(MakeNormName(ExtrDir, x_x), AnyFileDir, SR); {JO}
   if IsDummyDir(SR.FullName) then
@@ -1350,8 +1350,8 @@ TryAgain:
   if IsDummyDir(SR.FullName) then
     lFindNext(SR);
   lFindClose(SR);
-  // для разархивирования на дискеты и тестирования не используем
-  // временный подкаталог
+  // for extracting to floppies and for testing we do not use
+  // a temporary subdirectory
   if  ( (DT.W and 8) = 0) or ((DT.W and 2) <> 0) or (DosError <> 0) then
     begin
     TempExtrDir := ExtrDir;
@@ -1359,7 +1359,7 @@ TryAgain:
     end
   else
     begin
-    { даём имя временному подкаталогу в каталоге назначения}
+    { give a name to the temporary subdirectory in the destination directory}
     DNN := DNNumber;
     while True do
       begin
@@ -1375,8 +1375,8 @@ TryAgain:
     end;
   Inhr := CreateDirInheritance(ExtrDir, True);
   CreateDirInheritance(TempExtrDir, False);
-  //JO: если каталог назначения не создался (напpимеp, если диск доступен
-  //    только на чтение), то нет смысла и вызывать аpхиватоp
+  //JO: if the destination directory was not created (for example, if the disk is
+  //    read-only), there is no point in calling the archivator
   if not PathExist(TempExtrDir) then
     Exit;
   {/JO}
@@ -1446,8 +1446,8 @@ TryAgain:
     ExecStringRR(S, '', False);
     end
   else
-//JO: поскольку в DPMI32 веpсии ExecStringRR выполняется
-//    с выгpузкой DN/2, то вместо неё делаем AnsiExec
+//JO: since in the DPMI32 version ExecStringRR runs
+//    with DN/2 unloaded, we do AnsiExec instead
     begin
     DoneSysError;
     DoneEvents;
@@ -1467,12 +1467,12 @@ TryAgain:
     goto ex
   else
     begin
-    { перекидываем файлы из временного подкаталога в каталог назначения}
+    { move files from the temporary subdirectory to the destination directory}
     PV := TUserWindow.Create;
     Desktop.Insert(PV);
     CopyDirContent(TempExtrDir, ExtrDir, True, (DT.W and 4 <> 0));
     PV.Free;
-    { удаляем временный каталог со всем, что в нём осталось}
+    { delete the temporary directory with everything left in it}
     SetLength(TempExtrDir, Length(TempExtrDir)-1);
     S := GetPath(TempExtrDir);
     FRT := NewFileRec(GetName(TempExtrDir),
@@ -1486,7 +1486,7 @@ TryAgain:
     OldConfirms := Confirms;
     Confirms := 0;
     LFN.lChDir(S);
-     {освобождаем каталог}
+     {free the directory}
     if ActiveDir[2] = ':' then
       ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
     
@@ -1505,7 +1505,7 @@ ex:
   AType.Free; AType := nil;
   if  (not TempDirUsed) or (Inhr > 0) then
     begin
-    ExtrDir := '>' + ExtrDir; //признак перечитывания подкаталогов в ветви
+    ExtrDir := '>' + ExtrDir; // flag to reread subdirectories in a branch
     GlobalMessage(evCommand, cmPanelReread, @ExtrDir);
     GlobalMessage(evCommand, cmRereadInfo, nil);
     end;

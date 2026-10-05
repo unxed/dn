@@ -39,10 +39,10 @@ type
   PCReal = ^CReal;
 
 function Evalue(const s: String; CCV: Pointer): CReal;
-{Параметр CCV равен nil для простого вычислителя. При вызове
-из электронной таблицы - это TCalcView. В этом случае
-к функциям добавлятся SUM и MUL, а к операндам
-добавляются имена ячеек }
+{CCV is nil for a simple calculator. When called
+from a spreadsheet it is a TCalcView. In that case
+SUM and MUL are added to the functions, and cell
+names are added to the operands }
 
 function GetErrOp(var x: Integer): String;
 
@@ -55,15 +55,16 @@ var
 
 var
   MultR: String;
-    { Множители степеней 10 в национальном обозначении,
-    по 3 символа, первый в тройке - пробел. Должны позиционно
-    соответствовать следующим международным обозначениям и,
-    соответственно, степеням 10:
-          ' d  с  m  u  p  n  f  da k  M  G  T  P ';
+    { Power-of-10 multipliers in national notation,
+    3 characters each, first of the trio is a space. Must align
+    positionally with the following international designations and,
+    accordingly, powers of 10:
+          ' d  c  m  u  p  n  f  da k  M  G  T  P ';
            -1 -2 -3 -6 -9 -12-15 1  3  6  9  12 15
-      Например, для русского эта строка долна иметь вид:
-          ' д  с  м  мк п  н  ф  да к  М  Г  Т  П '
-    Если национальные обозначения не нужны, оставить MultR=''.
+      For example, for Russian this string should look like
+      (using national letters for deci/centi/milli/micro/...):
+          ' <d> <c> <m> <mk> <p> <n> <f> <da> <k> <M> <G> <T> <P> '
+    If national designations are not needed, leave MultR=''.
     }
 
 implementation
@@ -82,7 +83,7 @@ var
   CurCalcView: TCalcView;
 
 
-  { Число в указанной системе счичления }
+  { Number in the given radix }
 function GetV(S: String; Base: Integer; var Value: CReal): Boolean;
   const
     HexDigits = '0123456789ABCDEFG';
@@ -97,7 +98,7 @@ function GetV(S: String; Base: Integer; var Value: CReal): Boolean;
     Exit;
   RR := 0;
   UpStr(S);
-  {целая часть}
+  {integer part}
   for j := 1 to Length(S) do
     begin
     c := System.UpCase(S[j]);
@@ -115,7 +116,7 @@ function GetV(S: String; Base: Integer; var Value: CReal): Boolean;
     Result := True;
     Exit
     end;
-  {дробная часть}
+  {fractional part}
   FractValue := 1;
   for j := 1 to Length(S) do
     begin
@@ -129,14 +130,14 @@ function GetV(S: String; Base: Integer; var Value: CReal): Boolean;
   Result := True;
   end { GetV };
 
-{ После десятичного числа без пробела может быть десятичный множитель
-(всякие кило- микро- и т.п.). Множители распознаются международные
-(u=микро) и русские. Множитель 'гекто' отсутствует, так как его
-международное обозначение 'h' конфликтует с ассемблерной формой
-шестнадцатеричного числа }
+{ After a decimal number with no space there may be a decimal multiplier
+(kilo-, micro-, etc.). International multipliers are recognized
+(u=micro) as well as Russian ones. The 'hecto' multiplier is absent because its
+international designation 'h' conflicts with the assembler form
+of a hexadecimal number }
 function GetDec(S: String; var Value: CReal): Boolean;
   const
-    MultE = ' d  с  m  u  p  n  f  da k  M  G  T  P ';
+    MultE = ' d  c  m  u  p  n  f  da k  M  G  T  P ';
     //       -1 -2 -3 -6 -9 -12-15 1  3  6  9  12 15
     MultV: array[1..Length(MultE) div 3] of CReal =
       (1e-1, 1e-2, 1e-3, 1e-6, 1e-9, 1e-12, 1e-15
@@ -197,33 +198,33 @@ function GetValue(S: String; var Value: CReal): Boolean;
 var
   Operand: CReal;
   SymType, PrevSymType: Integer;
-  CurrOp: Integer; { текущая операция (для ошибок)}
-  T: Byte; { индекс необработанного символа строки выражения }
+  CurrOp: Integer; { current operation (for errors)}
+  T: Byte; { index of the unprocessed character in the expression string }
 
 const
   Delimiters: String[50] = '()*/+-=^<>:#,!|\&%~ '#3;
-  { Лексические разделители. }
+  { Lexical separators. }
 
   MaxOp = 127;
-  { приоритеты в тексте}
-  { приоритеты в стеке }
+  { priorities in the text}
+  { priorities on the stack }
   prio1: String[MaxOp] = '19244556733323444553333559';
-  { приоритеты в тексте}
+  { priorities in the text}
   prio2: String[MaxOp] = '00 44556733323444553333558';
-  { приоритеты в стеке }
+  { priorities on the stack }
   OpChars = #3'()+-*/^:=<>,#|\&%#4<<<<<<~'#1#2;
-  { #1 представляет унарный минус, #2 - унарный плюс,
-      #3 - конец выражения; Повторные '<' - это двухсимвольные оп.
-      #4 - div (это единственная бинарная операция, имеющая
-      только текстовое изображение. То, что его номер непосредственно
-      предшествует номерам двухсимвольных операций, ниже используется.
-      Если понадобится добавлять ещё операции с только текстовыми
-      обозначениями, их вставлять вслед за div, коррекутируя Op2Base
-      и не забывая вставить символ в строки приоритетов.)
+  { #1 is unary minus, #2 - unary plus,
+      #3 - end of expression; Repeated '<' are two-character ops.
+      #4 - div (the only binary operation that has
+      a text-only representation. The fact that its number immediately
+      precedes the two-character operation numbers is used below.
+      If more text-only operations need to be added,
+      insert them after div, adjusting Op2Base
+      and remembering to insert a character into the priority strings.)
   }
 
   Op2Chars = '<>!';
-  Op2 = '>='#0'<='#0'<>'#0'!='#0'<<'#0'>>'; {двухсимвольные операции}
+  Op2 = '>='#0'<='#0'<>'#0'!='#0'<<'#0'>>'; {two-character operations}
   OpDiv = 19;
   Op2Base = OpDiv + 1;
   LetterBinOp = ' DIV OR  XOR AND MOD SHL SHR ';
@@ -442,7 +443,7 @@ procedure IfEv(var d: CReal; d2, d3: CReal);
 
 const
   FnMax = 52;
-  CalcBase = FnBase+FnMax; { довески от электронной таблицы }
+  CalcBase = FnBase+FnMax; { extras from the spreadsheet }
   FnTab: array[0..FnMax-1] of TFnDesc =
     (
       (n: 'SIN'; E: @SinEv; A: 1)
@@ -513,7 +514,7 @@ procedure ScanSym;
   SymType := 0;
   c := Expression[t0];
   if T = t0 then
-    begin {операция - разделитель}
+    begin {operation - separator}
     Inc(T);
     if Pos(c, Op2Chars) <> 0 then
       begin
@@ -530,11 +531,11 @@ procedure ScanSym;
     SymType := Pos(CalcSym, OpChars);
     end
   else if (c = '$') or ((c >= '0') and (c <= '9')) then
-    begin {число}
+    begin {number}
     if  (c <> '$') and (System.UpCase(Expression[T-1]) = 'E')
       and (Expression[T] in ['-', '+'])
     then
-      begin {похоже на число вида 5e-3}
+      begin {looks like a number of the form 5e-3}
       repeat
         Inc(T)
       until Pos(Expression[T], Delimiters) <> 0;
@@ -542,7 +543,7 @@ procedure ScanSym;
     CalcSym := {UpStrg(}Copy(Expression, t0, T-t0) {)};
     end
   else
-    begin {должна быть функция или буквенная операция вроде AND}
+    begin {must be a function or a letter operation like AND}
     CalcSym := UpStrg(Copy(Expression, t0, T-t0));
     i := Pos(' '+CalcSym+' ', LetterBinOp);
     if i <> 0 then
@@ -565,7 +566,7 @@ procedure ScanSym;
       with TCalcView(CurCalcView) do
         begin
         if Expression[T] = '(' then
-          begin { что-то вроде sum(a1:a30) в wkz}
+          begin { something like sum(a1:a30) in wkz}
           for i := T+1 to Length(Expression) do
             if Expression[i] = ')' then
               begin
@@ -597,16 +598,16 @@ procedure SetError(Id: TStrIdx);
   raise eMathError.Create('');
   end;
 
-{ Классический алгоритм с двумя стеками и двумя приоритетами }
+{ Classic algorithm with two stacks and two priorities }
 var
   DataStack: array[1..20] of CReal;
-  TDS: Integer; { указатель вершины }
+  TDS: Integer; { top-of-stack pointer }
   OpStack: array[1..20] of
   record
     Infix: Boolean;
     Op, PrefixCount, Pos: Integer
     end;
-  TOS: Integer; { указатель вершины }
+  TOS: Integer; { top-of-stack pointer }
   i: Integer;
 
 procedure RegisterOperand;forward;
@@ -618,10 +619,10 @@ procedure EvalPrefixOp;
   case CurrOp of
     FnBase-3: { ~ }
       DataStack[TDS] := not Round(DataStack[TDS]);
-    FnBase-2: {Унарный плюс}
+    FnBase-2: {Unary plus}
       begin
       end;
-    FnBase-1: {Унарный минус}
+    FnBase-1: {Unary minus}
       DataStack[TDS] := -DataStack[TDS];
     else {case}
       with FnTab[CurrOp-FnBase] do
@@ -629,7 +630,7 @@ procedure EvalPrefixOp;
         if TDS < A then
           SetError(dlNoOperand);
         case A of
-          {     0: не бывает }
+          {     0: never happens }
           1:
             FnEval(E)(DataStack[TDS]);
           2:
@@ -663,7 +664,7 @@ procedure RegisterOperand;
   SymType := 0;
   end;
 
-procedure ToInt; {возведение в небольшую целую степень }
+procedure ToInt; {raise to a small integer power }
   var
     N: Integer;
     R: CReal;
@@ -711,14 +712,14 @@ procedure EvalText;
     PrevSymType := SymType;
     ScanSym;
     if SymType = 0 then
-      begin { разобрать операнд и положить на стек данных }
+      begin { parse operand and push onto the data stack }
       Inc(TDS);
       if not GetValue(CalcSym, DataStack[TDS]) then
         SetError(dlWrongText);
       RegisterOperand;
       end
     else if (SymType = CalcBase) then
-      begin {положить на стек значение переменной}
+      begin {push variable value onto the stack}
       Inc(TDS);
       DataStack[TDS] := Res;
       RegisterOperand;
@@ -730,15 +731,15 @@ procedure EvalText;
       RegisterOperand;
       end
     else
-      begin { разобраться с операцией }
+      begin { handle the operation }
       if  (OpStack[TOS].PrefixCount > 0) then
-        { ожидается источник значения }
+        { a value source is expected }
         case SymType of
-          2: { выражение в скобках годится }
+          2: { parenthesized expression is OK }
             ;
-          4, 5: { превращаем в унарные плюс и минус }
+          4, 5: { turn into unary plus and minus }
             SymType := FnBase-6+SymType;
-          FnBase-3..MaxOp: { унарные операции и функции }
+          FnBase-3..MaxOp: { unary operations and functions }
             ;
           else {case}
             SetError(dlNoOperand);
@@ -749,8 +750,8 @@ procedure EvalText;
             SetError(dlMissingOperation);
         end { case };
       while prio1[SymType] <= prio2[OpStack[TOS].Op] do
-        { выполнять инфиксные операции со стека; префиксные и унарные
-        выполняются не тут, а в RegisterOperand }
+        { execute infix operations from the stack; prefix and unary
+        are not done here, but in RegisterOperand }
         begin
         CurrOp := OpStack[TOS].Op;
         CalcErrPos := OpStack[TOS].Pos;
@@ -781,7 +782,7 @@ procedure EvalText;
               Trunc(DataStack[TDS]);
             Dec(TDS);
             end;
-          8: {^ - возведение в степень }
+          8: {^ - exponentiation }
             begin
             if  (Abs(DataStack[TDS]) < $7FFFFFFF)
               and (Trunc(DataStack[TDS]) = DataStack[TDS])
@@ -791,7 +792,7 @@ procedure EvalText;
               DataStack[TDS-1] := Exp(ln(DataStack[TDS-1])*DataStack[TDS]);
             Dec(TDS);
             end;
-          9: { время }
+          9: { time }
             begin
             DataStack[TDS-1] := DataStack[TDS-1]*60+DataStack[TDS];
             Dec(TDS);
@@ -820,7 +821,7 @@ procedure EvalText;
               DataStack[TDS-1] := 0;
             Dec(TDS);
             end;
-          {13 ',' в стек не попадает }
+          {13 ',' does not go onto the stack }
           15: { |  or }
             begin
             DataStack[TDS-1] := Round(DataStack[TDS-1])
@@ -891,11 +892,11 @@ procedure EvalText;
         1:
           goto ExprEnd;
         3:
-          begin { закрывающую скобку сокращаем с открывающей }
+          begin { reduce closing parenthesis with opening one }
           if OpStack[TOS].Op <> 2 then
             SetError(dlMissingLeftBracket);
           Dec(TOS);
-          SymType := 0; { выр. в скобках - операнд }
+          SymType := 0; { parenthesized expr. - operand }
           RegisterOperand;
           end;
         13: { , }
@@ -908,7 +909,7 @@ procedure EvalText;
           Dec(OpStack[TOS-1].PrefixCount);
           end;
         else {case}
-          begin { положить операцию на стек }
+          begin { push operation onto the stack }
           Inc(TOS);
           with OpStack[TOS] do
             begin
@@ -932,9 +933,9 @@ ExprEnd:
     SetError(dlMissingRightBracket);
   Res := DataStack[1];
 
-  { Для extended +0 и -0 имеют разные представления, и -0 потом так
-и отображается, удивляя юзера. Вот на этот случай заменяем любой 0,
-на просто 0, который есть +0}
+  { For Extended, +0 and -0 have different representations, and -0 is then
+displayed as such, surprising the user. For that case we replace any 0
+with plain 0, which is +0}
   if Res = 0 then
     Res := 0;
 

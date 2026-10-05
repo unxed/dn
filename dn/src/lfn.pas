@@ -53,10 +53,10 @@
 {$AlignRec-}
 
 {Cat
-   05/12/2001 - попытка бороться с виндозной глюкофичей: запоминается текущий
-   каталог не для всех дисков, а только для текущего диска, что приводит к
-   различным мелким неприятностям; чтобы это пофиксить, при lChDir сохраняем
-   устанавливаемый путь в массиве, а при lGetDir - извлекаем оттуда
+   05/12/2001 - attempt to fight a Windows quirk: the current
+   directory is remembered not for all drives, but only for the current drive, which leads to
+   various minor annoyances; to fix this, on lChDir we save
+   the path being set in an array, and on lGetDir we take it from there
 }
 
 unit LFN;
@@ -64,7 +64,7 @@ unit LFN;
 interface
 
 uses
-  osdep, // см. комментарий в конце vpsysos2
+  osdep, // see comment at the end of vpsysos2
   Dos, Defines
   ;
 
@@ -170,12 +170,12 @@ procedure lTrueName(const Name: String; var S: String);
 procedure NameToNameZ(const Name: String; var NameZ: TNameZ);
 
 function GetShareEnd(const S: String): Integer;
-{` AK155 22-11-2003 Найти конец шары в пути. 0 - если это не UNC-путь `}
+{` AK155 22-11-2003 Find the end of the share in the path. 0 if this is not a UNC path `}
 
 function GetRootStart(const Path: String): Integer;
-{` Найти начало корня; например, для C:\DIR результат 3,
-для \\Server\Share\Dir результат 15. Для путей вроде '' или C: результат
-на 1 больше длины. `}
+{` Find the start of the root; e.g. for C:\DIR the result is 3,
+for \\Server\Share\Dir the result is 15. For paths like '' or C: the result
+is length plus 1. `}
 
 { Basic file operation routines. To use IO functions from standard units,
               specify lFile.F or lText.T }
@@ -209,47 +209,47 @@ procedure lSetTAttr(var T: lText; Attr: Word);
 procedure lMkDir(const Path: String);
 procedure lRmDir(const Path: String);
 procedure lChDir(Path: String);
-  {` Если указанный каталог существует, то перейти на него, то есть
-  присвоить его ActiveDir. Код ошибки реально формируется в FindFirst,
-  то есть находится в DosError. Для совместимости со стандартной
-  ChDir он дублируется также в InOutRes. `}
+  {` If the given directory exists, switch to it, i.e.
+  assign it to ActiveDir. The error code is actually formed in FindFirst,
+  i.e. it is in DosError. For compatibility with standard
+  ChDir it is also duplicated in InOutRes. `}
 procedure lGetDir(D: Byte; var Path: String);
 
 { Name expansion and splitting }
 function lFExpand(Path: String): String;
-  {` расширить Path относительно ActiveDir. Если в Path были
-  '/', то в результате им будут соответствовать '\'.
-  Всякие . и .. коректно удаляются, скажем, вместо C:\TEMP\$$$\..
-  будет C:\TEMP. '\' на конце - только в корне диска.`}
+  {` expand Path relative to ActiveDir. If Path had
+  '/', they become '\' in the result.
+  Dots . and .. are correctly removed; e.g. instead of C:\TEMP\$$$\..
+  you get C:\TEMP. Trailing '\' only at the drive root.`}
 procedure lFSplit(const Path: String; var Dir, Name, ext: String);
 
 
 const
   NoShortName: String[12] = #22#22#22#22#22#22#22#22'.'#22#22#22;
-  {JO, AK155: зачем нужны эти #22:
-  В виндах функции API FindFileFirst и FindFileNext отдают два имени
-файла: основное и альтернативное (короткое).
-  Под НТ возможна ненормальная (с моей точки зрения,
-по крайней мере) ситуация, когда для файла с длинным (не укладывающимся
-в 8.3) имением файла альтернатвное имя недоступно. Так бывает, если
-файловая система в принципе не поддерживает двухименности (HPFS), или
-если формирование коротких имен отключено (на NTFS и FAT32).
-  Тогда в режиме показа коротких имён мы будем иметь для таких файлов
-обрезанные как попало имена в панели, не соответствующие
-действительности. Для этого JO и придумал этот условный заменитель
-недоступного короткого имени, так как символ #22 заведомо не
-может быть в принципе в реальном имени файла. Так показывать в
-режиме коротких имён файлы, для которых доступно только длинное имя, -
-честнее, чем с обрезанным именем, под которым файл недоступен.
+  {JO, AK155: why these #22 are needed:
+  On Windows, FindFileFirst and FindFileNext API return two file
+names: primary and alternate (short).
+  Under NT an abnormal (from my point of view,
+at least) situation is possible when for a file with a long (not fitting
+8.3) name the alternate name is unavailable. That happens if
+the file system does not support dual names at all (HPFS), or
+if short-name generation is disabled (on NTFS and FAT32).
+  Then in short-name display mode we would show for such files
+arbitrarily truncated names in the panel that do not match
+reality. So JO invented this placeholder for an
+unavailable short name, since character #22 cannot
+appear in a real file name. Showing in
+short-name mode files that only have a long name this way is
+more honest than with a truncated name under which the file is inaccessible.
 }
   
 
-{Cat: Windows запоминает текущий каталог только для текущего диска;
-запоминание остальных текущих каталогов приходится брать на себя}
+{Cat: Windows remembers the current directory only for the current drive;
+remembering other current directories has to be done by us}
 var
   CurrentPaths: array[1..1+Byte('Z')-Byte('A')] of PathStr;
-  ActiveDir: String; // всегда с '\' в конце
-  CurrentRoot: String; // без '\' в конце; может быть шара
+  ActiveDir: String; // always with trailing '\'
+  CurrentRoot: String; // without trailing '\'; may be a share
   StartDir: String;
 
 implementation
@@ -355,7 +355,7 @@ procedure CorrectSearchRec(var R: lSearchRec);
   R.FullName := R.SR.Name;
   
   
-  {JO: CorrectSearchRec вызывается только в отсутствие Win32 LFN API}
+  {JO: CorrectSearchRec is called only when Win32 LFN API is absent}
   R.SR.CreationTime := 0;
   R.SR.LastAccessTime := 0;
   {/JO}
@@ -999,8 +999,8 @@ procedure lFindNext(var R: lSearchRec);
 
   end else lWIN95FindNext(R);
 
-  {JO: ошибка 49 в оси зарезервирована; мы её будем использовать для}
-  {    отлова дупов на HPFS}
+  {JO: error 49 is reserved in the OS; we will use it for}
+  {    catching duplicates on HPFS}
   
   end;
 
@@ -1043,7 +1043,7 @@ procedure lTrueName(const Name: String; var S: String);
   S := Name;
   end;
 
-{AK155 22-11-2003 Найти конец шары в пути. 0 - если это не UNC-путь
+{AK155 22-11-2003 Find the end of the share in the path. 0 if this is not a UNC path
 }
 function GetShareEnd(const S: String): Integer;
   var
@@ -1052,7 +1052,7 @@ function GetShareEnd(const S: String): Integer;
   Result := 0;
   if Copy(S, 1, 2) <> '\\' then
     Exit;
-  { ищем '\' после '\\', и далее до конца или до второго '\' }
+  { look for '\' after '\\', and then to the end or to the second '\' }
   Result := 3;
   SlashFound := False;
   while Result < Length(S) do
@@ -1060,16 +1060,16 @@ function GetShareEnd(const S: String): Integer;
     if S[Result+1] = '\' then
       begin
       if SlashFound then
-        Exit; // Успех. Сейчас Copy(S, 1, i) - это '\\server\share'
+        Exit; // Success. Now Copy(S, 1, i) is '\\server\share'
       SlashFound := True;
       end;
     Inc(Result);
     end;
   if not SlashFound then
     Result := 0;
-  { Неправильный это путь: '\\' в начале есть,
-      а '\' потом - нет. Надо бы как-то признак ошибки выставить,
-      но непонятно как и для кого. }
+  { This path is wrong: '\\' at the start is there,
+      but no '\' afterwards. Should somehow set an error flag,
+      but unclear how and for whom. }
   end { GetShareEnd };
 {/AK155 22-11-2003}
 
@@ -1078,7 +1078,7 @@ function GetRootStart(const Path: String): Integer;
   Result := Min(Length(Path)+1, Max(3, GetShareEnd(Path)+1));
   end;
 
-{AK155 22-11-2003 Доработано с учётом UNC-путей }
+{AK155 22-11-2003 Reworked to account for UNC paths }
 procedure lFSplit(const Path: String; var Dir, Name, ext: String);
   var
     DriveEnd: Integer;
@@ -1102,7 +1102,7 @@ procedure lFSplit(const Path: String; var Dir, Name, ext: String);
     begin
     if  (Path[B] = '.') and (DotPos = 0) then
       begin
-      DotPos := B; {JO: имена могут состоять только из расширения}
+      DotPos := B; {JO: names may consist of extension only}
       if SlashPos <> 0 then
         Break;
       end;
@@ -1214,8 +1214,8 @@ procedure lAssignFile(var F: lFile; const Name: String);
     FName: String;
   begin
   FName := lFExpand(Name);
-    { текущий каталог панели - это не такущий каталог ОС, поэтому
-     надо развернуть имя до полного пути.}
+    { the panel's current directory is not the OS current directory, so
+     the name must be expanded to a full path.}
 
   if lAPI = lDOS then
   begin
@@ -1234,7 +1234,7 @@ procedure lAssignFile(var F: lFile; const Name: String);
 procedure lAssignText(var T: lText; const Name: String);
   begin
   Assign(T.T, SysOsPath(lFExpand(Name)));
-    { см. комментарий к lAssignFile }
+    { see comment on lAssignFile }
   end;
 
 procedure lResetFile(var F: lFile; RecSize: Word);
@@ -1302,9 +1302,9 @@ procedure lMkDir(const Path: String);
   MkDir(SysOsPath(Path));
   end;
 
-{AK155: В DN/2, если каталог имеет атрибут ReadOnly, то на FAT или HPFS
-он удаляется нормально, а на FAT32 - не удаляется. Так что на всякий
-случай надо ReadOnly снять. }
+{AK155: In DN/2, if a directory has the ReadOnly attribute, on FAT or HPFS
+it deletes normally, but on FAT32 it does not. So just in case
+ReadOnly must be cleared. }
 procedure lRmDir(const Path: String);
   var
     f: lFile;
@@ -1340,18 +1340,18 @@ function lFExpand(Path: String): String;
   if Path = '' then
     Result := ActiveDir
   else if (Copy(Path, 2, 2) = ':\') or (Copy(Path, 1, 2) = '\\') then
-    Result := Path // полный путь
+    Result := Path // full path
   else if Path[1] = '\' then
-    Result := CurrentRoot + Path // от корня текущего диска/шары
+    Result := CurrentRoot + Path // from the root of the current drive/share
   else if  (Length(Path) >= 2) and (Path[2] = ':') then
-    begin // относительный путь указанного диска
+    begin // relative path of the specified drive
     D := Byte(UpCase(Path[1]))-Byte('A')+1;
     Result := CurrentPaths[D] + Copy(Path, 3, 255);
     end
   else
-    Result := ActiveDir + Path; // относительный путь
+    Result := ActiveDir + Path; // relative path
   MakeNoSlash(Result);
-  { Удаление '\..' }
+  { Remove '\..' }
   while True do
     begin
     j := Pos('\..', Result);

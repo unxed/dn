@@ -106,7 +106,7 @@ type
 
     {`2}
   TFileEditor = class(TView)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is exposed via the plugin model; change with extreme care!}
     HScroll, VScroll: TScrollBar;
     ReplaceAll: Boolean;
     Delta: TPoint;
@@ -117,26 +117,26 @@ type
     ClipBrd: Boolean; {-$VOL}
     OptMenu: PMenu;
     Mark,
-      {` Выделение. A.X - входит в выделение, а B.X не входит.
-      То есть если выделены символы 3..7 в строке 5,
-      то Mark = ((3,5),(8,5))`}
+      {` Selection. A.X is included in the selection, B.X is not.
+      So if characters 3..7 on line 5 are selected,
+      then Mark = ((3,5),(8,5))`}
     Sel: TRect;
-      {`AK155 Тоже выделение. Чем Sel отличается от Mark - не знаю `}
+      {`AK155 Also a selection. How Sel differs from Mark - I do not know `}
     Pos, LastPos {,BlockPos}: TPoint;
     MarkPos: TPosArray;
     LastLine: LongInt;
-     {` Это вовсе не номер последней строки файла,
-     а номер последней (по времени) строкиЮ которая, возможно,
-     была изменена. См. WorkModified, WorkString, ChangeLine`}
+     {` This is not the last line number of the file at all,
+     but the number of the most recently (by time) line that may
+     have been modified. See WorkModified, WorkString, ChangeLine`}
     DrawMode: Integer;
     WorkString: LongString;
-      {` Копия строки LastLine, возможно, изменённая. См. WorkModified`}
+      {` Copy of line LastLine, possibly modified. See WorkModified`}
     OldBlockValid, SearchOnDisplay,
     InsertMode, VertBlock,
     Modified,
-      {` Изменён ли текст хоть где-то `}
+      {` Whether the text was changed anywhere `}
     WorkModified,
-      {`Строка номер LastLine была изменена во временном буфере
+      {`Line number LastLine was changed in the temporary buffer
        WorkString `}
     JustSaved, {piwamoto}
     BlockVisible, SpecChar, MouseMark, UnMark,
@@ -144,8 +144,8 @@ type
     TabReplace,
     SearchActive: Boolean;
     PrevSearchDir: byte;
-      {`Эта переменная принимается во внимание
-      только при SearchOnDisplay `}
+      {`This variable is considered
+      only when SearchOnDisplay `}
     UndoInfo: TCollection;
     RedoInfo: TCollection; {-$VOL}
     UndoTimes, LastSaveUndoTimes: LongInt;
@@ -179,9 +179,9 @@ type
     function Valid(Command: Word): Boolean; override;
     function GetPalette: TPalette; override;
     function GetLineAsIs(Index: LongInt): LongString;
-      {` строка читается "как есть", без перекодировки `}
+      {` the line is read "as is", without recoding `}
     function GetLine(Index: LongInt): LongString;
-      {` строка перекодируется из KeyMap в ASCII `}
+      {` the line is recoded from KeyMap to ASCII `}
     function GetSelection: TCollection;
     function BlockToClip(P: TCollection): TCollection;
       {` the lines of a block of the editor (internal) into the text of the clipboard (UTF-8 with -dDNUTF8); P is changed `}
@@ -203,37 +203,37 @@ type
     function LimitY: LongInt;
     procedure StoreUndoInfo(What: Word; Where: TPoint; var Info);
     function HandleCommand(var Event: TEvent): Boolean; virtual;
-      {` Результат - необходимость перерисовки. Реально эта функция
-      есть только в TXFileEditor, и больше там ничего нет. `}
+      {` Result - whether a redraw is needed. In practice this function
+      exists only in TXFileEditor, and nothing else is there. `}
     procedure WorkModify;
-     {` Отметить, что WorkString изменена `}
+     {` Mark that WorkString was changed `}
     procedure ChangeLine;
-     {` перейти к работе со строкой Delta.Y. Это значит, что
-      если WorkString изменена, то записать её по номеру LastLine.
-      Прочитать в WorkString строку Delta.Y `}
+     {` switch to working with line Delta.Y. That means:
+      if WorkString was changed, write it back at LastLine.
+      Read line Delta.Y into WorkString `}
     procedure FlushWorkString;
-     {` если WorkString изменена, то записать её по номеру LastLine `}
+     {` if WorkString was changed, write it back at LastLine `}
     procedure ChangeBlockCase(C: Word);
-     {` Обработка команд перекодировки, то есть всех изменений
-      регистра (нижний/верхний) и исправление раскладки`}
+     {` Handle recoding commands, i.e. all case changes
+      (lower/upper) and layout fixes`}
     procedure StrToAscii(var S: LongString);
-      {` Перекодировка из кодировки KeyMap в ASCII.
-       См. предостережения к StrFromAscii `}
+      {` Recode from KeyMap encoding to ASCII.
+       See the warnings for StrFromAscii `}
     procedure StrFromAscii(var S: LongString);
-      {` Перекодировка из ASCII в кодировку KeyMap. Выполняется
-      "на месте", без создания нового тела строки. Так эффективнее,
-      хотя для AnsiString это и опасно. Для конструкций типа
+      {` Recode from ASCII to KeyMap encoding. Done
+      in place, without creating a new string body. That is more efficient,
+      though unsafe for AnsiString. For constructs like
             S1 := S2; StrToAscii(S2)
-      получится, что S1 тоже перекодируется, так как фактически S1 и S2
-      ссылаются на одно и то же тело строки. Но здесь и сейчас (5/11/04)
-      подобных двойных ссылок нет.`}
+      S1 would be recoded too, because S1 and S2 actually
+      reference the same string body. But here and now (5/11/04)
+      no such dual references exist.`}
     procedure KeyMapAtInsert(N: LongInt; P: PLongString); {-$VIV}
-      {` Вставить строку P под номером N. На входе строка в ASCII, в
-      в процессе вставки перекодируется в KeyMap.
-      Эта процедура вызывает StrFromAscii, так что
-      очень хорошо, что во всех её вызовах параметр - NewLongStr`}
+      {` Insert string P at line number N. On entry the string is ASCII; during
+      insertion it is recoded to KeyMap.
+      This procedure calls StrFromAscii, so it is
+      very good that all call sites pass NewLongStr`}
     procedure KeyMapAtReplace(N: LongInt; P: PLongString); {-$VIV}
-      {` Заменить строку с номером N на строку P. См. KeyMapAtInsert`}
+      {` Replace the line with number N by string P. See KeyMapAtInsert`}
     procedure Convert4Do(iP: PUndoRec; DoKind: TDoKind); {-$VOL}
     end;
     {`}
@@ -247,27 +247,27 @@ const
 
 type
   TSearchData = record
-   {` Данные диалога поиска/замены}
+   {` Search/replace dialog data}
     Options: Word;
-      {` Bit0 - регистрозависимо, bit1 - целые слова,
-        bit2 - "во всех кодировках" для поиска и "запрос подтверждения"
-        для замены. `}
+      {` Bit0 - case-sensitive, bit1 - whole words,
+        bit2 - "in all encodings" for search and "ask for confirmation"
+        for replace. `}
     Dir: Word;
-      {` Bit0=1 - поиск назад`}
+      {` Bit0=1 - search backward`}
     Scope: Word;
-      {` Bit0=1 - отмеченный тест`}
+      {` Bit0=1 - selected text`}
     Origin: Word;
-      {` Bit0=1 - с начала текста`}
+      {` Bit0=1 - from start of text`}
     Line,
-      {` Что искать`}
-    What: String[250]; {AK155 Ну и обозначение! }
-      {` На что заменить.
-      Признаком поиска, а не замены является What = #0`}
+      {` What to search for`}
+    What: String[250]; {AK155 What a name! }
+      {` What to replace with.
+      Search (not replace) is indicated by What = #0`}
     end;
   {`}
 
-  {Cat: параметры поиска (TSearchData.Options)}
-  {необходимо согласовывать с константой SwapBits в модуле Editor}
+  {Cat: search parameters (TSearchData.Options)}
+  {must stay in sync with the SwapBits constant in the Editor unit}
 const
   efoCaseSens = 1;
   efoWholeWords = 2;
@@ -304,8 +304,8 @@ uses
 const
   cmNoCommand = 4000;
 
-  {AK155 Тут коды с Ctrl и без него должны обязательно стоять рядом,
- чтобы их позиции отличались только младшим битом индекса }
+  {AK155 Here codes with and without Ctrl must stand next to each other
+ so their positions differ only by the low bit of the index }
 const
   UpDnKey: array[0..7] of Word =
   (kbUp, kbCtrlUp,
@@ -314,9 +314,9 @@ const
   kbShiftDown, kbCtrlShiftDown);
 
   {SmartWindow: TEditWindow = nil;}
-  {Cat: перенёс эти переменные в модуль editfile}
+  {Cat: moved these variables into the editfile unit}
   {ClipboardWindow: TEditWindow = nil;}
-  {Cat: внимание! появились указатели SmartWindowPtr и ClipboardWindowPtr}
+  {Cat: note! SmartWindowPtr and ClipboardWindowPtr pointers appeared}
 
 function MemAvail: LongInt;
   begin
@@ -376,15 +376,15 @@ procedure TFileEditor.ChangeBlockCase(C: Word);
 {$ENDIF}
   OldMark := Mark;
   FlushWorkString;
-  {AK155 28.12.2004 Выделение области для перекодировки }
+  {AK155 28.12.2004 Select a region for recoding }
   if C < cmUpcaseBlock then
-    begin { Команда типа cmUpString: выделяем текущую строку }
+    begin { A cmUpString-style command: select the current line }
     Mark.Assign(0, Delta.Y, MaxLongStringLength, Delta.Y);
     end
   else if not BlockVisible or
       ((Mark.A.X = Mark.B.X) and (Mark.A.Y >= Mark.B.Y))
   then
-    begin { Пустое выделение - выделяем слово, содержащее курсор }
+    begin { Empty selection - select the word containing the cursor }
     Mark.Assign(Delta.X, Delta.Y, Delta.X, Delta.Y);
     S := GetLine(Mark.A.Y);
     WordSelect := False;
@@ -423,9 +423,9 @@ procedure TFileEditor.ChangeBlockCase(C: Word);
     S := GetLine(I);
     Mark.A.Y := I;
     StoreUndoInfo(udStrModified, Mark.A, S);
-      {! AK155 31-12-04 udStrModified - это очень плохо, так как
-       Undo работает построчно. Но сейчас сделать нормальный откат
-       я не сумел, отложил до серьёзной перетруски редактора }
+      {! AK155 31-12-04 udStrModified is very bad because
+       Undo works line by line. I could not make a proper undo
+       now; postponed until a serious editor overhaul }
 
     if (I = SY) or VertBlock then
       J := SX
@@ -435,8 +435,8 @@ procedure TFileEditor.ChangeBlockCase(C: Word);
       L := Min(EX, Length(S))
     else
       L := Length(S);
-    { Перекодировки выполняем прямо в S. Это безопасно, так как
-      теней S не создаётся}
+    { Recoding is done directly in S. That is safe because
+      no aliases of S are created}
     case C of
       cmUpcaseBlock, cmUpString:
         CaseArray := UpTab;
@@ -465,7 +465,7 @@ procedure TFileEditor.ChangeBlockCase(C: Word);
         goto EndS;
         end;
       else
-        Exit; // Вообще-то, так не бывает
+        Exit; // Actually, that never happens
     end {case};
     XLatBuf(S[J], L-J+1, CaseArray^);
 EndS:
@@ -1439,7 +1439,7 @@ function TFileEditor.LimitY: LongInt;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-{Cat: эта функция идентична имеющейся в DnStdDlg}
+{Cat: this function is identical to the one in DnStdDlg}
 (*
 function GetFileNameDialog(Mask, Title, Name: String; Buttons, HistoryID: Word): String;
  var S: String;
@@ -1524,11 +1524,11 @@ function TFileEditor.GetSelection: TCollection;
     { P.Insert(NewLongStr(S)); }
     P.AtInsert(P.Count, NewLongStr(S)); {AK155}
 
-    {AK155: MemOK - это нечто странное. Там, в конечном итоге,
-проверяется на nil некий Linker, которому нигде ничего не
-присваивается, так что он заведомо nil. А исключение этой
-бессмысленной проверки ускоряет работу во _много_ раз (более
-20, точно мерять не хватило терпения ). }
+    {AK155: MemOK is something odd. Ultimately it
+checks for nil some Linker that is never assigned
+anywhere, so it is always nil. Removing this
+pointless check speeds things up _many_ times (more than
+20; I lacked the patience to measure exactly). }
 
     end;
   GetSelection := P;
@@ -1587,7 +1587,7 @@ function TFileEditor.ValidBlock: Boolean;
         ( (Mark.A.Y = Mark.B.Y) and (Mark.A.X < Mark.B.X));
   end;
 
-{Cat: переделал для поиска с регэкспами}
+{Cat: reworked for regexp search}
 function TFileEditor.Search(StartX, StartY: Word): Boolean;
   label
     1, LExit, _LExit, EndReplace;
@@ -1605,7 +1605,7 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
     AllCP: Boolean; {-$VIV 14.05.99}
     BMT: BMTable;
     ShortW: String;
-    XLat: ^TXLat; // для поиска в текущей кодировке
+    XLat: ^TXLat; // for search in the current encoding
     CaseSensitive: Boolean;
     RepW: LongString; { SearchData.What in the lines of the editor }
     SearchLen: LongInt; { the length of SearchData.Line in the columns of the editor }
@@ -1622,7 +1622,7 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
   NewTimer(Tmr, 0);
   Marking := False;
   OldMark := Mark;
-  if  (SearchData.Scope = 1 {отмеченный текст})
+  if  (SearchData.Scope = 1 {selected text})
        and not (BlockVisible and ValidBlock)
   then
     goto LExit;
@@ -1638,12 +1638,12 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
 {$ENDIF}
   Prompt := (SearchData.What <> #0)
        and (SearchData.Options and efoReplacePrompt <> 0);
-  {запрос на замену}
+  {ask before replace}
   D.Assign(StartX, StartY);
 
   if SearchOnDisplay and (SearchData.Dir <> PrevSearchDir)
-  then { смена направления поиска: надо пропустить
-        текст, только что найденный в другом направлении }
+  then { search direction change: must skip
+        the text just found in the other direction }
     begin
     if (SearchData.Dir and 1) <> 0 then
       Dec(D.X, SearchLen)
@@ -1652,17 +1652,17 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
     end;
 
   {AK155 6-10-2003}
-  { при поиске в выделении сдвигаем точку старта поиска
-  в направлении поиска к соответствующему концу выделения }
+  { when searching in the selection, move the search start
+  in the search direction toward the matching selection end }
   if SearchData.Scope = 1 then
     begin
     if  (SearchData.Dir = 0) then
-      begin {вперёд}
+      begin {forward}
       if  (OldMark.A.Y > D.Y) then
         D := OldMark.A;
       end
     else
-      begin {назад}
+      begin {backward}
       if  (OldMark.B.Y < D.Y) then
         D := OldMark.B;
       end;
@@ -1680,8 +1680,8 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
   ShortW := W;
   CaseSensitive := SearchData.Options and efoCaseSens <> 0;
   AllCP := (SearchData.What = #0)
-       and (SearchData.Options and efoAllCP <> 0 {во всех кодировках});
-  Dir := 1-2*SearchData.Dir; {направление поиска: +1 вперёд, -1 назад}
+       and (SearchData.Options and efoAllCP <> 0 {in all encodings});
+  Dir := 1-2*SearchData.Dir; {search direction: +1 forward, -1 backward}
   if not AllCP then
     if Dir > 0 then
       Create_BMTable(BMT, ShortW, CaseSensitive)
@@ -1704,14 +1704,14 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
 {$ENDIF}
     TrX := Length(S1); {S := S1;}
     if  (Dir < 0) then
-      {поиск назад}
+      {search backward}
       begin
       if  (D.X > Length(S1)) then
         D.X := Length(S1);
       StX := 1;
       TrX := D.X;
       if SearchData.Scope = 1 then
-        {отмеченный текст}
+        {selected text}
         begin
         Mark := OldMark;
         if D.Y < Mark.A.Y then
@@ -1740,11 +1740,11 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
           I := BackBMsearch(BMT, S1[StX], TrX-StX+1, ShortW, XLat^);
         end;
       end
-    else {поиск вперёд}
+    else {search forward}
       begin
       StX := D.X+1;
       if SearchData.Scope = 1 then
-        {отмеченный текст}
+        {selected text}
         begin
         Mark := OldMark;
         if D.Y < Mark.A.Y then
@@ -1775,21 +1775,21 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
       end;
 
     if  (I > 0) and (SearchData.Options and efoWholeWords <> 0) then
-      {что-то нашли, надо проверить, отдельное ли это слово}
+      {found something; check whether it is a separate word}
       if not (((StX-1+I = 1) or (S1[StX-1+I-1] in BreakChars)) and
             ( (StX-1+I+Length(W) > Length(S1)) or (S1[StX-1+I+Length(W)]
                in BreakChars)))
       then
-        begin { старт для следующего поиска базируем на найденном тексте:}
+        begin { base the next search start on the found text:}
         if Dir > 0 then
-          D.X := StX+I-1 { на 1 правее первого символа }
+          D.X := StX+I-1 { 1 past the first character }
         else
-          D.X := StX+I+Length(W)-3; { на 1 левее последнего символа }
+          D.X := StX+I+Length(W)-3; { 1 before the last character }
         goto 1;
         end;
 
     if I > 0 then
-      {что-то нашли, надо нарисовать это на экране}
+      {found something; draw it on the screen}
       begin
       PrevSearchDir := SearchData.Dir;
       Search := True;
@@ -1899,14 +1899,14 @@ function TFileEditor.Search(StartX, StartY: Word): Boolean;
         begin
         Mark := OldMark;
 //AK155        LastPos.X := -1;
-  {Наличие этого оператора приводит к следующему глюку: если сразу после
-поиска вперёд делать выделение, то в качестве начала выделения
-берётся не то, что надо (положение курсора), и не то, что можно было бы
-понять (начало подсвеченного текста), а нечто удивительное: начало строки.
-    Для сравнения: если нажать Ctrl-Ins сразу после поиска, то в буфер
-берётся ничего. И это правильно.
-    Для чего ещё нужен этот оператор, кроме генерации описанного глюка,
-я понять не смог. 20.05.2005.
+  {Having this statement causes the following bug: if right after
+a forward search you start a selection, the selection start is
+neither what it should be (cursor position) nor something understandable
+(start of the highlighted text), but something odd: the start of the line.
+    By comparison: if you press Ctrl-Ins right after search, nothing
+goes into the buffer. And that is correct.
+    What else this statement is for, besides causing the bug above,
+I could not figure out. 20.05.2005.
 }
         goto _LExit;
         end;
@@ -2059,10 +2059,10 @@ procedure TFileEditor.InsertBlock(ABlock: TCollection; SaveUndo: Boolean);
           Inc(MarkPos[L].Y, J);
     end;
   SetLimits;
-  {AK155 2005-10-07 Для вертикального блока курсор
-остаётся, где был (как и раньше), а для потокового блока
-переносим курсор после вставленного блока (это новое поведение,
-такое, как в большинстве редакторов). }
+  {AK155 2005-10-07 For a vertical block the cursor
+stays where it was (as before), and for a stream block
+we move the cursor after the inserted block (new behaviour,
+like most editors). }
   if not VertBlock then
     begin
     Delta := Mark.B;
@@ -2533,7 +2533,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
     EnableMarking := False;
     if Length(WorkString) < LastX then
       WorkString := LongAddSpace(WorkString, LastX+1);
-    {Cat:warn проверить, нет ли тут ошибки}
+    {Cat:warn check whether there is a bug here}
     if EdOpt.BackIndent and ((WorkString[LastX+1] <> ' ') or
              (DelSpaces(WorkString) = ''))
       and (Copy(WorkString, 1, LastX) = LongStrg(' ', LastX))
@@ -2781,10 +2781,10 @@ L1:
     Block := GetSelection;
     InUse := False;
     if Block <> nil then
-      begin { Возможное удаление выделенного блока }
+      begin { Possibly delete the selected block }
       if EditorDefaults.EdOpt and (ebfPBl+ebfObl) = ebfObl
       then
-        begin { Если блок и буфер идентичны, то блок НЕ удаляем }
+        begin { If the block and the buffer are identical, do NOT delete the block }
         if ClipBoard = nil then
           goto DelBlk;
         if Block.Count <> ClipBoard.Count then
@@ -2793,7 +2793,7 @@ L1:
           begin
           P1 := Block.At(i);
           P2 := CB.At(i);
-          if P1 = P2 then { в частности, оба nil }
+          if P1 = P2 then { in particular, both nil }
             Continue;
           if (P1 = nil) or (P2 = nil) or (P1^ <> P2^) then
             goto DelBlk;
@@ -2801,7 +2801,7 @@ L1:
         goto EndDel;
 DelBlk:
         DeleteBlock(True, Block);
-        InUse := True; // Коллекция включена в Undo
+        InUse := True; // The collection is included in Undo
         end;
 EndDel:
       if not InUse then
@@ -2827,12 +2827,12 @@ EndDel:
     if SystemData.Options and ossUseSysClip <> 0 then
       SyncClipIn;
 
-    {AK155: не понял, зачем вообще нужен ClipBoardStream. Используется
-он в команде просмотра Clipbioard, но зачем его из коллекции нужно
-гонять в Stream, а потом обратно - непонятно. А тормозит он чудовищно.
-Поэтому пока что ограничиваю размер, в результате чего просмотр Clipboard
-при отключенном Use system clipboard для очень больших фрагментов
-работать временно не будет }
+    {AK155: unclear why ClipBoardStream is needed at all. It is used
+by the Clipboard view command, but why it must be moved from the
+collection into a Stream and back is unclear. And it is monstrously slow.
+So for now I limit the size; as a result Clipboard viewing
+with Use system clipboard off will temporarily not work
+for very large fragments }
     if  (ClipBoardStream <> nil)
       {AK155} and (ClipBoard.Count < 1000) {/AK155}
       then
@@ -2876,8 +2876,8 @@ EndDel:
     ChangeLine;
     end { DeleteLine };
 
-  {Cat: переписал для устранения проблем со стеком при рекурсии,
-      ускорения работы и ликвидации некоторых глюков}
+  {Cat: rewritten to avoid recursion stack problems,
+      speed things up, and fix some bugs}
 
   (*
  procedure WordLeft;
@@ -3082,8 +3082,8 @@ EndDel:
       PI: TView;
       A: Word;
 
-      {Cat: эта процедура теперь умеет работать с длинными строками
-      и находится в модуле strutil}
+      {Cat: this procedure now handles long strings
+      and lives in the strutil unit}
       (*
   procedure CompressString;
   var PP: Pointer;
@@ -3824,7 +3824,7 @@ EndDel:
 
     begin { OpenFileAtCursor }
     if WorkString = '' then
-      Exit; {Cat: работаем только на непустой строчке}
+      Exit; {Cat: only operate on a non-empty line}
     Res := '';
     S := '';
     R.Assign(0, 0, 20, 7);
@@ -3921,7 +3921,7 @@ Ex:
     end { WordEnd };
 
   procedure SelectAll;
-    begin {AK155 выделить весь текст}
+    begin {AK155 select all text}
     with Sel, FileLines do
       begin
       A.X := 0;
@@ -3941,9 +3941,9 @@ Ex:
     UEditName, UEditPath: String;
     GlobalConfigEdit: Boolean;
 
-  const { AK155 11-01-2006 Текстовые конфиги, к которым по F1 вызывается
-     специальный хелп. Значения FName надо записывать на верхнем регистре,
-     программа берёт их "как есть", без дополнительного перевода регистра.
+  const { AK155 11-01-2006 Text configs for which F1 invokes
+     special help. FName values must be stored in uppercase;
+     the program takes them as-is, without further case conversion.
       } {<editcore.001>}
     SpecialFile: array[1..6] of record
       FName: string[13];
@@ -3960,7 +3960,7 @@ Ex:
   begin { TFileEditor.HandleEvent }
   if  (Event.What = evCommand) and (Event.Command = cmHelp2) then
     begin
-    { Возможное изменение контекста хелпа по имени редактируемого файла }
+    { Possibly change the help context based on the edited file name }
     Event.Command := cmHelp;
     UEditName := UpStrg(EditName);
     UEditPath := GetPath(UEditName);
@@ -4694,9 +4694,9 @@ Ex:
         Exit;
         end;
 {$ENDIF}
-      {AK155 Для вертикальных стрелок (возможно, с шифтом) ScrollLock,
-      WheelEvent и Ctrl берутся по xor. См. чуть ниже обработку
-      kbCtrlUp и далее}
+      {AK155 For vertical arrows (possibly with Shift) ScrollLock,
+      WheelEvent and Ctrl are combined by xor. See below the handling
+      of kbCtrlUp and following}
       if (ShiftState and kbScrollState <> 0) xor WheelEvent then
         for i := Low(UpDnKey) to High(UpDnKey) do
           if DNKeyCode(Event) = UpDnKey[i] then
@@ -4712,8 +4712,8 @@ Ex:
         end;
       case DNKeyCode(Event) of
 
-        {JO: по Ctrl-Alt-Shift-цифра переходим к закладкам с пометкой текста}
-        {    от текущего места до закладки                                  }
+        {JO: Ctrl-Alt-Shift-digit jumps to bookmarks with text marking}
+        {    from the current position to the bookmark                       }
         kbCtrlAltShift1:
           Message(Self, evCommand, cmGoToMarker1, nil);
         kbCtrlAltShift2:
@@ -4734,8 +4734,8 @@ Ex:
           Message(Self, evCommand, cmGoToMarker9, nil);
 
         {AK155 27-12-2003
-           CtrlUp, kbCtrlShiftUp  скроллируют текст с сохранением
-           позиции курсора относительно окна. Down - аналогично}
+           CtrlUp, kbCtrlShiftUp scroll the text while keeping
+           the cursor position relative to the window. Down - likewise}
         kbCtrlUp, kbCtrlShiftUp:
           begin
           UnMark := (DNKeyCode(Event) = kbCtrlUp);
@@ -4758,7 +4758,7 @@ Ex:
         else {case}
           if  (DNKeyCode(Event) <> kbCtrlAltX) then
             if  (DNKeyCode(Event) and $CFFFF) = kbCtrlU then
-              WordEnd // Ctrl-U или Shift-Ctrl-U
+              WordEnd // Ctrl-U or Shift-Ctrl-U
             else {-$VIV}
               begin
               if DrawMode > 0 then
@@ -4835,23 +4835,23 @@ Ex:
                   Byte(EvStr[2]));
                 Exit
                 end;
-              { AK155 9-07-2002 После введения Козловым новой системы кодирования клавиш
-серые + и - с шифтом (перелистывание однотипных окон) стали иметь
-ненулевой CharCode, поэтому их приходится анализировать специально.
-Интересно, больше подобных ситуаций нет?}
+              { AK155 9-07-2002 After Kozlov introduced the new key encoding system
+grey + and - with Shift (flipping same-type windows) got a
+non-zero CharCode, so they must be handled specially.
+I wonder if there are more cases like this?}
               with Event do
                 if  (Char(Event.CharCode) > #31)
                   and (DNKeyCode(Event) <> kbShiftGrayPlus)
                   and (DNKeyCode(Event) <> kbShiftGrayMinus)
-                  {Есть! Alt-BS. На всякий случай отсекаем все с Alt и Ctrl}
+                  {There are! Alt-BS. Just in case, filter out all with Alt and Ctrl}
                  {and (KeyCode and $40000 = 0)}
-  //JO: подобное отсечение "на всякий случай" имеет далеко идущие
-  //    последствия: невозможность ввести символы в pедактоpе чеpез
-  //    Alt-Numpad и невозможность использовать AltGrey для ввода символов,
-  //    если отсекаются клавиши с Alt, а под Win NT и тогда, когда
-  //    отсекаются клавиши с Ctrl (т.к. под NT AltGrey pаботает как
-  //    комбинация Alt и Ctrl). В общем, надо отлавливать конкpетные
-  //    комбинации клавиш индивидуально.
+  //JO: such "just in case" filtering has far-reaching
+  //    consequences: inability to enter characters in the editor via
+  //    Alt-Numpad and inability to use AltGrey for character input,
+  //    if Alt keys are filtered, and under Win NT also when
+  //    Ctrl keys are filtered (because under NT AltGrey works as
+  //    an Alt+Ctrl combination). In short, catch specific
+  //    key combinations individually.
                 then
                   InputChar;
               end;

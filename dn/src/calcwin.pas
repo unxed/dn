@@ -47,8 +47,8 @@
 {$I STDEFINE.INC}
 {AK155 = Alexey Korop, 2:461/155@fidonet}
 {KV = Kirill Vodonosov}
-{20.08.2002 AK Почти весь текст в той или иной степени переработан.
-  См. также CellsCol. Основное нововведение - TSort и новый Recalc }
+{20.08.2002 AK Almost the whole text was reworked to some degree.
+  See also CellsCol. Main novelty - TSort and the new Recalc }
 unit calcwin;
 {&Delphi+}
 interface
@@ -112,9 +112,9 @@ type
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     function GetCellValue(const S: String): Boolean;
-    {S - имя ячейки; результат - в evaluator.Res}
+    {S - cell name; result in evaluator.Res}
     function GetFuncValue(S: String): Boolean;
-    {S - функция SUM или MUL, результат - в evaluator.Res}
+    {S - SUM or MUL function, result in evaluator.Res}
     procedure CalcError(Index: TStrIdx);
     procedure LoadSheet(FName: String); {DataCompBoy}
     procedure SaveSheet;
@@ -163,20 +163,20 @@ uses
 type
   THeaderDBF = record
     {KV}
-    DBFIdent: Char; { $03 - Нет MEMO; $83 - Есть MEMO }
+    DBFIdent: Char; { $03 - No MEMO; $83 - Has MEMO }
     { FoxBase+, FoxPro, dBaseIII+, dBaseIV, no memo - 0x03 }
     { FoxBase+, dBaseIII+ with memo - 0x83 }
     { FoxPro with memo - 0xF5 }
     { dBaseIV with memo - 0x8B }
     { dBaseIV with SQL Table - 0x8E }
 
-    Yar: Byte; { две последние цифры года }
+    Yar: Byte; { last two digits of the year }
     Month: Byte; { month number }
     Day: Byte; { day number }
-    LastRecord: LongInt; { номер последней записи }
+    LastRecord: LongInt; { last record number }
     DataOffset: AWord;
-    { смещение первой записи относительно начала файла}
-    RecSize: AWord; { размер записи с учетом символа удаления }
+    { offset of the first record from the start of the file}
+    RecSize: AWord; { record size including the deletion character }
     Reserv1: AWord;
     WaitTrans: Byte; { dB IV }
     Reserv2: array[0..12] of Byte;
@@ -184,7 +184,7 @@ type
     Reserv3: array[0..2] of Byte;
     end;
   TDBFLength = record
-    { длина поля DBF } {KV}
+    { DBF field length } {KV}
     case Integer of
       0: (FieldLength: AWord);
       1: (NumericLength: Byte; Decimals: Byte);
@@ -192,10 +192,10 @@ type
   PDBFField = ^TDBFField; {KV}
   TDBFField = record
     { dB field descriptor Length = 32 bytes }
-    FieldName: array[0..10] of Char; { имя поля }
-    FieldType: Char; { тип: C=$43, D=$44, L=$4C, $M=$4D, N=$4E }
-    Reserved: array[0..3] of Char; { Расположение поля внутри записи }
-    FLength: TDBFLength; { длина поля }
+    FieldName: array[0..10] of Char; { field name }
+    FieldType: Char; { type: C=$43, D=$44, L=$4C, $M=$4D, N=$4E }
+    Reserved: array[0..3] of Char; { Field location within the record }
+    FLength: TDBFLength; { field length }
     Reserved2: array[0..12] of Byte;
     Tag: Byte; { for multiindex, only dB IV }
     end;
@@ -471,14 +471,14 @@ procedure MakeDefaultOptions(const S: String;
     I: Integer;
   begin
   Val(S, R, I);
-  D := 2; { 2 десятичных знака по умолчанию }
+  D := 2; { 2 decimal places by default }
   if I = 0 then
-    { число: вправо, как есть }
+    { number: right-aligned, as is }
     o := coValue or coRight
   else if (S[1] = '=') and (Length(S) > 1) then
-    { формула: вправо, десятичное, 2 знака }
+    { formula: right-aligned, decimal, 2 places }
     o := coFormula or coDec or coRight
-  else { текст: влево, как есть }
+  else { text: left-aligned, as is }
     begin
     o := 0;
     R := 0;
@@ -525,7 +525,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
         end;
 
       MakeDefaultOptions(NewS, O, D, R);
-      TypeChanged := True; // на случай P=nil
+      TypeChanged := True; // in case P=nil
       if P <> nil then
         with P^ do
           begin
@@ -533,7 +533,7 @@ procedure TCalcInput.HandleEvent(var Event: TEvent);
             Options := (Options and not coTypeMask) or coFormula;
           TypeChanged := (Options xor O) and coTypeMask <> 0;
           if TypeChanged then
-            begin {Изменен тип ячейки}
+            begin {Cell type changed}
             if MessageBox(GetString(dlWkzWarningCellTypeChange),
                 nil, mfOKCancel) <> cmOK
             then
@@ -851,7 +851,7 @@ procedure TCalcView.Draw;
   StX := I;
   EnX := Size.X;
 
-  {Заголовки колонок и верхняя черта}
+  {Column headers and top rule}
   while (I < Size.X) and (J <= HScroll.MaxVal) do
     begin
     K := ColWidth[J];
@@ -910,13 +910,13 @@ procedure TCalcView.Draw;
         begin
         K := ColWidth[Delta.X+J];
         if ShowSeparators then
-          begin { ограничиваем длину по колонке }
+          begin { limit length by column }
           SetLength(S, K);
           FillChar(S[1], K, ' ');
           S[K] := #$B3;
           end
         else
-          begin { длина до конца экрана }
+          begin { length to end of screen }
           T := Size.X-L+1;
           SetLength(S, T);
           FillChar(S[1], T, ' ');
@@ -1050,10 +1050,10 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         fdOKButton+fdHelpButton) = cmCancel
     then
       Exit;
-    {KV: разделитель колонок можно определить автоматически, однако при этом
-         возникает несколько проблем: если в файле только одна строка нельзя
-         определить какие символы встречаются во второй строке столько-же раз
-         сколько и в первой. Выполнять проверку только на ',',';' неправильно}
+    {KV: column separator can be detected automatically, but then
+         several problems arise: if the file has only one line you cannot
+         tell which characters appear in the second line as many times
+         as in the first. Checking only for ',',';' is wrong}
     S := ';';
     if InputBox(GetString(dlWkzQuerySeparatorTitle),
            GetString(dlWkzQuerySeparatorLabel),
@@ -1080,7 +1080,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       begin
       Readln(F.T, S);
       if S <> '' then
-        begin {KV: Просто на всякий случай}
+        begin {KV: Just in case}
         CurCol := 0;
         StartCh := 1;
         while StartCh <= Length(S) do
@@ -1148,13 +1148,13 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         if CellValue <> '' then
           with Cells.NewItem(i-1, DBF.CurRecord-1, CellValue)^ do
             case DBF.FieldType(i) of
-              'N': {число}
+              'N': {number}
                 begin
                 DelLeft(S);
                 Options := coValue or coRight;
                 Decimals := DBF.FieldDec(i);
                 end;
-              'L': {логическое}
+              'L': {boolean}
                 begin
                 if UpCase(CellValue[1]) = 'T' then
                   S := '-1'
@@ -1162,7 +1162,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
                   S := '0';
                 Options := coValue or coBool or coRight;
                 end;
-              else {текст, дата, мемо...}
+              else {text, date, memo...}
                 if  (CellValue[1] = '=') and (Length(CellValue) > 1)
                 then
                   begin
@@ -1252,8 +1252,8 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
                 S := MakeCellText(P)
               else
                 begin
-                // Оставляем 5 знаков после запятой, на случай если
-                // неправильно указан формат
+                // Keep 5 digits after the decimal point, in case
+                // the format was specified incorrectly
                 if P.Decimals <= 5 then
                   Str(P.Value: 0: 5, S)
                 else
@@ -1291,19 +1291,19 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
       with TypeLenArr[P.Col] do
         begin
         if  (P.Options and coValue) <> coValue then
-          // Если в колонке текст или ошибка в формуле,
-          // то эта колонка сохраняется как текстовая
+          // If the column has text or a formula error,
+          // then this column is saved as text
           T := 'C'
         else if (T = #0) and ((P.Options and $F0) = coBool) then
-          // Если тип колонки еще не оределен и первое найденное значение
-          // имеет формат Boolean, то устанавливаем тип Boolean
+          // If the column type is not yet determined and the first found value
+          // has Boolean format, then set type Boolean
           T := 'L'
         else if T = #0 then
-          T := 'N'; // По умолчанию - число
+          T := 'N'; // By default - number
         end;
       end;
-    // Делаем второй проход когда типы полей уже известны
-    // для определения размерности
+    // Do a second pass when field types are already known
+    // to determine dimensions
     for i := 0 to Cells.Count-1 do
       begin
       P := Cells.At(i);
@@ -1404,8 +1404,8 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
     for CurRow := 0 to MaxRow do
       begin
       kvFillColIndexArray(CurRow, ColIndexArray);
-      i := 1; // Номер текущего поля внутри записи
-      S.AddRecord; // Добавляем новую пустую запись
+      i := 1; // Current field number within the record
+      S.AddRecord; // Add a new empty record
       for CurCol := 0 to MaxCol do
         begin
         if ColIndexArray[CurCol] >= 0 then
@@ -1602,7 +1602,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
   procedure ChangeFormat;
     const
       J: Integer = 0;
-      NewOptions: AWord = 0; {см. комментарий к ForRectangle}
+      NewOptions: AWord = 0; {see comment on ForRectangle}
     procedure SetFormat(Item: PCellrec);
       begin
       with Item^ do
@@ -2112,11 +2112,11 @@ function TCalcView.GetCellValue(const S: String): Boolean;
     end;
   end { TCalcView.GetCellValue };
 
-{  Вычисление функций SUM и MUL. В скобках через запятую могут быть
-диапазоны, ячейки и числа. Пробелы игнорируются. Наличие закрывающей
-скобки должно быть проверено перед вызовом.
-   Пример: =SUM(A 1:B7, C1 8, 1).
-   Вычисленное число кладется в evaluator.Res}
+{  Compute SUM and MUL. In parentheses, comma-separated, there may be
+ranges, cells and numbers. Spaces are ignored. Presence of the closing
+parenthesis must be checked before the call.
+   Example: =SUM(A 1:B7, C1 8, 1).
+   The computed number is placed in evaluator.Res}
 function TCalcView.GetFuncValue(S: String): Boolean;
   procedure DoSum(PP: PCellrec);
     begin
@@ -2181,7 +2181,7 @@ function TCalcView.GetFuncValue(S: String): Boolean;
         Exit;
       Cells.ForRectangle(AFromX, AFromY, AFromX, AFromY, Op);
       end;
-    Inc(t); { пропустить запятую или скобку }
+    Inc(t); { skip comma or parenthesis }
     end;
   Result := True;
   end { TCalcView.GetFuncValue };
@@ -2419,7 +2419,7 @@ procedure TCalcView.Copy;
   ClipRect.B.Y := Y2;
   end { TCalcView.Copy };
 
-{В формуле S ссылки на ячейки (>=LX,>=LY) сдвигать на (DX,DY) }
+{In formula S shift cell references (>=LX,>=LY) by (DX,DY) }
 function ReformFormula(const S: String; LX, LY, DX, DY: Integer): String;
   const
     Signs = [';', '[', ']', '{', '}', #39, ':', '"', '.', '<',
@@ -2457,7 +2457,7 @@ function ReformFormula(const S: String; LX, LY, DX, DY: Integer): String;
           S2 := '?'
         else
           S2 := GetColName(X+DX);
-        { сейчас S2 - имя колонки}
+        { now S2 is the column name}
 
         for l := 2 to Length(S1)-1 do
           if S1[l] = '@' then
@@ -2470,7 +2470,7 @@ function ReformFormula(const S: String; LX, LY, DX, DY: Integer): String;
         else
           S1 := GetRowName(Y+DY);
         end;
-EndRowName: { сейчас S1 - имя строки }
+EndRowName: { now S1 is the row name }
 
     Result := Result+S2+S1;
     end;
@@ -2659,7 +2659,7 @@ procedure TCalcView.DeleteCol;
   Modified := True;
   end { TCalcView.DeleteCol };
 
-{ вычисление формулы; s[1] = '=' }
+{ evaluate formula; s[1] = '=' }
 function TCalcView.CalcEval(const s: String; var Value: CReal): Boolean;
   var
     R: CReal;
@@ -2707,10 +2707,10 @@ procedure TCalcView.ReCalc(Full: Boolean);
       else if Full and ((Options and coValue) <> 0) then
         if S[1] = '=' then
           begin
-          {После некоторых старых версий DN бывает флаг coValue
-          без флага coFormula для формул, включающих только константные
-          операнды. То, что TSort не воспринимал их, как формулы, не
-          страшно, так как от других ячеек они не зависят. }
+          {After some old DN versions there may be coValue
+          without coFormula for formulas that include only constant
+          operands. That TSort did not treat them as formulas is not
+          a problem, since they do not depend on other cells. }
           Value := Evalue(System.Copy(S, 2, 255), Self);
           Options := Options or coValue;
           end
@@ -3081,10 +3081,10 @@ procedure TDbaseWriter.FieldPutString(FieldIndex: Integer;
     StrLen := L;
     FieldValue := System.Copy(FieldValue, 1, StrLen);
     end;
-  StrPCopy(Buf, FieldValue); // Можно было использовать Move,
-  // но при работе с длинными строками
-  // так безопаснее
-  Buf[StrLen] := ' '; // Для удаления #0, который вставляет StrPCopy
+  StrPCopy(Buf, FieldValue); // Could have used Move,
+  // but when working with long strings
+  // this is safer
+  Buf[StrLen] := ' '; // To remove the #0 that StrPCopy inserts
   inherited Seek(FieldOffsetInFile(FieldIndex));
   inherited Write(Buf, L);
   end { TDbaseWriter.FieldPutString };
