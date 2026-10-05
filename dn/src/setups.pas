@@ -73,34 +73,34 @@ type
     LocalData: TSystemData;
     SysData: TSysData;
     {constructor Init;}
-    procedure Awaken; virtual;
+    procedure Awaken; override;
     destructor Destroy; override;
-    procedure GetData(var Rec); virtual;
+    procedure GetData(var Rec); override;
     end;
 
   TCurrDriveInfo = class(TCheckBoxes)
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Press(Item: Integer); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Press(Item: Integer); override;
     end;
 
   TMouseBar = class(TScrollBar)
     constructor Create(var Bounds: TRect);
-    procedure SetData(var Rec); virtual;
-    procedure GetData(var Rec); virtual;
-    function DataSize: Integer; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure SetData(var Rec); override;
+    procedure GetData(var Rec); override;
+    function DataSize: Integer; override;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
   
   TSaversDialog = class(TDialog)
     constructor Create;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     destructor Destroy; override;
-    procedure Awaken; virtual;
+    procedure Awaken; override;
     end;
 
   TSaversListBox = class(TListBox)
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
   
 
