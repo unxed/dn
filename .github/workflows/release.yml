@@ -1,0 +1,42 @@
+name: release
+# Tag v* → build linux64 DN and attach a tarball to a GitHub Release (issue #1, part 1).
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  linux64:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
+      - name: Build DN (linux64 UTF-8)
+        run: tools/build.sh linux64 out/linux64
+      - name: Pack
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          staging="dn-${tag}-linux64"
+          mkdir -p "$staging"
+          cp -a out/linux64/dn "$staging/"
+          cp -a out/linux64/*.dlg out/linux64/*.lng out/linux64/*.hlp "$staging/" 2>/dev/null || true
+          if [ -d out/linux64/xlt ]; then cp -a out/linux64/xlt "$staging/"; fi
+          tar -czf "${staging}.tar.gz" "$staging"
+          ls -la "${staging}.tar.gz"
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dn-${{ github.ref_name }}-linux64.tar.gz
+          generate_release_notes: true
+          fail_on_unmatched_files: true
