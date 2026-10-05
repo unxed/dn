@@ -59,9 +59,9 @@ type
   TRARArchive = class(TARJArchive)
     VersionToExtr: Byte;
     constructor Create;
-    procedure GetFile; virtual;
-    function GetID: Byte; virtual;
-    function GetSign: TStr4; virtual;
+    procedure GetFile; override;
+    function GetID: Byte; override;
+    function GetSign: TStr4; override;
     end;
 
 type
@@ -112,9 +112,15 @@ constructor TRARArchive.Create;
   FreeStr := SourceDir+DNARC;
   inherited Create;
   
+  { Unix: lowercase rar (far2l multiarc); Windows: RAR as in Far2 multiarc }
+{$IFDEF UNIX}
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'rar'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'rar'));
+{$ELSE}
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'RAR'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'RAR'));
-  
+{$ENDIF}
+
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'e'));
   ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'x'));
   Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'a'));
