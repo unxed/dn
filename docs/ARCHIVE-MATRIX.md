@@ -1,12 +1,15 @@
 # Archive matrix: nested formats, ops, autotests
 
-Status: **in progress** (owner report 2026-10-05; nested `.tgz`/`.tar.gz` Enter fixed 2026-10-05)  
+Status: **in progress** (owner report 2026-10-05; nested `.tgz`/`.tar.gz` Enter fixed 2026-10-05;
+`.tar.bz2` / `.tar.xz` Enter+list and F5 extract smoke added 2026-10-05)  
 Depends on: plain zip/7z Enter already fixed (`override` on `fmt*` + drive hierarchy).
 
 **Done so far:** Unix `fmttgz` lists tar-in-gzip members; `fmtbz2` lists tar-in-bzip2
-(`.tar.bz2`). Fixture generator `tools/gen-archive-fixtures.py` + PTY smoke
-`tools/dn-linux-archives.py` (zip / 7z / tar / tgz / tar.gz / tar.bz2 / zip-in-zip
-Enter+leave; F3/F4 hang-bounded on zip/tgz/tar.bz2).
+(`.tar.bz2`); `fmtxz` lists tar-in-xz (`.tar.xz` / `.txz`) via `xz -dc` + tar parse.
+Fixture generator `tools/gen-archive-fixtures.py` + PTY smoke
+`tools/dn-linux-archives.py` (zip / 7z / tar / tgz / tar.gz / tar.bz2 / tar.xz / txz /
+zip-in-zip Enter+leave; F3/F4 hang-bounded on zip/tgz/tar.bz2/tar.xz; F5 extract
+cancel-path smoke on zip/tgz/tar.xz).
 
 ## Symptoms (user)
 
@@ -67,15 +70,13 @@ behavior is ambiguous (hard gate still applies globally).
       (`tools/dn-linux-archives.py`).
 - [x] Nested `.tar.gz`/`.tgz` enter without AV; listing shows `inside.txt` (TGZ: panel).
 - [x] F3/F4 from inside archive does not hang (timeout-bounded in
-      `tools/dn-linux-archives.py` for zip / tgz / tar.bz2).
-- [x] Autotests in CI for zip, 7z, tar, tgz, tar.gz, tar.bz2 Enter/leave (+ F3/F4)
-      (`dn-linux` / `linux64-utf8` → `tools/dn-linux-archives.py`).
-- [ ] Peers still open: `.tar.xz` (no xz detector yet), F5 extract smoke;
-      plain `.gz` already lists stem via TGZ.
+      `tools/dn-linux-archives.py` for zip / tgz / tar.bz2 / tar.xz).
+- [x] Autotests in CI for zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz Enter/leave
+      (+ F3/F4 / F5) (`dn-linux` / `linux64-utf8` → `tools/dn-linux-archives.py`).
+- [x] Peers: `.tar.xz` / `.txz` detector + Enter/list (`fmtxz`, needs `xz-utils`);
+      F5 extract smoke (cancel path) for zip and nested (tgz / tar.xz).
+      Plain `.gz` already lists stem via TGZ.
 
 Related: Unix packer defaults (`fmtzip`/`fmttar`/`fmt7z`…), ZIP charset
-(`docs/ZIP-CHARSET.md` — minimal `fmtzip` name decode via `dn/lib/zipcharset`),
-object/class gate (`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`).
-
-ZIP charset fixture (not part of `dn-linux-archives.py`):
-`python3 tools/test-zipcharset.py` → `tools/testdata/zipcharset/cp866-privet.zip`.
+(`docs/ZIP-CHARSET.md`), object/class gate
+(`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`).

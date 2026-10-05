@@ -61,12 +61,12 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3 p7zip-full
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3 p7zip-full xz-utils
       - name: Build DN (one command; UTF-8 inside is the default)
         run: tools/build.sh linux64 out/dn
       - name: File operations in a pty (and the UTF-8 checks)
         run: DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
-      - name: Archive enter/leave matrix (zip, 7z, tar, tgz, tar.gz)
+      - name: Archive enter/leave matrix (zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz + F5)
         run: python3 tools/dn-linux-archives.py out/dn
 
   linux-aarch64:

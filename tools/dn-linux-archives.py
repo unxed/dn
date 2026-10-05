@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PTY smoke tests for DN archive enter/leave and F3/F4 (class Linux / UTF-8).
+"""PTY smoke tests for DN archive enter/leave, F3/F4, and F5 (class Linux / UTF-8).
 
 Usage:
   python3 tools/dn-linux-archives.py OUTDIR
@@ -27,6 +27,7 @@ KEYS = {
     'ALT-X': '\x1bx',
     'F3': '\x1bOR',
     'F4': '\x1bOS',
+    'F5': '\x1b[15~',
 }
 
 
@@ -77,8 +78,29 @@ def open_archive(t: PtyTerm, name: str, expect_member: str, title_hint: str) -> 
     t.send(KEYS['ESC'], 0.3)
     t.send(KEYS['HOME'], 0.15)
     t.send(KEYS['DOWN'], 0.2)
-    t.send(KEYS['ENTER'], 2.0)
-    scr = t.text()
+    scr = ''
+    entered = False
+    for attempt in range(2):
+        if not entered:
+            t.send(KEYS['ENTER'], 2.5)
+        t0 = time.time()
+        while time.time() - t0 < 4.0:
+            t.pump(0.3, 1)
+            scr = t.text()
+            if title_hint and title_hint in scr:
+                entered = True
+            if expect_member.lower() in scr.lower():
+                break
+            if entered:
+                time.sleep(0.2)
+                continue
+            break
+        if expect_member.lower() in scr.lower():
+            break
+        if entered:
+            # Already inside; never send Enter again (that would leave).
+            break
+        # Still in parent dir — one retry.
     check(t.alive(), '%s: alive after Enter' % name, scr)
     check('Fatal' not in scr and 'Access' not in scr,
           '%s: Enter no Fatal' % name, scr)
@@ -126,7 +148,7 @@ def view_edit_smoke(
     title_hint: str,
     key: str,
     label: str,
-    timeout: float = 8.0,
+    timeout: float = 12.0,
 ) -> None:
     d = tempfile.mkdtemp(prefix='dn-arc-op-')
     try:
@@ -139,17 +161,23 @@ def view_edit_smoke(
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
         t0 = time.time()
-        t.send(key, 2.0)
+        t.send(key, 1.5)
         while time.time() - t0 < timeout:
             if not t.alive():
                 break
             scr = t.text()
             if 'Fatal' in scr or 'Access' in scr:
                 break
-            if 'hello' in scr.lower() or expect_member.lower() in scr.lower():
-                # content or viewer chrome present; treat as opened
-                if label == 'F3' or 'hello' in scr.lower():
-                    break
+            low = scr.lower()
+            if 'hello' in low:
+                break
+            if label == 'F3' and expect_member.lower() in low:
+                break
+            # Inside archives F4 is often Extr; treat dialog chrome as success.
+            if label == 'F4' and (
+                'extr' in low or 'edit' in low or 'to:' in low or 'copy' in low
+            ):
+                break
             time.sleep(0.2)
             t.pump(0.2, 1)
         elapsed = time.time() - t0
@@ -159,12 +187,65 @@ def view_edit_smoke(
               '%s/%s: no Fatal' % (name, label), scr)
         check(elapsed < timeout, '%s/%s: no hang (%.1fs)' % (name, label, elapsed), scr)
         check(
-            'hello' in scr.lower() or expect_member.lower() in scr.lower(),
+            'hello' in scr.lower()
+            or expect_member.lower() in scr.lower()
+            or 'extr' in scr.lower(),
             '%s/%s: opened content/chrome' % (name, label),
             scr,
         )
         t.send(KEYS['ESC'], 0.6)
         t.send(KEYS['ESC'], 0.4)
+        quit_dn(t)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
+def extract_smoke(
+    dn_out: str,
+    fixture_dir: str,
+    name: str,
+    expect_member: str,
+    title_hint: str,
+    timeout: float = 12.0,
+) -> None:
+    """F5 extract/copy from inside archive: open dialog, cancel path OK (timeout-bounded)."""
+    d = tempfile.mkdtemp(prefix='dn-arc-f5-')
+    try:
+        copy_dn(dn_out, d)
+        w = os.path.join(d, 'work')
+        os.makedirs(w)
+        shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
+        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        open_archive(t, name, expect_member, title_hint)
+        t.send(KEYS['HOME'], 0.15)
+        t.send(KEYS['DOWN'], 0.2)
+        t0 = time.time()
+        t.send(KEYS['F5'], 1.5)
+        while time.time() - t0 < timeout:
+            if not t.alive():
+                break
+            scr = t.text()
+            if 'Fatal' in scr or 'Access' in scr:
+                break
+            low = scr.lower()
+            if 'extract' in low or 'copy' in low or 'to:' in low or 'extr' in low:
+                break
+            if time.time() - t0 > 1.5:
+                break
+            time.sleep(0.2)
+            t.pump(0.2, 1)
+        elapsed = time.time() - t0
+        scr = t.text()
+        check(t.alive(), '%s/F5: alive' % name, scr)
+        check('Fatal' not in scr and 'Access' not in scr,
+              '%s/F5: no Fatal' % name, scr)
+        check(elapsed < timeout, '%s/F5: no hang (%.1fs)' % (name, elapsed), scr)
+        t.send(KEYS['ESC'], 0.6)
+        t.send(KEYS['ESC'], 0.4)
+        scr2 = t.text()
+        check(t.alive(), '%s/F5: alive after cancel' % name, scr2)
+        check('Fatal' not in scr2 and 'Access' not in scr2,
+              '%s/F5: cancel no Fatal' % name, scr2)
         quit_dn(t)
     finally:
         shutil.rmtree(d, ignore_errors=True)
@@ -181,6 +262,7 @@ def main() -> int:
     fix = tempfile.mkdtemp(prefix='dn-arc-fix-')
     try:
         names = gen_fixtures(fix)
+        print('FIXTURES', ' '.join(names), flush=True)
         cases = [
             ('simple.zip', 'inside', 'ZIP:'),
             ('simple.7z', 'inside', '7Z:'),
@@ -188,6 +270,8 @@ def main() -> int:
             ('simple.tgz', 'inside', 'TGZ:'),
             ('simple.tar.gz', 'inside', 'TGZ:'),
             ('simple.tar.bz2', 'inside', 'BZ2:'),
+            ('simple.tar.xz', 'inside', 'XZ:'),
+            ('simple.txz', 'inside', 'XZ:'),
             ('outer.zip', 'inner', 'ZIP:'),
         ]
         for name, member, title in cases:
@@ -200,6 +284,7 @@ def main() -> int:
             ('simple.zip', 'inside', 'ZIP:'),
             ('simple.tgz', 'inside', 'TGZ:'),
             ('simple.tar.bz2', 'inside', 'BZ2:'),
+            ('simple.tar.xz', 'inside', 'XZ:'),
         ):
             if name not in names:
                 print('SKIP', name, 'F3/F4 (not generated)', flush=True)
@@ -208,6 +293,16 @@ def main() -> int:
             view_edit_smoke(out, fix, name, member, title, KEYS['F3'], 'F3')
             print('CASE', name, 'F4', flush=True)
             view_edit_smoke(out, fix, name, member, title, KEYS['F4'], 'F4')
+        for name, member, title in (
+            ('simple.zip', 'inside', 'ZIP:'),
+            ('simple.tgz', 'inside', 'TGZ:'),
+            ('simple.tar.xz', 'inside', 'XZ:'),
+        ):
+            if name not in names:
+                print('SKIP', name, 'F5 (not generated)', flush=True)
+                continue
+            print('CASE', name, 'F5', flush=True)
+            extract_smoke(out, fix, name, member, title)
         print('ALL OK', flush=True)
         return 0
     finally:

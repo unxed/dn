@@ -1578,7 +1578,8 @@ const
   cmConfigZXZ = 3125;
   cmConfig7Z  = 3126;
   cmConfigBZ2 = 3127;
-  cmHiConfigArchiver = 3127;
+  cmConfigXZ = 3128;
+  cmHiConfigArchiver = 3128;
   cmUpdateArcFile = 3200;
 
   cmGlobalUserMenu = 3220;

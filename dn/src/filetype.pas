@@ -16,7 +16,7 @@ const
     {supported archives in order of appearance}
     'ace;ain;arc;pak;arj;bs2;bsa;cab;chz;ha;hap;hpk;hyp;z;'+
     'lha;ice;lzh;lim;ark;qrk;rar;sqz;tar;taz;tgz;gz;uc2;ufa;'+
-    'zip;zoo;$z;zxz;7z;bz2;tbz2'+
+    'zip;zoo;$z;zxz;7z;bz2;tbz2;xz;txz;tlz'+
     {arvid}
     'avt;tdr;'
     +'pk|';

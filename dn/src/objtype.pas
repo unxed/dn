@@ -80,6 +80,7 @@ const
   otTGZArchiver = 9225;
   otS7ZArchiver = 9226;
   otBZ2Archiver = 9227;
+  otXZArchiver = 9228;
 
   { --- ArcView }
 

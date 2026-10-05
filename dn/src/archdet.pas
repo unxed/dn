@@ -64,7 +64,7 @@ uses
   
   fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, fmttar, fmttgz,
   fmtzxz, fmtqrk, fmtufa, fmtis3, fmtsqz, fmthap, fmtzoo, fmtchz,
-  fmtuc2, fmtain, fmt7z,  fmtbz2,
+  fmtuc2, fmtain, fmt7z,  fmtbz2, fmtxz,
   
   profile, Defines, Streams, strutil, fileutil,
   Messages,
@@ -697,6 +697,20 @@ Function BZ2Detect: Boolean;
   ArcFile.Seek(ArcPos);
   end;
 
+Function XZDetect: Boolean;
+  var
+    ID: LongInt;
+    W: AWord;
+  begin
+  XZDetect := False;
+  ArcFile.Read(ID, SizeOf(ID));
+  ArcFile.Read(W, SizeOf(W));
+  { xz magic: FD 37 7A 58 5A 00 }
+  if (ArcFile.Status = stOK) and (ID = $587a37fd) and (W = $005a)
+    then XZDetect := True;
+  ArcFile.Seek(ArcPos);
+  end;
+
 
 function DetectArchive: TARJArchive;
   begin
@@ -756,6 +770,8 @@ function DetectArchive: TARJArchive;
     DetectArchive := PS7ZArchive.Create
   else if BZ2Detect then
     DetectArchive := PBZ2Archive.Create
+  else if XZDetect then
+    DetectArchive := PXZArchive.Create
   else
     
     
@@ -822,6 +838,8 @@ function GetArchiveTagBySign(Sign: TStr4): Byte;
     GetArchiveTagBySign := arc7Z
   else if sign = sigBZ2 then
     GetArchiveTagBySign := arcBZ2
+  else if sign = sigXZ then
+    GetArchiveTagBySign := arcXZ
   else
     
     
@@ -887,6 +905,8 @@ function GetArchiveByTag(ID: Byte): TARJArchive;
     GetArchiveByTag := PS7ZArchive.Create
   else if ID = arcBZ2 then
     GetArchiveByTag := PBZ2Archive.Create
+  else if ID = arcXZ then
+    GetArchiveByTag := PXZArchive.Create
   else
     
     

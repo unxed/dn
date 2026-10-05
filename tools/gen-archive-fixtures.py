@@ -71,6 +71,12 @@ def main() -> int:
         if have('xz'):
             run(['tar', '-cJf', os.path.join(out, 'simple.tar.xz'), 'inside.txt'], cwd=stage)
             made.append('simple.tar.xz')
+            # .txz is the short compound alias (same payload)
+            shutil.copy(
+                os.path.join(out, 'simple.tar.xz'),
+                os.path.join(out, 'simple.txz'),
+            )
+            made.append('simple.txz')
 
     if have('gzip'):
         shutil.copy(os.path.join(stage, 'inside.txt'), os.path.join(out, 'plain.txt'))
