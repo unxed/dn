@@ -1,7 +1,11 @@
 # Archive matrix: nested formats, ops, autotests
 
-Status: **open** (owner report 2026-10-05)  
+Status: **in progress** (owner report 2026-10-05; nested `.tgz`/`.tar.gz` Enter fixed 2026-10-05)  
 Depends on: plain zip/7z Enter already fixed (`override` on `fmt*` + drive hierarchy).
+
+**Done so far:** Unix `fmttgz` lists tar-in-gzip members (gunzip + tar headers; GNU `tar`
+defaults for pack/unpack). Fixture generator `tools/gen-archive-fixtures.py` + PTY
+smoke `tools/dn-linux-archives.py` (zip / 7z / tar / tgz / tar.gz Enter+leave).
 
 ## Symptoms (user)
 
@@ -57,11 +61,13 @@ behavior is ambiguous (hard gate still applies globally).
 
 ## Acceptance for this task
 
-- [ ] Fixture generator checked in and documented.
-- [ ] Click-through log (or CI) covers the table above on class Linux.
-- [ ] Nested `.tar.gz`/`.tgz` (and peers) enter without AV; behavior defined vs object baseline.
+- [x] Fixture generator checked in and documented (`tools/gen-archive-fixtures.py`).
+- [x] Click-through / PTY covers zip, 7z, tar, tgz, tar.gz Enter+leave on class Linux
+      (`tools/dn-linux-archives.py`).
+- [x] Nested `.tar.gz`/`.tgz` enter without AV; listing shows `inside.txt` (TGZ: panel).
 - [ ] F3/F4 from inside archive does not hang (timeout-bounded test).
 - [ ] Autotests in CI for at least zip, 7z, tar, tar.gz + one extract/view path.
+- [ ] Peers still open: `.tar.bz2` / `.tar.xz`, zip-in-zip, plain `.gz`, F5 extract.
 
 Related: Unix packer defaults (`fmtzip`/`fmttar`/`fmt7z`…), ZIP charset
 (`docs/ZIP-CHARSET.md`), object/class gate

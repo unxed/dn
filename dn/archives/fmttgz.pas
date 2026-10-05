@@ -50,21 +50,61 @@ unit fmttgz; {TGZ & TAZ & TAR.GZ}
 interface
 
 uses
-  Archiver, basics, strutil, Defines, objutil, Streams, Dos, timeutil,
-   fileutil
+  Archiver, Basics, strutil, Defines, objutil, Streams, Dos, timeutil,
+  fileutil
   ;
 
 type
   TTGZArchive = class;
   PTGZArchive = TTGZArchive;
   TTGZArchive = class(TARJArchive)
+    TarData: TMemoryStream;
+    TarMode: Boolean;
+    GzDone: Boolean;
     constructor Create;
+    destructor Destroy; override;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
     end;
 
 implementation
+
+uses
+  osdep
+{$IFDEF UNIX}
+  , zstream
+{$ENDIF}
+  ;
+
+const
+  BlkSize = 512;
+  MaxTName = 100;
+  Txt_Word = 8;
+  Txt_Long = 12;
+
+type
+  TARHdr = record
+    FName: array[1..MaxTName] of Char;
+    Mode: array[1..Txt_Word] of Char;
+    uid: array[1..Txt_Word] of Char;
+    gid: array[1..Txt_Word] of Char;
+    Size: array[1..Txt_Long] of Char;
+    mtime: array[1..Txt_Long] of Char;
+    chksum: array[1..Txt_Word] of Char;
+    filetype: Char;
+    linkname: array[1..MaxTName] of Char;
+    end;
+
+function IsCompoundTarGz(const N: String): Boolean;
+  var
+    U: String;
+  begin
+  U := UpStrg(N);
+  Result := (GetExt(U) = '.TGZ') or (GetExt(U) = '.TAZ') or
+    (Length(U) >= 7) and (Copy(U, Length(U) - 6, 7) = '.TAR.GZ');
+  end;
+
 { ----------------------------- TAR ------------------------------------}
 
 constructor TTGZArchive.Create;
@@ -73,11 +113,26 @@ constructor TTGZArchive.Create;
     q: String;
   begin
   inherited Create;
+  TarData := nil;
+  TarMode := False;
+  GzDone := False;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
-  
+
+{$IFDEF UNIX}
+  { GNU tar: list/extract compressed archives; OS/2 UNTGZOS2 is not on Linux. }
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'tar'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'tar'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'xzf'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'xzf'));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'czf'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, ''));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, 'tzf'));
+{$ELSE}
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, ''));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'UNTGZOS2'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-d'));
@@ -87,6 +142,7 @@ constructor TTGZArchive.Create;
   Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, ''));
   Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, ''));
   Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
+{$ENDIF}
   IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
   ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
   ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, ''));
@@ -111,21 +167,26 @@ constructor TTGZArchive.Create;
          ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
-  
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
   q := GetVal(@Sign[1], @FreeStr[1], PPutDirs, '0');
   PutDirs := q <> '0';
-  
+
   q := GetVal(@Sign[1], @FreeStr[1], PSwapWhenExec, '0');
   SwapWhenExec := q <> '0';
-  
-  
+
   q := GetVal(@Sign[1], @FreeStr[1], PUseLFN, '1');
   UseLFN := q <> '0';
-  
+
   end { TTGZArchive.Init };
+
+destructor TTGZArchive.Destroy;
+  begin
+  TarData.Free;
+  TarData := nil;
+  inherited Destroy;
+  end;
 
 function TTGZArchive.GetID: Byte;
   begin
@@ -136,6 +197,77 @@ function TTGZArchive.GetSign: TStr4;
   begin
   GetSign := sigTGZ;
   end;
+
+{$IFDEF UNIX}
+procedure ExpandGzipToTarData(var TarData: TMemoryStream);
+  var
+    GZ: TGZFileStream;
+    Buf: array[0..8191] of Byte;
+    N: LongInt;
+  begin
+  if TarData <> nil then
+    Exit;
+  TarData := TMemoryStream.Create(0, 8192);
+  try
+    GZ := TGZFileStream.Create(SysOsPath(ArcFileName), gzOpenRead);
+    try
+      repeat
+        N := GZ.Read(Buf, SizeOf(Buf));
+        if N > 0 then
+          TarData.Write(Buf, N);
+      until N = 0;
+    finally
+      GZ.Free;
+    end;
+    TarData.Seek(0);
+  except
+    TarData.Free;
+    TarData := nil;
+  end;
+  end;
+
+procedure GetTarMemberFromStream(S: TStream);
+  var
+    Buffer: array[0..BlkSize-1] of Char;
+    Hdr: TARHdr absolute Buffer;
+    DT: DateTime;
+    W: AWord;
+    NextPos: Int64;
+  begin
+  if S.GetPos >= S.GetSize then
+    begin
+    FileInfo.Last := 1;
+    Exit;
+    end;
+  FillChar(Buffer, SizeOf(Buffer), 0);
+  S.Read(Buffer, BlkSize);
+  if S.Status <> stOK then
+    begin
+    FileInfo.Last := 2;
+    Exit;
+    end;
+  FileInfo.Last := 0;
+  if Hdr.filetype = '5' then
+    FileInfo.Attr := Directory
+  else
+    FileInfo.Attr := 0;
+  FileInfo.FName := Hdr.FName+#0;
+  SetLength(FileInfo.FName, PosChar(#0, FileInfo.FName)-1);
+  if FileInfo.FName = '' then
+    begin
+    FileInfo.Last := 1;
+    Exit;
+    end;
+  FileInfo.USize := FromOct(Hdr.Size);
+  FileInfo.PSize := FileInfo.USize;
+  GetUNIXDate(i32(FromOct(Hdr.mtime)), DT.Year, DT.Month, DT.Day, DT.Hour,
+     DT.Min, DT.Sec);
+  PackTime(DT, FileInfo.Date);
+  W := Word(CompRec(FileInfo.PSize).Lo) and (BlkSize-1);
+  NextPos := S.GetPos + FileInfo.PSize - W + BlkSize*Byte(W <> 0);
+  S.Seek(NextPos);
+  end;
+{$ENDIF}
 
 procedure TTGZArchive.GetFile;
   type
@@ -149,6 +281,28 @@ procedure TTGZArchive.GetFile;
     DT: DateTime;
     C: Char;
   begin
+{$IFDEF UNIX}
+  if IsCompoundTarGz(ArcFileName) then
+    begin
+    TarMode := True;
+    if TarData = nil then
+      ExpandGzipToTarData(TarData);
+    if TarData = nil then
+      begin
+      FileInfo.Last := 2;
+      Exit;
+      end;
+    GetTarMemberFromStream(TarData);
+    Exit;
+    end;
+{$ENDIF}
+
+  { Plain .gz (and non-Unix builds): one synthetic member from the gzip header. }
+  if GzDone then
+    begin
+    FileInfo.Last := 1;
+    Exit;
+    end;
   ArcFile.Read(P, SizeOf(P));
   if ArcFile.Eof then
     begin
@@ -160,9 +314,7 @@ procedure TTGZArchive.GetFile;
   FileInfo.FName := '';
   if  (P.Flag and $800 = 0) or (P.Id = $9d1f)
   then
-    if {(UpStrg(GetExt(ArcFileName)) = '.GZ') or}
-        (UpCase(ArcFileName[Length(ArcFileName)]) = 'Z')
-      {gzip changes last char of extension to 'z' or adds '.gz' extension}
+    if (UpCase(ArcFileName[Length(ArcFileName)]) = 'Z')
       then
       FileInfo.FName := GetSName(ArcFileName)
     else
@@ -190,6 +342,7 @@ procedure TTGZArchive.GetFile;
   ArcFile.Read(FileInfo.USize, SizeOf(FileInfo.USize));
   FileInfo.Attr := 0;
   FileInfo.Last := 0;
+  GzDone := True;
   end { TTGZArchive.GetFile };
 
 end.

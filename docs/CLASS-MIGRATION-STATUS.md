@@ -68,7 +68,7 @@ explicitly excluded as the migration comparator.
 | Archive ctor `Destroy; Fail` double-free | `b9a6153`: `TArcDrive.Create` / `TArvidDrive.Load` use `Fail` only (FPC runs destructor once). | Fixed; audit other `Destroy; Fail` ctors |
 | UTF-8 panel names `?????` until Ctrl-R | `ab9ebd8`: post-startup `WriteScreenCells` skipped on `-dDNUTF8` (16-bit copy maps multi-byte cells to `?`). `DN_OPS_UTF8=1` dn-linux-ops green. | Fixed on class UTF-8 build |
 | Enter non-exec (`cmExecFile`) AV | Fixed: `System.PString` (^AnsiString) hid `Defines.PString` after `uses SysUtils`; bind + `PShortString` in `DoExecFile`. | Fixed on class self-build |
-| Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | Open; spec `docs/ARCHIVE-MATRIX.md` / PLAN 4c |
+| Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | **Partial:** `.tgz`/`.tar.gz` Enter+list OK (`fmttgz`); fixtures + `dn-linux-archives.py` Enter/leave green. Open: F3/F4/F5, peers, CI — `docs/ARCHIVE-MATRIX.md` / PLAN 4c |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. A valid comparison waits for a visible readiness
