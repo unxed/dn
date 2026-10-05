@@ -62,3 +62,17 @@ GitHub immediately after it is created.
 
 The `class-migration` workflow checks the current focused regression tests.
 It supplements the full workflows and does not waive either final tree gate.
+
+## Startup redraw (issue #6)
+
+- Cause: `WriteScreenCells` outputs a separate 16-bit copy refreshed only by
+  `ReadScreenCells`; after the startup `MyApplication.Draw` the copy was stale
+  (empty start), so configured starts showed a blank field and virgin starts
+  kept the About image. Fix: `ReadScreenCells` right after the startup draw
+  (`boot.pas`).
+- Regression test: the `dn-linux-ops.py` autosave-desktop check
+  (`dsk_cwd` right after the start, no F10/Right) fails without the fix.
+- Open: full cell comparison object/class (colours, several symbols) is not
+  closed; the 100-run acceptance is not done.
+- Analogues to check (not done): other `Draw` followed by `WriteScreenCells`
+  without `ReadScreenCells`: `dn.pas:130`, `videoman.pas:447`.
