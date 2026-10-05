@@ -4,6 +4,12 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
+Current gate status: **OPEN**. The classic baseline was identified as
+`unxed/dn` `backup/before-history-rewrite-2026-10-03` and builds successfully
+with the classic `unxed/tv` `main` revision `c9bb5c4`. Initial identical PTY
+checks for startup/exit and top-level menu rendering have been run against
+that baseline and the current build; the complete matrix is still pending.
+
 ## Required comparison
 
 For both builds, use the same clean temporary tree, terminal size, locale,
