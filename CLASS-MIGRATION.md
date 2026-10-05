@@ -101,7 +101,7 @@ Self-build only; absent on pre-class `dist`. Details live in
 - Plain zip/7z Enter: **fixed** (fmt + drive `override`); nested/compound archives and ops matrix still **open** (`docs/ARCHIVE-MATRIX.md`).
 - Failed archive ctor: **fixed** — `Destroy; Fail` → `Fail` only (`arcview`/`arvid`, `b9a6153`).
 - UTF-8 panel names at startup: **fixed** — no post-draw `WriteScreenCells` on `DNUTF8` (`ab9ebd8`).
-- Enter on non-exec file (`cmExecFile`): **open** class-only AV (PTY often selected `zzz.txt` beside `aaa.zip` — not zip Enter; see checklist).
+- Enter on non-exec file (`cmExecFile`): **fixed** — `System.PString` (^AnsiString) vs `Defines.PString` (^ShortString) after `uses SysUtils` (`pstring_bind.inc` / `PShortString`).
 
 ## UI notes (not all are class regressions)
 

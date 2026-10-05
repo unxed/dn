@@ -17,7 +17,10 @@ type
   Str40 = String[40]; PStr40 = ^Str40;
   Str50 = String[50]; PStr50 = ^Str50;
 
-  PString = ^String;
+  { Explicit ShortString: ^String follows $H/mode of the defining unit and can
+    become ^AnsiString while DN locals stay ShortString (-Sh-), so Message(@S)
+    then crashes in fpc_ansistr_to_shortstr (cmExecFile / language menu). }
+  PString = ^ShortString;
   LongString = AnsiString;
   PLongString = ^LongString;
 

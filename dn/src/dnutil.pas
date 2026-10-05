@@ -283,6 +283,8 @@ uses
   , Startup, dlgrecs
   , osdep;
 
+{$I manual/pstring_bind.inc}
+
 { Load and Store Palette routines }
 
 procedure LoadIndexes(var S: TStream);
@@ -2373,7 +2375,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     var
       S: String;
     begin
-    S := PString(Event.InfoPtr)^;
+    { PShortString: Message(@ShortString); a plain PString cast has been
+      compiled as AnsiString→ShortString here and AVed on Enter for .txt. }
+    if Event.InfoPtr = nil then
+      S := ''
+    else
+      S := PShortString(Event.InfoPtr)^;
     if
       not TryRunSession(S)
         and CheckExit  {JO}
@@ -2388,7 +2395,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     var
       S: String;
     begin
-    S := PString(Event.InfoPtr)^;
+    if Event.InfoPtr = nil then
+      S := ''
+    else
+      S := PShortString(Event.InfoPtr)^;
     if not TryRunSession(S)
         and CheckExit  {JO}
       then
