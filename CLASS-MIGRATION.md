@@ -63,8 +63,9 @@ GitHub immediately after it is created.
 
 ## Remaining implementation work
 
-- Verify the all-tracked-source Pascal gate and byte-identical bootstrap
-  reproduction on the commit that removes duplicate historical inputs.
+- Keep the all-tracked-source Pascal gate and byte-identical bootstrap
+  reproduction green. Current proof is DN `8f3057f` (`dn` run
+  `37386669632`; `layout` run `37386669509`).
 - Keep the object/class parity gate closed at its latest exact comparison
   (`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`); rerun it after UI, drawing,
   event, resource, or stream changes.

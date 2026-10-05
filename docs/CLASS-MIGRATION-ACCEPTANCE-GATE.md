@@ -7,7 +7,7 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
-Current behavioral gate status: **CLOSED** for DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` + TV3 `a06dd31` (2026-10-06). The current bootstrap/gate bookkeeping changes do not alter DN runtime sources; their exact-SHA CI is still required before advancing.
+Current behavioral gate status: **CLOSED** for DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` + TV3 `a06dd31` (2026-10-06). The whole-tree class-syntax and bootstrap-provenance gates are also green on current DN `8f3057f` (`dn` run `37386669632`; `layout` run `37386669509`); those changes do not alter DN runtime sources.
 
 **Closing evidence (exact SHA):** 12-shard `dn-accept` run
 [`37383488177`](https://github.com/unxed/dn/actions/runs/37383488177):
