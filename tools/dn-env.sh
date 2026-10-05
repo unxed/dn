@@ -61,7 +61,9 @@ dn_stage() {
     rm -rf "$DN_STAGE"; mkdir -p "$DN_STAGE"
     for f in "${DN_SRC:-$here/dn/src}"/*.pas "${DN_SRC:-$here/dn/src}"/*.inc "$here"/dn/archives/*.pas "$here"/dn/compat/*.pas; do ln -s "$f" "$DN_STAGE/$(basename "$f")"; done
     # ZIP charset libs (localecp + zipcharset); include maps staged beside the unit
-    for f in "$here"/dn/lib/localecp/*.{pas,inc} "$here"/dn/lib/zipcharset/*.pas; do
+    # Avoid bash-only brace globs — build may run under dash (no `{pas,inc}`).
+    for f in "$here"/dn/lib/localecp/*.pas "$here"/dn/lib/localecp/*.inc \
+             "$here"/dn/lib/zipcharset/*.pas; do
         [ -e "$f" ] && ln -sf "$f" "$DN_STAGE/$(basename "$f")"
     done
     for d in $DN_UNITS_EXTRA; do
