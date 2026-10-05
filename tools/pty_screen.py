@@ -184,12 +184,29 @@ class PtyTerm:
         self.screen = Screen(cols, rows)
         self.raw = b''
         e = dict(os.environ)
-        e.update({'TERM': 'xterm-256color', 'COLORTERM': ''})
+        # COLUMNS/LINES: OsSize falls back here when TIOCGWINSZ is 0 (common
+        # right after pty.fork before the parent sets winsize).
+        e.update({
+            'TERM': 'xterm-256color',
+            'COLORTERM': '',
+            'COLUMNS': str(cols),
+            'LINES': str(rows),
+        })
         if env:
             e.update(env)
+            # Keep size pins unless the caller overrode them explicitly.
+            e.setdefault('COLUMNS', str(cols))
+            e.setdefault('LINES', str(rows))
+        winsz = struct.pack('HHHH', rows, cols, 0, 0)
         self.pid, self.fd = pty.fork()
         self.status = None
         if self.pid == 0:
+            # Set slave winsize before exec so the program never observes 0x0
+            # (→ default 80) while the parent is still calling set_size.
+            try:
+                fcntl.ioctl(1, termios.TIOCSWINSZ, winsz)
+            except OSError:
+                pass
             if cwd:
                 os.chdir(cwd)
             os.environ.update(e)

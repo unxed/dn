@@ -23,6 +23,7 @@ optional corroboration only; see `docs/CI-SERIAL.md`. Push is optional.
 |---|---|
 | #6 startup redraw + About residue | `7572d73`; regressions `dn-linux-startup.py` / `dn-linux-about.py` |
 | Accept harness harden (FAST settle) | `ad9c4f7`; `dn-accept` green on that SHA historically |
+| F1 Help open-vs-idle settle | Harness `wait_help_window` for `f1help`/`f1_esc` — not a THelpWindow palette/frame class bug (shard5 looked like ═ vs ─) |
 | Archives xz / F5 smoke | `5f02362` — ALL OK locally |
 | ZIP listing charset | `27de843` |
 | `ChLngId` ShortString / `PShortString` | `88c19f8` |
@@ -95,7 +96,13 @@ object `TTrashCan.GetPalette` returns `@CTrashCan` against TV’s dynarray
 `TPalette` (`MapColor` → RTE 204); class uses `MakePalette(CTrashCan)`.
 Tracked in [#14](https://github.com/unxed/dn/issues/14). The accept harness
 excludes `menu_0_10` — cannot PASS on the unmodified object baseline binary.
-Changing language also raised an access violation in the class build. The
+Additional harness exclusions (not class-only regressions): `menu_0_16` (♦ Game /
+Tetris playfield animation), `menu_4_5` (Panel → Directory Branch — Access
+violation on both object and class), `menu_5_2` (Manager → Directory tree —
+full-volume scan exceeds `DN_ACCEPT_FAST` scenario timeout). `menu_2_7`–`menu_2_9`
+(Disk → Directory tree via `cmCreateTree`; same scan, 90s scenario alarm under
+`DN_ACCEPT_FAST`). Changing language
+also raised an access violation in the class build. The
 language-menu crash was traced to interpreting a `TStringCollection`
 ShortString item as an AnsiString (`System.PString` after `uses SysUtils`).
 `ChLngId` in `dnutil.pas` now reads items via `PShortString` (same typed fix
