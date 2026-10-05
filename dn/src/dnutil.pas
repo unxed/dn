@@ -115,7 +115,7 @@ type
     procedure LoadDesktop(var S: TStream);
     procedure StoreDesktop(var S: TStream);
     procedure ChgColors;
-    procedure EventError(var Event: TEvent); virtual;
+    procedure EventError(var Event: TEvent); override;
     procedure HandleCommand(var Event: TEvent);
   private
     procedure ProcessTempFile(TFStr: String);
