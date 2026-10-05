@@ -7,24 +7,24 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
-Current gate status: **CLOSED** (2026-10-05).
+Current behavioral gate status: **CLOSED** for DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` + TV3 `a06dd31` (2026-10-06). The current bootstrap/gate bookkeeping changes do not alter DN runtime sources; their exact-SHA CI is still required before advancing.
 
-**Closing evidence (local-first):** full `tools/dn-linux-accept.py` matrix
-`SUMMARY` across 12 shards: **pass=174 fail=0** (`DN_ACCEPT_FAST=1`), logs
-`/tmp/dn-accept-auth/shard{0..11}.log` + `DONE`. Object binary
-`/tmp/dn-object-gate/out/linux64-gate` (DN `b4916b8` + TV `521d064`). Class
-binary `out/linux64-gate` on `main` through harness harden `606cca3` (matrix
-run) / tip includes Tetris timing `fd4cbdb`. Issue [#6](https://github.com/unxed/dn/issues/6)
-startup/About: `tools/dn-linux-startup.py` + `dn-linux-about.py` ALL OK on
-`out/linux64` the same day. Harness compares full `Screen.cells` + cursor
-(with documented masks/skips). GitHub Actions remains optional corroboration
-only (`docs/CI-SERIAL.md`).
+**Closing evidence (exact SHA):** 12-shard `dn-accept` run
+[`37383488177`](https://github.com/unxed/dn/actions/runs/37383488177):
+**177/177 PASS**, including `f5_f6_f8`; `dn-linux` run
+[`37383488040`](https://github.com/unxed/dn/actions/runs/37383488040),
+`dn-windows` run [`37383488261`](https://github.com/unxed/dn/actions/runs/37383488261),
+layout run [`37383487968`](https://github.com/unxed/dn/actions/runs/37383487968),
+and `dn` audit run [`37383487991`](https://github.com/unxed/dn/actions/runs/37383487991)
+all completed successfully on that same SHA. The object binary was rebuilt
+from DN `b4916b8` + TV `521d064`; the class build used TV3 `a06dd31`. The
+harness compares full `Screen.cells` + cursor (with documented masks/skips).
 
 ### Evidence that closed the gate
 
 | Item | SHA / note |
 |---|---|
-| Full local accept matrix | **174/174 PASS**, 12 shards, `/tmp/dn-accept-auth/` (2026-10-05) |
+| Full object/class accept matrix | **177/177 PASS**, 12 shards, exact SHA `06259f5`, run `37383488177` (2026-10-06) |
 | #6 startup redraw + About residue | `7572d73`; regressions green |
 | Accept harness harden (masks, long-scan, help wait) | `606cca3` (+ earlier settle fixes) |
 | F1 Help open-vs-idle settle | `wait_help_window` for `f1help`/`f1_esc` |
@@ -76,15 +76,13 @@ object revision had it before the migration. Record the fix in the regression
 checklist; re-run the scenario on both builds when the object tree is still
 used for acceptance.
 
-## Current controlling result (2026-10-05)
+## Current controlling result (2026-10-06)
 
-The latest object baseline identified so far is DN
+The last object baseline used is DN
 `b4916b874989d7b35660d02cf935dc5f0db7a656` with TV
-`521d06479198789deeaa6fda287236ca83ba4051`. The latest class build is DN
-`7eaca15be92b86e69fb43a830029ed4e9e92a8e2` with TV3
-`ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3`. Recheck that no later object-based
-revision exists before final acceptance; rebuild both exact revisions with
-identical build metadata and fixtures. Earlier trials against
+`521d06479198789deeaa6fda287236ca83ba4051`. The class build used for the latest
+full result is DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` with TV3
+`a06dd31`. Both were rebuilt with matching UTF-8 mode and fixtures. Earlier trials against
 `33674fed7829124fbd3230440faf3075c45eb9f6` or the much older
 `10763d65d091fc8525599a45c155be228c1bb8b6` do not replace this comparison.
 
@@ -142,7 +140,7 @@ Post-fix: class and object gate binaries show panels before input and after
 F10+Right (5/5 each); virgin Esc and Enter leave panels with no About residue
 (`tools/dn-linux-about.py`). Configured regression: `tools/dn-linux-startup.py`.
 Full-cell object/class parity at accept checkpoints is covered by the closed
-174/174 matrix (harness compares `Screen.cells` + cursor with documented masks).
+177/177 matrix (harness compares `Screen.cells` + cursor with documented masks).
 
 The acceptance harness itself previously mishandled `CSI ? 1049 h/l`: it
 did not save and restore the primary-screen cells, attributes, and cursor.
@@ -153,7 +151,7 @@ any DN rendering discrepancy.
 These are hard failures, not approved normalizations. No action-matrix row is
 promoted to pass by a smoke tour or a diagnostic-only source copy. The gate
 **CLOSED** after object and class builds replayed the full harness matrix with
-matching checkpoints (174/174, 2026-10-05).
+matching checkpoints (177/177, 2026-10-06, exact SHA above).
 
 ## Newly recorded class-only crashes (2026-10-05)
 
@@ -169,9 +167,9 @@ Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
 | Autosave desktop second start (`dn.dsk` + Preserve directory) | **fixed** — was SIGSEGV / banner-only; `TFilePanelRoot.Store` again uses `S.Put(Drive)` | pass — restores `…/sub>` | Local PTY: first quit writes `dn.dsk`; second start alive with preserved `sub>` prompt |
 
 `F4` / `Ctrl+O` / autosave-desktop / issue #6 startup redraw are fixed on class;
-the full object/class accept matrix is **CLOSED** green (174/174, 2026-10-05).
+the full object/class accept matrix is **CLOSED** green (177/177, 2026-10-06).
 
-## Reopened gate: class-only AV after F5 copy (2026-10-05)
+## Fixed class-only AV after F5 copy (2026-10-05)
 
 The 174/174 matrix on class DN `cd79579` passed, but the broader Linux ops
 scenario exposed a path that matrix did not exercise end-to-end. On class DN
@@ -193,16 +191,16 @@ confirmed class-only discrepancy for the legacy-codepage Linux ops flow;
 the default UTF-8 class failure is reproduced too, but needs a same-mode
 object run before claiming parity status for that build mode.
 
-The accept matrix is **reopened** pending the fix's full run. The queue now
-uses `TLineQueue.FreeItem` to free each `TLine`; the unused record-owning
+The queue now uses `TLineQueue.FreeItem` to free each `TLine`; the unused record-owning
 `TCopyCollection` was removed. `tools/dn-linux-ops.py` now checks for a fatal
 error immediately after F5. Local evidence: class ops passes 32/32 with
 `DN_UTF8=0` and 42/42 with UTF-8; the object build passes 31/31 with
 `DN_UTF8=0`; the new `f5_f6_f8` object/class scenario passes 1/1 with both
 builds in UTF-8 mode. The repo-wide `FreeItem`/collection search and queue
 search confirms there are no remaining `TCopyCollection`/`PFileCopyRec`
-references, and the queue's only insertions are `TLine` instances.
-The full matrix must pass on the fix SHA before this gate can close.
+references, and the queue's only insertions are `TLine` instances. The fix is
+verified by the full **177/177** run on `06259f5` (run `37383488177`) and green
+Linux ops on that exact SHA (run `37383488040`).
 
 ## UI observations (2026-10-05)
 
@@ -241,8 +239,9 @@ Harness: `tools/dn-linux-accept.py OBJECT_OUT CLASS_OUT` — shared work tree, f
 scenarios + every top-menu cell (`menu_M_N`). Object baseline: DN `b4916b8` + TV
 `521d064`. Harness harden `ad9c4f7`. **Core result 2026-10-05:**
 `SUMMARY pass=32 fail=0` (historical). **Full matrix 2026-10-05:**
-`pass=174 fail=0` (12 shards, `/tmp/dn-accept-auth/`) — gate **CLOSED**.
-CI green alone was never required to close.
+`pass=177 fail=0` (12 shards, `dn-accept` run `37383488177` on `06259f5`) —
+gate **CLOSED**. All required GitHub workflows for that SHA reached terminal
+success.
 
 The matrix must include every user-visible action, not just one representative
 per feature: every item in every top-level and nested menu, each default and

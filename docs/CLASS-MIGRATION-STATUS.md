@@ -1,44 +1,42 @@
 # Class migration: status and administrative record
 
-Last updated: 2026-10-05
+Last updated: 2026-10-06
 
 Product frame for this work: **DN 3.0** — stable port, minimal interventions;
 deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 
-## Status snapshot (2026-10-05, local-first)
+## Status snapshot (2026-10-06)
 
 | Item | State |
 |---|---|
-| Gate | **CLOSED** (2026-10-05; full local matrix + #6) |
+| Gate | **CLOSED** on last behavior-verified SHA `06259f5` (2026-10-06) |
 | Core accept | **32/32 PASS** (historical) |
-| Full matrix | **174/174 PASS** local (`DN_ACCEPT_FAST=1`, 12 shards, object `/tmp/dn-object-gate/out/linux64-gate` vs class `out/linux64-gate`, 2026-10-05; evidence `/tmp/dn-accept-auth/`) |
+| Full matrix | **177/177 PASS** on exact SHA `06259f5` (12 shards; GitHub run `37383488177`; object DN `b4916b8` + TV `521d064` vs class DN + TV3 `a06dd31`) |
 | Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
 | Known object crash | ♦ Trashcan (`cmHideShowTools` / `menu_0_10`): object `TTrashCan.GetPalette`=`@CTrashCan` vs dynarray `TPalette` → RTE 204; class `MakePalette` OK — skip kept ([#14](https://github.com/unxed/dn/issues/14)) |
 | Accept skips (harness) | `menu_0_16` (♦ Game/Tetris animation), `menu_3_8` (Edit OS Environment — live env), `menu_5_2` (Manager Directory tree scan). Re-enabled: `menu_4_5` Branch, `menu_6_16` Colors |
 | Classic palette | Class on `CColor` (`b57025b`) |
 | Startup / About | [#6](https://github.com/unxed/dn/issues/6) fixed (`7572d73`); regressions `tools/dn-linux-startup.py` / `dn-linux-about.py` |
-| Archives xz / F5 | Local ALL OK (`5f02362`) |
+| F5 file-copy ownership | Fixed with `TLineQueue` (`3bc0d0f`); `f5_f6_f8` parity scenario and all Linux ops pass on `06259f5` |
+| Archives xz / F5 | Local ALL OK (`5f02362`); GitHub Linux archive matrix green on `06259f5` |
 | ZIP charset | Listing path `27de843` |
 | `ChLngId` | `PShortString` (`88c19f8`) |
 
 ## Working agreement
 
 - DN and TV3 work is on `main`; no migration feature branches are in use.
-- **Local verification first.** Prefer running accept/ops/archive scripts on this
-  machine before treating a fix as done. GitHub Actions is congested; do **not**
-  push solely to “get CI green.” Push is optional and parent-queued
-  (`docs/CI-SERIAL.md`).
-- Use the system `gh` authenticated as `unxed` when issues or a parent-owned
-  push are required. After any push, verify the remote ref.
+- Use local checks for fast feedback and GitHub Actions for exact-SHA acceptance.
+  Every commit is pushed to GitHub immediately as required by the owner; use
+  system `gh` authenticated as `unxed` and verify the remote ref after push.
 - For GitHub issues, send Markdown with real line breaks (for example through
   `gh issue edit --body-file -` and a quoted here-document), not escaped `\\n`
   text. Read the issue back with `gh issue view --json body` and verify the
   stored newlines and Markdown structure after every create/edit.
 - Keep changes small and atomic. Before a regex or potentially destructive
   bulk edit, create a local checkpoint commit. If the transformation is wrong,
-  restore that checkpoint rather than repairing individual fallout. Publish
-  checkpoints only when the parent push queue allows.
+  restore that checkpoint rather than repairing individual fallout. Push
+  every checkpoint immediately.
 - After each successful fix, add/check the analogous-pattern item in
   `CLASS-MIGRATION-REGRESSION-CHECKLIST.md` and perform the repository-wide
   search before treating the fix as complete.
@@ -51,7 +49,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Role | DN | Turbo Vision | Use |
 |---|---|---|---|
 | Last object-based baseline | `b4916b874989d7b35660d02cf935dc5f0db7a656` | `521d06479198789deeaa6fda287236ca83ba4051` | Required behavioral comparator |
-| Current class source used for the latest user build | `1380622` / later `main` (user `dn.err` build id); TV3 pin below | `ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3` | Rebuild from the current class-based `main` before final acceptance |
+| Current class source used for latest full parity | DN `06259f57c4ac1c72456b2162ca9df34ec4a5105f` | TV3 `a06dd31` | 177/177 acceptance + exact-SHA Linux/Windows CI green |
 | Older distributed binary | distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4`, built from `df0cca2` | pre-class distribution | Context only; do not substitute for the last object-based baseline |
 
 The user-reported self-build Fatal Errors are from
@@ -91,41 +89,30 @@ object/class parity remains an open gate item, not this symptom.
 | Archive ctor `Destroy; Fail` double-free | `b9a6153`: `TArcDrive.Create` / `TArvidDrive.Load` use `Fail` only (FPC runs destructor once). | Fixed; audit other `Destroy; Fail` ctors |
 | UTF-8 panel names `?????` until Ctrl-R | `ab9ebd8`: post-startup `WriteScreenCells` skipped on `-dDNUTF8` (16-bit copy maps multi-byte cells to `?`). `DN_OPS_UTF8=1` dn-linux-ops green. | Fixed on class UTF-8 build |
 | Enter non-exec (`cmExecFile`) AV | Fixed: `System.PString` (^AnsiString) hid `Defines.PString` after `uses SysUtils`; bind + `PShortString` in `DoExecFile`. | Fixed on class self-build |
-| Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | **Partial:** `.tgz`/`.tar.gz` Enter+list OK (`fmttgz`); fixtures + `dn-linux-archives.py` Enter/leave green. `.tar.xz`/`.txz` + F5 extract smoke ALL OK locally (`5f02362`). Open: remaining F3/F4/F5 peers, full compound matrix — `docs/ARCHIVE-MATRIX.md` / PLAN 4c. Prefer local re-runs; CI optional |
-| Accept harness settle flakes | Menu scenarios could flake on FAST settle timing under load | Hardened (`ad9c4f7`); `dn-accept` green on that SHA historically. Re-run full matrix **locally** to close the gate |
+| Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | **Partial:** `.tgz`/`.tar.gz` Enter+list OK (`fmttgz`); fixtures + `dn-linux-archives.py` Enter/leave green. `.tar.xz`/`.txz` + F5 extract smoke ALL OK locally (`5f02362`). Open: remaining F3/F4/F5 peers, full compound matrix — `docs/ARCHIVE-MATRIX.md` / PLAN 4c. Linux archive workflow is preferred exact-SHA evidence |
+| F5 copy queue ownership | `CopyQueue` contained `TLine` classes but freed entries as `TFileCopyRec`, causing an AV immediately after copy | `dn/src/filecopy.pas` | **Fixed** (`3bc0d0f`) | `TLineQueue.FreeItem` frees each class; strict collection/ownership search clean; new `f5_f6_f8` parity scenario PASS; linux ops all green on SHA `06259f5` | Keep F5→F6→F8 check in ops and acceptance suites |
+| Accept harness settle flakes | Menu scenarios could flake on FAST settle timing under load | Hardened (`ad9c4f7`); current full 177/177 acceptance is terminal green on exact SHA `06259f5` |
 | F1 Help accept flake | Parallel FAST: object still idle active panels (`═[■]`) vs class Help open (panels `─┐`) — ~1172 cells, looks like frame/palette | Harness waits for Help title after F1 (`f1help`/`f1_esc`); class `THelpWindow`/`CHelpWindow` unchanged |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. The configured blank-panel mismatch (10/10 before
-`7572d73`) is fixed; remaining gate work is full-cell object/class parity.
+`7572d73`) is fixed. Full-cell object/class parity most recently passed
+177/177 on `06259f5`.
 
 ## Remaining work, in order
 
-1. Finish remaining class-only crashes / archive gaps: nested/compound
-   formats (`.tar.gz`…), F3/F4/F5 from inside archives, hang/AV cases —
-   `docs/ARCHIVE-MATRIX.md` / PLAN 4c. Zip/7z Enter OK after
-   `af5337f`/`ce2e9dd`; xz/F5 smoke green locally (`5f02362`). Keep `dist`
-   as negative control only; acceptance comparator is the last object-based
-   baseline. Verify locally; do not wait on congested CI.
-2. **Hard gate (blocking everything below):** last object-based vs last
-   class-based DN — all functions, all scenarios, bitwise cell compare
-   (glyph + fg/bg + attrs + cursor + process + side effects). Spec:
-   `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`. **Primary path:** full local
-   `tools/dn-linux-accept.py` matrix green. CI is optional corroboration.
-   **CLOSED** 2026-10-05 after local **174/174 PASS** (`/tmp/dn-accept-auth/`).
-   Future mismatch on a re-run → fix; do not proceed. Same wrong output on
-   **both** object and class → still fix (shared-bugs rule in the gate doc);
-   parity is not an excuse to keep defects.
-3. Post-class stages in order (`docs/POST-CLASS-WORK.md`):
-   1. English (comments, docs, user strings / hardcode)
-   2. Refactoring for readability (publish done-criteria first)
-   3. Separate and formalize platform-dependent code
-   4. Expand tests to a minimally decent level (incl. Linux / DOS / Windows)
-4. Keep chasing known open rows outside the closed accept matrix where needed:
-   ZIP charset gaps (`docs/ZIP-CHARSET.md`), full archive matrix
-   (`docs/ARCHIVE-MATRIX.md`), etc. Already landed locally: #6 + About
-   (`7572d73`), accept harden (`606cca3`), xz/F5 (`5f02362`), ZIP listing
-   charset (`27de843`), `ChLngId` (`88c19f8`), `CColor` (`b57025b`).
+1. Verify the class gate with no exclusions (`CLASS_GATE_STRICT=1`) and exact
+   baseline bootstrap reproduction after the historical Pascal inputs are
+   retrieved from the pinned baseline commit; current local tests pass, new
+   GitHub workflow is pending on this documentation/source change.
+2. Keep full object/class parity closed at 177/177 on `06259f5`; rerun after
+   any UI, drawing, events, resources, or stream changes. Any mismatch blocks
+   later stages; shared bugs must still be fixed.
+3. Stage 3 platform separation is next, based on the corrected current-layout
+   plan in `docs/REFACTORING-CRITERIA.md` and `docs/POST-CLASS-WORK.md`.
+4. Stage 4 adds the minimally decent Linux/DOS/Windows tests, after stage 3.
+5. Track remaining product tests separately: `docs/ZIP-CHARSET.md`,
+   `docs/ARCHIVE-MATRIX.md`, and optional `PKTVIEW` runtime coverage.
 
 ## Recorded issue and administrative commits
 

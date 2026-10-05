@@ -29,7 +29,7 @@ begin
   Check(E.What = evNothing, 'ClearEvent clears');
   { an instance of the shim can be created and is a descendant of the original }
   V := TView.Create(R);
-  Check(V <> nil, 'New(V, Init(R))');
+  Check(V <> nil, 'The view class was created');
   Check((V.Size.X = 10) and (V.Size.Y = 3), 'TView of the shim');
   V.Free;
   Finish;

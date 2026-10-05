@@ -18,7 +18,7 @@ class ClassGateTest(unittest.TestCase):
                 p.parent.mkdir(parents=True, exist_ok=True)
                 p.write_bytes(text.encode('latin-1'))
             subprocess.run(['git', '-C', d, 'add', '-A'], check=True)
-            e = dict(os.environ, CLASS_GATE_EXCLUDE='bootstrap/', CLASS_GATE_STRICT='')
+            e = dict(os.environ, CLASS_GATE_EXCLUDE='', CLASS_GATE_STRICT='')
             e.update(env or {})
             r = subprocess.run([sys.executable, str(GATE), d], capture_output=True, text=True, env=e)
             return r.returncode, r.stdout + r.stderr
@@ -50,10 +50,10 @@ class ClassGateTest(unittest.TestCase):
     def test_non_pascal_files_are_not_looked_at(self):
         self.assertEqual(self.run_gate({'a.md': 'object', 'b.py': 'object', 'c.rw': 'T = object(TView)'})[0], 0)
 
-    def test_bootstrap_is_excluded_by_default_and_can_be_included(self):
+    def test_bootstrap_is_included_by_default_and_can_be_excluded_explicitly(self):
         f = {'bootstrap/new/a.pas': 'type T = object end;', 'dn/src/b.pas': 'type T = class end;'}
-        self.assertEqual(self.run_gate(f)[0], 0)
-        self.assertEqual(self.run_gate(f, {'CLASS_GATE_EXCLUDE': ''})[0], 1)
+        self.assertEqual(self.run_gate(f)[0], 1)
+        self.assertEqual(self.run_gate(f, {'CLASS_GATE_EXCLUDE': 'bootstrap/'})[0], 0)
 
     def test_old_construction_is_a_note_unless_strict(self):
         f = {'a.pas': 'begin D := New(TDialog, Init(R, S)); Dispose(D, Done); end.'}
@@ -69,7 +69,7 @@ class ClassGateTest(unittest.TestCase):
 
     def test_this_repository_passes(self):
         r = subprocess.run([sys.executable, str(GATE), str(TOOLS.parent)], capture_output=True, text=True,
-                           env=dict(os.environ, CLASS_GATE_EXCLUDE='bootstrap/', CLASS_GATE_STRICT=''))
+                           env=dict(os.environ, CLASS_GATE_EXCLUDE='', CLASS_GATE_STRICT=''))
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
 
