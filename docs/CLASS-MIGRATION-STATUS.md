@@ -9,13 +9,13 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 
 | Item | State |
 |---|---|
-| Gate | **OPEN** (not CLOSED — full local accept matrix still required) |
-| Core accept | **32/32 PASS** (historical); reconfirm locally on current `main` |
-| Full matrix | **Local verification is primary** (`tools/dn-linux-accept.py` and focused `tools/dn-linux-*.py`). CI (`.github/workflows/dn-accept.yml`, 12 shards) is congested / optional follow-up — see `docs/CI-SERIAL.md` |
-| Accept harness | Hardened `ad9c4f7` (menu FAST settle flakes); `dn-accept` green on that SHA historically |
+| Gate | **OPEN** |
+| Core accept | **32/32 PASS** (historical) |
+| Full matrix | **174/174 PASS** local (`DN_ACCEPT_FAST=1`, 12 shards, object `/tmp/dn-object-gate/out/linux64-gate` vs class `out/linux64-gate`, 2026-10-05; evidence `/tmp/dn-accept-auth/`) |
+| Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
 | Known object crash | ♦ Trashcan (`cmHideShowTools` / `menu_0_10`): object `TTrashCan.GetPalette`=`@CTrashCan` vs dynarray `TPalette` → RTE 204; class `MakePalette` OK — skip kept ([#14](https://github.com/unxed/dn/issues/14)) |
-| Accept skips (harness) | Also skip `menu_0_16` (♦ Game/Tetris — animation flake), `menu_4_5` (Panel → Directory Branch — AV on **both** object and class), `menu_5_2` (Manager → Directory tree — full-volume scan times out under `DN_ACCEPT_FAST`) |
+| Accept skips (harness) | `menu_0_16` (♦ Game/Tetris animation), `menu_3_8` (Edit OS Environment — AV both), `menu_4_5` (Directory Branch — AV both), `menu_5_2` (Manager Directory tree scan), `menu_6_16` (Window List — AV both) |
 | Classic palette | Class on `CColor` (`b57025b`) |
 | Startup / About | [#6](https://github.com/unxed/dn/issues/6) fixed (`7572d73`); regressions `tools/dn-linux-startup.py` / `dn-linux-about.py` |
 | Archives xz / F5 | Local ALL OK (`5f02362`) |
