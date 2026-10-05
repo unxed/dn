@@ -58,7 +58,7 @@ uses
 
 type
   
-  { Trash can object }
+  { Trash can class }
   TTrashCan = class;
 
   TTrashCan = class(TView)
@@ -188,7 +188,7 @@ procedure TKeyMacros.Play;
     Inc(N);
     end;
   end;
-{------ Heap Window object ----------}
+{------ Heap Window class -----------}
 
 constructor THeapView.Create(const Bounds: TRect);
   begin
@@ -215,7 +215,7 @@ procedure THeapView.Update;
     DrawView;
   end;
 
-{-------- ClockView Object --------}
+{-------- ClockView class ---------}
 
 function LeadingZero(w: Word): String;
   begin
