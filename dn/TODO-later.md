@@ -120,6 +120,8 @@ Count/Compare (reading the directories of `/` takes ~20 s, Esc stops it), File >
   resources (written in CP866) make it 866. Not done: the page of the multi-byte locales (ja, ko, zh: 437 here), 720, 1258, TIS-620 (TvCodePg has
   no such pages); the page that the resources need is known after the panels are read (a Russian UI on a host of another locale: the names that
   were read before are in the page of the host until the next reading); the DOS build takes the page from DOS (TvDos), not from the locale.
+- **ZIP names/comments (2026-10-05):** one-byte fields must follow github.com/unxed/zipcharset + localecp **1:1 including bugs**; locale→CP as a
+  reusable subproject. Spec: `docs/ZIP-CHARSET.md`, PLAN item 4b. Orthogonal to Enter-archive crash work.
 
 ## XLT рядом с программой (найдено при сборке под Windows)
 
