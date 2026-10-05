@@ -34,6 +34,36 @@ listed failure; it does not imply that every analogous site has been audited.
 | Legacy class aliases/carets and record-pointer confusion | Bulk rewrite either left old object syntax or damaged legitimate `PMenuItem`/record dereferences | `dn/src/*`, `tools/class_names.py`, `tools/class_carets.py` | **Verified for migration scan** | `faff106`, `bd33191`; 32 tool tests | Keep record-pointer regression coverage when extending scanners |
 | Oversized help topic | English help was not generated because a topic exceeded the compiler limit | `dn/src/resource/english/dnhelp.htx` | **Verified** | `f698616`; help build history | Keep help generation in the build gate |
 
+## Acceptance gate: object baseline versus class build
+
+The migration is not complete until both builds have been exercised. The
+comparison is mandatory: first build and run the last working object-based DN
+before the class migration, then build and run the current class-based DN.
+Use the same clean temporary input tree, terminal size, locale, and scripted
+key sequences for both runs. Record screen output, process status, generated
+files, and `dn.err`/exception output for every scenario.
+
+The action matrix must cover:
+
+1. Startup and shutdown: initial panels, resize/redraw, `Alt-X`, and clean
+   teardown.
+2. All main menus and nested submenus: File, Disk, Utilities, Panel, Manager,
+   Options, and Window; verify menu position, enabled state, and each action.
+3. Panel operations: switch panels, change drive/directory, create directory,
+   select/unselect, sort/filter/view modes, panel setup, and manager-new.
+4. File operations: view, edit, copy, move, rename, delete, attributes,
+   archive entry handling, and error/cancel paths.
+5. Built-in tools and dialogs: About, calculator, calendar, ASCII table,
+   Tetris, setup dialogs, help, history, and screen/user tools.
+6. Keyboard, mouse, function-key, and command-line paths where supported;
+   verify both success and cancellation/error paths.
+
+For each action, mark `baseline`, `class build`, and `comparison` as
+`pass`, `fail`, or `not applicable`. Any mismatch, crash, missing rendering,
+wrong menu geometry, wrong command dispatch, changed side effect, or teardown
+error is a migration failure and keeps the gate open. Do not merge or claim
+completion while any required row is `fail` or untested.
+
 ## Hard gate for future fixes
 
 Before closing a migration bug:
