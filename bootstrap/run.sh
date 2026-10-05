@@ -98,7 +98,7 @@ for e in "$boot"/edits/*.sed; do
 done
 for e in "$boot"/edits/*.py; do
     [ -f "$e" ] || continue
-    find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 python3 "$e" | sed 's|^.*/||; s|^|  edit '"$(basename "$e")"': |'
+    find "$out" -maxdepth 1 -type f -iname '*.pas' -print0 | xargs -0 env BOOTSTRAP_NEW_DIR="$new_inputs" python3 "$e" | sed 's|^.*/||; s|^|  edit '"$(basename "$e")"': |'
 done
 
 # our new files: exact inputs are read from the commit in bootstrap/BASELINE, not duplicated in the current tree

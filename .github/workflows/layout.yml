@@ -6,6 +6,7 @@ on:
     paths:
       - tv/**
       - dn/**
+      - bootstrap/**
       - tools/check-layout.sh
       - .github/workflows/layout.yml
 jobs:

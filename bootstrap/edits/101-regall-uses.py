@@ -9,7 +9,8 @@ for p in sys.argv[1:]:
     files[os.path.splitext(os.path.basename(p))[0].lower()] = os.path.splitext(os.path.basename(p))[0]
 import glob
 here = os.path.dirname(os.path.abspath(__file__))
-for q in glob.glob(os.path.join(here, '..', 'new', '*.pas')):      # our own units are copied into the tree later
+new_dir = os.environ.get('BOOTSTRAP_NEW_DIR', os.path.join(here, '..', 'new'))
+for q in glob.glob(os.path.join(new_dir, '*.pas')):      # our own units are copied into the tree later
     files[os.path.splitext(os.path.basename(q))[0].lower()] = os.path.splitext(os.path.basename(q))[0]
 for p in sys.argv[1:]:
     if os.path.basename(p).lower() != 'regall.pas':
