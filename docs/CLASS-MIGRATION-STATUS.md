@@ -71,23 +71,22 @@ the exact same action. The configured-launch mismatch has since reproduced in
 
 ## Remaining work, in order
 
-1. `F4`, `Ctrl+O`, and autosave-desktop second-start are fixed on class; keep
-   `dist` as a negative control only, and still compare against the last
-   object-based baseline for acceptance.
-2. On the last object-based baseline and latest class build, reproduce the
-   virgin About-close residue with full cell snapshots before, during and
-   after the dialog; locate/fix it and search all analogous dialog-close and
-   restore paths.
-3. With the same non-virgin `dn.ini`, work path, PTY dimensions and build
-   environment, retain repeated configured-start regression tests. Capture
-   full cells before input and after F10+Right; resolve every mismatch.
-4. Finish the Pascal keyword `object` gate / residual dialect audit
-   (`tools/class-gate.sh`) and verify no Pascal object-type construction
-   remains in scanned sources.
-5. Continue the full object/class action matrix in
-   `CLASS-MIGRATION-ACCEPTANCE-GATE.md`. The overall gate stays open until
-   every action, visual cell/attribute, cursor, process result and side effect
-   matches.
+1. Finish remaining class-only crashes / VMT hides (archive enter zip AV;
+   drive/`override` sweep residuals as found). Keep `dist` as negative control
+   only; acceptance comparator is the last object-based baseline.
+2. **Hard gate (blocking everything below):** last object-based vs last
+   class-based DN — all functions, all scenarios, bitwise cell compare
+   (glyph + fg/bg + attrs + cursor + process + side effects). Spec:
+   `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`. Mismatch → fix; do not proceed.
+3. Only after the gate PASSes — post-class stages in order
+   (`docs/POST-CLASS-WORK.md`):
+   1. English (comments, docs, user strings / hardcode)
+   2. Refactoring for readability (publish done-criteria first)
+   3. Separate and formalize platform-dependent code
+   4. Expand tests to a minimally decent level (incl. Linux / DOS / Windows)
+4. Until the gate PASSes, also keep chasing known open matrix rows: virgin
+   About residue, configured blank panels (#6), palette/UX notes that are
+   acceptance decisions, ZIP charset (`docs/ZIP-CHARSET.md`), etc.
 
 ## Recorded issue and administrative commits
 

@@ -6,7 +6,40 @@ porting artifacts remain.
 
 Current gate status: **OPEN**. Compare the latest object-based DN against the
 latest class-based DN, recording each exact revision and TV submodule. The
-older distribution artifact is not a substitute comparator.
+older distribution artifact (`dist/`) is **not** a substitute comparator.
+
+## Hard gate (owner, 2026-10-05) — bitwise, all functions
+
+Until this gate **PASS**es, **do not** start English translation, readability
+refactoring, platform-code separation, or the broad test expansion. Those
+post-success stages live in `docs/POST-CLASS-WORK.md`.
+
+**Comparator:** last object-based revision vs last class-based revision (exact
+SHAs + TV/TV3 pins), same fixtures, same terminal size/locale, same scripted
+actions. Rebuild both for the run; do not reuse stale binaries as the
+authority.
+
+**Coverage:** every scenario of every user-visible function — menus and nested
+menus, panels, file ops, archives, tools, dialogs, startup/teardown, keyboard /
+command-line / mouse paths where supported — success and cancel/error paths.
+
+**Compare at each checkpoint (all must match):**
+
+| Channel | What |
+|---|---|
+| Glyph | Unicode cell contents (including blanks) |
+| Color | Foreground **and** background per cell |
+| Attributes | Style bits the harness exposes (bold/underline/etc. if present) |
+| Cursor | Position and visibility |
+| Process | Alive/exit status, `dn.err` / fatals |
+| Side effects | Files, cwd, `dn.ini` / `dn.dsk`, temp artifacts |
+
+`Screen.lines()` / text-only dumps are **diagnostic only** and cannot pass the
+gate. Use the full `Screen.cells` (or equivalent) matrix.
+
+**Rule:** any mismatch → gate stays **OPEN** → fix the class build (or prove
+object was wrong and fix with owner agreement) → re-run the failing scenarios.
+No “close enough”, no skipping to post-class work.
 
 ## Current controlling result (2026-10-05)
 

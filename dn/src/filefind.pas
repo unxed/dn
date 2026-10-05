@@ -154,37 +154,37 @@ type
     constructor Create(const AName: String; ADirs: TCollection;
          AFiles: TFilesCollection); overload;
     constructor Create(const AName: String); overload; {DataCompBoy}
-    procedure lChDir(ADir: String); virtual; {DataCompBoy}
+    procedure lChDir(ADir: String); override; {DataCompBoy}
     function GetDirectory(
          const FileMask: String;
-        var TotalInfo: TSize): TFilesCollection; virtual;
+        var TotalInfo: TSize): TFilesCollection; override;
     procedure CopyFiles(AFiles: TCollection; Own: TView;
-         MoveMode: Boolean); virtual;
+         MoveMode: Boolean); override;
     procedure CopyFromArc(AFiles: TFilesCollection; Own: TView); {JO}
     procedure CopyFilesInto(AFiles: TCollection; Own: TView;
-         MoveMode: Boolean); virtual;
-    procedure EraseFiles(AFiles: TCollection); virtual;
-    procedure UseFile(P: PFileRec; Command: Word); virtual; {JO}
-    function Disposable: Boolean; virtual;
-    function GetRealName: String; virtual;
-    function GetInternalName: String; virtual;
-    function GetDir: String; virtual;
-    procedure MakeDir; virtual;
+         MoveMode: Boolean); override;
+    procedure EraseFiles(AFiles: TCollection); override;
+    procedure UseFile(P: PFileRec; Command: Word); override; {JO}
+    function Disposable: Boolean; override;
+    function GetRealName: String; override;
+    function GetInternalName: String; override;
+    function GetDir: String; override;
+    procedure MakeDir; override;
     destructor Destroy; override;
     {DataCompBoy}
-    procedure GetFreeSpace(var S: String); virtual;
-    function isUp: Boolean; virtual;
-    procedure ChangeUp(var S: String); virtual;
-    procedure ChangeRoot; virtual;
-    procedure RereadDirectory(S: String); virtual;
-    function GetFullFlags: Word; virtual;
-    procedure GetDirInfo(var B: TDiskInfoRec); virtual;
-    procedure HandleCommand(Command: Word; InfoPtr: Pointer); virtual;
+    procedure GetFreeSpace(var S: String); override;
+    function isUp: Boolean; override;
+    procedure ChangeUp(var S: String); override;
+    procedure ChangeRoot; override;
+    procedure RereadDirectory(S: String); override;
+    function GetFullFlags: Word; override;
+    procedure GetDirInfo(var B: TDiskInfoRec); override;
+    procedure HandleCommand(Command: Word; InfoPtr: Pointer); override;
     function OpenDirectory(const Dir: String;
-                                 PutDirs: Boolean): TDrive; virtual;
-    procedure DrvFindFile(FC: TFilesCollection); virtual;
-    procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
-    function GetDriveLetter: Char; virtual;
+                                 PutDirs: Boolean): TDrive; override;
+    procedure DrvFindFile(FC: TFilesCollection); override;
+    procedure ReadDescrptions(FilesC: TFilesCollection); override;
+    function GetDriveLetter: Char; override;
     end;
 
   TTempDrive = class;
@@ -195,16 +195,16 @@ type
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
     procedure CopyFilesInto(AFiles: TCollection; Own: TView;
-         MoveMode: Boolean); virtual;
-    function GetRealName: String; virtual;
-    function GetInternalName: String; virtual;
+         MoveMode: Boolean); override;
+    function GetRealName: String; override;
+    function GetInternalName: String; override;
     procedure CopyFiles(AFiles: TCollection; Own: TView;
-         MoveMode: Boolean); virtual;
-    procedure EraseFiles(AFiles: TCollection); virtual;
-    procedure ChangeRoot; virtual;
-    procedure GetDirInfo(var B: TDiskInfoRec); virtual;
+         MoveMode: Boolean); override;
+    procedure EraseFiles(AFiles: TCollection); override;
+    procedure ChangeRoot; override;
+    procedure GetDirInfo(var B: TDiskInfoRec); override;
     destructor Destroy; override;
-    function GetDriveLetter: Char; virtual;
+    function GetDriveLetter: Char; override;
     end;
 
 procedure CopyToTempDrive(AFiles: TCollection; Own: TView;
