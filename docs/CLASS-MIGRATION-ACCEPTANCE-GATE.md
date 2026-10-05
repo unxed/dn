@@ -117,6 +117,12 @@ and `filefind.pas` were reviewed type-by-type: they store ShortStrings and
 already resolve to `Defines.PString` / `pstring_bind`, so they were left
 unchanged.
 
+**Intermittent AVs (owner, 2026-10-05, unreproduced):** once on F4 open-file
+right after a clipboard permission prompt (far2l/OSC); once after (or instead
+of) running a command on the embedded console. Both Access Violation; no
+reliable repro yet. Suspect event/focus state after clipboard ask and after
+`ExecCommandLine` / shell return — track under shared bugs until caught.
+
 Startup redraw ([issue #6](https://github.com/unxed/dn/issues/6)) is **fixed
 functionally**. Both virgin About residue and configured blank panels shared
 one cause: after `MyApplication.Draw`, `WriteScreenCells` flushed a stale

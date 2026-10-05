@@ -53,8 +53,8 @@ interface
 function GetSTime: LongInt;
 
 function FindParam(const S: String): Integer;
-  {` Находит среди ParamStr тот параметр, который начинается
-    с '/' или '-' и последующего S. Результат - номер этого параметра. `}
+  {` Finds among ParamStr the parameter that starts
+    with '/' or '-' and then S. Result is that parameter's index. `}
 
 function Chk4Dos: Boolean;
 

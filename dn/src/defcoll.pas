@@ -95,8 +95,8 @@ constructor TDefCollection.Create(ALimit, ADelta: LongInt);
   Def('VER20');
   Def('VIRTUALPASCAL');
 
-  {AK155  символы можно задавать в комстроке в параметрах, начиная
-со второго. При этом второй параметр - целевая платформа.}
+  {AK155  characters can be given on the command line in parameters, starting
+from the second. The second parameter is the target platform.}
   if ParamStr(2) = '' then
     begin
     

@@ -50,10 +50,10 @@
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 
 {Cat
-   28/08/2001 - переделал функции для совместимости с типами AnsiString и
-   LongString, а также для поддержки коллекций с длинными строками
+   28/08/2001 - reworked functions for AnsiString and
+   LongString compatibility, and for collections with long strings
 
-   05/09/2001 - выкинул NeedStream из GetWinClip и SyncClipOut
+   05/09/2001 - dropped NeedStream from GetWinClip and SyncClipOut
 }
 
 unit WINCLP;

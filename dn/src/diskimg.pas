@@ -64,7 +64,7 @@ uses
   , uselfn, Tree, Math
   ;
 
-{Cat: добавил сюда эти типы, вместо того, чтобы подключать модуль DiskTool}
+{Cat: added these types here instead of using unit DiskTool}
 type
   PBootRec = ^TBootRec;
   TBootRec = record
@@ -494,7 +494,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
 procedure RereadGlobal(const OutputDir: String);
   var OD1 :String;
   begin
-  OD1 := '>' + OutputDir; //признак перечитывания подкаталогов в ветви
+  OD1 := '>' + OutputDir; //flag: reread subdirectories in the branch
   GlobalMessage(evCommand, cmPanelReread, @OD1);
   GlobalMessage(evCommand, cmRereadTree, @OutputDir);
   end;

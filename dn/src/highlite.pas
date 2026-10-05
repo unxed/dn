@@ -168,7 +168,7 @@ const
 implementation
 
 uses
-  {Consts,} {Cat: зачем? и без этого отлично компилится}
+  {Consts,} {Cat: why? compiles fine without it}
   Defines, { TCharSet }
   basics, { BreakChars }
   strutil

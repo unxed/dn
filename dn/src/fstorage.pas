@@ -73,8 +73,8 @@ type
     Attr: Byte;
     Name: String;
     end;
-  {JO: имя здесь должно обязательно быть в конце, т.к. мы сохраняем не всю }
-  {    длину String, а только реальную длину имени                         }
+  {JO: the name must be at the end here, because we store not the full }
+  {    String length, only the real name length                         }
   {-DataCompBoy-}
 
   TSwapLevel = (slNone, slCnv, slFail);

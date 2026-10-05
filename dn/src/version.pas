@@ -101,9 +101,9 @@ if ParamStr(2) = '' then
     
 else
   VersionName := VersionName+'/'+ParamStr(2);
-{Cat: компиляция плагинской версии:
-        - либо если задан параметр PLUGIN (компиляция посредством _DNC.CMD)
-        - либо если в STDEFINE.INC установлена директива PLUGIN (компиляция вручную)}
+{Cat: plugin build:
+        - either if PLUGIN is set (build via _DNC.CMD)
+        - or if STDEFINE.INC defines PLUGIN (manual build)}
 
 if ParamStr(ParamCount) = 'PLUGIN' then
   

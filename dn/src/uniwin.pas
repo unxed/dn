@@ -58,7 +58,7 @@ type
   { TUniWindow }
 
   TUniWindow = class(TWindow)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is in the plugin model; change with extreme care!}
     function GetPalette: TPalette; override;
     function MakeScrollBar(AOptions: Word): TScrollBar;
     procedure InitFrame; override;

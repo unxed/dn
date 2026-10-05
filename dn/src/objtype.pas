@@ -392,7 +392,7 @@ const
 
   { --- Plugins }
   otPlugins = 30000; {Cat}
-  {..........занято...........} {Cat}
+  {..........taken...........} {Cat}
   otPluginsEnd = 60000; {Cat}
 
 implementation
