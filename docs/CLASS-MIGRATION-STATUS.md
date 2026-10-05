@@ -11,7 +11,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 |---|---|
 | Gate | **OPEN** |
 | Core accept | **32/32 PASS** |
-| Full matrix | Re-running clean (~180 scenarios) after harness fixes |
+| Full matrix | **Delegated to GitHub Actions** (`.github/workflows/dn-accept.yml`, 12 shards) |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
 | Known object crash | File menu item 10 blanks object baseline (class alive) — xfail |
 | Classic palette | Class on `CColor` |

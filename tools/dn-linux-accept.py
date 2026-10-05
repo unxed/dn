@@ -5,8 +5,9 @@ Usage:
   python3 tools/dn-linux-accept.py OBJECT_OUTDIR CLASS_OUTDIR [scenario...]
   python3 tools/dn-linux-accept.py OBJECT_OUTDIR CLASS_OUTDIR --area menus
 
-Both builds install into the same absolute path (/tmp/dn-accept-install) so
-SourceDir / About paths match. Shared work tree: /tmp/dn-accept-shared/work.
+Both builds install into a per-PID absolute path so SourceDir matches within a
+run. CI: `.github/workflows/dn-accept.yml` builds object+class once and runs
+`--shard I/12` in parallel (`DN_ACCEPT_FAST=1`).
 See docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md.
 """
 from __future__ import annotations
@@ -23,9 +24,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
 COLS, ROWS = 100, 30
-SCENARIO_TIMEOUT_SEC = 45
+# DN_ACCEPT_FAST=1 shortens settles for CI shards (still enough for stable cells).
+_FAST = os.environ.get('DN_ACCEPT_FAST', '') == '1'
+SCENARIO_TIMEOUT_SEC = 30 if _FAST else 45
+_SETTLE_KEY = 0.22 if _FAST else 0.35
+_SETTLE_ENTER = 0.5 if _FAST else 0.8
+_SETTLE_AFTER = 0.5 if _FAST else 0.8
+_PUMP_AFTER = 1.5 if _FAST else 2.5
 INSTALL = '/tmp/dn-accept-install-%d' % os.getpid()
 WORK_ROOT = '/tmp/dn-accept-shared-%d' % os.getpid()
+
+# Object baseline pins (acceptance gate).
+OBJECT_DN_SHA = 'b4916b874989d7b35660d02cf935dc5f0db7a656'
+OBJECT_TV_SHA = '521d06479198789deeaa6fda287236ca83ba4051'
 
 KEYS = {
     'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS',
@@ -279,9 +290,8 @@ def run_one(out: str, work: str, spec: str) -> tuple[dict, str]:
         for k in tokens(spec):
             if not t.alive():
                 break
-            # Drive/lang menu actions need longer settle before the snapshot.
-            t.send(k, 0.8 if k == '\r' else 0.35)
-        t.pump(0.8, 2.5)
+            t.send(k, _SETTLE_ENTER if k == '\r' else _SETTLE_KEY)
+        t.pump(_SETTLE_AFTER, _PUMP_AFTER)
         snap = snapshot(t)
         err_path = os.path.join(INSTALL, 'dn.err')
         if os.path.isfile(err_path):
@@ -315,21 +325,50 @@ def run_one(out: str, work: str, spec: str) -> tuple[dict, str]:
                 pass
 
 
+def selected_scenarios(area: str | None, only: set[str], shard: tuple[int, int] | None):
+    items = []
+    for i, (name, spec, ar) in enumerate(SCENARIOS):
+        if area and ar != area:
+            continue
+        if only and name not in only:
+            continue
+        if shard is not None:
+            idx, total = shard
+            if i % total != idx:
+                continue
+        items.append((name, spec, ar))
+    return items
+
+
 def main() -> int:
     if len(sys.argv) < 3:
-        print('usage: dn-linux-accept.py OBJECT_OUT CLASS_OUT [scenario...|--area NAME]',
+        print('usage: dn-linux-accept.py OBJECT_OUT CLASS_OUT '
+              '[scenario...|--area NAME|--shard I/N|--list]',
               file=sys.stderr)
         return 2
+    if sys.argv[1] == '--list':
+        for name, _spec, ar in SCENARIOS:
+            print('%s\t%s' % (name, ar))
+        return 0
     obj = os.path.abspath(sys.argv[1])
     cls = os.path.abspath(sys.argv[2])
     args = sys.argv[3:]
     area = None
-    only = set()
+    only: set[str] = set()
+    shard = None
     i = 0
     while i < len(args):
         if args[i] == '--area' and i + 1 < len(args):
             area = args[i + 1]
             i += 2
+        elif args[i] == '--shard' and i + 1 < len(args):
+            a, b = args[i + 1].split('/', 1)
+            shard = (int(a), int(b))
+            i += 2
+        elif args[i] == '--list':
+            for name, _spec, ar in SCENARIOS:
+                print('%s\t%s' % (name, ar))
+            return 0
         else:
             only.add(args[i])
             i += 1
@@ -338,13 +377,14 @@ def main() -> int:
             print('no dn in', name, path, file=sys.stderr)
             return 2
 
+    selected = selected_scenarios(area, only, shard)
+    if shard is not None:
+        print('SHARD %d/%d scenarios=%d' % (shard[0], shard[1], len(selected)),
+              flush=True)
+
     fails = 0
     passed = 0
-    for name, spec, ar in SCENARIOS:
-        if area and ar != area:
-            continue
-        if only and name not in only:
-            continue
+    for name, spec, ar in selected:
         work = prep_tree(WORK_ROOT)
         print('SCENARIO', name, '(%s)' % ar, flush=True)
         so, eo = run_one(obj, work, spec)
