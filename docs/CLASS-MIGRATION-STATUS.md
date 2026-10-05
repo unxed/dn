@@ -15,7 +15,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
 | Known object crash | ♦ Trashcan (`cmHideShowTools` / `menu_0_10`): object `TTrashCan.GetPalette`=`@CTrashCan` vs dynarray `TPalette` → RTE 204; class `MakePalette` OK — skip kept ([#14](https://github.com/unxed/dn/issues/14)) |
-| Accept skips (harness) | `menu_0_16` (♦ Game/Tetris animation), `menu_3_8` (Edit OS Environment — AV both), `menu_4_5` (Directory Branch — AV both), `menu_5_2` (Manager Directory tree scan), `menu_6_16` (Window List — AV both) |
+| Accept skips (harness) | `menu_0_16` (♦ Game/Tetris animation), `menu_3_8` (Edit OS Environment — live env), `menu_5_2` (Manager Directory tree scan). Re-enabled: `menu_4_5` Branch, `menu_6_16` Colors |
 | Classic palette | Class on `CColor` (`b57025b`) |
 | Startup / About | [#6](https://github.com/unxed/dn/issues/6) fixed (`7572d73`); regressions `tools/dn-linux-startup.py` / `dn-linux-about.py` |
 | Archives xz / F5 | Local ALL OK (`5f02362`) |

@@ -1543,10 +1543,20 @@ if the (long) name and path match. }
 function SameFile(P1, P2: PFileRec): Boolean;
   begin
   Result := False;
+  if (P1 = nil) or (P2 = nil) then
+    Exit;
   if P1^.FlName[True] <> P2^.FlName[True] then
     Exit;
-  if (P1^.Owner <> P2^.Owner) and (P1^.Owner^ <> P2^.Owner^) then
-    Exit;
+  { Owner may be nil (e.g. UpFile ".." before CurDir is bound). Do not
+    dereference until both sides are non-nil — otherwise Directory Branch
+    DelDuplicates AVs when comparing a nil-Owner record to a real path. }
+  if P1^.Owner <> P2^.Owner then
+    begin
+    if (P1^.Owner = nil) or (P2^.Owner = nil) then
+      Exit;
+    if P1^.Owner^ <> P2^.Owner^ then
+      Exit;
+    end;
   Result := True;
   end;
 
@@ -1575,38 +1585,25 @@ function TFilesHash.Equal(Item1, Item2: Pointer): Boolean;
   end;
 
 procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
-  type
-    TIsDupe = function(i: Integer): Boolean;
   var
     i,j, DupeStart, k: Integer;
     H: TFilesHash;
     S: TSize;
-    IsDupe: TIsDupe;
-
-  function IsSortedDupe(i: Integer): Boolean;
-    begin { in a sorted collection dupes stand next to each other }
-    Result := SameFile(Items^[i-1], Items^[i]);
-    end;
-
-  function IsUnsortedDupe(i: Integer): Boolean;
-    begin
-    Result := not H.AddItem(i);
-    end;
+    IsDupe: Boolean;
+    UseHash: Boolean;
 
   begin
   if not Duplicates then
     Exit;
   TotalInfo := 0;
   H := nil;
-  if SortMode = psmUnsorted then
+  UseHash := SortMode = psmUnsorted;
+  if UseHash then
     begin
     H := TFilesHash.Create(Self);
     if H.HT <> nil then
       Exit; //! Probably out of memory, should report that
-    @IsDupe := @IsUnsortedDupe;
-    end
-  else
-    @IsDupe := @IsSortedDupe;
+    end;
 
   { Each pack of dupes is first fully identified, then
   deleted. Deleting one by one is incorrect, because after that
@@ -1614,9 +1611,17 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
   For search results it happens to work,
   only because search result records have UsageCount>1,
   which there is no sense in relying on.}
+  { Do not assign nested functions to procedural variables: FPC nested
+    proc pointers do not carry the parent frame, so IsSortedDupe/IsUnsortedDupe
+    saw a garbage Items^ and AVed in Directory Branch (menu_4_5). }
   j := 1; DupeStart := 1;
   for i := 1 to Count-1 do
-    if not IsDupe(i) then
+    begin
+    if UseHash then
+      IsDupe := not H.AddItem(i)
+    else
+      IsDupe := SameFile(Items^[i-1], Items^[i]); { sorted: dupes are adjacent }
+    if not IsDupe then
       begin
       for k := DupeStart to i-1 do
         DelFileRec(PFileRec(Items^[k]));
@@ -1625,8 +1630,9 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
       S := PFileRec(Items^[j])^.Size;
       if S > 0 then {for a directory with unknown size Size=-1}
         TotalInfo := TotalInfo + S;
-      inc(j);
+      Inc(j);
       end;
+    end;
   Count := j;
   Duplicates := False;
   { do not free the excess memory in Items^ }
