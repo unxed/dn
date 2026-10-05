@@ -16,6 +16,10 @@ on:
       - .github/workflows/dn-windows.yml
   pull_request:
 
+concurrency:
+  group: dn-windows-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-24.04
