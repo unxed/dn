@@ -1,0 +1,44 @@
+# Class-migration regression checklist
+
+This is the durable precedent list for the object-to-class migration. A fix
+must add a row (or link to an existing analogous row) before it is considered
+complete. “Verified” means that the cited commit or test actually covers the
+listed failure; it does not imply that every analogous site has been audited.
+
+| Precedent/pattern | Concrete symptom | Locations | Audit status | Test evidence | Remaining work |
+|---|---|---|---|---|---|
+| Startup receiver pointer vs class receiver | Startup `Message` received the wrong receiver after pointer-to-class conversion | `dn/src/boot.pas` | **Verified** | `2f53a0f` | Recheck new startup call sites |
+| Temporary-group `Self` construction | Temporary group/dialog construction used the old object model and produced invalid ownership/dispatch | `dn/src/boot.pas`, `dn/src/mainapp.pas` | **Verified** | `1040beb`, `75080e7`; class build/smoke history | Audit all temporary groups |
+| Class/record draw-buffer adapter | Class draw buffers were passed through record-style adapters, causing bad writes/dispatch | `dn/compat/drivers.pas`, `dn/src/menus.pas` | **Verified** | `d548219`; initial-screen smoke history | Audit every adapter boundary |
+| Screen-buffer ownership and element-size mismatch | Screen buffer was aliased/freed with the wrong owner or cell element size | `dn/compat/drivers.pas`, `dn/src/*`, `dn/src/mainapp.pas` | **Verified** | `d237815`; pseudo-terminal smoke history | Add a focused ownership/size test |
+| Draw-buffer bounds and negative offsets | A translated draw position can index before the buffer or beyond its width | `dn/tv/src/tvviews.pas`, `dn/compat/drivers.pas`, `dn/src/*` | **Unresolved** | No migration commit or focused test found | Audit all `WriteBuf*`, `WriteLine*`, and offset calculations; add boundary tests |
+| `TextDrawOne` off-by-one | Cell count/index advancement can skip or overwrite the final cell | `dn/tv/src/tvtext.pas` | **Unresolved** | No supporting fix/test found in history | Audit `I`, `CellCount`, wide/continuation cells, and add edge tests |
+| Owned-view double frees | A child was freed both by explicit cleanup and by its owning group | `dn/src/mainapp.pas`, `dn/src/diskinfo.pas` | **Verified** | `acad0c9`, `ae75c86`; teardown diagnostics | Exercise every owner/destructor path |
+| Peer back-pointers under group ownership | Tree peer metadata outlived or conflicted with the group-owned view | `dn/src/tree.pas` | **Verified** | `deeb04b`, `ae75c86`; teardown history | Audit all peer/back-pointer fields |
+| Application nil during teardown/clock events | Clock/event code dereferenced `Application` after teardown had begun | `dn/src/gadgets.pas`, `dn/src/mainapp.pas`, `dn/src/boot.pas` | **Partially verified** | `e765b81`, `d237815`; teardown smoke history | Audit all event/idler callbacks for nil-safe teardown |
+| Uninitialized strings/classes after `Create` conversion | Fields previously initialized by `Init` remained undefined, causing runtime errors or malformed resources | `dn/src/rcp.pas`, `dn/src/getconst.pas`, migrated classes | **Unresolved** | Runtime 211 exposed related initialization defects; no complete audit | Audit constructors and default field initialization across migrated classes |
+| Local stream `.Init`/`.Done` retained on class variables | Nil class locals are initialized through a method call, producing runtime error 211; `Done` may also bypass `Destroy` | `dn/src/pktview.pas:299,368,427,522,1372` | **Unresolved** | Explore audit found five concrete occurrences; `67173e3`/`5447d9c` show the migration boundary | Replace with `Create`/`Free` and audit remaining legacy `Init`/`Done` |
+| Virtual method hidden instead of `override` | Base implementation ran instead of subclass behavior; resource parsing hit runtime failure | `dn/src/getconst.pas`, `dn/src/dnutil.pas` | **Partially verified** | `11bab49`; `b7d2851` fixed a `Compare` override; 32 migration tests | Compile/audit every same-signature virtual method |
+| Hidden view/dialog event and data methods | Calls through a base `TView`/`TDialog` can skip subclass input, drawing, state, or serialization behavior | `dn/src/cmdline.pas`, `dndlgs.pas`, `paneldlgs.pas`, `filepanel.pas`, `pktview.pas`, `calcwin.pas`, `setups.pas`, others | **Unresolved** | Explore audit found many declarations still `virtual`; no whole-tree override audit exists | Compare all inherited signatures with tv3 and convert only exact matches to `override`; compile and exercise dispatch |
+| Resource stream/index ownership | Resource streams, registries, or indexes were not owned/freed consistently | `dn/src/rcp.pas`, `dn/src/regall.pas`, `dn/src/dnstrl.pas`, `dn/src/listmakr.pas` | **Partially verified** | `1040beb`, `b7d2851`; all `.LNG`/`.DLG` generation in history | Audit all `Load`/`Store` ownership and failure paths |
+| Resource index copy/bounds checks | Index maker copies one byte beyond temporary content; malformed keys/counts can read or write outside allocated storage | `dn/src/rstrings.pas:95-181` | **Unresolved** | Explore audit identified `MaxPos` loop and unchecked `Count`/`Key`; no focused malformed-resource tests | Fix/check bounds and status handling; test empty, truncated, oversized, and invalid-key resources |
+| `ObjChangeType`/VMT mutation | Retyping an instance by changing its VMT bypassed real subclass construction and could corrupt state | `dn/src/paneldlgs.pas`, `dn/src/calcline.pas` | **Unresolved** | `2ad39a0` documents the transitional pattern; no proof all sites are removed | Replace/audit every `ObjChangeType`; require constructed subclasses |
+| Menu `GetItemRect` dispatch | Class virtual dispatch was lost or the wrong menu level calculated item rectangles | `dn/src/menus.pas` | **Unresolved** | Overrides exist in current source; no focused behavior test found | Exercise nested menus and audit every virtual call |
+| Resource callback stream ABI (`var` vs value) | Callback received a corrupted stream reference and resource generation failed at runtime | `dn/src/rcp.pas`, `dn/src/regall.pas` | **Verified** | `b7d2851`; six `.LNG`/`.DLG` outputs generated | Add a regression test for callback signatures |
+| Resource classes not derived from `TStreamable` | `Load`/`Store` registry lookup returned invalid/nil objects | `dn/src/dnstrl.pas`, `dn/src/listmakr.pas`, `dn/src/regall.pas` | **Verified** | `b7d2851`; resource compiler completed | Audit newly registered streamable types |
+| Class references passed by address (`@T`) | Collection lookup compared an address rather than the class/string key; dialog IDs were missing | `dn/src/rcp.pas`, `dn/src/getconst.pas` | **Verified** | `b7d2851`; all dialog resources generated | Search for remaining class-address arguments |
+| Unix resource path conversion | DOS-style output names silently produced missing/empty resource files on Unix | `dn/src/rcp.pas`, `dn/compat/osdep.pas` | **Verified** | `b7d2851`; `.LNG`/`.DLG` generation | Audit all resource/file path boundaries |
+| Legacy class aliases/carets and record-pointer confusion | Bulk rewrite either left old object syntax or damaged legitimate `PMenuItem`/record dereferences | `dn/src/*`, `tools/class_names.py`, `tools/class_carets.py` | **Verified for migration scan** | `faff106`, `bd33191`; 32 tool tests | Keep record-pointer regression coverage when extending scanners |
+| Oversized help topic | English help was not generated because a topic exceeded the compiler limit | `dn/src/resource/english/dnhelp.htx` | **Verified** | `f698616`; help build history | Keep help generation in the build gate |
+
+## Hard gate for future fixes
+
+Before closing a migration bug:
+
+1. Search this checklist for an analogous precedent.
+2. If none exists, add a row with the symptom, locations, evidence, and
+   remaining work.
+3. Do not mark a row **Verified** without a commit plus a focused compile,
+   runtime, or regression-test result. Static inspection alone is an audit
+   result, not a fix.
+4. Preserve unresolved status when only one occurrence was fixed.
