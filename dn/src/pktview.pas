@@ -84,7 +84,7 @@ type
     end;
 
   TPktList = class(TListBox)
-    function GetText(Item: LongInt; MaxLen: LongInt): String; virtual;
+    function GetText(Item, MaxLen: Integer): ShortString; override;
     end;
 
   TPktListDialog = class(TDialog)
@@ -101,10 +101,10 @@ type
     constructor Create(var Bounds: TRect;
          AHScrollBar, AVScrollBar: TScrollBar; Buffer: PCharArray);
     destructor Destroy; override;
-    procedure Draw; virtual;
+    procedure Draw; override;
     procedure InitCol(Buffer: PCharArray);
-    procedure SetState(AState: LongInt; Enable: Boolean); virtual;
-    function Valid(Command: LongInt): Boolean; virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    function Valid(Command: Word): Boolean; override;
     end;
 
   TMsgViewer = class(TLineViewer)
@@ -296,9 +296,12 @@ procedure Msg2Strs(FName: String; var FromUser, ToUser, Subj, Date: String;
     buf: Char;
     txtbuf: String;
   begin
-  message.Init(FName, stOpenRead, 4096);
+  message := TBufStream.Create(FName, stOpenRead, 4096);
   if message.Status <> stOK then
+  begin
+    message.Free;
     Exit;
+  end;
   for i := 1 to 190 do
     message.Read(header.head[i], 1);
   FromUser := '';
@@ -352,7 +355,7 @@ procedure Msg2Strs(FName: String; var FromUser, ToUser, Subj, Date: String;
     else
       txtbuf := txtbuf+buf;
     end;
-  message.Done;
+  message.Free;
   end { Msg2Strs };
 
 function ReadPktHeader(FName: String; var PType: Word;
@@ -365,7 +368,7 @@ function ReadPktHeader(FName: String; var PType: Word;
     {Rb:Word;}
     Res: Boolean;
   begin
-  F.Init(FName, stOpenRead);
+  F := TDOSStream.Create(FName, stOpenRead);
   if F.Status <> stOK then
     goto l1;
   F.Read(PH, SizeOf(PacketHeader));
@@ -390,7 +393,7 @@ l1:
       end;
     Res := True;
     end;
-  F.Done;
+  F.Free;
   ReadPktHeader := Res;
   end { ReadPktHeader };
 
@@ -408,7 +411,6 @@ constructor TPktObj.Create(O: LongInt; Afu, Atu, Asu, Adt: String;
   end;
 
 constructor TPktCol.Create(PktFile: String);
-  label l1;
   var
     PH: PacketHeader;
     PMH: PacketMessageHeader;
@@ -424,17 +426,19 @@ constructor TPktCol.Create(PktFile: String);
   begin
   inherited Create(0, 1);
   FName := NewStr(PktFile);
-  F.Init(PktFile, stOpenRead, 4096);
+  F := TBufStream.Create(PktFile, stOpenRead, 4096);
   if F.Status <> stOK then
-    goto l1;
+  begin
+    F.Free;
+    Exit;
+  end;
   F.Read(PH, SizeOf(PacketHeader));
   EmptyPkt := (F.GetPos = F.GetSize);
   if EmptyPkt then
-    begin
-    F.Done;
-l1:
+  begin
+    F.Free;
     Exit;
-    end;
+  end;
   LSize := F.GetSize;
   repeat
     LPos := F.GetPos;
@@ -473,13 +477,12 @@ l1:
     if St = '' then
       St := ' ';
     Subj := St;
-    Insert(New(TPktObj, Init(LPos, FromUser, ToUser, Subj, Date, AFrm,
-           ATo)));
+    Insert(TPktObj.Create(LPos, FromUser, ToUser, Subj, Date, AFrm, ATo));
     repeat
       F.Read(ch, 1);
     until ch = #0;
   until LPos = LSize;
-  F.Done;
+  F.Free;
   end { TPktCol.Init };
 
 procedure TPktObj.GetMsgInfo(var FromUser, ToUser, Subj, Date: String);
@@ -519,13 +522,13 @@ procedure TPktObj.GetMsgTxt(var Buffer: PCharArray; var MsgLen: Word);
   begin
   MsgLen := 0;
   I := 0;
-  F.Init(PktFileName, stOpenRead, 4096);
+  F := TBufStream.Create(PktFileName, stOpenRead, 4096);
   LPos := FOfs;
   F.Seek(LPos);
   F.Read(PMH, SizeOf(PacketMessageHeader));
   if F.Status <> stOK then
     begin
-    F.Done;
+    F.Free;
     Exit;
     end;
   for I := 1 to 3 do
@@ -542,7 +545,7 @@ procedure TPktObj.GetMsgTxt(var Buffer: PCharArray; var MsgLen: Word);
   until ch = #0;
   MsgLen := I;
   F.Read(ch, 1);
-  F.Done;
+  F.Free;
   end { TPktObj.GetMsgTxt };
 
 destructor TPktCol.Destroy;
@@ -683,7 +686,7 @@ constructor TPktListDialog.Create(FName: String; C: TPktCol);
   GetExtent(R);
   R.Grow(-1, -1);
   Inc(R.A.Y);
-  lb := New(TPktList, Init(R, 1, TScrollBar(View)));
+  lb := TPktList.Create(R, 1, TScrollBar(View));
   lb.Options := lb.Options+ofFramed;
   Insert(lb);
   lb.NewLisT(C);
@@ -707,7 +710,7 @@ function PktHeaderDlg(AText: String): TDialog;
     View: TView;
   begin
   R.Assign(13, 6, 66, 17);
-  Dialog := New(TDialog, Init(R, GetString(dlPktHeader)));
+  Dialog := TDialog.Create(R, GetString(dlPktHeader));
   with Dialog do
     begin
     Options := Options+ofCenterX+ofCenterY;
@@ -760,9 +763,8 @@ procedure TPktListDialog.HandleEvent(var Event: TEvent);
         s2 := Pc.Tu^;
         s3 := Pc.Su^;
         s4 := Pc.DT^;
-        D := New(TPktMsgViewer, Init(Buf, s1, s2, s3, s4, lb.Focused+1,
-               lb.List.Count,
-              Pc.FA, Pc.TA));
+        D := TPktMsgViewer.Create(Buf, s1, s2, s3, s4, lb.Focused+1,
+              lb.List.Count, Pc.FA, Pc.TA);
         Dispose(Buf);
         Desktop.ExecView(D);
         D.Free;
@@ -781,7 +783,7 @@ constructor TLineViewer.Create(var Bounds: TRect; AHScrollBar,
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
   inherited Create(Bounds, AHScrollBar, AVScrollBar);
-  TLineViewer.InitCol(Buffer);
+  InitCol(Buffer);
   end;
 
 destructor TLineViewer.Destroy;
@@ -811,9 +813,9 @@ procedure TLineViewer.Draw;
   for I := 0 to Size.Y-1 do
     begin
     MoveChar(B[0], ' ', CNormal, Size.X);
-    if Delta.Y+I < FileLines^.Count then
+    if Delta.Y+I < FileLines.Count then
       begin
-      P := FileLines^.At(Delta.Y+I);
+      P := PString(FileLines.At(Delta.Y+I));
       if P <> nil then
         S := Copy(P^, Delta.X+1, Size.X)
       else
@@ -842,19 +844,20 @@ procedure TLineViewer.InitCol(Buffer: PCharArray);
   begin
   isValid := True;
   FileLines := TLineCollection.Create(5, 5, False);
-  Buffer2Strs(Buffer, FileLines);
+  if Buffer <> nil then
+    Buffer2Strs(Buffer, FileLines);
   Limit.X := 255;
-  Limit.Y := FileLines^.Count;
+  Limit.Y := FileLines.Count;
   end;
 
-procedure TLineViewer.SetState(AState: LongInt; Enable: Boolean);
+procedure TLineViewer.SetState(AState: Word; Enable: Boolean);
   begin
-  TScroller.SetState(AState, Enable);
+  inherited SetState(AState, Enable);
   if Enable and (AState and sfExposed <> 0) then
     SetLimit(Limit.X, Limit.Y);
   end;
 
-function TLineViewer.Valid(Command: LongInt): Boolean;
+function TLineViewer.Valid(Command: Word): Boolean;
   begin
   Valid := isValid;
   end;
@@ -865,18 +868,17 @@ constructor TMsgViewer.Create(var Bounds: TRect; AHScrollBar,
     s1, s2, s3, s4: String;
   begin
   HelpCtx := hcMsgViewer;
-  inherited Create(Bounds, AHScrollBar, AVScrollBar);
+  inherited Create(Bounds, AHScrollBar, AVScrollBar, nil);
   Options := Options or {ofCentered}ofSelectable;
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;
-  FileLines := TLineCollection.Create(5, 5, False);
   Msg2Strs(FName, s1, s2, s3, s4, FileLines);
   FromUser := NewStr(s1);
   ToUser := NewStr(s2);
   Subj := NewStr(s3);
   Date := NewStr(s4);
   Limit.X := 255;
-  Limit.Y := FileLines^.Count;
+  Limit.Y := FileLines.Count;
   end;
 
 destructor TMsgViewer.Destroy;
@@ -1061,8 +1063,8 @@ constructor TMsgViewerDlg.Create(FName: String);
   FV.Options := FV.Options or ofFramed;
   Insert(FV);
   R.Assign(1, 1, 79, 2);
-  Lb1 := New(TLabel, Init(R,
-         '~Msg~  :Private '+Spaces(30)+'~Date~ :'+FV.Date^, nil));
+  Lb1 := TLabel.Create(R,
+         '~Msg~  :Private '+Spaces(30)+'~Date~ :'+FV.Date^, nil);
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
   Lb2 := TLabel.Create(R, '~From~ :'+FV.FromUser^, nil);
@@ -1206,8 +1208,8 @@ procedure TMsgViewerDlg.GotoMsg;
   Lb4 := nil;
   R.Assign(1, 1, 79, 2);
   if FV <> nil then
-    Lb1 := New(TLabel, Init(R,
-           '~Msg  ~:Private '+Spaces(30)+'~Date~ :'+FV.Date^, nil));
+    Lb1 := TLabel.Create(R,
+           '~Msg  ~:Private '+Spaces(30)+'~Date~ :'+FV.Date^, nil);
   Insert(Lb1);
   R.Assign(1, 2, 79, 3);
   Lb2 := TLabel.Create(R, '~From ~:'+FV.FromUser^, nil);
@@ -1369,12 +1371,12 @@ function IsPktFile(Fname: String): Boolean;
     Head: PacketHeader;
     flag: Boolean;
   begin
-  S.Init(Fname, stOpenRead);
+  S := TDOSStream.Create(Fname, stOpenRead);
   if S.Status <> stOK then
     begin
 l_e:
     IsPktFile := False;
-    S.Done;
+    S.Free;
     Exit;
     end;
   S.Read(Head, SizeOf(PacketHeader));
@@ -1391,7 +1393,7 @@ l_e:
     end;
   if not flag then
     goto l_e;
-  S.Done;
+  S.Free;
   IsPktFile := True;
   end { IsPktFile };
 
@@ -1435,7 +1437,6 @@ constructor TLimitStream.Create(FileName: FNameStr; Mode: Word;
   end;
 
 function IsMsgFile(FName: String): Boolean;
-  label l_e;
   var
     F: TLimitStream;
     L: array[1..5] of PtrInt;
@@ -1443,7 +1444,7 @@ function IsMsgFile(FName: String): Boolean;
     XL: TXlat;
   begin
   NullXLAT(XL);
-  New(F, Init(FName, stOpenRead, 16384));
+  F := TLimitStream.Create(FName, stOpenRead, 16384);
   L[1] := -1;
   L[1] := SearchFileStr(F, XL, #1'MSGID: ', 0, False, False, False,
        False, True, False);
