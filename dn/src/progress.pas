@@ -306,6 +306,11 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
 
   procedure MoveView;
     begin
+    if Desktop = nil then
+      begin
+      ClearEvent(Event);
+      Exit;
+      end;
     Desktop.GetExtent(R);
     Inc(R.A.Y, Size.Y-1);
     SetState(sfDragging, True);
@@ -324,7 +329,8 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
           Event.What := evCommand;
           Event.Command := cmCancel;
           Event.InfoPtr := But;
-          Application.PutEvent(Event);
+          if Application <> nil then
+            Application.PutEvent(Event);
           ClearEvent(Event);
           end;
         kbLeft:

@@ -565,7 +565,8 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
           InterfaceStr := CalendarView.GetDateText;
           Event.What := evCommand;
           Event.Command := cmInsertText;
-          Application.PutEvent(Event);
+          if Application <> nil then
+            Application.PutEvent(Event);
           ClearEvent(Event);
           Close;
           Exit;
