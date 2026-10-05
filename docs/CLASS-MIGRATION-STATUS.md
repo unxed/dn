@@ -56,14 +56,15 @@ evidence/build input only, not the publication target.
 Root cause: after startup `MyApplication.Draw`, `WriteScreenCells` flushed a
 stale 16-bit cell copy over the panels. Fix: `ReadScreenCells` immediately
 after the draw (`7572d73`); skip the follow-up `WriteScreenCells` under
-`-dDNUTF8` (`ab9ebd8`). Regression: `tools/dn-linux-startup.py`. Full-cell
+`-dDNUTF8` (`ab9ebd8`). Regression: configured `tools/dn-linux-startup.py`;
+virgin About `tools/dn-linux-about.py`. Full-cell
 object/class parity remains an open gate item, not this symptom.
 
 ## Reproduction and verification ledger
 
 | Check | Evidence so far | State |
 |---|---|---|
-| Virgin first launch: About image remains after close | Same stale-copy path as configured blank panels. After `ReadScreenCells` post-draw: Esc on About leaves panels (class+object PTY, 2026-10-05). | Fixed with #6 (`7572d73`); full-cell parity still open |
+| Virgin first launch: About image remains after close | Same stale-copy path as configured blank panels. After `ReadScreenCells` post-draw: Esc and Enter each leave panels with no About markers (class `out/linux64`/`out/dn` and pre-class `dist/linux64`, 2026-10-05). Regression: `tools/dn-linux-about.py`. | Fixed with #6 (`7572d73`); full-cell parity still open |
 | Configured launch (`dn.ini`): blank panels until menu | Was 10/10 blank on class `7eaca15` vs panels on object `b4916b8` (shared ini SHA-256 `1a9b0b2b…`). After fix: class+object 5/5 show panels before input and after F10+Right on gate binaries. | Fixed (`7572d73`/`ab9ebd8`); `tools/dn-linux-startup.py` |
 | Class-vs-`dist` diagnostic | `dist` appears to draw panels before menu, but per-build saved `dn.ini` files differed; this is not controlled causal or acceptance evidence. User confirmed `dist` predates classes. | Excluded from the controlling comparator |
 | PTY alternate-screen restoration | Fixed in `133f3d4`; two focused tests cover cell/attribute/cursor restore and repeated transitions. Whole tool suite passed 34 tests. | Verified harness fix; not a DN behavior fix |

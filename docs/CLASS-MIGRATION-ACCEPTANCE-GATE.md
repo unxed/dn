@@ -96,9 +96,10 @@ Pre-fix evidence (for the record): with shared `dn.ini` SHA-256
 `100x30`, object `b4916b8` showed panels before input in 10/10 pairs while
 class `7eaca15` showed a blank purple area; F10+Right revealed panels on both.
 Post-fix: class and object gate binaries show panels before input and after
-F10+Right (5/5 each); virgin Esc leaves panels. Regression:
-`tools/dn-linux-startup.py`. Full-cell object/class parity (glyph/color/attrs)
-remains open under this gate and is separate from the blank-panel symptom.
+F10+Right (5/5 each); virgin Esc and Enter leave panels with no About residue
+(`tools/dn-linux-about.py`). Configured regression: `tools/dn-linux-startup.py`.
+Full-cell object/class parity (glyph/color/attrs) remains open under this gate
+and is separate from the blank-panel symptom.
 
 The acceptance harness itself previously mishandled `CSI ? 1049 h/l`: it
 did not save and restore the primary-screen cells, attributes, and cursor.
