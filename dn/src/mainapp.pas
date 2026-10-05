@@ -162,19 +162,14 @@ begin
   NewTimer(IdleSecs, 0);
 end;
 
-{ As TProgram.Done of DN: the menu, the status line and the desktop are disposed first and Application is nil before the group
-  is destroyed (the broadcasts that the views send while they go find nobody: the command line looks at Desktop^). The Done of
-  TvApp.TProgram is not called (it clears the pointers and destroys the group in one go). }
+{ Clear the global references before the group disposes its owned views (the broadcasts
+  that the views send while they go find nobody: the command line looks at Desktop^).
+  The Done of TvApp.TProgram is not called (it clears the pointers and destroys the
+  group in one go). }
 destructor TProgram.Destroy;
 begin
-  if MenuBar <> nil then
-    MenuBar.Free;
   MenuBar := nil;
-  if StatusLine <> nil then
-    StatusLine.Free;
   StatusLine := nil;
-  if Desktop <> nil then
-    Desktop.Free;
   Desktop := nil;
   Application := nil;
   inherited Destroy;
