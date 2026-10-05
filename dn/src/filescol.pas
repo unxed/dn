@@ -59,23 +59,23 @@ uses
 type
   PDiz = ^TDIZ;
   TDIZ = record
-    {` Описание файла для использования в TFileRec }
+    {` File description for use in TFileRec }
     Container: PString;
-      {` Полный путь файла описаний. Освобождать его не надо.
-       В Арвиде не используется. `}
+      {` Full path of the descriptions file. Need not free it.
+       Not used in Arvid. `}
     DIZText: LongString;
-      {` Описание без имени файла. Строки разделяются CrLf`}
+      {` Description without the file name. Lines separated by CrLf`}
     Line: LongInt;
-      {` У ритлабов это был номер строки в файле описаний, где
-       начинается это описание, но это нигде не использовалось.
-       Используется это поле только в Арвиде, но совершенно
-       в другом смысле.`}
+      {` At RITLabs this was the line number in the descriptions file where
+       this description starts, but it was never used anywhere.
+       This field is used only in Arvid, but in a completely
+       different sense.`}
     end;
     {`}
   TShortName = String[12];
   PFlName = ^TFlName;
   TFlName = array[TUseLFN] of TShortName;
-  {Использовано тут и в TDirRec}
+  {Used here and in TDirRec}
   TDate4 = record
     Minute, Hour, Day, Month: Byte
     end;
@@ -84,7 +84,7 @@ type
   PFileRec = ^TFileRec;
   TFileRec = record
     Size: TSize;
-      { Если размер неизвестнен, Size=-1 (типично для каталогов) }
+      { If size is unknown, Size=-1 (typical for directories) }
     PSize: TSize;
     Owner: PString;
     DIZ: PDiz;
@@ -98,18 +98,18 @@ type
     SecondLAcc: Byte;
     Selected: Boolean;
     UsageCount: Byte; {DataCompBoy}
-    FDate, FDateCreat, FDateLAcc: LongInt; {фактически - TDate4}
+    FDate, FDateCreat, FDateLAcc: LongInt; {actually TDate4}
     FlName: TFlName;
-    {см. uselfn.pas }
+    {see uselfn.pas }
     Dummy: array[1..SizeOf(ShortString)-SizeOf(TShortName)] of Char;
-    {а это место, куда будет свешиваться хвост длинного имени в тех
-      случаях, когда заводится локальная переменна типа TFileRec или
-      при временном динамическом резервировании в стиле new(PFilerec).
-      Нормально динамическое резервирование должно делаться через
-      CreateFileRec или NewFileRec, где памяти резервируется ровно
-      столько, сколько нужно. Из-за этого фокуса поле FlName
-      обязательно должно быть в самом конце этой структуры.
-      Копировать длинное имя надо не при помощи ':=', а при помощи
+    {and this is where the long name tail hangs in those
+      cases when a local variable of type TFileRec is created or
+      with temporary dynamic allocation in the style of new(PFilerec).
+      Normally dynamic allocation should be done via
+      CreateFileRec or NewFileRec, where exactly as much memory is
+      allocated as needed. Because of this trick the FlName field
+      must be at the very end of this structure.
+      Copy the long name not with ':=', but with
       CopyShortString. AK155 }
       {<filescol.001>}
     end;
@@ -138,7 +138,7 @@ type
     end;
   {-DataCompBoy-}
 
-  {Cat: выкинул, теперь используется Collect.TLineCollection}
+  {Cat: removed, Collect.TLineCollection is used now}
   (*
     TLineCollection = PTextCollection;
     TLineCollection = TTextCollection;
@@ -146,7 +146,7 @@ type
 
   TFilesCollection = class;
   TFilesCollection = class(TSortedCollection)
-    {Cat: этот объект вынесен в плагинную модель; изменять крайне осторожно!}
+    {Cat: this object is exposed in the plugin model; change with extreme care!}
     SortMode: Byte;
     Selected: LongInt;
     Panel: Pointer; {TFilePanel}
@@ -156,15 +156,15 @@ type
     function Compare(Key1, Key2: Pointer): Integer; override;
     function FileCompare(Key1, Key2: Pointer): Integer;
     procedure DelDuplicates(var TotalInfo: TSize);
-      {` Устранение записей, ссылающихся на один и тот же файл.
-        Если коллекция сортированная, то она должна быть отсортирована
-        до вызова данной программы `}
+      {` Remove records that refer to the same file.
+        If the collection is sorted, it must be sorted
+        before calling this routine `}
     end;
 
 type
   TFilesHash = class;
-  {` Хэшировщик, применяемый для быстрого поиска по имени/пути
-    в несортированных коллекциях `}
+  {` Hasher used for fast name/path lookup
+    in unsorted collections `}
   TFilesHash = class(THash)
     procedure Hash(Item: Pointer); override;
     function Equal(Item1, Item2: Pointer): Boolean; override;
@@ -182,9 +182,9 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean)
   : String;
 function CopyFileRec(FR: PFileRec): PFileRec; {DataCompBoy}
 function CreateFileRec(Name: String): PFileRec;
-  {` Name - это имя с полным путём. На основании пути создаётся
-   newstr и записывается в Owner. Вызывающая программа сама должна
-   освободить owner перед уничтожением этой файловой записи. `}
+  {` Name is the name with full path. Based on the path a
+   newstr is created and stored in Owner. The caller must
+   free owner before destroying this file record. `}
 
 function NewFileRec(const LFN, Name: String; Size: TSize;
      Date, CreationDate, LastAccDate: LongInt; Attr: Word;
@@ -194,9 +194,9 @@ procedure DelFileRec(var FR: PFileRec); {DataCompBoy}
 function LoadFileRec(var s: TStream): PFileRec; {DataCompBoy}
 procedure StoreFileRec(var s: TStream; fr: PFileRec); {DataCompBoy}
 function LoadFileRecOwn(var s: TStream; Dirs: TCollection): PFileRec;
-  {` Прочитать запись, затем индекс в Dirs и заполнить Owner`}
+  {` Read the record, then the index in Dirs and fill Owner`}
 procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: TCollection);
-  {` Записать запись и затем индекс owner в Dirs`}
+  {` Write the record and then the owner index into Dirs`}
 function PackedDate(P: PFileRec): LongInt; {DataCompBoy}
 function PackedCreationDate(P: PFileRec): LongInt; {JO}
 function PackedLastAccDate(P: PFileRec): LongInt; {JO}
@@ -204,8 +204,8 @@ function PackedLastAccDate(P: PFileRec): LongInt; {JO}
 {procedure ReplaceLongName(var fr: PFileRec; const NewName: string);}
 
 function SameFile(P1, P2: PFileRec): Boolean;
-  {` Относятся ли файловые записи к одному и тому же файлу,
-  то есть если совпадают ли (длинное) имя и путь. `}
+  {` Whether the file records refer to the same file,
+  i.e. whether the (long) name and path match. `}
 
 implementation
 uses
@@ -307,9 +307,9 @@ function CreateFileRec(Name: String): PFileRec;
       end
     else
       fr^.TType := GetFileType(lsr.FullName, fr^.Attr);
-    {Cat: это явно лишнее - для масок !\!.! для просмотрщиков и запуска по
-      расширению должны передаваться неискажённые имена файлов
-  PS  и следует ещё раз посмотреть и проверить - нужна ли вообще эта функция
+    {Cat: this is clearly redundant - for !\!.! masks for viewers and extension
+      launch, undistorted file names must be passed
+  PS  and one should look again and check whether this function is needed at all
      if fr^.Attr and Directory <> 0 then UpStr(fr^.Name) else LowStr(fr^.Name);}
     {/Cat}
     if fr^.Attr and Directory <> 0 then
@@ -349,7 +349,7 @@ procedure DelFileRec(var FR: PFileRec);
       begin
       if FR^.DIZ <> nil then
         begin
-        FR^.DIZ^.DIZText := ''; // освободить строку
+        FR^.DIZ^.DIZText := ''; // free the string
         Dispose(FR^.DIZ);
         end;
       {  FreeMem(FR, TFileRecFixedSize+length(FR^.FlName[true]));}
@@ -367,7 +367,7 @@ function LoadFileRec(var s: TStream): PFileRec;
     l: Byte;
     FullLen: LongInt;
   begin
-  s.Read(l, SizeOf(l)); {длина длинного имени}
+  s.Read(l, SizeOf(l)); {long name length}
   { FullLen := TFileRecFixedSize+l;}
   FullLen := SizeOf(TFileRec);
   GetMem(P, FullLen);
@@ -514,8 +514,8 @@ procedure TFilesCollection.FreeItem(Item: Pointer);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-//JO: 02-02-2004 - добавил сортировку по пути в панелях отображающих ветвь
-//                 и обратную сортировку
+//JO: 02-02-2004 - added sort by path in panels showing a branch
+//                 and reverse sort
 function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
   var
     {T1: TFileRec;}
@@ -614,7 +614,7 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
   var
     Name1, Name2: String; {UpStrg(P2^.Name)  // AK155}
     Own1, Own2: String;
-    Branched: Boolean; {идёт ли сравнение в панели представляющей ветвь}
+    Branched: Boolean; {whether comparison is in a panel showing a branch}
   const
     CompareXlat: array[0..2] of PXLat =
       (@ABCSortXlat, @UpCaseArray, @LowCaseArray);
@@ -640,7 +640,7 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
     Move(TFilePanel(Panel).PanSetup.Sort.Ups, Ups, SizeOf(Ups));
     CmpMethod := TFilePanel(Panel).PanSetup.Sort.CompareMethod;
     if TFilePanel(Panel).Drive <> nil then
-      {JO: все типы панели, представляющие собой раскрытую ветвь}
+      {JO: all panel types that represent an expanded branch}
       Branched := TFilePanel(Panel).Drive.DriveType
         in [dtFind, dtTemp, dtList, dtArcFind]
     else
@@ -648,9 +648,9 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
     end
   else
     begin
-      {! Раньше флаги брались из установок для новой панели,
-       интересно, зачем? А ещё интереснее, бывает ли и нужна
-       ли сортировка без панели?}
+      {! Previously flags were taken from settings for a new panel,
+       interesting, why? And even more interesting, does sorting
+       without a panel ever happen and is it needed?}
     SortFlags := 0;
     CmpMethod := 1;
     Branched := False;
@@ -685,9 +685,9 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
       Own2 := Owner^
     else
       Own2 := '';
-    //JO: Нижележащее условие с Branched  сделано в интересах производительности,
-    //    так как менять регистр объемлющего каталога для чего-либо кроме
-    //    раскрытой ветви - пустая трата процессорного времени
+    //JO: The Branched condition below is for performance,
+    //    since changing the case of the enclosing directory for anything but
+    //    an expanded branch is a waste of CPU time
     if Branched then
       begin
       MakeNoSlash(Own1);
@@ -704,8 +704,8 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
         case Ups[UpN] of
      upsDirs:
           begin
-//JO: если каталоги пеpемещаются в начало панели, то их соpтиpовка
-//    по имени пpи соpтиpовке файлов по другим критериям осмысленна
+//JO: if directories are moved to the start of the panel, then sorting them
+//    by name when sorting files by other criteria makes sense
           NameDirsSortEnabled := True;
           if  (P1^.TType = ttDirectory) and (TType <> ttDirectory) then
             begin
@@ -769,16 +769,16 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
 
       if SortFlags and psfSortByType <> 0 then
         begin
-//JO: поскольку при сортировке по типу все каталоги оказываются заведомо
-//    собраны вместе, то их соpтиpовка по имени пpи соpтиpовке файлов по
-//    другим критериям является осмысленной
+//JO: since when sorting by type all directories are definitely
+//    gathered together, sorting them by name when sorting files by
+//    other criteria makes sense
         NameDirsSortEnabled := True;
         I1 := P1^.TType;
         I2 := TType;
         if I1 = 0 then
-          I1 := 100; // файлы без типа - в конец
+          I1 := 100; // files without type - to the end
         if I2 = 0 then
-          I2 := 100; // файлы без типа - в конец
+          I2 := 100; // files without type - to the end
         if I1 < I2 then
           begin
           Compare := -1;
@@ -806,18 +806,18 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
 Lab1:
 
       if (SortFlags and psfDirsByName <> 0) and
-//JO: если каталоги не пеpемещаются в начало панели, то их
-//    соpтиpовка по имени пpи соpтиpовке файлов по pасшиpению
-//    не только бессмысленна, но и вpедна
+//JO: if directories are not moved to the start of the panel, then
+//    sorting them by name when sorting files by extension
+//    is not only pointless but harmful
          NameDirsSortEnabled and
            ((P1^.Attr or Attr) and Directory <> 0) then
                C := CmpName(Name1, Name2, Own1, Own2)
       else
       case SM of
-//JO: реально при psmUnsorted метод Compare никогда не вызывается, но
-//    на всякий случай лучше, чтобы сравнение производилось, причём
-//    будет честнее, если это будет нормальное сравнение по именам и
-//    путям, а не нечто, создающее псевдонесортированный беспорядок
+//JO: in reality with psmUnsorted the Compare method is never called, but
+//    just in case it is better that comparison is performed, and
+//    it will be fairer if it is a normal comparison by names and
+//    paths, rather than something that creates a pseudo-unsorted mess
              psmUnsorted,
         {LFN}psmLongName:
           C := CmpName(Name1, Name2, Own1, Own2);
@@ -889,8 +889,8 @@ Lab1:
           end;
         {/JO}
       else {case}
-//JO: если значение SortMode какое-нибудь нестандартное, то pеально
-//    ничего не сpавниваем, пpосто инициализиpуем значение функции
+//JO: if SortMode has some nonstandard value, then we really
+//    compare nothing, just initialize the function result
           C := -1;
       end; {case}
       end;
@@ -904,18 +904,18 @@ Lab1:
 {-DataCompBoy-}
 
 {JO}
-//JO: 29-01-2004 - выделил ту часть TFilesCollection.Compare , которая
-//    использовалась при сравнении каталогов в отдельный метод
-//    TFilesCollection.FileCompare . Это оправдано, поскольку во-первых
-//    TFilesCollection.Compare разрослась до безобразия, а для скорости
-//    сортировки важна быстрота её вызова, а во-вторых поскольку поле
-//    TFilesCollection.Sortmode используется этими двумя функциями совершенно
-//    разным образом. Метод FileCompare используется только для сравнения
-//    отдельно взятых файловых записей, и нигде не наследуется.
-//JO: 27-04-2006 - перенёс в TFilesCollection.FileCompare из
-//    TFilesCollection.Compare сравнение файлов по всем критериям сразу,
-//    используемое для групповых операций с файлами в панели (в данный
-//    момент используется только для разотметки файлов по cmCopyUnselect)
+//JO: 29-01-2004 - extracted the part of TFilesCollection.Compare that
+//    was used when comparing directories into a separate method
+//    TFilesCollection.FileCompare . This is justified because first
+//    TFilesCollection.Compare had grown disgracefully, and for sort
+//    speed its call speed matters, and second because the
+//    TFilesCollection.Sortmode field is used by these two functions in completely
+//    different ways. FileCompare is used only to compare
+//    individual file records, and is never inherited.
+//JO: 27-04-2006 - moved into TFilesCollection.FileCompare from
+//    TFilesCollection.Compare comparison of files by all criteria at once,
+//    used for group file operations in the panel (currently
+//    used only for unmarking files via cmCopyUnselect)
 function TFilesCollection.FileCompare(Key1, Key2: Pointer): Integer;
   var
     P1: PFileRec absolute Key1;
@@ -923,7 +923,7 @@ function TFilesCollection.FileCompare(Key1, Key2: Pointer): Integer;
     C: Integer;
     SM: Integer;
     P1P, P2P: Boolean;
-    C1: Integer; { результат сравнения имён   // AK155}
+    C1: Integer; { name comparison result   // AK155}
     Name1, Name2: String; {UpStrg(P2^.Name)  // AK155}
 
   begin
@@ -972,11 +972,11 @@ function TFilesCollection.FileCompare(Key1, Key2: Pointer): Integer;
       end;
 
     if SM = fcmPreciseCompare then
-//  сравнение используется в TFilePanel.HandleEvent для CM_CopyUnselect,
-//  т.е. для разотметки файлов при групповых операциях
+//  comparison is used in TFilePanel.HandleEvent for CM_CopyUnselect,
+//  i.e. for unmarking files during group operations
       begin
-//JO: по поводу маски $3F см. комментарий AK155 от 28-11-05 к константам
-//    Marked и Copied модуля FileCopy
+//JO: regarding the $3F mask see AK155's comment of 28-11-05 on the
+//    Marked and Copied constants in the FileCopy unit
       if (P1^.Attr and $3F = Attr and $3F)
             and (P1^.Yr = Yr)
             and (P1^.FDate = FDate) and (P1^.Second = Second)
@@ -1009,8 +1009,8 @@ function TFilesCollection.FileCompare(Key1, Key2: Pointer): Integer;
   end { TFilesCollection.FileCompare };
 {/JO}
 
-// JO: 18-11-2004 - ввёл полностью новые настройки показа информации
-//     в меню выбора диска
+// JO: 18-11-2004 - introduced completely new info display settings
+//     in the drive selection menu
 function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : String; {-$VIV, JO}
   var
     R: TRect;
@@ -1393,13 +1393,13 @@ function NewFileRec(const LFN, Name: String; Size: TSize; Date, CreationDate, La
   
   if (Attr and Directory <> 0) and (Size = 0) then
     T.Size := -1 {AK155 28-11-2005.
-      Вообще-то, это не очень хорошо, менять тот размер, который
-      задан в вызове. Но очень уж много этих вызовов, чтобы везде
-      вставлять такой анализ и -1 в качестве размера.
-      Если когда-то окажется, что этим мы испортим имеющуюся
-      информацию о нулевом размере, то ничего страшного от этого
-      не будет: на общем размере 0 не сказывается, а повторный подсчёт
-      этого нуля, если потребуется, будет выполнен достаточно быстро.
+      Actually, it is not very good to change the size that was
+      given in the call. But there are so many of these calls that inserting
+      such analysis and -1 as size everywhere is hard.
+      If it ever turns out that this spoils existing
+      information about zero size, nothing bad will come of it:
+      the total size is unaffected by 0, and recounting
+      that zero, if needed, will be done quickly enough.
       }
   else
     T.Size := Size;
@@ -1538,8 +1538,8 @@ function PackedLastAccDate(P: PFileRec): LongInt;
   PackedLastAccDate := L;
   end;
 
-{ Файловые записи считаются относящимися к одному и тому же файлу,
-если совпадают (длинное) имя и путь. }
+{ File records are considered to refer to the same file
+if the (long) name and path match. }
 function SameFile(P1, P2: PFileRec): Boolean;
   begin
   Result := False;
@@ -1584,7 +1584,7 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
     IsDupe: TIsDupe;
 
   function IsSortedDupe(i: Integer): Boolean;
-    begin { в сортированной коллекции дупы стоят рядом }
+    begin { in a sorted collection dupes stand next to each other }
     Result := SameFile(Items^[i-1], Items^[i]);
     end;
 
@@ -1602,34 +1602,34 @@ procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
     begin
     H := TFilesHash.Create(Self);
     if H.HT <> nil then
-      Exit; //! Наверно, памяти мало, сообщить бы об этом
+      Exit; //! Probably out of memory, should report that
     @IsDupe := @IsUnsortedDupe;
     end
   else
     @IsDupe := @IsSortedDupe;
 
-  { Каждый пакет дупов сначала полностью выявляется, а затем
-  удаляется. Удалять по одному некорректно, так как после этого
-  некорректным становится сравнение следующего с предыдущим
-  (удалённым). Для результатов поиска оно, впрочем, работает,
-  только потому, что у записей результатов поиска UsageCount>1,
-  на что закладываться нет никаго смысла.}
+  { Each pack of dupes is first fully identified, then
+  deleted. Deleting one by one is incorrect, because after that
+  comparing the next with the previous (deleted) becomes incorrect.
+  For search results it happens to work,
+  only because search result records have UsageCount>1,
+  which there is no sense in relying on.}
   j := 1; DupeStart := 1;
   for i := 1 to Count-1 do
     if not IsDupe(i) then
       begin
       for k := DupeStart to i-1 do
         DelFileRec(PFileRec(Items^[k]));
-      DupeStart := i+1; // новый кандидат на начало пакета дупов
+      DupeStart := i+1; // new candidate for start of a dupe pack
       Items^[j] := Items^[i];
       S := PFileRec(Items^[j])^.Size;
-      if S > 0 then {у каталога с неизвестным размером Size=-1}
+      if S > 0 then {for a directory with unknown size Size=-1}
         TotalInfo := TotalInfo + S;
       inc(j);
       end;
   Count := j;
   Duplicates := False;
-  { лишнюю память в Items^ не освобождаем }
+  { do not free the excess memory in Items^ }
   if H <> nil then
     H.Free;
   end;
