@@ -86,8 +86,8 @@ type
   TSeparator = class(TView)
     OldX, OldW: AInt;
     constructor Create(const R: TRect; AH: Integer);
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure Draw; virtual;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
     constructor Load(S: TStream);
     procedure Store(S: TStream);
     end;
@@ -118,8 +118,8 @@ type
       {`Сделать неактивную панель указанного типа, если сейчас у
       неё другой тип; а если именно такой - то сделать панель
       файловой`}
-    function Valid(C: Word): Boolean; virtual;
-    procedure ChangeBounds(const Bounds: TRect); virtual;
+    function Valid(C: Word): Boolean; override;
+    procedure ChangeBounds(const Bounds: TRect); override;
     procedure HandleCommand(var Event: TEvent);
       {`panelwin`}
     procedure SwitchPanel(N: TPanelNum);

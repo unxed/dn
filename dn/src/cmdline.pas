@@ -63,14 +63,14 @@ type
     Overwrite: Boolean;
     LineType: (ltNormal, ltFullScreen, ltWindow, ltTimer);
     constructor Create(const R: TRect);
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    procedure Update; virtual;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    procedure Update; override;
     procedure GetDir;
-    procedure GetData(var S); virtual;
-    procedure SetData(var S); virtual;
-    function DataSize: Integer; virtual;
+    procedure GetData(var S); override;
+    procedure SetData(var S); override;
+    function DataSize: Integer; override;
     procedure SetDirShape;
     procedure QueryCursorVisible; {AK155}
     end;
