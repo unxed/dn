@@ -9,7 +9,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 
 | Item | State |
 |---|---|
-| Gate | **OPEN** |
+| Gate | **CLOSED** (2026-10-05; full local matrix + #6) |
 | Core accept | **32/32 PASS** (historical) |
 | Full matrix | **174/174 PASS** local (`DN_ACCEPT_FAST=1`, 12 shards, object `/tmp/dn-object-gate/out/linux64-gate` vs class `out/linux64-gate`, 2026-10-05; evidence `/tmp/dn-accept-auth/`) |
 | Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |
@@ -112,20 +112,20 @@ invalid and not counted. The configured blank-panel mismatch (10/10 before
    (glyph + fg/bg + attrs + cursor + process + side effects). Spec:
    `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`. **Primary path:** full local
    `tools/dn-linux-accept.py` matrix green. CI is optional corroboration.
-   Gate stays **OPEN** until that local matrix PASSes. Mismatch → fix; do
-   not proceed. Same wrong output on **both** object and class → still fix
-   (shared-bugs rule in the gate doc); parity is not an excuse to keep defects.
-3. Only after the gate PASSes — post-class stages in order
-   (`docs/POST-CLASS-WORK.md`):
+   **CLOSED** 2026-10-05 after local **174/174 PASS** (`/tmp/dn-accept-auth/`).
+   Future mismatch on a re-run → fix; do not proceed. Same wrong output on
+   **both** object and class → still fix (shared-bugs rule in the gate doc);
+   parity is not an excuse to keep defects.
+3. Post-class stages in order (`docs/POST-CLASS-WORK.md`):
    1. English (comments, docs, user strings / hardcode)
    2. Refactoring for readability (publish done-criteria first)
    3. Separate and formalize platform-dependent code
    4. Expand tests to a minimally decent level (incl. Linux / DOS / Windows)
-4. Until the gate PASSes, also keep chasing known open matrix rows:
-   full-cell object/class parity, ZIP charset gaps (`docs/ZIP-CHARSET.md`),
-   archive matrix (`docs/ARCHIVE-MATRIX.md`), etc. Already landed locally:
-   #6 + About (`7572d73`), accept harden (`ad9c4f7`), xz/F5 (`5f02362`),
-   ZIP listing charset (`27de843`), `ChLngId` (`88c19f8`), `CColor` (`b57025b`).
+4. Keep chasing known open rows outside the closed accept matrix where needed:
+   ZIP charset gaps (`docs/ZIP-CHARSET.md`), full archive matrix
+   (`docs/ARCHIVE-MATRIX.md`), etc. Already landed locally: #6 + About
+   (`7572d73`), accept harden (`606cca3`), xz/F5 (`5f02362`), ZIP listing
+   charset (`27de843`), `ChLngId` (`88c19f8`), `CColor` (`b57025b`).
 
 ## Recorded issue and administrative commits
 
