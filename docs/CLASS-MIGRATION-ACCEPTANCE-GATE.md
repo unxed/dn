@@ -52,9 +52,12 @@ panel headers before menu input and six afterward; `dist/linux64/dn`, published
 by distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4` from source
 `df0cca2`, SHA-256
 `e88ec6c324801bc394e9665095f705c452f5c34b7ec2ffa1363c80f58542a41d`, had six
-headers before menu input. This is a one-trial classification based on panel
-headers, not full-cell acceptance evidence. A prior 100-start attempt sampled
-before UI readiness and is invalid; a valid 100-start series remains pending.
+headers before menu input. This was only a diagnostic trial: the binaries used
+their own saved `dn.ini` files, so it is not a controlled causal comparison.
+Because this `dist` predates the class migration, do not use it as the
+comparator for this defect; test only the latest class build with its
+configured-run settings. A prior 100-start attempt sampled before UI readiness
+and is invalid; a valid class-build-only 100-start series remains pending.
 Source searches found redraw/draw entry points in `mainapp.pas`,
 `panelroot.pas`, `paneldlgs.pas`, and `menus.pas`, but have not isolated either
 root cause. Keep the virgin-run About residue and configured-run self-build
@@ -65,12 +68,11 @@ Startup/panel regressions to reproduce and fix:
 * Closing the About dialog on first launch consistently leaves its image
   visible over the panels.
 * The configured-run blank-panel state is mutually exclusive with first-run
-  About: use the same non-virgin `dn.ini` condition for self-build and `dist`.
-  Run at least 100 fresh starts of each exact comparator binary (record source
-  revision, build flags, and `dist` artifact identity), capture complete
-  cells before input, then replay the same menu input and capture again.
-  Require zero missing-panel trials for the accepted class build and exact
-  parity with its object/distribution comparator.
+  About. For this reported defect, use only the latest class build and its
+  configured `dn.ini`; the supplied `dist` is from before class migration and
+  is not a comparator. Run at least 100 fresh starts, capture complete cells
+  before input, then replay the same menu input and capture again. Require zero
+  missing-panel trials on the accepted class build.
 * For the About residue, capture the screen immediately before opening About,
   while About is open, and immediately after closing it; all prior panel cells
   must be restored on every trial. Initial evidence: exact-pair fresh-start
