@@ -1,7 +1,7 @@
 # ZIP single-byte charset (names and comments)
 
-Status: **specified; not implemented in DN yet**  
-Recorded: 2026-10-05 (owner clarification)
+Status: **implemented (minimal DN listing path)**  
+Recorded: 2026-10-05 (owner clarification); landed 2026-10-05
 
 ## Requirement
 
@@ -25,49 +25,44 @@ treat bytes as UTF-8 when the flag or creator says so.
 
 ## Where it applies in DN
 
-- Built-in ZIP listing: `dn/archives/fmtzip.pas` (`GetFile` name bytes) and any
-  comment display path.
+- Built-in ZIP listing: `dn/archives/fmtzip.pas` (`GetFile` name bytes) via
+  `dn/lib/zipcharset` + `dn/lib/localecp`.
 - Later: pack/unpack UI strings that round-trip names through ZIP headers
-  (must stay consistent with the same rules).
+  (must stay consistent with the same rules); ZIP **comment** display path
+  (decode API is ready; `GetFile` does not surface comments yet).
 - Not a substitute for external `zip`/`unzip`/`7z` tools’ own name handling;
   DN’s **internal** reader must still match the references when it shows the
   panel listing.
 
-## Subproject split (locale codepage)
+## In-tree layout
 
-`localecp` is already a reusable Go library. For DN and other native
-consumers, **locale → OEM/ANSI deduction should live in a small shared
-subproject** (Pascal unit and/or keep publishing Go `localecp`), so:
+| Path | Role |
+|---|---|
+| `dn/lib/localecp/` | Pascal seed of `localecp`: locale tables, Unix init, OEM/ANSI/System UTF-8 decoders (`localecp_tables.inc` from `tools/gen-localecp-tables.py`) |
+| `dn/lib/zipcharset/` | Port of `DecodeText` / `ParseUnicodeExtraField` |
+| `tv/src/tvlocale.pas` | Still the UI OEM page pick (OEM half of the same locale table); ZIP decode uses `localecp` |
 
-- DN, other archivers, and tools share one mapping;
-- `zipcharset`-equivalent ZIP heuristics can depend on that subproject only;
-- others can reuse locale detection without pulling ZIP code.
-
-Existing seed in-tree: `tv/src/tvlocale.pas` already carries the OEM side of
-`localecp`’s `lcToOemTable` (for DOS/host codepage pick). That is **not** yet
-the full `localecp` API (ANSI, Windows ACP/OEMCP + UTF-8-ACP fallback,
-encoders/decoders) nor `zipcharset`. Grow or extract from there rather than
-forking a second table.
-
-Suggested shape (implementation order, not binding names):
-
-1. **Locale CP subproject** — tables + Unix/Windows init, API shaped like
-   `localecp` (`OEMDecoder` / `ANSIDecoder` / `SystemDecoder`, codepage
-   numbers). Tests locked to `localecp` fixtures where practical.
-2. **ZIP charset layer** — port of `zipcharset` on top of (1), used by
-   `fmtzip` (and any future ZIP writers).
-
-Exact repo layout (in-tree library vs sibling GitHub repo) is chosen when
-implementation starts; the behavioral lock to the two GitHub projects is
-mandatory either way.
+Staged into the DN build by `tools/dn-env.sh` (`dn_stage`).
 
 ## Acceptance
 
-- Golden vectors from `zipcharset` / `localecp` tests (and known buggy
-  corner cases) decode identically in DN.
-- Manual: CP866 / CP1251 / flag-0x800 / `0x7075` archives show the same
-  names as a small Go harness using `zipcharset` on the same files.
+- [x] Golden vectors from `zipcharset` tests decode identically in DN
+      (`dn/tests/t_zipcharset.pas`).
+- [x] Fixture + Go harness: `tools/test-zipcharset.py` writes
+      `tools/testdata/zipcharset/cp866-privet.zip` and checks the reference
+      `zipcharset` decoder → `привет.txt`.
+- [ ] Manual: CP866 / CP1251 / flag-0x800 / `0x7075` archives in a UTF-8 DN
+      panel match the Go harness (smoke left to owner / archives PTY).
 - Document any intentional deviation only with owner approval (none expected).
+
+## Remaining gaps
+
+- Windows `GetACP` / `GetOEMCP` + UTF-8-ACP Far-style fallback not ported
+  (Unix `LANG`/`LC_*` init matches `localecp_unix.go`).
+- Multi-byte locale encodings (GBK, BIG5, CP932, CP949) are not decoded;
+  same as a nil decoder → raw bytes (Go uses `htmlindex`).
+- ZIP comment bytes are not shown by `fmtzip` yet (decode helper exists).
+- ShortString 255-byte cap still truncates long UTF-8 expansions of OEM names.
 
 ## Related open work
 
@@ -75,3 +70,5 @@ mandatory either way.
   `GetFile`); Unix archiver command defaults (far2l multiarc).
 - This charset task is **orthogonal** to Enter-archive crashes but blocks
   correct Cyrillic (and other legacy) names once listing works.
+- Archive matrix: `docs/ARCHIVE-MATRIX.md`; status:
+  `docs/CLASS-MIGRATION-STATUS.md` / checklist.

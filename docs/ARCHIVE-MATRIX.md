@@ -74,5 +74,8 @@ behavior is ambiguous (hard gate still applies globally).
       plain `.gz` already lists stem via TGZ.
 
 Related: Unix packer defaults (`fmtzip`/`fmttar`/`fmt7z`…), ZIP charset
-(`docs/ZIP-CHARSET.md`), object/class gate
-(`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`).
+(`docs/ZIP-CHARSET.md` — minimal `fmtzip` name decode via `dn/lib/zipcharset`),
+object/class gate (`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`).
+
+ZIP charset fixture (not part of `dn-linux-archives.py`):
+`python3 tools/test-zipcharset.py` → `tools/testdata/zipcharset/cp866-privet.zip`.
