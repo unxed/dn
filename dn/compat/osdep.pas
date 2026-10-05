@@ -60,6 +60,8 @@ function SysGetVolumeLabel(Drive: Char): ShortString;
 function SysOsPath(const S: string): string;
 { The bytes of a text of DN (its code page) as the system wants them: UTF-8 on Unix (see NameToOs), else the text as it is. }
 function SysNameToOs(const S: string): string;
+{ Convert a DN command line to the host shell's encoding and path syntax. }
+function SysCommandLineToOs(const S: string): string;
 { Unix: runs a command of the shell with the terminal (the screen of the application is left, the command writes to the terminal, Enter
   returns to DN and the screen is drawn again); returns the exit code of the shell. Elsewhere: -1 (nothing is run). }
 function SysRunShell(const CmdLine: string): LongInt;
@@ -304,6 +306,33 @@ begin
   Result := NameToOs(S);
 end;
 
+function SysCommandLineToOs(const S: string): string;
+var
+  I, J: Integer;
+  Q: Boolean;
+begin
+  Result := '';
+  I := 1;
+  while I <= Length(S) do
+  begin
+    if (I + 2 <= Length(S)) and (UpCase(S[I]) in ['A'..'Z']) and (S[I + 1] = ':') and (S[I + 2] in ['\', '/'])
+      and ((I = 1) or (S[I - 1] in [' ', '"', '''', '>', '<', '=', '|', ';', '(', '&'])) then
+    begin
+      Q := (I > 1) and (S[I - 1] = '"');
+      J := I + 2;
+      while (J <= Length(S)) and (not Q or (S[J] <> '"')) and (Q or not (S[J] in [' ', '"', '''', '>', '<', '|', ';', '&', ')'])) do
+        Inc(J);
+      Result := Result + SysOsPath(Copy(S, I, J - I));
+      I := J;
+    end
+    else
+    begin
+      Result := Result + SysNameToOs(S[I]);
+      Inc(I);
+    end;
+  end;
+end;
+
 function SysRunShell(const CmdLine: string): LongInt;
 begin
   UnixSuspend;
@@ -340,6 +369,11 @@ begin
 end;
 
 function SysNameToOs(const S: string): string;
+begin
+  Result := S;
+end;
+
+function SysCommandLineToOs(const S: string): string;
 begin
   Result := S;
 end;

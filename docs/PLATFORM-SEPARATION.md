@@ -15,6 +15,13 @@ behaviour or to port unsupported targets.
 | Startup path and screen restoration | `dn/src/boot.pas`, `mainapp.pas`, `panelroot.pas` | Some terminal/UTF-8/OS initialization and user-screen restoration decisions remain at application call sites | Replace OS decisions with narrow facade calls; portable startup owns sequencing, platform services own mechanics |
 | UTF-8 names and terminal text | `dn/compat/osdep.pas`, `dn/compat/dnscreen.pas`, `dn/src/dnutf8.pas`, selected callers | Name conversion, screen-cell conversion, and terminal rendering have different platform semantics | Keep text policy in the shared facade; put OS-specific conversion/rendering at backend edges and document each unavoidable conditional |
 
+First extraction landed: Linux command-line path/encoding conversion moved
+from `DNRun` to the stable `osdep` facade as `SysCommandLineToOs`; its six
+command-path regression checks remain in `t_dnrun`. Local proof before commit:
+`tools/dn-test.sh` PASS (12 programs), `tools/build.sh linux64` PASS for legacy
+and `DN_UTF8=1` variants. Full object/class parity is still a hard gate for
+this commit; no next behavior-sensitive extraction starts until it passes.
+
 The inventory is deliberately limited to the first extraction families; the
 presence of `Dos` in historical DN units alone does not mean that every caller
 should be rewritten. Preserve DN's DOS path/error semantics through the
