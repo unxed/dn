@@ -4,25 +4,23 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
-Current gate status: **OPEN**. Earlier comparisons against the archived
-pre-rewrite DN/TV pair used a different product revision and are not the
-object-to-class acceptance baseline. Use only the exact object and class
-revisions recorded below; do not treat earlier palette, About-text, or startup
-cell counts as accepted evidence.
+Current gate status: **OPEN**. Compare the latest object-based DN against the
+latest class-based DN, recording each exact revision and TV submodule. The
+older distribution artifact is not a substitute comparator.
 
 ## Current controlling result (2026-10-05)
 
-The object baseline for acceptance is DN `b4916b874989d7b35660d02cf935dc5f0db7a656`
-with its recorded TV submodule `521d06479198789deeaa6fda287236ca83ba4051`.
-The current class build is DN `33674fed7829124fbd3230440faf3075c45eb9f6`
-with TV3 `ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3`. Both binaries must be
-rebuilt from these exact source revisions with identical build metadata and
-fixtures. The earlier comparison against DN `10763d65d091fc8525599a45c155be228c1bb8b6`
-and TV `c9bb5c4d0d87e73382ebdd48c117f4c29e1ae9e5` used the wrong object
-baseline and is not acceptance evidence; its reported differences are
-superseded, not waived.
+The latest object baseline identified so far is DN
+`b4916b874989d7b35660d02cf935dc5f0db7a656` with TV
+`521d06479198789deeaa6fda287236ca83ba4051`. The latest class build is DN
+`7eaca15be92b86e69fb43a830029ed4e9e92a8e2` with TV3
+`ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3`. Recheck that no later object-based
+revision exists before final acceptance; rebuild both exact revisions with
+identical build metadata and fixtures. Earlier trials against
+`33674fed7829124fbd3230440faf3075c45eb9f6` or the much older
+`10763d65d091fc8525599a45c155be228c1bb8b6` do not replace this comparison.
 
-The corrected 24-scenario PTY tour completed on both builds, but it did not
+The corrected 24-scenario PTY tour completed on earlier builds, but it did not
 exercise every action or provide a reproducible exact-cell comparison for
 every checkpoint. A separate full menu-cell probe exposed actionable
 differences: at menu item `(0,4)` the class build raised an access violation
@@ -45,20 +43,29 @@ class `1/1`. On a later run (with `dn.ini`), About does not appear; the user
 reports that some self-built starts show a blank purple panel area until a
 menu triggers drawing, while `dist` does not.
 
-The latter was reproduced once with the user's current binary variants and
-same PTY size/input: self-build `out/linux64/dn`, build `1f0a63d`, SHA-256
-`97f102cb466842bf6a0453ad5d83412a47ba06f2f427bf9578a62adc11a3cb7a`, had no
-panel headers before menu input and six afterward; `dist/linux64/dn`, published
-by distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4` from source
-`df0cca2`, SHA-256
-`e88ec6c324801bc394e9665095f705c452f5c34b7ec2ffa1363c80f58542a41d`, had six
-headers before menu input. This was only a diagnostic trial: the binaries used
-their own saved `dn.ini` files, so it is not a controlled causal comparison.
-Because this `dist` predates the class migration, do not use it as the
-comparator. Compare the latest object-based baseline with the latest class
-build using the same configured-run settings. A prior 100-start attempt
-sampled before UI readiness and is invalid; a valid object/class 100-start
-series remains pending.
+The configured-run discrepancy was reproduced in a controlled, ready-
+synchronized PTY pair using the same absolute working path, terminal size
+`100x30`, no About dialog, and identical saved `dn.ini` SHA-256
+`1a9b0b2b63ba27eb9324c3a09587ac337426756e174ba77f60ef05a8ab52ad9f`:
+
+* Object DN `b4916b874989d7b35660d02cf935dc5f0db7a656`, TV
+  `521d06479198789deeaa6fda287236ca83ba4051`, binary SHA-256
+  `8508cf5535cde1705aba33f83043caddc89dafdddef147a9d34068a619056b40`:
+  four panel headers before input.
+* Latest class build from DN `7eaca15be92b86e69fb43a830029ed4e9e92a8e2`,
+  TV3 `ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3`, binary SHA-256
+  `6e057566920a7d47dad45174203eeb5af407d86704b0d90555c76802c132d552`:
+  zero panel headers before input.
+* After the same `F10`, `Right` sequence both showed four headers; neither
+  displayed About, and the config hash was unchanged after each run.
+
+One pair confirms an object/class mismatch but is not complete intermittent-
+failure acceptance; run 100 fresh pairs and compare full cells/attributes,
+cursor, process state, and side effects. An earlier self-build/`dist` check
+used each binary's own configuration and is not controlled evidence. The
+distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4` from `df0cca2`
+predates classes and is not the migration comparator. A prior 100-start
+attempt sampled before UI readiness and is invalid.
 Source searches found redraw/draw entry points in `mainapp.pas`,
 `panelroot.pas`, `paneldlgs.pas`, and `menus.pas`, but have not isolated either
 root cause. Keep the virgin-run About residue and configured-run self-build
