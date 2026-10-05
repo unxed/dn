@@ -261,7 +261,7 @@ constructor TArcDrive.Create(const AName, VAName: String);
   ColAllowed := PanelFileColAllowed[pcArc];
   if not ReadArchive or (Files = nil) then
     begin
-    Destroy;
+    { Classes: Fail already runs Destroy; object-era Done+Fail would double-free here. }
     Fail;
     end;
   KillAfterUse := TempFile <> '';
@@ -459,6 +459,7 @@ function TArcDrive.ReadArchive: Boolean;
   if AType = nil then
     begin
     ArcFile.Free;
+    ArcFile := nil;
     Exit;
     end;
   Files := TDirStorage.Create;
