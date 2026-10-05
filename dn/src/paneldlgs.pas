@@ -109,7 +109,7 @@ uses
 type
   TSelectList = class(TListBox)
     function IsSelected(I: LongInt): Boolean; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
     end;
 
@@ -241,7 +241,7 @@ type
       Этот метод перекрывается в диалогах сортировки и фильтра.
       Виртуализация этого метода используется в программе обработки
       нажатия кнопки "записать" TSaveSetupButtonPress. }
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
       { Для реакции на хоткеи и кнопку "Записать".
       Это метод общий для всех трёх диалогов}
     end;
@@ -249,8 +249,8 @@ type
 { Радиокнопки класса панели в диалоге "Записать".
   Для реакции на смену выбора в блоке радиокнопок "Тип панели" }
   TPanelClassRB = class(TRadioButtons)
-    procedure MovedTo(Item: Integer); virtual;
-    procedure Press(Item: Integer); virtual;
+    procedure MovedTo(Item: Integer); override;
+    procedure Press(Item: Integer); override;
       { Приходится перекрываь и MoveTo, и Press, так как ни одна из
       них не вызывается всегда. Например, при перемещеии курсором
       вызывается только MovedTo, при нажатии мышью - только Press,
@@ -259,11 +259,11 @@ type
     end;
 
   TSaveSetupButton = class(TButton)
-    procedure Press; virtual;
+    procedure Press; override;
     end;
 
   TSaveSetupDialg = class(TDialog)
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
       { Для реакции на кнопку "Все" }
     end;
 
