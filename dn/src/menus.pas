@@ -68,15 +68,28 @@ const
 
 const
   miDisabled = 1;
-   {` TMenuItem.Flags bit. Item is disabled `}
+   {` Бит TMenuItem.Flags. Пункт недоступен `}
   miSubmenu = 2;
-   {` TMenuItem.Flags bit. Item is a submenu`}iExecDefault = 4;
-   {` TM{` TMenuItem.Flags bit. Item is a submenu, but on Enter
-    the submenu is not opened; instead the default item
-    of that submenu is executed. Usually when this bit is set Command <> 0 `}u = 8;
-   {` TMenuItem.Flags bit. {` TMenuItem.Flags bit. When freeing the menu, do not free
-    the submenu this item references `} TMenuItem.Flags bit. The submenu's{` TMenuItem.Flags bit. The submenu's default item can be changed
-     (by pressing Space) `}ags bit. Item has a no{` TMenuItem.Flags bit. Item has a non-empty Param `}TMenuStr = String[81];
+   {` Бит TMenuItem.Flags. Пункт является подменю`}
+  miExecDefault = 4;
+   {` Бит TMenuItem.Flags. Пункт является подменю, но по Enter
+    не раскрывается подменю, а выполняется пункт по умолчанию
+    этого подменю. Обычно при наличии этого бита Command <> 0 `}
+  miDoNotDisposeSubmenu = 8;
+   {` Бит TMenuItem.Flags. При освобождении меню не освобождать
+    подменю, на которое ссылается данный пункт `}
+  miAllowChangeDefault = 16;
+   {` Бит TMenuItem.Flags. У подменю можно сменять пункт по умолчанию
+     (нажатием пробела) `}
+  miParam = 32;
+   {` Бит TMenuItem.Flags. Пункт имеет непустой Param `}
+
+
+type
+
+  { TMenu types }
+
+  TMenuStr = String[81];
 
   PMenu = ^TMenu;
 
@@ -115,35 +128,43 @@ const
     Current: PMenuItem;
     HaveSubmenu: Boolean;
     LastActionIsExpand: Boolean;
-      { Such a field is cleaner than TypeOf{ Such a field is cleaner than checks TypeOf(Self) = TypeOf(TMenuBar),
-       because that check is not True for a type derived from
-       TMenuBar. No need to build such traps. Classes have
-       the 'is' operator, but objects have no analog, so we have to
-       improvise. }te: Word; override;
-      { AK155 21.05.2005 (ak50521a.dif) Honour the Disabled field.
-        Before, a Disabled item was d{ AK155 21.05.2005 (ak50521a.dif) Added Disabled field handling.
-        Before, a Disabled item was drawn dim in Draw, but
-        in Execute was selected like enabled ones. This may be needed
-        for an item whose command cannot be disabled because
-        its number is too large. For example, to disable a
-        combobox item. }tPalette: TPalette; override;
+      { Такое поле аккуратнее, чем проверки TypeOf(Self) = TypeOf(TMenuBar),
+       поскольку такая проверка не даст True для типа, производного от
+       TMenuBar. Ни к чему строить такие ловушки. Для классов есть
+       операция 'is', но для объектов её аналога нет, поэтому приходится
+       исхитряться. }
+    constructor Create(var Bounds: TRect);
+    constructor Load(S: TStream);
+    function Execute: Word; override;
+      { AK155 21.05.2005 (ak50521a.dif) Добавил учёт поля Disabled.
+        До этого Disabled-элемент в Draw отображался бледно, но
+        в Execute выбирался наравне с доступными. Это может понадобиться
+        для элемента, команда которого не может быть отключена, так как
+        имеет слишком большой номер. Например, для отключения элемента
+        комбобокса. }
+    function FindItem(Ch: Char): PMenuItem;
+    procedure GetItemRect(Item: PMenuItem; var R: TRect); virtual;
+    function GetHelpCtx: Word; override;
+    function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     function HotKey(KeyCode: LongInt): PMenuItem;
     function NewSubView(var Bounds: TRect; AMenu: PMenu;
         AParentMenu: TMenuView): TMenuView; virtual;
     procedure Store(S: TStream);
     function RightExpand: Boolean; virtual;
-      { on kbRight, open the submenu }
+      { по kbRight раскрывать подменю }
     function LeftCollapse: Boolean; virtual;
-      { on kbLeft, collapse an open submenu }
+      { по kbLeft сворачивать развёрнутое подменю }
     end;
 
   { TMenuBar class }
 
-  { Palet{ on kbRight open submenu }}
+  { Palette layout }
+  { 1 = Normal text }
   { 2 = Disabled text }
   { 3 = Shortcut text }
- { on kbLeft collapse an open submenu }election }
+  { 4 = Normal selection }
+  { 5 = Disabled selection }
   { 6 = Shortcut selection }
 
   TMenuBar = class;
@@ -281,14 +302,19 @@ const
 
 var
   ParentItem: PMenuItem;
-    {` Parent-menu item from which the submenu was opened.`}
+    {` Пункт родительского меню, из которого было вызвано подменю.`}
 
 implementation
 uses
   TvSys, TvClip,
   basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8
   , keymap
-  ;{` Parent menu item from which the submenu was invoked.`}
+  ;
+
+const
+  OldKbdState: Byte = 0;
+
+  { TMenuItem routines }
 
 function NewItem(Name, Param: TMenuStr; KeyCode: LongInt; Command: Word;
     AHelpCtx: Word; Next: PMenuItem): PMenuItem;
@@ -683,22 +709,24 @@ q:
                       begin
                       TrackKey(True);
                       {if Current = Menu^.Items then TrackKey(False);}
-                      {JO - why is this here???}
+                      {JO - зачем здесь это???}
                       end
                   else if not Going then
                     begin
                     Going := True;
-                    TrackKe{JO - why is this here???}      end
+                    TrackKey(False);
+                    end
                   else
                     begin
                     TrackKey(False);
                     {if Current.Next = nil then TrackKey(true);}
-                    {JO - why is this here???}
+                    {JO - зачем здесь это???}
                     end;
                   end
                 else if DNKeyCode(E) = kbDown then
                   AutoSelect := True; {new end}
-        {JO - why is this here???}       begin
+              kbRight:
+                begin
                 if RightExpand then
                   goto lEnter;
                 if ParentMenu = nil then
@@ -750,13 +778,14 @@ q:
                   begin
                   for W := 1 to Size.Y-2 do
                     if  (Current = Menu^.Items) {and (W>1)}
-                      {JO - why is this here???}
+                      {JO - зачем здесь это???}
                       then
                       begin
                       TrackKey(False);
                       Break
                       end
-    {JO - why is this here???}                   begin
+                    else
+                      begin
                       Current := Current.Next;
                       if Current = nil then
                         Current := Menu^.Items;
@@ -780,12 +809,15 @@ lEnter:
                 end;
               kbSpace:
                 begin
-                { Inside a submenu with a default, Space changes the default;
-                  elsewhere it may be a hotkey
-                  (e.g. in the drive-selection menu)}
-                if{ Inside a submenu with a default, Space changes the default;
-                  but in other cases it may be a hotkey
-                  (e.g. in the drive selection menu)}              Action := DoNothing;
+                { Внутри подменю с умолчанием пробел меняет умолчание;
+                  но в других случаях он может оказаться корячей клавишей
+                  (например, в меню выбора дисков)}
+                if  (ParentMenu <> nil) and
+                    (ParentMenu.Current.Flags and
+                         miAllowChangeDefault <> 0)
+                then
+                  begin
+                  Action := DoNothing;
                   Menu^.Default := Current;
                   Draw;
                   end
@@ -928,13 +960,21 @@ lHotkey:
       PutEvent(E);
   if Current <> nil then
     begin
-    { Do not make the selected item the default if the
-    parent-menu item has a submenu with miExecDefault.
-    Then the default changes only via Space, and only if
-    allowed (miAllowChangeDefault) }{ Do not make the selected item the default if
-    the parent menu item has a submenu with miExecDefault.
-    In that case changing the default is only with Space, and only
-    when allowed (miAllowChangeDefault) }ction TMenuView.FindItem(Ch: Char): PMenuItem;
+    { Выбранный пункт не делаем пунктом по умолчанияю, если
+    пункт родительского меню имеет подменю с miExecDefault.
+    В этом случае смена умолчания - только пробелом, да и то
+    только при наличии разрешения (miAllowChangeDefault) }
+    if (ParentMenu = nil) or
+       (ParentMenu.Current.Flags and miExecDefault = 0)
+    then
+      Menu^.Default := Current;
+    Current := nil;
+    DrawView;
+    end;
+  MenuActive := False;
+  end { TMenuView.Execute: };
+
+function TMenuView.FindItem(Ch: Char): PMenuItem;
   var
     P: PMenuItem;
     I: Integer;
@@ -1043,16 +1083,23 @@ procedure TMenuView.HandleEvent(var Event: TEvent);
       evMouseDown:
         DoSelect;
       evKeyDown:
-        { AK155 9-07-2002 Pushing every character through all menus
-does not help speed. Hotkeys here are only for the inactive menu,
-so only Ctrl/Alt keys (and some Shift keys not shown in StatusLine)
-need checking. But listing all Shift keys{ AK155 9-07-2002 Passing every character through all menus
-does not help speed. Hotkeys are really handled here only for
-an inactive menu, so it makes sense to analyze only keys
-with Ctrl or Alt, and some with Shift (those that do not light up
-in StatusLine). But since hunting down all Shift keys is tedious,
-let all be checked. In practice there are at least these:
-GrayPlus, GrayMinus, F2, F10, F11, F12 }mand;
+        { AK155 9-07-2002 То, что каждый символ протаскивается через все меню,
+не добавляет скорости. Реально тут хоткеи обрабатываются только для
+неактивного меню, поэтому имеет смысл анализировать только клавиши
+с Ctrl или Alt, а также некоторые с Shift (те, которые не светятся
+в StatusLine). Hо поскольку выискивать все шифтовые клавиши не хочется,
+пусть проверяются все. Реально есть, как минимум, такие:
+GrayPlus, GrayMinus, F2, F10, F11, F12 }
+        if  ( (DNKeyCode(Event) and $F0000) <> 0) {AK155} and
+            (FindItem(Drivers.GetAltChar(DNKeyCode(Event))) <> nil)
+        then
+          DoSelect
+        else
+          begin
+          P := HotKey(DNKeyCode(Event));
+          if  (P <> nil) and CommandEnabled(P^.Command) then
+            begin
+            Event.What := evCommand;
             Event.Command := P^.Command;
             Event.InfoPtr := nil;
             PutEvent(Event);
@@ -1327,19 +1374,25 @@ procedure TMenuBox.Draw;
     end
   else
     begin
-//JO: highlighted hotkey background matches the combobox background,
-//    letter colour matches ordinary-menu hotkeys
+//JO: фон подсвеченных хоткеев делаем таким же как общий фон комбобокса,
+//    а цвет буковок - как у хоткеев в обычном меню
     CNormal := (GetColorW($0307) and $0FFF) + (GetColorW($0700) and $F000);
     CSelect := (GetColorW($0608) and $0FFF) + (GetColorW($0800) and $F000);
-//JO: same for disabled items
-    CNormDisabled := (GetColorW($0202) and $0F0//JO: make the background of highlighted hotkeys the same as the overall combobox background,le//    and the letter color the same as hotkeys in a normal menu      + (GetColorW($0808) and $F0F0);
+//JO: аналогично - с недоступными элементами
+    CNormDisabled := (GetColorW($0202) and $0F0F)
+                      + (GetColorW($0707) and $F0F0);
+    CSelDisabled := (GetColorW($0505) and $0F0F)
+                      + (GetColorW($0808) and $F0F0);
     end;
   Y := 0;
   ParamEnd := Size.X-3;
   if HaveSubmenu then
     Dec(ParamEnd, 3);
   Color := CNormal;
-  Fr//JO: similarly for disabled itemsil) and (Menu^.Items <> nil) then
+  FrameLine(0);
+  DrawLine;
+
+  if  (Menu <> nil) and (Menu^.Items <> nil) then
     begin
     P := Menu^.Items;
     if TopItem = nil then
@@ -1378,8 +1431,8 @@ procedure TMenuBox.Draw;
         MoveCStr(B[3], P^.Name^, Color);
         if (P = Menu.Default) and (ParentMenu <> nil) and
           (ParentMenu.Current.Flags and miExecDefault <> 0)
-        then { mark with a diamond the item that runs on
-          Enter on the parent-menu item }
+        then { помечаем алмазиком пункт, который выполняется по
+          Enter на пункте родительского меню }
           MoveChar(B[2], #4, Byte(Color), 1);
         if P^.Param <> nil then
           MoveStr(B[ParamEnd-Length(P^.Param^)],
@@ -1387,8 +1440,10 @@ procedure TMenuBox.Draw;
         if P^.Flags and miSubmenu <> 0 then
           begin
           if P^.Flags and miExecDefault <> 0 then
-     { mark with a diamond the item that is executed on
-          Enter on the parent menu item }  MoveStr(B[Size.X-5], SubmenuArrow, Byte(Color));
+            SubmenuArrow := '['#16']'
+          else
+            SubmenuArrow := ' '#16' ';
+          MoveStr(B[Size.X-5], SubmenuArrow, Byte(Color));
           end
         end;
       DrawLine;
@@ -1486,9 +1541,10 @@ function TMenuBox.Execute: Word;
 function TMenuBox.RightExpand: Boolean;
   begin
   Result := not LastActionIsExpand and (Current.Flags and miSubmenu <> 0);
-    { Normally kbRight opens the submenu. But if it was just
-    opened and is now closing on RIGHT arrow, do not reopen it —
-    pass that kbRight to the parent menu }
+    { Обычно по kbRight надо раскрывать подменю. Но если оно только что
+    было раскрыто и теперь закрывается по нажатию стрелки ВПРАВО,
+    то надо не опять раскрывать его, а передавать эту kbRight
+    вышележащемму меню }
   end;
 
 function TMenuBox.LeftCollapse: Boolean;
@@ -1500,10 +1556,18 @@ function TMenuBox.LeftCollapse: Boolean;
 
 constructor TMenuPopup.Create(var Bounds: TRect; AMenu: PMenu);
   begin
-  inherited Create(Bound{ Usually on kbRight the submenu should open. But if it was just
-    opened and is now closing on RIGHT arrow,
-    then do not open it again; pass this kbRight
-    to the parent menu }   if P = nil then
+  inherited Create(Bounds, AMenu, nil);
+  end;
+
+procedure TMenuPopup.HandleEvent(var Event: TEvent);
+  var
+    P: PMenuItem;
+  begin
+  case Event.What of
+    evKeyDown:
+      begin
+      P := FindItem(GetCtrlChar(DNKeyCode(Event)));
+      if P = nil then
         P := HotKey(DNKeyCode(Event));
       if  (P <> nil) and (CommandEnabled(P^.Command)) then
         begin
