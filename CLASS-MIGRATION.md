@@ -76,9 +76,8 @@ It supplements the full workflows and does not waive either final tree gate.
 - Regression test: the `dn-linux-ops.py` autosave-desktop check
   (`dsk_cwd` right after the start, no F10/Right) fails without the fix.
 - Open: full cell comparison object/class (colours, several symbols) is not
-  closed; the 100-run acceptance is not done. Separately, class self-builds
-  still hard-crash on the second start with a saved `dn.dsk` (SIGSEGV; see
-  the regression checklist row for autosave desktop restore).
+  closed; the 100-run acceptance is not done. Autosave-desktop second-start
+  SIGSEGV is fixed (`S.Put(Drive)` in `TFilePanelRoot.Store`).
 - Analogues to check (not done): other `Draw` followed by `WriteScreenCells`
   without `ReadScreenCells`: `dn.pas:130`, `videoman.pas:447`.
 
@@ -89,7 +88,7 @@ Self-build only; absent on pre-class `dist`. Details live in
 
 - `F4`: **fixed** — `Build_REditSaver`/`Store_REditSaver` match `TLoadProc` (no `var S`).
 - `Ctrl+O`: **fixed** — nil-check `UserScr`; `VtShowScreen` guards nil (`tv3` `396fb86`).
-- Autosave desktop restore: **open** — second start SIGSEGV; peer fixups point at `Self`.
+- Autosave desktop restore: **fixed** — `TFilePanelRoot.Store` uses `S.Put(Drive)` again (was `Drive.Store(S)`).
 
 ## UI notes (not all are class regressions)
 

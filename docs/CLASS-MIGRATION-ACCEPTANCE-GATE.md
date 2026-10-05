@@ -116,11 +116,9 @@ Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
 |---|---|---|---|
 | `F4` open internal editor | **fixed** on class (`a14015a`) — was Fatal Error / Access violation | pass | was `dn.err` `00534B61`; cause `var S` stream callbacks in `editwin.pas` |
 | `Ctrl+O` user/command screen | **fixed** on class (`a14015a` / tv3 `396fb86`) — was Fatal Error / Access violation | pass | was `dn.err` `0058BDD2`; cause nil `UserScr` before first command |
-| Autosave desktop second start (`dn.dsk` + Preserve directory) | **fail** — process dies (local status `-11` / SIGSEGV) before `>` prompt; CI `dsk_cwd` IndexError | pass — restores `…/sub>` | First session writes `dn.dsk`/`dn.ini`; second start shows banner only, no `dn.err` |
+| Autosave desktop second start (`dn.dsk` + Preserve directory) | **fixed** — was SIGSEGV / banner-only; `TFilePanelRoot.Store` again uses `S.Put(Drive)` | pass — restores `…/sub>` | Local PTY: first quit writes `dn.dsk`; second start alive with preserved `sub>` prompt |
 
-These rows keep the gate **OPEN**. They are separate from issue #6 startup
-redraw (blank panels / About residue), though desktop restore may share
-stream/LoadDesktop failure modes with other serialization bugs.
+`F4` / `Ctrl+O` / autosave-desktop are fixed on class; the gate remains **OPEN** for issue #6 startup redraw (blank panels / About residue) and the full object/class matrix.
 
 ## UI observations (2026-10-05)
 
@@ -147,7 +145,7 @@ and `dn.err` or exception output.
 | Nested menus | Every submenu, enabled/disabled state, geometry, cancellation | pending | pending | pending |
 | Panels | Switch, drive, directory, manager-new, select, sort, filter, view mode | pending | pending | pending |
 | File operations | View, edit, copy, move, rename, delete, attributes, cancel/error paths | pending | pending | pending |
-| Archives | Enter archive, list, extract/copy, leave archive, error paths | pending | pending | pending |
+| Archives | Enter archive, list, extract/copy, leave archive, error paths; ZIP legacy name charset (`docs/ZIP-CHARSET.md`) | pending | pending | pending |
 | Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
 | Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
 | Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |
