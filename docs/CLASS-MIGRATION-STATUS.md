@@ -62,6 +62,7 @@ explicitly excluded as the migration comparator.
 | Yes/default button red–magenta | User: Yes is red, counter-intuitive; want classic DN colors. Class default palette is `CColorOsp` (jaroslaw); classic table is `CColor` (cyan default). Object baseline used `CColor`; class kept `CColorOsp` in `0c4e839`. | Open; restore classic palette for acceptance unless OSP look is explicit |
 | ZIP single-byte name/comment charset | Owner: decode 1:1 (incl. bugs) via [zipcharset](https://github.com/unxed/zipcharset) + [localecp](https://github.com/unxed/localecp); locale→CP as reusable subproject | Specified in `docs/ZIP-CHARSET.md` / PLAN 4b; not implemented |
 | Drive hierarchy + archive `GetFile` VMT hides | Enter `aaa.zip`/`aaa.7z` listed `inside.txt`; no Fatal/Broken. `af5337f` fmt+Arc/Arvid; `ce2e9dd` Find/Temp overrides. Alt-F7 Find File dialog still opens. | Fixed on class self-build; keep PTY enter gate |
+| Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | Open; spec `docs/ARCHIVE-MATRIX.md` / PLAN 4c |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. A valid comparison waits for a visible readiness
@@ -72,10 +73,11 @@ the exact same action. The configured-launch mismatch has since reproduced in
 
 ## Remaining work, in order
 
-1. Finish remaining class-only crashes / VMT hides (drive/`override`
-   sweep residuals as found). Zip/7z Enter lists archive contents after
-   `af5337f`/`ce2e9dd` overrides. Keep `dist` as negative control only;
-   acceptance comparator is the last object-based baseline.
+1. Finish remaining class-only crashes / archive gaps: nested/compound
+   formats (`.tar.gz`…), F3/F4/F5 from inside archives, hang/AV cases —
+   `docs/ARCHIVE-MATRIX.md` / PLAN 4c. Zip/7z Enter OK after
+   `af5337f`/`ce2e9dd`. Keep `dist` as negative control only; acceptance
+   comparator is the last object-based baseline.
 2. **Hard gate (blocking everything below):** last object-based vs last
    class-based DN — all functions, all scenarios, bitwise cell compare
    (glyph + fg/bg + attrs + cursor + process + side effects). Spec:
@@ -88,7 +90,8 @@ the exact same action. The configured-launch mismatch has since reproduced in
    4. Expand tests to a minimally decent level (incl. Linux / DOS / Windows)
 4. Until the gate PASSes, also keep chasing known open matrix rows: virgin
    About residue, configured blank panels (#6), palette/UX notes that are
-   acceptance decisions, ZIP charset (`docs/ZIP-CHARSET.md`), etc.
+   acceptance decisions, ZIP charset (`docs/ZIP-CHARSET.md`), archive
+   matrix (`docs/ARCHIVE-MATRIX.md`), etc.
 
 ## Recorded issue and administrative commits
 

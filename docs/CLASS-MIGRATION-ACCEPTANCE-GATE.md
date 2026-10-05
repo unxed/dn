@@ -178,7 +178,7 @@ and `dn.err` or exception output.
 | Nested menus | Every submenu, enabled/disabled state, geometry, cancellation | pending | pending | pending |
 | Panels | Switch, drive, directory, manager-new, select, sort, filter, view mode | pending | pending | pending |
 | File operations | View, edit, copy, move, rename, delete, attributes, cancel/error paths | pending | pending | pending |
-| Archives | Enter archive, list, extract/copy, leave archive, error paths; ZIP legacy name charset (`docs/ZIP-CHARSET.md`) | pending | pending | pending |
+| Archives | Enter/leave, list, nested (`.tar.gz`…), F3/F4/F5, error paths; ZIP charset (`docs/ZIP-CHARSET.md`); matrix (`docs/ARCHIVE-MATRIX.md`) | pending | zip/7z Enter pass; nested/ops **open** | pending |
 | Built-in tools | About, calculator, calendar, ASCII table, Tetris | pending | pending | pending |
 | Dialogs/setup | Panel setup, system/options setup, language, history, help | pending | pending | pending |
 | Input paths | Function keys, command line, mouse paths where supported | pending | pending | pending |
