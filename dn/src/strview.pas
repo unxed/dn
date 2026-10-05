@@ -12,8 +12,8 @@ type
 
   TDStringView = class(TView)
     S1, S2: String[50];
-    function GetPalette: TPalette; virtual;
-    procedure Draw; virtual;
+    function GetPalette: TPalette; override;
+    procedure Draw; override;
   end;
 
 implementation

@@ -19,27 +19,27 @@ type
   { the table: the characters 0..255 in 8 rows of 32; the cursor is the current character (Data = its code) }
 
   TTable = class(TView)
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
-    function DataSize: Integer; virtual;
-    procedure GetData(var Data); virtual;
-    procedure SetData(var Data); virtual;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
+    function DataSize: Integer; override;
+    procedure GetData(var Data); override;
+    procedure SetData(var Data); override;
   end;
 
   { the line with the character, its decimal and hexadecimal code }
 
   TReport = class(TView)
     ASCIIChar: LongInt;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure Store(var S: TStream);
-    procedure Draw; virtual;
+    procedure Draw; override;
     constructor Load(var S: TStream);
   end;
 
 
   TASCIIChart = class(TWindow)
-    destructor Done; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    destructor Destroy; override;
+    procedure HandleEvent(var Event: TEvent); override;
     constructor Create(var R: TRect);
   end;
 
@@ -279,7 +279,7 @@ begin
   inherited HandleEvent(Event);
 end;
 
-destructor TASCIIChart.Done;
+destructor TASCIIChart.Destroy;
 begin
   fASCIITable := False;
   inherited Destroy;
