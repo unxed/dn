@@ -1,5 +1,8 @@
 # After class migration succeeds
 
+Still inside **DN 3.0** (stabilize the port). Not a green light for arbitrary
+new product features — see [`DN-3.0.md`](DN-3.0.md).
+
 Owner order (2026-10-05). **Do not start this work while the object/class
 acceptance gate is open.** The gate is documented in
 `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`: last object-based DN vs last

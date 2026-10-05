@@ -1,5 +1,8 @@
 # Class-migration acceptance gate
 
+Hard stop inside the **DN 3.0** milestone (stable port to the new stack).
+Product framing: [`DN-3.0.md`](DN-3.0.md).
+
 The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
