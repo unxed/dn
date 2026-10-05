@@ -1,88 +1,87 @@
-# Происхождение кода magiblot/tvision (2026-10-01)
+# Provenance of magiblot/tvision code (2026-10-01)
 
-Задача: убедиться, что в части magiblot/tvision, которую переводим, есть только код из
-опубликованного Borland выпуска Turbo Vision 2.0 и код magiblot и соавторов (MIT).
-Иначе говоря, что в неё не попал код из других портов (в первую очередь из GPL-порта SET)
-или из коммерческих продуктов Borland.
+Goal: confirm that the magiblot/tvision portion we are translating contains only code from
+the published Borland Turbo Vision 2.0 release and code by magiblot and co-authors (MIT).
+In other words, that it did not pick up code from other ports (especially the GPL SET port)
+or from Borland commercial products.
 
-Инструмент: `audit/cclone.py` — тот же подход, что `xclone.py` (дословные цепочки из
-24 токенов), но для C/C++ и с двумя эталонами. Колонка `only%` — код, который совпадает со
-вторым эталоном и при этом отсутствует в первом.
+Tool: `audit/cclone.py` — same approach as `xclone.py` (verbatim chains of
+24 tokens), but for C/C++ and with two references. Column `only%` — code that matches the
+second reference and is absent from the first.
 
-## Материалы
+## Materials
 
-- magiblot/tvision, полная история (1361 коммит, HEAD `b4831e2`). Корневой коммит
-  `adb6e3a` — «Version 1.03», следом `4a67222` — «Version 2.0». Оба от 2019-01-02, это
-  импорт выпусков Borland. В импорте 2.0 201 файл, только `include/` и `source/`,
-  Borland упомянут в каждом.
-- Порт SET (Salvador E. Tropea) 2.0.3 — архив `TV_2.03_sources.ver.2.03.English.7z`,
+- magiblot/tvision, full history (1361 commits, HEAD `b4831e2`). Root commit
+  `adb6e3a` — “Version 1.03”, then `4a67222` — “Version 2.0”. Both dated 2019-01-02; these are
+  imports of Borland releases. The 2.0 import has 201 files, only `include/` and `source/`,
+  Borland mentioned in each.
+- SET port (Salvador E. Tropea) 2.0.3 — archive `TV_2.03_sources.ver.2.03.English.7z`,
   http://old-dos.ru/dl.php?id=9393, sha256
-  `34d27cffff01d0b38b199c035d040bb2b3e88c41935f63d9828dd4db033471ac`. Это не
-  оригинальный выпуск Borland, а производный порт под GPL v2, в нём лежит `borland.txt`
-  с текстом Borland. В его `readme.txt` указан источник оригинала
-  (`ftp.inprise.com/pub/borlandcpp/devsupport/archive/turbovision/tv.zip`) и сказано, что
-  по данным Inprise это «Public Domain version». Часть примеров SET взял из порта Sigala (BSD).
+  `34d27cffff01d0b38b199c035d040bb2b3e88c41935f63d9828dd4db033471ac`. This is not
+  the original Borland release but a derived GPL v2 port; it contains `borland.txt`
+  with Borland’s text. Its `readme.txt` names the original source
+  (`ftp.inprise.com/pub/borlandcpp/devsupport/archive/turbovision/tv.zip`) and says that
+  per Inprise this is a “Public Domain version”. Some SET examples came from the Sigala port (BSD).
 
-## Результаты
+## Results
 
-**Объём перевода — библиотека magiblot:** `source/tvision`, `source/platform` и
-`include/tvision` без `compat/`. Это 261 файл C/C++, 204 тыс. токенов.
+**Translation scope — magiblot library:** `source/tvision`, `source/platform` and
+`include/tvision` without `compat/`. That is 261 C/C++ files, 204k tokens.
 
-1. Код из GPL-порта SET, которого нет в импорте Borland, в библиотеке не найден.
-   Самые длинные такие цепочки — 60, 53 и 53 токена. В `tview.cpp` это список
-   инициализации конструктора `TView` (значения полей — из кода Borland; оба порта
-   переписали присваивания в инициализаторы). В `base64.cpp` — таблица чисел 26…51,
-   в `codepage.cpp` — алфавит «A»…«Z» в таблице. Остальное — цепочки не длиннее 43 токенов.
-2. Кода, который есть в TV 1.03 и отсутствует в TV 2.0, в библиотеке 0,1 %: одна цепочка
-   в 27 токенов (`tparamte.cpp`). Код Borland в библиотеке, таким образом, происходит из
-   выпуска 2.0.
-3. 46,1 % токенов библиотеки дословно совпадают с импортом Borland 2.0. Остальное
-   написано magiblot и соавторами (MIT).
-4. Импорт magiblot «Version 2.0» дословно совпадает с портом SET на 52,6 % токенов
-   (SET свои файлы сильно правил). Это согласуется с общим происхождением от одного
-   выпуска Borland.
+1. Code from the GPL SET port that is absent from the Borland import was not found in the library.
+   Longest such chains — 60, 53 and 53 tokens. In `tview.cpp` this is the
+   `TView` constructor initializer list (field values from Borland code; both ports
+   rewrote assignments into initializers). In `base64.cpp` — the table of numbers 26…51,
+   in `codepage.cpp` — the alphabet “A”…“Z” in a table. Everything else — chains no longer than 43 tokens.
+2. Code present in TV 1.03 and absent from TV 2.0 is 0.1 % of the library: one chain
+   of 27 tokens (`tparamte.cpp`). Borland code in the library therefore comes from
+   the 2.0 release.
+3. 46.1 % of library tokens match the Borland 2.0 import verbatim. The rest
+   was written by magiblot and co-authors (MIT).
+4. The magiblot “Version 2.0” import matches the SET port verbatim on 52.6 % of tokens
+   (SET heavily edited its files). That is consistent with shared origin from one
+   Borland release.
 
-## Что не переводим
+## What we do not translate
 
-- `examples/` (tvdemo, tvedit, tvhc, tvforms и др.). В импорте Borland 2.0 примеров нет,
-  а с портом SET они совпадают на 40–90 % мимо импорта. Это не часть опубликованного
-  выпуска TV, у них другое происхождение. Компилятор справки для DN (`tvhc`) пишем сами.
-  Библиотечная часть справки (`helpbase`, `help`) входит в выпуск.
-- `include/tvision/compat/borland/` — заголовки совместимости с RTL Borland C++. По
-  истории (`f9c6121`) часть из них скопирована из Borland C++ 4.0. В Pascal-переводе они
-  не нужны.
+- `examples/` (tvdemo, tvedit, tvhc, tvforms, etc.). The Borland 2.0 import has no examples,
+  and they match the SET port 40–90 % outside the import. They are not part of the published
+  TV release; they have different provenance. We write the help compiler for DN (`tvhc`) ourselves.
+  The library help pieces (`helpbase`, `help`) are in the release.
+- `include/tvision/compat/borland/` — Borland C++ RTL compatibility headers. Per
+  history (`f9c6121`) some were copied from Borland C++ 4.0. Not needed in the Pascal translation.
 
-## Сверка с опубликованным выпуском
+## Cross-check against the published release
 
-Источник опубликованного выпуска — https://github.com/FSharpCSharp/TurboVision, коммит
-`5b9182e` («Adding the unzipped files published by Borland», 2019-02-01). В нём `Include/`,
-`Source/`, `readme.txt` (текст Borland «NOTE ON THE CONTENTS OF THIS ARCHIVE…»),
+Source of the published release — https://github.com/FSharpCSharp/TurboVision, commit
+`5b9182e` (“Adding the unzipped files published by Borland”, 2019-02-01). It has `Include/`,
+`Source/`, `readme.txt` (Borland text “NOTE ON THE CONTENTS OF THIS ARCHIVE…”),
 `disclaim.txt`.
 
-Сравнение с импортом magiblot `4a67222` («Version 2.0»), пофайлово:
-- 200 из 201 файла совпадают полностью, разница только в переводах строк (CRLF) и символе
-  конца файла;
-- `tv.h` отличается только комментарием-шапкой: в опубликованной версии в ней текст
-  отказа от гарантий и «Copyright (c) 1991, 1994», у magiblot — «Copyright (c) 1994».
-  Код совпадает токен в токен (2076 токенов).
+Comparison with magiblot import `4a67222` (“Version 2.0”), file by file:
+- 200 of 201 files match fully; difference only in line endings (CRLF) and the
+  end-of-file character;
+- `tv.h` differs only in the header comment: the published version has the
+  warranty disclaimer and “Copyright (c) 1991, 1994”; magiblot has “Copyright (c) 1994”.
+  Code matches token for token (2076 tokens).
 
-Вывод: код Borland в magiblot происходит из опубликованного выпуска TV 2.0. Импорт
-«Version 1.03» (`adb6e3a`) в опубликованный выпуск не входит, но кода, которого нет в 2.0,
-в текущей библиотеке 0,1 % (одна цепочка в 27 токенов, `tparamte.cpp`).
+Conclusion: Borland code in magiblot comes from the published TV 2.0 release. The
+“Version 1.03” import (`adb6e3a`) is not in the published release, but code absent from 2.0
+is 0.1 % of the current library (one 27-token chain, `tparamte.cpp`).
 
-Оговорка: `FSharpCSharp/TurboVision` — это стороннее зеркало. Канонический `tv.zip`
-лежит на сайте Sergio Sigala, но из сессии он недоступен (sigala.it — 403, web.archive
-закрыт). Сверку с ним можно повторить в CI.
+Caveat: `FSharpCSharp/TurboVision` is a third-party mirror. The canonical `tv.zip`
+is on Sergio Sigala’s site, but was unreachable from the session (sigala.it — 403, web.archive
+closed). The check against it can be repeated in CI.
 
-## Ссылки
+## Links
 
-- Опубликованный выпуск TV 2.0, распакованный: https://github.com/FSharpCSharp/TurboVision
-- Страница исходников на сайте Sergio Sigala (порт TV, BSD):
+- Published TV 2.0 release, unpacked: https://github.com/FSharpCSharp/TurboVision
+- Sources page on Sergio Sigala’s site (TV port, BSD):
   http://www.sigala.it/sergio/tvision/resources.html#sources
-- `tv.zip` от Borland: http://www.sigala.it/sergio/tvision/borland/tv.zip,
-  копия в web.archive:
+- Borland `tv.zip`: http://www.sigala.it/sergio/tvision/borland/tv.zip,
+  web.archive copy:
   https://web.archive.org/web/20170708213734/http://www.sigala.it/sergio/tvision/borland/tv.zip
-- Исходный адрес Borland/Inprise (по `readme.txt` порта SET, сейчас недоступен):
+- Original Borland/Inprise URL (from SET port `readme.txt`, currently unavailable):
   `ftp://ftp.inprise.com/pub/borlandcpp/devsupport/archive/turbovision/tv.zip`
-- Порт SET 2.0.3 (GPL): http://old-dos.ru/dl.php?id=9393
+- SET port 2.0.3 (GPL): http://old-dos.ru/dl.php?id=9393
 - magiblot/tvision: https://github.com/magiblot/tvision
