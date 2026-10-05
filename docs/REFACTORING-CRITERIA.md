@@ -60,24 +60,34 @@ Out of scope for this stage (post-3.0 / TODO-later unless owner moves them):
 
 ### C. IFDEF and dual models (port debt, not beauty)
 
-- [ ] UTF-8 vs OEM call sites go through one small facade or a documented
+- [x] UTF-8 vs OEM call sites go through one small facade or a documented
       short list of units (`dnutf8` or equivalent); no new scattered
-      `{$IFDEF DNUTF8}` outside that list.
-- [ ] Screen buffer API: call sites that mix `WriteLineW` / cell APIs are
+      `{$IFDEF DNUTF8}` outside that list. *(Facade: `dn/src/dnutf8.pas`.
+      Allowed IFDEF sites as of 2026-10-05: `dnutf8`, `editcore`, `editfile`,
+      `strutil`, `fileutil`, `filescol`, `basics`, `boot`, `cmdline`, `menus`,
+      `setups`, `winclp`, `apploop`, `mainapp`, `calendar`, `compat/osdep`.
+      New IFDEFs need a one-line note here.)*
+- [x] Screen buffer API: call sites that mix `WriteLineW` / cell APIs are
       catalogued; new code uses cells only; at least the known mix-up class
       from 2026-10-03 has a regression test or accept coverage note.
-- [ ] `tvtermos.pas` split **or** a written split plan with file boundaries
+      *(Catalog 2026-10-05 — `Write*W` only in: `idlers`, `calendar`,
+      `dbview`, `panelwin`, `editundo`, `inputfname`, `topview`.
+      `LegacyText` border: `compat/drivers.pas`. Panel draw path covered by
+      accept matrix / `dn-linux-ops.py`; no new `Write*W` outside this list.)*
+- [x] `tvtermos.pas` split **or** a written split plan with file boundaries
       accepted in this doc’s “Parked plans” section (implementation may be
       stage 3 if it is purely platform separation).
 
 ### D. Compat layer clarity
 
-- [ ] `dn/compat/` README or `FILES.md` section states what must stay for
+- [x] `dn/compat/` README or `FILES.md` section states what must stay for
       VP/DOS error semantics vs what is already thin FPC wrapping
       (table in `TODO-refactoring.md` is the source; sync summary into
-      `FILES.md`).
-- [ ] No new VP-emulation units; additions go to `tv/` or portable `dn/src`
-      unless they are DOS real-mode only.
+      `FILES.md`). *(2026-10-05: “Keep vs thin wrap” table under How dn/
+      is laid out in `dn/FILES.md`.)*
+- [x] No new VP-emulation units; additions go to `tv/` or portable `dn/src`
+      unless they are DOS real-mode only. *(Policy recorded in FILES.md;
+      enforce in review.)*
 
 ## Parked plans
 
@@ -87,7 +97,7 @@ _(Fill when a criterion is deferred with owner OK.)_
 |---|---|---|
 | Intermittent F4-after-clipboard / console AVs | No reliable PTY repro (2026-10-05 attempts: F4, Ctrl/Shift-Ins, Alt-Q, cmdline, Ctrl-O — 0/8 AV) | When reproduced or under far2l clipboard prompt |
 | Safe Pascal style | Explicitly after 3.0 / separate track | Post-3.0 |
-| `tvtermos` physical split | May land in stage 3 (platform) if only OS boundaries | Stage 2 plan or stage 3 |
+| `tvtermos` physical split | **Plan (stage 3):** split `tv/src/tvtermos.pas` into (1) `tvtermunix.pas` — termios / PTY / OSC / far2l hooks; (2) `tvtermwin.pas` — Win32 console / ConPTY; (3) keep a thin `tvtermos.pas` as the unit DN `uses` that re-exports the active target. VT interpret for console mode should call `TvVt` instead of a private copy. No behaviour change; proof = existing `tv` pty tests + DN linux/win smoke. | Stage 3 implementation |
 
 ## How to use this file
 

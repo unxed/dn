@@ -24,6 +24,18 @@ The records of the analysis of the original archive (the old names) are in [`../
 
 What is in `compat/` is not DN: it is what makes the code of DN run on a modern runtime. When the code of DN no longer asks for a unit of `compat/`, the unit goes away.
 
+**Keep vs thin wrap (sync with `TODO-refactoring.md`, 2026-10-05):**
+
+| Unit | Role | Policy |
+|---|---|---|
+| `osdep` | file/search/disk APIs with DOS error codes + name conversion | **keep** — callers check DOS codes; not a pure FPC rename |
+| `dnscreen` | 16-bit cell screen glue over `tv/` | **keep** until DN reads `TvScreen` cells directly |
+| `realmode` | DOS real-mode / LFN / FAT32 | **DOS only** (`GO32V2`); stubs elsewhere |
+| `drivers` | keys/events/draw buffers over `tv/` | **keep** — DN↔TV border |
+| `objutil` | `FreeObject` / `ObjChangeType` + stream aliases | **keep** until shims/`Collect` go |
+| `country` (+ `linux/country`) | country table / CP866 upper case | **keep** |
+| New VP-emulation units | — | **forbidden**; add to `tv/` or portable `src/` unless DOS real-mode only |
+
 ## The program and its commands
 | File | What it holds |
 |---|---|
