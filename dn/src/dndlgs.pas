@@ -513,13 +513,6 @@ look very strange.
           Draw;
           end;
 
-(*
-        kbDown, kbUp: { arrow-navigation prosthetic }
-          begin
-          PGroup(Owner).SelectNext(DNKeyCode(Event) = kbUp);
-          ClearEvent(Event);
-          end;
-*)
         kbAltDown, kbCtrlDown:
           OpenList;
         else
