@@ -60,12 +60,12 @@ var
 
 const
   AnyFileDir = $37;
-    {` Сюда не входит VolumeID. Под OS/2 это то же самое, что и
-     AnyFile, так как есть соответствующий IFDEF в DOS.PAS.
-     Для DPMI на (кажется, Новеловских) сетевых дисках наличие
-     бита VolumeId блокирует поиск всех файлов, кроме метки диска.
-     Так что настоятельно рекомендуется использовать везде
-     AnyFileDir вместо AnyFile и не читать метку без надобности. `}
+    {` VolumeID is not included here. Under OS/2 this is the same as
+     AnyFile, because there is a corresponding IFDEF in DOS.PAS.
+     For DPMI on (apparently Novell) network drives the presence
+     of the VolumeId bit blocks finding all files except the volume label.
+     So it is strongly recommended to use AnyFileDir everywhere
+     instead of AnyFile and not to read the label unless needed. `}
 
 function ExistFile(const FName: String): Boolean; {DataCompBoy}
 //function  ExistDir(const DName: string): Boolean; { VK }
@@ -80,15 +80,15 @@ procedure EraseTempFile(S: String); {piwamoto}
 {JO}
 function ValidDrive(dr: Char): Boolean;
 function GetDrive: Byte;
-  {` Дать номер диска активной панели (0..25).
-    Для сетевых путей получится 27 ('\'-'A') `}
+  {` Return the drive number of the active panel (0..25).
+    For network paths the result is 27 ('\'-'A') `}
 procedure GetMask(var m: String);
 function GetCurDrive: Char;
-  {` Дать букву диска активной панели ('A'..'Z').
-    Для сетевых путей получится '\' `}
+  {` Return the drive letter of the active panel ('A'..'Z').
+    For network paths the result is '\' `}
 function GetExt(const s: String): String;
-  {` s - имя файла, возможно, с путём. Результат - расширение,
-   начинающееся с точки. Если расширения нет - результат '.' `}
+  {` s - file name, possibly with a path. Result is the extension
+   starting with a dot. If there is no extension - result is '.' `}
 function Norm12(const s: String): Str12;
 {-DataCompBoy-}
 function DelSquashes(s: String): String;
@@ -100,8 +100,8 @@ function GetURZ(const s: String): Str12;
 function GetfURZ(const s: String): String;
   {` cuts name and path to 8.3 `}
 function IsSeparatingChars(const s: String): Boolean;
-{` JO: проверяет на наличие  пробелов и
-  символов '+' ';' ',' '[' ']' '&' '^' `}
+{` JO: checks for spaces and
+  characters '+' ';' ',' '[' ']' '&' '^' `}
 function SquashesName(const s: String): String;
   {` quotes name if needed `}
 function InMask(Name, Mask: String): Boolean;
@@ -127,11 +127,11 @@ function IsDir(const s: String): Boolean; {is this a directory? }
 function MkName(const Nm, Mask: String): String;
 {modifies name to fit Mask}
 function GetPath(const S: String): String;
-  {` Часть S, предшествующая имени `}
+  {` Part of S preceding the name `}
 function GetName(const S: String): String;
-  {` Имя с расширением `}
+  {` Name with extension `}
 function GetSName(const S: String): String;
-  {` Имя без расширения `}
+  {` Name without extension `}
 function GetAttrStr(Attr: Word): Str6;
 
 function GetShortRelPath(Path: String): String;
@@ -145,17 +145,17 @@ function GetFileAttr(const S: String): Word;
 function SetFileAttr(const S: String; Attr: Word): Word;
 function CorrectFile(const N: String): Boolean;
 function PathExist(s: String): Boolean; {Is path exist}
-{` Проверка существования каталога s (путь относительный).
-  Параметр допускается как со слешем на конце, так и без него.
-  Джокеры не допускаются. `}
+{` Check whether directory s exists (relative path).
+  The parameter may be with or without a trailing slash.
+  Wildcards are not allowed. `}
 
 function PathFoundInArc(S: String): Boolean; {JO}
 
 {-DataCompBoy-}
 procedure GetFTimeSizeAttr(const A: String; var ATime: LongInt;
-{` Чтение через DosFileFirst данных о файле. Если файл не найден,
-будет DOSError <> 0, так что эту функцию можно использовать и для
-проверки наличия файла `}
+{` Read file data via DosFileFirst. If the file is not found,
+DOSError <> 0, so this function can also be used to
+check file existence `}
     var ASize: TSize; var AAttr: Word);
 {-DataCompBoy-}
 
@@ -164,16 +164,16 @@ var
   LastSuccessPos: Integer;
 
 function QSMaskPlusStar: String;
-  {` добавить '*' в конце QSMask, если там её не было `}
+  {` append '*' at the end of QSMask if it was not there `}
 procedure InitQuickSearch(Panel: TView);
 procedure StopQuickSearch;
 procedure DoQuickSearch(Key: Word);
 function QuickSearchString(SizeX: Word): String;
-  {` Построение строки для показа текущей маски быстрого поиска.
-  Собственно строка выделяется цветом (тильдами), поэтому содержащиеся
-  внутри неё тильды нужно защищать. Звезда в конце маски, если она
-  подразумеваемая, выводится обычным цветом, а если действительно
-  является частью маски, то выводится ярко `}
+  {` Build a string to display the current quick-search mask.
+  The string itself is highlighted (with tildes), so tildes inside
+  it must be escaped. A star at the end of the mask, if it is
+  implied, is shown in normal color, and if it is really
+  part of the mask, it is shown bright `}
 
 procedure FileChanged(const Name: String);
 {-DataCompBoy-}
@@ -190,9 +190,9 @@ type
 function CompareFiles(const N1, N2: String): Boolean;
 
 procedure MakeSlash(var S: String);
-  {` Обеспечить '\' в конце S. Пустая строка остаётся пустой `}
+  {` Ensure '\' at the end of S. Empty string stays empty `}
 procedure MakeNoSlash(var S: String);
-  {` Обеспечить отсутствие '\' в конце S, кроме путей типа 'C:\' `}
+  {` Ensure no '\' at the end of S, except paths like 'C:\' `}
 
 implementation
 uses
@@ -256,8 +256,8 @@ function ExistFile(const FName: String): Boolean;
     end;
   end;
 {-DataCompBoy-}
-{AK155 21-01-2002 Эта программа дублирует PathExist, все ее вызовы
- (в boot и startup) заменил на вызовы PathExist}
+{AK155 21-01-2002 This routine duplicates PathExist; all its calls
+ (in boot and startup) were replaced with PathExist calls}
 (*
 { VK/ }
 function  ExistDir(const DName: string): Boolean; {based on ExistFile}
@@ -391,7 +391,7 @@ procedure EraseTempFile(S: String);
     Dir: String;
     F: lFile;
   begin
-  {JO: проверочка файла на нахождение во временном каталоге не помешает}
+  {JO: checking whether the file is in the temp directory won't hurt}
   Dir := GetPath(S);
   if UpStrg(Dir) = UpStrg(TempDir) then
     begin
@@ -579,35 +579,35 @@ function SquashesName(const s: String): String;
   end;
 {-DataCompBoy-}
 
-{ Вспомогательная программа для InMask; обработка и маски,
-и имени начинается с указанных позиций.
-  Имя не долджно сожержать ничего, кроме символов имени
-(в частности, не должно быть обрамляющих кавычек).
-  Спецсимволы маски обрабатываются так:
-  - '"' игнорируется;
-  - '?' сопоставляется с ровно одним символом;
-  - '|' сопоставляется с ровно одной цифрой;
-  - '>' сопоставляется со всеми символами до последней
-    точки включительно;
-  - '*' сопоставляется с любой последовательностью (пустой
-    в том числе). Для этого предпринимаются попытки найти в имени
-    ближайший следующий за звездой контекст маски и сопоставить
-    хвосты маски и имени (рекурсия). Если этот контекст маски
-    можно найти более, чем в одном месте остатка имени, все эти
-    места проверяются последовательно.
+{ Helper for InMask; processing of both the mask
+and the name starts at the given positions.
+  The name must contain nothing but name characters
+(in particular, no surrounding quotes).
+  Mask special characters are handled as follows:
+  - '"' is ignored;
+  - '?' matches exactly one character;
+  - '|' matches exactly one digit;
+  - '>' matches all characters up to and including
+    the last dot;
+  - '*' matches any sequence (including empty).
+    For this, attempts are made to find in the name
+    the nearest mask context after the star and match
+    the tails of mask and name (recursion). If that mask context
+    can be found in more than one place in the remainder of the name,
+    all those places are checked in sequence.
 
-  Переменная LastSuccessPos отслеживает позицию имени, на которой
-остановилось успешное сопоставление с незвёздным контекстом.
-Используется при быстром поиске, где маска всегда заканчивается звездой,
-и определяет позицию курсора в текущем найденном имени.
-В других применениях (кроме быстрого поиска) эта переменная не используется.
+  LastSuccessPos tracks the name position where
+successful matching with a non-star context stopped.
+Used in quick search, where the mask always ends with a star,
+and determines the cursor position in the currently found name.
+In other uses (besides quick search) this variable is unused.
   }
 
 function InMaskA(const Name: String; const  Mask: String;
     iName, iMask: Integer): Boolean;
   var
     i, l, s: Integer;
-    Exact: string; {контекст, следующий за звездой }
+    Exact: string; {context following the star }
   begin
   Result := False;
   while iMask <= Length(Mask) do
@@ -623,7 +623,7 @@ function InMaskA(const Name: String; const  Mask: String;
     case Mask[iMask] of
       '"':
         Inc(iMask);
-      '>': { Переход вправо к расширению }
+      '>': { Move right to the extension }
         begin
         Inc(iMask);
         l := PosLastDot(Name);
@@ -640,7 +640,7 @@ function InMaskA(const Name: String; const  Mask: String;
         Inc(iName);
         LastSuccessPos := iName;
         end;
-      '|': { Цифра }
+      '|': { Digit }
         begin
         if not (Name[iName] in ['0'..'9']) then
           Exit;
@@ -671,30 +671,30 @@ function InMaskA(const Name: String; const  Mask: String;
           begin
           i := iName;
           while True do
-            begin { попытки найти Exact и сопоставить остаток маски
-              с остатком имени. Цикл нужен, так как Exact может
-              встретиться несколько раз.
-              i - текущая точка имени, l - текущая точка маски }
+            begin { try to find Exact and match the rest of the mask
+              with the rest of the name. The loop is needed because Exact may
+              occur several times.
+              i - current name point, l - current mask point }
             i := SPos(Exact, Name, i);
             if i = 0 then
-              Exit; { Окончательная неудача }
+              Exit; { Final failure }
             inc(i, l-iMask);
             s := LastSuccessPos;
             LastSuccessPos := i;
             if InMaskA(Name, Mask, i, l) then
               begin
-              Result := True; Exit; { Удача }
+              Result := True; Exit; { Success }
               end;
             LastSuccessPos := s;
             end;
           end
         else if Mask[l] in ['?', '|'] then
-          begin { указанный джокер вслед за звездой }
+          begin { given wildcard right after the star }
           s := LastSuccessPos;
           for i := iName to Length(Name) do
             if InMaskA(Name, Mask, i, l) then
               begin
-              Result := True; Exit; { Удача }
+              Result := True; Exit; { Success }
               end;
           LastSuccessPos := s;
           end;
@@ -711,8 +711,8 @@ function InMaskA(const Name: String; const  Mask: String;
     end;
   l := Length(Name);
   if Name[l] = '.' then
-    Dec(l); { Это нужно для сопоставлений типа Name='CMD.' Mask = 'CMD',
-      см. добавление точки в InMask }
+    Dec(l); { Needed for matches like Name='CMD.' Mask = 'CMD',
+      see the added dot in InMask }
   Result := (iName >= l+1);
   end;
 
@@ -729,7 +729,7 @@ function InMask(Name, Mask: String): Boolean;
     Result := True; Exit;
     end;
   if Pos('.', Name) = 0 then
-    Name := Name + '.'; { Подразумеваемая точка в конце имени без расширения }
+    Name := Name + '.'; { Implied dot at the end of a name without extension }
   UpStr(Mask);
   UpStr(Name);
   s := LastSuccessPos;
@@ -740,7 +740,7 @@ function InMask(Name, Mask: String): Boolean;
   else
     if (LastSuccessPos = Length(Name)+1) and
        (Name[LastSuccessPos-1] = '.')
-    then { Стали на воображаемой точке - надо вернуться }
+    then { Landed on the imaginary dot - need to go back }
       Dec(LastSuccessPos);
   end { InMask };
 
@@ -1174,23 +1174,23 @@ function PathExist(s: String): Boolean;
     if (DosError = 0) then
       goto FClose;
 
-    { Под виндой (NT - точно, 98 - не знаю) в корне получается
-      RC=2, если сам этот корень существует. Для несуществующей
-      шары, несуществующего диска или невставленного сменного
-      носителя RC другой }
+    { Under Windows (NT - for sure, 98 - not sure) at the root you get
+      RC=2 if that root itself exists. For a nonexistent
+      share, nonexistent drive, or missing removable
+      media RC is different }
     if IsRoot and (DosError = 2) then
       goto FClose; {}
 
-    { Бывает, что каталог есть, а SysFindFirst даёт ошибку.
-      Так бывает, например, в корне шары, а также при каких-то
-      невыясненных обстоятельствах под OS/2 на FAT16. Поэтому, если
-      сам каталог в лоб не нашли, то попытаемся найти что-то внутри
-      каталога. Ограничиваться только этим тоже нельзя, так как бывает,
-      что каталог совсем-совсем пустой, даже без '.' и '..' внутри.
-      Так бывает, например, под Win на DirectCD CDRW.}
+    { Sometimes the directory exists but SysFindFirst returns an error.
+      This happens e.g. at a share root, and also under some
+      unclear circumstances under OS/2 on FAT16. So if
+      the directory itself was not found directly, try to find something inside
+      the directory. Relying only on that is also wrong, because sometimes
+      the directory is completely empty, even without '.' and '..' inside.
+      That happens e.g. under Win on DirectCD CDRW.}
     Attr := AnyFileDir;
     if IsRoot then
-      begin { корень диска }
+      begin { drive root }
       delete(S, Length(s), 1);
       end;
     S := S + '\*.*';
@@ -1243,7 +1243,7 @@ procedure InitQuickSearch(Panel: TView);
     begin
     SaveHelpCtx := HelpCtx;
     HelpCtx := hcQuickSearch;
-    InfoView.Draw; { Чтобы появилась маска из одной звёздочки }
+    InfoView.Draw; { So that a single-star mask appears }
     end;
   end;
 
@@ -1285,7 +1285,7 @@ procedure DoQuickSearch(Key: Word);
 
 function QuickSearchString(SizeX: Word): String;
   var
-    S: String; { текст маски, поднотовленный к показу }
+    S: String; { mask text prepared for display }
     l, i: Integer;
     DefaultStar: Boolean;
   begin
@@ -1293,9 +1293,9 @@ function QuickSearchString(SizeX: Word): String;
   DefaultStar := QSMask[Length(QSMask)] <> '*';
   L := SizeX - Length(Result) - Ord(DefaultStar) - 1;
 
-  { Определяем i - начало выводимой части маски }
+  { Determine i - start of the displayed part of the mask }
   if Length(QSMask) > L then
-    begin  { Обрезание слева }
+    begin  { Truncate from the left }
     Result := Result + #17'~';
     i := Length(QSMask)-L;
     end
@@ -1305,7 +1305,7 @@ function QuickSearchString(SizeX: Word): String;
     i := 0;
     end;
 
-  l := 0; { L - это длина S }
+  l := 0; { L is the length of S }
   while i <> Length(QSMask) do
     begin
     inc(i);
