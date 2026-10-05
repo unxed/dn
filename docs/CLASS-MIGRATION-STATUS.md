@@ -26,15 +26,15 @@ Last updated: 2026-10-05
 | Role | DN | Turbo Vision | Use |
 |---|---|---|---|
 | Last object-based baseline | `b4916b874989d7b35660d02cf935dc5f0db7a656` | `521d06479198789deeaa6fda287236ca83ba4051` | Required behavioral comparator |
-| Current class source used for the latest user build | `1f0a63db1b644c5b599fd75c2baf5d63e30166c2` | `ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3` | Rebuild from the current class-based `main` before final acceptance |
+| Current class source used for the latest user build | `1380622` / later `main` (user `dn.err` build id); TV3 pin below | `ca5cd6bcab8e04a9a95018a3a3183b2b18f73cf3` | Rebuild from the current class-based `main` before final acceptance |
 | Older distributed binary | distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4`, built from `df0cca2` | pre-class distribution | Context only; do not substitute for the last object-based baseline |
 
-The user-provided self-build `out/linux64/dn` identified build `1f0a63d` and
-had SHA-256 `97f102cb466842bf6a0453ad5d83412a47ba06f2f427bf9578a62adc11a3cb7a`.
-The `dist` binary had SHA-256
-`e88ec6c324801bc394e9665095f705c452f5c34b7ec2ffa1363c80f58542a41d`.
-The historical user checkout `/home/unxed/dev/dn` is not this task's writable
-checkout; treat it as evidence/build input only, not as the publication target.
+The user-reported self-build Fatal Errors are from
+`/home/unxed/dev/dn/out/linux64/dn` build id `1380622` compiled
+`2026-10-05 11:21:22 UTC` (`dn.err` addresses `00534B61`, `0058BDD2`).
+Those faults appear only on class self-builds; pre-class `dist` does not show
+them on the same actions. The historical checkout `/home/unxed/dev/dn` is
+evidence/build input only, not the publication target.
 
 ## Open GitHub issue
 
@@ -55,6 +55,9 @@ explicitly excluded as the migration comparator.
 | PTY alternate-screen restoration | Fixed in `133f3d4`; two focused tests cover cell/attribute/cursor restore and repeated transitions. Whole tool suite passed 34 tests. | Verified harness fix; not a DN behavior fix |
 | Pascal string collection representations | A class language-menu fault was traced to interpreting a `TStringCollection` ShortString item as AnsiString. A repository search found analogous `PString(Collection.At(...))` in `dnutil.pas`, `paneldlgs.pas`, `printman.pas`, `histories.pas`, `eraser.pas`, `diskinfo.pas`, and `filefind.pas`. | Open; inspect each type and add/test only confirmed fixes |
 | Case-insensitive `object` tree audit | Initial inventory search `rg -uuu --text -i -l object . -g '!.git/**'` listed 348 paths, including docs, bootstrap, tests and compiled output. | Newly registered subtask; full contextual audit not started |
+| `F4` internal editor AV (class only) | User: Fatal Error / Access violation on self-build `1380622`, `dn.err` addr `00534B61`; absent on `dist`. Local class `out/linux64` PTY: AV in `editwin.pas` `TEditSaver.Load` line 102 while loading `dlgEditorCommands`. | Open; class-only; root cause open |
+| `Ctrl+O` user screen AV (class only) | User: Fatal Error / Access violation on self-build `1380622`, `dn.err` addr `0058BDD2` (repeated); absent on `dist`. Local class `out/linux64` PTY: AV in `tvvt.pas` `TVtEmu.Cols` line 309. | Open; class-only; root cause open |
+| Autosave desktop second-start crash (class only) | After enabling Autosave Desktop + Preserve directory, writing `dn.dsk`, and restarting: class self-build dies before a `>` prompt. Local PTY second start: process status `-11` (SIGSEGV), banner only, no `dn.err`. CI `dn-linux-ops.py` then hits `IndexError` in `dsk_cwd`. `dist/linux64` restores `…/sub>` on the same harness. | Open; class-only; root cause open |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. A valid comparison waits for a visible readiness
@@ -65,18 +68,21 @@ the exact same action. The configured-launch mismatch has since reproduced in
 
 ## Remaining work, in order
 
-1. On the last object-based baseline and latest class build, reproduce the
+1. Fix the three class-only hard crashes newly recorded below (`F4` editor
+   command load, `Ctrl+O` user-screen VT access, autosave-desktop second-start
+   SIGSEGV); keep `dist` as a negative control only, and still compare against
+   the last object-based baseline for acceptance.
+2. On the last object-based baseline and latest class build, reproduce the
    virgin About-close residue with full cell snapshots before, during and
    after the dialog; locate/fix it and search all analogous dialog-close and
    restore paths.
-2. With the same non-virgin `dn.ini`, work path, PTY dimensions and build
+3. With the same non-virgin `dn.ini`, work path, PTY dimensions and build
    environment, retain repeated configured-start regression tests. Capture
    full cells before input and after F10+Right; resolve every mismatch.
-3. Finish the case-insensitive `object` audit over the complete DN tree,
-   inspect every match, remove every Pascal-source match (`.pas`, `.pp`,
-   `.inc` and other Pascal compilation units), and verify no Pascal
-   object-dialect construction remains anywhere.
-4. Continue the full object/class action matrix in
+4. Finish the Pascal keyword `object` gate / residual dialect audit
+   (`tools/class-gate.sh`) and verify no Pascal object-type construction
+   remains in scanned sources.
+5. Continue the full object/class action matrix in
    `CLASS-MIGRATION-ACCEPTANCE-GATE.md`. The overall gate stays open until
    every action, visual cell/attribute, cursor, process result and side effect
    matches.
@@ -95,5 +101,5 @@ Relevant pushed commits on DN `main`:
   `6fe26fb` — record the discrepancies, reproductions, build-variant scope,
   `dist` provenance, and current test policy. `254bc78` is the rebased
   publication of the local scope-recording change.
-- This status-ledger addition and the new `object`-audit gate are the next
-  administrative commit; the repository HEAD is authoritative for its SHA.
+- Administrative commits that record gates/discrepancies; the repository HEAD
+  is authoritative for the latest SHA after each push.
