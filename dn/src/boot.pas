@@ -652,7 +652,6 @@ procedure CrLf;
   Writeln;
   end;
 
-
 procedure RUN_IT;
   var
     ShiftRec: record
@@ -739,9 +738,9 @@ procedure RUN_IT;
     EraseFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
   if RunFirst then
     begin
-    if  (Message(@MyApplication, evBroadcast, cmLookForPanels, nil) = nil)
+    if  (Message(MyApplication, evBroadcast, cmLookForPanels, nil) = nil)
     then
-      Message(@MyApplication, evCommand, cmFirstTimePanel, nil);
+      Message(MyApplication, evCommand, cmFirstTimePanel, nil);
 
     FreeStr[1] := Char(FindParam('/P'));
     if  (FreeStr[1] > #0) then
@@ -751,7 +750,7 @@ procedure RUN_IT;
     if Virgin then
       begin
       ConfigModified := True; {создаём новый конфиг}
-      Message(@MyApplication, evCommand, cmAbout, nil);
+      Message(MyApplication, evCommand, cmAbout, nil);
       end;
 {/JO}
     if NoTempDir then
