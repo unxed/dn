@@ -110,7 +110,7 @@ type
     Default: PMenuItem;
     end;
 
-  { TMenuView object }
+  { TMenuView class }
 
   { Palette layout }
   { 1 = Normal text }
@@ -157,7 +157,7 @@ type
       { по kbLeft сворачивать развёрнутое подменю }
     end;
 
-  { TMenuBar object }
+  { TMenuBar class }
 
   { Palette layout }
   { 1 = Normal text }
@@ -177,7 +177,7 @@ type
     function Execute: Word; override;
     end;
 
-  { TMenuBox object }
+  { TMenuBox class }
 
   { Palette layout }
   { 1 = Normal text }
@@ -201,7 +201,7 @@ type
     function LeftCollapse: Boolean; override;
     end;
 
-  { TMenuPopup object }
+  { TMenuPopup class }
 
   { Palette layout }
   { 1 = Normal text }

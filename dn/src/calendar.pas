@@ -88,7 +88,7 @@ const
 
   GregorianThreshold = 1582; { 5..14 October skipped }
 
-  { TCalendarWindow object }
+  { TCalendarWindow class }
 
 const
 
