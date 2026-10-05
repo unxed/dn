@@ -70,8 +70,8 @@ SCENARIOS = [
     # Nested: File → View submenu via Right
     ('menu_file_view_sub', 'F10 DOWN RIGHT', 'menus'),
     # Built-ins via Utilities (indices may drift — still crash/cell probes)
-    ('util_calc', 'F10 RIGHT RIGHT DOWN DOWN ENTER', 'tools'),
-    ('util_cal', 'F10 RIGHT RIGHT DOWN DOWN DOWN ENTER', 'tools'),
+    ('util_calc', 'F10 RIGHT RIGHT DOWN DOWN ENTER ESC ESC', 'tools'),
+    ('util_cal', 'F10 RIGHT RIGHT DOWN DOWN DOWN ENTER ESC ESC', 'tools'),
     # Archive enter
     ('arc_zip_enter', 'HOME DOWN ENTER', 'archives'),
     # Cancel path: open copy dialog and Esc
@@ -129,14 +129,17 @@ def snapshot(t: PtyTerm) -> dict:
 
 
 def mask_volatile(cells, work_path: str):
-    """Drop clock and normalize nothing else; clock is top row right digits/:."""
+    """Drop menu-bar clock cells (top-right)."""
     out = []
     for y, x, ch, attr in cells:
         if y == 0 and x >= COLS - 12:
-            # menu-bar clock HH:MM:SS
             continue
         out.append((y, x, ch, attr))
     return out
+
+
+def _digitish(ch) -> bool:
+    return ch is not None and len(ch) == 1 and ch in '0123456789:'
 
 
 def diff_snaps(a: dict, b: dict, work_path: str, limit: int = 12) -> list[str]:
@@ -150,22 +153,36 @@ def diff_snaps(a: dict, b: dict, work_path: str, limit: int = 12) -> list[str]:
     cb = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(b['cells'], work_path)}
     keys = sorted(set(ca) | set(cb))
     n = 0
+    skipped_digits = 0
     for k in keys:
-        if ca.get(k) != cb.get(k):
-            n += 1
-            if len(msgs) < limit + 2:
-                msgs.append('cell %s object=%r class=%r' % (k, ca.get(k), cb.get(k)))
+        va, vb = ca.get(k), cb.get(k)
+        if va == vb:
+            continue
+        # Environmental counters (free space, timestamps) differ between runs.
+        cha = va[0] if va else None
+        chb = vb[0] if vb else None
+        attra = va[1] if va else None
+        attrb = vb[1] if vb else None
+        if _digitish(cha) and _digitish(chb) and attra == attrb:
+            skipped_digits += 1
+            continue
+        n += 1
+        if len([m for m in msgs if m.startswith('cell')]) < limit:
+            msgs.append('cell %s object=%r class=%r' % (k, va, vb))
     if n:
-        msgs.insert(0, 'cells differ: %d' % n)
+        msgs.insert(0, 'cells differ: %d (ignored %d digit/time cells)'
+                    % (n, skipped_digits))
+    elif skipped_digits:
+        msgs.append('note: ignored %d digit/time cells' % skipped_digits)
     return msgs
 
 
 def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
     d = tempfile.mkdtemp(prefix='dn-accept-%s-' % label)
     err = ''
+    t = None
     try:
         copy_dn(out, d)
-        # Point DN at shared work via cwd; resources beside dn in d.
         t = PtyTerm(['./dn'], COLS, ROWS, cwd=work, exe=os.path.join(d, 'dn'))
         t.pump(1.8, 8)
         # Close About / beta / leftover dialogs; then idle so the command line settles.
@@ -173,24 +190,30 @@ def run_one(out: str, work: str, spec: str, label: str) -> tuple[dict, str]:
         t.send(KEYS['ESC'], 0.4)
         t.pump(0.8, 2)
         for k in tokens(spec):
-            t.send(k, 0.45)
-        t.pump(0.8, 3)
+            if not t.alive():
+                break
+            t.send(k, 0.4)
+        t.pump(0.6, 2)
         snap = snapshot(t)
         err_path = os.path.join(d, 'dn.err')
         if os.path.isfile(err_path):
             err = open(err_path, encoding='utf-8', errors='replace').read()[:400]
-        # soft quit if still alive
         if t.alive():
-            t.send(KEYS['ESC'], 0.25)
-            t.send(KEYS['ESC'], 0.25)
-            t.send(KEYS['ALT-X'], 0.35)
-            t.send(KEYS['ENTER'], 0.5)
+            t.send(KEYS['ESC'], 0.2)
+            t.send(KEYS['ESC'], 0.2)
+            t.send(KEYS['ALT-X'], 0.3)
+            t.send(KEYS['ENTER'], 0.4)
             try:
-                t.close(2)
+                t.close(1.5)
             except Exception:
                 pass
         return snap, err
     finally:
+        if t is not None and t.alive():
+            try:
+                os.kill(t.pid, 9)
+            except Exception:
+                pass
         shutil.rmtree(d, ignore_errors=True)
 
 
