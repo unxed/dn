@@ -95,6 +95,7 @@ Self-build only; absent on pre-class `dist`. Details live in
 - `F4`: **fixed** — `Build_REditSaver`/`Store_REditSaver` match `TLoadProc` (no `var S`).
 - `Ctrl+O`: **fixed** — nil-check `UserScr`; `VtShowScreen` guards nil (`tv3` `396fb86`).
 - Autosave desktop restore: **fixed** — `TFilePanelRoot.Store` uses `S.Put(Drive)` again (was `Drive.Store(S)`).
+- Plain zip/7z Enter: **fixed** (fmt + drive `override`); nested/compound archives and ops matrix still **open** (`docs/ARCHIVE-MATRIX.md`).
 
 ## UI notes (not all are class regressions)
 
