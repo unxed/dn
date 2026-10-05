@@ -84,10 +84,9 @@ It supplements the full workflows and does not waive either final tree gate.
 
 ## Class-only runtime crashes (recorded 2026-10-05)
 
-Self-build only; absent on pre-class `dist`. Details and evidence live in
-`docs/CLASS-MIGRATION-REGRESSION-CHECKLIST.md` and
-`docs/CLASS-MIGRATION-STATUS.md`.
+Self-build only; absent on pre-class `dist`. Details live in
+`docs/CLASS-MIGRATION-REGRESSION-CHECKLIST.md`.
 
-- `F4`: AV in `editwin.pas` `TEditSaver.Load` while loading editor commands.
-- `Ctrl+O`: AV in `tvvt.pas` `TVtEmu.Cols` (invalid/nil emulator).
-- Autosave desktop restore: second start SIGSEGV before the command prompt.
+- `F4`: **fixed** — `Build_REditSaver`/`Store_REditSaver` match `TLoadProc` (no `var S`).
+- `Ctrl+O`: **fixed** — nil-check `UserScr`; `VtShowScreen` guards nil (`tv3` `396fb86`).
+- Autosave desktop restore: **open** — second start SIGSEGV; peer fixups point at `Self`.

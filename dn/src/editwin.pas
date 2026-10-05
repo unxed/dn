@@ -267,12 +267,14 @@ procedure TEditWindow.SetState(AState: Word; Enable: Boolean);
   Redraw;
   end;
 
-function Build_REditSaver(var S: TStream): TStreamable;
+function Build_REditSaver(S: TStream): TStreamable;
 begin
+  { Match TLoadProc (value, not var): a var parameter would treat the
+    TStream reference as a pointer-to-pointer and corrupt Load. }
   Result := TStreamable(TEditSaver.Load(S));
 end;
 
-procedure Store_REditSaver(P: TStreamable; var S: TStream);
+procedure Store_REditSaver(P: TStreamable; S: TStream);
 begin
   TEditSaver(P).Store(S);
 end;

@@ -428,7 +428,7 @@ procedure TApplication.ShowUserScreen;
 begin
 {$IFDEF LINUX}
   { the screen of the commands that DN ran (TvVtRun); the key leaves it, DN is drawn again }
-  if UserScr.Cols > 0 then
+  if (UserScr <> nil) and (UserScr.Cols > 0) then
     begin
     VtShowScreen(UserScr);
     Redraw;
