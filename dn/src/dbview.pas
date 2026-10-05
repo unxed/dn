@@ -1395,7 +1395,7 @@ procedure TDBViewer.Draw;
     end;
   { -------- Eugeny Zvyagintzev ---------}
   repeat
-    MoveChar(B, ' ', C1, Size.X);
+    MoveChar(B[0], ' ', C1, Size.X);
     J := Pos.X;
     NFN := 0;
     I := 1;
@@ -1427,7 +1427,7 @@ procedure TDBViewer.Draw;
   WriteLineW(0, 0, Size.X, 1, B);
   for K := 1 to Size.Y-1 do
     begin
-    MoveChar(B, ' ', C2, Size.X);
+    MoveChar(B[0], ' ', C2, Size.X);
     if DBFile.NumRec > 0 then
       begin
       J := Delta.X;
@@ -1524,7 +1524,7 @@ procedure TDBIndicator.Draw;
   else
     C := TWindow(Owner).Frame.GetColorW($03);
   {--- finish -------- Eugeny Zvyagintzev ---- 14-03-2003 -----}
-  MoveStr(B, S, C);
+  MoveStr(B[0], S, C);
   WriteLineC(0, 0, Size.X, 1, B);
   end { TDBIndicator.Draw };
 

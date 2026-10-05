@@ -104,7 +104,7 @@ procedure TTopView.Draw;
   C := GetColorW(1);
   if not Panel.GetState(sfSelected) then
     C := GetColorW(2);
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   MoveStr(B[0], S, C);
   WriteLineC(0, 0, Size.X, Size.Y, B);
   end { TTopView.Draw };

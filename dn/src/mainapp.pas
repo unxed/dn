@@ -171,9 +171,9 @@ begin
   MenuBar := nil;
   StatusLine := nil;
   Desktop := nil;
-  Application := nil;
   Buffer := nil;
   inherited Destroy;
+  Application := nil;
 end;
 
 procedure TProgram.ActivateView(P: TView);

@@ -188,13 +188,13 @@ procedure TTeamView.Draw;
     C: Word;
   begin
   C := Owner.GetColorW($0807);
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   S := GetString(dlTeamAll);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
   WriteLineC(0, 0, Size.X, 1, B);
   for I := 1 to Size.Y-1 do
     begin
-    MoveChar(B, ' ', C, Size.X);
+    MoveChar(B[0], ' ', C, Size.X);
     if  (Strings[I] > 0) and (Strings[I] <= MaxTeam) then
       begin
       S := GetString(TStrIdx(Integer(dlTeamAll)+Strings[I]));
@@ -486,7 +486,7 @@ procedure TDiskInfo.Draw;
     var
       I: Integer;
     begin
-    MoveChar(B, ' ', C, Size.X);
+    MoveChar(B[0], ' ', C, Size.X);
     I := (Size.X-CStrLen(S)) div 2;
     if  (I < 0) or CC then
       I := 0;
@@ -499,7 +499,7 @@ procedure TDiskInfo.Draw;
     var
       I: Integer;
     begin
-    MoveChar(B, ' ', C, Size.X);
+    MoveChar(B[0], ' ', C, Size.X);
     I := (Size.X-CStrLen(S)) div 2;
     if  (I < 0) or CC then
       I := 0;
@@ -515,7 +515,7 @@ procedure TDiskInfo.Draw;
     var
       I: Integer;
     begin
-    MoveChar(B, ' ', C, Size.X);
+    MoveChar(B[0], ' ', C, Size.X);
     MoveCStr(B[0], S, C);
     WriteLineC(0, Y, Size.X, 1, B);
     Inc(Y);
@@ -618,7 +618,7 @@ procedure TDiskInfo.Draw;
         Break;
       end;
     end;
-  MoveChar(B, ' ', C, Size.X);
+  MoveChar(B[0], ' ', C, Size.X);
   if Y <= Size.Y-1 then
     WriteLineC(0, Y, Size.X, Size.Y-Y+1, B);
   end { TDiskInfo.Draw };

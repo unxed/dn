@@ -276,7 +276,7 @@ procedure TDriveLine.Draw;
       ViewLine := '{'+ViewLine+'}';
       end;
     end;
-  MoveStr(B, ViewLine, GetColorW(1));
+  MoveStr(B[0], ViewLine, GetColorW(1));
   I := PosChar(Panel.DriveLetter, ViewLine);
   if I > 0 then
     SetCellAttr(B[I-1], GetColorW(3));
@@ -768,7 +768,7 @@ Scroll:
     C1 := GetColorW(1); { Normal }
     for i := 0 to pred(Owner.Size.Y) do
       begin
-      MoveChar(B, ' ', C1, Size.X);
+      MoveChar(B[0], ' ', C1, Size.X);
       WriteLineC(0, i, Owner.Size.X, 1, B[0]);
       end;
     Exit;
@@ -851,7 +851,7 @@ Scroll:
             j*(Size.Y-Byte(ColumnTitles))+Delta;
           if  (Idx = CurPos) or (Idx = OldPos) then
             begin
-            MoveChar(B, ' ', C1, Size.X);
+            MoveChar(B[0], ' ', C1, Size.X);
             DrawAtIdx;
             Idx := (j+1)*LineLength;
             if Idx < Size.X then
@@ -883,7 +883,7 @@ Scroll:
     end;
   for i := Byte(ColumnTitles) to Size.Y-1 do
     begin
-    MoveChar(B, ' ', C1, Size.X);
+    MoveChar(B[0], ' ', C1, Size.X);
     for j := 0 to Size.X div LineLength do
       begin
       Idx := i-Byte(ColumnTitles)+
@@ -1072,7 +1072,7 @@ function MakeDivider(IV: TInfoView): Boolean;
   Result := False;
   with IV do
     begin
-    MoveChar(B, #196, CDivdier, IV.Size.X+Panel.DeltaX);
+    MoveChar(B[0], #196, CDivdier, IV.Size.X+Panel.DeltaX);
     I := 0;
     C := (CDivdier shl 8) or 193;
     while I < Size.X do
@@ -1089,7 +1089,7 @@ function MakeCurFile(IV: TInfoView): Boolean;
   begin
   with IV do
     begin
-    MoveChar(B, ' ', C1, Size.X+Panel.DeltaX);
+    MoveChar(B[0], ' ', C1, Size.X+Panel.DeltaX);
       { Очистить надо безусловно, особенно если файлов нет. }
     Result := False;
     if PF = nil then
@@ -1139,7 +1139,7 @@ function MakeSelected(IV: TInfoView): Boolean;
     begin
     Result := Panel.SelNum <> 0;
     if Y <> 0 then
-      MoveChar(B, ' ', C3, IV.Size.X+Panel.DeltaX);
+      MoveChar(B[0], ' ', C3, IV.Size.X+Panel.DeltaX);
     if Result then
       begin
       with Panel do
@@ -1303,8 +1303,8 @@ function MakePathDecr(IV: TInfoView): Boolean;
     Result := S2 <> '';
     if Result then
       begin
-      MoveChar(B, ' ', C1, Size.X+Panel.DeltaX);
-      MoveCStr(B, S2, C1);
+      MoveChar(B[0], ' ', C1, Size.X+Panel.DeltaX);
+      MoveCStr(B[0], S2, C1);
       end;
     end;
   end;
@@ -1320,7 +1320,7 @@ function MakePacked(IV: TInfoView): Boolean;
   if Result then
     begin
     C := IV.GetColorW($0405);
-    MoveChar(B, ' ', Hi(C), IV.Size.X+IV.Panel.DeltaX);
+    MoveChar(B[0], ' ', Hi(C), IV.Size.X+IV.Panel.DeltaX);
     S :=
       GetString(dlArcPSize)+' ' +
       AddSpace(FStr(PF^.PSize), 14) +
@@ -1540,7 +1540,7 @@ function MakeLongName(IV: TInfoView): Boolean;
     Exit;
   Result := True;
   if Y <> 0 then
-    MoveChar(B, ' ', C9, IV.Size.X+IV.Panel.DeltaX);
+    MoveChar(B[0], ' ', C9, IV.Size.X+IV.Panel.DeltaX);
   if I < 0 then
     I := Max(0, (IV.Size.X-CStrLen(S)) div 2);
   MoveCStr(B[I], S, Swap(C8_9));
@@ -1651,7 +1651,7 @@ procedure TInfoView.Draw;
       inc(I);
       end;
     WriteLineC(0, Y, Size.X, 1, B);
-    MoveChar(B, ' ', C1, Size.X);
+    MoveChar(B[0], ' ', C1, Size.X);
     end;
 
   procedure FindCurFileLine;

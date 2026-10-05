@@ -485,7 +485,7 @@ procedure TViewInfo.Draw;
     if not Owner.GetState(sfActive) then
       begin
       Color := TWindow(Owner).Frame.GetColorW(1);
-      MoveChar(B, #196, Color, Size.X);
+      MoveChar(B[0], #196, Color, Size.X);
       WriteLineC(0, 0, Size.X, 1, B);
       Exit;
       end
@@ -557,8 +557,8 @@ procedure TViewInfo.Draw;
       S := S + ' of '+FStr(FileSize)+' Bytes'+Ch2;
       end;
     end;
-  MoveChar(B, Ch2, Color, Size.X);
-  MoveStr(B, S, Color);
+  MoveChar(B[0], Ch2, Color, Size.X);
+  MoveStr(B[0], S, Color);
   Self.WriteLineC(0, 0, Size.X, Size.Y, B);
   end { TViewInfo.Draw };
 
@@ -931,7 +931,7 @@ procedure TViewScroll.Draw;
   begin
   C1 := GetColorW(1);
   C2 := GetColorW(2);
-  MoveChar(B1, #177, C1, Size.Y);
+  MoveChar(B1[0], #177, C1, Size.Y);
   i := GetPartCode;
   B1[i] := CellFromBIOS(254+LongInt(C2*256));
   B1[0] := CellFromBIOS(30+LongInt(C2*256));
@@ -1388,10 +1388,10 @@ procedure TFileViewer.Draw;
           end {case};
           {-DataCompBoy & Axel: done-}
           if J = HexPos then
-            Drivers.MoveStr(B, S, C)
+            Drivers.MoveStr(B[0], S, C)
           else
             begin
-            Drivers.MoveStr(B, Copy(S, 1, J*3+10), C);
+            Drivers.MoveStr(B[0], Copy(S, 1, J*3+10), C);
             Drivers.MoveStr(B[10+HexPos*3], Copy(S, J*3+11,
                  MaxStringLength), C);
             end;
@@ -1465,7 +1465,7 @@ procedure TFileViewer.Draw;
           XDumpStr(S, Buf^[W], L, J, Filter); //!!s
           XLatBuf(S[10], Length(S)-9, XCoder.XLatCP[ToAscii]);
           CpBytesToUtf8(S, 10);
-          Drivers.MoveStr(B, S, C);
+          Drivers.MoveStr(B[0], S, C);
           if SearchActive then
             begin
             if  (L <= SearchX) and (L+J > SearchX) then
@@ -1521,7 +1521,7 @@ procedure TFileViewer.Draw;
                 +': '+D.CodeStr+Strg(' ', 29-Length(D.CodeStr))+
             D.Command+Strg(' ', 10-Length(D.Command))+
             D.Operands;
-          Drivers.MoveStr(B, S, C);
+          Drivers.MoveStr(B[0], S, C);
           L := L + D.InstrLen;
           end;
         WriteLineC(0, I, WDH, 1, B[XDelta]);
@@ -1617,7 +1617,7 @@ procedure TFileViewer.Draw;
                     S[W] := #250;
             end {case};
             {/Cat}
-            MoveStr(B, S, C (*, Filter, TS*));
+            MoveStr(B[0], S, C (*, Filter, TS*));
             if HiLite and not QuickView then
               begin
               Highlites(Length(S), @S[1], HiLitePar);

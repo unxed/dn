@@ -405,8 +405,8 @@ procedure TCommandLine.Draw;
     DeltaX := CurX;
   while CellsIn(Copy(Str, DeltaX+1, CurX-DeltaX)) > Size.X-Min(Length(Dir), 50)-1 do
     Inc(DeltaX, CharAt(Str, DeltaX+1));
-  MoveChar(B, ' ', C1, Size.X);
-  MoveStr(B, S^, C3);
+  MoveChar(B[0], ' ', C1, Size.X);
+  MoveStr(B[0], S^, C3);
   MoveStr(B[SW], WholeChars(Copy(Str, DeltaX+1, Size.X-SW)), C1);
   if not MenuActive then
     ShowCursor

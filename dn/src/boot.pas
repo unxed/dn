@@ -74,7 +74,7 @@ uses
   apploop, editcore, ArchSet, linepos, RegAll, DnExec, histories, Menus,
    VideoMan, timeutil,
   dirwatch, realmode, 
-  Tree
+  Tree, TvScreen
   , filetype, panelsetup
   , osdep, dnscreen, cfgstate, palettes;
 
@@ -777,7 +777,9 @@ procedure RUN_IT;
     Clock.MakeFirst;
     UnLock;
     end;
-  MyApplication.Buffer := ScreenBuffer;
+  { TGroup.Buffer stores TvScreen cells; Drivers.ScreenBuffer is the
+    two-byte DOS-compatible copy and must not be used as its backing store. }
+  MyApplication.Buffer := TvScreen.ScreenBuffer;
   R.Assign(0, 0, ScreenWidth, ScreenHeight);
   MyApplication.ChangeBounds(R);
   MyApplication.Draw;

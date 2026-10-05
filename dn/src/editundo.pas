@@ -364,8 +364,8 @@ procedure TInfoLine.Draw;
       S := S+'>'; {-$VIV::}
       end;
     end;
-  MoveChar(B, Ch2, Color, Size.X);
-  MoveStr(B, S, Color);
+  MoveChar(B[0], Ch2, Color, Size.X);
+  MoveStr(B[0], S, Color);
   WriteLineC(0, 0, Size.X, 1, B);
   end { TInfoLine.Draw };
 
@@ -415,7 +415,7 @@ procedure TBookmarkLine.Draw;
     end;
   if not ShowBookmarks then
     begin
-    MoveChar(B, Ch, Col, 1); {SYR}
+    MoveChar(B[0], Ch, Col, 1); {SYR}
     WriteLineW(0, 0, Size.X, Size.Y, B);
     Exit;
     end;
@@ -423,9 +423,9 @@ procedure TBookmarkLine.Draw;
     begin
     Mrk := IsMarker(P.Pos.Y+I);
     if Mrk = #0 then
-      MoveChar(B, Ch, Col, 1) {SYR}
+      MoveChar(B[0], Ch, Col, 1) {SYR}
     else
-      MoveChar(B, Mrk, SwitchHalfs(Col), 1);
+      MoveChar(B[0], Mrk, SwitchHalfs(Col), 1);
     WriteLineW(0, I, Size.X, 1, B);
     end;
   end { TBookmarkLine.Draw };

@@ -195,9 +195,9 @@ var
 begin
   Normal := Byte(GetColorW(6));
   Value := Byte(GetColorW(7));
-  MoveChar(Buf, ' ', Normal, Size.X);
+  MoveChar(Buf[0], ' ', Normal, Size.X);
   T := ' Char:   Decimal: ' + Format('%3d', [ASCIIChar]) + ' Hex: ' + Format('%.2x', [ASCIIChar]);
-  MoveStr(Buf, T, Normal);
+  MoveStr(Buf[0], T, Normal);
   { the value fields in the color of the selection }
   MoveChar(Buf[16], ' ', Value, 0);
   if (ASCIIChar > 0) and (Size.X > 7) then

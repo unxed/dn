@@ -25,11 +25,11 @@ var
   C: Byte;
 begin
   C := Byte(GetColorW(1));
-  MoveChar(B, ' ', C, Size.X);
-  MoveStr(B, S1, C);
+  MoveChar(B[0], ' ', C, Size.X);
+  MoveStr(B[0], S1, C);
   WriteLineC(0, 0, Size.X, 1, B);
-  MoveChar(B, ' ', C, Size.X);
-  MoveStr(B, S2, C);
+  MoveChar(B[0], ' ', C, Size.X);
+  MoveStr(B[0], S2, C);
   WriteLineC(0, 1, Size.X, 1, B);
 end;
 
