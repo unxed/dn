@@ -76,7 +76,7 @@ type
 
   TGameWindow = class(TDialog)
     constructor Create;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
 
@@ -112,25 +112,25 @@ type
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     procedure NewGame;
-    procedure Draw; virtual;
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure Draw; override;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure Rotate;
     procedure ReadFig;
-    procedure Update; virtual;
+    procedure Update; override;
     function MoveFig(DeltaX, DeltaY: Integer): Boolean;
     function ValidMove(DeltaX, DeltaY: Integer): Boolean;
     function MoveDown: Boolean;
     procedure MakeTime;
     procedure ShowScores(HighLight: Integer);
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
-    destructor Done; virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
+    destructor Destroy; override;
     end;
 
 
   TGameInfo = class(TView)
     Hc, Gm: TGameView;
-    function GetPalette: TPalette; virtual;
-    procedure Draw; virtual;
+    function GetPalette: TPalette; override;
+    procedure Draw; override;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;
@@ -491,7 +491,7 @@ procedure TGameView.Store(var S: TStream);
   S.Write(Glass, SizeOf(Self)-SizeOf(TView)-SizeOf(TView));
   end;
 
-destructor TGameView.Done;
+destructor TGameView.Destroy;
   begin
   Game := nil;
   inherited Destroy;
