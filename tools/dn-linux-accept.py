@@ -341,15 +341,15 @@ def selected_scenarios(area: str | None, only: set[str], shard: tuple[int, int] 
 
 
 def main() -> int:
+    if len(sys.argv) >= 2 and sys.argv[1] == '--list':
+        for name, _spec, ar in SCENARIOS:
+            print('%s\t%s' % (name, ar))
+        return 0
     if len(sys.argv) < 3:
         print('usage: dn-linux-accept.py OBJECT_OUT CLASS_OUT '
               '[scenario...|--area NAME|--shard I/N|--list]',
               file=sys.stderr)
         return 2
-    if sys.argv[1] == '--list':
-        for name, _spec, ar in SCENARIOS:
-            print('%s\t%s' % (name, ar))
-        return 0
     obj = os.path.abspath(sys.argv[1])
     cls = os.path.abspath(sys.argv[2])
     args = sys.argv[3:]
@@ -365,10 +365,6 @@ def main() -> int:
             a, b = args[i + 1].split('/', 1)
             shard = (int(a), int(b))
             i += 2
-        elif args[i] == '--list':
-            for name, _spec, ar in SCENARIOS:
-                print('%s\t%s' % (name, ar))
-            return 0
         else:
             only.add(args[i])
             i += 1
