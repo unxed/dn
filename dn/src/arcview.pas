@@ -77,14 +77,14 @@ type
     constructor Create(PC: TDirStorage; const AName, VAName: String);
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;
-    procedure RereadDirectory(S: String); virtual; {DataCompBoy}
-    procedure KillUse; virtual;
+    procedure RereadDirectory(S: String); override; {DataCompBoy}
+    procedure KillUse; override;
     function ReadArchive: Boolean;
-    procedure lChDir(ADir: String); virtual; {DataCompBoy}
-    function GetDir: String; virtual;
+    procedure lChDir(ADir: String); override; {DataCompBoy}
+    function GetDir: String; override;
     function GetDirectory(
          const FileMask: String;
-        var TotalInfo: TSize): TFilesCollection; virtual;
+        var TotalInfo: TSize): TFilesCollection; override;
     function Exec(Prg, Cmd: String; Lst: AnsiString; B: Boolean): Boolean;
     {JO:  выделил список файлов в командной строке или путь к               }
     {     файлу-списку в отдельный параметр Lst;                            }
@@ -92,7 +92,7 @@ type
     {     файл-список или разархивируем одиночный файл не прибегая к списку }
     {     и True, если используем список в командной строке                 }
 
-    procedure UseFile(P: PFileRec; Command: Word); virtual;
+    procedure UseFile(P: PFileRec; Command: Word); override;
     {DataCompBoy}
     function MakeListFile(PC: TCollection; UseUnp: Boolean;
          var B: Boolean): AnsiString;
@@ -102,32 +102,32 @@ type
     {     командной строке (True) или в файле-списке (False)            }
 
     procedure CopyFiles(AFiles: TCollection; Own: TView;
-         MoveMode: Boolean); virtual;
+         MoveMode: Boolean); override;
     procedure CopyFilesInto(AFiles: TCollection; Own: TView;
-         MoveMode: Boolean); virtual;
-    procedure EraseFiles(AFiles: TCollection); virtual;
+         MoveMode: Boolean); override;
+    procedure EraseFiles(AFiles: TCollection); override;
     {procedure  GetDown(var B; C: Word; P: PFileRec); virtual;}
     {DataCompBoy}
-    function GetRealName: String; virtual;
-    function GetInternalName: String; virtual;
-    procedure HandleCommand(Command: Word; InfoPtr: Pointer); virtual;
-    procedure MakeDir; virtual;
-    function isUp: Boolean; virtual;
-    procedure ChangeUp(var S: String); virtual;
-    procedure ChangeRoot; virtual;
+    function GetRealName: String; override;
+    function GetInternalName: String; override;
+    procedure HandleCommand(Command: Word; InfoPtr: Pointer); override;
+    procedure MakeDir; override;
+    function isUp: Boolean; override;
+    procedure ChangeUp(var S: String); override;
+    procedure ChangeRoot; override;
     procedure ExtractFiles(AFiles: TCollection; ExtrDir: String;
          Own: TView; Options: Byte); {DataCompBoy}
-    procedure GetFreeSpace(var S: String); virtual;
-    procedure GetDirInfo(var B: TDiskInfoRec); virtual;
-    function GetFullFlags: Word; virtual;
-    procedure GetDirLength(PF: PFileRec); virtual; {DataCompBoy}
+    procedure GetFreeSpace(var S: String); override;
+    procedure GetDirInfo(var B: TDiskInfoRec); override;
+    function GetFullFlags: Word; override;
+    procedure GetDirLength(PF: PFileRec); override; {DataCompBoy}
     destructor Destroy; override;
     procedure StdMsg4;
     function OpenDirectory(const Dir: String;
-                                 PutDirs: Boolean): TDrive; virtual;
-    procedure DrvFindFile(FC: TFilesCollection); virtual;
-    procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
-    function GetDriveLetter: Char; virtual;
+                                 PutDirs: Boolean): TDrive; override;
+    procedure DrvFindFile(FC: TFilesCollection); override;
+    procedure ReadDescrptions(FilesC: TFilesCollection); override;
+    function GetDriveLetter: Char; override;
     end;
 
 function ArcViewer(AName, VAName: String): Boolean;

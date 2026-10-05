@@ -58,9 +58,9 @@ type
   PTARArchive = TTARArchive;
   TTARArchive = class(TARJArchive)
     constructor Create;
-    procedure GetFile; virtual;
-    function GetID: Byte; virtual;
-    function GetSign: TStr4; virtual;
+    procedure GetFile; override;
+    function GetID: Byte; override;
+    function GetSign: TStr4; override;
     end;
 
 const
@@ -123,8 +123,14 @@ constructor TTARArchive.Create;
   FreeStr := SourceDir+DNARC;
   inherited Create;
   
+  { Unix: lowercase tar; Windows keeps TAR (Far2-era external tools) }
+{$IFDEF UNIX}
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'tar'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'tar'));
+{$ELSE}
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'TAR'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'TAR'));
+{$ENDIF}
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, 'xf'));
   ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, 'xf'));
   Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, 'cvf'));

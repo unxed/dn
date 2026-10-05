@@ -58,9 +58,9 @@ type
   PSQZArchive = TSQZArchive;
   TSQZArchive = class(TARJArchive)
     constructor Create;
-    procedure GetFile; virtual;
-    function GetID: Byte; virtual;
-    function GetSign: TStr4; virtual;
+    procedure GetFile; override;
+    function GetID: Byte; override;
+    function GetSign: TStr4; override;
     end;
 
 type

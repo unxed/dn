@@ -57,9 +57,9 @@ type
   PZIPArchive = TZIPArchive;
   TZIPArchive = class(TARJArchive)
     constructor Create;
-    procedure GetFile; virtual;
-    function GetID: Byte; virtual;
-    function GetSign: TStr4; virtual;
+    procedure GetFile; override;
+    function GetID: Byte; override;
+    function GetSign: TStr4; override;
     end;
 
 type
@@ -115,8 +115,45 @@ constructor TZIPArchive.Create;
   Sign := Sign+#0;
   FreeStr := SourceDir+DNARC;
   inherited Create;
-  
-  
+
+  { Unix: Info-ZIP zip/unzip (far2l multiarc); Windows: classic PKZIP/PKUNZIP }
+{$IFDEF UNIX}
+  Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'zip'));
+  UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'unzip'));
+  Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, '-j'));
+  ExtractWP := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtractWP, ''));
+  Add := NewStr(GetVal(@Sign[1], @FreeStr[1], PAdd, '-r'));
+  Move := NewStr(GetVal(@Sign[1], @FreeStr[1], PMove, '-m'));
+  Delete := NewStr(GetVal(@Sign[1], @FreeStr[1], PDelete, '-d'));
+  Garble := NewStr(GetVal(@Sign[1], @FreeStr[1], PGarble, '-P'));
+  Test := NewStr(GetVal(@Sign[1], @FreeStr[1], PTest, '-t'));
+  IncludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PIncludePaths, ''));
+  ExcludePaths := NewStr(GetVal(@Sign[1], @FreeStr[1], PExcludePaths, ''));
+  ForceMode := NewStr(GetVal(@Sign[1], @FreeStr[1], PForceMode, '-o'));
+  RecoveryRec := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecoveryRec, ''));
+  SelfExtract := NewStr(GetVal(@Sign[1], @FreeStr[1], PSelfExtract, ''));
+  Solid := NewStr(GetVal(@Sign[1], @FreeStr[1], PSolid, ''));
+  RecurseSubDirs := NewStr(GetVal(@Sign[1], @FreeStr[1], PRecurseSubDirs,
+         ''));
+  SetPathInside := NewStr(GetVal(@Sign[1], @FreeStr[1], PSetPathInside,
+         ''));
+  StoreCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PStoreCompression, '-0'));
+  FastestCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PFastestCompression, '-1'));
+  FastCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PFastCompression, '-3'));
+  NormalCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PNormalCompression, '-6'));
+  GoodCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PGoodCompression, '-8'));
+  UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
+         PUltraCompression, '-9'));
+  ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
+         '-@'));
+  ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
+       ' '));
+{$ELSE}
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'PKZIP'));
   UnPacker := NewStr(GetVal(@Sign[1], @FreeStr[1], PUnPacker, 'PKUNZIP'));
   Extract := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtract, ''));
@@ -154,8 +191,9 @@ constructor TZIPArchive.Create;
          '@'));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        '@'));
-  
-  
+{$ENDIF}
+
+ 
 
   q := GetVal(@Sign[1], @FreeStr[1], PAllVersion, '0');
   AllVersion := q <> '0';
