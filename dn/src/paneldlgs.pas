@@ -83,17 +83,17 @@ procedure CM_MakeDir(AFP: Pointer);
 procedure CM_LongCopy(AFP: Pointer);
 procedure CM_ChangeCase(AFP: Pointer);
 function PanelSetupTag(const PSS: TPanelSetupSet;
-  {` Сформировать краткое строковое описание настроек панели }
+  {` Build a short string description of the panel settings }
     PC: TPanelClass): String;
   {`}
 procedure CM_SelectColumn(AFP: Pointer); {JO}
 
 
 function FirstNameNum(P: TFilePanelRoot): LongInt;
-{` AK155 Получение первого номера (от 1) в коллекции файлов панели,
-  соответствующего не фиктивному имени '..', а настоящему имени.
-  Возвращает либо 1, если это корень диска и элемента '..' нет,
-  либо 2, если он есть. `}
+{` AK155 Get the first index (from 1) in the panel file collection
+  that corresponds not to the fictitious '..' name but to a real name.
+  Returns either 1 if this is the drive root and there is no '..',
+  or 2 if it is present. `}
 
 implementation
 uses
@@ -219,42 +219,42 @@ function TSelectList.GetText(Item: LongInt; MaxLen: Integer): String;
   Result := S;
   end;
 
-{AK155 29.05.05 Средства "оживления" диалогов записи и чтения
-настроек панелей, а также самих диалогов настроек панели.
+{AK155 29.05.05 Means of "animating" the panel settings save/load
+dialogs, as well as the panel settings dialogs themselves.
  }
 
 var
   PanelClass: Word;
-    { В какой класс панели будем писать; это значение блока
-      радиокнопок, то есть от 0 до High(TPanelClass)+1 ("Все") }
+    { Which panel class we will write to; this is the radio-button
+      block value, i.e. from 0 to High(TPanelClass)+1 ("All") }
   PresetNum: Word;
-    { Номер пресета панели или последнего загруженного.
-    Он выбран по умолчанию в диалоге "Записать" }
+    { Panel preset number or the last loaded one.
+    It is selected by default in the "Save" dialog }
 
 type
-{ Диалог установок вида панелей. Является также базовым типом
-  для диалогов установок сортировки и фильтра. }
+{ Panel view settings dialog. Also the base type
+  for the sort and filter settings dialogs. }
   TShowDialog = class(TDialog)
     function OwnDataAddress(P: PPanelSetup): Pointer; virtual;
-      { Адрес того блока данных внутри P^, с которым работает
-      данный диалог, то есть, в данном случае, адрес P.Show.
-      Этот метод перекрывается в диалогах сортировки и фильтра.
-      Виртуализация этого метода используется в программе обработки
-      нажатия кнопки "записать" TSaveSetupButtonPress. }
+      { Address of the data block inside P^ that this dialog
+      works with, i.e. in this case the address of P.Show.
+      This method is overridden in the sort and filter dialogs.
+      Virtualizing this method is used by the handler of the
+      "save" button press TSaveSetupButtonPress. }
     procedure HandleEvent(var Event: TEvent); override;
-      { Для реакции на хоткеи и кнопку "Записать".
-      Это метод общий для всех трёх диалогов}
+      { To react to hotkeys and the "Save" button.
+      This method is shared by all three dialogs}
     end;
 
-{ Радиокнопки класса панели в диалоге "Записать".
-  Для реакции на смену выбора в блоке радиокнопок "Тип панели" }
+{ Panel-class radio buttons in the "Save" dialog.
+  To react to a selection change in the "Panel type" radio block }
   TPanelClassRB = class(TRadioButtons)
     procedure MovedTo(Item: Integer); override;
     procedure Press(Item: Integer); override;
-      { Приходится перекрываь и MoveTo, и Press, так как ни одна из
-      них не вызывается всегда. Например, при перемещеии курсором
-      вызывается только MovedTo, при нажатии мышью - только Press,
-      а при нажатии горячей клавишей - обе.}
+      { Must override both MoveTo and Press, because neither is
+      always called. E.g. when moving with the cursor only
+      MovedTo is called, on mouse click only Press,
+      and on a hotkey both.}
     procedure ChangeClass(Item: Integer);
     end;
 
@@ -264,13 +264,13 @@ type
 
   TSaveSetupDialg = class(TDialog)
     procedure HandleEvent(var Event: TEvent); override;
-      { Для реакции на кнопку "Все" }
+      { To react to the "All" button }
     end;
 
   var
-    SavePresetData: record { даные диалога "Записать"}
-      ForClass: Word; {Класс панели: диск, список и.п.д.}
-      Target: Word; { Пресет, эта и та панели.}
+    SavePresetData: record { "Save" dialog data}
+      ForClass: Word; {Panel class: disk, list, etc.}
+      Target: Word; { Preset, this and that panel.}
       end;
 
 procedure TSaveSetupDialg.HandleEvent(var Event: TEvent);
@@ -298,9 +298,9 @@ procedure PrepareSaveSetupDialog(P: TDialog);
   begin
   ObjChangeType(P, TClass(TSaveSetupDialg));
   ObjChangeType(P.DirectLink[1], TClass(TPanelClassRB));
-    { Прицепили свою реакцию на смену выбора класса панели }
+    { Attached our reaction to panel-class selection changes }
   TPanelClassRB(P.DirectLink[1]).ChangeClass(Ord(PanelClass));
-    { Сформировали блок радиокнопок с пресетами }
+    { Built the radio-button block with presets }
   end;
 
 procedure TPanelClassRB.Press(Item: Integer);
@@ -318,7 +318,7 @@ procedure TPanelClassRB.MovedTo(Item: Integer);
   end;
 
 procedure TPanelClassRB.ChangeClass(Item: Integer);
-  { Реакция на смену выбора типа панели: перерисовка блока пресетов }
+  { Reaction to panel-type selection change: redraw the presets block }
   var
     T: TCheckBoxes;
     i: Integer;
@@ -329,18 +329,18 @@ procedure TPanelClassRB.ChangeClass(Item: Integer);
   T := TCheckBoxes(TDialog(Owner).DirectLink[2]);
   with T.Strings do
     begin
-    { Освобождение обозначений десяти пресетов, если они есть.
-    Последние два элемента (эта и другая панели) есть всегда. }
+    { Free the labels of the ten presets, if any.
+    The last two items (this and the other panel) are always present. }
     for i := Count-3 downto 0 do
       AtFree(i);
-    { Добавление обозначений десяти пресетов. Исходно у Strings
-    Delta=0, Limit=2, Count=2, поэтому добавить ничего нельзя.}
-    Delta := 10; // нужно добавить ровно столько
+    { Add the labels of the ten presets. Initially Strings has
+    Delta=0, Limit=2, Count=2, so nothing can be added.}
+    Delta := 10; // need to add exactly that many
     for i := 1 to 10 do
       begin
       S := '~' + ItoS(i mod 10) + '~ ';
       if PanelClass <= Ord(High(TPanelClass)) then
-        { нормальный класс, а не "Все"}
+        { a real class, not "All"}
         S := S +
           PanelSetupTag(PanSetupPreset[i], TPanelClass(PanelClass));
       AtInsert(i-1, NewStr(S));
@@ -360,12 +360,12 @@ procedure TSaveSetupButton.Press;
   begin
   PresetNum := ActivePanel.PresetNum;
   PanelClass := Ord(dt2pc[ActivePanel.Drive.DriveType]);
-  EnableCommands([cmOK]); { Диалог фильтра мог задизейблить }
+  EnableCommands([cmOK]); { The filter dialog may have disabled it }
   SavePresetData.ForClass := PanelClass;
   SavePresetData.Target := 1 shl (PresetNum-1);
   @PreExecuteDialog := @PrepareSaveSetupDialog;
   SaveTaggedDataOnly := TaggedDataOnly;
-  TaggedDataOnly := False; // для самого диалога сохранения
+  TaggedDataOnly := False; // for the save dialog itself
   Cmd := ExecResource(dlgSavePanelSetup, SavePresetData);
   TaggedDataOnly := SaveTaggedDataOnly;
   if Cmd = cmOK then
@@ -374,34 +374,34 @@ procedure TSaveSetupButton.Press;
       if ((1 shl TargetBlock) and SavePresetData.Target) <> 0 then
         begin
         case TargetBlock of
-          0..9: {пресеты 1..10}
+          0..9: {presets 1..10}
             begin
             TargetPanel := nil;
             TargetSetupSet := @PanSetupPreset[TargetBlock+1];
             ConfigModified := True;
             end;
-          10: { Эта панель}
+          10: { This panel}
             begin
             TargetPanel := ActivePanel;
             TargetSetupSet := @TargetPanel.PanelSetupSet;
             end;
-          11: { Другая панель}
+          11: { The other panel}
             begin
             TargetPanel := PassivePanel;
             TargetSetupSet := @TargetPanel.PanelSetupSet;
             end;
         end {case};
-        if PanelClass > Ord(High(TPanelClass)) then { "Все"}
+        if PanelClass > Ord(High(TPanelClass)) then { "All"}
           for PC := Low(TPanelClass) to High(TPanelClass) do
             with TShowDialog(Owner) do
               GetData(OwnDataAddress(@TargetSetupSet^[PC])^)
-        else { один реальный класс }
+        else { one real class }
           begin
           PC := TPanelClass(PanelClass);
           with TShowDialog(Owner) do
             GetData(OwnDataAddress(@TargetSetupSet^[PC])^);
           end;
-        if TargetPanel <> nil then { записали не в пресет, а в панель }
+        if TargetPanel <> nil then { wrote not to a preset but to a panel }
           begin
           TDoubleWindow(TargetPanel.Owner).SetMaxiState(TargetPanel);
           TargetPanel.Rebound;
@@ -470,37 +470,36 @@ procedure TShowDialog.HandleEvent(var Event: TEvent);
 
 { ----------------- CM_AdvancedFilter ----------------- }
 
-{ Нужно обеспечить такое поведение диалога. Если активна строка
-ввода, то кнопка по умолчанию - "OK", и её нажатие завершает диалог
-с занесением содержимого строки ввода. А если активен список
-расширений, то кнопка по умолчанию - "Добавить", и её нажатие
-добавляет элемент фильтра и возобновляет диалог. Лишние кнопки
-должны быть не активны. Лучше бы, конечно, было сделать их
-невидимыми, но Hide и Show для TButton работают настолько
-нетривиально, что связываться с ними не хочется.
-  Для манипуляций с кнопками цепляемся через SetState к событиям
-выбора списка и строки ввода. }
+{ The dialog must behave as follows. If the input line is active,
+the default button is "OK", and pressing it closes the dialog
+storing the input-line contents. If the extensions list is active,
+the default button is "Add", and pressing it adds a filter item
+and resumes the dialog. Extra buttons must be inactive. It would
+be nicer to make them invisible, but Hide and Show for TButton are
+so nontrivial that we would rather not deal with them.
+  For button manipulation we hook via SetState into the
+list and input-line selection events. }
 
 var
   OkButton, AddButton: TButton;
 
 type
 
-   { Диалог фильтра }
+   { Filter dialog }
   TFilterDialog = class(TShowDialog)
     function OwnDataAddress(P: PPanelSetup): Pointer; override;
     destructor Destroy; override;
     end;
 
-   { Список расширений }
+   { Extensions list }
   TExtSelList = class(TSelectList)
     procedure SetState(AState: Word; Enable: Boolean); override;
     function DataSize: Integer; override;
     procedure GetData(var Rec); override;
-      { Чтобы список не участвовал в GetData - SetData}
+      { So the list does not take part in GetData - SetData}
     end;
 
-   { Строка ввода фильтра }
+   { Filter input line }
   TFilterLine = class(TInputLine)
     procedure SetState(AState: Word; Enable: Boolean); override;
     end;
@@ -559,21 +558,21 @@ procedure CM_AdvancedFilter(AFP: Pointer);
     FItem: Integer;
     SelectFilterLine: Boolean;
     PC: TStringCollection;
-      { Коллекция расширений с элементами типа ' *.pas'.
-      Первый символ текста элемента - признак отметки:
-      пробел - значит не отмечен }
+      { Extensions collection with items like ' *.pas'.
+      The first character of the item text is the mark flag:
+      a space means not marked }
 
   procedure BuildPC;
-  { Построение коллекции расширений для ListBox }
-  { Строится коллекция файлов, а потом из неё выбираются расширения.
-  Это надо делать именно через методы TDrive, а не через чтение диска,
-  так как бывают архивы и т.п.
-    Но строить всю коллекцию - это плохой метод, так как он приводит
-  к лишней трате памяти  на коллекцию файлов. Лучше было бы, если бы
-  у TDrive был итератор (виртуальный), позволяющий для каждой файловой
-  записи что-то сделать, не строя сначала всю коллекцию. Кстати, и
-  построение коллекции можно было бы сделать через него, то есть
-  итератор был бы более элементарной функцией, чем GetDirectory.
+  { Build the extensions collection for the ListBox }
+  { A file collection is built, then extensions are picked from it.
+  This must go through TDrive methods, not by reading the disk,
+  because there are archives etc.
+    But building the whole collection is a bad approach because it
+  wastes memory on the file collection. It would be better if
+  TDrive had a (virtual) iterator that lets you do something for each
+  file record without building the whole collection first. By the way,
+  collection building could also go through it, so the iterator would
+  be a more primitive function than GetDirectory.
   }
     var
       SR: lSearchRec;
@@ -622,12 +621,12 @@ procedure CM_AdvancedFilter(AFP: Pointer);
         for b := 3 to 5 do
           with TButton(DirectLink[b]) do
             Options := Options and not ofSelectable;
-          { Кнопки "OK", "Добавить" и "Закрыть" по Tab пропускаются }
+          { The "OK", "Add" and "Close" buttons are skipped by Tab }
         ObjChangeType(Dlg.DirectLink[7], TClass(TSaveSetupButton));
-          { Подменяем тип кнопки "Записать", чтобы подсунуть свой Press }
+          { Replace the "Save" button type to supply our own Press }
         end;
       IL.SetState(sfSelected, True);
-        { Чтобы привести кнопки в нужные состояния, см. TFilterLine }
+        { To put the buttons into the right states, see TFilterLine }
       if not SelectFilterLine then
         begin
         Dlg.SelectNext(False);
@@ -717,9 +716,9 @@ procedure CM_AdvancedFilter(AFP: Pointer);
   BuildPC;
   repeat
     S := GetMaskSelection;
-    if S = '' then { Кнопка "Закрыть" или Esc }
+    if S = '' then { The "Close" button or Esc }
       Break;
-    if S[1] = #20 then { Кнопка "OK" }
+    if S[1] = #20 then { The "OK" button }
       FileMask := Copy(S, 2, 255)
     else
     if  (S = '- *.*') or (S = x_x) then
@@ -774,9 +773,9 @@ procedure CM_AdvancedFilter(AFP: Pointer);
     with P do
       begin
       NeedRebound := (PanSetup^.FileMask = x_x) <> (FileMask = x_x);
-        { Если фильтр стал или перестал быть тождественным, это
-          может вызывать изменение числа строк подвала, если в какой-то
-          строке нет ничего, кроме фильтра. См. TInfoView.Compile }
+        { If the filter became or ceased to be identity, that
+          may change the footer line count when some
+          line has nothing but the filter. See TInfoView.Compile }
       PanSetup^.FileMask := FileMask;
       if NeedRebound then
         Rebound;
@@ -799,7 +798,7 @@ function FirstNameNum(P: TFilePanelRoot): LongInt;
   end;
 {/AK155}
 
-{AK155: оформил эту процедуру по-человечески }
+{AK155: cleaned this procedure up properly }
 function GetSelection(P: TFilePanelRoot; Single: Boolean):
   TFilesCollection;
   var
@@ -818,7 +817,7 @@ function GetSelection(P: TFilePanelRoot; Single: Boolean):
     CurFile := SourceFiles.At(P.ScrollBar.Value);
     if CurFile^.TType = ttUpDir
     then
-      begin {все файлы, кроме элемента 0, который есть UpDir}
+      begin {all files except item 0, which is UpDir}
       FC := TFilesCollection.Create(N-1, 1);
       FC.Count := N-1;
       Move(SourceFiles.Items^[1], FC.Items^, (N-1)*SizeOf(Pointer));
@@ -876,7 +875,7 @@ function SelectFiles(AFP: Pointer; Select, XORs: Boolean): Boolean;
     then
       PF^.Selected := Select;
     {/JO}
-    (* {работает, но тормозит}
+    (* {works, but is slow}
    if (FMSetup.Options and fmoAlwaysCopyDesc <> 0) then
      begin
       SD := GetPossibleDizOwner(1);
@@ -953,7 +952,7 @@ procedure InvertSelection(AFP: Pointer; dr: Boolean);
     if dr or (PF^.Attr and Directory = 0) then
       PF^.Selected := not PF^.Selected;
 
-    {JO} {работает, но тормозит}
+    {JO} {works, but is slow}
     (*
    if (FMSetup.Options and fmoAlwaysCopyDesc <> 0) then
      begin
@@ -1050,17 +1049,17 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
   DT.FMask := ComareDirsOptions.FMask;
   DT.o := ComareDirsOptions.o;
   DT.S := ComareDirsOptions.S;
-(* !! AK155 04.05.05 временно - надо разобраться
+(* !! AK155 04.05.05 temporary - need to figure this out
   {$IFDEF DualName}
   D := TDialog(LoadResource(dlgCompareDirs));
   if D = nil then
     Exit;
-  {JO: левое условие означает, что показ коротких имён включен в активной }
-  {    панели, правое (закомментированное) - в пассивной                  }
+  {JO: the left condition means short-name display is on in the active }
+  {    panel; the right (commented) one - in the passive               }
   if  (not PFilesCollection(IP).LFNActive)
     {or ((P.Drive^.Flags and psShowLongName) = 0)}
   then
-    begin {JO: делаем недоступным чекбокс регистрочувствительности}
+    begin {JO: disable the case-sensitive checkbox}
     P1 := D^.FirstThat(IsCheckboxes);
     TCheckBoxes(P1).SetButtonState(16, False);
     end;
@@ -1311,7 +1310,7 @@ CurTime:
         D.D_LAc := '';
         goto CurTime;
         end;
-      (*  работает, но падает после n-ного кол-ва раз
+      (*  works, but crashes after the nth time
  cmSkip:
       begin
       {$IFNDEF OS2}
@@ -1536,7 +1535,7 @@ CurTime:
         UnpackTime(DTT1_Cr, DT_Cr);
         UnpackTime(DTT1_LAc, DT_LAc);
         if SetFileAges(S, DTT1, DTT1_Cr, DTT1_LAc) = 0 then
-{JO: чтобы обновлялась инфоpмация в панелях поиска/ветви}
+{JO: so info updates in the search/branch panels}
           begin
           PF^.Yr := DT.Year;
           PF^.YrCreat := DT_Cr.Year;
@@ -1570,7 +1569,7 @@ CurTime:
         end;
       if SetFileAttr(S, K and not Directory
                      and not VolumeID) = 0 then
-        {JO: чтобы обновлялась инфоpмация в панелях поиска/ветви}
+        {JO: so info updates in the search/branch panels}
          PF^.Attr := GetFileAttr(S);
       if not Single then
         PF^.Selected := False;
@@ -1596,15 +1595,15 @@ procedure PrepareShowDialog(P: TDialog);
     i: Integer;
   begin
   ObjChangeType(P, TClass(TShowDialog));
-    { Подменяем диалогу тип, чтобы подсунуть свой HandleEvent}
+    { Replace the dialog type to supply our own HandleEvent}
   ObjChangeType(P.DirectLink[4], TClass(TSaveSetupButton));
-    { Подменяем тип кнопки "Записать", чтобы подсунуть свой Press }
+    { Replace the "Save" button type to supply our own Press }
   TComboBox(P.DirectLink[2]).Items[1].Flags := miDisabled;
-    { Сделали недоступным "Не показывать" для выделенных }
+    { Disabled "Do not show" for the selected }
   with TComboBox(P.DirectLink[3]) do
     for i := 2 to 6 do
       Items[i].Flags := miDisabled;
-    { Сделали недоступным "В подвале" и "На разделителе" % упаковки }
+    { Disabled "In footer" and "On separator" packing % }
   end;
 
 procedure CM_SetShowParms(AFP: Pointer);
@@ -1690,7 +1689,7 @@ procedure CM_ArchiveFiles(AFP: Pointer);
   else
     S := '';
   {Cat}
-  FSplit(S, Dir, Name, Ext); {AK155: не уверен, что это нужно }
+  FSplit(S, Dir, Name, Ext); {AK155: not sure this is needed }
   MakeArchive(Name, PC, False, False, P);
   {/Cat}
   PC.DeleteAll;
@@ -1748,14 +1747,14 @@ procedure CM_ToggleLongNames(AFP: Pointer);
   P.DeltaX := 0;
   {  P.RereadDir; }
   {AK155 22-07-2002
-Само по себе перечитывание абсолютно не нужно. Может иметь смысл
-только входящая в него сортировка. При сортировке не по имени.расширению,
-а также если сортировки по длинным и коротким именам/расширениям
-отделены, то перечитывание не дает ничего, кроме тормозов. А если
-сортировки унифицированы, то есть отдельных сортировок по длинным и
-коротким именам/расширениям нет, то при отсутствии перечитывания
-все имена на панели остаются на тех же местах и переключение происходит
-мгновенно. Ну а если хочется пересортировать - надо нажать Ctrl-R. }
+Rereading itself is completely unnecessary. Only the sorting
+inside it may make sense. When sorting is not by name.ext,
+and also if long/short name/ext sorts are separate,
+rereading gives nothing but slowdown. And if
+sorts are unified, i.e. there are no separate long/short
+name/ext sorts, then without rereading
+all names stay in place on the panel and switching is
+instant. And if you want to resort - press Ctrl-R. }
   DrawViews(P);
   end { CM_ToggleLongNames };
 
@@ -1763,7 +1762,7 @@ procedure CM_ToggleShowMode(AFP: Pointer);
   var
     P: TFilePanelRoot absolute AFP;
   begin
-{!! Это переключени в то ли 2, то ли 1, надо просто выкинуть }
+{!! This switch to either 2 or 1 should simply be removed }
 (*
   P.DeltaX := 0;
   if P.Drive^.Param <> 2 then
@@ -1819,8 +1818,8 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
   R.A := Mover.Origin;
   Mover.Free;
   if Event.What = evMouseUp then
-    {AK155 13-08-2003 Может быть не evMouseUp, если во время
-    перетаскивания нажали Esc, см. TView.DragView}
+    {AK155 13-08-2003 May not be evMouseUp if Esc was pressed
+    during dragging; see TView.DragView}
     begin
     C^.FC := FC;
     Desktop.MakeGlobal(R.A, R.A);
@@ -1876,7 +1875,7 @@ procedure CM_DragDropper(AFP: Pointer; CurPos: Integer; EV: Pointer);
   else if not (PFileRec(P.Files.At(CurPos)).TType = ttUpDir)
   then
     begin
-    FC := TFilesCollection.Create(1, 1); {AK155: заменил 10,10 на 1,1}
+    FC := TFilesCollection.Create(1, 1); {AK155: replaced 10,10 with 1,1}
     FC.Insert(P.Files.Items^[CurPos]);
     end
   else
@@ -1919,11 +1918,11 @@ procedure CM_Dropped(AFP, EI: Pointer);
   {AK155 5-02-2004}
   if (MPos.Y < 0) then
     i := P.Files.Count;
-      {MPos.Y < 0 - это значит, Drop на DirView (см.
-       TFilePanelRoot.CommandHandle, cmDropped). В этом случае
-       надо копировать в каталог данной панели. И такое присвоение
-       для i гарантирует, что не попадём случайно на какой-то
-       подкаталог}
+      {MPos.Y < 0 means Drop on DirView (see
+       TFilePanelRoot.CommandHandle, cmDropped). In that case
+       copy into this panel's directory. And this assignment
+       for i guarantees we do not accidentally hit some
+       subdirectory}
   {/AK155}
   CopyDirName := P.DirectoryName;
   if PCopyRec(EI).Owner <> nil then
@@ -1973,7 +1972,7 @@ procedure CM_Dropped(AFP, EI: Pointer);
   end { CM_Dropped };
 
 procedure DoRenameSingle(PF: PFileRec; const S, S2: String; DlgRes: Word);
-{` Собственно переименование; общее для Alt-F6 и Shift-Alt-F6. `}
+{` The actual rename; shared by Alt-F6 and Shift-Alt-F6. `}
   var
     SSS: String;
     DosE: Word;
@@ -1999,14 +1998,14 @@ NameErr:
     end;
   ExportDiz(@PF^.FlName, S, PF^.DIZ, SSS);
 {!RLN}  CopyShortString(S, PF^.FlName[True]);
-   { Это на случай если стоим как раз на этом имени.
-   Чтобы при перечитывании каталога курсор ушёл на новое имя,
-   а не остался на старой позиции }
+   { In case we are standing exactly on that name.
+   So when the directory is reread the cursor moves to the new name
+   instead of staying at the old position }
 
 {AK155 25-01-2004
   if not DnIni.AutoRefreshPanels then}
-{Поскольку автообновление отключено, надо перечитать. Кроме того,
-даже если бы оно было, перечитывание с задержкой здорово раздражает}
+{Since auto-refresh is off, we must reread. Besides,
+even if it were on, delayed reread is very annoying}
   GlobalMessage(evCommand, cmRereadDir, PF^.Owner);
   ClrIO;
   end;
@@ -2036,7 +2035,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     Exit;
   PF := P.Files.At(ScrollBarValue);
   if  (PF^.TType = ttUpDir) or
-    {JO: для найденных в архиве файлов в панели поиска}
+    {JO: for files found in an archive on the search panel}
     PathFoundInArc(PF^.Owner^) or
     {/JO}
     not (P.Drive.DriveType in [dtDisk, dtTemp, dtFind, dtList])
@@ -2088,8 +2087,8 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   PIF.SetValidator(TFilterValidator.Create([#32..#255]-IllegalCharSet-['\', '/', '*', '?', '"']));
   PIF.SelectAll(False);
 
-  {AK155 Чтобы комстрока не забирала курсор себе, отключаем
-         ее на время работы }
+  {AK155 So the command line does not steal the cursor, disable
+         it for the duration }
   ReEnableCmdLine := (CommandLine <> nil) and
     not CommandLine.GetState(sfDisabled);
   if ReEnableCmdLine then
@@ -2098,10 +2097,10 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     CommandLine.Update;
     end;
 
-  NotifySuspend; {AK155 25-01-2004 Если не отключить автообновление
-      на время редактирования, то при изменеии состава файлов панель
-      перерисовывается очень странно, так как строка ввода имеет
-      уже зафиксированную позицию }
+  NotifySuspend; {AK155 25-01-2004 If auto-refresh is not disabled
+      during editing, then when the file set changes the panel
+      redraws very oddly because the input line already has
+      a fixed position }
 
   PIF.HelpCtx := hcRenameFile;
   P.ScrollBar.Hide;
@@ -2124,9 +2123,9 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     DoRenameSingle(PF, S, S2, DlgRes);
 (* AK155
     if DlgRes <> cmOK then
-      begin {! Так не бывает. Диалог завершается либо по OK, либо по Cancel.
-      Какие-то cmNo и cmYes есть при define UPLOWSTRSINDLG, но на кой они
-      нужны - непонятно, когда есть Ctrl-], Ctrl-[. Надо их выкинуть.
+      begin {! That never happens. The dialog ends either via OK or Cancel.
+      There are some cmNo and cmYes under define UPLOWSTRSINDLG, but why
+      they are needed is unclear when Ctrl-] and Ctrl-[ exist. Should remove them.
       }
       Event^.What := evKeyDown;
       SetDNKeyCode(Event^, DlgRes);
@@ -2165,7 +2164,7 @@ procedure CM_RenameSingleDialog(AFP, PEV: Pointer);
     Exit;
   PF := P.Files.At(ScrollBarValue);
   if  (PF^.TType = ttUpDir) or
-    {JO: для найденных в архиве файлов в панели поиска}
+    {JO: for files found in an archive on the search panel}
     PathFoundInArc(PF^.Owner^) or
     {/JO}
     not (P.Drive.DriveType in [dtDisk, dtTemp, dtFind, dtList])
@@ -2307,7 +2306,7 @@ procedure CM_SortBy(AFP: Pointer);
         end;
       end;
 
-    { При переключении режимов не закрываем меню }
+    { When switching modes do not close the menu }
     i := N-cmSortOwnerToggle;
     wFlags := wFlags xor (1 shl i);
     i := N-cmSortOwnerToggle;
@@ -2353,9 +2352,9 @@ function TSortDialog.OwnDataAddress(P: PPanelSetup): Pointer;
 procedure PrepareSortDialog(P: TDialog);
   begin
   ObjChangeType(P, TClass(TSortDialog));
-    { Подменяем диалогу тип, чтобы подсунуть свой HandleEvent}
+    { Replace the dialog type to supply our own HandleEvent}
   ObjChangeType(P.DirectLink[1], TClass(TSaveSetupButton));
-    { Подменяем тип кнопки "Записать", чтобы подсунуть свой Press }
+    { Replace the "Save" button type to supply our own Press }
   end;
 
 procedure CM_PanelSortSetup;
@@ -2445,7 +2444,7 @@ procedure CM_LongCopy(AFP: Pointer);
     Exit;
   PF := P.Files.At(P.ScrollBar.Value);
   if  (PF^.Attr and Directory <> 0)
-    {JO: для найденных в архиве файлов в панели поиска}
+    {JO: for files found in an archive on the search panel}
     or PathFoundInArc(PF^.Owner^)
     {/JO}
     then
@@ -2539,7 +2538,7 @@ procedure CM_ChangeCase(AFP: Pointer);
     DoChangeCase := Abort;
     if Abort then
       Exit;
-    {JO: для найденных в архиве файлов в панели поиска}
+    {JO: for files found in an archive on the search panel}
     if PathFoundInArc(PF^.Owner^) then
       Exit;
     {/JO}
@@ -2580,12 +2579,12 @@ procedure CM_ChangeCase(AFP: Pointer);
     else
       begin
       CopyShortString(GetName(S), PF^.FlName[True]);
-        { В данном случае копировать можно, так как длина заведомо та же}
+        { In this case copying is fine because the length is known to be the same}
       ExportDiz(nil, PF^.FlName[True], PF^.DIZ, PF^.Owner^);
 (*!
-      {JO: при изменении регистра файла имеет хоть какой-то смысл менять регистр }
-      {    его имени в файле описаний только если описания даются по длинным     }
-      {    именам, так как для коротких имён регистр не меняется                 }
+      {JO: when changing a file's case it only makes some sense to change the case }
+      {    of its name in the description file if descriptions use long           }
+      {    names, because short-name case does not change                         }
 
       {$IFDEF DualName}
       if (FMSetup.Options and fmoDescrByShortNames) = 0 then
@@ -2697,13 +2696,13 @@ function PanelSetupTag(const PSS: TPanelSetupSet;
       Result := '';
     Result := LFNLen + '.' + ExtLen + ' ' + Result;
     end;
-  {!! AK155 28.04.2005 В программе JO было ещё формирование
-    признаков длинного и короткого имени ("Д" и "К"), но это
-    я пока делать не стал, глядишь, никто и не заметит пропажу.}
+  {!! AK155 28.04.2005 JO's code also formed
+    long/short name markers ("L" and "S"), but I
+    have not done that yet; maybe nobody will notice they are gone.}
   end;
 
 procedure CM_SelectColumn(AFP: Pointer); {JO}
-  {` Меню выбора номера блока настроек панели `}
+  {` Menu for choosing a panel settings block number `}
   var
     I: Integer;
     P: TFilePanelRoot absolute AFP;
@@ -2791,7 +2790,7 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
     Exit;
   W := ParentItem^.Command;
   if N <> cmYes then
-    Inc(W, $10000{см. GetParam});
+    Inc(W, $10000{see GetParam});
   P.GetParam(W-16000);
   end { CM_SelectColumn }; {JO}
 
