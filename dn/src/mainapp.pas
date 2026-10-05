@@ -172,6 +172,7 @@ begin
   StatusLine := nil;
   Desktop := nil;
   Application := nil;
+  Buffer := nil;
   inherited Destroy;
 end;
 
