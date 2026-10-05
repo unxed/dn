@@ -171,6 +171,37 @@ Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
 `F4` / `Ctrl+O` / autosave-desktop / issue #6 startup redraw are fixed on class;
 the full object/class accept matrix is **CLOSED** green (174/174, 2026-10-05).
 
+## Reopened gate: class-only AV after F5 copy (2026-10-05)
+
+The 174/174 matrix on class DN `cd79579` passed, but the broader Linux ops
+scenario exposed a path that matrix did not exercise end-to-end. On class DN
+`cd79579` + TV `a06dd31`, `python3 tools/dn-linux-ops.py OUTDIR` reports F5
+copy success, then later file operations fail. A focused reproduction using
+the same F5 dialog sequence writes `Access violation` to `dn.err` at
+`00419927` immediately after F5. Root cause: `CopyQueue` contains `TLine`
+instances but was constructed as `TCopyCollection`, whose `FreeItem` treats
+each element as `TFileCopyRec` and tries to free its first field (the `TLine`
+VMT pointer). The F6 sequence (`ESC [ 17 ~`) subsequently appears literally
+because it is sent after the crash; it is a downstream symptom, not an F6
+parser defect. CI run `37374242564` on the same DN SHA fails the broader ops
+flow in linux32, linux64, linux64-utf8, and aarch64.
+
+Control: object DN `b4916b874989d7b35660d02cf935dc5f0db7a656` + object TV
+`521d06479198789deeaa6fda287236ca83ba4051`, built with `DN_UTF8=0`, passes
+all 31 `dn-linux-ops.py` checks, including F6 move and F8 delete. This is a
+confirmed class-only discrepancy for the legacy-codepage Linux ops flow;
+the default UTF-8 class failure is reproduced too, but needs a same-mode
+object run before claiming parity status for that build mode.
+
+The 174-scenario accept matrix is therefore **reopened**. Fix the queue item
+ownership and add a regression that asserts the application remains alive
+after F5, then completes F6-move → F8-delete. Search all custom collection
+construction sites for a mismatch between stored item types and `FreeItem`.
+Re-run object and class ops under matching build modes, then repeat the full
+bitwise acceptance matrix before closing the gate.
+
+## UI observations (2026-10-05)
+
 ## UI observations (2026-10-05)
 
 | Observation | Class vs object / `dist` | Notes |
