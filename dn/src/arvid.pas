@@ -459,8 +459,7 @@ constructor TArvidDrive.Load(S: TStream);
   if Stream.Status <> stOK then
     begin
 1:
-    Destroy;
-    {      Drives.DriveLoadingError:=True;}
+    { Classes: Fail already runs Destroy. }
     Fail;
     end;
   Stream.Read(AVT, SizeOf(AVT));

@@ -62,6 +62,7 @@ explicitly excluded as the migration comparator.
 | Yes/default button red–magenta | User: Yes is red, counter-intuitive; want classic DN colors. Class default palette is `CColorOsp` (jaroslaw); classic table is `CColor` (cyan default). Object baseline used `CColor`; class kept `CColorOsp` in `0c4e839`. | Open; restore classic palette for acceptance unless OSP look is explicit |
 | ZIP single-byte name/comment charset | Owner: decode 1:1 (incl. bugs) via [zipcharset](https://github.com/unxed/zipcharset) + [localecp](https://github.com/unxed/localecp); locale→CP as reusable subproject | Specified in `docs/ZIP-CHARSET.md` / PLAN 4b; not implemented |
 | Drive hierarchy + archive `GetFile` VMT hides | Enter `aaa.zip`/`aaa.7z` listed `inside.txt`; no Fatal/Broken. `af5337f` fmt+Arc/Arvid; `ce2e9dd` Find/Temp overrides. Alt-F7 Find File dialog still opens. | Fixed on class self-build; keep PTY enter gate |
+| Enter non-exec (`cmExecFile`) AV | Class-only AV on Enter for `.txt` via `_GotoExt`/`cmExecFile` (`ansistr_to_shortstr`). Zip/7z Enter itself OK when the archive is selected. | Open; separate from archive VMT |
 | Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | Open; spec `docs/ARCHIVE-MATRIX.md` / PLAN 4c |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
