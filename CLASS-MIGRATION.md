@@ -90,3 +90,10 @@ Self-build only; absent on pre-class `dist`. Details live in
 - `F4`: **fixed** — `Build_REditSaver`/`Store_REditSaver` match `TLoadProc` (no `var S`).
 - `Ctrl+O`: **fixed** — nil-check `UserScr`; `VtShowScreen` guards nil (`tv3` `396fb86`).
 - Autosave desktop restore: **open** — second start SIGSEGV; peer fixups point at `Self`.
+
+## UI notes (not all are class regressions)
+
+- Nested dropdown submenus sit on top of / inside the parent menu (same X,
+  below the item). Same formulas in object/`dist` — **not class-only**.
+- Default Yes button is red–magenta under `CColorOsp`; classic DN is `CColor`
+  (cyan default). Object baseline used `CColor`; user wants classic colors.
