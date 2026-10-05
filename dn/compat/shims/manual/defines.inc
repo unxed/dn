@@ -68,7 +68,11 @@ procedure Beep(Freq, Dur: LongInt);
 { The free memory of the heap and its largest free block (bytes; VP and BP have them built in). }
 function MemAvail: LongInt;
 function MaxAvail: LongInt;
+{ Fill/free the VP-style Environment block from the process environment. }
+procedure InitEnvironment;
+procedure DoneEnvironment;
 
 var
-  { VP: the environment block of the program (the strings one after another, a double NUL at the end). TODO: not filled }
+  { VP: the environment block of the program (the strings one after another, a double NUL at the end). }
   Environment: PByteArray = nil;
+  EnvironmentSize: LongInt = 0;

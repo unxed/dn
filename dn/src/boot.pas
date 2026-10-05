@@ -632,6 +632,7 @@ procedure DoStartup;
     i: Integer;
   begin { DoStartup }
   {AK155 10.03.2005 }
+  InitEnvironment;
   i := FindParam('/DNHIS=');
   if i <> 0 then
     HistNameSuffix := Copy(ParamStr(i), Length('/DNHIS=')+1, 255)

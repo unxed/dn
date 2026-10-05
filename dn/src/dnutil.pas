@@ -687,6 +687,7 @@ destructor TDNApplication.Destroy;
     INItime, INIsize: LongInt;
   begin
   {-$VOL begin} {if CBAutoSave added by piwamoto}
+  DoneEnvironment;
   if cbAutoSave then
     begin
     SaveStream := TBufStream.Create(SourceDir+'dn'+'.clp',

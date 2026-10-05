@@ -144,13 +144,13 @@ SCENARIOS.append(('cmdline_echo', 'e c h o SPACE h i ENTER', 'input'))
 # pointer as a dynarray → Invalid pointer operation (RTE 204) @ ~00411516 on
 # first Draw after Show/MakeFirst. Class uses MakePalette(CTrashCan) and is OK.
 # Cannot PASS against unmodified object bin — keep skip (github.com/unxed/dn/issues/14).
+# Skip menu_3_8: Utilities → Edit OS Environment. Crash fixed (InitEnvironment +
+# empty-value TDOSVar); still skipped because the dialog lists live process env
+# vars — names/order differ across runs and object vs class process environments,
+# so full-cell compare flakes (not a class-migration delta).
 # Skip menu_0_16: ♦ item 16 = Game (Tetris). Playfield colors/piece geometry are
 # non-deterministic across object/class runs (animation timing) — not a migration
 # delta; cell diffs on █ attrs are expected flakes.
-# Skip menu_3_8: Utilities → Edit OS Environment (EditDOSEnvironment /
-# dlgEditEnvironment). Object and class both Access-violation opening the
-# dialog (blank screen + dn.err); shared crash, not class-only — cannot PASS
-# vs object baseline. (Not the menu_3_3/menu_3_16 status-bar locale issue.)
 # Skip menu_4_5: Panel → Directory Branch (cmDirBranch / Ctrl-H). Object and class
 # both Access-violation on OpenDirectory insert (blank screen + dn.err); shared
 # crash, not class-only — cannot PASS vs object baseline.
