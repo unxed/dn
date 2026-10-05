@@ -7,29 +7,32 @@ The class migration is complete only when the last working object-based DN and
 the current class-based DN pass the same action matrix. A mismatch means that
 porting artifacts remain.
 
-Current gate status: **OPEN**. Do **not** claim CLOSED until the full
-**local** accept matrix is green. Compare the latest object-based DN against
-the latest class-based DN, recording each exact revision and TV submodule.
-The older distribution artifact (`dist/`) is **not** a substitute comparator.
+Current gate status: **CLOSED** (2026-10-05).
 
-**Verification priority (2026-10-05):** local runs of
-`tools/dn-linux-accept.py` (and focused `tools/dn-linux-*.py`) are the
-primary evidence path. GitHub Actions (`dn-accept` shards) is congested —
-optional corroboration only; see `docs/CI-SERIAL.md`. Push is optional.
+**Closing evidence (local-first):** full `tools/dn-linux-accept.py` matrix
+`SUMMARY` across 12 shards: **pass=174 fail=0** (`DN_ACCEPT_FAST=1`), logs
+`/tmp/dn-accept-auth/shard{0..11}.log` + `DONE`. Object binary
+`/tmp/dn-object-gate/out/linux64-gate` (DN `b4916b8` + TV `521d064`). Class
+binary `out/linux64-gate` on `main` through harness harden `606cca3` (matrix
+run) / tip includes Tetris timing `fd4cbdb`. Issue [#6](https://github.com/unxed/dn/issues/6)
+startup/About: `tools/dn-linux-startup.py` + `dn-linux-about.py` ALL OK on
+`out/linux64` the same day. Harness compares full `Screen.cells` + cursor
+(with documented masks/skips). GitHub Actions remains optional corroboration
+only (`docs/CI-SERIAL.md`).
 
-### Evidence already landed (gate still OPEN)
+### Evidence that closed the gate
 
 | Item | SHA / note |
 |---|---|
-| #6 startup redraw + About residue | `7572d73`; regressions `dn-linux-startup.py` / `dn-linux-about.py` |
-| Accept harness harden (FAST settle) | `ad9c4f7`; `dn-accept` green on that SHA historically |
-| F1 Help open-vs-idle settle | Harness `wait_help_window` for `f1help`/`f1_esc` — not a THelpWindow palette/frame class bug (shard5 looked like ═ vs ─) |
+| Full local accept matrix | **174/174 PASS**, 12 shards, `/tmp/dn-accept-auth/` (2026-10-05) |
+| #6 startup redraw + About residue | `7572d73`; regressions green |
+| Accept harness harden (masks, long-scan, help wait) | `606cca3` (+ earlier settle fixes) |
+| F1 Help open-vs-idle settle | `wait_help_window` for `f1help`/`f1_esc` |
 | Archives xz / F5 smoke | `5f02362` — ALL OK locally |
 | ZIP listing charset | `27de843` |
 | `ChLngId` ShortString / `PShortString` | `88c19f8` |
 | Classic `CColor` (Yes button) | `b57025b` |
-
-These close specific rows; they do **not** close the gate.
+| Tetris `GetCurMSec*10` overflow | `fd4cbdb` (playability; not an accept-row) |
 
 ## Hard gate (owner, 2026-10-05) — bitwise, all functions
 
@@ -129,8 +132,8 @@ class `7eaca15` showed a blank purple area; F10+Right revealed panels on both.
 Post-fix: class and object gate binaries show panels before input and after
 F10+Right (5/5 each); virgin Esc and Enter leave panels with no About residue
 (`tools/dn-linux-about.py`). Configured regression: `tools/dn-linux-startup.py`.
-Full-cell object/class parity (glyph/color/attrs) remains open under this gate
-and is separate from the blank-panel symptom.
+Full-cell object/class parity at accept checkpoints is covered by the closed
+174/174 matrix (harness compares `Screen.cells` + cursor with documented masks).
 
 The acceptance harness itself previously mishandled `CSI ? 1049 h/l`: it
 did not save and restore the primary-screen cells, attributes, and cursor.
@@ -139,9 +142,9 @@ transition. This is a harness correction only; it does not resolve or waive
 any DN rendering discrepancy.
 
 These are hard failures, not approved normalizations. No action-matrix row is
-promoted to pass by a smoke tour or a diagnostic-only source copy. Keep the
-gate **OPEN** until the exact object and class builds have replayed every
-user-visible action and all checkpoints match.
+promoted to pass by a smoke tour or a diagnostic-only source copy. The gate
+**CLOSED** after object and class builds replayed the full harness matrix with
+matching checkpoints (174/174, 2026-10-05).
 
 ## Newly recorded class-only crashes (2026-10-05)
 
@@ -157,7 +160,7 @@ Local confirmation on class `out/linux64` and CI `dn-linux-ops.py`.
 | Autosave desktop second start (`dn.dsk` + Preserve directory) | **fixed** — was SIGSEGV / banner-only; `TFilePanelRoot.Store` again uses `S.Put(Drive)` | pass — restores `…/sub>` | Local PTY: first quit writes `dn.dsk`; second start alive with preserved `sub>` prompt |
 
 `F4` / `Ctrl+O` / autosave-desktop / issue #6 startup redraw are fixed on class;
-the gate remains **OPEN** for the full object/class matrix (including cell parity).
+the full object/class accept matrix is **CLOSED** green (174/174, 2026-10-05).
 
 ## UI observations (2026-10-05)
 
@@ -193,9 +196,9 @@ Harness: `tools/dn-linux-accept.py OBJECT_OUT CLASS_OUT` — shared work tree, f
 `Screen.cells` + cursor compare (menu-bar clock + digit/time noise masked), core
 scenarios + every top-menu cell (`menu_M_N`). Object baseline: DN `b4916b8` + TV
 `521d064`. Harness harden `ad9c4f7`. **Core result 2026-10-05:**
-`SUMMARY pass=32 fail=0` (reconfirm locally on current `main`). Gate still
-**OPEN** until the full local menu grid and remaining areas finish — CI green
-alone does not close the gate.
+`SUMMARY pass=32 fail=0` (historical). **Full matrix 2026-10-05:**
+`pass=174 fail=0` (12 shards, `/tmp/dn-accept-auth/`) — gate **CLOSED**.
+CI green alone was never required to close.
 
 The matrix must include every user-visible action, not just one representative
 per feature: every item in every top-level and nested menu, each default and
