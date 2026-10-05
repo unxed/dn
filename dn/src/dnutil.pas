@@ -2492,7 +2492,9 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
             S := '~'+Chr(Ord('1')+i)+'~ '
           else
             S := '  ';
-          Current := NewItem(S+CutH(PString(L.At(i))^, 40), '', kbNoKey,
+          { L is TStringCollection(..., False): items are ShortString via NewStr.
+            PShortString: same SysUtils/System.PString trap as DoExecFile. }
+          Current := NewItem(S+CutH(PShortString(L.At(i))^, 40), '', kbNoKey,
               cmCancel+1+i, hcChLngId, Current);
           if i = CurIdx then
             Default := Current
@@ -2516,11 +2518,11 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
         end
       else
         CurIdx := (CurIdx+1) mod L.Count;
-      if  (CurIdx >= 0) and (PString(L.At(CurIdx))^ <>
+      if  (CurIdx >= 0) and (PShortString(L.At(CurIdx))^ <>
           LngMixCase(ActiveLanguage)) and CheckExit
       then
         begin
-        ActiveLanguage := PString(L.At(CurIdx))^;
+        ActiveLanguage := PShortString(L.At(CurIdx))^;
         if ActiveLanguage = LngMixCase(GetEnv('DNLNG'))
         then
           ActiveLanguage := '';
