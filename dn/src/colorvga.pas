@@ -435,9 +435,9 @@ procedure VGAColorRegister;
 
     { oldPalette := VGA_palette;}
 
-    if Application.ExecuteDialog(
+    if (Application <> nil) and (Application.ExecuteDialog(
         TColorVGADialog.Create,
-        @DataRec) = cmCancel
+        @DataRec) = cmCancel)
     then
       SetPalette(VGA_palette)
     else

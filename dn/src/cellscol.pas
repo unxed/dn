@@ -75,7 +75,7 @@ type
   TCellCollection = class(TSortedCollection)
     constructor ShortLoad(var S: TStream);
     procedure ShortStore(var S: TStream);
-    procedure FreeItem(Item: Pointer); virtual;
+    procedure FreeItem(Item: Pointer); override;
     function NewCellRec(ACol, ARow: AInt; const A_S: String): PCellrec;
     { создать запись }
     function NewItem(ACol, ARow: AInt; const A_S: String): PCellrec;
@@ -88,7 +88,7 @@ type
     procedure PutItem(var S: TStream; Item: Pointer); virtual;
     function GetItem(var S: TStream): Pointer; virtual;
     function MakeFormatString(AValue: CReal): String;
-    function Compare(K1, K2: Pointer): Integer; virtual;
+    function Compare(K1, K2: Pointer): Integer; override;
     function TSort(var Start: Integer): Boolean; {AK155}
     procedure ForRectangle(AX: Byte; AY: AInt; {AK155}
         BX: Byte; BY: AInt; Action: Pointer); {см. комментарий к телу!}

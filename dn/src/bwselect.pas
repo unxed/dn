@@ -60,7 +60,7 @@ type
     SelType: TColorSel; {Is't a selector of Foreground color ? }
     constructor Create(var Bounds: TRect; ASelType: TColorSel;
          AStrings: PSItem);
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     procedure NewColor; virtual;
     end;
 

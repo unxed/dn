@@ -173,12 +173,12 @@ type
     end;
 
   TCopyCollection = class(TCollection)
-    procedure FreeItem(P: Pointer); virtual;
+    procedure FreeItem(P: Pointer); override;
     end;
 
   TDirCollection = class(TSortedCollection)
-    procedure FreeItem(P: Pointer); virtual;
-    function Compare(P1, P2: Pointer): Integer; virtual;
+    procedure FreeItem(P: Pointer); override;
+    function Compare(P1, P2: Pointer): Integer; override;
     end;
 
 function MemAvail: LongInt;
@@ -481,7 +481,7 @@ var
 
 type
   TOverriteDialog = class(TDialog)
-    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure HandleEvent(var Event: TEvent); override;
     end;
 
 procedure TOverriteDialog.HandleEvent(var Event: TEvent);

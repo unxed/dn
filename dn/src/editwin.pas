@@ -74,7 +74,7 @@ type
   Execute нигде не используется, и зачем он нужен - непонятно.
   Вероятно, введён на случай модального окна редактора, только
   вряд ли такое может понадобиться кому-то.
-    function Execute: Word; virtual;
+    function Execute: Word; override;
 }
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     end;

@@ -65,7 +65,7 @@ type
     end;
 
   TWindowCol = class(TCollection)
-    procedure FreeItem(Item: Pointer); virtual;
+    procedure FreeItem(Item: Pointer); override;
     end;
 
 implementation
