@@ -535,9 +535,7 @@ procedure DoStartup;
       end {case};
       end;
     S.Free;
-    { the default of the builds before 2026-10-04 (the table of the OSP source: red and magenta buttons) was saved with the config: it is replaced by the colors of DN if the user did not change it }
-    if SystemColors[apColor] = palettes.CColorOsp then
-      SystemColors[apColor] := palettes.CColor;
+    { Keep the object-era palette unchanged during the class migration. }
     Security := Startup.FMSetup.Show and fmsShowHidden = 0;
 
     SystemDataOpt := SystemData.Options;
