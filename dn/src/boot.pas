@@ -824,9 +824,12 @@ procedure RUN_IT;
   ReadScreenCells; { issue #6: sync the 16-bit copy that WriteScreenCells outputs; otherwise a stale copy overwrites the panels }
   TraceStartupState('after-initial-draw');
 {$IFNDEF DNUTF8}
+{$IFNDEF UNIX}
   WriteScreenCells(0, ScreenWidth * ScreenHeight);
 {$ENDIF}
-  { With DNUTF8, WriteScreenCells would push the 16-bit copy back through CellFromBIOS and replace UTF-8 cells with '?'. }
+{$ENDIF}
+  { On Unix, CellText converts even the code-page build to UTF-8 for the terminal.
+    Writing the one-byte DOS-compatible copy back would replace such cells with '?'. }
   
   w95QuitInit; {Gimly}
   
