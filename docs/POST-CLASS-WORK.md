@@ -5,12 +5,13 @@ new product features — see [`DN-3.0.md`](DN-3.0.md).
 
 Owner order (2026-10-06). English translation and stage-2 refactoring are
 complete; all A–D criteria in `docs/REFACTORING-CRITERIA.md` are checked or
-explicitly parked. The latest object/class gate passed **177/177** on DN
-`06259f5` + TV3 `a06dd31` (GitHub runs `37383488177`, `37383488040`,
-`37383488261`). The current all-tree/bootstrap gate work is tracked in
-`docs/CLASS-MIGRATION-REGRESSION-CHECKLIST.md`; do not start stage 3 until its
-exact-SHA workflows pass. Re-open / re-run parity after a risky batch; do not
-skip or reorder stages below.
+explicitly parked. Object/class parity passed **177/177** on DN `06259f5` +
+TV3 `a06dd31` (GitHub runs `37383488177`, `37383488040`, `37383488261`). The
+all-tree class gate and baseline-reproducible bootstrap now pass on DN
+`8f3057f` (`dn` run `37386669632`, `layout` run `37386669509`). Stage 3 is
+unblocked; its initial code-boundary inventory and acceptance criteria are in
+[`PLATFORM-SEPARATION.md`](PLATFORM-SEPARATION.md). Re-open / re-run parity
+after a risky batch; do not skip or reorder stages below.
 
 When object and class **both** show the same bug, fix it anyway — see
 **Shared bugs** in `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md` (do not treat
@@ -46,6 +47,9 @@ so resources stay loadable.
 - Formalize layout (units / directories / `{$IFDEF}` policy) so Linux, DOS,
   and Windows backends are obvious and swappable.
 - Prefer one portable core with thin platform layers over scattered ifdefs.
+- Start from the inventory and completion criteria in
+  [`PLATFORM-SEPARATION.md`](PLATFORM-SEPARATION.md); land one backend family
+  at a time and preserve the object/class parity gate.
 
 ## 4. Tests to a minimally decent level — pending stage 3
 
