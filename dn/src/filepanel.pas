@@ -77,28 +77,28 @@ const
 type
   TInfoView = class;
   TFooterProc = function(IV: TInfoView): Boolean;
-    { Процедура формирования (части) строки подвала. Для каждой
-    строки таких процедур может быть задано несколько, они вызываются
-    по порядку.
-      Результат True обозначает, что формирование строки закончено и
-    последующие процедуры не вызываются. }
+    { Procedure that forms (part of) a footer line. For each
+    line several such procedures may be given; they are called
+    in order.
+      Result True means line formation is finished and
+    subsequent procedures are not called. }
   TInfoView = class(TView)
     Panel: TFilePanel;
     DnD: TPanelBottomDnD;
     LineMaker: array[0..MaxFooterHeight] of array[0..6] of TFooterProc;
-      {` Для каждой строки подвала, начиная с разделителя,
-       последовательность процедур формирования этой строки.
-       Каждая последовательность завершается nil.`}
+      {` For each footer line, starting from the separator,
+       the sequence of procedures that form that line.
+       Each sequence ends with nil.`}
     constructor Create(const R: TRect);
     procedure Compile(Value: Word;
       FullProc, BriefProc: TFooterProc);
     procedure CompileShowOptions;
     procedure Draw; override;
-    {AK155: Этот метод нагружен двумя важными побочными эффектами:
-        он в соответствии с настройками устанавливает свой Size.Y и
-        заполняет DnD координатами строк, из которых возможен D&D.
-        Первое используется в TFilePanelRoot.ChangeBounds,
-        второе в HandleEvent}
+    {AK155: This method has two important side effects:
+        according to settings it sets its Size.Y and
+        fills DnD with coordinates of lines from which D&D is possible.
+        The first is used in TFilePanelRoot.ChangeBounds,
+        the second in HandleEvent}
     constructor Load(S: TStream);
     procedure Store(S: TStream);
     function GetPalette: TPalette; override;
@@ -128,16 +128,16 @@ type
     procedure Store(S: TStream);
     procedure Refresh; {Cat}
     procedure Update; override;
-     {` AK155 18.03.2005 Раньше настройка автообновления строки дисков
-     срабатывала только при загрузке. Это было вызвано тем, что
-     при смене этой настройки сложно "со стороны" включить полосы дисков
-     всех панелй в список автообновления (RegisterToBackground).
-       Сейчас я сделал просто, хотя и горбато: RegisterToBackground
-     делается при создании и навсегда, а Update фактичсески делает
-     опрос и обновление только при включённой настройке. `}
+     {` AK155 18.03.2005 Previously the disk-line auto-update setting
+     only took effect at load. That was because
+     when changing this setting it is hard to "from outside" include disk bars
+     of all panels into the auto-update list (RegisterToBackground).
+       Now I did it simply, though crookedly: RegisterToBackground
+     is done at creation and forever, and Update actually does
+     polling and updating only when the setting is on. `}
     procedure ShiftLetter(d: Integer);
-      {` Сдвинуть Panel^.DriveLetter вправо (d=1) или влево (d=-1),
-        циклически. `}
+      {` Shift Panel^.DriveLetter right (d=1) or left (d=-1),
+        cyclically. `}
     end;
     {`}
 
@@ -148,13 +148,13 @@ const
   CDriveLine = #41#42#43;
 
 (* AK155 16.05.05
-   Я не понял, зачем вообще здесь нужны эти определения, поскольку
-в uses интерфейсной части panelroot есть и все эти переменные видны
-без всяких ухищрений. И вдвойне я не понял, зачем нужно было их помещать
-в интерфейсной части с типами, отличающимися от оригинальных
-(типа Pointer вместо PFilesPanelRoot), так как после этого в прочих
-модулях получается, что тип этих пероеменных зависит от порядка
-panelroot и filepanel в их uses. Так что убираю эту секцию нафиг.
+   I did not understand why these definitions are needed here at all, since
+panelroot is in the interface uses and all these variables are visible
+without any tricks. And doubly I did not understand why they had to be placed
+in the interface with types differing from the originals
+(like Pointer instead of PFilesPanelRoot), because after that in other
+units the type of these variables depends on the order of
+panelroot and filepanel in their uses. So I am throwing this section out.
 var
   ActivePanel: Pointer absolute panelroot.ActivePanel;
   PassivePanel: Pointer absolute panelroot.PassivePanel;
@@ -182,10 +182,10 @@ uses
 
 var
   QSLastSuccessPos: Integer;
-    {` Последняя успешная позиция быстрого поиска. Это собственная
-    (для быстрогно поиска) копия LastSuccessPos, который может изменяться
-    в результате других сопоставлений с маской (например, при
-    автообновлении панелей). `}
+    {` Last successful quick-search position. This is our own
+    (for quick search) copy of LastSuccessPos, which may change
+    as a result of other mask matches (for example, during
+    panel auto-update). `}
 
 constructor TDriveLine.Create(const R: TRect; APanel: TFilePanel);
   begin
@@ -300,26 +300,26 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
          (cmHideLeft, cmHideRight);
     begin
     Manager := TDoubleWindow(Panel.Owner);
-    { Если панель распахнута, то операция применяется к ней, независимо
-      от того, правая или левая скобка была нажата. Так что подгоняем
-      T к внутренннему номеру данной панели }
+    { If the panel is expanded, the operation applies to it regardless
+      of whether the right or left bracket was pressed. So we adjust
+      T to the internal number of this panel }
     if Manager.PanelZoomed then
       T := Manager.Panel[pRight].AnyPanel.GetState(sfSelected);
     TargetPanel := Manager.Panel[T].AnyPanel;
     if (Event.Buttons and mbLeftButton <> 0) or
       not TargetPanel.GetState(sfVisible)
-    then { левая кнопка мыши или операция со скрытой панелью:
-           скрытие/показ, как Ctrl-F1/F2}
+    then { left mouse button or operation on a hidden panel:
+           hide/show, like Ctrl-F1/F2}
       Message(Owner, evCommand, HideCommand[T], nil)
     else
-      begin { правая кнопка мыши: активизация и
-          распахивание/восстановление (как Alt-Ctrl-Z) }
+      begin { right mouse button: activate and
+          expand/restore (like Alt-Ctrl-Z) }
       TargetPanel.Select;
       Message(TargetPanel.Owner, evCommand, cmMaxi, nil);
       end;
     end;
 
-  procedure Scroll(D: Integer{+1 или -1});
+  procedure Scroll(D: Integer{+1 or -1});
     begin
     repeat
       CharDelta := 1 + ((CharDelta+D-1+Length(DriveLine)) mod Length(DriveLine));
@@ -341,7 +341,7 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
             MakeLocal(PCopyRec(Event.InfoPtr)^.Where, P);
             if ViewLine[P.X+1] = ' ' then
               {Dec(P.X);}
-              begin { между буквами - игнорируем. Это лучше, чем промахнуться }
+              begin { between letters - ignore. This is better than missing }
               ClearEvent(Event); Exit;
               end;
             case ViewLine[P.X+1] of
@@ -372,7 +372,7 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
       MakeLocal(Event.Where, P);
       if ViewLine[P.X+1] = ' ' then
         {Dec(P.X);}
-        begin { между буквами - игнорируем. Это лучше, чем промахнуться }
+        begin { between letters - ignore. This is better than missing }
         ClearEvent(Event); Exit;
         end;
       if ((Event.EventFlags and 2) <> 0) then
@@ -381,9 +381,9 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
           'A'..'Z':
             Panel.ChDir(ViewLine[P.X+1]+':\');
           '}':
-             Scroll(+1); // без этого быстрые клики на скобке не работают
+             Scroll(+1); // without this fast clicks on the bracket do not work
           '{':
-             Scroll(-1); // аналогично
+             Scroll(-1); // similarly
         end {case};
         end
       else if ViewLine[P.X+1] = Panel.DirectoryName[1]
@@ -516,10 +516,10 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
     NeedAbort := DriveState and dsInvalid <> 0;
 
     Message(CommandLine, evCommand, cmRereadInfo, nil);
-    {Cat:warn где-то в промежутке от b4.09 к b4.13 произошли какие-то изменения,
-      скорее всего, связанные с командной строкой, в результате которых стал
-      вылезать этот кусок. Вместе с тем, осуществляемые здесь действия на мой
-      взгляд достаточно безумны, так что закомментировал их}
+    {Cat:warn somewhere between b4.09 and b4.13 some changes happened,
+      most likely related to the command line, as a result of which this
+      piece started showing up. At the same time, the actions performed here look
+      quite insane to me, so I commented them out}
     (*
      if (UpStrg(ActiveDir) <> UpStrg(DirectoryName)) or A then
       begin
@@ -540,8 +540,8 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
 
   begin { TFilePanel.SetState }
   inherited SetState(AState, Enable);
-  { AK155 Подвал и строку дисков надо прятать синхронно с панелью.
-    Раньше этим занимался HideView }
+  { AK155 Footer and disk line must be hidden synchronously with the panel.
+    Previously HideView did that }
   if (AState and sfVisible) <> 0 then
     begin
     if (InfoView <> nil) then
@@ -574,7 +574,7 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
   if  (AState and sfSelected <> 0) and Enable then
     begin
     ActivePanel := Self;
-    if Owner <> nil then { nil бывает во время Load }
+    if Owner <> nil then { nil happens during Load }
       PassivePanel := OtherFilePanel(Self);
     end;
   if  (AState and sfFocused and State <> 0) then
@@ -707,26 +707,26 @@ procedure TFilePanel.Draw;
         begin
         if LFNLonger250 then
           Inc(JJ, CalcLengthWithoutName);
-        if (QSLastSuccessPos > flnNLength) then {курсор в поле расширения }
+        if (QSLastSuccessPos > flnNLength) then {cursor in the extension field }
           begin
           CursorPos := flnDotPos + QSLastSuccessPos - flnNLength - 2;
           if CursorPos >= LFNLen - Byte(flnPanelName[LFNLen] = #16) then
-            goto Scroll; { курсор ушёл вправо за границу }
+            goto Scroll; { cursor went right past the boundary }
           end
-        else if QSLastSuccessPos <= flnNSize then {курсор в поле имени }
+        else if QSLastSuccessPos <= flnNSize then {cursor in the name field }
           CursorPos := QSLastSuccessPos - 1
-        else { курсор за пределами имени }
+        else { cursor outside the name }
 Scroll:
           begin
-          {Символ, на котором должен быть курсор, не виден.
-           Выводим имя заново без табуляции и с обрезкой, если надо.
-           Если обрезка справа есть, то курсор помещаем не правее
-           последнего символа перед обрезкой. Если обрезки справа нет,
-           то курсор отпускаем вправо аж до линии за колонкой. }
+          {The character where the cursor should be is not visible.
+           Redisplay the name without tabulation and with truncation if needed.
+           If there is right truncation, place the cursor no further than
+           the last character before truncation. If there is no right truncation,
+           let the cursor go right all the way to the line after the column. }
           S := P^.FlName[uLFN];
           RLimit := Max(-1, QSLastSuccessPos - Length(S));
-            {Правый предел позиции курсора относительно LFNLen;
-             меняется от -1 до +1 }
+            {Right limit of cursor position relative to LFNLen;
+             ranges from -1 to +1 }
           if QSLastSuccessPos > LFNLen  then
             begin
             System.Delete(S, 2, QSLastSuccessPos - LFNLen - RLimit);
@@ -814,7 +814,7 @@ Scroll:
   ScrollBar.PgStep := PgS;
   if Delta < 0 then
     Delta := 0;
-  if (Files <> nil {бывает, например, при входе в битый zip-архив} )
+  if (Files <> nil {happens, for example, when entering a broken zip archive} )
     and (Files.Count > 0)
   then
     begin
@@ -1002,7 +1002,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
     MakeLocal(Event.Where, P);
     Y := 0;
     if Y = P.Y then
-      begin { мышь в разделителе }
+      begin { mouse in the separator }
       if Panel.Files.Count = 0 then
         Exit;
       if  (P.X >= Panel.SelectedInfoInDividerMin) and
@@ -1045,7 +1045,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
       end;
     Inc(Y);
 
-    { D&D из подвала панели }
+    { D&D from the panel footer }
     if  (P.Y = DnD.CurrentY1) or (P.Y = DnD.CurrentY2) then
       DragCurrent
     else if P.Y = DnD.SelectedY then
@@ -1058,9 +1058,9 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
 
 var
   Y: Word;
-  PF: PFileRec;  { описатель текущего файла }
+  PF: PFileRec;  { descriptor of the current file }
   BriefL1: Integer;
-    { Длина слева, уже занятая краткой информацией в разделителе}
+    { Length on the left already taken by brief info in the separator}
   CDivdier: Byte;
   LFN_inCurFileLine: Boolean;
 
@@ -1090,7 +1090,7 @@ function MakeCurFile(IV: TInfoView): Boolean;
   with IV do
     begin
     MoveChar(B[0], ' ', C1, Size.X+Panel.DeltaX);
-      { Очистить надо безусловно, особенно если файлов нет. }
+      { Must clear unconditionally, especially if there are no files. }
     Result := False;
     if PF = nil then
       Exit;
@@ -1123,9 +1123,9 @@ function MakeQSMask(IV: TInfoView): Boolean;
   begin
   Result := QuickSearch and (Pointer(IV.Panel) = Pointer(ActivePanel));
    { Flash 25-01-2004:
-       Если не сравнивать текущую панель с активной, то
-    при включённом автообновлении строка с маской быстрого поиска
-    может появиться на обеих панелях, а это нонсенс. }
+       If we do not compare the current panel with the active one, then
+    with auto-update on the quick-search mask line
+    may appear on both panels, which is nonsense. }
   if Result then
     MoveCStr(B[0], QuickSearchString(IV.Size.X), Swap(C2_3));
   end;
@@ -1269,25 +1269,25 @@ function MakePathDecr(IV: TInfoView): Boolean;
     begin
     S2 := '';
     if Panel.Drive.ColAllowed[psnShowDir] then
-      begin { Показ пути }
+      begin { Show path }
       if  (PF <> nil) and (PF^.Owner <> nil) then
         S2 := (PF^.Owner^);
       Mask := psShowDir;
       end
     else
-      begin { Показ описания }
+      begin { Show description }
       if  (PF <> nil) and (PF^.DIZ <> nil) and (PF^.DIZ^.DIZText <> '')
       then
         begin
-        S2 := DizMaxLine(PF^.DIZ); {Первую строку не выделяем}
-        Replace('~', #0'~', S2); {тильды показывать}
+        S2 := DizMaxLine(PF^.DIZ); {Do not highlight the first line}
+        Replace('~', #0'~', S2); {show tildes}
         Mask := psShowDescript;
         end;
       end;
     if Panel.PanSetup.Show.ColumnsMask and Mask <> 0
     then
       begin
-      { выводим в подвале то, что не поместилось в панели }
+      { in the footer we output what did not fit in the panel }
       with Panel do
         begin
         J := CalcNameLength + CalcColPos(psShowDescript);
@@ -1315,7 +1315,7 @@ function MakePacked(IV: TInfoView): Boolean;
     I: Integer;
     C: Word;
   begin
-  Result := (PF <> nil) { бывает на пустом диске } and
+  Result := (PF <> nil) { happens on an empty disk } and
       ((PF^.Size > 0) or (PF^.Attr and Directory = 0));
   if Result then
     begin
@@ -1336,7 +1336,7 @@ function MakeRatio(IV: TInfoView): Boolean;
     S: String;
     I: Integer;
   begin
-  if (PF <> nil) { бывает на пустом диске } and
+  if (PF <> nil) { happens on an empty disk } and
      ((PF^.Size > 0) or (PF^.Attr and Directory = 0))
   then
     begin
@@ -1354,14 +1354,14 @@ function MakeRatio(IV: TInfoView): Boolean;
   end;
 
 procedure PrepareLongName(IV: TInfoView; var S: String; var I: Integer);
-  { Длинное имя в подвале или на разделителе. Результат - в S,
-    Сдвиг для выравнивания - в I (-1 - центрировать) }
+  { Long name in the footer or on the separator. Result - in S,
+    Alignment shift - in I (-1 - center) }
   var
     D: TDrive;
     CutLen: Integer;
     Dif1Start, Dif2Start: Integer;
-    ExtPos: Integer; { начало расширения в формируемой строке }
-    S1: String; { рабочая переменная для определения общей части }
+    ExtPos: Integer; { start of extension in the formed string }
+    S1: String; { working variable for determining the common part }
     Dummy: String;
 
   procedure DelFromS(DelStart, DelLen: Integer);
@@ -1398,31 +1398,31 @@ procedure PrepareLongName(IV: TInfoView; var S: String; var I: Integer);
     S := PF^.FlName[True];
     S1 := UpStrg(S);
     TFilePanelRoot(D.Panel).FormatName(PF, Dummy, l);
-      { Повторяем форматирование для панели, чтобы было с чем сравнивать }
+      { Repeat formatting for the panel so there is something to compare with }
     UpStr(flnPanelName);
-      { Сравнивать надо регистронезависимо }
+      { Must compare case-insensitively }
 
     ExtPos := PosLastDot(S)+1;
     Dif1Start := 255; Dif2Start := 255;
-{Длинное имя    ┌─────────────────────┐
-  ├─ .......... │     Не выделять     │0
-  ├─ .......... │  Показывать бледно  │1
-  └─ Общую часть│    Не показывать    │2
+{Long name     ┌─────────────────────┐
+  ├─ .......... │    Do not highlight │0
+  ├─ .......... │   Show dimly        │1
+  └─ Common part│    Do not show      │2
                 └─────────────────────┘
-   Сейчас только находим позиции отличий и отрезаем общие части,
- если это задано. В процессе обрезки по длине позиции могут
- измениться (уменьшиться), а уж после этого будем вставлять тильды
- для раскраски. Если вставить тильды сейчас, это затруднит контроль
- длин для обрезки. }
+   For now we only find difference positions and cut common parts
+ if that is set. During length truncation positions may
+ change (shrink), and only after that will we insert tildes
+ for coloring. If we insert tildes now, that will hinder length
+ control for truncation. }
     Dif2Start := ExtPos;
     l := flnDotPos+1;
     while flnPanelName[l] = S1[Dif2Start] do
       begin
       Inc(Dif2Start); Inc(l);
       end;
-    { с Dif2Start до конца - новые }
+    { from Dif2Start to the end - new }
 
-    { Теперь разбираемся с общими от начала до ExtPos-1}
+    { Now deal with the common part from the start to ExtPos-1}
     Dif1Start := 1;
     l := 1;
     while (Dif1Start < ExtPos) and (flnPanelName[l] = S1[Dif1Start]) do
@@ -1432,9 +1432,9 @@ procedure PrepareLongName(IV: TInfoView; var S: String; var I: Integer);
     if (Dif1Start = ExtPos-1) and
        (S1[Dif1Start] = '.') and (flnPanelName[l] = ' ')
     then
-      inc(Dif1Start); { нормально, это табуляция расширения }
-    { Окончательно:
-      отличия в S с Dif1Start по ExtPos-1 и с Dif2Start до конца }
+      inc(Dif1Start); { normal, this is extension tabulation }
+    { Finally:
+      differences in S from Dif1Start to ExtPos-1 and from Dif2Start to the end }
 
     if FMSetup.LFN_Autohide <> 0 then
       begin
@@ -1450,21 +1450,21 @@ procedure PrepareLongName(IV: TInfoView; var S: String; var I: Integer);
       begin
       ShowLFN_Difference := FMSetup.LFN_Difference;
       if ShowLFN_Difference = 2 then
-        begin { общую часть слева отбрасываем без символа обрезки }
-        if (Dif1Start < ExtPos) then { Есть отличие в имени }
+        begin { discard the common part on the left without a truncation character }
+        if (Dif1Start < ExtPos) then { There is a difference in the name }
           DelFromS(1, Dif1Start-1)
-        else{ Отличие, если и есть, то только в расширении }
+        else{ The difference, if any, is only in the extension }
           DelFromS(1, Dif2Start-1)
         end;
       end;
 
     CutLen := Length(S) - Size.X;
     if CutLen <= 0 then
-      begin { Варианты прижатия }
-{Длинное имя   ┌─────────────────────┐
- ├─ Разместить │        Слева        │ 0
- ├─ .......... │      По центру      │ 1
- └─ .......... │       Справа        │ 2
+      begin { Alignment variants }
+{Long name    ┌─────────────────────┐
+ ├─ Place     │        Left         │ 0
+ ├─ .......... │      Center         │ 1
+ └─ .......... │       Right         │ 2
                └─────────────────────┘ }
         case FMSetup.LFN_Wrap of
           0:
@@ -1476,18 +1476,18 @@ procedure PrepareLongName(IV: TInfoView; var S: String; var I: Integer);
         end {case};
       end
     else
-      begin { Варианты обрезания }
+      begin { Truncation variants }
       I := 0;
-{Длинное имя   ┌─────────────────────┐
- ├─ .......... │ Левую часть и расш. │ 0
- ├─ Показывать │    Правую часть     │ 1
- └─ .......... │     Левую часть     │ 2
+{Long name    ┌─────────────────────┐
+ ├─ .......... │ Left part and ext.  │ 0
+ ├─ Show      │    Right part       │ 1
+ └─ .......... │     Left part       │ 2
                └─────────────────────┘}
       case FMSetup.LFN_Cut of
         0:
           begin
           if Length(S)-ExtPos > Size.X-3 then
-            goto ShowRight; { от имени ничего не останется }
+            goto ShowRight; { nothing will remain of the name }
           CutNamePos := Min(Length(S), ExtPos-1) - CutLen;
           DelFromS(CutNamePos, CutLen);
           S[CutNamePos] := FMSetup.RestChar[1];
@@ -1505,11 +1505,11 @@ ShowRight:
           end;
       end {case};
       end;
-{  Вставляем тильды, не забывая, что в имени могли быть настоящие тильды }
-{Длинное имя    ┌─────────────────────┐
-  ├─ .......... │    Не выделять      │0
-  ├─ .......... │  Выделить цветом    │1
-  └─ Общую часть│   Не показывать     │2
+{  Insert tildes, not forgetting that the name may have had real tildes }
+{Long name     ┌─────────────────────┐
+  ├─ .......... │   Do not highlight  │0
+  ├─ .......... │  Highlight by color │1
+  └─ Common part│   Do not show       │2
                 └─────────────────────┘}
     if ShowLFN_Difference <> 0 then
       begin
@@ -1553,8 +1553,8 @@ function Terminate(IV: TInfoView): Boolean;
 
 var
   ElNumber: array[0..MaxFooterHeight] of Byte;
-    { Используется во время компиляции настроек вида подвала.
-      ElNumber[Y] - число элементов, выводимых в строке Y }
+    { Used while compiling footer view settings.
+      ElNumber[Y] - number of elements output in line Y }
 
 procedure TInfoView.Compile(Value: Word;
     FullProc, BriefProc: TFooterProc);
@@ -1566,14 +1566,14 @@ procedure TInfoView.Compile(Value: Word;
     Exit;
   @P := @FullProc;
   if Value > MaxFooterHeight then
-    begin { На разделителе, На разделителе кратко }
+    begin { On separator, On separator briefly }
     if Value = MaxFooterHeight+2 then
       @P := @BriefProc;
     Value := 0;
     end;
   if ElNumber[Value] >= High(LineMaker[Value]) then
-    Exit; {! Собщение выдать бы, но вряд ли такой абсурд
-      в жизни встретится }
+    Exit; {! Would be nice to show a message, but such absurdity
+      is unlikely to occur in life }
   @LineMaker[Value][ElNumber[Value]] := @P;
   inc(ElNumber[Value]);
   end;
@@ -1590,8 +1590,8 @@ procedure TInfoView.CompileShowOptions;
     Compile(MaxFooterHeight+1, MakeDivider, nil);
     Compile(ShowCurFile, MakeCurFile, nil);
     Compile(SelectedInfo, MakeQSMask, MakeQSMask);
-      { Маска быстрого поиска выводится туда же, куда и
-      данные о выделенных, притом маска имеет больший приоритет. }
+      { The quick-search mask is output in the same place as
+      selected-files data, and the mask has higher priority. }
     Compile(SelectedInfo, MakeSelected, MakeSelectedBrief);
     Compile(FilterInfo, MakeFilter, nil);
     Compile(PathDescrInfo, MakePathDecr, nil);
@@ -1610,7 +1610,7 @@ procedure TInfoView.CompileShowOptions;
        (Panel.PanSetup^.FileMask = x_x)
     then
       ElNumber[FilterInfo] := 0;
-        { Строка, в которой только тождественный фильтр, не нужна }
+        { A line that has only an identical filter is not needed }
     end;
   Y := 0;
   for i := 0 to High(ElNumber) do
@@ -1632,11 +1632,11 @@ procedure TInfoView.Draw;
       (TotalY: 255; SelectedY: 255; CurrentY1: 255; CurrentY2: 255);
   var
     YCurFileLine: Integer;
-      {` Номер строки подвала (разделитель - 0), в которой выводится
-      информация от текущем файле. -1, если не выводится нигде.
-        Эта строка прорисовывается перовй независимо от её расположения,
-      поскольку информация об имени из этой строки влияет на прорисовку
-      длинного имени.`}
+      {` Footer line number (separator is 0) where
+      info about the current file is shown. -1 if shown nowhere.
+        This line is drawn first regardless of its position,
+      because name info from this line affects drawing
+      of the long name.`}
 
   procedure DrawAtY;
     var
@@ -1689,15 +1689,15 @@ procedure TInfoView.Draw;
   CDivdier := Panel.GetColorW(2);
   DnD := NoDnD;
   with Panel do
-    begin { Очистить координаты D&D из разделителя }
+    begin { Clear D&D coordinates from the separator }
     TotalInfoInDividerMin := 1; TotalInfoInDividerMax := 0;
     SelectedInfoInDividerMin := 1; SelectedInfoInDividerMax := 0;
     end;
   { the list may be empty (a new temporary drive is shown before its directory is read: At(0) was a collection error) }
   if (Panel.Files <> nil) and (Panel.ScrollBar.Value < Panel.Files.Count) and (Panel.ScrollBar.Value >= 0) then
-      {AK155 nil бывает при запуске DN с сохранённым десктопом,
-       когда размер окна не соответствует тому, при котором
-       десктоп был сохранён.}
+      {AK155 nil happens when starting DN with a saved desktop,
+       when the window size does not match the one at which
+       the desktop was saved.}
     begin
     PF := Panel.Files.At(Panel.ScrollBar.Value);
     LFN_inCurFileLine := False;
@@ -1817,8 +1817,8 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     end { CM_CopyUnselect };
 
   function MaskSearch(B: Byte): Boolean;
-{ Поиск файла, соответствия маске быстрого поиска, начиная с
-  текущего (B=0) или со следующего (B=1) файла }
+{ Search for a file matching the quick-search mask, starting from
+  the current (B=0) or the next (B=1) file }
     var
       I: LongInt;
     begin
@@ -1907,10 +1907,10 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           if Drive.DriveType = dtDisk then
             begin
             
-            { AK155 13.02.05 Фактичекси сюда можно попасть только из
-            panelwin при обработке Ctrl-[ и Ctrl-], возможно, с Alt.
-            Вот этот самый Alt и используем для инверсии
-            признака работы с длинным или коротким именем }
+            { AK155 13.02.05 You can actually only get here from
+            panelwin when handling Ctrl-[ and Ctrl-], possibly with Alt.
+            And that very Alt we use to invert
+            the long-or-short name working flag }
             if (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0) =
                (ShiftState and kbAltShift <> 0)
             then
@@ -1972,7 +1972,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           if not MaskSearch(0) then
             DoQuickSearch(kbBack)
           else
-            InfoView.DrawView; { надо сменить и маску, и данные о файле }
+            InfoView.DrawView; { need to change both the mask and the file data }
           QSLastSuccessPos := LastSuccessPos;
           CED;
           Exit;
@@ -2039,11 +2039,11 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
         if QuickSearch then
           begin
           if DNKeyCode(Event) and $FFFF = 0 then
-            begin { Чисто шифтовое событие. Если его не проигнорировать,
-              то во время быстрого поиска невозможно переключить
-              раскладку, так как драйверы клавиатуры и OS/2,
-              и Windows не проглатывают хоткей смены раскладки, а
-              передают его и приложению тоже. }
+            begin { A pure Shift event. If it is not ignored,
+              then during quick search it is impossible to switch
+              the layout, because keyboard drivers of both OS/2
+              and Windows do not swallow the layout-change hotkey, but
+              pass it to the application too. }
             ClearEvent(Event);
             Exit;
             end;
@@ -2163,8 +2163,8 @@ GotoKb:
             begin
             if ScrollBar.ForceScroll or WheelEvent then
               Inc(Delta, ScrollBar.Step);
-                { Немедленное скроллирование с сохранением позиции
-                  курсора относительно окна }
+                { Immediate scrolling keeping the cursor
+                  position relative to the window }
             if MSelect then
               begin
               CE;
