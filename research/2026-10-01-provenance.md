@@ -1,71 +1,71 @@
-# Происхождение кода DN и выбор основы для TV (2026-10-01)
+# Provenance of DN code and choice of TV base (2026-10-01)
 
-## Инструмент
+## Tool
 
-`audit/xclone.py`. Эталон — исходники Borland из архива BP 7.0 + 7.01
-(`audit/fetch_reference.sh`, 72 файла: юниты TV, Strings, демо и примеры к TV, Memory из
-примеров Graph Vision 2.3).
+`audit/xclone.py`. Reference — Borland sources from the BP 7.0 + 7.01 archive
+(`audit/fetch_reference.sh`, 72 files: TV units, Strings, TV demos and examples, Memory from
+Graph Vision 2.3 examples).
 
-Код разбивается на токены, комментарии, разметка и регистр отбрасываются. Ищем цепочки
-из 24 токенов подряд (примерно 2–3 строки кода), которые есть у Borland.
+Code is split into tokens; comments, markup and case are discarded. We look for chains
+of 24 consecutive tokens (roughly 2–3 lines of code) that exist in Borland.
 
-- `raw%` — доля токенов файла, покрытых такими цепочками дословно, с теми же
-  идентификаторами. Это главный показатель. У чистого кода он 0–1 %: у архиваторов DN 0 %.
-- `maxrun` — самая длинная непрерывная совпавшая цепочка. Цепочка от 100 токенов случайно
-  не возникает.
-- `impl%` — то же, что `raw%`, только по разделу `implementation`.
-- `ren%` — то же с заменой идентификаторов на `ID`. Шумный: у кода, никак не связанного
-  с Borland, он 5–10 %.
+- `raw%` — fraction of the file’s tokens covered by such chains verbatim, with the same
+  identifiers. Main metric. Clean code is 0–1 %: DN archivers are 0 %.
+- `maxrun` — longest continuous matching chain. A chain of 100+ tokens does not arise
+  by chance.
+- `impl%` — same as `raw%`, but only over the `implementation` section.
+- `ren%` — same with identifiers replaced by `ID`. Noisy: for code unrelated
+  to Borland it is 5–10 %.
 
-Сравнение построчно не годится: переформатированный код оно пропускает. Поэтому
-сравниваем токены.
+Line-by-line comparison does not work: it misses reformatted code. So
+we compare tokens.
 
-## Код Borland в исходниках DN
+## Borland code in DN sources
 
-Таблицы: `audit/reports/2026-10-01/dn151.txt` (DN 1.51) и `dnosp214.txt` (DN OSP 2.14,
-архив `dn2s214.rar`).
+Tables: `audit/reports/2026-10-01/dn151.txt` (DN 1.51) and `dnosp214.txt` (DN OSP 2.14,
+archive `dn2s214.rar`).
 
-Код Borland не ограничен файлами с копирайтом Borland. В DN OSP, кроме самих TV-юнитов,
-его несут: `scroller` (из Views), `HELPKERN` и `helpfile` (из демо HelpFile), `DNStdDlg`
-(StdDlg), `DNAPP` (App), `asciitab`, `messages` (MsgBox), `gauge(s)` (демо TVFM), `listmakr`,
-`COLLECT`, `_collect`, `_streams`, `_defines` (Objects/Views), `tvhc`, отчасти `FVIEWER`.
-Если искать по заголовкам, всё это пропускается.
+Borland code is not limited to files with a Borland copyright. In DN OSP, besides the TV units
+themselves, it appears in: `scroller` (from Views), `HELPKERN` and `helpfile` (from the HelpFile demo), `DNStdDlg`
+(StdDlg), `DNAPP` (App), `asciitab`, `messages` (MsgBox), `gauge(s)` (TVFM demo), `listmakr`,
+`COLLECT`, `_collect`, `_streams`, `_defines` (Objects/Views), `tvhc`, partly `FVIEWER`.
+Searching by headers alone misses all of this.
 
-Копии DN 1.51, в которых «чистый» TV уже заменён, эталоном чистоты не являются: проверка
-нашла в одной из них остатки кода TV.
+DN 1.51 copies where “clean” TV was already replaced are not a purity baseline: the check
+found TV leftovers in one of them.
 
-## Ограничения аудита
+## Audit limits
 
-- Для Drivers, Menus и TextView исходника Borland нет: 0 % там ничего не доказывает.
-- Пересказ с переименованием и перестановкой ловится плохо (`ren%` шумный).
-- Код Borland, которого нет в эталоне (TV 1.0 из TP 6, RTL), не ловится совсем.
+- For Drivers, Menus and TextView there is no Borland source: 0 % proves nothing there.
+- Paraphrase with renaming and reordering is caught poorly (`ren%` is noisy).
+- Borland code absent from the reference (TV 1.0 from TP 6, RTL) is not caught at all.
 
-## Выбор основы для TV
+## Choice of TV base
 
-Что рассматривали:
+Options considered:
 
-1. **Свой TV с нуля по спецификации.** Самый чистый вариант, но и самый дорогой: всё
-   проектировать заново, включая Unicode.
-2. **Free Vision.** LGPL здесь не мешает: у FV, как у всей RTL FPC, есть исключение для
-   статической линковки. Оно прямо разрешает собирать FV в один бинарник с модулями под
-   любой лицензией и распространять результат на своих условиях; иначе DN нельзя было бы
-   собрать FPC вообще, ведь System — та же лицензия. Не выбран из-за происхождения: по
-   собственным заголовкам FV его интерфейсы — «Copyright Borland», а `stddlg.pas` назван
-   «портом StdDlg.pas от Borland». Это Pascal-TV из коммерческого BP7, который Borland не
-   публиковал. Чтобы добиться чистоты, пришлось бы переписать заметную часть FV, а Unicode
-   там UTF-16.
-3. **Перевод `magiblot/tvision` (C++) на Free Pascal — выбран.** Он восходит к C++ Turbo
-   Vision 2.0, исходники которого Borland опубликовал сам («Borland International made
-   the Turbo Vision source code public…»; отказ от гарантий, явной лицензии нет). Правки
-   magiblot под MIT. С 1997 года его открыто распространяют порты Sigala, SET и magiblot.
-   Что получаем сразу:
-   - UTF-8 внутри (то, что нужно);
-   - слой платформы: расширения far2l (`far2l.cpp`), протокол kitty и OSC 52
-     (`termio.cpp`), буфер обмена Unix, консоли Linux и Win32, перекодировка CP437;
-   - живой апстрим.
+1. **Own TV from scratch against a spec.** Cleanest option, but also the most expensive: design
+   everything anew, including Unicode.
+2. **Free Vision.** LGPL is not a blocker here: FV, like the whole FPC RTL, has a static-linking
+   exception. It explicitly allows linking FV into one binary with modules under
+   any license and distributing the result on your terms; otherwise DN could not be
+   built with FPC at all, since System is the same license. Not chosen because of provenance: by
+   its own headers FV interfaces say “Copyright Borland”, and `stddlg.pas` is called
+   a “port of StdDlg.pas from Borland”. That is Pascal-TV from commercial BP7, which Borland did not
+   publish. To get clean, a large part of FV would need rewriting, and Unicode
+   there is UTF-16.
+3. **Translate `magiblot/tvision` (C++) to Free Pascal — chosen.** It descends from C++ Turbo
+   Vision 2.0, whose sources Borland published itself (“Borland International made
+   the Turbo Vision source code public…”; warranty disclaimer, no explicit license). magiblot
+   changes are MIT. Since 1997 the Sigala, SET and magiblot ports have distributed it openly.
+   What we get immediately:
+   - UTF-8 inside (what we need);
+   - platform layer: far2l extensions (`far2l.cpp`), kitty protocol and OSC 52
+     (`termio.cpp`), Unix clipboard, Linux and Win32 consoles, CP437 remapping;
+   - a living upstream.
 
-   Объём: ядро около 25 тыс. строк (190 файлов), платформа 7,2 тыс.
+   Size: core about 25k lines (190 files), platform 7.2k.
 
-Оговорка к варианту 3: Borland опубликовал код без явной лицензии. Это не то же самое, что
-открытая лицензия, но это самый сильный из доступных для TV вариантов: код опубликовал
-сам правообладатель.
+Caveat on option 3: Borland published the code without an explicit license. That is not the same as
+an open license, but it is the strongest available option for TV: the rights holder
+published the code themselves.
