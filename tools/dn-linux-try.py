@@ -61,7 +61,7 @@ def main():
         for n in ('dn.err', 'dnerr.txt'):
             p = os.path.join(w, n)
             if os.path.exists(p):
-                print('--- ' + n); print(open(p, errors='replace').read()[:1500])
+                print('--- ' + n); print(open(p, errors='replace').read()[:int(os.environ.get('DN_TRY_ERRMAX', '1500'))])
         if alive:
             t.close(0.5)
         print('--- files:'); 
