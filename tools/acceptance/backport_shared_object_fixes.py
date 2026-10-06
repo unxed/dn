@@ -136,6 +136,48 @@ procedure Fill(var F: TOSSearchRec; const R: SysUtils.TSearchRec; IsPChar: Boole
     )
     replace_once(osdep, b"  F.Time := R.Time;\n", b"  F.Time := SysFileTimeToDos(R.Time);\n")
 
+    # the same conversion in the file finder of TV (the dialogs that list files showed Unix times as DOS times: dates of 2033)
+    tvfiles = tv_root / "src/tvfiles.pas"
+    replace_once(
+        tvfiles,
+        b"""procedure TFileFinder.Fill;
+var
+  P: PSysRec;
+begin
+  P := PSysRec(Sys);
+  Rec.Attr := Byte(P^.Attr);
+  Rec.Time := P^.Time;
+""",
+        b"""{$IFDEF UNIX}
+function UnixTimeToDos(T: LongInt): LongInt;
+var
+  Y, M, D, H, N, S, MS: Word;
+begin
+  DecodeDate(FileDateToDateTime(T), Y, M, D);
+  DecodeTime(FileDateToDateTime(T), H, N, S, MS);
+  if Y < 1980 then
+  begin
+    Y := 1980; M := 1; D := 1; H := 0; N := 0; S := 0;
+  end;
+  Result := LongInt((Cardinal(Y - 1980) shl 25) or (Cardinal(M) shl 21) or (Cardinal(D) shl 16) or
+    (Cardinal(H) shl 11) or (Cardinal(N) shl 5) or (Cardinal(S) shr 1));
+end;
+{$ENDIF}
+
+procedure TFileFinder.Fill;
+var
+  P: PSysRec;
+begin
+  P := PSysRec(Sys);
+  Rec.Attr := Byte(P^.Attr);
+{$IFDEF UNIX}
+  Rec.Time := UnixTimeToDos(P^.Time);
+{$ELSE}
+  Rec.Time := P^.Time;
+{$ENDIF}
+""",
+    )
+
     filescol = root / "dn/src/filescol.pas"
     replace_once(
         filescol,
