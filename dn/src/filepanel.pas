@@ -1962,13 +1962,16 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
         then
           goto GotoKb;
         if (Char(Event.CharCode) > #31) or
+{$IFDEF DNUTF8}
+              ((Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80)) or
+{$ENDIF}
               (DNKeyCode(Event) = kbBack) or
               (DNKeyCode(Event) = kbBackUp) or
               (DNKeyCode(Event) = kbCtrlRight) or
               (DNKeyCode(Event) = kbCtrlLeft)
         then
           begin
-          DoQuickSearch(DNKeyCode(Event));
+          DoQuickSearchEvent(Event);
           if not MaskSearch(0) then
             DoQuickSearch(kbBack)
           else
