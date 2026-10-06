@@ -45,7 +45,7 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `commands.pas` | all constants: commands `cm*`, key codes `kb*` (DN's codes include the scan code: `kbCtrlS = $041F13`), help contexts |
 | `dnutil.pas` | the central dispatcher of the commands of the application (`TDNApplication`: menu items, windows, Ctrl-O...) |
 | `apploop.pas` (was `u_myapp`) | the event loop of the application (keys before the dispatch, macros, the idle work) |
-| `dnexec.pas`, `dnrun.pas` (ours) | running an external program / a command of the command line (on Linux: the embedded terminal) |
+| `dnexec.pas`, `dnrun.pas` (ours) | running an external program / a command of the command line: `dnrun.pas` is the portable facade (`HasCommandScreen`, `ShowCommandScreen`), the targets are in `compat/dnrun*.pas` |
 | `cmdline.pas` | the command line of the panels (`TCommandLine`) |
 | `menus.pas` | menus, the menu bar, the status line (the hot letters) |
 | `setups.pas`, `paneldlgs.pas` (was `fltools`) | the dialogs of the settings; the dialogs of the panel (select group, filter, the button "Save setup") |
@@ -149,6 +149,7 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `compat/dnscreen.pas` (the 16-bit cell screen and the cursor of DN over `tv/`, was the `SysTv*` part of `vpsyslow`, ours) | the copy of the screen for the code that reads the screen, the cursor shape |
 | `compat/dnuserscreendos.pas` (ours) | GO32V2 BIOS/video-memory handling for restoring, capturing, and showing the external-program user screen |
 | `compat/osnamesunix.pas`, `compat/osnamesdos.pas` (ours) | the names of the files of DN at the border of Unix (cp866 <-> UTF-8, the case, the paths) and of DOS (the AMIS provider `DOS-UTF8/NAMES`); `osdep` calls them |
+| `compat/dnrundos.pas`, `dnrunlinux.pas`, `dnrunother.pas` (ours) | the backends of `dnrun.pas`: DOS (the user screen, COMMAND.COM), Linux (a pty through `TvVtRun`, the screen of the commands), the rest (the terminal goes to the shell) |
 | `compat/osrun.pas` + `osrununix.pas`, `osrunwindows.pas`, `osrundos.pas` (ours) | starting programs and restarting DN: the facade and the backends (the DOS way `COMSPEC /c command` on Unix) |
 | `compat/ossystem.pas` + `ossystemdos.pas`, `ossystemother.pas` (ours) | the small calls of the system: device test, volume label, disk buffers, the speaker, memory |
 | `compat/osstartscreen.pas` (ours) | the text screen of the program that started DN (DOS), grabbed at the start |
@@ -202,4 +203,4 @@ no silent gaps (post-class criterion A).
 * A panel draws wrong → `filepanel.pas` `TFilePanel.Draw` (the partial redraw is in the same procedure: after a cursor move only two lines are drawn).
 * A name is cut or padded wrong → `basics.pas` / `fileutil.pas` `FormatLongName` (and `dnutf8.pas` for the columns).
 * The editor → `editcore.pas` (everything is one byte per column; `DocTab` in `dnutf8.pas` makes it UTF-8).
-* A command is run → `dnexec.pas` → `dnrun.pas` → `tv/src/tvvtrun.pas`.
+* A command is run → `dnexec.pas` → `dnrun.pas` → `compat/dnrunlinux.pas` → `tv/src/tvvtrun.pas`.

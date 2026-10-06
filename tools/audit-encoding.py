@@ -60,7 +60,7 @@ def integrity(files):
         except UnicodeDecodeError as error:
             problems.append("%s: not UTF-8 (byte %d)" % (name, error.start))
             continue
-        if text.startswith("﻿"):
+        if text.startswith("\ufeff"):
             problems.append("%s: byte order mark" % name)
         for number, line in enumerate(text.split("\n"), 1):
             if "\ufffd" in line:

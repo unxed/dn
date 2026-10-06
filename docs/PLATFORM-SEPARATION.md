@@ -206,3 +206,12 @@ process id of a temporary file name: it now calls `SysRunQuiet` (facade `OSRun.R
 tour scenarios `f5copy`, `tab`, `f1help`, `userscr`). What is left in the inventory: `dnrun` (the Linux PTY runner and the DOS vector swap in one unit), the target
 decisions of `mainapp` and `boot`, the `.BAT` defaults of `startup`/`dlgrecs`, and the split of tv3 `tvtermos`.
 
+Eighth step (2026-10-06): `DNRun` is a portable facade and the targets are `compat/dnrundos.pas` (the user screen of DOS, COMMAND.COM, `SwapVectors`),
+`compat/dnrunlinux.pas` (the pty of `TvVtRun` and the screen of the commands) and `compat/dnrunother.pas` (the shell gets the terminal); `mainapp` and `dnutil`
+ask `HasCommandScreen` instead of deciding by the target. The extension of the files for a command interpreter (`OSSystem.OSBatchExt`), the default temporary
+directory (`OSDefaultTempDir`), the directories that a tree scan skips (`SysSkipInTree`) and the sync of the 16-bit screen copy after the first draw
+(`SyncScreenCopyAfterDraw` of `dnscreen`) moved behind facades too. In tv3 `TvTermOs` is a facade and the code of the targets is in `TvTermOsUnix`, `TvTermOsWin` and
+`TvTermOsNone` (the shared types in `TvTermOsBase`; not done: the replacement of the private parser of the Windows console by `TvVt`, it would change behaviour).
+Compiles for linux64 (UTF-8 and code page) and dos locally, the DOS tour scenarios `f5copy`, `tab`, `f1help`, `userscr`, `ctrlo` pass in DOSBox-X; the Windows
+build is checked by the CI of the commit.
+
