@@ -23,15 +23,11 @@ var
   RestartPending: Boolean = False;   { set by the command that restarts DN (change of the language, Restart): the program starts itself again after the shutdown }
 { Starts DN again (the same program, the same parameters): Unix replaces the process (exec), else the new one runs and the old one ends after it. Called by dn.pas after the shutdown. }
 procedure RestartSelf;
-{$IFDEF GO32V2}
-{ Ctrl-O: shows the user screen (what the programs left) until a key is pressed; the caller redraws DN. }
-procedure ShowUserScreenDos;
-{$ENDIF}
 
 implementation
 
 uses
-  SysUtils, Dos{$IFDEF GO32V2}, go32, Drivers{$ENDIF}, osdep, DNErrLog{$IFDEF LINUX}, TvVtRun{$ENDIF};
+  SysUtils, Dos, osdep, DNErrLog{$IFDEF GO32V2}, DNUserScreenDos{$ENDIF}{$IFDEF LINUX}, TvVtRun{$ENDIF};
 
 {$IFDEF LINUX}
 function CurDir: AnsiString;
@@ -44,99 +40,9 @@ end;
   "7z l C:\tmp\a.7z >C:\tmp\!!!DN!!!.TMP" and the shell ate the backslashes. }
 {$ENDIF}
 
-{$IFDEF GO32V2}
-var
-  UserCur: Word = $FFFF;       { the cursor of the user screen (BIOS 0040:0050: low byte the column, high the row); $FFFF: not known yet }
-
-{ The size of the text screen by the BIOS (0040:004A the columns, 0040:0084 the rows - 1); False when the values make no sense. }
-function BiosScreen(var Cols, Rows: Word): Boolean;
-var
-  B: Byte;
-begin
-  dosmemget($40, $4A, Cols, 2);
-  dosmemget($40, $84, B, 1);
-  Rows := B + 1;
-  Result := (Cols > 0) and (Cols <= 255) and (Rows >= 2) and (Rows <= 100);
-end;
-
-{ The user screen (UserScreen of Drivers: the screen that started DN, then what the programs left) goes back to the video memory,
-  the cursor to its place: the program goes on where the previous one ended (as in DN for DOS), not on a cleared screen. }
-procedure PutUserScreen;
-var
-  Cols, Rows, N: Word;
-  R: Registers;
-begin
-  if (UserScreen = nil) or not BiosScreen(Cols, Rows) or (Cols <> UserScreenWidth) then
-    Exit;
-  N := Cols * Rows * 2;
-  if N > UserScreenSize then
-    N := UserScreenSize;
-  dosmemput($B800, 0, UserScreen^, N);
-  if UserCur = $FFFF then
-    UserCur := SysStartCursor;
-  R.ah := $02; R.bh := 0;
-  R.dl := Lo(UserCur);
-  R.dh := Hi(UserCur);
-  if R.dh >= Rows then
-    R.dh := Rows - 1;
-  Intr($10, R);
-end;
-
-{ What the program left on the screen becomes the user screen (Ctrl-O shows it), with the cursor. }
-procedure GetUserScreen;
-var
-  Cols, Rows, N: Word;
-begin
-  if (UserScreen = nil) or not BiosScreen(Cols, Rows) or (Cols <> UserScreenWidth) then
-    Exit;
-  N := Cols * Rows * 2;
-  if N > UserScreenSize then
-    N := UserScreenSize;
-  dosmemget($B800, 0, UserScreen^, N);
-  dosmemget($40, $50, UserCur, 2);
-end;
-{$ENDIF}
-
-{$IFDEF GO32V2}
-{ A test aid (DNDUMP is set: the key is not waited for): the lines of the user screen that are not empty go to the trace. }
-procedure TraceUserScreen;
-var
-  Cols, Rows, Y, X: Word;
-  Line: String;
-begin
-  if (UserScreen = nil) or not BiosScreen(Cols, Rows) or (Cols <> UserScreenWidth) then
-    Exit;
-  for Y := 0 to Rows - 1 do
-  begin
-    Line := '';
-    for X := 0 to Cols - 1 do
-      Line := Line + Chr(PByteArray(UserScreen)^[(Y * Cols + X) * 2]);
-    while (Length(Line) > 0) and (Line[Length(Line)] in [#0, ' ']) do
-      SetLength(Line, Length(Line) - 1);
-    if Line <> '' then
-      DNTrace('UserScreen ' + IntToStr(Y) + ': ' + Line);
-  end;
-end;
-
-procedure ShowUserScreenDos;
-var
-  R: Registers;
-begin
-  PutUserScreen;
-  if GetEnv('DNDUMP') <> '' then
-    TraceUserScreen
-  else
-  begin
-    R.ax := $0000;
-    Intr($16, R);
-  end;
-end;
-{$ENDIF}
-
 procedure RunExternal(const CmdLine: String);
 {$IFDEF GO32V2}
 var
-  R: Registers;
   Shell, Args: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
@@ -145,9 +51,7 @@ var
 {$ENDIF}
 begin
 {$IFDEF GO32V2}
-  R.ax := $0003;                  { the text mode 80x25 (it clears the screen), then the user screen comes back }
-  Intr($10, R);
-  PutUserScreen;
+  DNUserScreenDos.PrepareUserScreenForExternal;
   Writeln(CmdLine);
   DNTrace('RunExternal: exec ' + CmdLine);
   Shell := GetEnv('COMSPEC');
@@ -156,16 +60,13 @@ begin
   SysExecute(PChar(Shell), PChar(Args), nil, False, nil, 0, 0, 0);
   SwapVectors;
   DNTrace('RunExternal: back, DosError ' + IntToStr(DosError));
-  GetUserScreen;                  { before the line about the key: it is not a part of the output of the program }
+  DNUserScreenDos.CaptureUserScreenAfterExternal; { before the line about the key: it is not part of program output }
   Writeln;
   Write('Press any key to return to DN...');
   { INT 16h, AH = 0: wait for a key (not in the test runs with DNDUMP: no one presses it, the keys of DNKEYS are put in by the
     idle loop that does not run here) }
   if GetEnv('DNDUMP') = '' then
-  begin
-    R.ax := $0000;
-    Intr($16, R);
-  end;
+    DNUserScreenDos.WaitForUserKeyDos;
 {$ELSE}
 {$IFDEF LINUX}
   if GetEnvironmentVariable('DN_EMBED_TERM') <> '0' then
