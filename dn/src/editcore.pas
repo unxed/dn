@@ -298,6 +298,7 @@ uses
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, histories,
   timeutil, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
+{$IFDEF DNUTF8}, TvCodePg, TvUtf8{$ENDIF}
 , osdep, DNStdDlg, Dialogs, DNHelp, Math
   ;
 
@@ -5025,17 +5026,31 @@ procedure OpenSmartpad;
     var
       Str: LongString;
       Idx: Integer;
+      LineCh: Char;
+{$IFDEF DNUTF8}
+      Buf: array[0..7] of Byte;
+      Cell: Byte;
+{$ENDIF}
     begin
     with SmartWindow.Intern do
       begin
       if SPInsertDate then
         begin
+        LineCh := Char(SPLineChar);
+{$IFDEF DNUTF8}
+        { the line is internal here (one byte per character): the character of it is a cell of the table of the document }
+        Cell := TabTyped(DocTab, Copy(PChar(@Buf[0]), 1, Utf8Encode(CpToUnicode(SPLineChar), @Buf[0])), 0);
+        if Cell <> 0 then
+          LineCh := Char(Cell)
+        else
+          LineCh := '-';
+{$ENDIF}
         Str := '';
         for Idx := 0 to 5 do
-          Str := Str+Char(SPLineChar);
+          Str := Str+LineCh;
         Str := Str+'< '+GetDateTime(False)+' '+GetDateTime(True)+' >';
         for Idx := 0 to 35 do
-          Str := Str+Char(SPLineChar);
+          Str := Str+LineCh;
         { Flash >>> }
         if  (Copy(GetLine(FileLines.Count-2), 1, 7) = Copy(Str, 1, 7)) and
             (Copy(GetLine(FileLines.Count-2), 29, 37) = Copy(Str, 29,
@@ -5056,6 +5071,11 @@ procedure OpenSmartpad;
         then
           FileLines.Insert(nil);
         { Flash <<< }
+{$IFDEF DNUTF8}
+        { the lines of a UTF-8 document are UTF-8 (GetLine makes the internal line of them); Str is internal until here }
+        if DocU8 then
+          Str := TabToUtf8(DocTab, Str);
+{$ENDIF}
         FileLines.Insert(NewLongStr(Str));
         end;
       FileLines.Insert(nil);
