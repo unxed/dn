@@ -11,6 +11,13 @@ Rules for everything that is tracked in git (checked by `tools/tests/test_text_p
 
 Run: `python3 -B -m unittest discover -s tools/tests -p 'test_text_policy.py'`
 
+Lost or damaged characters (U+FFFD, C1 controls, a code page byte read as Latin-1, a character that an older revision had and the tree lost):
+`tools/audit-encoding.py [--against REV | --against-dir ORIGINAL_TREE]` (the integrity part is also a test, `tools/tests/test_audit_encoding.py`).
+The comparison reads the Pascal comments out (they were translated) and compares the code, the string literals and the resources.
+Audit of the conversion to UTF-8 (`dcf46b0`, 89 files): every file is identical to its CP866 original after decoding, except the one
+file that was changed on purpose. Later differences are repaired look-alike letters and the frame characters of `calcwin.pas` and `dndlgs.pas`
+that became byte constants (to be named Unicode constants, see PLAN.md).
+
 ## Allowed: Cyrillic on purpose
 
 | Files | Why |
