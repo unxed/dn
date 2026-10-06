@@ -1,5 +1,6 @@
 { OSRun: starting programs and restarting DN: the stable facade used by the DN compatibility layer (osdep). The code of a target is in
-  OSRunUnix, OSRunWindows or OSRunDos. }
+  OSRunUnix, OSRunWindows or OSRunDos.
+  MIT (see LICENSE). }
 unit OSRun;
 
 {$mode objfpc}

@@ -5,17 +5,17 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 16 |
+| Our files (MIT, see `LICENSE`) | 25 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 120 |
-| Contributors of DN OSP | 13 |
-| Upstream without a notice | 17 |
+| Contributors of DN OSP | 7 |
+| Upstream without a notice | 14 |
 
 ## Our files (MIT, see `LICENSE`)
 
 The replacements of the units that were excluded (their code is of Borland origin or of the Virtual Pascal runtime), the adapters to `tv/`, the system layer. They carry the MIT notice of this project in their head; the audit (`dn/audit`) checks them against the archive.
 
-`asciitab.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnstddlg.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `objutil.pas`, `osdep.pas`, `realmode.pas`, `strview.pas`, `version.inc`
+`asciitab.pas`, `cfgstate.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnscreen.pas`, `dnstddlg.pas`, `dnutf8.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `objutil.pas`, `osdep.pas`, `osnamesdos.pas`, `osnamesunix.pas`, `osrun.pas`, `osrundos.pas`, `osrununix.pas`, `osrunwindows.pas`, `realmode.pas`, `strview.pas`, `version.inc`
 
 ## Carved (the license of DN)
 
@@ -33,10 +33,10 @@ Files of the public DN OSP 2.14 with the notice of RIT Research Labs; changed by
 
 Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155...) and give no license of their own: they came in the same public release as the rest, and are used as part of it. This is the thing to ask the owner of the project about (PLAN.md).
 
-`cfgstate.pas`, `dirwatch.pas`, `dnscreen.pas`, `dnuserscreendos.pas`, `dnutf8.pas`, `fsinfo.pas`, `hash.pas`, `osdisk.pas`, `osnamesdos.pas`, `osrun.pas`, `osrundos.pas`, `topview.pas`, `uue2inc.pas`
+`dirwatch.pas`, `dnuserscreendos.pas`, `fsinfo.pas`, `hash.pas`, `osdisk.pas`, `topview.pas`, `uue2inc.pas`
 
 ## Upstream without a notice
 
 Files of the public DN OSP 2.14 with no notice in the head (small adapters, tables, include files). Part of the same release.
 
-`copyini.pas`, `fatalerr.pas`, `fileerrors.pas`, `filetype.pas`, `osdiskdos.pas`, `osdiskunix.pas`, `osdiskwindows.pas`, `osnamesunix.pas`, `osrununix.pas`, `osrunwindows.pas`, `panelsetup.pas`, `rcpvpd.ini`, `stdefine.inc`, `sysutils.inc`, `uselfn.pas`, `usersavr.pas`, `xcode.pas`
+`copyini.pas`, `fatalerr.pas`, `fileerrors.pas`, `filetype.pas`, `osdiskdos.pas`, `osdiskunix.pas`, `osdiskwindows.pas`, `panelsetup.pas`, `rcpvpd.ini`, `stdefine.inc`, `sysutils.inc`, `uselfn.pas`, `usersavr.pas`, `xcode.pas`

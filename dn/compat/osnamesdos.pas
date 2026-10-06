@@ -1,5 +1,6 @@
 { OSNamesDos: the names of the files of DN at the border of the DOS (the backend of the facade in OSDep).
-  Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new. }
+  Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new.
+  MIT (see LICENSE). }
 unit OSNamesDos;
 
 {$mode objfpc}
