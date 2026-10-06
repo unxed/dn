@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 import importlib.util
 spec = importlib.util.spec_from_file_location('tour', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dn-linux-tour.py'))
-KEYS = {'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~',
+KEYS = {'SHIFT-UP': '\x1b[1;2A', 'SHIFT-DOWN': '\x1b[1;2B', 'SHIFT-RIGHT': '\x1b[1;2C', 'SHIFT-LEFT': '\x1b[1;2D', 'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~',
         'F8': '\x1b[19~', 'F9': '\x1b[20~', 'F10': '\x1b[21~', 'UP': '\x1b[A', 'DOWN': '\x1b[B', 'RIGHT': '\x1b[C', 'LEFT': '\x1b[D',
         'HOME': '\x1b[H', 'END': '\x1b[F', 'PGUP': '\x1b[5~', 'PGDN': '\x1b[6~', 'INS': '\x1b[2~', 'DEL': '\x1b[3~', 'TAB': '\t',
         'ENTER': '\r', 'ESC': '\x1b', 'BS': '\x7f', 'ALT-X': '\x1bx', 'ALT-F1': '\x1b[1;3P', 'ALT-F2': '\x1b[1;3Q',

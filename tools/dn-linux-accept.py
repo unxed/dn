@@ -45,6 +45,7 @@ OBJECT_DN_SHA = 'b4916b874989d7b35660d02cf935dc5f0db7a656'
 OBJECT_TV_SHA = '521d06479198789deeaa6fda287236ca83ba4051'
 
 KEYS = {
+    'SHIFT-UP': '\x1b[1;2A', 'SHIFT-DOWN': '\x1b[1;2B', 'SHIFT-RIGHT': '\x1b[1;2C', 'SHIFT-LEFT': '\x1b[1;2D', 
     'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS',
     'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~',
     'F9': '\x1b[20~', 'F10': '\x1b[21~',
@@ -168,6 +169,10 @@ for _m in range(7):
             continue
         _keys = 'F10 ' + 'RIGHT ' * _m + 'DOWN ' * _n + 'ENTER'
         SCENARIOS.append(('menu_%d_%d' % (_m, _n), _keys.strip(), 'menus'))
+
+# Scenarios of the area u8cp are for the comparison of two builds of the same source (the UTF-8 build against the code page build, DN_UTF8=0):
+# the object baseline has the same bug in them, so the object-vs-class run skips them (select them with --area u8cp or by name).
+SCENARIOS.append(('f4edit_draw', 'DOWN DOWN DOWN DOWN F4 F4 SHIFT-RIGHT SHIFT-RIGHT SHIFT-RIGHT SHIFT-DOWN SHIFT-DOWN SHIFT-LEFT SHIFT-LEFT', 'u8cp'))
 
 
 def tokens(spec: str):
@@ -594,6 +599,8 @@ def selected_scenarios(area: str | None, only: set[str], shard: tuple[int, int] 
     items = []
     for i, (name, spec, ar) in enumerate(SCENARIOS):
         if area and ar != area:
+            continue
+        if ar == 'u8cp' and area != 'u8cp' and name not in only:
             continue
         if only and name not in only:
             continue
