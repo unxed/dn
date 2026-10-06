@@ -4,7 +4,7 @@
 Usage:
   python3 tools/dn-linux-archives.py OUTDIR
 
-Uses tools/gen-archive-fixtures.py. Skips formats whose files were not generated.
+Uses tools/gen-archive-fixtures.py. Skips formats whose files were not generated; DN_ARC_ONLY='simple.zip ...' runs only those.
 """
 from __future__ import annotations
 
@@ -194,9 +194,17 @@ def view_edit_smoke(
         check('Fatal' not in scr and 'Access' not in scr,
               '%s/%s: no Fatal' % (name, label), scr)
         if label == 'F4':
-            # F4 in an archive is "Extr" (the key bar says so): the Extract dialog must be there, and nothing else is checked
+            # F4 in an archive is "Extr" (the key bar says so): DN (the object build too) extracts the member to the directory of the other panel
+            # at once, or shows the Extract dialog; either is right, nothing else is checked
+            for _ in range(10):
+                if 'extract' in scr.lower() or os.path.exists(os.path.join(w, expect_member + '.txt')):
+                    break
+                t.pump(0.5, 2)
+                scr = t.text()
             if 'extract' in scr.lower():
                 print('PASS %s/F4: the Extract dialog is shown' % name, flush=True)
+            elif os.path.exists(os.path.join(w, expect_member + '.txt')):
+                print('PASS %s/F4: the member is extracted at once' % name, flush=True)
             else:
                 SOFT_FAILS.append('%s F4 dialog' % name)
                 print('SOFTFAIL %s/F4: no Extract dialog' % name, flush=True)
@@ -426,7 +434,8 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         t.send(KEYS['DOWN'], 0.2)                  # added.zzz (the extension zzz sorts after zip)
         t.send(KEYS['F5'], 1.5)
         dlg = t.text()
-        t.send('\r', 1.5)
+        t.send('\r', 1.5)                              # the Copy dialog: OK; the dialog Archive files follows
+        t.send('\r', 1.5)                              # Archive files: OK
         for _ in range(8):
             t.pump(0.5, 2)
             if 'added.zzz' in members(os.path.join(w, name)):
@@ -458,6 +467,9 @@ def main() -> int:
     fix = tempfile.mkdtemp(prefix='dn-arc-fix-')
     try:
         names = gen_fixtures(fix)
+        only = os.environ.get('DN_ARC_ONLY')                  # for example DN_ARC_ONLY='simple.zip simple.tar.bz2': the formats to run
+        if only:
+            names = [n for n in names if n in only.split()]
         print('FIXTURES', ' '.join(names), flush=True)
         cases = [
             ('simple.zip', 'inside', 'ZIP:'),

@@ -26,9 +26,9 @@ function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 begin
   UnixSuspend;
   Writeln;
-  Writeln('$ ', NameToOs(CmdLine));
+  Writeln('$ ', CommandLineToOs(CmdLine));
   Flush(Output);
-  Result := fpSystem(NameToOs(CmdLine));
+  Result := fpSystem(CommandLineToOs(CmdLine));
   if Pause and UnixActive then
   begin
     Writeln;
@@ -41,7 +41,7 @@ end;
 
 function BackendRunQuiet(const CmdLine: string): LongInt;
 begin
-  Result := fpSystem(NameToOs(CmdLine));
+  Result := fpSystem(CommandLineToOs(CmdLine));
 end;
 
 function BackendExecute(Path, Args: PChar): LongInt;

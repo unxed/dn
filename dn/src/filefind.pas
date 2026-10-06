@@ -443,7 +443,7 @@ function FindFiles(var Files: TFilesCollection;
     S := TDOSStream.Create(FilePath, stOpenRead);
     CaseSensitive := FindRec.Options and ffoCaseSens <> 0;
     SearchF := (S.Status = stOK) and
-        (FViewer.SearchFileStr(@S,
+        (FViewer.SearchFileStr(S,
           KeyMapDescr[kmAscii].XLatCP^[Ord(CaseSensitive)],
           FindRec.What, 0,
           CaseSensitive,

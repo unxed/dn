@@ -93,6 +93,9 @@ SCENARIOS = [
     ('f6_cancel', 'HOME DOWN DOWN F6 ESC ESC', 'fileops'),
     ('f7mkdir', 'F7', 'fileops'),
     ('f7_cancel', 'F7 ESC', 'fileops'),
+    # Find File with a mask, and with a text (the class build had an access violation in the search of the text: @S for a class variable)
+    ('find_mask', 'ALT-F7 *.txt ENTER', 'fileops'),
+    ('find_text', 'ALT-F7 *.txt TAB second ENTER', 'fileops'),
     ('f8del', 'HOME DOWN DOWN F8', 'fileops'),
     ('f8_cancel', 'HOME DOWN DOWN F8 ESC', 'fileops'),
     # --- dialogs / find / help ---
@@ -595,12 +598,23 @@ def run_one(out: str, work: str, spec: str, area: str = '',
                 pass
 
 
+# DN_ACCEPT_U8CP=1: the two builds are the UTF-8 build and the code page build (DN_UTF8=0) of the same source, not the object and the class build.
+# The scenarios of the area u8cp are then run too, and the ones below are left out: the difference is in the data, not in a bug.
+U8CP_SKIP = {
+    # dn.ini is UTF-8 in both builds (docs/TEXT-POLICY.md); the editor of the code page build shows its bytes by the page of the document
+    'menu_6_9',
+}
+
+
 def selected_scenarios(area: str | None, only: set[str], shard: tuple[int, int] | None):
     items = []
+    same = os.environ.get('DN_ACCEPT_U8CP') == '1'
     for i, (name, spec, ar) in enumerate(SCENARIOS):
         if area and ar != area:
             continue
-        if ar == 'u8cp' and area != 'u8cp' and name not in only:
+        if ar == 'u8cp' and not same and area != 'u8cp' and name not in only:
+            continue
+        if same and name in U8CP_SKIP and name not in only:
             continue
         if only and name not in only:
             continue
