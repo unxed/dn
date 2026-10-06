@@ -358,3 +358,8 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - `ArcDrive.Exec` (arcview.pas) and `archiver.pas` still have the DOS 120/95-character command line limits and the `$DNn$.BAT` batch files of the swap mode; on Unix the swap mode (`SwapWhenExec`) must stay off.
 - The quick search of the directory tree (window of the button [Tree] of the Copy dialog, `tree.pas`) takes UTF-8 characters now, but has no test: the window scans the whole host (the root of `C:` is `/`) for minutes before the search works (`Reading directories: 22891 Esc - stop`); a test needs a way to limit the scan (a setting or an environment variable).
 - F4 in an archive is "Extr" (the Extract dialog, as the key bar says); the editor does not open a member of an archive (`UseFile` leaves on `cmEditFile`).
+
+## Status at the end of the session (2026-10-06)
+- Head `397217d`: green `dn`, `layout`, `dn-windows`, `dn-accept`, `toolchain` (DOS); `dn-linux` (archives F3/F4/F5/F8/add, find, qsearch) was still running: read its job `linux64-utf8` (tail <= 60 lines; `DIAG dn.log`, `DIAG wrapper log` lines).
+- Fixed for F5 from an archive on Linux: `COMSPEC /c` (`osrununix.pas`) and `SysFindFirst` 3 vs 18 (`osdep.pas`); the real extraction is not confirmed by CI yet.
+- Next: confirm the archive tests, then stage 4 tests, colors, `DumpAtExit`, named frame constants (see PLAN.md, "Next items in order").
