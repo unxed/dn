@@ -208,9 +208,12 @@ function OemToCharStr(const OemS: String): String;
 function CharToOemStr(const CharS: String): String;
   {` Convert from WIN to DOS `}
 
+procedure RefreshCaseTables;
+  {` The tables of upper and lower case again (the OS gives them for the code page it has; the letters of the current code page of DN that it does not know are added: see CompleteUpcaseFromPage). Without -dDNUTF8 only: with it the case is done by DNUtf8. `}
+
 implementation
   uses
-    country, basics, Streams;
+    country, basics, Streams, DNUtf8, TvCodePg;
 
 procedure XLatBuf(var B; Len: Integer; const XTable: TXLat);
   var
@@ -424,11 +427,36 @@ procedure XLatStr(var S: String; const XLat: TXLat);
     S[i] := XLat[S[i]];
   end;
 
+{ The OS gives the case of the letters for the code page it was set for (a DOS that does not have the page 1125 gives the table of another one): a letter of the
+  current page that has a capital in it (by Unicode) and that the OS left as it is gets that capital. A letter that the OS did convert is not touched. }
+procedure CompleteUpcaseFromPage;
+  var
+    B: Integer;
+    U, U2: LongWord;
+    Cap: Byte;
+  begin
+  for B := $80 to $FF do
+    if UpCaseArray[Char(B)] = Char(B) then
+      begin
+      U := CpToUnicode(B);
+      U2 := CpUpper(U);
+      if U2 <> U then
+        begin
+        Cap := CpFromUnicode(U2);
+        if Cap <> 0 then
+          UpCaseArray[Char(B)] := Char(Cap);
+        end;
+      end;
+  end;
+
 procedure InitUpcase;
   var
     C, L, U: Char;
   begin
   QueryUpcaseTable;
+{$IFNDEF DNUTF8}
+  CompleteUpcaseFromPage;
+{$ENDIF}
   NullXLAT(LowCaseArray);
 {see the comment on AcceptToAscii}
   for C := High(TXlat) downto Low(TXlat) do
@@ -590,6 +618,13 @@ function CharToOemStr(const CharS: String): String;
     Result[I] := WinXlatCP[ToAscii][CharS[I]];
   end;
 {/JO}
+
+procedure RefreshCaseTables;
+  begin
+{$IFNDEF DNUTF8}
+  InitUpcase;
+{$ENDIF}
+  end;
 
 begin
 NullXLAT(NullXlatTable);

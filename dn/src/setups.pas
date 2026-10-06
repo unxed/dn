@@ -138,7 +138,7 @@ implementation
 uses
   Dos, Tree, Drives, basics, strutil, fileutil, TvGlyphs, Messages, DNHelp,
   linepos, DnIni, iniengine, country, keymap, dirwatch
-  , lfn, mainapp, Validate
+  , lfn, mainapp, Validate, TvCodePg
   ;
 
 procedure ConfirmSetup;
@@ -310,6 +310,17 @@ function ApplyCodetables: Integer;
       Result := 1;
       Exit;
       end;
+{$IFNDEF DNUTF8}
+    { the table of the sort order that DN ships goes with the page: the Ukrainian page 1125 has its letters elsewhere (tools/gen-sort1125.py); a table the user
+      named is left as it is }
+    if CpCurrent = 1125 then
+      begin
+      if UpStrg(ABCSortTable) = 'SORT866.XLT' then
+        ABCSortTable := 'sort1125.xlt';
+      end
+    else if UpStrg(ABCSortTable) = 'SORT1125.XLT' then
+      ABCSortTable := 'sort866.xlt';
+{$ENDIF}
     if ABCSortTable = '' then
       ABCSortTable := '0';
     Val(ABCSortTable, CP, Err);
@@ -322,6 +333,9 @@ function ApplyCodetables: Integer;
       Exit;
       end;
 
+{$IFNDEF DNUTF8}
+    RefreshCaseTables;               { the case of the letters of the current page }
+{$ENDIF}
     FreeCodetables;
     if (WinCodetable <> '') and not BuildWinCodeTable(WinCodeTable)
     then
