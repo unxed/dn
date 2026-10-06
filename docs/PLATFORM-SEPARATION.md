@@ -38,6 +38,15 @@ acceptance `37390645223`. The DOS build exposed and prompted the `PGroup` →
 workflow uses the same `runner.temp` prefix for cache, compiler, hello program,
 and DN build.
 
+Unix process replacement was then moved from `DNRun` into
+`osdep.SysRestartSelf`; the Windows and DOS `ExecuteProcess` branch is there as
+well. Exact-SHA DN `e551fee53eddf009720f6d79037a1bc06bd9f570` passed the class
+gate, layout, Linux, Windows, full DOS build, and object/class acceptance
+(177 pass, 0 fail; runs `37395436984`, `37395436849`, `37395436982`,
+`37395436934`, `37395436869`, and `37395436777`, respectively). A dedicated
+runtime scenario for restart arguments and environment is still required; the
+parity matrix has not exercised that action yet.
+
 The next narrow step moved DOS process creation out of `DNRun`: it now calls
 the existing `osdep.SysExecute` facade while retaining DOS vector swapping and
 screen handling in the runner. Exact-SHA DN `68400a80218b01503f7f55900c7535299d3db093`
