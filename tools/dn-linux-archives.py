@@ -140,6 +140,9 @@ def enter_archive(
         shutil.rmtree(d, ignore_errors=True)
 
 
+SOFT_FAILS: list = []
+
+
 def view_edit_smoke(
     dn_out: str,
     fixture_dir: str,
@@ -201,6 +204,18 @@ def view_edit_smoke(
                 '%s/%s: opened content/chrome' % (name, label),
                 scr,
             )
+        for _ in range(12):                          # the extraction by the unpacker takes a moment
+            if 'hello from fixture' in scr.lower() or not t.alive():
+                break
+            t.pump(0.5, 2)
+            scr = t.text()
+        # the content of the member must be on the screen (the viewer or the editor shows the file that DN extracted with the unpacker)
+        if 'hello from fixture' in scr.lower():
+            print('PASS %s/%s: the content of the member is shown' % (name, label), flush=True)
+        else:
+            SOFT_FAILS.append('%s %s content' % (name, label))
+            print('SOFTFAIL %s/%s: the content of the member is not shown' % (name, label), flush=True)
+            print('DIAG %s screen: %s' % (label, ' | '.join(l.strip() for l in scr.split('\n') if l.strip())[-500:]), flush=True)
         t.send(KEYS['ESC'], 0.6)
         t.send(KEYS['ESC'], 0.4)
         quit_dn(t)
@@ -257,9 +272,6 @@ def extract_smoke(
         quit_dn(t)
     finally:
         shutil.rmtree(d, ignore_errors=True)
-
-
-SOFT_FAILS: list = []
 
 
 def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title_hint: str) -> None:
