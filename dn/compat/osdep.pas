@@ -87,6 +87,9 @@ type
     LastAccessTime: LongInt;
   end;
 
+{ The time of a search record of SysUtils as the DOS packed date and time that DN keeps in TOSSearchRec.Time: SysUtils gives the Unix time on Unix (a time before 1980
+  is 1980-01-01 00:00:00, the first DOS time), the DOS time elsewhere. }
+function SysFileTimeToDos(T: LongInt): LongInt;
 { 0 when found, else the error code (18 = nothing more) }
 function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
 function SysFindNext(var F: TOSSearchRec; IsPChar: Boolean): LongInt;
@@ -315,6 +318,25 @@ type
 var
   Searches: array[1..MaxSearches] of PSysSearch;
 
+function SysFileTimeToDos(T: LongInt): LongInt;
+{$IFDEF UNIX}
+var
+  Y, M, D, H, N, S, MS: Word;
+begin
+  DecodeDate(FileDateToDateTime(T), Y, M, D);
+  DecodeTime(FileDateToDateTime(T), H, N, S, MS);
+  if Y < 1980 then
+  begin
+    Y := 1980; M := 1; D := 1; H := 0; N := 0; S := 0;
+  end;
+  Result := LongInt((Cardinal(Y - 1980) shl 25) or (Cardinal(M) shl 21) or (Cardinal(D) shl 16) or (Cardinal(H) shl 11) or (Cardinal(N) shl 5) or (Cardinal(S) shr 1));
+end;
+{$ELSE}
+begin
+  Result := T;
+end;
+{$ENDIF}
+
 procedure Fill(var F: TOSSearchRec; const R: SysUtils.TSearchRec; IsPChar: Boolean);
 var
   N: ShortString;
@@ -329,7 +351,7 @@ begin
   F.Attr := Byte(R.Attr);
   if R.Attr and faSymLink <> 0 then
     F.Attr := F.Attr or SysLinkAttr;
-  F.Time := R.Time;
+  F.Time := SysFileTimeToDos(R.Time);
   F.Size := R.Size;
   F.Name := N;
   F.Name[Length(N) + 1] := #0;

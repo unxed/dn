@@ -15,6 +15,7 @@ var
   Rc: LongInt;
   HI, Act: LongInt;
   Srch: TOSSearchRec;
+  Stamp: LongInt;
 
 begin
   { the constants are those of DOS INT 21h AH=3Dh }
@@ -119,5 +120,13 @@ begin
   Check(Rc = 18, 'SysFindFirst: nothing matches in an existing directory: 18 (no more files)');
   SysFindClose(Srch);
 {$ENDIF}
-  Finish;
+    { the time of a search record is the DOS packed time on every target (on Unix SysUtils gives the Unix time: the panels showed garbage dates) }
+{$IFDEF UNIX}
+  Stamp := DateTimeToFileDate(EncodeDate(2026, 10, 6) + EncodeTime(19, 46, 10, 0));
+  Check(SysFileTimeToDos(Stamp) = LongInt((Cardinal(2026 - 1980) shl 25) or (10 shl 21) or (6 shl 16) or (19 shl 11) or (46 shl 5) or 5), 'file time: Unix time to DOS time');
+  Check(SysFileTimeToDos(0) = LongInt((1 shl 21) or (1 shl 16)), 'file time: before 1980 is the first DOS time');
+{$ELSE}
+  Check(SysFileTimeToDos($12345678) = $12345678, 'file time: the DOS time stays');
+{$ENDIF}
+Finish;
 end.
