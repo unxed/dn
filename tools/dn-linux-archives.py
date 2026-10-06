@@ -322,6 +322,47 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         shutil.rmtree(d, ignore_errors=True)
 
 
+def delete_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title_hint: str) -> None:
+    """F8 from inside a zip, confirmed with Enter: the member must be gone from the archive on the disk (the packer is run by DN)."""
+    import zipfile
+
+    def members(path):
+        try:
+            return zipfile.ZipFile(path).namelist()
+        except (OSError, zipfile.BadZipFile):
+            return []                          # zip removes the archive file when the last member is deleted
+
+    d = tempfile.mkdtemp(prefix='dn-arc-f8r-')
+    try:
+        copy_dn(dn_out, d)
+        w = os.path.join(d, 'work')
+        os.makedirs(w)
+        shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
+        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        open_archive(t, name, expect_member, title_hint)
+        t.send(KEYS['HOME'], 0.15)
+        t.send(KEYS['DOWN'], 0.2)
+        t.send('\x1b[19~', 1.5)                # F8
+        dlg = t.text()
+        t.send('\r', 1.5)
+        for _ in range(8):
+            t.pump(0.5, 2)
+            if 'inside.txt' not in members(os.path.join(w, name)):
+                break
+        scr = t.text()
+        check(t.alive(), '%s/F8 real: alive' % name, scr)
+        if 'inside.txt' in members(os.path.join(w, name)):
+            SOFT_FAILS.append(name + ' F8')
+            print('SOFTFAIL %s/F8 real: the member is still in the archive' % name, flush=True)
+            print('DIAG F8 dialog:', ' | '.join(l.strip() for l in dlg.split('\n') if l.strip())[-500:], flush=True)
+            print('DIAG F8 screen tail:', ' | '.join(l.strip() for l in scr.split('\n') if l.strip())[-400:], flush=True)
+        else:
+            print('PASS %s/F8 real: the member is deleted from the archive' % name, flush=True)
+        quit_dn(t)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print('usage: dn-linux-archives.py OUTDIR', file=sys.stderr)
@@ -379,6 +420,9 @@ def main() -> int:
             extract_smoke(out, fix, name, member, title)
             print('CASE', name, 'F5 real', flush=True)
             extract_real(out, fix, name, member, title)
+            if name == 'simple.zip':
+                print('CASE', name, 'F8 real', flush=True)
+                delete_real(out, fix, name, member, title)
         if SOFT_FAILS:
             print('F5 real FAILED for:', SOFT_FAILS, flush=True)
             return 1
