@@ -79,6 +79,8 @@ jobs:
         run: python3 tools/dn-linux-archives.py out/dn
       - name: The sort letter in the corner of the panel in three languages
         run: python3 tools/dn-linux-sortmark.py out/dn
+      - name: Quick search of the panel with a character outside the code page
+        run: python3 tools/dn-linux-qsearch.py out/dn
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64

@@ -168,6 +168,9 @@ function QSMaskPlusStar: String;
 procedure InitQuickSearch(Panel: TView);
 procedure StopQuickSearch;
 procedure DoQuickSearch(Key: Word);
+procedure DoQuickSearchEvent(const Event: TEvent);
+  {` The key of a key down event into the mask: the typed text (UTF-8 in the build DNUTF8: also a character that is not in the code page,
+  its CharCode is 0), else the same as DoQuickSearch(DNKeyCode(Event)) `}
 function QuickSearchString(SizeX: Word): String;
   {` Build a string to display the current quick-search mask.
   The string itself is highlighted (with tildes), so tildes inside
@@ -1282,6 +1285,18 @@ procedure DoQuickSearch(Key: Word);
 {$ENDIF}
   end {case};
   end { DoQuickSearch };
+
+procedure DoQuickSearchEvent(const Event: TEvent);
+  begin
+{$IFDEF DNUTF8}
+  if (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) then
+    begin
+    QSMask := QSMask + EventText(Event);
+    Exit;
+    end;
+{$ENDIF}
+  DoQuickSearch(DNKeyCode(Event));
+  end;
 
 function QuickSearchString(SizeX: Word): String;
   var
