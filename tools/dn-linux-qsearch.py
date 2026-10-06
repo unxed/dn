@@ -50,7 +50,9 @@ def run(out, open_tree):
         res = ''
         if not ok:
             def brief(x):
-                return ' | '.join(l.strip() for l in x.split('\n') if l.strip())[:700]
+                import re
+                rows = [re.sub(r'\s{2,}', ' ', l.strip()) for l in x.split('\n')[4:20]]
+                return ' | '.join(r for r in rows if r.strip('║│ '))[:900]
             res = 'opened: ' + brief(s_open) + '\ntyped: ' + brief(s_typed) + '\nend: ' + brief(s_end)
         return ok, res
     finally:
