@@ -69,7 +69,9 @@ Out of scope for this stage (post-3.0 / TODO-later unless owner moves them):
       Allowed IFDEF sites as of 2026-10-05: `dnutf8`, `editcore`, `editfile`,
       `strutil`, `fileutil`, `filescol`, `basics`, `boot`, `cmdline`, `menus`,
       `setups`, `winclp`, `apploop`, `mainapp`, `calendar`, `compat/osdep`.
-      New IFDEFs need a one-line note here.)*
+      New IFDEFs need a one-line note here. 2026-10-06: `keymap` (the case of the letters of the current code page is added to the tables of the OS: code page builds only),
+      `setups` (the table of the sort order that goes with the page 1125), `boot` (the hook `CodePageChanged`), `editcore` (SmartPad line and the line drawing mode are cells of the
+      table of the document in a UTF-8 document), `lfn`/`filediz` none (they call `osdep`).)*
 - [x] Screen buffer API: call sites that mix `WriteLineW` / cell APIs are
       catalogued; new code uses cells only; at least the known mix-up class
       from 2026-10-03 has a regression test or accept coverage note.
@@ -100,7 +102,7 @@ _(Fill when a criterion is deferred with owner OK.)_
 |---|---|---|
 | Intermittent F4-after-clipboard / console AVs | No reliable PTY repro (2026-10-05 attempts: F4, Ctrl/Shift-Ins, Alt-Q, cmdline, Ctrl-O — 0/8 AV) | When reproduced or under far2l clipboard prompt |
 | Safe Pascal style | Explicitly after 3.0 / separate track | Post-3.0 |
-| `TvTermOs` physical split | **Plan (stage 3):** split the current `tv/src/tvtermos.pas` (`unit TvTermOs`) into Unix OS calls (termios, poll, ioctl, signals) and Win32 console/ConPTY calls; keep `TvTermOs` as the stable facade imported by `TvUnix` and the clipboard demo. Reuse `TvVt` for Windows VT interpretation instead of keeping its private `ConFeed` parser. Keep the shared `TvUnix` terminal protocol/dispatch portable. No behaviour change; proof = existing TV PTY tests + DN Linux/Windows smoke. | Stage 3 implementation |
+| `TvTermOs` physical split | **Done (stage 3, 2026-10-06):** `TvTermOs` is a facade over `TvTermOsUnix`, `TvTermOsWin`, `TvTermOsNone` (shared types in `TvTermOsBase`); not done: replacing the private parser of the Windows console by `TvVt` (it would change behaviour). The plan was: split the current `tv/src/tvtermos.pas` (`unit TvTermOs`) into Unix OS calls (termios, poll, ioctl, signals) and Win32 console/ConPTY calls; keep `TvTermOs` as the stable facade imported by `TvUnix` and the clipboard demo. Reuse `TvVt` for Windows VT interpretation instead of keeping its private `ConFeed` parser. Keep the shared `TvUnix` terminal protocol/dispatch portable. No behaviour change; proof = existing TV PTY tests + DN Linux/Windows smoke. | Stage 3 implementation |
 
 ## How to use this file
 
