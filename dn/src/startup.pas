@@ -374,7 +374,7 @@ const
 
 implementation
 uses
-  osdep, strutil, fileutil
+  osdep, OSSystem, strutil, fileutil
   ;
 
 procedure FatalError(const S: String);
@@ -389,8 +389,6 @@ procedure FatalError(const S: String);
 { becouse there is TOO MUCH filetypes with these extensions }
 
 begin
-{$IFDEF GO32V2}
-  CmdExt := '.BAT'                { DOS (and Windows 9x): batch files; elsewhere the default }
-{$ENDIF}
+  CmdExt := OSBatchExt            { .BAT on DOS (and Windows 9x), .CMD elsewhere }
 end.
 

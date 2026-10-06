@@ -124,6 +124,12 @@ begin
   Check((Pos('dn-t-', Name) > 0) and (Copy(Name, Length(Name) - 3, 4) = '.tmp') and (ExtractFilePath(Name) = IncludeTrailingPathDelimiter(GetTempDir(False))), 'SysTempFileName: prefix, extension, the temporary directory');
   Check(SysTempFileName('dn-t-', '.tmp') <> SysTempFileName('dn-t-', '.tmp') , 'SysTempFileName: two names differ');
 
+{$IFDEF UNIX}
+  Check(SysSkipInTree('C:\', 'proc') and SysSkipInTree('C:\', 'SYS') and SysSkipInTree('/', 'sys'), 'tree: /proc and /sys of the root are not entered');
+  Check(not SysSkipInTree('C:\home\', 'proc') and not SysSkipInTree('C:\', 'home'), 'tree: other directories are');
+{$ELSE}
+  Check(not SysSkipInTree('C:\', 'proc'), 'tree: nothing is skipped');
+{$ENDIF}
   { the time of a search record is the DOS packed time on every target (on Unix SysUtils gives the Unix time: the panels showed garbage dates) }
 {$IFDEF UNIX}
   Stamp := DateTimeToFileDate(EncodeDate(2026, 10, 6) + EncodeTime(19, 46, 10, 0));

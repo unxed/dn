@@ -155,9 +155,5 @@ SourceDir := lfGetLongFileName(SourceDir);
 TempDir := lfGetLongFileName(TempDir);
 TempFile := lfGetLongFileName(TempFile);
 
-
-{$IFDEF GO32V2}
-  CmdExt := '.BAT'                { DOS (and Windows 9x): batch files; elsewhere the default }
-{$ENDIF}
 end.
 

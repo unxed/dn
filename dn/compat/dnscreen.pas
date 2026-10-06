@@ -24,6 +24,10 @@ function ReadScreenCells: Pointer;
 { Writes Size cells from the position Pos (the number of the cell) of that array to the screen of tv/. }
 procedure WriteScreenCells(Pos, Size: LongInt);
 procedure ClearScreenCells;
+{ After the first draw of the application: the build with the code page inside on DOS and Windows writes the 16-bit copy back to the screen (the cells of the
+  copy are the text of DN as bytes of the page); on Unix and in the UTF-8 build it does nothing: CellText turns even the code-page build into UTF-8 for the terminal,
+  and the one-byte copy would replace such cells with '?'. }
+procedure SyncScreenCopyAfterDraw;
 procedure GetCursorType(var Y1, Y2: Integer; var Visible: Boolean);
 procedure SetCursorType(Y1, Y2: Integer; Visible: Boolean);
 procedure MoveCursorTo(X, Y: Word);
@@ -136,6 +140,13 @@ begin
   end;
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
   UnixFlush;                 { DN writes the screen and goes on working (a long loop): the terminal gets it now }
+{$ENDIF}
+end;
+
+procedure SyncScreenCopyAfterDraw;
+begin
+{$IF NOT DEFINED(DNUTF8) AND NOT DEFINED(UNIX)}
+  WriteScreenCells(0, ScreenWidth * ScreenHeight);
 {$ENDIF}
 end;
 

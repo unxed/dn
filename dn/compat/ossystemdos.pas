@@ -17,6 +17,8 @@ procedure BackendDiskReset;
 procedure BackendBeep(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
 procedure BackendSerialTrace(const Msg: string);
+function BackendBatchExt: string;
+function BackendDefaultTempDir: string;
 function BackendMemAvail: LongInt;
 
 implementation
@@ -94,6 +96,16 @@ begin
     else
       outportb($3F8, 10);
   end;
+end;
+
+function BackendBatchExt: string;
+begin
+  Result := '.BAT';
+end;
+
+function BackendDefaultTempDir: string;
+begin
+  Result := '';
 end;
 
 function BackendMemAvail: LongInt;

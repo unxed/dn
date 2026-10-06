@@ -335,10 +335,8 @@ procedure ReadTree(C: Char; CountLen: Boolean);
         begin
         { a link to a directory (SysLinkAttr) is not entered: a loop such as /proc/self/root would never end }
         if (SR.SR.Attr and Directory <> 0) and (SR.SR.Attr and SysLinkAttr = 0)
-{$IFDEF UNIX}
-           { the pseudo file systems of the root (/proc, /sys) are not a tree of files: thousands of entries that change as they are read }
-           and not ((Length(S) <= 3) and ((UpStrg(SR.SR.Name) = 'PROC') or (UpStrg(SR.SR.Name) = 'SYS')))
-{$ENDIF}
+           { the pseudo file systems of the root (Unix: /proc, /sys) are not a tree of files }
+           and not SysSkipInTree(S, SR.SR.Name)
           then
           begin
           New(P);
