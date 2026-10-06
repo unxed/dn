@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply the two shared-bug fixes to the pinned object comparator checkout.
+"""Apply shared-bug fixes to the pinned object comparator checkout.
 
 The historical object commit remains unchanged. This exact, guarded backport
 lets the acceptance gate compare the class port with the corrected legacy
@@ -53,6 +53,15 @@ def main() -> int:
     ).strip()
     if actual_sha != OBJECT_DN_SHA:
         raise SystemExit(f"expected object DN {OBJECT_DN_SHA}, got {actual_sha}")
+    tv_root = root / "tv"
+    actual_tv_sha = subprocess.check_output(
+        ["git", "-C", str(tv_root), "rev-parse", "HEAD"], text=True
+    ).strip()
+    if actual_tv_sha != "521d06479198789deeaa6fda287236ca83ba4051":
+        raise SystemExit(
+            "expected object TV 521d06479198789deeaa6fda287236ca83ba4051, "
+            f"got {actual_tv_sha}"
+        )
 
     filescol = root / "dn/src/filescol.pas"
     replace_once(
@@ -172,7 +181,286 @@ def main() -> int:
 """,
     )
 
-    print(f"Applied guarded shared-bug backports to object DN {actual_sha}.")
+    # The object TV comparator predates TV3's ColorSel stream support. Backport
+    # the equivalent object methods only in this disposable comparator checkout.
+    colorsel = tv_root / "src/tvcolorsel.pas"
+    replace_once(
+        colorsel,
+        b"""    constructor Init(const Bounds: TRect; ASelType: TColorSel);
+    procedure Draw; virtual;""",
+        b"""    constructor Init(const Bounds: TRect; ASelType: TColorSel);
+    constructor Load(var S: TStream);
+    procedure Store(var S: TStream);
+    procedure Draw; virtual;""",
+    )
+    replace_once(
+        colorsel,
+        b"""    constructor Init(const Bounds: TRect);
+    procedure Draw; virtual;""",
+        b"""    constructor Init(const Bounds: TRect);
+    constructor Load(var S: TStream);
+    procedure Draw; virtual;""",
+    )
+    replace_once(
+        colorsel,
+        b"""    constructor Init(const Bounds: TRect; const AText: ShortString);
+    destructor Done; virtual;""",
+        b"""    constructor Init(const Bounds: TRect; const AText: ShortString);
+    constructor Load(var S: TStream);
+    destructor Done; virtual;
+    procedure Store(var S: TStream);""",
+    )
+    replace_once(
+        colorsel,
+        b"""    constructor Init(const Bounds: TRect; AScrollBar: PScrollBar; AGroups: PColorGroup);
+    destructor Done; virtual;""",
+        b"""    constructor Init(const Bounds: TRect; AScrollBar: PScrollBar; AGroups: PColorGroup);
+    constructor Load(var S: TStream);
+    destructor Done; virtual;
+    procedure Store(var S: TStream);""",
+    )
+    replace_once(
+        colorsel,
+        b"""    constructor Init(const Bounds: TRect; AScrollBar: PScrollBar; AItems: PColorItem);
+    procedure FocusItem(Item: Integer); virtual;""",
+        b"""    constructor Init(const Bounds: TRect; AScrollBar: PScrollBar; AItems: PColorItem);
+    constructor Load(var S: TStream);
+    procedure FocusItem(Item: Integer); virtual;""",
+    )
+    replace_once(
+        colorsel,
+        b"""    constructor Init(const APalette: TPalette; AGroups: PColorGroup);
+    destructor Done; virtual;""",
+        b"""    constructor Init(const APalette: TPalette; AGroups: PColorGroup);
+    constructor Load(var S: TStream);
+    destructor Done; virtual;
+    procedure Store(var S: TStream);""",
+    )
+    replace_once(
+        colorsel,
+        b"procedure TColorSelector.Draw;",
+        b"""constructor TColorSelector.Load(var S: TStream);
+var
+  Temp: Integer;
+begin
+  inherited Load(S);
+  S.Read(Color, SizeOf(Color));
+  S.Read(Temp, SizeOf(Temp));
+  SelType := TColorSel(Temp);
+end;
+
+procedure TColorSelector.Store(var S: TStream);
+var
+  Temp: Integer;
+begin
+  inherited Store(S);
+  S.Write(Color, SizeOf(Color));
+  Temp := Ord(SelType);
+  S.Write(Temp, SizeOf(Temp));
+end;
+
+procedure TColorSelector.Draw;""",
+    )
+    replace_once(
+        colorsel,
+        b"procedure TMonoSelector.Draw;",
+        b"""constructor TMonoSelector.Load(var S: TStream);
+begin
+  inherited Load(S);
+end;
+
+procedure TMonoSelector.Draw;""",
+    )
+    replace_once(
+        colorsel,
+        b"destructor TColorDisplay.Done;",
+        b"""constructor TColorDisplay.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Text := S.ReadStr;
+  Color := nil;
+end;
+
+procedure TColorDisplay.Store(var S: TStream);
+begin
+  inherited Store(S);
+  S.WriteStr(Text);
+end;
+
+destructor TColorDisplay.Done;""",
+    )
+    replace_once(
+        colorsel,
+        b"""constructor TColorGroupList.Init(const Bounds: TRect; AScrollBar: PScrollBar;
+  AGroups: PColorGroup);""",
+        b"""procedure WriteColorItems(var S: TStream; Items: PColorItem);
+var
+  Count: Integer;
+  Cur: PColorItem;
+begin
+  Count := 0;
+  Cur := Items;
+  while Cur <> nil do
+  begin
+    Inc(Count);
+    Cur := Cur^.Next;
+  end;
+  S.Write(Count, SizeOf(Count));
+  Cur := Items;
+  while Cur <> nil do
+  begin
+    S.WriteStr(Cur^.Name);
+    S.Write(Cur^.Index, SizeOf(Cur^.Index));
+    Cur := Cur^.Next;
+  end;
+end;
+
+procedure WriteColorGroups(var S: TStream; Groups: PColorGroup);
+var
+  Count: Integer;
+  Cur: PColorGroup;
+begin
+  Count := 0;
+  Cur := Groups;
+  while Cur <> nil do
+  begin
+    Inc(Count);
+    Cur := Cur^.Next;
+  end;
+  S.Write(Count, SizeOf(Count));
+  Cur := Groups;
+  while Cur <> nil do
+  begin
+    S.WriteStr(Cur^.Name);
+    WriteColorItems(S, Cur^.Items);
+    Cur := Cur^.Next;
+  end;
+end;
+
+function ReadColorItems(var S: TStream): PColorItem;
+var
+  Count: Integer;
+  Items, Last, Cur: PColorItem;
+  Name: PStr;
+  Index: Byte;
+begin
+  S.Read(Count, SizeOf(Count));
+  Items := nil;
+  Last := nil;
+  while Count > 0 do
+  begin
+    Dec(Count);
+    Name := S.ReadStr;
+    S.Read(Index, SizeOf(Index));
+    New(Cur);
+    Cur^.Name := Name;
+    Cur^.Index := Index;
+    Cur^.Next := nil;
+    if Items = nil then
+      Items := Cur
+    else
+      Last^.Next := Cur;
+    Last := Cur;
+  end;
+  ReadColorItems := Items;
+end;
+
+function ReadColorGroups(var S: TStream): PColorGroup;
+var
+  Count: Integer;
+  Groups, Last, Cur: PColorGroup;
+  Name: PStr;
+begin
+  S.Read(Count, SizeOf(Count));
+  Groups := nil;
+  Last := nil;
+  while Count > 0 do
+  begin
+    Dec(Count);
+    Name := S.ReadStr;
+    New(Cur);
+    Cur^.Name := Name;
+    Cur^.Index := 0;
+    Cur^.Items := ReadColorItems(S);
+    Cur^.Next := nil;
+    if Groups = nil then
+      Groups := Cur
+    else
+      Last^.Next := Cur;
+    Last := Cur;
+  end;
+  ReadColorGroups := Groups;
+end;
+
+constructor TColorGroupList.Init(const Bounds: TRect; AScrollBar: PScrollBar;
+  AGroups: PColorGroup);""",
+    )
+    replace_once(
+        colorsel,
+        b"destructor TColorGroupList.Done;",
+        b"""constructor TColorGroupList.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Groups := ReadColorGroups(S);
+end;
+
+procedure TColorGroupList.Store(var S: TStream);
+begin
+  inherited Store(S);
+  WriteColorGroups(S, Groups);
+end;
+
+destructor TColorGroupList.Done;""",
+    )
+    replace_once(
+        colorsel,
+        b"procedure TColorItemList.FocusItem(Item: Integer);",
+        b"""constructor TColorItemList.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Items := nil;
+end;
+
+procedure TColorItemList.FocusItem(Item: Integer);""",
+    )
+    replace_once(
+        colorsel,
+        b"destructor TColorDialog.Done;",
+        b"""constructor TColorDialog.Load(var S: TStream);
+begin
+  inherited Load(S);
+  Display := PColorDisplay(ReadChildPtr(S));
+  Groups := PColorGroupList(ReadChildPtr(S));
+  ForLabel := PLabel(ReadChildPtr(S));
+  ForSel := PColorSelector(ReadChildPtr(S));
+  BakLabel := PLabel(ReadChildPtr(S));
+  BakSel := PColorSelector(ReadChildPtr(S));
+  MonoLabel := PLabel(ReadChildPtr(S));
+  MonoSel := PMonoSelector(ReadChildPtr(S));
+  Pal := nil;
+  GroupIndex := 0;
+end;
+
+procedure TColorDialog.Store(var S: TStream);
+begin
+  inherited Store(S);
+  PutPeerViewPtr(S, PView(Display));
+  PutPeerViewPtr(S, PView(Groups));
+  PutPeerViewPtr(S, PView(ForLabel));
+  PutPeerViewPtr(S, PView(ForSel));
+  PutPeerViewPtr(S, PView(BakLabel));
+  PutPeerViewPtr(S, PView(BakSel));
+  PutPeerViewPtr(S, PView(MonoLabel));
+  PutPeerViewPtr(S, PView(MonoSel));
+end;
+
+destructor TColorDialog.Done;""",
+    )
+
+    print(
+        f"Applied guarded shared-bug backports to object DN {actual_sha} "
+        f"and object TV {actual_tv_sha}."
+    )
     return 0
 
 
