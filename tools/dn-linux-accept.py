@@ -289,7 +289,8 @@ def _wait_file_total_stable(t: PtyTerm, stable_sec: float = 45.0,
         row = next((line for line in t.text().split('\n')
                     if re.search(r'\d+ files with .* bytes', line)), None)
         if row is None:
-            return True
+            t.pump(0.8, 1.4)
+            continue
         now = time.time()
         if row != previous:
             previous = row
@@ -534,7 +535,7 @@ def run_one(out: str, work: str, spec: str, area: str = '',
             # The editor-selection tree scans the host root; wait for its
             # displayed aggregate to settle before comparing the two builds.
             if not _wait_file_total_stable(t):
-                print('file-total aggregate still changing at wait limit',
+                print('file-total aggregate absent or still changing at wait limit',
                       flush=True)
         if _directory_scan_active(t.text()):
             _dismiss_directory_scan(t)
