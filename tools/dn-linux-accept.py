@@ -279,8 +279,8 @@ def _directory_scan_active(text: str) -> bool:
     return ('Scanning directories' in text) or ('Reading directories:' in text)
 
 
-def _wait_file_total_stable(t: PtyTerm, stable_sec: float = 10.0,
-                            limit_sec: float = 65.0) -> None:
+def _wait_file_total_stable(t: PtyTerm, stable_sec: float = 45.0,
+                            limit_sec: float = 110.0) -> bool:
     """Wait for the tree dialog's recursive file/byte totals to stop changing."""
     end = time.time() + limit_sec
     previous = None
@@ -289,14 +289,15 @@ def _wait_file_total_stable(t: PtyTerm, stable_sec: float = 10.0,
         row = next((line for line in t.text().split('\n')
                     if re.search(r'\d+ files with .* bytes', line)), None)
         if row is None:
-            return
+            return True
         now = time.time()
         if row != previous:
             previous = row
             unchanged_since = now
         elif unchanged_since is not None and now - unchanged_since >= stable_sec:
-            return
+            return True
         t.pump(0.8, 1.4)
+    return False
 
 
 def _dismiss_directory_scan(t: PtyTerm, limit: float = 20.0) -> None:
@@ -493,7 +494,8 @@ def run_one(out: str, work: str, spec: str, area: str = '',
     def _alarm(_signum, _frame):
         raise _ScenarioTimeout('timeout')
 
-    timeout_sec = (_LONG_SCAN_TIMEOUT_SEC
+    timeout_sec = (150 if scenario == 'menu_5_13' else
+                   _LONG_SCAN_TIMEOUT_SEC
                    if scenario in _LONG_SCAN_SCENARIOS or scenario.startswith('menu_')
                    else SCENARIO_TIMEOUT_SEC)
 
@@ -531,7 +533,9 @@ def run_one(out: str, work: str, spec: str, area: str = '',
         if scenario == 'menu_5_13':
             # The editor-selection tree scans the host root; wait for its
             # displayed aggregate to settle before comparing the two builds.
-            _wait_file_total_stable(t)
+            if not _wait_file_total_stable(t):
+                print('file-total aggregate still changing at wait limit',
+                      flush=True)
         if _directory_scan_active(t.text()):
             _dismiss_directory_scan(t)
         else:
