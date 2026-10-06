@@ -66,7 +66,7 @@ type
     procedure FreeItem(Item: Pointer); override;
     end;
 
-  TPhoneDir = class(TObject)
+  TPhoneDir = class
     Name: String[30];
     Memo1: PString;
     Memo2: PString;
@@ -79,7 +79,7 @@ type
     destructor Destroy; override;
     end;
 
-  TPhone = class(TObject)
+  TPhone = class
     Name: String[30];
     Memo1: PString;
     Memo2: PString;

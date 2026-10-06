@@ -58,7 +58,7 @@ type
   TFindDir = class;
   TFindFile = class;
   TFindBox = class;
-  TFindObject = class(TObject)
+  TFindObject = class
     Text: PString;
     TT: (ttTape, ttDir, ttFile);
     constructor Create(const S: String);

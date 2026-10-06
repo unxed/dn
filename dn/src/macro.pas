@@ -57,7 +57,7 @@ uses
 
 type
   TEditMacros = class;
-  TEditMacros = class(TObject)
+  TEditMacros = class
     Name: PString;
     Commands: TCollection;
     constructor Create(S: String; var F: TTextReader);
@@ -66,7 +66,7 @@ type
     end;
 
   TMacroCommand = class;
-  TMacroCommand = class(TObject)
+  TMacroCommand = class
     Command: Integer;
     Repetitions: Integer;
     constructor Create(ACommand, ARepetitions: Word);
@@ -114,7 +114,7 @@ uses
 
 type
   TLngWord = class;
-  TLngWord = class(TObject)
+  TLngWord = class
     Name: String[30];
     l: Word;
     constructor Create(AL: Word; const AName: String);
@@ -500,7 +500,7 @@ destructor TMacroString.Destroy;
 //       16383 characters (see dn.dnr, dlgEditEnvironment resources)
 type
   TDOSVar = class;
-  TDOSVar = class(TObject)
+  TDOSVar = class
     Name: PString;
     Value: AnsiString; {JO}
     constructor Create(P: PChar; NameLen, ValueLen: Longint);

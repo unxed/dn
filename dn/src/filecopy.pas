@@ -296,7 +296,7 @@ var
   WriteStream: lFile;
 
 type
-  TLine = class(TObject)
+  TLine = class
     { CopyQueue element}
     Owner: PFileRec;
     OldName: PString;
@@ -317,7 +317,7 @@ type
     procedure FreeItem(Item: Pointer); override;
     end;
 
-  TDirName = class(TObject)
+  TDirName = class
     OldName, NewName: PString;
     Check: Boolean;
     CopyIt: Boolean;

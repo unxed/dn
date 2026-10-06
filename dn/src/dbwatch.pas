@@ -90,7 +90,7 @@ type
     end;
 
   TDBFile = class;
-  TDBFile = class(TObject)
+  TDBFile = class
     WriteMode: Byte;
     BaseName: String; {DataCompBoy}
     BaseFile: TBufStream;

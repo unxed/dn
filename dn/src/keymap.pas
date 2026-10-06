@@ -74,7 +74,7 @@ var
 
 type
   {(c) SeYKo}
-  TCodePageDetector = class(TObject)
+  TCodePageDetector = class
     procedure CheckString(P1: PChar; len: Integer);
     function DetectedCodePage: TKeyMap;
   private

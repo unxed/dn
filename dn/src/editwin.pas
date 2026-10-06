@@ -87,7 +87,7 @@ uses
   ;
 
 type
-  TEditSaver = class(TObject)
+  TEditSaver = class
     constructor Load(var S: TStream);
     procedure Store(var S: TStream);
     end;
