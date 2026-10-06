@@ -52,6 +52,7 @@ KEYS = {
     'HOME': '\x1b[H', 'END': '\x1b[F', 'PGUP': '\x1b[5~', 'PGDN': '\x1b[6~',
     'INS': '\x1b[2~', 'DEL': '\x1b[3~', 'TAB': '\t', 'ENTER': '\r', 'ESC': '\x1b',
     'BS': '\x7f', 'ALT-X': '\x1bx', 'ALT-F1': '\x1b[1;3P', 'ALT-F7': '\x1b[18;3~',
+    'ALT-F12': '\x1b[24;3~',
     'ALT-F10': '\x1b[21;3~', 'CTRL-L': '\x0c', 'CTRL-O': '\x0f', 'CTRL-R': '\x12',
     'CTRL-S': '\x13', 'CTRL-U': '\x15', 'PLUS': '+', 'MINUS': '-', 'STAR': '*',
     'SPACE': ' ',
@@ -64,6 +65,7 @@ SCENARIOS = [
     ('quitask', 'ALT-X', 'startup'),
     ('quit', 'ALT-X ENTER', 'startup'),
     ('quit_cancel', 'ALT-X ESC', 'startup'),
+    ('restart_language', 'ALT-F12 DOWN ENTER', 'startup'),
     # --- panels ---
     ('tab', 'TAB', 'panels'),
     ('tab_back', 'TAB TAB', 'panels'),
@@ -495,6 +497,8 @@ def run_one(out: str, work: str, spec: str, area: str = '',
             # race an idle active panel frame against a settled Help peer.
             if scenario in _HELP_OPEN_SCENARIOS and k == KEYS['F1']:
                 wait_help_window(t, 3.0 if _FAST else 4.0)
+        if scenario == 'restart_language' and t.alive():
+            wait_menu_bar(t, 5.0 if _FAST else 8.0)
         t.pump(sa, pa)
         if scenario == 'f1help':
             wait_help_window(t, 2.0 if _FAST else 3.0)
@@ -514,6 +518,14 @@ def run_one(out: str, work: str, spec: str, area: str = '',
         err_path = os.path.join(INSTALL, 'dn.err')
         if os.path.isfile(err_path):
             err = open(err_path, encoding='utf-8', errors='replace').read()[:400]
+        if scenario == 'restart_language':
+            ini_path = os.path.join(INSTALL, 'dn.ini')
+            ini = open(ini_path, encoding='utf-8', errors='replace').read() if os.path.isfile(ini_path) else ''
+            if not re.search(r'(?im)^ActiveLanguage=\S+', ini):
+                err = 'language selection was not persisted; self-restart was not requested'
+            elif not snap['alive'] or not any(label in snap['text'].split('\n', 1)[0]
+                                              for label in ('File', 'Файл')):
+                err = 'DN did not return to its startup screen after selecting a language'
         if t.alive():
             for _ in range(3):
                 t.send(KEYS['ESC'], 0.15)
