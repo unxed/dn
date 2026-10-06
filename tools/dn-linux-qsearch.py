@@ -23,25 +23,36 @@ def run(out, open_tree):
         t.pump(0.5, 3)
         head0 = '\n'.join(t.text().split('\n')[:3])
         if open_tree:
-            t.send('\x1b[21;3~', 1.5)          # Alt+F10: the tree
+            # the tree of directories is the window of the button [Tree] of the Copy dialog: F5 on "alpha", Alt+T
+            t.send('\x1b[H', 0.2)
+            t.send('\x1b[B', 0.2)                  # Gyor
+            t.send('\x1b[B', 0.2)                  # alpha
+            t.send('\x1b[15~', 1.5)                # F5: the Copy dialog
+            t.send('\x1bt', 1.5)                   # Alt+T: [Tree]
             t.pump(1.0, 4)
         else:
-            t.send('\x13', 0.5)                # Ctrl+S: the quick search
+            t.send('\x13', 0.5)                    # Ctrl+S: the quick search
         s_open = t.text()
         t.send('Győ', 0.8)
         t.pump(0.5, 3)
         s_typed = t.text()
-        t.send('\r', 0.8)
+        t.send('\r', 1.0)
         t.pump(0.8, 3)
         s_end = t.text()
-        head1 = '\n'.join(s_end.split('\n')[:3])
+        t.send('\x1b', 0.3)
+        t.send('\x1b', 0.3)
         t.close(0.3)
-        ok = 'Győr' not in head0 and 'Győr' in head1
+        if open_tree:
+            # the chosen directory is the end of the destination in the Copy dialog: "...\\work\\Győr" (the panels show the name without the backslash)
+            ok = any('\\Győr' in l for l in s_end.split('\n'))
+        else:
+            ok = 'Győr' not in head0 and 'Győr' in '\n'.join(s_end.split('\n')[:3])
+        res = ''
         if not ok:
             def brief(x):
-                return ' | '.join(l.strip() for l in x.split('\n') if l.strip())[:900]
-            head1 = 'opened: ' + brief(s_open) + '\ntyped: ' + brief(s_typed) + '\nend: ' + brief(s_end)
-        return ok, head1
+                return ' | '.join(l.strip() for l in x.split('\n') if l.strip())[:700]
+            res = 'opened: ' + brief(s_open) + '\ntyped: ' + brief(s_typed) + '\nend: ' + brief(s_end)
+        return ok, res
     finally:
         shutil.rmtree(d, ignore_errors=True)
 

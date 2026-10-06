@@ -9,6 +9,9 @@ interface
 
 { A line of the trace of the start (test aid): written and flushed to DNERR.TXT when DNDUMP is set. }
 procedure DNTrace(const Msg: String);
+{ A line for the log file named by the environment variable DN_LOG_FILE (a diagnostic aid of the tests of the real operations: what DN was asked to run
+  and what came of it); nothing if the variable is not set. Short lines only. }
+procedure DNLog(const Msg: String);
 { In an exception handler: the class, the message and the call stack of the exception with the lines of the sources (the
   program is built with -gl). }
 procedure DNTraceException(const ClassName, MessageText: String);
@@ -50,6 +53,26 @@ begin
       end;
     end;
 {$ENDIF}
+  end;
+end;
+
+procedure DNLog(const Msg: String);
+var
+  Name: String;
+  T: Text;
+begin
+  Name := GetEnvironmentVariable('DN_LOG_FILE');
+  if Name = '' then
+    Exit;
+  try
+    Assign(T, Name);
+    if FileExists(Name) then
+      Append(T)
+    else
+      Rewrite(T);
+    Writeln(T, Msg);
+    Close(T);
+  except
   end;
 end;
 

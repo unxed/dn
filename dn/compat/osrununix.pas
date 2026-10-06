@@ -42,6 +42,7 @@ var
   R: LongInt;
   A: string;
 begin
+  DNLog('Execute: [' + StrPas(Path) + '] [' + StrPas(Args) + ']');
   { through the shell, with the terminal: the program may write to it and read from it }
   A := StrPas(Args);
   { DN starts its helpers (the archivers) the DOS way: the program is COMSPEC and the arguments are "/c command". COMSPEC is not set
@@ -53,6 +54,7 @@ begin
   Result := 0;
   if (R < 0) or ((R shr 8) = 127) or (R = 9009) then
     Result := 2;                   { the shell could not run it: DOS "file not found" }
+  DNLog('Execute: status ' + IntToStr(R) + ', DOS error ' + IntToStr(Result));
 end;
 
 procedure BackendRestartSelf;

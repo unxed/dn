@@ -282,8 +282,10 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
                 os.chmod(os.path.join(bindir, prog), 0o755)
         old_path = os.environ['PATH']
         os.environ['PATH'] = bindir + os.pathsep + old_path
+        os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
         os.environ['PATH'] = old_path
+        del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
@@ -302,6 +304,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         if not os.path.exists(got):
             print('DIAG files:', sorted(os.path.relpath(os.path.join(r, f), d) for r, _, fs in os.walk(d) for f in fs if f != 'dn' and not f.endswith(('.lng', '.dlg', '.hlp'))), flush=True)
             print('DIAG wrapper log:', open(wlog).read() if os.path.exists(wlog) else '(the unpacker was not started)', flush=True)
+            print('DIAG dn.log:', open(os.path.join(d, 'dn.log')).read()[-900:] if os.path.exists(os.path.join(d, 'dn.log')) else '(none)', flush=True)
             import subprocess
             print('DIAG unzip:', shutil.which('unzip'), 'zip:', shutil.which('zip'), flush=True)
             print('DIAG find:', subprocess.run(['find', '/tmp', '-name', 'inside.txt', '-not', '-path', '*/fix*'], capture_output=True, text=True).stdout.split(), flush=True)
@@ -391,8 +394,10 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         os.chmod(os.path.join(bindir, 'zip'), 0o755)
         old_path = os.environ['PATH']
         os.environ['PATH'] = bindir + os.pathsep + old_path
+        os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
         os.environ['PATH'] = old_path
+        del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
         t.send('\t', 0.6)                          # the other panel: the directory with added.txt
         t.send(KEYS['HOME'], 0.15)
@@ -412,6 +417,7 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
             SOFT_FAILS.append(name + ' add')
             print('SOFTFAIL %s/F5 add: the file is not in the archive; members: %s' % (name, members(os.path.join(w, name))), flush=True)
             print('DIAG add wrapper log:', open(wlog).read() if os.path.exists(wlog) else '(zip was not started)', flush=True)
+            print('DIAG add dn.log:', open(os.path.join(d, 'dn.log')).read()[-900:] if os.path.exists(os.path.join(d, 'dn.log')) else '(none)', flush=True)
             print('DIAG add dialog:', ' | '.join(l.strip() for l in dlg.split('\n') if l.strip())[-500:], flush=True)
             print('DIAG add screen tail:', ' | '.join(l.strip() for l in scr.split('\n') if l.strip())[-400:], flush=True)
         quit_dn(t)
