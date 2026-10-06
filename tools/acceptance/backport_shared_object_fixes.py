@@ -106,6 +106,36 @@ begin
   end;""",
     )
 
+    # SysUtils gives the Unix time on Unix and TOSSearchRec.Time is a DOS packed time: the panels showed garbage dates (5.06.33 10:12) and a time
+    # that depends on the second of the creation of a file. The class build has the conversion (SysFileTimeToDos); the comparator gets the same one.
+    replace_once(
+        osdep,
+        b"""procedure Fill(var F: TOSSearchRec; const R: SysUtils.TSearchRec; IsPChar: Boolean);
+""",
+        b"""function SysFileTimeToDos(T: LongInt): LongInt;
+{$IFDEF UNIX}
+var
+  Y, M, D, H, N, S, MS: Word;
+begin
+  DecodeDate(FileDateToDateTime(T), Y, M, D);
+  DecodeTime(FileDateToDateTime(T), H, N, S, MS);
+  if Y < 1980 then
+  begin
+    Y := 1980; M := 1; D := 1; H := 0; N := 0; S := 0;
+  end;
+  Result := LongInt((Cardinal(Y - 1980) shl 25) or (Cardinal(M) shl 21) or (Cardinal(D) shl 16) or (Cardinal(H) shl 11) or (Cardinal(N) shl 5) or (Cardinal(S) shr 1));
+end;
+{$ELSE}
+begin
+  Result := T;
+end;
+{$ENDIF}
+
+procedure Fill(var F: TOSSearchRec; const R: SysUtils.TSearchRec; IsPChar: Boolean);
+""",
+    )
+    replace_once(osdep, b"  F.Time := R.Time;\n", b"  F.Time := SysFileTimeToDos(R.Time);\n")
+
     filescol = root / "dn/src/filescol.pas"
     replace_once(
         filescol,
