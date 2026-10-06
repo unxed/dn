@@ -635,6 +635,9 @@ procedure Saver(Group, Parameter: PChar; Kind: TIniItemKind; Size: Word;
   if  (SaveVar <> nil) and (SaveVar <> PVar) then
     Exit;
   s := IniVarToStr(Kind, Size, PVar)+#0;
+  { the optional keys are written only when they have a value (an empty DefaultSortMode is not put into a new dn.ini) }
+  if (Kind = ikStr) and (Length(s) = 1) and (StrComp(Parameter, 'DefaultSortMode') = 0) then
+    Exit;
   { This code is provided only to not cut longer string if only a part }
   { was read in Loader procedure.                                      }
   if  ( (Kind = ikStr) and (Length(s) = (Size-1)))
