@@ -542,7 +542,7 @@ will be under the same (long or short) name }
   NewContainerNotEmpty := False;
   if OpenFileList(ContainerFullName) then
     begin
-    GetFAttr(OldConatainerFile, OldContainerAttr);
+    SysGetTAttr(OldConatainerFile, OldContainerAttr);
     ReadFileList(SaveDizNameProc, SaveDizLineProc, SaveDizEndProc);
     EraseFile(ContainerFullName);
     end
@@ -566,7 +566,7 @@ will be under the same (long or short) name }
   then
     begin
     Rename(NewContainerFile, SysOsPath(ContainerFullName));
-    SetFAttr(NewContainerFile, OldContainerAttr);
+    SysSetTAttr(NewContainerFile, OldContainerAttr);
     end
   else
     Erase(NewContainerFile);

@@ -89,6 +89,9 @@ jobs:
       - name: The terminal changes its size (SIGWINCH)
         if: success() || failure()
         run: python3 tools/dn-linux-resize.py out/dn
+      - name: Symbolic links and permissions in the panels
+        if: success() || failure()
+        run: python3 tools/dn-linux-fsattrs.py out/dn
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64

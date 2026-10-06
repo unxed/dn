@@ -16,6 +16,12 @@ var
   HI, Act: LongInt;
   Srch: TOSSearchRec;
   Stamp: LongInt;
+  AttrFile: File;
+  AttrTmp: string;
+  Attr: Word;
+{$IFDEF UNIX}
+  AttrStat: Stat;
+{$ENDIF}
 
 begin
   { the constants are those of DOS INT 21h AH=3Dh }
@@ -138,5 +144,24 @@ begin
 {$ELSE}
   Check(SysFileTimeToDos($12345678) = $12345678, 'file time: the DOS time stays');
 {$ENDIF}
+  { the attribute ReadOnly of a file: on Unix the write permission of the owner (the RTL has no attributes there) }
+  AttrTmp := GetTempDir + 't_osdep_attr_' + IntToStr(GetProcessID) + '.txt';
+  Assign(F, AttrTmp);
+  Rewrite(F, 1);
+  Close(F);
+  Assign(AttrFile, AttrTmp);
+  SysGetFAttr(AttrFile, Attr);
+  Check((Attr and 1) = 0, 'attributes: a new file is not read-only');
+  SysSetFAttr(AttrFile, 1);
+  SysGetFAttr(AttrFile, Attr);
+  Check((Attr and 1) = 1, 'attributes: ReadOnly is set and read back');
+{$IFDEF UNIX}
+  fpStat(AttrTmp, AttrStat);
+  Check((AttrStat.st_mode and (S_IWUSR or S_IWGRP or S_IWOTH)) = 0, 'attributes: the file has no write permission now (Unix)');
+{$ENDIF}
+  SysSetFAttr(AttrFile, 32);
+  SysGetFAttr(AttrFile, Attr);
+  Check((Attr and 1) = 0, 'attributes: ReadOnly is cleared again (Archive alone)');
+  DeleteFile(AttrTmp);
 Finish;
 end.

@@ -41,6 +41,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-linux-locale.py` | the single-byte code page by the locale of the host | dn-linux |
 | `dn-linux-find.py` | Find File (Alt+F7) with a mask and with a text, the result panel | dn-linux |
 | `dn-linux-resize.py` | the terminal changes its size under DN (SIGWINCH: 80x25, 120x40, 100x30): the bars and the frames follow | dn-linux |
+| `dn-linux-fsattrs.py` | symbolic links (to a file, to a directory, dangling) and read-only files in the panels: list, enter, F5, F8, the permissions of the copy | dn-linux |
 | `dn-linux-archives.py` | the archive matrix (enter, F3, F4, F5, F8, add) for zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz; `DN_ARC_ONLY='simple.zip ...'` runs some | dn-linux |
 | `dn-linux-menus.py` | opens every item of every menu, reports what died | by hand |
 | `dn-win-smoke.py` | the Windows build on a real console (ConPTY via pywinpty) | dn-windows |
