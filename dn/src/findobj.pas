@@ -54,11 +54,11 @@ uses
   ;
 
 type
-  TFindObject = class;
+  TFindEntry = class;
   TFindDir = class;
   TFindFile = class;
   TFindBox = class;
-  TFindObject = class
+  TFindEntry = class
     Text: PString;
     TT: (ttTape, ttDir, ttFile);
     constructor Create(const S: String);
@@ -66,13 +66,13 @@ type
     destructor Destroy; override;
     end;
 
-  TFindDir = class(TFindObject)
+  TFindDir = class(TFindEntry)
     Pos: LongInt;
     constructor Create(const S: String; APos: LongInt);
     function GetText: String; virtual;
     end;
 
-  TFindFile = class(TFindObject)
+  TFindFile = class(TFindEntry)
     Name: PString;
     Size: LongInt;
     Time: LongInt;
@@ -95,19 +95,19 @@ uses
   strutil, mainapp, Commands, Dos
   ;
 
-constructor TFindObject.Create(const S: String);
+constructor TFindEntry.Create(const S: String);
   begin
   inherited Create;
   Text := NewStr(S);
   TT := ttTape;
   end;
 
-function TFindObject.GetText: String;
+function TFindEntry.GetText: String;
   begin
   GetText := GetString(dlArvid_TapeDir)+CnvString(Text);
   end;
 
-destructor TFindObject.Destroy;
+destructor TFindEntry.Destroy;
   begin
   DisposeStr(Text);
   end;
@@ -153,7 +153,7 @@ function TFindFile.GetText: String;
 
 function TFindBox.GetText(Item: LongInt; MaxLen: Integer): String;
   var
-    P: TFindObject;
+    P: TFindEntry;
   begin
   P := List.At(Item);
   if P <> nil then
@@ -164,7 +164,7 @@ function TFindBox.GetText(Item: LongInt; MaxLen: Integer): String;
 
 function TFindBox.IsSelected(Item: LongInt): Boolean;
   var
-    P: TFindObject;
+    P: TFindEntry;
   begin
   P := List.At(Item);
   IsSelected := (P <> nil) and (P.TT = ttTape);

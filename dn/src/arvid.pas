@@ -1060,7 +1060,7 @@ procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
       Exit;
       end;
     if not WasTape then
-      FindList.Insert(TFindObject.Create(Name));
+      FindList.Insert(TFindEntry.Create(Name));
     if not WasDir then
       FindList.Insert(TFindDir.Create(dr, LP));
     WasTape := True;
@@ -1315,10 +1315,10 @@ procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
       R: TRect;
       PL: TFindBox;
       P: TView;
-      F: TFindObject;
+      F: TFindEntry;
 
     procedure DoCount(P_: Pointer);
-    var P: TFindObject absolute P_;
+    var P: TFindEntry absolute P_;
       begin
       Inc(R.A.X, Byte(P.TT = ttFile));
       end;
