@@ -9,7 +9,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 120 |
 | Contributors of DN OSP | 10 |
-| Upstream without a notice | 15 |
+| Upstream without a notice | 14 |
 
 ## Our files (MIT, see `LICENSE`)
 

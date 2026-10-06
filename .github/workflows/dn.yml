@@ -65,6 +65,7 @@ jobs:
           tag=$(grep -v '^#' bootstrap/BASELINE | tail -1)
           echo "baseline commit: $tag"
           mkdir -p out/ref && git archive "$tag" dn/src dn/data | tar -x -C out/ref
+          rm -f out/ref/dn/src/read.me   # the old Virtual Pascal notes: removed from the tree after the baseline (docs/TEXT-POLICY.md), not made by the bootstrap
           diff -r out/bootstrap/src out/ref/dn/src && diff -r out/bootstrap/data out/ref/dn/data && echo "the same as $tag"
 
   units:
