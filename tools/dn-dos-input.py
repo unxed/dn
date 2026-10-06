@@ -4,7 +4,7 @@ INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at th
 usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
 Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
-utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), all of them by default. (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
+utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need the patched DOSBox-X
 (docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
@@ -210,7 +210,23 @@ def sc_utf8_names_cp(src, work, scr):
     check(has(lines, 'C:\\Каталог') and has(lines, 'Файл'), 'UTF-8 names: a double click on the directory enters it (the path and the file are in the code page)', lines)
 
 
-SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp}
+def sc_names_cp_plain(src, work, scr):
+    """The same build and names with the stock DOSBox-X: there is no provider DOS-UTF8/NAMES, the DOS gives the names in the code page (the host UTF-8 names become cp866 ones
+    by the emulator, `chcp 866`): DN shows them and goes into the directory just the same (the names are what the DOS gives)."""
+    if PATCHED:
+        print('SKIP names-cp-plain: it is for the stock DOSBox-X (without DN_DOS_PATCHED=1)')
+        return
+    prepare(src, work)
+    os.makedirs(os.path.join(work, 'Каталог'), exist_ok=True)
+    open(os.path.join(work, 'Каталог', 'Файл.txt'), 'w').write('hi\n')
+    open(os.path.join(work, 'Привет.txt'), 'w').write('hi\n')
+    extra = ['-c', 'chcp 866']
+    lines = run(work, STARTUP + 8, '011B', None, extra=extra)
+    check(has(lines, 'Привет'), 'plain DOS: a file with a Russian name is shown in the code page', lines)
+    check(has(lines, 'Каталог'), 'plain DOS: a directory with a Russian name is shown in the code page', lines)
+
+
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain}
 
 
 def main():
