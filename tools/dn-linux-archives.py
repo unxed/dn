@@ -259,6 +259,9 @@ def extract_smoke(
         shutil.rmtree(d, ignore_errors=True)
 
 
+SOFT_FAILS: list = []
+
+
 def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title_hint: str) -> None:
     """F5 from inside the archive, confirmed with Enter: the member must be on the disk next to the archive with its content."""
     d = tempfile.mkdtemp(prefix='dn-arc-f5r-')
@@ -294,9 +297,13 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
                     if f.lower() in ('dn.err', 'dn.log', 'dnerr.log') or f.endswith('.err'):
                         print('DIAG', f, ':', open(os.path.join(root, f), errors='replace').read()[-600:], flush=True)
             print('DIAG typed:\n' + '\n'.join(l.rstrip() for l in dlg2.split('\n') if l.strip())[-1500:], flush=True)
-        check(os.path.exists(got), '%s/F5 real: the member is extracted' % name, scr)
-        with open(got) as f:
-            check(f.read() == 'hello from fixture\n', '%s/F5 real: the content is right' % name, scr)
+        if not os.path.exists(got):
+            SOFT_FAILS.append(name)               # the other formats are still tried (one run tells which formats extract)
+            print('SOFTFAIL %s/F5 real: the member is not extracted' % name, flush=True)
+        else:
+            with open(got) as f:
+                check(f.read() == 'hello from fixture\n', '%s/F5 real: the content is right' % name, scr)
+            print('PASS %s/F5 real: the member is extracted' % name, flush=True)
         quit_dn(t)
     finally:
         shutil.rmtree(d, ignore_errors=True)
@@ -356,6 +363,9 @@ def main() -> int:
             extract_smoke(out, fix, name, member, title)
             print('CASE', name, 'F5 real', flush=True)
             extract_real(out, fix, name, member, title)
+        if SOFT_FAILS:
+            print('F5 real FAILED for:', SOFT_FAILS, flush=True)
+            return 1
         print('ALL OK', flush=True)
         return 0
     finally:
