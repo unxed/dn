@@ -472,8 +472,10 @@ begin
     L := '';
     if WithLanguage then
       L := UpperCase(Copy(LngId, 1, 3));
-    if (L = 'RUS') or (L = 'UKR') or (L = 'BEL') then
+    if (L = 'RUS') or (L = 'BEL') then
       Id := 866
+    else if L = 'UKR' then
+      Id := 1125                  { the Ukrainian resources of the code page builds are landed on it (tools/to-codepage.py) }
     else
       Id := HostOemCodePage;
   end;

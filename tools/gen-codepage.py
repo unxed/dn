@@ -9,7 +9,7 @@ usage: python3 tools/gen-codepage.py > tv/src/tvcp.inc
 import sys
 
 # the OEM code pages of DOS that Python knows (what DOS reports by INT 21h AX=6601h)
-IDS = [437, 737, 775, 850, 852, 855, 857, 858, 860, 861, 862, 863, 864, 865, 866, 869]
+IDS = [437, 737, 775, 850, 852, 855, 857, 858, 860, 861, 862, 863, 864, 865, 866, 869, 1125]   # 1125: the DOS page of Ukrainian (RUSCII)
 PAGES = [("Cp%d" % i, "cp%d" % i) for i in IDS]
 
 # Unicode code points of the IBM PC glyphs for bytes 00h..1Fh and 7Fh
