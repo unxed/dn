@@ -81,7 +81,7 @@ used for acceptance.
 The last object baseline used is DN
 `b4916b874989d7b35660d02cf935dc5f0db7a656` with TV
 `521d06479198789deeaa6fda287236ca83ba4051`. The class build used for the latest
-full result is DN `1f51f75677ae19ccb13c4d9071dedb3f7177f87e` with TV3
+full result is DN `c2144661158afcc286504f918920bf97427de8a1` with TV3
 `a06dd31`. Both were rebuilt with matching UTF-8 mode and fixtures. Earlier trials against
 `33674fed7829124fbd3230440faf3075c45eb9f6` or the much older
 `10763d65d091fc8525599a45c155be228c1bb8b6` do not replace this comparison.
@@ -115,21 +115,19 @@ and `filefind.pas` were reviewed type-by-type: they store ShortStrings and
 already resolve to `Defines.PString` / `pstring_bind`, so they were left
 unchanged.
 
-**Latest exact-SHA run:** DN `c2fb5f303d0093400b1433065d036cf61782b6e0`
-(TV3 `a06dd31`) rebuilt against the same object pins above. The class/object
-build job succeeded. The object comparator received only exact-SHA-guarded
-temporary backports for the shared DN fixes and ColorSel streaming; the pinned
-source tree was not changed. Acceptance summary `37402336433` recorded
-`160 pass / 3 fail`; one shard terminated at `menu_1_11` with exit 143 and no
-summary, so the run is **not** a passing full gate. `menu_4_5` and
-`menu_6_16` now pass. Two reported failures (`menu_2_12`, `menu_5_13`) have the
-same one-column drift in the transient, centered “Reading directories” progress
-line; its width includes a volatile count, and the focused replay of
-`menu_2_3`, `menu_2_6`, and `menu_5_13` passed. The third (`menu_2_15`) timed
-out in the class run after 30 seconds and remains unexplained. The harness now
-Esc-dismisses detected directory-scan progress on all scenarios and allows
-menu scenarios more time to report it; focused reproduction and a new full
-matrix are still required.
+**Latest exact-SHA run:** DN `c2144661158afcc286504f918920bf97427de8a1`
+(TV3 `a06dd31`) rebuilt against the same object pins above. The object
+comparator received only exact-SHA-guarded temporary backports for shared DN
+fixes and ColorSel streaming; pinned object sources were not changed. All
+12 scenario shards and the aggregate job succeeded: **178 pass / 0 fail**
+(`dn-accept` run `37403835290`). This includes the previously mismatching
+`menu_2_3`, `menu_2_6`, `menu_2_12`, `menu_5_13`, Directory Branch, Colors, and
+the previously timed-out `menu_2_15`. The transient progress-line drift was
+caused by comparing different live directory-count widths; the harness now
+detects and Esc-dismisses either directory-scan progress message before taking
+the snapshot. The five affected menu actions also pass in a focused replay.
+The earlier `c2fb5f3` run `37402336433` remains recorded as a failed diagnostic
+run (160/3 plus an interrupted shard); it is superseded by this complete run.
 
 **Intermittent AVs (owner, 2026-10-05, unreproduced):** once on F4 open-file
 right after a clipboard permission prompt (far2l/OSC); once after (or instead
