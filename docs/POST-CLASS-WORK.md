@@ -10,8 +10,9 @@ platform work: **177/177 pass, 0 fail** on DN
 `e551fee53eddf009720f6d79037a1bc06bd9f570` (`dn-accept` run `37395436777`;
 Linux `37395436982`; Windows `37395436934`; DOS `37395436869`; `dn`
 `37395436984`; layout `37395436849`). Stage 3 has begun; disk queries and
-process launch/restart use `osdep` facades. A dedicated restart runtime test is
-still open. The remaining inventory, criteria, and next `DNRun` extraction are in
+process launch/restart use `osdep` facades. A focused language-change restart
+scenario has been added and passes locally on the class build; its object/class
+CI run remains pending. The remaining inventory, criteria, and next `DNRun` extraction are in
 [`PLATFORM-SEPARATION.md`](PLATFORM-SEPARATION.md). Re-open / re-run parity
 after a risky batch; do not skip or reorder stages below.
 

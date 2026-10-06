@@ -43,9 +43,11 @@ Unix process replacement was then moved from `DNRun` into
 well. Exact-SHA DN `e551fee53eddf009720f6d79037a1bc06bd9f570` passed the class
 gate, layout, Linux, Windows, full DOS build, and object/class acceptance
 (177 pass, 0 fail; runs `37395436984`, `37395436849`, `37395436982`,
-`37395436934`, `37395436869`, and `37395436777`, respectively). A dedicated
-runtime scenario for restart arguments and environment is still required; the
-parity matrix has not exercised that action yet.
+`37395436934`, `37395436869`, and `37395436777`, respectively). A new
+`restart_language` acceptance scenario now changes the active language, checks
+that the setting was persisted, and requires DN to return to a live localized
+startup screen. The focused class self-comparison passes locally; exact
+object/class comparison and target builds for this new scenario are pending.
 
 The next narrow step moved DOS process creation out of `DNRun`: it now calls
 the existing `osdep.SysExecute` facade while retaining DOS vector swapping and
