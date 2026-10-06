@@ -146,3 +146,20 @@ win64 and dos locally; the proof is the CI of the commit (unit tests `t_osdep`,
 `t_dnrun`, the class gate, Linux and Windows, the full DOS build). Left in
 `osdep`: the DOS names (`DosNameToUtf8`, `DosNameFromUtf8`, the AMIS provider
 `DOS-UTF8/NAMES`), then the file calls, the find calls, `SysExecute`.
+
+Second narrow step (2026-10-06): the DOS names family (the AMIS provider
+`DOS-UTF8/NAMES` switch `DosNamesInit`, `DosNamesUtf8`, `DosNameToUtf8`,
+`DosNameFromUtf8`) moved from `osdep` to `compat/osnamesdos.pas` (code as it
+was). `osdep` keeps `SysOsPath` / `SysNameToOs` and the file calls, which use the
+unit on the GO32V2 target. Compiles for dos (code page inside), dos with
+`DN_UTF8=1`, linux64 and win64 locally; the proof is the CI of the commit
+(full DOS build with the scenarios of `tools/dn-dos-input.py`, among them
+`utf8-names-cp`). Left in `osdep`: the file calls, the find calls, the disk
+calls of the facade, `SysExecute`, the start screen of DOS.
+
+Also found while testing archives (not a separation step): DN starts its helpers
+(the archivers) as `COMSPEC /c command`; on Unix COMSPEC is not set, the command
+became `"" /c ...` and nothing was extracted or packed. `SysExecute` now takes
+the `/c` form on Unix and runs the command in the shell of the system without
+the pause for Enter (`RunShellUnix`); test in `t_osdep`, the real extraction in
+`tools/dn-linux-archives.py`.
