@@ -5,12 +5,13 @@ new product features — see [`DN-3.0.md`](DN-3.0.md).
 
 Owner order (2026-10-06). English translation and stage-2 refactoring are
 complete; all A–D criteria in `docs/REFACTORING-CRITERIA.md` are checked or
-explicitly parked. Object/class parity passed **177/177** on DN `1f51f75` +
-TV3 `a06dd31` (`dn-accept` run `37387363591`; Linux `37387361374`; Windows
-`37387362011`). The all-tree class gate and baseline-reproducible bootstrap
-passed on its parent DN `8f3057f` (`dn` run `37386669632`, `layout` run
-`37386669509`); current exact-SHA `dn` and `layout` also pass on `1f51f75`.
-Stage 3 is unblocked; its initial code-boundary inventory and acceptance criteria are in
+explicitly parked. The class/object parity gate was repeated after the
+platform disk-backend extraction: **177/177 pass, 0 fail** on DN
+`22b7db490f76276ef426cf475bc85c30a4504b22` (`dn-accept` run `37390645223`;
+Linux `37390644764`; Windows `37390644905`; DOS `37390644563`; `dn`
+`37390644713`; layout `37390645351`). Stage 3 has begun; disk queries are
+isolated behind platform backends and verified. The remaining inventory,
+criteria, and next `DNRun` extraction are in
 [`PLATFORM-SEPARATION.md`](PLATFORM-SEPARATION.md). Re-open / re-run parity
 after a risky batch; do not skip or reorder stages below.
 
