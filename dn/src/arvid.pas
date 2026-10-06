@@ -174,7 +174,7 @@ type
   TArvidDrive = class;
 
   TArvidDrive = class(TDrive)
-    {Cat: this object is in the plugin model; change with extreme care!}
+    {Cat: this type is in the plugin model; change with extreme care!}
     Name: PString;
     Stream: TStream;
     CurFile: LongInt;

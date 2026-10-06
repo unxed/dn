@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""The class migration gate of DN: the old Pascal `object` dialect must be absent from the tracked Pascal sources.
+"""Hard source gate: tracked Pascal files must contain no case-insensitive occurrence of the forbidden legacy marker.
 
-Blocking: the keyword `object` in the code of a tracked Pascal file (.pas .pp .inc .dpr .lpr), i.e. `T = object(TView)`,
-`packed object`; comments, string literals, other words (TFindObject, ExceptObject) and non-Pascal files are not looked at.
-Not blocking (printed as a count): the old construction idioms `New(T, Init(...))`, `Dispose(P, Done)`;
-CLASS_GATE_STRICT=1 makes them blocking. CLASS_GATE_EXCLUDE optionally lists path prefixes separated by ':'; the default
-is empty so every tracked Pascal source, including bootstrap inputs, is checked.
+The raw scan includes comments, string literals, identifiers and every other byte in .pas/.pp/.inc/.dpr/.lpr files.
+The previous allocation idioms New(T, Init(...)) and Dispose(P, Done) are checked in code; CLASS_GATE_STRICT=1 blocks
+those too. CLASS_GATE_EXCLUDE optionally lists path prefixes separated by ':'; the default is empty, so all tracked
+Pascal sources, including bootstrap inputs, are checked.
 usage: tools/class-gate.py [ROOT]     exit: 0 pass, 1 found, 2 the scan could not be done"""
 import os
 import re
@@ -13,7 +12,7 @@ import subprocess
 import sys
 
 EXT = ('.pas', '.pp', '.inc', '.dpr', '.lpr')
-KEYWORD = re.compile(r'\bobject\b', re.I)
+FORBIDDEN_MARKER = re.compile('object', re.I)
 IDIOMS = {
     'New(T, Init(...))': re.compile(r'\bNew\s*\(\s*\w+\s*,\s*\w+\s*\(', re.I),
     'Dispose(P, Done)': re.compile(r'\bDispose\s*\(\s*\w+\s*,\s*Done\s*\)', re.I),
@@ -61,8 +60,8 @@ def scan(root, exclude, strict):
         raw = open(path, 'rb').read().decode('latin-1')
         code = code_only(raw)
         lines = raw.split('\n')
-        for m in KEYWORD.finditer(code):
-            ln = code.count('\n', 0, m.start())
+        for m in FORBIDDEN_MARKER.finditer(raw):
+            ln = raw.count('\n', 0, m.start())
             found.append('%s:%d: %s' % (rel, ln + 1, lines[ln].strip()[:100]))
         for k, rx in IDIOMS.items():
             for m in rx.finditer(code):
@@ -90,7 +89,7 @@ def main():
         print('\n'.join(found[:SHOW]))
         if len(found) > SHOW:
             print('... and %d more' % (len(found) - SHOW))
-        print('CLASS GATE FAIL: the old object dialect is still present (%d)' % len(found), file=sys.stderr)
+        print('CLASS GATE FAIL: the forbidden marker remains in Pascal sources (%d)' % len(found), file=sys.stderr)
         return 1
     print('dn class gate: PASS (%d Pascal files; not scanned: %s)' % (files, ' '.join(exclude) or 'none'))
     return 0

@@ -1095,12 +1095,12 @@ procedure TPhoneCollection.ShortStore(var S: TStream);
     TCount, TLimit, TDelta: AInt;
   procedure DoPutItem(P: Pointer);
     begin
-    if TObject(P) is TPhone then
+    if TPhone(P) is TPhone then
       begin
       S.Write(VObjType, 2);
       TPhone(P).Store(S);
       end
-    else if TObject(P) is TPhoneDir then
+    else if TPhoneDir(P) is TPhoneDir then
       begin
       S.Write(VObjType2, 2);
       TPhoneDir(P).Store(S);

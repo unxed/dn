@@ -59,7 +59,7 @@ type
 
 
   TEditWindow = class(TUniWindow)
-    {Cat: this object is in the plugin model; change with extreme care!}
+    {Cat: this type is in the plugin model; change with extreme care!}
     AInfo: TInfoLine;
     ABookLine: TBookmarkLine;
     Intern: TFileEditor;

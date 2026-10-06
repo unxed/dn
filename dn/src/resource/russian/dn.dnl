@@ -1237,8 +1237,8 @@ dlResTrailingBackSlash     ^C'Обратная косая черта не мож
 ;PZ end - regular expressions
 ;JO+
 dlNotValidForCurSession 'Этот видеорежим невозможен для текущей сессии'
-dlCreateObject 'Создать объект на рабочем столе для: '
-dlObjectTitle  'Заголовок объекта:'
+dlCreateItem 'Создать объект на рабочем столе для: '
+dlItemTitle  'Заголовок объекта:'
 dl_CodePage_FS_Error 'Ошибка файловой системы, связанная с кодовой страницей'
 dlCre 'Сзд '
 dlLac 'ПДс '

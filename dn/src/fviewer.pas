@@ -71,7 +71,7 @@ type
 
   TViewScroll = class;
   TViewScroll = class(TView)
-    {Cat: this object is exposed via the plugin model; change with extreme care!}
+    {Cat: this type is exposed via the plugin model; change with extreme care!}
     MaxV, Value: TFileSize;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
@@ -86,7 +86,7 @@ type
   TFileViewer = class;
 
   TFileViewer = class(TView)
-    {Cat: this object is exposed via the plugin model; change with extreme care!}
+    {Cat: this type is exposed via the plugin model; change with extreme care!}
     Filtr: Boolean;
     NoEdit: Boolean;
     FileName: String; {DataCompBoy}

@@ -124,7 +124,7 @@ except
     end;
   on E: Exception do
     begin
-    DNErrLog.DNTraceException;
+    DNErrLog.DNTraceException(E.ClassName, E.Message);
     CloseWriteStream;
     ClearScreen;
     WriteScreenCells(0, ScreenWidth*ScreenHeight);

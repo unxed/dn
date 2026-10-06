@@ -58,7 +58,7 @@ uses
 
 type
   MyApp = class(TDNApplication)
-    {Cat: this object is in the plugin model; change with extreme care!}
+    {Cat: this type is in the plugin model; change with extreme care!}
     procedure HandleEvent(var Event: TEvent); override;
     procedure GetEvent(var Event: TEvent); override;
     procedure Idle; override;

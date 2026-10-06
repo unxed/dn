@@ -65,12 +65,12 @@ const
 type
   TDrive = class;
 
-{`2 Helper object inserted into a file panel.
+{`2 Helper class inserted into a file panel.
   Holds features specific to the panel type (disk,
   archive, etc.). Used in particular for drawing
   file panel rows.`}
   TDrive = class(TStreamable)
-    {Cat: this object is in the plugin model; change with extreme care!}
+    {Cat: this type is in the plugin model; change with extreme care!}
     Panel: Pointer{TFilePanelRoot};
     Prev: TDrive;
     DriveType: TDriveType;

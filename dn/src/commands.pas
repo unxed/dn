@@ -887,7 +887,7 @@ const
   hsFBBCopySize = 155;
   hsFBBCopyNum = 156;
   hsEditEALongname = 157;
-  hsCreateWPSObject = 158;
+  hsCreateWPSItem = 158;
   hsDBFGotoRow = 159; {John_SW}
   hsDBFGotoCol = 160; {John_SW}
   hsKbdToggleLayot = 165; {AK155}
@@ -1348,7 +1348,7 @@ const
   cmToggleShowMode = 10921;
   cmToggleLongNames = 10922;
   cmOpenWPSWindow = 10923;
-  cmCreateWPSObject = 10924;
+  cmCreateWPSItem = 10924;
   cmExportToCsv = 10925; {KV}
   cmExportToDbf = 10926; {KV}
   cmExportToXls = 10927; {KV}
@@ -3001,8 +3001,8 @@ type
     dlUseCalcRecNumber, {JOHN_SW}
     dlCopyTimeSpeed,    {John_SW}
     dlNotValidForCurSession, {JO}
-    dlCreateObject, {JO}
-    dlObjectTitle,
+    dlCreateItem, {JO}
+    dlItemTitle,
     dl_CodePage_FS_Error, {JO}
     dlCre, {JO}
     dlLac, {JO}

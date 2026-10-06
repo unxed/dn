@@ -99,7 +99,7 @@ type
 
 
   TParamText = class(TStaticText)
-    {Cat: this object is exposed in the plugin model; change with extreme care!}
+    {Cat: this type is exposed in the plugin model; change with extreme care!}
     ParamCount: AInt;
     ParamList: Pointer;
     constructor Create(var Bounds: TRect; const AText: String;

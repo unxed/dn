@@ -1540,7 +1540,7 @@ procedure SkipSFX; {piwamoto}
       end;
     LXhdrRec: record
       NumOfPages : Longint;
-      ObjectPageTableOffset : Longint;
+      PageTableOffset : Longint;
       DataPagesOffset : Longint;
       NonResTableOffs: LongInt;
       TableLenght: Byte;
@@ -1744,7 +1744,7 @@ Recurce:
           ArcFile.Read(PEhdrRec.ObjNum, SizeOf(PEhdrRec.ObjNum));
           PEhdrRec.MaxObjNum := 0;
           PEhdrRec.MaxOffset := 0;
-          ArcFile.Seek(MZExeRec.NewExe+$F8); {offset 2 first object}
+          ArcFile.Seek(MZExeRec.NewExe+$F8); {offset 2 first section}
           for TempWord := 1 to PEhdrRec.ObjNum do
             begin
             ArcFile.Read(PEobjRec, SizeOf(PEobjRec));
@@ -1755,7 +1755,7 @@ Recurce:
               end;
             end;
           ArcFile.Seek(MZExeRec.NewExe+$28*PEhdrRec.MaxObjNum+$0D0);
-          {offset 2 object with MaxOffset}
+          {offset 2 section with MaxOffset}
           ArcFile.Read(PEobjRec, SizeOf(PEobjRec));
           if PEobjRec.Name = '_winzip_' then
             begin
@@ -1825,7 +1825,7 @@ Recurce:
           ArcFile.Seek(MZExeRec.NewExe + $14);
           ArcFile.Read(LXhdrRec.NumOfPages, SizeOf(LXhdrRec.NumOfPages));
           ArcFile.Seek(MZExeRec.NewExe + $48);
-          ArcFile.Read(LXhdrRec.ObjectPageTableOffset, SizeOf(LXhdrRec.ObjectPageTableOffset));
+          ArcFile.Read(LXhdrRec.PageTableOffset, SizeOf(LXhdrRec.PageTableOffset));
           ArcFile.Seek(MZExeRec.NewExe + $80);
           ArcFile.Read(LXhdrRec.DataPagesOffset, SizeOf(LXhdrRec.DataPagesOffset));
           ArcFile.Seek(MZExeRec.NewExe+$88);
@@ -1840,7 +1840,7 @@ Recurce:
           else
             begin
             ArcFile.Seek(MZExeRec.NewExe
-                         + LXhdrRec.ObjectPageTableOffset
+                         + LXhdrRec.PageTableOffset
                          + 8 * (LXhdrRec.NumOfPages - 1));{last page offset}
             ArcFile.Read(LXPage, SizeOf(LXPage));
             ArcPos := LXhdrRec.DataPagesOffset

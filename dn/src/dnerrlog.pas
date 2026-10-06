@@ -11,7 +11,7 @@ interface
 procedure DNTrace(const Msg: String);
 { In an exception handler: the class, the message and the call stack of the exception with the lines of the sources (the
   program is built with -gl). }
-procedure DNTraceException;
+procedure DNTraceException(const ClassName, MessageText: String);
 
 implementation
 
@@ -53,15 +53,15 @@ begin
   end;
 end;
 
-procedure DNTraceException;
+procedure DNTraceException(const ClassName, MessageText: String);
 var
   I: Integer;
   Fr: PPointer;
 begin
   if not Tracing then
     Exit;
-  if ExceptObject <> nil then
-    DNTrace('exception ' + ExceptObject.ClassName + ': ' + (ExceptObject as Exception).Message);
+  if ClassName <> '' then
+    DNTrace('exception ' + ClassName + ': ' + MessageText);
   DNTrace(BackTraceStrFunc(ExceptAddr));
   Fr := ExceptFrames;
   for I := 0 to ExceptFrameCount - 1 do

@@ -1296,8 +1296,8 @@ dlResTrailingBackSlash     ^C'Trailing backslash is not allowed'
 ;PZ end - regular expressions
 ;JO+
 dlNotValidForCurSession 'This videomode is not valid for current session'
-dlCreateObject 'Create object on desktop for: '
-dlObjectTitle  'Object title:'
+dlCreateItem 'Create object on desktop for: '
+dlItemTitle  'Object title:'
 dl_CodePage_FS_Error 'Codepage-related file system error'
 dlCre 'Cre '
 dlLac 'Lac '

@@ -1216,7 +1216,7 @@ procedure ProcessDLGs;
         else if (S <> '') and (S[1] <> ';') then
           Error('Unknown identifier in line '+ItoS(Line));
         if nDirectLink <> 0 then
-          begin { remember a direct link to the current object }
+          begin { remember a direct link to the current resource }
           if D.DirectLink[nDirectLink] <> nil then
             Error('Direct Link Label redefined in line '+ItoS(Line));
           D.DirectLink[nDirectLink] := PV;

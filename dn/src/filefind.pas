@@ -138,7 +138,7 @@ type
   TFindDrive = class;
 
   TFindDrive = class(TDrive)
-    {Cat: this object is exposed via the plugin model; change with extreme care!}
+    {Cat: this type is exposed via the plugin model; change with extreme care!}
     isDisposable: Boolean;
     Files: TFilesCollection;
     Dirs: TSortedCollection;
@@ -190,7 +190,7 @@ type
   TTempDrive = class;
 
   TTempDrive = class(TFindDrive)
-    {Cat: this object is exposed via the plugin model; change with extreme care!}
+    {Cat: this type is exposed via the plugin model; change with extreme care!}
     constructor Create; overload;
     constructor Load(S: TStream);
     procedure Store(S: TStream); override;

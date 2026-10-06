@@ -84,7 +84,7 @@ type
   TWhileView = class;
 
   TWhileView = class(TGroup)
-    {Cat: this object is in the plugin model; change with extreme care!}
+    {Cat: this type is in the plugin model; change with extreme care!}
     Lines: TCollection;
     But: TButton;
     QuitNormal: Boolean;

@@ -62,7 +62,7 @@ type
   TArcDrive = class;
 
   TArcDrive = class(TDrive)
-    {Cat: this object is exposed via the plugin model; change with extreme care!}
+    {Cat: this type is exposed via the plugin model; change with extreme care!}
     ArcName: String; {DataCompBoy}
     VArcName: String; {JO}
     AType: TARJArchive;
@@ -261,7 +261,7 @@ constructor TArcDrive.Create(const AName, VAName: String);
   ColAllowed := PanelFileColAllowed[pcArc];
   if not ReadArchive or (Files = nil) then
     begin
-    { Classes: Fail already runs Destroy; object-era Done+Fail would double-free here. }
+    { Classes: Fail already runs Destroy; legacy Done+Fail would double-free here. }
     Fail;
     end;
   KillAfterUse := TempFile <> '';

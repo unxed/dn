@@ -106,7 +106,7 @@ type
 
     {`2}
   TFileEditor = class(TView)
-    {Cat: this object is exposed via the plugin model; change with extreme care!}
+    {Cat: this type is exposed via the plugin model; change with extreme care!}
     HScroll, VScroll: TScrollBar;
     ReplaceAll: Boolean;
     Delta: TPoint;

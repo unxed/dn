@@ -197,7 +197,7 @@ const
   {AK155 5-01-2002. Before that there was such a field
 in TFilePanelRoot and in Tree.TTreeView. Since by usage logic
 there can be only one QuickSearch, the natural solution is a
-global variable, and smearing it across objects can give nothing but
+global variable, and smearing it across instances can give nothing but
 glitches. The reason for turning these fields into a global
 variable was the wish to analyze it in TCommandLine.Update }
 
