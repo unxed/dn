@@ -79,6 +79,9 @@ type
     procedure SetState(AState: Word; Enable: Boolean); virtual;
     end;
 
+{ the stream type of the editor commands of the resource (the first use of the editor registers it; a test registers it to load every key) }
+procedure RegisterEditSaver;
+
 implementation
 uses
   editfile, mainapp, Commands, DNHelp, Views,
@@ -109,15 +112,20 @@ procedure TEditSaver.Store(var S: TStream);
   S.Write(EditCommands, SizeOf(TEditCommand)*MaxCommands);
   end;
 
+procedure RegisterEditSaver;
+  begin
+  if not Registered then
+    RegisterType(REditSaver);
+  Registered := True;
+  end;
+
 procedure LoadCommands;
   var
     P: TEditSaver;
   begin
   if MaxCommands = 0 then
     begin
-    if not Registered then
-      RegisterType(REditSaver);
-    Registered := True;
+    RegisterEditSaver;
     P := TEditSaver(LoadResource(dlgEditorCommands));
     P.Free;
     end;
