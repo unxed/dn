@@ -137,6 +137,7 @@ procedure RunExternal(const CmdLine: String);
 {$IFDEF GO32V2}
 var
   R: Registers;
+  Shell, Args: AnsiString;
 {$ENDIF}
 {$IFDEF LINUX}
 var
@@ -149,8 +150,10 @@ begin
   PutUserScreen;
   Writeln(CmdLine);
   DNTrace('RunExternal: exec ' + CmdLine);
+  Shell := GetEnv('COMSPEC');
+  Args := '/c ' + CmdLine;
   SwapVectors;
-  Exec(GetEnv('COMSPEC'), '/c ' + CmdLine);
+  SysExecute(PChar(Shell), PChar(Args), nil, False, nil, 0, 0, 0);
   SwapVectors;
   DNTrace('RunExternal: back, DosError ' + IntToStr(DosError));
   GetUserScreen;                  { before the line about the key: it is not a part of the output of the program }
