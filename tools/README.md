@@ -42,6 +42,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-tour.sh` | the same tour of the DOS build in DOSBox-X | by hand |
 | `dn-dos-input.py` | the DOS build in DOSBox-X on a virtual X display (Xvfb): a real X pointer through INT 33h (menu, double click, status line), a normal exit (autosave of the desktop, the saved setup) | by hand |
 | `showcase-dosbox.sh` | builds and runs the DOS demo of `tv/` in DOSBox-X | by hand |
+| `audit-encoding.py [--against REV]` | lost or damaged characters in the tracked text (UTF-8, U+FFFD, C1 controls) and against an older revision or the original tree | test_audit_encoding |
 | `render-dump.py` | renders a text screen dump of the DOS backend into an image | tv |
 
 ## Debug and generators (not part of the build)
