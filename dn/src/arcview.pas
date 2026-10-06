@@ -1278,6 +1278,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
     SCurDir := '';
 
   {JO}
+  DNLog('ExtractFiles: dir [' + ExtrDir + '] cur [' + SCurDir + ']');
   // check whether the destination directory contains files
   DosError := 0;
   lFindFirst(MakeNormName(ExtrDir, x_x), AnyFileDir, SR); {JO}
@@ -1303,6 +1304,8 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
       begin
       TempExtrDir := ExtrDir+'$DN'+ItoS(DNN)+'$.EDR';
       ClrIO;
+      if DNN < 4 then
+        DNLog('ExtractFiles: temp dir candidate [' + TempExtrDir + '] exists ' + ItoS(Ord(PathExist(TempExtrDir))));
       if PathExist(TempExtrDir) then
         Inc(DNN)
       else
