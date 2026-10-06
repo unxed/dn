@@ -34,6 +34,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `../bootstrap/tools/dn-manifest.py --check` | the manifest of provenance (PROVENANCE) of `dn/src` against the archive | dn |
 | `dos-run.sh DIR PROG.EXE` | runs a go32v2 program in DOSBox-X without a display | tv |
 | `pty_screen.py` | the library of the pty tests: runs a program in a pty, sends keys, keeps the screen (`PTY_RUN_PREFIX` for qemu) | tv, dn-linux, dn-windows |
+| `accept-local.sh build\|run\|all\|shot` | the object vs class gate on this machine in one command: builds the pinned object baseline (worktree, shared fixes backported) and the class tree, runs `dn-linux-accept.py` (shards, areas), `shot` shows one build on a screen | by hand (CI: dn-accept) |
 | `dn-linux-tour.py` | smoke tour of the Linux build: scenarios from a clean start, keys, the screen | dn-linux |
 | `dn-linux-ops.py` | file operations of DN in a pty, checked on the file system | dn-linux |
 | `dn-linux-locale.py` | the single-byte code page by the locale of the host | dn-linux |
