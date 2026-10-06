@@ -38,6 +38,14 @@ Run: `python3 -B -m unittest discover -s tools/tests -p 'test_text_policy.py'`
 ## The DOS build and the code pages
 
 The sources are UTF-8 only. The build of DOS (without `-dDNUTF8`) lands the resources (`dn.dnl`, `dn.dnr`) and the help (`dnhelp.htx`) of every language
-on one code page, `DN_CODEPAGE` (default `cp866`), with `tools/to-codepage.py`: a character that the page has is kept, else the letter without marks
-(`Győr` becomes `Gyor`), else a plain sign for a few symbols, else `?`; never a letter of another script. The lost characters are listed by the build.
-The builds with `-dDNUTF8` (Linux, Windows) use the files as they are.
+on the code page of the language with `tools/to-codepage.py`: `cp866` for English and Russian (`DN_CODEPAGE`), `cp1125` for Ukrainian
+(`DN_CODEPAGE_UKRAIN`; the DOS machine must have this page loaded to show the Ukrainian letters). A character that the page has is kept, else the
+letter without marks (`Győr` becomes `Gyor`), else a plain sign for a few symbols, else `?`; never a letter of another script. The lost characters are
+listed by the build. The builds with `-dDNUTF8` (Linux, Windows) use the files as they are.
+
+## One script per word
+
+A word of the Russian and Ukrainian resources is in one script. The old texts were typed with Latin look-alikes inside Cyrillic words (a Latin `p`
+for the Russian `r`, the Latin `i` for the Ukrainian `i`, the Belarusian short u as `i`) and with Cyrillic look-alikes inside English words (`ESC`, `Ctrl`);
+`tools/fix-resource-lookalikes.py` repaired them once (it can be run again: nothing changes) and the test keeps it. The only mixed words are the
+abbreviations with a Russian ending (`DN`, `FAT` + one Cyrillic letter) and the button `OK` is Latin in all the languages.
