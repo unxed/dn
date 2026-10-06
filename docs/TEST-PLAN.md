@@ -60,7 +60,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Area | Floor | Have | Gap |
 |---|---|---|---|
 | Start and screen | start, panels, menu, in the code page build (437, 866) | `dn-tour.sh`, `dn-dos-input.py` (DOSBox-X) | the screen of the pages 850 and 852 |
-| Names | UTF-8 names to the DOS when `DOS-UTF8/NAMES` is there, code page names when it is not | scenario `utf8-names-cp` | the case without the provider (plain DOSBox-X): the same scenario must pass on code page names |
+| Names | UTF-8 names to the DOS when `DOS-UTF8/NAMES` is there, code page names when it is not | scenarios `utf8-names-cp` (patched DOSBox-X), `names-cp-plain` (stock DOSBox-X: no provider, code page names) | none |
 | Input | the keyboard and the mouse | `dn-dos-input.py` | the keys of the harness for F3, F4, F5, F6, F7, F8 on real files |
 | State | desktop and setup saved and restored | `tools/dn-tour.sh` scenarios, `t_cfgstate` | the saved setup (`Save setup`) |
 | User screen | a program's output kept and shown again | `userscr` smoke (in `toolchain`) | none |
