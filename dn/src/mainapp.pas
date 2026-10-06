@@ -374,6 +374,9 @@ end;
 procedure TProgram.Idle;
 begin
   inherited Idle;
+{$IFDEF GO32V2}
+  CheckScreenDump;                 { DOS test harness: inject DNKEYS and stop after DNDUMPSEC }
+{$ENDIF}
   if Drivers.ScreenBuffer <> nil then
     ReadScreenCells;               { the copy of the screen that DN reads }
   if StatusLine <> nil then
