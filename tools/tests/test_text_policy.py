@@ -94,6 +94,24 @@ class TextPolicyTests(unittest.TestCase):
             self.assertIn("(Győr)", text, lang)
             self.assertNotIn("GyУr", text, lang)
 
+    def test_resource_words_are_in_one_script(self):
+        """The old texts had Latin look-alikes in Cyrillic words (and back): tools/fix-resource-lookalikes.py repaired them once."""
+        word = re.compile(r"[A-Za-z\u0400-\u04ff]+(?:~[A-Za-z\u0400-\u04ff]+)*")
+        spec = re.compile(r"%[-0-9.*]*[A-Za-z]")
+        kept = {"DN\u0443", "DN\u0430", "FAT\u0430"}      # an abbreviation and a Russian ending
+        bad = []
+        for lang in ("russian", "ukrain"):
+            for name in ("dn.dnl", "dn.dnr", "dnhelp.htx"):
+                text = spec.sub(" ", (ROOT / "dn/src/resource" / lang / name).read_text(encoding="utf-8"))
+                for m in word.finditer(text):
+                    w = m.group()
+                    if CYR.search(w) and re.search("[A-Za-z]", w) and w not in kept:
+                        bad.append("%s/%s: %s" % (lang, name, w))
+        self.assertEqual(sorted(set(bad))[:20], [])
+        for lang in ("ukrain",):
+            text = (ROOT / "dn/src/resource" / lang / "dn.dnl").read_text(encoding="utf-8")
+            self.assertNotIn("\u045e", text)           # the short u was the hack for the Ukrainian i
+
 
 if __name__ == "__main__":
     unittest.main()
