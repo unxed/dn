@@ -64,6 +64,10 @@ function SysCommandLineToOs(const S: string): string;
 { Unix: runs a command of the shell with the terminal (the screen of the application is left, the command writes to the terminal, Enter
   returns to DN and the screen is drawn again); returns the exit code of the shell. Elsewhere: -1 (nothing is run). }
 function SysRunShell(const CmdLine: string): LongInt;
+{ A command of the shell that DN runs for itself (no screen, no pause); the status as SysRunShell, -1 if it was not run (DOS). }
+function SysRunQuiet(const CmdLine: string): LongInt;
+{ The name of a new temporary file in the temporary directory of the system: Prefix, a number that makes it unique, Ext (with its dot). }
+function SysTempFileName(const Prefix, Ext: string): string;
 { Replaces the current process with DN and its original arguments, or starts a new DN process on other targets. }
 procedure SysRestartSelf;
 { GetDir for DN: the current directory as "C:\DIR" (on Unix: C: is the root). }
@@ -307,6 +311,21 @@ end;
 function SysGetVolumeLabel(Drive: Char): ShortString;
 begin
   Result := OSVolumeLabel(Drive);
+end;
+
+function SysRunQuiet(const CmdLine: string): LongInt;
+begin
+  Result := RunQuiet(CmdLine);
+end;
+
+function SysTempFileName(const Prefix, Ext: string): string;
+var
+  Dir: string;
+begin
+  Dir := IncludeTrailingPathDelimiter(GetTempDir(False));
+  repeat
+    Result := Dir + Prefix + IntToStr(Random($7FFF)) + Ext;
+  until not FileExists(Result);
 end;
 
 { --- searching a directory ---------------------------------------------------- }

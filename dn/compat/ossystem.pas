@@ -17,6 +17,8 @@ procedure OSDiskReset;
 procedure OSBeep(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
 function OSMemAvail: LongInt;
+{ DOS: the text and a line end go to the serial port COM1 (a debug trace that survives a program that dies, see DNErrLog); elsewhere: nothing. }
+procedure OSSerialTrace(const Msg: string);
 
 implementation
 
@@ -50,6 +52,11 @@ end;
 function OSMemAvail: LongInt;
 begin
   Result := BackendMemAvail;
+end;
+
+procedure OSSerialTrace(const Msg: string);
+begin
+  BackendSerialTrace(Msg);
 end;
 
 end.

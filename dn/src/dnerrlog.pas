@@ -19,7 +19,7 @@ procedure DNTraceException(const ClassName, MessageText: String);
 implementation
 
 uses
-  SysUtils{$IFDEF GO32V2}, Dos, go32{$ENDIF};
+  SysUtils, OSSystem;
 
 var
   Tracing: Boolean = False;
@@ -28,31 +28,13 @@ var
   UseSerial: Boolean = False;
 
 procedure DNTrace(const Msg: String);
-{$IFDEF GO32V2}
-var
-  I, J: Integer;
-{$ENDIF}
 begin
   if Tracing then
   begin
     Writeln(StdErr, Msg);
     Flush(StdErr);
-{$IFDEF GO32V2}
     if UseSerial then
-    begin
-      for I := 1 to Length(Msg) + 1 do
-      begin
-        { wait for the transmitter holding register to become empty (bit 5 of the line status) }
-        J := 0;
-        while ((inportb($3FD) and $20) = 0) and (J < 100000) do
-          Inc(J);
-        if I <= Length(Msg) then
-          outportb($3F8, Ord(Msg[I]))
-        else
-          outportb($3F8, 10);
-      end;
-    end;
-{$ENDIF}
+      OSSerialTrace(Msg);          { DOS only: the other targets do nothing }
   end;
 end;
 

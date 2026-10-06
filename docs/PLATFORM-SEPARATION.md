@@ -198,3 +198,11 @@ Sixth step (2026-10-06): the DOS test harness (`DNDUMP`, `DNKEYS`, `DNMOUSE`:
 GO32V2. Same code. `DumpAtExit` is not called by anyone (dead code, kept as it
 was; noted in `dn/TODO-later.md`). The proof is the DOS scenarios of
 `tools/dn-dos-input.py` in the CI of the commit.
+
+Seventh step (2026-10-06): the units outside the backends no longer call a platform unit. `fmtxz.pas` took `Unix`/`BaseUnix` for `fpSystem` and the
+process id of a temporary file name: it now calls `SysRunQuiet` (facade `OSRun.RunQuiet`, backends `OSRunUnix`, `OSRunWindows`, `OSRunDos`) and `SysTempFileName`
+(`osdep`, portable). `dnerrlog.pas` took `go32` for the serial trace of DOS: the trace goes through `OSSystem.OSSerialTrace` (`OSSystemDos` writes to COM1,
+`OSSystemOther` does nothing). Tests: `t_osrun` (`RunQuiet`), `t_osdep` (`SysTempFileName`). Compiles for linux64 and dos locally (the DOS build runs in DOSBox-X: the
+tour scenarios `f5copy`, `tab`, `f1help`, `userscr`). What is left in the inventory: `dnrun` (the Linux PTY runner and the DOS vector swap in one unit), the target
+decisions of `mainapp` and `boot`, the `.BAT` defaults of `startup`/`dlgrecs`, and the split of tv3 `tvtermos`.
+

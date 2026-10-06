@@ -12,6 +12,8 @@ interface
   (the exit code is in the second byte), -1 if it could not be run. }
 function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 { DOS error code of running a program (0 = it was run). }
+{ Runs a command line in the shell and waits; no screen, no pause. The status as BackendRunShell, -1 if it could not be run. }
+function BackendRunQuiet(const CmdLine: string): LongInt;
 function BackendExecute(Path, Args: PChar): LongInt;
 procedure BackendRestartSelf;
 
@@ -39,6 +41,17 @@ begin
     Readln;
   end;
   UnixResume;
+  if Result > 0 then
+    Result := Result shl 8;        { as the status of waitpid on Unix: the exit code is in the second byte }
+end;
+
+function BackendRunQuiet(const CmdLine: string): LongInt;
+begin
+  try
+    Result := ExecuteProcess(GetEnvironmentVariable('COMSPEC'), '/c ' + CmdLine);
+  except
+    Result := -1;
+  end;
   if Result > 0 then
     Result := Result shl 8;        { as the status of waitpid on Unix: the exit code is in the second byte }
 end;

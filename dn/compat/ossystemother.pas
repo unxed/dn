@@ -16,6 +16,7 @@ function BackendVolumeLabel(Drive: Char): ShortString;
 procedure BackendDiskReset;
 procedure BackendBeep(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
+procedure BackendSerialTrace(const Msg: string);
 function BackendMemAvail: LongInt;
 
 implementation
@@ -37,6 +38,10 @@ end;
 procedure BackendBeep(Frequency, Duration: LongInt);
 begin
   { nothing to play on the systems of the tests }
+end;
+
+procedure BackendSerialTrace(const Msg: string);
+begin
 end;
 
 function BackendMemAvail: LongInt;

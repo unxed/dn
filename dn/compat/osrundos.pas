@@ -12,6 +12,8 @@ interface
   (the exit code is in the second byte), -1 if it could not be run. }
 function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 { DOS error code of running a program (0 = it was run). }
+{ Runs a command line in the shell and waits; no screen, no pause. The status as BackendRunShell, -1 if it could not be run. }
+function BackendRunQuiet(const CmdLine: string): LongInt;
 function BackendExecute(Path, Args: PChar): LongInt;
 procedure BackendRestartSelf;
 
@@ -24,6 +26,11 @@ uses
 function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 begin
   Result := -1;                    { DN runs the commands of the user by itself on DOS (DNRun) }
+end;
+
+function BackendRunQuiet(const CmdLine: string): LongInt;
+begin
+  Result := -1;                    { DN has no filters that it runs for itself on DOS }
 end;
 
 function BackendExecute(Path, Args: PChar): LongInt;
