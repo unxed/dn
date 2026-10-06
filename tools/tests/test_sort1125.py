@@ -17,8 +17,18 @@ def keys():
     return table
 
 
+def L(code):
+    return chr(code)
+
+
 def key(table, ch):
     return table[ch.encode("cp1125")[0]]
+
+
+GHE, GHE_UP, DE = L(0x413), L(0x490), L(0x414)
+IE, UK_IE, ZHE = L(0x415), L(0x404), L(0x416)
+I_, UK_I, YI, SHORT_I = L(0x418), L(0x406), L(0x407), L(0x419)
+ALL = [L(c) for c in list(range(0x410, 0x430)) + [0x401, 0x404, 0x406, 0x407, 0x490]]
 
 
 class Sort1125Tests(unittest.TestCase):
@@ -27,16 +37,16 @@ class Sort1125Tests(unittest.TestCase):
 
     def test_both_cases_have_one_key(self):
         t = keys()
-        for letter in "АБВГҐДЕЁЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ":
+        for letter in ALL:
             self.assertEqual(key(t, letter), key(t, letter.lower()), letter)
 
     def test_ukrainian_letters_stand_where_the_alphabet_puts_them(self):
         t = keys()
-        order = [key(t, c) for c in "ГҐД"]
+        order = [key(t, c) for c in (GHE, GHE_UP, DE)]
         self.assertEqual(order, sorted(order))
         self.assertEqual(len(set(order)), 3)
-        for a, b in (("Е", "Є"), ("Є", "Ж"), ("И", "І"), ("І", "Ї"), ("Ї", "Й")):
-            self.assertLess(key(t, a), key(t, b), a + b)
+        for a, b in ((IE, UK_IE), (UK_IE, ZHE), (I_, UK_I), (UK_I, YI), (YI, SHORT_I)):
+            self.assertLess(key(t, a), key(t, b), "%04X %04X" % (ord(a), ord(b)))
 
     def test_latin_and_signs_are_those_of_sort866(self):
         t = keys()

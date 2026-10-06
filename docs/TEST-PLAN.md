@@ -40,7 +40,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Area | Floor | Have | Gap |
 |---|---|---|---|
 | Start and screen | start, menu bar, exit, language switch, startup panels | `dn-linux-tour.py`, `-startup.py`, `-about.py`, accept `start`, `restart_language` | none (`dn-linux-resize.py` is the SIGWINCH test) |
-| File operations | make directory, copy, move, delete, edit and save, on real files | `dn-linux-ops.py` | symbolic links in panels, permissions (`ro.txt`) |
+| File operations | make directory, copy, move, delete, edit and save, on real files | `dn-linux-ops.py` | none (`dn-linux-fsattrs.py`: links and read-only files) |
 | Input | win32 input mode, far2l, quick search | `dn-linux-win32.py`, `-far2l.py`, `-qsearch.py` | Kitty keyboard flags in DN (not only in `tv`) |
 | Text | the code page by the locale (code page build), UTF-8 names | `dn-linux-locale.py`, `DN_OPS_UTF8` | a non-UTF-8 locale for the UTF-8 build |
 | Embedded terminal | a command line command, Ctrl-O, the user screen | `dn-linux-ops.py` (command), `tv/tests/pty/test_vtrun.py` | an interactive program and the return to DN |

@@ -101,6 +101,12 @@ function SysFindClose(var F: TOSSearchRec): LongInt;
 { Is the directory Name of the directory ParentDir one that a scan of a tree must not enter? On Unix the pseudo file systems of the root (/proc, /sys): thousands of
   entries that change as they are read; elsewhere never. }
 function SysSkipInTree(const ParentDir, Name: string): Boolean;
+{ The DOS attributes of a file that was assigned (Dos.GetFAttr, SetFAttr): on Unix the RTL has none (it always says 0 and does nothing), so the attribute ReadOnly (1) is the missing
+  write permission of the owner and setting it changes that permission; the other attributes (hidden, system, archive) mean nothing there. Elsewhere the calls of the unit Dos. }
+procedure SysGetFAttr(var F: File; var Attr: Word);
+procedure SysSetFAttr(var F: File; Attr: Word);
+procedure SysGetTAttr(var T: Text; var Attr: Word);
+procedure SysSetTAttr(var T: Text; Attr: Word);
 
 { --- disks -------------------------------------------------------------------- }
 { Free and total space of the disk of the path (the drive letter and the colon of the path are taken,
@@ -448,6 +454,90 @@ begin
   Result := (Length(ParentDir) <= 3) and ((UpperCase(Name) = 'PROC') or (UpperCase(Name) = 'SYS'));
 {$ELSE}
   Result := False;
+{$ENDIF}
+end;
+
+{$IFDEF UNIX}
+{ The name that Assign has put into a file record: one byte per character or, with FPC 3.2 on Unix, UTF-16 (TFileTextRecChar), so the record is read by the size of the character }
+function RecName(Chars: Pointer; CharSize: Integer): string;
+var
+  U: UnicodeString;
+  A: AnsiString;
+begin
+  if CharSize = 1 then
+    Result := StrPas(PChar(Chars))
+  else
+  begin
+    U := UnicodeString(PUnicodeChar(Chars));
+    A := System.UTF8Encode(U);
+    Result := A;
+  end;
+end;
+
+{ the owner's write permission is the attribute ReadOnly }
+function UnixGetAttr(const Name: string): Word;
+var
+  St: Stat;
+begin
+  Result := 0;
+  if fpStat(Name, St) <> 0 then
+    Exit;
+  if (St.st_mode and S_IWUSR) = 0 then
+    Result := 1;
+  if fpS_ISDIR(St.st_mode) then
+    Result := Result or 16;
+end;
+
+procedure UnixSetAttr(const Name: string; Attr: Word);
+var
+  St: Stat;
+begin
+  if fpStat(Name, St) <> 0 then
+    Exit;
+  if (Attr and 1) <> 0 then
+    fpChmod(Name, St.st_mode and not (S_IWUSR or S_IWGRP or S_IWOTH) and $FFF)
+  else if (St.st_mode and S_IWUSR) = 0 then
+    fpChmod(Name, (St.st_mode or S_IWUSR) and $FFF);
+end;
+{$ENDIF}
+
+procedure SysGetFAttr(var F: File; var Attr: Word);
+begin
+{$IFDEF UNIX}
+  Attr := UnixGetAttr(RecName(@FileRec(F).Name[0], SizeOf(FileRec(F).Name[0])));
+  DosError := 0;
+{$ELSE}
+  Dos.GetFAttr(F, Attr);
+{$ENDIF}
+end;
+
+procedure SysSetFAttr(var F: File; Attr: Word);
+begin
+{$IFDEF UNIX}
+  UnixSetAttr(RecName(@FileRec(F).Name[0], SizeOf(FileRec(F).Name[0])), Attr);
+  DosError := 0;
+{$ELSE}
+  Dos.SetFAttr(F, Attr);
+{$ENDIF}
+end;
+
+procedure SysGetTAttr(var T: Text; var Attr: Word);
+begin
+{$IFDEF UNIX}
+  Attr := UnixGetAttr(RecName(@TextRec(T).Name[0], SizeOf(TextRec(T).Name[0])));
+  DosError := 0;
+{$ELSE}
+  Dos.GetFAttr(T, Attr);
+{$ENDIF}
+end;
+
+procedure SysSetTAttr(var T: Text; Attr: Word);
+begin
+{$IFDEF UNIX}
+  UnixSetAttr(RecName(@TextRec(T).Name[0], SizeOf(TextRec(T).Name[0])), Attr);
+  DosError := 0;
+{$ELSE}
+  Dos.SetFAttr(T, Attr);
 {$ENDIF}
 end;
 

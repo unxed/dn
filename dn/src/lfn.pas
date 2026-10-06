@@ -1270,28 +1270,28 @@ procedure lGetFAttr(var F: lFile; var Attr: Word);
 
   if F.AssignFileMode = lWIN95 then lWIN95FileAttrFunc(F, Attr, faGetAttr) else
 
-  Dos.GetFAttr(F.F, Attr);
+  SysGetFAttr(F.F, Attr);
   end;
 procedure lSetFAttr(var F: lFile; Attr: Word);
   begin
 
   if F.AssignFileMode = lWIN95 then lWIN95FileAttrFunc(F, Attr, faSetAttr) else
 
-  Dos.SetFAttr(F.F, Attr);
+  SysSetFAttr(F.F, Attr);
   end;
 procedure lGetTAttr(var T: lText; var Attr: Word);
   begin
 
   if T.AssignTextMode = lWIN95 then lWIN95TextAttrFunc(T, Attr, faGetAttr) else
 
-  Dos.GetFAttr(T.T, Attr);
+  SysGetTAttr(T.T, Attr);
   end;
 procedure lSetTAttr(var T: lText; Attr: Word);
   begin
 
   if T.AssignTextMode = lWIN95 then lWIN95TextAttrFunc(T, Attr, faSetAttr) else
 
-  Dos.SetFAttr(T.T, Attr);
+  SysSetTAttr(T.T, Attr);
   end;
 procedure lMkDir(const Path: String);
   begin
