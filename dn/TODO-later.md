@@ -356,3 +356,5 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - `DefaultSortMode` of `dn.ini` applies only to a DN without a saved setup (`PanSetupFromConfig`); a user who saved the setup keeps what was saved.
 - The archivers on Windows are started through `COMSPEC /c` as before (`osrunwindows.pas`); only the Unix side needed the fix. Not driven by a test on Windows.
 - `ArcDrive.Exec` (arcview.pas) and `archiver.pas` still have the DOS 120/95-character command line limits and the `$DNn$.BAT` batch files of the swap mode; on Unix the swap mode (`SwapWhenExec`) must stay off.
+- The quick search of the directory tree (window of the button [Tree] of the Copy dialog, `tree.pas`) takes UTF-8 characters now, but has no test: the window scans the whole host (the root of `C:` is `/`) for minutes before the search works (`Reading directories: 22891 Esc - stop`); a test needs a way to limit the scan (a setting or an environment variable).
+- F4 in an archive is "Extr" (the Extract dialog, as the key bar says); the editor does not open a member of an archive (`UseFile` leaves on `cmEditFile`).

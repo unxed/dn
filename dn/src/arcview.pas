@@ -838,7 +838,9 @@ TryAgain:
     LFN.lChDir(Copy(TempDir, 1, 2));
     lGetDir(0, DirToChange);
     LFN.lChDir(TempDir);
+    DNLog('UseFile: exec [' + Unp + '] [' + S + '] temp [' + TempFile + ']');
     Exec(Unp, (S), '', False);
+    DNLog('UseFile: back from exec');
     LFN.lChDir(DirToChange);
     DirToChange := '';
     end;
@@ -893,6 +895,7 @@ the Windows debugger or the Windows RTL? Hopefully the former. }
   begin { TArcDrive.Exec }
   Exec := True;
   S := Prg+' '+Cmd;
+  DNLog('Exec: swap ' + ItoS(Ord(AType.SwapWhenExec)) + ' b ' + ItoS(Ord(B)) + ' [' + S + '] list [' + Lst + ']');
   
   if AType.SwapWhenExec then
     begin
@@ -1020,6 +1023,7 @@ the Windows debugger or the Windows RTL? Hopefully the former. }
     SwapVectors;
     EraseFile(SwpDir+'$DN'+ItoS(DNNumber)+'$.LST'); {DataCompBoy}
     end;
+  DNLog('Exec: the program ended, DOS error ' + ItoS(DE));
   InitVideo;
   InitEvents;
   InitSysError;

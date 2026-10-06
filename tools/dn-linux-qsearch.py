@@ -61,7 +61,7 @@ def run(out, open_tree):
 
 out = os.path.abspath(sys.argv[1])
 bad = 0
-for name, tree in (('panel', False), ('tree', True)):
+for name, tree in (('panel', False),):          # the tree: the window of the button [Tree] scans the whole host (minutes): not driven
     ok, head = run(out, tree)
     bad += not ok
     print('quick search of the %s with a character outside the code page: %s' % (name, 'ok' if ok else 'FAIL\n' + head))
