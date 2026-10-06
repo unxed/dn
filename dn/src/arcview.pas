@@ -154,7 +154,7 @@ type
 implementation
 
 uses
-  osdep, Eraser,
+  osdep, Eraser, DNErrLog,
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
   Arvid, timeutil, VideoMan, DnExec, FileFind
   , UserMenu {JO: for hiding panels while extracting }
@@ -1236,6 +1236,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
     end;
 
   begin { TArcDrive.ExtractFiles }
+  DNLog('ExtractFiles: to [' + ExtrDir + '] options ' + ItoS(Options) + ' files ' + ItoS(AFiles.Count));
   while ExtrDir[Length(ExtrDir)] = ' ' do
     SetLength(ExtrDir, Length(ExtrDir)-1);
   if  (ExtrDir = '') or (ExtrDir = '..') then
@@ -1376,7 +1377,10 @@ TryAgain:
   //JO: if the destination directory was not created (e.g. if the drive is
   //    read-only), there is no point calling the archiver
   if not PathExist(TempExtrDir) then
+    begin
+    DNLog('ExtractFiles: the directory [' + TempExtrDir + '] was not created');
     Exit;
+    end;
   { Flash 21-01-2004
     The directory must be remembered on the drive that holds
     the temporary folder. On the drive that holds the archive
@@ -1392,7 +1396,9 @@ TryAgain:
       DirToMoveContent := '<'+ DirToMoveContent;
     end;
  
+  DNLog('ExtractFiles: exec [' + Unp + '] [' + S + '] list [' + SS + '] cmdline ' + ItoS(Ord(B)));
   Exec(Unp, (S), SS, B);
+  DNLog('ExtractFiles: back from exec');
   {JO}
   if not TempDirUsed then
     begin
@@ -1497,9 +1503,11 @@ procedure TArcDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean
   else
     DT.W := DT.W or 8;
   {/JO}
+  DNLog('CopyFiles: the dialog for [' + DT.S + '] skip ' + ItoS(Ord(SkipCopyDialog)));
   if not SkipCopyDialog then
     if ExecResource(dlgExtract, DT) <> cmOK then
       begin
+      DNLog('CopyFiles: the dialog was cancelled');
       NotifyResume;
       Exit;
       end;
