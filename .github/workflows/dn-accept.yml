@@ -63,14 +63,14 @@ jobs:
           name: dn-accept-bins
           path: |
             class/out/linux64-gate/dn
-            class/out/linux64-gate/*.LNG
-            class/out/linux64-gate/*.DLG
-            class/out/linux64-gate/*.HLP
+            class/out/linux64-gate/*.lng
+            class/out/linux64-gate/*.dlg
+            class/out/linux64-gate/*.hlp
             class/out/linux64-gate/xlt/**
             object/out/linux64-gate/dn
-            object/out/linux64-gate/*.LNG
-            object/out/linux64-gate/*.DLG
-            object/out/linux64-gate/*.HLP
+            object/out/linux64-gate/*.lng
+            object/out/linux64-gate/*.dlg
+            object/out/linux64-gate/*.hlp
             object/out/linux64-gate/xlt/**
           if-no-files-found: error
 

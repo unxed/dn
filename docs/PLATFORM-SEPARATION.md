@@ -46,8 +46,11 @@ gate, layout, Linux, Windows, full DOS build, and object/class acceptance
 `37395436934`, `37395436869`, and `37395436777`, respectively). A new
 `restart_language` acceptance scenario now changes the active language, checks
 that the setting was persisted, and requires DN to return to a live localized
-startup screen. The focused class self-comparison passes locally; exact
-object/class comparison and target builds for this new scenario are pending.
+startup screen. Its first CI run exposed uppercase resource artifact globs
+although `build.sh` emits lowercase `.lng/.dlg/.hlp`, leaving both test binaries
+without language assets; the workflow globs and scenario fixture were corrected.
+A local replay with both object and class binaries plus the packaged resources
+passes. Exact-SHA CI with freshly uploaded resources is pending.
 
 The next narrow step moved DOS process creation out of `DNRun`: it now calls
 the existing `osdep.SysExecute` facade while retaining DOS vector swapping and

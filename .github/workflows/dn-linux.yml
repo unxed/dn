@@ -58,9 +58,9 @@ jobs:
           name: dn-linux-x86_64
           path: |
             out/dn/dn
-            out/dn/*.LNG
-            out/dn/*.DLG
-            out/dn/*.HLP
+            out/dn/*.lng
+            out/dn/*.dlg
+            out/dn/*.hlp
 
   linux64-utf8:
     # DN with UTF-8 inside (the default of the build on Linux, -dDNUTF8): the same file operations in a pty and the UTF-8 checks
@@ -126,6 +126,6 @@ jobs:
           name: dn-linux-i386
           path: |
             out/dn/dn
-            out/dn/*.LNG
-            out/dn/*.DLG
-            out/dn/*.HLP
+            out/dn/*.lng
+            out/dn/*.dlg
+            out/dn/*.hlp
