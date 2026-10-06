@@ -37,6 +37,7 @@ begin
   RemoveDir(Dir);
 
   Check(CommandLineToOs('ls C:\nonex\a') = 'ls /nonex/a', 'a path in a command line is converted');
+  Check(CommandLineToOs('7z x -y C:\nonex\a.7z @C:\nonex\$DN0$.LST') = '7z x -y /nonex/a.7z @/nonex/\$DN0\$.LST', 'a list file after the sign @ (the archivers), the $ of its name is not for the shell');
   Check(CommandLineToOs('echo ' + #$80) = 'echo ' + #$D0#$90, 'a letter of the page in a command line is converted');
   Finish;
 end.
