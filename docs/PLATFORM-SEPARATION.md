@@ -10,7 +10,7 @@ behaviour or to port unsupported targets.
 | Area | Current location | What is mixed today | Intended boundary |
 |---|---|---|---|
 | Files, paths, search, disks, process execution | `dn/compat/osdep.pas`, `dn/compat/osdisk*.pas` | Most DOS/Unix/Windows operations still share `osdep`; disk queries are now routed through a stable `OSDisk` facade to GO32V2, Windows, or Unix backend units | Continue extracting target operations behind stable facades; disk selection is centralized in `osdisk.pas` |
-| External commands and user screen | `dn/src/dnrun.pas`, `dn/compat/osdep.pas` | Linux VT/PTy flow and DOS BIOS/video-memory user-screen handling/vector swapping remain in `DNRun`; shell and process replacement are delegated to `osdep` facades | Keep `DNRun` as the portable call surface; give platform runners explicit units and keep argument/path conversion with the runner that owns it |
+| External commands and user screen | `dn/src/dnrun.pas`, `dn/compat/dnuserscreendos.pas`, `dn/compat/osdep.pas` | Linux VT/PTy flow and DOS vector swapping remain in `DNRun`; DOS BIOS/video-memory user-screen handling is now in `DNUserScreenDos`; shell and process replacement are delegated to `osdep` facades | Keep `DNRun` as the portable call surface; give platform runners explicit units and keep argument/path conversion with the runner that owns it |
 | Real-mode compatibility | `dn/compat/realmode.pas` | GO32-only BIOS/DPMI operations are conditional stubs on other targets | Keep DOS-only implementation isolated; do not spread direct BIOS/DPMI calls into application units |
 | Startup path and screen restoration | `dn/src/boot.pas`, `mainapp.pas`, `panelroot.pas` | Some terminal/UTF-8/OS initialization and user-screen restoration decisions remain at application call sites | Replace OS decisions with narrow facade calls; portable startup owns sequencing, platform services own mechanics |
 | UTF-8 names and terminal text | `dn/compat/osdep.pas`, `dn/compat/dnscreen.pas`, `dn/src/dnutf8.pas`, selected callers | Name conversion, screen-cell conversion, and terminal rendering have different platform semantics | Keep text policy in the shared facade; put OS-specific conversion/rendering at backend edges and document each unavoidable conditional |
@@ -61,6 +61,22 @@ acceptance (177 pass, 0 fail; runs `37393996207`, `37393995793`, `37393995904`,
 only process creation; BIOS screen handling and vector lifecycle are still
 platform-specific code in `DNRun`.
 
+The DOS user-screen operations were then moved to `compat/dnuserscreendos.pas`:
+BIOS mode/cursor reads, video-memory capture/restore, and the Ctrl-O display
+path no longer live in `DNRun`/`mainapp`. Exact-SHA `e2d49d9` passes `dn`,
+layout, Windows, and all four Linux targets; the complete object/class
+acceptance rerun reports 178/178 (run `37406171992`; its first execution had a
+single non-reproducible `menu_5_13` mismatch, recorded in the migration
+checklist). The DOS build passes, but its new `userscr` runtime smoke exposed a
+harness bug: `CheckScreenDump` (which injects `DNKEYS` and enforces
+`DNDUMPSEC`) was defined but never called, so DOSBox-X timed out before running
+the external command. Commit `cb55ec3` adds a shorter timeout and trace on
+failure; `cd37065` calls the test hook from the GO32V2 idle loop. On that exact
+SHA, DOS/toolchain run `37408063336` passed and printed `userscr ok` after
+finding `hi` in the captured user screen. This closes the user-screen
+preservation smoke for this batch. DOS vector swapping/lifecycle and Linux PTY
+remain in `DNRun`.
+
 The inventory is deliberately limited to the first extraction families; the
 presence of `Dos` in historical DN units alone does not mean that every caller
 should be rewritten. Preserve DN's DOS path/error semantics through the
@@ -93,10 +109,10 @@ facades.
    its public API; disk queries are complete. Prove platform behavior for each
    additional family before closing it.
 2. Extract `DNRun` platform runners and DOS user-screen handling. DOS command
-   creation uses `SysExecute`, and process replacement now uses
-   `SysRestartSelf`; BIOS screen handling, DOS vector swapping, and Linux PTY
-   remain in `dn/src/dnrun.pas`. Prove Linux PTY/user-screen and DOS screen
-   behavior, plus Windows shell smoke.
+   creation uses `SysExecute`, and process replacement uses `SysRestartSelf`;
+   BIOS user-screen operations now live in `DNUserScreenDos`, with the DOS
+   persistence smoke passing. DOS vector swapping and Linux PTY remain in
+   `dn/src/dnrun.pas`. Prove Linux PTY/user-screen and Windows shell smoke.
 3. Move remaining startup/screen platform mechanics behind existing/new
    facades, guided by call-site search and parity failures.
 4. Re-run the full source inventory; mark stage 3 complete only when criteria
