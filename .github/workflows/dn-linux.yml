@@ -78,8 +78,10 @@ jobs:
       - name: Archive enter/leave matrix (zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz + F5)
         run: python3 tools/dn-linux-archives.py out/dn
       - name: The sort letter in the corner of the panel in three languages
+        if: success() || failure()
         run: python3 tools/dn-linux-sortmark.py out/dn
       - name: Quick search of the panel with a character outside the code page
+        if: success() || failure()
         run: python3 tools/dn-linux-qsearch.py out/dn
 
   linux-aarch64:
