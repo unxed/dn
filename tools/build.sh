@@ -71,8 +71,10 @@ cp "$src/rcpvpd.ini" "$w/RCPVPD.INI"; cp "$src/dnhelp.pas" "$w/DNHELP.PAS"; cp "
 for l in english russian ukrain; do u=$(echo $l | tr a-z A-Z); mkdir -p "$w/RESOURCE/$u"; cp "$src/resource/$l"/* "$w/RESOURCE/$u/"; done
 case "${DN_EXTRA:-}" in *-dDNUTF8*)      # DN inside in UTF-8: the UTF-8 resources are used as-is
     : ;;
-*)      # The legacy DOS/code-page build still receives CP866 resources.
-    for f in "$w"/RESOURCE/RUSSIAN/dn.dn? "$w"/RESOURCE/UKRAIN/dn.dn?; do iconv -f utf-8 -t cp866 "$f" > "$f.cp866" && mv "$f.cp866" "$f"; done ;;
+*)      # The code page build (DOS): the UTF-8 resources land on the code page of the machine (tools/to-codepage.py: a character that the page lacks
+        # becomes its letter without marks or "?", never a letter of another script). One page for all the languages: DN_CODEPAGE (default cp866).
+    for u in ENGLISH RUSSIAN UKRAIN; do for f in "$w"/RESOURCE/$u/dn.dn?; do
+        python3 "$here/tools/to-codepage.py" "${DN_CODEPAGE:-cp866}" "$f" "$f.cp" && mv "$f.cp" "$f" || exit 1; done; done ;;
 esac
 if [ "$DN_TARGET" = dos ]; then
     cp "$DN_OBJ/rcp.exe" "$w/RCP.EXE"
@@ -93,8 +95,8 @@ for l in english russian ukrain; do
     htx=$src/resource/$l/dnhelp.htx
     case "${DN_EXTRA:-}" in *-dDNUTF8*)      # the help is UTF-8 in the source and in DNUTF8 builds
         : ;;
-    *)      # The legacy build consumes CP866 help.
-        htx=$tmp/dnhelp-$l.htx; iconv -f utf-8 -t cp866 "$src/resource/$l/dnhelp.htx" > "$htx" ;;
+    *)      # The code page build consumes the help on the code page.
+        htx=$tmp/dnhelp-$l.htx; python3 "$here/tools/to-codepage.py" "${DN_CODEPAGE:-cp866}" "$src/resource/$l/dnhelp.htx" "$htx" || exit 1 ;;
     esac
     "$th/tvhc" "$htx" "$out/$l.hlp" /4DN_OSP | sed 's|^|  |'
 done

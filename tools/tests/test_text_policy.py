@@ -87,6 +87,13 @@ class TextPolicyTests(unittest.TestCase):
                     bad.append(name)
         self.assertEqual(bad, [])
 
+    def test_resource_text_is_not_mojibake(self):
+        """'Győr' was 'GyУr' in the Russian and Ukrainian resources (a one-byte code page could not keep it); the DOS build lands it (tools/to-codepage.py)."""
+        for lang in ("english", "russian", "ukrain"):
+            text = (ROOT / "dn/src/resource" / lang / "dn.dnl").read_text(encoding="utf-8")
+            self.assertIn("(Győr)", text, lang)
+            self.assertNotIn("GyУr", text, lang)
+
 
 if __name__ == "__main__":
     unittest.main()

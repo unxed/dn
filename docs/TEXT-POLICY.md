@@ -30,7 +30,14 @@ Run: `python3 -B -m unittest discover -s tools/tests -p 'test_text_policy.py'`
 
 ## Not fixed (out of the scope of the cleanup; no decision yet)
 
-- `GyУr` (a broken `Győr`) is left in `dn/src/resource/russian/dn.dnl` and `ukrain/dn.dnl`; the English one is `Gyor`.
+- The Russian and Ukrainian resource texts have Latin look-alike letters inside words (the author's old habit: a Russian surname with a Latin `p`; the Ukrainian letter i written as Latin `i` or as the Belarusian short u). They are left as they are: see `dn/TODO-later.md`.
 - The `Objects` word is still in docs on purpose: the Borland unit name in provenance texts, and the old name in
   `dn/renames.map` (`objutil.pas objects2.pas`). The unit `Objects` itself is not used (the shim is removed).
 - The English help sample of number suffixes had the Russian-letter forms (`1.2к`, `1.2мк`); they are removed from the text. Whether the program accepts them is not checked.
+
+## The DOS build and the code pages
+
+The sources are UTF-8 only. The build of DOS (without `-dDNUTF8`) lands the resources (`dn.dnl`, `dn.dnr`) and the help (`dnhelp.htx`) of every language
+on one code page, `DN_CODEPAGE` (default `cp866`), with `tools/to-codepage.py`: a character that the page has is kept, else the letter without marks
+(`Győr` becomes `Gyor`), else a plain sign for a few symbols, else `?`; never a letter of another script. The lost characters are listed by the build.
+The builds with `-dDNUTF8` (Linux, Windows) use the files as they are.
