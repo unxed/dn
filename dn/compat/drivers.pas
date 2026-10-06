@@ -667,8 +667,20 @@ begin
 end;
 
 function CellChar(const Cell: TScreenCell): Byte;
+var
+  S: ShortString;
+  CP: LongWord;
+  Used: Integer;
 begin
+  { the cell holds UTF-8 (TvCell.ScInitChar turns a byte of the code page into its character): DN asks for the byte of the page (a line character, a letter) }
   Result := Cell.Character.Text[0];
+  if ScLength(Cell.Character) > 1 then
+  begin
+    S := ScText(Cell.Character);
+    Result := Ord('?');
+    if Utf8Decode(@S[1], Length(S), CP, Used) and (CpFromUnicode(CP) <> 0) then
+      Result := CpFromUnicode(CP);
+  end;
 end;
 
 function CellAttr(const Cell: TScreenCell): Byte;
