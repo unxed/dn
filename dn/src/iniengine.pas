@@ -65,6 +65,7 @@ uses
 function DnIniFileName: String;
 
 procedure LoadDnIniSettings;
+procedure ApplyIniVars;
 procedure SaveDnIniSettings(PVar: Pointer);
 procedure DoneIniEngine;
 
@@ -88,7 +89,7 @@ uses
 
 const
   IniCacheSign: array[1..60] of Char =
-    'This file is compiled binary cache of dn.ini; v2, dnini.txt ';
+    'This file is compiled binary cache of dn.ini; v3, dnini.txt ';
   INIModified: Boolean = False; {JO}
 
 type
@@ -246,6 +247,8 @@ procedure Proceed(RegisterVar: TDoProc);
        SizeOf(HorizScrollBarChars), @HorizScrollBarChars);
   RegisterVar(CSInterface, 'VertScrollBarChars', ikStr,
        SizeOf(VertScrollBarChars), @VertScrollBarChars);
+  RegisterVar(CSInterface, 'DefaultSortMode', ikStr,
+       SizeOf(DefaultSortMode), @DefaultSortMode);
   RegisterVar(CSInterface, 'ReflectCopyDirection', ikBool,
        SizeOf(ReflectCopyDirection), @ReflectCopyDirection);
   RegisterVar(CSInterface, 'ReuseViewers', ikUInt, SizeOf(ReuseViewers),
@@ -664,7 +667,12 @@ procedure LoadDnIniSettings;
   FreeStr := DnIniFileName+#0;
   Proceed(Loader);
   CloseProfile;
-  { the characters of the scroll bars are glyphs in UTF-8 in dn.ini (or the bytes of a page in an old one) }
+  end;
+
+{ What is made of the values of dn.ini after they are read (from the file or from its cache): the characters of the scroll bars are glyphs in UTF-8 in dn.ini
+  (or the bytes of a page in an old one) }
+procedure ApplyIniVars;
+  begin
   ScrollCharsV := GlyphsToPage(VertScrollBarChars);
   ScrollCharsH := GlyphsToPage(HorizScrollBarChars);
   end;
