@@ -37,6 +37,11 @@ type
   PDrawBuffer = ^TDrawBuffer;
   TDrawBuffer = array[0..MaxViewWidth - 1] of TScreenCell;
 
+var
+  { The scroll bar characters of dn.ini (5 bytes of the page: first, last, bar, thumb, empty bar); '' keeps those of tv/. Set by the loader of dn.ini. }
+  ScrollCharsV: String[5] = '';
+  ScrollCharsH: String[5] = '';
+
 type
   { the title of a window (Borland TV: String[80]) }
   TTitleStr = ShortString;

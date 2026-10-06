@@ -53,7 +53,17 @@ begin
 end;
 
 procedure TMyScrollBar.Draw;
+var
+  S: String[5];
+  I: Integer;
 begin
+  if Size.X = 1 then
+    S := ScrollCharsV
+  else
+    S := ScrollCharsH;
+  if Length(S) = 5 then
+    for I := 0 to 4 do
+      Chars[I] := Byte(S[I + 1]);
   inherited Draw;
 end;
 

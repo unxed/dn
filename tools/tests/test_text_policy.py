@@ -20,11 +20,13 @@ CYRILLIC_OK = _rx(
     r"^dn/archives/fmtain\.pas$",
     r"^dn/tests/t_(dnutf8|drivrs|zipcharset)\.pas$",
     r"^docs/ZIP-CHARSET\.md$",
+    r"^docs/TEXT-POLICY\.md$",
+    r"^tools/(fix-resource-lookalikes\.py|tests/test_(text_policy|to_codepage)\.py)$",
     r"^docs/patches/",
     r"^tools/(dn-linux-(accept|far2l|locale|ops|sortmark)|dn-dos-input|test-zipcharset)\.py$",
     r"^tools/tests/test_source_encoding\.py$",
 )
-NOT_UTF8_OK = _rx(r"/xlt/", r"^dn/data/dn\.ini$", r"^dist/[^/]+/dn\.ini$")
+NOT_UTF8_OK = _rx(r"/xlt/", r"^dist/[^/]+/dn\.ini$")   # dist/ is the old build: its dn.ini still has page bytes
 INI = _rx(r"^dn/data/dn\.ini$", r"^dist/[^/]+/dn\.ini$")
 
 
@@ -61,13 +63,17 @@ class TextPolicyTests(unittest.TestCase):
         self.assertEqual(bad, [], "Cyrillic outside docs/TEXT-POLICY.md")
 
     def test_ini_comments_are_english(self):
-        # dn.ini holds CP437 glyph bytes in values, so it is read as CP866 here; comments must be ASCII-clean of Cyrillic
+        # dn/data/dn.ini is UTF-8; the old dist/ one holds page bytes in values and is read as CP866; comments must be free of Cyrillic
         bad = []
         for name, data in tracked_files():
             if not _any(INI, name):
                 continue
             for number, line in enumerate(data.split(b"\n"), 1):
-                if line.lstrip().startswith(b";") and CYR.search(line.decode("cp866", "replace")):
+                try:
+                    text = line.decode("utf-8")
+                except UnicodeDecodeError:
+                    text = line.decode("cp866", "replace")
+                if line.lstrip().startswith(b";") and CYR.search(text):
                     bad.append("%s:%d" % (name, number))
         self.assertEqual(bad, [])
 
