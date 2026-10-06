@@ -41,7 +41,7 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 |---|---|
 | `dn.pas` | the main program (starts the application, the loop): `uses boot, mainapp, ...` |
 | `mainapp.pas` (ours; was `dnapp.pas`) | the application class on top of `tv/` (`TApplication`, the background, the user screen) |
-| `dosharness.pas` (ours) | the test aid of the DOS build (`DNDUMP`, `DNKEYS`, `DNMOUSE`: keys and mouse put in, the screen dumped; `tools/dn-dos-input.py`), taken out of `mainapp.pas` |
+| `compat/dosharness.pas` (ours) | the test aid of the DOS build (`DNDUMP`, `DNKEYS`, `DNMOUSE`: keys and mouse put in, the screen dumped; `tools/dn-dos-input.py`), taken out of `mainapp.pas` |
 | `commands.pas` | all constants: commands `cm*`, key codes `kb*` (DN's codes include the scan code: `kbCtrlS = $041F13`), help contexts |
 | `dnutil.pas` | the central dispatcher of the commands of the application (`TDNApplication`: menu items, windows, Ctrl-O...) |
 | `apploop.pas` (was `u_myapp`) | the event loop of the application (keys before the dispatch, macros, the idle work) |

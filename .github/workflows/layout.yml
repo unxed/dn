@@ -8,6 +8,7 @@ on:
       - dn/**
       - bootstrap/**
       - tools/check-layout.sh
+      - tools/check-platform.py
       - .github/workflows/layout.yml
 jobs:
   layout:
@@ -18,3 +19,7 @@ jobs:
           submodules: true
           fetch-depth: 0
       - run: tools/check-layout.sh
+      - name: The platform boundary of DN (no platform unit or target conditional outside the backends)
+        run: python3 tools/check-platform.py
+      - name: The tests of the tools and of the text policy
+        run: python3 -B -m unittest discover -s tools/tests -p 'test_*.py'

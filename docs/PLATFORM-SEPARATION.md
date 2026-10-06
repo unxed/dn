@@ -215,3 +215,7 @@ directory (`OSDefaultTempDir`), the directories that a tree scan skips (`SysSkip
 Compiles for linux64 (UTF-8 and code page) and dos locally, the DOS tour scenarios `f5copy`, `tab`, `f1help`, `userscr`, `ctrlo` pass in DOSBox-X; the Windows
 build is checked by the CI of the commit.
 
+Ninth step (2026-10-06): the boundary is checked, not only documented: `tools/check-platform.py` (CI: `layout`) fails when a unit outside the backends uses `BaseUnix`,
+`Unix`, `Windows`, `go32`, `termio`, `dpmiexcp` or `Linux`, or has a target conditional that is not in its table (the table gives the reason: the facade of the runner, the archive
+formats that need the tools of Unix). The DOS test aid `dosharness.pas` moved to `compat/` (it is a DOS backend), `mainapp` no longer uses `go32`.
+
