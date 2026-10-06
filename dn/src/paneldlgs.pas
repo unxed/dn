@@ -99,7 +99,7 @@ implementation
 uses
   dirwatch,
   Lfn, uselfn, Collect, timeutil, DnIni, HistList,
-  basics, strutil, fileutil, Dos, Defines, Dialogs,
+  basics, strutil, fileutil, TvGlyphs, Dos, Defines, Dialogs,
   Views, mainapp, Commands, Drivers, filepanel, Drives, FileCopy,
   progress, gadgets, Archiver, Startup, inputfname, Validate, Messages, Menus, DNHelp,
   FileFind, Tree, copyio, DNUtil, Filediz, Filelst, fsinfo, panelwin,
@@ -2058,12 +2058,12 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   if R.B.X-P.Origin.X-P.Size.X = 0 then
     Inc(R.B.X);
   PIF.Create(R, 255);
-  PIF.LC := #179;
-  PIF.RC := #179;
+  PIF.LC := GlyphChar(glLightV);
+  PIF.RC := GlyphChar(glLightV);
   if P.Origin.X-R.A.X = 1 then
-    PIF.LC := #186
+    PIF.LC := GlyphChar(glDblV)
   else if R.B.X-P.Origin.X-P.Size.X = 1 then
-    PIF.RC := #186;
+    PIF.RC := GlyphChar(glDblV);
   if  (PF^.TType = 0) or (Startup.FMSetup.Show and fmsHiliteFiles = 0)
   then
     PIF.C[1] := P.GetColorW(1)

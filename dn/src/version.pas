@@ -109,7 +109,7 @@ if ParamStr(ParamCount) = 'PLUGIN' then
   
   VersionName := VersionName+'/Plugin';
 
-Writeln(' '#254' Creating ', ParamStr(1)+' '+VersionName);
+Writeln(' * Creating ', ParamStr(1)+' '+VersionName);
 
 GetDate(Year, Month, Day, dow);
 Str(Year, VersionDate);

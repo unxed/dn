@@ -107,7 +107,7 @@ procedure DispatchEvents(InfoView: TWhileView; var CancelParam: Boolean);
 
 implementation
 uses
-  mainapp, Commands, Dos, TitleSet, basics, strutil, fileutil
+  mainapp, Commands, Dos, TitleSet, basics, strutil, fileutil, TvGlyphs
   ;
 
 constructor TPercentGauge.Create(const Bounds: TRect; AMaxValue: LongInt);
@@ -185,8 +185,8 @@ procedure TBarGauge.Draw;
   Filled := SolveForX(SolveForY(CurValue, MaxValue), Size.X);
   if Filled > Size.X then
     Filled := Size.X;
-  MoveChar(Row[0], #176, Attr, Size.X);
-  MoveChar(Row[0], #178, Attr, Filled);
+  MoveGlyph(Row[0], glShadeLight, Attr, Size.X);
+  MoveGlyph(Row[0], glShadeDark, Attr, Filled);
   WriteLineC(0, 0, Size.X, Size.Y, Row);
   end;
 procedure TWhileView.InsBut;
@@ -381,10 +381,6 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
 procedure TWhileView.Draw;
   var
     B: TDrawBuffer;
-    B1: array[0..127] of record
-      C: Char;
-      A: Byte;
-      end absolute B;
     C1, C2: Byte;
     I: Integer;
     PS: PString;
@@ -436,21 +432,21 @@ procedure TWhileView.Draw;
     end;
   C1 := GetColorW(2+Byte(GetState(sfDragging)));
   C2 := GetColorW(7);
-  MoveChar(B[0], #205, C1, Size.X);
+  MoveGlyph(B[0], glDblH, C1, Size.X);
   if Top <> '' then
     MoveStr(B[(Size.X-Length(Top)) div 2-1], ' '+Top+' ', C1);
-  B1[0].C := #201;
-  B1[Size.X-1].C := #187;
+  SetCellGlyph(B[0], glDblDR);
+  SetCellGlyph(B[Size.X-1], glDblDL);
   WriteLineC(0, 0, Size.X, 1, B);
-  MoveChar(B[0], #205, C1, Size.X);
+  MoveGlyph(B[0], glDblH, C1, Size.X);
   if Bottom <> '' then
     MoveStr(B[(Size.X-Length(Bottom)) div 2-1], ' '+Bottom+' ', C1);
-  B1[0].C := #200;
-  B1[Size.X-1].C := #188;
+  SetCellGlyph(B[0], glDblUR);
+  SetCellGlyph(B[Size.X-1], glDblUL);
   WriteLineC(0, Size.Y-1, Size.X, 1, B);
 
-  B1[0].C := #186;
-  B1[Size.X-1].C := #186;
+  SetCellGlyph(B[0], glDblV);
+  SetCellGlyph(B[Size.X-1], glDblV);
   for I := 0 to Size.Y-5 do
     begin
     MoveChar(B[1], ' ', C2, Size.X-2);

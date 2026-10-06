@@ -54,7 +54,7 @@ interface
 
 uses
   Dos,
-  Strings,
+  Strings, TvGlyphs,
   objutil, Lfn {DataCompBoy}
   , Defines, Streams
   ;
@@ -70,7 +70,7 @@ type
 
 const
   NameFormatChar: array[TNameFormatMode] of Char =
-    ('.', #176, #177, #178);
+    ('.', gcShadeLight, gcShadeMedium, gcShadeDark);
 
 (*  flnPreferName = 1;  { Non-tabulated extension;
         in this case always ExtSize = 0}

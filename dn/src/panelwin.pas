@@ -164,7 +164,7 @@ const
 implementation
 uses
   DiskInfo, Commands, FileCopy, FilesCol, basics, strutil, fileutil,
-  Startup, mainapp, topview, Tree, FViewer
+  Startup, mainapp, topview, Tree, FViewer, TvGlyphs
   
   , Dos, Math
   ;
@@ -1208,27 +1208,27 @@ procedure TSeparator.Draw;
   B[Size.Y-1].B := C;
   if Owner.GetState(sfActive) and not Owner.GetState(sfDragging) then
     begin
-    B[0].C := #187;
-    Ch := #186;
-    B[Size.Y-1].C := #188;
+    B[0].C := GlyphChar(glDblDL);
+    Ch := GlyphChar(glDblV);
+    B[Size.Y-1].C := GlyphChar(glDblUL);
     end
   else
     begin
-    B[0].C := #191;
-    Ch := #179;
-    B[Size.Y-1].C := #217;
+    B[0].C := GlyphChar(glLightDL);
+    Ch := GlyphChar(glLightV);
+    B[Size.Y-1].C := GlyphChar(glLightUL);
     end;
   MoveChar(B[1], Ch, C, Size.Y-2);
   WriteBufW(0, 0, 1, Size.Y, B);
   if Owner.GetState(sfActive) and not Owner.GetState(sfDragging) then
     begin
-    B[0].C := #201;
-    B[Size.Y-1].C := #200;
+    B[0].C := GlyphChar(glDblDR);
+    B[Size.Y-1].C := GlyphChar(glDblUR);
     end
   else
     begin
-    B[0].C := #218;
-    B[Size.Y-1].C := #192;
+    B[0].C := GlyphChar(glLightDR);
+    B[Size.Y-1].C := GlyphChar(glLightUR);
     end;
   WriteBufW(1, 0, 1, Size.Y, B);
   end { TSeparator.Draw };

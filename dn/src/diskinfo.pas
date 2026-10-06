@@ -155,7 +155,7 @@ var
 implementation
 uses
   Startup, mainapp, Commands, DNHelp, Tree, timeutil
-  , basics, strutil, fileutil, Math
+  , basics, strutil, fileutil, TvGlyphs, Math
   , osdep, Lfn, keymap, objutil
   , fsinfo, panelroot, panelsetup, Dos
   , Strings;
@@ -568,7 +568,7 @@ procedure TDiskInfo.Draw;
     and (DriveInfoData and (fdiEMSFree+fdiXMSFree) <> 0)
   then
     Wrt(
-      #196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196
+      Strg(GlyphChar(glLightH), 19)
       );
   if  (DriveInfoData and fdiEMSFree <> 0) and EMSFound then
     begin

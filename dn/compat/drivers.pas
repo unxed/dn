@@ -165,6 +165,9 @@ procedure MoveStr(var Dest: TScreenCell; const Str: String; Attr: Byte); overloa
 procedure MoveColor(var Buf: array of TScreenCell; Num: Word; Attr: Byte); overload;
 procedure MoveBuf(var Dest: array of TScreenCell; var Source; Attr: Byte; Count: Word); overload;
 procedure MoveChar(var Dest: array of TScreenCell; C: Char; Attr: Byte; Count: LongInt); overload;
+{ Count cells from Dest on with the glyph (a Unicode code point, TvGlyphs: gl*) and the BIOS attribute Attr; the cell holds its UTF-8. }
+procedure MoveGlyph(var Dest: TScreenCell; CodePoint: LongWord; Attr: Byte; Count: LongInt); overload;
+procedure MoveGlyph(var Dest: array of TScreenCell; CodePoint: LongWord; Attr: Byte; Count: LongInt); overload;
 procedure MoveCStr(var Dest: array of TScreenCell; const Str: String; Attrs: Word); overload;
 procedure MoveStr(var Dest: array of TScreenCell; const Str: String; Attr: Byte); overload;
 
@@ -644,6 +647,27 @@ end;
 procedure MoveChar(var Dest: array of TScreenCell; C: Char; Attr: Byte; Count: LongInt);
 begin
   MoveChar(Dest[0], C, Attr, Count);
+end;
+
+procedure MoveGlyph(var Dest: TScreenCell; CodePoint: LongWord; Attr: Byte; Count: LongInt);
+var
+  I: Integer;
+  P: PScreenCell;
+  A: TColorAttr;
+begin
+  P := @Dest;
+  A := AttrFromBIOS(Attr);
+  for I := 0 to Count - 1 do
+  begin
+    ScInitCodePoint(P^.Character, CodePoint);
+    P^.Attribute := A;
+    Inc(P);
+  end;
+end;
+
+procedure MoveGlyph(var Dest: array of TScreenCell; CodePoint: LongWord; Attr: Byte; Count: LongInt);
+begin
+  MoveGlyph(Dest[0], CodePoint, Attr, Count);
 end;
 
 procedure MoveStr(var Dest: array of TScreenCell; const Str: String; Attr: Byte);

@@ -118,7 +118,7 @@ implementation
 
 uses
   Startup, DNHelp, mainapp, Messages
-  , basics, strutil, fileutil
+  , basics, strutil, fileutil, TvGlyphs
   , osdep {for Open_Access_ReadOnly}
   , LFN 
   ;
@@ -194,8 +194,8 @@ procedure TPrintStatus.Draw;
     S := S+CutH(PString(Print.List.At(0))^, Size.X-CStrLen(S));
     if Print.FileLen <> 0 then
       S1 := '~'+Copy(
-          Strg(#219, Trunc(((Size.X-6)*Print.FilePos) / Print.FileLen)) +
-            Strg(#177, Size.X-6),
+          Strg(GlyphChar(glBlockFull), Trunc(((Size.X-6)*Print.FilePos) / Print.FileLen)) +
+            Strg(GlyphChar(glShadeMedium), Size.X-6),
           1, Size.X-6) +
         ' ~' + Percent(Print.FilePos+1, Print.FileLen+1);
     end;

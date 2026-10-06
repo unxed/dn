@@ -121,7 +121,7 @@ procedure PrintFiles(Files: TCollection; Own: TView);
 
 implementation
 uses
-  Tree, Messages, mainapp, basics, strutil, fileutil,
+  Tree, Messages, mainapp, basics, strutil, fileutil, TvGlyphs,
    {AK155}
   FilesCol, Startup, DnIni, FileCopy, Eraser, Commands
   , Calendar 
@@ -452,11 +452,11 @@ procedure TTrashCan.Draw;
   else
     Index := 1;
   Attr := GetColorW(Index);
-  MoveStr(Row[0], #209#209#216#209#209, Attr);
+  MoveStr(Row[0], GlyphChar(glDownSglHorizDbl)+GlyphChar(glDownSglHorizDbl)+GlyphChar(glVertSglHorizDbl)+GlyphChar(glDownSglHorizDbl)+GlyphChar(glDownSglHorizDbl), Attr);
   WriteLineC(0, 0, Size.X, 1, Row);
   MoveStr(Row[0], GetString(dlTrashCaption), Attr);
   WriteLineC(0, 1, Size.X, 1, Row);
-  MoveStr(Row[0], #192#193#193#193#217, Attr);
+  MoveStr(Row[0], GlyphChar(glLightUR)+GlyphChar(glUpSglHorizDbl)+GlyphChar(glUpSglHorizDbl)+GlyphChar(glUpSglHorizDbl)+GlyphChar(glLightUL), Attr);
   WriteLineC(0, 2, Size.X, 1, Row);
   end;
 

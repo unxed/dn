@@ -65,7 +65,7 @@ implementation
 
 uses
   Lfn, Views, Defines, Streams, keymap, Collect, editundo,
-  basics, strutil, fileutil, Dos, Dialogs, mainapp,
+  basics, strutil, fileutil, TvGlyphs, Dos, Dialogs, mainapp,
   {SBlocks,}progress, Startup, WinClp, Messages, Commands, Macro,
   editwin, timeutil, DnIni, DNUtil, linepos, evaluator, FViewer {AK155}
   
@@ -994,8 +994,8 @@ function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
     for I := 0 to L.Count-1 do
       begin
       PS := L.At(I);
-      P.Write(2, Copy(LongStrg(#219, ((I+1)*25) div
-             L.Count)+LongStrg(#177, 25), 1, 25));
+      P.Write(2, Copy(LongStrg(GlyphChar(glBlockFull), ((I+1)*25) div
+             L.Count)+LongStrg(GlyphChar(glShadeMedium), 25), 1, 25));
       LL[1] := I+1;
       LL[2] := L.Count+1;
       FormatStr(M, GetString(dlED_PrintLine), LL);

@@ -133,7 +133,7 @@ procedure WriteBlock(Hint: String; S: TStream; C: TLineCollection
 
 implementation
 uses
-  basics, strutil, fileutil
+  basics, strutil, fileutil, TvGlyphs
   , Messages, Dos, mainapp, editcore, Startup, DnIni, editwin
   ;
 
@@ -291,12 +291,12 @@ procedure TInfoLine.Draw;
       Color := TWindow(Owner).Frame.GetColorW(5)
     else
       Color := TWindow(Owner).Frame.GetColorW(2);
-    Ch2 := #196;
+    Ch2 := GlyphChar(glLightH);
     end
   else
     begin
     Color := TWindow(Owner).Frame.GetColorW(3);
-    Ch2 := #205;
+    Ch2 := GlyphChar(glDblH);
     end;
   if not Owner.GetState(sfActive) then
     SetLength(S, 0)
@@ -360,7 +360,7 @@ procedure TInfoLine.Draw;
         then
           S := S+Char(X+48)
         else
-          S := S+#250;
+          S := S+GlyphChar(glMidDot);
       S := S+'>'; {-$VIV::}
       end;
     end;
@@ -406,12 +406,12 @@ procedure TBookmarkLine.Draw;
       Col := TWindow(Owner).Frame.GetColorW(5)
     else
       Col := TWindow(Owner).Frame.GetColorW(2);
-    Ch := #179;
+    Ch := GlyphChar(glLightV);
     end
   else
     begin
     Col := TWindow(Owner).Frame.GetColorW(3);
-    Ch := #186;
+    Ch := GlyphChar(glDblV);
     end;
   if not ShowBookmarks then
     begin

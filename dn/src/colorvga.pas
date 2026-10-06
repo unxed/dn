@@ -59,7 +59,7 @@ implementation
 
 uses
   Defines, Drivers, Views, Dialogs, Commands, Dos, mainapp, Startup,
-  basics, strutil, fileutil, Collect, Messages, VideoMan
+  basics, strutil, fileutil, Collect, Messages, VideoMan, TvGlyphs
   ;
 
 const
@@ -142,7 +142,7 @@ procedure TColorView.Draw;
       for J := 0 to 3 do
         begin
         C := (I-1)*4+J;
-        MoveChar(B[J*3+5], #219, C, 3);
+        MoveGlyph(B[J*3+5], glBlockFull, C, 3);
         if C = Byte(Color2Display) then
           begin
           SetCellChar(B[J*3+1+5], 8);

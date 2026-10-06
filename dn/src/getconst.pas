@@ -155,7 +155,7 @@ procedure TValuesHolder.Show;
   var P: TTypeHolder absolute P_;
     begin
     Writeln('TYPE ', P.TypeID);
-    Writeln(Strg(#196, 5+Length(P.TypeID)));
+    Writeln(Strg('-', 5+Length(P.TypeID)));
     P.Show;
     end;
   begin

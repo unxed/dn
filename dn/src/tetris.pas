@@ -141,7 +141,7 @@ const
 implementation
 
 uses
-  timeutil, Startup, DNHelp, basics, strutil, fileutil
+  timeutil, Startup, DNHelp, basics, strutil, fileutil, TvGlyphs
   , mainapp, Messages, Commands, Math
   ;
 
@@ -291,35 +291,35 @@ procedure TGameInfo.Draw;
     C, I, J, K: Word;
   begin
   C := GetColorW($0201);
-  MoveChar(B[0], #196, C, Size.X);
+  MoveGlyph(B[0], glLightH, C, Size.X);
   S := GetString(dlGameInfo);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
-  MoveChar(B[0], #218, C, 1);
-  MoveChar(B[Size.X-1], #191, C, 1);
+  MoveGlyph(B[0], glLightDR, C, 1);
+  MoveGlyph(B[Size.X-1], glLightDL, C, 1);
   WriteLineC(0, 0, Size.X, 1, B);
 
   MoveChar(B[0], ' ', C, Size.X);
   MoveCStr(B[0], GetString(dlGameScore2)+ItoS(Gm.Score)+'~', C);
-  MoveChar(B[Size.X-1], #179, C, 1);
+  MoveGlyph(B[Size.X-1], glLightV, C, 1);
   WriteLineC(0, 1, Size.X, 1, B);
   MoveChar(B[0], ' ', C, Size.X);
   MoveCStr(B[0], GetString(dlGameLines)+ItoS(Gm.Lines)+'~', C);
-  MoveChar(B[Size.X-1], #179, C, 1);
+  MoveGlyph(B[Size.X-1], glLightV, C, 1);
   WriteLineC(0, 2, Size.X, 1, B);
   MoveChar(B[0], ' ', C, Size.X);
   MoveCStr(B[0], GetString(dlGameLevel)+ItoS(Gm.Level)+'~', C);
-  MoveChar(B[Size.X-1], #179, C, 1);
+  MoveGlyph(B[Size.X-1], glLightV, C, 1);
   WriteLineC(0, 3, Size.X, 1, B);
-  { MoveChar(B[0], #196, C, Size.X);
- MoveChar(B[0], #192, C, 1);
- MoveChar(B[Size.X-1], #217, C, 1);
+  { MoveGlyph(B[0], glLightH, C, Size.X);
+ MoveGlyph(B[0], glLightUR, C, 1);
+ MoveGlyph(B[Size.X-1], glLightUL, C, 1);
  WriteLineC(0,4,Size.X,1,B);}
 
-  MoveChar(B[0], #196, C, Size.X);
+  MoveGlyph(B[0], glLightH, C, Size.X);
   S := GetString(dlTetrisNext);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
-  MoveChar(B[0], #195, C, 1);
-  MoveChar(B[Size.X-1], #180, C, 1);
+  MoveGlyph(B[0], glLightVR, C, 1);
+  MoveGlyph(B[Size.X-1], glLightVL, C, 1);
   WriteLineC(0, 4, Size.X, 1, B);
   K := ((15-Gm.NextFig mod 7) shl 8)+219;
   for I := 5 to 10 do
@@ -334,13 +334,13 @@ procedure TGameInfo.Draw;
           B[Figures[Gm.NextFig*5+J, 2]*2+4] := CellFromBIOS(K);
           end;
       end;
-    MoveChar(B[0], #179, C, 1);
-    MoveChar(B[Size.X-1], #179, C, 1);
+    MoveGlyph(B[0], glLightV, C, 1);
+    MoveGlyph(B[Size.X-1], glLightV, C, 1);
     WriteLineC(0, I, Size.X, 1, B);
     end;
-  MoveChar(B[0], #196, C, Size.X);
-  MoveChar(B[0], #192, C, 1);
-  MoveChar(B[Size.X-1], #217, C, 1);
+  MoveGlyph(B[0], glLightH, C, Size.X);
+  MoveGlyph(B[0], glLightUR, C, 1);
+  MoveGlyph(B[Size.X-1], glLightUL, C, 1);
   WriteLineC(0, 10, Size.X, 1, B);
 
 { For tall pentix — gap between next piece and the buttons }
@@ -349,25 +349,25 @@ procedure TGameInfo.Draw;
     WriteLineC(0, I, Size.X, 1, B);
 
   C := Owner.GetColorW($1112);
-  MoveChar(B[0], #196, C, Size.X);
+  MoveGlyph(B[0], glLightH, C, Size.X);
   S := GetString(dlTetrisBest);
   MoveCStr(B[(Size.X-CStrLen(S)) div 2], S, C);
-  MoveChar(B[0], #218, C, 1);
-  MoveChar(B[Size.X-1], #191, C, 1);
+  MoveGlyph(B[0], glLightDR, C, 1);
+  MoveGlyph(B[Size.X-1], glLightDL, C, 1);
   WriteLineC(0, 11, Size.X, 1, B);
   MoveChar(B[0], ' ', C, Size.X);
   MoveCStr(B[0],
      GetString(dlTetName)+Gm.HiScores[1+10*Byte(Gm.Pentix)].Name, C);
-  MoveChar(B[Size.X-1], #179, C, 1);
+  MoveGlyph(B[Size.X-1], glLightV, C, 1);
   WriteLineC(0, 12, Size.X, 1, B);
   MoveChar(B[0], ' ', C, Size.X);
   MoveCStr(B[0], GetString(dlGameScore) +
     ItoS(Gm.HiScores[1+10*Byte(Gm.Pentix)].Score), C);
-  MoveChar(B[Size.X-1], #179, C, 1);
+  MoveGlyph(B[Size.X-1], glLightV, C, 1);
   WriteLineC(0, 13, Size.X, 1, B);
-  MoveChar(B[0], #196, C, Size.X);
-  MoveChar(B[0], #192, C, 1);
-  MoveChar(B[Size.X-1], #217, C, 1);
+  MoveGlyph(B[0], glLightH, C, Size.X);
+  MoveGlyph(B[0], glLightUR, C, 1);
+  MoveGlyph(B[Size.X-1], glLightUL, C, 1);
   WriteLineC(0, 14, Size.X, 1, B);
   end { TGameInfo.Draw };
 

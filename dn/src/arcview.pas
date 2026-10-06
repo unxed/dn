@@ -154,7 +154,7 @@ type
 implementation
 
 uses
-  osdep, Eraser, DNErrLog,
+  osdep, Eraser, DNErrLog, TvGlyphs,
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
   Arvid, timeutil, VideoMan, DnExec, FileFind
   , UserMenu {JO: for hiding panels while extracting }
@@ -486,8 +486,8 @@ function TArcDrive.ReadArchive: Boolean;
         Desktop.Insert(P);
         end;
       P.Write(2,
-         Copy(Strg(#219, 25 div Trunc(Ln / (ArcFile.GetPos+1))) +
-           Strg(#177, 25),
+         Copy(Strg(GlyphChar(glBlockFull), 25 div Trunc(Ln / (ArcFile.GetPos+1))) +
+           Strg(GlyphChar(glShadeMedium), 25),
          1, 25));
       P.Write(3, ItoS(Files.Files)+GetString(dlFilesFound));
       NewTimer(T, 300);
