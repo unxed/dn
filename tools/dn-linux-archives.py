@@ -159,7 +159,9 @@ def view_edit_smoke(
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
+        os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
@@ -181,10 +183,9 @@ def view_edit_smoke(
             if label == 'F3' and expect_member.lower() in scr.lower():
                 opened = True
                 break
-            if label == 'F4' and scr != before:
-                if 'hello' in scr.lower() or scr.count(expect_member) < before.count(expect_member):
-                    opened = True
-                    break
+            if label == 'F4' and 'extract' in scr.lower():       # F4 in an archive is "Extr": the dialog of the extraction
+                opened = True
+                break
             time.sleep(0.2)
             t.pump(0.2, 1)
         elapsed = time.time() - t0
@@ -192,11 +193,13 @@ def view_edit_smoke(
         check(t.alive(), '%s/%s: alive' % (name, label), scr)
         check('Fatal' not in scr and 'Access' not in scr,
               '%s/%s: no Fatal' % (name, label), scr)
-        if label == 'F4' and not opened and scr == before:
-            # Edit-from-archive did nothing in this PTY build — skip hang/content
-            # gates so Enter/leave + F3 still protect the matrix (main was red on
-            # "no hang (8.0s)" while the listing never changed).
-            print('SKIP %s/%s: edit-from-archive no-op in PTY' % (name, label), flush=True)
+        if label == 'F4':
+            # F4 in an archive is "Extr" (the key bar says so): the Extract dialog must be there, and nothing else is checked
+            if 'extract' in scr.lower():
+                print('PASS %s/F4: the Extract dialog is shown' % name, flush=True)
+            else:
+                SOFT_FAILS.append('%s F4 dialog' % name)
+                print('SOFTFAIL %s/F4: no Extract dialog' % name, flush=True)
         else:
             check(elapsed < timeout, '%s/%s: no hang (%.1fs)' % (name, label, elapsed), scr)
             check(
@@ -209,13 +212,19 @@ def view_edit_smoke(
                 break
             t.pump(0.5, 2)
             scr = t.text()
+        if label == 'F4':
+            t.send(KEYS['ESC'], 0.6)
+            t.send(KEYS['ESC'], 0.4)
+            quit_dn(t)
+            return
         # the content of the member must be on the screen (the viewer or the editor shows the file that DN extracted with the unpacker)
         if 'hello from fixture' in scr.lower():
             print('PASS %s/%s: the content of the member is shown' % (name, label), flush=True)
         else:
             SOFT_FAILS.append('%s %s content' % (name, label))
             print('SOFTFAIL %s/%s: the content of the member is not shown' % (name, label), flush=True)
-            print('DIAG %s screen: %s' % (label, ' | '.join(l.strip() for l in scr.split('\n') if l.strip())[-500:]), flush=True)
+            print('DIAG %s screen: %s' % (label, ' | '.join(' '.join(l.split()) for l in scr.split('\n')[1:24] if l.strip('║│ \t'))[:600]), flush=True)
+            print('DIAG %s dn.log: %s' % (label, open(os.path.join(d, 'dn.log')).read()[-900:] if os.path.exists(os.path.join(d, 'dn.log')) else '(none)'), flush=True)
         t.send(KEYS['ESC'], 0.6)
         t.send(KEYS['ESC'], 0.4)
         quit_dn(t)
