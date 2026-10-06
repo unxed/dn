@@ -38,6 +38,15 @@ acceptance `37390645223`. The DOS build exposed and prompted the `PGroup` →
 workflow uses the same `runner.temp` prefix for cache, compiler, hello program,
 and DN build.
 
+The next narrow step moved DOS process creation out of `DNRun`: it now calls
+the existing `osdep.SysExecute` facade while retaining DOS vector swapping and
+screen handling in the runner. Exact-SHA DN `68400a80218b01503f7f55900c7535299d3db093`
+passed the class gate, layout, Linux, Windows, full DOS build, and object/class
+acceptance (177 pass, 0 fail; runs `37393996207`, `37393995793`, `37393995904`,
+`37393996078`, `37393995642`, and `37393995667`, respectively). This closes
+only process creation; BIOS screen handling and vector lifecycle are still
+platform-specific code in `DNRun`.
+
 The inventory is deliberately limited to the first extraction families; the
 presence of `Dos` in historical DN units alone does not mean that every caller
 should be rewritten. Preserve DN's DOS path/error semantics through the
