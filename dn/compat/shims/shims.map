@@ -20,6 +20,3 @@ MsgBox:   TvMsgBox
 App:      TvApp
 _Apps:    TvApp
 StdDlg:   TvFileDlg TvChDir TvFiles
-
-# the unit Objects of Borland (the file of the archive is a placeholder): the TObject, streams and collections of tv/ (Collect and Streams of DN, used after it, win where the names are the same)
-Objects:  TvGeom TvObjs
