@@ -135,3 +135,14 @@ facades.
 
 Do not begin stage 4 (broader platform test expansion) until stage 3 is
 complete, except for narrow tests required to prove an extraction batch.
+
+Next narrow step (2026-10-06): the Unix names family (`NameConv`, `NameFromOs`,
+`NameToOs`, `ResolveCase`, the path and command-line conversion) moved from
+`osdep` to `compat/osnamesunix.pas`; `osdep` keeps `SysOsPath`, `SysNameToOs`,
+`SysCommandLineToOs` as thin wrappers and its other users of the names
+(`SysRunShell`, `SysGetDirDos`, `SysFindFirst`, the initialization) call the new
+unit. The code is moved as it was, no behaviour change. Compiles for linux64,
+win64 and dos locally; the proof is the CI of the commit (unit tests `t_osdep`,
+`t_dnrun`, the class gate, Linux and Windows, the full DOS build). Left in
+`osdep`: the DOS names (`DosNameToUtf8`, `DosNameFromUtf8`, the AMIS provider
+`DOS-UTF8/NAMES`), then the file calls, the find calls, `SysExecute`.
