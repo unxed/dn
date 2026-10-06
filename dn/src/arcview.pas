@@ -1317,6 +1317,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
   S := ' ';
   Pswd := False;
   AFiles.ForEach(Unselect);
+  DNLog('ExtractFiles: list [' + SS + '] password needed ' + ItoS(Ord(Pswd)));
   ExtrChar := CnvString(AType.ExtractWP);
   if Options and 1 = 0 then
     ExtrChar := CnvString(AType.Extract);

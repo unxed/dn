@@ -324,7 +324,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
                 for f in fs:
                     if f.lower() in ('dn.err', 'dn.log', 'dnerr.log') or f.endswith('.err'):
                         print('DIAG', f, ':', open(os.path.join(root, f), errors='replace').read()[-600:], flush=True)
-            print('DIAG screen tail:', ' | '.join(l.strip() for l in scr.split('\n') if l.strip())[-500:], flush=True)
+            print('DIAG screen middle:', ' | '.join(' '.join(l.split()) for l in scr.split('\n')[4:20] if l.strip('║│ \t'))[:700], flush=True)
         if not os.path.exists(got):
             SOFT_FAILS.append(name)               # the other formats are still tried (one run tells which formats extract)
             print('SOFTFAIL %s/F5 real: the member is not extracted' % name, flush=True)
@@ -395,7 +395,7 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
-        with open(os.path.join(w, 'added.txt'), 'w') as f:
+        with open(os.path.join(w, 'added.zzz'), 'w') as f:
             f.write('added by DN\n')
         bindir = os.path.join(d, 'wrapbin')
         os.makedirs(bindir)
@@ -411,19 +411,20 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         os.environ['PATH'] = old_path
         del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
-        t.send('\t', 0.6)                          # the other panel: the directory with added.txt
+        t.send('\t', 0.6)                          # the other panel: the directory with added.zzz
         t.send(KEYS['HOME'], 0.15)
-        t.send(KEYS['DOWN'], 0.2)                  # added.txt (the first file after ..)
+        t.send(KEYS['DOWN'], 0.2)                  # simple.zip
+        t.send(KEYS['DOWN'], 0.2)                  # added.zzz (the extension zzz sorts after zip)
         t.send(KEYS['F5'], 1.5)
         dlg = t.text()
         t.send('\r', 1.5)
         for _ in range(8):
             t.pump(0.5, 2)
-            if 'added.txt' in members(os.path.join(w, name)):
+            if 'added.zzz' in members(os.path.join(w, name)):
                 break
         scr = t.text()
         check(t.alive(), '%s/F5 add: alive' % name, scr)
-        if 'added.txt' in members(os.path.join(w, name)):
+        if 'added.zzz' in members(os.path.join(w, name)):
             print('PASS %s/F5 add: the file is in the archive' % name, flush=True)
         else:
             SOFT_FAILS.append(name + ' add')
