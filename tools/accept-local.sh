@@ -27,7 +27,7 @@ build() {
     git -C "$work/object" submodule update --init --depth 1 tv
     git -C "$work/object/tv" fetch -q --depth 1 origin "$tv_sha" || true
     git -C "$work/object/tv" checkout -q -f "$tv_sha"
-    git -C "$work/object" checkout -q -- dn/compat/osdep.pas dn/src/colors.pas dn/src/filescol.pas dn/src/topview.pas 2>/dev/null || true
+    git -C "$work/object" checkout -q -- dn/compat/osdep.pas dn/src/colors.pas dn/src/editcore.pas dn/src/filescol.pas dn/src/topview.pas 2>/dev/null || true
     python3 "$here/tools/acceptance/backport_shared_object_fixes.py" "$work/object"
     echo "== object: DN $dn_sha, TV $tv_sha"
     ( cd "$work/object" && tools/build.sh linux64 "$out/object" )

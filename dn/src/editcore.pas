@@ -298,7 +298,7 @@ uses
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, histories,
   timeutil, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile {-$VIV}
-{$IFDEF DNUTF8}, TvCodePg, TvUtf8{$ENDIF}
+, TvCodePg, TvUtf8, TvGlyphs
 , osdep, DNStdDlg, Dialogs, DNHelp, Math
   ;
 
@@ -3491,21 +3491,24 @@ for very large fragments }
 
   procedure DrawLine(Dir: Byte);
     const
-      Line00 = '│─└││┌├─┘─┴┐┤┬┼';
-      Line11 = '║═╚║║╔╠═╝═╩╗╣╦╬';
-      Line01 = '│═╘││╒╞═╛═╧╕╡╤╪';
-      Line10 = '║─╙║║╓╟─╜─╨╖╢╥╫';
+      U8Line00 = '│─└││┌├─┘─┴┐┤┬┼';
+      U8Line11 = '║═╚║║╔╠═╝═╩╗╣╦╬';
+      U8Line01 = '│═╘││╒╞═╛═╧╕╡╤╪';
+      U8Line10 = '║─╙║║╓╟─╜─╨╖╢╥╫';
 
-      UpContact1 = '│├┼┤┌┬┐╞╪╡╒╤╕';
-      UpContact2 = '║╠╬╣╔╦╗╟╫╢╓╥╖';
-      DownContact1 = '│├┼┤└┴┘╞╪╡╘╧╛';
-      DownContact2 = '║╠╬╣╚╩╝╟╫╢╙╨╜';
-      LeftContact1 = '─├┼┌└┬┴╟╫╓╙╥╨';
-      LeftContact2 = '═╠╬╔╚╦╩╞╪╒╘╤╧';
-      RightContact1 = '─┤┼┐┘┬┴╢╫╖╜╥╨';
-      RightContact2 = '═╣╬╗╝╦╩╡╪╕╛╤╧';
+      U8UpContact1 = '│├┼┤┌┬┐╞╪╡╒╤╕';
+      U8UpContact2 = '║╠╬╣╔╦╗╟╫╢╓╥╖';
+      U8DownContact1 = '│├┼┤└┴┘╞╪╡╘╧╛';
+      U8DownContact2 = '║╠╬╣╚╩╝╟╫╢╙╨╜';
+      U8LeftContact1 = '─├┼┌└┬┴╟╫╓╙╥╨';
+      U8LeftContact2 = '═╠╬╔╚╦╩╞╪╒╘╤╧';
+      U8RightContact1 = '─┤┼┐┘┬┴╢╫╖╜╥╨';
+      U8RightContact2 = '═╣╬╗╝╦╩╡╪╕╛╤╧';
 
     var
+      Line00, Line11, Line01, Line10: String[16];     { the tables above as cells of this document }
+      UpContact1, UpContact2, DownContact1, DownContact2: String[16];
+      LeftContact1, LeftContact2, RightContact1, RightContact2: String[16];
       _Up, _In, _Down: LongString;
       VL: String[32];
       A, B: Word;
@@ -3577,9 +3580,54 @@ for very large fragments }
       Modify := True;
       end { Modify };
 
+    { the characters of a table of UTF-8 as the cells of this document: a cell of its table (UTF-8 inside) or the byte of the code page }
+    function FrameCells(const U: String): String;
+      var
+        I, Used: Integer;
+        Cp: LongWord;
+        Cell: Byte;
+      begin
+      Result := '';
+      I := 1;
+      while I <= Length(U) do
+        if Byte(U[I]) < $80 then
+          begin
+          Result := Result+U[I];
+          Inc(I);
+          end
+        else
+          begin
+          if not Utf8Decode(@U[I], Length(U)-I+1, Cp, Used) then
+            Break;
+          Cell := 0;
+{$IFDEF DNUTF8}
+          if DocU8 then
+            Cell := TabTyped(DocTab, Copy(U, I, Used), 0)
+          else
+{$ENDIF}
+            Cell := GlyphByte(Cp);
+          if Cell = 0 then
+            Cell := CpFallback(Cp);
+          Result := Result+Char(Cell);
+          Inc(I, Used);
+          end;
+      end;
+
     var
       WasShift: Boolean; {-$VIV 18.05.99--}
     begin { DrawLine }
+    Line00 := FrameCells(U8Line00);
+    Line11 := FrameCells(U8Line11);
+    Line01 := FrameCells(U8Line01);
+    Line10 := FrameCells(U8Line10);
+    UpContact1 := FrameCells(U8UpContact1);
+    UpContact2 := FrameCells(U8UpContact2);
+    DownContact1 := FrameCells(U8DownContact1);
+    DownContact2 := FrameCells(U8DownContact2);
+    LeftContact1 := FrameCells(U8LeftContact1);
+    LeftContact2 := FrameCells(U8LeftContact2);
+    RightContact1 := FrameCells(U8RightContact1);
+    RightContact2 := FrameCells(U8RightContact2);
     {-$VIV 18.05.99--}
     WasShift := (ShiftState and kbRightShift > 0) and DrawRShift;
     if WasShift then
