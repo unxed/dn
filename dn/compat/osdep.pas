@@ -131,7 +131,7 @@ var
 implementation
 
 uses
-  SysUtils, Dos, OSDisk, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
+  SysUtils, Dos, OSDisk, OSRun, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
 {$IFDEF GO32V2}, go32, TvDos, OSNamesDos{$ENDIF}
 {$IFDEF UNIX}, BaseUnix, Unix, OSNamesUnix{$ENDIF}
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
@@ -155,46 +155,14 @@ begin
   Result := CommandLineToOs(S);
 end;
 
-{ Pause: wait for Enter after the program (the user runs a command and wants to see its output); False for the helpers of DN (archivers) }
-function RunShellUnix(const CmdLine: string; Pause: Boolean): LongInt;
-begin
-  UnixSuspend;
-  Writeln;
-  Writeln('$ ', NameToOs(CmdLine));
-  Flush(Output);
-  Result := fpSystem(NameToOs(CmdLine));
-  if Pause and UnixActive then
-  begin
-    Writeln;
-    Write('[DN] Press Enter to return...');
-    Flush(Output);
-    Readln;
-  end;
-  UnixResume;
-end;
-
 function SysRunShell(const CmdLine: string): LongInt;
 begin
-  Result := RunShellUnix(CmdLine, True);
+  Result := RunShell(CmdLine);
 end;
 
 procedure SysRestartSelf;
-var
-  Strs: array of AnsiString;
-  Args: array of PAnsiChar;
-  I: Integer;
 begin
-  DNTrace('RestartSelf: ' + ParamStr(0));
-  SetLength(Strs, ParamCount + 1);
-  SetLength(Args, ParamCount + 2);
-  for I := 0 to ParamCount do
-  begin
-    Strs[I] := ParamStr(I);
-    Args[I] := PAnsiChar(Strs[I]);
-  end;
-  Args[ParamCount + 1] := nil;
-  fpExecve(PAnsiChar(Strs[0]), @Args[0], envp);
-  DNTrace('RestartSelf: exec failed, errno ' + IntToStr(fpGetErrno));
+  RestartSelf;
 end;
 
 procedure SysGetDirDos(D: Byte; var S: string);
@@ -234,44 +202,13 @@ begin
 end;
 
 function SysRunShell(const CmdLine: string): LongInt;
-{$IFDEF WINDOWS}
 begin
-  UnixSuspend;
-  Writeln;
-  Writeln('> ', CmdLine);
-  Flush(Output);
-  try
-    Result := ExecuteProcess(GetEnvironmentVariable('COMSPEC'), '/c ' + CmdLine);
-  except
-    Result := -1;
-  end;
-  if UnixActive then
-  begin
-    Writeln;
-    Write('[DN] Press Enter to return...');
-    Flush(Output);
-    Readln;
-  end;
-  UnixResume;
-  if Result > 0 then
-    Result := Result shl 8;        { as the status of waitpid on Unix: the exit code is in the second byte }
+  Result := RunShell(CmdLine);
 end;
-{$ELSE}
-begin
-  Result := -1;
-end;
-{$ENDIF}
 
 procedure SysRestartSelf;
-var
-  Strs: array of AnsiString;
-  I: Integer;
 begin
-  DNTrace('RestartSelf: ' + ParamStr(0));
-  SetLength(Strs, ParamCount);
-  for I := 1 to ParamCount do
-    Strs[I - 1] := ParamStr(I);
-  ExecuteProcess(ParamStr(0), Strs);
+  RestartSelf;
 end;
 
 procedure SysGetDirDos(D: Byte; var S: string);
@@ -577,31 +514,8 @@ end;
 
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
-{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
-var
-  R: LongInt;
-  A: string;
-{$ENDIF}
 begin
-{$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
-  { through the shell, with the terminal: the program may write to it and read from it }
-  A := StrPas(Args);
-{$IFDEF UNIX}
-  { DN starts its helpers (the archivers) the DOS way: the program is COMSPEC and the arguments are "/c command". COMSPEC is not set
-    on Unix (Path is empty), so the command goes to the shell of the system as it is, without a pause for Enter. }
-  if (Length(A) >= 3) and (A[1] = '/') and (UpCase(A[2]) = 'C') and (A[3] = ' ') then
-    R := RunShellUnix(Copy(A, 4, MaxInt), False)
-  else
-{$ENDIF}
-  R := SysRunShell('"' + StrPas(Path) + '" ' + A);
-  Result := 0;
-  if (R < 0) or ((R shr 8) = 127) or (R = 9009) then
-    Result := 2;                   { the shell could not run it: DOS "file not found" }
-{$ELSE}
-  Dos.DosError := 0;
-  Dos.Exec(SysOsPath(StrPas(Path)), StrPas(Args));
-  Result := Dos.DosError;          { 0 = the program was run; its exit code is Dos.DosExitCode }
-{$ENDIF}
+  Result := Execute(Path, Args);
 end;
 
 { The program takes over the screen at the start (DN reads the size of the screen before it creates the application; the

@@ -163,3 +163,13 @@ became `"" /c ...` and nothing was extracted or packed. `SysExecute` now takes
 the `/c` form on Unix and runs the command in the shell of the system without
 the pause for Enter (`RunShellUnix`); test in `t_osdep`, the real extraction in
 `tools/dn-linux-archives.py`.
+
+Third narrow step (2026-10-06): starting programs moved out of `osdep` into the
+facade `compat/osrun.pas` with the backends `osrununix.pas`, `osrunwindows.pas`
+and `osrundos.pas` (`RunShell`, `Execute`, `RestartSelf`; the DOS way
+`COMSPEC /c command` on Unix is in `OSRunUnix.BackendExecute`). `osdep` keeps
+`SysRunShell`, `SysExecute`, `SysRestartSelf` as thin wrappers. Same code, same
+behaviour. Compiles for linux64, win64, dos and dos with `DN_UTF8=1`; the proof
+is the CI of the commit. What stays in `osdep` now: the thin wrappers, the file
+and find calls (already neutral: `SysUtils` + the names units), the volume label
+and device calls with a GO32V2 branch, the start screen of DOS.
