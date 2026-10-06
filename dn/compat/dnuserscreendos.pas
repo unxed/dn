@@ -13,7 +13,7 @@ procedure ShowUserScreenDos;
 implementation
 
 uses
-  SysUtils, Dos, go32, Drivers, osdep, DNErrLog;
+  SysUtils, Dos, go32, Drivers, osdep, OSStartScreen, DNErrLog;
 
 var
   UserCur: Word = $FFFF;       { BIOS 0040:0050: low byte column, high byte row }

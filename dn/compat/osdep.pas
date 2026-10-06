@@ -120,19 +120,11 @@ var
 function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
   StdIn, StdOut, StdErr: LongInt): LongInt;
 
-var
-  { the text screen of the program that started DN (16-bit cells: character + attribute), copied before the application takes
-    the screen over: the "user screen" of DN (Ctrl-O, Alt-F5) and what is seen after the exit }
-  SysStartScreen: array of Word;
-  SysStartScreenWidth: Integer = 0;
-  { the cursor of that screen as the BIOS keeps it (0040:0050): low byte the column, high byte the row; 0 elsewhere }
-  SysStartCursor: Word = 0;
-
 implementation
 
 uses
   SysUtils, Dos, OSDisk, OSRun, OSSystem, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
-{$IFDEF GO32V2}, go32, TvDos, OSNamesDos{$ENDIF}
+{$IFDEF GO32V2}, go32, TvDos, OSNamesDos, OSStartScreen{$ENDIF}   { OSStartScreen: its initialization (the grab of the screen) must come before DosInit below }
 {$IFDEF UNIX}, BaseUnix, Unix, OSNamesUnix{$ENDIF}
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
 
@@ -444,27 +436,8 @@ begin
   Result := Execute(Path, Args);
 end;
 
-{ The program takes over the screen at the start (DN reads the size of the screen before it creates the application; the
-  application of TV needs the screen of TvScreen to be there). Other targets: their backends do the same. }
 {$IFDEF GO32V2}
-procedure GrabStartScreen;
-var
-  Rows: Byte;
-  Cols: Word;
-begin
-  dosmemget($40, $84, Rows, 1);
-  dosmemget($40, $4A, Cols, 2);
-  Inc(Rows);
-  if (Cols = 0) or (Cols > 255) or (Rows < 2) or (Rows > 100) then
-    Exit;
-  SetLength(SysStartScreen, Cols * Rows);
-  dosmemget($B800, 0, SysStartScreen[0], Cols * Rows * 2);
-  SysStartScreenWidth := Cols;
-  dosmemget($40, $50, SysStartCursor, 2);
-end;
-
 initialization
-  GrabStartScreen;
   DosInit;
   DosNamesInit;
 finalization

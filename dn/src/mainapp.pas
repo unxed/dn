@@ -110,7 +110,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, osdep, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun, DNUserScreenDos{$ENDIF};
+uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun, DNUserScreenDos{$ENDIF};
 
 constructor TBackground.Create(const Bounds: TRect; APattern: Byte);
 begin

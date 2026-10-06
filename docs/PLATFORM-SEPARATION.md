@@ -182,3 +182,12 @@ names as wrappers. Same code and behaviour; compiles for linux64, win64 and dos;
 CI is the proof. `osdep` now has no direct DOS call except the start screen
 (`GrabStartScreen`, the vars `SysStartScreen*`, read by `dnuserscreendos`): moving
 them needs the readers to use the new unit; the next step.
+
+Fifth step (2026-10-06): the start screen of DOS (`SysStartScreen*`,
+`GrabStartScreen`) moved to `compat/osstartscreen.pas` (mainapp and
+dnuserscreendos use it now; `osdep` uses it so that the grab still runs before
+`DosInit`). After this `osdep` has no DOS-specific code that is not a thin
+wrapper or the initialization of the target. Stage 3 for `osdep` is done at this
+granularity; what is left is outside it (`dnrun`, `dnscreen`, `boot` call sites
+that decide by the target, see the table at the top), to be taken from the list
+there when the CI of the steps above is green.
