@@ -1719,7 +1719,7 @@ WrongArc:
       S: String;
     begin
 
-    if (OS2exec or Win32exec) and (Drive.DriveType = dtDisk)
+    if Win32exec and (Drive.DriveType = dtDisk)
       and (PF^.TType = ttExec)
       and (ShiftState and (kbCtrlShift or 3) <> 0)
     then
@@ -1755,17 +1755,6 @@ WrongArc:
       else
         begin
         CE;
-        Exit;
-        end;
-      
-      if OS2exec and (UpStrg(GetExt(PF^.FlName[uLfn])) = '.CMD') then
-        begin
-        S := 'call "'+S+'"';
-        if ShiftState and 3 <> 0 then
-          S := '<'+S
-        else
-          S := '>'+S;
-        Message(Application, evCommand, cmExecString, @S);
         Exit;
         end;
       
@@ -1814,11 +1803,7 @@ WrongArc:
       if PathFoundInArc(PF^.Owner^) and
           ArcViewer(S, S, FreeByte) then
             begin
-            {$IFNDEF OS2}
               GotoSingle(GetLFN(PF^.LFN));
-            {$ELSE}
-              GotoSingle(PF^.Name);
-            {$ENDIF}
               Exit;
             end;
 {/JO}

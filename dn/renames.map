@@ -55,7 +55,6 @@ langid.pas advance7.pas
 linepos.pas advance6.pas
 mainapp.pas dnapp.pas
 objutil.pas objects2.pas
-os2sess.pas advance4.pas
 osdep.pas vpsyslow.pas
 palettes.pas dnpalet.pas
 paneldlgs.pas fltools.pas
@@ -69,3 +68,4 @@ strutil.pas advance1.pas
 timeutil.pas xtime.pas
 topview.pas topview_.pas
 uselfn.pas files.pas
+winsess.pas advance4.pas

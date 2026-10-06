@@ -64,7 +64,7 @@ unit LFN;
 interface
 
 uses
-  osdep, // see comment at the end of vpsysos2
+  osdep,
   Dos, Defines
   ;
 

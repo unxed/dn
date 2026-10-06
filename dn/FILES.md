@@ -130,7 +130,7 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `envutil.pas` (was `advance3`) | the command line and the environment (`FindParam`, `GetEnv`), the time of the day, CRC32 |
 | `linepos.pas` (was `advance6`) | the line number of an offset in a file and back, the hot letter of a string, the CRC table |
 | `langid.pas` (was `advance7`) | the language of the program and of the help (`LngId`, `HelpLngId`) |
-| `os2sess.pas` (was `advance4`) | running a program in a session of OS/2 (not used on our targets) |
+| `winsess.pas` (was `os2sess`, `advance4`) | running a program in a new window on Windows (the OS/2 sessions are dropped) |
 | `dndlgs.pas`, `dnstrl.pas`, `dncolor.pas`, `palettes.pas` (was `dnpalet`: `CColor` is the colors of DN as `data/colors/default.pal`, `CColorOsp` the table of the OSP source) | the classes of DN that were carved out of the files that came from Borland (combo box, notepad pages, the string list, the palettes) |
 | `compat/drivers.pas` (ours) | the keys, the events, the draw buffers on top of `tv/` (`DNKeyCode`, `GetAltChar`, `LegacyText`) |
 | `dnutf8.pas` (ours) | UTF-8 inside DN: columns, the proxy of a string, the table of a document of the editor |

@@ -277,7 +277,7 @@ uses
   Drives, Archiver, ArchSet,
   ArcView, FViewer, CmdLine, copyio, DNStdDlg,
   Colors, editcore, editundo, Editor, editwin,
-  basics, strutil, fileutil, envutil, os2sess, langid,
+  basics, strutil, fileutil, envutil, winsess, langid,
   ColorSel, Eraser,  DiskInfo
   , FileType, panelsetup, keymap
   , Startup, dlgrecs
@@ -2084,28 +2084,28 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     if S = '' then
       Exit;
     TryRunSession := False;
-    if not (OS2exec or Win32exec) then
+    if not Win32exec then
       Exit;
     case S[1] of
       '>':
         begin
         B := False;
-        ST := stOS2FullScreen
+        ST := stFullScreen
         end;
       '<':
         begin
         B := True;
-        ST := stOS2FullScreen
+        ST := stFullScreen
         end;
       ']':
         begin
         B := False;
-        ST := stOS2Windowed
+        ST := stWindowed
         end;
       '[':
         begin
         B := True;
-        ST := stOS2Windowed
+        ST := stWindowed
         end;
       else {case}
         if  (CmdLine.Str <> '')
@@ -2116,9 +2116,9 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
           S:= ' '+S;
           B := ShiftState and 3 <> 0;
           if TCommandLine(CommandLine).LineType = ltWindow then
-            ST := stOS2Windowed
+            ST := stWindowed
           else
-            ST := stOS2FullScreen
+            ST := stFullScreen
           end
         else
           Exit;

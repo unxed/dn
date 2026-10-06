@@ -46,13 +46,12 @@
 //////////////////////////////////////////////////////////////////////////}
 {$I STDEFINE.INC}
 
-unit os2sess; {OS/2 support}
+unit winsess; {a program in a new window: Windows (the start of the OS/2 sessions is dropped)}
 
 interface
 
 type
-  SessionType = (stOS2SYS, stOS2FullScreen, stOS2Windowed, stPMSession,
-    stVDMFullScreen, stWinFullScreen, stWinWindow, stVDMWindow);
+  SessionType = (stFullScreen, stWindowed);
 
 procedure RunSession(Command: String; Bckg: Boolean;
      Session: SessionType);
@@ -72,15 +71,12 @@ procedure RunSession(Command: String; Bckg: Boolean; Session: SessionType);
     S, M, EX: String;
     CmdExt1: String[4];
   begin
-  if not (OS2exec or Win32exec) then
+  if not Win32exec then
     Exit;
   I := 1;
   repeat
     ClrIO;
     CmdExt1 := CmdExt;
-   
-    if OS2exec then CmdExt1 := '.CMD';
-   
     EX := SwpDir+'$DN'+ItoS(I)+'$'+CmdExt1;
     lAssignText(T, EX);
     FileMode := $40;
@@ -116,7 +112,7 @@ procedure RunSession(Command: String; Bckg: Boolean; Session: SessionType);
     Writeln(T.T, Command);
   if not Bckg and (ShiftState and $20 = 0) then
     Writeln(T.T, '@pause');
-  if OS2exec or (opSys and opWNT <> 0) then
+  if opSys and opWNT <> 0 then
     Write(T.T, '@del "'+EX+'" & exit'^Z)
   else
     Write(T.T, '@del "'+EX+'"'^Z);
@@ -125,17 +121,7 @@ procedure RunSession(Command: String; Bckg: Boolean; Session: SessionType);
   if (opSys and opWNT <> 0) then
     M := 'START "'+Command+'" '+EX
   else
-    
-    if OS2exec then
-      begin
-      if Session = stOS2FullScreen then
-        M := 'HSTART "'+Command+'" /C /FS '+EX
-      else
-        M := 'HSTART "'+Command+'" /C /WIN '+EX;
-      end
-    else
-    
-      M := 'START '+GetEnv('COMSPEC')+' /C '+EX;
+    M := 'START '+GetEnv('COMSPEC')+' /C '+EX;
  
   ExecString(M, '');
   end { RunSession };

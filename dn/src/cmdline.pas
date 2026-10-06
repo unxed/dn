@@ -689,7 +689,7 @@ RIT Labs DN also wobbled but seemed to fetch correctly.
                   Dec(LineType)
                 else
                   Inc(LineType);
-                while (not (OS2exec or Win32exec)
+                while (not Win32exec
                        and (LineType in [ltWindow, ltFullScreen]))
                      //under Windows you cannot launch F/S from the command line
                      or (Win32exec and (LineType = ltFullScreen))

@@ -66,7 +66,7 @@ uses
    {Cat}
   
   
-  SysUtils, basics, strutil, fileutil, envutil, os2sess,
+  SysUtils, basics, strutil, fileutil, envutil, winsess,
   Startup, dlgrecs, Defines, Streams,
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
@@ -644,7 +644,7 @@ procedure DoStartup;
   UpdateConfig;
 
   MouseVisible := MouseData.Options and omsCursor <> 0;
-  if OS2exec or (opSys and opWNT <> 0)
+  if opSys and opWNT <> 0
   then
     Executables := Executables+';cmd';
   

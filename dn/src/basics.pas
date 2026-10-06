@@ -154,7 +154,6 @@ const
 
   opUnk = 0; { Unknown  }
   opDOS = 1; { DOS      }
-  opOS2 = 2; { OS/2     }
   opWin = 4; { Wind0ze  }
   opDV = 8; { DesqView }
   opWNT = 16; { Win NT & Win y2k }
@@ -165,7 +164,6 @@ const
 
   opSys: Byte = opUnk;
 
-  { useful under OS2 with WinAPI emulator: if (opSys and opWin)=opWin then ...}
 
 procedure CheckOS;
 { Check for OS - For checking API please use error codes }
@@ -220,17 +218,9 @@ const
   cTEMP_: String[5] = 'TEMP:';
   cLINK_: String[5] = 'LINK:';
   cNET_: String[7] = 'Network';
-  {.$IFNDEF OS2}
   x_x: String[3] = '*.*';
-  {.$ELSE}
-  {x_x     : string[3] = '*';}
-  {.$ENDIF}
 
 var
-  OS2exec: Boolean; { use OS2exec to determine if starting of OS/2  }
-  { programs is supported                         }
-  { use opsys and opOS2 <> 0 to determine if OS/2 }
-  { is running                                    }
   Win32exec: Boolean; {starting of Win32 programs is supported  }
   FreeStr: String;
   FreeLongStr: LongString;
@@ -756,17 +746,6 @@ procedure TinySlice;
 
 begin
 CheckOS;
-{ Starting of OS/2 programs is possible under:              }
-{ - OS/2 2.10+, OS2COMSPEC environment variable is required }
-{ - OS/2 Warp 3+, no additional requirements                }
-{ - OS/2 for PPC, future versions for IA64 (I hope)         }
-
-OS2exec := (opSys and opOS2 <> 0) and
-    ( (Lo(DosVersion) > 20) or
-      ( (Lo(DosVersion) = 20) and
-        ( (Hi(DosVersion) >= 30) or
-          ( (Hi(DosVersion) >= 10) and (GetEnv('OS2COMSPEC') <> ''))
-        )));
 Win32exec := opSys and opWin <> 0; {does not work for NT yet}
 
 

@@ -59,7 +59,7 @@ uses
   DNErrLog, DNRun, Drivers, Lfn, uselfn,
   boot, Dos, mainapp,
   Menus, panelroot, filepanel, FileCopy, Filediz, Filelst, Eraser,
-  DiskInfo, basics, strutil, fileutil, os2sess, highlite,
+  DiskInfo, basics, strutil, fileutil, winsess, highlite,
   Startup, Dialogs, gadgets, panelwin, Messages, HistList,
   FileFind, Commands, Tree, FViewer, CmdLine, copyio, DNStdDlg,
   FilesCol, UserMenu, Colors, editcore, Editor, Macro,
