@@ -19,6 +19,10 @@ procedure OSBeep(Frequency, Duration: LongInt);
 function OSMemAvail: LongInt;
 { DOS: the text and a line end go to the serial port COM1 (a debug trace that survives a program that dies, see DNErrLog); elsewhere: nothing. }
 procedure OSSerialTrace(const Msg: string);
+{ The extension of the files that DN writes for a command interpreter (the swap batch files, the list of files): .BAT on DOS, .CMD elsewhere. }
+function OSBatchExt: string;
+{ The directory for temporary files when neither DN.INI nor TEMP and TMP name one: C:\tmp\ on Unix (it is /tmp in the DN way of paths), '' elsewhere. }
+function OSDefaultTempDir: string;
 
 implementation
 
@@ -57,6 +61,16 @@ end;
 procedure OSSerialTrace(const Msg: string);
 begin
   BackendSerialTrace(Msg);
+end;
+
+function OSBatchExt: string;
+begin
+  Result := BackendBatchExt;
+end;
+
+function OSDefaultTempDir: string;
+begin
+  Result := BackendDefaultTempDir;
 end;
 
 end.

@@ -36,6 +36,16 @@ begin
   Check(Execute('echo', P) = 0, 'Execute: a program with arguments');
 {$ENDIF}
 
+{$IFDEF GO32V2}
+  Check(OSBatchExt = '.BAT', 'batch extension on DOS');
+{$ELSE}
+  Check(OSBatchExt = '.CMD', 'batch extension elsewhere');
+{$ENDIF}
+{$IFDEF UNIX}
+  Check(OSDefaultTempDir = 'C:\tmp\', 'default temporary directory of Unix (/tmp in the DN way)');
+{$ELSE}
+  Check(OSDefaultTempDir = '', 'no default temporary directory elsewhere');
+{$ENDIF}
   Check(OSFileIsDevice(0) = 0, 'a handle is not a device on a system of the tests');
   Check(OSVolumeLabel('C') = '', 'no volume label on a system of the tests');
   OSDiskReset;

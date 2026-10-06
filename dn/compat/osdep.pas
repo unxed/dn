@@ -98,6 +98,9 @@ function SysFileTimeToDos(T: LongInt): LongInt;
 function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
 function SysFindNext(var F: TOSSearchRec; IsPChar: Boolean): LongInt;
 function SysFindClose(var F: TOSSearchRec): LongInt;
+{ Is the directory Name of the directory ParentDir one that a scan of a tree must not enter? On Unix the pseudo file systems of the root (/proc, /sys): thousands of
+  entries that change as they are read; elsewhere never. }
+function SysSkipInTree(const ParentDir, Name: string): Boolean;
 
 { --- disks -------------------------------------------------------------------- }
 { Free and total space of the disk of the path (the drive letter and the colon of the path are taken,
@@ -437,6 +440,15 @@ begin
   end;
   F.Handle := 0;
   Result := 0;
+end;
+
+function SysSkipInTree(const ParentDir, Name: string): Boolean;
+begin
+{$IFDEF UNIX}
+  Result := (Length(ParentDir) <= 3) and ((UpperCase(Name) = 'PROC') or (UpperCase(Name) = 'SYS'));
+{$ELSE}
+  Result := False;
+{$ENDIF}
 end;
 
 { --- disks -------------------------------------------------------------------- }

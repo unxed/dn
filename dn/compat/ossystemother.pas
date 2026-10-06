@@ -17,6 +17,8 @@ procedure BackendDiskReset;
 procedure BackendBeep(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
 procedure BackendSerialTrace(const Msg: string);
+function BackendBatchExt: string;
+function BackendDefaultTempDir: string;
 function BackendMemAvail: LongInt;
 
 implementation
@@ -42,6 +44,16 @@ end;
 
 procedure BackendSerialTrace(const Msg: string);
 begin
+end;
+
+function BackendBatchExt: string;
+begin
+  Result := '.CMD';
+end;
+
+function BackendDefaultTempDir: string;
+begin
+  Result := {$IFDEF UNIX}'C:\tmp\'{$ELSE}''{$ENDIF};
 end;
 
 function BackendMemAvail: LongInt;

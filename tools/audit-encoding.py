@@ -63,7 +63,7 @@ def integrity(files):
         if text.startswith("﻿"):
             problems.append("%s: byte order mark" % name)
         for number, line in enumerate(text.split("\n"), 1):
-            if "�" in line:
+            if "\ufffd" in line:
                 problems.append("%s:%d: U+FFFD (a lost character): %s" % (name, number, line.strip()[:100]))
             elif C1.search(line):
                 problems.append("%s:%d: C1 control character (a code page byte read as Latin-1): %s" % (name, number, line.strip()[:100]))

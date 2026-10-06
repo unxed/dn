@@ -66,7 +66,7 @@ uses
    {Cat}
   
   
-  SysUtils, basics, strutil, fileutil, envutil, winsess,
+  SysUtils, basics, strutil, fileutil, envutil, winsess, OSSystem,
   Startup, dlgrecs, Defines, Streams,
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
@@ -165,11 +165,9 @@ procedure InvalidateTempDir;
   TempDir := GetEnv('TMP');
   if not BadTemp(TempDir) then
     Exit;
-{$IFDEF UNIX}
-  TempDir := 'C:\tmp\';           { Unix: TEMP and TMP are not set by the shell as a rule }
-  if not BadTemp(TempDir) then
+  TempDir := OSDefaultTempDir;    { Unix: TEMP and TMP are not set by the shell as a rule }
+  if (TempDir <> '') and not BadTemp(TempDir) then
     Exit;
-{$ENDIF}
   TempDir := SourceDir;
   if not BadTemp(TempDir) then
     begin
@@ -833,13 +831,7 @@ procedure RUN_IT;
   MyApplication.Draw;
   ReadScreenCells; { issue #6: sync the 16-bit copy that WriteScreenCells outputs; otherwise a stale copy overwrites the panels }
   TraceStartupState('after-initial-draw');
-{$IFNDEF DNUTF8}
-{$IFNDEF UNIX}
-  WriteScreenCells(0, ScreenWidth * ScreenHeight);
-{$ENDIF}
-{$ENDIF}
-  { On Unix, CellText converts even the code-page build to UTF-8 for the terminal.
-    Writing the one-byte DOS-compatible copy back would replace such cells with '?'. }
+  SyncScreenCopyAfterDraw;
   
   w95QuitInit; {Gimly}
   
