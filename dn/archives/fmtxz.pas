@@ -77,7 +77,7 @@ implementation
 uses
   osdep
 {$IFDEF UNIX}
-  , Unix, BaseUnix, Classes, SysUtils
+  , Classes, SysUtils
 {$ENDIF}
   ;
 
@@ -210,7 +210,7 @@ function TXZArchive.GetSign: TStr4;
 {$IFDEF UNIX}
 procedure ExpandXzToTarData(var TarData: Streams.TMemoryStream);
   var
-    OutName, Tmp, Cmd: String;
+    OutName, Cmd: String;
     FS: Classes.TFileStream;
     Buf: array[0..8191] of Byte;
     N: LongInt;
@@ -218,16 +218,10 @@ procedure ExpandXzToTarData(var TarData: Streams.TMemoryStream);
   if TarData <> nil then
     Exit;
   { Shell out to xz-utils into a temp file (avoids TProcess pipe deadlocks). }
-  Tmp := GetEnvironmentVariable('TMPDIR');
-  if Tmp = '' then
-    Tmp := '/tmp';
-  if Tmp[Length(Tmp)] <> '/' then
-    Tmp := Tmp + '/';
-  OutName := Tmp + 'dn-xz-' + ItoS(FpGetpid) + '-' + ItoS(Random($7fff)) +
-    '.tar';
+  OutName := SysTempFileName('dn-xz-', '.tar');
   Cmd := 'xz -dc -- "' + SysOsPath(ArcFileName) + '" > "' + OutName +
     '" 2>/dev/null';
-  if fpSystem(Cmd) <> 0 then
+  if SysRunQuiet(Cmd) <> 0 then
     begin
     DeleteFile(OutName);
     Exit;

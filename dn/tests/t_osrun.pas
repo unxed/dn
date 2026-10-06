@@ -16,6 +16,11 @@ begin
   R := RunShell('true');
   Check(R = 0, 'RunShell: success is 0');
 
+  R := RunQuiet('exit 3');
+  Check((R >= 0) and ((R shr 8) = 3), 'RunQuiet: the exit code of the shell is in the second byte');
+  Check(RunQuiet('true') = 0, 'RunQuiet: success is 0');
+  Check(RunQuiet('no_such_program_runquiet 2>/dev/null') <> 0, 'RunQuiet: a missing program is an error');
+
   Name := GetTempDir + 't_osrun_' + IntToStr(GetProcessID) + '.txt';
   StrPCopy(P, '/c echo ok > ' + Name);
   Check((Execute('', P) = 0) and FileExists(Name), 'Execute: COMSPEC /c command (the DOS way) runs the command');

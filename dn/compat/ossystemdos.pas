@@ -16,6 +16,7 @@ function BackendVolumeLabel(Drive: Char): ShortString;
 procedure BackendDiskReset;
 procedure BackendBeep(Frequency, Duration: LongInt);
 { Bytes of memory that can be used for buffers. }
+procedure BackendSerialTrace(const Msg: string);
 function BackendMemAvail: LongInt;
 
 implementation
@@ -76,6 +77,23 @@ begin
   outportb($61, Port61 or 3);
   Sleep(Duration);
   outportb($61, inportb($61) and not 3);
+end;
+
+procedure BackendSerialTrace(const Msg: string);
+var
+  I, J: Integer;
+begin
+  for I := 1 to Length(Msg) + 1 do
+  begin
+    { wait for the transmitter holding register to become empty (bit 5 of the line status) }
+    J := 0;
+    while ((inportb($3FD) and $20) = 0) and (J < 100000) do
+      Inc(J);
+    if I <= Length(Msg) then
+      outportb($3F8, Ord(Msg[I]))
+    else
+      outportb($3F8, 10);
+  end;
 end;
 
 function BackendMemAvail: LongInt;

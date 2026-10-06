@@ -120,7 +120,11 @@ begin
   Check(Rc = 18, 'SysFindFirst: nothing matches in an existing directory: 18 (no more files)');
   SysFindClose(Srch);
 {$ENDIF}
-    { the time of a search record is the DOS packed time on every target (on Unix SysUtils gives the Unix time: the panels showed garbage dates) }
+    Name := SysTempFileName('dn-t-', '.tmp');
+  Check((Pos('dn-t-', Name) > 0) and (Copy(Name, Length(Name) - 3, 4) = '.tmp') and (ExtractFilePath(Name) = IncludeTrailingPathDelimiter(GetTempDir(False))), 'SysTempFileName: prefix, extension, the temporary directory');
+  Check(SysTempFileName('dn-t-', '.tmp') <> SysTempFileName('dn-t-', '.tmp') , 'SysTempFileName: two names differ');
+
+  { the time of a search record is the DOS packed time on every target (on Unix SysUtils gives the Unix time: the panels showed garbage dates) }
 {$IFDEF UNIX}
   Stamp := DateTimeToFileDate(EncodeDate(2026, 10, 6) + EncodeTime(19, 46, 10, 0));
   Check(SysFileTimeToDos(Stamp) = LongInt((Cardinal(2026 - 1980) shl 25) or (10 shl 21) or (6 shl 16) or (19 shl 11) or (46 shl 5) or 5), 'file time: Unix time to DOS time');
