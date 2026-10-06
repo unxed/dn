@@ -67,10 +67,14 @@ path no longer live in `DNRun`/`mainapp`. Exact-SHA `e2d49d9` passes `dn`,
 layout, Windows, and all four Linux targets; the complete object/class
 acceptance rerun reports 178/178 (run `37406171992`; its first execution had a
 `menu_5_13` mismatch, recorded in the migration checklist). That same scenario
-failed again on `cd37065` (`37408063297`, 177/178); a focused replay of the
-scenario passed locally once, so the class/object gate remains open. Commit
-`0ad0900` adds complete differing screen rows to failure output; the new CI run
-is pending. The DOS build passes, but its new `userscr` runtime smoke exposed a
+failed again on `cd37065` (`37408063297`, 177/178). Full row diagnostics showed
+that its Options→Editors file-selection tree recursively scans the host root;
+the object/class snapshots were taken 28 seconds apart during that scan, and
+the `files with … bytes` aggregate advanced from 68,459 / 5,538,459K to 120,614
+/ 9,916,057K. Commit `0ad0900` added full differing-row output; `3318781` waits
+for that aggregate to remain stable before snapshotting. Its exact-SHA full
+acceptance run is pending; the class/object gate remains open until it passes.
+The DOS build passes, but its new `userscr` runtime smoke exposed a
 harness bug: `CheckScreenDump` (which injects `DNKEYS` and enforces
 `DNDUMPSEC`) was defined but never called, so DOSBox-X timed out before running
 the external command. Commit `cb55ec3` adds a shorter timeout and trace on
