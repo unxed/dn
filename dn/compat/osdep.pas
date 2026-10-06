@@ -65,6 +65,8 @@ function SysCommandLineToOs(const S: string): string;
 { Unix: runs a command of the shell with the terminal (the screen of the application is left, the command writes to the terminal, Enter
   returns to DN and the screen is drawn again); returns the exit code of the shell. Elsewhere: -1 (nothing is run). }
 function SysRunShell(const CmdLine: string): LongInt;
+{ Replaces the current process with DN and its original arguments, or starts a new DN process on other targets. }
+procedure SysRestartSelf;
 { GetDir for DN: the current directory as "C:\DIR" (on Unix: C: is the root). }
 procedure SysGetDirDos(D: Byte; var S: string);
 
@@ -350,6 +352,25 @@ begin
   UnixResume;
 end;
 
+procedure SysRestartSelf;
+var
+  Strs: array of AnsiString;
+  Args: array of PAnsiChar;
+  I: Integer;
+begin
+  DNTrace('RestartSelf: ' + ParamStr(0));
+  SetLength(Strs, ParamCount + 1);
+  SetLength(Args, ParamCount + 2);
+  for I := 0 to ParamCount do
+  begin
+    Strs[I] := ParamStr(I);
+    Args[I] := PAnsiChar(Strs[I]);
+  end;
+  Args[ParamCount + 1] := nil;
+  fpExecve(PAnsiChar(Strs[0]), @Args[0], envp);
+  DNTrace('RestartSelf: exec failed, errno ' + IntToStr(fpGetErrno));
+end;
+
 procedure SysGetDirDos(D: Byte; var S: string);
 var
   I: Integer;
@@ -406,6 +427,18 @@ begin
   Result := -1;
 end;
 {$ENDIF}
+
+procedure SysRestartSelf;
+var
+  Strs: array of AnsiString;
+  I: Integer;
+begin
+  DNTrace('RestartSelf: ' + ParamStr(0));
+  SetLength(Strs, ParamCount);
+  for I := 1 to ParamCount do
+    Strs[I - 1] := ParamStr(I);
+  ExecuteProcess(ParamStr(0), Strs);
+end;
 
 procedure SysGetDirDos(D: Byte; var S: string);
 begin

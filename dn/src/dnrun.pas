@@ -31,7 +31,7 @@ procedure ShowUserScreenDos;
 implementation
 
 uses
-  SysUtils, Dos{$IFDEF UNIX}, BaseUnix{$ENDIF}{$IFDEF GO32V2}, go32, Drivers{$ENDIF}, osdep, DNErrLog{$IFDEF LINUX}, TvVtRun{$ENDIF};
+  SysUtils, Dos{$IFDEF GO32V2}, go32, Drivers{$ENDIF}, osdep, DNErrLog{$IFDEF LINUX}, TvVtRun{$ENDIF};
 
 {$IFDEF LINUX}
 function CurDir: AnsiString;
@@ -186,31 +186,8 @@ begin
 end;
 
 procedure RestartSelf;
-var
-  Strs: array of AnsiString;
-  I: Integer;
-{$IFDEF UNIX}
-  Args: array of PAnsiChar;
-{$ENDIF}
 begin
-  DNTrace('RestartSelf: ' + ParamStr(0));
-{$IFDEF UNIX}
-  SetLength(Strs, ParamCount + 1);
-  SetLength(Args, ParamCount + 2);
-  for I := 0 to ParamCount do
-  begin
-    Strs[I] := ParamStr(I);
-    Args[I] := PAnsiChar(Strs[I]);
-  end;
-  Args[ParamCount + 1] := nil;
-  fpExecve(PAnsiChar(Strs[0]), @Args[0], envp);
-  DNTrace('RestartSelf: exec failed, errno ' + IntToStr(fpGetErrno));
-{$ELSE}
-  SetLength(Strs, ParamCount);
-  for I := 1 to ParamCount do
-    Strs[I - 1] := ParamStr(I);
-  ExecuteProcess(ParamStr(0), Strs);
-{$ENDIF}
+  osdep.SysRestartSelf;
 end;
 
 end.
