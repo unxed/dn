@@ -1309,7 +1309,7 @@ An example of this type
 │║                                      ║
 │╚[ A C D E F G H I * ]═════════════════╝
 
-  The panel's name can be "TEMP:", "Branch:", "Find:" или "List:"
+  The panel's name can be "TEMP:", "Branch:", "Find:" or "List:"
 Displayed after the colon are directory for which the branch is build,
 search mask, or name of a file-list.
 You cannot see files' descriptions in columns and footer, but one can see
@@ -1339,7 +1339,7 @@ An example of this type
 │║descript ion│            │            ▒
 │║english  lng│            │            
 │║─600/516(1)─┴────────────1 730 996(16)║
-│║XLT           <Каталог> 28.05.05 19:28║
+│║XLT           <DIR>     28.05.05 19:28║
 │║XLT                                   ║
 │║  Packed:  1 061         Ratio: 96%   ║
 │╚[ A C D E F G H I * ]═════════════════╝
@@ -1553,7 +1553,7 @@ which represents the working environment of Navigator:
        {│ title item of this submenu. This command could be also called:_}
        {│ by key combination mentioned in the menu.:_}
        {:_}
-██Ё██File██Disk██Utilities██Panel██Manager██Options██Window███████████22:29:19
+██≡██File██Disk██Utilities██Panel██Manager██Options██Window███████████22:29:19
                              ╔═[■]════════ E:\TP\DNHLP ═════════[]═╗
  C:\DN>arj f dn              ║..          │            │            
  ARJ 2.30 Copyright (c) 1990-║ dn      hlp│            │            ▒
@@ -1827,7 +1827,7 @@ exponential form (1e-3 = 0.001). Besides, one can specify a literal
 multiplier after decimal number (right up to the number, without spaces).
 Russian and international multipliers' notation is allowed
 ('u' instead of Greek letter 'mu').
-For example, 1.2к = 1.2k = 1200; 1.2мк = 1.2u = 0.0000012.
+For example, 1.2k = 1200; 1.2u = 0.0000012.
 'hecto' multiplier is missing, because its international notation (h)
 conflicts with assembler form of hexadecimal number.
 Multipliers are case-sensitive (for example, m = milli, M = mega),
@@ -2398,7 +2398,7 @@ See also: {User Menu:UserMenu}
    >2 ~A~rchive                  │
      pkzip -mex archive\mail.zip │ Call archiver
      pkunzip -t archive\mail.zip │ Check archive
-   >2 ~Р~азархивировать          │
+   >2 ~E~xtract                  │
      pkunzip archive\mail.zip    │
  >1                              │ Divider
  >1 ~G~ames                      │
@@ -4161,7 +4161,7 @@ combinations is called {filters:_}.
 │           *.asm;*.c;*.cpp;*.inc;*.pas    ─┼- This is a filters
 │           name.*; *.exe                  ─┘
 
-In first case, all files with 'exe' 'сom' 'bat' 'btm' and 'cmd' extesions will
+In first case, all files with 'exe' 'com' 'bat' 'btm' and 'cmd' extesions will
 be processed. In second - with 'asm' 'c' 'cpp' 'inc' and 'pas extensions. In
 third - files with 'name' name and any extension, and files with any name, but
 'exe' extension.
@@ -4566,7 +4566,7 @@ only).
 .title Task List
 ; /portions by Deleter/ 07.02.2003
 
- Таsk list has some useful options which can be set by keys in
+ Task list has some useful options which can be set by keys in
 section {[Tasklist] :_} of {dn.ini:IniFile} file:
 
 {ShowExePaths (Boolean) :_} When set to 0 , the names of processes'
@@ -4706,7 +4706,7 @@ mask. It substitute all symbols to last point including. For example you have
 a directiory, containing files with different extensions. And you want to move
 to files with 'txt' extension. So, you activate a quick search and enter
 '>txt'. But usually only '>t' is quite enough. If you want to continue quick
-search by the name of file, you can clear the mask by pressing BackSpaсe and
+search by the name of file, you can clear the mask by pressing BackSpace and
 start entering a name.
 
 .topic SelectPreset=48104

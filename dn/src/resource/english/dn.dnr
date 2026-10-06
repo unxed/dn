@@ -3163,7 +3163,7 @@ DIALOG dlgCalcFormat, 28, 18, 'Precision'
    InputLine 7, 12, 11, 13, 2, 0
    Label 1, 12, '~T~IME', ofPostProcess, ofPreProcess
    StaticText 12, 12, 26, 13, 'fractal digits'
-   Button 3,15,13,17, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+   Button 3,15,13,17, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
    Button 15,15,25,17, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
 END
 
@@ -4746,7 +4746,7 @@ DIALOG dlgSetExportCsvFormat, 46, 16, 'CSV Export Format'
       ITEM 'As calculated value'
     END
     Label 3, 8, '~F~ormula format:', ofPostProcess, ofPreProcess
-    Button 11, 13, 21, 15, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button 11, 13, 21, 15, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 25, 13, 35, 15, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
 END
 ;KV
@@ -4758,7 +4758,7 @@ DIALOG dlgDBFGoto, 41, 9, 'Go to row/column'
     Label 3, 2, '~R~ow number', ofPostProcess, ofPreProcess
     InputLine 17, 4, 35, 5, 10, hsDBFGotoCol
     Label 3, 4, '~C~olumn name', ofPostProcess, ofPreProcess
-    Button  9, 6, 19, 8, 'О~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button  9, 6, 19, 8, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 19, 6, 29, 8, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
     Button 29, 6, 39, 8, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
