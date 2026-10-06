@@ -115,6 +115,22 @@ and `filefind.pas` were reviewed type-by-type: they store ShortStrings and
 already resolve to `Defines.PString` / `pstring_bind`, so they were left
 unchanged.
 
+**Latest exact-SHA run:** DN `c2fb5f303d0093400b1433065d036cf61782b6e0`
+(TV3 `a06dd31`) rebuilt against the same object pins above. The class/object
+build job succeeded. The object comparator received only exact-SHA-guarded
+temporary backports for the shared DN fixes and ColorSel streaming; the pinned
+source tree was not changed. Acceptance summary `37402336433` recorded
+`160 pass / 3 fail`; one shard terminated at `menu_1_11` with exit 143 and no
+summary, so the run is **not** a passing full gate. `menu_4_5` and
+`menu_6_16` now pass. Two reported failures (`menu_2_12`, `menu_5_13`) have the
+same one-column drift in the transient, centered “Reading directories” progress
+line; its width includes a volatile count, and the focused replay of
+`menu_2_3`, `menu_2_6`, and `menu_5_13` passed. The third (`menu_2_15`) timed
+out in the class run after 30 seconds and remains unexplained. The harness now
+Esc-dismisses detected directory-scan progress on all scenarios and allows
+menu scenarios more time to report it; focused reproduction and a new full
+matrix are still required.
+
 **Intermittent AVs (owner, 2026-10-05, unreproduced):** once on F4 open-file
 right after a clipboard permission prompt (far2l/OSC); once after (or instead
 of) running a command on the embedded console. Both Access Violation; no

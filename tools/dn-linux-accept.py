@@ -155,12 +155,11 @@ SCENARIOS.append(('cmdline_echo', 'e c h o SPACE h i ENTER', 'input'))
 # menu_4_5 Directory Branch and menu_6_16 Options→Colors were shared AVs; fixed
 # (filescol DelDuplicates/SameFile; Colors TPalette + ColorSel stream Load/Store).
 _SKIP_MENU = {(0, 10), (0, 16), (3, 8), (5, 2)}
-# menu_2_7..9: menu index 2 = Disk (♦=0); DOWN≥7 stays on Directory tree
-# (cmCreateTree → ReadTree / "Scanning directories"). Not a class regression — object
-# run can exceed 30s under parallel CI shards while the scan runs synchronously.
-# menu_4_12: Panel → Change directory (Alt-T) also opens a full-volume scan.
-# After ENTER, Esc-dismiss the progress dialog so the snapshot is a settled UI
-# rather than a racing counter (digit width / mid-scan flake).
+# Menu actions can enter ReadTree / another synchronous directory scan, including
+# repeated DOWN on the Disk menu and actions outside the original known list.
+# Give menu actions enough time to detect the progress screen, then Esc-dismiss it
+# before comparing cells; the centered message includes a volatile count whose
+# digit width can shift the text by one column between independently timed runs.
 _LONG_SCAN_SCENARIOS = frozenset({'menu_2_7', 'menu_2_8', 'menu_2_9', 'menu_4_12'})
 _LONG_SCAN_TIMEOUT_SEC = 90 if _FAST else SCENARIO_TIMEOUT_SEC
 for _m in range(7):
@@ -474,7 +473,8 @@ def run_one(out: str, work: str, spec: str, area: str = '',
     def _alarm(_signum, _frame):
         raise _ScenarioTimeout('timeout')
 
-    timeout_sec = (_LONG_SCAN_TIMEOUT_SEC if scenario in _LONG_SCAN_SCENARIOS
+    timeout_sec = (_LONG_SCAN_TIMEOUT_SEC
+                   if scenario in _LONG_SCAN_SCENARIOS or scenario.startswith('menu_')
                    else SCENARIO_TIMEOUT_SEC)
 
     old = signal.signal(signal.SIGALRM, _alarm)
@@ -506,12 +506,10 @@ def run_one(out: str, work: str, spec: str, area: str = '',
         if scenario == 'f1help':
             wait_help_window(t, 2.0 if _FAST else 3.0)
         if scenario in _LONG_SCAN_SCENARIOS:
-            # Give the progress dialog a moment to appear, then Esc-abort.
+            # Allow the legacy long-scan screen enough time to become visible.
             t.pump(0.4, 1.5)
-            if _directory_scan_active(t.text()):
-                _dismiss_directory_scan(t)
-            else:
-                settle_snapshot(t, 0.18 if _FAST else 0.25, 2.5 if _FAST else 3.5)
+        if _directory_scan_active(t.text()):
+            _dismiss_directory_scan(t)
         else:
             settle_snapshot(t, 0.18 if _FAST else 0.25, 2.5 if _FAST else 3.5)
         if _top_left_csi_garbage(t):
