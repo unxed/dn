@@ -363,6 +363,62 @@ def delete_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, ti
         shutil.rmtree(d, ignore_errors=True)
 
 
+def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title_hint: str) -> None:
+    """F5 of a file of the other panel into a zip that is open in the active panel (Tab, F5, Enter): the file must be in the archive on the disk
+    (the packer is run by DN: the wrapper log tells)."""
+    import zipfile
+
+    def members(path):
+        try:
+            return zipfile.ZipFile(path).namelist()
+        except (OSError, zipfile.BadZipFile):
+            return []
+
+    d = tempfile.mkdtemp(prefix='dn-arc-f5a-')
+    try:
+        copy_dn(dn_out, d)
+        w = os.path.join(d, 'work')
+        os.makedirs(w)
+        shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
+        with open(os.path.join(w, 'added.txt'), 'w') as f:
+            f.write('added by DN\n')
+        bindir = os.path.join(d, 'wrapbin')
+        os.makedirs(bindir)
+        wlog = os.path.join(d, 'wrap.log')
+        real = shutil.which('zip')
+        with open(os.path.join(bindir, 'zip'), 'w') as f:
+            f.write('#!/bin/sh\necho "$0 $* [cwd=$PWD]" >> %s\n%s "$@" 2>>%s\nrc=$?\necho "  rc=$rc" >> %s\nexit $rc\n' % (wlog, real, wlog, wlog))
+        os.chmod(os.path.join(bindir, 'zip'), 0o755)
+        old_path = os.environ['PATH']
+        os.environ['PATH'] = bindir + os.pathsep + old_path
+        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        os.environ['PATH'] = old_path
+        open_archive(t, name, expect_member, title_hint)
+        t.send('\t', 0.6)                          # the other panel: the directory with added.txt
+        t.send(KEYS['HOME'], 0.15)
+        t.send(KEYS['DOWN'], 0.2)                  # added.txt (the first file after ..)
+        t.send(KEYS['F5'], 1.5)
+        dlg = t.text()
+        t.send('\r', 1.5)
+        for _ in range(8):
+            t.pump(0.5, 2)
+            if 'added.txt' in members(os.path.join(w, name)):
+                break
+        scr = t.text()
+        check(t.alive(), '%s/F5 add: alive' % name, scr)
+        if 'added.txt' in members(os.path.join(w, name)):
+            print('PASS %s/F5 add: the file is in the archive' % name, flush=True)
+        else:
+            SOFT_FAILS.append(name + ' add')
+            print('SOFTFAIL %s/F5 add: the file is not in the archive; members: %s' % (name, members(os.path.join(w, name))), flush=True)
+            print('DIAG add wrapper log:', open(wlog).read() if os.path.exists(wlog) else '(zip was not started)', flush=True)
+            print('DIAG add dialog:', ' | '.join(l.strip() for l in dlg.split('\n') if l.strip())[-500:], flush=True)
+            print('DIAG add screen tail:', ' | '.join(l.strip() for l in scr.split('\n') if l.strip())[-400:], flush=True)
+        quit_dn(t)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print('usage: dn-linux-archives.py OUTDIR', file=sys.stderr)
@@ -423,6 +479,8 @@ def main() -> int:
             if name == 'simple.zip':
                 print('CASE', name, 'F8 real', flush=True)
                 delete_real(out, fix, name, member, title)
+                print('CASE', name, 'F5 add', flush=True)
+                add_real(out, fix, name, member, title)
         if SOFT_FAILS:
             print('F5 real FAILED for:', SOFT_FAILS, flush=True)
             return 1
