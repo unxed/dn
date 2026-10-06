@@ -1,4 +1,5 @@
 """Text policy of the repository (docs/TEXT-POLICY.md): English, UTF-8, no VP read.me, no Objects shim."""
+import importlib.util
 import os
 import re
 import subprocess
@@ -21,7 +22,7 @@ CYRILLIC_OK = _rx(
     r"^dn/tests/t_(dnutf8|drivrs|zipcharset)\.pas$",
     r"^docs/ZIP-CHARSET\.md$",
     r"^docs/TEXT-POLICY\.md$",
-    r"^tools/(fix-resource-lookalikes\.py|tests/test_(text_policy|to_codepage)\.py)$",
+    r"^tools/(fix-resource-lookalikes\.py|tests/test_(text_policy|to_codepage|audit_encoding)\.py)$",
     r"^docs/patches/",
     r"^tools/(dn-linux-(accept|far2l|locale|ops|sortmark)|dn-dos-input|test-zipcharset)\.py$",
     r"^tools/tests/test_source_encoding\.py$",
@@ -76,6 +77,24 @@ class TextPolicyTests(unittest.TestCase):
                 if line.lstrip().startswith(b";") and CYR.search(text):
                     bad.append("%s:%d" % (name, number))
         self.assertEqual(bad, [])
+
+    def test_no_single_byte_glyphs_in_code(self):
+        """A frame, a shade, a block or an arrow is a name of tv/src/tvglyphs.pas (glLightH, GlyphChar(glDblV) ...), not #196 or #$B3.
+        The files below hold palettes (strings of palette indices that look like bytes), the tables of the code pages and the range checks of a key."""
+        spec = importlib.util.spec_from_file_location("audit_encoding", ROOT / "tools/audit-encoding.py")
+        audit = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(audit)
+        glyph = re.compile(r"#(17[6-9]|18[0-9]|19[0-9]|2[01][0-9]|22[0-3]|240|249|25[0-4])\b|#\$(B[0-9A-Fa-f]|[C-D][0-9A-Fa-f]|F0|F9|FA|FB|FC|FD|FE)\b", re.I)
+        palettes = _rx(r"^dn/src/(calendar|dbview|dndlgs|fviewer|palettes|panelwin|pktview|uniwin)\.pas$",
+                       r"^dn/src/(filepanel|keymap)\.pas$")              # range checks of a key, the tables of the code pages
+        bad = []
+        for name, data in tracked_files():
+            if not re.match(r"^dn/(src|archives|compat)/.*\.(pas|inc)$", name) or _any(palettes, name):
+                continue
+            for number, line in enumerate(audit.code_only(data.decode("utf-8", "replace")).split("\n"), 1):
+                if glyph.search(line):
+                    bad.append("%s:%d: %s" % (name, number, line.strip()[:80]))
+        self.assertEqual(bad, [], "a single-byte glyph: use a name of TvGlyphs")
 
     def test_obsolete_vp_readme_is_gone(self):
         names = [n for n, _ in tracked_files()]
