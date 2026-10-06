@@ -11,8 +11,7 @@ interface
 
 uses
   SysUtils, TvInput, TvGeom, TvObjs, TvEvents, TvViews, TvWindow, TvDialog, TvApp, TvList, TvScreen, TvCell, Menus,
-  Streams, Views, Drivers, Commands, timeutil, DnIni, DNStrL, RStrings
-{$IFDEF GO32V2}, TvDos, go32{$ENDIF}, DNErrLog;
+  Streams, Views, Drivers, Commands, timeutil, DnIni, DNStrL, RStrings, DNErrLog;
 
 const
   apColor = TvApp.apColor;
