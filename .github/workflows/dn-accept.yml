@@ -116,6 +116,71 @@ jobs:
           name: accept-shard-${{ matrix.shard }}
           path: accept-shard-${{ matrix.shard }}.log
 
+  # The same source in two builds: UTF-8 inside (the default) and the code page inside (DN_UTF8=0, the way DOS is built). Every scenario must give the same
+  # cells in both (the screens differ only in the code page of the machine: it is one: the cells hold the characters). The area u8cp is run too; U8CP_SKIP of
+  # tools/dn-linux-accept.py lists what differs by the data (dn.ini is UTF-8 in both, the editor of the code page build shows its bytes by the page).
+  build-u8cp:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
+      - name: Build UTF-8 DN
+        run: tools/build.sh linux64 out/u8
+      - name: Build DN with the code page inside
+        run: DN_UTF8=0 tools/build.sh linux64 out/cp
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dn-u8cp-bins
+          path: |
+            out/u8/dn
+            out/u8/*.lng
+            out/u8/*.dlg
+            out/u8/*.hlp
+            out/u8/xlt/**
+            out/cp/dn
+            out/cp/*.lng
+            out/cp/*.dlg
+            out/cp/*.hlp
+            out/cp/xlt/**
+          if-no-files-found: error
+
+  u8cp:
+    needs: build-u8cp
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dn-u8cp-bins
+          path: bins
+      - name: Layout bins
+        run: |
+          mkdir -p out
+          cp -a bins/out/u8 out/u8
+          cp -a bins/out/cp out/cp
+          chmod +x out/u8/dn out/cp/dn
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3
+      - name: UTF-8 build against the code page build, shard ${{ matrix.shard }}/6
+        run: |
+          set -o pipefail
+          DN_ACCEPT_U8CP=1 DN_ACCEPT_FAST=1 python3 tools/dn-linux-accept.py out/u8 out/cp \
+            --shard ${{ matrix.shard }}/6 | tee u8cp-shard-${{ matrix.shard }}.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: u8cp-shard-${{ matrix.shard }}
+          path: u8cp-shard-${{ matrix.shard }}.log
+
   summarize:
     needs: accept
     if: always()
