@@ -81,7 +81,9 @@ behavior is ambiguous (hard gate still applies globally).
   (`extract_real` in `tools/dn-linux-archives.py`) and F8 delete from a zip (`delete_real`: the archive is read back with Python). Both write the
   calls of the unpackers into a log (wrappers of `unzip`, `tar`, `7z`... in the PATH of DN: `DIAG wrapper log` on a failure) and report all failing formats in one run.
   The first run (2026-10-06) found a real bug of the Linux build: DN started the archivers as `COMSPEC /c command`, COMSPEC is empty on Unix, nothing ran;
-  fixed in `osrununix.pas` (`BackendExecute`), the result of the CI of the fix is not in this file yet.
+  fixed in `osrununix.pas` (`BackendExecute`). The second finding (diagnostics `DN_LOG_FILE`, `DNLog`): `ExtractFiles` never reached the unpacker, it looped
+  forever looking for a free temporary directory: `SysFindFirst` returned 18 ("no more files") for a directory that is not there, so `PathExist` said yes to every path;
+  now 3 ("path not found") as in DOS (`osdep.pas`, `t_osdep`, and the same in the comparator backport). The results of the CI of both fixes are not in this file yet.
   Left: F3/F4 content checks for 7z and the others, adding to an archive (F5 into it), a member of a nested archive.
 
 Related: Unix packer defaults (`fmtzip`/`fmttar`/`fmt7z`…), ZIP charset
