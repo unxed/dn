@@ -92,6 +92,9 @@ jobs:
       - name: Symbolic links and permissions in the panels
         if: success() || failure()
         run: python3 tools/dn-linux-fsattrs.py out/dn
+      - name: The desktop is saved at the exit and restored at the start
+        if: success() || failure()
+        run: python3 tools/dn-linux-desktop.py out/dn
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64
