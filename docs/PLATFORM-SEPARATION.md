@@ -71,9 +71,12 @@ failed again on `cd37065` (`37408063297`, 177/178). Full row diagnostics showed
 that its Options→Editors file-selection tree recursively scans the host root;
 the object/class snapshots were taken 28 seconds apart during that scan, and
 the `files with … bytes` aggregate advanced from 68,459 / 5,538,459K to 120,614
-/ 9,916,057K. Commit `0ad0900` added full differing-row output; `3318781` waits
-for that aggregate to remain stable before snapshotting. Its exact-SHA full
-acceptance run is pending; the class/object gate remains open until it passes.
+/ 9,916,057K. Commit `0ad0900` added full differing-row output; the first
+stabilization at `3318781` (10 seconds unchanged) still sampled progress at
+81,121 / 5,694,486K versus 126,183 / 10,450,278K. The current change waits 45
+seconds unchanged (110-second cap; 150-second scenario limit); its exact-SHA
+full acceptance run is pending. The class/object gate remains open until it
+passes.
 The DOS build passes, but its new `userscr` runtime smoke exposed a
 harness bug: `CheckScreenDump` (which injects `DNKEYS` and enforces
 `DNDUMPSEC`) was defined but never called, so DOSBox-X timed out before running
