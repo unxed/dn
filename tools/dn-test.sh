@@ -13,7 +13,7 @@ for t in "$here"/dn/tests/t_*.pas; do
     out=$(cd "$here/dn/tests" && fpc -Mdelphi -Sh- -Rintel -Se300 -dDPMI32 -dLINUX -dDNUTF8 -Fu../compat/linux -Fu../compat -Fu../archives -Fu../src -Fu../lib/localecp -Fu../lib/zipcharset -Fu"$w/shims" \
           -Fu../../tv/src -Fi. -Fi../compat/shims -Fi../src -Fi../lib/localecp -FU"$w/obj" -FE"$w/obj" "$t" 2>&1) || true
     if echo "$out" | grep -qE "Error:|Fatal:"; then echo "BUILD FAIL $n"; echo "$out" | grep -E "Error:|Fatal:" | head -3; fail=1; continue; fi
-    r=$("$w/obj/$n" 2>&1 | tail -1); echo "$n: $r"
+    r=$(DN_RES_DIR=${DN_RES_DIR:-$([ -f "$here/out/linux64/english.dlg" ] && echo "$here/out/linux64")} "$w/obj/$n" 2>&1 | tail -1); echo "$n: $r"
     case "$r" in "ALL OK"*) ;; *) fail=1;; esac
 done
 exit $fail
