@@ -719,7 +719,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
     OW := @CurDir;
   (* if TTL > MaxLongInt then F := NewFileRec('..', '..',0, ArcDate, Directory, OW) else
  begin
-   F := NewFileRec({$IFNDEF OS2}'..',{$ENDIF} '..',Round(TTL), ArcDate, Directory, OW);
+   F := NewFileRec('..', '..',Round(TTL), ArcDate, Directory, OW);
    F^.Attr := $8000 or F^.Attr;
  end;
  if TPL < MaxLongInt then F^.PSize := Round(TPL); *)

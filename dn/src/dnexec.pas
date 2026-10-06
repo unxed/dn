@@ -78,7 +78,7 @@ uses DNRun,
   
    realmode, 
   DNUtil, basics, mainapp, strutil, Lfn,
-  Dos, panelroot, CmdLine, Views, fileutil, Drivers, os2sess,
+  Dos, panelroot, CmdLine, Views, fileutil, Drivers, winsess,
   VideoMan, osdep, dnscreen, timeutil,
   
   Startup, UserMenu, Messages, Strings, filetype, TitleSet
@@ -530,9 +530,9 @@ procedure ExecFile(const FileName: String);
     then
       begin
       if TCommandLine(CommandLine).LineType = ltFullScreen then
-        ST := stOS2FullScreen
+        ST := stFullScreen
       else
-        ST := stOS2Windowed;
+        ST := stWindowed;
       RunSession(M, False, ST);
       CmdLine.StrModified := True;
       MessageKey(CommandLine, kbDown);

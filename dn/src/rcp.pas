@@ -1451,7 +1451,6 @@ Writeln('Copyright(C) 1995 AxoN(R)Soft');
 {/Cat}
 
 {Cat: choose which config file to use:
-      - command line O or OS2 → RCPVPO.INI
       - command line W or W32 → RCPVPW.INI
       - command line D or D32 → RCPVPD.INI
       - empty command line → the config file for the
@@ -1459,8 +1458,7 @@ Writeln('Copyright(C) 1995 AxoN(R)Soft');
 
 FreeStr := ParamStr(1);
 UpStr(FreeStr);
-if  (FreeStr = 'O') or (FreeStr = 'OS2')
-  or (FreeStr = 'W') or (FreeStr = 'W32')
+if  (FreeStr = 'W') or (FreeStr = 'W32')
   or (FreeStr = 'D') or (FreeStr = 'D32')
   or (FreeStr = '')
 then

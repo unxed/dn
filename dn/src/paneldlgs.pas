@@ -880,11 +880,7 @@ function SelectFiles(AFP: Pointer; Select, XORs: Boolean): Boolean;
      begin
       SD := GetPossibleDizOwner(1);
       if SD <> '' then
-      {$IFNDEF OS2}
       if (LowStrg(MakeFileName(PF^.Name))
-      {$ELSE}
-      if (LowStrg(PF^.Name)
-      {$ENDIF}
         = LowStrg(GetName(GetDizOwner(PF^.Owner^, SD, false)))) then PF^.Selected := false;
      end;
 *)
@@ -958,11 +954,7 @@ procedure InvertSelection(AFP: Pointer; dr: Boolean);
      begin
       SD := GetPossibleDizOwner(1);
       if SD <> '' then
-      {$IFNDEF OS2}
       if (LowStrg(MakeFileName(PF^.Name))
-      {$ELSE}
-      if (LowStrg(PF^.Name)
-      {$ENDIF}
         = LowStrg(GetName(GetDizOwner(PF^.Owner^, SD, false)))) then PF^.Selected := false;
      end;
 *)
@@ -1313,9 +1305,7 @@ CurTime:
       (*  works, but crashes after the nth time
  cmSkip:
       begin
-      {$IFNDEF OS2}
        Dlg.EnableCommands([cmYes, cmNo]);
-      {$ENDIF}
        Dlg.Free;
        NotifyResume; {Cat}
        MessageKey(Application, kbDown);

@@ -1513,7 +1513,7 @@ lbStartWrite:
         Own^.FlName[False] := GetName(lfGetShortFileName(NName));
         
 {!RLN}        CopyShortString(GetName(NName), Own^.FlName[True]);
-        //         ReplaceLongName(Own, {$IFDEF OS2}GetName{$ENDIF}(NName));
+        //         ReplaceLongName(Own, (NName));
    { This is in case we are standing right on this name.
    So that when the directory is reread the cursor goes to the new name,
    and does not stay at the old position }
