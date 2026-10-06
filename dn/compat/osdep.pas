@@ -349,6 +349,7 @@ end;
 function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
 var
   I: Integer;
+  Mask, Dir: string;
 begin
   I := 1;
   while (I <= MaxSearches) and (Searches[I] <> nil) do
@@ -356,12 +357,19 @@ begin
   if I > MaxSearches then
     Exit(4);                       { too many open files }
   New(Searches[I]);
-  if SysUtils.FindFirst(FixMask(SysOsPath(StrPas(Path))), Attr or faSymLink, Searches[I]^) <> 0 then
+  Mask := FixMask(SysOsPath(StrPas(Path)));
+  if SysUtils.FindFirst(Mask, Attr or faSymLink, Searches[I]^) <> 0 then
   begin
     SysUtils.FindClose(Searches[I]^);
     Dispose(Searches[I]);
     Searches[I] := nil;
     F.Handle := 0;
+    { DOS tells "path not found" (3) from "no more files" (18): PathExist of DN takes any of 0, 2, 18 of a probe of DIR\*.* as "the directory exists" }
+    Dir := ExtractFileDir(Mask);
+    if Dir = '' then
+      Dir := '.';
+    if not DirectoryExists(Dir) then
+      Exit(3);
     Exit(18);
   end;
   F.Handle := I;

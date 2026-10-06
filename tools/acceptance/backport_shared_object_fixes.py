@@ -63,6 +63,49 @@ def main() -> int:
             f"got {actual_tv_sha}"
         )
 
+    osdep = root / "dn/compat/osdep.pas"
+    # SysFindFirst told "no more files" (18) for a missing directory: PathExist of DN took every directory as existing (the extraction from
+    # an archive looped forever looking for a free temporary directory). The class build has the fix; the comparator gets the same one.
+    replace_once(
+        osdep,
+        b"""function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
+var
+  I: Integer;
+begin
+  I := 1;""",
+        b"""function SysFindFirst(Path: PChar; Attr: LongInt; var F: TOSSearchRec; IsPChar: Boolean): LongInt;
+var
+  I: Integer;
+  Mask, Dir: string;
+begin
+  I := 1;""",
+    )
+    replace_once(
+        osdep,
+        b"""  if SysUtils.FindFirst(FixMask(SysOsPath(StrPas(Path))), Attr or faSymLink, Searches[I]^) <> 0 then
+  begin
+    SysUtils.FindClose(Searches[I]^);
+    Dispose(Searches[I]);
+    Searches[I] := nil;
+    F.Handle := 0;
+    Exit(18);
+  end;""",
+        b"""  Mask := FixMask(SysOsPath(StrPas(Path)));
+  if SysUtils.FindFirst(Mask, Attr or faSymLink, Searches[I]^) <> 0 then
+  begin
+    SysUtils.FindClose(Searches[I]^);
+    Dispose(Searches[I]);
+    Searches[I] := nil;
+    F.Handle := 0;
+    Dir := ExtractFileDir(Mask);
+    if Dir = '' then
+      Dir := '.';
+    if not DirectoryExists(Dir) then
+      Exit(3);
+    Exit(18);
+  end;""",
+    )
+
     filescol = root / "dn/src/filescol.pas"
     replace_once(
         filescol,
