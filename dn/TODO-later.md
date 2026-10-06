@@ -349,3 +349,10 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 
 - `ScInitChar` (tv3 `tvcell.pas`) keeps the raw byte of the code page; the writers (TvText, TvUnix, TvDos) turn it into its character. Making the cell hold UTF-8 at once (tv3 `0bc5e6b`, reverted) leaves stray `═` cells of a closed dialog frame in the panels after F5 (scenario `f5_f6_f8` of `dn-accept`; the object build shows spaces) and changes the DEL glyph (`menu_3_3`, `menu_3_16`). Not found why a repaint does not overwrite the cell (the panel draw uses `MoveChar`/`CellFromBIOS`); to find with a dump of `ScreenBuffer` against `Shown` of `tvunix.pas`.
 - `DumpAtExit` (`dosharness.pas`, was in `mainapp.pas`) is never called: the DOS harness writes `dnlog.txt` only if it is hooked; either hook it as an exit procedure or delete it.
+
+## Doubts and leftovers of 2026-10-06 (platform separation, archives, input)
+- Quick search of the panel by a typed character in the Caps/Shift start modes still takes only characters of the code page (`filepanel.pas`, the conditions `Char(Event.CharCode) >= #32`); the display of a long search mask cuts by bytes (`QuickSearchString`).
+- `uk_UA` in `tvlocale.pas` maps to cp866 (as glibc does); a DOS user with cp1125 would want 1125: make it a setting if asked.
+- `DefaultSortMode` of `dn.ini` applies only to a DN without a saved setup (`PanSetupFromConfig`); a user who saved the setup keeps what was saved.
+- The archivers on Windows are started through `COMSPEC /c` as before (`osrunwindows.pas`); only the Unix side needed the fix. Not driven by a test on Windows.
+- `ArcDrive.Exec` (arcview.pas) and `archiver.pas` still have the DOS 120/95-character command line limits and the `$DNn$.BAT` batch files of the swap mode; on Unix the swap mode (`SwapWhenExec`) must stay off.
