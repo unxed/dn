@@ -368,6 +368,9 @@ def main() -> int:
             ('simple.zip', 'inside', 'ZIP:'),
             ('simple.tgz', 'inside', 'TGZ:'),
             ('simple.tar.xz', 'inside', 'XZ:'),
+            ('simple.7z', 'inside', '7Z:'),
+            ('simple.tar', 'inside', 'TAR:'),
+            ('simple.tar.bz2', 'inside', 'BZ2:'),
         ):
             if name not in names:
                 print('SKIP', name, 'F5 (not generated)', flush=True)
