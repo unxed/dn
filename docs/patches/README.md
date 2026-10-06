@@ -23,3 +23,9 @@ gets UTF-8 long names. The PR text is `dosbox-x-pr-utf8-names.md`. Tests (nasm -
 (creates `716Ch` and renames `7156h` with UTF-8 names). Config for the check: `[dos]` `utf8 file names = true`, `lfn = true`, `ver = 7.1`.
 
 The Windows part of the clipboard patch (`CF_UNICODETEXT`) is written but was not compiled.
+
+## A build of DOSBox-X for the DN tests (`tools/dn-dos-input.py` with `DN_DOS_PATCHED=1`)
+
+Build `master` with the two patches above **and** the guard of `dosbox-x-pr-extdevice-loop.md` (the loop of `DOS_CheckExtDevice()` is limited to 1024 links). Without the guard the
+emulator of `master` hangs at 100% of a core as soon as DN does its first `FindFirst` (a hung `dn-dos-input.py` with every check FAIL and no `SCR.DAT` is this). The stock
+`dosbox-x` of the distribution (2024.03.01) has no such bug and no AMIS provider: the UTF-8 name scenario is skipped there, the rest runs.

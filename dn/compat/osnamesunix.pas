@@ -181,6 +181,20 @@ begin
   Result := ResolveCase(Result);
 end;
 
+{ a path in a command line is read by the shell: $ and ` in it (the list files of the archivers are named $DN0$.LST) keep their meaning with a backslash }
+function ShellEscape(const S: string): string;
+var
+  I: Integer;
+begin
+  Result := '';
+  for I := 1 to Length(S) do
+  begin
+    if S[I] in ['$', '`'] then
+      Result := Result + '\';
+    Result := Result + S[I];
+  end;
+end;
+
 function CommandLineToOs(const S: string): string;
 var
   I, J: Integer;
@@ -191,13 +205,13 @@ begin
   while I <= Length(S) do
   begin
     if (I + 2 <= Length(S)) and (UpCase(S[I]) in ['A'..'Z']) and (S[I + 1] = ':') and (S[I + 2] in ['\', '/'])
-      and ((I = 1) or (S[I - 1] in [' ', '"', '''', '>', '<', '=', '|', ';', '(', '&'])) then
+      and ((I = 1) or (S[I - 1] in [' ', '"', '''', '>', '<', '=', '|', ';', '(', '&', '@'])) then
     begin
       Q := (I > 1) and (S[I - 1] = '"');
       J := I + 2;
       while (J <= Length(S)) and (not Q or (S[J] <> '"')) and (Q or not (S[J] in [' ', '"', '''', '>', '<', '|', ';', '&', ')'])) do
         Inc(J);
-      Result := Result + OsPath(Copy(S, I, J - I));
+      Result := Result + ShellEscape(OsPath(Copy(S, I, J - I)));
       I := J;
     end
     else
