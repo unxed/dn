@@ -83,6 +83,9 @@ jobs:
       - name: Quick search of the panel with a character outside the code page
         if: success() || failure()
         run: python3 tools/dn-linux-qsearch.py out/dn
+      - name: Find File (Alt+F7) with a mask and with a text
+        if: success() || failure()
+        run: python3 tools/dn-linux-find.py out/dn
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64
