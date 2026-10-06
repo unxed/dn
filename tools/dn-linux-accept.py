@@ -279,6 +279,26 @@ def _directory_scan_active(text: str) -> bool:
     return ('Scanning directories' in text) or ('Reading directories:' in text)
 
 
+def _wait_file_total_stable(t: PtyTerm, stable_sec: float = 10.0,
+                            limit_sec: float = 65.0) -> None:
+    """Wait for the tree dialog's recursive file/byte totals to stop changing."""
+    end = time.time() + limit_sec
+    previous = None
+    unchanged_since = None
+    while time.time() < end and t.alive():
+        row = next((line for line in t.text().split('\n')
+                    if re.search(r'\d+ files with .* bytes', line)), None)
+        if row is None:
+            return
+        now = time.time()
+        if row != previous:
+            previous = row
+            unchanged_since = now
+        elif unchanged_since is not None and now - unchanged_since >= stable_sec:
+            return
+        t.pump(0.8, 1.4)
+
+
 def _dismiss_directory_scan(t: PtyTerm, limit: float = 20.0) -> None:
     """Esc out of ReadTree / Change-directory progress (Esc is polled in-tree)."""
     end = time.time() + limit
@@ -508,6 +528,10 @@ def run_one(out: str, work: str, spec: str, area: str = '',
         if scenario in _LONG_SCAN_SCENARIOS:
             # Allow the legacy long-scan screen enough time to become visible.
             t.pump(0.4, 1.5)
+        if scenario == 'menu_5_13':
+            # The editor-selection tree scans the host root; wait for its
+            # displayed aggregate to settle before comparing the two builds.
+            _wait_file_total_stable(t)
         if _directory_scan_active(t.text()):
             _dismiss_directory_scan(t)
         else:
