@@ -21,7 +21,7 @@ CYRILLIC_OK = _rx(
     r"^dn/tests/t_(dnutf8|drivrs|zipcharset)\.pas$",
     r"^docs/ZIP-CHARSET\.md$",
     r"^docs/patches/",
-    r"^tools/(dn-linux-(accept|far2l|locale|ops|sortmark)|test-zipcharset)\.py$",
+    r"^tools/(dn-linux-(accept|far2l|locale|ops|sortmark)|dn-dos-input|test-zipcharset)\.py$",
     r"^tools/tests/test_source_encoding\.py$",
 )
 NOT_UTF8_OK = _rx(r"/xlt/", r"^dn/data/dn\.ini$", r"^dist/[^/]+/dn\.ini$")
