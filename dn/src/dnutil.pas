@@ -2752,18 +2752,11 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmFormatDisk:
       AddFormat;
     cmShowOutput:
-{$IFDEF LINUX}
-      { the screen of the commands that DN ran (TvVtRun): Ctrl-O shows it }
-      if (UserScr <> nil) and (UserScr.Cols > 0) then
+      { the screen of the commands that DN ran (DNRun: the pty of Linux, the programs of DOS): Ctrl-O shows it, else the window of the stored one }
+      if HasCommandScreen then
         ShowUserScreen
       else
-{$ENDIF}
-{$IFDEF GO32V2}
-      ShowUserScreen   { DOS: the screen of the programs (DNRun) instead of the window of the stored one }
-{$ELSE}
-      GetUserScreen
-{$ENDIF}
-      ;
+        GetUserScreen;
     cmHistoryList:
       CmdHistory;
     cmLoadDesk:
