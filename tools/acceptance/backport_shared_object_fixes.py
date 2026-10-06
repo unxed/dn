@@ -457,6 +457,75 @@ end;
 destructor TColorDialog.Done;""",
     )
 
+    # The sort letter in the corner of a panel: the Russian and Ukrainian strings of dlSortTag are UTF-8 and one byte of them was taken (a box
+    # character or a wrong letter in the corner); the object build has the same bug.
+    topview = root / "dn/src/topview.pas"
+    replace_once(
+        topview,
+        b"""procedure TSortView.Draw;
+  var
+    B: Word;
+    C: Char;
+    R: TRect;
+    SortSetup: ^TPanelSortSetup;
+  begin""",
+        b"""{$IFDEF DNUTF8}
+{ the bytes of the character of S that starts at P (the sort letters of the language are UTF-8: the Russian ones are two bytes each) }
+function SortCharLen(const S: String; P: Integer): Integer;
+  begin
+  Result := 1;
+  if (P < 1) or (P > Length(S)) then
+    Exit;
+  case Byte(S[P]) of
+    $C2..$DF: Result := 2;
+    $E0..$EF: Result := 3;
+    $F0..$F4: Result := 4;
+  end;
+  if P+Result-1 > Length(S) then
+    Result := 1;
+  end;
+{$ENDIF}
+
+procedure TSortView.Draw;
+  var
+{$IFDEF DNUTF8}
+    B: TDrawBuffer;
+    S, T: String;
+    P, N: Integer;
+{$ELSE}
+    B: Word;
+    C: Char;
+{$ENDIF}
+    R: TRect;
+    SortSetup: ^TPanelSortSetup;
+  begin""",
+    )
+    replace_once(
+        topview,
+        b"""  C := GetString(dlSortTag)[SortSetup^.SortMode + 1];
+  if (SortSetup^.SortFlags and psfInverted) <> 0  then
+    C := Upcase(C);
+  MoveChar(B, C, Panel^.Owner^.GetColorW(3), 1);
+  WriteLineW(0, 0, 1, 1, B);""",
+        b"""{$IFDEF DNUTF8}
+  S := GetString(dlSortTag);
+  P := 1;
+  for N := 1 to SortSetup^.SortMode do
+    Inc(P, SortCharLen(S, P));
+  T := Copy(S, P, SortCharLen(S, P));
+  if (SortSetup^.SortFlags and psfInverted) <> 0  then
+    Utf8UpStr(T);
+  MoveStr(B[0], T, Panel^.Owner^.GetColorW(3));
+  WriteLineC(0, 0, 1, 1, B);
+{$ELSE}
+  C := GetString(dlSortTag)[SortSetup^.SortMode + 1];
+  if (SortSetup^.SortFlags and psfInverted) <> 0  then
+    C := Upcase(C);
+  MoveChar(B, C, Panel^.Owner^.GetColorW(3), 1);
+  WriteLineW(0, 0, 1, 1, B);
+{$ENDIF}""",
+    )
+
     print(
         f"Applied guarded shared-bug backports to object DN {actual_sha} "
         f"and object TV {actual_tv_sha}."
