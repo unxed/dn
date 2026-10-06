@@ -149,8 +149,9 @@ constructor TZIPArchive.Create;
          PGoodCompression, '-8'));
   UltraCompression := NewStr(GetVal(@Sign[1], @FreeStr[1],
          PUltraCompression, '-9'));
+  { Info-ZIP zip reads a list of names from the standard input (-@), not from a file named after it: the names go on the command line }
   ComprListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PComprListChar,
-         '-@'));
+         ' '));
   ExtrListChar := NewStr(GetVal(@Sign[1], @FreeStr[1], PExtrListChar,
        ' '));
 {$ELSE}

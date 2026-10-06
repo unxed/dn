@@ -37,7 +37,7 @@ def run(out, mask, text, want, not_want):
         t.pump(2.0, 6)
         s_res = t.text()
         t.close(0.3)
-        ok = all(x in s_res for x in want) and not any(x in s_res for x in not_want)
+        ok = all(re.search(x, s_res) for x in want) and not any(re.search(x, s_res) for x in not_want)     # the patterns: the panel shows the name and the extension in two columns
         return ok, ('dialog: ' + brief(s_dlg) + '\nresult: ' + brief(s_res)) if not ok else ''
     finally:
         shutil.rmtree(d, ignore_errors=True)
@@ -46,8 +46,8 @@ def run(out, mask, text, want, not_want):
 out = os.path.abspath(sys.argv[1])
 bad = 0
 for label, mask, text, want, not_want in (
-        ('mask beta*', 'beta*', '', ['beta.txt'], ['gamma.txt']),
-        ('mask *.txt and the text needle', '*.txt', 'needle', ['beta.txt'], ['gamma.txt'])):
+        ('mask beta*', 'beta*', '', [r'beta\s+txt'], [r'gamma']),
+        ('mask *.txt and the text needle', '*.txt', 'needle', [r'beta\s+txt'], [r'gamma'])):
     ok, info = run(out, mask, text, want, not_want)
     bad += not ok
     print('find file, %s: %s' % (label, 'ok' if ok else 'FAIL\n' + info), flush=True)
