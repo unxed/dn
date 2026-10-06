@@ -8,13 +8,14 @@ complete; all A–D criteria in `docs/REFACTORING-CRITERIA.md` are checked or
 explicitly parked. The strict class/object parity gate is currently **open**:
 the reference run `c214466` passed 178/178 (`37403835290`), but a later
 `menu_5_13` mismatch occurred on `e2d49d9` (attempt 1: 177/178; attempt 2:
-178/178) and recurred on `cd37065` (177/178, `37408063297`). A focused local
-replay of the same scenario passed once. Commit `0ad0900` adds complete
-object/class screen rows to mismatch logs; its full acceptance run is pending.
-Do not infer parity success from the earlier clean run until this discrepancy
-is explained and the gate passes. All four Linux targets, Windows, DOS/toolchain,
-`dn`, and layout passed on `cd37065` (`37408063312`, `37408063321`,
-`37408063336`, `37408063309`, `37408063313`). Stage 3 has begun; disk queries,
+178/178) and recurred on `cd37065` (177/178, `37408063297`). Diagnostics traced
+it to the Options→Editors tree's asynchronous scan of the host root, whose
+aggregate count/size changed between the sequential snapshots. `3318781` waits
+for this aggregate to settle; the local focused replay passes, and its full
+exact-SHA acceptance run is pending. Do not infer parity success until that
+full gate passes. All four Linux targets, Windows, DOS/toolchain, `dn`, and
+layout passed on `cd37065` (`37408063312`, `37408063321`, `37408063336`,
+`37408063309`, `37408063313`). Stage 3 has begun; disk queries,
 process launch/restart, and DOS user-screen handling now have named facades or
 backend units. The remaining inventory and criteria are in
 [`PLATFORM-SEPARATION.md`](PLATFORM-SEPARATION.md). Re-open / re-run parity
