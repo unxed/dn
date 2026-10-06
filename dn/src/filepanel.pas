@@ -180,6 +180,16 @@ uses
   
   ;
 
+{ A key that types a character: of the code page (CharCode), or in the build DNUTF8 a character outside the page (the UTF-8 text of the event) }
+function IsTypedChar(const Event: TEvent): Boolean;
+  begin
+  Result := (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254);
+{$IFDEF DNUTF8}
+  if (not Result) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) then
+    Result := True;
+{$ENDIF}
+  end;
+
 var
   QSLastSuccessPos: Integer;
     {` Last successful quick-search position. This is our own
@@ -1987,10 +1997,10 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           { a terminal gives no double Alt: Ctrl-S starts the quick search (the command line is empty: else it is the cursor left there) }
           ( (DNKeyCode(Event) = kbCtrlS) and (CmdLine.Str = '')) or
           ( (DNKeyCode(Event) = kbDoubleCtrl) and (FMSetup.Quick = pqsCtrl)) or
-          ( (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254) and
+          ( IsTypedChar(Event) and
             (Char(Event.CharCode) <> '\') and (FMSetup.Quick = pqsCaps) and
             (I and $40 <> 0)) or
-          ( (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254) and
+          ( IsTypedChar(Event) and
             (ShiftState and 3 <> 0) and (ShiftState and 4 = 0) and
             (not CommandLine.GetState(sfVisible)) and
             (InterfaceData.Options and ouiHideCmdline <> 0))
@@ -2006,7 +2016,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           InitQuickSearch(Self);
           QSLastSuccessPos := LastSuccessPos;
           end;
-        if  (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254) then
+        if  IsTypedChar(Event) then
           begin
           if not ((ShiftState and 3 <> 0) and (not
                    CommandLine.GetState(sfVisible)))
@@ -2017,7 +2027,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             end
           else
             ShiftState := ShiftState and $FC;
-          DoQuickSearch(DNKeyCode(Event));
+          DoQuickSearchEvent(Event);
           if QuickSearch then
             begin
             if  (FMSetup.Quick = pqsCaps) and (I and kbCapsState <> 0)
