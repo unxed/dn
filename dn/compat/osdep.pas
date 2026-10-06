@@ -160,14 +160,15 @@ begin
   Result := CommandLineToOs(S);
 end;
 
-function SysRunShell(const CmdLine: string): LongInt;
+{ Pause: wait for Enter after the program (the user runs a command and wants to see its output); False for the helpers of DN (archivers) }
+function RunShellUnix(const CmdLine: string; Pause: Boolean): LongInt;
 begin
   UnixSuspend;
   Writeln;
   Writeln('$ ', NameToOs(CmdLine));
   Flush(Output);
   Result := fpSystem(NameToOs(CmdLine));
-  if UnixActive then
+  if Pause and UnixActive then
   begin
     Writeln;
     Write('[DN] Press Enter to return...');
@@ -175,6 +176,11 @@ begin
     Readln;
   end;
   UnixResume;
+end;
+
+function SysRunShell(const CmdLine: string): LongInt;
+begin
+  Result := RunShellUnix(CmdLine, True);
 end;
 
 procedure SysRestartSelf;
@@ -658,11 +664,20 @@ function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
 var
   R: LongInt;
+  A: string;
 {$ENDIF}
 begin
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}
   { through the shell, with the terminal: the program may write to it and read from it }
-  R := SysRunShell('"' + StrPas(Path) + '" ' + StrPas(Args));
+  A := StrPas(Args);
+{$IFDEF UNIX}
+  { DN starts its helpers (the archivers) the DOS way: the program is COMSPEC and the arguments are "/c command". COMSPEC is not set
+    on Unix (Path is empty), so the command goes to the shell of the system as it is, without a pause for Enter. }
+  if (Length(A) >= 3) and (A[1] = '/') and (UpCase(A[2]) = 'C') and (A[3] = ' ') then
+    R := RunShellUnix(Copy(A, 4, MaxInt), False)
+  else
+{$ENDIF}
+  R := SysRunShell('"' + StrPas(Path) + '" ' + A);
   Result := 0;
   if (R < 0) or ((R shr 8) = 127) or (R = 9009) then
     Result := 2;                   { the shell could not run it: DOS "file not found" }

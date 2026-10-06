@@ -102,5 +102,12 @@ begin
   { running a program that is not there: an error code, not an exception }
   Rc := SysExecute('no_such_program_vpsys', '', nil, False, nil, -1, -1, -1);
   Check(Rc <> 0, 'running a missing program gives an error code');
+{$IFDEF UNIX}
+  { DN starts the archivers as "COMSPEC /c command"; COMSPEC is empty on Unix: the command still runs (in the shell of the system) }
+  Name := '/tmp/t_osdep_exec_' + IntToStr(GetProcessID) + '.txt';
+  Rc := SysExecute('', PChar('/c echo run > ' + Name), nil, False, nil, -1, -1, -1);
+  Check((Rc = 0) and FileExists(Name), 'the DOS way "COMSPEC /c command" runs the command on Unix');
+  DeleteFile(Name);
+{$ENDIF}
   Finish;
 end.
