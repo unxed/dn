@@ -707,3 +707,18 @@ The requirements the owner stated in the working dialog, with the state in the r
     * a settings section `[XLat]` in `dn.ini` (on/off, the list of layouts), the default is on;
     * a command that converts the typed text to the other layout (far2l: the key `Ctrl+Alt+...`), as a second step;
     * tests: the table (a round trip), a hotkey on both layouts in a pty scenario, a character without a partner is unchanged.
+
+## Next items in order (2026-10-06)
+
+Order inside the rules of `docs/POST-CLASS-WORK.md` (the gate first; then the stages). Update the marks when an item is done.
+
+1. [~] **The strict class/object gate** (`dn-accept`): the last red scenarios (`restart_language`, `menu_0_4`) were the sort letter bug, fixed in both builds (the backport in `tools/acceptance/backport_shared_object_fixes.py`); wait for a full green run on the head; `menu_5_13` (the tree scan) is the known unstable one: a stabilizer is in, not proven.
+2. [ ] **Remove the OS/2 remains** (item 8 of the checklist above): `dn/src/os2sess.pas`, the six `{$IFDEF OS2}` places, the word in the resources and the help. Build matrix: Linux (x86_64, ARM64, i386), Windows (64, 32), DOS (code page, UTF-8 inside).
+3. [ ] **cp1125 table in tv** (`tools/gen-codepage.py`, `tvcodepg.pas`): the DOS page of Ukrainian; the build already lands the Ukrainian resources on it.
+4. [ ] **Frame, scroll and shadow characters as Unicode (UTF-8)** everywhere (item 6 of the checklist) with the DOS landing on the current page; then **`dn.ini` scroll characters as Unicode** (item 4).
+5. [ ] **Platform separation** (stage 3, `docs/PLATFORM-SEPARATION.md`) and **tests** (stage 4: Linux, DOS, Windows specifics); the DOS names scenario `utf8-names-cp` is the first DOS one.
+6. [ ] **Other input sites** with `Char(Event.CharCode)` on UTF-8 strings (calculator, `dndlgs.pas`, `paneldlgs.pas`, the search of the viewer and of the editor); **colors**: the rest of the dull palette entries and the colors in the code.
+7. [ ] **Archive matrix** (`docs/ARCHIVE-MATRIX.md`): F3/F4/F5 from an archive, `.tar.bz2` / `.tar.xz`, zip in zip, the CI wiring.
+8. [ ] **xlat for hotkeys** (design in item 11 of the checklist): on the owner's word.
+9. [ ] **Default sort by the name** as a setting of `dn.ini` (a question to the owner).
+10. [ ] Lower: Save setup on DOS, the UTF-8 border without a provider, far2l (pictures, drag and drop), Kitty flags 4 and 16, text keys of the settings in `dn.ini`, the input line color `9f` against black in the references, the `dist/` directory against the nightly releases (keep or drop).
