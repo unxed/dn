@@ -8,4 +8,4 @@
 # dialogs.inc, views.inc: the names of the standard palettes (CButton, CGrayDialog...) with the numeric indexes of the palette; the values are those of tv/.
 shims/manual/collect.inc 60 80 320   # signatures of the Borland collections that DN code overrides
 shims/manual/dialogs.inc 50 40 80    # names and indexes of the standard palettes
-shims/manual/views.inc   20 32 220   # names and indexes of the standard palettes
+shims/manual/views.inc   20 32 230   # names and indexes of the standard palettes (+ the two scroll bar character strings of dn.ini)

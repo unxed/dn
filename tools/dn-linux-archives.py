@@ -286,6 +286,13 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         if not os.path.exists(got):
             print('DIAG files:', sorted(os.path.relpath(os.path.join(r, f), d) for r, _, fs in os.walk(d) for f in fs if f != 'dn' and not f.endswith(('.lng', '.dlg', '.hlp'))), flush=True)
             print('DIAG dialog:\n' + '\n'.join(l.rstrip() for l in dlg.split('\n') if l.strip()), flush=True)
+            import subprocess
+            print('DIAG unzip:', shutil.which('unzip'), 'zip:', shutil.which('zip'), flush=True)
+            print('DIAG find:', subprocess.run(['find', '/tmp', '-name', 'inside.txt', '-not', '-path', '*/fix*'], capture_output=True, text=True).stdout.split(), flush=True)
+            for root, _, fs in os.walk(d):
+                for f in fs:
+                    if f.lower() in ('dn.err', 'dn.log', 'dnerr.log') or f.endswith('.err'):
+                        print('DIAG', f, ':', open(os.path.join(root, f), errors='replace').read()[-600:], flush=True)
             print('DIAG typed:\n' + '\n'.join(l.rstrip() for l in dlg2.split('\n') if l.strip())[-1500:], flush=True)
         check(os.path.exists(got), '%s/F5 real: the member is extracted' % name, scr)
         with open(got) as f:
