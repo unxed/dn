@@ -32,6 +32,7 @@ The other scripts and what each one checks: [`tools/README.md`](tools/README.md)
 ## Branches and the submodule
 
 Work goes to `main`. `tv/` is the submodule `unxed/tv3`; a change to it is made and tested there (a branch of that repository), then the pointer is moved here.
+**Open for the owner:** the `tv/` pointer of `main` is a commit of the branch `claude/glyphs` of `unxed/tv3` (the glyph names `TvGlyphs`, the `TvTermOs` split, the text policy of tv3, the code page tests); `main` of tv3 was not touched. Merge that branch into `main` of tv3 (a fast-forward is enough: it is a line of commits on `main`), then the pointer is on `main` too. Until then `git submodule update` works because the commit is on a branch of the repository.
 The object baseline of the gate is pinned in `tools/dn-linux-accept.py` (`OBJECT_DN_SHA`, `OBJECT_TV_SHA`).
 
 ## Open items
