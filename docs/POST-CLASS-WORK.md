@@ -5,14 +5,15 @@ new product features — see [`DN-3.0.md`](DN-3.0.md).
 
 Owner order (2026-10-06). English translation and stage-2 refactoring are
 complete; all A–D criteria in `docs/REFACTORING-CRITERIA.md` are checked or
-explicitly parked. The class/object parity gate was repeated after the
-platform work: **177/177 pass, 0 fail** on DN
-`e551fee53eddf009720f6d79037a1bc06bd9f570` (`dn-accept` run `37395436777`;
-Linux `37395436982`; Windows `37395436934`; DOS `37395436869`; `dn`
-`37395436984`; layout `37395436849`). Stage 3 has begun; disk queries and
-process launch/restart use `osdep` facades. A focused language-change restart
-scenario has been added and passes locally on the class build; its object/class
-CI run remains pending. The remaining inventory, criteria, and next `DNRun` extraction are in
+explicitly parked. The latest class/object parity gate is **178/178 pass, 0
+fail** on DN `c2144661158afcc286504f918920bf97427de8a1` with TV3 `a06dd31`
+(`dn-accept` run `37403835290`); all 4 Linux targets also passed on this SHA
+(`37403835275`). The prior platform extraction result `e551fee` passed 177/177
+plus Linux, Windows, DOS, `dn`, and layout; no DN product-source changes were
+made after those Windows/DOS checks, while the current acceptance harness and
+comparator overlay were rerun at `c214466`. Stage 3 has begun; disk queries
+and process launch/restart use `osdep` facades. The remaining inventory,
+criteria, and next `DNRun` extraction are in
 [`PLATFORM-SEPARATION.md`](PLATFORM-SEPARATION.md). Re-open / re-run parity
 after a risky batch; do not skip or reorder stages below.
 
