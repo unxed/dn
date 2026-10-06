@@ -173,3 +173,12 @@ behaviour. Compiles for linux64, win64, dos and dos with `DN_UTF8=1`; the proof
 is the CI of the commit. What stays in `osdep` now: the thin wrappers, the file
 and find calls (already neutral: `SysUtils` + the names units), the volume label
 and device calls with a GO32V2 branch, the start screen of DOS.
+
+Fourth narrow step (2026-10-06): the small calls of the system (device test of a
+handle, volume label, disk buffers, the PC speaker, memory for buffers) moved to
+the facade `compat/ossystem.pas` with `ossystemdos.pas` (BIOS/DPMI) and
+`ossystemother.pas` (Unix and Windows: nothing to do); `osdep` keeps the `Sys*`
+names as wrappers. Same code and behaviour; compiles for linux64, win64 and dos;
+CI is the proof. `osdep` now has no direct DOS call except the start screen
+(`GrabStartScreen`, the vars `SysStartScreen*`, read by `dnuserscreendos`): moving
+them needs the readers to use the new unit; the next step.

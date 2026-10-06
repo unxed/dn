@@ -5,7 +5,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 25 |
+| Our files (MIT, see `LICENSE`) | 28 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 120 |
 | Contributors of DN OSP | 7 |
@@ -15,7 +15,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 The replacements of the units that were excluded (their code is of Borland origin or of the Virtual Pascal runtime), the adapters to `tv/`, the system layer. They carry the MIT notice of this project in their head; the audit (`dn/audit`) checks them against the archive.
 
-`asciitab.pas`, `cfgstate.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnscreen.pas`, `dnstddlg.pas`, `dnutf8.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `objutil.pas`, `osdep.pas`, `osnamesdos.pas`, `osnamesunix.pas`, `osrun.pas`, `osrundos.pas`, `osrununix.pas`, `osrunwindows.pas`, `realmode.pas`, `strview.pas`, `version.inc`
+`asciitab.pas`, `cfgstate.pas`, `country.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnscreen.pas`, `dnstddlg.pas`, `dnutf8.pas`, `drivers.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `objutil.pas`, `osdep.pas`, `osnamesdos.pas`, `osnamesunix.pas`, `osrun.pas`, `osrundos.pas`, `osrununix.pas`, `osrunwindows.pas`, `ossystem.pas`, `ossystemdos.pas`, `ossystemother.pas`, `realmode.pas`, `strview.pas`, `version.inc`
 
 ## Carved (the license of DN)
 
