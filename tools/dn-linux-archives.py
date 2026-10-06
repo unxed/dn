@@ -272,7 +272,10 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
         t.send(KEYS['F5'], 1.5)
-        t.send('\r', 1.5)                      # the destination is the other panel: the directory of the archive
+        dlg = t.text()
+        t.send(w + '/', 0.6)                    # the destination typed (the first typed text replaces the one that is there)
+        dlg2 = t.text()
+        t.send('\r', 1.5)
         for _ in range(8):
             t.pump(0.5, 2)
             if os.path.exists(os.path.join(w, 'inside.txt')):
@@ -280,6 +283,10 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         scr = t.text()
         check(t.alive(), '%s/F5 real: alive' % name, scr)
         got = os.path.join(w, 'inside.txt')
+        if not os.path.exists(got):
+            print('DIAG files:', sorted(os.path.relpath(os.path.join(r, f), d) for r, _, fs in os.walk(d) for f in fs if f != 'dn' and not f.endswith(('.lng', '.dlg', '.hlp'))), flush=True)
+            print('DIAG dialog:\n' + '\n'.join(l.rstrip() for l in dlg.split('\n') if l.strip()), flush=True)
+            print('DIAG typed:\n' + '\n'.join(l.rstrip() for l in dlg2.split('\n') if l.strip())[-1500:], flush=True)
         check(os.path.exists(got), '%s/F5 real: the member is extracted' % name, scr)
         with open(got) as f:
             check(f.read() == 'hello from fixture\n', '%s/F5 real: the content is right' % name, scr)
