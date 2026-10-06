@@ -57,6 +57,15 @@ jobs:
           fpc -Futv/src -FUout -FEout tv/tests/pty/clipdemo.pas | grep -E 'Error|Fatal' && exit 1
           python3 tv/tests/pty/test_clip.py out/clipdemo
 
+  policy:
+    # the text of tv/: UTF-8, English, the glyphs by name (tv/tools/text-policy.py)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - run: python3 tv/tools/text-policy.py
+
   dos:
     runs-on: ubuntu-24.04
     steps:

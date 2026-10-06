@@ -26,7 +26,7 @@ that became byte constants (to be named Unicode constants, see PLAN.md).
 | `dn/archives/fmtain.pas` | matches the Russian output of the AIN archiver (`Pos('...', s)`), a function, not a comment |
 | `dn/tests/t_dnutf8.pas`, `t_drivrs.pas`, `t_zipcharset.pas`, `tools/dn-linux-*.py`, `tools/test-zipcharset.py`, `tools/tests/test_source_encoding.py` | test data: Cyrillic names and text |
 | `docs/ZIP-CHARSET.md`, `docs/patches/`, `docs/TEXT-POLICY.md` | examples with Cyrillic file names and text |
-| `tools/fix-resource-lookalikes.py`, `tools/tests/test_text_policy.py`, `tools/tests/test_to_codepage.py` | the tools and tests of the Cyrillic text itself (look-alike letters, the code page landing) |
+| `tools/fix-resource-lookalikes.py`, `tools/tests/test_text_policy.py`, `tools/tests/test_to_codepage.py`, `tools/tests/test_audit_encoding.py` | the tools and tests of the Cyrillic text itself (look-alike letters, the code page landing) |
 | `dist/*/screenshots/viewer.txt` | sample text for the viewer encodings |
 
 ## Allowed: not UTF-8 on purpose
@@ -42,6 +42,13 @@ that became byte constants (to be named Unicode constants, see PLAN.md).
 - The `Objects` word is still in docs on purpose: the Borland unit name in provenance texts, and the old name in
   `dn/renames.map` (`objutil.pas objects2.pas`). The unit `Objects` itself is not used (the shim is removed).
 - The English help sample of number suffixes had the Russian-letter forms (`1.2к`, `1.2мк`); they are removed from the text. Whether the program accepts them is not checked.
+
+## Frame, shade and block characters
+
+A glyph is a name of `tv/src/tvglyphs.pas` (a Unicode code point such as `glLightH`; `GlyphChar`, `GlyphStr` and the Char constants `gc*` where a
+single byte or a typed constant is needed), never a byte constant of a code page (`#196`, `#$B3`). The cells of the screen hold UTF-8 and the DOS backend
+lands a glyph on the code page of the machine. `tools/tests/test_text_policy.py` (`test_no_single_byte_glyphs_in_code`) and `tv/tools/text-policy.py` check it;
+the files that hold palettes (strings of palette indices) are listed in the test.
 
 ## The DOS build and the code pages
 
