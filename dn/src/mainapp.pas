@@ -110,7 +110,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes{$IFDEF LINUX}, DNRun, TvVtRun{$ENDIF}{$IFDEF GO32V2}, DNRun, DNUserScreenDos, DosHarness{$ENDIF};
+uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes, DNRun, DosHarness;
 
 constructor TBackground.Create(const Bounds: TRect; APattern: Byte);
 begin
@@ -214,9 +214,7 @@ end;
 procedure TProgram.Idle;
 begin
   inherited Idle;
-{$IFDEF GO32V2}
-  CheckScreenDump;                 { DOS test harness: inject DNKEYS and stop after DNDUMPSEC }
-{$ENDIF}
+  CheckScreenDump;                 { the test harness of the DOS build (DosHarness): inject DNKEYS and stop after DNDUMPSEC; nothing elsewhere }
   if Drivers.ScreenBuffer <> nil then
     ReadScreenCells;               { the copy of the screen that DN reads }
   if StatusLine <> nil then
@@ -269,19 +267,12 @@ end;
 
 procedure TApplication.ShowUserScreen;
 begin
-{$IFDEF LINUX}
-  { the screen of the commands that DN ran (TvVtRun); the key leaves it, DN is drawn again }
-  if (UserScr <> nil) and (UserScr.Cols > 0) then
+  { the screen of the commands that DN ran (DNRun keeps it: the pty of Linux, the video memory of DOS); the key leaves it, DN is drawn again }
+  if HasCommandScreen then
     begin
-    VtShowScreen(UserScr);
+    ShowCommandScreen;
     Redraw;
     end;
-{$ENDIF}
-{$IFDEF GO32V2}
-  { the screen of the programs that DN ran (and before that of the one that started DN), DNRun.RunExternal keeps it in UserScreen }
-  ShowUserScreenDos;
-  Redraw;
-{$ENDIF}
 end;
 
 procedure TApplication.WhenShow;
