@@ -270,7 +270,20 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
+        # wrappers of the unpackers in the PATH of DN: they log the call (arguments, directory, exit code) and run the real program
+        bindir = os.path.join(d, 'wrapbin')
+        os.makedirs(bindir)
+        wlog = os.path.join(d, 'wrap.log')
+        for prog in ('unzip', 'tar', 'gzip', 'gunzip', 'xz', 'bzip2', 'bunzip2', '7z', '7za', '7zr'):
+            real = shutil.which(prog)
+            if real:
+                with open(os.path.join(bindir, prog), 'w') as f:
+                    f.write('#!/bin/sh\necho "$0 $* [cwd=$PWD]" >> %s\n%s "$@" 2>>%s\nrc=$?\necho "  rc=$rc" >> %s\nexit $rc\n' % (wlog, real, wlog, wlog))
+                os.chmod(os.path.join(bindir, prog), 0o755)
+        old_path = os.environ['PATH']
+        os.environ['PATH'] = bindir + os.pathsep + old_path
         t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        os.environ['PATH'] = old_path
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
@@ -288,7 +301,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         got = os.path.join(w, 'inside.txt')
         if not os.path.exists(got):
             print('DIAG files:', sorted(os.path.relpath(os.path.join(r, f), d) for r, _, fs in os.walk(d) for f in fs if f != 'dn' and not f.endswith(('.lng', '.dlg', '.hlp'))), flush=True)
-            print('DIAG dialog:\n' + '\n'.join(l.rstrip() for l in dlg.split('\n') if l.strip()), flush=True)
+            print('DIAG wrapper log:', open(wlog).read() if os.path.exists(wlog) else '(the unpacker was not started)', flush=True)
             import subprocess
             print('DIAG unzip:', shutil.which('unzip'), 'zip:', shutil.which('zip'), flush=True)
             print('DIAG find:', subprocess.run(['find', '/tmp', '-name', 'inside.txt', '-not', '-path', '*/fix*'], capture_output=True, text=True).stdout.split(), flush=True)
@@ -296,7 +309,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
                 for f in fs:
                     if f.lower() in ('dn.err', 'dn.log', 'dnerr.log') or f.endswith('.err'):
                         print('DIAG', f, ':', open(os.path.join(root, f), errors='replace').read()[-600:], flush=True)
-            print('DIAG typed:\n' + '\n'.join(l.rstrip() for l in dlg2.split('\n') if l.strip())[-1500:], flush=True)
+            print('DIAG screen tail:', ' | '.join(l.strip() for l in scr.split('\n') if l.strip())[-500:], flush=True)
         if not os.path.exists(got):
             SOFT_FAILS.append(name)               # the other formats are still tried (one run tells which formats extract)
             print('SOFTFAIL %s/F5 real: the member is not extracted' % name, flush=True)
