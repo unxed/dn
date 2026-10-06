@@ -191,3 +191,10 @@ wrapper or the initialization of the target. Stage 3 for `osdep` is done at this
 granularity; what is left is outside it (`dnrun`, `dnscreen`, `boot` call sites
 that decide by the target, see the table at the top), to be taken from the list
 there when the CI of the steps above is green.
+
+Sixth step (2026-10-06): the DOS test harness (`DNDUMP`, `DNKEYS`, `DNMOUSE`:
+`CheckScreenDump`, its state, `TraceView`, `DumpAtExit`) moved from `mainapp` to
+`src/dosharness.pas`; `TProgram.Idle` still calls `CheckScreenDump` under
+GO32V2. Same code. `DumpAtExit` is not called by anyone (dead code, kept as it
+was; noted in `dn/TODO-later.md`). The proof is the DOS scenarios of
+`tools/dn-dos-input.py` in the CI of the commit.

@@ -41,6 +41,7 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 |---|---|
 | `dn.pas` | the main program (starts the application, the loop): `uses boot, mainapp, ...` |
 | `mainapp.pas` (ours; was `dnapp.pas`) | the application class on top of `tv/` (`TApplication`, the background, the user screen) |
+| `dosharness.pas` (ours) | the test aid of the DOS build (`DNDUMP`, `DNKEYS`, `DNMOUSE`: keys and mouse put in, the screen dumped; `tools/dn-dos-input.py`), taken out of `mainapp.pas` |
 | `commands.pas` | all constants: commands `cm*`, key codes `kb*` (DN's codes include the scan code: `kbCtrlS = $041F13`), help contexts |
 | `dnutil.pas` | the central dispatcher of the commands of the application (`TDNApplication`: menu items, windows, Ctrl-O...) |
 | `apploop.pas` (was `u_myapp`) | the event loop of the application (keys before the dispatch, macros, the idle work) |
@@ -147,6 +148,10 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `fatalerr.pas` (the place of an address and the wait for a key at the fatal-error screen of `dn.pas`; was in `vpsyslow`, ours) | what the crash screen needs |
 | `compat/dnscreen.pas` (the 16-bit cell screen and the cursor of DN over `tv/`, was the `SysTv*` part of `vpsyslow`, ours) | the copy of the screen for the code that reads the screen, the cursor shape |
 | `compat/dnuserscreendos.pas` (ours) | GO32V2 BIOS/video-memory handling for restoring, capturing, and showing the external-program user screen |
+| `compat/osnamesunix.pas`, `compat/osnamesdos.pas` (ours) | the names of the files of DN at the border of Unix (cp866 <-> UTF-8, the case, the paths) and of DOS (the AMIS provider `DOS-UTF8/NAMES`); `osdep` calls them |
+| `compat/osrun.pas` + `osrununix.pas`, `osrunwindows.pas`, `osrundos.pas` (ours) | starting programs and restarting DN: the facade and the backends (the DOS way `COMSPEC /c command` on Unix) |
+| `compat/ossystem.pas` + `ossystemdos.pas`, `ossystemother.pas` (ours) | the small calls of the system: device test, volume label, disk buffers, the speaker, memory |
+| `compat/osstartscreen.pas` (ours) | the text screen of the program that started DN (DOS), grabbed at the start |
 | `compat/osdep.pas` (was `vpsyslow`, ours), `realmode.pas` (was `dpmi32`, `dpmi32df` and `doslow`) | the system layer: files, drives, time, keys, the terminal, running programs, the search of a directory with the times of a file, the calls of the real mode of DOS (replaces the runtime of Virtual Pascal; named by what it does) |
 | `compat/country.pas` (was `country_`; DOS), `compat/linux/country.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `resource/*` → `*.LNG`, `*.DLG`) |
