@@ -24,17 +24,19 @@ acceptance scenarios (`37387363591`), Linux (`37387361374`), Windows
 (`37387362011`), `dn` (`37387362801`), and layout (`37387361710`). No mismatch
 was introduced; this extraction is closed.
 
-The next atomic extraction is the disk-query family: `osdep` retains its
-existing four public `Sys*` APIs, while `OSDisk` selects `OSDiskDos`,
-`OSDiskWindows`, or `OSDiskUnix`. The existing `t_osdep` checks exercise
-free-space, total-space, drive-number, and drive-map behavior through the
-facade. Local tests and Linux legacy/UTF-8 builds pass; exact-SHA Linux,
-Windows, DOS, and object/class parity are pending for this candidate. The DOS
-toolchain workflow is extended to compile the complete DN target so this
-backend has a real target-build check. Its first run exposed one remaining
-hello-program step hard-coded to the previous toolchain directory; the
-workflow now uses the same `runner.temp` prefix for cache, toolchain, hello,
-and DN compilation, and must be re-run on the fix SHA.
+The disk-query family is extracted and verified: `osdep` retains its existing
+four public `Sys*` APIs, while `OSDisk` selects `OSDiskDos`, `OSDiskWindows`,
+or `OSDiskUnix`. `t_osdep` exercises free-space, total-space, drive-number,
+and drive-map behavior through the facade. On DN
+`22b7db490f76276ef426cf475bc85c30a4504b22`, the strict class gate, all 12
+unit-test programs, layout, Linux legacy/UTF-8 and PTY/archive matrix, Windows,
+DOS full build, and object/class acceptance all passed; acceptance summary:
+177 pass, 0 fail. Actions: `dn` run `37390644713`, layout `37390645351`, Linux
+`37390644764`, Windows `37390644905`, DOS/toolchain `37390644563`, and
+acceptance `37390645223`. The DOS build exposed and prompted the `PGroup` →
+`TGroup` correction recorded in the regression checklist. The toolchain
+workflow uses the same `runner.temp` prefix for cache, compiler, hello program,
+and DN build.
 
 The inventory is deliberately limited to the first extraction families; the
 presence of `Dos` in historical DN units alone does not mean that every caller
@@ -64,11 +66,13 @@ facades.
 
 ## Implementation order
 
-1. Continue extracting `osdep` file/path/search/disk operations without
-   changing its public API; the disk-query family is this batch. Prove Linux
-   paths and Windows/DOS compile paths.
-2. Extract `DNRun` platform runners and DOS user-screen handling; prove Linux
-   PTY/user-screen and DOS screen behavior, plus Windows shell smoke.
+1. Continue extracting `osdep` file/path/search operations without changing
+   its public API; disk queries are complete. Prove platform behavior for each
+   additional family before closing it.
+2. Extract `DNRun` platform runners and DOS user-screen handling; direct BIOS,
+   DOS process, Linux PTY, and Unix process/restart calls are still compiled in
+   `dn/src/dnrun.pas`. Prove Linux PTY/user-screen and DOS screen behavior,
+   plus Windows shell smoke.
 3. Move remaining startup/screen platform mechanics behind existing/new
    facades, guided by call-site search and parity failures.
 4. Re-run the full source inventory; mark stage 3 complete only when criteria
