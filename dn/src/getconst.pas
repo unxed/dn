@@ -75,7 +75,7 @@ type
     procedure Show;
     end;
 
-  TLngWord = class(TObject)
+  TLngWord = class
     Name: String[30];
     l: LongInt;
     Mark: Byte;

@@ -10,7 +10,7 @@ type
 
   TXCoder = class;
   {`2 Recoding support in viewer, dbf, etc.}
-  TXCoder = class(TObject)
+  TXCoder = class
     XLatCP: TXLatCP;
     KeyMap: TKeyMap;
       {` KeyMap=kmXlat for an encoding loaded from an xlt file`}

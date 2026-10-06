@@ -90,7 +90,7 @@ type
     end;
 
   TARJArchive = class;
-  TARJArchive = class(TObject)
+  TARJArchive = class
     Packer,
     UnPacker,
     Extract,

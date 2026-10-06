@@ -62,7 +62,7 @@ type
   TIndexArray = array[0..65520 div SizeOf(TOffsetType)-1] of TOffsetType;
 
   TIdxResource = class;
-  TIdxResource = class(TObject)
+  TIdxResource = class
     Stream: TStream;
     Index: PIndexArray;
     Count: AInt;
@@ -72,7 +72,7 @@ type
     end;
 
   TIdxMaker = class;
-  TIdxMaker = class(TObject)
+  TIdxMaker = class
     Stream: TStream;
     TempStream: TBufStream;
     Index: PIndexArray;

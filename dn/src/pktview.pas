@@ -65,7 +65,7 @@ type
   PCharArray = ^TCharArray;
   TCharArray = array[0..65500] of Char;
 
-  TPktObj = class(TObject)
+  TPktObj = class
     FOfs: LongInt;
     Fu, Tu, Su, DT: PString;
     FA, TA: TNetAddr;

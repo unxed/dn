@@ -72,7 +72,7 @@ type
   
 
   TKeyMacros = class;
-  TKeyMacros = class(TObject)
+  TKeyMacros = class
     Keys: PWordArray;
     Count: AInt;
     Limit: AInt;

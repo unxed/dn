@@ -20,7 +20,7 @@ type
   by 10% or more. If there is not enough memory to create such a table,
   after Init HT=nil.
   `}
-  THash = class(TObject)
+  THash = class
     HT: ^THashTable;
       {` Hash table.
       Contains indices into Items^ or EmptyIndex (free) `}
