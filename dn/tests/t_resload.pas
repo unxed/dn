@@ -3,7 +3,7 @@ program t_resload;
   stored view, an unregistered type). Needs the resources of a build: DN_RES_DIR=<the directory with english.dlg ...> (tools/build.sh makes them);
   without them the test reports SKIPPED. Also: the three languages have the same set of keys, and a loaded view is not empty. }
 {$mode objfpc}{$H-}
-uses SysUtils, Classes, Objects, Views, Dialogs, Menus, Streams, Commands, RegAll, rstrings, editwin;
+uses SysUtils, Classes, Streams, Commands, RegAll, rstrings, editwin;
 {$I dntest.inc}
 
 const
