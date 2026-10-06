@@ -82,13 +82,13 @@ implementation
 uses
   Dos, Lfn, profile, basics, strutil, Collect, Messages, mainapp,
   
-  keymap, country,
+  keymap, country, DNUtf8, Views,
   Strings, Streams, fileutil
   ;
 
 const
   IniCacheSign: array[1..60] of Char =
-    'This file is compiled binary cache of dn.ini; see dnini.txt ';
+    'This file is compiled binary cache of dn.ini; v2, dnini.txt ';
   INIModified: Boolean = False; {JO}
 
 type
@@ -664,6 +664,9 @@ procedure LoadDnIniSettings;
   FreeStr := DnIniFileName+#0;
   Proceed(Loader);
   CloseProfile;
+  { the characters of the scroll bars are glyphs in UTF-8 in dn.ini (or the bytes of a page in an old one) }
+  ScrollCharsV := GlyphsToPage(VertScrollBarChars);
+  ScrollCharsH := GlyphsToPage(HorizScrollBarChars);
   end;
 
 procedure SaveDnIniSettings(PVar: Pointer);

@@ -85,8 +85,8 @@ const
   {}WinManagerSelectNext: Boolean = True;
   {}DriveSelectVCenter: Boolean = False; {-$X-Man}
   {}SystemMenuChar: Byte = 4;
-  {}HorizScrollBarChars: String[6] = #17#16#177#254#178; {DataCompBoy}
-  {}VertScrollBarChars: String[6] = #30#31#177#254#178; {DataCompBoy}
+  {}HorizScrollBarChars: String[31] = '◄►▒■▓'; {DataCompBoy; glyphs in UTF-8: GlyphsToPage turns them into the bytes of the page}
+  {}VertScrollBarChars: String[31] = '▲▼▒■▓'; {DataCompBoy}
   {}ReflectCopyDirection: Boolean = False;
   {}ReuseViewers: Byte = 0; { 0 - always open new}
   {}ReuseEditors: Byte = 0; { 1 - prompt for open}

@@ -18,7 +18,8 @@ Run: `python3 -B -m unittest discover -s tools/tests -p 'test_text_policy.py'`
 | `dn/src/resource/russian/`, `dn/src/resource/ukrain/` | the localizations |
 | `dn/archives/fmtain.pas` | matches the Russian output of the AIN archiver (`Pos('...', s)`), a function, not a comment |
 | `dn/tests/t_dnutf8.pas`, `t_drivrs.pas`, `t_zipcharset.pas`, `tools/dn-linux-*.py`, `tools/test-zipcharset.py`, `tools/tests/test_source_encoding.py` | test data: Cyrillic names and text |
-| `docs/ZIP-CHARSET.md`, `docs/patches/` | examples with Cyrillic file names and text |
+| `docs/ZIP-CHARSET.md`, `docs/patches/`, `docs/TEXT-POLICY.md` | examples with Cyrillic file names and text |
+| `tools/fix-resource-lookalikes.py`, `tools/tests/test_text_policy.py`, `tools/tests/test_to_codepage.py` | the tools and tests of the Cyrillic text itself (look-alike letters, the code page landing) |
 | `dist/*/screenshots/viewer.txt` | sample text for the viewer encodings |
 
 ## Allowed: not UTF-8 on purpose
@@ -26,7 +27,7 @@ Run: `python3 -B -m unittest discover -s tools/tests -p 'test_text_policy.py'`
 | Files | Why |
 |---|---|
 | `dn/data/xlt/`, `dist/*/xlt/` | the code page tables (data) |
-| `dn/data/dn.ini`, `dist/*/dn.ini` | the values `VertScrollBarChars` / `HorizScrollBarChars` hold CP437 glyph bytes that DN reads as is. The comments (lines with `;`) are English, the test checks it |
+| `dist/*/dn.ini` | the old build in `dist/` (not rebuilt yet): the values `VertScrollBarChars` / `HorizScrollBarChars` hold bytes of a page. `dn/data/dn.ini` itself is UTF-8 (the scroll bar characters are glyphs `▲▼▒■▓`, DN turns them into the bytes of its page: `GlyphsToPage`); the comments (lines with `;`) are English, the test checks it |
 
 ## Not fixed (out of the scope of the cleanup; no decision yet)
 

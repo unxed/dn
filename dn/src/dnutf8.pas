@@ -13,6 +13,9 @@ unit DNUtf8;
 
 interface
 
+function GlyphsToPage(const S: String): String;
+  {` A text of glyphs written as UTF-8 (the scroll bar characters of dn.ini: "▲▼▒■▓") as the bytes of the current code page; a character that the
+  page lacks becomes its plain sign (CpFallback), else '?'. A string that is not UTF-8 (the old dn.ini with the bytes of a page) is returned as it is. `}
 function Utf8Chars(const S: String): Integer;
   {` The number of characters (not bytes) of S. `}
 
@@ -98,6 +101,46 @@ uses
 const
   ProxySlot = 8;                    { the bytes of an entry of the table of a proxy string }
   ProxyFill = #$FF;                 { the second byte of a wide character }
+
+function GlyphsToPage(const S: String): String;
+  var
+    I, Used: Integer;
+    Cp: LongWord;
+    B: Byte;
+  begin
+  Result := S;
+  I := 1;
+  while I <= Length(S) do
+    begin
+    if Byte(S[I]) >= $80 then
+      begin
+      if not Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) then
+        Exit(S);
+      I := I + Used;
+      end
+    else
+      Inc(I);
+    end;
+  Result := '';
+  I := 1;
+  while I <= Length(S) do
+    begin
+    if Byte(S[I]) < $80 then
+      begin
+      Result := Result + S[I];
+      Inc(I);
+      Continue;
+      end;
+    Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used);
+    Inc(I, Used);
+    B := CpFromUnicode(Cp);
+    if B = 0 then
+      B := CpFallback(Cp);
+    if B = 0 then
+      B := Ord('?');
+    Result := Result + Char(B);
+    end;
+  end;
 
 function CharLen(const S: String; I: Integer): Integer;
   var

@@ -108,5 +108,12 @@ begin
   Check((UpT[$A0] = $80) and (LowT[$80] = $A0) and (TogT[$A0] = $80) and (TogT[$80] = $A0), 'case table: a and A of the page 866');
   Check((UpT[Ord('q')] = Ord('Q')) and (LowT[Ord('Q')] = Ord('q')) and (UpT[Ord('1')] = Ord('1')), 'case table: ASCII');
   Check((UpT[$B0] = $B0) and (LowT[$B0] = $B0), 'case table: a frame cell has no case');
+  { the scroll bar characters of dn.ini: glyphs in UTF-8 -> the bytes of the page }
+  CpSelect(866);
+  Check(GlyphsToPage('▲▼▒■▓') = #30#31#177#254#178, 'glyphs: vertical scroll bar characters on cp866');
+  Check(GlyphsToPage('◄►▒■▓') = #17#16#177#254#178, 'glyphs: horizontal scroll bar characters on cp866');
+  Check(GlyphsToPage(#17#16#177#254#178) = #17#16#177#254#178, 'glyphs: the old form (bytes of a page) is returned as it is');
+  Check(GlyphsToPage('日') = '?', 'glyphs: a character that the page lacks is ?');
+  Check(GlyphsToPage('a═b') = 'a'#205'b', 'glyphs: ASCII is kept, a frame character is its byte');
   Finish;
 end.
