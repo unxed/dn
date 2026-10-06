@@ -135,7 +135,7 @@ fi
 # the code pages, the palettes, the default settings) go to data/. Not taken: the binaries of the archive (DN.COM, icons), the build
 # scripts of Virtual Pascal (*.cmd, *.vpo, vpc.cfg, *._vp), and the old copies of units (*.001 ...): nothing of them is a source of our builds.
 mkdir -p "$OUT/src" "$OUT/data"
-(cd "$out" && find . -maxdepth 1 -type f \( -iname '*.pas' -o -iname '*.inc' -o -iname 'rcpvpd.ini' -o -iname 'read.me' \)) | while read -r f; do
+(cd "$out" && find . -maxdepth 1 -type f \( -iname '*.pas' -o -iname '*.inc' -o -iname 'rcpvpd.ini' \)) | while read -r f; do
     cp "$out/$f" "$OUT/src/$f"
 done
 cp -r "$out/RESOURCE" "$OUT/src/RESOURCE"

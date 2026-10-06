@@ -56,7 +56,7 @@ The archive is not stored in the repository. Only what is listed below is taken 
    checkout. The repository history must contain the pinned commit (CI fetches full history). These are our files (MIT).
 9. **Lowercase names** (FPC on a case-sensitive filesystem looks for `unit.pas`), **unit aliases** from `vpc.cfg`
    (`-ALFN=LFNVP`).
-10. **What goes into the repository**: `*.pas`, `*.inc`, `rcpvpd.ini`, `read.me`, and the `RESOURCE` directory (dialog, string,
+10. **What goes into the repository**: `*.pas`, `*.inc`, `rcpvpd.ini`, and the `RESOURCE` directory (dialog, string,
     and help texts in three languages) → `dn/src`; DN data (`EXE.D32`: code-page tables, palettes, defaults) →
     `dn/data`. Archive binaries (`DN.COM`, icons), VP build scripts, and old unit copies are not taken.
 

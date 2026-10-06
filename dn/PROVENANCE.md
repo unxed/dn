@@ -39,4 +39,4 @@ Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155.
 
 Files of the public DN OSP 2.14 with no notice in the head (small adapters, tables, include files). Part of the same release.
 
-`copyini.pas`, `fatalerr.pas`, `fileerrors.pas`, `filetype.pas`, `osdiskdos.pas`, `osdiskunix.pas`, `osdiskwindows.pas`, `panelsetup.pas`, `rcpvpd.ini`, `read.me`, `stdefine.inc`, `sysutils.inc`, `uselfn.pas`, `usersavr.pas`, `xcode.pas`
+`copyini.pas`, `fatalerr.pas`, `fileerrors.pas`, `filetype.pas`, `osdiskdos.pas`, `osdiskunix.pas`, `osdiskwindows.pas`, `panelsetup.pas`, `rcpvpd.ini`, `stdefine.inc`, `sysutils.inc`, `uselfn.pas`, `usersavr.pas`, `xcode.pas`
