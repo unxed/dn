@@ -133,6 +133,27 @@ def main():
             t.send('\u043f\u0430\u043f\u043a\u0430', 0.5)
             t.send('\r', 1.5)
             check(os.path.isdir(os.path.join(w, '\u043f\u0430\u043f\u043a\u0430')), 'UTF-8: F7 makes a directory with a Russian name', t.text())
+        # a command typed in the command line is run through COMSPEC /c (osrunwindows): the file that it makes is the proof
+        t.send('echo hi> cmdout.txt', 0.5)
+        t.send('\r', 3.0)
+        for _ in range(20):
+            if os.path.isfile(os.path.join(w, 'cmdout.txt')):
+                break
+            time.sleep(0.3)
+        check(os.path.isfile(os.path.join(w, 'cmdout.txt')), 'command line: the command is run (cmdout.txt is made)', t.text())
+        shot(t, 'after-command')
+        t.send('\r', 1.0)                             # a pause of the screen of the command, if there is one
+        if u8:
+            # F5 of a file with a Russian name into the directory newdir, then F8 of the copy: the wide API of the files with the names outside the ANSI page
+            t.send('\x1b[H', 0.4)                      # Home: the first entry
+            for _ in range(5):                         # .., newdir, the Russian directory, a, the Greek name, the Russian name
+                t.send('\x1b[B', 0.3)
+            t.send('\x1b[15~', 1.0)                   # F5
+            shot(t, 'f5-u8')
+            t.send('newdir', 0.5)
+            t.send('\r', 2.0)
+            copied = os.path.join(w, 'newdir', '\u041f\u0440\u0438\u0432\u0435\u0442.txt')
+            check(os.path.isfile(copied) and open(copied, encoding='utf-8').read() == '\u041f\u0440\u0438\u0432\u0435\u0442\n', 'UTF-8: F5 copies a file with a Russian name', t.text())
         t.send('\x1bx', 1.0)                          # Alt-X: quit
         t.send('\r', 1.5)
         for _ in range(20):
