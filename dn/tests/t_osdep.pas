@@ -110,5 +110,14 @@ begin
   Check((Rc = 0) and FileExists(Name), 'the DOS way "COMSPEC /c command" runs the command on Unix');
   DeleteFile(Name);
 {$ENDIF}
+    { the search of a directory that is not there is "path not found" (3), not "no more files" (18): PathExist of DN depends on it }
+  Rc := SysFindFirst('/no_such_dir_osdep_xyz/*.*', faAnyFile, Srch, False);
+  Check(Rc = 3, 'SysFindFirst: a missing directory is 3 (path not found)');
+  SysFindClose(Srch);
+{$IFDEF UNIX}
+  Rc := SysFindFirst('/tmp/*.no_match_osdep_xyz', faAnyFile, Srch, False);
+  Check(Rc = 18, 'SysFindFirst: nothing matches in an existing directory: 18 (no more files)');
+  SysFindClose(Srch);
+{$ENDIF}
   Finish;
 end.
