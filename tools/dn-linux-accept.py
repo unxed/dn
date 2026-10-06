@@ -638,6 +638,15 @@ def main() -> int:
             print('FAIL', name, flush=True)
             for p in problems[:20]:
                 print(' ', p, flush=True)
+            if any(p.startswith('cell ') for p in problems):
+                object_rows = so.get('text', '').splitlines()
+                class_rows = sc.get('text', '').splitlines()
+                for y in range(max(len(object_rows), len(class_rows))):
+                    object_row = object_rows[y] if y < len(object_rows) else ''
+                    class_row = class_rows[y] if y < len(class_rows) else ''
+                    if object_row != class_row:
+                        print('  screen row %d object=%r class=%r' %
+                              (y, object_row, class_row), flush=True)
         else:
             passed += 1
             print('PASS', name, flush=True)
