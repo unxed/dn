@@ -34,6 +34,8 @@ for line in open(os.path.join(root, 'bootstrap', 'carve.list'), encoding='utf-8'
 
 def head_class(path):
     head = '\n'.join(open(path, encoding='cp866', errors='replace').read().split('\n')[:60]).lower()
+    if 'our own code (mit' in head:                  # a unit written after the baseline: its head says so
+        return 'OURS'
     if 'rit research labs' in head or 'dos navigator open source' in head or 'dos navigator/2 open source' in head or 'dos navigator /2 osp' in head:
         return 'RIT'
     if re.search(r'copyright|\(c\)|written by|\bby [a-z]+ [a-z]+|\(ak155\)|\(cat\)', head):

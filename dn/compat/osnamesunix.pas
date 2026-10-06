@@ -1,5 +1,6 @@
 { OSNamesUnix: the names of the files of DN at the border of Linux and the other Unix systems (the backend of the facade in OSDep).
-  Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new. }
+  Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new.
+  This unit is our own code (MIT, see LICENSE). }
 unit OSNamesUnix;
 
 {$mode objfpc}

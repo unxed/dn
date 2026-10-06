@@ -1,5 +1,6 @@
 { OSRunWindows: starting programs and restarting DN on Windows (the backend of the facade OSRun).
-  Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new. }
+  Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new.
+  This unit is our own code (MIT, see LICENSE). }
 unit OSRunWindows;
 
 {$mode objfpc}
