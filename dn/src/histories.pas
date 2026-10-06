@@ -180,7 +180,7 @@ implementation
 uses
   Lfn, Dos, Commands, mainapp, Dialogs, HistList,
   Startup, timeutil, Messages, DNUtil, DnIni,
-  osdep, editwin, strutil,  fileutil,
+  osdep, editwin, strutil,  fileutil, TvGlyphs,
   
   Idlers,
   
@@ -668,7 +668,7 @@ function TTHistList.GetText(Item: LongInt; MaxLen: Integer): String;
         Copy(FreeStr, Length(FreeStr) - (Size.X-4), Size.X-3);
     end;
   if FreeStr[1] = '+' then
-    FreeStr[1] := #254
+    FreeStr[1] := GlyphChar(glSquare)
   else
     FreeStr[1] := ' ';
   GetText := FreeStr;

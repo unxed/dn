@@ -307,7 +307,7 @@ var
 implementation
 uses
   TvSys, TvClip,
-  basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8
+  basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8, TvGlyphs
   , keymap
   ;
 
@@ -1335,13 +1335,17 @@ procedure TMenuBox.Draw;
 
   procedure FrameLine(N: Integer);
     const
-      FrameChars: array[0..19] of Char =
-      #32#218#196#191#32#32#192#196#217#32#32#179#32#179#32#32#195#196#180#32
-      ;
+      FrameGlyphs: array[0..19] of LongWord =
+      (0, glLightDR, glLightH, glLightDL, 0, 0, glLightUR, glLightH, glLightUL, 0, 0, glLightV, 0, glLightV, 0, 0, glLightVR, glLightH, glLightVL, 0);
       {'  |'' --  ''|       |.. --  ..|       |      |         |-  --  -|     '}
       UpArr: array[0..2] of Char = #32#30#32; { ^ }
       DnArr: array[0..2] of Char = #32#31#32; { v }
+    var
+      FrameChars: array[0..19] of Char;
+      K: Integer;
     begin
+    for K := 0 to 19 do
+      if FrameGlyphs[K] = 0 then FrameChars[K] := ' ' else FrameChars[K] := GlyphChar(FrameGlyphs[K]);
     MoveBuf(B[0], FrameChars[N], Byte(CNormal), 2);
     MoveChar(B[2], FrameChars[N+2], Byte(Color), Size.X-4);
     MoveBuf(B[Size.X-2], FrameChars[N+3], Byte(CNormal), 2);
@@ -1781,7 +1785,7 @@ procedure TStatusLine.DrawSelect(Selected: PStatusItem);
     HintBuf := Hint(HelpCtx);
     if HintBuf <> '' then
       begin
-      MoveChar(B[I], #179, Byte(CNormal), 1);
+      MoveGlyph(B[I], glLightV, Byte(CNormal), 1);
       Inc(I, 2);
       if I+Length(HintBuf) > Size.X then
         SetLength(HintBuf, Size.X-I);

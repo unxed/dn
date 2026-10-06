@@ -91,7 +91,7 @@ implementation
 uses
   uselfn, Math, Tree
   , Dos, Lfn {DataCompBoy}
-  , basics, strutil, fileutil, Views, Startup, Dialogs,
+  , basics, strutil, fileutil, TvGlyphs, Views, Startup, Dialogs,
   timeutil, FilesCol, mainapp, Drivers, progress, Messages, Commands,
   FileCopy, HistList, DNUtil
 
@@ -975,7 +975,7 @@ procedure CalcLnCRC(var Strng: String; var CRC: Word);
           if TmpCRC <> WholeSectCRC then
             begin
             LocalError
-              (GetString(dlleCRC_Err)+' '#196' '+CurPFile^.FName^+', '+
+              (GetString(dlleCRC_Err)+' '+GlyphChar(glLightH)+' '+CurPFile^.FName^+', '+
               GetString(dlleSection)+' '+ItoS(CurSectNo));
             end;
           AuxT := Num;
@@ -984,7 +984,7 @@ procedure CalcLnCRC(var Strng: String; var CRC: Word);
           if s <> SectSSz then
             begin
             LocalError
-              (GetString(dlleSizeMism)+' '#196' '+CurPFile^.FName^+', '+
+              (GetString(dlleSizeMism)+' '+GlyphChar(glLightH)+' '+CurPFile^.FName^+', '+
               GetString(dlleSection)+' '+ItoS(CurSectNo));
             end;
           CheckS := True;

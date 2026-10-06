@@ -271,7 +271,7 @@ function Str2Comp(const s: String): Int64;
 implementation
 
 uses
-  DnIni, Startup, Commands, basics, keymap, DNUtf8
+  DnIni, Startup, Commands, basics, keymap, DNUtf8, TvGlyphs
   ;
 procedure AddStr(var S: String; C: Char);
   
@@ -325,9 +325,9 @@ function StrGrd(AMax, ACur: TSize; Wide: Byte; Rev: Boolean): String;
   else
     A := Round((ACur*Wide)/AMax);
   if Rev then
-    StrGrd := Strg(#177, Wide-A)+Strg(#219, A)
+    StrGrd := Strg(GlyphChar(glShadeMedium), Wide-A)+Strg(GlyphChar(glBlockFull), A)
   else
-    StrGrd := Strg(#219, A)+Strg(#177, Wide-A);
+    StrGrd := Strg(GlyphChar(glBlockFull), A)+Strg(GlyphChar(glShadeMedium), Wide-A);
   end;
 
 function Percent(AMax, ACur: TSize): String;

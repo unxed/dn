@@ -170,7 +170,7 @@ uses
   uselfn, osdep, Dos, Eraser, Drives, DNHelp, TitleSet,
   Lfn, DNUtil, mainapp, basics, strutil, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, copyio, ArcView, CmdLine, histories, Archiver,
-  gadgets, progress, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz
+  gadgets, progress, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz, TvGlyphs
   
   , UUCode
    {, Crt}
@@ -806,7 +806,7 @@ Scroll:
   if FMSetup.TagChar[1] <> ' ' then
     TagC := FMSetup.TagChar[1]
   else
-    TagC := #251;
+    TagC := GlyphChar(glRadical);
   if Startup.FMSetup.Show and fmsHiliteFiles <> 0 then
     for i := 1 to ttCust10 do
       HLC[i] := GetColorW(6+i) {JO}
@@ -1082,15 +1082,15 @@ function MakeDivider(IV: TInfoView): Boolean;
   Result := False;
   with IV do
     begin
-    MoveChar(B[0], #196, CDivdier, IV.Size.X+Panel.DeltaX);
+    MoveGlyph(B[0], glLightH, CDivdier, IV.Size.X+Panel.DeltaX);
     I := 0;
-    C := (CDivdier shl 8) or 193;
+    C := (CDivdier shl 8) or GlyphByte(glLightUH);
     while I < Size.X do
       begin
       Panel.GetEmpty(B[I], C, True);
       Inc(I, Panel.LineLength);
       if I = Size.X then
-        B[I-1] := CellFromBIOS((C and $FF00)+196);
+        B[I-1] := CellFromBIOS((C and $FF00)+GlyphByte(glLightH));
       end;
     end;
   end;

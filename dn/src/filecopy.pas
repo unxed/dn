@@ -103,7 +103,7 @@ uses
   mainapp, Startup, Messages, HistList, Commands,
   timeutil, Validate, TitleSet, UserMenu, Dos, DnIni,
   
-  osdep, dnscreen, Filediz , ArvidAvt ,
+  osdep, dnscreen, TvGlyphs, Filediz , ArvidAvt ,
   dirwatch, fsinfo, basics, strutil, fileutil,
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
@@ -967,7 +967,7 @@ Moreover, on a negative answer the created file remains
           Wrote := 0;
           Info.Write(5,
                GetString(dlFC_Writing)+Cut(CurNewName, 40)+' ');
-          Info.Write(6, Strg(#177, Info.Size.X-6));
+          Info.Write(6, Strg(GlyphChar(glShadeMedium), Info.Size.X-6));
           Info.Write(7, WriteCount);
           //Dispatch;
           GrdClick := False;
@@ -1756,7 +1756,7 @@ PrepareResume:
       lResetFile(ReadStream, 1);
       end;
     Info.Write(1, GetString(dlFC_Reading)+Cut(FName, 40)+' ');
-    Info.Write(2, Strg(#177, Info.Size.X-6));
+    Info.Write(2, Strg(GlyphChar(glShadeMedium), Info.Size.X-6));
     Info.Write(3, ReadCount);
     //Dispatch;
     GrdClick := False;

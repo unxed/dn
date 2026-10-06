@@ -122,12 +122,12 @@ const
 implementation
 
 uses
-  Dos, DnExec, mainapp, basics, strutil, Startup, Commands,
+  Dos, DnExec, mainapp, basics, strutil, Startup, Commands, TvGlyphs,
    VideoMan
   ;
 
 const
-  StarChars: array[0..5] of Char = (#32, #250, #249, #7, #4, #15);
+  StarChars: array[0..5] of Char = (#32, gcMidDot, gcDot, #7, #4, #15);
   MColors: array[0..3] of Byte = (1, 3, 9, 11);
 
 procedure TSSaver.Update;

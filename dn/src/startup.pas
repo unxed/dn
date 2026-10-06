@@ -52,7 +52,7 @@ interface
 
 uses
   Defines, Dos, Commands,
-  Drivers, Collect
+  Drivers, Collect, TvGlyphs
   ;
 
 procedure FatalError(const S: String);
@@ -305,7 +305,7 @@ const
     LFN_Cut: 0; {Combo}
     LFN_Autohide: 0; {Checkbox[1]}
     LFN_Difference: 0; {Combo}
-    TagChar: #251;
+    TagChar: gcRadical;
     RestChar: #16;
     DIZ: 'descript.ion;uselfn.bbs';
     NewPanelPreset: 2; {zero-based, so 2 means Ctrl-3}

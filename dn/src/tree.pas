@@ -229,7 +229,7 @@ uses
   Lfn, uselfn, Startup, Dos, DnIni, DNHelp,
   basics, strutil, fileutil, envutil,
   panelroot, mainapp, Messages, Commands, Drives, Eraser, Menus,
-  timeutil, FileCopy, osdep, dnscreen
+  timeutil, FileCopy, osdep, dnscreen, TvGlyphs
   ;
 
 const
@@ -1736,32 +1736,32 @@ procedure TTreeView.Draw;
       begin
       P := DC.At(Idx);
       if P^.Attr and 1 = 1 then
-        C := #195
+        C := GlyphChar(glLightVR)
       else
-        C := #192;
+        C := GlyphChar(glLightUR);
       if P^.Level = 0 then
         S := ''
       else
         begin
         {if Parital then S := C + #196'[ ] ' else}S :=
-           C+#196#196#196#196' ';
+           C+GlyphChar(glLightH)+GlyphChar(glLightH)+GlyphChar(glLightH)+GlyphChar(glLightH)+' ';
         if  (P^.Attr and trHasBranch <> 0) and
             (PDirRec(Dirs.At(P^.Number+1))^.Level > P^.Level)
         then
           if Parital then
             if Expanded(P, Idx+1) then
-              S := C+#196'[-] '
+              S := C+GlyphChar(glLightH)+'[-] '
             else
-              S := C+#196'[+] '
+              S := C+GlyphChar(glLightH)+'[+] '
           else
-            S[4] := #194;
+            S[4] := GlyphChar(glLightDH);
         end;
       K := 2;
       if P^.Level > 0 then
         for J := 1 to P^.Level-1 do
           begin
           if Levels[J] then
-            MoveChar(B[K], #179, C1, 1);
+            MoveGlyph(B[K], glLightV, C1, 1);
           Inc(K, 3);
           end;
       Levels[P^.Level] := (P^.Attr and 1 = 1);

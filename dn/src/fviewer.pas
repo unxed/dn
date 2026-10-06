@@ -253,7 +253,7 @@ type
 implementation
 
 uses
-  Lfn, Dos, DNUtf8, osdep, Commands, DNHelp, strutil, fileutil, keymap
+  Lfn, Dos, DNUtf8, osdep, Commands, DNHelp, strutil, fileutil, keymap, TvGlyphs
   , editcore, Macro, linepos, Math, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
    {Cat}
@@ -481,18 +481,18 @@ procedure TViewInfo.Draw;
   with Viewer, Self do
     begin
     Color := TWindow(Owner).Frame.GetColorW(3);
-    Ch2 := #205;
+    Ch2 := GlyphChar(glDblH);
     if not Owner.GetState(sfActive) then
       begin
       Color := TWindow(Owner).Frame.GetColorW(1);
-      MoveChar(B[0], #196, Color, Size.X);
+      MoveGlyph(B[0], glLightH, Color, Size.X);
       WriteLineC(0, 0, Size.X, 1, B);
       Exit;
       end
     else if Owner.GetState(sfDragging) then
       begin
       Color := TWindow(Owner).Frame.GetColorW(5);
-      Ch2 := #196;
+      Ch2 := GlyphChar(glLightH);
       end;
     if ViewMode = vmHex then
       begin
@@ -500,7 +500,7 @@ procedure TViewInfo.Draw;
           Cur.Y* (HexPos+BufPos+FilePos))+' ';
       J := FSizeMod(FilePos+BufPos, Max(1, HexPos));
       for I := 0 to HexPos-1 do
-        S := S+Hex2(I+J)+#196;
+        S := S+Hex2(I+J)+GlyphChar(glLightH);
       SetLength(S, Length(S)-1);
       Insert('[', S, 1);
       Insert(']', S, Length(S)+1);
@@ -529,7 +529,7 @@ procedure TViewInfo.Draw;
           if not ((X=-1) and (Y=-1)) then
             S := S+Char(I+48)
           else
-            S := S+#250;
+            S := S+GlyphChar(glMidDot);
       S := S+'>';
       end;
     Insert(Ch2+Ch2, S, Length(S)+1);
@@ -770,10 +770,10 @@ procedure TViewScroll.DrawPos(Pos: Integer);
     Last: Integer;
   begin
   Last := GetSize-1;
-  MoveChar(Buf[0], #177, GetColorW(1), Last+1); { the track }
-  MoveChar(Buf[Pos], #254, GetColorW(3), 1); { the thumb }
-  MoveChar(Buf[0], #30, GetColorW(2), 1); { the arrow up }
-  MoveChar(Buf[Last], #31, GetColorW(2), 1); { the arrow down }
+  MoveGlyph(Buf[0], glShadeMedium, GetColorW(1), Last+1); { the track }
+  MoveGlyph(Buf[Pos], glSquare, GetColorW(3), 1); { the thumb }
+  MoveGlyph(Buf[0], glTriUp, GetColorW(2), 1); { the arrow up }
+  MoveGlyph(Buf[Last], glTriDown, GetColorW(2), 1); { the arrow down }
   WriteBufC(0, 0, Size.X, Size.Y, Buf);
   end;
 procedure TViewScroll.HandleEvent(var Event: TEvent);
@@ -931,7 +931,7 @@ procedure TViewScroll.Draw;
   begin
   C1 := GetColorW(1);
   C2 := GetColorW(2);
-  MoveChar(B1[0], #177, C1, Size.Y);
+  MoveGlyph(B1[0], glShadeMedium, C1, Size.Y);
   i := GetPartCode;
   B1[i] := CellFromBIOS(254+LongInt(C2*256));
   B1[0] := CellFromBIOS(30+LongInt(C2*256));
@@ -1361,7 +1361,7 @@ procedure TFileViewer.Draw;
         if J > 0 then
           begin
           S := DumpStr(Buf^[W], L, J, Filter);
-          W2 := Pos(#179, S);
+          W2 := Pos(GlyphChar(glLightV), S);
           SetLength(SZ, Length(S)-W2);
           for IZ := 1 to Length(SZ) do
             if S[W2+IZ] = #0 then
@@ -1380,11 +1380,11 @@ procedure TFileViewer.Draw;
             1:
               for W3 := W2+1 to Length(S) do
                 if not (Byte(S[W3]) in [32..127]) then
-                  S[W3] := #250;
+                  S[W3] := GlyphChar(glMidDot);
             else {case}
               for W3 := W2+1 to Length(S) do
                 if not (Byte(S[W3]) in [32..255]) then
-                  S[W3] := #250;
+                  S[W3] := GlyphChar(glMidDot);
           end {case};
           {-DataCompBoy & Axel: done-}
           if J = HexPos then
@@ -1610,11 +1610,11 @@ and determine its X-position (accounting for tabs) for later highlighting }
               1:
                 for W := 1 to Length(S) do
                   if not (Byte(S[W]) in [32..127]) then
-                    S[W] := #250;
+                    S[W] := GlyphChar(glMidDot);
               2:
                 for W := 1 to Length(S) do
                   if not (Byte(S[W]) in [32..255]) then
-                    S[W] := #250;
+                    S[W] := GlyphChar(glMidDot);
             end {case};
             {/Cat}
             MoveStr(B[0], S, C (*, Filter, TS*));

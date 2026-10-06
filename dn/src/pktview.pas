@@ -157,7 +157,7 @@ const
 implementation
 
 uses
-  DNHelp, fileutil, keymap, timeutil, Commands, mainapp
+  DNHelp, fileutil, keymap, timeutil, Commands, mainapp, TvGlyphs
 
   , osdep;
 
@@ -1258,11 +1258,9 @@ procedure TMsgViewerDlg.SaveAsText;
   Writeln(F,
 
 
-       #196#196#196#196#196#196#196#196#196'['+CenterStr(GetName(CurMsg^),
+       Strg(GlyphChar(glLightH), 9)+'['+CenterStr(GetName(CurMsg^),
        17)
-    +']'#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196
-    +#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196
-    +#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196#196);
+    +']'+Strg(GlyphChar(glLightH), 15+16+16));
   Writeln(F, 'Msg  : Private '+Spaces(30)+'Date : '+FV.Date^);
   Writeln(F, 'From : '+FV.FromUser^);
   Writeln(F, 'To   : '+FV.ToUser^);

@@ -136,7 +136,7 @@ const
 
 implementation
 uses
-  Dos, Tree, Drives, basics, strutil, fileutil, Messages, DNHelp,
+  Dos, Tree, Drives, basics, strutil, fileutil, TvGlyphs, Messages, DNHelp,
   linepos, DnIni, iniengine, country, keymap, dirwatch
   , lfn, mainapp, Validate
   ;
@@ -392,7 +392,7 @@ procedure DoFMSetup;
   if (Startup.FMSetup.RestChar = '') or
      (Startup.FMSetup.RestChar[1] = ' ')
   then
-    Startup.FMSetup.RestChar := #16; { truncation character must always exist }
+    Startup.FMSetup.RestChar := GlyphChar(glTriRight); { truncation character must always exist }
   Message(Application, evCommand, cmUpdateConfig, nil);
   GlobalMessage(evCommand, cmReboundPanel, nil);
 
@@ -720,10 +720,10 @@ procedure TSaversDialog.Awaken;
     Data.Selected.List := TLineCollection.Create(5, 5, False);
   with Data.Available.List do
     begin
-    Insert(NewStr(#249' Star flight'));
-    Insert(NewStr(#249' Flash-light'));
-    Insert(NewStr(#249' Clock'));
-    Insert(NewStr(#249' Blackness'));
+    Insert(NewStr(GlyphChar(glDot)+' Star flight'));
+    Insert(NewStr(GlyphChar(glDot)+' Flash-light'));
+    Insert(NewStr(GlyphChar(glDot)+' Clock'));
+    Insert(NewStr(GlyphChar(glDot)+' Blackness'));
     lFindFirst(SourceDir+'ssavers\*.SS', AnyFileDir, lSR);
     while DosError = 0 do
       begin

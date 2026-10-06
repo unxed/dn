@@ -54,7 +54,7 @@ procedure LongCopy(Fn1: String);
 
 implementation
 uses
-  Lfn, Dos, Tree, osdep, basics, strutil, fileutil, FileCopy, mainapp,
+  Lfn, Dos, Tree, osdep, basics, strutil, fileutil, TvGlyphs, FileCopy, mainapp,
   Messages, Views, Defines, Dialogs, Commands, Drivers, HistList,
   progress, Startup, timeutil, fileerrors, Math
   , Strings;
@@ -165,9 +165,9 @@ procedure LongCopy(Fn1: String);
   procedure DsplInfo;
     begin
     PInfo.Write(5, GetString(dlRead)+
-      Copy(Strg(#219, (LongInt(WL)*Cs) div (Ls + Byte(Ls=0)))+Strg(#177, WL), 1, WL));
+      Copy(Strg(GlyphChar(glBlockFull), (LongInt(WL)*Cs) div (Ls + Byte(Ls=0)))+Strg(GlyphChar(glShadeMedium), WL), 1, WL));
     PInfo.Write(6, GetString(dlWrite)+
-      Copy(Strg(#219, (LongInt(WL)*CD) div (Ls + Byte(Ls=0)))+Strg(#177, WL), 1, WL));
+      Copy(Strg(GlyphChar(glBlockFull), (LongInt(WL)*CD) div (Ls + Byte(Ls=0)))+Strg(GlyphChar(glShadeMedium), WL), 1, WL));
     end;
 
   procedure MaxRead;

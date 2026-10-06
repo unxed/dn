@@ -157,7 +157,7 @@ implementation
 uses
   basics, Lfn, Messages, HistList, Math,
   Collect, Strings, fileerrors, Dos, mainapp, DNStdDlg, strutil, fileutil,
-  editfile, histories
+  editfile, histories, TvGlyphs
   ;
 
 type
@@ -778,10 +778,6 @@ procedure TCalcView.Draw;
 
   var
     B, B1: TDrawBuffer;
-    BC: array[0..High(B)] of record
-      C: Char;
-      A: Byte;
-      end absolute B;
     I, J, K, L, T: Integer;
     C1, C2, C3: Byte;
     S, S1: String;
@@ -842,9 +838,9 @@ procedure TCalcView.Draw;
   SetLength(EmptyLine, Size.X);
   FillChar(EmptyLine[1], Size.X, ' ');
   MoveChar(B[0], ' ', C1, Size.X);
-  BC[6].C := #$B3;
-  MoveChar(B1[0], #$C4, C1, Size.X);
-  SetCellChar(B1[6], $C5);
+  SetCellGlyph(B[6], glLightV);
+  MoveGlyph(B1[0], glLightH, C1, Size.X);
+  SetCellGlyph(B1[6], glLightVH);
   NumC := 0;
   I := 7;
   J := Delta.X;
@@ -858,10 +854,10 @@ procedure TCalcView.Draw;
     L := ColWidth[J+1];
     SetLength(S, K);
     FillChar(S[1], K, ' ');
-    S[K] := #$B3;
+    S[K] := GlyphChar(glLightV);
     S1 := GetColName(J);
     Move(S1[1], S[K div 2], Length(S1));
-    SetCellChar(B1[I+K-1], $C5);
+    SetCellGlyph(B1[I+K-1], glLightVH);
     MoveStr(B[I], S, C1);
     if J < X1 then
       Inc(StX, K);
@@ -913,7 +909,7 @@ procedure TCalcView.Draw;
           begin { limit length by column }
           SetLength(S, K);
           FillChar(S[1], K, ' ');
-          S[K] := #$B3;
+          S[K] := GlyphChar(glLightV);
           end
         else
           begin { length to end of screen }
@@ -955,8 +951,8 @@ procedure TCalcView.Draw;
         L := L+K;
         end;
       end;
-    BC[6].C := #$B3;
-    BC[6].A := C1;
+    SetCellGlyph(B[6], glLightV);
+    SetCellAttr(B[6], C1);
     if  (Delta.Y+I >= Y1) and (Delta.Y+I <= Y2) and (StX < EnX)
     then
       MoveColor(B[StX], EnX-StX-Ord(ShowSeparators), C3);
@@ -1533,7 +1529,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         begin
         K := ColWidth[I];
         if ShowSeparators then
-          S := Strg(' ', K-1)+#$B3
+          S := Strg(' ', K-1)+GlyphChar(glLightV)
         else
           S := Strg(' ', 255);
         if C[I] >= 0 then

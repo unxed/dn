@@ -190,6 +190,11 @@ def prep_tree(root: str) -> str:
         zf.writestr('inside.txt', 'hello from zip\n')
     # nested peer for later archive scenarios
     open(os.path.join(w, 'plain.txt'), 'w', encoding='utf-8').write('plain\n')
+    # fixed modification times: the object and the class run each make their own tree, and a time column that depends on the second of the
+    # creation (DN shows the Unix time of a file as a DOS time on Linux, a shared bug to fix: dn/TODO-later.md) made two scenarios flaky
+    for dirpath, dirnames, filenames in os.walk(w):
+        for name in dirnames + filenames:
+            os.utime(os.path.join(dirpath, name), (1000000000, 1000000000))
     return w
 
 

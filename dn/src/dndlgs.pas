@@ -53,7 +53,7 @@ unit DNDlgs;
 interface
 
 uses
-  TvDrawBuf, TvColors, Defines, Streams, Drivers, Views, Menus, Commands, mainapp, strutil, TvDialog, TvCluster, TvUtil, basics;
+  TvDrawBuf, TvColors, Defines, Streams, Drivers, Views, Menus, Commands, mainapp, strutil, TvDialog, TvCluster, TvUtil, basics, TvGlyphs;
 
 const
   CGrayDialog = #32#33#34#35#36#37#38#39#40#41#42#43#44#45#46#47+
@@ -764,31 +764,31 @@ function TNotepadFrame.GetTitleWidth: integer;
 procedure TNotepadFrame.FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Integer; Color: TColorAttr);
   var
     BMStart: Integer;
-    C: Byte;
+    C: LongWord;
   begin
   inherited FrameLine(FrameBuf, Y, N, Color);
   BMStart := TNotepad(Owner).BookmarkStart;
   if Y = 0 then
-    C := 187
+    C := glDblDL
   else if Y = Size.Y-1 then
-    C := 188
+    C := glDblUL
   else
-    C := 186;
-  FrameBuf.MoveChar(BMStart, C, Color, 1);
+    C := glDblV;
+  FrameBuf.MoveGlyph(BMStart, C, Color, 1);
   if Size.X-1 > BMStart then
     FrameBuf.MoveChar(BMStart+1, 32, Color, Size.X-1-BMStart);
   end;
 
 const
   FrameC: array[boolean] of record
-       H: Char; // horizontal line
+       H: LongWord; // horizontal line
        C0,  // upper corners (left and right)
        C1,  // vertical lines
        C2:  // lower corners
-         array[1..2] of char;
+         array[1..2] of LongWord;
        end =
-    ((H: #$C4; C0: (#$C7, #$B4); C1: (#$BA, #$B3); C2: (#$C7, #$D9) ),
-     (H: #$CD; C0: (#$C8, #$BB); C1: (' ', #$BA); C2: (#$C9, #$BC) )
+    ((H: glLightH; C0: (glVertDblRightSgl, glLightVL); C1: (glDblV, glLightV); C2: (glVertDblRightSgl, glLightUL) ),
+     (H: glDblH; C0: (glDblUR, glDblDL); C1: (32, glDblV); C2: (glDblDR, glDblUL) )
     );
 
 procedure TBookmark.Draw;
@@ -796,7 +796,7 @@ procedure TBookmark.Draw;
     B: TDrawBuffer;
     LineColor: Byte;
     TextColor: Word;
-    C: Char;
+    C: LongWord;
   begin
   TextColor := GetColorW($0301);
   LineColor := Owner.GetColorW(2);
@@ -804,25 +804,25 @@ procedure TBookmark.Draw;
     begin
     { Remove burr on the upper-right corner of the upper inactive bookmark }
     if not Light and (Origin.Y = 1) then
-      C := #$C9
+      C := glDblDR
     else
       C := C0[2];
 
-    MoveChar(B[0], C0[1], LineColor, 1);
-    MoveChar(B[1], H, LineColor, Size.X-2);
-    MoveChar(B[Size.X-1], C, LineColor, 1);
+    MoveGlyph(B[0], C0[1], LineColor, 1);
+    MoveGlyph(B[1], H, LineColor, Size.X-2);
+    MoveGlyph(B[Size.X-1], C, LineColor, 1);
     WriteLineC(0, 0, Size.X, 1, B);
 
-    MoveChar(B[0], C2[1], LineColor, 1);
-    MoveChar(B[1], H, LineColor, Size.X-2);
-    MoveChar(B[Size.X-1], C2[2], LineColor, 1);
+    MoveGlyph(B[0], C2[1], LineColor, 1);
+    MoveGlyph(B[1], H, LineColor, Size.X-2);
+    MoveGlyph(B[Size.X-1], C2[2], LineColor, 1);
     WriteLineC(0, Size.Y-1, Size.X, 1, B);
 
     MoveChar(B[1], ' ', TextColor, Size.X-2);
-    MoveChar(B[Size.X-1], C1[2], LineColor, 1);
+    MoveGlyph(B[Size.X-1], C1[2], LineColor, 1);
     if Light then
       TextColor := GetColorW($0402);
-    MoveChar(B[0], C1[1], LineColor, 1);
+    MoveGlyph(B[0], C1[1], LineColor, 1);
     MoveCStr(B[1], Text^, TextColor);
     WriteLineC(0, 1, Size.X, 1, B);
     end;
