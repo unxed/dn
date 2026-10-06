@@ -9,12 +9,12 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 
 | Item | State |
 |---|---|
-| Gate | **CLOSED** on last behavior-verified SHA `1f51f75` (2026-10-06) |
+| Gate | **CLOSED** on exact-SHA class source `d569ddd69b91c04c3260ece04520b97549ff7378` (2026-10-06) |
 | Whole-tree class syntax gate | **PASS locally** on the disk-backend candidate: strict scan of all 189 tracked Pascal files; no exclusions; exact-SHA CI pending |
 | Bootstrap provenance | **PASS** on DN `8f3057f`; `dn` run `37386669632` reproduced pinned baseline byte-for-byte; `layout` run `37386669509` passed; re-run on candidate |
 | Core accept | **32/32 PASS** (historical) |
-| Full matrix | **177/177 PASS** on exact SHA `1f51f75` (12 shards; GitHub run `37387363591`; object DN `b4916b8` + TV `521d064` vs class DN + TV3 `a06dd31`) |
-| Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; long-scan Esc dismiss (`menu_2_7..9`, `menu_4_12`) |
+| Full matrix | **178/178 PASS** on exact SHA `d569ddd69b91c04c3260ece04520b97549ff7378` (12 shards; GitHub run `37412056898`; object DN `b4916b8` + TV `521d064` vs class DN + TV3 `a06dd31`) |
+| Accept harness | Menu FAST settle (`ad9c4f7`); fil/dir count + Help open waits; generic long-scan detection/Esc dismiss; aggregate appearance + 45-second stability wait for `menu_5_13` |
 | Known noise fixed | About/build rows masked; cursor-only ignored; unique temp paths |
 | Known object crash | ♦ Trashcan (`cmHideShowTools` / `menu_0_10`): object `TTrashCan.GetPalette`=`@CTrashCan` vs dynarray `TPalette` → RTE 204; class `MakePalette` OK — skip kept ([#14](https://github.com/unxed/dn/issues/14)) |
 | Accept skips (harness) | `menu_0_16` (♦ Game/Tetris animation), `menu_3_8` (Edit OS Environment — live env), `menu_5_2` (Manager Directory tree scan). Re-enabled: `menu_4_5` Branch, `menu_6_16` Colors |
@@ -51,7 +51,7 @@ deferred features and owner exceptions: [`DN-3.0.md`](DN-3.0.md).
 | Role | DN | Turbo Vision | Use |
 |---|---|---|---|
 | Last object-based baseline | `b4916b874989d7b35660d02cf935dc5f0db7a656` | `521d06479198789deeaa6fda287236ca83ba4051` | Required behavioral comparator |
-| Current class source used for latest full parity | DN `1f51f75677ae19ccb13c4d9071dedb3f7177f87e` | TV3 `a06dd31` | 177/177 acceptance + exact-SHA Linux/Windows CI green |
+| Current class source used for latest full parity | DN `d569ddd69b91c04c3260ece04520b97549ff7378` | TV3 `a06dd31` | 178/178 acceptance + exact-SHA Linux CI green |
 | Older distributed binary | distribution commit `11daf16c6f0ac69f8bbaeb34407c764408bad3e4`, built from `df0cca2` | pre-class distribution | Context only; do not substitute for the last object-based baseline |
 
 The user-reported self-build Fatal Errors are from
@@ -68,8 +68,8 @@ Root cause: after startup `MyApplication.Draw`, `WriteScreenCells` flushed a
 stale 16-bit cell copy over the panels. Fix: `ReadScreenCells` immediately
 after the draw (`7572d73`); skip the follow-up `WriteScreenCells` under
 `-dDNUTF8` (`ab9ebd8`). Regression: configured `tools/dn-linux-startup.py`;
-virgin About `tools/dn-linux-about.py`. Full-cell
-object/class parity remains an open gate item, not this symptom.
+virgin About `tools/dn-linux-about.py`. Full-cell object/class parity is
+verified separately; latest exact-SHA matrix is 178/178 on `d569ddd`.
 
 ## Reproduction and verification ledger
 
@@ -93,17 +93,19 @@ object/class parity remains an open gate item, not this symptom.
 | Enter non-exec (`cmExecFile`) AV | Fixed: `System.PString` (^AnsiString) hid `Defines.PString` after `uses SysUtils`; bind + `PShortString` in `DoExecFile`. | Fixed on class self-build |
 | Nested / compound archive matrix | User: nested (`.tar.gz` etc.) broken; intermittent AV; editor hung once opening a file from archive. Need fixtures + click-through + autotests | **Partial:** `.tgz`/`.tar.gz` Enter+list OK (`fmttgz`); fixtures + `dn-linux-archives.py` Enter/leave green. `.tar.xz`/`.txz` + F5 extract smoke ALL OK locally (`5f02362`). Open: remaining F3/F4/F5 peers, full compound matrix — `docs/ARCHIVE-MATRIX.md` / PLAN 4c. Linux archive workflow is preferred exact-SHA evidence |
 | F5 copy queue ownership | `CopyQueue` contained `TLine` classes but freed entries as `TFileCopyRec`, causing an AV immediately after copy | `dn/src/filecopy.pas` | **Fixed** (`3bc0d0f`) | `TLineQueue.FreeItem` frees each class; strict collection/ownership search clean; new `f5_f6_f8` parity scenario PASS; linux ops all green on SHA `1f51f75` | Keep F5→F6→F8 check in ops and acceptance suites |
-| Accept harness settle flakes | Menu scenarios could flake on FAST settle timing under load | Hardened (`ad9c4f7`); current full 177/177 acceptance is terminal green on exact SHA `1f51f75` |
+| Accept harness settle flakes | Menu scenarios could flake on FAST settle timing under load | Hardened (`ad9c4f7`) and further hardened for recursive scans; current full 178/178 acceptance is terminal green on exact SHA `d569ddd` (`37412056898`) |
 | F1 Help accept flake | Parallel FAST: object still idle active panels (`═[■]`) vs class Help open (panels `─┐`) — ~1172 cells, looks like frame/palette | Harness waits for Help title after F1 (`f1help`/`f1_esc`); class `THelpWindow`/`CHelpWindow` unchanged |
 
 An earlier 100-start attempt sampled before waiting for UI readiness; it is
 invalid and not counted. The configured blank-panel mismatch (10/10 before
 `7572d73`) is fixed. Full-cell object/class parity most recently passed
-177/177 on `1f51f75`.
+178/178 on `d569ddd` (run `37412056898`); the final formerly intermittent
+`menu_5_13` scan scenario passed after the harness waited for its aggregate row
+to appear and remain stable.
 
 ## Remaining work, in order
 
-1. Keep full object/class parity closed at 177/177 on `1f51f75`; rerun after
+1. Keep full object/class parity closed at 178/178 on `d569ddd`; rerun after
    any UI, drawing, events, resources, or stream changes. Any mismatch blocks
    later stages; shared bugs must still be fixed.
 2. Stage 3 platform separation is next; its current code map and done criteria

@@ -76,9 +76,11 @@ stabilization at `3318781` (10 seconds unchanged) still sampled progress at
 81,121 / 5,694,486K versus 126,183 / 10,450,278K. On `ca44f21`, the 45-second
 stabilizer still sampled changing totals because it returned before the row
 first appeared. The current change waits for the aggregate to appear and then
-remain unchanged for 45 seconds (110-second cap; 150-second scenario limit);
-its exact-SHA full acceptance run is pending. The class/object gate remains
-open until it passes.
+remain unchanged for 45 seconds (110-second cap; 150-second scenario limit).
+Exact-SHA DN `d569ddd69b91c04c3260ece04520b97549ff7378` acceptance run
+`37412056898` passed 178/178, including `menu_5_13`; the Linux workflow
+`37412056902` passed all four Linux jobs (legacy/UTF-8 x86_64, i386 and
+aarch64). The class/object parity gate is closed on this SHA.
 The DOS build passes, but its new `userscr` runtime smoke exposed a
 harness bug: `CheckScreenDump` (which injects `DNKEYS` and enforces
 `DNDUMPSEC`) was defined but never called, so DOSBox-X timed out before running
