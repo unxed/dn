@@ -481,6 +481,9 @@ def run_one(out: str, work: str, spec: str, area: str = '',
     signal.alarm(timeout_sec)
     try:
         install_dn(out)
+        if scenario == 'restart_language':
+            with open(os.path.join(INSTALL, 'dn.ini'), 'w', encoding='utf-8') as f:
+                f.write('[Language]\nShowLanguageMenu=1\nActiveLanguage=English\n')
         t = PtyTerm(['./dn'], COLS, ROWS, cwd=work, exe=os.path.join(INSTALL, 'dn'))
         t.pump(1.5, 6)
         t.send(KEYS['ESC'], 0.4)
