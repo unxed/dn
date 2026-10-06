@@ -61,6 +61,8 @@ jobs:
           tools/build.sh dos out/dn-dos
           file out/dn-dos/dn.exe
       - name: DOS user-screen persistence smoke
+        env:
+          DOS_TIMEOUT: 40
         run: |
           tools/dn-tour.sh out/dn-dos userscr | tee out/dn-dos-userscr.log
           grep -Eq '^userscr +ok$' out/dn-dos-userscr.log

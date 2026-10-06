@@ -24,6 +24,9 @@ for s in $SCEN; do
     elif [ "$name" = userscr ] && ! grep -aq 'UserScreen [0-9]*: hi$' "$d/SER.TXT" 2>/dev/null; then
         # "echo hi" then Ctrl-O: the user screen must hold the output of the command (the trace of DNRun.ShowUserScreenDos)
         printf '%-12s FAIL (no "hi" in the user screen)\n' "$name"
+        if [ -f "$d/SER.TXT" ]; then
+            tail -n 80 "$d/SER.TXT"
+        fi
     elif [ "$name" = mousemenu ] && ! python3 "$here/tools/render-dump.py" "$d/SCR.DAT" 2>/dev/null | grep -q 'Rename/Move'; then
         printf '%-12s FAIL (a click on File did not open the menu)\n' "$name"
     elif [ "$name" = mousedir ] && ! python3 "$here/tools/render-dump.py" "$d/SCR.DAT" 2>/dev/null | grep -q 'C:.TEMP>'; then
