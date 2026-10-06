@@ -713,12 +713,12 @@ The requirements the owner stated in the working dialog, with the state in the r
 
 Order inside the rules of `docs/POST-CLASS-WORK.md` (the gate first; then the stages). Update the marks when an item is done.
 
-1. [~] **The strict class/object gate** (`dn-accept`): the last red scenarios (`restart_language`, `menu_0_4`) were the sort letter bug, fixed in both builds (the backport in `tools/acceptance/backport_shared_object_fixes.py`); wait for a full green run on the head; `menu_5_13` (the tree scan) is the known unstable one: a stabilizer is in, not proven.
+1. [x] **The strict class/object gate** (`dn-accept`): full green run on head `dee88bf` (2026-10-06; the last red scenarios were the sort letter bug, fixed in both builds by the backport in `tools/acceptance/backport_shared_object_fixes.py`; the UTF-8-only cell of tv3 was reverted because it broke the gate, see `dn/TODO-later.md`); keep it green; `menu_5_13` (the tree scan) is the known unstable one: a stabilizer is in, not proven.
 2. [x] **Remove the OS/2 remains** (done 2026-10-06, see item 8 of the checklist above).
 3. [x] **cp1125 table in tv** (done 2026-10-06, see item 5 of the checklist above).
 4. [~] **Frame, scroll and shadow characters as Unicode (UTF-8)** everywhere: the cells and the DOS landing are done (item 6 of the checklist above); the named constants in the source and the `dn.ini` scroll characters as Unicode (item 4) are left.
 5. [ ] **Platform separation** (stage 3, `docs/PLATFORM-SEPARATION.md`) and **tests** (stage 4: Linux, DOS, Windows specifics); the DOS names scenario `utf8-names-cp` is the first DOS one.
-6. [~] **Other input sites** with `Char(Event.CharCode)` on UTF-8 strings: the quick search of the panel takes the typed text (`DoQuickSearchEvent`, test `tools/dn-linux-qsearch.py`); left: starting the quick search by a typed character (Caps/Shift modes), the quick search of the tree, the calculator, `dndlgs.pas`, `paneldlgs.pas`, the search of the viewer and of the editor; the display of a long mask cuts by bytes; **colors**: the rest of the dull palette entries and the colors in the code.
+6. [~] **Other input sites** with `Char(Event.CharCode)` on UTF-8 strings: the quick search of the panel takes the typed text (`DoQuickSearchEvent`, test `tools/dn-linux-qsearch.py`); the tree takes it too; left: starting the quick search of the panel by a typed character (Caps/Shift modes), the calculator, `dndlgs.pas`, `paneldlgs.pas`, the search of the viewer and of the editor; the display of a long mask cuts by bytes; **colors**: the rest of the dull palette entries and the colors in the code.
 7. [ ] **Archive matrix** (`docs/ARCHIVE-MATRIX.md`): F3/F4/F5 from an archive, `.tar.bz2` / `.tar.xz`, zip in zip, the CI wiring.
 8. [ ] **xlat for hotkeys** (design in item 11 of the checklist): on the owner's word.
 9. [ ] **Default sort by the name** as a setting of `dn.ini` (a question to the owner).
