@@ -96,6 +96,8 @@ var
   StatusLine: Menus.TStatusLine = nil;
   MenuBar: Menus.TMenuView = nil;
   CommandLine: TView = nil;
+  { called when the code page of the strings changed (set by the program: boot) }
+  CodePageChanged: procedure = nil;
   ResourceStream: TStream = nil;
   LngStream: TStream = nil;
   LStringList: TStringList = nil;
@@ -293,9 +295,10 @@ end;
   the locale of the host (TvLocale: ru_RU 866, de_DE 850, pl_PL 852...); a locale that is not known (C, POSIX): the default of TvCodePg. }
 procedure ApplyCodePage(WithLanguage: Boolean);
 var
-  Id: Integer;
+  Id, Before: Integer;
   L: String;
 begin
+  Before := CpCurrent;
   Id := StrToIntDef(GetEnvironmentVariable('DN_CODEPAGE'), 0);
   if Id = 0 then
   begin
@@ -311,6 +314,9 @@ begin
   end;
   if Id <> 0 then
     CpSelect(Id);
+  { the tables that go with the page (the case of the letters, the sort order) are made again when it changed (the language of the resources is known later than the first call) }
+  if (CpCurrent <> Before) and Assigned(CodePageChanged) then
+    CodePageChanged;
 end;
 
 { The resource files lie in the directory named by the environment variable DNDLG, else in that of the program (SourceDir),

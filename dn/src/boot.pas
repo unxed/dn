@@ -219,6 +219,14 @@ procedure UpdateConfig;
   end { UpdateConfig };
 
 {-DataCompBoy-}
+{ the tables that go with the code page of the strings (the case of the letters, the sort order) again, when mainapp changes the page }
+procedure ApplyCodetablesOfPage;
+  begin
+{$IFNDEF DNUTF8}
+  ApplyCodetables;
+{$ENDIF}
+  end;
+
 procedure DoStartup;
   var
     SavePos, SPos1: LongInt;
@@ -649,6 +657,7 @@ procedure DoStartup;
   {/AK155}
 
   (*  RegisterType( RTextCollection );*)
+  CodePageChanged := @ApplyCodetablesOfPage;
   SavePos := ReadConfig;
   ReadHighlite; {JO}
   UpdateConfig;

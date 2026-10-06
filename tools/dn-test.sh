@@ -10,10 +10,11 @@ python3 "$here/tools/gen-shim.py" "$here/dn/compat/shims/shims.map" "$w/shims" "
 fail=0
 for t in "$here"/dn/tests/t_*.pas; do
     n=$(basename "$t" .pas)
-    out=$(cd "$here/dn/tests" && fpc -Mdelphi -Sh- -Rintel -Se300 -dDPMI32 -dLINUX -dDNUTF8 -Fu../compat/linux -Fu../compat -Fu../archives -Fu../src -Fu../lib/localecp -Fu../lib/zipcharset -Fu"$w/shims" \
-          -Fu../../tv/src -Fi. -Fi../compat/shims -Fi../src -Fi../lib/localecp -FU"$w/obj" -FE"$w/obj" "$t" 2>&1) || true
+    od="$w/obj"; u8=-dDNUTF8; if grep -q "DN_TEST: code page build" "$t"; then od="$w/obj-cp"; u8=-dNOTUTF8; mkdir -p "$od"; fi         
+    out=$(cd "$here/dn/tests" && fpc -Mdelphi -Sh- -Rintel -Se300 -dDPMI32 -dLINUX $u8 -Fu../compat/linux -Fu../compat -Fu../archives -Fu../src -Fu../lib/localecp -Fu../lib/zipcharset -Fu"$w/shims" \
+          -Fu../../tv/src -Fi. -Fi../compat/shims -Fi../src -Fi../lib/localecp -FU"$od" -FE"$od" "$t" 2>&1) || true
     if echo "$out" | grep -qE "Error:|Fatal:"; then echo "BUILD FAIL $n"; echo "$out" | grep -E "Error:|Fatal:" | head -3; fail=1; continue; fi
-    r=$(DN_RES_DIR=${DN_RES_DIR:-$([ -f "$here/out/linux64/english.dlg" ] && echo "$here/out/linux64")} "$w/obj/$n" 2>&1 | tail -1); echo "$n: $r"
+    r=$(DN_RES_DIR=${DN_RES_DIR:-$([ -f "$here/out/linux64/english.dlg" ] && echo "$here/out/linux64")} "$od/$n" 2>&1 | tail -1); echo "$n: $r"
     case "$r" in "ALL OK"*) ;; *) fail=1;; esac
 done
 exit $fail

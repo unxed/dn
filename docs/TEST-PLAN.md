@@ -27,7 +27,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 
 | Area | Floor | Have | Gap |
 |---|---|---|---|
-| Text and encodings | UTF-8 and code page conversion, case, widths, the border of names; the glyph names (frames) | `t_dnutf8`, `t_zipcharset`, `t_osnames`, `tv/tests/t_utf8`, `t_text`, `t_glyphs` | the code page tables of the DOS pages in use (437 850 852 866 1125): round trip of every byte; the DOS landing of the frame glyphs |
+| Text and encodings | UTF-8 and code page conversion, case, widths, the border of names; the glyph names (frames) | `t_dnutf8`, `t_zipcharset`, `t_osnames`, `t_cpcase` (the case of the page 1125), `test_sort1125.py`, `tv/tests/t_utf8`, `t_text`, `t_glyphs`, `t_cpall` (all pages: round trip, frames) | the DOS landing of the frame glyphs on the screen of the pages 850 and 852 (a screenshot check) |
 | Resources | every dialog, menu and string of the three languages loads and a dialog draws | `rcp` in the build, `t_shim`, `t_resload` (every stored view of each language loads through the stream loader, the key sets of the languages are equal) | the control count of a loaded dialog against the source of `rcp` |
 | Settings | `dn.ini`, the saved setup, the desktop, the histories: write, read, migrate | `t_cfgstate`, `t_defsort`, `t_profile` | the desktop of two panels and two windows saved and restored (shared part of the DOS and Linux checks) |
 | Files and paths | find, names, attributes, the DOS path semantics through the facades | `t_osdep`, `t_flname`, `t_dnscreen` | long names, names with spaces and UTF-8, a missing directory, a read-only file |
