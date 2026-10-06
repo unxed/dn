@@ -219,3 +219,4 @@ Ninth step (2026-10-06): the boundary is checked, not only documented: `tools/ch
 `Unix`, `Windows`, `go32`, `termio`, `dpmiexcp` or `Linux`, or has a target conditional that is not in its table (the table gives the reason: the facade of the runner, the archive
 formats that need the tools of Unix). The DOS test aid `dosharness.pas` moved to `compat/` (it is a DOS backend), `mainapp` no longer uses `go32`.
 
+Tenth step (2026-10-06): the build matrix is a command, `tools/build-matrix.sh [NAME...]` (criterion 3): it builds every shipped configuration with `tools/build.sh` and reports PASS, FAIL or UNAVAILABLE for each; a target whose toolchain is not on the machine is UNAVAILABLE, never PASS (`DN_MATRIX_REQUIRE=1` turns it into a failure, for the CI of a target that must be there). The test is `tools/tests/test_build_matrix.py`. The CI builds the same set: `dn-linux`, `dn-windows`, `nightly` (i386, aarch64, win32, win64, DOS).

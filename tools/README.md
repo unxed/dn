@@ -30,6 +30,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 |---|---|---|
 | `tv-test.sh [t_name ...]` | unit tests of `tv/tests/t_*.pas`, native or another CPU (`TV_FPC`, `TV_RUN`) | tv |
 | `dn-test.sh` | unit tests of `dn/tests/t_*.pas` (`t_resload` reads the resources of `out/linux64` or `DN_RES_DIR`, else reports SKIPPED) | dn |
+| `build-matrix.sh` | every shipped build configuration (linux64 UTF-8 and code page, i386, aarch64, win64/win32 both, DOS both): PASS, FAIL, or UNAVAILABLE when the toolchain is not here (never a pass); `DN_MATRIX_REQUIRE=1` fails on UNAVAILABLE | dn |
 | `check-layout.sh` | the separation of `tv/`, `dn/`, `bootstrap/` (what may use what, where a `tv/src` unit comes from) | layout |
 | `../bootstrap/tools/dn-manifest.py --check` | the manifest of provenance (PROVENANCE) of `dn/src` against the archive | dn |
 | `dos-run.sh DIR PROG.EXE` | runs a go32v2 program in DOSBox-X without a display | tv |
