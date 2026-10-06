@@ -10,7 +10,7 @@ behaviour or to port unsupported targets.
 | Area | Current location | What is mixed today | Intended boundary |
 |---|---|---|---|
 | Files, paths, search, disks, process execution | `dn/compat/osdep.pas`, `dn/compat/osdisk*.pas` | Most DOS/Unix/Windows operations still share `osdep`; disk queries are now routed through a stable `OSDisk` facade to GO32V2, Windows, or Unix backend units | Continue extracting target operations behind stable facades; disk selection is centralized in `osdisk.pas` |
-| External commands and user screen | `dn/src/dnrun.pas`, `dn/compat/osdep.pas` | Linux VT/PTy flow, DOS BIOS/video-memory user-screen handling and vector swapping, and generic restart/shell flow are compiled together; DOS process creation now goes through `SysExecute` | Keep `DNRun` as the portable call surface; give platform runners explicit units and keep argument/path conversion with the runner that owns it |
+| External commands and user screen | `dn/src/dnrun.pas`, `dn/compat/osdep.pas` | Linux VT/PTy flow and DOS BIOS/video-memory user-screen handling/vector swapping remain in `DNRun`; shell and process replacement are delegated to `osdep` facades | Keep `DNRun` as the portable call surface; give platform runners explicit units and keep argument/path conversion with the runner that owns it |
 | Real-mode compatibility | `dn/compat/realmode.pas` | GO32-only BIOS/DPMI operations are conditional stubs on other targets | Keep DOS-only implementation isolated; do not spread direct BIOS/DPMI calls into application units |
 | Startup path and screen restoration | `dn/src/boot.pas`, `mainapp.pas`, `panelroot.pas` | Some terminal/UTF-8/OS initialization and user-screen restoration decisions remain at application call sites | Replace OS decisions with narrow facade calls; portable startup owns sequencing, platform services own mechanics |
 | UTF-8 names and terminal text | `dn/compat/osdep.pas`, `dn/compat/dnscreen.pas`, `dn/src/dnutf8.pas`, selected callers | Name conversion, screen-cell conversion, and terminal rendering have different platform semantics | Keep text policy in the shared facade; put OS-specific conversion/rendering at backend edges and document each unavoidable conditional |
@@ -78,11 +78,11 @@ facades.
 1. Continue extracting `osdep` file/path/search operations without changing
    its public API; disk queries are complete. Prove platform behavior for each
    additional family before closing it.
-2. Extract `DNRun` platform runners and DOS user-screen handling. The DOS
-   command is now launched through `SysExecute`; BIOS screen handling, DOS
-   vector swapping, Linux PTY, and Unix process/restart calls remain in
-   `dn/src/dnrun.pas`. Prove Linux PTY/user-screen and DOS screen behavior,
-   plus Windows shell smoke.
+2. Extract `DNRun` platform runners and DOS user-screen handling. DOS command
+   creation uses `SysExecute`, and process replacement now uses
+   `SysRestartSelf`; BIOS screen handling, DOS vector swapping, and Linux PTY
+   remain in `dn/src/dnrun.pas`. Prove Linux PTY/user-screen and DOS screen
+   behavior, plus Windows shell smoke.
 3. Move remaining startup/screen platform mechanics behind existing/new
    facades, guided by call-site search and parity failures.
 4. Re-run the full source inventory; mark stage 3 complete only when criteria
