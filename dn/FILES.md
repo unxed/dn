@@ -146,6 +146,7 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `cfgstate.pas` (ours) | the image of the records of the dialogs (what `dn.cfg` held) in the section `[Saved]` of `dn.ini`: hex pieces, read and written through `profile.pas` |
 | `fatalerr.pas` (the place of an address and the wait for a key at the fatal-error screen of `dn.pas`; was in `vpsyslow`, ours) | what the crash screen needs |
 | `compat/dnscreen.pas` (the 16-bit cell screen and the cursor of DN over `tv/`, was the `SysTv*` part of `vpsyslow`, ours) | the copy of the screen for the code that reads the screen, the cursor shape |
+| `compat/dnuserscreendos.pas` (ours) | GO32V2 BIOS/video-memory handling for restoring, capturing, and showing the external-program user screen |
 | `compat/osdep.pas` (was `vpsyslow`, ours), `realmode.pas` (was `dpmi32`, `dpmi32df` and `doslow`) | the system layer: files, drives, time, keys, the terminal, running programs, the search of a directory with the times of a file, the calls of the real mode of DOS (replaces the runtime of Virtual Pascal; named by what it does) |
 | `compat/country.pas` (was `country_`; DOS), `compat/linux/country.pas` (ours) | the country information and the upper-case table of CP866 for Linux |
 | `rcp.pas` | the resource compiler (a separate program: `resource/*` → `*.LNG`, `*.DLG`) |
