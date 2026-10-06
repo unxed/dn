@@ -10,6 +10,7 @@ on:
       - tools/build.sh
       - tools/dn-env.sh
       - tools/dn-linux-accept.py
+      - tools/acceptance/**
       - tools/pty_screen.py
       - .github/workflows/dn-accept.yml
   pull_request:
@@ -17,6 +18,7 @@ on:
       - dn/**
       - tv/**
       - tools/dn-linux-accept.py
+      - tools/acceptance/**
       - .github/workflows/dn-accept.yml
 
 # One accept matrix per ref — newer pushes cancel older runs (runner budget).
@@ -52,6 +54,11 @@ jobs:
           echo "class  DN=$(git -C class rev-parse HEAD) TV=$(git -C class/tv rev-parse HEAD)"
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
+      - name: Backport shared fixes to the object comparator
+        run: |
+          python3 class/tools/acceptance/backport_shared_object_fixes.py object
+          git -C object -c core.whitespace=cr-at-eol diff --check
+          git -C object diff --stat
       - name: Build class DN
         working-directory: class
         run: tools/build.sh linux64 out/linux64-gate
