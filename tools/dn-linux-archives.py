@@ -259,6 +259,35 @@ def extract_smoke(
         shutil.rmtree(d, ignore_errors=True)
 
 
+def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title_hint: str) -> None:
+    """F5 from inside the archive, confirmed with Enter: the member must be on the disk next to the archive with its content."""
+    d = tempfile.mkdtemp(prefix='dn-arc-f5r-')
+    try:
+        copy_dn(dn_out, d)
+        w = os.path.join(d, 'work')
+        os.makedirs(w)
+        shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
+        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        open_archive(t, name, expect_member, title_hint)
+        t.send(KEYS['HOME'], 0.15)
+        t.send(KEYS['DOWN'], 0.2)
+        t.send(KEYS['F5'], 1.5)
+        t.send('\r', 1.5)                      # the destination is the other panel: the directory of the archive
+        for _ in range(8):
+            t.pump(0.5, 2)
+            if os.path.exists(os.path.join(w, 'inside.txt')):
+                break
+        scr = t.text()
+        check(t.alive(), '%s/F5 real: alive' % name, scr)
+        got = os.path.join(w, 'inside.txt')
+        check(os.path.exists(got), '%s/F5 real: the member is extracted' % name, scr)
+        with open(got) as f:
+            check(f.read() == 'hello from fixture\n', '%s/F5 real: the content is right' % name, scr)
+        quit_dn(t)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print('usage: dn-linux-archives.py OUTDIR', file=sys.stderr)
@@ -311,6 +340,8 @@ def main() -> int:
                 continue
             print('CASE', name, 'F5', flush=True)
             extract_smoke(out, fix, name, member, title)
+            print('CASE', name, 'F5 real', flush=True)
+            extract_real(out, fix, name, member, title)
         print('ALL OK', flush=True)
         return 0
     finally:

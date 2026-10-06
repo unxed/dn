@@ -77,6 +77,9 @@ behavior is ambiguous (hard gate still applies globally).
       F5 extract smoke (cancel path) for zip and nested (tgz / tar.xz).
       Plain `.gz` already lists stem via TGZ.
 
+- [~] F5 with the real extraction (confirmed with Enter, the member and its content checked on the disk) for zip, tgz, tar.xz: `extract_real` in `tools/dn-linux-archives.py` (added 2026-10-06, first CI run pending).
+  Left: F3/F4/F5 for `.7z` and the other formats, the content of a member of a nested archive.
+
 Related: Unix packer defaults (`fmtzip`/`fmttar`/`fmt7z`…), ZIP charset
 (`docs/ZIP-CHARSET.md`), object/class gate
 (`docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`).
