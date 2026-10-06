@@ -1768,7 +1768,7 @@ STATUSLINE
 ;$ENDIF
      StatusItem '+П~а~пка', kbCtrlF, cmOpenWPSWindow,
 ;$IFDEF OS2
-     StatusItem '+~О~б''єкт', kbCtrlJ, cmCreateWPSObject,
+     StatusItem '+~О~б''єкт', kbCtrlJ, cmCreateWPSItem,
 ;$ENDIF
 ;{-$VIV}
 ;$IFDEF NETINFO

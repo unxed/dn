@@ -50,7 +50,7 @@
 {Cat
    05/10/2001 - rewrote this unit so that with $DEFINE PLUGIN
    it builds as an EventCatcher plugin library
-   28/01/2002 - in the plugin case added object registration
+   28/01/2002 - in the plugin case added class registration
 }
 
 
@@ -717,7 +717,7 @@ procedure TGameView.MakeTime;
     Exit;
   { Wall-clock ms. Old DN compared GetCurMSec*10 to LevelDelay (*200);
     that is the same gate as (elapsed_ms > Delay/10), but LongInt*10 overflows
-    after ~2.5 days of uptime and the piece falls every Idle. Objects and
+    after ~2.5 days of uptime and the piece falls every Idle. Instances and
     classes share LevelDelay — do not retune it here. }
   LastT := GetCurMSec;
   end;

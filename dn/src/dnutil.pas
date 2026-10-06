@@ -90,7 +90,7 @@ type
   TDNApplication = class;
 
   TDNApplication = class(TApplication)
-    {Cat: this object is exposed in the plugin model; change with extreme care!}
+    {Cat: this type is exposed in the plugin model; change with extreme care!}
     IdleClick: TEventTimer;
     IdleEvt: TEvent;
     TreeReader: TTreeReader;

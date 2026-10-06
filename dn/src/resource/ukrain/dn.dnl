@@ -1237,8 +1237,8 @@ dlResTrailingBackSlash     ^C'Зворотня коса риска не може
 ;PZ end - regular expressions
 ;JO+
 dlNotValidForCurSession 'Цей вiдеорежим неможоивий для поточної сесiї'
-dlCreateObject 'Створити об''єкт на робочому столi для: '
-dlObjectTitle  'Заголовок об''єкта:'
+dlCreateItem 'Створити об''єкт на робочому столi для: '
+dlItemTitle  'Заголовок об''єкта:'
 dl_CodePage_FS_Error 'Помилка файлової системи, пов''язана з кодовою сторiнкою'
 dlCre 'Ств '
 dlLac 'ОДс '

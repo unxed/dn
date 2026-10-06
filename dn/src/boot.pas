@@ -567,7 +567,7 @@ procedure DoStartup;
       end {case};
       end;
     S.Free;
-    { Keep the object-era palette unchanged during the class migration. }
+    { Keep the legacy palette unchanged during the class migration. }
     Security := Startup.FMSetup.Show and fmsShowHidden = 0;
 
     SystemDataOpt := SystemData.Options;

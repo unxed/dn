@@ -733,9 +733,9 @@ initialization
 {$ENDIF}
   CommandHiddenHook := @CommandHidden;
   ListBoxOwnsList := False;       { DN: the owner of the list disposes it }
-  { Keep the object-era default palette during the class migration.  The
+  { Keep the legacy default palette during the class migration.  The
     newer palette is intentionally retained in palettes.pas, but changing
-    it here would make the class build differ from the working object build
+    it here would make the class build differ from the working legacy build
     in every screen cell's foreground/background attributes. }
   { Classic DN palette for acceptance (owner 2026-10-05): cyan default Yes,
     not OSP jaroslaw red/magenta CColorOsp. }

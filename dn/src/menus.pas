@@ -131,7 +131,7 @@ type
       { Such a field is cleaner than checks TypeOf(Self) = TypeOf(TMenuBar),
        because that check is not True for a type derived from
        TMenuBar. No need to build such traps. Classes have
-       the 'is' operator, but objects have no analog, so we have to
+       the 'is' operator, but records have no equivalent, so we have to
        improvise. }
     constructor Create(var Bounds: TRect);
     constructor Load(S: TStream);

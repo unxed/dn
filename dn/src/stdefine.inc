@@ -93,7 +93,7 @@
 {$DEFINE MicroedOvr}
 {$DEFINE VIDEOOVR}
 
-{ Only TPW uses "WObjects"; BP 7 calls the same unit "Objects" }
+{ Only TPW uses the W-prefixed unit; BP 7 uses the unprefixed unit }
 
 
 

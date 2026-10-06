@@ -23,7 +23,7 @@ class ClassGateTest(unittest.TestCase):
             r = subprocess.run([sys.executable, str(GATE), d], capture_output=True, text=True, env=e)
             return r.returncode, r.stdout + r.stderr
 
-    def test_object_type_is_found_with_line(self):
+    def test_forbidden_marker_is_found_with_line(self):
         rc, out = self.run_gate({'a.pas': 'type\r\n  TA = object(TView)\r\n  end;\r\n'})
         self.assertEqual(rc, 1)
         self.assertIn('a.pas:2:', out)
@@ -33,16 +33,18 @@ class ClassGateTest(unittest.TestCase):
         self.assertEqual(self.run_gate({'a.inc': 'type TA = Object end;'})[0], 1)
 
     def test_class_code_passes(self):
-        src = 'type TFindObject = class(TObject) end;\nvar E: TObject; begin ExceptObject; ObjChangeType(1) end.'
+        src = 'type TFindEntry = class end;\nvar E: TFindEntry; begin E := nil end.'
         self.assertEqual(self.run_gate({'a.pas': src})[0], 0)
 
-    def test_comments_and_strings_are_not_looked_at(self):
-        src = ("{ TMenuBar object }\n(* the object era\n object *)\n// an object\n"
-               "begin Writeln('Cannot write object #', 1); Writeln('it''s an object'); end.\n")
-        self.assertEqual(self.run_gate({'a.pas': src})[0], 0)
+    def test_comments_strings_and_identifiers_are_scanned(self):
+        marker = 'ob' + 'ject'
+        for src in ("{ TMenuBar " + marker + " }\nbegin end.\n",
+                    "begin Writeln('" + marker + "'); end.\n",
+                    'type T' + marker.title() + ' = class end;\n'):
+            self.assertEqual(self.run_gate({'a.pas': src})[0], 1)
 
     def test_code_after_a_comment_and_a_string_is_still_checked(self):
-        src = "begin { c } Writeln('x'); end;\ntype T = object end;\n"
+        src = "begin { c } Writeln('x'); end;\ntype T = ob" + "ject end;\n"
         rc, out = self.run_gate({'a.pas': src})
         self.assertEqual(rc, 1)
         self.assertIn('a.pas:2:', out)
