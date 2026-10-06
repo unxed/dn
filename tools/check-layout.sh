@@ -15,7 +15,7 @@ err() { echo "layout: $*" >&2; fail=1; }
 
 # 1. units used by tv/
 own=$(ls tv/src/*.pas tv/tests/*.pas | sed 's|.*/||; s|\.pas$||' | tr 'A-Z' 'a-z' | sort -u | tr '\n' ' ')
-allowed="system sysutils dos go32 objpas math strings classes baseunix unix termio"
+allowed="system sysutils dos go32 objpas math strings classes baseunix unix termio windows"
 for f in tv/src/*.pas tv/tests/*.pas tv/dostests/*.pas tv/demo/*.pas; do
     [ -f "$f" ] || continue
     # the "uses" clauses: from "uses" to the first ";"

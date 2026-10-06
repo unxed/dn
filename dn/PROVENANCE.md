@@ -5,7 +5,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 30 |
+| Our files (MIT, see `LICENSE`) | 33 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 120 |
 | Contributors of DN OSP | 7 |
