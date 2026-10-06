@@ -66,8 +66,11 @@ BIOS mode/cursor reads, video-memory capture/restore, and the Ctrl-O display
 path no longer live in `DNRun`/`mainapp`. Exact-SHA `e2d49d9` passes `dn`,
 layout, Windows, and all four Linux targets; the complete object/class
 acceptance rerun reports 178/178 (run `37406171992`; its first execution had a
-single non-reproducible `menu_5_13` mismatch, recorded in the migration
-checklist). The DOS build passes, but its new `userscr` runtime smoke exposed a
+`menu_5_13` mismatch, recorded in the migration checklist). That same scenario
+failed again on `cd37065` (`37408063297`, 177/178); a focused replay of the
+scenario passed locally once, so the class/object gate remains open. Commit
+`0ad0900` adds complete differing screen rows to failure output; the new CI run
+is pending. The DOS build passes, but its new `userscr` runtime smoke exposed a
 harness bug: `CheckScreenDump` (which injects `DNKEYS` and enforces
 `DNDUMPSEC`) was defined but never called, so DOSBox-X timed out before running
 the external command. Commit `cb55ec3` adds a shorter timeout and trace on

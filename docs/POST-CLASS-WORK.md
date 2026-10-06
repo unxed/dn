@@ -5,15 +5,18 @@ new product features — see [`DN-3.0.md`](DN-3.0.md).
 
 Owner order (2026-10-06). English translation and stage-2 refactoring are
 complete; all A–D criteria in `docs/REFACTORING-CRITERIA.md` are checked or
-explicitly parked. The latest class/object parity gate is **178/178 pass, 0
-fail** on DN `c2144661158afcc286504f918920bf97427de8a1` with TV3 `a06dd31`
-(`dn-accept` run `37403835290`); all 4 Linux targets also passed on this SHA
-(`37403835275`). The prior platform extraction result `e551fee` passed 177/177
-plus Linux, Windows, DOS, `dn`, and layout; no DN product-source changes were
-made after those Windows/DOS checks, while the current acceptance harness and
-comparator overlay were rerun at `c214466`. Stage 3 has begun; disk queries
-and process launch/restart use `osdep` facades. The remaining inventory,
-criteria, and next `DNRun` extraction are in
+explicitly parked. The strict class/object parity gate is currently **open**:
+the reference run `c214466` passed 178/178 (`37403835290`), but a later
+`menu_5_13` mismatch occurred on `e2d49d9` (attempt 1: 177/178; attempt 2:
+178/178) and recurred on `cd37065` (177/178, `37408063297`). A focused local
+replay of the same scenario passed once. Commit `0ad0900` adds complete
+object/class screen rows to mismatch logs; its full acceptance run is pending.
+Do not infer parity success from the earlier clean run until this discrepancy
+is explained and the gate passes. All four Linux targets, Windows, DOS/toolchain,
+`dn`, and layout passed on `cd37065` (`37408063312`, `37408063321`,
+`37408063336`, `37408063309`, `37408063313`). Stage 3 has begun; disk queries,
+process launch/restart, and DOS user-screen handling now have named facades or
+backend units. The remaining inventory and criteria are in
 [`PLATFORM-SEPARATION.md`](PLATFORM-SEPARATION.md). Re-open / re-run parity
 after a risky batch; do not skip or reorder stages below.
 
