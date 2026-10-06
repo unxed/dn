@@ -1520,7 +1520,11 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
               CE
               end;
         else {case}
-          if Char(Event.CharCode) >= #32 then
+          if (Char(Event.CharCode) >= #32)
+{$IFDEF DNUTF8}
+             or ((Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80))
+{$ENDIF}
+          then
             begin
             if QuickSearch then
               begin
@@ -1542,14 +1546,14 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
                 DrawView;
                 Exit;
                 end;
-              DoQuickSearch(DNKeyCode(Event));
+              DoQuickSearchEvent(Event);
               if not SearchForMask(0) then
                 DoQuickSearch(kbBack);
               end
             else
               begin
               InitQuickSearch(Self);
-              DoQuickSearch(DNKeyCode(Event));
+              DoQuickSearchEvent(Event);
               SearchForMask(0);
               if QSMask = '\' then
                 InitQuickSearch(Self);
