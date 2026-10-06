@@ -317,12 +317,12 @@ procedure TInfoLine.Draw;
     else
       S := Ch2+Ch2;
     S := S+SStr(Y, 5, Ch2)+':'+SSt2(X, 4, Ch2)
-        +Ch2+'['+SStr(CharNum, 3, '0')+'·'+Hex2(CharNum)+']'+Ch2;
+        +Ch2+'['+SStr(CharNum, 3, '0')+GlyphChar(glMidDot)+Hex2(CharNum)+']'+Ch2;
     {-$VIV}
     if P.DrawMode = 1 then
-      S := S+'{┼'
+      S := S+'{'+GlyphChar(glLightVH)
     else if P.DrawMode = 2 then
-      S := S+'{╬'
+      S := S+'{'+GlyphChar(glDblVH)
     else if P.VertBlock then
       S := S+'('#18
     else
@@ -331,11 +331,11 @@ procedure TInfoLine.Draw;
       if P.OptimalFill then
         S := S+'F)'
       else
-        S := S+')═'
+        S := S+')'+GlyphChar(glDblH)
     else if P.OptimalFill then
       S := S+'F}'
     else
-      S := S+'}═';
+      S := S+'}'+GlyphChar(glDblH);
 
     if P.EdOpt.ForcedCRLF = cfNone then
       begin
