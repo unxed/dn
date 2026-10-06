@@ -125,6 +125,9 @@ with the DefaultInit program. Now it is called only at
 initialization, but eventually its call could be made via
 (a new) "Restore defaults" command. `}
 
+{ The sort of all the preset panels by a name from dn.ini (name, ext, size, date, unsorted; any case); another name changes nothing. }
+procedure ApplyDefaultSortMode(const Mode: String);
+
 implementation
 
 const
@@ -229,6 +232,26 @@ procedure DefaultInit;
         Sort.CompareMethod := 2; { lowercase }
         Sort.Ups[1] := upsDirs;
         end;
+  end;
+
+procedure ApplyDefaultSortMode(const Mode: String);
+  var
+    i: Integer;
+    pc: TPanelClass;
+    M: Integer;
+    S: String;
+  begin
+  S := LowerCase(Mode);
+  if S = 'name' then M := psmLongName
+  else if S = 'ext' then M := psmLongExt
+  else if S = 'size' then M := psmSize
+  else if (S = 'date') or (S = 'time') then M := psmTime
+  else if S = 'unsorted' then M := psmUnsorted
+  else
+    Exit;
+  for i := 1 to 10 do
+    for pc := Low(TPanelClass) to High(TPanelClass) do
+      PanSetupPreset[i][pc].Sort.SortMode := M;
   end;
 
 begin

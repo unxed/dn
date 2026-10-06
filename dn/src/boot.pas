@@ -78,6 +78,9 @@ uses
   , filetype, panelsetup
   , osdep, dnscreen, cfgstate, palettes;
 
+var
+  PanSetupFromConfig: Boolean = False;   { the presets of the panels came from a saved setup (then DefaultSortMode of dn.ini does not change them) }
+
 {AK155 Checking that the temp directory name is non-empty is not enough:
 also check that it exists and that files can be created and deleted in it.
 Side effect: s always ends with '\' }
@@ -482,7 +485,12 @@ procedure DoStartup;
         
         cfgPanSetupPreset:
           if SizeOf(PanSetupPreset) = L then
-            SRead(PanSetupPreset) else SSkip;
+            begin
+            SRead(PanSetupPreset);
+            PanSetupFromConfig := True;
+            end
+          else
+            SSkip;
         cfgDriveInfoData:
           if SizeOf(DriveInfoData) = L then
             SRead(DriveInfoData) else SSkip;
@@ -620,6 +628,10 @@ procedure DoStartup;
           SaveDnIniSettings(nil);
         end;
       CopyIniVarsToCfgVars;
+      ApplyIniVars;
+      { the sort of the panels that dn.ini asks for is the default of a DN that has no saved setup }
+      if not PanSetupFromConfig then
+        ApplyDefaultSortMode(DefaultSortMode);
       end
     else
       SaveDnIniSettings(nil); {create ini}

@@ -87,6 +87,7 @@ const
   {}SystemMenuChar: Byte = 4;
   {}HorizScrollBarChars: String[31] = '◄►▒■▓'; {DataCompBoy; glyphs in UTF-8: GlyphsToPage turns them into the bytes of the page}
   {}VertScrollBarChars: String[31] = '▲▼▒■▓'; {DataCompBoy}
+  {}DefaultSortMode: String[15] = '';   { name, ext, size, date, unsorted: the sort of the panels when no setup was saved; '' = by the extension }
   {}ReflectCopyDirection: Boolean = False;
   {}ReuseViewers: Byte = 0; { 0 - always open new}
   {}ReuseEditors: Byte = 0; { 1 - prompt for open}
