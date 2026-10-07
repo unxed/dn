@@ -2593,8 +2593,8 @@ DIALOG dlgPanelShowSetup, 74, 22, 'File Panel appearance'
       ITEM '~T~ime'
       ITEM 'Creation date'
       ITEM 'Creation time'
-      ITEM 'Last acc. date
-      ITEM 'Last acc. time
+      ITEM 'Last acc. date'
+      ITEM 'Last acc. time'
       ITEM 'D~e~scription'
       ITEM 'Path'
 ;$IFDEF DualName
@@ -3408,7 +3408,7 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
       ITEM '~B~eep after copy'
       ITEM '~E~NTER opens archive'
       ITEM '~S~PACE toggles selection'
-      ITEM '~D~EL erases file(s)
+      ITEM '~D~EL erases file(s)'
       ITEM 'Use ~/~'#26' keys'
       ITEM '~A~lt difference'
       ITEM 'BS - go to ~u~pper directory'
