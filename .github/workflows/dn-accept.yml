@@ -116,6 +116,33 @@ jobs:
           name: accept-shard-${{ matrix.shard }}
           path: accept-shard-${{ matrix.shard }}.log
 
+  # The state that a run leaves for the next one is not a screen of a scenario: the desktop with an editor and a viewer window is saved, DN is left, and the
+  # next start must bring the windows back, in the object build and in the class build alike (the load of the viewer was broken in the class build once).
+  state:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dn-accept-bins
+          path: bins
+      - name: Layout bins
+        run: |
+          mkdir -p out/object out/class
+          cp -a bins/object/out/linux64-gate/. out/object/
+          cp -a bins/class/out/linux64-gate/. out/class/
+          chmod +x out/object/dn out/class/dn
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3
+      - name: The desktop, saved and restored (the editor, the viewer), the object build
+        run: python3 tools/dn-linux-desktop.py out/object
+      - name: The desktop, saved and restored (the editor, the viewer), the class build
+        if: success() || failure()
+        run: python3 tools/dn-linux-desktop.py out/class
+
   # The same source in two builds: UTF-8 inside (the default) and the code page inside (DN_UTF8=0, the way DOS is built). Every scenario must give the same
   # cells in both (the screens differ only in the code page of the machine: it is one: the cells hold the characters). The area u8cp is run too; U8CP_SKIP of
   # tools/dn-linux-accept.py lists what differs by the data (dn.ini is UTF-8 in both, the editor of the code page build shows its bytes by the page).
