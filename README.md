@@ -34,6 +34,10 @@ that calls `tools/build.sh` and installs the binary plus resources under
 `$(PREFIX)/lib/dn` with a small wrapper in `$(PREFIX)/bin/dn` (`PREFIX` defaults to
 `/usr/local`; `DESTDIR` is honoured). Example: `make && sudo make install`.
 
+`make install` also puts a launcher entry (`share/applications/dn.desktop`, it starts DN in a
+terminal) and an icon (`share/icons/hicolor/scalable/apps/dn.svg`) under the same prefix, so DN
+shows up in the menu of a desktop environment. The sources of both are in `dist/desktop/`.
+
 The installed wrapper (when started as root) may check GitHub Releases every tenth
 run and stage an update for the next launch (`tools/dn-autoupdate.sh`, issue #4).
 Turn off with `DN_AUTOUPDATE=0` or `touch /var/lib/dn/disabled`. Needs a published

@@ -1,6 +1,7 @@
 # Laconic front-end for the native DN build (issue #3).
 #   make              -> tools/build.sh linux64
 #   make install      -> $(PREFIX)/lib/dn/ + wrapper in $(PREFIX)/bin/dn
+#                        + share/applications/dn.desktop and share/icons/.../dn.svg (issue #22)
 # Overrides: PREFIX=/usr/local  DESTDIR=  TARGET=linux64  OUT=out/linux64
 
 PREFIX  ?= /usr/local
@@ -9,6 +10,8 @@ TARGET  ?= linux64
 OUT     ?= out/$(TARGET)
 LIBDIR  := $(DESTDIR)$(PREFIX)/lib/dn
 BINDIR  := $(DESTDIR)$(PREFIX)/bin
+APPDIR  := $(DESTDIR)$(PREFIX)/share/applications
+ICONDIR := $(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps
 
 .PHONY: all install uninstall clean
 
@@ -33,9 +36,13 @@ install: all
 	  'fi' \
 	  'exec "$$LIB/dn" "$$@"' > $(BINDIR)/dn
 	chmod 755 $(BINDIR)/dn
+	# Issue #22: a launcher entry and an icon, so DN starts from a desktop menu (in a terminal).
+	install -d $(APPDIR) $(ICONDIR)
+	install -m 644 dist/desktop/dn.desktop $(APPDIR)/dn.desktop
+	install -m 644 dist/desktop/dn.svg $(ICONDIR)/dn.svg
 
 uninstall:
-	rm -f $(BINDIR)/dn
+	rm -f $(BINDIR)/dn $(APPDIR)/dn.desktop $(ICONDIR)/dn.svg
 	rm -rf $(LIBDIR)
 
 clean:
