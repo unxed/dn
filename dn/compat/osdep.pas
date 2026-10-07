@@ -141,7 +141,7 @@ implementation
 
 uses
   SysUtils, Dos, OSDisk, OSRun, OSSystem, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
-{$IFDEF GO32V2}, go32, TvDos, OSNamesDos, OSStartScreen{$ENDIF}   { OSStartScreen: its initialization (the grab of the screen) must come before DosInit below }
+{$IFDEF GO32V2}, go32, TvDos, TvDosNames, OSStartScreen{$ENDIF}   { OSStartScreen: its initialization (the grab of the screen) must come before DosInit below }
 {$IFDEF UNIX}, BaseUnix, Unix, OSNamesUnix{$ENDIF}
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
 
@@ -597,8 +597,8 @@ end;
 
 {$IFDEF GO32V2}
 initialization
-  DosInit;
-  DosNamesInit;
+  DosInit;                    { it switches the DOS to UTF-8 names when the DOS can (TvDosNames.NamesUtf8) }
+  DNTrace('DOS UTF-8 names: ' + BoolToStr(TvDosNames.NamesUtf8, True));
 finalization
   DosDone;
 {$ENDIF}

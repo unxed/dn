@@ -371,9 +371,9 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 
 ## DOS UTF-8 API (DOSBox-X PR 6632): what is in tv3 and what is in dn (2026-10-07)
 
-- tv3 (`tv/src/tvdos.pas`): the AMIS primitives (`AmisFind`, `AmisSetEncoding`) and the clipboard provider `DOS-UTF8/CLIPBRD`.
-- dn (`dn/compat/osnamesdos.pas`): the switch-on of the names provider `DOS-UTF8/NAMES` (`DosNamesInit`, `DN_DOS_UTF8_NAMES=0` turns it off) and the conversion of a name at the border of the DOS (`DosNameToUtf8`, `DosNameFromUtf8`).
-- Open (the owner, 2026-10-07): what other programs on tv3 can use goes to tv3, so the names provider switch-on and the name conversion move there; dn keeps only its own part. Keep the DOS tests (`tools/dn-dos-input.py`) green with stock DOSBox-X master.
+- tv3 (`tv/src/tvdos.pas`, `tv/src/tvdosnames.pas`): the AMIS primitives (`AmisFind`, `AmisSetEncoding`), the clipboard provider `DOS-UTF8/CLIPBRD`, the names provider `DOS-UTF8/NAMES` and the conversion of a name.
+- dn: only the calls (`osdep`, `osrundos`); the unit `osnamesdos.pas` is gone.
+- Done (2026-10-07, the owner asked): the switch-on of the names provider `DOS-UTF8/NAMES` (`TvDos.DosInit`, `TV_DOS_UTF8_NAMES=0` turns it off; was `DN_DOS_UTF8_NAMES`) and the conversion of a name at the border (`TvDosNames`: `DosNameToUtf8`, `DosNameFromUtf8`, tested natively by `tv/tests/t_dosnames.pas`) are in tv3 (branch `claude/dos-names`). The DOS tests of dn stay green with stock DOSBox-X master.
 
 ## Flight recorder (2026-10-07, done; what is left)
 

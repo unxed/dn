@@ -147,6 +147,8 @@ win64 and dos locally; the proof is the CI of the commit (unit tests `t_osdep`,
 `osdep`: the DOS names (`DosNameToUtf8`, `DosNameFromUtf8`, the AMIS provider
 `DOS-UTF8/NAMES`), then the file calls, the find calls, `SysExecute`.
 
+(2026-10-07: the DOS names family moved on from `compat/osnamesdos.pas` to tv3: `TvDosNames` (the conversion) and `TvDos` (the switch-on, `TV_DOS_UTF8_NAMES=0`); the unit is gone.)
+
 Second narrow step (2026-10-06): the DOS names family (the AMIS provider
 `DOS-UTF8/NAMES` switch `DosNamesInit`, `DosNamesUtf8`, `DosNameToUtf8`,
 `DosNameFromUtf8`) moved from `osdep` to `compat/osnamesdos.pas` (code as it
