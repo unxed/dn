@@ -43,6 +43,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-linux-resize.py` | the terminal changes its size under DN (SIGWINCH: 80x25, 120x40, 100x30): the bars and the frames follow | dn-linux |
 | `dn-linux-fsattrs.py` | symbolic links (to a file, to a directory, dangling) and read-only files in the panels: list, enter, F5, F8, the permissions of the copy | dn-linux |
 | `dn-linux-desktop.py` | the options Autosave Desktop and Preserve directory, Alt-X, the next start: `dn.dsk` and the directory of the panel are restored (the Linux twin of the scenario `autosave` of `dn-dos-input.py`) | dn-linux |
+| `dn-linux-kitty.py` | keys in the encoding of the Kitty keyboard protocol: a press and a release are one character, a repeat is a key, the lock bits, Ctrl-Tab, Alt-X | dn-linux |
 | `dn-linux-embterm.py` | programs that read the terminal, run from the command line: a prompt and a typed line, the size of the terminal, raw mode (q, Up), Ctrl-C | dn-linux |
 | `dn-linux-locale-utf8.py` | the build with UTF-8 inside under C, POSIX, KOI8-R, ru_RU.UTF-8, en_US.UTF-8 and a Latin-1 locale: names, Russian typed into the command line and a dialog | dn-linux |
 | `dn-linux-clip.py` | the clipboard of DN in a pty: copy in the editor goes to the terminal by OSC 52, paste inside DN, bracketed paste into the editor and the command line, `TV_CLIPBOARD=0` | dn-linux |
