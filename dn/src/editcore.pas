@@ -275,7 +275,7 @@ uses
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, histories,
   timeutil, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile, editinfo
-, TvCodePg, TvUtf8, TvGlyphs, TvCharset, TvKeys
+, TvCodePg, TvUtf8, TvGlyphs, TvCharset, TvKeys, TvXlat
 , osdep, DNStdDlg, Dialogs, DNHelp, Math, fileerrors
 , TveBuf, TveEditor, TveCmds, TveBlocks, TveExtras, TveLang, TveHl, TveLayout, TveFile
   ;
@@ -1861,6 +1861,7 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
         if CC1[2] <> #0 then
           begin
           KeyEvent(Event);
+          XlatPlain(Event);
           EvStr[2] := Char(Event.CharCode);
           end;
         Break;
@@ -1871,6 +1872,7 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
         if CC2[2] <> #0 then
           begin
           KeyEvent(Event);
+          XlatPlain(Event);
           EvStr[2] := Char(Event.CharCode);
           end;
         Break;
