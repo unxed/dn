@@ -1158,7 +1158,7 @@ constructor TFileViewer.Load(S: TStream);
   KillAfterUse := False;
   S.Read(Filter, 1);
   S.Read(ViewMode, 2);
-  XCoder.Load(S);
+  XCoder := TXCoder.Load(S);   { a class: the constructor makes the object (it was a field of the object type) }
   S.Read(MarkPos, SizeOf(MarkPos));
   Fl := nil;
   Buf := nil;

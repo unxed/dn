@@ -26,7 +26,7 @@ Updated: 2026-10-07. This file is the handoff point: read it first, then [`PLAN.
   fault that nobody can reproduce looked at.
 - **DOS UTF-8 names** are tv3's now (`TvDos` switches `DOS-UTF8/NAMES` on, `TvDosNames` converts a name); the DOS tests of dn pass on a vanilla DOSBox-X `master`.
 - **Found by this work and fixed** (shared bugs, the object build had them too): the read-only attribute lost at a copy on Unix, names cut by bytes with UTF-8 inside, the SmartPad line,
-  the line drawing of the editor, the archivers on Unix (paths and list files), Find File with a text (class only), the data of a copy written after zeros on Windows, a Cyrillic letter typed in the panels under a locale whose code page lacks it (en_US.UTF-8) opened Find File and swallowed the input (the status line took a key without a code for a key of an item without one), and the command line dropped such a letter. See `dn/TODO-later.md`.
+  the line drawing of the editor, the archivers on Unix (paths and list files), Find File with a text (class only), the data of a copy written after zeros on Windows, a Cyrillic letter typed in the panels under a locale whose code page lacks it (en_US.UTF-8) opened Find File and swallowed the input (the status line took a key without a code for a key of an item without one), and the command line dropped such a letter; the viewer window of a saved desktop crashed the class build at the next start (the load of the viewer did not make its `XCoder`; the object build restores it: a regression of the class migration that the gate did not drive). See `dn/TODO-later.md`.
 
 ## Build and check
 
@@ -49,7 +49,7 @@ The object baseline of the gate is pinned in `tools/dn-linux-accept.py` (`OBJECT
 
 The list is in `PLAN.md` and in `dn/TODO-later.md`. The ones that decide what to do next:
 
-1. The parked rows of `docs/TEST-PLAN.md` (DN-level clipboard checks, the viewer window of the desktop, screenshot checks of the DOS pages 850, 852, 1125 and of the DOS help, the keys of the DOS harness, an interactive program in the embedded terminal).
+1. The parked rows of `docs/TEST-PLAN.md` (DN-level clipboard checks, screenshot checks of the DOS pages 850, 852, 1125 and of the DOS help, the keys of the DOS harness, an interactive program in the embedded terminal).
 2. Intermittent access violations that were seen once (after a clipboard prompt, after a command in the embedded terminal) and could not be reproduced:
    `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`. The flight recorder is there to catch them: the next one comes with `dn.log` and a crash report.
 3. The unstable `menu_5_13` scenario (an asynchronous scan of the host root); a stabilizer is in, the CI has been green with it.

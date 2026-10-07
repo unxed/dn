@@ -86,7 +86,6 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 |---|---|---|
 | Screenshot checks of the screens of the pages 850 and 852, of the help in Russian and Ukrainian (cp866, cp1125) | DOSBox-X has no such pages; the tables are checked by unit tests (`t_cpall`, `t_cpcase`, `test_sort1125.py`) | when a DOS with these pages can run |
 | The control count of a loaded dialog against the source of `rcp` | `t_resload` proves that every view loads and that the three languages have the same keys; the source has no machine readable count | when `rcp` writes a manifest |
-| The viewer window of the desktop saved and restored | the editor is covered (`dn-linux-desktop.py` runs 4 and 5: out by the menu File -> Exit, the editor comes back, object and class builds alike); the viewer is not | with the next desktop change |
 | Add and delete of archive members as separate checks | covered by the accept scenarios and `dn-linux-archives.py` in part | stage 4 follow-up |
 | Kitty keyboard flags in DN | tested in `tv` (`tv/tests/pty`); a DN scenario needs a terminal that answers the Kitty query | stage 4 follow-up |
 | DN-level clipboard checks (DOS and Windows) | `tv` tests the backends (`t_dosbk`, the Windows clipboard); a DN scenario needs the system clipboard of the runner | stage 4 follow-up |
