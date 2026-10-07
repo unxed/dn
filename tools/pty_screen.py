@@ -103,6 +103,17 @@ class Screen:
         while i < len(text):
             b = text[i:i + 1]
             if b == b'\x1b':
+                if text[i + 1:i + 2] in (b']', b'_', b'P', b'^', b'X'):
+                    # a string (OSC, APC, DCS, PM, SOS) ends with BEL or ESC \: it is not text of the screen
+                    end_bel = text.find(b'\x07', i + 2)
+                    end_st = text.find(b'\x1b\\', i + 2)
+                    ends = [(e, n) for e, n in ((end_bel, 1), (end_st, 2)) if e >= 0]
+                    if not ends:
+                        self.pending = text[i:]
+                        return
+                    e, n = min(ends)
+                    i = e + n
+                    continue
                 m = self.CSI.match(text, i)
                 if not m:
                     if i + 1 >= len(text) or text[i + 1:i + 2] == b'[':
