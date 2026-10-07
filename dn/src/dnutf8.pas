@@ -99,7 +99,7 @@ function ProxyToUtf8(const S, Tab: String): String;
 implementation
 
 uses
-  TvUtf8, TvCodePg;
+  TvUtf8, TvCodePg, TvUStr;
 
 const
   ProxySlot = 8;                    { the bytes of an entry of the table of a proxy string }
@@ -157,137 +157,38 @@ function CharLen(const S: String; I: Integer): Integer;
   end;
 
 function StrCols(const S: String): Integer;
-{$IFDEF DNUTF8}
-  var
-    I, Used: Integer;
-    Cp: LongWord;
-{$ENDIF}
   begin
-{$IFDEF DNUTF8}
-  Result := 0;
-  I := 1;
-  while I <= Length(S) do
-    begin
-    if  (Byte(S[I]) >= $80) and Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) then
-      begin
-      Inc(Result, CharWidth(Cp));
-      Inc(I, Used);
-      end
-    else
-      begin
-      Inc(Result);
-      Inc(I);
-      end;
-    end;
-{$ELSE}
-  Result := Length(S);
-{$ENDIF}
+  Result := U8Cols(S);
   end;
 
 function Utf8Chars(const S: String): Integer;
-  var
-    I: Integer;
   begin
-  Result := 0;
-  I := 1;
-  while I <= Length(S) do
-    begin
-    Inc(I, CharLen(S, I));
-    Inc(Result);
-    end;
+  Result := U8Len(S);
   end;
 
 function Utf8Prefix(const S: String; MaxBytes: Integer): String;
-  var
-    N: Integer;
   begin
-  if Length(S) <= MaxBytes then
-    Exit(S);
-  N := MaxBytes;
-{$IFDEF DNUTF8}
-  { back over the continuation bytes (10xxxxxx) of a character that does not fit }
-  while (N > 0) and ((Byte(S[N+1]) and $C0) = $80) do
-    Dec(N);
-{$ENDIF}
-  Result := Copy(S, 1, N);
+  Result := U8Prefix(S, MaxBytes);
   end;
 
 function CpUpper(C: LongWord): LongWord;
   begin
-  Result := C;
-  case C of
-    $61..$7A: Result := C - 32;
-    $E0..$F6, $F8..$FE: Result := C - 32;
-    $FF: Result := $178;
-    $100..$137, $14A..$177: if Odd(C) then Result := C - 1;
-    $139..$148, $179..$17E: if not Odd(C) then Result := C - 1;
-    $3AC: Result := $386;
-    $3AD..$3AF: Result := C - 37;
-    $3B1..$3C1, $3C3..$3CB: Result := C - 32;
-    $3C2: Result := $3A3;
-    $430..$44F: Result := C - 32;
-    $450..$45F: Result := C - 80;
-    $460..$481, $48A..$4BF, $4D0..$4FF: if Odd(C) then Result := C - 1;
-  end;
+  Result := TvUStr.CpUpper(C);
   end;
 
 function CpLower(C: LongWord): LongWord;
   begin
-  Result := C;
-  case C of
-    $41..$5A: Result := C + 32;
-    $C0..$D6, $D8..$DE: Result := C + 32;
-    $178: Result := $FF;
-    $100..$137, $14A..$177: if not Odd(C) then Result := C + 1;
-    $139..$148, $179..$17E: if Odd(C) then Result := C + 1;
-    $386: Result := $3AC;
-    $388..$38A: Result := C + 37;
-    $391..$3A1, $3A3..$3AB: Result := C + 32;
-    $410..$42F: Result := C + 32;
-    $400..$40F: Result := C + 80;
-    $460..$481, $48A..$4BF, $4D0..$4FF: if not Odd(C) then Result := C + 1;
-  end;
+  Result := TvUStr.CpLower(C);
   end;
 
 procedure Utf8Case(var S: String; Up: Boolean);
   var
-    I, L, N: Integer;
-    Cp, Cp2: LongWord;
-    Used: Integer;
-    R: String;
-    Buf: array[0..7] of Byte;
+    R: AnsiString;
   begin
-  R := '';
-  I := 1;
-  while I <= Length(S) do
-    begin
-    if  Byte(S[I]) < $80 then
-      begin
-      if Up then
-        R := R + Chr(CpUpper(Byte(S[I])))
-      else
-        R := R + Chr(CpLower(Byte(S[I])));
-      Inc(I);
-      Continue;
-      end;
-    L := CharLen(S, I);
-    if  (L > 1) and Utf8Decode(@S[I], Length(S) - I + 1, Cp, Used) then
-      begin
-      if Up then
-        Cp2 := CpUpper(Cp)
-      else
-        Cp2 := CpLower(Cp);
-      N := Utf8Encode(Cp2, @Buf[0]);
-      for L := 0 to N - 1 do
-        R := R + Chr(Buf[L]);
-      Inc(I, Used);
-      end
-    else
-      begin
-      R := R + S[I];
-      Inc(I);
-      end;
-    end;
+  if Up then
+    R := U8Upper(S)
+  else
+    R := U8Lower(S);
   if Length(R) <= 255 then
     S := R;
   end;
@@ -304,28 +205,11 @@ procedure Utf8LowStr(var S: String);
 
 procedure Utf8CapFirst(var S: String);
   var
-    Cp, Cp2: LongWord;
-    Used, N, I: Integer;
-    Buf: array[0..7] of Byte;
-    Tail: String;
+    R: AnsiString;
   begin
-  if Length(S) = 0 then
-    Exit;
-  if Byte(S[1]) < $80 then
-    begin
-    S[1] := Chr(CpUpper(Byte(S[1])));
-    Exit;
-    end;
-  if Utf8Decode(@S[1], Length(S), Cp, Used) then
-    begin
-    Cp2 := CpUpper(Cp);
-    N := Utf8Encode(Cp2, @Buf[0]);
-    Tail := Copy(S, Used + 1, MaxInt);
-    S := '';
-    for I := 0 to N - 1 do
-      S := S + Chr(Buf[I]);
-    S := S + Tail;
-    end;
+  R := U8CapFirst(S);
+  if Length(R) <= 255 then
+    S := R;
   end;
 
 procedure CpBytesToUtf8(var S: String; From: Integer);
@@ -367,15 +251,8 @@ function CpCharToUtf8(B: Byte): String;
   end;
 
 procedure Utf8DeleteLast(var S: String);
-  var
-    L: Integer;
   begin
-  L := Length(S);
-  if L = 0 then
-    Exit;
-  while (L > 1) and ((Byte(S[L]) and $C0) = $80) do
-    Dec(L);
-  SetLength(S, L - 1);
+  U8DeleteLast(S);
   end;
 
 function HotMatches(const Name: String; At: Integer; Ch: Char): Boolean;
