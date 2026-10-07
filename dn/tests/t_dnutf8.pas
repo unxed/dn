@@ -115,5 +115,13 @@ begin
   Check(GlyphsToPage(#17#16#177#254#178) = #17#16#177#254#178, 'glyphs: the old form (bytes of a page) is returned as it is');
   Check(GlyphsToPage('日') = '?', 'glyphs: a character that the page lacks is ?');
   Check(GlyphsToPage('a═b') = 'a'#205'b', 'glyphs: ASCII is kept, a frame character is its byte');
+  { the beginning of a name that is cut by bytes does not split a character (the 12 bytes of the short name of a file record) }
+  Check(Utf8Prefix('abc.txt', 12) = 'abc.txt', 'prefix: a short name is as it is');
+{$IFDEF DNUTF8}
+  Check(Utf8Prefix('Привет.txt', 12) = 'Привет', 'prefix: twelve bytes are six Cyrillic letters');
+  Check(Utf8Prefix('Привет.txt', 11) = 'Приве', 'prefix: eleven bytes: the sixth letter does not fit and is left out whole');
+{$ELSE}
+  Check(Length(Utf8Prefix('0123456789abcdef', 12)) = 12, 'prefix: bytes are characters');
+{$ENDIF}
   Finish;
 end.

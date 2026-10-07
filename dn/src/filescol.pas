@@ -1376,7 +1376,7 @@ function NewFileRec(const LFN, Name: String; Size: TSize; Date, CreationDate, La
     l: LongInt;
   begin
   
-  T.FlName[False] := Name;
+  T.FlName[False] := Utf8Prefix(Name, SizeOf(TShortName)-1);   { 12 bytes: not in the middle of a UTF-8 character }
   if Attr and Directory <> 0 then
     UpStr(T.FlName[False])
   else
