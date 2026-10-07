@@ -110,6 +110,9 @@ jobs:
       - name: Programs that read the terminal (the embedded terminal)
         if: success() || failure()
         run: python3 tools/dn-linux-embterm.py out/dn
+      - name: Keys in the encoding of the Kitty keyboard protocol
+        if: success() || failure()
+        run: python3 tools/dn-linux-kitty.py out/dn
       - name: Locales that are not UTF-8 (the build with UTF-8 inside)
         if: success() || failure()
         run: python3 tools/dn-linux-locale-utf8.py out/dn
