@@ -59,7 +59,7 @@ procedure SetVLabel;
 function ValidErase(Files: TCollection): Boolean;
 
 implementation
-uses dnscreen,
+uses dnscreen, FlightRec,
   Defines, uselfn, Filediz,
   Dos, Lfn {DataCompBoy}, FilesCol, Commands, basics, strutil, fileutil,
   Startup, Messages, timeutil, Drivers, Tree,
@@ -376,6 +376,7 @@ TryDel:
   label LLL, DeleteDirDIZ;
 
   begin { EraseFiles }
+  FRNote('file', 'delete ' + ItoS(Files.Count) + ' item(s)');
   NotifySuspend; {<fnotify.001>}
   if not ValidErase(Files) then
     begin

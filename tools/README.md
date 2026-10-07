@@ -43,6 +43,9 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-linux-resize.py` | the terminal changes its size under DN (SIGWINCH: 80x25, 120x40, 100x30): the bars and the frames follow | dn-linux |
 | `dn-linux-fsattrs.py` | symbolic links (to a file, to a directory, dangling) and read-only files in the panels: list, enter, F5, F8, the permissions of the copy | dn-linux |
 | `dn-linux-desktop.py` | the options Autosave Desktop and Preserve directory, Alt-X, the next start: `dn.dsk` and the directory of the panel are restored (the Linux twin of the scenario `autosave` of `dn-dos-input.py`) | dn-linux |
+| `dn-linux-crash.py` | the flight recorder: the log of a run (`dn.log`, `dn_prev.log`), the report of an access violation forced with `DN_TEST_CRASH=1` + F12 (`crash/crash001.txt`), the typed characters not recorded, `DN_LOG_KEYS=full`, `DN_LOG=0`, a killed run told in the next log | dn-linux |
+| `gen-evnames.py` | writes `dn/src/evnames.pas` (the names of the commands and the keys for the log) from `commands.pas`, the units of `tv/src` and `tvkeys.pas`; `--check` is in `check-layout.sh` | layout |
+| `dn-linux-config.py` | where the files of the user go: `$XDG_CONFIG_HOME/dn`, `~/.config/dn`, the move of the files of an older DN (the originals stay), `DN2` | dn-linux |
 | `dn-linux-archives.py` | the archive matrix (enter, F3, F4, F5, F8, add) for zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz; `DN_ARC_ONLY='simple.zip ...'` runs some | dn-linux |
 | `dn-linux-menus.py` | opens every item of every menu, reports what died | by hand |
 | `dn-win-smoke.py` | the Windows build on a real console (ConPTY via pywinpty) | dn-windows |

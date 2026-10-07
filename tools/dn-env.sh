@@ -49,6 +49,7 @@ esac
 tmp=${TMPDIR:-/tmp}
 # FPC does not rebuild a unit when only a -d option changed: every set of options has its own directory of the objects
 case "${DN_EXTRA:-}" in *-dDNUTF8*) dn_objsfx=-utf8;; *) dn_objsfx=;; esac
+case "$DN_OPT ${DN_EXTRA:-}" in *-gl*) dn_objsfx=$dn_objsfx-gl;; esac
 DN_OBJ=${DN_OBJ:-$tmp/dn-obj-$DN_TARGET$dn_objsfx}
 DN_GEN=${DN_GEN:-$tmp/dn-gen}
 DN_OPTS="$DN_FPC_COMMON $DN_OPT ${DN_EXTRA:-}"

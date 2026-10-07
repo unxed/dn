@@ -73,7 +73,7 @@ const
 
 implementation
 
-uses DNRun,
+uses DNRun, FlightRec,
   
   
    realmode, 
@@ -211,7 +211,7 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
     ActDir1: String;
 
   begin
-  
+  FRNote('run', S);
   if TimerMark then
     DDTimer := GetCurMSec
   else
@@ -304,7 +304,7 @@ function SearchExt(FileRec: PFileRec; var HS: String): Boolean;
     begin
 RL:
     Local := False;
-    f := TTextReader.Create(SourceDir+'dn.ext');
+    f := TTextReader.Create(ConfigDir+'dn.ext');
     end;
   if f = nil then
     Exit;
@@ -437,7 +437,7 @@ function ExecExtFile(const ExtFName: String; UserParams: PUserParams;
     begin
 RepeatLocal:
     Local := False;
-    F := TTextReader.Create(SourceDir+ExtFName);
+    F := TTextReader.Create(ConfigDir+ExtFName);
     end;
   if F = nil then
     Exit;

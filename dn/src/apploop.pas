@@ -53,7 +53,7 @@ interface
 uses
    {Cat}
   DNUtil, Drivers, Views, Collect,
-  timeutil, Defines, objutil
+  timeutil, Defines, objutil, FlightRec
   ;
 
 type
@@ -113,6 +113,10 @@ procedure MyApp.GetEvent(var Event: TEvent);
   
 
   inherited GetEvent(Event);
+  FRNoteEvent(Event);                { the flight recorder: the keys, the clicks and the commands }
+  { a test aid (tools/dn-linux-crash.py): with DN_TEST_CRASH set, F12 is an access violation }
+  if (Event.What = evKeyDown) and (Event.KeyCode = kbF12) and (GetEnv('DN_TEST_CRASH') <> '') then
+    PInteger(nil)^ := 1;
   if MacroPlaying and ((Event.What = evKeyDown) or (Event.What =
          evNothing))
   then
