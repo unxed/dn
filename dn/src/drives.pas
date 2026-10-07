@@ -944,13 +944,7 @@ procedure TDrive.GetDown(var B: TScreenCell; C: Word; P: PFileRec; var LFN_inCur
     else
       
       S2 := P^.FlName[True];
-    if Length(S2) > NameWidht then
-      begin
-      SetLength(S2, NameWidht);
-      S2[NameWidht] := FMSetup.RestChar[1];
-      end
-    else
-      S2 := AddSpace(S2, NameWidht);
+    S2 := CutCols(S2, NameWidht, FMSetup.RestChar[1]);   { columns, not bytes: a name in UTF-8 }
     end;
   LFN_inCurFileLine := UpStrg(P^.FlName[True]) = UpStrg(fDelRight(S2));
   

@@ -19,6 +19,9 @@ function GlyphsToPage(const S: String): String;
 function Utf8Chars(const S: String): Integer;
   {` The number of characters (not bytes) of S. `}
 
+function Utf8Prefix(const S: String; MaxBytes: Integer): String;
+  {` The longest beginning of S of at most MaxBytes bytes that does not split a character (a short name of the file record holds 12 bytes). `}
+
 function StrCols(const S: String): Integer;
   {` The width of S in columns: columns of the characters with -dDNUTF8 (a wide one is two, a combining mark none), else bytes (a name is shown in one byte per column). `}
 
@@ -192,6 +195,21 @@ function Utf8Chars(const S: String): Integer;
     Inc(I, CharLen(S, I));
     Inc(Result);
     end;
+  end;
+
+function Utf8Prefix(const S: String; MaxBytes: Integer): String;
+  var
+    N: Integer;
+  begin
+  if Length(S) <= MaxBytes then
+    Exit(S);
+  N := MaxBytes;
+{$IFDEF DNUTF8}
+  { back over the continuation bytes (10xxxxxx) of a character that does not fit }
+  while (N > 0) and ((Byte(S[N+1]) and $C0) = $80) do
+    Dec(N);
+{$ENDIF}
+  Result := Copy(S, 1, N);
   end;
 
 function CpUpper(C: LongWord): LongWord;

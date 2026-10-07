@@ -107,6 +107,8 @@ function fDelLeft(s: String): String;
 
 function Cut(p: String; len: Integer): String;
 function CutH(p: String; len: Integer): String;
+function CutCols(const S: String; Width: Integer; Rest: Char): String;
+  {` S as a field of Width columns: padded with blanks, or cut with Rest as its last column (UTF-8 inside: a column is a character, not a byte) `}
 
 function Strg(C: Char; Num: Byte): String;
   {` Create a string of length Num filled with character C `}
@@ -407,6 +409,36 @@ function AddSpace(const s: String; n: Byte): String;
 {$ELSE}
   begin
   Result := AddSpaceB(s, n);
+  end;
+{$ENDIF}
+
+
+function CutCols(const S: String; Width: Integer; Rest: Char): String;
+{$IFDEF DNUTF8}
+  var
+    Tab, P: String;
+  begin
+  P := Utf8ToProxy(S, Tab);
+  if Length(P) > Width then
+    begin
+    SetLength(P, Width);
+    if Width > 0 then
+      P[Width] := Rest;
+    end
+  else
+    P := AddSpaceB(P, Width);
+  Result := ProxyToUtf8(P, Tab);
+  end;
+{$ELSE}
+  begin
+  if Length(S) > Width then
+    begin
+    Result := Copy(S, 1, Width);
+    if Width > 0 then
+      Result[Width] := Rest;
+    end
+  else
+    Result := AddSpaceB(S, Width);
   end;
 {$ENDIF}
 

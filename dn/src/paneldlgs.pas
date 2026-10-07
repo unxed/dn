@@ -99,7 +99,7 @@ implementation
 uses
   dirwatch,
   Lfn, uselfn, Collect, timeutil, DnIni, HistList,
-  basics, strutil, fileutil, TvGlyphs, Dos, Defines, Dialogs,
+  basics, strutil, DNUtf8, fileutil, TvGlyphs, Dos, Defines, Dialogs,
   Views, mainapp, Commands, Drivers, filepanel, Drives, FileCopy,
   progress, gadgets, Archiver, Startup, inputfname, Validate, Messages, Menus, DNHelp,
   FileFind, Tree, copyio, DNUtil, Filediz, Filelst, fsinfo, panelwin,
@@ -211,11 +211,8 @@ function TSelectList.GetText(Item: LongInt; MaxLen: Integer): String;
   else
     S := '';
   ColWidth := (Size.X div NumCols)-1;
-  if Length(S) > ColWidth then
-    begin
-    SetLength(S, ColWidth);
-    S[ColWidth] := FMSetup.RestChar[1];
-    end;
+  if StrCols(S) > ColWidth then
+    S := CutCols(S, ColWidth, FMSetup.RestChar[1]);   { columns, not bytes: a name in UTF-8 }
   Result := S;
   end;
 

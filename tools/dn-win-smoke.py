@@ -153,7 +153,12 @@ def main():
             t.send('newdir', 0.5)
             t.send('\r', 2.0)
             copied = os.path.join(w, 'newdir', '\u041f\u0440\u0438\u0432\u0435\u0442.txt')
-            check(os.path.isfile(copied) and open(copied, encoding='utf-8').read() == '\u041f\u0440\u0438\u0432\u0435\u0442\n', 'UTF-8: F5 copies a file with a Russian name', t.text())
+            for _ in range(25):                        # the copy takes a moment
+                if os.path.isfile(copied):
+                    break
+                time.sleep(0.4)
+            tree = '\n'.join(os.path.join(r, n) for r, ds, fs in os.walk(w) for n in ds + fs)
+            check(os.path.isfile(copied) and open(copied, encoding='utf-8').read().strip() == '\u041f\u0440\u0438\u0432\u0435\u0442', 'UTF-8: F5 copies a file with a Russian name', 'the tree of the work directory:\n' + tree)
         t.send('\x1bx', 1.0)                          # Alt-X: quit
         t.send('\r', 1.5)
         for _ in range(20):

@@ -168,7 +168,7 @@ implementation
 
 uses
   uselfn, osdep, Dos, Eraser, Drives, DNHelp, TitleSet,
-  Lfn, DNUtil, mainapp, basics, strutil, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
+  Lfn, DNUtil, mainapp, basics, strutil, DNUtf8, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, copyio, ArcView, CmdLine, histories, Archiver,
   gadgets, progress, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz, TvGlyphs
   
@@ -1305,11 +1305,8 @@ function MakePathDecr(IV: TInfoView): Boolean;
         end;
       System.Delete(S2, 1, J);
       end;
-    if Length(S2) > Size.X then
-      begin
-      SetLength(S2, Size.X);
-      S2[Size.X] := FMSetup.RestChar[1];
-      end;
+    if StrCols(S2) > Size.X then
+      S2 := CutCols(S2, Size.X, FMSetup.RestChar[1]);   { columns, not bytes: a name in UTF-8 }
     Result := S2 <> '';
     if Result then
       begin

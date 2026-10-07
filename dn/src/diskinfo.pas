@@ -155,7 +155,7 @@ var
 implementation
 uses
   Startup, mainapp, Commands, DNHelp, Tree, timeutil
-  , basics, strutil, fileutil, TvGlyphs, Math
+  , basics, strutil, DNUtf8, fileutil, TvGlyphs, Math
   , osdep, Lfn, keymap, objutil
   , fsinfo, panelroot, panelsetup, Dos
   , Strings;
@@ -264,11 +264,8 @@ function TDriveView.GetText(MaxWidth: Integer): String;
     if Share <> '' then
       Result := Result + ' ' + Share; { Indeed network }
     end;
-  if Length(Result) > MaxWidth then
-    begin
-    SetLength(Result, MaxWidth);
-    Result[MaxWidth] := FMSetup.RestChar[1];
-    end;
+  if StrCols(Result) > MaxWidth then
+    Result := CutCols(Result, MaxWidth, FMSetup.RestChar[1]);   { columns, not bytes: a path in UTF-8 }
   end;
 
 destructor TDriveView.Destroy;
