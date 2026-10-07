@@ -227,7 +227,7 @@ procedure ClearIniErrors;
 
 function DnIniFileName: String;
   begin
-  DnIniFileName := SourceDir+'dn.ini';
+  DnIniFileName := ConfigDir+'dn.ini';
   end;
 
 procedure Proceed(RegisterVar: TDoProc);
@@ -725,7 +725,7 @@ procedure WriteIniCache(INItime, INIsize: LongInt);
   if INIModified then
     begin
     INIModified := False;
-    S := TBufStream.Create(SourceDir+'dn.cbc', stCreate, 8192);
+    S := TBufStream.Create(ConfigDir+'dn.cbc', stCreate, 8192);
     if S.Status <> stOK then
       begin
       S.Free;
@@ -747,7 +747,7 @@ function ReadIniCache(INItime, INIsize: LongInt): Boolean;
     Sign: array[1..60] of Char;
   begin
   Result := False;
-  S := TBufStream.Create(SourceDir+'dn.cbc', stOpenRead, 8192);
+  S := TBufStream.Create(ConfigDir+'dn.cbc', stOpenRead, 8192);
   if  (S.Status <> stOK) or (S.GetSize = 0) then
     begin
     S.Free;

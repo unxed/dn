@@ -197,6 +197,10 @@ class PtyTerm:
             # Keep size pins unless the caller overrode them explicitly.
             e.setdefault('COLUMNS', str(cols))
             e.setdefault('LINES', str(rows))
+        # DN keeps its settings in the configuration of the user (~/.config/dn); a test that runs a copy of DN in a directory of its own wants them there (the DN2 of DN:
+        # the directory of the program and of the files together, as it was before the move); a test of the default place passes env={'DN2': ''}
+        if exe and os.path.basename(exe) == 'dn' and 'DN2' not in e:
+            e['DN2'] = os.path.dirname(os.path.abspath(exe))
         winsz = struct.pack('HHHH', rows, cols, 0, 0)
         self.pid, self.fd = pty.fork()
         self.status = None

@@ -999,7 +999,7 @@ function InitHighLight
     Macros.FreeAll;
   InitHighLight := False; {PZ 2000.06.09 Default is No Highlight }
   FillChar(HiLitePar, SizeOf(HiLitePar), 0);
-  F := TTextReader.Create(SourceDir+'dn.hgl');
+  F := TTextReader.Create(ConfigDir+'dn.hgl');
   if F = nil then
     Exit;
   while not F.Eof do

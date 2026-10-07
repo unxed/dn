@@ -117,8 +117,8 @@ const
 implementation
 uses
   osdep, basics, strutil, fileutil,
-  Lfn
-  , Dos;
+  Lfn, CfgDir
+  , Dos, SysUtils;
 
 begin
 TempDir := '';
@@ -138,7 +138,10 @@ StartupDir := SourceDir;
 *)
 SourceDir := Dos.GetEnv('DN2');
 DelLeft(SourceDir);
-if (SourceDir <> '') and not PathExist(SourceDir) then
+if SourceDir <> '' then
+  SourceDir := lFExpand(SourceDir);        { a path of the system (/home/x) is a path of DN (\home\x) }
+{ the file system is asked directly: the current directories of Lfn are not known yet }
+if (SourceDir <> '') and not DirectoryExists(SysOsPath(SourceDir)) then
   begin
   Writeln(
     'Warning! Path specified in DN2 environment variable does not exist!');
@@ -148,10 +151,15 @@ if (SourceDir <> '') and not PathExist(SourceDir) then
 if SourceDir = '' then
   SourceDir := StartupDir;
 MakeSlash(SourceDir);
-
+{ the files that the user changes: his configuration directory, but DN2 (an explicit directory) keeps everything together as before }
+if Dos.GetEnv('DN2') = '' then
+  ConfigDir := UserConfigDir(SourceDir)
+else
+  ConfigDir := SourceDir;
 
 StartupDir := lfGetLongFileName(StartupDir);
 SourceDir := lfGetLongFileName(SourceDir);
+ConfigDir := lfGetLongFileName(ConfigDir);
 TempDir := lfGetLongFileName(TempDir);
 TempFile := lfGetLongFileName(TempFile);
 

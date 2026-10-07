@@ -584,7 +584,7 @@ constructor TDNApplication.Create;
 *)
   LoadStream := PresentFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
   if LoadStream = nil then
-    LoadStream := PresentFile(SourceDir+'dn'+GetEnv('DNDSK')+'.dsk');
+    LoadStream := PresentFile(ConfigDir+'dn'+GetEnv('DNDSK')+'.dsk');
   if LoadStream <> nil then
     RetrieveDesktop('', LoadStream, True);
   InitDrivers;
@@ -593,7 +593,7 @@ constructor TDNApplication.Create;
   if not RunFirst or cbAutoSave then
     begin
     ClipBoardStream := GetMeMemoStream;
-    LoadStream := PresentFile(SourceDir+'dn'+'.clp');
+    LoadStream := PresentFile(ConfigDir+'dn'+'.clp');
     if  (LoadStream <> nil) and (ClipBoardStream <> nil) then
       begin
       LoadStream.Seek(0);
@@ -660,7 +660,7 @@ procedure TDNApplication.InitCommandLine;
 procedure SaveRealDsk;
   begin
   TDNApplication(Application).SaveDesktop
-    (SourceDir+'dn'+GetEnv('DNDSK')+'.dsk');
+    (ConfigDir+'dn'+GetEnv('DNDSK')+'.dsk');
   end;
 {-DataCompBoy-}
 
@@ -690,7 +690,7 @@ destructor TDNApplication.Destroy;
   DoneEnvironment;
   if cbAutoSave then
     begin
-    SaveStream := TBufStream.Create(SourceDir+'dn'+'.clp',
+    SaveStream := TBufStream.Create(ConfigDir+'dn'+'.clp',
            stCreate, 2048);
     if  (SaveStream <> nil) and (SaveStream.Status = stOK)
          and (ClipBoardStream <> nil)
@@ -756,7 +756,7 @@ procedure WriteHighlite;
   var
     F: lText;
   begin
-  lAssignText(F, SourceDir+'dnhgl.grp');
+  lAssignText(F, ConfigDir+'dnhgl.grp');
   lRewriteText(F);
   Writeln(F.T, CustomMask1);
   Writeln(F.T, CustomMask2);
@@ -865,11 +865,11 @@ procedure WriteConfig;
     begin
     { the old file of the records is not needed any more: it stays as dn.old (a copy to go back to) }
     {$I-}
-    Assign(OldCfg, SourceDir+'dn'+GetEnv('DNCFG')+'.old');
+    Assign(OldCfg, ConfigDir+'dn'+GetEnv('DNCFG')+'.old');
     Erase(OldCfg);
     if IOResult <> 0 then;
-    Assign(OldCfg, SourceDir+'dn'+GetEnv('DNCFG')+'.cfg');
-    Rename(OldCfg, SourceDir+'dn'+GetEnv('DNCFG')+'.old');
+    Assign(OldCfg, ConfigDir+'dn'+GetEnv('DNCFG')+'.cfg');
+    Rename(OldCfg, ConfigDir+'dn'+GetEnv('DNCFG')+'.old');
     if IOResult <> 0 then;
     {$I+}
     end
@@ -2019,7 +2019,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   procedure StoreColors;
     begin
-    FN := GetFileNameDialog(SourceDir+'colors\*.pal',
+    FN := GetFileNameDialog(ConfigDir+'colors\*.pal',
            GetString(dlStoreColorPal), GetString(dlFileName),
         fdOKButton+fdHelpButton, hsColors);
     if FN = '' then
@@ -2047,7 +2047,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
   { procedure LoadColors;
  begin
   asm int 3 end;
-  FN := GetFileNameDialog(SourceDir+'colors\*.pal', GetString(dlLoadColorPal), GetString(dlFileName),
+  FN := GetFileNameDialog(ConfigDir+'colors\*.pal', GetString(dlLoadColorPal), GetString(dlFileName),
                           fdOKButton + fdHelpButton, hsColors);
   if FN = '' then Exit;
   LoadPalFromFile(FN);
@@ -2060,10 +2060,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     begin
     More := True;
     None := False;
-    FN := GetFileNameMenu(SourceDir+'colors\', '*.pal', '', True, More,
+    FN := GetFileNameMenu(ConfigDir+'colors\', '*.pal', '', True, More,
          None);
     if More then
-      FN := GetFileNameDialog(SourceDir+'colors\*.pal',
+      FN := GetFileNameDialog(ConfigDir+'colors\*.pal',
              GetString(dlLoadColorPal), GetString(dlFileName),
           fdOKButton+fdHelpButton, hsColors);
     if FN = '' then
@@ -2706,26 +2706,26 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmIntFileEdit:
       EditFile(False, CnvString(Event.InfoPtr));
     cmEditQuickRun:
-      EditFile(True, Copy(SourceDir, 1, Byte(ShiftState and 3 =
+      EditFile(True, Copy(ConfigDir, 1, Byte(ShiftState and 3 =
            0)*MaxStringLength)+'dn.xrn');
     cmExtFileEdit:
-      EditFile(True, Copy(SourceDir, 1, Byte(ShiftState and 3 =
+      EditFile(True, Copy(ConfigDir, 1, Byte(ShiftState and 3 =
            0)*MaxStringLength)+'dn.ext');
     cmMenuFileEdit:
-      EditFile(True, SourceDir+'dn.mnu');
+      EditFile(True, ConfigDir+'dn.mnu');
     cmLocalMenuFileEdit:
       EditFile(True, 'dn.mnu');
     cmEditHGL:
-      EditFile(True, SourceDir+'dn.hgl');
+      EditFile(True, ConfigDir+'dn.hgl');
     cmEditSPF:
-      EditFile(True, SourceDir+'dn.spf');
+      EditFile(True, ConfigDir+'dn.spf');
     cmEditINI:
-      EditFile(True, SourceDir+'dn.ini');
+      EditFile(True, ConfigDir+'dn.ini');
     cmExternalViewers:
-      EditFile(True, Copy(SourceDir, 1, Byte(ShiftState and 3 =
+      EditFile(True, Copy(ConfigDir, 1, Byte(ShiftState and 3 =
            0)*MaxStringLength)+'dn.vwr');
     cmExternalEditors:
-      EditFile(True, Copy(SourceDir, 1, Byte(ShiftState and 3 =
+      EditFile(True, Copy(ConfigDir, 1, Byte(ShiftState and 3 =
            0)*MaxStringLength)+'dn.edt');
     cmShowUserScreen:
       ShowUserScreen;
@@ -2760,7 +2760,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmHistoryList:
       CmdHistory;
     cmLoadDesk:
-      RetrieveDesktop(SourceDir+'dn'+GetEnv('DNDSK')+'.dsk', nil, True);
+      RetrieveDesktop(ConfigDir+'dn'+GetEnv('DNDSK')+'.dsk', nil, True);
     cmRetrieveSwp:
       ProcessTempFile(TempFileSWP);
     cmSaveDesk:

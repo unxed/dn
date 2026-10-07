@@ -412,7 +412,7 @@ procedure TARJArchive.Save;
     StoS := @q[1];
     end;
   begin
-  FreeStr := SourceDir+DNARC;
+  FreeStr := ConfigDir+DNARC;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
@@ -536,7 +536,7 @@ constructor TARJArchive.Create;
   Sign := GetSign;
   SetLength(Sign, Length(Sign)-1);
   Sign := Sign+#0;
-  FreeStr := SourceDir+DNARC;
+  FreeStr := ConfigDir+DNARC;
   inherited Create;
   
   Packer := NewStr(GetVal(@Sign[1], @FreeStr[1], PPacker, 'ARJ'));

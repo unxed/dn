@@ -23,6 +23,14 @@ procedure OSSerialTrace(const Msg: string);
 function OSBatchExt: string;
 { The directory for temporary files when neither DN.INI nor TEMP and TMP name one: C:\tmp\ on Unix (it is /tmp in the DN way of paths), '' elsewhere. }
 function OSDefaultTempDir: string;
+{ The directory for the files that the user changes (the settings, the desktop, the histories, the crash reports) as a path of the system with a separator at the end: the
+  directory `dn` of the configuration of the user on Unix ($XDG_CONFIG_HOME or ~/.config), `DN` of %APPDATA% on Windows; '' when the target keeps them next to the program
+  (DOS) or the directory is not known. }
+function OSConfigDir: string;
+{ What the system is ("Linux 6.1.0", "Windows 10.0", "DOS 7.10"): a fact for the log of the flight recorder. }
+function OSDescribe: string;
+{ Does the file system give 8.3 names beside the long ones (DOS, Windows)? Not on Unix: there the name of a file is one, and a short form of it is the name itself. }
+function OSHasShortNames: Boolean;
 
 implementation
 
@@ -66,6 +74,21 @@ end;
 function OSBatchExt: string;
 begin
   Result := BackendBatchExt;
+end;
+
+function OSConfigDir: string;
+begin
+  Result := BackendConfigDir;
+end;
+
+function OSDescribe: string;
+begin
+  Result := BackendDescribe;
+end;
+
+function OSHasShortNames: Boolean;
+begin
+  Result := BackendHasShortNames;
 end;
 
 function OSDefaultTempDir: string;

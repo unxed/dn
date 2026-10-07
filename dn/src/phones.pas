@@ -182,7 +182,7 @@ procedure PhoneBook(Manual: Boolean);
     R.Assign(2, 3, D.Size.X-3, 12);
     PL := TPhoneBox.Create(R, 1, TScrollBar(PV));
     PL.Options := PL.Options or ofPostProcess;
-    S := TBufStream.Create(SourceDir+'dn.phn', stOpenRead, 1024);
+    S := TBufStream.Create(ConfigDir+'dn.phn', stOpenRead, 1024);
     PC := nil;
     PC := TCollection(S.Get);
     if PC = nil then
@@ -307,7 +307,7 @@ procedure TPhoneBox.SetList(Alpha: Boolean);
       end
     else
       begin
-      S := TBufStream.Create(SourceDir+'dn.phn', stOpenRead, 1024);
+      S := TBufStream.Create(ConfigDir+'dn.phn', stOpenRead, 1024);
       PC := nil;
       PC := TPhoneCollection(S.Get);
       if PC = nil then
@@ -416,7 +416,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     NewLisT(C);
     FocusItem(R.A.X);
     Owner.UnLock;
-    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
     Phones := C;
     if Phones.Count > 16380 then
       Stream.Put(Phones)
@@ -476,7 +476,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     FocusItem(R.A.X);
     Owner.UnLock;
     Active.Phones := C;
-    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
     if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
@@ -525,7 +525,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     NewLisT(C);
     FocusItem(I);
     Owner.UnLock;
-    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
     Phones := C;
     if Phones.Count > 16380 then
       Stream.Put(Phones)
@@ -571,7 +571,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     FocusItem(I);
     Owner.UnLock;
     Active.Phones := C;
-    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
     if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
@@ -642,7 +642,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         NewLisT(C);
         Owner.UnLock;
         Active.Phones := C;
-        Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+        Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
         if Phones.Count > 16380 then
           Stream.Put(Phones)
         else
@@ -845,7 +845,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     List := nil;
     NewLisT(Active.Phones);
     F.Free;
-    Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
     if Phones.Count > 16380 then
       Stream.Put(Phones)
     else
@@ -966,7 +966,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
             SetRange(List.Count);
             DrawView;
             end;
-          Stream := TBufStream.Create(SourceDir+'dn.phn', stCreate, 1024);
+          Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
           if Phones.Count > 16380 then
             Stream.Put(Phones)
           else
