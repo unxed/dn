@@ -4,7 +4,7 @@ INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at th
 usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
 Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
-utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), save-setup (Alt-K, a column, Store, OK, a restart), clipboard (the editor copies, a DOS program reads the DOS clipboard; needs nasm and DN_DOS_PATCHED=1), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
+utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), save-setup (Alt-K, a column, Store, OK, a restart), clipboard (the editor copies, a DOS program reads the DOS clipboard; needs nasm and DN_DOS_PATCHED=1), pages (chcp 437, 850, 852, 866, 1125: the frames, Russian on 866, Ukrainian on 1125), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need a DOSBox-X with the UTF-8 DOS API (`master` since October 2026; before that the patches of
 docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
@@ -284,7 +284,47 @@ def sc_clipboard(src, work, scr):
     check('TEXT=6869' in out, 'the text that DN copied (hi) is in the DOS clipboard', out.split('\n'))
 
 
-SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files, 'edit': sc_edit, 'save-setup': sc_save_setup, 'clipboard': sc_clipboard}
+def screen_rows(work, page):
+    """the rows of the dump of the screen decoded by the code page of the DOS (the cells hold the bytes of the page)"""
+    import struct
+    data = open(os.path.join(work, 'SCR.DAT'), 'rb').read()
+    w, h = struct.unpack_from('<HH', data, 0)
+    cells = struct.unpack_from('<%dH' % (w * h), data, 4)
+    return [bytes(c & 255 for c in cells[y * w:(y + 1) * w]).decode('cp%d' % page, 'replace') for y in range(h)]
+
+
+def sc_pages(src, work, scr):
+    """The code pages of the DOS (chcp in DOSBox-X): the build with the code page inside shows its language by the page of the machine: the frames are the same on 437, 850, 852, 866, 1125; Russian
+    on 866, Ukrainian on 1125 (its letters are not where they are on 866)."""
+    ru = '\u0424\u0430\u0439\u043b  \u0414\u0438\u0441\u043a  \u0423\u0442\u0438\u043b\u0438\u0442\u044b  \u041f\u0430\u043d\u0435\u043b\u044c'
+    ua = ['\u0423\u0442\u0438\u043b\u0456\u0442\u0438', '\u0456\u043c\'\u044f', '\u0412\u0456\u043a\u043d\u0430']
+    cases = [(437, 'ENGLISH', ['File  Disk  Utilities  Panel', 'F1 Help']), (850, 'ENGLISH', ['File  Disk  Utilities  Panel', 'F1 Help']),
+             (852, 'ENGLISH', ['File  Disk  Utilities  Panel', 'F1 Help']), (866, 'RUSSIAN', [ru]), (1125, 'UKRAIN', ua)]
+    for page, lang, words in cases:
+        prepare(src, work)
+        run(work, 14, '011B', None, extra=['-c', 'chcp %d' % page, '-c', 'set DNLNG=%s' % lang])
+        if not os.path.isfile(os.path.join(work, 'SCR.DAT')):
+            check(False, 'page %d, %s: DN gave a screen' % (page, lang))
+            continue
+        rows = screen_rows(work, page)
+        text = '\n'.join(rows)
+        for w in words:
+            check(w in text, 'page %d, %s: the screen has %r' % (page, lang, w), rows[:6])
+        check('\u2550' in text and '\u2551' in text, 'page %d, %s: the frames are on the screen' % (page, lang), rows[:6])
+    # the help (F1) in its own language: Russian on 866, Ukrainian on 1125
+    helps = [(866, 'RUSSIAN', ['\u0424\u0430\u0439\u043b\u043e\u0432\u0430\u044f \u043f\u0430\u043d\u0435\u043b\u044c']),
+             (1125, 'UKRAIN', ['\u0424\u0430\u0439\u043b\u043e\u0432\u0430 \u043f\u0430\u043d\u0435\u043b\u044c', '\u0432\u0456\u0434\u043a\u0440\u0438\u0432\u0430\u0454'])]
+    for page, lang, words in helps:
+        prepare(src, work)
+        run(work, 20, '011B,3B00', None, extra=['-c', 'chcp %d' % page, '-c', 'set DNLNG=%s' % lang])
+        rows = screen_rows(work, page) if os.path.isfile(os.path.join(work, 'SCR.DAT')) else []
+        text = '\n'.join(rows)
+        check(' Help ' in text, 'page %d, %s: F1 opens the help' % (page, lang), rows[:8])
+        for w in words:
+            check(w in text, 'page %d, %s: the help text has %r' % (page, lang, w), rows[:12])
+
+
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files, 'edit': sc_edit, 'save-setup': sc_save_setup, 'clipboard': sc_clipboard, 'pages': sc_pages}
 
 
 def main():

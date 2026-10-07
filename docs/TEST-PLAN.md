@@ -28,7 +28,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Area | Floor | Have | Gap |
 |---|---|---|---|
 | Text and encodings | UTF-8 and code page conversion, case, widths, the border of names; the glyph names (frames) | `t_dnutf8`, `t_zipcharset`, `t_osnames`, `t_cpcase` (the case of the page 1125), `test_sort1125.py`, `tv/tests/t_utf8`, `t_text`, `t_glyphs`, `t_cpall` (all pages: round trip, frames) | the DOS landing of the frame glyphs on the screen of the pages 850 and 852 (a screenshot check) |
-| Resources | every dialog, menu and string of the three languages loads and a dialog draws | `rcp` in the build, `t_shim`, `t_resload` (every stored view of each language loads through the stream loader, the key sets of the languages are equal) | the control count of a loaded dialog against the source of `rcp` |
+| Resources | every dialog, menu and string of the three languages loads and a dialog draws | `rcp` in the build, `t_shim`, `t_resload` (every stored view of each language loads through the stream loader, the key sets of the languages are equal, every stored dialog has the same number of controls in the three languages) | none |
 | Settings | `dn.ini`, the saved setup, the desktop, the histories: write, read, migrate | `t_cfgstate`, `t_defsort`, `t_profile`, `t_cfgdir` (the directory, the move of the old files), `dn-linux-config.py` (XDG, `~/.config/dn`, the move, `DN2`) | the windows of the desktop (editor, viewer) saved and restored: `dn-linux-desktop.py` and the DOS scenario `autosave` do the panels only (Alt-X in an editor closes the editor, not DN: the exit with a window open needs another way out) |
 | Crash and hang reports | the log of a run, the report of a crash, the privacy of the typed characters, the next log after a killed run | `t_flightrec` (the log, the ring, the report, the masking), `dn-linux-crash.py` (an access violation forced in the real program) | the report of a crash on DOS and Windows (addresses only on DOS; the CI builds both, nobody has forced a crash there) |
 | Files and paths | find, names, attributes, the DOS path semantics through the facades | `t_osdep`, `t_flname`, `t_dnscreen` | long names, names with spaces and UTF-8, a missing directory, a read-only file |
@@ -61,13 +61,13 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 
 | Area | Floor | Have | Gap |
 |---|---|---|---|
-| Start and screen | start, panels, menu, in the code page build (437, 866) | `dn-tour.sh`, `dn-dos-input.py` (DOSBox-X) | the screen of the pages 850 and 852 |
+| Start and screen | start, panels, menu, in the code page build (437, 866) | `dn-tour.sh`, `dn-dos-input.py` (DOSBox-X; the scenario `pages`: chcp 437, 850, 852, 866, 1125) | none |
 | Names | UTF-8 names to the DOS when `DOS-UTF8/NAMES` is there, code page names when it is not | scenarios `utf8-names-cp` (patched DOSBox-X), `names-cp-plain` (stock DOSBox-X: no provider, code page names) | none |
 | Input | the keyboard and the mouse | `dn-dos-input.py` | none (F5, F6, F7, F8: scenario `files`, F3 and F4: scenario `edit` of `dn-dos-input.py`) |
 | State | desktop and setup saved and restored | `tools/dn-tour.sh` scenarios, `t_cfgstate`, `dn-dos-input.py` scenarios `autosave` and `save-setup` (Store of the panel appearance) | none |
 | User screen | a program's output kept and shown again | `userscr` smoke (in `toolchain`) | none |
 | Clipboard | UTF-8 clipboard when `DOS-UTF8/CLIPBRD` is there, OEM when not | `tv` `t_dosbk` | a DN-level check on Linux (`dn-linux-clip.py`) and on DOS (`dn-dos-input.py clipboard`: the editor copies, a DOS program reads the DOS clipboard); on Windows none |
-| Resources and help | the DOS build lands them on the code page of the language (`to-codepage.py`) | `tools/tests/test_to_codepage.py` | a screenshot check of the help in Russian and Ukrainian (cp866, cp1125) |
+| Resources and help | the DOS build lands them on the code page of the language (`to-codepage.py`) | `tools/tests/test_to_codepage.py`, `dn-dos-input.py pages` (the menu and the help in Russian on 866 and in Ukrainian on 1125, read from the cells by the page) | none |
 
 ## Where the tests run
 
@@ -85,8 +85,6 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 
 | Item | Why parked | Revisit |
 |---|---|---|
-| Screenshot checks of the screens of the pages 850 and 852, of the help in Russian and Ukrainian (cp866, cp1125) | DOSBox-X has no such pages; the tables are checked by unit tests (`t_cpall`, `t_cpcase`, `test_sort1125.py`) | when a DOS with these pages can run |
-| The control count of a loaded dialog against the source of `rcp` | `t_resload` proves that every view loads and that the three languages have the same keys; the source has no machine readable count | when `rcp` writes a manifest |
 | DN-level clipboard check on Windows | `tv` tests the backend of the Windows clipboard; a DN scenario needs the clipboard of the runner (the DOS one is `dn-dos-input.py clipboard`) | stage 4 follow-up |
 | The scenarios of the gate for the glyphs and the platform facades | the whole gate runs on both builds at every push (the glyphs are the screen of every scenario) | none |
 | Real DOS machines and FreeDOS | no runner; DOSBox-X is the only DOS we can run | when go2dos has a 386 mode (`PLAN.md`, milestone 7) |
