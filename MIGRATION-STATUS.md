@@ -42,7 +42,7 @@ The other scripts and what each one checks: [`tools/README.md`](tools/README.md)
 ## Branches and the submodule
 
 Work goes to `main`. `tv/` is the submodule `unxed/tv3`; a change to it is made and tested there (a branch of that repository), then the pointer is moved here.
-The `tv/` pointer of `main` is on the branch `claude/dos-names` of `unxed/tv3` (TvDosNames; not merged into its `main` yet: the owner says when). `claude/glyphs` of tv3 was merged on 2026-10-07 (`27f0a8a`) and can be deleted by the owner (the token of this work cannot).
+The `tv/` pointer of `main` is on `main` of `unxed/tv3` (`claude/dos-names` was merged into it on 2026-10-07 together with the clipboard and far2l work that was already there: `1bb5290`). The merged branches `claude/glyphs` and `claude/dos-names` of tv3 are still on GitHub: the token of this work cannot delete a branch (HTTP 403), the owner deletes them in the web interface.
 The object baseline of the gate is pinned in `tools/dn-linux-accept.py` (`OBJECT_DN_SHA`, `OBJECT_TV_SHA`).
 
 ## Open items
