@@ -48,4 +48,4 @@ The list is in `PLAN.md` and in `dn/TODO-later.md`. The ones that decide what to
    `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`.
 3. The unstable `menu_5_13` scenario (an asynchronous scan of the host root); a stabilizer is in, the CI has been green with it.
 4. The short name of a file record is 12 bytes: with UTF-8 inside the line under the panel shows a short form of a long name (see `dn/TODO-later.md`).
-5. The patched DOSBox-X (UTF-8 names, clipboard, the guard against the loop of `DOS_CheckExtDevice`) is local: the PRs to `joncampbell123/dosbox-x` are in `docs/patches/`.
+5. DOSBox-X: the UTF-8 DOS API (names, clipboard) and the guard against the loop of `DOS_CheckExtDevice` are in `joncampbell123/dosbox-x` `master` (PRs 6632 and 6634). `tools/dn-dos-input.py` with `DN_DOS_PATCHED=1` passes on a vanilla `master` (2026.10.01, checked 2026-10-07: 9 checks); `docs/patches/` is the history. The package `dosbox-x` of Ubuntu that the CI installs is older (no UTF-8 names): a CI job that builds `master` for this scenario is open (`dn/TODO-later.md`).
