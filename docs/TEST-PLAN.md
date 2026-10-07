@@ -50,9 +50,9 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 
 | Area | Floor | Have | Gap |
 |---|---|---|---|
-| Start and screen | start on a real console, menu bar, no country-setup error | `dn-win-smoke.py` (ConPTY) | the same for win32 and win64 both (the matrix has both builds) |
-| Names | UTF-8 names through the wide API: create, list, enter, copy | CI check of `Privet`, `αβγ`, F7 | copy and delete of such a name |
-| Processes | the shell and the archivers through `COMSPEC /c` | none | `t_osrun` branch for Windows; one real run of a command from DN |
+| Start and screen | start on a real console, menu bar, no country-setup error | `dn-win-smoke.py` (ConPTY) | none (`dn-windows` runs the smoke on win32 and win64, with and without UTF-8 inside) |
+| Names | UTF-8 names through the wide API: create, list, enter, copy | CI check of `Privet`, `αβγ`, F7 | delete of such a name (`dn-win-smoke.py` copies it: it found the copy bug) |
+| Processes | the shell and the archivers through `COMSPEC /c` | none | none (`dn-win-smoke.py` runs a command of the command line; `t_osrun` has no Windows branch: the tests of `dn/tests` run on Linux only) |
 | Clipboard | text round trip through the system clipboard | `tv` (Windows backend) | a DN-level check |
 
 ### DOS
@@ -83,5 +83,13 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 
 | Item | Why parked | Revisit |
 |---|---|---|
+| Screenshot checks of the screens of the pages 850 and 852, of the help in Russian and Ukrainian (cp866, cp1125) | DOSBox-X has no such pages; the tables are checked by unit tests (`t_cpall`, `t_cpcase`, `test_sort1125.py`) | when a DOS with these pages can run |
+| The control count of a loaded dialog against the source of `rcp` | `t_resload` proves that every view loads and that the three languages have the same keys; the source has no machine readable count | when `rcp` writes a manifest |
+| The windows of the desktop (editor, viewer) saved and restored | Alt-X inside an editor closes the editor; a way out of DN with a window open needs the menu of the window | with the next desktop change |
+| Names with spaces, a missing directory in the panels; `DN_RUN_PAUSE`; zip in zip; add and delete of archive members as separate checks | covered by the accept scenarios and `dn-linux-archives.py` in part | stage 4 follow-up |
+| Kitty keyboard flags in DN, a non-UTF-8 locale for the UTF-8 build, an interactive program in the embedded terminal | the first two are tested in `tv` (`tv/tests/pty`); the third needs a program that reads the terminal in the test | stage 4 follow-up |
+| DN-level clipboard checks (DOS and Windows) | `tv` tests the backends (`t_dosbk`, the Windows clipboard); a DN scenario needs the system clipboard of the runner | stage 4 follow-up |
+| The keys of the DOS harness for F3, F4, F6, F7, F8 on real files, the DOS `Save setup` | `dn-tour.sh` has F5, F6, F7, F8 as screens, not as checks of the files | stage 4 follow-up |
+| The scenarios of the gate for the glyphs and the platform facades | the whole gate runs on both builds at every push (the glyphs are the screen of every scenario) | none |
 | Real DOS machines and FreeDOS | no runner; DOSBox-X is the only DOS we can run | when go2dos has a 386 mode (`PLAN.md`, milestone 7) |
 | macOS, BSD | no target in the build matrix | when a target is added |

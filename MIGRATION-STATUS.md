@@ -1,6 +1,6 @@
 # Migration status
 
-Updated: 2026-10-06. This file is the handoff point: read it first, then [`PLAN.md`](PLAN.md) (the plan and the owner's checklist) and
+Updated: 2026-10-07. This file is the handoff point: read it first, then [`PLAN.md`](PLAN.md) (the plan and the owner's checklist) and
 [`docs/POST-CLASS-WORK.md`](docs/POST-CLASS-WORK.md) (the order of the stages).
 
 ## Where the port stands
@@ -14,9 +14,13 @@ Updated: 2026-10-06. This file is the handoff point: read it first, then [`PLAN.
   Unicode code points of `tv/src/tvglyphs.pas`, never byte constants.
 - **English:** comments, documents, hard-coded strings and the English resources are English (Cyrillic only where the policy lists it).
 - **Refactoring** (stage 2): done against [`docs/REFACTORING-CRITERIA.md`](docs/REFACTORING-CRITERIA.md).
-- **Platform separation** (stage 3): in progress and enforced; see [`docs/PLATFORM-SEPARATION.md`](docs/PLATFORM-SEPARATION.md). `tools/check-platform.py` (CI: `layout`)
-  fails when a platform unit or a target conditional appears outside the backends.
-- **Tests** (stage 4): the floor is defined in [`docs/TEST-PLAN.md`](docs/TEST-PLAN.md); the gaps listed there are the work.
+- **Platform separation** (stage 3): done and enforced; see [`docs/PLATFORM-SEPARATION.md`](docs/PLATFORM-SEPARATION.md). `tools/check-platform.py` (CI: `layout`)
+  fails when a platform unit or a target conditional appears outside the backends; `tools/build-matrix.sh` reports PASS, FAIL or UNAVAILABLE for every shipped configuration.
+- **Tests** (stage 4): the floor of [`docs/TEST-PLAN.md`](docs/TEST-PLAN.md) is met: every row has a test that runs in CI, or is parked there with a reason. CI at the head: `dn`, `layout`,
+  `toolchain`, `dn-linux` (tour, file operations, archives, find, resize, links and permissions, desktop), `dn-windows` (win32 and win64, with and without UTF-8 inside), `dn-accept`
+  (object vs class, 181 scenarios, and the UTF-8 build vs the code page build), `nightly`. DOS: `tools/dn-tour.sh`, `tools/dn-dos-input.py` (stock and patched DOSBox-X) by hand.
+- **Found by this work and fixed** (shared bugs, the object build had them too): the read-only attribute lost at a copy on Unix, names cut by bytes with UTF-8 inside, the SmartPad line,
+  the line drawing of the editor, the archivers on Unix (paths and list files), Find File with a text (class only), the data of a copy written after zeros on Windows. See `dn/TODO-later.md`.
 
 ## Build and check
 
@@ -37,10 +41,12 @@ The object baseline of the gate is pinned in `tools/dn-linux-accept.py` (`OBJECT
 
 ## Open items
 
-The list is in `PLAN.md` ("Owner requirements checklist" and "Next items in order") and in `dn/TODO-later.md`. The ones that decide what to do next:
+The list is in `PLAN.md` and in `dn/TODO-later.md`. The ones that decide what to do next:
 
-1. DOS: the UTF-8 names with the patched DOSBox-X (`DN_DOS_PATCHED=1 tools/dn-dos-input.py`) and the case and sort tables for the code page 1125 (Ukrainian).
-2. The rest of stage 3 (see the last steps in `docs/PLATFORM-SEPARATION.md`) and then stage 4 tests.
+1. **The owner:** merge the branch `claude/glyphs` of `unxed/tv3` into its `main` (see above).
+2. The parked rows of `docs/TEST-PLAN.md` (DN-level clipboard checks, the windows of the desktop, screenshot checks of the DOS pages 850, 852, 1125 and of the DOS help).
 3. Intermittent access violations that were seen once (after a clipboard prompt, after a command in the embedded terminal) and could not be reproduced:
    `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`.
-4. The unstable `menu_5_13` scenario (an asynchronous scan of the host root); a stabilizer is in, not proven.
+4. The unstable `menu_5_13` scenario (an asynchronous scan of the host root); a stabilizer is in, the CI has been green with it.
+5. The short name of a file record is 12 bytes: with UTF-8 inside the line under the panel shows a short form of a long name (see `dn/TODO-later.md`).
+6. The patched DOSBox-X (UTF-8 names, clipboard, the guard against the loop of `DOS_CheckExtDevice`) is local: the PRs to `joncampbell123/dosbox-x` are in `docs/patches/`.
