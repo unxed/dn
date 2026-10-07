@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>DN</title>
+  <!-- A text-mode screen: blue background, two panels with a double frame, the letters DN. -->
+  <rect x="4" y="4" width="120" height="120" rx="14" fill="#0000aa"/>
+  <rect x="14" y="14" width="46" height="100" fill="none" stroke="#55ffff" stroke-width="3"/>
+  <rect x="68" y="14" width="46" height="100" fill="none" stroke="#55ffff" stroke-width="3"/>
+  <rect x="18" y="18" width="38" height="92" fill="none" stroke="#55ffff" stroke-width="1"/>
+  <rect x="72" y="18" width="38" height="92" fill="none" stroke="#55ffff" stroke-width="1"/>
+  <rect x="22" y="40" width="30" height="8" fill="#00aaaa"/>
+  <text x="64" y="84" text-anchor="middle" font-family="DejaVu Sans Mono, monospace" font-weight="bold" font-size="40" fill="#ffff55">DN</text>
+</svg>
