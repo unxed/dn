@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The desktop of DN is saved at the exit and restored at the next start (Linux, a pty): tools/dn-linux-desktop.py OUTDIR
 Run 1: Options -> Configuration -> Startup: Autosave Desktop and Preserve directory on; Run 2: into the directory sub and out of DN by Alt-X (Yes);
-Run 3: the panel is in sub (the title of the panel), dn.dsk is on the disk. Runs 4 and 5: a window of the desktop, the editor, is saved and restored. The same scenario as `autosave` of tools/dn-dos-input.py."""
+Run 3: the panel is in sub (the title of the panel), dn.dsk is on the disk. Runs 4 and 5: a window of the desktop, the editor, is saved and restored; runs 6 and 7: the viewer. The same scenario as `autosave` of tools/dn-dos-input.py."""
 import os, re, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
@@ -76,6 +76,14 @@ try:
     check(not alive, 'run 4: DN ended by File -> Exit with the editor open', text)
     text, alive = run(d, w, '', wait_exit=False)
     check('Edit - ' in text and 'a.txt' in text, 'run 5: the next start brings the editor window back', text)
+    # the viewer: the same (the object build restores it; the class build died in the load of the viewer, XCoder was not made)
+    d, w = install(out)
+    dirs.append(d)
+    run(d, w, OPTIONS)
+    text, alive = run(d, w, 'ESC DOWN DOWN \x1bOR \x1b[<0;5;1M\x1b[<0;5;1m \x1b[F ENTER ENTER')    # a.txt, F3, File -> Exit, Yes
+    check(not alive, 'run 6: DN ended by File -> Exit with the viewer open', text)
+    text, alive = run(d, w, '', wait_exit=False)
+    check('Fatal' not in text and 'a.txt' in text and 'Edit - ' not in text, 'run 7: the next start brings the viewer window back', text)
 finally:
     for d in dirs:
         shutil.rmtree(d, ignore_errors=True)
