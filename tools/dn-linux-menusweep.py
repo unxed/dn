@@ -66,8 +66,9 @@ def leaves(items, path, names):
 def keys_for(path):
     m, rest = path[0], path[1:]
     ks = ['F10'] + ['RIGHT'] * m
-    for r in rest:
-        ks += ['DOWN'] * (r + 1) + ['ENTER']
+    for depth, r in enumerate(rest):
+        # the first Down opens the menu of the bar and selects its first item; a submenu opened with Enter has its first item selected already
+        ks += ['DOWN'] * (r + 1 if depth == 0 else r) + ['ENTER']
     return ks
 
 
