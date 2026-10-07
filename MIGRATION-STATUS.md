@@ -1,6 +1,6 @@
 # Migration status
 
-Updated: 2026-10-07. This file is the handoff point: read it first, then [`PLAN.md`](PLAN.md) (the plan and the owner's checklist) and
+Updated: 2026-10-07. Acceptance evidence at the head of that day: `dn-accept` green on `6ea4b21` (object vs class, 181 scenarios; UTF-8 vs code page; the saved desktop in both builds), `dn-linux` green on `4c0305e` (x86_64, i386, aarch64, with the tests of the configuration directory, the flight recorder, the clipboard, the embedded terminal, the locales, the Kitty keys), `dn-windows`, `toolchain`, `layout`, `tv` green. This file is the handoff point: read it first, then [`PLAN.md`](PLAN.md) (the plan and the owner's checklist) and
 [`docs/POST-CLASS-WORK.md`](docs/POST-CLASS-WORK.md) (the order of the stages).
 
 ## Where the port stands
