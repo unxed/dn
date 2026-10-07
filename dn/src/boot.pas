@@ -57,6 +57,8 @@ procedure UpdateConfig;
 procedure DoStartup;
 
 procedure RUN_IT;
+{ Starts the flight recorder (the log in ConfigDir; flightrec.pas): the first call of the program. }
+procedure StartRecorder;
 
 procedure Error(const FileName: String; LineNo, Addr, Code: LongInt);
 
@@ -76,7 +78,7 @@ uses
   dirwatch, realmode, 
   Tree, TvScreen, DNErrLog
   , filetype, panelsetup
-  , osdep, dnscreen, cfgstate, palettes;
+  , osdep, dnscreen, cfgstate, palettes, FlightRec;
 
 var
   PanSetupFromConfig: Boolean = False;   { the presets of the panels came from a saved setup (then DefaultSortMode of dn.ini does not change them) }
@@ -115,6 +117,124 @@ procedure TraceStartupState(const Stage: String);
 begin
   TraceStartupGroup(Stage, 'application', MyApplication);
   TraceStartupGroup(Stage, 'desktop', Desktop);
+end;
+
+{ --- the flight recorder (flightrec.pas): the facts of the run and what a crash report tells about the state --- }
+
+function ViewTitle(V: TView): string;
+begin
+  Result := V.ClassName;
+  if (V is TWindow) and (TWindow(V).Title <> nil) then
+    Result := Result + ' "' + TWindow(V).Title^ + '"';
+end;
+
+{ where an event goes: the deepest of the views that are current }
+function RecorderContext: string;
+var
+  V: TView;
+  N: Integer;
+begin
+  V := MyApplication;
+  N := 0;
+  while (V is TGroup) and (TGroup(V).Current <> nil) and (N < 12) do
+  begin
+    V := TGroup(V).Current;
+    Inc(N);
+  end;
+  if V = nil then
+    Result := ''
+  else
+    Result := V.ClassName;
+end;
+
+function RecorderViews: AnsiString;
+var
+  V: TView;
+  N: Integer;
+begin
+  Result := 'modal views running: ' + ItoS(ModalCount) + LineEnding;
+  V := MyApplication;
+  N := 0;
+  while V <> nil do
+  begin
+    Result := Result + StringOfChar(' ', N * 2) + ViewTitle(V) + LineEnding;
+    if (V is TGroup) and (TGroup(V).Current <> nil) and (N < 12) then
+    begin
+      V := TGroup(V).Current;
+      Inc(N);
+    end
+    else
+      Break;
+  end;
+end;
+
+function PanelText(const Name: string; P: TFilePanelRoot): AnsiString;
+begin
+  if P = nil then
+  begin
+    Result := Name + ': none' + LineEnding;
+    Exit;
+  end;
+  Result := Name + ': ' + P.ClassName + ' dir [' + P.DirectoryName + ']';
+  if P.Files <> nil then
+    Result := Result + ' files ' + ItoS(P.Files.Count);
+  Result := Result + ' cursor ' + ItoS(P.Delta) + ' selected ' + ItoS(P.SelNum);
+  if P.Drive <> nil then
+    Result := Result + ' drive ' + P.Drive.ClassName;
+  Result := Result + LineEnding;
+end;
+
+function RecorderPanels: AnsiString;
+begin
+  Result := PanelText('active', ActivePanel) + PanelText('passive', PassivePanel);
+end;
+
+function RecorderMemory: AnsiString;
+var
+  H: TFPCHeapStatus;
+begin
+  H := GetFPCHeapStatus;
+  Result := 'heap used ' + ItoS(H.CurrHeapUsed) + ' of ' + ItoS(H.CurrHeapSize) + ' bytes, the most used ' + ItoS(H.MaxHeapUsed) + LineEnding;
+end;
+
+procedure StartRecorder;
+var
+  I: Integer;
+  Args: string;
+begin
+  FRStart(ConfigDir, 'DN ' + VersionName + ' build ' + VersionRev + ' compiled ' + VersionDate);
+  FRFact('os', OSDescribe);
+  FRFact('program', {$I %FPCTARGETOS%} + '/' + {$I %FPCTARGETCPU%} + ' fpc ' + {$I %FPCVERSION%}
+{$IFDEF DNUTF8}
+    + ' utf8 inside'
+{$ELSE}
+    + ' code page inside'
+{$ENDIF}
+    );
+  FRFact('config dir', ConfigDir);
+  FRFact('program dir', SourceDir);
+  FRFact('start dir', StartupDir);
+  Args := '';
+  for I := 1 to ParamCount do
+    Args := Args + ' ' + ParamStr(I);
+  FRFact('arguments', Args);
+  FRFact('TERM', GetEnv('TERM'));
+  FRFact('COLORTERM', GetEnv('COLORTERM'));
+  FRFact('TERM_PROGRAM', GetEnv('TERM_PROGRAM'));
+  FRFact('LANG', GetEnv('LANG'));
+  FRFact('LC_ALL', GetEnv('LC_ALL'));
+  FRFact('LC_CTYPE', GetEnv('LC_CTYPE'));
+  FRFact('DNLNG', GetEnv('DNLNG'));
+  FRFact('DN2', GetEnv('DN2'));
+  FRContext := @RecorderContext;
+  FRAddState('views', @RecorderViews);
+  FRAddState('panels', @RecorderPanels);
+  FRAddState('memory', @RecorderMemory);
+end;
+
+procedure RecordScreenFacts;
+begin
+  FRFact('screen', ItoS(ScreenWidth) + 'x' + ItoS(ScreenHeight));
 end;
 
 function BadTemp(var s: String): Boolean;
@@ -168,7 +288,7 @@ procedure InvalidateTempDir;
   TempDir := OSDefaultTempDir;    { Unix: TEMP and TMP are not set by the shell as a rule }
   if (TempDir <> '') and not BadTemp(TempDir) then
     Exit;
-  TempDir := SourceDir;
+  TempDir := ConfigDir;
   if not BadTemp(TempDir) then
     begin
     TempDir := TempDir+'TEMP';
@@ -236,7 +356,7 @@ procedure DoStartup;
       F: TTextReader;
     begin
     FileMode := $40;
-    F := TTextReader.Create(SourceDir+'dnhgl.grp');
+    F := TTextReader.Create(ConfigDir+'dnhgl.grp');
     if F = nil then
       Exit;
     if not F.Eof then
@@ -290,7 +410,7 @@ procedure DoStartup;
         end
       else
         begin
-        Old := TBufStream.Create(SourceDir+'dn'+GetEnv('DNCFG')+'.cfg', stOpenRead, 16384);
+        Old := TBufStream.Create(ConfigDir+'dn'+GetEnv('DNCFG')+'.cfg', stOpenRead, 16384);
         if (Old.Status = stOK) and (Old.GetSize <> 0) then
           S.CopyFrom(Old, Old.GetSize);
         Old.Free;
@@ -779,6 +899,7 @@ procedure RUN_IT;
   (* InitLFNCol; *)
   MyApplication := MyApp.Create;
   TraceStartupState('after-application-create');
+  RecordScreenFacts;
 
   if RunFirst then
     ShowIniErrors;

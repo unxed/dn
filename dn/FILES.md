@@ -86,11 +86,13 @@ The names of the units are words without digits and underscores (a unit has the 
 | The groups of files for the colors/highlight of the panels (?) | `dnhgl.grp` | by hand | `boot.pas`, `dnutil.pas` |
 | The commands of the archivers | `archiver.ini` | by hand | `archiver.pas` |
 | The flag of a running copy in the swap directory | `dn.flg` | `dnutil.pas` | `dnutil.pas` |
-| Reports of a crash and the log of the start | `dn.err`, `dnerr.txt`, `dnlog.txt` | `dn.pas`, `dnerrlog.pas`, `mainapp.pas` | people |
+| The log of a run, the report of a crash (see [`../docs/CRASH-REPORTS.md`](../docs/CRASH-REPORTS.md)) | `dn.log`, `dn_prev.log`, `crash/crashNNN.txt` (in `ConfigDir`); `dn.err` only when there is no such directory; `dnerr.txt`, `dnlog.txt` are the files of test aids (`DNDUMP`, `DN_LOG_FILE`) | `flightrec.pas` (the events are noted by `apploop.pas`, `panelroot.pas`, `dnexec.pas`, `filecopy.pas`, `eraser.pas`; the report by `dn.pas`) | people |
 | Resources: dialogs, menus, strings, help of a language | `<language>.dlg`, `<language>.lng`, `<language>.hlp` (`english`, `russian`, `ukrain`) | the build (`rcp`, `tvhc`) | `mainapp.pas`, `langid.pas` |
 | Tables of the layouts of the keyboard, the palettes | `xlt/*.xlt`, `colors/*.pal` (from `dn/data/`) | people | `xcode.pas`, `dnutil.pas` |
 
 One file for the settings (2026-10-04): the image of the records that `dn.cfg` held lives in the section `[Saved]` of `dn.ini` (hex, written by DN at the exit, not for editing; `cfgstate.pas`), the rest of the file (the comments, the settings of the people) is not touched. Making a text key of every field of every record (instead of the image) is a later step (`TODO-later.md`).
+
+**Where these files are (2026-10-07):** the files that the user changes (everything in the table above except the resources, `xlt` and `colors`, which are read from the program directory, `SourceDir`) are in the directory `ConfigDir` (`basics.pas`; chosen in `dlgrecs.pas`, the rules are in `cfgdir.pas`): `$XDG_CONFIG_HOME/dn` or `~/.config/dn` on Linux and the like, `%APPDATA%\DN` on Windows; DOS keeps them next to the program; the environment variable `DN2` names one directory for everything. The first start copies the files of an older DN from the program directory.
 One directory: every file in the table is composed as `SourceDir + name` (`basics.SourceDir`: the directory of the program, or the directory in the environment variable `DN2`, set in `dlgrecs.pas`), so the settings, the histories and the desktop can be moved by `DN2`; the Unix per-user directory (`~/.config/dn`) is not the default yet (`TODO-later.md`).
 
 * The flags of the Startup dialog are `osu*` in `commands.pas` (`osuAutosave = $02`, `osuPreserveDir = $08`...); `StartupData.Load` is for the start, `.Unload` is for the exit. The dialog is in `setups.pas`.
@@ -144,6 +146,9 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `topview.pas` (was `topview_`) | the view that shows the top of a stack of windows and the sorted view (`TTopView`, `TSortView`) |
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
+| `flightrec.pas` (ours) | the flight recorder: the log of a run, the facts, the ring of the last events, the report of a crash |
+| `evnames.pas` (generated) | the names of the commands and the keys for the log (`tools/gen-evnames.py`) |
+| `cfgdir.pas` (ours) | the directory of the files of the user (`UserConfigDir`) and the one-time copy of the files of an older DN into it (`MoveUserFiles`) |
 | `cfgstate.pas` (ours) | the image of the records of the dialogs (what `dn.cfg` held) in the section `[Saved]` of `dn.ini`: hex pieces, read and written through `profile.pas` |
 | `fatalerr.pas` (the place of an address and the wait for a key at the fatal-error screen of `dn.pas`; was in `vpsyslow`, ours) | what the crash screen needs |
 | `compat/dnscreen.pas` (the 16-bit cell screen and the cursor of DN over `tv/`, was the `SysTv*` part of `vpsyslow`, ours) | the copy of the screen for the code that reads the screen, the cursor shape |

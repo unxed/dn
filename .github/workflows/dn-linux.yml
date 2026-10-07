@@ -95,6 +95,12 @@ jobs:
       - name: The desktop is saved at the exit and restored at the start
         if: success() || failure()
         run: python3 tools/dn-linux-desktop.py out/dn
+      - name: The files of the user are in the configuration directory
+        if: success() || failure()
+        run: python3 tools/dn-linux-config.py out/dn
+      - name: The flight recorder - the log of a run and the report of a crash
+        if: success() || failure()
+        run: python3 tools/dn-linux-crash.py out/dn
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64

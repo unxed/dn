@@ -100,7 +100,7 @@ procedure CloseWriteStream;
 
 implementation
 uses
-  mainapp, Startup, Messages, HistList, Commands,
+  FlightRec, mainapp, Startup, Messages, HistList, Commands,
   timeutil, Validate, TitleSet, UserMenu, Dos, DnIni,
   
   osdep, dnscreen, TvGlyphs, Filediz , ArvidAvt ,
@@ -2887,6 +2887,10 @@ procedure CopyFiles(Files: TCollection; SourcePanel: TView; MoveMode: Boolean; F
   begin
   CtrlBreakHit := False;
   Files.Pack;
+  if MoveMode then
+    FRNote('file', 'move ' + ItoS(Files.Count) + ' item(s)')
+  else
+    FRNote('file', 'copy ' + ItoS(Files.Count) + ' item(s)');
   if Files.Count <= 0 then
     Exit;
   if not CopyDialog(CopyDir, Mask, CopyOpt, CopyMode, CopyPrn,

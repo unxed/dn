@@ -53,5 +53,8 @@ fi
 # 5. the manifest of the origin of the files of dn/src
 python3 bootstrap/tools/dn-manifest.py --check >/dev/null || err "dn/PROVENANCE.md is not up to date (run bootstrap/tools/dn-manifest.py)"
 
+# 6. the names of the commands and keys for the log of the flight recorder are made from the sources
+python3 tools/gen-evnames.py --check || err "dn/src/evnames.pas is not up to date (run tools/gen-evnames.py)"
+
 [ "$fail" -eq 0 ] && echo "layout: ok"
 exit "$fail"

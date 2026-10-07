@@ -216,7 +216,7 @@ function OtherFilePanel(P: TFilePanelRoot): TFilePanelRoot;
 implementation
 
 uses
-  Lfn, uselfn, basics, strutil, fileutil, envutil, osdep,
+  Lfn, uselfn, basics, strutil, fileutil, envutil, osdep, FlightRec,
   Messages, mainapp, DNHelp, Startup, Commands, histories, HistList, paneldlgs,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
   DNUtil, fsinfo, Dos, Filediz, Collect, Math,
@@ -3031,6 +3031,7 @@ procedure TFilePanelRoot.ChDir(Dir: String);
   if Drive.DriveType <> dtDisk then
     Exit;
   MakeNoSlash(Dir);
+  FRNote('dir', 'panel ' + ItoS(Ord(SelfNum)) + ' to [' + Dir + ']');
   Drive.lChDir(Dir);
   DriveLetter := Drive.GetDriveLetter;
   IncDrawDisabled;

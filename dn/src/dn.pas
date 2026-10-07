@@ -79,7 +79,7 @@ uses
   
   , SysUtils 
   
-  , osdep, dnscreen, fatalerr
+ , osdep, dnscreen, fatalerr, FlightRec, TvScreen
  , realmode 
   ;
 
@@ -91,8 +91,43 @@ var
   FileName: ShortString;
   LineNo: LongInt;
   DNErrFile: Text;
+  CrashFile: String;
+  Lines: array[0..11] of String;
 
   
+
+{ The text of a fatal error on the screen: put into the copy of the cells that dnscreen keeps (the way everything else is drawn), so it needs neither the
+  position of the cursor nor the way the terminal ends a line. }
+procedure FatalScreen(const Lines: array of String);
+var
+  Cells: PWord;
+  X, Y: Integer;
+  S: String;
+begin
+  if (ScreenWidth <= 0) or (ScreenHeight <= 0) then
+    Exit;
+  Cells := PWord(ReadScreenCells);
+  if Cells = nil then
+    Exit;
+  for Y := 0 to High(Lines) do
+  begin
+    if Y >= ScreenHeight then
+      Break;
+    S := Lines[Y];
+    for X := 0 to ScreenWidth - 1 do
+      if X < Length(S) then
+      begin
+        if Byte(S[X + 1]) in [32..126] then
+          Cells[Y * ScreenWidth + X] := $0700 or Byte(S[X + 1])
+        else
+          Cells[Y * ScreenWidth + X] := $073F;        { a character that is not plain ASCII: ? }
+      end
+      else
+        Cells[Y * ScreenWidth + X] := $0720;
+  end;
+  WriteScreenCells(0, ScreenWidth * ScreenHeight);
+  SetCaretSize(0);
+end;
 
 begin
 
@@ -108,6 +143,7 @@ try
       create a log of all Load and Store method calls}
   begin
  
+  StartRecorder;
   RUN_IT;
   if RestartPending then
     RestartSelf;
@@ -124,34 +160,47 @@ except
     end;
   on E: Exception do
     begin
+    { the report first: the screen is still what the user saw (flightrec.pas: the key facts, the last events, the state, the screen) }
+    CrashFile := FRCrash(E.ClassName, E.Message);
     DNErrLog.DNTraceException(E.ClassName, E.Message);
     CloseWriteStream;
-    ClearScreen;
-    WriteScreenCells(0, ScreenWidth*ScreenHeight);
-    SourceDir := SourceDir+'dn.err';
-    Writeln('Fatal Error'^M^J'-----------'^M^J^M^J+
-      'Exception 0', Hex2(ExitCode), 'h at address ',
-           Hex8(LongInt(ExceptAddr)));
-    Writeln(E.Message);
-    if GetLocationInfo(ExceptAddr, FileName, LineNo) <> nil then
-      Writeln('Source location: '+FileName+' line ', LineNo);
-    Writeln('Please report to https://github.com/unxed/dn'^M^J+
-      '( file '+SourceDir+' )'^M^J^M^J+
-      'Press any key...');
+    if CrashFile = '' then
+      begin
+      { no directory for the log (it could not be made): the old way, a short text next to the settings }
+      CrashFile := ConfigDir+'dn.err';
 {$I-}
-    Assign(DNErrFile, SysOsPath(SourceDir));
-    ClrIO;
-    Append(DNErrFile);
-    if IOResult <> 0 then
-      Rewrite(DNErrFile);
-    Writeln(DNErrFile, '');
-    Writeln(DNErrFile, 'DN/2 ' + VersionName + ' build '+VersionRev+' compiled '+VersionDate);
-    Writeln(DNErrFile, E.Message);
+      Assign(DNErrFile, SysOsPath(CrashFile));
+      ClrIO;
+      Append(DNErrFile);
+      if IOResult <> 0 then
+        Rewrite(DNErrFile);
+      Writeln(DNErrFile, '');
+      Writeln(DNErrFile, 'DN/2 ' + VersionName + ' build '+VersionRev+' compiled '+VersionDate);
+      Writeln(DNErrFile, E.Message);
+      if GetLocationInfo(ExceptAddr, FileName, LineNo) <> nil then
+        Writeln(DNErrFile, 'Source location: '+FileName+' line ', LineNo)
+      else
+        Writeln(DNErrFile, 'Exception at addr '+IntToHex(PtrUInt(ExceptAddr), 8));
+      Close(DNErrFile);
+{$I+}
+      end;
+    ClearScreen;
+    Lines[0] := 'Fatal Error';
+    Lines[1] := '-----------';
+    Lines[2] := '';
+    Lines[3] := 'Exception 0' + Hex2(ExitCode) + 'h at address ' + Hex8(LongInt(ExceptAddr));
+    Lines[4] := E.Message;
     if GetLocationInfo(ExceptAddr, FileName, LineNo) <> nil then
-      Writeln(DNErrFile, 'Source location: '+FileName+' line ', LineNo)
+      Lines[5] := 'Source location: ' + FileName + ' line ' + IntToStr(LineNo)
     else
-      Writeln(DNErrFile, 'Exception at addr '+IntToHex(PtrUInt(ExceptAddr), 8));
-    Close(DNErrFile);
+      Lines[5] := '';
+    Lines[6] := '';
+    Lines[7] := 'Please report to https://github.com/unxed/dn';
+    Lines[8] := 'and attach the file';
+    Lines[9] := CrashFile;
+    Lines[10] := '';
+    Lines[11] := 'Press any key...';
+    FatalScreen(Lines);
     WaitForKey;
     end;
 end;
