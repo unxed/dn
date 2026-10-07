@@ -4,7 +4,7 @@ INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at th
 usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
 Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
-utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
+utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need a DOSBox-X with the UTF-8 DOS API (`master` since October 2026; before that the patches of
 docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
@@ -226,7 +226,20 @@ def sc_names_cp_plain(src, work, scr):
     check(has(lines, 'Каталог'), 'plain DOS: a directory with a Russian name is shown in the code page', lines)
 
 
-SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain}
+def sc_files(src, work, scr):
+    """The keys of the harness on real files (DOS, on the file system of the host): F7 makes a directory, F5 copies, F6 moves, F8 deletes."""
+    prepare(src, work)
+    # Esc (the About box); F7, "newd", Enter; Down (the directory sub), Enter (into it); Down (plain.txt), F5, Enter (to the other panel, C:\); F8, Enter (Yes);
+    # the cursor is on two.txt: F6, Enter (to C:\)
+    keys = '011B,4100,316E,1265,1177,2064,1C0D,5000,1C0D,5000,3F00,1C0D,4200,1C0D,4000,1C0D'
+    run(work, 60, keys)
+    check(os.path.isdir(os.path.join(work, 'newd')), 'F7: the directory is made')
+    check(os.path.isfile(os.path.join(work, 'plain.txt')) and open(os.path.join(work, 'plain.txt')).read() == 'hi\n', 'F5: plain.txt is copied to the other panel')
+    check(not os.path.exists(os.path.join(work, 'sub', 'plain.txt')), 'F8: plain.txt is deleted from sub')
+    check(os.path.isfile(os.path.join(work, 'two.txt')) and not os.path.exists(os.path.join(work, 'sub', 'two.txt')), 'F6: two.txt is moved to the other panel')
+
+
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files}
 
 
 def main():
