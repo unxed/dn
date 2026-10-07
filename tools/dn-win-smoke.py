@@ -185,6 +185,24 @@ def main():
                 break
             time.sleep(0.4)
         check(plain_text() == 'first', 'F5: a plain file is copied with its data (not after a block of zeros)', 'content: %r\n%s' % (plain_text(), t.text()))
+        # the clipboard: the editor copies "first" (Ctrl-Ins), the clipboard of Windows has it (read with PowerShell); a runner without a clipboard is a skip, not a fault
+        t.send('\x1b[H', 0.4)
+        for _ in range(3 if u8 else 2):
+            t.send('\x1b[B', 0.3)
+        t.send('\x1bOS', 1.5)                          # F4: the editor on a.txt
+        for _ in range(5):
+            t.send('\x1b[1;2C', 0.2)                   # Shift-Right: "first"
+        t.send('\x1b[2;5~', 1.0)                       # Ctrl-Ins: copy
+        try:
+            import subprocess
+            got = subprocess.run(['powershell', '-NoProfile', '-Command', 'Get-Clipboard'], capture_output=True, text=True, timeout=60)
+            if got.returncode != 0:
+                print('SKIP clipboard: Get-Clipboard failed: %s' % got.stderr.strip()[:200], flush=True)
+            else:
+                check(got.stdout.strip() == 'first', 'clipboard: the text copied in the editor is in the clipboard of Windows', 'clipboard: %r\n%s' % (got.stdout, t.text()))
+        except Exception as e:
+            print('SKIP clipboard: %s' % e, flush=True)
+        t.send('\x1b', 1.0)                            # leave the editor
         t.send('\x1bx', 1.0)                          # Alt-X: quit
         t.send('\r', 1.5)
         for _ in range(20):
