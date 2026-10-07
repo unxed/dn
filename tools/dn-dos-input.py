@@ -4,7 +4,7 @@ INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at th
 usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
 Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
-utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
+utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need a DOSBox-X with the UTF-8 DOS API (`master` since October 2026; before that the patches of
 docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
@@ -239,7 +239,19 @@ def sc_files(src, work, scr):
     check(os.path.isfile(os.path.join(work, 'two.txt')) and not os.path.exists(os.path.join(work, 'sub', 'two.txt')), 'F6: two.txt is moved to the other panel')
 
 
-SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files}
+def sc_edit(src, work, scr):
+    """F4 opens the editor on a real file, a typed character and F2 save it; F3 views a file and Esc leaves the viewer (DOS, on the file system of the host)."""
+    prepare(src, work)
+    # Esc (the About box); the active panel is the right one, in C:\\ (the first entry is the directory sub): Enter (into it); Down (plain.txt); F4, "Z", F2 (save),
+    # Esc (leave the editor); Down (two.txt); F3, Esc
+    keys = '011B,1C0D,5000,3E00,2C5A,3C00,011B,5000,3D00,011B'
+    lines = run(work, 50, keys)
+    check(open(os.path.join(work, 'sub', 'plain.txt')).read() == 'Zhi\n', 'F4: the typed character is saved by F2')
+    check(open(os.path.join(work, 'sub', 'two.txt')).read() == 'hi\n', 'F3: the viewer does not change the file')
+    check(has(lines, 'C:\\sub') and not has(lines, 'Fatal'), 'F3, Esc: back in the panel', lines)
+
+
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files, 'edit': sc_edit}
 
 
 def main():
