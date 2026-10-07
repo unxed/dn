@@ -32,7 +32,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Settings | `dn.ini`, the saved setup, the desktop, the histories: write, read, migrate | `t_cfgstate`, `t_defsort`, `t_profile`, `t_cfgdir` (the directory, the move of the old files), `dn-linux-config.py` (XDG, `~/.config/dn`, the move, `DN2`) | the windows of the desktop (editor, viewer) saved and restored: `dn-linux-desktop.py` and the DOS scenario `autosave` do the panels only (Alt-X in an editor closes the editor, not DN: the exit with a window open needs another way out) |
 | Crash and hang reports | the log of a run, the report of a crash, the privacy of the typed characters, the next log after a killed run | `t_flightrec` (the log, the ring, the report, the masking), `dn-linux-crash.py` (an access violation forced in the real program) | the report of a crash on DOS and Windows (addresses only on DOS; the CI builds both, nobody has forced a crash there) |
 | Files and paths | find, names, attributes, the DOS path semantics through the facades | `t_osdep`, `t_flname`, `t_dnscreen` | long names, names with spaces and UTF-8, a missing directory, a read-only file |
-| Processes | start a program, restart, the user screen | `t_osrun`, `t_dnrun` | exit codes and the pause setting (`DN_RUN_PAUSE`) |
+| Processes | start a program, restart, the user screen | `t_osrun`, `t_dnrun`, `dn-linux-names.py` (`DN_RUN_PAUSE` 0, 1, 2) | exit codes of the programs as DN shows them |
 | Archives | enter, leave, list, F3, F4, F5, F8, add (zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz) | `dn-linux-archives.py`, `docs/ARCHIVE-MATRIX.md` | zip in zip; add and delete as separate checks of the files in the archive |
 | The object/class gate | every scenario of every function, cell by cell | `dn-accept` (178 scenarios) | the scenarios added by stages 1 to 3 (glyphs, platform facades) |
 
@@ -41,7 +41,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Area | Floor | Have | Gap |
 |---|---|---|---|
 | Start and screen | start, menu bar, exit, language switch, startup panels | `dn-linux-tour.py`, `-startup.py`, `-about.py`, accept `start`, `restart_language` | none (`dn-linux-resize.py` is the SIGWINCH test) |
-| File operations | make directory, copy, move, delete, edit and save, on real files | `dn-linux-ops.py` | none (`dn-linux-fsattrs.py`: links and read-only files) |
+| File operations | make directory, copy, move, delete, edit and save, on real files | `dn-linux-ops.py`, `dn-linux-names.py` (names with spaces, a missing directory, a zip in a zip) | none (`dn-linux-fsattrs.py`: links and read-only files) |
 | Input | win32 input mode, far2l, quick search | `dn-linux-win32.py`, `-far2l.py`, `-qsearch.py` | Kitty keyboard flags in DN (not only in `tv`) |
 | Text | the code page by the locale (code page build), UTF-8 names | `dn-linux-locale.py`, `DN_OPS_UTF8` | a non-UTF-8 locale for the UTF-8 build |
 | Embedded terminal | a command line command, Ctrl-O, the user screen | `dn-linux-ops.py` (command), `tv/tests/pty/test_vtrun.py` | an interactive program and the return to DN |
@@ -87,7 +87,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Screenshot checks of the screens of the pages 850 and 852, of the help in Russian and Ukrainian (cp866, cp1125) | DOSBox-X has no such pages; the tables are checked by unit tests (`t_cpall`, `t_cpcase`, `test_sort1125.py`) | when a DOS with these pages can run |
 | The control count of a loaded dialog against the source of `rcp` | `t_resload` proves that every view loads and that the three languages have the same keys; the source has no machine readable count | when `rcp` writes a manifest |
 | The windows of the desktop (editor, viewer) saved and restored | Alt-X inside an editor closes the editor; a way out of DN with a window open needs the menu of the window | with the next desktop change |
-| Names with spaces, a missing directory in the panels; `DN_RUN_PAUSE`; zip in zip; add and delete of archive members as separate checks | covered by the accept scenarios and `dn-linux-archives.py` in part | stage 4 follow-up |
+| Add and delete of archive members as separate checks | covered by the accept scenarios and `dn-linux-archives.py` in part | stage 4 follow-up |
 | Kitty keyboard flags in DN, a non-UTF-8 locale for the UTF-8 build, an interactive program in the embedded terminal | the first two are tested in `tv` (`tv/tests/pty`); the third needs a program that reads the terminal in the test | stage 4 follow-up |
 | DN-level clipboard checks (DOS and Windows) | `tv` tests the backends (`t_dosbk`, the Windows clipboard); a DN scenario needs the system clipboard of the runner | stage 4 follow-up |
 | The keys of the DOS harness for F3, F4, F6, F7, F8 on real files, the DOS `Save setup` | `dn-tour.sh` has F5, F6, F7, F8 as screens, not as checks of the files | stage 4 follow-up |

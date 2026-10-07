@@ -43,6 +43,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-linux-resize.py` | the terminal changes its size under DN (SIGWINCH: 80x25, 120x40, 100x30): the bars and the frames follow | dn-linux |
 | `dn-linux-fsattrs.py` | symbolic links (to a file, to a directory, dangling) and read-only files in the panels: list, enter, F5, F8, the permissions of the copy | dn-linux |
 | `dn-linux-desktop.py` | the options Autosave Desktop and Preserve directory, Alt-X, the next start: `dn.dsk` and the directory of the panel are restored (the Linux twin of the scenario `autosave` of `dn-dos-input.py`) | dn-linux |
+| `dn-linux-names.py` | `DN_RUN_PAUSE` 0/1/2, names with spaces (enter, F7, F5, F8, checked on the file system), a missing directory (`cd`, a directory removed under the panel), a zip in a zip | dn-linux |
 | `dn-linux-crash.py` | the flight recorder: the log of a run (`dn.log`, `dn_prev.log`), the report of an access violation forced with `DN_TEST_CRASH=1` + F12 (`crash/crash001.txt`), the typed characters not recorded, `DN_LOG_KEYS=full`, `DN_LOG=0`, a killed run told in the next log | dn-linux |
 | `gen-evnames.py` | writes `dn/src/evnames.pas` (the names of the commands and the keys for the log) from `commands.pas`, the units of `tv/src` and `tvkeys.pas`; `--check` is in `check-layout.sh` | layout |
 | `dn-linux-config.py` | where the files of the user go: `$XDG_CONFIG_HOME/dn`, `~/.config/dn`, the move of the files of an older DN (the originals stay), `DN2` | dn-linux |
