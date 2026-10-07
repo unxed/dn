@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The desktop of DN is saved at the exit and restored at the next start (Linux, a pty): tools/dn-linux-desktop.py OUTDIR
 Run 1: Options -> Configuration -> Startup: Autosave Desktop and Preserve directory on; Run 2: into the directory sub and out of DN by Alt-X (Yes);
-Run 3: the panel is in sub (the title of the panel), dn.dsk is on the disk. The same scenario as `autosave` of tools/dn-dos-input.py."""
+Run 3: the panel is in sub (the title of the panel), dn.dsk is on the disk. Runs 4 and 5: a window of the desktop, the editor, is saved and restored. The same scenario as `autosave` of tools/dn-dos-input.py."""
 import os, re, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
@@ -68,6 +68,14 @@ try:
     check(any(n.lower() == 'dn.dsk' for n in os.listdir(d)), 'run 2: dn.dsk is written at the exit', text)
     text, alive = run(d, w, '', wait_exit=False)                     # the panel is in sub
     check(re.search(r'work\\sub', text) is not None, 'run 3: the next start restores the directory of the panel (work\\sub)', text)
+    # a window of the desktop (the editor): out of DN by the menu File -> Exit (Alt-X in an editor does not leave DN), the next start brings the editor back
+    d, w = install(out)
+    dirs.append(d)
+    run(d, w, OPTIONS)
+    text, alive = run(d, w, 'ESC DOWN DOWN \x1bOS \x1b[<0;5;1M\x1b[<0;5;1m \x1b[F ENTER ENTER')    # a.txt, F4, the menu File (the mouse), its last item (Exit), Yes
+    check(not alive, 'run 4: DN ended by File -> Exit with the editor open', text)
+    text, alive = run(d, w, '', wait_exit=False)
+    check('Edit - ' in text and 'a.txt' in text, 'run 5: the next start brings the editor window back', text)
 finally:
     for d in dirs:
         shutil.rmtree(d, ignore_errors=True)
