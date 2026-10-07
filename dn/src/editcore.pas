@@ -407,7 +407,7 @@ constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TS
 
 constructor TFileEditor.Load(S: TStream);
   begin
-  inherited Load(S, TTveDoc.Create, True);
+  inherited LoadWith(S, TTveDoc.Create, True);
   HelpCtx := hcEditor;
   isValid := True;
   MILoad(Self, S);
