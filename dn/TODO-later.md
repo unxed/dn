@@ -373,7 +373,7 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 
 - tv3 (`tv/src/tvdos.pas`, `tv/src/tvdosnames.pas`): the AMIS primitives (`AmisFind`, `AmisSetEncoding`), the clipboard provider `DOS-UTF8/CLIPBRD`, the names provider `DOS-UTF8/NAMES` and the conversion of a name.
 - dn: only the calls (`osdep`, `osrundos`); the unit `osnamesdos.pas` is gone.
-- Done (2026-10-07, the owner asked): the switch-on of the names provider `DOS-UTF8/NAMES` (`TvDos.DosInit`, `TV_DOS_UTF8_NAMES=0` turns it off; was `DN_DOS_UTF8_NAMES`) and the conversion of a name at the border (`TvDosNames`: `DosNameToUtf8`, `DosNameFromUtf8`, tested natively by `tv/tests/t_dosnam.pas`) are in tv3 (branch `claude/dos-names`). The DOS tests of dn stay green with stock DOSBox-X master.
+- Done (2026-10-07, the owner asked): the switch-on of the names provider `DOS-UTF8/NAMES` (`TvDos.DosInit`, `TV_DOS_UTF8_NAMES=0` turns it off; was `DN_DOS_UTF8_NAMES`) and the conversion of a name at the border (`TvDosNames`: `DosNameToUtf8`, `DosNameFromUtf8`, tested natively by `tv/tests/t_dosnam.pas`) are in tv3 (`main`, merged 2026-10-07). The DOS tests of dn stay green with stock DOSBox-X master.
 
 ## Flight recorder (2026-10-07, done; what is left)
 
