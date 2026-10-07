@@ -36,17 +36,16 @@ The other scripts and what each one checks: [`tools/README.md`](tools/README.md)
 ## Branches and the submodule
 
 Work goes to `main`. `tv/` is the submodule `unxed/tv3`; a change to it is made and tested there (a branch of that repository), then the pointer is moved here.
-**Open for the owner:** the `tv/` pointer of `main` is a commit of the branch `claude/glyphs` of `unxed/tv3` (the glyph names `TvGlyphs`, the `TvTermOs` split, the text policy of tv3, the code page tests); `main` of tv3 was not touched. Merge that branch into `main` of tv3 (a fast-forward is enough: it is a line of commits on `main`), then the pointer is on `main` too. Until then `git submodule update` works because the commit is on a branch of the repository.
+The `tv/` pointer of `main` is on `main` of `unxed/tv3` too (the branch `claude/glyphs` was merged by a fast-forward on 2026-10-07: `27f0a8a`); the branch can be deleted.
 The object baseline of the gate is pinned in `tools/dn-linux-accept.py` (`OBJECT_DN_SHA`, `OBJECT_TV_SHA`).
 
 ## Open items
 
 The list is in `PLAN.md` and in `dn/TODO-later.md`. The ones that decide what to do next:
 
-1. **The owner:** merge the branch `claude/glyphs` of `unxed/tv3` into its `main` (see above).
-2. The parked rows of `docs/TEST-PLAN.md` (DN-level clipboard checks, the windows of the desktop, screenshot checks of the DOS pages 850, 852, 1125 and of the DOS help).
-3. Intermittent access violations that were seen once (after a clipboard prompt, after a command in the embedded terminal) and could not be reproduced:
+1. The parked rows of `docs/TEST-PLAN.md` (DN-level clipboard checks, the windows of the desktop, screenshot checks of the DOS pages 850, 852, 1125 and of the DOS help).
+2. Intermittent access violations that were seen once (after a clipboard prompt, after a command in the embedded terminal) and could not be reproduced:
    `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`.
-4. The unstable `menu_5_13` scenario (an asynchronous scan of the host root); a stabilizer is in, the CI has been green with it.
-5. The short name of a file record is 12 bytes: with UTF-8 inside the line under the panel shows a short form of a long name (see `dn/TODO-later.md`).
-6. The patched DOSBox-X (UTF-8 names, clipboard, the guard against the loop of `DOS_CheckExtDevice`) is local: the PRs to `joncampbell123/dosbox-x` are in `docs/patches/`.
+3. The unstable `menu_5_13` scenario (an asynchronous scan of the host root); a stabilizer is in, the CI has been green with it.
+4. The short name of a file record is 12 bytes: with UTF-8 inside the line under the panel shows a short form of a long name (see `dn/TODO-later.md`).
+5. The patched DOSBox-X (UTF-8 names, clipboard, the guard against the loop of `DOS_CheckExtDevice`) is local: the PRs to `joncampbell123/dosbox-x` are in `docs/patches/`.
