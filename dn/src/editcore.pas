@@ -880,6 +880,7 @@ procedure TFileEditor.CalcMenu;
     SetM(EdOpt.HiLite);
     SetM(TabReplace);
     SetM(EdOpt.SmartTab);
+    SetM(Wrap);
     end;
   GetCommands(GC);
   TEditWindow(Owner).MenuBar.SetCommands(GC);
@@ -1304,6 +1305,11 @@ function TFileEditor.CommandOf(Cmd: Word; var Event: TEvent): Boolean;
       EdOpt.AutoIndent := False;
     cmSwitchSmartTab:
       Toggle(EdOpt.SmartTab);
+    cmSwitchSoftWrap:
+      begin
+      Wrap := not Wrap;
+      CalcMenu;
+      end;
     cmSwitchHighLight:
       Toggle(EdOpt.HiLite);
     cmSwitchBrackets:

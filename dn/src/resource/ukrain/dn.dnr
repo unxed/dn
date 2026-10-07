@@ -2525,7 +2525,7 @@ Menu dlgEditorMenu
 ; {-$VOL} {Tab Replace}
       MenuItem 'За~м~іна табуляції', 'Off', kbNoKey, cmSwitchTabReplace, hcedOptions,
 ;DataCompBoy - SmartTab
-      MenuItem '~S~mart Tab', 'Off', kbNoKey, cmSwitchSmartTab, hcedOptions,
+      MenuItem 'Перенос ~р~ядків', 'Off', kbNoKey, cmSwitchSoftWrap, hcedOptions,
      END
 END
 

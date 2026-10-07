@@ -2540,6 +2540,7 @@ Menu dlgEditorMenu
       MenuItem 'За~м~ена табуляции', 'Off', kbNoKey, cmSwitchTabReplace, hcedOptions,
 ;DataCompBoy - SmartTab
       MenuItem '~S~mart Tab', 'Off', kbNoKey, cmSwitchSmartTab, hcedOptions,
+      MenuItem 'Мя~г~кий перенос', 'Off', kbNoKey, cmSwitchSoftWrap, hcedOptions,
      END
 END
 

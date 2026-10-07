@@ -431,6 +431,7 @@ MENU dlgEditorMenu
 ;NEW+
 ;DataCompBoy - SmartTab
       MenuItem '~S~mart Tab','Off', kbNoKey, cmSwitchSmartTab, hcedOptions,
+      MenuItem 'S~o~ft wrap','Off', kbNoKey, cmSwitchSoftWrap, hcedOptions,
 ;NEW-
      END
 END

@@ -22,7 +22,7 @@ type
   end;
 
 const
-  Commands: array[0..604] of TNameRec = (
+  Commands: array[0..605] of TNameRec = (
     (V: 0; N: 'cmValid'),
     (V: 1; N: 'cmQuit'),
     (V: 2; N: 'cmError'),
@@ -553,6 +553,7 @@ const
     (V: 12196; N: 'cmLoadXlatTable'),
     (V: 12198; N: 'cmGotoLineNumber2'),
     (V: 12199; N: 'cmSwitchSmartTab'),
+    (V: 12200; N: 'cmSwitchSoftWrap'),
     (V: 13000; N: 'cmSortName'),
     (V: 13001; N: 'cmSortExt'),
     (V: 13002; N: 'cmSortSize'),

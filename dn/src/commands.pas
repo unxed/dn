@@ -1220,6 +1220,7 @@ const
 
   cmGotoLineNumber2 = 12198;
   cmSwitchSmartTab = 12199;
+  cmSwitchSoftWrap = 12200;
   cmPlaceMarker1 = 14001;
   cmPlaceMarker2 = 14002;
   cmPlaceMarker3 = 14003;
