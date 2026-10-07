@@ -26,7 +26,7 @@ Updated: 2026-10-07. This file is the handoff point: read it first, then [`PLAN.
   fault that nobody can reproduce looked at.
 - **DOS UTF-8 names** are tv3's now (`TvDos` switches `DOS-UTF8/NAMES` on, `TvDosNames` converts a name); the DOS tests of dn pass on a vanilla DOSBox-X `master`.
 - **Found by this work and fixed** (shared bugs, the object build had them too): the read-only attribute lost at a copy on Unix, names cut by bytes with UTF-8 inside, the SmartPad line,
-  the line drawing of the editor, the archivers on Unix (paths and list files), Find File with a text (class only), the data of a copy written after zeros on Windows. See `dn/TODO-later.md`.
+  the line drawing of the editor, the archivers on Unix (paths and list files), Find File with a text (class only), the data of a copy written after zeros on Windows, a Cyrillic letter typed in the panels under a locale whose code page lacks it (en_US.UTF-8) opened Find File and swallowed the input (the status line took a key without a code for a key of an item without one), and the command line dropped such a letter. See `dn/TODO-later.md`.
 
 ## Build and check
 

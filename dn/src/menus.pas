@@ -1898,7 +1898,8 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
           S := T^.Text^
         else
           S := '';
-        if  (DNKeyCode(Event) = T^.KeyCode) and
+        { an item without a key (KeyCode 0) is not the key of a character that has no key code (a letter that the code page lacks) }
+        if  (DNKeyCode(Event) <> kbNoKey) and (DNKeyCode(Event) = T^.KeyCode) and
           CommandEnabled(T^.Command) or
             (T^.KeyCode = kbShortCut) and
 {$IFDEF DNUTF8}

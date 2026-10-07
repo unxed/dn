@@ -630,6 +630,11 @@ RIT Labs DN also wobbled but seemed to fetch correctly.
       end {case};
     evKeyDown:
       begin
+{$IFDEF DNUTF8}
+      { a character that the code page of the locale lacks (Russian under en_US.UTF-8) has no CharCode, but it has the text: it is typed like the others (TypedText) }
+      if (Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) and (Event.ControlKeyState and 12 = 0) then
+        Event.CharCode := $80;
+{$ENDIF}
       if InterfaceData.Options and ouiHideCmdline = 0 then
         case Char(Event.CharCode) of
           ^V:

@@ -107,6 +107,12 @@ jobs:
       - name: The clipboard (OSC 52, paste inside DN, bracketed paste)
         if: success() || failure()
         run: python3 tools/dn-linux-clip.py out/dn
+      - name: Programs that read the terminal (the embedded terminal)
+        if: success() || failure()
+        run: python3 tools/dn-linux-embterm.py out/dn
+      - name: Locales that are not UTF-8 (the build with UTF-8 inside)
+        if: success() || failure()
+        run: python3 tools/dn-linux-locale-utf8.py out/dn
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64

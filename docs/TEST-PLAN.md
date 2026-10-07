@@ -88,7 +88,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | The control count of a loaded dialog against the source of `rcp` | `t_resload` proves that every view loads and that the three languages have the same keys; the source has no machine readable count | when `rcp` writes a manifest |
 | The viewer window of the desktop saved and restored | the editor is covered (`dn-linux-desktop.py` runs 4 and 5: out by the menu File -> Exit, the editor comes back, object and class builds alike); the viewer is not | with the next desktop change |
 | Add and delete of archive members as separate checks | covered by the accept scenarios and `dn-linux-archives.py` in part | stage 4 follow-up |
-| Kitty keyboard flags in DN, a non-UTF-8 locale for the UTF-8 build, an interactive program in the embedded terminal | the first two are tested in `tv` (`tv/tests/pty`); the third needs a program that reads the terminal in the test | stage 4 follow-up |
+| Kitty keyboard flags in DN | tested in `tv` (`tv/tests/pty`); a DN scenario needs a terminal that answers the Kitty query | stage 4 follow-up |
 | DN-level clipboard checks (DOS and Windows) | `tv` tests the backends (`t_dosbk`, the Windows clipboard); a DN scenario needs the system clipboard of the runner | stage 4 follow-up |
 | The keys of the DOS harness for F3 and F4 on real files, the DOS `Save setup` | F5, F6, F7, F8 are checked on the files by the scenario `files` of `dn-dos-input.py` (run by hand: DOSBox-X and Xvfb) | stage 4 follow-up |
 | The scenarios of the gate for the glyphs and the platform facades | the whole gate runs on both builds at every push (the glyphs are the screen of every scenario) | none |
