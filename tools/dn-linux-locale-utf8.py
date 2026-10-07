@@ -26,7 +26,7 @@ def install(out):
             (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(d, f))
     w = os.path.join(d, 'work')
     os.makedirs(w)
-    open(os.path.join(w, 'Файл.txt'), 'w').write('x')
+    open(os.path.join(w, '\u0424\u0430\u0439\u043b.txt'), 'w').write('x')
     return d, w
 
 
@@ -44,19 +44,19 @@ try:
         t.pump(1.5, 6)
         t.send('\x1b', 0.5)
         text = t.text()
-        check('Файл' in text, '%s: a file with a Russian name is shown' % loc, text)
-        t.send('привет abc', 0.6)
+        check('\u0424\u0430\u0439\u043b' in text, '%s: a file with a Russian name is shown' % loc, text)
+        t.send('\u043f\u0440\u0438\u0432\u0435\u0442 abc', 0.6)
         line = cmdline(t.text())
         if utf8_ok:
-            check(line and line[0].endswith('привет abc'), '%s: typed Russian text reaches the command line' % loc, str(line))
+            check(line and line[0].endswith('\u043f\u0440\u0438\u0432\u0435\u0442 abc'), '%s: typed Russian text reaches the command line' % loc, str(line))
         else:
             check(line and line[0].endswith('abc'), '%s: ASCII typed after other text reaches the command line' % loc, str(line))
         if utf8_ok:
             t.send('\x15', 0.3)                                       # Ctrl-U: clears the command line
             t.send('\x1b[18~', 0.6)                                   # F7: make a directory
-            t.send('Каталог', 0.6)
+            t.send('\u041a\u0430\u0442\u0430\u043b\u043e\u0433', 0.6)
             t.send('\r', 1.0)
-            check(os.path.isdir(os.path.join(w, 'Каталог')), '%s: a directory with a Russian name is made through a dialog' % loc, t.text())
+            check(os.path.isdir(os.path.join(w, '\u041a\u0430\u0442\u0430\u043b\u043e\u0433')), '%s: a directory with a Russian name is made through a dialog' % loc, t.text())
         check(t.alive() and 'Fatal' not in t.text(), '%s: DN is alive' % loc)
         t.close(0.3)
 finally:

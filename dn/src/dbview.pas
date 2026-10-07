@@ -466,7 +466,7 @@ constructor TDBViewer.Load(S: TStream);
   S.Read(Delta, SizeOf(Delta));
   S.Read(Pos, SizeOf(Pos));
 
-  XCoder := TXCoder.Load(S);   { a class: the constructor makes the object (it was a field of the object type) }
+  XCoder := TXCoder.Load(S);   { a class: the constructor makes the instance }
   end;
 
 destructor TDBViewer.Destroy;
