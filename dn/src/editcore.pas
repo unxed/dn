@@ -962,7 +962,7 @@ constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TS
     begin
     Line := GetEnv('SMARTPAD');
     if  (Line = '') then
-      Line := SourceDir;
+      Line := ConfigDir;
     MakeSlash(Line);
     FileName := Line+FileName+'.DN';
     end
@@ -3928,7 +3928,7 @@ for very large fragments }
       case ExecResource(dlgSrchFailed, Q) of
         cmYes:
           TDNApplication(Application).EditFile(True,
-             SourceDir+'dn.spf');
+             ConfigDir+'dn.spf');
         cmNo:
           TDNApplication(Application).EditFile(True, S);
       end
@@ -4013,7 +4013,7 @@ Ex:
     Event.Command := cmHelp;
     UEditName := UpStrg(EditName);
     UEditPath := GetPath(UEditName);
-    GlobalConfigEdit := UEditPath = Upstrg(SourceDir);
+    GlobalConfigEdit := UEditPath = Upstrg(ConfigDir);
     System.Delete(UEditName, 1, Length(UEditPath));
     for i := 1 to High(SpecialFile) do
       begin

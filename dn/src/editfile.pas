@@ -304,7 +304,7 @@ procedure MISaveFile(AED: TFileEditor);
     Owner.Redraw;
     if not (SmartPad or ClipBrd) then
       FileChanged(EditName);
-    if UpStrg(EditName) = UpStrg(MakeNormName(SourceDir, 'dn.ini')) then
+    if UpStrg(EditName) = UpStrg(MakeNormName(ConfigDir, 'dn.ini')) then
       begin
       LoadDnIniSettings;
       DoneIniEngine;

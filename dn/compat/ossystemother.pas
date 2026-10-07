@@ -19,9 +19,15 @@ procedure BackendBeep(Frequency, Duration: LongInt);
 procedure BackendSerialTrace(const Msg: string);
 function BackendBatchExt: string;
 function BackendDefaultTempDir: string;
+function BackendConfigDir: string;
+function BackendDescribe: string;
+function BackendHasShortNames: Boolean;
 function BackendMemAvail: LongInt;
 
 implementation
+
+uses
+  SysUtils;
 
 function BackendFileIsDevice(Handle: THandle): LongInt;
 begin
@@ -54,6 +60,67 @@ end;
 function BackendDefaultTempDir: string;
 begin
   Result := {$IFDEF UNIX}'C:\tmp\'{$ELSE}''{$ENDIF};
+end;
+
+function BackendConfigDir: string;
+var
+  Base: string;
+begin
+{$IFDEF UNIX}
+  Base := GetEnvironmentVariable('XDG_CONFIG_HOME');
+  if (Base = '') or (Base[1] <> '/') then
+  begin
+    Base := GetEnvironmentVariable('HOME');
+    if Base = '' then
+      Exit('');
+    Base := Base + '/.config';
+  end;
+  Result := Base + '/dn/';
+{$ELSE}
+  Base := GetEnvironmentVariable('APPDATA');
+  if Base = '' then
+    Exit('');
+  Result := Base + '\DN\';
+{$ENDIF}
+end;
+
+function BackendHasShortNames: Boolean;
+begin
+{$IFDEF UNIX}
+  Result := False;
+{$ELSE}
+  Result := True;
+{$ENDIF}
+end;
+
+function BackendDescribe: string;
+{$IFDEF UNIX}
+  function FirstLine(const Name: string): string;
+  var
+    T: TextFile;
+  begin
+    Result := '';
+    if not FileExists(Name) then
+      Exit;
+    {$I-}
+    Assign(T, Name);
+    Reset(T);
+    if IOResult = 0 then
+    begin
+      Readln(T, Result);
+      Close(T);
+    end;
+    {$I+}
+  end;
+{$ENDIF}
+begin
+{$IFDEF UNIX}
+  Result := Trim(FirstLine('/proc/sys/kernel/ostype') + ' ' + FirstLine('/proc/sys/kernel/osrelease'));
+  if Result = '' then
+    Result := 'Unix';
+{$ELSE}
+  Result := 'Windows ' + IntToStr(Win32MajorVersion) + '.' + IntToStr(Win32MinorVersion) + ' build ' + IntToStr(Win32BuildNumber);
+{$ENDIF}
 end;
 
 function BackendMemAvail: LongInt;

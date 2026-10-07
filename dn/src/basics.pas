@@ -238,6 +238,9 @@ var
   SourceDir: String;
     {` Directory where configs and histories live. With '\' at the end.
       Controlled by the DN2 env variable. `}
+  ConfigDir: String;
+    {` Directory of the files that the user changes (dn.ini, the desktop, the histories, the crash reports). With '\' at the end. The configuration of the user
+      (~/.config/dn, %APPDATA%\DN) unless DN2 names a directory or the target keeps the files next to the program (DOS): then it is SourceDir. `}
   TempDir: String;
     {` Temporary directory. With '\' at the end `}
   TempFile: String;
