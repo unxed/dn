@@ -1,3 +1,6 @@
 [submodule "tv"]
 	path = tv
 	url = https://github.com/unxed/tv3
+[submodule "tve"]
+	path = tve
+	url = https://github.com/unxed/tve

@@ -66,7 +66,7 @@ uses
   Arvid,
   
   Archiver, ArcView, ASCIITab, calcline, Collect, DiskInfo, mainapp,
-  DNStdDlg, DNUtil, Drives, editundo, Editor, FileFind, FilesCol,
+  DNStdDlg, DNUtil, Drives, editinfo, Editor, FileFind, FilesCol,
   filepanel, FStorage, FViewer, gadgets, histories, editcore, Startup,
   Tree, UniWin, UserMenu, panelwinx, HelpKern,
   calcwin, CellsCol, 
@@ -248,7 +248,7 @@ RSortedListBox : TStreamRec = (ObjType: otSortedListBox; VmtLink: 0; Load: nil; 
 RDataSaver : TStreamRec = (ObjType: otDataSaver; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     { Drives }
 RDrive : TStreamRec = (ObjType: otDrive; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-    { editundo }
+    { editinfo }
 RInfoLine : TStreamRec = (ObjType: otInfoLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RBookLine : TStreamRec = (ObjType: otBookLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
     { Editor }
@@ -1500,22 +1500,22 @@ end;
 
 function Build_RInfoLine(S: TStream): TStreamable;
 begin
-  Result := TStreamable(editundo.TInfoLine.Load(S));
+  Result := TStreamable(editinfo.TInfoLine.Load(S));
 end;
 
 procedure Store_RInfoLine(P: TStreamable; S: TStream);
 begin
-  editundo.TInfoLine(P).Store(S);
+  editinfo.TInfoLine(P).Store(S);
 end;
 
 function Build_RBookLine(S: TStream): TStreamable;
 begin
-  Result := TStreamable(editundo.TBookmarkLine.Load(S));
+  Result := TStreamable(editinfo.TBookmarkLine.Load(S));
 end;
 
 procedure Store_RBookLine(P: TStreamable; S: TStream);
 begin
-  editundo.TBookmarkLine(P).Store(S);
+  editinfo.TBookmarkLine(P).Store(S);
 end;
 
 function Build_RXFileEditor(S: TStream): TStreamable;
@@ -2639,12 +2639,12 @@ begin
 
   RDrive.Store := @Store_RDrive;
 
-  RInfoLine.VmtLink := PtrUInt(System.TClass(editundo.TInfoLine));
+  RInfoLine.VmtLink := PtrUInt(System.TClass(editinfo.TInfoLine));
   RInfoLine.Load := @Build_RInfoLine;
 
   RInfoLine.Store := @Store_RInfoLine;
 
-  RBookLine.VmtLink := PtrUInt(System.TClass(editundo.TBookmarkLine));
+  RBookLine.VmtLink := PtrUInt(System.TClass(editinfo.TBookmarkLine));
   RBookLine.Load := @Build_RBookLine;
 
   RBookLine.Store := @Store_RBookLine;

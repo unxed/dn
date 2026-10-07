@@ -276,7 +276,7 @@ uses
   Idlers, panelroot, WinClp,
   Drives, Archiver, ArchSet,
   ArcView, FViewer, CmdLine, copyio, DNStdDlg,
-  Colors, editcore, editundo, Editor, editwin,
+  Colors, editcore, editinfo, Editor, editwin,
   basics, strutil, fileutil, envutil, winsess, langid,
   ColorSel, Eraser,  DiskInfo
   , FileType, panelsetup, keymap
@@ -1635,40 +1635,7 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
            P^.fOrigin.Y+P^.fSize.Y);
         AdjustToDesktopSize(R, P^.fDeskSize);
         W.Locate(R);
-        with V, P^ do
-          begin
-          if (InterfaceData.Options and ouiStoreEditorPosition <> 0)
-          then
-            begin
-            Mark.A := fBlockStart;
-            Mark.B := fBlockEnd;
-            ScrollTo(fDelta.X, fDelta.Y);
-            Pos := fPos;
-            end;
-          MarkPos := fMarks;
-          BlockVisible := fBlockVisible;
-          VertBlock := fVerticalBlock;
-          EdOpt.HiLite := fHighlight;
-          EdOpt.HiliteColumn := fHiliteColumn;
-          EdOpt.HiliteLine := fHiliteLine;
-          EdOpt.AutoIndent := fAutoIndent;
-          EdOpt.AutoJustify := fAutoJustify;
-          EdOpt.AutoBrackets := fAutoBrackets;
-          EdOpt.LeftSide := fLeftSide;
-          EdOpt.RightSide := fRightSide;
-          EdOpt.InSide := fInSide;
-          InsertMode := fInsMode;
-          if fKeyMap <= MaxKeyMap then
-            KeyMap := fKeyMap; {-$VIV}
-          { Flash >>> }
-          EdOpt.BackIndent := fBackIndent;
-          EdOpt.AutoWrap := fAutoWrap;
-          OptimalFill := fOptimalFill;
-          TabReplace := fTabReplace;
-          EdOpt.SmartTab := fSmartTab;
-          { Flash <<< }
-          WorkString := GetLine(fDelta.Y); {-$VIV 11.05.99}
-          end;
+        V.ApplyRecord(P, InterfaceData.Options and ouiStoreEditorPosition <> 0);
         end { else StoreEditInfo(W)}; { Commented by Flash 21-12-2002 }
       InsertWindow(W);
       end;

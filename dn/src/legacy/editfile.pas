@@ -1,0 +1,879 @@
+{/////////////////////////////////////////////////////////////////////////
+//
+//  Dos Navigator Open Source 1.51.08
+//  Based on Dos Navigator (C) 1991-99 RIT Research Labs
+//
+//  This programs is free for commercial and non-commercial use as long as
+//  the following conditions are aheared to.
+//
+//  Copyright remains RIT Research Labs, and as such any Copyright notices
+//  in the code are not to be removed. If this package is used in a
+//  product, RIT Research Labs should be given attribution as the RIT Research
+//  Labs of the parts of the library used. This can be in the form of a textual
+//  message at program startup or in documentation (online or textual)
+//  provided with the package.
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are
+//  met:
+//
+//  1. Redistributions of source code must retain the copyright
+//     notice, this list of conditions and the following disclaimer.
+//  2. Redistributions in binary form must reproduce the above copyright
+//     notice, this list of conditions and the following disclaimer in the
+//     documentation and/or other materials provided with the distribution.
+//  3. All advertising materials mentioning features or use of this software
+//     must display the following acknowledgement:
+//     "Based on Dos Navigator by RIT Research Labs."
+//
+//  THIS SOFTWARE IS PROVIDED BY RIT RESEARCH LABS "AS IS" AND ANY EXPRESS
+//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+//  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+//  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+//  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+//  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+//  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+//  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+//  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//  The licence and distribution terms for any publically available
+//  version or derivative of this code cannot be changed. i.e. this code
+//  cannot simply be copied and put under another distribution licence
+//  (including the GNU Public Licence).
+//
+//////////////////////////////////////////////////////////////////////////}
+{$I STDEFINE.INC}
+unit editfile;
+
+interface
+
+uses
+  Defines, Streams, editcore, editwin
+  ;
+
+const
+  TabStep: Integer = 8;
+
+procedure MISaveFileAs(AED: TFileEditor);
+procedure MISaveFile(AED: TFileEditor);
+procedure MIOpenFile(AED: TFileEditor);
+procedure MILoadFile(AED: TFileEditor; Name: String);
+function MIReadBlock(AED: TFileEditor; var FileName: String;
+    RetCollector: Boolean): Pointer;
+procedure MILockFile(AED: TFileEditor);
+procedure MIUnLockFile(AED: TFileEditor);
+
+procedure MIStore(AED: TFileEditor; var S: TStream);
+procedure MILoad(AED: TFileEditor; var S: TStream);
+procedure MIAwaken(AED: TFileEditor);
+
+const
+  SmartWindow: TEditWindow = nil;
+  ClipboardWindow: TEditWindow = nil;
+  SmartWindowPtr: ^TEditWindow = @SmartWindow;
+  ClipboardWindowPtr: ^TEditWindow = @ClipboardWindow;
+
+implementation
+uses
+  DNStdDlg, basics, mainapp, Commands, Lfn, fileutil, editundo, strutil, Views,
+  Collect, WinClp, Dos, Messages, Startup, DnIni, iniengine, CopyIni, DNUtf8,
+  {SBlocks,}keymap, Macro,
+  timeutil, Drivers,
+  fsinfo,
+  dirwatch,
+  
+  fileerrors
+
+  ;
+
+type
+  ByteArray = array[1..MaxBytes] of Byte;
+const
+  FBufSize = 8192;
+
+function ESC_Pressed: Boolean;
+  var
+    E: TEvent;
+  begin
+  Application.Idle;
+  GetKeyEvent(E);
+  ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
+  end;
+
+{-DataCompBoy-}
+procedure MISaveFileAs(AED: TFileEditor);
+  var
+    FileName: String;
+    S: TStream;
+    
+  begin
+  {Cat}
+  
+  {/Cat}
+
+  with AED do
+    begin
+    FileName := GetFileNameDialog(x_x, GetString(dlSaveFileAs),
+        GetString(dlSaveFileAsName),
+        fdOKButton+fdHelpButton, hsEditSave);
+    if FileName <> '' then
+      begin
+      MIUnLockFile(AED);
+      S := CheckForOver(FileName);
+      if S = nil then
+        begin
+        MILockFile(AED);
+        Exit;
+        end;
+      EditName := lFExpand(FileName);
+      if EditName[Length(EditName)] = '.' then
+        SetLength(EditName, Length(EditName)-1);
+      WriteBlock(EditName, S, FileLines, EdOpt.ForcedCRLF, OptimalFill);
+      S.Free;
+      FileChanged(EditName);
+      DisposeStr(TWindow(Owner).Title);
+      if EditName = ''
+      then
+        TWindow(Owner).Title := NewStr(GetString(dlEditTitle))
+      else
+        TWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
+            (EditName));
+      Owner.Redraw;
+      Modified := False;
+      MILockFile(AED);
+      end;
+    end
+  end { MISaveFileAs };
+{-DataCompBoy-}
+
+{-DataCompBoy-}
+procedure MIOpenFile(AED: TFileEditor);
+  var
+    FileName: String;
+  begin
+  with AED do
+    begin
+    FileName := GetFileNameDialog(x_x, GetString(dlOpenFile),
+        GetString(dlOpenFileName),
+        fdOpenButton+fdHelpButton, hsEditOpen);
+    if FileName <> '' then
+      begin
+      MIUnLockFile(AED);
+      MILoadFile(AED, lFExpand(FileName));
+      BlockVisible := False; {Cat}
+      Mark.Assign(0, 0, 0, 0); {Cat}
+      if not isValid then
+        begin
+        isValid := True;
+        Message(Owner, evCommand, cmClose, nil);
+        MILockFile(AED);
+        Exit;
+        end;
+      ScrollTo(0, 0);
+      Owner.Redraw;
+      end;
+    end
+  end { MIOpenFile };
+{-DataCompBoy-}
+
+{-DataCompBoy-}
+procedure MISaveFile(AED: TFileEditor);
+  var
+    S: TBufStream;
+    I: LongInt;
+    F: lFile;
+    Dr: String;
+    Nm: String;
+    Xt: String;
+    OldAttr: Word;
+    L: array[0..0] of PtrInt;
+    PC: TLineCollection;
+    FileExist: Boolean;
+    TempEAContainerName: String;
+    TempEAContainer: lFile;
+    
+  begin
+  {Cat}
+  
+  {/Cat}
+
+  with AED do
+    begin
+    MIUnLockFile(AED);
+    if ClipBrd then
+      begin {-$VOL begin}
+      if ClipBoardStream <> nil then
+        ClipBoardStream.Free;
+      ClipBoardStream := nil;
+      PC := TLineCollection.Create(100, 5, True);
+      for I := 0 to FileLines.Count-1 do
+        PC.Insert(NewLongStr(CnvLongString(FileLines.At(I))));
+      CopyLines2Stream(PC, ClipBoardStream);
+      PC.Free;
+      end
+    else
+      begin {-$VOL end}
+      if EditName = '' then
+        begin
+        MISaveFileAs(AED);
+        Exit
+        end;
+      FileExist := False;
+      lAssignFile(F, EditName);
+      ClrIO;
+      OldAttr := 0;
+      lGetFAttr(F, OldAttr);
+      if  (DosError = 0) then
+        FileExist := True;
+      if FileExist and (OldAttr and ReadOnly <> 0) then
+        begin
+        Pointer(L[0]) := @EditName;
+        if Msg(dlED_ModifyRO, @L, mfConfirmation+mfOKCancel) <> cmOK
+        then
+          begin
+          MILockFile(AED);
+          Exit;
+          end;
+        end;
+      ClrIO;
+      lSetFAttr(F, Archive);
+      if Abort then
+        begin
+        MILockFile(AED);
+        Exit;
+        end;
+      if FileExist then  {<editfile.001>}
+        begin
+        TempEAContainerName := SwpDir+'DN'+ItoS(DNNumber)+'.EA_';
+        lAssignFile(TempEAContainer, TempEAContainerName);
+        lReWriteFile(TempEAContainer, 0);
+        Close(TempEAContainer.F);
+        
+        
+        end;
+      if EditorDefaults.EdOpt and ebfCBF <> 0 then
+        begin
+        lFSplit(EditName, Dr, Nm, Xt);
+        ClrIO;
+        EraseFile(Dr+Nm+'.BAK');
+        lChangeFileName(EditName, Dr+Nm+'.BAK');
+        ClrIO;
+        end;
+      S := TBufStream.Create(EditName, stCreate, 4096);
+      if S = nil then
+        begin
+        MILockFile(AED);
+        Exit;
+        end;
+      {Cat: previously the status check somehow happened at this point,
+      i.e. it was assumed that if the stream was created successfully, then it was also
+      written successfully, which is wrong (for example when disk space
+      runs out); now the check is done after writing the block;
+      also added a FileChanged call - on a failed write
+      the file contents may change}
+      WriteBlock(EditName, S, FileLines, EdOpt.ForcedCRLF, OptimalFill);
+      if S.Status <> stOK then
+        begin
+        CantWrite(EditName);
+        S.Free;
+        MILockFile(AED);
+        if not (SmartPad or ClipBrd) then
+          FileChanged(EditName);
+        Exit;
+        end;
+      {/Cat}
+      S.Free;
+      lAssignFile(F, EditName);
+      ClrIO;
+      if  (OldAttr <> Archive) and (OldAttr <> $FFFF) then
+        lSetFAttr(F, OldAttr or Archive);
+      ClrIO;
+      if FileExist then
+        begin
+        
+        
+        EraseFile(TempEAContainerName);
+        end;
+      end;
+    MILockFile(AED);
+    Modified := False;
+    JustSaved := True;
+    LastSaveUndoTimes := UndoTimes; {piwamoto}
+    Owner.Redraw;
+    if not (SmartPad or ClipBrd) then
+      FileChanged(EditName);
+    if UpStrg(EditName) = UpStrg(MakeNormName(ConfigDir, 'dn.ini')) then
+      begin
+      LoadDnIniSettings;
+      DoneIniEngine;
+
+      CopyIniVarsToCfgVars;
+
+      ShowIniErrors;
+      end;
+    end
+  end { MISaveFile };
+{-DataCompBoy-}
+
+{-DataCompBoy-}
+{$IFDEF DNUTF8}
+{ UTF-8 inside: is the file UTF-8 (then the editor works with it by the table of the document) or bytes of a code page (then by the code page) }
+procedure ScanDocU8(AED: TFileEditor);
+  var
+    I: LongInt;
+    P: PLongString;
+    Ok: Boolean;
+  begin
+  with AED do
+    begin
+    TabNatural(DocTab);
+    DocU8 := False;
+    Ok := True;
+    for I := 0 to FileLines.Count-1 do
+      begin
+      P := FileLines.At(I);
+      if (P <> nil) and not TabSee(DocTab, P^) then
+        begin
+        Ok := False;
+        Break;
+        end;
+      end;
+    if Ok and TabBuild(DocTab) then
+      begin
+      DocU8 := True;
+      KeyMap := kmAscii;
+      end
+    else
+      TabNatural(DocTab);
+    end;
+  end;
+{$ENDIF}
+
+procedure MILoadFile(AED: TFileEditor; Name: String);
+  label
+    1;
+  var
+    Nm: String;
+    Xt: String;
+    PC: TCollection; {-$VOL}
+    
+  begin
+  with AED do
+    begin
+    if FileLines <> nil then
+      FileLines.Free;
+    FileLines := nil;
+    if UndoInfo <> nil then
+      UndoInfo.Free;
+    UndoInfo := nil;
+    if RedoInfo <> nil then
+      RedoInfo.Free;
+    RedoInfo := nil;
+    UndoTimes := 0;
+    LastDir := -1; {DrawMode := 0;}
+    LastSaveUndoTimes := 0;
+    JustSaved := False; {piwamoto}
+    SearchOnDisplay := False;
+    EdOpt.ForcedCRLF := cfNone;
+1:
+    if Name = '' then
+      begin
+      {FileLines := GetCollector(1000, 100);}
+      FileLines := TLineCollection.Create(300, 1000, True);
+      {-SBlocks}
+      if ClipBrd then
+        begin {-$VOL begin}
+        {Cat:warn redundant reassignments}
+        PC := nil;
+        CopyStream2Lines(ClipBoardStream, PC);
+        if PC <> nil then
+          with PC do
+            begin
+            while Count > 0 do
+              begin
+              FileLines.Insert(At(Count-1));
+              AtDelete(Count-1);
+              end;
+            PC.Free;
+            end;
+        end; {-$VOL end}
+      if FileLines.Count = 0 then
+        FileLines.Insert(NewLongStr(''))
+      end
+    else
+      begin
+      FileLines := MIReadBlock(AED, Name, True);
+      {/Cat}
+      if not isValid then
+        Exit;
+      if FileLines = nil then
+        begin
+        {FileLines := GetCollector(1000, 100);}
+        FileLines := TLineCollection.Create(300, 1000, True);
+        {-SBlocks}
+        FileLines.Insert(NewLongStr(''));
+        KeyMap := kmAscii;
+        end;
+      if Name <> '' then
+        Name := lFExpand(Name);
+      end;
+{$IFDEF DNUTF8}
+    ScanDocU8(AED);
+{$ENDIF}
+    SetLimits;
+    Pos.X := 0;
+    Pos.Y := 0;
+    Delta := Pos;
+    {InsertMode := true;}
+    {BlockVisible := false;}
+    {Mark.Assign(0,0,0,0);}
+    Modified := False; {DrawMode := 0;}
+    WorkModified := False;
+    LastLine := -1;
+    SpecChar := False;
+    Marking := False;
+    MouseMark := False;
+    RulerVisible := False;
+    EnableMarking := True;
+    WorkString := GetLine(0);
+    if Name <> '' then
+      Name := lFExpand(Name);
+    EditName := Name;
+    DisposeStr(TWindow(Owner).Title);
+    {Cat:warn isn't this nonsense?}
+    if '*^&'+EditName = TempFile then
+      begin
+      EditName := '';
+      TempFile := '';
+      end;
+    if SmartPad then
+      begin
+      TWindow(Owner).Title := NewStr('SmartPad(TM) - '+EditName);
+      end
+    else if ClipBrd then
+      begin
+      TWindow(Owner).Title := NewStr('Clipboard');
+      end
+    else if EditName <> ''
+    then
+      TWindow(Owner).Title := NewStr(GetString(dlEditTitle)+' - '+
+          (EditName))
+    else
+      TWindow(Owner).Title := NewStr(GetString(dlEditTitle));
+    MILockFile(AED);
+    lFSplit(EditName, FreeStr, Nm, Xt);
+    {PZ 2000.06.09}
+    EdOpt.HiLite := Macro.InitHighLight(Nm+Xt, HiLitePar, Macros, @EdOpt);
+    if EdOpt.HiLite then
+      { check if highlighting is not disabled }
+      EdOpt.HiLite := (EditorDefaults.EdOpt2 and ebfHlt) <> 0;
+    {PZ end}
+    end;
+
+  {Cat}
+  
+  {/Cat}
+  end { MILoadFile };
+{-DataCompBoy-}
+
+{-DataCompBoy-}
+function MIReadBlock(AED: TFileEditor; var FileName: String;
+    RetCollector: Boolean): Pointer;
+  var
+    S: TDosStream;
+    B: ^ByteArray;
+    I: LongInt;
+    FFSize: LongInt; {!!s}
+    J: LongInt; // length of the chunk read into the buffer
+    K: LongInt;
+    LCount: LongInt;
+    Lines: TLineCollection {PCollector}; {-SBlocks}
+    S1, ST, S2: LongString;
+    L: LongInt;
+    KeyMapDetecting: Boolean;
+    CodePageDetector: TCodePageDetector;
+    OD, OA, ODOA: LongInt;
+
+{AK155  15-02-2006 Completely rewritten, dropping assembler and fixing
+   a bug in tab expansion at the end of the intermediate buffer. }
+  procedure SearchLines;
+    var
+      L: LongInt;
+      MMM: array[0..1124] of Char;
+        // intermediate buffer so as not to thrash AnsiString needlessly
+      TS: LongInt; // tab width
+      i: Integer; // filling MMM
+      InChar, BufEnd: PChar;
+      C: Char;
+    label
+      WrChar;
+    begin
+    if KeyMapDetecting then
+      CodePageDetector.CheckString(PChar(B), J);
+    with AED do
+      begin
+      TS := TabStep;
+      InChar := PChar(B);
+      BufEnd := PChar(B)+J;
+      while True do
+        begin { line loop; exit - bail out at end of buffer }
+        i := 0;
+        while True do { character loop; exit on line separator or
+            bail out at end of buffer }
+          begin
+          if InChar = BufEnd then
+            begin // bail out at end of buffer
+            if i <> 0 then
+              begin
+              L := Length(ST);
+              SetLength(ST, L + i);
+              Move(MMM, ST[L+1], i);
+              end;
+            Exit;
+            end;
+          C := InChar^;
+          inc(InChar);
+          case C of
+           #$0D:
+             begin
+             if InChar^ = #$0A then
+               begin
+               inc(InChar);
+               inc(ODOA);
+               Break
+               end;
+             inc(OD);
+             Break;
+             end;
+           #$0A:
+             begin
+             inc(OA);
+             Break;
+             end;
+          end {case};
+          { Write character into the intermediate buffer }
+          if (C <> #$09) or (TS = 0) then
+            begin { Just write the character }
+            MMM[i] := C;
+            inc(i);
+            { Check intermediate buffer overflow. At the end
+              of the buffer leave a reserve for the maximum TabStep size}
+            if i > SizeOf(MMM)-101 then
+              begin
+              L := Length(ST);
+              SetLength(ST, L + i);
+              Move(MMM, ST[L+1], i);
+              i := 0;
+              end;
+            end
+          else
+            begin { Replace tab with spaces. Here buffer overflow
+              is not checked; the reserve is enough (see above). }
+            L := (i div TS + 1)*TS;
+            while i <> L do
+              begin
+              MMM[i] := ' ';
+              inc(i);
+              end;
+            end
+          end;
+
+        if i <> 0 then
+          begin
+          L := Length(ST);
+          SetLength(ST, L + i);
+          Move(MMM, ST[L+1], i);
+          end;
+
+{!! Strip trailing spaces. Should be made optional }
+        if (ST <> '') and (ST[Length(ST)] = ' ') then
+          LongDelRight(ST);
+
+        Lines.Insert(NewLongStr(ST));
+        ST := '';
+        end;
+      end
+    end { SearchLines };
+{/AK155}
+  var
+    Info: TView;
+    ep: Boolean;
+    tmr: TEventTimer;
+  begin { MIReadBlock }
+  with AED do
+    begin
+    MIReadBlock := nil;
+    Abort := False;
+    CodePageDetector := TCodePageDetector.Create;
+    KeyMap := ProcessDefCodepage(DefCodePage);
+    KeyMapDetecting := (KeyMap = kmNone);
+    ODOA := 0;
+    OD := 0;
+    OA := 0;
+    S := TBufStream.Create(FileName, stOpenRead, 1024);
+    if  (S.Status <> stOK) then
+      begin
+      K := S.ErrorInfo;
+      isValid := (K = 2) or (K = 3) or (K = 110);
+      if  (K <> 2) and (K <> 3) and (K <> 110) then
+        MessFileNotOpen(FileName, K); {JO, AK155}
+      S.Free;
+      Exit
+      end;
+    if  (S.GetSize > MemAvail-$4000)
+    then
+      begin
+      Application.OutOfMemory;
+      S.Free;
+      FileName := '';
+      isValid := False;
+      Exit
+      end;
+    B := GetMem(FBufSize);
+    if B = nil then
+      begin
+      S.Free;
+      FileName := '';
+      Exit
+      end;
+    Info := nil;
+    I := 0;
+    FFSize := i32(S.GetSize);
+    Lines := TLineCollection.Create(1000 + (FFSize div 20), 1000, True);
+    {-$VOL begin}
+    if EditorDefaults.EdOpt and ebfTRp = 0
+    then
+      TabStep := 0
+    else
+      begin
+      TabStep := StoI(EditorDefaults.TabSize);
+      if TabStep = 0 then
+        TabStep := 8;
+      end;
+    if TabStep > 100 then
+      TabStep := 100;
+    {-$VOL end}
+    S.Seek(0);
+    I := 0;
+    FFSize := i32(S.GetSize);
+    LCount := 1;
+    ep := False;
+    NewTimer(tmr, 150);
+    ST := '';
+    if FFSize > FBufSize then
+      J := FBufSize
+    else
+      J := FFSize;
+    while I < FFSize do
+      begin
+      UpdateWriteView(Info);
+      S.Read(B^, J);
+      if TimerExpired(tmr) then
+        begin
+        NewTimer(tmr, 150);
+        if Info = nil then
+          Info := WriteMsg(^M^M^C+GetString(dlReadingFile));
+        ep := ESC_Pressed;
+        end;
+      if  (S.Status <> stOK) or ep or Abort or (MemAvail < $4000) or
+        (Lines.Count > MaxCollectionSize)
+      then
+        begin
+        Lines.Free;
+        Lines := nil;
+        FileName := '';
+        FreeMem(B, FBufSize);
+        S.Free;
+        Info.Free;
+        Application.OutOfMemory;
+        isValid := False;
+        Exit
+        end;
+      if  (B^[J] = 13) and (S.GetPos < S.GetSize) then
+        begin
+        Dec(J);
+        S.Seek(S.GetPos-1);
+        end;
+      SearchLines;
+      I := i32(S.GetPos){!!s};
+      if FFSize-I > FBufSize then
+        J := FBufSize
+      else
+        J := FFSize-I;
+      end;
+    if  (ST <> '') and (ST[1] = #10) then
+      System.Delete(ST, 1, 1);
+    while (ST <> '') and (ST[Length(ST)] = ' ') do
+      SetLength(ST, Length(ST)-1);
+    Lines.Insert(NewLongStr(ST));
+    if KeyMapDetecting then
+      KeyMap := CodePageDetector.DetectedCodePage;
+    if  (ODOA shl 1 >= OD+OA) then
+      EdOpt.ForcedCRLF := cfCRLF
+    else if (OD shl 1 >= ODOA+OA) then
+      EdOpt.ForcedCRLF := cfCR
+    else if (OA shl 1 >= ODOA+OD) then
+      EdOpt.ForcedCRLF := cfLF;
+    if RetCollector then
+      MIReadBlock := Lines
+    else
+      begin
+      {MIReadBlock := PStdCollector(Lines)^.Collection;}
+      {PStdCollector(Lines)^.Collection := nil;}
+      {Lines.Free; Lines:=nil;}
+      MIReadBlock := TLineCollection(Lines); {-SBlocks}
+      Lines := nil; {-SBlocks}
+      end;
+    S.Free;
+    FreeMem(B, FBufSize);
+    Info.Free;
+    end
+  end { MIReadBlock };
+{-DataCompBoy-}
+
+procedure MILockFile(AED: TFileEditor);
+  begin
+  with AED do
+    begin
+    if EditorDefaults.EdOpt and ebfLck = 0 then
+      Exit;
+    if Locker <> nil then
+      Locker.Free;
+    Locker := TDosStream.Create(EditName, (stOpenRead and fmDeny) or
+           fmDenyWrite);
+    end
+  end;
+
+procedure MIUnLockFile(AED: TFileEditor);
+  begin
+  with AED do
+    begin
+    if EditorDefaults.EdOpt and ebfLck = 0 then
+      Exit;
+    if Locker = nil then
+      Exit; { just in case }
+    Locker.Free;
+    Locker := nil;
+    end
+  end;
+
+procedure MIStore(AED: TFileEditor; var S: TStream);
+  begin
+  with AED do
+    begin
+    PutPeerViewPtr(S, HScroll);
+    PutPeerViewPtr(S, VScroll);
+    PutPeerViewPtr(S, InfoL);
+    PutPeerViewPtr(S, BMrk);
+    S.WriteStr(@EditName);
+    S.Write(SmartPad, SizeOf(SmartPad));
+    S.Write(ClipBrd, SizeOf(ClipBrd));
+    S.Write(MarkPos, SizeOf(MarkPos));
+    S.Write(EdOpt.LeftSide, 6);
+    S.Write(EdOpt.HiLite, 1);
+    S.Write(EdOpt.HiliteColumn, SizeOf(EdOpt.HiliteColumn));
+    S.Write(EdOpt.HiliteLine, SizeOf(EdOpt.HiliteLine));
+    S.Write(EdOpt.AutoIndent, SizeOf(EdOpt.AutoIndent));
+    S.Write(VertBlock, SizeOf(VertBlock));
+    S.Write(EdOpt.BackIndent, SizeOf(EdOpt.BackIndent));
+    S.Write(EdOpt.AutoJustify, SizeOf(EdOpt.AutoJustify));
+    S.Write(OptimalFill, SizeOf(OptimalFill));
+    S.Write(EdOpt.AutoWrap, SizeOf(EdOpt.AutoWrap));
+    S.Write(EdOpt.AutoBrackets, SizeOf(EdOpt.AutoBrackets));
+    S.Write(KeyMap, SizeOf(KeyMap)); {-$VIV}
+    S.Write(TabReplace, SizeOf(TabReplace)); {-$VOL}
+    S.Write(EdOpt.SmartTab, SizeOf(EdOpt.SmartTab)); {-$VOL}
+    S.Write(Pos, SizeOf(Pos)); {Cat}
+    S.Write(InsertMode, SizeOf(InsertMode)); {Cat}
+    S.Write(DrawMode, SizeOf(DrawMode)); {Cat}
+    S.Write(Mark, SizeOf(Mark)); {Cat}
+    S.Write(BlockVisible, SizeOf(BlockVisible)); {Cat}
+    S.Write(EdOpt.ForcedCRLF, SizeOf(EdOpt.ForcedCRLF)); {Cat}
+    end
+  end { MIStore };
+
+procedure MILoad(AED: TFileEditor; var S: TStream);
+  var
+    SS: PString;
+  begin
+  with AED do
+    begin
+    GetPeerViewPtr(S, HScroll);
+    GetPeerViewPtr(S, VScroll);
+    GetPeerViewPtr(S, InfoL);
+    GetPeerViewPtr(S, BMrk);
+    SS := S.ReadStr;
+    if SS = nil then
+      EditName := ''
+    else
+      begin
+      EditName := SS^;
+      DisposeStr(SS);
+      end;
+    S.Read(SmartPad, SizeOf(SmartPad));
+    S.Read(ClipBrd, SizeOf(ClipBrd));
+    {Cat}
+    if SmartPad then
+      SmartWindowPtr := @Owner;
+    if ClipBrd then
+      ClipboardWindowPtr := @Owner;
+    {/Cat}
+    S.Read(MarkPos, SizeOf(MarkPos));
+    S.Read(EdOpt.LeftSide, 6);
+    S.Read(EdOpt.HiLite, 1);
+    S.Read(EdOpt.HiliteColumn, SizeOf(EdOpt.HiliteColumn));
+    S.Read(EdOpt.HiliteLine, SizeOf(EdOpt.HiliteLine));
+    S.Read(EdOpt.AutoIndent, SizeOf(EdOpt.AutoIndent));
+    S.Read(VertBlock, SizeOf(VertBlock));
+    S.Read(EdOpt.BackIndent, SizeOf(EdOpt.BackIndent));
+    S.Read(EdOpt.AutoJustify, SizeOf(EdOpt.AutoJustify));
+    S.Read(OptimalFill, SizeOf(OptimalFill));
+    S.Read(EdOpt.AutoWrap, SizeOf(EdOpt.AutoWrap));
+    S.Read(EdOpt.AutoBrackets, SizeOf(EdOpt.AutoBrackets));
+    S.Read(KeyMap, SizeOf(KeyMap)); {-$VIV}
+    S.Read(TabReplace, SizeOf(TabReplace)); {-$VOL}
+    S.Read(EdOpt.SmartTab, SizeOf(EdOpt.SmartTab)); {-$VOL}
+    S.Read(Pos, SizeOf(Pos)); {Cat}
+    S.Read(InsertMode, SizeOf(InsertMode)); {Cat}
+    S.Read(DrawMode, SizeOf(DrawMode)); {Cat}
+    S.Read(Mark, SizeOf(Mark)); {Cat}
+    S.Read(BlockVisible, SizeOf(BlockVisible)); {Cat}
+    S.Read(EdOpt.ForcedCRLF, SizeOf(EdOpt.ForcedCRLF)); {Cat}
+    isValid := True;
+    Macros := TCollection.Create(10, 10);
+    LastDir := -1;
+    MenuItemStr[True] := NewStr(GetString(dlMenuItemOn));
+    MenuItemStr[False] := NewStr(GetString(dlMenuItemOff));
+    end
+  end { MILoad };
+
+procedure MIAwaken(AED: TFileEditor);
+  var
+    X, Y: LongInt;
+    XD: TPoint;
+    Hi: Boolean;
+    _KeyMap: TKeyMap;
+    _ForcedCrLf: TCRLF;
+  begin
+  with AED do
+    begin
+    X := HScroll.Value;
+    Y := VScroll.Value;
+    XD := Pos;
+    Hi := EdOpt.HiLite;
+    _KeyMap := KeyMap; {Cat}
+    _ForcedCrLf := EdOpt.ForcedCRLF; {Cat}
+    MILoadFile(AED, EditName);
+    KeyMap := _KeyMap; {Cat}
+    EdOpt.ForcedCRLF := _ForcedCrLf; {Cat}
+    EdOpt.HiLite := Hi;
+    ScrollTo(X, Y);
+    Pos := XD;
+    ChPosition := False;
+    Owner.Redraw;
+    end
+  end { MIAwaken };
+
+end.

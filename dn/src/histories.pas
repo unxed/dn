@@ -452,38 +452,12 @@ procedure StoreEditInfo(P: Pointer);
   New(R);
   with TFileEditor(E.Intern), R^ do
     begin
-    
     FName := NewStr(' '+lfGetLongFileName(EditName)); {DataCompBoy}
-    
     fOrigin := Owner.Origin;
     fSize := Owner.Size;
     fDeskSize := Desktop.Size;
-    fMarks := MarkPos;
-    fBlockStart := Mark.A;
-    fBlockEnd := Mark.B;
-    fPos := Pos;
-    fDelta := Delta;
-    fBlockVisible := BlockVisible;
-    fVerticalBlock := VertBlock;
-    fHighlight := EdOpt.HiLite;
-    fHiliteColumn := EdOpt.HiliteColumn;
-    fHiliteLine := EdOpt.HiliteLine;
-    fAutoIndent := EdOpt.AutoIndent;
-    fAutoJustify := EdOpt.AutoJustify;
-    fAutoBrackets := EdOpt.AutoBrackets;
-    fLeftSide := EdOpt.LeftSide;
-    fRightSide := EdOpt.RightSide;
-    fInSide := EdOpt.InSide;
-    fInsMode := InsertMode;
-    fKeyMap := KeyMap; {-$VIV}
-    { Flash >>> }
-    fBackIndent := EdOpt.BackIndent;
-    fAutoWrap := EdOpt.AutoWrap;
-    fOptimalFill := OptimalFill;
-    fTabReplace := TabReplace;
-    fSmartTab := EdOpt.SmartTab;
-    { Flash <<< }
     end;
+  TFileEditor(E.Intern).FillRecord(R);
   I := EditHistory.IndexOf(R);
   if I >= 0 then
     begin

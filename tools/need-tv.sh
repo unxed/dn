@@ -14,3 +14,13 @@ fi
 if [ -z "${DN_TV:-}" ] && git -C "$here" submodule status tv 2>/dev/null | grep -q '^[+-]'; then
     echo "NOTE: tv/ is not at the commit recorded in dn; if the build fails on a missing name run: git submodule update --init tv" >&2
 fi
+# tve/ is the git submodule of https://github.com/unxed/tve (the editor); the same rules: DN_TVE=/path/to/tve uses that directory instead.
+if [ -n "${DN_TVE:-}" ] && [ ! -e "$here/tve/src" ]; then
+    rmdir "$here/tve" 2>/dev/null || true
+    ln -s "$DN_TVE" "$here/tve"
+fi
+if [ ! -f "$here/tve/src/tvedoc.pas" ]; then
+    echo "tve/ is empty: fetching the submodule (git submodule update --init --depth 1 tve)" >&2
+    git -C "$here" submodule update --init --depth 1 tve >&2 ||
+        { echo "ERROR: no tve/. Run: git submodule update --init tve   (or set DN_TVE=/path/to/a/checkout of https://github.com/unxed/tve)" >&2; exit 1; }
+fi

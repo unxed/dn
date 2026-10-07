@@ -443,12 +443,12 @@ procedure TMacroCommand.ExecCommand(Editor: TView);
 procedure TMacroGoto.ExecCommand(Editor: TView);
   begin
   if  (Command < 0) then
-    TFileEditor(Editor).ScrollTo(TFileEditor(Editor).Delta.X,
+    TFileEditor(Editor).GotoXY(TFileEditor(Editor).Cursor.X,
        Repetitions)
   else if (Repetitions < 0) then
-    TFileEditor(Editor).ScrollTo(Command, TFileEditor(Editor).Delta.Y)
+    TFileEditor(Editor).GotoXY(Command, TFileEditor(Editor).Cursor.Y)
   else
-    TFileEditor(Editor).ScrollTo(Command, Repetitions);
+    TFileEditor(Editor).GotoXY(Command, Repetitions);
   end;
 
 constructor TMacroMark.Create(AN: Integer; AMark: Boolean);
@@ -462,10 +462,10 @@ procedure TMacroMark.ExecCommand(Editor: TView);
   begin
   if Mark then
     with TFileEditor(Editor) do
-      MarkPos[Command] := Delta
+      MarkPos[Command] := Cursor
   else
     with TFileEditor(Editor) do
-      ScrollTo(MarkPos[Command].X, MarkPos[Command].Y);
+      GotoXY(MarkPos[Command].X, MarkPos[Command].Y);
   end;
 
 constructor TMacroString.Create(const AString: String; ARepetitions: Word);

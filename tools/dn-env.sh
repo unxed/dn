@@ -71,7 +71,7 @@ dn_stage() {
         for f in "$here/dn/$d"/*; do ln -sf "$f" "$DN_STAGE/$(basename "$f")"; done
     done
 }
-DN_UPATHS="$DN_FUNITS -Fu$here/tv/src -Fu$DN_GEN -Fi$here/dn/compat/shims -Fu$DN_STAGE -Fi$DN_STAGE"
+DN_UPATHS="$DN_FUNITS -Fu$here/tv/src -Fu$here/tve/src -Fu$DN_GEN -Fi$here/tv/src -Fi$here/tve/src -Fi$here/dn/compat/shims -Fu$DN_STAGE -Fi$DN_STAGE"
 # the shim units (the names of the units of Borland TV that DN uses, made from tv/): generated for the builds, not committed
 dn_gen_shims() {
     mkdir -p "$DN_GEN"; dn_stage
