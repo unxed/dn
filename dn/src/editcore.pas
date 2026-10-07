@@ -129,6 +129,7 @@ type
     procedure Store(S: TStream); override;
     procedure Awaken; override;
     procedure HandleEvent(var Event: TEvent); override;
+    procedure Draw; override;
     function Valid(Command: Word): Boolean; override;
     function GetPalette: TPalette; override;
     procedure SetState(AState: Word; Enable: Boolean); override;
@@ -911,6 +912,15 @@ procedure TFileEditor.SetState(AState: Word; Enable: Boolean);
         VScroll.Hide;
       DrawView;
       end;
+  end;
+
+procedure TFileEditor.Draw;
+  begin
+  inherited Draw;
+  if InfoL <> nil then
+    InfoL.Draw;
+  if BMrk <> nil then
+    BMrk.Draw;
   end;
 
 procedure TFileEditor.ChangeBounds(const R: TRect);
