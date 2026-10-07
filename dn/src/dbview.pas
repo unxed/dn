@@ -1556,8 +1556,7 @@ constructor TDBWindow.Create(FName: String; var FileIsDBF: Boolean);
   Insert(P);
   if not P.isValid then
     begin
-    Free;
-    Fail;
+    Fail;                      { a failing constructor of a class destroys the instance itself: a Free before it destroyed it twice }
     end;
   { -------- Eugeny Zvyagintzev ---------}
   R.A.X := R.B.X;

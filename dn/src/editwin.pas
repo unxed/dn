@@ -251,8 +251,7 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
   MILoadFile(Intern, FileName);
   if not Intern.isValid then
     begin
-    Free;
-    Fail;
+    Fail;                      { a failing constructor of a class destroys the instance itself: a Free before it destroyed it twice }
     end;
 R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
   AInfo := TInfoLine.Create(R);
