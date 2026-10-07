@@ -153,7 +153,7 @@ One directory: every file in the table is composed as `SourceDir + name` (`basic
 | `fatalerr.pas` (the place of an address and the wait for a key at the fatal-error screen of `dn.pas`; was in `vpsyslow`, ours) | what the crash screen needs |
 | `compat/dnscreen.pas` (the 16-bit cell screen and the cursor of DN over `tv/`, was the `SysTv*` part of `vpsyslow`, ours) | the copy of the screen for the code that reads the screen, the cursor shape |
 | `compat/dnuserscreendos.pas` (ours) | GO32V2 BIOS/video-memory handling for restoring, capturing, and showing the external-program user screen |
-| `compat/osnamesunix.pas`, `compat/osnamesdos.pas` (ours) | the names of the files of DN at the border of Unix (cp866 <-> UTF-8, the case, the paths) and of DOS (the AMIS provider `DOS-UTF8/NAMES`); `osdep` calls them |
+| `compat/osnamesunix.pas` (ours) | the names of the files of DN at the border of Unix (cp866 <-> UTF-8, the case, the paths); `osdep` calls it. The border of DOS (the AMIS provider `DOS-UTF8/NAMES`, the conversion of a name for the build with the code page inside) is `TvDosNames` / `TvDos` of tv3 |
 | `compat/dnrundos.pas`, `dnrunlinux.pas`, `dnrunother.pas` (ours) | the backends of `dnrun.pas`: DOS (the user screen, COMMAND.COM), Linux (a pty through `TvVtRun`, the screen of the commands), the rest (the terminal goes to the shell) |
 | `compat/osrun.pas` + `osrununix.pas`, `osrunwindows.pas`, `osrundos.pas` (ours) | starting programs and restarting DN: the facade and the backends (the DOS way `COMSPEC /c command` on Unix) |
 | `compat/ossystem.pas` + `ossystemdos.pas`, `ossystemother.pas` (ours) | the small calls of the system: device test, volume label, disk buffers, the speaker, memory |

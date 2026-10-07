@@ -21,7 +21,7 @@ implementation
 
 uses
   SysUtils, Dos, DNErrLog
-{$IFNDEF DNUTF8}, OSNamesDos{$ENDIF};
+{$IFNDEF DNUTF8}, TvDosNames{$ENDIF};
 
 function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 begin
