@@ -21,7 +21,7 @@ implementation
 
 uses
   SysUtils, Dos, DNErrLog
-{$IFNDEF DNUTF8}, TvDosNames{$ENDIF};
+, TvDosNames;
 
 function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 begin
@@ -38,9 +38,7 @@ var
   P: string;
 begin
   P := StrPas(Path);
-{$IFNDEF DNUTF8}
-  P := DosNameToUtf8(P);           { the names go to the DOS in UTF-8 when the provider DOS-UTF8/NAMES is on (the build with the code page inside) }
-{$ENDIF}
+  P := NameToDos(P);               { the name goes to the DOS as the DOS wants it (tv/: UTF-8 or the code page) }
   Dos.DosError := 0;
   Dos.Exec(P, StrPas(Args));
   Result := Dos.DosError;          { 0 = the program was run; its exit code is Dos.DosExitCode }

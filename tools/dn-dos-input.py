@@ -4,7 +4,7 @@ INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at th
 usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
 Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
-utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), save-setup (Alt-K, a column, Store, OK, a restart), clipboard (the editor copies, a DOS program reads the DOS clipboard; needs nasm and DN_DOS_PATCHED=1), pages (chcp 437, 850, 852, 866, 1125: the frames, Russian on 866, Ukrainian on 1125), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
+utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), save-setup (Alt-K, a column, Store, OK, a restart), clipboard (the editor copies, a DOS program reads the DOS clipboard; needs nasm and DN_DOS_PATCHED=1), pages (chcp 437, 850, 852, 866, 1125: the frames, Russian on 866, Ukrainian on 1125), all of them by default. utf8-names-u8 (the build with UTF-8 inside, the DOS with UTF-8 names: F5 copies files with a Chinese and a Russian name; needs DN_DOS_PATCHED=1 and the build with DN_UTF8=1), names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need a DOSBox-X with the UTF-8 DOS API (`master` since October 2026; before that the patches of
 docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
@@ -201,13 +201,35 @@ def sc_utf8_names_cp(src, work, scr):
     os.makedirs(os.path.join(work, 'Каталог'), exist_ok=True)
     open(os.path.join(work, 'Каталог', 'Файл.txt'), 'w').write('hi\n')
     open(os.path.join(work, 'Привет.txt'), 'w').write('hi\n')
+    open(os.path.join(work, '世界.txt'), 'w').write('hi\n')
     extra = ['-c', 'chcp 866']
     lines = run(work, STARTUP + 8, '011B', None, extra=extra)
     check(has(lines, 'Привет'), 'UTF-8 names: a file with a Russian name is shown in the code page', lines)
+    check(has(lines, '{U+4E16}'), 'UTF-8 names: the characters that the code page lacks are shown as U+XXXX in braces (the column cuts the long name)', lines)
     check(has(lines, 'Каталог'), 'UTF-8 names: a directory with a Russian name is shown in the code page', lines)
     # the active panel is the right one (C:\); its directories: sub, TEMP, xlt, Каталог (the fourth: row 6)
-    lines = run(work, STARTUP + 16, '011B', scr, [(STARTUP, lambda: scr.click_cell(55, 6, 2, 0.12))], extra=extra)
-    check(has(lines, 'C:\\Каталог') and has(lines, 'Файл'), 'UTF-8 names: a double click on the directory enters it (the path and the file are in the code page)', lines)
+    # the keys of the harness: Down three times (sub, TEMP, xlt, then the directory with the Russian name), Enter
+    lines = run(work, STARTUP + 16, '011B,5000,5000,5000,1C0D', None, extra=extra)
+    check(has(lines, 'C:\\Каталог') and has(lines, 'Файл'), 'UTF-8 names: Enter on the directory enters it (the path and the file are in the code page)', lines)
+
+
+def sc_utf8_names_u8(src, work, scr):
+    """The build with UTF-8 inside and the DOS with UTF-8 names (the patched DOSBox-X, or its master since October 2026): the names go to the DOS and come back as they are. F5 copies a file
+    with a Chinese name (the code page of the screen lacks it) and a file with a Russian name from a directory to the other panel; the host sees the copies with the right names."""
+    if not PATCHED:
+        print('SKIP utf8-names-u8: needs DN_DOS_PATCHED=1 (the patched DOSBox-X)')
+        return
+    for sub, name in (('aaa', '世界.txt'), ('aab', 'Файл.txt')):
+        prepare(src, work)
+        os.makedirs(os.path.join(work, sub), exist_ok=True)
+        open(os.path.join(work, sub, name), 'w').write('copy me\n')
+        # Esc (the About box); Enter (into the directory, it is the first); Down (the file; the cursor was on ..); F5, Enter (to the other panel, C:\\)
+        keys = ','.join(['011B'] + [] + ['1C0D', '5000', '3F00', '1C0D'])
+        run(work, 40, keys, None, extra=['-c', 'chcp 866'])
+        copy = os.path.join(work, name)
+        check(os.path.isfile(copy) and open(copy).read() == 'copy me\n', 'UTF-8 build: F5 copies %r to the other panel with the right name' % name)
+        if os.path.exists(copy):
+            os.remove(copy)
 
 
 def sc_names_cp_plain(src, work, scr):
@@ -324,7 +346,7 @@ def sc_pages(src, work, scr):
             check(w in text, 'page %d, %s: the help text has %r' % (page, lang, w), rows[:12])
 
 
-SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files, 'edit': sc_edit, 'save-setup': sc_save_setup, 'clipboard': sc_clipboard, 'pages': sc_pages}
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'utf8-names-u8': sc_utf8_names_u8, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files, 'edit': sc_edit, 'save-setup': sc_save_setup, 'clipboard': sc_clipboard, 'pages': sc_pages}
 
 
 def main():

@@ -188,8 +188,8 @@ end;
 {$ELSE}
 function SysOsPath(const S: string): string;
 begin
-{$IF DEFINED(GO32V2) AND NOT DEFINED(DNUTF8)}
-  Result := DosNameToUtf8(S);
+{$IFDEF GO32V2}
+  Result := NameToDos(S);          { tv/: UTF-8 or the code page on either side, U+XXXX in braces, nothing off DOS }
 {$ELSE}
   Result := S;
 {$ENDIF}
@@ -197,8 +197,8 @@ end;
 
 function SysNameToOs(const S: string): string;
 begin
-{$IF DEFINED(GO32V2) AND NOT DEFINED(DNUTF8)}
-  Result := DosNameToUtf8(S);
+{$IFDEF GO32V2}
+  Result := NameToDos(S);          { tv/: UTF-8 or the code page on either side, U+XXXX in braces, nothing off DOS }
 {$ELSE}
   Result := S;
 {$ENDIF}
@@ -222,8 +222,8 @@ end;
 procedure SysGetDirDos(D: Byte; var S: string);
 begin
   GetDir(D, S);
-{$IF DEFINED(GO32V2) AND NOT DEFINED(DNUTF8)}
-  S := DosNameFromUtf8(S);
+{$IFDEF GO32V2}
+  S := NameFromDos(S);
 {$ENDIF}
 end;
 {$ENDIF}
@@ -381,8 +381,8 @@ begin
 {$IFDEF UNIX}
   N := NameFromOs(N);
 {$ENDIF}
-{$IF DEFINED(GO32V2) AND NOT DEFINED(DNUTF8)}
-  N := DosNameFromUtf8(N);
+{$IFDEF GO32V2}
+  N := NameFromDos(N);
 {$ENDIF}
   F.Attr := Byte(R.Attr);
   if R.Attr and faSymLink <> 0 then

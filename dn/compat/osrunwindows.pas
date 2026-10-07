@@ -20,40 +20,25 @@ procedure BackendRestartSelf;
 implementation
 
 uses
-  SysUtils, TvUnix, DNErrLog;
+  SysUtils, TvProc, DNErrLog;
+
+{ TvProc gives the exit code; DN keeps the status of waitpid (the exit code in the second byte), -1 if the command could not be run }
+function ToStatus(Code: LongInt): LongInt;
+begin
+  if Code < 0 then
+    Result := -1
+  else
+    Result := Code shl 8;
+end;
 
 function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 begin
-  UnixSuspend;
-  Writeln;
-  Writeln('> ', CmdLine);
-  Flush(Output);
-  try
-    Result := ExecuteProcess(GetEnvironmentVariable('COMSPEC'), '/c ' + CmdLine);
-  except
-    Result := -1;
-  end;
-  if Pause and UnixActive then
-  begin
-    Writeln;
-    Write('[DN] Press Enter to return...');
-    Flush(Output);
-    Readln;
-  end;
-  UnixResume;
-  if Result > 0 then
-    Result := Result shl 8;        { as the status of waitpid on Unix: the exit code is in the second byte }
+  Result := ToStatus(RunShell(CmdLine, Pause, '[DN] Press Enter to return...'));
 end;
 
 function BackendRunQuiet(const CmdLine: string): LongInt;
 begin
-  try
-    Result := ExecuteProcess(GetEnvironmentVariable('COMSPEC'), '/c ' + CmdLine);
-  except
-    Result := -1;
-  end;
-  if Result > 0 then
-    Result := Result shl 8;        { as the status of waitpid on Unix: the exit code is in the second byte }
+  Result := ToStatus(RunQuiet(CmdLine));
 end;
 
 function BackendExecute(Path, Args: PChar): LongInt;
@@ -68,15 +53,9 @@ begin
 end;
 
 procedure BackendRestartSelf;
-var
-  Strs: array of AnsiString;
-  I: Integer;
 begin
   DNTrace('RestartSelf: ' + ParamStr(0));
-  SetLength(Strs, ParamCount);
-  for I := 1 to ParamCount do
-    Strs[I - 1] := ParamStr(I);
-  ExecuteProcess(ParamStr(0), Strs);
+  RestartSelf;
 end;
 
 end.

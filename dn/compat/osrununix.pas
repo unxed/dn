@@ -20,28 +20,25 @@ procedure BackendRestartSelf;
 implementation
 
 uses
-  SysUtils, BaseUnix, Unix, TvUnix, OSNamesUnix, DNErrLog;
+  SysUtils, TvProc, OSNamesUnix, DNErrLog;
+
+{ TvProc gives the exit code; DN keeps the status of waitpid (the exit code in the second byte), -1 if the command could not be run }
+function ToStatus(Code: LongInt): LongInt;
+begin
+  if Code < 0 then
+    Result := -1
+  else
+    Result := Code shl 8;
+end;
 
 function BackendRunShell(const CmdLine: string; Pause: Boolean): LongInt;
 begin
-  UnixSuspend;
-  Writeln;
-  Writeln('$ ', CommandLineToOs(CmdLine));
-  Flush(Output);
-  Result := fpSystem(CommandLineToOs(CmdLine));
-  if Pause and UnixActive then
-  begin
-    Writeln;
-    Write('[DN] Press Enter to return...');
-    Flush(Output);
-    Readln;
-  end;
-  UnixResume;
+  Result := ToStatus(RunShell(CommandLineToOs(CmdLine), Pause, '[DN] Press Enter to return...'));
 end;
 
 function BackendRunQuiet(const CmdLine: string): LongInt;
 begin
-  Result := fpSystem(CommandLineToOs(CmdLine));
+  Result := ToStatus(RunQuiet(CommandLineToOs(CmdLine)));
 end;
 
 function BackendExecute(Path, Args: PChar): LongInt;
@@ -65,22 +62,10 @@ begin
 end;
 
 procedure BackendRestartSelf;
-var
-  Strs: array of AnsiString;
-  Args: array of PAnsiChar;
-  I: Integer;
 begin
   DNTrace('RestartSelf: ' + ParamStr(0));
-  SetLength(Strs, ParamCount + 1);
-  SetLength(Args, ParamCount + 2);
-  for I := 0 to ParamCount do
-  begin
-    Strs[I] := ParamStr(I);
-    Args[I] := PAnsiChar(Strs[I]);
-  end;
-  Args[ParamCount + 1] := nil;
-  fpExecve(PAnsiChar(Strs[0]), @Args[0], envp);
-  DNTrace('RestartSelf: exec failed, errno ' + IntToStr(fpGetErrno));
+  RestartSelf;
+  DNTrace('RestartSelf: exec failed');
 end;
 
 end.
