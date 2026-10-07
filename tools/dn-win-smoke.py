@@ -146,7 +146,7 @@ def main():
         if u8:
             # F5 of a file with a Russian name into the directory newdir, then F8 of the copy: the wide API of the files with the names outside the ANSI page
             t.send('\x1b[H', 0.4)                      # Home: the first entry
-            for _ in range(5):                         # .., newdir, the Russian directory, a, the Greek name, the Russian name
+            for _ in range(6):                         # .., newdir, the Russian directory, a, cmdout (made above), the Greek name, the Russian name
                 t.send('\x1b[B', 0.3)
             t.send('\x1b[15~', 1.0)                   # F5
             shot(t, 'f5-u8')
