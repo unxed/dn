@@ -75,7 +75,7 @@ def main():
         open(os.path.join(w, 'my dir', 'c d.txt'), 'w').write('inner\n')
         open(os.path.join(w, 'a b.txt'), 'w').write('with a space\n')
         t = run(d, w)
-        check('my dir' in t.text().replace('│', ' ') or 'my' in t.text(), 'a directory with a space in its name is listed', t.text())
+        check('my dir' in t.text(), 'a directory with a space in its name is listed', t.text())
         key(t, 'HOME'); key(t, 'DOWN'); key(t, 'ENTER', 1.0)
         check('my dir' in t.text(), 'Enter: the directory "my dir" is entered (the title of the panel)', t.text())
         key(t, 'HOME'); key(t, 'DOWN')
