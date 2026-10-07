@@ -4,7 +4,7 @@ INT 33h, the keys of the harness (DNKEYS) drive the menus. The checks look at th
 usage: tools/dn-dos-input.py OUTDIR [SCENARIO...]      OUTDIR has the build of DN for DOS (dn.exe, *.dlg, *.lng, *.hlp, cwsdpmi.exe: tools/build.sh dos OUTDIR)
 Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double click on a directory enters it), mouse-fkey (a click on F7 in the status line opens
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
-utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), save-setup (Alt-K, a column, Store, OK, a restart), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
+utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), save-setup (Alt-K, a column, Store, OK, a restart), clipboard (the editor copies, a DOS program reads the DOS clipboard; needs nasm and DN_DOS_PATCHED=1), all of them by default. names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need a DOSBox-X with the UTF-8 DOS API (`master` since October 2026; before that the patches of
 docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
@@ -99,7 +99,7 @@ def prepare(src, work):
         open(os.path.join(work, 'sub', n), 'w').write('hi\n')
 
 
-def run(work, seconds, keys, screen=None, actions=(), extra=()):
+def run(work, seconds, keys, screen=None, actions=(), extra=(), after=()):
     """One run of DN: keys by DNKEYS (the harness), actions = [(seconds from the start, function)] on the pointer; returns the lines of the dump of the screen or None"""
     for f in ('SCR.DAT', 'SER.TXT'):
         try:
@@ -113,7 +113,7 @@ def run(work, seconds, keys, screen=None, actions=(), extra=()):
     cmd += ['-c', 'mount c ' + work, '-c', 'c:', '-c', 'set DNDUMP=SCR.DAT', '-c', 'set DNSERIAL=1', '-c', 'set DNDUMPSEC=%d' % seconds]
     if keys:
         cmd += ['-c', 'set DNKEYS=' + keys]
-    cmd += list(extra) + ['-c', 'DN.EXE > OUT.TXT', '-c', 'exit']
+    cmd += list(extra) + ['-c', 'DN.EXE > OUT.TXT'] + list(after) + ['-c', 'exit']
     if screen is not None:
         env['DISPLAY'] = DISPLAY
         env['SDL_VIDEODRIVER'] = 'x11'
@@ -264,7 +264,27 @@ def sc_save_setup(src, work, scr):
     check(has(lines, '[X] Size') and has(lines, 'File Panel appearance'), 'Store: the next start has the column Size on in the dialog of the panel', lines)
 
 
-SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files, 'edit': sc_edit, 'save-setup': sc_save_setup}
+def sc_clipboard(src, work, scr):
+    """The clipboard of DN in DOSBox-X (the DOS clipboard API, the provider DOS-UTF8/CLIPBRD): the editor copies "hi", DN is left, and a DOS program (docs/patches/dosbox-x-test/utf8clip.asm,
+    built with nasm) reads the text of the clipboard."""
+    if not PATCHED:
+        print('SKIP clipboard: needs DN_DOS_PATCHED=1 (a DOSBox-X with the UTF-8 DOS API)')
+        return
+    if shutil.which('nasm') is None:
+        print('SKIP clipboard: no nasm')
+        return
+    prepare(src, work)
+    here = os.path.dirname(os.path.abspath(__file__))
+    subprocess.run(['nasm', '-f', 'bin', '-o', os.path.join(work, 'UCLIP.COM'), os.path.join(here, '..', 'docs', 'patches', 'dosbox-x-test', 'utf8clip.asm')], check=True)
+    # Esc (the About box); Enter (into sub: the first entry); Down (plain.txt); F4 (the editor), Shift-Right twice, Ctrl-Ins (copy), Esc (leave the editor); File -> Exit
+    keys = '011B,1C0D,5000,3E00,S4D00,S4D00,C9200,011B,' + EXIT
+    run(work, 60, keys, None, extra=['-set', 'dos clipboard api=true'], after=['-c', 'UCLIP.COM > CLIP.TXT'])
+    out = open(os.path.join(work, 'CLIP.TXT'), errors='replace').read() if os.path.isfile(os.path.join(work, 'CLIP.TXT')) else ''
+    check('SET=FF' in out, 'the clipboard provider is there', out.split('\n'))
+    check('TEXT=6869' in out, 'the text that DN copied (hi) is in the DOS clipboard', out.split('\n'))
+
+
+SCEN = {'mouse-menu': sc_mouse_menu, 'mouse-dir': sc_mouse_dir, 'mouse-fkey': sc_mouse_fkey, 'autosave': sc_autosave, 'utf8-names-cp': sc_utf8_names_cp, 'names-cp-plain': sc_names_cp_plain, 'files': sc_files, 'edit': sc_edit, 'save-setup': sc_save_setup, 'clipboard': sc_clipboard}
 
 
 def main():
