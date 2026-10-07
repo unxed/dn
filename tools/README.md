@@ -45,7 +45,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-linux-desktop.py` | the options Autosave Desktop and Preserve directory, Alt-X, the next start: `dn.dsk` and the directory of the panel are restored (the Linux twin of the scenario `autosave` of `dn-dos-input.py`) | dn-linux |
 | `dn-linux-arcmembers.py` | F8 on a member of a zip and F5 into the archive of the other panel, checked on the archive (the add needs the system `zip`) | dn-linux |
 | `dn-linux-setup.py` | the dialog of the panel appearance (Alt-K) in the three languages; a column on, Store, OK, a restart: the stored setup is there | dn-linux |
-| `dn-linux-menusweep.py` | every item of the main menu, the submenus included, in the three languages, each opened from a fresh start: no fatal error (found the dialog of Alt-K and View as Hex) | by hand (`-j N`) |
+| `dn-linux-menusweep.py` | every item of the main menu, the submenus included, in the three languages, each opened from a fresh start: no fatal error (found the dialog of Alt-K and View as Hex) | dn-linux (job menusweep; `-j N`) |
 | `dn-linux-kitty.py` | keys in the encoding of the Kitty keyboard protocol: a press and a release are one character, a repeat is a key, the lock bits, Ctrl-Tab, Alt-X | dn-linux |
 | `dn-linux-embterm.py` | programs that read the terminal, run from the command line: a prompt and a typed line, the size of the terminal, raw mode (q, Up), Ctrl-C | dn-linux |
 | `dn-linux-locale-utf8.py` | the build with UTF-8 inside under C, POSIX, KOI8-R, ru_RU.UTF-8, en_US.UTF-8 and a Latin-1 locale: names, Russian typed into the command line and a dialog | dn-linux |

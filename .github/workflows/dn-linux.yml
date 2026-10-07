@@ -123,6 +123,20 @@ jobs:
         if: success() || failure()
         run: python3 tools/dn-linux-locale-utf8.py out/dn
 
+  menusweep:
+    # every item of the main menu, the submenus included, in the three languages, each from a fresh start: no fatal error
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
+      - name: Build DN (one command)
+        run: tools/build.sh linux64 out/dn
+      - name: Every menu item in English, Russian and Ukrainian
+        run: python3 tools/dn-linux-menusweep.py out/dn -j 4
+
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64
     runs-on: ubuntu-24.04-arm
