@@ -70,7 +70,7 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3 p7zip-full xz-utils
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3 p7zip-full xz-utils zip unzip
       - name: Build DN (one command; UTF-8 inside is the default)
         run: tools/build.sh linux64 out/dn
       - name: File operations in a pty (and the UTF-8 checks)
@@ -113,6 +113,9 @@ jobs:
       - name: Keys in the encoding of the Kitty keyboard protocol
         if: success() || failure()
         run: python3 tools/dn-linux-kitty.py out/dn
+      - name: Add and delete the members of an archive
+        if: success() || failure()
+        run: python3 tools/dn-linux-arcmembers.py out/dn
       - name: Locales that are not UTF-8 (the build with UTF-8 inside)
         if: success() || failure()
         run: python3 tools/dn-linux-locale-utf8.py out/dn

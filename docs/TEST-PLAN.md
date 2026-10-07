@@ -33,7 +33,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Crash and hang reports | the log of a run, the report of a crash, the privacy of the typed characters, the next log after a killed run | `t_flightrec` (the log, the ring, the report, the masking), `dn-linux-crash.py` (an access violation forced in the real program) | the report of a crash on DOS and Windows (addresses only on DOS; the CI builds both, nobody has forced a crash there) |
 | Files and paths | find, names, attributes, the DOS path semantics through the facades | `t_osdep`, `t_flname`, `t_dnscreen` | long names, names with spaces and UTF-8, a missing directory, a read-only file |
 | Processes | start a program, restart, the user screen | `t_osrun`, `t_dnrun`, `dn-linux-names.py` (`DN_RUN_PAUSE` 0, 1, 2) | exit codes of the programs as DN shows them |
-| Archives | enter, leave, list, F3, F4, F5, F8, add (zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz) | `dn-linux-archives.py`, `docs/ARCHIVE-MATRIX.md` | zip in zip; add and delete as separate checks of the files in the archive |
+| Archives | enter, leave, list, F3, F4, F5, F8, add (zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz) | `dn-linux-archives.py`, `dn-linux-arcmembers.py` (add and delete a member of a zip, checked in the archive), `dn-linux-names.py` (zip in zip), `docs/ARCHIVE-MATRIX.md` | add and delete for the other formats (7z, tar...) |
 | The object/class gate | every scenario of every function, cell by cell | `dn-accept` (178 scenarios) | the scenarios added by stages 1 to 3 (glyphs, platform facades) |
 
 ### Linux
@@ -86,7 +86,6 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 |---|---|---|
 | Screenshot checks of the screens of the pages 850 and 852, of the help in Russian and Ukrainian (cp866, cp1125) | DOSBox-X has no such pages; the tables are checked by unit tests (`t_cpall`, `t_cpcase`, `test_sort1125.py`) | when a DOS with these pages can run |
 | The control count of a loaded dialog against the source of `rcp` | `t_resload` proves that every view loads and that the three languages have the same keys; the source has no machine readable count | when `rcp` writes a manifest |
-| Add and delete of archive members as separate checks | covered by the accept scenarios and `dn-linux-archives.py` in part | stage 4 follow-up |
 | DN-level clipboard checks (DOS and Windows) | `tv` tests the backends (`t_dosbk`, the Windows clipboard); a DN scenario needs the system clipboard of the runner | stage 4 follow-up |
 | The DOS `Save setup` | the keys F3, F4, F5, F6, F7, F8 on real files are checked by the scenarios `files` and `edit` of `dn-dos-input.py` (run by hand: DOSBox-X and Xvfb) | stage 4 follow-up |
 | The scenarios of the gate for the glyphs and the platform facades | the whole gate runs on both builds at every push (the glyphs are the screen of every scenario) | none |
