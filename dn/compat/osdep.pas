@@ -44,6 +44,7 @@ function SysFileCreate(FileName: PChar; Mode, Attr: LongInt; var Handle: LongInt
 { Method: 0 from the beginning, 1 from the current position, 2 from the end. }
 function SysFileSeek(Handle: THandle; Distance, Method: LongInt; var Actual: LongInt): LongInt;
 function SysFileClose(Handle: THandle): LongInt;
+{ The size of the file becomes Size (a larger one: zeros); the position in the file stays as it was. }
 function SysFileSetSize(Handle: THandle; Size: TFileSize): LongInt;
 { nonzero (the low byte) when the handle is a device (a terminal, a printer...), 0 for a file }
 function SysFileIsDevice(Handle: THandle): LongInt;
@@ -305,11 +306,18 @@ begin
 end;
 
 function SysFileSetSize(Handle: THandle; Size: TFileSize): LongInt;
+var
+  Pos: Int64;
 begin
+  { the position of the file is not changed: the truncation of Windows leaves it at the new end (a copy set the final size first and then wrote its data
+    after that many zero bytes), that of Unix does not move it }
+  Pos := FileSeek(Handle, Int64(0), 1);
   if FileTruncate(Handle, Size) then
     Result := 0
   else
     Result := 1;
+  if Pos >= 0 then
+    FileSeek(Handle, Pos, 0);
 end;
 
 function SysFileIsDevice(Handle: THandle): LongInt;

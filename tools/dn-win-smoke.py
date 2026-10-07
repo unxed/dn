@@ -165,6 +165,26 @@ def main():
                 time.sleep(0.4)
             tree = '\n'.join(os.path.join(r, n) for r, ds, fs in os.walk(w) for n in ds + fs)
             check(copied_text() == '\u041f\u0440\u0438\u0432\u0435\u0442', 'UTF-8: F5 copies a file with a Russian name', 'content: %r\nthe tree of the work directory:\n%s' % (copied_text(), tree))
+        # F5 of a plain file into newdir: the data is the same (a copy sets the final size first: the position of the file must stay at the start)
+        t.send('\x1b[H', 0.4)
+        for _ in range(3 if u8 else 2):                # .., newdir, [the Russian directory,] a
+            t.send('\x1b[B', 0.3)
+        t.send('\x1b[15~', 1.0)
+        t.send('newdir', 0.5)
+        t.send('\r', 2.0)
+        plain = os.path.join(w, 'newdir', 'a.txt')
+
+        def plain_text():
+            try:
+                return open(plain).read().strip()
+            except OSError:
+                return None
+
+        for _ in range(25):
+            if plain_text() == 'first':
+                break
+            time.sleep(0.4)
+        check(plain_text() == 'first', 'F5: a plain file is copied with its data (not after a block of zeros)', 'content: %r\n%s' % (plain_text(), t.text()))
         t.send('\x1bx', 1.0)                          # Alt-X: quit
         t.send('\r', 1.5)
         for _ in range(20):

@@ -81,6 +81,13 @@ begin
   H := FileOpen(AnsiString(Name), fmOpenReadWrite);
   Check(H <> THandle(-1), 'the test file is opened');
   Check(SysFileIsDevice(H) = 0, 'a file is not a device');
+  { the position stays where it was (on Windows the truncation moved it to the new end: a copy wrote its data after a block of zeros) }
+  Check(FileSeek(H, 2, 0) = 2, 'the position is 2');
+  Check(SysFileSetSize(H, 10) = 0, 'SysFileSetSize 10 (a position inside the file)');
+  Check(FileSeek(H, 0, 1) = 2, 'the position is still 2 after the size was set');
+  FileSeek(H, 0, 0);
+  Check(SysFileSetSize(H, 30) = 0, 'SysFileSetSize 30 (the file grows)');
+  Check(FileSeek(H, 0, 1) = 0, 'the position is still 0 after the size grew: the data written next goes to the start');
   Check(SysFileSetSize(H, 4) = 0, 'SysFileSetSize cuts the file');
   Check(FileSeek(H, 0, 2) = 4, 'the file is 4 bytes long now');
   Check(SysFileSetSize(H, 20) = 0, 'and grows it');
