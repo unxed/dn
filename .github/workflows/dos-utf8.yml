@@ -1,0 +1,75 @@
+name: dos-utf8
+# UTF-8 file names of DOS against the DOSBox-X of the branch master (the provider DOS-UTF8/NAMES and the option "utf8 file names", pull request 6632 of
+# joncampbell123/dosbox-x), every night and on demand: the test of tv/ (dostests/utf8-names.sh: a program with UTF-8 inside, in the UTF-8 mode and in the
+# code page mode with U+XXXX in braces) and DN for DOS in both builds (the code page inside, UTF-8 inside). The DOSBox-X of Ubuntu does not have the
+# provider yet, so the other workflows use it only for what does not need it.
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/dos-utf8.yml
+      - tools/dn-dos-input.py
+      - dn/compat/osdep.pas
+      - dn/compat/osrundos.pas
+      - tv
+
+concurrency:
+  group: dos-utf8-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  utf8-names:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc make bzip2 git curl unzip python3 \
+            build-essential autoconf automake libtool nasm pkg-config libsdl2-dev libsdl2-net-dev libpng-dev libfreetype-dev libncurses-dev libpcap-dev libslirp-dev \
+            libx11-dev libxkbfile-dev libxrandr-dev libfluidsynth-dev zlib1g-dev
+      - name: The revision of DOSBox-X master
+        id: dbxrev
+        run: echo "sha=$(git ls-remote https://github.com/joncampbell123/dosbox-x HEAD | cut -f1)" >> "$GITHUB_OUTPUT"
+      - name: DOSBox-X cache
+        id: dbxcache
+        uses: actions/cache@v4
+        with:
+          path: ~/dosbox-x-master
+          key: dosbox-x-master-${{ steps.dbxrev.outputs.sha }}
+      - name: Build DOSBox-X master
+        if: steps.dbxcache.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 https://github.com/joncampbell123/dosbox-x "$RUNNER_TEMP/dbx"
+          cd "$RUNNER_TEMP/dbx"
+          ./autogen.sh
+          ./configure --prefix="$HOME/dosbox-x-master" --enable-sdl2 --disable-debug --enable-core-inline
+          make -j"$(nproc)"
+          make install
+      - name: Cross compiler cache
+        id: fpccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/fpc-go32v2
+          key: fpc-go32v2-${{ hashFiles('tools/build-fpc-go32v2.sh') }}
+      - name: Build the go32v2 cross compiler
+        if: steps.fpccache.outputs.cache-hit != 'true'
+        run: tools/build-fpc-go32v2.sh "${{ runner.temp }}/fpc-go32v2"
+      - name: The test of tv/ (a program with UTF-8 inside)
+        run: |
+          DOSBOX="$HOME/dosbox-x-master/bin/dosbox-x" FPC_GO32V2="${{ runner.temp }}/fpc-go32v2/bin/fpc-go32v2" tv/dostests/utf8-names.sh
+      - name: DN for DOS, the code page inside
+        run: |
+          export PATH="$HOME/dosbox-x-master/bin:$PATH" DN_PREFIX="${{ runner.temp }}/fpc-go32v2"
+          tools/build.sh dos out/dos-cp
+          DOSBOX_X="$HOME/dosbox-x-master/bin/dosbox-x" DN_DOS_PATCHED=1 python3 tools/dn-dos-input.py out/dos-cp utf8-names-cp
+      - name: DN for DOS, UTF-8 inside
+        run: |
+          export PATH="$HOME/dosbox-x-master/bin:$PATH" DN_PREFIX="${{ runner.temp }}/fpc-go32v2"
+          DN_UTF8=1 tools/build.sh dos out/dos-u8
+          DOSBOX_X="$HOME/dosbox-x-master/bin/dosbox-x" DN_DOS_PATCHED=1 python3 tools/dn-dos-input.py out/dos-u8 utf8-names-u8
