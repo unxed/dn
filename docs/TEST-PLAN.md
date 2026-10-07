@@ -54,7 +54,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Start and screen | start on a real console, menu bar, no country-setup error | `dn-win-smoke.py` (ConPTY) | none (`dn-windows` runs the smoke on win32 and win64, with and without UTF-8 inside) |
 | Names | UTF-8 names through the wide API: create, list, enter, copy | CI check of `Privet`, `αβγ`, F7 | delete of such a name (`dn-win-smoke.py` copies it: it found the copy bug) |
 | Processes | the shell and the archivers through `COMSPEC /c` | none | none (`dn-win-smoke.py` runs a command of the command line; `t_osrun` has no Windows branch: the tests of `dn/tests` run on Linux only) |
-| Clipboard | text round trip through the system clipboard | `tv` (Windows backend) | a DN-level check |
+| Clipboard | text round trip through the system clipboard | `tv` (Windows backend) | a DN-level check on Linux (`dn-linux-clip.py`); on DOS and Windows still none |
 
 ### DOS
 
@@ -65,7 +65,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Input | the keyboard and the mouse | `dn-dos-input.py` | the keys of the harness for F3 and F4 on real files (F5, F6, F7, F8: scenario `files` of `dn-dos-input.py`) |
 | State | desktop and setup saved and restored | `tools/dn-tour.sh` scenarios, `t_cfgstate` | the saved setup (`Save setup`) |
 | User screen | a program's output kept and shown again | `userscr` smoke (in `toolchain`) | none |
-| Clipboard | UTF-8 clipboard when `DOS-UTF8/CLIPBRD` is there, OEM when not | `tv` `t_dosbk` | a DN-level check |
+| Clipboard | UTF-8 clipboard when `DOS-UTF8/CLIPBRD` is there, OEM when not | `tv` `t_dosbk` | a DN-level check on Linux (`dn-linux-clip.py`); on DOS and Windows still none |
 | Resources and help | the DOS build lands them on the code page of the language (`to-codepage.py`) | `tools/tests/test_to_codepage.py` | a screenshot check of the help in Russian and Ukrainian (cp866, cp1125) |
 
 ## Where the tests run
