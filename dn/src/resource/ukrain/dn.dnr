@@ -578,28 +578,29 @@ DIALOG dlgSetupModem, 66, 21, 'Комунікаційні установки'
       ITEM 'INT 14h'
     END
     Label 49, 2, '~І~нтерфейс'
-    InputLine 39, 8, 44, 9, 2, 0
-    Label 33, 8, 'IRQ:', ofPostProcess, ofPreProcess
-    Label 3, 8, 'Установки Користувача: ', ofPostProcess, ofPreProcess
-    InputLine 55, 8, 62, 9, 3, 0
-    Label 47, 8, 'Порт:', ofPostProcess, ofPreProcess
+    InputLine 27, 8, 31, 9, 2, 0
+    Label 20, 8, 'IRQ:', ofPostProcess, ofPreProcess
+    Label 3, 8, 'Власна схема:', ofPostProcess, ofPreProcess
+    InputLine 42, 8, 47, 9, 3, 0
+    Label 35, 8, 'Порт:', ofPostProcess, ofPreProcess
+    Button 50, 8, 62, 10, '~Б~ільше', cmAdvancePortSetup, ofPostProcess, ofPreProcess
     InputLine 8, 10, 63, 11, 80, 0
     Label 2, 10, '~I~nit', ofPostProcess, ofPreProcess
     InputLine 10, 12, 35, 13, 20, 0
     Label 2, 12, '~E~scape', ofPostProcess, ofPreProcess
     InputLine 46, 12, 63, 13, 20, 0
     Label 36, 12, '~O~n-hook', ofPostProcess, ofPreProcess
-    InputLine 16, 14, 35, 15, 20, 0
+    InputLine 15, 14, 35, 15, 20, 0
     Label 2, 14, '~П~реф. набору', ofPostProcess, ofPreProcess
-    InputLine 51, 14, 63, 15, 20, 0
+    InputLine 50, 14, 63, 15, 20, 0
     Label 37, 14, 'С~у~ф. набору', ofPostProcess, ofPreProcess
     InputLine 22, 16, 63, 17, 255, 0
     Label 2, 16, 'К~а~талог прийому', ofPostProcess, ofPreProcess
     InputLine 23, 18, 28, 19, 4, 0
     Label 2, 18, 'По~в~тор після (сек):', ofPostProcess, ofPreProcess
-    Button 30, 18, 41, 20, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 42, 18, 53, 20, 'Відміна', cmCancel, ofPostProcess, ofPreProcess
-    Button 54, 18, 65, 20, '~Б~ільше', cmAdvancePortSetup, ofPostProcess, ofPreProcess
+    Button 30, 18, 40, 20, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button 41, 18, 51, 20, 'Відміна', cmCancel, ofPostProcess, ofPreProcess
+    Button 52, 18, 62, 20, 'Допомо~г~а', cmHelp, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgEditorDefaults, 59, 23, 'Установки редактора/перегляду'
@@ -3265,7 +3266,7 @@ DIALOG dlgFMSetup, 76, 22, 'Установки Менеджера Файлів'
     Label 38, 1, 'Зовнішній вигляд', ofPostProcess, ofPreProcess
 
 
-    StaticText 36, 7, 66, 8, 'Довге ім'я в підвалі'
+    StaticText 36, 7, 66, 8, 'Довге ім''я в підвалі'
     ComboBox 52, 8, 75, 9
       ITEM 'Ліворуч'
       ITEM 'У центрі'
@@ -3289,13 +3290,12 @@ DIALOG dlgFMSetup, 76, 22, 'Установки Менеджера Файлів'
     END
     Label 35, 11, ' └─Спільну част.', ofPostProcess, ofPreProcess
 
-    StaticText 36, 12, 44, 13, 'Символи:'
 ; TagChar
-    InputLine 54, 12, 57, 13, 1, 0
-    Label 44, 12, 'від~м~ітки', ofPostProcess, ofPreProcess
+    InputLine 46, 12, 49, 13, 1, 0
+    Label 35, 12, 'Від~м~ітка:', ofPostProcess, ofPreProcess
 ; RestChar
-    InputLine 70, 12, 73, 13, 1, 0
-    Label 58, 12, 'о~б~різання', ofPostProcess, ofPreProcess
+    InputLine 66, 12, 69, 13, 1, 0
+    Label 55, 12, 'О~б~різання:', ofPostProcess, ofPreProcess
 
 ; DIZ
     InputLine 36, 15, 70, 28, 250, 0
@@ -3446,9 +3446,8 @@ DIALOG dlgSystemSetup, 72, 21, 'Системні установки'
     InputLine 63, 13, 70, 14, 5, 0
     Label 43, 13, 'Буфер копіювання:', ofPostProcess, ofPreProcess
 
-    InputLine 64, 16, 70, 17, 3, 0
-    Label 49, 15, 'Архіватор за', ofPostProcess, ofPreProcess
-    Label 49, 16, 'замовчуванням:', ofPostProcess, ofPreProcess
+    InputLine 64, 15, 70, 16, 3, 0
+    Label 44, 15, 'Типовий архіватор:', ofPostProcess, ofPreProcess
 
     Button 39, 18, 47, 20, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 47, 18, 58, 20, 'Відміна', cmCancel, ofPostProcess, ofPreProcess

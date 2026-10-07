@@ -578,20 +578,21 @@ DIALOG dlgSetupModem, 66, 21, 'Коммуникационные установк
       ITEM 'INT 14h'
     END
     Label 49, 2, '~И~нтерфейс'
-    InputLine 39, 8, 44, 9, 2, 0
-    Label 33, 8, 'IRQ:', ofPostProcess, ofPreProcess
-    Label 3, 8, 'Пользовательские установки: ', ofPostProcess, ofPreProcess
-    InputLine 55, 8, 62, 9, 3, 0
-    Label 47, 8, 'Порт:', ofPostProcess, ofPreProcess
+    InputLine 27, 8, 31, 9, 2, 0
+    Label 20, 8, 'IRQ:', ofPostProcess, ofPreProcess
+    Label 3, 8, 'Своя схема:', ofPostProcess, ofPreProcess
+    InputLine 42, 8, 47, 9, 3, 0
+    Label 35, 8, 'Порт:', ofPostProcess, ofPreProcess
+    Button 50, 8, 62, 10, '~Б~ольше', cmAdvancePortSetup, ofPostProcess, ofPreProcess
     InputLine 8, 10, 63, 11, 80, 0
     Label 2, 10, '~I~nit', ofPostProcess, ofPreProcess
     InputLine 10, 12, 35, 13, 20, 0
     Label 2, 12, '~E~scape', ofPostProcess, ofPreProcess
     InputLine 46, 12, 63, 13, 20, 0
     Label 36, 12, '~O~n-hook', ofPostProcess, ofPreProcess
-    InputLine 16, 14, 35, 15, 20, 0
+    InputLine 15, 14, 35, 15, 20, 0
     Label 2, 14, '~П~реф. набора', ofPostProcess, ofPreProcess
-    InputLine 51, 14, 63, 15, 20, 0
+    InputLine 50, 14, 63, 15, 20, 0
     Label 37, 14, 'С~у~фф. набора', ofPostProcess, ofPreProcess
     InputLine 22, 16, 63, 17, 255, 0
     Label 2, 16, 'К~а~талог приема', ofPostProcess, ofPreProcess
@@ -599,7 +600,7 @@ DIALOG dlgSetupModem, 66, 21, 'Коммуникационные установк
     Label 2, 18, 'По~в~тор после (сек):', ofPostProcess, ofPreProcess
     Button 30, 18, 40, 20, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 41, 18, 51, 20, 'Отмена', cmCancel, ofPostProcess, ofPreProcess
-    Button 52, 18, 62, 20, '~Б~ольше', cmAdvancePortSetup, ofPostProcess, ofPreProcess
+    Button 52, 18, 62, 20, 'Помо~щ~ь', cmHelp, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgEditorDefaults, 59, 23, 'Установки редактора/просмотра'
