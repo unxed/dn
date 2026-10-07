@@ -62,7 +62,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 |---|---|---|---|
 | Start and screen | start, panels, menu, in the code page build (437, 866) | `dn-tour.sh`, `dn-dos-input.py` (DOSBox-X) | the screen of the pages 850 and 852 |
 | Names | UTF-8 names to the DOS when `DOS-UTF8/NAMES` is there, code page names when it is not | scenarios `utf8-names-cp` (patched DOSBox-X), `names-cp-plain` (stock DOSBox-X: no provider, code page names) | none |
-| Input | the keyboard and the mouse | `dn-dos-input.py` | the keys of the harness for F3, F4, F5, F6, F7, F8 on real files |
+| Input | the keyboard and the mouse | `dn-dos-input.py` | the keys of the harness for F3 and F4 on real files (F5, F6, F7, F8: scenario `files` of `dn-dos-input.py`) |
 | State | desktop and setup saved and restored | `tools/dn-tour.sh` scenarios, `t_cfgstate` | the saved setup (`Save setup`) |
 | User screen | a program's output kept and shown again | `userscr` smoke (in `toolchain`) | none |
 | Clipboard | UTF-8 clipboard when `DOS-UTF8/CLIPBRD` is there, OEM when not | `tv` `t_dosbk` | a DN-level check |
@@ -90,7 +90,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Add and delete of archive members as separate checks | covered by the accept scenarios and `dn-linux-archives.py` in part | stage 4 follow-up |
 | Kitty keyboard flags in DN, a non-UTF-8 locale for the UTF-8 build, an interactive program in the embedded terminal | the first two are tested in `tv` (`tv/tests/pty`); the third needs a program that reads the terminal in the test | stage 4 follow-up |
 | DN-level clipboard checks (DOS and Windows) | `tv` tests the backends (`t_dosbk`, the Windows clipboard); a DN scenario needs the system clipboard of the runner | stage 4 follow-up |
-| The keys of the DOS harness for F3, F4, F6, F7, F8 on real files, the DOS `Save setup` | `dn-tour.sh` has F5, F6, F7, F8 as screens, not as checks of the files | stage 4 follow-up |
+| The keys of the DOS harness for F3 and F4 on real files, the DOS `Save setup` | F5, F6, F7, F8 are checked on the files by the scenario `files` of `dn-dos-input.py` (run by hand: DOSBox-X and Xvfb) | stage 4 follow-up |
 | The scenarios of the gate for the glyphs and the platform facades | the whole gate runs on both builds at every push (the glyphs are the screen of every scenario) | none |
 | Real DOS machines and FreeDOS | no runner; DOSBox-X is the only DOS we can run | when go2dos has a 386 mode (`PLAN.md`, milestone 7) |
 | macOS, BSD | no target in the build matrix | when a target is added |
