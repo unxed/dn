@@ -297,7 +297,7 @@ function MakeString(S: String; UserParams: PUserParams;
       else
         ts := MakeNormName(GetPath(lfGetShortFileName(MakeNormName(
                   UserParams^.Active.Owner^,
-                   UserParams^.Active.FlName[False]))), '');
+                   FileShortName(UserParams^.Active^)))), '');
       end;
     if HandleTildes then
       Replace('~', #0'~', ts);
@@ -349,7 +349,7 @@ function MakeString(S: String; UserParams: PUserParams;
     else
       ts := MakeNormName(GetPath(lfGetShortFileName(MakeNormName(
                 UserParams^.Passive^.Owner^,
-                 UserParams^.Passive^.FlName[False]))), '');
+                 FileShortName(UserParams^.Passive^)))), '');
     if HandleTildes then
       Replace('~', #0'~', ts);
     Replace('$', #4, ts);
@@ -589,7 +589,7 @@ function MakeString(S: String; UserParams: PUserParams;
     if UserParams^.Active = nil then
       ts := '' {KSNK}
     else
-      ts := UserParams^.Active.FlName[False];
+      ts := FileShortName(UserParams^.Active^);
     NameAndExt(HandleTildes, ts, '!', S);
     end;
 
@@ -598,7 +598,7 @@ function MakeString(S: String; UserParams: PUserParams;
     if UserParams^.Passive = nil then
       ts := '' {KSNK}
     else
-      ts := UserParams^.Passive^.FlName[False];
+      ts := FileShortName(UserParams^.Passive^);
     NameAndExt(HandleTildes, ts, '$', S);
     end;
   
@@ -767,7 +767,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   until I < 3;
 2:
   DoGlobal := True;
-  F := TTextReader.Create(SourceDir+'dn.mnu');
+  F := TTextReader.Create(ConfigDir+'dn.mnu');
   if F = nil then
     begin
     ErrMsg(dlMNUNotFound);
@@ -1225,7 +1225,7 @@ function QuickExecExternal(N: Integer): Boolean;
     begin
 RL:
     Local := False;
-    F := TTextReader.Create(SourceDir+'dn.xrn');
+    F := TTextReader.Create(ConfigDir+'dn.xrn');
     end;
   if F = nil then
     Exit;

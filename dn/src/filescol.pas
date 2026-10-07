@@ -181,6 +181,9 @@ const
 function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean)
   : String;
 function CopyFileRec(FR: PFileRec): PFileRec; {DataCompBoy}
+function FileShortName(const FR: TFileRec): String;
+  {` The short name of a file for the macros of the menus and the descriptions: the 8.3 name where the file system has such names (DOS, Windows), else the
+   name itself: the field FlName[False] holds 12 bytes and cuts a longer name, which is no name of a file. `}
 function CreateFileRec(Name: String): PFileRec;
   {` Name is the name with full path. Based on the path a
    newstr is created and stored in Owner. The caller must
@@ -214,7 +217,7 @@ uses
   {!!}CmdLine
   
   
-  , osdep, Math
+  , osdep, Math, OSSystem
   
   , fsinfo, DnIni, Dos, FileType, panelsetup, keymap
   , DNHelp, basics, strutil, fileutil, Startup
@@ -232,6 +235,14 @@ type
     end;
 
   {-DataCompBoy-}
+function FileShortName(const FR: TFileRec): String;
+  begin
+  if OSHasShortNames then
+    Result := FR.FlName[False]
+  else
+    Result := FR.FlName[True];
+  end;
+
 function CreateFileRec(Name: String): PFileRec;
   var
     fr: PFileRec;

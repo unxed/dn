@@ -2032,7 +2032,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   S2 := S;
   
   if (FMSetup.Options and fmoDescrByShortNames) <> 0 then
-    Nm := PF^.FlName[False]
+    Nm := FileShortName(PF^)
   else
     
     Nm := PF^.FlName[True];
@@ -2160,7 +2160,7 @@ procedure CM_RenameSingleDialog(AFP, PEV: Pointer);
   S := PF^.FlName[uLfn];
   
   if (FMSetup.Options and fmoDescrByShortNames) <> 0 then
-    Nm := PF^.FlName[False]
+    Nm := FileShortName(PF^)
   else 
     Nm := PF^.FlName[True];
   S2 := S;
