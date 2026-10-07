@@ -64,7 +64,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Start and screen | start, panels, menu, in the code page build (437, 866) | `dn-tour.sh`, `dn-dos-input.py` (DOSBox-X) | the screen of the pages 850 and 852 |
 | Names | UTF-8 names to the DOS when `DOS-UTF8/NAMES` is there, code page names when it is not | scenarios `utf8-names-cp` (patched DOSBox-X), `names-cp-plain` (stock DOSBox-X: no provider, code page names) | none |
 | Input | the keyboard and the mouse | `dn-dos-input.py` | none (F5, F6, F7, F8: scenario `files`, F3 and F4: scenario `edit` of `dn-dos-input.py`) |
-| State | desktop and setup saved and restored | `tools/dn-tour.sh` scenarios, `t_cfgstate` | the saved setup (`Save setup`) |
+| State | desktop and setup saved and restored | `tools/dn-tour.sh` scenarios, `t_cfgstate`, `dn-dos-input.py` scenarios `autosave` and `save-setup` (Store of the panel appearance) | none |
 | User screen | a program's output kept and shown again | `userscr` smoke (in `toolchain`) | none |
 | Clipboard | UTF-8 clipboard when `DOS-UTF8/CLIPBRD` is there, OEM when not | `tv` `t_dosbk` | a DN-level check on Linux (`dn-linux-clip.py`); on DOS and Windows still none |
 | Resources and help | the DOS build lands them on the code page of the language (`to-codepage.py`) | `tools/tests/test_to_codepage.py` | a screenshot check of the help in Russian and Ukrainian (cp866, cp1125) |
@@ -88,7 +88,6 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 | Screenshot checks of the screens of the pages 850 and 852, of the help in Russian and Ukrainian (cp866, cp1125) | DOSBox-X has no such pages; the tables are checked by unit tests (`t_cpall`, `t_cpcase`, `test_sort1125.py`) | when a DOS with these pages can run |
 | The control count of a loaded dialog against the source of `rcp` | `t_resload` proves that every view loads and that the three languages have the same keys; the source has no machine readable count | when `rcp` writes a manifest |
 | DN-level clipboard checks (DOS and Windows) | `tv` tests the backends (`t_dosbk`, the Windows clipboard); a DN scenario needs the system clipboard of the runner | stage 4 follow-up |
-| The DOS `Save setup` | the keys F3, F4, F5, F6, F7, F8 on real files are checked by the scenarios `files` and `edit` of `dn-dos-input.py` (run by hand: DOSBox-X and Xvfb) | stage 4 follow-up |
 | The scenarios of the gate for the glyphs and the platform facades | the whole gate runs on both builds at every push (the glyphs are the screen of every scenario) | none |
 | Real DOS machines and FreeDOS | no runner; DOSBox-X is the only DOS we can run | when go2dos has a 386 mode (`PLAN.md`, milestone 7) |
 | macOS, BSD | no target in the build matrix | when a target is added |
