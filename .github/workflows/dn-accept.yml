@@ -164,10 +164,15 @@ jobs:
           path: bins
       - name: Layout bins
         run: |
+          # the artifact keeps the directories below the common root of the paths (here out/): find them instead of guessing
           mkdir -p out
-          cp -a bins/out/u8 out/u8
-          cp -a bins/out/cp out/cp
+          for v in u8 cp; do
+            src=$(find bins -type d -name $v | head -1)
+            test -n "$src" || { echo "no $v in the artifact"; find bins | head -30; exit 1; }
+            cp -a "$src" out/$v
+          done
           chmod +x out/u8/dn out/cp/dn
+          ls -la out/u8 out/cp | head -30
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3
       - name: UTF-8 build against the code page build, shard ${{ matrix.shard }}/6
