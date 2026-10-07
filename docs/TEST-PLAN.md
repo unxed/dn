@@ -40,6 +40,7 @@ narrow tests that prove an extraction batch. This file fixes the floor before th
 
 | Area | Floor | Have | Gap |
 |---|---|---|---|
+| Menus and dialogs | every item of the main menu and of its submenus opens in each language without a fault | `dn-linux-menusweep.py` (465 runs; the gate compares the top level only), `dn-linux-setup.py` (Alt-K and Store) | the content of the dialogs below the top level is not compared between the builds |
 | Start and screen | start, menu bar, exit, language switch, startup panels | `dn-linux-tour.py`, `-startup.py`, `-about.py`, accept `start`, `restart_language` | none (`dn-linux-resize.py` is the SIGWINCH test) |
 | File operations | make directory, copy, move, delete, edit and save, on real files | `dn-linux-ops.py`, `dn-linux-names.py` (names with spaces, a missing directory, a zip in a zip) | none (`dn-linux-fsattrs.py`: links and read-only files) |
 | Input | win32 input mode, far2l, quick search | `dn-linux-win32.py`, `-far2l.py`, `-qsearch.py` | Kitty keyboard flags in DN (not only in `tv`) |
