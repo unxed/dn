@@ -6,7 +6,7 @@ A port of DOS Navigator to Free Pascal.
 
 ## Status
 
-**Alpha.** The port runs on Windows, Linux and DOS (UTF-8 under DOS needs a patched DOSBox-X for now). The codebase is being moved from the old Pascal object model to classes so the project can keep evolving; reliability is roughly where the pre-migration tree was, not worse by intent, but crashes and hangs are still possible — treat data carefully. The in-app About box says alpha for the same reason.
+**Alpha.** The port runs on Windows, Linux and DOS (UTF-8 file names under DOS need a DOS with the UTF-8 API: DOSBox-X from `master` since October 2026 has it). The codebase is being moved from the old Pascal object model to classes so the project can keep evolving; reliability is roughly where the pre-migration tree was, not worse by intent, but crashes and hangs are still possible — treat data carefully. The in-app About box says alpha for the same reason.
 
 When a stretch of real use goes by without crash/hang reports, the label moves to beta. Feature gaps that are already known (for example archive browsing) are tracked in issues and will be fixed after the class migration settles.
 

@@ -1,5 +1,7 @@
 # Patches for other projects
 
+**History (2026-10-07):** the patches below are merged into `joncampbell123/dosbox-x` `master` (the UTF-8 DOS API: pull request 6632; the guard against the loop of `DOS_CheckExtDevice`: 6634). A build of `master` is enough for the DN tests (`DN_DOS_PATCHED=1`); the files stay as the record and for an older DOSBox-X.
+
 ## `dosbox-x-amis-utf8-clipboard.patch`: INT 2Dh (AMIS) and the UTF-8 clipboard text for DOSBox-X
 
 A patch for `git am` on top of `joncampbell123/dosbox-x` `master` (made 2026-10-03, checked on a build with SDL2 on Linux). It adds the AMIS interface

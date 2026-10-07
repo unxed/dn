@@ -379,3 +379,8 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 
 - Done: `dn.log`/`dn_prev.log`, the report `crash/crashNNN.txt`, the call stack with lines (the builds for Linux and Windows have `-gl`), the screen text, the state of the panels and of the views; the way to hand it over: `docs/CRASH-REPORTS.md`.
 - Left: the selected files of the panel and the file under the cursor are not in the report (file names are private; add on request); the report on DOS has addresses only (a map file of the build could name them); a crash outside the handler of `dn.pas` (a signal that is not turned into an exception, a stack overflow, a kill) leaves the log without the line `exit` and the report is not written: the next log says so; the lines of the log are not sent anywhere.
+
+## DOSBox-X master for the DOS tests (2026-10-07)
+
+- Checked: DOSBox-X `master` (2026.10.01, built from `joncampbell123/dosbox-x`) runs `tools/dn-dos-input.py` with `DN_DOS_PATCHED=1`: all 9 checks pass, including the UTF-8 names (the patches are in `master`).
+- Open: the CI installs the package `dosbox-x` of Ubuntu (stock, no UTF-8 names), so the UTF-8 DOS scenarios are not in the CI. A job that builds `master` (about 15 minutes; cache the build by the commit) and runs `dn-dos-input.py` with `DN_DOS_PATCHED=1` belongs in `nightly`.
