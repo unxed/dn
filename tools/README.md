@@ -43,6 +43,7 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `dn-linux-locale.py` | the single-byte code page by the locale of the host | dn-linux |
 | `dn-linux-find.py` | Find File (Alt+F7) with a mask and with a text, the result panel | dn-linux |
 | `dn-linux-resize.py` | the terminal changes its size under DN (SIGWINCH: 80x25, 120x40, 100x30): the bars and the frames follow | dn-linux |
+| `dn-linux-dlgresize.py` | the corner of a dialog is dragged with the mouse (Make directory, Commands history): the controls follow, the minimum size holds | dn-linux |
 | `dn-linux-fsattrs.py` | symbolic links (to a file, to a directory, dangling) and read-only files in the panels: list, enter, F5, F8, the permissions of the copy | dn-linux |
 | `dn-linux-desktop.py` | the options Autosave Desktop and Preserve directory, Alt-X, the next start: `dn.dsk` and the directory of the panel are restored (the Linux twin of the scenario `autosave` of `dn-dos-input.py`) | dn-linux |
 | `dn-linux-arcmembers.py` | F8 on a member of a zip and F5 into the archive of the other panel, checked on the archive (the add needs the system `zip`) | dn-linux |
