@@ -24,7 +24,7 @@ begin
   NameConv := True;
 
   Check(OsPath('/nonex/a.txt') = '/nonex/a.txt', 'a name of the host is kept as it is');
-  Check(OsPath('') = '.', 'an empty name is the current directory');
+  Check(OsPath('') = '', 'an empty name stays empty');
   Check(OsPath('/nonex/a\b') = '/nonex/a\b', 'a backslash in a name of Unix is a letter');
 
   Dir := GetTempDir + 't_osnames_' + IntToStr(GetProcessID) + '/';

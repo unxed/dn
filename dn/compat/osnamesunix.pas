@@ -159,9 +159,7 @@ function OsPath(const S: string): string;
 var
   Raw: string;
 begin
-  Result := S;                { DN keeps the names of the host: no drive, "/" }
-  if Result = '' then
-    Result := '.';
+  Result := S;                { DN keeps the names of the host: no drive, "/"; an empty name stays empty (it is no directory) }
   if NameConv and HasHigh(Result) then
   begin
     Raw := Result;
