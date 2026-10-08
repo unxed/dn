@@ -1,5 +1,5 @@
 name: release
-# A tag v* (or a run by hand with the name of an existing tag): DN for all the targets (Linux x86_64, ARM64, i386, Windows 64
+# A tag v* (or a run by hand with the name of a new tag: it is made at the commit the run is started on): DN for all the targets (Linux x86_64, ARM64, i386, Windows 64
 # and 32 bit, DOS with the code page and with UTF-8 inside), built from the sources of the tag with the submodules tv and tve
 # (tools/build.sh, the same builds as in the other workflows), packed by tools/dn-pack.sh with the licence texts and README.TXT,
 # and published as one GitHub Release with one archive per target and SHA256SUMS.txt. The builds are never committed.
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'The tag to build and publish (it must exist), e.g. v0.1.0'
+        description: 'The tag to make at the commit of this run, build and publish, e.g. v0.1.0'
         required: true
 
 concurrency:
@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/${{ env.TAG }}
+          ref: ${{ github.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/${{ env.TAG }}
+          ref: ${{ github.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/${{ env.TAG }}
+          ref: ${{ github.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils python3
@@ -92,7 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/${{ env.TAG }}
+          ref: ${{ github.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils binutils-mingw-w64-x86-64 binutils-mingw-w64-i686 python3 zip
@@ -120,7 +120,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/${{ env.TAG }}
+          ref: ${{ github.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make bzip2 git curl dosbox-x unzip python3 zip
@@ -175,5 +175,5 @@ jobs:
             gh release upload "$TAG" --clobber "$@"
           else
             pre=; case "$TAG" in *-*) pre=--prerelease;; esac      # v1.2.0-rc1 is a pre-release
-            gh release create "$TAG" --verify-tag --title "DN $TAG" --generate-notes $pre "$@"
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "DN $TAG" --generate-notes $pre "$@"
           fi
