@@ -149,7 +149,7 @@ uses
   Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
   Dialogs, FileFind, panelroot, Filediz, CmdLine
   , timeutil, Messages, dirwatch, Dos
-  , progress {for TWhileView}, DnIni, basics, strutil, fileutil
+  , progress {for TWhileView}, DnIni, basics, strutil, fileutil, OSSystem
   ;
 
 const
@@ -951,9 +951,9 @@ procedure TDrive.GetDown(var B: TScreenCell; C: Word; P: PFileRec; var LFN_inCur
     
     uLfn := TFilePanelRoot(Panel).PanSetup.Show.
       ColumnsMask and psLFN_InColumns <> 0;
-    if w = cfnTypeOther then
+    if (w = cfnTypeOther) and OSHasShortNames then
       S2 := P^.FlName[uLfn xor InvLFN]
-    else
+    else          { a system without short names: the short name is only the first bytes of the long one }
       
       S2 := P^.FlName[True];
     S2 := CutCols(S2, NameWidht, FMSetup.RestChar[1]);   { columns, not bytes: a name in UTF-8 }
