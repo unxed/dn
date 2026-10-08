@@ -49,7 +49,7 @@ unit ArvidAvt;
 
 interface
 
-uses
+uses DnPath,
   Arvid, objutil, Streams, Messages, mainapp, Commands, Collect,
   Views, Drivers, Startup, keymap, basics, Lfn, uselfn, Dos, Tree,
   FilesCol, fileutil, Drives, filepanel
@@ -766,12 +766,12 @@ function AvtDelFile(AvtDr: TArvidDrive; AName: String): Boolean;
       goto 1;
     CurDir2 := CurDir;
     ArcMakeSlash(CurDir2);
-    if AName[1] <> '\' then
+    if AName[1] <> ArcSep then
       begin
       AName := CurDir2+AName;
       end;
     lFSplit(AName, Dr, Nm, Xt);
-    if  (Dr[1] = '\') and (Length(Dr) > 1) then
+    if  (Dr[1] = ArcSep) and (Length(Dr) > 1) then
       Delete(Dr, 1, 1); {DelFC(Dr);}
     if CurDir2 <> Dr then
       begin
@@ -923,7 +923,7 @@ function AvtNewFile(
       begin
       NewCell := AvtGetCell(AvtDr);
       FC.Flags := 0;
-      if  (AName[1] = '\') or AIsDir then
+      if  (AName[1] = ArcSep) or AIsDir then
         AAttr := AAttr or Directory
       else
         AAttr := AAttr and not Directory;
@@ -933,11 +933,11 @@ function AvtNewFile(
       FC.StartSector := 0;
       FC.ChildOrSize := AChildOrSize;
       FC.Time := ATime;
-      if  (AName[1] = '\') or AIsDir then
+      if  (AName[1] = ArcSep) or AIsDir then
         begin
         FC.Flags := (FC.Flags and (not AvtIsDir)) or AvtIsDir;
         end;
-      if  (AName = '') or (AName = '\') then
+      if  (AName = '') or (AName = ArcSep) then
         AvtPutDesc(ADescription)
       else
         AvtPutDesc('');
@@ -1127,12 +1127,12 @@ function AvtNewFile(
       NewCellFailed := False;
       Lv := CurLevel+1;
       Stream.Status := stOK;
-      if AName[1] = '\' then
+      if AName[1] = ArcSep then
         Delete(AName, 1, 1); {DelFC(AName);}
       while AName <> '' do
         begin
         SS := '';
-        while (AName[1] <> '\') and (AName <> '') do
+        while (AName[1] <> ArcSep) and (AName <> '') do
           begin
           AddStr(SS, AName[1]);
           Delete(AName, 1, 1); {DelFC(AName);}
@@ -1140,7 +1140,7 @@ function AvtNewFile(
             Break;
           end;
         if Length(SS) = 12 then
-          while (AName[1] <> '\') and (AName <> '') do
+          while (AName[1] <> ArcSep) and (AName <> '') do
             Delete(AName, 1, 1); {DelFC(AName);}
         SN := CharToOemStr(CurDir2+SS);
         if  (SS = '.') or (SS = '..') or (Pos('?', SS) > 0)
@@ -1153,7 +1153,7 @@ function AvtNewFile(
           Exit;
           end;
         NewCurDirPos := AvtTreeNodeInsert(CurDirPos);
-        NewCellIsDir := (AName[1] = '\') or AIsDir;
+        NewCellIsDir := (AName[1] = ArcSep) or AIsDir;
         Delete(AName, 1, 1); {DelFC(AName);}
         if NewCellFailed then
           begin
@@ -1173,8 +1173,8 @@ function AvtNewFile(
           begin
           FirstNameProcessed := True;
           if NewCellIsDir then
-            if  (CurDir[Length(CurDir)] <> '\') and (CurDir <> '') then
-              CreatedDir := GetDir+'\'+SS
+            if  (CurDir[Length(CurDir)] <> ArcSep) and (CurDir <> '') then
+              CreatedDir := GetDir+ArcSep+SS
             else
               CreatedDir := GetDir+SS;
           end;
@@ -1221,11 +1221,11 @@ function AvtNewFile(
     CurDir2 := CurDir;
     ArcMakeSlash(CurDir2);
     SaveCurDir := CurDir2;
-    if AName[1] <> '\' then
+    if AName[1] <> ArcSep then
       begin
       AName := CurDir2+AName;
       end;
-    if  (AName <> '') and (AName[1] = '\') then
+    if  (AName <> '') and (AName[1] = ArcSep) then
       Delete(AName, 1, 1); {DelFC(AName);}
     lFSplit(AName, Dr, Nm, Xt);
     Stream.Status := stOK;
@@ -1236,7 +1236,7 @@ function AvtNewFile(
       CurDir2 := CurDir;
       ArcMakeSlash(CurDir2);
       end;
-    if CurDir2 <> '\' then
+    if CurDir2 <> ArcSep then
       Dr := Copy(Dr, Length(CurDir2)+1, Length(Dr));
     AName := Dr+Nm+Xt;
 
@@ -1246,7 +1246,7 @@ function AvtNewFile(
       begin
       SN := Copy(CurDir2, Length(SaveCurDir)+1, Length(CurDir2));
       SS := '';
-      while (SN <> '\') and (SN <> '') do
+      while (SN <> ArcSep) and (SN <> '') do
         begin
         AddStr(SS, SN[1]);
         Delete(SN, 1, 1); {DelFC(SN);}
@@ -1255,8 +1255,8 @@ function AvtNewFile(
         begin
         SN := CurDir;
         CurDir := SaveCurDir;
-        if  (CurDir[Length(CurDir)] <> '\') and (CurDir <> '') then
-          CreatedDir := GetDir+'\'+SS
+        if  (CurDir[Length(CurDir)] <> ArcSep) and (CurDir <> '') then
+          CreatedDir := GetDir+ArcSep+SS
         else
           CreatedDir := GetDir+SS;
         CurDir := SN;
@@ -1296,19 +1296,19 @@ procedure AvtSeekDirectory(AvtDr: TArvidDrive);
     CurDirCellPos := 0;
     Stream.Status := stOK;
     SeekFailed := False;
-    if S[1] = '\' then
+    if S[1] = ArcSep then
       Delete(S, 1, 1); {DelFC(S);}
     while S <> '' do
       begin
       SS := '';
-      while (S[1] <> '\') and (S <> '') do
+      while (S[1] <> ArcSep) and (S <> '') do
         begin
         AddStr(SS, S[1]);
         Delete(S, 1, 1); {DelFC(S);}
         {          if SS[0] = #12 then Break;}
         end;
       {      if SS[0] = #12 then while (S[1] <> '\') and (S <> '') do DelFC(S);}
-      while (S[1] <> '\') and (S <> '') do
+      while (S[1] <> ArcSep) and (S <> '') do
         Delete(S, 1, 1); {DelFC(S);}
       Delete(S, 1, 1); {DelFC(S);}
       while True do
@@ -1455,7 +1455,7 @@ function CopyFilesToArvid(const S: String; Files: TCollection;
     I := J; {TDR found}
   S2 := Copy(S, 1, I);
   Inc(I, 5);
-  while (I <= Length(S)) and (S[I] <> '\') do
+  while (I <= Length(S)) and (S[I] <> ArcSep) do
     begin
     AddStr(S2, S[I]);
     Inc(I);
@@ -1470,7 +1470,7 @@ function CopyFilesToArvid(const S: String; Files: TCollection;
   CopyFilesToArvid := True;
   ToStr := Copy(S, I, 256);
   if ToStr = '' then
-    ToStr := '\';
+    ToStr := ArcSep;
   OldDir := PAD.CurDir;
   PAD.CurDir := ToStr;
   PAD.SeekDirectory;
@@ -1528,12 +1528,12 @@ procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
                  PF^.Attr) <> 0
             then
               begin
-              S1 := S3+'\';
-              S2 := S4+'\';
+              S1 := S3+ArcSep;
+              S2 := S4+ArcSep;
               AvtWalkTree;
               SetLength(S1, Length(S1)-1);
               SetLength(S2, Length(S2)-1);
-              while (S1 <> '') and (S1[Length(S1)] <> '\') do
+              while (S1 <> '') and (S1[Length(S1)] <> ArcSep) do
                 begin
                 SetLength(S1, Length(S1)-1);
                 SetLength(S2, Length(S2)-1);
@@ -1594,7 +1594,7 @@ procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
       for I := 0 to AFiles.Count-1 do
         begin
         PF := AFiles.At(I);
-        S1 := ArcNormName('\'+CurDir, PF^.FlName[True]);
+        S1 := ArcNormName(ArcSep+CurDir, PF^.FlName[True]);
         S2 := MakeNormName(From, PF^.FlName[True]);
         if  (PF^.Attr and Directory) = 0 then
           Writeln(T.T,
@@ -1630,7 +1630,7 @@ procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
       for I := 0 to AFiles.Count-1 do
         begin
         PF := AFiles.At(I);
-        S1 := ArcNormName('\'+CurDir, PF^.FlName[True]);
+        S1 := ArcNormName(ArcSep+CurDir, PF^.FlName[True]);
         S2 := MakeNormName(From, PF^.FlName[True]);
         Desc := '';
         if  (PF^.DIZ <> nil) and (PF^.DIZ^.DIZText <> '') then
@@ -1642,8 +1642,8 @@ procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
           begin
           AvtNewFile(AvtDr, S1, Desc, True, 0, PackedDate(PF), 0,
              PF^.Attr);
-          S1 := S1+'\';
-          S2 := S2+'\';
+          S1 := S1+ArcSep;
+          S2 := S2+ArcSep;
           OldDir := PD.GetDir;
           AvtWalkTree;
           PD.lChDir(OldDir);

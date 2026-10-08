@@ -1,10 +1,6 @@
 archdet.pas 1
 archiver.pas 4
-archread.pas 5
-arcview.pas 36
-arvid.pas 22
-arvidavt.pas 29
-arvidtdr.pas 2
+arcview.pas 2
 basics.pas 2
 calcwin.pas 1
 cmdline.pas 2

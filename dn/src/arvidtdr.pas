@@ -49,7 +49,7 @@ unit ArvidTdr;
 
 interface
 
-uses
+uses DnPath,
   Arvid, objutil, Streams, strutil, Messages, mainapp, Commands, Collect,
   Views, Drivers, Startup, keymap, basics, Lfn, uselfn, Dos, Tree,
   FilesCol, fileutil, Drives, filepanel
@@ -107,12 +107,12 @@ procedure TdrSeekDirectory(AvtDr: TArvidDrive);
     CurLevel := 0;
     CurDir := '';
     Lv := 1;
-    if S[1] = '\' then
+    if S[1] = ArcSep then
       Delete(S, 1, 1); {DelFC(S);}
     while S <> '' do
       begin
       SS := '';
-      while (S[1] <> '\') and (S <> '') do
+      while (S[1] <> ArcSep) and (S <> '') do
         begin
         SS := SS+S[1]; {AddStr(SS, S[1]);}
         Delete(S, 1, 1); {DelFC(S);}

@@ -171,7 +171,7 @@ const
 
 procedure CheckSlashDot(var S: String);{piwamoto}
 begin
-  if ((S[Length(S)] <> '.') and (S[Length(S)-1] <> '\')) then
+  if ((S[Length(S)] <> '.') and (S[Length(S)-1] <> ArcSep)) then
     {directory name '.' bugfix by piwamoto}
     While (PosChar(S[Length(S)], '.\') > 0) do SetLength(S, Length(S)-1);
 end;
@@ -231,14 +231,14 @@ constructor TArcDrive.Create(const AName, VAName: String);
   if I > 2 then
     begin
     Q := Copy(AName, I+1, MaxStringLength);
-    if Q[Length(Q)] in ['\', '/'] then
+    if Q[Length(Q)] in [ArcSep, '/'] then
       SetLength(Q, Length(Q)-1);
     ArcName := lFExpand(Copy(AName, 1, I-1));
     end
   else
     begin
     ArcName := lFExpand(AName);
-    Q := '\';
+    Q := ArcSep;
     end;
 
   {lFSplit(ArcName, FreeStr, Nm, Xt);
@@ -350,7 +350,7 @@ constructor TArcDrive.Load(S: TStream);
     goto Failure;
   if  (ArcDate <> SR.SR.Time) or (ArcSize <> SR.SR.Size) then
     begin {archive changed, must reread it}
-    CurDir := '\';
+    CurDir := ArcSep;
     ReadArchive;
     end
   else
@@ -495,13 +495,13 @@ function TArcDrive.ReadArchive: Boolean;
     AType.GetFile;
     if FileInfo.Last = 0 then
       begin
-      Replace('/', '\', FileInfo.FName);
-      if FileInfo.FName[1] <> '\' then
-        FileInfo.FName := '\'+FileInfo.FName;
+      Replace('/', ArcSep, FileInfo.FName);
+      if FileInfo.FName[1] <> ArcSep then
+        FileInfo.FName := ArcSep+FileInfo.FName;
       if FileInfo.Attr and Directory <> 0 then
-        FileInfo.FName := FileInfo.FName+'\';
+        FileInfo.FName := FileInfo.FName+ArcSep;
 
-      if FileInfo.FName[length(FileInfo.FName)] = '\' then
+      if FileInfo.FName[length(FileInfo.FName)] = ArcSep then
         FileInfo.Attr := FileInfo.Attr or Directory;
 
       {attribute "Hidden" means "with password"}
@@ -562,7 +562,7 @@ procedure TArcDrive.lChDir(ADir: String);
     begin
     if CurDir <> '' then
       while (CurDir <> '')
-           and (not (CurDir[Length(CurDir)] in ['\', '/']))
+           and (not (CurDir[Length(CurDir)] in [ArcSep, '/']))
       do
         SetLength(CurDir, Length(CurDir)-1)
     else
@@ -573,15 +573,15 @@ procedure TArcDrive.lChDir(ADir: String);
   if ArcGetName(ADir) = '..' then
     begin
     CurDir := Dr;
-    while (CurDir <> '') and not (CurDir[Length(CurDir)] in ['\', '/'])
+    while (CurDir <> '') and not (CurDir[Length(CurDir)] in [ArcSep, '/'])
     do
       SetLength(CurDir, Length(CurDir)-1);
     end
   else
     CurDir := ADir;
   ArcMakeNoSlash(CurDir);
-  if CurDir[1]<>'\' then
-    CurDir:='\'+CurDir;
+  if CurDir[1]<>ArcSep then
+    CurDir:=ArcSep+CurDir;
   CheckSlashDot(CurDir);
   AddToDirectoryHistory(ArcName+':'+CurDir, Integer(DriveType));
   end { TArcDrive.lChDir };
@@ -595,8 +595,8 @@ function TArcDrive.GetDir: String;
     Xt: String;
   begin
   CheckSlashDot(CurDir);
-  if  (Length(CurDir) > 0) and (not (CurDir[1] in ['\', '/'])) then
-    CurDir := '\'+CurDir;
+  if  (Length(CurDir) > 0) and (not (CurDir[1] in [ArcSep, '/'])) then
+    CurDir := ArcSep+CurDir;
   if  (Prev <> nil) and (Prev.DriveType = dtDisk) then
     lFSplit(VArcName, Dr, Nm, Xt) {JO}
   else
@@ -642,7 +642,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
     begin
     _USize := Files.CurFile.Size;
     _PSize := Files.CurFile.CSize;
-    if  (UpStrg(CurDir+'\') = UpStrg(Files.LastDir)) and
+    if  (UpStrg(CurDir+ArcSep) = UpStrg(Files.LastDir)) and
         (AllFiles or InFilter(Files.CurFile.Name, FileMask))
     then
       begin
@@ -661,12 +661,12 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
       TTL := TTL+_USize;
       TPL := TPL+_PSize;
       end
-    else if (UpStrg(CurDir+'\') = UpStrg(Copy(Files.LastDir, 1,
+    else if (UpStrg(CurDir+ArcSep) = UpStrg(Copy(Files.LastDir, 1,
                Length(CurDir)+1)))
     then
       begin
       Dr := Copy(Files.LastDir, Length(CurDir)+2, MaxStringLength);
-      I := PosChar('\', Dr);
+      I := PosChar(ArcSep, Dr);
       if I = 0 then
         I := Length(Dr)+1;
       SetLength(Dr, I-1);
@@ -796,7 +796,7 @@ TryAgain:
     { Flash <<< }
     end;
   SS := ArcNormName(P^.Owner^, P^.FlName[True]);
-  if SS[1] = '\' then
+  if SS[1] = ArcSep then
     Delete(SS, 1, 1); {DelFC(SS);}
   
   if AType.UseLFN then
@@ -1116,8 +1116,8 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
       I: Integer;
       S1: String;
     begin
-    if not (SS[Length(SS)] in ['\', '/']) then
-      AddStr(SS, '\');
+    if not (SS[Length(SS)] in [ArcSep, '/']) then
+      AddStr(SS, ArcSep);
     Files.ResetPointer('');
     while not Files.Last and Files.GetNextFile do
       if  (SS = Copy(Files.LastDir, 1, Length(SS)))
@@ -1125,7 +1125,7 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
       then
         begin
         S1 := Files.LastDir+Files.CurFile.Name;
-        if S1[1] in ['\', '/'] then
+        if S1[1] in [ArcSep, '/'] then
           Delete(S1, 1, 1); {DelFC(S1);}
         if  (Copy(S1, Length(S1)-2, 3) = '\..')
                or (Copy(S1, Length(S1)-2, 3) = '/..')
@@ -1180,7 +1180,7 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
       S1 := ArcNormName(GetArcOwn(PF^.Owner^), PF^.FlName[True])
     else
       S1 := ArcNormName(PF^.Owner^, PF^.FlName[True]);
-    if S1[1] in ['\', '/'] then
+    if S1[1] in [ArcSep, '/'] then
       Delete(S1, 1, 1); {DelFC(S1);}
 
     {JO:  use #$14 as a temporary separator between file names}
@@ -1191,7 +1191,7 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
       else
         Writeln(F.T, S1)
     else
-      PutDir('\'+S1+'\');
+      PutDir(ArcSep+S1+ArcSep);
     MakeListFile := S;
     end;
   MakeListFile := S;
@@ -1264,7 +1264,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
     begin
     while (SCurDir[Length(SCurDir)] = '.') do
       SetLength(SCurDir, Length(SCurDir)-1);
-    while (SCurDir <> '') and (SCurDir[1] = '\') do
+    while (SCurDir <> '') and (SCurDir[1] = ArcSep) do
       Delete(SCurDir, 1, 1);
     ArcMakeSlash(SCurDir);
     if  (CnvString(AType.SetPathInside) <> '') then
@@ -1610,8 +1610,8 @@ function TArcDrive.GetInternalName: String;
     IntPath: String;
   begin
   IntPath := GetDir;
-  if PosChar('\', IntPath) > 0 then
-    GetInternalName := Copy(IntPath, PosChar('\', IntPath), 255)
+  if PosChar(ArcSep, IntPath) > 0 then
+    GetInternalName := Copy(IntPath, PosChar(ArcSep, IntPath), 255)
   else
     GetInternalName := '';
   end;
@@ -1761,7 +1761,7 @@ function ArcViewer(AName, VAName: String): Boolean;
     begin
     if Copy(PathInside, Length(PathInside)-1, 2) = '\.' then
       SetLength(PathInside, Length(PathInside)-2);
-    if  (ArcGetPath(PathInside) <> '\') then
+    if  (ArcGetPath(PathInside) <> ArcSep) then
       begin
       P.lChDir(Copy(ArcGetPath(PathInside), 2, 255));
       Message(Application, evCommand, cmPanelReread, nil);
@@ -1791,7 +1791,7 @@ procedure TArcDrive.GetDirInfo(var B: TDiskInfoRec);
   var P: PArcFile absolute P_;
     begin
     if  (P <> nil)
-         and (not (P^.FName^[Length(P^.FName^)] in ['\', '/']))
+         and (not (P^.FName^[Length(P^.FName^)] in [ArcSep, '/']))
     then
       begin
       Inc(Fl);
@@ -1863,7 +1863,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
   Fils := TFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
   Files.ResetPointer('');
-  Root := UpStrg(CurDir)+'\';
+  Root := UpStrg(CurDir)+ArcSep;
   l := Length(Root);
   {JO: first determine available memory once, then as we go}
   {    track how much memory demand grows and whether it has exceeded         }
@@ -1898,7 +1898,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
         repeat
           SetLength(LDir, Length(LDir)-1);
           for I := Length(LDir) downto L do
-            if LDir[I] = '\' then
+            if LDir[I] = ArcSep then
               Break;
           DrName := Copy(LDir, I+1, MaxStringLength);
           SetLength(LDir, I);
@@ -2002,7 +2002,7 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
   Fils := TFilesCollection.Create($10, $10);
   Fils.SortMode := psmLongName;
   Files.ResetPointer('');
-  Root := UpStrg(CurDir)+'\';
+  Root := UpStrg(CurDir)+ArcSep;
   L := Length(Root);
   {JO: first determine available memory once, then as we go}
   {    track how much memory demand grows and whether it has exceeded         }
@@ -2045,7 +2045,7 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
           repeat
             SetLength(LDir, Length(LDir)-1);
             for I := Length(LDir) downto L do
-              if LDir[I] = '\' then
+              if LDir[I] = ArcSep then
                 Break;
             DrName := Copy(LDir, I+1, MaxStringLength);
             SetLength(LDir, I);
