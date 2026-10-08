@@ -130,6 +130,11 @@ def main():
         i = args.index('-j')
         jobs_n = int(args[i + 1])
         del args[i:i + 2]
+    part, parts = 1, 1                               # --part K/N: only the jobs number K of N (CI runs the parts side by side)
+    if '--part' in args:
+        i = args.index('--part')
+        part, parts = [int(x) for x in args[i + 1].split('/')]
+        del args[i:i + 2]
     out = os.path.abspath(args[0])
     langs = [a.upper() for a in args[1:]] or ['ENGLISH', 'RUSSIAN', 'UKRAIN']
     tree = parse()
@@ -140,6 +145,7 @@ def main():
                 continue
             for lang in langs:
                 jobs.append((out, lang, path, names))
+    jobs = [j for k, j in enumerate(jobs) if k % parts == part - 1]
     print('%d items x %d languages = %d runs' % (len(jobs) // len(langs), len(langs), len(jobs)), flush=True)
     bad = 0
     with ThreadPoolExecutor(jobs_n) as ex:

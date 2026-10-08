@@ -1,12 +1,16 @@
 name: dn-linux
-# DN on Linux, built by tools/build.sh from the tree dn/src: x86_64 (native FPC) and i386 (static, the cross compiler built from
-# the sources of FPC and cached); then the tour and the file operations in a pty (tools/dn-linux-tour.py, tools/dn-linux-ops.py).
+# DN on Linux, built by tools/build.sh from the tree dn/src: x86_64 (native FPC), i386 (static, the cross compiler built from
+# the sources of FPC and cached) and aarch64. The build takes seconds; the time goes into the pty tests (they wait for the program),
+# so every group of tests is a job of its own and the jobs run side by side: the wall time is the time of the slowest group.
 on:
   workflow_dispatch:
   push:
     paths:
       - dn/**
+      - tv
       - tv/**
+      - tve
+      - tve/**
       - tools/build.sh
       - tools/dn-env.sh
       - tools/dn-linux-*.py
@@ -25,131 +29,132 @@ concurrency:
 
 jobs:
   linux64:
+    # DN with the code page inside (DN_UTF8=0)
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Tour in a pty
+            cmds: |
+              python3 tools/dn-linux-tour.py out/dn | tee tour.txt && ! grep -v ' ok$' tour.txt
+          - name: File operations and the win32 input mode
+            cmds: |
+              python3 tools/dn-linux-ops.py out/dn
+              python3 tools/dn-linux-win32.py out/dn
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
-      - name: Build DN (one command, DN_UTF8=0 is the old one with the code page inside)
+      - name: Build DN (one command)
         run: DN_UTF8=0 tools/build.sh linux64 out/dn
-      - name: Tour in a pty
+      - name: ${{ matrix.name }}
+        env:
+          CMDS: ${{ matrix.cmds }}
         run: |
-          python3 tools/dn-linux-tour.py out/dn | tee tour.txt
-          ! grep -v ' ok$' tour.txt
-      - name: File operations in a pty
-        run: python3 tools/dn-linux-ops.py out/dn
-      - name: The win32 input mode (keys as ESC [ Vk;Sc;Uc;Kd;Cs;Rc _) in a pty
-        run: python3 tools/dn-linux-win32.py out/dn
-      # locale PTY gate parked: DN_UTF8=0 still draws non-ASCII FS names as '?'
-      # in the UTF-8 tty (CellText/Cp round-trip). tools/dn-linux-locale.py stays
-      # for local diagnosis; see issue follow-up from main-dn-linux status.
-      - name: Locales for the code-page test (installed for later)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends locales
-          sudo locale-gen de_DE.UTF-8 ru_RU.UTF-8 en_US.UTF-8
-      - name: The code page by the locale
-        if: false
-        run: python3 tools/dn-linux-locale.py out/dn
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dn-linux-x86_64
-          path: |
-            out/dn/dn
-            out/dn/*.lng
-            out/dn/*.dlg
-            out/dn/*.hlp
+          rc=0
+          while IFS= read -r c; do
+            [ -z "$c" ] && continue
+            echo "::group::$c"
+            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
+            echo "::endgroup::"
+          done <<< "$CMDS"
+          exit $rc
 
   linux64-utf8:
-    # DN with UTF-8 inside (the default of the build on Linux, -dDNUTF8): the same file operations in a pty and the UTF-8 checks
+    # DN with UTF-8 inside (the default of the build on Linux, -dDNUTF8): file operations in a pty and the UTF-8 checks, in groups that run side by side
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ops
+            cmds: |
+              DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
+          - name: fsattrs
+            cmds: |
+              python3 tools/dn-linux-fsattrs.py out/dn
+          - name: archives
+            cmds: |
+              python3 tools/dn-linux-archives.py out/dn
+              python3 tools/dn-linux-arcmembers.py out/dn
+          - name: desktop, config, crash
+            cmds: |
+              python3 tools/dn-linux-desktop.py out/dn
+              python3 tools/dn-linux-config.py out/dn
+              python3 tools/dn-linux-crash.py out/dn
+          - name: names, setup, clipboard, locales
+            cmds: |
+              python3 tools/dn-linux-names.py out/dn
+              python3 tools/dn-linux-setup.py out/dn
+              python3 tools/dn-linux-clip.py out/dn
+              python3 tools/dn-linux-locale-utf8.py out/dn
+          - name: panel, find, terminal
+            cmds: |
+              python3 tools/dn-linux-sortmark.py out/dn
+              python3 tools/dn-linux-qsearch.py out/dn
+              python3 tools/dn-linux-places.py out/dn
+              python3 tools/dn-linux-find.py out/dn
+              python3 tools/dn-linux-resize.py out/dn
+              python3 tools/dn-linux-embterm.py out/dn
+              python3 tools/dn-linux-kitty.py out/dn
+          - name: stage 10 dialogs
+            cmds: |
+              python3 tools/dn-linux-scrollchars.py out/dn
+              python3 tools/dn-linux-colors.py out/dn
+              python3 tools/dn-linux-arcsetup.py out/dn
+              python3 tools/dn-linux-envedit.py out/dn
+              python3 tools/dn-linux-emptyhist.py out/dn
+              python3 tools/dn-linux-dialogok.py out/dn
+              python3 tools/dn-linux-cyrsearch.py out/dn
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 p7zip-full xz-utils zip unzip
-      - name: Build DN (one command; UTF-8 inside is the default)
+      - name: Build DN (one command)
         run: tools/build.sh linux64 out/dn
-      - name: File operations in a pty (and the UTF-8 checks)
-        run: DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
-      - name: Archive enter/leave matrix (zip, 7z, tar, tgz, tar.gz, tar.bz2, tar.xz + F5)
-        run: python3 tools/dn-linux-archives.py out/dn
-      - name: The sort letter in the corner of the panel in three languages
-        if: success() || failure()
-        run: python3 tools/dn-linux-sortmark.py out/dn
-      - name: Quick search of the panel with a character outside the code page
-        if: success() || failure()
-        run: python3 tools/dn-linux-qsearch.py out/dn
-      - name: The drive menu lists places on a host without drive letters
-        if: success() || failure()
-        run: python3 tools/dn-linux-places.py out/dn
-      - name: Find File (Alt+F7) with a mask and with a text
-        if: success() || failure()
-        run: python3 tools/dn-linux-find.py out/dn
-      - name: The terminal changes its size (SIGWINCH)
-        if: success() || failure()
-        run: python3 tools/dn-linux-resize.py out/dn
-      - name: Symbolic links and permissions in the panels
-        if: success() || failure()
-        run: python3 tools/dn-linux-fsattrs.py out/dn
-      - name: The desktop is saved at the exit and restored at the start
-        if: success() || failure()
-        run: python3 tools/dn-linux-desktop.py out/dn
-      - name: The files of the user are in the configuration directory
-        if: success() || failure()
-        run: python3 tools/dn-linux-config.py out/dn
-      - name: The flight recorder - the log of a run and the report of a crash
-        if: success() || failure()
-        run: python3 tools/dn-linux-crash.py out/dn
-      - name: Names with spaces, a missing directory, DN_RUN_PAUSE, a zip in a zip
-        if: success() || failure()
-        run: python3 tools/dn-linux-names.py out/dn
-      - name: The clipboard (OSC 52, paste inside DN, bracketed paste)
-        if: success() || failure()
-        run: python3 tools/dn-linux-clip.py out/dn
-      - name: Programs that read the terminal (the embedded terminal)
-        if: success() || failure()
-        run: python3 tools/dn-linux-embterm.py out/dn
-      - name: Keys in the encoding of the Kitty keyboard protocol
-        if: success() || failure()
-        run: python3 tools/dn-linux-kitty.py out/dn
-      - name: Add and delete the members of an archive
-        if: success() || failure()
-        run: python3 tools/dn-linux-arcmembers.py out/dn
-      - name: The setup of the file panel (Alt-K) and its Store button
-        if: success() || failure()
-        run: python3 tools/dn-linux-setup.py out/dn
-      - name: Locales that are not UTF-8 (the build with UTF-8 inside)
-        if: success() || failure()
-        run: python3 tools/dn-linux-locale-utf8.py out/dn
-      - name: The scroll bar characters of dn.ini
-        if: success() || failure()
-        run: python3 tools/dn-linux-scrollchars.py out/dn
-      - name: The colors of the active elements (the calendar, the title of the panel)
-        if: success() || failure()
-        run: python3 tools/dn-linux-colors.py out/dn
-      - name: The settings dialog of an archiver, OK (Enter and a Cyrillic hot letter)
-        if: success() || failure()
-        run: python3 tools/dn-linux-arcsetup.py out/dn
-      - name: The editor of the environment variables, OK
-        if: success() || failure()
-        run: python3 tools/dn-linux-envedit.py out/dn
-      - name: The history lists with nothing in them
-        if: success() || failure()
-        run: python3 tools/dn-linux-emptyhist.py out/dn
-      - name: Dialogs that died after the class migration (attributes of files, rename, list of windows)
-        if: success() || failure()
-        run: python3 tools/dn-linux-dialogok.py out/dn
-      - name: Search for Cyrillic text in the editor and the viewer
-        if: success() || failure()
-        run: python3 tools/dn-linux-cyrsearch.py out/dn
+      - name: ${{ matrix.name }}
+        env:
+          CMDS: ${{ matrix.cmds }}
+        run: |
+          rc=0
+          while IFS= read -r c; do
+            [ -z "$c" ] && continue
+            echo "::group::$c"
+            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
+            echo "::endgroup::"
+          done <<< "$CMDS"
+          exit $rc
 
   menusweep:
-    # every item of the main menu, the submenus included, in the three languages, each from a fresh start: no fatal error
+    # every item of the main menu, the submenus included, each from a fresh start: no fatal error and no path of DOS form; one job per language and half
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: menusweep ENGLISH part 1 of 2
+            cmds: |
+              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 4 --part 1/2
+          - name: menusweep ENGLISH part 2 of 2
+            cmds: |
+              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 4 --part 2/2
+          - name: menusweep RUSSIAN part 1 of 2
+            cmds: |
+              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 4 --part 1/2
+          - name: menusweep RUSSIAN part 2 of 2
+            cmds: |
+              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 4 --part 2/2
+          - name: menusweep UKRAIN part 1 of 2
+            cmds: |
+              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 4 --part 1/2
+          - name: menusweep UKRAIN part 2 of 2
+            cmds: |
+              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 4 --part 2/2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -158,12 +163,32 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
       - name: Build DN (one command)
         run: tools/build.sh linux64 out/dn
-      - name: Every menu item in English, Russian and Ukrainian
-        run: python3 tools/dn-linux-menusweep.py out/dn -j 4
+      - name: ${{ matrix.name }}
+        env:
+          CMDS: ${{ matrix.cmds }}
+        run: |
+          rc=0
+          while IFS= read -r c; do
+            [ -z "$c" ] && continue
+            echo "::group::$c"
+            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
+            echo "::endgroup::"
+          done <<< "$CMDS"
+          exit $rc
 
   hotkeys:
-    # the hot letters of the menus and of the dialogs on a Cyrillic layout (Alt and a Russian or Ukrainian letter), every item of the main menu
+    # the hot letters of the menus and of the dialogs on a Cyrillic layout (Alt and a Russian or Ukrainian letter)
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: menus
+            cmds: |
+              python3 tools/dn-linux-hotkeys.py out/dn -j 4
+          - name: dialogs
+            cmds: |
+              python3 tools/dn-linux-dialoghot.py out/dn -j 4
     steps:
       - uses: actions/checkout@v4
         with:
@@ -172,14 +197,32 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
       - name: Build DN (one command)
         run: tools/build.sh linux64 out/dn
-      - name: The menus (a hot letter of each submenu and item)
-        run: python3 tools/dn-linux-hotkeys.py out/dn -j 4
-      - name: The dialogs (the hot letters of each dialog found on the screen)
-        run: python3 tools/dn-linux-dialoghot.py out/dn -j 4
+      - name: ${{ matrix.name }}
+        env:
+          CMDS: ${{ matrix.cmds }}
+        run: |
+          rc=0
+          while IFS= read -r c; do
+            [ -z "$c" ] && continue
+            echo "::group::$c"
+            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
+            echo "::endgroup::"
+          done <<< "$CMDS"
+          exit $rc
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64
     runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Tour in a pty
+            cmds: |
+              python3 tools/dn-linux-tour.py out/dn | tee tour.txt && ! grep -v ' ok$' tour.txt
+          - name: File operations in a pty and the UTF-8 checks
+            cmds: |
+              DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
     steps:
       - uses: actions/checkout@v4
         with:
@@ -188,21 +231,37 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
       - name: Build DN (one command, native)
         run: tools/build.sh linux64 out/dn
-      - name: Tour in a pty
+      - name: ${{ matrix.name }}
+        env:
+          CMDS: ${{ matrix.cmds }}
         run: |
-          python3 tools/dn-linux-tour.py out/dn | tee tour.txt
-          ! grep -v ' ok$' tour.txt
-      - name: File operations in a pty and the UTF-8 checks
-        run: DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
+          rc=0
+          while IFS= read -r c; do
+            [ -z "$c" ] && continue
+            echo "::group::$c"
+            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
+            echo "::endgroup::"
+          done <<< "$CMDS"
+          exit $rc
 
   linux32:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Tour in a pty
+            cmds: |
+              python3 tools/dn-linux-tour.py out/dn | tee tour.txt && ! grep -v ' ok$' tour.txt
+          - name: File operations in a pty and the UTF-8 checks
+            cmds: |
+              DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 make git binutils
       - name: Cross compiler cache
         id: cache
         uses: actions/cache@v4
@@ -214,17 +273,15 @@ jobs:
         run: tools/build-fpc-i386-linux.sh ~/fpc-i386-linux
       - name: Build DN (one command)
         run: DN_LINUX=~/fpc-i386-linux tools/build.sh linux out/dn
-      - name: Tour in a pty
+      - name: ${{ matrix.name }}
+        env:
+          CMDS: ${{ matrix.cmds }}
         run: |
-          python3 tools/dn-linux-tour.py out/dn | tee tour.txt
-          ! grep -v ' ok$' tour.txt
-      - name: File operations in a pty and the UTF-8 checks (the locale test is for DN_UTF8=0 only)
-        run: DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dn-linux-i386
-          path: |
-            out/dn/dn
-            out/dn/*.lng
-            out/dn/*.dlg
-            out/dn/*.hlp
+          rc=0
+          while IFS= read -r c; do
+            [ -z "$c" ] && continue
+            echo "::group::$c"
+            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
+            echo "::endgroup::"
+          done <<< "$CMDS"
+          exit $rc
