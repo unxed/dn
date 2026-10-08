@@ -24,7 +24,7 @@ jobs:
           submodules: true
       - name: Packages
         # only the compiler and the RTL: 'fpc' drags in GTK and takes ~13 minutes
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc make bzip2 git curl dosbox-x unzip
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make bzip2 git curl dosbox-x unzip
       - name: Cross toolchain cache
         id: cache
         uses: actions/cache@v4

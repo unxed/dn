@@ -53,7 +53,7 @@ jobs:
           echo "object DN=$(git -C object rev-parse HEAD) TV=$(git -C object/tv rev-parse HEAD)"
           echo "class  DN=$(git -C class rev-parse HEAD) TV=$(git -C class/tv rev-parse HEAD)"
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
       - name: Backport shared fixes to the object comparator
         run: |
           python3 class/tools/acceptance/backport_shared_object_fixes.py object
@@ -153,7 +153,7 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
       - name: Build UTF-8 DN
         run: tools/build.sh linux64 out/u8
       - name: Build DN with the code page inside

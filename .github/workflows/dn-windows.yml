@@ -33,7 +33,7 @@ jobs:
         with:
           submodules: true
       - name: Packages
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc make git binutils binutils-mingw-w64-x86-64 binutils-mingw-w64-i686 python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils binutils-mingw-w64-x86-64 binutils-mingw-w64-i686 python3
       - name: Cross compiler cache
         id: cache
         uses: actions/cache@v4

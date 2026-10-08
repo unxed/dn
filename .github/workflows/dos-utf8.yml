@@ -30,7 +30,7 @@ jobs:
       - name: Packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-base fp-units-misc make bzip2 git curl unzip python3 \
+          sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make bzip2 git curl unzip python3 \
             build-essential autoconf automake libtool nasm pkg-config libsdl2-dev libsdl2-net-dev libpng-dev libfreetype-dev libncurses-dev libpcap-dev libslirp-dev \
             libx11-dev libxkbfile-dev libxrandr-dev libfluidsynth-dev zlib1g-dev
       - name: The revision of DOSBox-X master

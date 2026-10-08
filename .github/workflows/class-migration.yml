@@ -29,7 +29,7 @@ jobs:
         with:
           submodules: true
       - name: Compiler
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl python3
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl python3
       - name: tv3 prerequisite gate
         run: tv/tools/class-gate.sh
       - name: Pascal class-name conversion checks
