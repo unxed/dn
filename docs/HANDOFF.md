@@ -26,7 +26,7 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 | 9 | English in all code, texts and docs | done (`tools/text-policy.py` in CI) |
 | 10 | dn leftovers (PLAN.md, MIGRATION-STATUS) | open |
 | 11 | word wrap (reference: f4), xlat (reference: far2l, behaviour only) | done |
-| 12 | the four DN editor files `editcore`, `editfile`, `editinfo`, `editor` still hold code of the old RIT editor | they keep the RIT notice; to be written anew over tve without that code (item L1) |
+| 12 | the four DN editor files `editcore`, `editfile`, `editinfo`, `editor` hold code of the old editor of DN | they are DN code under the RIT licence with its notice; they stay as they are (owner, 2026-10-08) |
 
 ## Legal state (what the audit and the rewrite established)
 
