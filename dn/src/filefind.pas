@@ -230,7 +230,7 @@ uses DnPath,
   ArcView {JO: for extracting files found in archives}
 
   , fsinfo {JO: for GetDriveTypeNew}
-  , filetype, Eraser, basics, uselfn, DnIni, Menus, FileCopy
+  , filetype, Eraser, basics, uselfn, DnIni, Menus, FileCopy, osdep
   , panelsetup, Math
   ;
 
@@ -774,7 +774,8 @@ NotArchive:
         then
           if  (SR.SR.Attr and Directory <> 0) then
             begin
-            if  (FindRec.Options and ffoRecursive <> 0) then
+            { a link to a directory is not entered: a loop of links would never end }
+            if  (FindRec.Options and ffoRecursive <> 0) and (SR.SR.Attr and SysLinkAttr = 0) then
               DirCol.Insert(NewStr(Path+SR.FullName+DnSep))
             end
           else
@@ -937,7 +938,7 @@ Skip:
 {JO: add directories and archives to the search string collection}
         if  (FR^.Attr and Directory <> 0) then
           begin
-          if  (FindRec.Options and ffoRecursive <> 0) then
+          if  (FindRec.Options and ffoRecursive <> 0) and (FR^.Attr and SysLinkAttr = 0) then
             LCol.Insert(NewStr(MakeNormName(FR^.Owner^,
                                            FR^.FlName[uLfn])));
           end

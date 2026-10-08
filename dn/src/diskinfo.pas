@@ -679,7 +679,7 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
         if SR.SR.Attr and Directory <> 0 then
           begin
           Inc(NumDirs); {AK155}
-          if Recurse then
+          if Recurse and (SR.SR.Attr and SysLinkAttr = 0) then   { a link to a directory is not entered: a loop of links }
             begin
             if  (Word(Length(FreeStr))+Word(Length(SR.FullName)) >
                  MaxPathLen-1)

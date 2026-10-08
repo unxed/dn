@@ -1421,16 +1421,24 @@ function QuickSearchString(SizeX: Word): String;
     S: String; { mask text prepared for display }
     l, i: Integer;
     DefaultStar: Boolean;
+    Mask, Tab: String;
   begin
   Result := GetString(dlFileSearch);
   DefaultStar := QSMask[Length(QSMask)] <> '*';
+  { the mask is cut by columns: with UTF-8 inside a character of it is one byte of a proxy string here }
+  {$IFDEF DNUTF8}
+  Mask := Utf8ToProxy(QSMask, Tab);
+  L := SizeX - StrCols(Result) - Ord(DefaultStar) - 1;
+  {$ELSE}
+  Mask := QSMask;
   L := SizeX - Length(Result) - Ord(DefaultStar) - 1;
+  {$ENDIF}
 
   { Determine i - start of the displayed part of the mask }
-  if Length(QSMask) > L then
+  if Length(Mask) > L then
     begin  { Truncate from the left }
     Result := Result + #17'~';
-    i := Length(QSMask)-L;
+    i := Length(Mask)-L;
     end
   else
     begin
@@ -1439,21 +1447,24 @@ function QuickSearchString(SizeX: Word): String;
     end;
 
   l := 0; { L is the length of S }
-  while i <> Length(QSMask) do
+  while i <> Length(Mask) do
     begin
     inc(i);
-    if QSMask[i] = '~' then
+    if Mask[i] = '~' then
       begin
       Inc(l);
       S[l] := #0;
       end;
     Inc(l);
-    S[l] := QSMask[i]
+    S[l] := Mask[i]
     end;
   SetLength(S, l+1);
   S[l+1] := '~';
   if DefaultStar then
     S := S + '*';
+  {$IFDEF DNUTF8}
+  S := ProxyToUtf8(S, Tab);
+  {$ENDIF}
   Result := Result + S;
   end;
 

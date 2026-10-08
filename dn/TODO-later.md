@@ -76,6 +76,9 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
 - UTF-8 file names are shown as bytes in the code page (garbage instead of "file.txt"): solved by moving to UTF-8 inside DN (PLAN, item 4).
 - Dot files (`.hidden`) and broken symbolic links are not visible in the panel: `FindFirst` returns them (except broken links), so DN itself hides them
   (check the panel setting "hidden files" and the comparison `Name[1] = '.'` in the directory parse); Unix permissions and links are not shown in `Attr`.
+  (Checked 2026-10-08: the broken links are listed (`tools/dn-linux-fsattrs.py`); the dot files are the hidden files of the RTL and DN shows
+  them when the setting "show hidden files" of the panels (`fmsShowHidden`) is on; it is off by default, as in DN. Whether Unix wants it on by
+  default is a decision of the owner.)
 - Paths look like DOS (`C:\home\you`): drive C: is the root of the file system; show Unix paths after the move to UTF-8.
 - Case: names that are not on disk in the case DN asks for are looked up without regard to case (`SysOsPath`); two files that differ only by
   case, DN will not be able to tell apart.
@@ -87,6 +90,15 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   a directory (`/proc/self/root` made the scan of `C:\` endless). The panels still enter them (Enter on a link to a directory works);
   how the panels show a link (a mark, the target) is not done. Other scanners of DN (Find files, the size of a directory, the
   copy of a tree) may loop on a link cycle: check when they are used on `/`.
+  **Checked and fixed 2026-10-08** (`tools/dn-linux-fsattrs.py`): Find File found the files again and again through a link to `..`, F5 of a
+  directory with such a link copied without end, and **F8 of a directory that held a link to a directory deleted the files of the target**
+  (then failed on the link). Now a link to a directory is not entered by Find File (`filefind.pas`) and the size of a directory
+  (`CountDirLen`); the deletion removes the link (`SysEraseLink`: the RTL `Erase` refuses a link to a directory); F5/F6 make a link with the
+  same target (`SysCopyLink`; a move removes the old link; DOS and Windows keep the old behaviour). The same check found that **every F5 of a
+  directory ended in an access violation** after the copy (a regression of the class migration: the list of the directories was made as a
+  `TDirCollection` of records and held `TDirName` objects; `filecopy.pas`). The check of F6 across file systems found that **no move to
+  another file system worked on Linux**: the rename gives EXDEV (18), which DN did not take for NOT_SAME_DEVICE (17), so a file stayed where
+  it was without a word and a directory gave "Could not rename"; `RnFl` maps it now (test: F6 to `/dev/shm` in `tools/dn-linux-fsattrs.py`).
 ## Names of files and keyboard (Linux, code page build only: DN_UTF8=0), 2026-10-02 — the stop-gap before UTF-8 inside (now the default)
 ## Names of files and keyboard (Linux), 2026-10-02 — stop-gap until DN is UTF-8 inside
 - At the border with the file system (`vpsyslow.pas`: `NameFromOs`, `NameToOs`, `SysOsPath`) a name that is valid UTF-8 and has only
@@ -95,7 +107,8 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   The real fix is PLAN.md item 4 (UTF-8 inside).
 - The tree (Disk > Directory tree) on `/` reads every directory (30 000 directories took 20 s here), a line "Reading directories: N   Esc - stop" is shown while it works (Esc aborts); `/proc` and `/sys` of the root are skipped.
 - `DN0.SWP` (the saved desktop) is written to the current directory when a command is run from the command line: it shows in the panel; the place
-  and the need of the file are to be decided.
+  and the need of the file are to be decided. (Checked 2026-10-08: a command of the command line runs in the embedded terminal and no file is
+  written to the current directory; the files of DN are in the configuration directory.)
 
 ## DOS: DN.EXE hangs in the DOSBox that is built into Wine (2026-10-02, reported by the owner; to be investigated)
 - Symptom: `dist/dos/DN.EXE` started in the DOSBox 0.74-3 of Wine ("Cpu speed: max 100% cycles, Frameskip 1") hangs at once: no output, only the
@@ -179,6 +192,10 @@ The rest of `dn/data` (`COLORS`, `DN.FLG`) is unused so far: check whether it is
 ## Found by looking at the Russian screens (2026-10-03)
 - The message boxes (F8 delete confirmation etc.) have the title `Confirm` and the buttons `Yes`/`No` in English in the Russian interface
   (both builds): the stock strings of `tv/` (`MessageBox`), not the language file of DN. To check where DN's own texts should go in.
+  **Done 2026-10-08:** `InitLngStream` (`mainapp.pas`) sets the texts of `TvMsgBox` (`MsgYesText` ... `MsgConfirmText`) from the strings of the
+  resources (`dlYesButton`, `dlMsgConfirm` ...); the English Cancel keeps the hot letter of tv/. Test `tools/dn-linux-msgbox.py` (the quit box in English,
+  Russian, Ukrainian: title, buttons, the hot letters). Left in tv3: the file dialog (`TvFileDlg`), the directory dialog (`TvChDir`) and the color
+  dialog (`TvColorSel`) have their button texts as constants; they need variables like those of `TvMsgBox` to be translated.
 - Fixed: after the move of the cursor the two redrawn lines of the panel were drawn by `WriteLineW` from a buffer of cells (garbage `♂ ◘` in the
   panel): a leftover of the conversion of the draw buffers to cells (commit 86cb12f), `flpanel.pas` now uses `WriteLineC`; the ops test has a check.
   Other leftovers of that kind may exist: the places that still hand cell buffers to the word-based `WriteLineW/WriteBufW` (the DBF viewer and
@@ -300,6 +317,8 @@ selection on the clipboard of the far2l terminal (the script checks it: PASS).
 
 **Confirmed by the owner (2026-10-03, the far2l terminal on Linux Mint, dist built from 18b36b9):** Ctrl+Ins copies and Shift+Ins pastes in the editor now. The red Shift+Ins check of `tools/dn-linux-far2l.py`
 (a block is selected when it pastes) stays as a note: a possible difference between pasting over a selected block and pasting without one; not seen by the owner.
+(2026-10-08: the script does not start at the current pin of tv3: it imports `tv/tests/pty/f2lterm.py`, the far2l terminal of the tests, which
+tv3 no longer has. It needs that test terminal in tv3 again, or one of its own here.)
 
 ## DOS: "save the desktop on exit" and "Save setup" (2026-10-03, started, not finished)
 
@@ -348,16 +367,18 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - Resources, DOS landing (`tools/to-codepage.py`, `docs/TEXT-POLICY.md`): English and Russian go to cp866, Ukrainian to cp1125 (`DN_CODEPAGE`, `DN_CODEPAGE_UKRAIN`). Not checked on a real DOS machine or in DOSBox-X: whether the DOS build of DN (without `-dDNUTF8`) treats the cp1125 letters (upper and lower case, sorting) right: its tables know cp866. The look-alike letters of the old texts are repaired (`tools/fix-resource-lookalikes.py`); left: a few Latin letters that stand alone and were not converted on purpose (`Track'a`, `a:b`, lists of extensions).
 
 - Cells hold UTF-8 for a code page byte of $80 and up (tv3 `ScInitChar`); the bytes below $20 and $7F stay raw and the writers turn them into the IBM glyphs. The stray `═` cells that made the first attempt fail (`f5_f6_f8` of `dn-accept`) came from DN, not from tv3: `TWhileView.Draw` (`progress.pas`) and `TCalcView.Draw` (`calcwin.pas`) wrote into the draw buffer through a record overlay (`absolute B`, a one-byte `C: Char`), which replaced the first byte of a UTF-8 cell and left the rest (`E2 95 90` became `C9 95 90`). Both now use `SetCellGlyph`. Do not write into a `TScreenCell` through an overlay: use `SetCellChar`, `SetCellGlyph`, `SetCellAttr`.
-- File times on Unix: `osdep.Fill` passed `TSearchRec.Time` (the Unix time on Unix) as a DOS packed time, so the panels showed garbage dates for files (`5.06.33  9:63`). Fixed 2026-10-06 (`SysFileTimeToDos`, test in `t_osdep`; the comparator of the gate gets the same fix by `backport_shared_object_fixes.py`). Not checked: `SetFTime`/`GetFTime` of `Dos` on Unix in copy, move and the file ages dialog (they use the unit `Dos` of the RTL, which should pack the DOS time itself), and the creation and access times of `TOSSearchRec` (0 on Unix).
-- `DumpAtExit` (`dosharness.pas`, was in `mainapp.pas`) is never called: the DOS harness writes `dnlog.txt` only if it is hooked; either hook it as an exit procedure or delete it.
+- File times on Unix: `osdep.Fill` passed `TSearchRec.Time` (the Unix time on Unix) as a DOS packed time, so the panels showed garbage dates for files (`5.06.33  9:63`). Fixed 2026-10-06 (`SysFileTimeToDos`, test in `t_osdep`; the comparator of the gate gets the same fix by `backport_shared_object_fixes.py`). Not checked: `SetFTime`/`GetFTime` of `Dos` on Unix in copy, move and the file ages dialog (they use the unit `Dos` of the RTL, which should pack the DOS time itself; checked by hand 2026-10-08: F5 and F6 to another file system keep the modification time of the file, 2001-09-09 01:46:40 stayed exact; the file ages dialog not checked), and the creation and access times of `TOSSearchRec` (0 on Unix).
+- `DumpAtExit` (`dosharness.pas`, was in `mainapp.pas`) was never called: deleted 2026-10-08 (no script reads `dnlog.txt`; the flight recorder writes `dn.log` and the crash reports on DOS too).
 
 ## Doubts and leftovers of 2026-10-06 (platform separation, archives, input)
-- Quick search of the panel: the display of a long search mask cuts by bytes (`QuickSearchString`); the Caps/Shift start modes take UTF-8 characters now (`IsTypedChar`) but no test drives them.
+- Quick search of the panel: the display of a long search mask cut by bytes (`QuickSearchString`): fixed 2026-10-08, it cuts by characters (`tools/dn-linux-footer.py`); the Caps/Shift start modes take UTF-8 characters now (`IsTypedChar`) but no test drives them.
 - `uk_UA` in `tvlocale.pas` maps to cp866 (as glibc does); a DOS user with cp1125 would want 1125: make it a setting if asked.
 - `DefaultSortMode` of `dn.ini` applies only to a DN without a saved setup (`PanSetupFromConfig`); a user who saved the setup keeps what was saved.
 - The archivers on Windows are started through `COMSPEC /c` as before (`osrunwindows.pas`); only the Unix side needed the fix. Not driven by a test on Windows.
 - `ArcDrive.Exec` (arcview.pas) and `archiver.pas` still have the DOS 120/95-character command line limits and the `$DNn$.BAT` batch files of the swap mode; on Unix the swap mode (`SwapWhenExec`) must stay off.
-- The quick search of the directory tree (window of the button [Tree] of the Copy dialog, `tree.pas`) takes UTF-8 characters now, but has no test: the window scans the whole host (the root of `C:` is `/`) for minutes before the search works (`Reading directories: 22891 Esc - stop`); a test needs a way to limit the scan (a setting or an environment variable).
+- The quick search of the directory tree (window of the button [Tree] of the Copy dialog, `tree.pas`) takes UTF-8 characters now, but has no test: the window scans the whole host (the root of `C:` is `/`) for minutes before the search works (`Reading directories: 22891 Esc - stop`); a test needs a way to limit the scan (a setting or an environment variable). (2026-10-08: the build is static, so `unshare -r --root=DIR` runs
+  it in a small root where the scan is instant, no setting needed; the Tree button of the Copy dialog is F10, not Alt-T as the disabled branch of
+  `tools/dn-linux-qsearch.py` has it. The tree did not open in a first try in such a root: not finished.)
 - F4 in an archive is "Extr": the object build and the class build extract the member to the directory of the other panel at once (no dialog); the editor does not open a member of an archive (`UseFile` leaves on `cmEditFile`).
 
 ## Status at the end of the session (2026-10-06, second part)
@@ -366,7 +387,7 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - Not done: the DOS checks (the UTF-8 names with the patched DOSBox-X, cp1125 case and sort), the stage 4 gaps of `docs/TEST-PLAN.md`, the full click-through at the final head. See `PLAN.md`, "Next items in order".
 - Code page 1125 (Ukrainian) in the builds with the code page inside (DOS, `DN_UTF8=0`): the case of its letters is added to the tables of the OS from the page (`keymap.CompleteUpcaseFromPage`, test `t_cpcase`), and the sort order has its own table `sort1125.xlt` (made by `tools/gen-sort1125.py`: Ghe with upturn after Ghe, Ukrainian Ie after Io, Ukrainian I and Yi before Short I); `ApplyCodetables` takes it when the page is 1125 and the table is the default one, and `mainapp.CodePageChanged` makes the tables again when the language of the resources changes the page. Not driven on a real DOS with the page 1125 (DOSBox-X has no such page in its DOS): the tables are checked by unit tests.
 - The attribute ReadOnly of DOS on Unix: the RTL unit `Dos` has no file attributes there (`GetFAttr` says 0, `SetFAttr` does nothing), so DN lost the read-only attribute at a copy (a shared bug: the object build too). `osdep` has `SysGetFAttr`/`SysSetFAttr`/`SysGetTAttr`/`SysSetTAttr` now (the write permission of the owner is the attribute; hidden, system and archive mean nothing on Unix), `lfn` and `filediz` use them; tests `t_osdep`, `tools/dn-linux-fsattrs.py`. A file name in a file record is UTF-16 with FPC 3.2 on Unix (`TFileTextRecChar`): read it by the size of the character (`RecName`). The creation and access times (`TOSSearchRec`: 0 on Unix) and `SetFTime`/`GetFTime` of the unit `Dos` are still not looked at.
-- Names cut by bytes with UTF-8 inside (a shared bug: the object build too): the line under the panel (`TDrive.GetDown`), the footer of the panel, the lists of the selection dialogs and the path of the disk info cut a field at N bytes and put the mark on the Nth byte, so a Cyrillic name lost its extension and the cut could stand inside a character (`CutCols` of `strutil` cuts by columns now and is used in those four places; `Utf8Prefix` keeps the 12 bytes of the short name of a file record, `TShortName`, whole). Still by bytes: the long-name cuts of the panel footer by `LFN_Cut` 0 and 1 (`filepanel.pas`, the index arithmetic with `DelFromS`), and the short name itself stays 12 bytes: `privet.txt` of the info line shows `privet` (the short name is a 12 byte field of the file record that streams keep; to make it longer is a change of the record).
+- Names cut by bytes with UTF-8 inside (a shared bug: the object build too): the line under the panel (`TDrive.GetDown`), the footer of the panel, the lists of the selection dialogs and the path of the disk info cut a field at N bytes and put the mark on the Nth byte, so a Cyrillic name lost its extension and the cut could stand inside a character (`CutCols` of `strutil` cuts by columns now and is used in those four places; `Utf8Prefix` keeps the 12 bytes of the short name of a file record, `TShortName`, whole). Still by bytes: the long-name cuts of the panel footer by `LFN_Cut` 0 and 1 (`filepanel.pas`, the index arithmetic with `DelFromS`), and the short name itself stays 12 bytes: `privet.txt` of the info line showed `privet` (fixed 2026-10-08: on a system without short names, `OSHasShortNames`, the line under the panel shows the long name cut by columns, `TDrive.GetDown`; test `tools/dn-linux-footer.py`) (the short name is a 12 byte field of the file record that streams keep; to make it longer is a change of the record).
 - Windows: F5 wrote the data of a copy after a block of zeros (found by the Windows smoke, 2026-10-07): `RewriteWriteStrem` of `filecopy` sets the final size of the new file first (`SysFileSetSize` = `FileTruncate`), and on Windows the truncation leaves the file position at the new end, so the data went to that offset. `SysFileSetSize` keeps the position now (test `t_osdep`, the smoke copies a plain and a Russian-named file and compares the content). The object and the class build of Windows both had it; no one had looked at a copied file on Windows before.
 
 ## DOS UTF-8 API (DOSBox-X PR 6632): what is in tv3 and what is in dn (2026-10-07)

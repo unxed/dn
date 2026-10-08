@@ -4,12 +4,18 @@ Each case is a start of DN on a small tree, some keys, and the result is checked
   - the panel lists a link to a file, a link to a directory and a dangling link; Enter on the link to a directory enters it;
   - F5 of a link to a file makes a regular file with the content of the target;
   - F5 of a read-only file (mode 444) makes a read-only file (the attribute ReadOnly of DOS is the write permission of the owner);
-  - F8 of a link removes the link and not its target; F8 of a read-only file asks, and removes it after Yes."""
+  - F8 of a link removes the link and not its target; F8 of a read-only file asks, and removes it after Yes;
+  - a link to a directory is a link for the operations on trees: F8 of a directory that holds one removes the link and not the files of its target
+    (they were deleted), F5 of such a directory copies the link (a link to `..` made the copy endless), F5 and F8 of the link itself act on the link,
+    Find File does not enter it (a link to `..` gave the same file again and again); F5 of a directory (with no link) does not stop DN (an access
+    violation at the end of every copy of a directory);
+  - F6 to another file system (/dev/shm when it is one) moves a file and a directory with a link in it (the rename gave EXDEV, which DN did not
+    take for "another device": the file stayed silently, the directory gave an error)."""
 import os, re, shutil, stat, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
-K = {'ENTER': '\r', 'ESC': '\x1b', 'HOME': '\x1b[H', 'DOWN': '\x1b[B', 'TAB': '\t', 'F5': '\x1b[15~', 'F8': '\x1b[19~'}
+K = {'F6': '\x1b[17~', 'ALT-F7': '\x1b[18;3~', 'ENTER': '\r', 'ESC': '\x1b', 'HOME': '\x1b[H', 'DOWN': '\x1b[B', 'TAB': '\t', 'F5': '\x1b[15~', 'F8': '\x1b[19~'}
 bad = 0
 
 
@@ -106,6 +112,81 @@ check('Read-Only' in text and os.path.exists(os.path.join(w, 'ro.txt')), 'F8 of 
 d, w, text, alive = case(out, tree_ro, 'HOME DOWN DOWN F8 ENTER ENTER')
 dirs.append(d)
 check(not os.path.exists(os.path.join(w, 'ro.txt')), 'a read-only file is removed after both confirmations', text)
+
+# links to directories in the operations on trees: the target (outside of the work directory) must stay as it is
+def outside(w):
+    o = os.path.join(os.path.dirname(w), 'outside')
+    os.makedirs(o, exist_ok=True)
+    open(os.path.join(o, 'keep.txt'), 'w').write('keep\n')
+    return o
+
+
+def tree_dir_with_link(w):
+    os.makedirs(os.path.join(w, 'sub'))
+    open(os.path.join(w, 'sub', 'in.txt'), 'w').write('inner\n')
+    os.symlink(outside(w), os.path.join(w, 'sub', 'out'))
+
+
+def tree_dir_with_loop(w):
+    os.makedirs(os.path.join(w, 'sub'))
+    open(os.path.join(w, 'sub', 'in.txt'), 'w').write('inner\n')
+    os.symlink('..', os.path.join(w, 'sub', 'loop'))
+
+
+def tree_top_link(w):
+    os.symlink(outside(w), os.path.join(w, 'top'))
+
+
+def kept(w):
+    return os.path.isfile(os.path.join(os.path.dirname(w), 'outside', 'keep.txt'))
+
+
+d, w, text, alive = case(out, tree_dir_with_link, 'HOME DOWN DOWN F8 ENTER ENTER')       # .., dst, sub; the second Enter: "is not empty"
+dirs.append(d)
+check(alive and not os.path.lexists(os.path.join(w, 'sub')), 'F8 of a directory with a link to a directory removes the directory', text)
+check(kept(w), 'F8 of a directory with a link to a directory keeps the files of the target', text)
+d, w, text, alive = case(out, tree_dir_with_link, 'HOME DOWN DOWN F5 dst ENTER')
+dirs.append(d)
+p = os.path.join(w, 'dst', 'sub')
+check(alive and os.path.isfile(os.path.join(p, 'in.txt')) and os.path.islink(os.path.join(p, 'out')) and kept(w),
+      'F5 of a directory copies a link to a directory as a link', text)
+check(not os.path.exists(os.path.join(d, 'crash')), 'F5 of a directory does not stop DN (no crash report)', text)
+d, w, text, alive = case(out, tree_dir_with_loop, 'HOME DOWN DOWN F5 dst ENTER')
+dirs.append(d)
+p = os.path.join(w, 'dst', 'sub')
+check(alive and os.path.islink(os.path.join(p, 'loop')) and os.readlink(os.path.join(p, 'loop')) == '..',
+      'F5 of a directory with a link to .. copies the link once', text)
+d, w, text, alive = case(out, tree_dir_with_loop, 'ALT-F7 *.txt ENTER')
+dirs.append(d)
+check(alive and len(re.findall(r'\bin\s+txt', text)) == 1, 'Find File does not enter a link to .. (in.txt is found once)', text)
+d, w, text, alive = case(out, tree_top_link, 'HOME DOWN DOWN F8 ENTER')               # .., dst, top
+dirs.append(d)
+check(alive and not os.path.lexists(os.path.join(w, 'top')) and kept(w), 'F8 of a link to a directory removes the link, not the files of the target', text)
+d, w, text, alive = case(out, tree_top_link, 'HOME DOWN DOWN F5 dst ENTER')
+dirs.append(d)
+check(alive and os.path.islink(os.path.join(w, 'dst', 'top')) and os.path.islink(os.path.join(w, 'top')) and kept(w),
+      'F5 of a link to a directory makes a link', text)
+
+# F6 to another file system: a copy and a delete
+def tree_move(w):
+    tree_dir_with_link(w)
+    open(os.path.join(w, 'f.txt'), 'w').write('file\n')
+
+
+if os.path.isdir('/dev/shm') and os.stat('/dev/shm').st_dev != os.stat(tempfile.gettempdir()).st_dev:
+    for name, keys in (('f.txt', 'HOME DOWN DOWN DOWN F6'), ('sub', 'HOME DOWN DOWN F6')):       # .., dst, sub, f.txt
+        other = tempfile.mkdtemp(prefix='dnfsattr-mv-', dir='/dev/shm')
+        d, w, text, alive = case(out, tree_move, keys + ' ' + other + '/ ENTER ENTER')
+        dirs.extend([d, other])
+        moved = os.path.join(other, name)
+        if name == 'f.txt':
+            ok = os.path.isfile(moved) and not os.path.exists(os.path.join(w, name))
+        else:
+            ok = (os.path.isfile(os.path.join(moved, 'in.txt')) and os.path.islink(os.path.join(moved, 'out')) and
+                  not os.path.lexists(os.path.join(w, name)) and kept(w))
+        check(alive and ok, 'F6 of %s to another file system moves it' % name, text)
+else:
+    print('SKIP F6 to another file system: /dev/shm is not one', flush=True)
 
 for d in dirs:
     shutil.rmtree(d, ignore_errors=True)

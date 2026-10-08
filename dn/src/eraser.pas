@@ -222,7 +222,8 @@ error. For unrelated refusals (e.g. Abort) Params.RC=0}
           Abort := True;
           Break;
           end;
-        if  (SR.SR.Attr and Directory) <> 0 then
+        { a link to a directory is removed as a link: what it points to is not deleted }
+        if  ((SR.SR.Attr and Directory) <> 0) and ((SR.SR.Attr and SysLinkAttr) = 0) then
           begin
           s := MakeNormName(FreeStr, SR.FullName);
           
@@ -246,10 +247,15 @@ error. For unrelated refusals (e.g. Abort) Params.RC=0}
             Break;
             end;
           ClrIO;
-          lAssignFile(F, MakeNormName(FreeStr, SR.FullName));
-          lSetFAttr(F, 0);
-          lEraseFile(F);
-          Params.RC := IOResult;
+          if SR.SR.Attr and SysLinkAttr <> 0 then
+            Params.RC := SysEraseLink(MakeNormName(FreeStr, SR.FullName))
+          else
+            begin
+            lAssignFile(F, MakeNormName(FreeStr, SR.FullName));
+            lSetFAttr(F, 0);
+            lEraseFile(F);
+            Params.RC := IOResult;
+            end;
           if Params.RC <> 0 then
             begin
             Abort := True;
@@ -417,7 +423,7 @@ TryDel:
     S := PF^.FlName[True];
     CalcCancel;
     if  (PF <> nil) and not EraseCancel and not Abort then
-      if  (PF^.Attr and Directory = 0) then
+      if  (PF^.Attr and Directory = 0) or (PF^.Attr and SysLinkAttr <> 0) then
         begin
         InfoWrite(1, GetString(dlErasingFile));
         InfoWrite(2, Cut(S, 40));
@@ -430,7 +436,9 @@ TryDel:
           S := MakeNormName(PF^.Owner^, S);
           lAssignFile(F, S);
           ClrIO;
-          if PF^.Attr and ReadOnly <> 0 then
+          if PF^.Attr and SysLinkAttr <> 0 then
+            InOutRes := SysEraseLink(S)    { the link, not what it points to }
+          else if PF^.Attr and ReadOnly <> 0 then
             begin
 LLL:
             lSetFAttr(F, Archive);

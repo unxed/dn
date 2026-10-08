@@ -111,6 +111,12 @@ procedure SysGetFAttr(var F: File; var Attr: Word);
 procedure SysSetFAttr(var F: File; Attr: Word);
 procedure SysGetTAttr(var T: Text; var Attr: Word);
 procedure SysSetTAttr(var T: Text; Attr: Word);
+{ Removes a symbolic link (a found entry with SysLinkAttr), not what it points to: Erase of the RTL takes a link to a directory for the
+  directory and refuses it. The DOS error code (0 = done). }
+function SysEraseLink(const Name: string): LongInt;
+{ Makes Dest a symbolic link to what the link Source points to (a copy of the link, not of its target). The DOS error code (0 = done); -1 on a
+  system where DN does not copy links (the caller copies what the link points to). }
+function SysCopyLink(const Source, Dest: string): LongInt;
 
 { --- disks -------------------------------------------------------------------- }
 { Free and total space of the disk of the path (the drive letter and the colon of the path are taken,
@@ -544,6 +550,31 @@ begin
 {$ELSE}
   Dos.GetFAttr(T, Attr);
 {$ENDIF}
+end;
+
+function SysCopyLink(const Source, Dest: string): LongInt;
+{$IFDEF UNIX}
+var
+  Target: RawByteString;
+begin
+  Target := fpReadLink(SysOsPath(Source));
+  if (Target <> '') and (fpSymlink(PChar(Target), PChar(RawByteString(SysOsPath(Dest)))) = 0) then
+    Result := 0
+  else
+    Result := 5;
+end;
+{$ELSE}
+begin
+  Result := -1;
+end;
+{$ENDIF}
+
+function SysEraseLink(const Name: string): LongInt;
+begin
+  if DeleteFile(SysOsPath(Name)) then
+    Result := 0
+  else
+    Result := 5;
 end;
 
 procedure SysSetTAttr(var T: Text; Attr: Word);
