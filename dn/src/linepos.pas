@@ -55,7 +55,6 @@ uses
   Defines
   ;
 
-procedure MakeCRCTable;
 function GetLineNumberForOffset(const FName: String; Offset: LongInt)
   : LongInt;
 function GetOffsetForLineNumber
@@ -164,38 +163,5 @@ function HotKey(const S: String): Char;
   else
     HotKey := #0;
   end;
-
-procedure MakeCRCTable;
-  var
-    c: LongInt;
-    n, k: Integer;
-    poly: LongInt; { polynomial exclusive-or pattern }
-
-  const
-    { terms of polynomial defining this crc (except x^32): }
-    p: array[0..13] of Byte = (0, 1, 2, 4, 5, 7, 8, 10, 11, 12, 16, 22,
-       23, 26);
-
-  begin
-  New(Crc_Table);
-  { make exclusive-or pattern from polynomial ($EDB88320) }
-  poly := 0;
-  for n := 0 to (SizeOf(p) div SizeOf(Byte))-1 do
-    poly := poly or (LongInt(1) shl (31-p[n]));
-
-  for n := 0 to 255 do
-    begin
-    c := n;
-    for k := 0 to 7 do
-      begin
-      if  (c and 1) <> 0 then
-        c := poly xor (c shr 1)
-      else
-        c := (c shr 1);
-      end;
-    Crc_Table^[n] := c;
-    end;
-  Crc_Table_Empty := False;
-  end { MakeCRCTable };
 
 end.

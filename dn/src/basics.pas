@@ -286,12 +286,6 @@ const
 
 
 type
-  TCrc_Table = array[0..255] of LongInt;
-const
-  Crc_Table_Empty: Boolean = True;
-  Crc_Table: ^TCrc_Table = nil;
-
-type
   TPosArray = array[1..9] of TPoint;
 
   TFPos = record X: Integer; Y: TFileSize end;

@@ -59,7 +59,6 @@ function FindParam(const S: String): Integer;
 function Chk4Dos: Boolean;
 
 function GetEnv(S: String): String;
-function GetCrc(StartCrc: LongInt; var Buf; BufSize: Word): LongInt;
 
 implementation
 
@@ -103,39 +102,6 @@ function GetEnv(S: String): String;
   S := Dos.GetEnv(S);
   DelSpace(S);
   GetEnv := S;
-  end;
-
-{-DataCompBoy-}
-function UpdateCrc32(CurByte: Byte;
-    CurCrc: LongInt): LongInt;
-  {-Returns an updated crc32}
-
-  (* Model for inline code below
-  UpdateCrc32 := Crc_Table^[Byte(CurCrc xor LongInt(CurByte))] xor
-                 ((CurCrc shr 8) and $00FFFFFF);
-  *)
-  inline;
-  begin
-  UpdateCrc32 := Crc_Table^[Byte(CurCrc xor LongInt(CurByte))] xor
-      ( (CurCrc shr 8) and $00FFFFFF);
-  end;
-
-function GetCrc(StartCrc: LongInt; var Buf; BufSize: Word): LongInt;
-  type
-    AA = array[1..$F000] of Byte;
-  var
-    CNT: Word;
-    CRC: LongInt;
-  begin
-  if Crc_Table_Empty then
-    MakeCRCTable;
-  CRC := StartCrc;
-  GetCrc := StartCrc;
-  if BufSize = 0 then
-    Exit;
-  for CNT := 1 to BufSize do
-    CRC := UpdateCrc32(AA(Buf)[CNT], CRC);
-  GetCrc := CRC;
   end;
 
 end.
