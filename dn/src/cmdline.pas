@@ -275,6 +275,8 @@ procedure TCommandLine.GetDir;
   Dec(SkyEnabled);
   NeedAbort := False;
   MakeNoSlash(Dir);
+  { On Unix the prompt shows the path the way the system writes it: /dev/shm>, not C:\dev\shm> (issue #23). }
+  Dir := SysDisplayPath(Dir);
   SetDirShape;
   end { TCommandLine.GetDir };
 
