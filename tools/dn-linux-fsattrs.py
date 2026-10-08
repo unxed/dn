@@ -67,7 +67,7 @@ dirs.append(d)
 check(alive and all(n in text for n in ('dlink', 'broken', 'link', 'target')), 'the panel lists the links, the dangling one too', text)
 d, w, text, alive = case(out, tree_links, 'HOME DOWN ENTER')       # .., dlink
 dirs.append(d)
-check(alive and 'work\\dlink' in text and re.search(r'in\s+txt', text) is not None, 'Enter on a link to a directory enters it', text)
+check(alive and re.search(r'work[\\/]dlink', text) and re.search(r'in\s+txt', text) is not None, 'Enter on a link to a directory enters it', text)
 
 # F5 of a link to a file: the content of the target in a regular file
 def tree_one_link(w):
