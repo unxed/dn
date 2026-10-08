@@ -6,23 +6,23 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 
 | repo | state |
 |---|---|
-| tv3 | one root commit `652bd98` (main = the work branch); the far2l extensions on both sides; the audit gate in CI (`borrow-audit`, `generated`) |
-| tve | main = the work branch; the audit gate in CI on the tree and on every commit of a push |
-| dn | tv3 `652bd98` and tve `7acf739` pinned; the options for the UX rules that contradict the DN keys (`docs/UX-CONFORMANCE.md`, all off by default) |
-| sp | fpide pins the same tv3 and tve; acceptance 297 + 35 checks pass |
+| tv3 | history from one root commit `652bd98`; head `199026b` (main = the work branch); the far2l extensions on both sides; CI job `generated`; the audit is manual (`tools/audit/run.sh`) |
+| tve | head `2871737` (main = the work branch); the audit is manual (`tools/audit/run.sh`) |
+| dn | tv3 `199026b` and tve `2871737` pinned; the options for the UX rules that contradict the DN keys (`docs/UX-CONFORMANCE.md`, all off by default); releases by `release.yml`, snapshots by `nightly.yml` |
+| sp | fpide pins the same tv3 and tve; the configuration in the platform directories (`tests/accept/test_config.py`) |
 
 ## The plan of the owner and where each item is
 
 | # | item | state |
 |---|---|---|
 | 1 | tve: the editor component, MIT, written from nothing (other editors only as a reference of behaviour) | in dn and fpide; the history passes the audit; open: the remaining editor features of `tve/README.md` |
-| 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; most of the rest is blocked by licences (the code of one side is RIT or GPL: a tv3 unit must be written anew) |
+| 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir` replace the duplicates; open: the clock (#19), the ASCII table (#18) |
 | 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; the tvision PR (magiblot/tvision#241, branch `dos-utf8-names` of the fork) waits for the owner |
 | 4 | fpide: the ASCII splash removed | done |
 | 5 | the vtui UX guidelines in tv3, dn, fpide, tve | tables in `docs/UX-CONFORMANCE.md` (dn) and tv3; the rows marked gap are open |
 | 6 | fpide: other languages, Go first | Go done (template, gofmt, Delve); Python, Rust, C were never asked for |
-| 7 | sp as "Better Pascal" (safe / ext / fpide, one unit that gives everything) | open (`sp/PLAN.md`) |
-| 8 | no DOS/Windows path remnants on other systems ("C:" on Linux) | ratchet of `tools/check-paths.py`; the Windows and DOS runtime is not checked by hand |
+| 7 | sp as "Better Pascal" (safe / ext / fpide, one unit that gives everything) | `sp/PLAN.md`; the rename of the repository to bp is the last step |
+| 8 | no DOS/Windows path remnants on other systems ("C:" on Linux) | tv3 `TvPath`; tve and fpide use it; dn open (DnPath over TvPath); ratchet of `tools/check-paths.py` |
 | 9 | English in all code, texts and docs | done (`tools/text-policy.py` in CI) |
 | 10 | dn leftovers (PLAN.md, MIGRATION-STATUS) | open |
 | 11 | word wrap (reference: f4), xlat (reference: far2l, behaviour only) | done |
@@ -56,8 +56,10 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 
 ## How to
 
-- Audit: `tools/audit/fetch-corpora.sh`, then `python3 tools/audit/borrow-audit.py --ref build/corpora/list.txt
-  [--allowed build/corpora/allowed.txt] src tests tools ...` (tv3 and tve).
+- Audit: `tools/audit/run.sh` in tv3 or tve (fetches the corpora once into `~/.cache/tv-audit`; prints `AUDIT PASS` or
+  `AUDIT FAIL`).
 - Pin tv3/tve in dn or sp: rule 4 above.
+- Configuration directories: tv3 `TvAppDir` (XDG on Linux and BSD, `~/Library/Application Support` on macOS,
+  `%APPDATA%` and `%LOCALAPPDATA%` on Windows, the program directory on DOS).
 - dn on a new tv3: `tools/build.sh linux64`, then `tools/dn-linux-*.py out/linux64` (the CI list is in
   `.github/workflows/dn-linux.yml`).
