@@ -1805,6 +1805,15 @@ DIALOG dlgInterfaceSetup, 71, 22, 'Interface Setup'
       ITEM 'Track ~v~iewing history'
       ITEM 'Track ~d~irectories'
     END
+; the keys of the vtui UX guidelines (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck)
+    CheckBoxes 8, 8, 70, 10, ofPostProcess, ofPreProcess
+      ITEM 'F9 opens menu'
+      ITEM '←/→ open menus'
+      ITEM 'Esc steps back'
+      ITEM 'Home/End: list'
+      ITEM 'Enter toggles'
+    END
+    Label 2, 8, 'Keys:', ofPostProcess, ofPreProcess
     RadioButtons 2, 11, 23, 14, ofPostProcess, ofPreProcess
       ITEM 'For all drives'
       ITEM 'For all, except:'
@@ -3423,6 +3432,11 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
 ;$ENDIF
     END
     Label 1, 1, 'Behavior', ofPostProcess, ofPreProcess
+
+; PanelArrowsPage (dn.ini [FilePanels]): the keys of the vtui UX guidelines in the panels
+    CheckBoxes 1, 17, 35, 18, ofPostProcess, ofPreProcess
+      ITEM 'Left/Right by page'
+    END
 
 ; Quick
     ComboBox 17, 18, 35, 19

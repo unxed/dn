@@ -308,8 +308,12 @@ implementation
 uses
   TvSys, TvClip,
   basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8, TvGlyphs
-  , keymap
+  , keymap, DnIni
   ;
+
+var
+  { MenuEscStep (dn.ini): set by a drop-down of the menu bar that Esc closed, so that the bar stays active and does not open it again }
+  EscClosedDropDown: Boolean = False;
 
 const
   OldKbdState: Byte = 0;
@@ -730,7 +734,12 @@ q:
                 if RightExpand then
                   goto lEnter;
                 if ParentMenu = nil then
-                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight)
+                  begin
+                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
+                  { MenuArrowsOpen (dn.ini): in the bar the arrow also opens the menu of the item }
+                  if MenuArrowsOpen and (Size.Y = 1) then
+                    AutoSelect := True;
+                  end
                 else
                   Action := DoReturn;
                 end;
@@ -739,7 +748,11 @@ q:
                 if LeftCollapse then
                   {nothing to do}
                 else if ParentMenu = nil then
-                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight)
+                  begin
+                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
+                  if MenuArrowsOpen and (Size.Y = 1) then
+                    AutoSelect := True;
+                  end
                 else
                   Action := DoReturn;
                 end;
@@ -844,7 +857,12 @@ lEnter:
                 Action := DoReturn;
                 Result := 0;
                 if  (ParentMenu = nil) or (ParentMenu.Size.Y <> 1) then
+                  ClearEvent(E)
+                else if MenuEscStep then
+                  begin { MenuEscStep (dn.ini): Esc closes only the drop-down, the bar stays active }
                   ClearEvent(E);
+                  EscClosedDropDown := True;
+                  end;
                 end;
               else {case}
                 begin
@@ -936,6 +954,11 @@ lHotkey:
                 Target := TopMenu.NewSubView(R, SubMenu, Self);
                 Result := Owner.ExecView(Target);
                 Target.Free;
+                if EscClosedDropDown then
+                  begin { the drop-down was closed by Esc: the bar keeps the highlight and waits }
+                  EscClosedDropDown := False;
+                  AutoSelect := False;
+                  end;
                 end;
               end
             else if (Action = DoSelect) and ((Flags and miDisabled) = 0) then

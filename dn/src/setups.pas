@@ -198,14 +198,43 @@ procedure SystemSetup;
   DoneIniEngine;
   end { SystemSetup };
 
+{ The group "Keys" of the Interface setup: the options of dn.ini for the keys of the vtui UX guidelines, one bit each in the order of the dialog }
+function GetUxKeys: Word;
+  begin
+  Result := Ord(F9OpensMenu) or Ord(MenuArrowsOpen) shl 1 or Ord(MenuEscStep) shl 2 or Ord(ListHomeEndItems) shl 3
+    or Ord(EnterTogglesCheck) shl 4;
+  end;
+
+procedure SetUxKeys(W: Word);
+  begin
+  F9OpensMenu := W and 1 <> 0;
+  MenuArrowsOpen := W and 2 <> 0;
+  MenuEscStep := W and 4 <> 0;
+  ListHomeEndItems := W and 8 <> 0;
+  EnterTogglesCheck := W and 16 <> 0;
+  end;
+
 procedure InterfaceSetup;
   var
     AltTab: Boolean;
     R: TRect;
+    { the data of the dialog: the options, the group "Keys", the information of the drive menu }
+    Data: record
+      Options: Word;
+      UxKeys: Word;
+      DrvInfType: TDriveInfoType;
+      end;
   begin
+  Data.Options := InterfaceData.Options;
+  Data.UxKeys := GetUxKeys;
+  Data.DrvInfType := InterfaceData.DrvInfType;
   with TApplication(Application) do
-    if ExecResource(dlgInterfaceSetup, InterfaceData) <> cmCancel then
+    if ExecResource(dlgInterfaceSetup, Data) <> cmCancel then
       begin
+      InterfaceData.Options := Data.Options;
+      InterfaceData.DrvInfType := Data.DrvInfType;
+      SetUxKeys(Data.UxKeys);
+      ApplyUxOptions;
       GetExtent(R);
       if InterfaceData.Options and ouiHideMenu = 0 then
         Inc(R.A.Y);
@@ -229,6 +258,11 @@ procedure InterfaceSetup;
       end;
   InterfaceDataOpt := InterfaceData.Options;
   SaveDnIniSettings(@InterfaceDataOpt);
+  SaveDnIniSettings(@F9OpensMenu);
+  SaveDnIniSettings(@MenuArrowsOpen);
+  SaveDnIniSettings(@MenuEscStep);
+  SaveDnIniSettings(@ListHomeEndItems);
+  SaveDnIniSettings(@EnterTogglesCheck);
   DoneIniEngine;
   end { InterfaceSetup };
 
@@ -398,9 +432,23 @@ TryDialog:
   end;
 
 procedure DoFMSetup;
+  var
+    { the data of the dialog: the behaviour, the check box "Left/Right by page" (PanelArrowsPage of dn.ini), the rest of FMSetup }
+    Data: record
+      Options: Word;
+      ArrowsPage: Word;
+      Rest: array[1..SizeOf(TFMSetup)-SizeOf(Word)] of Byte;
+      end;
   begin
-  if ExecResource(dlgFMSetup, Startup.FMSetup) <> cmOK then
+  Data.Options := Startup.FMSetup.Options;
+  Data.ArrowsPage := Ord(PanelArrowsPage);
+  Move(PByte(@Startup.FMSetup)[SizeOf(Word)], Data.Rest, SizeOf(Data.Rest));
+  if ExecResource(dlgFMSetup, Data) <> cmOK then
     Exit;
+  Startup.FMSetup.Options := Data.Options;
+  Move(Data.Rest, PByte(@Startup.FMSetup)[SizeOf(Word)], SizeOf(Data.Rest));
+  PanelArrowsPage := Data.ArrowsPage and 1 <> 0;
+  SaveDnIniSettings(@PanelArrowsPage);
   if Startup.FMSetup.TagChar = '' then
     Startup.FMSetup.TagChar[1] := ' ';
   if (Startup.FMSetup.RestChar = '') or

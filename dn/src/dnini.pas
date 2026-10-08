@@ -102,6 +102,12 @@ const
   {}UseEnterInViewer: Byte = 0; {JO}
   {}SkipXLatMenu: Boolean = False; {JO}
   {}EscForOutputWindow: Boolean = False; {JO}
+  { the keys of the vtui UX guidelines where they differ from the DN (Norton) keys; False (the default) keeps the DN keys (docs/UX-CONFORMANCE.md) }
+  {}F9OpensMenu: Boolean = False;       { M.1: F9 opens the menu bar too (F9 is then no longer "next window") }
+  {}MenuArrowsOpen: Boolean = False;    { M.2: Left/Right in the menu bar open the menu of the item they move to }
+  {}MenuEscStep: Boolean = False;       { M.4: Esc closes the open drop-down and keeps the bar; a second Esc leaves it }
+  {}ListHomeEndItems: Boolean = False;  { L.2: Home/End in the lists go to the first/last item, not to the first/last row shown }
+  {}EnterTogglesCheck: Boolean = False; { G.2b: Enter on a check box or a radio button toggles it instead of pressing the default button }
   {,'~~~~~~~~~~~~~~~~~~~~~~~~;~~~~~~~~~~~~;~~~~~~~~~~~~~~~~~~~~;~~~~~~~~~~~~~~~~~~`,}
   {;      Variable name      ;   Type     ; Default value      ;          Comments ;}
   { '._______________________;____________;____________________;___________________'}
@@ -167,6 +173,7 @@ const
   {} {FilePanels}
   {}QuickRenameInDialog: Boolean = False;
   {}UpperCaseSorting: Boolean = True; {JO}
+  {}PanelArrowsPage: Boolean = False;   { P.1 of the vtui UX guidelines: Left/Right in a file panel go a page up/down (as PgUp/PgDn) }
   
   {,'~~~~~~~~~~~~~~~~~~~~~~~~;~~~~~~~~~~~~;~~~~~~~~~~~~~~~~~~~~;~~~~~~~~~~~~~~~~~~`,}
   {;      Variable name      ;   Type     ; Default value      ;          Comments ;}

@@ -375,6 +375,7 @@ procedure MISaveFile(AED: TFileEditor);
       LoadDnIniSettings;
       DoneIniEngine;
       CopyIniVarsToCfgVars;
+      ApplyUxOptions;
       ShowIniErrors;
       end;
     end

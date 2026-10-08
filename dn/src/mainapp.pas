@@ -111,7 +111,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes, DNRun, DosHarness;
+uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes, DNRun, DosHarness, TvCluster;
 
 constructor TBackground.Create(const Bounds: TRect; APattern: Byte);
 begin
@@ -195,9 +195,32 @@ procedure TProgram.InsertIdlerN(N: Integer);
 begin
 end;
 
+{ True when the focused view (the end of the chain of the current views) is a group of check boxes or radio buttons }
+function FocusedIsCluster(App: TGroup): Boolean;
+var
+  V: TView;
+begin
+  V := App;
+  while (V is TGroup) and (TGroup(V).Current <> nil) do
+    V := TGroup(V).Current;
+  Result := V is TCluster;
+end;
+
 procedure TProgram.GetEvent(var Event: TEvent);
 begin
   inherited GetEvent(Event);
+  { the keys of the vtui UX guidelines that the options of the Interface setup switch on (dn.ini; the defaults keep the DN keys);
+    before the status line, which gives F9 the command "next window" }
+  if Event.What = evKeyDown then
+    if F9OpensMenu and (DNKeyCode(Event) = Commands.kbF9) then
+    begin { M.1: F9 opens the menu bar, as F10 does }
+      Event.What := evCommand;
+      Event.Command := Commands.cmMenu;
+      Event.InfoPtr := nil;
+    end
+    else if EnterTogglesCheck and (DNKeyCode(Event) = Commands.kbEnter) and FocusedIsCluster(Self) then
+      { G.2b: Enter on a check box or a radio button toggles it (it becomes Space); from the other controls it presses the default button }
+      MakeKeyEvent(Event, Word(Commands.kbSpace), 0);
   { as in Turbo Vision: the status line sees the keys and the clicks on it }
   if (Event.What <> evNothing) and (StatusLine <> nil) then
     if ((Event.What and evKeyDown) <> 0) or

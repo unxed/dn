@@ -1902,6 +1902,12 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
       CommandLine.HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
+  { PanelArrowsPage (dn.ini, the File Manager setup): Left/Right go a page up/down, as PgUp/PgDn (P.1 of the vtui UX guidelines) }
+  if PanelArrowsPage and (Event.What = evKeyDown) then
+    if DNKeyCode(Event) = kbLeft then
+      SetDNKeyCode(Event, kbPgUp)
+    else if DNKeyCode(Event) = kbRight then
+      SetDNKeyCode(Event, kbPgDn);
   I := ShiftState2;
   case Event.What of
     evCommand:

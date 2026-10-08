@@ -2810,6 +2810,21 @@ Hotkey is Alt-PgDn.
 
 {Track directories:_} Same as previous two, Hotkey is Alt-BkSp.
 
+{Keys:_} The keys of the UX guidelines of vtui where they differ from the
+keys of DN (Norton Commander). Turned off (the default), DN keeps its keys.
+They are also the lines F9OpensMenu, MenuArrowsOpen, MenuEscStep,
+ListHomeEndItems and EnterTogglesCheck of section [Interface] of dn.ini.
+  {F9 opens menu:_} F9 opens the menu bar, as F10 does (F9 is then no longer
+"next window" in the editor and the viewer).
+  {←/→ open menus:_} Left/Right in the menu bar open the menu of the item
+they move to. Off: they only move the highlight, Down or Enter opens it.
+  {Esc steps back:_} Esc closes the open menu and the menu bar stays active;
+a second Esc leaves it. Off: one Esc leaves both.
+  {Home/End: list:_} Home/End in the lists of the dialogs go to the first
+and the last item. Off: to the first and the last row shown.
+  {Enter toggles:_} Enter on a check box or a radio button toggles it. Off:
+Enter presses the default button of the dialog.
+
 Block "Drive selection menu information"
 
 This block sets the view for Drive selection menu, which is called by pressing
@@ -3829,6 +3844,11 @@ the file system and refresh file panels, when necessary.
    {[X] Desriptions by Short names:_} - When turned on, descriptions will be
 assigned short (alternative) file names. Otherwise, descriptions will be
 assigned long (standard) file names.
+
+   {[X] Left/Right by page:_} - Left/Right in a file panel go a page up or
+down, as PgUp/PgDn (the UX guidelines of vtui). When turned off (the default),
+they go to the previous or the next column, or scroll a panel of one column
+sideways. It is also PanelArrowsPage in section [FilePanels] of dn.ini.
 
    {Quick search:_} - Selects the quick search key. There are 2 variants:
 "Single Alt" and "Single Ctrl". "Single Alt" means, that you need to press and

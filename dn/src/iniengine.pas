@@ -66,6 +66,8 @@ function DnIniFileName: String;
 
 procedure LoadDnIniSettings;
 procedure ApplyIniVars;
+{ Gives the options of the guideline keys that tv3 has a switch for to tv3 (at start and after a change of the options) }
+procedure ApplyUxOptions;
 procedure SaveDnIniSettings(PVar: Pointer);
 procedure DoneIniEngine;
 
@@ -84,7 +86,7 @@ uses
   Dos, Lfn, profile, basics, strutil, Collect, Messages, mainapp,
   
   keymap, country, DNUtf8, Views,
-  Strings, Streams, fileutil, TvXlat, osdep
+  Strings, Streams, fileutil, TvXlat, osdep, TvList
   ;
 
 const
@@ -277,6 +279,12 @@ procedure Proceed(RegisterVar: TDoProc);
      @SkipXLatMenu); {JO}
   RegisterVar(CSInterface, 'EscForOutputWindow', ikBool,
        SizeOf(EscForOutputWindow), @EscForOutputWindow); {JO}
+  { the keys of the vtui UX guidelines (Options / Configuration / Interface, the group "Keys") }
+  RegisterVar(CSInterface, 'F9OpensMenu', ikBool, SizeOf(F9OpensMenu), @F9OpensMenu);
+  RegisterVar(CSInterface, 'MenuArrowsOpen', ikBool, SizeOf(MenuArrowsOpen), @MenuArrowsOpen);
+  RegisterVar(CSInterface, 'MenuEscStep', ikBool, SizeOf(MenuEscStep), @MenuEscStep);
+  RegisterVar(CSInterface, 'ListHomeEndItems', ikBool, SizeOf(ListHomeEndItems), @ListHomeEndItems);
+  RegisterVar(CSInterface, 'EnterTogglesCheck', ikBool, SizeOf(EnterTogglesCheck), @EnterTogglesCheck);
   {Clock}
   RegisterVar(CSClock, 'ShowSeconds', ikBool, SizeOf(ShowSeconds),
      @ShowSeconds);
@@ -352,6 +360,8 @@ procedure Proceed(RegisterVar: TDoProc);
        SizeOf(QuickRenameInDialog), @QuickRenameInDialog);
   RegisterVar(CSFilePanels, 'UpperCaseSorting', ikBool,
        SizeOf(UpperCaseSorting), @UpperCaseSorting); {JO}
+  { Options / File Manager / Setup, "Left/Right by page" }
+  RegisterVar(CSFilePanels, 'PanelArrowsPage', ikBool, SizeOf(PanelArrowsPage), @PanelArrowsPage);
   
   {NetInfo}
   RegisterVar(CSNetInfo, 'NoLevelsInfo', ikBool, SizeOf(NoLevelsInfo),
@@ -683,6 +693,15 @@ procedure ApplyIniVars;
   XlatLoadFile(SysOsPath(ConfigDir+'xlat.txt'));
   ScrollCharsV := GlyphsToPage(VertScrollBarChars);
   ScrollCharsH := GlyphsToPage(HorizScrollBarChars);
+  ApplyUxOptions;
+  end;
+
+procedure ApplyUxOptions;
+  begin
+  { L.2: Home/End of the lists of tv3 (dialog lists, histories, the list of windows); a tv3 without the switch keeps its own keys }
+{$IF DECLARED(UxListHomeEnd)}
+  UxListHomeEnd := ListHomeEndItems;
+{$ENDIF}
   end;
 
 procedure SaveDnIniSettings(PVar: Pointer);
