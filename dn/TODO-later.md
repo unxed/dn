@@ -77,8 +77,11 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
 - Dot files (`.hidden`) and broken symbolic links are not visible in the panel: `FindFirst` returns them (except broken links), so DN itself hides them
   (check the panel setting "hidden files" and the comparison `Name[1] = '.'` in the directory parse); Unix permissions and links are not shown in `Attr`.
   (Checked 2026-10-08: the broken links are listed (`tools/dn-linux-fsattrs.py`); the dot files are the hidden files of the RTL and DN shows
-  them when the setting "show hidden files" of the panels (`fmsShowHidden`) is on; it is off by default, as in DN. Whether Unix wants it on by
-  default is a decision of the owner.)
+  them when the setting "show hidden files" of the panels (`fmsShowHidden`) is on. Owner, 2026-10-08: it is on by default on Unix builds
+  (`ShowHiddenByDefault` of `startup.pas`), off on DOS and Windows as in DN; a saved setup keeps its own value (`tools/dn-linux-fsattrs.py`). A dot file
+  is shown in the columns of a DOS name (an empty name, the extension `hidden`). Open: the key Alt-' of the panel (`kbAltQuote`), which switches the
+  setting, did nothing in the pty test (xterm sends `ESC '`); the dialog Options, File Manager, Setup switches it; after its OK the passive panel drops the dot
+  file at once, the active one kept it in the test until the next reread.)
 - Paths look like DOS (`C:\home\you`): drive C: is the root of the file system; show Unix paths after the move to UTF-8.
 - Case: names that are not on disk in the case DN asks for are looked up without regard to case (`SysOsPath`); two files that differ only by
   case, DN will not be able to tell apart.

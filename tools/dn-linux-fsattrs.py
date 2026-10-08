@@ -2,6 +2,7 @@
 """Symbolic links and permissions in the panels of DN on Linux: tools/dn-linux-fsattrs.py OUTDIR
 Each case is a start of DN on a small tree, some keys, and the result is checked on the file system:
   - the panel lists a link to a file, a link to a directory and a dangling link; Enter on the link to a directory enters it;
+  - a fresh start lists the dot files (the setting "show hidden files" is on by default on Unix); a saved setup with it off (Options, File Manager, Setup) hides them;
   - F5 of a link to a file makes a regular file with the content of the target;
   - F5 of a read-only file (mode 444) makes a read-only file (the attribute ReadOnly of DOS is the write permission of the owner);
   - F8 of a link removes the link and not its target; F8 of a read-only file asks, and removes it after Yes;
@@ -15,7 +16,7 @@ import os, re, shutil, stat, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
-K = {'F6': '\x1b[17~', 'ALT-F7': '\x1b[18;3~', 'ENTER': '\r', 'ESC': '\x1b', 'HOME': '\x1b[H', 'DOWN': '\x1b[B', 'TAB': '\t', 'F5': '\x1b[15~', 'F8': '\x1b[19~'}
+K = {'F6': '\x1b[17~', 'ALT-F7': '\x1b[18;3~', 'ENTER': '\r', 'ESC': '\x1b', 'HOME': '\x1b[H', 'DOWN': '\x1b[B', 'TAB': '\t', 'F5': '\x1b[15~', 'F8': '\x1b[19~', 'ALT-O': '\x1bo', 'SPACE': ' '}
 bad = 0
 
 
@@ -28,15 +29,18 @@ def check(ok, what, info=''):
             print('    | ' + info.replace('\n', '\n    | ')[:1500], flush=True)
 
 
-def case(out, setup, keys):
-    """starts DN in a tree made by setup(work), sends the keys, returns (work, screen text)"""
-    d = tempfile.mkdtemp(prefix='dnfsattr-')
-    for f in os.listdir(out):
-        if f == 'dn' or f.lower().endswith(('.lng', '.dlg', '.hlp')):
-            shutil.copy(os.path.join(out, f), d)
+def case(out, setup, keys, d=None, quit=False):
+    """starts DN in a tree made by setup(work), sends the keys, returns (work, screen text);
+    d: the directory of an earlier case (its saved setup is used again); quit: DN exits by Alt-X (the setup is saved)"""
+    if d is None:
+        d = tempfile.mkdtemp(prefix='dnfsattr-')
+        for f in os.listdir(out):
+            if f == 'dn' or f.lower().endswith(('.lng', '.dlg', '.hlp')):
+                shutil.copy(os.path.join(out, f), d)
+        w = os.path.join(d, 'work')
+        os.makedirs(os.path.join(w, 'dst'))
+        setup(w)
     w = os.path.join(d, 'work')
-    os.makedirs(os.path.join(w, 'dst'))
-    setup(w)
     os.environ['DNLNG'] = 'ENGLISH'
     t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
     t.pump(1.5, 6)
@@ -46,6 +50,13 @@ def case(out, setup, keys):
     t.pump(1.0, 3)
     text = t.text()
     alive = t.alive()
+    if quit:
+        t.send('\x1bx', 0.8)
+        t.send('\r', 0.8)
+        for _ in range(20):
+            if not t.alive():
+                break
+            t.pump(0.3, 1)
     t.close(0.3)
     return d, w, text, alive
 
@@ -74,6 +85,22 @@ check(alive and all(n in text for n in ('dlink', 'broken', 'link', 'target')), '
 d, w, text, alive = case(out, tree_links, 'HOME DOWN ENTER')       # .., dlink
 dirs.append(d)
 check(alive and re.search(r'work[\\/]dlink', text) and re.search(r'in\s+txt', text) is not None, 'Enter on a link to a directory enters it', text)
+
+# dot files: listed by a fresh start; a saved setup with "show hidden files" off hides them
+def tree_dot(w):
+    files(w, '.hidden', 'plain.txt')
+
+
+d, w, text, alive = case(out, tree_dot, '')
+dirs.append(d)
+# the panel shows `.hidden` in the columns of a DOS name: an empty name and the extension `hidden`, cut (`hid►`)
+check(alive and 'hid' in text and 'plain' in text, 'a fresh start lists a dot file in the panel', text)
+# the check box "Show hidden files" of the dialog (the fifth of the group "Display", the fifth stop of Tab) off, OK; then Alt-X saves the setup
+d, w, text, alive = case(out, tree_dot, 'ALT-O f s TAB TAB TAB TAB DOWN DOWN DOWN DOWN SPACE ENTER', quit=True)
+dirs.append(d)
+check(alive, 'the setting "Show hidden files" switched off in the dialog', text)
+d, w, text, alive = case(out, tree_dot, '', d=d)
+check(alive and 'hid' not in text and 'plain' in text, 'the saved setting wins over the default at the next start', text)
 
 # F5 of a link to a file: the content of the target in a regular file
 def tree_one_link(w):
