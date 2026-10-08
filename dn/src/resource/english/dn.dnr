@@ -2556,6 +2556,7 @@ END
 
 DIALOG dlgMakeList, 69, 20, 'Make List File'
     HELPCTX hcMakeListFile
+    RESIZE NONE
     Label -1, 4, '╟───────────────────────────────────────────────────────────────────╢'
 #1  InputLine 14, 2, 64, 3, 255, hsMakeList
     Label 2, 2, '~F~ile name', ofPostProcess, ofPreProcess

@@ -18,7 +18,7 @@ Verdicts: **conformant**, **gap** (does not hold somewhere), **conflict** (the r
 an option gives the rule; see "Options for the guideline behaviour"),
 **n/a**. How checked: `P:ux` = `tools/dn-linux-ux.py` (a pty, the screen is read; this task); `P:sweep` = `tools/dn-linux-menusweep.py` (every item of the menu
 opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux-dialoghot.py` (hot letters in the three languages); `P:path` =
-`tools/dn-linux-pathscan.py`; `C` = read in the code only.
+`tools/dn-linux-pathscan.py`; `P:dlgresize` = `tools/dn-linux-dlgresize.py` (the corner of a dialog dragged with the mouse); `C` = read in the code only.
 
 ## The table
 
@@ -36,7 +36,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | D.1 | `Enter` presses the default button, also in an edit field | Make directory: the name, `Enter`, the directory is made | conformant | P:ux |
 | D.2 | `Esc` closes the window or dialog | copy, move, make directory, attributes; every dialog that the sweep opens is left with `Esc` | conformant | P:ux, P:sweep |
 | D.3 | `F1` opens the help of the focused element | `F1` in a modal dialog opens the topic of the dialog (the copy dialog) | conformant | P:ux |
-| D.4 | Drag the top border to move, the bottom right corner to resize | windows: yes; dialogs: movable, fixed size (as in tv3: `TDialog` has no `wfGrow`). The 92 dialogs of DN come from the resources (`dn.dnr`, compiled by `rcp`), whose controls carry no grow modes: a bigger dialog would only show empty space. Needs grow modes in the resource format and a layout in every dialog | gap | C |
+| D.4 | Drag the top border to move, the bottom right corner to resize | windows: yes; dialogs: yes. The dialogs of the resources (`DIALOG` of `dn.dnr`, class `TResDialog`, `dn/src/dlglayout.pas`) have the resize corners; when a dialog is shown its controls get the grow modes of tv3 by a layout rule (input lines stretch to the right, lists to the right and down, what is to the right or below moves, buttons keep to the right edge, the scroll bars follow their list; the controls that the code inserts are covered too). A dialog grows only where something stretches and never below the size it was shown with; `GROW` and `RESIZE` of the resource format (`docs/RESOURCES.md`) set a control or a dialog by hand. The pages dialogs (`NOTEPAD`), the system setup and the colour dialog keep their size | conformant | P:dlgresize |
 | G.1 | Arrows move the cursor of a group, the selection does not change | radio buttons (cursor moves, `(.)` stays) and check boxes (nothing toggles) | conformant | P:ux |
 | G.2a | `Space` toggles / selects the item under the cursor | yes | conformant | P:ux |
 | G.2b | `Enter` toggles the item | default: `Enter` presses the default button (D.1 and this rule cannot both hold). Option `EnterTogglesCheck`: `Enter` on a check box or a radio button toggles it (DN turns it into `Space`; tv3 has no switch), from the other controls it still presses the default button | conflict (option `EnterTogglesCheck`, default DN) | P:ux |
@@ -71,7 +71,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | X.4 | The wheel scrolls the component under the cursor | the windows: tv3 (`UxWheelUnderCursor`) gives the wheel to the window under the pointer (an editor that is not active scrolls). The two panels are one window: a panel takes the wheel itself and moves its own cursor (`filepanel.pas`), so the wheel over the panel that is not active moves that panel and the focus stays | conformant | P:ux |
 | R.1 | One action = one declaration (the registry `TvActions`) | DN keeps its resource tables (`dn.dnr`: menus, status lines, key maps); not migrated. `TvActions` builds the items of `TvMenus` and the status keys of tv3, while the menu bar and the status lines of DN are its own `Menus` unit, read from the resources of each language (the captions are translated there) | gap | C |
 
-Count: 46 rows: **35 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **2 gap** (D.4, R.1), **7 conflict** (G.2b, L.2, E.7, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
+Count: 46 rows: **36 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **1 gap** (R.1), **7 conflict** (G.2b, L.2, E.7, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
 
 ## Other keys the guidelines touch
 
@@ -91,6 +91,7 @@ dropping the letters would change the hot keys of the menu.
 
 ## The gap rows closed afterwards
 
+* D.4: `P:dlgresize` = `tools/dn-linux-dlgresize.py` drags the corner of Make directory (it grows to the right only: the input line stretches, the buttons follow; it cannot be made smaller) and of Commands history (the list stretches both ways, the buttons move down).
 * 0.2, 0.3: the switcher of tv3 works in DN as it is (DN's desktop is tv3's); DN adds the names of the windows that have no title. `P:ux` answers the query of the
   keyboard protocol of Kitty and sends the presses and releases of that protocol.
 * M.7: the menus of DN (`menus.pas`) stop a held arrow at the end. `P:ux` sends the keys of the win32 input mode (a press with no release before it is a repeat).

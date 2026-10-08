@@ -165,6 +165,7 @@ const
   otBookmark = 37;
   otPageFrame = 38;
   otNotepadFrame = 39;
+  otResDialog = 44;
 
   { --- DiskInfo }
 

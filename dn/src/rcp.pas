@@ -73,7 +73,7 @@ uses
    DefColl,
   ColorSel,
   inputfname
-  , DNDlgs, DNStrL;
+  , DNDlgs, DNStrL, DlgLayout;
 
 const
   tidCommands = 'cm'#0'cd'#0;
@@ -381,6 +381,8 @@ const
   idEditorCommands = 'EDITOR COMMANDS';
   idDriveCheckBox = 'DRIVECHECKBOXES ';
   idColorPoint = 'COLORPOINT ';
+  idGrow = 'GROW ';
+  idResize = 'RESIZE ';
 
   TheRF: TIdxMaker = nil;
 
@@ -1099,6 +1101,56 @@ procedure ProcessDLGs;
         P.Options := P.Options or GetID(Token(S, i));
       end;
 
+    { GROW flag, flag...: the grow mode of the last control (the names of tv3: gfGrowLoX gfGrowLoY gfGrowHiX gfGrowHiY
+      gfGrowAll gfGrowRel, or a number; 0 = it stays); the layout of TResDialog keeps it }
+    procedure MakeGrow;
+      var
+        B: String;
+        G, K: Integer;
+      begin
+      if PV = nil then
+        Error('GROW without a control in line '+ItoS(Line));
+      G := 0;
+      while i <= Length(S) do
+        begin
+        B := UpStrg(Token(S, i));
+        DelLeft(B);
+        DelRight(B);
+        if B = 'GFGROWLOX' then G := G or gfGrowLoX
+        else if B = 'GFGROWLOY' then G := G or gfGrowLoY
+        else if B = 'GFGROWHIX' then G := G or gfGrowHiX
+        else if B = 'GFGROWHIY' then G := G or gfGrowHiY
+        else if B = 'GFGROWALL' then G := G or gfGrowAll
+        else if B = 'GFGROWREL' then G := G or gfGrowRel
+        else if B <> '' then
+          begin
+          Val(B, K, J);
+          if (J <> 0) or (K < 0) or (K > $3F) then
+            Error('Unknown grow mode ('+B+') in line '+ItoS(Line));
+          G := G or K;
+          end;
+        end;
+      PV.GrowMode := G or gfExplicit;
+      end;
+
+    { RESIZE NONE | X | Y | XY: the directions the dialog may grow in (the default: as its layout finds) }
+    procedure MakeResize;
+      var
+        B: String;
+      begin
+      if not (D is TResDialog) then
+        Error('RESIZE in a dialog that cannot be resized, line '+ItoS(Line));
+      B := UpStrg(Token(S, i));
+      DelLeft(B);
+      DelRight(B);
+      if B = 'NONE' then TResDialog(D).Resize := rzNone
+      else if B = 'X' then TResDialog(D).Resize := rzX
+      else if B = 'Y' then TResDialog(D).Resize := rzY
+      else if B = 'XY' then TResDialog(D).Resize := rzXY
+      else
+        Error('RESIZE: NONE, X, Y or XY expected in line '+ItoS(Line));
+      end;
+
     var
       ID: TDlgIdx;
       T: TLngWord;
@@ -1138,7 +1190,7 @@ procedure ProcessDLGs;
       D := Notepad; // everything will be inserted into the dialog
       end
     else {idDialog}
-      D := TDialog.Create(R, Token(S, I));
+      D := TResDialog.Create(R, Token(S, I));
     D.Options := D.Options or ofCentered;
     while not Eof(F.T) do
       begin
@@ -1205,6 +1257,10 @@ procedure ProcessDLGs;
           MakeButton
         else if IsThis(idColorPoint) then
           MakeColorPoint
+        else if IsThis(idGrow) then
+          MakeGrow
+        else if IsThis(idResize) then
+          MakeResize
         else if IsThis(idEND) then
           begin
           if not inPage then

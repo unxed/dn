@@ -1211,6 +1211,7 @@ END
 
 DIALOG dlgMakeList, 69, 20, 'Создать список файлов'
     HELPCTX hcMakeListFile
+    RESIZE NONE
     Label -1, 4, '╟───────────────────────────────────────────────────────────────────╢'
 #1  InputLine 14, 2, 64, 3, 255, hsMakeList
     Label 2, 2, 'Имя ~ф~айла', ofPostProcess, ofPreProcess
