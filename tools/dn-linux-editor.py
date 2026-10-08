@@ -54,7 +54,7 @@ def edit(t, downs):
 def info(t):
     """The line:column of the information line."""
     import re
-    m = re.search(r'(\d+):(\d+)\s*[═─]*\[', t.text())
+    m = re.search(r'(\d+):(\d+)\s*[\u2550\u2500]*\[', t.text())
     return (int(m.group(1)), int(m.group(2))) if m else None
 
 
@@ -73,8 +73,8 @@ dirs = []
 try:
     # a.txt: three lines; b.txt: Cyrillic in UTF-8; c.txt: a code page file (cp1251); d.txt: CRLF
     d, w = install(out, {'a.txt': b'one two three\nfoo bar foo\nlast line\n',
-                         'b.txt': 'привет мир\n'.encode('utf-8'),
-                         'c.txt': 'привет\n'.encode('cp1251'),
+                         'b.txt': '\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440\n'.encode('utf-8'),
+                         'c.txt': '\u043f\u0440\u0438\u0432\u0435\u0442\n'.encode('cp1251'),
                          'd.txt': b'x\r\ny\r\n'}); dirs.append(d)
     t = start(d, w)
     edit(t, 1)
@@ -155,21 +155,21 @@ try:
     t.close(0.3)
 
     # Cyrillic UTF-8, code page, CRLF
-    d, w = install(out, {'b.txt': 'привет мир\n'.encode('utf-8'), 'c.txt': 'привет\n'.encode('cp1251'), 'd.txt': b'x\r\ny\r\n'}); dirs.append(d)
+    d, w = install(out, {'b.txt': '\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440\n'.encode('utf-8'), 'c.txt': '\u043f\u0440\u0438\u0432\u0435\u0442\n'.encode('cp1251'), 'd.txt': b'x\r\ny\r\n'}); dirs.append(d)
     t = start(d, w)
     edit(t, 1)
-    check('привет мир' in t.text() and 'UTF' in t.text(), 'a UTF-8 file is shown as it is (UTF)', t.text())
-    keys(t, 'Я')
+    check('\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440' in t.text() and 'UTF' in t.text(), 'a UTF-8 file is shown as it is (UTF)', t.text())
+    keys(t, '\u042f')
     t.send(K['F2'], 0.8)
-    check(disk(w, 'b.txt') == 'Япривет мир\n'.encode('utf-8'), 'a Cyrillic letter typed in a UTF-8 file is saved', repr(disk(w, 'b.txt')))
+    check(disk(w, 'b.txt') == '\u042f\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440\n'.encode('utf-8'), 'a Cyrillic letter typed in a UTF-8 file is saved', repr(disk(w, 'b.txt')))
     t.send(K['ESC'], 0.6)
     edit(t, 1)
     t.send('\x1b[19~', 0.6)            # F8: the next character set (DOS by default, then Windows)
-    check('привет' in t.text() and 'WIN' in t.text(), 'F8 switches a cp1251 file to Windows: Cyrillic', t.text())
+    check('\u043f\u0440\u0438\u0432\u0435\u0442' in t.text() and 'WIN' in t.text(), 'F8 switches a cp1251 file to Windows: Cyrillic', t.text())
     t.send('\x1b[19~', 0.3); t.send('\x1b[19~', 0.3); t.send('\x1b[19~', 0.3)
     t.send('\x1b[19~', 0.6)            # round: back to DOS ... until Windows again
     t.send(K['F2'], 0.8)
-    check(disk(w, 'c.txt') == 'привет\n'.encode('cp1251'), 'and written back in cp1251 as it was', repr(disk(w, 'c.txt')))
+    check(disk(w, 'c.txt') == '\u043f\u0440\u0438\u0432\u0435\u0442\n'.encode('cp1251'), 'and written back in cp1251 as it was', repr(disk(w, 'c.txt')))
     t.send(K['ESC'], 0.6)
     edit(t, 1)
     keys(t, 'a')
