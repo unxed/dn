@@ -16,7 +16,7 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 | # | item | state |
 |---|---|---|
 | 1 | tve: the editor component, MIT (the rules of `CLAUDE.md`) | in dn and fpide; the history passes the audit; open: the remaining editor features of `tve/README.md` |
-| 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir` replace the duplicates; open: the clock (#19), the ASCII table (#18) |
+| 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir`, `TvAscii` (the ASCII table, #18), `TvGadgets` (the clock and the heap view, #19) replace the duplicates (TvAscii, TvGadgets: branch `feat-gadgets` of tv3, dn and sp, to be merged and pinned) |
 | 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; the tvision PR (magiblot/tvision#241, branch `dos-utf8-names` of the fork) waits for the owner |
 | 4 | fpide: the ASCII splash removed | done |
 | 5 | the vtui UX guidelines in tv3, dn, fpide, tve | tables in `docs/UX-CONFORMANCE.md` (dn) and tv3; the rows marked gap are open |

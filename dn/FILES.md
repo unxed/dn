@@ -120,7 +120,7 @@ One file for the settings (2026-10-04): the image of the records that `dn.cfg` h
 
 ## Tools and extras
 `calcwin.pas` (was `calc`: the calculator window, the dBase writer), `evaluator.pas` (was `calculat`: the evaluator of expressions), `calcline.pas` (was `ccalc`: the line of the calculator and its indicator), `bwselect.pas` (was `dncolor`: the selector of the black and white colors), `calendar.pas`, `tetris.pas`, `phones.pas` (the telephone book),
-`printman.pas` (the print manager), `progress.pas` (was `gauge`: the progress windows and bars) and `gadgets.pas` (was `gauges`: the trash can, the key macros, the heap and clock indicators), `idlers.pas` (the screen savers), `colorvga.pas` (the colors dialog),
+`printman.pas` (the print manager), `progress.pas` (was `gauge`: the progress windows and bars) and `gadgets.pas` (was `gauges`: the trash can, the key macros, the heap and clock indicators; the clock and the heap view over tv/ `TvGadgets`), `idlers.pas` (the screen savers), `colorvga.pas` (the colors dialog),
 `usermenu.pas` (the user menu F2, the output window, the screen grabber), `cellscol.pas` (the collection of the cells of the calculator).
 
 ## Basics that everything uses
@@ -171,7 +171,7 @@ no silent gaps (post-class criterion A).
 | `archread.pas` | reading archive member streams for viewers / extract |
 | `archset.pas` | archiver setup dialogs and `ARCHIVER.INI` editing |
 | `arvidtdr.pas` | Arvid tape drive low-level (historic) |
-| `asciitab.pas` | ASCII table dialog (Borland-style replacement) |
+| `asciitab.pas` | ASCII table dialog: subclasses of the views of tv/ `TvAscii` (DN key codes, report text, palette, help) |
 | `colors.pas` | Colors dialog, highlight groups, Window Manager list |
 | `dbwatch.pas` | DBF viewer field / watch helpers |
 | `defcoll.pas` | definition collections used while building resources |
