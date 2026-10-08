@@ -618,7 +618,7 @@ constructor TDNApplication.Create;
         FileName := ParamStr(I);
       if Pos('"', FileName) <> 0 then
         flj := not flj;
-      if  (FileName[1] <> '/') and not flj then
+      if  (FileName[1] <> {$IFDEF UNIX}'-'{$ELSE}'/'{$ENDIF}) and not flj then
         EditFile(True, DelSquashes(FileName));
       end;
 

@@ -1,5 +1,5 @@
-{ osdep: the system layer that DN OSP takes from the runtime library of Virtual Pascal, written anew
-  for Free Pascal. It replaces osdep.pas of the archive (code of vpascal.com, see dn/exclude.list).
+{ osdep: the system layer of DN on Free Pascal: the interface that DN OSP calls in the runtime library of Virtual Pascal
+  (osdep.pas of the archive is excluded, see dn/exclude.list).
 
   MIT, see LICENSE. The names and the way they are called
   come from the call sites in DN (spec/vp-api-osdep.md, tools/vp-api.py).

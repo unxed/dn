@@ -81,8 +81,8 @@ backend, every failure in DN is a failure in DN.
 * Tokenize both trees (identifiers and punctuation; ignore case, comments, whitespace). For each of our files compute: `raw%` (share of tokens that are in a
   matching run) and `maxrun` (the longest run of matching tokens). Gates we used: for DN, `raw% ≤ 2` and `maxrun < 48`; for `tv/`, matches are natural (same
   author's architecture), so only procedures that cite their source in the unit header are allowed.
-* Files above the gate are **excluded** (`bootstrap/exclude.list`, every entry has a reason) and replaced by our own unit with the same interface, or the
-  matching procedure is **rewritten from a behavior specification** (never from the Borland text). The unit headers of `tv/` name the magiblot files and the commit
+* Files above the gate are **excluded** (`bootstrap/exclude.list`, every entry has a reason) and replaced by a unit with the same interface, or the
+  matching procedure is **replaced**; the audit script is run again on the result. The unit headers of `tv/` name the magiblot files and the commit
   that each unit was translated from.
 * `tools/check-layout.sh` keeps the two projects apart: `tv/` must not mention DN or use its units; a translated `tv/` unit has an origin note ("Translated
   from…"); `dn/PROVENANCE.md` (class of every file: ours / carved / RIT / contributor / upstream without notice) must be up to date

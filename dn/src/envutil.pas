@@ -80,6 +80,14 @@ function FindParam(const S: String): Integer;
     I: Integer;
   begin
   FindParam := 0;
+  {$IFDEF UNIX}
+  { on Unix a word that starts with "/" is a path, the switches start with "-" }
+  if S[1] = '/' then
+    begin
+    FindParam := FindParam('-'+Copy(S, 2, MaxStringLength));
+    Exit;
+    end;
+  {$ENDIF}
   for I := 1 to ParamCount do
     if S = Copy(UpStrg(ParamStr(I)), 1, Length(S)) then
       begin

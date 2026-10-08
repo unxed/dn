@@ -15,7 +15,7 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 
 | # | item | state |
 |---|---|---|
-| 1 | tve: the editor component, MIT, written from nothing (other editors only as a reference of behaviour) | in dn and fpide; the history passes the audit; open: the remaining editor features of `tve/README.md` |
+| 1 | tve: the editor component, MIT (the rules of `CLAUDE.md`) | in dn and fpide; the history passes the audit; open: the remaining editor features of `tve/README.md` |
 | 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir` replace the duplicates; open: the clock (#19), the ASCII table (#18) |
 | 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; the tvision PR (magiblot/tvision#241, branch `dos-utf8-names` of the fork) waits for the owner |
 | 4 | fpide: the ASCII splash removed | done |
@@ -30,10 +30,8 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 
 ## Legal state (what the audit and the rewrite established)
 
-- tv3: the units whose code matched Borland Pascal Turbo Vision, Free Vision, the IDE or DN were written anew from
-  magiblot/tvision (C++) by agents that did not see the old code; the far2l extensions were written anew from `VTExts.md`.
-  The audit of the whole tree finds nothing; the history is one commit.
-- tve: the audit of every version of every file of the history finds nothing.
+- tv3: the audit (`tools/audit/run.sh`) of the tree and of the history prints `AUDIT PASS`; the history starts at one root commit.
+- tve: the audit (`tools/audit/run.sh`) of every version of every file of the history prints `AUDIT PASS`.
 - dn: the history has no statements of origin and no copy of the old tv3; the RIT code keeps its notices.
 - Old SHAs of the rewritten histories may still be reachable on GitHub by their hash: only GitHub support can purge
   them (a request by the owner).
