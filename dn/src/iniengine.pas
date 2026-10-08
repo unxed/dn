@@ -84,7 +84,7 @@ uses
   Dos, Lfn, profile, basics, strutil, Collect, Messages, mainapp,
   
   keymap, country, DNUtf8, Views,
-  Strings, Streams, fileutil
+  Strings, Streams, fileutil, TvXlat, osdep
   ;
 
 const
@@ -117,6 +117,7 @@ const
   CSInterface: PChar = 'Interface';
   CSClock: PChar = 'Clock';
   CSSmartPad: PChar = 'SmartPad';
+  CSXLat: PChar = 'XLat';
   CSGame: PChar = 'Game';
   CSClipboard: PChar = 'Clipboard';
   CSKernel: PChar = 'Kernel';
@@ -289,6 +290,8 @@ procedure Proceed(RegisterVar: TDoProc);
      @DaysOfWeek);
   RegisterVar(CSClock, 'RightAlignClock', ikBool,
      SizeOf(RightAlignClock), @RightAlignClock); {FY 13-03-2000}
+  {XLat: the shortcuts on any keyboard layout (tv3, TvXlat)}
+  RegisterVar(CSXLat, 'Enabled', ikBool, SizeOf(XlatEnabled), @XlatEnabled);
   {SmartPad}
   RegisterVar(CSSmartPad, 'InsertDate', ikBool, SizeOf(SPInsertDate),
      @SPInsertDate);
@@ -676,6 +679,8 @@ procedure LoadDnIniSettings;
   (or the bytes of a page in an old one) }
 procedure ApplyIniVars;
   begin
+  { more layouts for the shortcuts: xlat.txt in the configuration directory (lines "letters of the layout = Latin keys") }
+  XlatLoadFile(SysOsPath(ConfigDir+'xlat.txt'));
   ScrollCharsV := GlyphsToPage(VertScrollBarChars);
   ScrollCharsH := GlyphsToPage(HorizScrollBarChars);
   end;
