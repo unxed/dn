@@ -238,8 +238,8 @@ procedure TDirStorage.AddFile(FName: String; Size, CSize: TSize; Date: LongInt; 
   L := 0;
   if  (FName <> #0) and (FName <> '') then
     begin
-    lFSplit(FName, Dr, Nm, Xt);
-    MakeSlash(Dr);
+    Dr := ArcGetPath(FName);
+    ArcMakeSlash(Dr);
     if  (UpStrg(CurDir) <> UpStrg(Dr)) then
       begin
       CurDir := Dr;
@@ -255,7 +255,7 @@ procedure TDirStorage.AddFile(FName: String; Size, CSize: TSize; Date: LongInt; 
       SF.T.Id := siFileDir
     else
       SF.T.Id := siFile;
-    SF.Name := GetName(FName);
+    SF.Name := ArcGetName(FName);
     SF.T.len := TStoredFixLength+1+Length(SF.Name);
     SF.Size := Size;
     TotalLength := TotalLength+Size;
@@ -293,7 +293,7 @@ procedure TDirStorage.ResetPointer(const Dir: String);
   FillChar(CurFile, SizeOf(CurFile), 0);
   CurDir := Dir;
   LastDir := '';
-  MakeSlash(CurDir);
+  ArcMakeSlash(CurDir);
   end;
 
 {-DataCompBoy-}
@@ -406,7 +406,7 @@ procedure TDirStorage.DeleteFile(P: PFileRec);
     Nm: String;
   begin
   Dr := P^.Owner^;
-  MakeSlash(Dr);
+  ArcMakeSlash(Dr);
   ResetPointer('');
   Nm := UpStrg(P^.FlName[True]);
   while not Last and GetNextFile do
