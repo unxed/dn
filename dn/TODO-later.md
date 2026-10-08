@@ -317,6 +317,8 @@ selection on the clipboard of the far2l terminal (the script checks it: PASS).
 
 **Confirmed by the owner (2026-10-03, the far2l terminal on Linux Mint, dist built from 18b36b9):** Ctrl+Ins copies and Shift+Ins pastes in the editor now. The red Shift+Ins check of `tools/dn-linux-far2l.py`
 (a block is selected when it pastes) stays as a note: a possible difference between pasting over a selected block and pasting without one; not seen by the owner.
+(2026-10-08: the script does not start at the current pin of tv3: it imports `tv/tests/pty/f2lterm.py`, the far2l terminal of the tests, which
+tv3 no longer has. It needs that test terminal in tv3 again, or one of its own here.)
 
 ## DOS: "save the desktop on exit" and "Save setup" (2026-10-03, started, not finished)
 
@@ -374,7 +376,9 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - `DefaultSortMode` of `dn.ini` applies only to a DN without a saved setup (`PanSetupFromConfig`); a user who saved the setup keeps what was saved.
 - The archivers on Windows are started through `COMSPEC /c` as before (`osrunwindows.pas`); only the Unix side needed the fix. Not driven by a test on Windows.
 - `ArcDrive.Exec` (arcview.pas) and `archiver.pas` still have the DOS 120/95-character command line limits and the `$DNn$.BAT` batch files of the swap mode; on Unix the swap mode (`SwapWhenExec`) must stay off.
-- The quick search of the directory tree (window of the button [Tree] of the Copy dialog, `tree.pas`) takes UTF-8 characters now, but has no test: the window scans the whole host (the root of `C:` is `/`) for minutes before the search works (`Reading directories: 22891 Esc - stop`); a test needs a way to limit the scan (a setting or an environment variable).
+- The quick search of the directory tree (window of the button [Tree] of the Copy dialog, `tree.pas`) takes UTF-8 characters now, but has no test: the window scans the whole host (the root of `C:` is `/`) for minutes before the search works (`Reading directories: 22891 Esc - stop`); a test needs a way to limit the scan (a setting or an environment variable). (2026-10-08: the build is static, so `unshare -r --root=DIR` runs
+  it in a small root where the scan is instant, no setting needed; the Tree button of the Copy dialog is F10, not Alt-T as the disabled branch of
+  `tools/dn-linux-qsearch.py` has it. The tree did not open in a first try in such a root: not finished.)
 - F4 in an archive is "Extr": the object build and the class build extract the member to the directory of the other panel at once (no dialog); the editor does not open a member of an archive (`UseFile` leaves on `cmEditFile`).
 
 ## Status at the end of the session (2026-10-06, second part)

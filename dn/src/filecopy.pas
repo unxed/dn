@@ -2204,7 +2204,7 @@ TryGetInfo:
             Exit;
         end {case};
       end {if};
-    Dirs := TCollection.Create(10, 10);   { of TDirName: freed as objects }
+    Dirs := TCollection.Create(10, 10);   { of TDirName: FreeItem of TCollection frees them }
     for I := 0 to Files.Count-1 do
       begin
       P := Files.At(I);

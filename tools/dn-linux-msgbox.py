@@ -11,10 +11,10 @@ bad = 0
 # language: (title, yes, no, the hot letter of no, the hot letter of yes)
 LANGS = {
     'ENGLISH': ('Confirm', 'Yes', 'No', 'n', 'y'),
-    'RUSSIAN': ('Подтверждение', 'Да', 'Нет',
-                'н', 'д'),
-    'UKRAIN': ('Підтвердження', 'Так', 'Ні',
-               'н', 'т'),
+    'RUSSIAN': ('\u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0435', '\u0414\u0430', '\u041d\u0435\u0442',
+                '\u043d', '\u0434'),
+    'UKRAIN': ('\u041f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043d\u043d\u044f', '\u0422\u0430\u043a', '\u041d\u0456',
+               '\u043d', '\u0442'),
 }
 
 

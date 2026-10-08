@@ -10,7 +10,7 @@ from pty_screen import PtyTerm
 
 bad = 0
 LONG_ASCII = 'averyverylongname.txt'
-MASK = 'длинная-маска-' * 4 + 'конец'
+MASK = '\u0434\u043b\u0438\u043d\u043d\u0430\u044f-\u043c\u0430\u0441\u043a\u0430-' * 4 + '\u043a\u043e\u043d\u0435\u0446'
 
 
 def check(ok, what, info=''):
@@ -51,13 +51,13 @@ try:
     check(f.strip().startswith('averyverylong') and '►' in f.split()[0], 'the long ASCII name is cut by the mark, not at 12 bytes: %r' % f, t.text())
     t.send('\x1b[B', 0.6)                          # the Cyrillic name (it is also the name that the quick search finds)
     f = footer(t)
-    check(f.strip().startswith(MASK[:12]) and '►' in f.split()[0] and '�' not in f,
+    check(f.strip().startswith(MASK[:12]) and '\u25ba' in f.split()[0] and '\ufffd' not in f,
           'the long Cyrillic name is cut by columns: %r' % f, t.text())
     t.send('\x13', 0.5)                            # Ctrl-S: the quick search (the name of a file must match what is typed)
     t.send(MASK, 1.0)
     t.pump(0.5, 3)
     f = footer(t, 2)
-    check(f.rstrip('\u2500 ').rstrip('*').endswith(MASK[-12:]) and '�' not in f and '◄' in f,
+    check(f.rstrip('\u2500 ').rstrip('*').endswith(MASK[-12:]) and '\ufffd' not in f and '\u25c4' in f,
           'the long quick search mask is cut from the left by characters: %r' % f, t.text())
     t.send('\x1b', 0.5)
     check(t.alive(), 'DN runs', t.text())
