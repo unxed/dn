@@ -5,8 +5,8 @@ __pycache__/
 *.ppu
 *.a
 build/
-# the DOS build that can be tried without building it (tools/dn-dist.sh)
-!dist/dos/*.EXE
+# the builds made by tools/dn-dist.sh and the like (they are published as releases, never committed)
+dist/
 out/
 tv/tests/tvhc-o/
 tv/tests/t_*
