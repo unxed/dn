@@ -310,7 +310,19 @@ procedure UpdateConfig;
     TempInteger: Integer; {DataCompBoy}
     R: TRect;
     const
-      NotAPath: Char = #22;
+      NotAPath: String[1] = #22;
+
+  procedure RereadPanels(View: TView);
+    var
+      Event: TEvent;
+    begin
+    FillChar(Event, SizeOf(Event), 0);
+    Event.What := evCommand;
+    Event.Command := cmTotalReread;
+    Event.InfoPtr := @NotAPath;
+    View.HandleEvent(Event);
+    end;
+
   begin
   InvalidateTempDir;
   OldSecurity := Security;
@@ -331,11 +343,9 @@ procedure UpdateConfig;
   MouseReverse := MouseData.Options and omsReverse <> 0;
   Security := Startup.FMSetup.Show and fmsShowHidden = 0;
 
-  if OldSecurity xor Security then
-    begin
-    if Application <> nil then
-      GlobalMessage(evCommand, cmPanelReread, @NotAPath);
-    end;
+  { the files shown depend on the setting "show hidden files": every panel reads its directory again, the passive one too }
+  if (OldSecurity xor Security) and (Application <> nil) and (Desktop <> nil) then
+    Desktop.ForEach(RereadPanels);
 
   SetBlink(CurrentBlink);
   end { UpdateConfig };
