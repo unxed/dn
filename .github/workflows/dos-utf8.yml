@@ -11,6 +11,7 @@ on:
     paths:
       - .github/workflows/dos-utf8.yml
       - tools/dn-dos-input.py
+      - tools/ci-par.sh
       - dn/compat/osdep.pas
       - dn/compat/osrundos.pas
       - tv
@@ -60,16 +61,18 @@ jobs:
       - name: Build the go32v2 cross compiler
         if: steps.fpccache.outputs.cache-hit != 'true'
         run: tools/build-fpc-go32v2.sh "${{ runner.temp }}/fpc-go32v2"
-      - name: The test of tv/ (a program with UTF-8 inside)
-        run: |
-          DOSBOX="$HOME/dosbox-x-master/bin/dosbox-x" FPC_GO32V2="${{ runner.temp }}/fpc-go32v2/bin/fpc-go32v2" tv/dostests/utf8-names.sh
-      - name: DN for DOS, the code page inside
+      - name: Build DN for DOS, the code page inside and UTF-8 inside
         run: |
           export PATH="$HOME/dosbox-x-master/bin:$PATH" DN_PREFIX="${{ runner.temp }}/fpc-go32v2"
           tools/build.sh dos out/dos-cp
-          DOSBOX_X="$HOME/dosbox-x-master/bin/dosbox-x" DN_DOS_PATCHED=1 python3 tools/dn-dos-input.py out/dos-cp utf8-names-cp
-      - name: DN for DOS, UTF-8 inside
-        run: |
-          export PATH="$HOME/dosbox-x-master/bin:$PATH" DN_PREFIX="${{ runner.temp }}/fpc-go32v2"
           DN_UTF8=1 tools/build.sh dos out/dos-u8
-          DOSBOX_X="$HOME/dosbox-x-master/bin/dosbox-x" DN_DOS_PATCHED=1 python3 tools/dn-dos-input.py out/dos-u8 utf8-names-u8
+      - name: The test of tv/ (a program with UTF-8 inside) and DN for DOS in both builds, side by side
+        env:
+          CMDS: |
+            DOSBOX="$DBX" FPC_GO32V2="$FPC_GO32V2" tv/dostests/utf8-names.sh
+            DOSBOX_X="$DBX" DN_DOS_PATCHED=1 python3 tools/dn-dos-input.py out/dos-cp utf8-names-cp
+            DOSBOX_X="$DBX" DN_DOS_PATCHED=1 python3 tools/dn-dos-input.py out/dos-u8 utf8-names-u8
+        run: |
+          # tools/ci-par.sh gives each command a HOME of its own: the paths are taken here, from the HOME of the runner
+          export DBX="$HOME/dosbox-x-master/bin/dosbox-x" FPC_GO32V2="${{ runner.temp }}/fpc-go32v2/bin/fpc-go32v2"
+          tools/ci-par.sh

@@ -8,8 +8,10 @@ on:
       - tv          # the pointer of the submodule (a change of it is a change of the file `tv`, not of `tv/**`)
       - tv/**
       - tools/dos-run.sh
+      - tools/dos-par.sh
       - tools/render-dump.py
       - tools/pty_screen.py
+      - tools/ci-par.sh
       - tools/build-fpc-go32v2.sh
       - .github/workflows/tv.yml
 
@@ -37,25 +39,22 @@ jobs:
         with:
           submodules: true
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl python3
-      - name: Build tvdemo and run it in a pty
+      - name: Build the programs
         run: |
           mkdir -p out
-          fpc -Futv/src -FUout -FEout tv/demo/tvdemo.pas | grep -E 'Error|Fatal' && exit 1
-          python3 tv/tests/pty/test_tvdemo.py out/tvdemo
-          python3 tv/tests/pty/test_win32input.py out/tvdemo
-      - name: The terminal view (tvterm, a shell in a window) in a pty
-        run: |
-          mkdir -p out
-          fpc -Futv/src -FUout -FEout tv/demo/tvterm.pas | grep -E 'Error|Fatal' && exit 1
-          python3 tv/tests/pty/test_tvterm.py out/tvterm
-      - name: A program on the whole screen (VtRunScreen) in a pty
-        run: |
-          fpc -Futv/src -FUout -FEout tv/tests/pty/rundemo.pas | grep -E 'Error|Fatal' && exit 1
-          python3 tv/tests/pty/test_vtrun.py out/rundemo
-      - name: The clipboard (OSC 52) in a pty
-        run: |
-          fpc -Futv/src -FUout -FEout tv/tests/pty/clipdemo.pas | grep -E 'Error|Fatal' && exit 1
-          python3 tv/tests/pty/test_clip.py out/clipdemo
+          for p in tv/demo/tvdemo.pas tv/demo/tvterm.pas tv/tests/pty/rundemo.pas tv/tests/pty/clipdemo.pas; do
+            fpc -Futv/src -FUout -FEout "$p" | grep -E 'Error|Fatal' && exit 1
+          done
+          true
+      - name: tvdemo, the terminal view (tvterm), a program on the whole screen (VtRunScreen) and the clipboard (OSC 52) in a pty, side by side
+        env:
+          CMDS: |
+            python3 tv/tests/pty/test_tvdemo.py out/tvdemo
+            python3 tv/tests/pty/test_win32input.py out/tvdemo
+            python3 tv/tests/pty/test_tvterm.py out/tvterm
+            python3 tv/tests/pty/test_vtrun.py out/rundemo
+            python3 tv/tests/pty/test_clip.py out/clipdemo
+        run: tools/ci-par.sh
 
   policy:
     # the text of tv/: UTF-8, English, the glyphs by name (tv/tools/text-policy.py)
@@ -87,13 +86,19 @@ jobs:
           mkdir -p out
           cd tv/tests
           failed=""
+          exes=""
           for t in t_*.pas; do
             case "${t%.pas}" in t_tvhc) continue ;; esac     # runs the help compiler with the fpc of the system: not under DOS
             [ ${#t} -gt 12 ] && { echo "=== ${t%.pas}: skipped (the name is not 8.3: a native test)"; continue; }
             ~/fpc-go32v2/bin/fpc-go32v2 -Fu../src -Fu. -FE../../out "$t" | grep -E 'Error|Fatal' && exit 1
-            echo "=== ${t%.pas}"
-            ../../tools/dos-run.sh ../../out "${t%.pas}.exe" | tee ../../out/${t%.pas}.txt
-            grep -q '^ALL OK' ../../out/${t%.pas}.txt || failed="$failed ${t%.pas}"
+            exes="$exes ${t%.pas}.exe"
+          done
+          # the programs wait for the emulator, not for the CPU: all of them side by side, each in a directory of its own
+          ../../tools/dos-par.sh ../../out $exes
+          for e in $exes; do
+            echo "=== ${e%.exe}"
+            cat ../../out/${e%.exe}.txt
+            grep -q '^ALL OK' ../../out/${e%.exe}.txt || failed="$failed ${e%.exe}"
           done
           # a compact report of what failed (the full output is above)
           for t in $failed; do
