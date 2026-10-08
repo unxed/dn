@@ -1,0 +1,428 @@
+; The actions of DN: each command that a menu item or a status line offers, with its key, the text of the key in the menu and its
+; help context, declared once for all the languages. The menus and the status lines of dn.dnr name them; the captions are in
+; the dn.dnr of each language. Format: docs/RESOURCES.md.
+;   ACTION name, command, key, key text, help context
+
+ACTION editor.LoadText,                     cmLoadText, kbShiftF3, 'F3', hcedFile
+ACTION editor.OpenFileAtCursor,             cmOpenFileAtCursor, kbCtrlEnter, 'Ctrl-Enter', hcedFile
+ACTION editor.SaveText,                     cmSaveText, kbF2, 'F2', hcedFile
+ACTION editor.SaveTextAs,                   cmSaveTextAs, kbShiftF2, 'Shift-F2', hcedFile
+ACTION editor.SaveAll,                      cmSaveAll, kbCtrlF2, 'Ctrl-F2', hcedFile
+ACTION editor.PrintFileEd,                  cmPrintFileEd, kbCtrlF8, 'Ctrl-F8', hcedFile
+ACTION editor.PrintBlock,                   cmPrintBlock, kbShiftF8, 'Shift-F8', hcedFile
+ACTION editor.MainMenu,                     cmMainMenu, kbF10, 'F10', hcedFile
+ACTION editor.Close,                        cmClose, kbCtrlF4, 'Ctrl-F4', hcedFile
+ACTION editor.Undo,                         cmUndo, kbAltBack, 'Alt-BkSp', hcedEdit
+ACTION editor.Redo,                         cmRedo, kbAltTilde, 'Alt-~', hcedEdit
+ACTION editor.Cut,                          cmCut, kbShiftDel, 'Shift-Del', hcedEdit
+ACTION editor.Copy,                         cmCopy, kbCtrlIns, 'Ctrl-Ins', hcedEdit
+ACTION editor.Paste,                        cmPaste, kbShiftIns, 'Shift-Ins', hcedEdit
+ACTION editor.BlockWrite,                   cmBlockWrite, kbNoKey, ' ', hcedEdit
+ACTION editor.BlockRead,                    cmBlockRead, kbNoKey, ' ', hcedEdit
+ACTION editor.WindowsCopy,                  cmWindowsCopy, kbNokey, 'Ctrl-Q P', hcedEdit
+ACTION editor.WindowsPaste,                 cmWindowsPaste, kbNokey, 'Ctrl-Q C', hcedEdit
+ACTION editor.WindowsCopy.2,                cmWindowsCopy, kbNokey, 'Ctrl-Q P', hcedEdit
+ACTION editor.WindowsPaste.2,               cmWindowsPaste, kbNokey, 'Ctrl-Q C', hcedEdit
+ACTION editor.Clear,                        cmClear, kbCtrlDel, 'Ctrl-Del', hcedEdit
+ACTION editor.StartSearch,                  cmStartSearch, kbF7, 'F7', hcedSearch
+ACTION editor.Replace,                      cmReplace, kbCtrlF7, 'Ctrl-F7', hcedSearch
+ACTION editor.ContSearch,                   cmContSearch, kbShiftF7, 'Shift-F7', hcedSearch
+ACTION editor.ReverseSearch,                cmReverseSearch, kbAltF7, 'Alt-F7', hcedSearch
+ACTION editor.GotoLineNumber,               cmGotoLineNumber, kbAltG, 'Alt-G', hcedSearch
+ACTION editor.MoveBlockStart,               cmMoveBlockStart, kbNoKey, 'Ctrl-Q B', hcedSearch
+ACTION editor.MoveBlockEnd,                 cmMoveBlockEnd, kbNoKey, 'Ctrl-Q K', hcedSearch
+ACTION editor.FJustify,                     cmFJustify, kbAltJ, 'Alt-J', hcedParagraph
+ACTION editor.FRight,                       cmFRight, kbAltR, 'Alt-R', hcedParagraph
+ACTION editor.FLeft,                        cmFLeft, kbAltL, 'Alt-L', hcedParagraph
+ACTION editor.FCenter,                      cmFCenter, kbAltC, 'Alt-C', hcedParagraph
+ACTION editor.SetMargins,                   cmSetMargins, kbNoKey, '', hcedOptions
+ACTION editor.MoveBlock,                    cmMoveBlock, kbNoKey, 'Ctrl-K V', hcedParagraph
+ACTION editor.CopyBlock,                    cmCopyBlock, kbNoKey, 'Ctrl-K C', hcedParagraph
+ACTION editor.IndentBlock,                  cmIndentBlock, kbNoKey, 'Ctrl-K I', hcedParagraph
+ACTION editor.UnIndentBlock,                cmUnIndentBlock, kbNoKey, 'Ctrl-K U', hcedParagraph
+ACTION editor.HideBlock,                    cmHideBlock, kbCtrlH, 'Ctrl-H', hcedParagraph
+ACTION editor.RevSortBlock,                 cmRevSortBlock, kbCtrlR, 'Ctrl-R', hcedParagraph
+ACTION editor.SortBlock,                    cmSortBlock, kbAltT, 'Alt-T', hcedParagraph
+ACTION editor.CalcBlock,                    cmCalcBlock, kbAltIns, 'Alt-Ins', hcedParagraph
+ACTION editor.InsertDate,                   cmInsertDate, kbNoKey, 'Ctrl-Q D', hcedParagraph
+ACTION editor.InsertTime,                   cmInsertTime, kbNoKey, 'Ctrl-Q T', hcedParagraph
+ACTION editor.DuplicateLine,                cmDuplicateLine, kbNoKey, '', 0
+ACTION editor.ASCIITable,                   cmASCIITable, kbCtrlP, 'Ctrl-P', 0
+ACTION editor.SwitchDrawMode,               cmSwitchDrawMode, kbF4, 'F4', 0
+ACTION editor.SwitchKeyMapping,             cmSwitchKeyMapping, kbF8, 'F8', 0
+ACTION editor.UpcaseBlock,                  cmUpcaseBlock, kbNoKey, 'Ctrl-[', hcMiscUpper
+ACTION editor.UpString,                     cmUpString, kbNoKey, 'Ctrl-Shift-[', hcMiscUpper
+ACTION editor.LowcaseBlock,                 cmLowcaseBlock, kbNoKey, 'Ctrl-]', hcMiscLower
+ACTION editor.LowString,                    cmLowString, kbNoKey, 'Ctrl-Shift-]', hcMiscLower
+ACTION editor.CapitalizeBlock,              cmCapitalizeBlock, kbNoKey, 'Ctrl\', hcMiscCapitalize
+ACTION editor.CapString,                    cmCapString, kbNoKey, 'Ctrl-Shift\', hcMiscCapitalize
+ACTION editor.RusEngConvBlock,              cmRusEngConvBlock, kbAltF12, 'Alt-F12', hcMiscKbdLayout
+ACTION editor.RusEngConvString,             cmRusEngConvString, kbAltShiftF12, 'Alt-Shift-F12', hcMiscKbdLayout
+ACTION editor.ToggleCaseBlock,              cmToggleCaseBlock, kbCtrlSlash, 'Ctrl-Gray/', hcMiscToggleCase
+ACTION editor.ToggleCaseString,             cmToggleCaseString, kbCtrlShiftSlash, 'Ctrl-Shift-Gray/', hcMiscToggleCase
+ACTION editor.EditCrLfMode,                 cmEditCrLfMode, kbNoKey, '', 0
+ACTION editor.EditLfMode,                   cmEditLfMode, kbNoKey, '', 0
+ACTION editor.EditCrMode,                   cmEditCrMode, kbNoKey, '', 0
+ACTION editor.SwitchBack,                   cmSwitchBack, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchBrackets,               cmSwitchBrackets, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchIndent,                 cmSwitchIndent, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchSave,                   cmSwitchSave, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchWrap,                   cmSwitchWrap, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchBlock,                  cmSwitchBlock, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchFill,                   cmSwitchFill, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchHiLine,                 cmSwitchHiLine, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchHiColumn,               cmSwitchHiColumn, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchHighLight,              cmSwitchHighLight, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchTabReplace,             cmSwitchTabReplace, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchSmartTab,               cmSwitchSmartTab, kbNoKey, 'Off', hcedOptions
+ACTION editor.SwitchSoftWrap,               cmSwitchSoftWrap, kbNoKey, 'Off', hcedOptions
+
+ACTION fixer.FixFile,                       cmFixFile, kbAltF, 'Alt-F', hcDiskEditor
+ACTION fixer.FixDir,                        cmFixDir, kbAltR, 'Alt-R', hcDiskEditor
+ACTION fixer.FixDrive,                      cmFixDrive, kbAltD, 'Alt-D', hcDiskEditor
+ACTION fixer.FixCluster,                    cmFixCluster, kbAltC, 'Alt-C', hcDiskEditor
+ACTION fixer.FixSector,                     cmFixSector, kbAltS, 'Alt-S', hcDiskEditor
+ACTION fixer.Close,                         cmClose, kbAltF3, 'Alt-F3', hcDiskEditor
+ACTION fixer.Undo,                          cmUndo, kbAltBack, 'Alt-BkSp', hcDiskEditor
+ACTION fixer.Copy,                          cmCopy, kbCtrlIns, 'Ctrl-Ins', hcDiskEditor
+ACTION fixer.Paste,                         cmPaste, kbShiftIns, 'Shift-Ins', hcDiskEditor
+ACTION fixer.FixBlockWrite,                 cmFixBlockWrite, kbNoKey, ' ', hcDiskEditor
+ACTION fixer.Clear,                         cmClear, kbNoKey, ' ', hcDiskEditor
+ACTION fixer.SearchFor,                     cmSearchFor, kbF7, 'F7', hcDiskEditor
+ACTION fixer.ContinueSearch,                cmContinueSearch, kbShiftF7, 'Shift-F7', hcDiskEditor
+ACTION fixer.HexMode,                       cmHexMode, kbF2, 'F2', hcDiskEditor
+ACTION fixer.DirMode,                       cmDirMode, kbF3, 'F3', hcDiskEditor
+ACTION fixer.TextMode,                      cmTextMode, kbF4, 'F4', hcDiskEditor
+ACTION fixer.FATMode,                       cmFATMode, kbF5, 'F5', hcDiskEditor
+
+ACTION main.About,                          cmAbout, kbNoKey, ' ', hcMenuBox
+ACTION main.Refresh,                        cmRefresh, kbNoKey, ' ', hcMenuBox
+ACTION main.ScreenRest,                     cmScreenRest, kbNoKey, ' ', hcMenuBox
+ACTION main.ChLngId,                        cmChLngId, kbAltF12, 'Alt-F12', hcMenuBox
+ACTION main.ExecGrabber,                    cmExecGrabber, kbNoKey, 'Shift-Alt-Ins', hcMenuBox
+ACTION main.ShowUserScreen,                 cmShowUserScreen, kbAltF5, 'Alt-F5', hcMenuBox
+ACTION main.ShowOutput,                     cmShowOutput, kbCtrlO, 'Ctrl-O', hcMenuBox
+ACTION main.OpenSmartpad,                   cmOpenSmartpad, kbAltQ, 'Alt-Q', hcMenuBox
+ACTION main.OpenClipBoard,                  cmOpenClipBoard, kbAltQ, '', hcMenuBox
+ACTION main.HideShowTools,                  cmHideShowTools, kbNoKey, '', hcMenuBox
+ACTION main.ExecuteDOSCmd,                  cmExecuteDOSCmd, kbNoKey, '', hcFileMenu
+ACTION main.ChangeMode,                     cmChangeMode, kbShiftF10, 'Shift-F10', hcMenuBox
+ACTION main.ChangeUserMode1,                cmChangeUserMode1, kbAltF10, 'Alt-F10', hcMenuBox
+ACTION main.ChangeUserMode2,                cmChangeUserMode2, kbCtrlF10, 'Ctrl-F10', hcMenuBox
+ACTION main.ChScreenMode,                   cmChScreenMode, kbShiftF12, 'Shift-F12 ', hcMenuBox
+ACTION main.Game,                           cmGame, kbAltF9, 'Alt-F9', hcMenuBox
+ACTION main.ViewFile,                       cmViewFile, kbF3, 'F3', hcFileMenu
+ACTION main.IntViewFile,                    cmIntViewFile, kbAltF3, 'Alt-F3', hcFileMenu
+ACTION main.ViewText,                       cmViewText, kbNoKey, 'Alt-Shift-F3', hcFileMenu
+ACTION main.ViewHex,                        cmViewHex, kbNoKey, ' ', hcFileMenu
+ACTION main.ViewDBF,                        cmViewDBF, kbNoKey, ' ', hcFileMenu
+ACTION main.ViewWKZ,                        cmViewWKZ, kbNoKey, ' ', hcFileMenu
+ACTION main.EditFile,                       cmEditFile, kbF4, 'F4', hcFileMenu
+ACTION main.IntEditFile,                    cmIntEditFile, kbAltF4, 'Alt-F4', hcFileMenu
+ACTION main.XEditFile,                      cmXEditFile, kbShiftF4, 'Shift-F4', hcFileMenu
+ACTION main.FindFile,                       cmFindFile, kbAltF7, 'Alt-F7', hcFileMenu
+ACTION main.CopyFiles,                      cmCopyFiles, kbF5, 'F5', hcFileMenu
+ACTION main.MoveFiles,                      cmMoveFiles, kbF6, 'F6', hcFileMenu
+ACTION main.ChangeNameCase,                 cmChangeNameCase, kbCtrlAltF6, 'Ctrl-Alt-F6', hcFileMenu
+ACTION main.PanelArcFiles,                  cmPanelArcFiles, kbShiftF1, 'Shift-F1', hcFileMenu
+ACTION main.ExtractArchive,                 cmExtractArchive, kbShiftF2, 'Shift-F2', hcFileMenu
+ACTION main.PanelLongCopy,                  cmPanelLongCopy, kbCtrlAltF5, 'Ctrl-Alt-F5', hcFileMenu
+ACTION main.PrintFile,                      cmPrintFile, kbCtrlF9, 'Ctrl-F9', hcFileMenu
+ACTION main.PanelMkDir,                     cmPanelMkDir, kbF7, 'F7', hcFileMenu
+ACTION main.PanelErase,                     cmPanelErase, kbF8, 'F8', hcFileMenu
+ACTION main.SetFAttr,                       cmSetFAttr, kbAltE, 'Alt-E', hcFileMenu
+ACTION main.SingleAttr,                     cmSingleAttr, kbCtrlA, 'Ctrl-A', hcFileMenu
+ACTION main.SingleCopy,                     cmSingleCopy, kbNoKey, 'Shift-F5', hcFileMenu
+ACTION main.SingleRename,                   cmSingleRename, kbNoKey, 'Shift-F6', hcFileMenu
+ACTION main.SingleDel,                      cmSingleDel, kbShiftF8, 'Shift-F8', hcFileMenu
+ACTION main.SetEALongname,                  cmSetEALongname, kbCtrlF11, 'Ctrl-F11', hcFileMenu
+ACTION main.Restart,                        cmRestart, kbCtrlAltX, 'Ctrl-Alt-X', hcFileMenu
+ACTION main.Quit,                           cmQuit, kbAltX, 'Alt-X', hcFileMenu
+ACTION main.FormatDisk,                     cmFormatDisk, kbShiftF7, 'Shift-F7', hcDiskMenu
+ACTION main.SetVolumeLabel,                 cmSetVolumeLabel, kbNoKey, ' ', hcDiskMenu
+ACTION main.UnpDiskImg,                     cmUnpDiskImg, kbCtrlI, 'Ctrl-I', hcFileMenu
+ACTION main.Reanimator,                     cmReanimator, kbNoKey, 'Shift-F6', hcDiskMenu
+ACTION main.DiskEdit,                       cmDiskEdit, kbNoKey, ' ', hcDiskMenu
+ACTION main.CreateTree,                     cmCreateTree, kbNoKey, '', hcDiskMenu
+ACTION main.MemoryInfo,                     cmMemoryInfo, kbAltY, 'Alt-Y', hcUtilMenu
+ACTION main.SystemInfo,                     cmSystemInfo, kbNoKey, '', hcUtilMenu
+ACTION main.Tasklist,                       cmTasklist, kbF11, 'F11', hcNoContext
+ACTION main.Calculator,                     cmCalculator, kbCtrlF6, 'Ctrl-F6', hcUtilMenu
+ACTION main.Calendar,                       cmCalendar, kbCtrlF12, 'Ctrl-F12', hcUtilMenu
+ACTION main.ASCIITable,                     cmASCIITable, kbCtrlB, 'Ctrl-B', hcUtilMenu
+ACTION main.PhoneBook,                      cmPhoneBook, kbShiftF3, 'Shift-F3', hcUtilMenu
+ACTION main.SheetLoad,                      cmSheetLoad, kbShiftF11, 'Shift-F11', hcUtilMenu
+ACTION main.UUEncodeFile,                   cmUUEncodeFile, kbCtrlF7, 'Ctrl-F7', hcFileMenu
+ACTION main.UUDecodeFile,                   cmUUDecodeFile, kbCtrlF8, 'Ctrl-F8', hcFileMenu
+ACTION main.PlayCD,                         cmPlayCD, kbCtrlF11, 'Ctrl-F11', hcUtilMenu
+ACTION main.Terminal,                       cmTerminal, kbAltJ, 'Alt-J', hcUtilMenu
+ACTION main.NavyLink,                       cmNavyLink, kbAltF11, 'Alt-F11', hcUtilMenu
+ACTION main.Undial,                         cmUndial, kbAltA, 'Alt-A', hcUtilMenu
+ACTION main.HangUp,                         cmHangUp, kbNoKey, 'Alt-H', hcUtilMenu
+ACTION main.EnvEdit,                        cmEnvEdit, kbNoKey, '', hcUtilMenu
+ACTION main.UserMenu,                       cmUserMenu, kbF2, 'F2', hcUtilMenu
+ACTION main.DirHistory,                     cmDirHistory, kbNoKey, 'Alt-BkSp', hcPanelMenu
+ACTION main.HistoryList,                    cmHistoryList, kbAltF8, 'Alt-F8', hcUtilMenu
+ACTION main.EditHistory,                    cmEditHistory, kbAltPgUp, 'Alt-PgUp', hcUtilMenu
+ACTION main.ViewHistory,                    cmViewHistory, kbAltPgDn, 'Alt-PgDn', hcUtilMenu
+ACTION main.Plugins,                        cmPlugins, kbAltF11, 'Alt-F11', hcPluginManager
+ACTION main.MakeList,                       cmMakeList, kbAltL, 'Alt-L', hcPanelMenu
+ACTION main.PanelMakeList,                  cmPanelMakeList, kbAltV, 'Alt-V', hcPanelMenu
+ACTION main.CompareDir,                     cmCompareDir, kbCtrlC, 'Ctrl-C', hcPanelMenu
+ACTION main.CountLen,                       cmCountLen, kbAltG, 'Alt-G', hcPanelMenu
+ACTION main.DirBranch,                      cmDirBranch, kbCtrlH, 'Ctrl-H', hcPanelMenu
+ACTION main.SelectPreset,                   cmSelectPreset, kbAltMinus, 'Alt-"-"', hcPanelMenu
+ACTION main.SortBy,                         cmSortBy, kbAltB, 'Alt-B', hcPanelMenu
+ACTION main.PanelSelect,                    cmPanelSelect, kbNoKey, 'Gray "+"', hcPanelMenu
+ACTION main.PanelUnselect,                  cmPanelUnselect, kbNoKey, 'Gray "-"', hcPanelMenu
+ACTION main.PanelInvertSel,                 cmPanelInvertSel, kbNoKey, 'Gray "*"', hcPanelMenu
+ACTION main.ChangeDrive,                    cmChangeDrive, kbAltC, 'Alt-C', hcPanelMenu
+ACTION main.ChangeDir,                      cmChangeDir, kbAltT, 'Alt-T', hcPanelMenu
+ACTION main.ForceRescan,                    cmForceRescan, kbAltR, 'Alt-R', hcPanelMenu
+ACTION main.ListOfDirs,                     cmListOfDirs, kbNoKey, 'Alt-Shift-0', hcPanelMenu
+ACTION main.CreatePanel,                    cmCreatePanel, kbCtrlF3, 'Ctrl-F3', hcManagerCommands
+ACTION main.DirTree,                        cmDirTree, kbCtrlT, 'Ctrl-T', hcManagerCommands
+ACTION main.DiskInfo,                       cmDiskInfo, kbCtrlL, 'Ctrl-L', hcManagerCommands
+ACTION main.NetInfo,                        cmNetInfo, kbCtrlN, 'Ctrl-N', hcManagerCommands
+ACTION main.QuickView,                      cmQuickView, kbCtrlQ, 'Ctrl-Q', hcManagerCommands
+ACTION main.DizView,                        cmDizView, kbCtrlD, 'Ctrl-D', hcManagerCommands
+ACTION main.SwapPanels,                     cmSwapPanels, kbCtrlU, 'Ctrl-U', hcManagerCommands
+ACTION main.HideLeft,                       cmHideLeft, kbCtrlF1, 'Ctrl-F1', hcManagerCommands
+ACTION main.HideRight,                      cmHideRight, kbCtrlF2, 'Ctrl-F2', hcManagerCommands
+ACTION main.SwitchOther,                    cmSwitchOther, kbCtrlP, 'Ctrl-P', hcManagerCommands
+ACTION main.ChangeLeft,                     cmChangeLeft, kbAltF1, 'Alt-F1', hcManagerCommands
+ACTION main.ChangeRight,                    cmChangeRight, kbAltF2, 'Alt-F2', hcManagerCommands
+ACTION main.SystemSetup,                    cmSystemSetup, kbNoKey, '', hcSubMenuConfig
+ACTION main.Startup,                        cmStartup, kbNoKey, '', hcSubMenuConfig
+ACTION main.InterfaceSetup,                 cmInterfaceSetup, kbNoKey, '', hcSubMenuConfig
+ACTION main.SetupConfirmation,              cmSetupConfirmation, kbNoKey, '', hcSubMenuConfig
+ACTION main.SaversSetup,                    cmSaversSetup, kbNoKey, '', hcSubMenuConfig
+ACTION main.SetupPrinter,                   cmSetupPrinter, kbNoKey, '', hcSubMenuConfig
+ACTION main.CountrySetup,                   cmCountrySetup, kbNoKey, ' ', hcSubMenuConfig
+ACTION main.SetupMouse,                     cmSetupMouse, kbNoKey, '', hcSubMenuConfig
+ACTION main.SetupModem,                     cmSetupModem, kbNoKey, '', hcSubMenuConfig
+ACTION main.EditorDefaults,                 cmEditorDefaults, kbNoKey, '', hcSubMenuConfig
+ACTION main.TerminalDefaults,               cmTerminalDefaults, kbNoKey, '', hcSubMenuConfig
+ACTION main.FMSetup,                        cmFMSetup, kbNoKey, ' ', hcSubMenuFileMgr
+ACTION main.DriveInfoSetup,                 cmDriveInfoSetup, kbNoKey, '', hcSubMenuFileMgr
+ACTION main.HighlightGroups,                cmHighlightGroups, kbNoKey, ' ', hcSubMenuFileMgr
+ACTION main.PanelShowSetup,                 cmPanelShowSetup, kbAltK, 'Alt-K', hcPanelSetup
+ACTION main.PanelSortSetup,                 cmPanelSortSetup, kbAltS, 'Alt-S', hcPanelSetup
+ACTION main.AdvFilter,                      cmAdvFilter, kbAltDel, 'Alt-Del', hcPanelSetup
+ACTION main.SetupArchive,                   cmSetupArchive, kbAltN, 'Alt-N', hcArchives
+ACTION main.UpdateArcFile,                  cmUpdateArcFile, kbNoKey, '', hcArchives
+ACTION main.ConfigACE,                      cmConfigACE, kbNoKey, '', hcArchives
+ACTION main.ConfigAIN,                      cmConfigAIN, kbNoKey, '', hcArchives
+ACTION main.ConfigARC,                      cmConfigARC, kbNoKey, '', hcArchives
+ACTION main.ConfigARJ,                      cmConfigARJ, kbNoKey, '', hcArchives
+ACTION main.ConfigBS2,                      cmConfigBS2, kbNoKey, '', hcArchives
+ACTION main.ConfigBSA,                      cmConfigBSA, kbNoKey, '', hcArchives
+ACTION main.ConfigCAB,                      cmConfigCAB, kbNoKey, '', hcArchives
+ACTION main.ConfigCHZ,                      cmConfigCHZ, kbNoKey, '', hcArchives
+ACTION main.ConfigHA,                       cmConfigHA, kbNoKey, '', hcArchives
+ACTION main.ConfigHAP,                      cmConfigHAP, kbNoKey, '', hcArchives
+ACTION main.ConfigHPK,                      cmConfigHPK, kbNoKey, '', hcArchives
+ACTION main.ConfigHYP,                      cmConfigHYP, kbNoKey, '', hcArchives
+ACTION main.ConfigIS3,                      cmConfigIS3, kbNoKey, '', hcArchives
+ACTION main.ConfigLHA,                      cmConfigLHA, kbNoKey, '', hcArchives
+ACTION main.ConfigLIM,                      cmConfigLIM, kbNoKey, '', hcArchives
+ACTION main.ConfigQUARK,                    cmConfigQUARK, kbNoKey, '', hcArchives
+ACTION main.ConfigRAR,                      cmConfigRAR, kbNoKey, '', hcArchives
+ACTION main.ConfigSQZ,                      cmConfigSQZ, kbNoKey, '', hcArchives
+ACTION main.ConfigTAR,                      cmConfigTAR, kbNoKey, '', hcArchives
+ACTION main.ConfigTGZ,                      cmConfigTGZ, kbNoKey, '', hcArchives
+ACTION main.ConfigUC2,                      cmConfigUC2, kbNoKey, '', hcArchives
+ACTION main.ConfigUFA,                      cmConfigUFA, kbNoKey, '', hcArchives
+ACTION main.ConfigZIP,                      cmConfigZIP, kbNoKey, '', hcArchives
+ACTION main.ConfigZOO,                      cmConfigZOO, kbNoKey, '', hcArchives
+ACTION main.ConfigZXZ,                      cmConfigZXZ, kbNoKey, '', hcArchives
+ACTION main.Config7Z,                       cmConfig7Z, kbNoKey, '', hcArchives
+ACTION main.ConfigBZ2,                      cmConfigBZ2, kbNoKey, '', hcArchives
+ACTION main.EditQuickRun,                   cmEditQuickRun, kbNoKey, ' ', hcOptionsMenu
+ACTION main.ExtFileEdit,                    cmExtFileEdit, kbNoKey, ' ', hcOptionsMenu
+ACTION main.EditHGL,                        cmEditHGL, kbNoKey, ' ', hcOptionsMenu
+ACTION main.EditSPF,                        cmEditSPF, kbNoKey, ' ', hcOptionsMenu
+ACTION main.EditINI,                        cmEditINI, kbNoKey, ' ', hcOptionsMenu
+ACTION main.MenuFileEdit,                   cmMenuFileEdit, kbNoKey, ' ', hcOptionsMenu
+ACTION main.LocalMenuFileEdit,              cmLocalMenuFileEdit, kbNoKey, ' ', hcOptionsMenu
+ACTION main.ExternalViewers,                cmExternalViewers, kbNoKey, ' ', hcOptionsMenu
+ACTION main.ExternalEditors,                cmExternalEditors, kbNoKey, ' ', hcOptionsMenu
+ACTION main.SaveDesk,                       cmSaveDesk, kbNoKey, '', hcOptionsMenu
+ACTION main.LoadDesk,                       cmLoadDesk, kbNoKey, ' ', hcOptionsMenu
+ACTION main.ChangeColors,                   cmChangeColors, kbNoKey, ' ', hcOptionsMenu
+ACTION main.StoreColors,                    cmStoreColors, kbNoKey, ' ', hcOptionsMenu
+ACTION main.LoadColors,                     cmLoadColors, kbNoKey, ' ', hcOptionsMenu
+ACTION main.Tile,                           cmTile, kbNoKey, '', hcWindows
+ACTION main.Cascade,                        cmCascade, kbNoKey, '', hcWindows
+ACTION main.ClearDesktop,                   cmClearDesktop, kbNoKey, '', hcWindows
+ACTION main.Resize,                         cmResize, kbCtrlF5, 'Ctrl-F5', hcWindows
+ACTION main.Zoom,                           cmZoom, kbAltZ, 'Alt-Z', hcWindows
+ACTION main.Maxi,                           cmMaxi, kbCtrlAltZ, 'Ctrl-Alt-Z', hcWindows
+ACTION main.Next,                           cmNext, kbCtrlShiftTab, 'Ctrl-Shift-Tab', hcWindows
+ACTION main.Prev,                           cmPrev, kbCtrlTab, 'Ctrl-Tab', hcWindows
+ACTION main.Next2,                          cmNext2, kbShiftGrayPlus, 'Shift-Gray "+"', hcWindows
+ACTION main.Prev2,                          cmPrev2, kbShiftGrayMinus, 'Shift-Gray "-"', hcWindows
+ACTION main.Next3,                          cmNext3, kbNoKey, '', hcWindows
+ACTION main.Prev3,                          cmPrev3, kbNoKey, '', hcWindows
+ACTION main.Close,                          cmClose, kbCtrlF4, 'Ctrl-F4', hcWindows
+ACTION main.WindowManager,                  cmWindowManager, kbAlt0, 'Alt-0', hcWindows
+
+ACTION sheet.NewTable,                      cmNewTable, kbF4, 'F4', hcSpreadSheet
+ACTION sheet.XEditFile,                     cmXEditFile, kbF3, 'F3', hcSpreadSheet
+ACTION sheet.Save,                          cmSave, kbF2, 'F2', hcSpreadSheet
+ACTION sheet.SaveSheetAs,                   cmSaveSheetAs, kbShiftF2, 'Shift-F2', hcSpreadSheet
+ACTION sheet.ImportToFile,                  cmImportToFile, kbNoKey, ' ', hcSpreadSheet
+ACTION sheet.ImportFromCsv,                 cmImportFromCsv, kbNoKey, ' ', hcSpreadSheet
+ACTION sheet.ImportFromDbf,                 cmImportFromDbf, kbNoKey, ' ', hcSpreadSheet
+ACTION sheet.ExportToCsv,                   cmExportToCsv, kbNoKey, ' ', hcSpreadSheet
+ACTION sheet.ExportToDbf,                   cmExportToDbf, kbNoKey, ' ', hcSpreadSheet
+ACTION sheet.ExportToXls,                   cmExportToXls, kbNoKey, ' ', hcSpreadSheet
+ACTION sheet.MainMenu,                      cmMainMenu, kbF10, 'F10', hcSpreadSheet
+ACTION sheet.Close,                         cmClose, kbESC, 'Ctrl-F4', hcSpreadSheet
+ACTION sheet.Undo,                          cmUndo, kbAltBack, 'Alt-BkSp', hcSpreadSheet
+ACTION sheet.Cut,                           cmCut, kbShiftDel, 'Shift-Del', hcSpreadSheet
+ACTION sheet.Copy,                          cmCopy, kbCtrlIns, 'Ctrl-Ins', hcSpreadSheet
+ACTION sheet.Paste,                         cmPaste, kbShiftIns, 'Shift-Ins', hcSpreadSheet
+ACTION sheet.Clear,                         cmClear, kbCtrlDel, 'Ctrl-Del', hcSpreadSheet
+ACTION sheet.FindCell,                      cmFindCell, kbNoKey, '', hcSpreadSheet
+ACTION sheet.ReplaceCell,                   cmReplaceCell, kbNoKey, '', hcSpreadSheet
+ACTION sheet.SearchAgain,                   cmSearchAgain, kbNoKey, '', hcSpreadSheet
+ACTION sheet.GotoCell,                      cmGotoCell, kbNoKey, '', hcSpreadSheet
+ACTION sheet.GotoError,                     cmGotoError, kbNoKey, '', hcSpreadSheet
+ACTION sheet.ChangeFormat,                  cmChangeFormat, kbNoKey, '', hcSpreadSheet
+ACTION sheet.ChangeWidth,                   cmChangeWidth, kbNoKey, '', hcSpreadSheet
+ACTION sheet.ToggleShowMode,                cmToggleShowMode, kbNoKey, '', hcSpreadSheet
+ACTION sheet.InsertLine,                    cmInsertLine, kbNoKey, '', hcSpreadSheet
+ACTION sheet.InsertColumn,                  cmInsertColumn, kbNoKey, '', hcSpreadSheet
+ACTION sheet.DeleteLine,                    cmDeleteLine, kbNoKey, '', hcSpreadSheet
+ACTION sheet.DeleteColumn,                  cmDeleteColumn, kbNoKey, '', hcSpreadSheet
+
+ACTION key.Help.F1,                         cmHelp, kbF1, '', 0
+ACTION key.AddVariable.AltIns,              cmAddVariable, kbAltIns, '', 0
+ACTION key.DelVariable.AltDel,              cmDelVariable, kbAltDel, '', 0
+ACTION key.RenVariable.F6,                  cmRenVariable, kbF6, '', 0
+ACTION key.Default.F1,                      cmDefault, kbF1, '', 0
+ACTION key.No.AltF1,                        cmNo, kbAltF1, '', 0
+ACTION key.Cancel.ShiftF1,                  cmCancel, kbShiftF1, '', 0
+ACTION key.Next.F9,                         cmNext, kbF9, '', 0
+ACTION key.Prev.ShiftF9,                    cmPrev, kbShiftF9, '', 0
+ACTION key.Menu.F10,                        cmMenu, kbF10, '', 0
+ACTION key.FastRename.AltF6,                cmFastRename, kbAltF6, '', 0
+ACTION key.FastRename.AltShiftF6,           cmFastRename, kbAltShiftF6, '', 0
+ACTION key.ToggleDescriptions.AltSemicolon, cmToggleDescriptions, kbAltSemicolon, '', 0
+ACTION key.SingleCopy.ShiftF5,              cmSingleCopy, kbShiftF5, '', 0
+ACTION key.SingleRename.ShiftF6,            cmSingleRename, kbShiftF6, '', 0
+ACTION key.ToggleDescriptions.CtrlK,        cmToggleDescriptions, kbCtrlK, '', 0
+ACTION key.ToggleLongNames.CtrlN,           cmToggleLongNames, kbCtrlN, '', 0
+ACTION key.OpenWPSWindow.CtrlF,             cmOpenWPSWindow, kbCtrlF, '', 0
+ACTION key.CreateWPSItem.CtrlJ,             cmCreateWPSItem, kbCtrlJ, '', 0
+ACTION key.ToggleShowMode.CtrlY,            cmToggleShowMode, kbCtrlY, '', 0
+ACTION key.DirBranchFull.CtrlAltH,          cmDirBranchFull, kbCtrlAltH, '', 0
+ACTION key.DiskInfo.AltI,                   cmDiskInfo, kbAltI, '', 0
+ACTION key.DirHistory.AltBack,              cmDirHistory, kbAltBack, '', 0
+ACTION key.ExtractTo.F4,                    cmExtractTo, kbF4, '', 0
+ACTION key.ArcTest.F6,                      cmArcTest, kbF6, '', 0
+ACTION key.SetPassword.F7,                  cmSetPassword, kbF7, '', 0
+ACTION key.ForceRescan.CtrlR,               cmForceRescan, kbCtrlR, '', 0
+ACTION key.UnWrap.F2,                       cmUnWrap, kbF2, '', 0
+ACTION key.HexMode.F4,                      cmHexMode, kbF4, '', 0
+ACTION key.GotoCell.F5,                     cmGotoCell, kbF5, '', 0
+ACTION key.AddFilter.F6,                    cmAddFilter, kbF6, '', 0
+ACTION key.FileEdit.AltE,                   cmFileEdit, kbAltE, '', 0
+ACTION key.ReverseSearch.CtrlF7,            cmReverseSearch, kbCtrlF7, '', 0
+ACTION key.ContinueSearch.CtrlL,            cmContinueSearch, kbCtrlL, '', 0
+ACTION key.Save.ShiftF2,                    cmSave, kbShiftF2, '', 0
+ACTION key.SaveAll.ShiftF5,                 cmSaveAll, kbShiftF5, '', 0
+ACTION key.LoadXlatTable.ShiftF6,           cmLoadXlatTable, kbShiftF6, '', 0
+ACTION key.ContinueSearch.CtrlEnter,        cmContinueSearch, kbCtrlEnter, '', 0
+ACTION key.ShowFields.F2,                   cmShowFields, kbF2, '', 0
+ACTION key.ShowMemo.F3,                     cmShowMemo, kbF3, '', 0
+ACTION key.EditDBField.F4,                  cmEditDBField, kbF4, '', 0
+ACTION key.DBFGoto.F6,                      cmDBFGoto, kbF6, '', 0
+ACTION key.BackSearch.AltF7,                cmBackSearch, kbAltF7, '', 0
+ACTION key.InsertDBRec.CtrlI,               cmInsertDBRec, kbCtrlI, '', 0
+ACTION key.DeleteDBRec.CtrlD,               cmDeleteDBRec, kbCtrlD, '', 0
+ACTION key.UpDBRec.CtrlAltUp,               cmUpDBRec, kbCtrlAltUp, '', 0
+ACTION key.DownDBRec.CtrlAltDown,           cmDownDBRec, kbCtrlAltDown, '', 0
+ACTION key.Maxi.CtrlM,                      cmMaxi, kbCtrlM, '', 0
+ACTION key.Help2.F1,                        cmHelp2, kbF1, '', 0
+ACTION key.LoadText.F3,                     cmLoadText, kbF3, '', 0
+ACTION key.SwitchBlock.F5,                  cmSwitchBlock, kbF5, '', 0
+ACTION key.DuplicateLine.F6,                cmDuplicateLine, kbF6, '', 0
+ACTION key.Redo.AltShiftBack,               cmRedo, kbAltShiftBack, '', 0
+ACTION key.ViewFile.AltV,                   cmViewFile, kbAltV, '', 0
+ACTION key.DeleteLine.CtrlY,                cmDeleteLine, kbCtrlY, '', 0
+ACTION key.SaveText.CtrlS,                  cmSaveText, kbCtrlS, '', 0
+ACTION key.SBBStore.F2,                     cmSBBStore, kbF2, '', 0
+ACTION key.SBBGrab.F10,                     cmSBBGrab, kbF10, '', 0
+ACTION key.SBBKill.F8,                      cmSBBKill, kbF8, '', 0
+ACTION key.TermWrite.F2,                    cmTermWrite, kbF2, '', 0
+ACTION key.TermLog.F3,                      cmTermLog, kbF3, '', 0
+ACTION key.SendModemBreak.F4,               cmSendModemBreak, kbF4, '', 0
+ACTION key.ReceiveFile.PgDn,                cmReceiveFile, kbPgDn, '', 0
+ACTION key.SendFile.PgUp,                   cmSendFile, kbPgUp, '', 0
+ACTION key.ScrollBack.AltB,                 cmScrollBack, kbAltB, '', 0
+ACTION key.SendInitModem.AltI,              cmSendInitModem, kbAltI, '', 0
+ACTION key.HangUp.AltH,                     cmHangUp, kbAltH, '', 0
+ACTION key.TermVisible.AltV,                cmTermVisible, kbAltV, '', 0
+ACTION key.Save.CtrlIns,                    cmSave, kbCtrlIns, '', 0
+ACTION key.ShowMemo.CtrlF9,                 cmShowMemo, kbCtrlF9, '', 0
+ACTION key.HangUp.CtrlZ,                    cmHangUp, kbCtrlZ, '', 0
+ACTION key.Open.ShiftIns,                   cmOpen, kbShiftIns, '', 0
+ACTION key.No.Del,                          cmNo, kbDel, '', 0
+ACTION key.InsertPhone.Ins,                 cmInsertPhone, kbIns, '', 0
+ACTION key.DeletePhone.Del,                 cmDeletePhone, kbDel, '', 0
+ACTION key.EditPhone.F4,                    cmEditPhone, kbF4, '', 0
+ACTION key.DialPhone.F5,                    cmDialPhone, kbF5, '', 0
+ACTION key.NewGame.F2,                      cmNewGame, kbF2, '', 0
+ACTION key.Stop.F3,                         cmStop, kbF3, '', 0
+ACTION key.ShowHi.F4,                       cmShowHi, kbF4, '', 0
+ACTION key.Setup.F5,                        cmSetup, kbF5, '', 0
+ACTION key.TetrisIncLevel.GrayPlus,         cmTetrisIncLevel, kbGrayPlus, '', 0
+ACTION key.TetrisPreview.GrayAst,           cmTetrisPreview, kbGrayAst, '', 0
+ACTION key.NewGame.AltN,                    cmNewGame, kbAltN, '', 0
+ACTION key.Stop.AltP,                       cmStop, kbAltP, '', 0
+ACTION key.ShowHi.AltT,                     cmShowHi, kbAltT, '', 0
+ACTION key.Setup.AltS,                      cmSetup, kbAltS, '', 0
+ACTION key.RViewFile.F3,                    cmRViewFile, kbF3, '', 0
+ACTION key.ReanimateFile.F5,                cmReanimateFile, kbF5, '', 0
+ACTION key.RChDrive.AltC,                   cmRChDrive, kbAltC, '', 0
+ACTION key.MarkFile.Space,                  cmMarkFile, kbSpace, '', 0
+ACTION key.MarkFiles.GrayPlus,              cmMarkFiles, kbGrayPlus, '', 0
+ACTION key.UnMarkFiles.GrayMinus,           cmUnMarkFiles, kbGrayMinus, '', 0
+ACTION key.Open.F3,                         cmOpen, kbF3, '', 0
+ACTION key.Recalc.F5,                       cmRecalc, kbF5, '', 0
+ACTION key.GotoCell.F6,                     cmGotoCell, kbF6, '', 0
+ACTION key.FindCell.F7,                     cmFindCell, kbF7, '', 0
+ACTION key.InsertLine.AltI,                 cmInsertLine, kbAltI, '', 0
+ACTION key.InsertColumn.AltC,               cmInsertColumn, kbAltC, '', 0
+ACTION key.DeleteLine.AltL,                 cmDeleteLine, kbAltL, '', 0
+ACTION key.DeleteColumn.AltD,               cmDeleteColumn, kbAltD, '', 0
+ACTION key.ChangeFormat.AltO,               cmChangeFormat, kbAltO, '', 0
+ACTION key.ToggleShowMode.AltS,             cmToggleShowMode, kbAltS, '', 0
+ACTION key.ImportToFile.ShiftF3,            cmImportToFile, kbShiftF3, '', 0
+ACTION key.GlobalUserMenu.F2,               cmGlobalUserMenu, kbF2, '', 0
+ACTION key.LocalMenuFileEdit.F4,            cmLocalMenuFileEdit, kbF4, '', 0
+ACTION key.MenuFileEdit.F4,                 cmMenuFileEdit, kbF4, '', 0
+ACTION key.GetTeam.AltI,                    cmGetTeam, kbAltI, '', 0
+ACTION key.Tree.F10,                        cmTree, kbF10, '', 0
+ACTION key.Play.ShortCut,                   cdPlay, kbShortCut, '', 0
+ACTION key.Stop.ShortCut,                   cdStop, kbShortCut, '', 0
+ACTION key.Pause.ShortCut,                  cdPause, kbShortCut, '', 0
+ACTION key.Next.ShortCut,                   cdNext, kbShortCut, '', 0
+ACTION key.Prev.ShortCut,                   cdPrev, kbShortCut, '', 0
+ACTION key.FFwd.ShortCut,                   cdFFwd, kbShortCut, '', 0
+ACTION key.Frew.ShortCut,                   cdFrew, kbShortCut, '', 0
+ACTION key.Eject.ShortCut,                  cdEject, kbShortCut, '', 0
+ACTION key.Zoom.ShortCut,                   cdZoom, kbShortCut, '', 0
+ACTION key.SetupModem.F2,                   cmSetupModem, kbF2, '', 0
+ACTION key.Yes.Space,                       cmYes, kbSpace, '', 0
+ACTION key.OK.Enter,                        cmOK, kbEnter, '', 0
+ACTION key.Yes.CtrlEnter,                   cmYes, kbCtrlEnter, '', 0
+ACTION key.ToggleTagData.CtrlS,             cmToggleTagData, kbCtrlS, '', 0
+ACTION key.SelectAll.CtrlA,                 cmSelectAll, kbCtrlA, '', 0
+ACTION key.MakeList.AltW,                   cmMakeList, kbAltW, '', 0
+ACTION key.Terminal.CtrlJ,                  cmTerminal, kbCtrlJ, '', 0
+ACTION key.PrintBlock.CtrlF9,               cmPrintBlock, kbCtrlF9, '', 0
+ACTION key..,                               0, 0, '', 0
+ACTION key.Reanimator.CtrlAltF8,            cmReanimator, kbCtrlAltF8, '', 0

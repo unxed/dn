@@ -69,6 +69,7 @@ w=$out/rcp.work; rm -rf "$w"; mkdir -p "$w/EXE.D32"
 cp "$src/rcpvpd.ini" "$w/RCPVPD.INI"; cp "$src/dnhelp.pas" "$w/DNHELP.PAS"; cp "$src/commands.pas" "$w/COMMANDS.PAS"; cp "$src/stdefine.inc" "$w/STDEFINE.INC"
 # the resource compiler is an old program: it asks for RESOURCE\ENGLISH (capitals) in its own directory; the repository has lower case
 for l in english russian ukrain; do u=$(echo $l | tr a-z A-Z); mkdir -p "$w/RESOURCE/$u"; cp "$src/resource/$l"/* "$w/RESOURCE/$u/"; done
+cp "$src/resource/actions.dna" "$w/RESOURCE/ACTIONS.DNA"
 case "${DN_EXTRA:-}" in *-dDNUTF8*)      # DN inside in UTF-8: the UTF-8 resources are used as-is
     : ;;
 *)      # The code page build (DOS): the UTF-8 resources land on the code page of the language (tools/to-codepage.py: a character that the page lacks

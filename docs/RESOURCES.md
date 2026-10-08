@@ -7,6 +7,7 @@ The dialogs, menus, status lines and strings of each language are text files in 
 | `dn.dnl` | the strings (`dlXxx` of `TStrIdx`, one per line: `dlName 'text'`) | `<language>.lng` |
 | `dn.dnr` | the dialogs, the menus, the status lines, the colour dialog, the editor commands | `<language>.dlg` |
 | `dnhelp.htx` | the help | `<language>.hlp` (by `tv/tools/tvhc.pas`) |
+| `../actions.dna` | the actions of the menus and the status lines, for all the languages (below) | the resource `dlgActions` of each `<language>.dlg` |
 
 `rcp` (`dn/src/rcp.pas`, run by `tools/build.sh`) compiles them; `dn/src/rcpvpd.ini` names the languages, the input and output
 files and the Pascal units whose constants the resources may name (`cm*`, `hc*`, `hs*`, `kb*`, `of*`, `TDlgIdx`, `TStrIdx`).
@@ -66,27 +67,59 @@ than it was shown. Two statements change the rule:
 In the stream, a control with `GROW` has the bit `gfExplicit` ($80) in its `GrowMode` (`TResDialog.Load` takes it off), and
 `TResDialog` stores one byte after `TDialog`: the `RESIZE` value (`$FF` = as the layout finds).
 
-## Menus and status lines
+## Actions, menus and status lines
+
+An action is a command that a menu item or a status line offers, with its key, the text of the key in the menu and its help
+context. Each is declared once, for all the languages, in `dn/src/resource/actions.dna` (named by `Actions=` of `rcpvpd.ini`):
+
+```
+ACTION main.ViewFile, cmViewFile, kbF3, 'F3', hcFileMenu
+ACTION key.Help.F1,   cmHelp,     kbF1, '',   0
+```
+
+The names: `main.*`, `editor.*`, `fixer.*`, `sheet.*` for the items of the main menu, the editor, the disk editor and the
+spreadsheet (the command without `cm`, `.2` for its second item in the same menu), `key.<command>.<key>` for a key that only a
+status line binds. The menus and the status lines of each language name the actions; the caption stays in the language:
 
 ```
 MENU dlgMainMenu
-  SUBMENU '~F~ile', hcFile
-    MENUITEM '~V~iew', 'F3', kbF3, cmView, hcView
+  SUBMENU '~F~ile', hcFileMenu
+    MENUITEM 'M~a~in viewer', main.ViewFile
     MENULINE
   END
 END
 
 STATUSLINE
   STATUSDEF hcFrom, hcTo
-    STATUSITEM '~F1~ Help', kbF1, cmHelp
+    STATUSITEM '~F1~ Help', key.Help.F1
+    STATUSITEM '~Esc~ Cancel', kbNoKey, cmNo
   STATUSDEF hcOther, hcOther
     ...
 END
 ```
 
-`MENUITEM 'caption', 'key text', kbKey, cmCommand, hcContext`; a `STATUSDEF` holds the items for the help contexts
-`hcFrom..hcTo` (the first that matches the context of the focused view is shown); an item with an empty caption is a key
-binding only.
+`MENUITEM 'caption', action` takes the key, the text of the key, the command and the help context from the action;
+`STATUSITEM 'text', action` the key and the command. The older forms `MENUITEM 'caption', 'key text', kbKey, cmCommand, hcContext`
+and `STATUSITEM 'text', kbKey, cmCommand` still compile; the resources use them only for the hints of the status lines that bind
+no key (`kbNoKey`). A `STATUSDEF` holds the items for the help contexts `hcFrom..hcTo` (the first that matches the context of the
+focused view is shown); an item with an empty text is a key binding only.
+
+Where a language has other keys than `actions.dna` (the Russian and the Ukrainian DN have some), its `dn.dnr` says so once, in a
+block before the menus:
+
+```
+ACTIONS
+  main.MakeList, kbAltW, 'Alt-W'
+  main.SetFAttr, kbAltF, 'Alt-F', hcPanelMenu
+END
+```
+
+(name, key, key text and, if it differs, the help context). The menus and the status lines of that language then use those keys.
+
+`rcp` stores the table of the actions of each language (with the caption of the menu item that names the action) as the resource
+`dlgActions` (`TActionTable`, `dn/src/dnactions.pas`); at start DN puts it into the registry `TvActions` of tv3
+(`dn/src/dnactreg.pas`), where an action is found by its name, its command or its key. `dn/tests/t_actions.pas` checks that every
+menu item and every key of the status lines of the three languages is an action of the table.
 
 ## Other blocks
 

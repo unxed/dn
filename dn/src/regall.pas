@@ -83,7 +83,7 @@ uses
   Dialogs, Menus, Streams, ObjType, Scroller, Setups,
   Validate, Views, inputfname 
   , editwin
-  , DNDlgs, DNStrL, bwselect, DlgLayout;
+  , DNDlgs, DNStrL, bwselect, DlgLayout, DnActions;
 
 const
     { Validate }
@@ -212,6 +212,7 @@ RFieldListBox : TStreamRec = (ObjType: otFieldListBox; VmtLink: 0; Load: nil; St
     { Dialogs }
 RDialog : TStreamRec = (ObjType: otDialog; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RResDialog : TStreamRec = (ObjType: otResDialog; VmtLink: 0; Load: nil; Store: nil; Next: nil);
+RActionTable : TStreamRec = (ObjType: otActionTable; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RInputLine : TStreamRec = (ObjType: otInputLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RHexLine : TStreamRec = (ObjType: otHexLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
 RLongInputLine : TStreamRec = (ObjType: otLongInputLine; VmtLink: 0; Load: nil; Store: nil; Next: nil);
@@ -427,6 +428,7 @@ procedure RegisterAll;
     RegisterType(RFieldListBox);
     RegisterType(RDialog);
     RegisterType(RResDialog);
+    RegisterType(RActionTable);
     RegisterStretch(DNDlgs.THexLine, True, False);
     RegisterType(RInputLine);
     RegisterType(RHexLine);
@@ -1189,6 +1191,16 @@ end;
 procedure Store_RDialog(P: TStreamable; S: TStream);
 begin
   Dialogs.TDialog(P).Store(S);
+end;
+
+function Build_RActionTable(S: TStream): TStreamable;
+begin
+  Result := DnActions.TActionTable.Load(S);
+end;
+
+procedure Store_RActionTable(P: TStreamable; S: TStream);
+begin
+  DnActions.TActionTable(P).Store(S);
 end;
 
 function Build_RResDialog(S: TStream): TStreamable;
@@ -2500,6 +2512,10 @@ begin
   RResDialog.VmtLink := PtrUInt(System.TClass(DlgLayout.TResDialog));
   RResDialog.Load := @Build_RResDialog;
   RResDialog.Store := @Store_RResDialog;
+
+  RActionTable.VmtLink := PtrUInt(System.TClass(DnActions.TActionTable));
+  RActionTable.Load := @Build_RActionTable;
+  RActionTable.Store := @Store_RActionTable;
 
   RInputLine.VmtLink := PtrUInt(System.TClass(Dialogs.TInputLine));
   RInputLine.Load := @Build_RInputLine;

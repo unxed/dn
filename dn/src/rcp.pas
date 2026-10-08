@@ -73,7 +73,7 @@ uses
    DefColl,
   ColorSel,
   inputfname
-  , DNDlgs, DNStrL, DlgLayout;
+  , DNDlgs, DNStrL, DlgLayout, DnActions;
 
 const
   tidCommands = 'cm'#0'cd'#0;
@@ -383,6 +383,8 @@ const
   idColorPoint = 'COLORPOINT ';
   idGrow = 'GROW ';
   idResize = 'RESIZE ';
+  idAction = 'ACTION ';
+  idActions = 'ACTIONS';
 
   TheRF: TIdxMaker = nil;
 
@@ -463,6 +465,9 @@ procedure StoreResource(P: TStreamable; Id: TDlgIdx);
 var
   TkL: array[1..8] of LongInt;
   TkS: array[1..8] of String;
+  { the actions (resource/actions.dna, then the keys of the language): the menus and the status lines name them }
+  ActionsFileName: String;
+  Acts: TActionTable = nil;
 
 function GetID(const S: String): LongInt;
   var
@@ -489,6 +494,85 @@ function GetID(const S: String): LongInt;
     GetID := L;
     end;
   end { GetID };
+
+function Token(const S: String; var Pos: LongInt): String; forward;
+
+function ActionIndex(Name: String): Integer;
+  begin
+  DelLeft(Name);
+  DelRight(Name);
+  Result := Acts.IndexOf(Name);
+  if Result < 0 then
+    Error('Unknown action ('+Name+') in line '+ItoS(Line));
+  end;
+
+{ resource/actions.dna: ACTION name, command, key, 'key text', help context }
+procedure LoadActions;
+  var
+    A: lText;
+    S, Name, KeyText: String;
+    I: LongInt;
+    C, K, H: LongInt;
+  begin
+  Acts.Free;
+  Acts := TActionTable.Create;
+  lAssignText(A, ActionsFileName);
+  lResetText(A);
+  if IOResult <> 0 then
+    Error('Cannot open file '+ActionsFileName);
+  Line := 0;
+  while not Eof(A.T) do
+    begin
+    Readln(A.T, S);
+    S := DefineParser.ProceedStr2(S);
+    Inc(Line);
+    DelLeft(S);
+    if (S = '') or (S[1] = ';') then
+      Continue;
+    if UpStrg(Copy(S, 1, Length(idAction))) <> idAction then
+      Error('ACTION expected in line '+ItoS(Line)+' of '+ActionsFileName);
+    I := Length(idAction);
+    Name := Token(S, I);
+    DelRight(Name);
+    C := GetID(Token(S, I));
+    K := GetID(Token(S, I));
+    KeyText := Token(S, I);
+    H := GetID(Token(S, I));
+    if Acts.IndexOf(Name) >= 0 then
+      Error('Duplicate action '+Name+' in line '+ItoS(Line)+' of '+ActionsFileName);
+    Acts.Add(Name, C, K, KeyText, H);
+    end;
+  Close(A.T);
+  Line := 0;
+  end { LoadActions };
+
+{ ACTIONS ... END of a language: name, key, 'key text'[, help context]: the keys of this language }
+procedure MakeActionKeys;
+  var
+    I: LongInt;
+    A: Integer;
+  begin
+  while not Eof(F.T) do
+    begin
+    Readln(F.T, S);
+    S := DefineParser.ProceedStr2(S);
+    Inc(Line);
+    DelLeft(S);
+    if (S = '') or (S[1] = ';') then
+      Continue;
+    if UpStrg(S) = idEND then
+      Break;
+    I := 1;
+    A := ActionIndex(Token(S, I));
+    with Acts.Items[A] do
+      begin
+      KeyCode := GetID(Token(S, I));
+      KeyText := Token(S, I);
+      if I <= Length(S) then
+        HelpCtx := GetID(Token(S, I));
+      end;
+    end;
+  end { MakeActionKeys };
 
 function Token(const S: String; var Pos: LongInt): String;
   var
@@ -730,11 +814,24 @@ procedure ProcessDLGs;
     procedure MakeStatusItem;
       var
         P: PStatusItem;
+        A: Integer;
       begin
       if DL = nil then
         Error('Could not make Status Item without Status Definition');
       i := Length(idStatusItem);
-      begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); P := NewStatusKey(TkS[1], TkL[2], TkL[3], nil) end;
+      TkS[1] := Token(S, i);
+      TkS[2] := Token(S, i);
+      if i > Length(S) then
+        begin { StatusItem 'text', action }
+        A := ActionIndex(TkS[2]);
+        P := NewStatusKey(TkS[1], Acts.Items[A].KeyCode, Acts.Items[A].Command, nil);
+        end
+      else
+        begin { StatusItem 'text', key, command }
+        TkL[2] := GetID(TkS[2]);
+        TkL[3] := GetID(Token(S, i));
+        P := NewStatusKey(TkS[1], TkL[2], TkL[3], nil);
+        end;
       if PL = nil then
         DL^.Items := P
       else
@@ -807,10 +904,28 @@ procedure ProcessDLGs;
 
     procedure MakeMenuItem;
       var
-        HK, Cmd, Ctx: Word;
+        A: Integer;
       begin
       i := Length(idMenuItem);
-      begin TkS[1] := Token(S, i); TkS[2] := Token(S, i); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); TkL[5] := GetID(Token(S, i)); AddItem(NewItem(TkS[1], TkS[2], TkL[3], TkL[4], TkL[5], nil)) end;
+      TkS[1] := Token(S, i);
+      TkS[2] := Token(S, i);
+      if i > Length(S) then
+        begin { MenuItem 'caption', action: the key, its text, the command and the help context come from the action }
+        A := ActionIndex(TkS[2]);
+        with Acts.Items[A] do
+          begin
+          if Caption = '' then
+            Caption := TkS[1];
+          AddItem(NewItem(TkS[1], KeyText, KeyCode, Command, HelpCtx, nil));
+          end;
+        end
+      else
+        begin { MenuItem 'caption', 'key text', key, command, help context }
+        TkL[3] := GetID(Token(S, i));
+        TkL[4] := GetID(Token(S, i));
+        TkL[5] := GetID(Token(S, i));
+        AddItem(NewItem(TkS[1], TkS[2], TkL[3], TkL[4], TkL[5], nil));
+        end;
       end;
 
     procedure MakeMenuLine;
@@ -1328,6 +1443,7 @@ procedure ProcessDLGs;
   tP := Types.GetType(tidOptions);
   tP.ForEach(DoInsert);
 
+  LoadActions;
   Writeln('Reading ', dlgFileName);
   lAssignText(F, dlgFileName);
   ClrIO;
@@ -1362,6 +1478,8 @@ procedure ProcessDLGs;
         CompileDialog(S, idNotepad)
       else if Copy(FreeStr, 1, Length(idMenu)) = idMenu then
         MakeMenu(S)
+      else if FreeStr = idActions then
+        MakeActionKeys
       else if Copy(FreeStr, 1, Length(idStatusLine)) = idStatusLine then
         MakeStatus
       else if Copy(FreeStr, 1, Length(idEditorCommands))
@@ -1374,6 +1492,7 @@ procedure ProcessDLGs;
 
   Close(F.T);
   SetSavers;
+  StoreResource(Acts, dlgActions);
   if FailCheck then
     Halt(1);
 
@@ -1557,6 +1676,10 @@ repeat
     Break
 until False;
 {-DataCompBoy-}
+
+ActionsFileName := INI.Get('Controls', 'Actions');
+if ActionsFileName = '' then
+  Error('No Actions file in the section [Controls].');
 
 LList := INI.Get('Controls', 'Indexes');
 repeat

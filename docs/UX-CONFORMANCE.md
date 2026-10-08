@@ -18,7 +18,7 @@ Verdicts: **conformant**, **gap** (does not hold somewhere), **conflict** (the r
 an option gives the rule; see "Options for the guideline behaviour"),
 **n/a**. How checked: `P:ux` = `tools/dn-linux-ux.py` (a pty, the screen is read; this task); `P:sweep` = `tools/dn-linux-menusweep.py` (every item of the menu
 opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux-dialoghot.py` (hot letters in the three languages); `P:path` =
-`tools/dn-linux-pathscan.py`; `P:dlgresize` = `tools/dn-linux-dlgresize.py` (the corner of a dialog dragged with the mouse); `C` = read in the code only.
+`tools/dn-linux-pathscan.py`; `P:dlgresize` = `tools/dn-linux-dlgresize.py` (the corner of a dialog dragged with the mouse); `T:t_actions` = the unit test `dn/tests/t_actions.pas` (`tools/dn-test.sh`); `C` = read in the code only.
 
 ## The table
 
@@ -69,9 +69,9 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | X.2 | Double click is `Enter` | yes (panels, lists) | conformant | C |
 | X.3 | Right click for secondary actions in file panels | the right button marks files in the panels (the NC habit) | conformant | C |
 | X.4 | The wheel scrolls the component under the cursor | the windows: tv3 (`UxWheelUnderCursor`) gives the wheel to the window under the pointer (an editor that is not active scrolls). The two panels are one window: a panel takes the wheel itself and moves its own cursor (`filepanel.pas`), so the wheel over the panel that is not active moves that panel and the focus stays | conformant | P:ux |
-| R.1 | One action = one declaration (the registry `TvActions`) | DN keeps its resource tables (`dn.dnr`: menus, status lines, key maps); not migrated. `TvActions` builds the items of `TvMenus` and the status keys of tv3, while the menu bar and the status lines of DN are its own `Menus` unit, read from the resources of each language (the captions are translated there) | gap | C |
+| R.1 | One action = one declaration (the registry `TvActions`) | the 419 actions of the menus and the status lines (command, key, key text, help context) are declared once in `dn/src/resource/actions.dna`; the menus (`MENUITEM 'caption', action`) and the status lines (`STATUSITEM 'text', action`) of the three languages name them and keep only their captions; a language whose DN has other keys says so once in its `ACTIONS` block (Russian 34, Ukrainian 33 actions). `rcp` builds the menus and the status lines from the actions and stores the table of each language (`dlgActions`); DN puts it into `TvActions` at start. The menus and the status lines are the same as before in every language (compared item by item: caption, key text, key, command, help context). Not moved: the hints of the status lines that bind no key, the key map of the editor (`EDITOR COMMANDS`), the keys that the code of DN handles itself; a key rebound in `TvActions` at run time does not reach the menus of DN (they are built by `rcp`) | conformant | C, T:t_actions |
 
-Count: 46 rows: **36 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **1 gap** (R.1), **7 conflict** (G.2b, L.2, E.7, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
+Count: 46 rows: **37 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **0 gap**, **7 conflict** (G.2b, L.2, E.7, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
 
 ## Other keys the guidelines touch
 
@@ -91,6 +91,7 @@ dropping the letters would change the hot keys of the menu.
 
 ## The gap rows closed afterwards
 
+* R.1: `dn/tests/t_actions.pas` (`T:t_actions`) checks that every menu item and every key of the status lines of the three languages is an action of the table of its language, that the languages have the same actions and that the table goes into `TvActions`.
 * D.4: `P:dlgresize` = `tools/dn-linux-dlgresize.py` drags the corner of Make directory (it grows to the right only: the input line stretches, the buttons follow; it cannot be made smaller) and of Commands history (the list stretches both ways, the buttons move down).
 * 0.2, 0.3: the switcher of tv3 works in DN as it is (DN's desktop is tv3's); DN adds the names of the windows that have no title. `P:ux` answers the query of the
   keyboard protocol of Kitty and sends the presses and releases of that protocol.
