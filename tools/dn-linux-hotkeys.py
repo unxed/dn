@@ -90,7 +90,9 @@ def arrow_keys(path):
     m, rest = path[0], path[1:]
     ks = ['F10'] + ['RIGHT'] * m
     for depth, r in enumerate(rest):
-        ks += ['DOWN'] * (r + 1 if depth == 0 else r) + ['ENTER']
+        # Right in the bar opens the menu of the next item and selects its first item: the first Down is not needed there
+        first = 0 if depth == 0 and path[0] > 0 else 1
+        ks += ['DOWN'] * (r + first if depth == 0 else r) + ['ENTER']
     return [KEYS[k] for k in ks]
 
 

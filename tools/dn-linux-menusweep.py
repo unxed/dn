@@ -83,7 +83,9 @@ def keys_for(path):
     ks = ['F10'] + ['RIGHT'] * m
     for depth, r in enumerate(rest):
         # the first Down opens the menu of the bar and selects its first item; a submenu opened with Enter has its first item selected already
-        ks += ['DOWN'] * (r + 1 if depth == 0 else r) + ['ENTER']
+        # (Right in the bar opens the menu of the next item and selects its first item, so there the first Down is not needed)
+        first = 0 if depth == 0 and path[0] > 0 else 1
+        ks += ['DOWN'] * (r + first if depth == 0 else r) + ['ENTER']
     return ks
 
 
