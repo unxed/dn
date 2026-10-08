@@ -35,10 +35,19 @@ class PathNotationRows(unittest.TestCase):
         msgs = accept.diff_snaps(snap(self.OBJECT), snap(changed))
         self.assertTrue(msgs and msgs[0].startswith('cells differ'), msgs)
 
-    def test_a_different_path_still_fails(self):
-        other = list(self.CLASS)
-        other[1] = '\u2554\u2550\u2550\u2550\u2550 /tmp/y \u2550\u2550\u2550\u2550\u2557'
-        msgs = accept.diff_snaps(snap(self.OBJECT), snap(other))
+    def test_a_title_cut_by_a_menu_at_a_different_place_passes(self):
+        object_rows = ['menu', 'x\u2550[\u25a0]\u2550\u2550 C:\\tmp\\dn-accept-1\\work  \u250c\u2500\u2510 -1\\work \u2550[\u2195]\u2550\u2557']
+        class_rows = ['menu', 'x\u2550[\u25a0]\u2550\u2550\u2550 /tmp/dn-accept-1/work \u2550 \u250c\u2500\u2510 1/work \u2550\u2550[\u2195]\u2550\u2557']
+        self.assertEqual(accept.diff_snaps(snap(object_rows), snap(class_rows)), [])
+
+    def test_a_lost_gadget_on_the_title_row_still_fails(self):
+        object_rows = ['menu', 'x\u2550[\u25a0]\u2550\u2550 C:\\tmp\\w \u2550\u2550[\u2195]\u2550\u2557']
+        class_rows = ['menu', 'x\u2550\u2550\u2550\u2550\u2550 /tmp/w \u2550\u2550[\u2195]\u2550\u2557']
+        msgs = accept.diff_snaps(snap(object_rows), snap(class_rows))
+        self.assertTrue(msgs and msgs[0].startswith('cells differ'), msgs)
+
+    def test_a_row_without_a_drive_path_is_compared_exactly(self):
+        msgs = accept.diff_snaps(snap(['menu', '/tmp/x', 'files']), snap(['menu', '/tmp/y', 'files']))
         self.assertTrue(msgs and msgs[0].startswith('cells differ'), msgs)
 
     def test_a_changed_colour_on_the_title_still_fails(self):

@@ -443,38 +443,38 @@ def _csi_topleft_residue(text: str) -> bool:
 
 
 _DRIVE_PREFIX = re.compile(r'(?<![A-Za-z])[A-Za-z]:(?=[\\/])')
-_BORDER_FILL = re.compile(r'[\u2500-\u257f ]+')
+_PATH_TEXT = re.compile(r'[\w.~:\\/\- \u2500-\u257f]+')
 
 
 def _path_notation_key(row: str) -> str:
-    """The row with the way a path is written taken out.
+    """What is left of a row once the path text and the border fill are taken out.
 
     The frozen object build shows a panel path as C:\\tmp\\x, a build that
-    shows the Linux path shows /tmp/x (dn#23). A centred title also moves the
-    border fill by the difference in length. Drive letters, the slash kind and
-    the runs of border characters and blanks are removed, so two rows that say
-    the same thing in the two notations get the same key.
+    shows the Linux path shows /tmp/x (dn#23). That changes the length of a
+    centred title, so the border fill moves, and the part of a long title that a
+    menu leaves visible moves with it. Words, digits, slashes, drive letters and
+    border characters are removed, so what remains are the decorations (the
+    window number and the close and zoom gadgets, the corners a menu draws).
     """
-    row = _DRIVE_PREFIX.sub('', row).replace('\\', '/')
-    return _BORDER_FILL.sub('', row)
+    return _PATH_TEXT.sub('', row)
 
 
 def path_notation_rows(ta: str, tb: str, ca: dict, cb: dict) -> set[int]:
-    """Rows that differ only in the notation of a path (dn#23).
+    """Rows whose only difference is the notation of a path (dn#23).
 
-    A row qualifies when its text differs between the builds, is the same once
-    the notation is taken out, and uses the same set of cell attributes on both
-    sides; the colours of a title are still compared that way. Anything else on
-    the row, a changed word included, keeps the row in the comparison.
+    A row qualifies when it holds a drive-letter path on one side, differs in
+    text between the builds, keeps the same decorations once the path text and
+    the border fill are taken out, and uses the same set of cell attributes on
+    both sides. A row without a drive-letter path is always compared cell by cell.
     """
     rows_a, rows_b = ta.splitlines(), tb.splitlines()
     out = set()
     for y in range(min(len(rows_a), len(rows_b))):
         if rows_a[y] == rows_b[y]:
             continue
-        if _path_notation_key(rows_a[y]) != _path_notation_key(rows_b[y]):
+        if not (_DRIVE_PREFIX.search(rows_a[y]) or _DRIVE_PREFIX.search(rows_b[y])):
             continue
-        if not any(c in rows_a[y] or c in rows_b[y] for c in ('\\', ':')):
+        if _path_notation_key(rows_a[y]) != _path_notation_key(rows_b[y]):
             continue
         attrs_a = {v[1] for (yy, _), v in ca.items() if yy == y}
         attrs_b = {v[1] for (yy, _), v in cb.items() if yy == y}
