@@ -9,7 +9,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 119 |
 | Contributors of DN OSP | 8 |
-| Upstream without a notice | 14 |
+| Upstream without a notice | 15 |
 
 ## Our files (MIT, see `LICENSE`)
 
@@ -39,4 +39,4 @@ Files of the public DN OSP 2.14 whose heads name another author (Cat, JO, AK155.
 
 Files of the public DN OSP 2.14 with no notice in the head (small adapters, tables, include files). Part of the same release.
 
-`copyini.pas`, `fatalerr.pas`, `fileerrors.pas`, `filetype.pas`, `osdiskdos.pas`, `osdiskunix.pas`, `osdiskwindows.pas`, `panelsetup.pas`, `rcpvpd.ini`, `stdefine.inc`, `sysutils.inc`, `uselfn.pas`, `usersavr.pas`, `xcode.pas`
+`copyini.pas`, `dnpath.pas`, `fatalerr.pas`, `fileerrors.pas`, `filetype.pas`, `osdiskdos.pas`, `osdiskunix.pas`, `osdiskwindows.pas`, `panelsetup.pas`, `rcpvpd.ini`, `stdefine.inc`, `sysutils.inc`, `uselfn.pas`, `usersavr.pas`, `xcode.pas`

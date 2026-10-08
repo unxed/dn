@@ -12,6 +12,7 @@ diskimg.pas 1
 dnexec.pas 1
 dnutil.pas 3
 drives.pas 3
+editcore.pas 2
 eraser.pas 1
 filecopy.pas 5
 filefind.pas 1
@@ -19,5 +20,7 @@ fsinfo.pas 1
 fviewer.pas 1
 highlite.pas 1
 lfn.pas 19
+paneldlgs.pas 1
 panelroot.pas 1
+strutil.pas 1
 tree.pas 1
