@@ -36,3 +36,8 @@ They hold for the current tree and for the whole commit history of every reposit
 5. **Legal texts** (LICENSE, COPYRIGHT files, licence notices) are changed only by a decision of the owner.
 6. Something found in violation is removed from the tree and from the history, then written again from the allowed
    sources; a loss of function is acceptable until then, a violation is not.
+
+## State of the work
+
+The plan, the state of each item, the root causes of the delays and the working rules: `docs/HANDOFF.md` of the
+repository unxed/dn.
