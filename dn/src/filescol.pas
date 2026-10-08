@@ -211,7 +211,7 @@ function SameFile(P1, P2: PFileRec): Boolean;
   i.e. whether the (long) name and path match. `}
 
 implementation
-uses
+uses DnPath,
   Lfn, DNUtf8, mainapp, Menus, Views, panelroot, filepanel, Drives,
   objutil, Commands, Messages,
   {!!}CmdLine
@@ -1156,7 +1156,10 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
       begin
       Inc(DrvCnt);
       DrvStrArr[DrvCnt].Dr := C;
-      DrvStrArr[DrvCnt].FullS := '~'+C+':~';
+      if HasDrives then
+        DrvStrArr[DrvCnt].FullS := '~'+C+':~'
+      else
+        DrvStrArr[DrvCnt].FullS := '~'+C+'~ '+DnSep;     { one tree: the root of the file system }
       end;
 
   for I := 1 to DrvCnt do
@@ -1168,6 +1171,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
         begin
        {DriveNum := Byte(C)-64;}
         DT := GetDriveTypeNew(Dr);
+        if HasDrives then
         case DT of
           dtnFloppy:
             if (InterfaceData.DrvInfType.TypeShowFor and ditFloppy <> 0) then

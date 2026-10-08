@@ -298,7 +298,7 @@ const
     Quick: pqsAlt;
     LRCtrlInDriveLine: fdlPassive;
     Show: fmsSortIndicator+
-      fmsDriveLine+
+      {$IFNDEF UNIX}fmsDriveLine+{$ENDIF}
       fmsShowScrollBar+
       fmsHiliteFiles;
     LFN_Wrap: 0; {Combo}
