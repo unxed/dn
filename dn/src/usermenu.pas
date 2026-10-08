@@ -90,7 +90,7 @@ const
   RunFrom2E: Boolean = False;
 
 implementation
-uses
+uses DnPath,
   Lfn, {DataCompBoy}
   mainapp, basics, strutil, fileutil, Startup, Messages, Menus,
   Commands, editcore, WinClp, DNHelp, Dos, Dialogs, Tree

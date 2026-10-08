@@ -88,7 +88,7 @@ procedure UUEncode(const FName: String);
 
 implementation
 
-uses
+uses DnPath,
   uselfn, Math, Tree
   , Dos, Lfn {DataCompBoy}
   , basics, strutil, fileutil, TvGlyphs, Views, Startup, Dialogs,

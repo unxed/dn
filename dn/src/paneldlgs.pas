@@ -2071,7 +2071,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   PIF.C[4] := P.GetColorW(2);
   
   PIF.SetData(S);
-  PIF.SetValidator(TFilterValidator.Create([#32..#255]-IllegalCharSet-[PathSep, '/', '*', '?', '"']));
+  PIF.SetValidator(TFilterValidator.Create([#32..#255]-IllegalCharSet-['\', '/', '*', '?', '"']));
   PIF.SelectAll(False);
 
   {AK155 So the command line does not steal the cursor, disable

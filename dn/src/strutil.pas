@@ -272,7 +272,7 @@ function Str2Comp(const s: String): Int64;
 
 implementation
 
-uses
+uses DnPath,
   DnIni, Startup, Commands, basics, keymap, DNUtf8, TvGlyphs
   ;
 procedure AddStr(var S: String; C: Char);
@@ -1791,7 +1791,7 @@ function PosLastDot(StrToMake: String): Byte;
   for I := Length(StrToMake) downto 1 do
     begin
     case StrToMake[I] of
-      PathSep, '/':
+      '\', '/':
         Break;
       '.':
         begin

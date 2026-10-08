@@ -59,7 +59,7 @@ function LngId: String;
 
 implementation
 
-uses Dos, lfn, DnIni, iniengine;
+uses DnPath, Dos, lfn, DnIni, iniengine;
 
 function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   var
@@ -70,10 +70,10 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   S1 := GetEnv('DNDLG');
   if S1 = '' then
     S1 := SourceDir;
-  if not (S1[Length(S1)] in [PathSep, '/']) then
+  if not (IsPathSep(S1[Length(S1)])) then
     S1 := S1+PathSep;
   S2 := StartupDir;
-  if not (S2[Length(S2)] in [PathSep, '/']) then
+  if not (IsPathSep(S2[Length(S2)])) then
     S2 := S2+PathSep;
   if  (not CheckForHelp) and (not ExistFile(S1+LI+'.dlg')) and
       (not ExistFile(S2+LI+'.dlg'))
@@ -86,7 +86,7 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   if CheckForHelp then
     begin
     S1 := SourceDir;
-    if not (S1[Length(S1)] in [PathSep, '/']) then
+    if not (IsPathSep(S1[Length(S1)])) then
       S1 := S1+PathSep;
     if  (not ExistFile(S1+LI+'.hlp')) and (not ExistFile(S2+LI+'.hlp'))
     then

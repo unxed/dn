@@ -212,7 +212,7 @@ procedure RefreshCaseTables;
   {` The tables of upper and lower case again (the OS gives them for the code page it has; the letters of the current code page of DN that it does not know are added: see CompleteUpcaseFromPage). Without -dDNUTF8 only: with it the case is done by DNUtf8. `}
 
 implementation
-  uses
+  uses DnPath,
     country, basics, Streams, DNUtf8, TvCodePg;
 
 procedure XLatBuf(var B; Len: Integer; const XTable: TXLat);

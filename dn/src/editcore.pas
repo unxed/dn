@@ -1675,9 +1675,9 @@ procedure TFileEditor.OpenFileAtCursor;
     IllegalCharSetDos =
       [';', ',', '=', '+', '<', '>', '|', '"', '[', ']', ' ', '*', '?'];
     Break2 = IllegalCharSet+['*', '?'];
-    Break1 = Break2+[PathSep, '/'];
+    Break1 = Break2+['\', '/'];
     Break4 = IllegalCharSetDos;
-    Break3 = Break4+[PathSep, '/'];
+    Break3 = Break4+['\', '/'];
 
   type
     TSetChar = set of Char;

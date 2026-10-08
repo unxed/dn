@@ -1027,10 +1027,10 @@ function GetSName(const S: String): String;
     begin
     if  (S[B] = '.') and (Pe = Length(S)+1) then
       Pe := B;
-    if S[B] in [PathSep, '/'] then
+    if IsPathSep(S[B]) then
       Break;
     end;
-  if S[B] in [PathSep, '/'] then
+  if IsPathSep(S[B]) then
     B := B+1
   else
     Pe := Pe-1; {JO}
@@ -1065,17 +1065,17 @@ function GetShortRelPath(Path: String): String;
   var
     CD: String;
   begin
-  if Path[Length(Path)] in [PathSep, '/'] then
+  if IsPathSep(Path[Length(Path)]) then
     SetLength(Path, Length(Path)-1);
   Path := lfGetShortFileName(Path);
   lGetDir(0, CD);
-  if CD[Length(CD)] in [PathSep, '/'] then
+  if IsPathSep(CD[Length(CD)]) then
     SetLength(CD, Length(CD)-1);
   CD := lfGetShortFileName(CD);
   if UpStrg(Copy(Path, 1, Length(CD))) = UpStrg(CD)
   then
     Delete(Path, 1, Length(CD));
-  if Path[1] in [PathSep, '/'] then
+  if IsPathSep(Path[1]) then
     Delete(Path, 1, 1); {DelFC(Path);}
   GetShortRelPath := Path;
   end;
@@ -1086,18 +1086,18 @@ function GetLongRelPath(Path: String): String;
   var
     CD: String;
   begin
-  if Path[Length(Path)] in [PathSep, '/'] then
+  if IsPathSep(Path[Length(Path)]) then
     SetLength(Path, Length(Path)-1);
   
   Path := lfGetLongFileName(Path);
   
   lGetDir(0, CD);
-  if CD[Length(CD)] in [PathSep, '/'] then
+  if IsPathSep(CD[Length(CD)]) then
     SetLength(CD, Length(CD)-1);
   if UpStrg(Copy(Path, 1, Length(CD))) = UpStrg(CD)
   then
     Delete(Path, 1, Length(CD));
-  if Path[1] in [PathSep, '/'] then
+  if IsPathSep(Path[1]) then
     Delete(Path, 1, 1); {DelFC(Path);}
   GetLongRelPath := Path;
   end;

@@ -162,7 +162,7 @@ const
   
 
 implementation
-uses
+uses DnPath,
   DiskInfo, Commands, FileCopy, FilesCol, basics, strutil, fileutil,
   Startup, mainapp, topview, Tree, FViewer, TvGlyphs
   
@@ -822,7 +822,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
     Message(Panel[N].AnyPanel, evCommand, cmGetDirName, @S);
     if S <> '' then
       begin
-      if not (S[Length(S)] in [PathSep, '/']) then
+      if not (IsPathSep(S[Length(S)])) then
         AddStr(S, PathSep);
       S := SquashesName(S);
       Message(CommandLine, evCommand, cmInsertName, @S);

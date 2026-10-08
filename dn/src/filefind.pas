@@ -603,12 +603,12 @@ function FindFiles(var Files: TFilesCollection;
           AType.GetFile;
           if FileInfo.Last = 0 then
             begin
-            Replace('/', PathSep, FileInfo.FName);
+            Replace('/', ArcSep, FileInfo.FName);
             with FileInfo do
               begin
-              if FName[1] <> PathSep then
-                FName := PathSep+FName;
-              if FName[Length(FName)] = PathSep then
+              if FName[1] <> ArcSep then
+                FName := ArcSep+FName;
+              if FName[Length(FName)] = ArcSep then
                 begin
                 SetLength(FName, Length(FName)-1);
                 Attr := Attr or Directory;
@@ -627,10 +627,10 @@ function FindFiles(var Files: TFilesCollection;
               begin
               if  (FileInfo.Attr and Directory) <> 0 then
                 begin
-                if FileInfo.FName[Length(FileInfo.FName)] = PathSep then
+                if FileInfo.FName[Length(FileInfo.FName)] = ArcSep then
                   PArcLastDir := NewStr(UpStrg(FileInfo.FName))
                 else
-                  PArcLastDir := NewStr(UpStrg(FileInfo.FName+PathSep));
+                  PArcLastDir := NewStr(UpStrg(FileInfo.FName+ArcSep));
                 Inc(MemReq, Length(PArcLastDir^)+1);
                 end;
               if  ( ( (FileInfo.Attr and Directory) = 0) or
@@ -685,7 +685,7 @@ function FindFiles(var Files: TFilesCollection;
                 Inc(MemReq, Length(PArcLastDir^)+1);
                 SetLength(LDir, Length(LDir)-1);
                 for I := Length(LDir) downto 1 do
-                  if LDir[I] = PathSep then
+                  if LDir[I] = ArcSep then
                     Break;
                 DrName := Copy(LDir, I+1, MaxStringLength);
                 SetLength(LDir, I);
@@ -1801,7 +1801,7 @@ procedure TFindDrive.UseFile(P: PFileRec; Command: Word);
     I := PosChar(':', OwnArc);
     OwnArc := Copy(P^.Owner^, 1, I-1);
     PathInside := Copy(P^.Owner^, I+1, MaxStringLength);
-    if PathInside[1] = PathSep then
+    if PathInside[1] = ArcSep then
       Delete(PathInside, 1, 1);
     { detect the archive type}
     ArcFile := TBufStream.Create(OwnArc, stOpenRead, 512);
@@ -1859,7 +1859,7 @@ TryAgain:
       { Flash <<< }
       end;
     SS := MakeNormName(PathInside, P^.FlName[True]);
-    if SS[1] = PathSep then
+    if SS[1] = ArcSep then
       Delete(SS, 1, 1);
     S2 := OwnArc;
     
