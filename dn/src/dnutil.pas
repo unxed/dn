@@ -107,6 +107,7 @@ type
     {AK155}
     procedure AddFormat;
     procedure EditFile(Intern: Boolean; FileName: String);
+    procedure EditCommandLineFiles;
     {DataCompBoy}
     procedure OutOfMemory; override;
     procedure RetrieveDesktop(const FileName: String; LS: TStream;
@@ -533,12 +534,8 @@ constructor TDNApplication.Create;
     R: TRect;
     I: Integer;
     C: Char absolute I { let's so };
-    FileName: String;
     LoadStream: TStream;
     Event: TEvent;
-
-  var
-    flj: Boolean;
   begin
   for C := 'A' to 'Z' do
     DrvTrees[C].C := nil;
@@ -608,20 +605,6 @@ constructor TDNApplication.Create;
 
   Insert(Clock);
 
-  flj := False;
-  if RunFirst then
-    for I := 1 to ParamCount do
-      begin
-      if flj then
-        FileName := FileName+ParamStr(I)
-      else
-        FileName := ParamStr(I);
-      if Pos('"', FileName) <> 0 then
-        flj := not flj;
-      if  (FileName[1] <> {$IFDEF UNIX}'-'{$ELSE}'/'{$ENDIF}) and not flj then
-        EditFile(True, DelSquashes(FileName));
-      end;
-
   if RunMenu then
     begin
     Event.What := evCommand;
@@ -632,6 +615,28 @@ constructor TDNApplication.Create;
     EraseByName(SwpDir+'dn'+ItoS(DNNumber)+'.swp');
   end { TDNApplication.Init };
 {-DataCompBoy-}
+
+{ the files named on the command line go to the editor; called after the first panel is open, so that the
+  editors are in front of it }
+procedure TDNApplication.EditCommandLineFiles;
+  var
+    I: Integer;
+    FileName: String;
+    flj: Boolean;
+  begin
+  flj := False;
+  for I := 1 to ParamCount do
+    begin
+    if flj then
+      FileName := FileName+ParamStr(I)
+    else
+      FileName := ParamStr(I);
+    if Pos('"', FileName) <> 0 then
+      flj := not flj;
+    if  (FileName <> '') and (FileName[1] <> {$IFDEF UNIX}'-'{$ELSE}'/'{$ENDIF}) and not flj then
+      EditFile(True, DelSquashes(FileName));
+    end;
+  end;
 
 procedure TDNApplication.InitCommandLine;
   var

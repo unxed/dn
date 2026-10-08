@@ -920,6 +920,7 @@ procedure RUN_IT;
     then
       Message(MyApplication, evCommand, cmFirstTimePanel, nil);
     TraceStartupState('after-first-panel-command');
+    MyApplication.EditCommandLineFiles;
 
     FreeStr[1] := Char(FindParam('/P'));
     if  (FreeStr[1] > #0) then
