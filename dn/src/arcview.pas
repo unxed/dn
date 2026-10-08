@@ -153,7 +153,7 @@ type
 
 implementation
 
-uses
+uses DnPath,
   osdep, Eraser, DNErrLog, TvGlyphs,
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
   Arvid, timeutil, VideoMan, DnExec, FileFind
@@ -1255,8 +1255,8 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
       
       ;
 
-  if not (ExtrDir[Length(ExtrDir)] in ['\', '/']) then
-    ExtrDir := ExtrDir+'\';
+  if not IsPathSep(ExtrDir[Length(ExtrDir)]) then
+    ExtrDir := ExtrDir+DnSep;
 
   SCurDir := CurDir;
   SCr := '';

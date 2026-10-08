@@ -277,7 +277,7 @@ const
 
 implementation
 
-uses
+uses DnPath,
   Lfn, basics, strutil, fileutil, mainapp, Commands,
   Dialogs, FilesCol, FViewer, Startup,
   ArcView, FileCopy, HistList, {FStorage,}Menus, ArchDet,
@@ -1296,8 +1296,8 @@ procedure UnarchiveFiles(const FName: String);
     DT.S := HistoryStr(hsExtract, 0);
   if DT.S = cTEMP_ then
     DT.S := '';
-  if  (Length(DT.S) > 3) and (DT.S[Length(DT.S)] <> '\') then
-    DT.S := DT.S+'\';
+  if  (Length(DT.S) > PathRootLen(DT.S)) and not IsPathSep(DT.S[Length(DT.S)]) then
+    DT.S := DT.S+DnSep;
   {JO}
   // check whether the drive is in the list of drives onto which we
   // extract without a temporary subdirectory (by default A: and B:)
@@ -1338,8 +1338,8 @@ TryAgain:
   if  (DT.S = '') or (DT.S = '.') then
     DT.S := GetPath(FName);
   ExtrDir := DT.S;
-  if ExtrDir[Length(ExtrDir)] <> '\' then
-    ExtrDir := ExtrDir+'\';
+  if not IsPathSep(ExtrDir[Length(ExtrDir)]) then
+    ExtrDir := ExtrDir+DnSep;
 
   {JO}
   // check whether the destination directory contains files

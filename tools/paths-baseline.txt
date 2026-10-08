@@ -1,7 +1,7 @@
 archdet.pas 1
-archiver.pas 8
+archiver.pas 4
 archread.pas 5
-arcview.pas 38
+arcview.pas 36
 arvid.pas 22
 arvidavt.pas 29
 arvidtdr.pas 2
