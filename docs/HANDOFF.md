@@ -58,6 +58,8 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     choosing a lower number; a test that cannot run beside others is a bug of the test (a fixed path, a fixed tmux session name).
 11. "Later, after the other agent" for a task the owner asked for now. Rule: a task the owner asks for starts at once, in its own
     worktree; a possible conflict with another agent is settled at the merge, not by waiting.
+12. Priority (owner, 2026-10-08): making every test that can run in parallel do so, locally and in CI, comes first; work that
+    would interfere with it (edits of the workflows or of the test runners) waits until it is merged.
 
 ## How to
 
