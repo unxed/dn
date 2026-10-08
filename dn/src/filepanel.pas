@@ -1728,8 +1728,8 @@ function TInfoView.GetPalette: TPalette;
 
 function TDirView.GetText(MaxWidth: Integer): String;
   begin
-  Result := 
-    (TFilePanelRoot(Panel).DirectoryName);
+  { On Unix the path is shown the way the system writes it: /dev/shm/, not C:\dev\shm\ (issue #23). }
+  Result := SysDisplayPath(TFilePanelRoot(Panel).DirectoryName);
   Result := Cut(Result, MaxWidth);
   end { TDirView.Draw };
 
