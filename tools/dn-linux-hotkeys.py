@@ -34,7 +34,18 @@ def unquote(s):
             return ''.join(r), s[j + 1:]
 
 
+def action_commands():
+    """the command of each action of dn/src/resource/actions.dna (the name in lower case): a menu item of the form MenuItem 'caption', action"""
+    r = {}
+    for l in open(os.path.join(RESDIR, 'actions.dna'), encoding='utf-8').read().split('\n'):
+        m = re.match(r'\s*ACTION\s+([^,\s]+)\s*,\s*(\w+)', l, re.I)
+        if m:
+            r[m.group(1).lower()] = m.group(2)
+    return r
+
+
 def parse(lang):
+    ACTIONS = action_commands()
     lines = open(os.path.join(RESDIR, LANGDIR[lang], 'dn.dnr'), encoding='utf-8', errors='replace').read().split('\n')
     start = [k for k, l in enumerate(lines) if l.strip().startswith('MENU dlgMainMenu')][0]
     tree = []
@@ -54,7 +65,8 @@ def parse(lang):
                 stack[-1].append(node)
                 stack.append(node['items'])
             else:
-                node['cmd'] = rest.split(',')[3].strip() if rest.count(',') >= 4 else ''
+                parts = [x.strip() for x in rest.split(',')]
+                node['cmd'] = parts[3] if len(parts) > 4 else ACTIONS.get(parts[1].lower(), '') if len(parts) > 1 else ''
                 stack[-1].append(node)
         elif s.startswith('MenuLine'):
             stack[-1].append({'name': 'LINE', 'hot': None, 'items': None, 'cmd': ''})

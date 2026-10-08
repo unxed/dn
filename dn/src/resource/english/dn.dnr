@@ -314,467 +314,467 @@ END
 
 MENU dlgEditorMenu
  SubMenu '~F~ile', hcedFile,
-      MenuItem '~O~pen...', 'F3', kbShiftF3, cmLoadText, hcedFile,
-      MenuItem 'Op~e~n file at cursor...', 'Ctrl-Enter', kbCtrlEnter, cmOpenFileAtCursor, hcedFile,
-      MenuItem '~S~ave', 'F2', kbF2, cmSaveText, hcedFile,
-      MenuItem 'Save ~a~s...', 'Shift-F2', kbShiftF2, cmSaveTextAs, hcedFile,
-      MenuItem 'Save a~l~l...', 'Ctrl-F2', kbCtrlF2, cmSaveAll, hcedFile,
+      MenuItem '~O~pen...', editor.LoadText
+      MenuItem 'Op~e~n file at cursor...', editor.OpenFileAtCursor
+      MenuItem '~S~ave', editor.SaveText
+      MenuItem 'Save ~a~s...', editor.SaveTextAs
+      MenuItem 'Save a~l~l...', editor.SaveAll
       MenuLine
 ; {-$VIV}
-      MenuItem '~P~rint', 'Ctrl-F8', kbCtrlF8, cmPrintFileEd, hcedFile,
-      MenuItem 'Print ~b~lock', 'Shift-F8', kbShiftF8, cmPrintBlock, hcedFile,
+      MenuItem '~P~rint', editor.PrintFileEd
+      MenuItem 'Print ~b~lock', editor.PrintBlock
       MenuLine
-      MenuItem '~M~ain menu', 'F10', kbF10, cmMainMenu, hcedFile,
-      MenuItem 'E~x~it', 'Ctrl-F4', kbCtrlF4, cmClose, hcedFile,
+      MenuItem '~M~ain menu', editor.MainMenu
+      MenuItem 'E~x~it', editor.Close
     END
  SubMenu '~E~dit', hcedEdit,
-      MenuItem '~U~ndo', 'Alt-BkSp', kbAltBack, cmUndo, hcedEdit,
-      MenuItem '~R~edo', 'Alt-~', kbAltTilde, cmRedo, hcedEdit,
+      MenuItem '~U~ndo', editor.Undo
+      MenuItem '~R~edo', editor.Redo
       MenuLine
-      MenuItem 'Cu~t~', 'Shift-Del', kbShiftDel, cmCut, hcedEdit,
-      MenuItem '~C~opy', 'Ctrl-Ins', kbCtrlIns, cmCopy, hcedEdit,
-      MenuItem '~P~aste', 'Shift-Ins', kbShiftIns, cmPaste, hcedEdit,
-      MenuItem 'C~o~py to...', ' ', kbNoKey, cmBlockWrite, hcedEdit,
-      MenuItem 'P~a~ste from...', ' ', kbNoKey, cmBlockRead, hcedEdit,
+      MenuItem 'Cu~t~', editor.Cut
+      MenuItem '~C~opy', editor.Copy
+      MenuItem '~P~aste', editor.Paste
+      MenuItem 'C~o~py to...', editor.BlockWrite
+      MenuItem 'P~a~ste from...', editor.BlockRead
       MenuLine
 ;{csablak}
 ;$IFDEF OS2
-      Menuitem 'Copy on OS/2 clipboard', 'Ctrl-Q P', kbNokey, cmWindowsCopy, hcedEdit,
-      Menuitem 'Copy from OS/2 clipboard', 'Ctrl-Q C', kbNokey, cmWindowsPaste, hcedEdit,
+      MenuItem 'Copy on OS/2 clipboard', editor.WindowsCopy
+      MenuItem 'Copy from OS/2 clipboard', editor.WindowsPaste
 ;$ELSE
-      Menuitem 'Copy on Windows clipboard', 'Ctrl-Q P', kbNokey, cmWindowsCopy, hcedEdit,
-      Menuitem 'Copy from Windows clipboard', 'Ctrl-Q C', kbNokey, cmWindowsPaste, hcedEdit,
+      MenuItem 'Copy on Windows clipboard', editor.WindowsCopy.2
+      MenuItem 'Copy from Windows clipboard', editor.WindowsPaste.2
 ;$ENDIF
 ;{csablak end}
       MenuLine
-      MenuItem 'C~l~ear', 'Ctrl-Del', kbCtrlDel, cmClear, hcedEdit,
+      MenuItem 'C~l~ear', editor.Clear
     END
  SubMenu '~S~earch', hcedSearch,
-      MenuItem '~F~ind...', 'F7', kbF7, cmStartSearch, hcedSearch,
-      MenuItem '~R~eplace...', 'Ctrl-F7', kbCtrlF7, cmReplace, hcedSearch,
-      MenuItem '~S~earch again', 'Shift-F7', kbShiftF7, cmContSearch, hcedSearch,
-      MenuItem 'Re~v~ersed search', 'Alt-F7', kbAltF7, cmReverseSearch, hcedSearch,
-      MenuItem '~G~o to line number...', 'Alt-G', kbAltG, cmGotoLineNumber, hcedSearch,
+      MenuItem '~F~ind...', editor.StartSearch
+      MenuItem '~R~eplace...', editor.Replace
+      MenuItem '~S~earch again', editor.ContSearch
+      MenuItem 'Re~v~ersed search', editor.ReverseSearch
+      MenuItem '~G~o to line number...', editor.GotoLineNumber
 ;{csablak}
-      MenuItem 'Goto ~b~lock begin','Ctrl-Q B', kbNoKey, cmMoveBlockStart, hcedSearch,
-      MenuItem 'Goto b~l~ock end','Ctrl-Q K', kbNoKey, cmMoveBlockEnd, hcedSearch,
+      MenuItem 'Goto ~b~lock begin', editor.MoveBlockStart
+      MenuItem 'Goto b~l~ock end', editor.MoveBlockEnd
 ;{csablak end}
     END
  SubMenu '~P~aragraph', hcedParagraph,
-      MenuItem '~J~ustify', 'Alt-J', kbAltJ, cmFJustify, hcedParagraph,
-      MenuItem '~R~ight', 'Alt-R', kbAltR, cmFRight, hcedParagraph,
-      MenuItem '~L~eft', 'Alt-L', kbAltL, cmFLeft, hcedParagraph,
-      MenuItem '~C~enter', 'Alt-C', kbAltC, cmFCenter, hcedParagraph,
+      MenuItem '~J~ustify', editor.FJustify
+      MenuItem '~R~ight', editor.FRight
+      MenuItem '~L~eft', editor.FLeft
+      MenuItem '~C~enter', editor.FCenter
       MenuLine
-      MenuItem '~M~argins...', '', kbNoKey, cmSetMargins, hcedOptions,
+      MenuItem '~M~argins...', editor.SetMargins
     END
  SubMenu '~B~lock', hcEditBlockMenu,
-      MenuItem '~M~ove', 'Ctrl-K V', kbNoKey, cmMoveBlock, hcedParagraph,
-      MenuItem '~C~opy', 'Ctrl-K C', kbNoKey, cmCopyBlock, hcedParagraph,
-      MenuItem '~I~ndent', 'Ctrl-K I', kbNoKey, cmIndentBlock, hcedParagraph,
-      MenuItem '~U~nindent', 'Ctrl-K U', kbNoKey, cmUnIndentBlock, hcedParagraph,
-      MenuItem '~T~oggle selection', 'Ctrl-H', kbCtrlH, cmHideBlock, hcedParagraph,
+      MenuItem '~M~ove', editor.MoveBlock
+      MenuItem '~C~opy', editor.CopyBlock
+      MenuItem '~I~ndent', editor.IndentBlock
+      MenuItem '~U~nindent', editor.UnIndentBlock
+      MenuItem '~T~oggle selection', editor.HideBlock
       MenuLine
 ;{Added by PaSkol}
-      MenuItem 'Re~v~erse sort', 'Ctrl-R', kbCtrlR, cmRevSortBlock, hcedParagraph,
-      MenuItem '~S~ort', 'Alt-T', kbAltT, cmSortBlock, hcedParagraph,
-      MenuItem 'Calc~u~late sum', 'Alt-Ins', kbAltIns, cmCalcBlock, hcedParagraph,
+      MenuItem 'Re~v~erse sort', editor.RevSortBlock
+      MenuItem '~S~ort', editor.SortBlock
+      MenuItem 'Calc~u~late sum', editor.CalcBlock
     END
  SubMenu '~M~isc', hcEditMiscMenu,
-      MenuItem 'Insert ~d~ate   ', 'Ctrl-Q D', kbNoKey, cmInsertDate, hcedParagraph,
-      MenuItem 'Insert ~t~ime   ', 'Ctrl-Q T', kbNoKey, cmInsertTime, hcedParagraph,
-      Menuitem 'Du~p~licate line', '', kbNoKey, cmDuplicateLine, 0,
-      MenuItem 'ASCII Ta~b~le   ', 'Ctrl-P', kbCtrlP, cmASCIITable, 0,
-      MenuItem 'Line Dra~w~ing   ', 'F4', kbF4, cmSwitchDrawMode, 0,
+      MenuItem 'Insert ~d~ate   ', editor.InsertDate
+      MenuItem 'Insert ~t~ime   ', editor.InsertTime
+      MenuItem 'Du~p~licate line', editor.DuplicateLine
+      MenuItem 'ASCII Ta~b~le   ', editor.ASCIITable
+      MenuItem 'Line Dra~w~ing   ', editor.SwitchDrawMode
 ; {-$VIV}
-      MenuItem 'Key ~m~apping   ', 'F8', kbF8, cmSwitchKeyMapping, 0,
+      MenuItem 'Key ~m~apping   ', editor.SwitchKeyMapping
      MenuLine
      SubMenu '~U~ppercase', hcMiscUpper,
-      MenuItem '~W~ord/Block', 'Ctrl-[', kbNoKey, cmUpcaseBlock, hcMiscUpper,
-      MenuItem '~L~ine', 'Ctrl-Shift-[', kbNoKey, cmUpString, hcMiscUpper,
+      MenuItem '~W~ord/Block', editor.UpcaseBlock
+      MenuItem '~L~ine', editor.UpString
      END
      SubMenu '~L~owercase', hcMiscLower,
-      MenuItem '~W~ord/Block', 'Ctrl-]', kbNoKey, cmLowcaseBlock, hcMiscLower,
-      MenuItem '~L~ine', 'Ctrl-Shift-]', kbNoKey, cmLowString, hcMiscLower,
+      MenuItem '~W~ord/Block', editor.LowcaseBlock
+      MenuItem '~L~ine', editor.LowString
      END
      SubMenu '~C~apitalize', hcMiscCapitalize,
-      MenuItem '~W~ord/Block', 'Ctrl\', kbNoKey, cmCapitalizeBlock, hcMiscCapitalize,
-      MenuItem '~L~ine', 'Ctrl-Shift\', kbNoKey, cmCapString, hcMiscCapitalize,
+      MenuItem '~W~ord/Block', editor.CapitalizeBlock
+      MenuItem '~L~ine', editor.CapString
      END
      SubMenu 'Convert keyboard layout', hcMiscKbdLayout,
-      MenuItem '~W~ord/Block', 'Alt-F12', kbAltF12, cmRusEngConvBlock, hcMiscKbdLayout,
-      MenuItem '~L~ine', 'Alt-Shift-F12', kbAltShiftF12, cmRusEngConvString, hcMiscKbdLayout,
+      MenuItem '~W~ord/Block', editor.RusEngConvBlock
+      MenuItem '~L~ine', editor.RusEngConvString
      END
      SubMenu 'Toggle Up/Low case', hcMiscToggleCase
-      MenuItem '~W~ord/Block', 'Ctrl-Gray/', kbCtrlSlash, cmToggleCaseBlock, hcMiscToggleCase,
-      MenuItem '~L~ine', 'Ctrl-Shift-Gray/', kbCtrlShiftSlash, cmToggleCaseString, hcMiscToggleCase,
+      MenuItem '~W~ord/Block', editor.ToggleCaseBlock
+      MenuItem '~L~ine', editor.ToggleCaseString
      END
      SubMenu 'Line breaks', 0,
-      MenuItem 'CR~+~LF', '', kbNoKey, cmEditCrLfMode, 0,
-      MenuItem '~L~F',    '', kbNoKey, cmEditLfMode,   0,
-      MenuItem '~C~R',    '', kbNoKey, cmEditCrMode,   0,
+      MenuItem 'CR~+~LF', editor.EditCrLfMode
+      MenuItem '~L~F', editor.EditLfMode
+      MenuItem '~C~R', editor.EditCrMode
      END
    END
  SubMenu '~O~ptions', hcedOptions,
-      MenuItem '~B~ackspace indents', 'Off', kbNoKey, cmSwitchBack, hcedOptions,
-      MenuItem 'AutoB~r~ackets', 'Off', kbNoKey, cmSwitchBrackets, hcedOptions,
-      MenuItem 'Auto~i~ndent', 'Off', kbNoKey, cmSwitchIndent, hcedOptions,
-      MenuItem '~A~uto wrap', 'Off', kbNoKey, cmSwitchSave, hcedOptions,
-      MenuItem '~J~ustify on wrap', 'Off', kbNoKey, cmSwitchWrap, hcedOptions,
-      MenuItem '~V~ertical blocks', 'Off', kbNoKey, cmSwitchBlock, hcedOptions,
-      MenuItem 'Opti~m~al fill', 'Off', kbNoKey, cmSwitchFill, hcedOptions,
-      MenuItem 'Current ~l~ine highlight', 'Off', kbNoKey, cmSwitchHiLine, hcedOptions,
-      MenuItem 'Current ~c~olumn highlight', 'Off', kbNoKey, cmSwitchHiColumn, hcedOptions,
-      MenuItem 'Syntax ~h~ighlight',  'Off', kbNoKey, cmSwitchHighLight, hcedOptions,
+      MenuItem '~B~ackspace indents', editor.SwitchBack
+      MenuItem 'AutoB~r~ackets', editor.SwitchBrackets
+      MenuItem 'Auto~i~ndent', editor.SwitchIndent
+      MenuItem '~A~uto wrap', editor.SwitchSave
+      MenuItem '~J~ustify on wrap', editor.SwitchWrap
+      MenuItem '~V~ertical blocks', editor.SwitchBlock
+      MenuItem 'Opti~m~al fill', editor.SwitchFill
+      MenuItem 'Current ~l~ine highlight', editor.SwitchHiLine
+      MenuItem 'Current ~c~olumn highlight', editor.SwitchHiColumn
+      MenuItem 'Syntax ~h~ighlight', editor.SwitchHighLight
 ; {-$VOL} {Tab Replace}
-      MenuItem 'Tab ~R~eplace', 'Off', kbNoKey, cmSwitchTabReplace, hcedOptions,
+      MenuItem 'Tab ~R~eplace', editor.SwitchTabReplace
 ;NEW+
 ;DataCompBoy - SmartTab
-      MenuItem '~S~mart Tab','Off', kbNoKey, cmSwitchSmartTab, hcedOptions,
-      MenuItem 'S~o~ft wrap','Off', kbNoKey, cmSwitchSoftWrap, hcedOptions,
+      MenuItem '~S~mart Tab', editor.SwitchSmartTab
+      MenuItem 'S~o~ft wrap', editor.SwitchSoftWrap
 ;NEW-
      END
 END
 
 MENU dlgFixerMenu
   SubMenu '~A~rea', hcDiskEditor,
-      MenuItem '~F~ile...', 'Alt-F', kbAltF, cmFixFile, hcDiskEditor,
-      MenuItem 'Di~r~ectory...', 'Alt-R', kbAltR, cmFixDir, hcDiskEditor,
-      MenuItem '~D~rive...', 'Alt-D', kbAltD, cmFixDrive, hcDiskEditor,
-      MenuItem '~C~luster...', 'Alt-C', kbAltC, cmFixCluster, hcDiskEditor,
-      MenuItem '~S~ector...', 'Alt-S', kbAltS, cmFixSector, hcDiskEditor,
+      MenuItem '~F~ile...', fixer.FixFile
+      MenuItem 'Di~r~ectory...', fixer.FixDir
+      MenuItem '~D~rive...', fixer.FixDrive
+      MenuItem '~C~luster...', fixer.FixCluster
+      MenuItem '~S~ector...', fixer.FixSector
       MenuLine
-      MenuItem 'E~x~it', 'Alt-F3', kbAltF3, cmClose, hcDiskEditor,
+      MenuItem 'E~x~it', fixer.Close
     END
  SubMenu '~E~dit', hcDiskEditor,
-      MenuItem '~U~ndo', 'Alt-BkSp', kbAltBack, cmUndo, hcDiskEditor,
+      MenuItem '~U~ndo', fixer.Undo
       MenuLine
-      MenuItem '~C~opy', 'Ctrl-Ins', kbCtrlIns, cmCopy, hcDiskEditor,
-      MenuItem '~P~aste over', 'Shift-Ins', kbShiftIns, cmPaste, hcDiskEditor,
-      MenuItem 'C~o~py to...', ' ', kbNoKey, cmFixBlockWrite, hcDiskEditor,
-      MenuItem '~F~ill...', ' ', kbNoKey, cmClear, hcDiskEditor,
+      MenuItem '~C~opy', fixer.Copy
+      MenuItem '~P~aste over', fixer.Paste
+      MenuItem 'C~o~py to...', fixer.FixBlockWrite
+      MenuItem '~F~ill...', fixer.Clear
       MenuLine
-      MenuItem '~S~earch for...', 'F7', kbF7, cmSearchFor, hcDiskEditor,
-      MenuItem 'Co~n~tinue search...', 'Shift-F7', kbShiftF7, cmContinueSearch, hcDiskEditor,
+      MenuItem '~S~earch for...', fixer.SearchFor
+      MenuItem 'Co~n~tinue search...', fixer.ContinueSearch
     END
  SubMenu '~V~iew', hcDiskEditor,
-      MenuItem 'As ~H~ex', 'F2', kbF2, cmHexMode, hcDiskEditor,
-      MenuItem 'As ~D~ir', 'F3', kbF3, cmDirMode, hcDiskEditor,
-      MenuItem 'As ~T~ext', 'F4', kbF4, cmTextMode, hcDiskEditor,
-      MenuItem 'As ~F~AT', 'F5', kbF5, cmFATMode, hcDiskEditor,
+      MenuItem 'As ~H~ex', fixer.HexMode
+      MenuItem 'As ~D~ir', fixer.DirMode
+      MenuItem 'As ~T~ext', fixer.TextMode
+      MenuItem 'As ~F~AT', fixer.FATMode
     END
 END
 
 MENU dlgMainMenu
   SubMenu '(placeholder)', hcMenuBox,
-    MenuItem '~A~bout...', ' ', kbNoKey, cmAbout, hcMenuBox,
-    MenuItem '~R~efresh display', ' ', kbNoKey, cmRefresh, hcMenuBox,
-    MenuItem '~S~creen rest', ' ', kbNoKey, cmScreenRest, hcMenuBox,
-    MenuItem '~C~hange language','Alt-F12',kbAltF12,cmChLngId,hcMenuBox,
+    MenuItem '~A~bout...', main.About
+    MenuItem '~R~efresh display', main.Refresh
+    MenuItem '~S~creen rest', main.ScreenRest
+    MenuItem '~C~hange language', main.ChLngId
     MenuLine
-    MenuItem 'Screen gra~b~ber', 'Shift-Alt-Ins', kbNoKey, cmExecGrabber, hcMenuBox,
-    MenuItem '~U~ser screen', 'Alt-F5', kbAltF5, cmShowUserScreen, hcMenuBox,
-    MenuItem '~O~utput window', 'Ctrl-O', kbCtrlO, cmShowOutput, hcMenuBox,
-    MenuItem 'S~m~artPad (TM)', 'Alt-Q', kbAltQ, cmOpenSmartpad, hcMenuBox,
+    MenuItem 'Screen gra~b~ber', main.ExecGrabber
+    MenuItem '~U~ser screen', main.ShowUserScreen
+    MenuItem '~O~utput window', main.ShowOutput
+    MenuItem 'S~m~artPad (TM)', main.OpenSmartpad
 ;{-$VOL}
-    MenuItem 'Show C~l~ipboard', '', kbAltQ, cmOpenClipBoard, hcMenuBox,
-    MenuItem '~T~rashcan on/off', '', kbNoKey, cmHideShowTools, hcMenuBox,
-    MenuItem 'Execute ~O~S command', '', kbNoKey, cmExecuteDOSCmd, hcFileMenu,
+    MenuItem 'Show C~l~ipboard', main.OpenClipBoard
+    MenuItem '~T~rashcan on/off', main.HideShowTools
+    MenuItem 'Execute ~O~S command', main.ExecuteDOSCmd
     MenuLine
-    MenuItem '~E~GA/VGA lines', 'Shift-F10', kbShiftF10, cmChangeMode, hcMenuBox,
-    MenuItem 'Custom video mode ~1~', 'Alt-F10', kbAltF10, cmChangeUserMode1, hcMenuBox,
-    MenuItem 'Custom video mode ~2~', 'Ctrl-F10', kbCtrlF10, cmChangeUserMode2, hcMenuBox,
-    MenuItem 'C~h~ange Screen  Mode', 'Shift-F12 ', kbShiftF12, cmChScreenMode, hcMenuBox,
+    MenuItem '~E~GA/VGA lines', main.ChangeMode
+    MenuItem 'Custom video mode ~1~', main.ChangeUserMode1
+    MenuItem 'Custom video mode ~2~', main.ChangeUserMode2
+    MenuItem 'C~h~ange Screen  Mode', main.ChScreenMode
 ;.$IFNDEF PLUGINRES
     MenuLine
-    MenuItem '~G~ame', 'Alt-F9', kbAltF9, cmGame, hcMenuBox,
+    MenuItem '~G~ame', main.Game
 ;.$ENDIF
   END
  SubMenu '~F~ile', hcFileMenu,
     SubMenu '~V~iew', hcFileMenu,
-      MenuItem 'M~a~in viewer', 'F3', kbF3, cmViewFile, hcFileMenu,
-      MenuItem 'Alternate vie~w~er', 'Alt-F3', kbAltF3, cmIntViewFile, hcFileMenu,
-      MenuItem 'As ~T~ext', 'Alt-Shift-F3', kbNoKey, cmViewText, hcFileMenu,
-      MenuItem 'As He~x~', ' ', kbNoKey, cmViewHex, hcFileMenu,
-      MenuItem 'As ~D~ataBase', ' ', kbNoKey, cmViewDBF, hcFileMenu,
-      MenuItem 'As ~S~preadsheet', ' ', kbNoKey, cmViewWKZ, hcFileMenu,
+      MenuItem 'M~a~in viewer', main.ViewFile
+      MenuItem 'Alternate vie~w~er', main.IntViewFile
+      MenuItem 'As ~T~ext', main.ViewText
+      MenuItem 'As He~x~', main.ViewHex
+      MenuItem 'As ~D~ataBase', main.ViewDBF
+      MenuItem 'As ~S~preadsheet', main.ViewWKZ
     END
     SubMenu '~E~dit', hcFileMenu,
-      MenuItem '~E~dit', 'F4', kbF4, cmEditFile, hcFileMenu,
-      MenuItem '~A~lternate edit', 'Alt-F4', kbAltF4, cmIntEditFile, hcFileMenu,
+      MenuItem '~E~dit', main.EditFile
+      MenuItem '~A~lternate edit', main.IntEditFile
       MenuLine
-      MenuItem 'Edit ~n~ew file...', 'Shift-F4', kbShiftF4, cmXEditFile, hcFileMenu,
+      MenuItem 'Edit ~n~ew file...', main.XEditFile
     END
-    MenuItem '~F~ind...', 'Alt-F7', kbAltF7, cmFindFile, hcFileMenu,
-    MenuItem '~C~opy...', 'F5', kbF5, cmCopyFiles, hcFileMenu,
-    MenuItem '~R~ename/Move...', 'F6', kbF6, cmMoveFiles, hcFileMenu,
-    MenuItem 'C~h~ange name case...', 'Ctrl-Alt-F6', kbCtrlAltF6, cmChangeNameCase, hcFileMenu,
-    MenuItem 'Cop~y~ to archive...', 'Shift-F1', kbShiftF1, cmPanelArcFiles, hcFileMenu,
-    MenuItem 'Ex~t~ract archive...', 'Shift-F2', kbShiftF2, cmExtractArchive, hcFileMenu,
-    MenuItem '~S~plit/combine...', 'Ctrl-Alt-F5', kbCtrlAltF5, cmPanelLongCopy, hcFileMenu,
-    MenuItem '~P~rint', 'Ctrl-F9', kbCtrlF9, cmPrintFile, hcFileMenu,
-    MenuItem '~M~ake directory', 'F7', kbF7, cmPanelMkDir, hcFileMenu,
-    MenuItem '~D~elete', 'F8', kbF8, cmPanelErase, hcFileMenu,
-    MenuItem 'File ~A~ttributes...', 'Alt-E', kbAltE, cmSetFAttr, hcFileMenu,
-    MenuItem 'Sin~g~le file attributes...', 'Ctrl-A', kbCtrlA, cmSingleAttr, hcFileMenu,
-    MenuItem 'Copy single file...','Shift-F5',kbNoKey, cmSingleCopy, hcFileMenu,
-    MenuItem 'Move single file...','Shift-F6',kbNoKey, cmSingleRename, hcFileMenu,
-    MenuItem 'Delete single file','Shift-F8',kbShiftF8, cmSingleDel, hcFileMenu,
+    MenuItem '~F~ind...', main.FindFile
+    MenuItem '~C~opy...', main.CopyFiles
+    MenuItem '~R~ename/Move...', main.MoveFiles
+    MenuItem 'C~h~ange name case...', main.ChangeNameCase
+    MenuItem 'Cop~y~ to archive...', main.PanelArcFiles
+    MenuItem 'Ex~t~ract archive...', main.ExtractArchive
+    MenuItem '~S~plit/combine...', main.PanelLongCopy
+    MenuItem '~P~rint', main.PrintFile
+    MenuItem '~M~ake directory', main.PanelMkDir
+    MenuItem '~D~elete', main.PanelErase
+    MenuItem 'File ~A~ttributes...', main.SetFAttr
+    MenuItem 'Sin~g~le file attributes...', main.SingleAttr
+    MenuItem 'Copy single file...', main.SingleCopy
+    MenuItem 'Move single file...', main.SingleRename
+    MenuItem 'Delete single file', main.SingleDel
 ;$IFDEF EAOP
 ;$IFDEF OS2
-    MenuItem 'Edit EA .LONGNAME',  'Ctrl-F11', kbCtrlF11, cmSetEALongname, hcFileMenu,
+    MenuItem 'Edit EA .LONGNAME', main.SetEALongname
 ;$ENDIF
 ;$ENDIF
     MenuLine
 ;$IFDEF DPMI32
-    MenuItem 'Res~t~art', 'Ctrl-Alt-X', kbCtrlAltX, cmRestart, hcFileMenu,
+    MenuItem 'Res~t~art', main.Restart
 ;$ENDIF
-    MenuItem 'E~x~it', 'Alt-X', kbAltX, cmQuit, hcFileMenu,
+    MenuItem 'E~x~it', main.Quit
   END
  SubMenu '~D~isk', hcDiskMenu,
 ;$IFNDEF VIRTUALPASCAL
-    MenuItem '~F~ormat disk...', 'Shift-F7', kbShiftF7, cmFormatDisk, hcDiskMenu,
+    MenuItem '~F~ormat disk...', main.FormatDisk
 ;$ENDIF
 ;$IFNDEF WIN32
-    MenuItem '~V~olume label...', ' ', kbNoKey, cmSetVolumeLabel, hcDiskMenu,
+    MenuItem '~V~olume label...', main.SetVolumeLabel
 ;$ENDIF
-    MenuItem 'Unpack diskette images','Ctrl-I',kbCtrlI, cmUnpDiskImg, hcFileMenu,
+    MenuItem 'Unpack diskette images', main.UnpDiskImg
 ;$IFNDEF VIRTUALPASCAL
-    MenuItem '~R~eanimator...', 'Shift-F6', kbNoKey, cmReanimator, hcDiskMenu,
-    MenuItem 'Disk ~e~ditor', ' ', kbNoKey, cmDiskEdit, hcDiskMenu,
+    MenuItem '~R~eanimator...', main.Reanimator
+    MenuItem 'Disk ~e~ditor', main.DiskEdit
 ;$ENDIF
     MenuLine
-    MenuItem '~D~irectory tree', '', kbNoKey, cmCreateTree, hcDiskMenu,
+    MenuItem '~D~irectory tree', main.CreateTree
  END
  SubMenu '~U~tilities', hcUtilMenu,
 ;$IFNDEF VIRTUALPASCAL
-    MenuItem '~M~emory Information', 'Alt-Y', kbAltY, cmMemoryInfo, hcUtilMenu,
-    MenuItem 'S~y~stem Information', '', kbNoKey, cmSystemInfo, hcUtilMenu,
+    MenuItem '~M~emory Information', main.MemoryInfo
+    MenuItem 'S~y~stem Information', main.SystemInfo
     MenuLine
 ;$ENDIF
 ;$IFDEF Tasklist
-    MenuItem '~T~asklist', 'F11', kbF11, cmTasklist, hcNoContext,
+    MenuItem '~T~asklist', main.Tasklist
 ;$ENDIF
-    MenuItem '~C~alculator', 'Ctrl-F6', kbCtrlF6, cmCalculator, hcUtilMenu,
-    MenuItem 'Cale~n~dar', 'Ctrl-F12', kbCtrlF12, cmCalendar, hcUtilMenu,
-    MenuItem 'ASCII Ta~b~le', 'Ctrl-B', kbCtrlB, cmASCIITable, hcUtilMenu,
-    MenuItem '~P~hone Book', 'Shift-F3', kbShiftF3, cmPhoneBook, hcUtilMenu,
-    MenuItem '~O~pen spreadsheet', 'Shift-F11', kbShiftF11, cmSheetLoad, hcUtilMenu,
-    MenuItem 'UU E~n~code...', 'Ctrl-F7', kbCtrlF7, cmUUEncodeFile, hcFileMenu,
-    MenuItem '~U~U Decode...', 'Ctrl-F8', kbCtrlF8, cmUUDecodeFile, hcFileMenu,
+    MenuItem '~C~alculator', main.Calculator
+    MenuItem 'Cale~n~dar', main.Calendar
+    MenuItem 'ASCII Ta~b~le', main.ASCIITable
+    MenuItem '~P~hone Book', main.PhoneBook
+    MenuItem '~O~pen spreadsheet', main.SheetLoad
+    MenuItem 'UU E~n~code...', main.UUEncodeFile
+    MenuItem '~U~U Decode...', main.UUDecodeFile
 ;$IFNDEF VIRTUALPASCAL
-    MenuItem 'C~D~ Player', 'Ctrl-F11', kbCtrlF11, cmPlayCD, hcUtilMenu,
+    MenuItem 'C~D~ Player', main.PlayCD
     MenuLine
-    MenuItem 'Te~r~minal', 'Alt-J', kbAltJ, cmTerminal, hcUtilMenu,
-    MenuItem 'Navigator ~L~ink', 'Alt-F11', kbAltF11, cmNavyLink, hcUtilMenu,
-    MenuItem 'Manual di~a~l...', 'Alt-A', kbAltA, cmUndial, hcUtilMenu,
-    MenuItem 'Di~s~connect', 'Alt-H', kbNoKey, cmHangUp, hcUtilMenu,
+    MenuItem 'Te~r~minal', main.Terminal
+    MenuItem 'Navigator ~L~ink', main.NavyLink
+    MenuItem 'Manual di~a~l...', main.Undial
+    MenuItem 'Di~s~connect', main.HangUp
 ;$ENDIF
     MenuLine
-    MenuItem 'Edi~t~ OS Environment', '', kbNoKey, cmEnvEdit, hcUtilMenu,
-    MenuItem '~U~ser menu', 'F2', kbF2, cmUserMenu, hcUtilMenu,
+    MenuItem 'Edi~t~ OS Environment', main.EnvEdit
+    MenuItem '~U~ser menu', main.UserMenu
     MenuLine
-    MenuItem 'History of directories...', 'Alt-BkSp', kbNoKey, cmDirHistory, hcPanelMenu,
-    MenuItem 'Commands ~H~istory', 'Alt-F8', kbAltF8, cmHistoryList, hcUtilMenu,
-    MenuItem 'File ~E~dit History', 'Alt-PgUp', kbAltPgUp, cmEditHistory, hcUtilMenu,
-    MenuItem 'File ~V~iew History', 'Alt-PgDn', kbAltPgDn, cmViewHistory, hcUtilMenu,
+    MenuItem 'History of directories...', main.DirHistory
+    MenuItem 'Commands ~H~istory', main.HistoryList
+    MenuItem 'File ~E~dit History', main.EditHistory
+    MenuItem 'File ~V~iew History', main.ViewHistory
 ;$IFDEF PLUGINRES
     MenuLine
-    MenuItem 'Plugin Manager', 'Alt-F11', kbAltF11, cmPlugins, hcPluginManager,
+    MenuItem 'Plugin Manager', main.Plugins
 ;$ENDIF
    END
  SubMenu '~P~anel', hcPanelMenu,
-    MenuItem '~M~ake list file...', 'Alt-L', kbAltL, cmMakeList, hcPanelMenu,
-    MenuItem 'Read file ~l~ist', 'Alt-V', kbAltV, cmPanelMakeList, hcPanelMenu,
-    MenuItem '~C~ompare directories', 'Ctrl-C', kbCtrlC, cmCompareDir, hcPanelMenu,
-    MenuItem 'Count directory len~g~th', 'Alt-G', kbAltG, cmCountLen, hcPanelMenu,
-    MenuItem 'Directory Branc~h~', 'Ctrl-H', kbCtrlH, cmDirBranch, hcPanelMenu,
+    MenuItem '~M~ake list file...', main.MakeList
+    MenuItem 'Read file ~l~ist', main.PanelMakeList
+    MenuItem '~C~ompare directories', main.CompareDir
+    MenuItem 'Count directory len~g~th', main.CountLen
+    MenuItem 'Directory Branc~h~', main.DirBranch
     MenuLine
-    MenuItem 'Select appearance ~p~reset...', 'Alt-"-"', kbAltMinus, cmSelectPreset, hcPanelMenu,
-    MenuItem 'Sort ~b~y...', 'Alt-B', kbAltB, cmSortBy, hcPanelMenu,
+    MenuItem 'Select appearance ~p~reset...', main.SelectPreset
+    MenuItem 'Sort ~b~y...', main.SortBy
     MenuLine
-    MenuItem 'Select grou~p~...', 'Gray "+"', kbNoKey, cmPanelSelect, hcPanelMenu,
-    MenuItem '~U~nselect group...', 'Gray "-"', kbNoKey, cmPanelUnselect, hcPanelMenu,
-    MenuItem 'In~v~ert selection', 'Gray "*"', kbNoKey, cmPanelInvertSel, hcPanelMenu,
+    MenuItem 'Select grou~p~...', main.PanelSelect
+    MenuItem '~U~nselect group...', main.PanelUnselect
+    MenuItem 'In~v~ert selection', main.PanelInvertSel
     MenuLine
-    MenuItem 'Change ~d~rive', 'Alt-C', kbAltC, cmChangeDrive, hcPanelMenu,
-    MenuItem 'Change direc~t~ory', 'Alt-T', kbAltT, cmChangeDir, hcPanelMenu,
-    MenuItem '~R~e-read', 'Alt-R', kbAltR, cmForceRescan, hcPanelMenu,
-    MenuItem '~Q~uick dirs...', 'Alt-Shift-0', kbNoKey, cmListOfDirs, hcPanelMenu,
+    MenuItem 'Change ~d~rive', main.ChangeDrive
+    MenuItem 'Change direc~t~ory', main.ChangeDir
+    MenuItem '~R~e-read', main.ForceRescan
+    MenuItem '~Q~uick dirs...', main.ListOfDirs
    END
  SubMenu '~M~anager', hcManagerCommands,
-    MenuItem '~N~ew', 'Ctrl-F3', kbCtrlF3, cmCreatePanel, hcManagerCommands,
-    MenuItem '~D~irectory tree', 'Ctrl-T', kbCtrlT, cmDirTree, hcManagerCommands,
-    MenuItem '~I~nfo', 'Ctrl-L', kbCtrlL, cmDiskInfo, hcManagerCommands,
+    MenuItem '~N~ew', main.CreatePanel
+    MenuItem '~D~irectory tree', main.DirTree
+    MenuItem '~I~nfo', main.DiskInfo
 ;{-$VIV}
 ;$IFDEF NETINFO
-    MenuItem 'N~e~t info', 'Ctrl-N', kbCtrlN, cmNetInfo, hcManagerCommands,
+    MenuItem 'N~e~t info', main.NetInfo
 ;$ENDIF
-    MenuItem '~Q~uick view', 'Ctrl-Q', kbCtrlQ, cmQuickView, hcManagerCommands,
-    MenuItem '~D~escription View', 'Ctrl-D', kbCtrlD, cmDizView, hcManagerCommands,
+    MenuItem '~Q~uick view', main.QuickView
+    MenuItem '~D~escription View', main.DizView
     MenuLine
-    MenuItem '~S~wap panels', 'Ctrl-U', kbCtrlU, cmSwapPanels, hcManagerCommands,
-    MenuItem 'Show/hide ~l~eft panel', 'Ctrl-F1', kbCtrlF1, cmHideLeft, hcManagerCommands,
-    MenuItem 'Show/hide ~r~ight panel', 'Ctrl-F2', kbCtrlF2, cmHideRight, hcManagerCommands,
-    MenuItem 'Show/hide inactive ~p~anel', 'Ctrl-P', kbCtrlP, cmSwitchOther, hcManagerCommands,
+    MenuItem '~S~wap panels', main.SwapPanels
+    MenuItem 'Show/hide ~l~eft panel', main.HideLeft
+    MenuItem 'Show/hide ~r~ight panel', main.HideRight
+    MenuItem 'Show/hide inactive ~p~anel', main.SwitchOther
     MenuLine
-    MenuItem 'Change drive le~f~t', 'Alt-F1', kbAltF1, cmChangeLeft, hcManagerCommands,
-    MenuItem 'Change drive rig~h~t', 'Alt-F2', kbAltF2, cmChangeRight, hcManagerCommands,
+    MenuItem 'Change drive le~f~t', main.ChangeLeft
+    MenuItem 'Change drive rig~h~t', main.ChangeRight
   END
   SubMenu '~O~ptions', hcOptionsMenu,
     SubMenu '~C~onfiguration', hcOptionsMenu,
-      MenuItem 'S~y~stem Setup...', '', kbNoKey, cmSystemSetup, hcSubMenuConfig,
-      MenuItem '~S~tartup...', '', kbNoKey, cmStartup, hcSubMenuConfig,
-      MenuItem '~I~nterface...', '', kbNoKey, cmInterfaceSetup, hcSubMenuConfig,
-      MenuItem '~C~onfirmations...', '', kbNoKey, cmSetupConfirmation, hcSubMenuConfig,
+      MenuItem 'S~y~stem Setup...', main.SystemSetup
+      MenuItem '~S~tartup...', main.Startup
+      MenuItem '~I~nterface...', main.InterfaceSetup
+      MenuItem '~C~onfirmations...', main.SetupConfirmation
       MenuLine
-      MenuItem 'Screen sa~v~ers...', '', kbNoKey, cmSaversSetup, hcSubMenuConfig,
-      MenuItem 'P~r~inter setup...', '', kbNoKey, cmSetupPrinter, hcSubMenuConfig,
-      MenuItem 'C~o~untry support...', ' ', kbNoKey, cmCountrySetup, hcSubMenuConfig,
-      MenuItem '~M~ouse...', '', kbNoKey, cmSetupMouse, hcSubMenuConfig,
+      MenuItem 'Screen sa~v~ers...', main.SaversSetup
+      MenuItem 'P~r~inter setup...', main.SetupPrinter
+      MenuItem 'C~o~untry support...', main.CountrySetup
+      MenuItem '~M~ouse...', main.SetupMouse
 ;$IFNDEF VIRTUALPASCAL
-      MenuItem 'Comm~u~nications...', '', kbNoKey, cmSetupModem, hcSubMenuConfig,
+      MenuItem 'Comm~u~nications...', main.SetupModem
 ;$ENDIF
       MenuLine
-      MenuItem '~E~ditor/Viewer...', '', kbNoKey, cmEditorDefaults, hcSubMenuConfig,
+      MenuItem '~E~ditor/Viewer...', main.EditorDefaults
 ;$IFNDEF VIRTUALPASCAL
-      MenuItem '~T~erminal...', '', kbNoKey, cmTerminalDefaults, hcSubMenuConfig,
+      MenuItem '~T~erminal...', main.TerminalDefaults
 ;$ENDIF
      END
     SubMenu '~F~ile Manager', hcOptionsMenu,
-      MenuItem '~S~etup...', ' ', kbNoKey, cmFMSetup, hcSubMenuFileMgr,
-      MenuItem '~I~nformation panel...', '', kbNoKey, cmDriveInfoSetup, hcSubMenuFileMgr
-      MenuItem '~H~ighlight groups...', ' ', kbNoKey, cmHighlightGroups, hcSubMenuFileMgr,
+      MenuItem '~S~etup...', main.FMSetup
+      MenuItem '~I~nformation panel...', main.DriveInfoSetup
+      MenuItem '~H~ighlight groups...', main.HighlightGroups
     END
     SubMenu '~P~anel', hcOptionsMenu,
-      MenuItem 'Setup ~a~ppearance', 'Alt-K', kbAltK, cmPanelShowSetup, hcPanelSetup,
-      MenuItem 'Setup ~S~ort', 'Alt-S', kbAltS, cmPanelSortSetup, hcPanelSetup,
-      MenuItem 'Advanced ~f~ilter...', 'Alt-Del', kbAltDel, cmAdvFilter, hcPanelSetup,
+      MenuItem 'Setup ~a~ppearance', main.PanelShowSetup
+      MenuItem 'Setup ~S~ort', main.PanelSortSetup
+      MenuItem 'Advanced ~f~ilter...', main.AdvFilter
     END
    SubMenu 'A~r~chives', hcOptionsMenu
-      MenuItem 'Current archiver...', 'Alt-N', kbAltN, cmSetupArchive, hcArchives,
-      MenuItem 'Update ARCHIVER.INI', '', kbNoKey, cmUpdateArcFile, hcArchives,
+      MenuItem 'Current archiver...', main.SetupArchive
+      MenuItem 'Update ARCHIVER.INI', main.UpdateArcFile
       MenuLine
-      MenuItem 'AC~E~ - ACE (C) Marcel Lemke',                          '', kbNoKey, cmConfigACE, hcArchives,
-      MenuItem 'AI~N~ - AIN (C) Transas Marine Ltd',                    '', kbNoKey, cmConfigAIN, hcArchives,
-      MenuItem '~A~RC - Arc (C) NoGate Consulting',                     '', kbNoKey, cmConfigARC, hcArchives,
-      MenuItem 'AR~J~ - ARJ (C) Robert K. Jung',                        '', kbNoKey, cmConfigARJ, hcArchives,
-      MenuItem 'BS~2~ - BSArc v2.xx (C) PhysTechSoft',                  '', kbNoKey, cmConfigBS2, hcArchives,
-      MenuItem '~B~SA - BSArc v1.xx (C) PhysTechSoft',                  '', kbNoKey, cmConfigBSA, hcArchives,
-      MenuItem 'CAB - CAB (C) Microsoft',                               '', kbNoKey, cmConfigCAB, hcArchives,
-      MenuItem '~C~HZ - ChArc (C) Dialogue',                            '', kbNoKey, cmConfigCHZ, hcArchives,
-      MenuItem '~H~A  - HA (C) Harri Hirvola',                          '', kbNoKey, cmConfigHA,  hcArchives,
-      MenuItem 'HA~P~ - HAP (C) Hamarsoft',                             '', kbNoKey, cmConfigHAP, hcArchives,
-      MenuItem 'HP~K~ - HPack (C) Peter Gutmann',                       '', kbNoKey, cmConfigHPK, hcArchives,
-      MenuItem 'H~Y~P - Hyper (C) P.Sawatzki & K.P.Nicshke',            '', kbNoKey, cmConfigHYP, hcArchives,
-      MenuItem 'IS~3~ - InstallShield 3.00.xxx',                        '', kbNoKey, cmConfigIS3, hcArchives,
-      MenuItem '~L~HA - LHArc (C) Haruyasu Yoshizaki',                  '', kbNoKey, cmConfigLHA, hcArchives,
-      MenuItem 'L~I~M - Limit (C) J Y Lim',                             '', kbNoKey, cmConfigLIM, hcArchives,
-      MenuItem 'QRK - QUARK (C) Kunz Robert',                           '', kbNoKey, cmConfigQUARK, hcArchives,
-      MenuItem '~R~AR - RAR (C) A. Roshal',                             '', kbNoKey, cmConfigRAR, hcArchives,
-      MenuItem '~S~QZ - SQZ (C) J.I.Hammarberg',                        '', kbNoKey, cmConfigSQZ, hcArchives,
-      MenuItem '~T~AR - Tape ARchiver for *NIX',                        '', kbNoKey, cmConfigTAR, hcArchives,
-      MenuItem '~G~Z  - GZip compressor',                               '', kbNoKey, cmConfigTGZ, hcArchives,
-      MenuItem '~U~C2 - Ultra Compressor II (C) Ad Infinitum Programs', '', kbNoKey, cmConfigUC2, hcArchives,
-      MenuItem 'U~F~A - UFA (C) Igor Pavlov',                           '', kbNoKey, cmConfigUFA, hcArchives,
-      MenuItem '~Z~IP - PKZIP (C) PKWARE Inc.',                         '', kbNoKey, cmConfigZIP, hcArchives,
-      MenuItem 'ZO~O~ - Zoo (C) Rahul Dhesi',                           '', kbNoKey, cmConfigZOO, hcArchives,
-      MenuItem 'Z~X~Z - ZXZip (C) Michael Kondratyev',                  '', kbNoKey, cmConfigZXZ, hcArchives,
-      MenuItem '~7~Z  - 7-Zip (C) Igor Pavlov',                         '', kbNoKey, cmConfig7Z,  hcArchives,
-      MenuItem 'BZ2 - BZip2 (C) Julian Seward',                         '', kbNoKey, cmConfigBZ2, hcArchives,
+      MenuItem 'AC~E~ - ACE (C) Marcel Lemke', main.ConfigACE
+      MenuItem 'AI~N~ - AIN (C) Transas Marine Ltd', main.ConfigAIN
+      MenuItem '~A~RC - Arc (C) NoGate Consulting', main.ConfigARC
+      MenuItem 'AR~J~ - ARJ (C) Robert K. Jung', main.ConfigARJ
+      MenuItem 'BS~2~ - BSArc v2.xx (C) PhysTechSoft', main.ConfigBS2
+      MenuItem '~B~SA - BSArc v1.xx (C) PhysTechSoft', main.ConfigBSA
+      MenuItem 'CAB - CAB (C) Microsoft', main.ConfigCAB
+      MenuItem '~C~HZ - ChArc (C) Dialogue', main.ConfigCHZ
+      MenuItem '~H~A  - HA (C) Harri Hirvola', main.ConfigHA
+      MenuItem 'HA~P~ - HAP (C) Hamarsoft', main.ConfigHAP
+      MenuItem 'HP~K~ - HPack (C) Peter Gutmann', main.ConfigHPK
+      MenuItem 'H~Y~P - Hyper (C) P.Sawatzki & K.P.Nicshke', main.ConfigHYP
+      MenuItem 'IS~3~ - InstallShield 3.00.xxx', main.ConfigIS3
+      MenuItem '~L~HA - LHArc (C) Haruyasu Yoshizaki', main.ConfigLHA
+      MenuItem 'L~I~M - Limit (C) J Y Lim', main.ConfigLIM
+      MenuItem 'QRK - QUARK (C) Kunz Robert', main.ConfigQUARK
+      MenuItem '~R~AR - RAR (C) A. Roshal', main.ConfigRAR
+      MenuItem '~S~QZ - SQZ (C) J.I.Hammarberg', main.ConfigSQZ
+      MenuItem '~T~AR - Tape ARchiver for *NIX', main.ConfigTAR
+      MenuItem '~G~Z  - GZip compressor', main.ConfigTGZ
+      MenuItem '~U~C2 - Ultra Compressor II (C) Ad Infinitum Programs', main.ConfigUC2
+      MenuItem 'U~F~A - UFA (C) Igor Pavlov', main.ConfigUFA
+      MenuItem '~Z~IP - PKZIP (C) PKWARE Inc.', main.ConfigZIP
+      MenuItem 'ZO~O~ - Zoo (C) Rahul Dhesi', main.ConfigZOO
+      MenuItem 'Z~X~Z - ZXZip (C) Michael Kondratyev', main.ConfigZXZ
+      MenuItem '~7~Z  - 7-Zip (C) Igor Pavlov', main.Config7Z
+      MenuItem 'BZ2 - BZip2 (C) Julian Seward', main.ConfigBZ2
      END
     MenuLine
-    MenuItem '~Q~uick run file edit...', ' ', kbNoKey, cmEditQuickRun, hcOptionsMenu,
-    MenuItem 'E~x~tension file edit...', ' ', kbNoKey, cmExtFileEdit, hcOptionsMenu,
-    MenuItem '~H~ighlight file edit...', ' ', kbNoKey, cmEditHGL, hcOptionsMenu,
+    MenuItem '~Q~uick run file edit...', main.EditQuickRun
+    MenuItem 'E~x~tension file edit...', main.ExtFileEdit
+    MenuItem '~H~ighlight file edit...', main.EditHGL
 ;{-$VIV 19.05.00}
-    MenuItem 'Search ~p~ath file (SPF) edit...', ' ', kbNoKey, cmEditSPF, hcOptionsMenu,
-    MenuItem '~I~ni file edit...', ' ', kbNoKey, cmEditINI, hcOptionsMenu,
-    MenuItem '~G~lobal menu definition...', ' ', kbNoKey, cmMenuFileEdit, hcOptionsMenu,
-    MenuItem 'Local ~m~enu definition...', ' ', kbNoKey, cmLocalMenuFileEdit, hcOptionsMenu,
-    MenuItem '~V~iewers...', ' ', kbNoKey, cmExternalViewers, hcOptionsMenu,
-    MenuItem '~E~ditors...', ' ', kbNoKey, cmExternalEditors, hcOptionsMenu,
+    MenuItem 'Search ~p~ath file (SPF) edit...', main.EditSPF
+    MenuItem '~I~ni file edit...', main.EditINI
+    MenuItem '~G~lobal menu definition...', main.MenuFileEdit
+    MenuItem 'Local ~m~enu definition...', main.LocalMenuFileEdit
+    MenuItem '~V~iewers...', main.ExternalViewers
+    MenuItem '~E~ditors...', main.ExternalEditors
     MenuLine
-    MenuItem '~S~ave desktop', '', kbNoKey, cmSaveDesk, hcOptionsMenu,
-    MenuItem '~L~oad desktop', ' ', kbNoKey, cmLoadDesk, hcOptionsMenu,
+    MenuItem '~S~ave desktop', main.SaveDesk
+    MenuItem '~L~oad desktop', main.LoadDesk
     MenuLine
-    MenuItem 'C~o~lors...', ' ', kbNoKey, cmChangeColors, hcOptionsMenu,
-    MenuItem 'S~t~ore palette', ' ', kbNoKey, cmStoreColors, hcOptionsMenu,
-    MenuItem 'Lo~a~d palette', ' ', kbNoKey, cmLoadColors, hcOptionsMenu,
+    MenuItem 'C~o~lors...', main.ChangeColors
+    MenuItem 'S~t~ore palette', main.StoreColors
+    MenuItem 'Lo~a~d palette', main.LoadColors
   END
  SubMenu '~W~indow', hcWindows,
-    MenuItem '~T~ile', '', kbNoKey, cmTile, hcWindows,
-    MenuItem 'C~a~scade', '', kbNoKey, cmCascade, hcWindows,
-    MenuItem 'Cl~o~se all', '', kbNoKey, cmClearDesktop, hcWindows,
+    MenuItem '~T~ile', main.Tile
+    MenuItem 'C~a~scade', main.Cascade
+    MenuItem 'Cl~o~se all', main.ClearDesktop
     MenuLine
-    MenuItem '~S~ize/Move','Ctrl-F5',   kbCtrlF5,  cmResize, hcWindows,
-    MenuItem '~Z~oom',     'Alt-Z',     kbAltZ,      cmZoom, hcWindows,
-    MenuItem '~M~aximize', 'Ctrl-Alt-Z',kbCtrlAltZ,  cmMaxi, hcWindows,
-    MenuItem '~N~ext', 'Ctrl-Shift-Tab', kbCtrlShiftTab, cmNext, hcWindows,
-    MenuItem '~P~rev',     'Ctrl-Tab',  kbCtrlTab,   cmPrev, hcWindows,
-    MenuItem 'Next similar',        'Shift-Gray "+"', kbShiftGrayPlus, cmNext2, hcWindows,
-    MenuItem 'Prev similar',        'Shift-Gray "-"', kbShiftGrayMinus,cmPrev2, hcWindows,
-    MenuItem 'Next different',      '', kbNoKey,   cmNext3, hcWindows,
-    MenuItem 'Prev different',      '', kbNoKey,   cmPrev3, hcWindows,
-    MenuItem '~C~lose', 'Ctrl-F4', kbCtrlF4, cmClose, hcWindows,
+    MenuItem '~S~ize/Move', main.Resize
+    MenuItem '~Z~oom', main.Zoom
+    MenuItem '~M~aximize', main.Maxi
+    MenuItem '~N~ext', main.Next
+    MenuItem '~P~rev', main.Prev
+    MenuItem 'Next similar', main.Next2
+    MenuItem 'Prev similar', main.Prev2
+    MenuItem 'Next different', main.Next3
+    MenuItem 'Prev different', main.Prev3
+    MenuItem '~C~lose', main.Close
     MenuLine
-    MenuItem '~L~ist...', 'Alt-0', kbAlt0, cmWindowManager, hcWindows,
+    MenuItem '~L~ist...', main.WindowManager
   END
 END
 
 MENU dlgWkzMenuBar
   SubMenu '~F~ile', hcSpreadFileMenu,
-       MenuItem '~N~ew', 'F4', kbF4, cmNewTable, hcSpreadSheet,
-       MenuItem '~O~pen...', 'F3', kbF3, cmXEditFile, hcSpreadSheet,
-       MenuItem '~S~ave', 'F2', kbF2, cmSave, hcSpreadSheet,
-       MenuItem 'Save ~a~s...', 'Shift-F2', kbShiftF2, cmSaveSheetAs, hcSpreadSheet,
-       MenuItem 'Save ~t~ext', ' ', kbNoKey, cmImportToFile, hcSpreadSheet,
+       MenuItem '~N~ew', sheet.NewTable
+       MenuItem '~O~pen...', sheet.XEditFile
+       MenuItem '~S~ave', sheet.Save
+       MenuItem 'Save ~a~s...', sheet.SaveSheetAs
+       MenuItem 'Save ~t~ext', sheet.ImportToFile
        SubMenu '~I~mport', hcSpreadSheet,
-         MenuItem 'Comma Seperated Value (~C~SV)', ' ', kbNoKey, cmImportFromCsv, hcSpreadSheet,
-         MenuItem 'dBase III (~D~BF)',' ',kbNoKey, cmImportFromDbf, hcSpreadSheet,
+         MenuItem 'Comma Seperated Value (~C~SV)', sheet.ImportFromCsv
+         MenuItem 'dBase III (~D~BF)', sheet.ImportFromDbf
        END
        SubMenu '~E~xport', hcSpreadSheet,
-         MenuItem 'Comma Seperated Value (~C~SV)', ' ', kbNoKey, cmExportToCsv, hcSpreadSheet,
-         MenuItem 'dBase III (~D~BF)',' ',kbNoKey, cmExportToDbf, hcSpreadSheet,
-         MenuItem 'Excel (~X~LS)', ' ',kbNoKey, cmExportToXls, hcSpreadSheet,
+         MenuItem 'Comma Seperated Value (~C~SV)', sheet.ExportToCsv
+         MenuItem 'dBase III (~D~BF)', sheet.ExportToDbf
+         MenuItem 'Excel (~X~LS)', sheet.ExportToXls
        END
        MenuLine
-       MenuItem '~M~ain menu', 'F10', kbF10, cmMainMenu, hcSpreadSheet,
+       MenuItem '~M~ain menu', sheet.MainMenu
        MenuLine
-       MenuItem 'E~x~it', 'Ctrl-F4', kbESC, cmClose, hcSpreadSheet,
+       MenuItem 'E~x~it', sheet.Close
      END
   SubMenu '~E~dit', hcSpreadEditMenu,
-       MenuItem '~U~ndo', 'Alt-BkSp', kbAltBack, cmUndo, hcSpreadSheet,
+       MenuItem '~U~ndo', sheet.Undo
        MenuLine
-       MenuItem 'Cu~t~...', 'Shift-Del', kbShiftDel, cmCut, hcSpreadSheet,
-       MenuItem '~C~opy', 'Ctrl-Ins', kbCtrlIns, cmCopy, hcSpreadSheet,
-       MenuItem '~P~aste', 'Shift-Ins', kbShiftIns, cmPaste, hcSpreadSheet,
+       MenuItem 'Cu~t~...', sheet.Cut
+       MenuItem '~C~opy', sheet.Copy
+       MenuItem '~P~aste', sheet.Paste
        MenuLine
-       MenuItem 'C~l~ear', 'Ctrl-Del', kbCtrlDel, cmClear, hcSpreadSheet,
+       MenuItem 'C~l~ear', sheet.Clear
      END
   SubMenu '~S~earch', hcSpreadSearchMenu,
-       MenuItem '~F~ind...', '', kbNoKey, cmFindCell, hcSpreadSheet,
-       MenuItem '~R~eplace...', '', kbNoKey, cmReplaceCell, hcSpreadSheet,
-       MenuItem '~S~earch again', '', kbNoKey, cmSearchAgain, hcSpreadSheet,
-       MenuItem '~G~o to cell number...', '', kbNoKey, cmGotoCell, hcSpreadSheet,
-       MenuItem 'Go to last ~e~rror', '', kbNoKey, cmGotoError, hcSpreadSheet,
+       MenuItem '~F~ind...', sheet.FindCell
+       MenuItem '~R~eplace...', sheet.ReplaceCell
+       MenuItem '~S~earch again', sheet.SearchAgain
+       MenuItem '~G~o to cell number...', sheet.GotoCell
+       MenuItem 'Go to last ~e~rror', sheet.GotoError
      END
   SubMenu '~T~able', hcSpreadTableMenu,
-       MenuItem '~C~ell format', '', kbNoKey, cmChangeFormat, hcSpreadSheet,
-       MenuItem 'C~o~lumn width...', '', kbNoKey, cmChangeWidth, hcSpreadSheet,
-       MenuItem '~T~oggle column separators', '', kbNoKey, cmToggleShowMode, hcSpreadSheet,
+       MenuItem '~C~ell format', sheet.ChangeFormat
+       MenuItem 'C~o~lumn width...', sheet.ChangeWidth
+       MenuItem '~T~oggle column separators', sheet.ToggleShowMode
        MenuLine
-       MenuItem '~I~nsert row', '', kbNoKey, cmInsertLine, hcSpreadSheet,
-       MenuItem 'I~n~sert column', '', kbNoKey, cmInsertColumn, hcSpreadSheet,
-       MenuItem '~D~elete row', '', kbNoKey, cmDeleteLine, hcSpreadSheet,
-       MenuItem 'D~e~lete column', '', kbNoKey, cmDeleteColumn, hcSpreadSheet,
+       MenuItem '~I~nsert row', sheet.InsertLine
+       MenuItem 'I~n~sert column', sheet.InsertColumn
+       MenuItem '~D~elete row', sheet.DeleteLine
+       MenuItem 'D~e~lete column', sheet.DeleteColumn
      END
 END
 
 STATUSLINE
   StatusDef 1, 1,
 ;{NO SHOW}
-      StatusItem '', kbF1, cmHelp,
+      StatusItem '', key.Help.F1
 ;{BASE}
       StatusItem '~'#26'~ Moving', kbNoKey, cmNo,
       StatusItem '~─┘~ Done', kbNoKey, cmNo,
@@ -784,740 +784,740 @@ STATUSLINE
 
   StatusDef hcEnvEditor, hcEnvEditor,
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', main.Resize
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '-~Ins~ Append', kbAltIns, cmAddVariable,
-     StatusItem '-~Del~ Delete', kbAltDel, cmDelVariable,
-     StatusItem '~F6~ Rename', kbF6, cmRenVariable,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '-~Ins~ Append', key.AddVariable.AltIns
+     StatusItem '-~Del~ Delete', key.DelVariable.AltDel
+     StatusItem '~F6~ Rename', key.RenVariable.F6
 
   StatusDef hcHelp, hcHelp,
 ;{BASE}
-      StatusItem '~F1~ Help on help', kbF1, cmDefault,
+      StatusItem '~F1~ Help on help', key.Default.F1
       StatusItem '~Tab~ Next reference', kbNoKey, cmYes,
       StatusItem '~ENTER~ Open',kbNoKey, cmOk,
       StatusItem '~Esc~ Cancel', kbNoKey, cmClose,
 ;{csablak}
-      StatusItem '~Alt-F1~ Go back~', kbAltF1, cmNo,
+      StatusItem '~Alt-F1~ Go back~', key.No.AltF1
 ;{SHIFT}
-      StatusItem ':~F1~ Index', kbShiftF1, cmCancel,
+      StatusItem ':~F1~ Index', key.Cancel.ShiftF1
       StatusItem ':~Tab~ Previous reference', kbNoKey, cmSave,
 ;{ALT}
       StatusItem '-~F1~ Go back', kbNoKey, cmNo,
-      StatusItem '-~Z~ Zoom', kbAltZ, cmZoom,
+      StatusItem '-~Z~ Zoom', main.Zoom
 ;{CTRL}
-      StatusItem '+~F5~ Resize', kbCtrlF5, cmResize,
+      StatusItem '+~F5~ Resize', main.Resize
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-      StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+      StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-      StatusItem '', kbF9, cmNext,
-      StatusItem '', kbShiftF9, cmPrev,
-      StatusItem '', kbF10, cmMenu,
+      StatusItem '', key.Next.F9
+      StatusItem '', key.Prev.ShiftF9
+      StatusItem '', key.Menu.F10
 
   StatusDef hcFilePanel, hcFilePanel,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ User', kbF2, cmUserMenu,
-     StatusItem '~F3~ View', kbF3, cmViewFile,
-     StatusItem '~F4~ Edit', kbF4, cmEditFile,
-     StatusItem '~F5~ Copy', kbF5, cmCopyFiles,
-     StatusItem '~F6~ Ren', kbF6, cmMoveFiles,
-     StatusItem '~F7~ MkDir', kbF7, cmPanelMkDir,
-     StatusItem '~F8~ Del', kbF8, cmPanelErase,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ User', main.UserMenu
+     StatusItem '~F3~ View', main.ViewFile
+     StatusItem '~F4~ Edit', main.EditFile
+     StatusItem '~F5~ Copy', main.CopyFiles
+     StatusItem '~F6~ Ren', main.MoveFiles
+     StatusItem '~F7~ MkDir', main.PanelMkDir
+     StatusItem '~F8~ Del', main.PanelErase
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~B~ Sort', kbAltB, cmSortBy,
-     StatusItem '-~-~ Look', kbAltMinus, cmSelectPreset,
-     StatusItem '-~C~ Drive', kbAltC, cmChangeDrive,
-     StatusItem '-~S~etup', kbAltS, cmPanelSortSetup,
-     StatusItem '-~L~ist', kbAltL, cmMakeList,
-     StatusItem '-~F6~ Ren', kbAltF6, cmFastRename,
-     StatusItem ''    , kbAltShiftF6, cmFastRename,
+     StatusItem '-~B~ Sort', main.SortBy
+     StatusItem '-~-~ Look', main.SelectPreset
+     StatusItem '-~C~ Drive', main.ChangeDrive
+     StatusItem '-~S~etup', main.PanelSortSetup
+     StatusItem '-~L~ist', main.MakeList
+     StatusItem '-~F6~ Ren', key.FastRename.AltF6
+     StatusItem '    ', key.FastRename.AltShiftF6
      StatusItem '-~F7~ Find', kbNoKey, cmFindFile,
-     StatusItem '-~R~e-read', kbAltR, cmForceRescan,
-     StatusItem '-~;~ Desc', kbAltSemicolon, cmToggleDescriptions,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~R~e-read', main.ForceRescan
+     StatusItem '-~;~ Desc', key.ToggleDescriptions.AltSemicolon
+     StatusItem '-~X~ Quit', main.Quit
 ;{SHIFT}
-     StatusItem ':~F1~ Arc', kbShiftF1, cmPanelArcFiles,
-     StatusItem ':~F2~ Ext', kbShiftF2, cmExtractArchive,
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F1~ Arc', main.PanelArcFiles
+     StatusItem ':~F2~ Ext', main.ExtractArchive
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F5~ Split/Combine', kbShiftF5, cmPanelLongCopy,
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F5~ Copy Single', kbShiftF5, cmSingleCopy,
-     StatusItem ':~F6~ Ren Single', kbShiftF6, cmSingleRename,
-     StatusItem ':~F8~ Del', kbShiftF8, cmSingleDel,
+     StatusItem ':~F5~ Copy Single', key.SingleCopy.ShiftF5
+     StatusItem ':~F6~ Ren Single', key.SingleRename.ShiftF6
+     StatusItem ':~F8~ Del', main.SingleDel
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F6~ Calc', main.Calculator
 ;    StatusItem '+~F9~ Print', kbCtrlF9, cmPrintFile,
-     StatusItem '+~K~ Desc', kbCtrlK, cmToggleDescriptions,
-     StatusItem '+~L~ Info', kbCtrlL, cmDiskInfo,
+     StatusItem '+~K~ Desc', key.ToggleDescriptions.CtrlK
+     StatusItem '+~L~ Info', main.DiskInfo
 ;$IFNDEF OS2
-     StatusItem '+LF~N~', kbCtrlN, cmToggleLongNames,
+     StatusItem '+LF~N~', key.ToggleLongNames.CtrlN
 ;$ELSE
-     StatusItem '+Logical ~n~ames', kbCtrlN, cmToggleLongNames,
+     StatusItem '+Logical ~n~ames', key.ToggleLongNames.CtrlN
 ;$ENDIF
-     StatusItem '+~F~older', kbCtrlF, cmOpenWPSWindow,
+     StatusItem '+~F~older', key.OpenWPSWindow.CtrlF
 ;$IFDEF OS2
-     StatusItem '+Ob~j~ect', kbCtrlJ, cmCreateWPSItem,
+     StatusItem '+Ob~j~ect', key.CreateWPSItem.CtrlJ
 ;$ENDIF
 ;{-$VIV}
 ;$IFDEF NETINFO
-     StatusItem '+~N~ NetInfo', kbCtrlN, cmNetInfo,
+     StatusItem '+~N~ NetInfo', main.NetInfo
 ;$ENDIF
-     StatusItem '+~T~ Tree', kbCtrlT, cmDirTree,
-     StatusItem '+~Q~ Preview', kbCtrlQ, cmQuickView,
-     StatusItem '+~Y~ Show', kbCtrlY, cmToggleShowMode,
+     StatusItem '+~T~ Tree', main.DirTree
+     StatusItem '+~Q~ Preview', main.QuickView
+     StatusItem '+~Y~ Show', key.ToggleShowMode.CtrlY
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
-     StatusItem '^~H~ Full Directory Branch', kbCtrlAltH, cmDirBranchFull,
-     StatusItem '^~F5~ Split/Combine', kbCtrlAltF5, cmPanelLongCopy,
-     StatusItem '^~F6~ Change names case', kbCtrlAltF6, cmChangeNameCase,
+     StatusItem '^~Z~ Maximize', main.Maxi
+     StatusItem '^~H~ Full Directory Branch', key.DirBranchFull.CtrlAltH
+     StatusItem '^~F5~ Split/Combine', main.PanelLongCopy
+     StatusItem '^~F6~ Change names case', main.ChangeNameCase
 ;{NO SHOW}
-     StatusItem '', kbAltI, cmDiskInfo,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbAltBack, cmDirHistory,
+     StatusItem '', key.DiskInfo.AltI
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', key.DirHistory.AltBack
 
   StatusDef hcLinkPanel, hcLinkPanel,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ User', kbF2, cmUserMenu,
-     StatusItem '~F3~ View', kbF3, cmViewFile,
-     StatusItem '~F5~ Copy', kbF5, cmCopyFiles,
-     StatusItem '~F7~ MkDir', kbF7, cmPanelMkDir,
-     StatusItem '~F8~ Del', kbF8, cmPanelErase,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ User', main.UserMenu
+     StatusItem '~F3~ View', main.ViewFile
+     StatusItem '~F5~ Copy', main.CopyFiles
+     StatusItem '~F7~ MkDir', main.PanelMkDir
+     StatusItem '~F8~ Del', main.PanelErase
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~B~ Sort', kbAltB, cmSortBy,
-     StatusItem '-~-~ Look', kbAltMinus, cmSelectPreset,
-     StatusItem '-~C~ Drive', kbAltC, cmChangeDrive,
-     StatusItem '-~S~ Setup', kbAltS, cmPanelSortSetup,
-     StatusItem '-~R~ Re-read', kbAltR, cmForceRescan,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~B~ Sort', main.SortBy
+     StatusItem '-~-~ Look', main.SelectPreset
+     StatusItem '-~C~ Drive', main.ChangeDrive
+     StatusItem '-~S~ Setup', main.PanelSortSetup
+     StatusItem '-~R~ Re-read', main.ForceRescan
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~L~ Info', kbCtrlL, cmDiskInfo,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~L~ Info', main.DiskInfo
 ;{-$VIV}
 ;$IFDEF NETINFO
-     StatusItem '+~N~ NetInfo', kbCtrlN, cmNetInfo,
+     StatusItem '+~N~ NetInfo', main.NetInfo
 ;$ENDIF
-     StatusItem '+~Y~ Show', kbCtrlY, cmToggleShowMode,
+     StatusItem '+~Y~ Show', key.ToggleShowMode.CtrlY
 ;{SHIFT}
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F8~ Del', kbShiftF8, cmSingleDel,
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F8~ Del', main.SingleDel
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
-     StatusItem '^~F6~ Change names case', kbCtrlAltF6, cmChangeNameCase,
+     StatusItem '^~Z~ Maximize', main.Maxi
+     StatusItem '^~F6~ Change names case', main.ChangeNameCase
 ;{NO SHOW}
-     StatusItem '', kbAltI, cmDiskInfo,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbAltBack, cmDirHistory,
+     StatusItem '', key.DiskInfo.AltI
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', key.DirHistory.AltBack
 
   StatusDef hcArchives, hcArchives,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ User', kbF2, cmUserMenu,
-     StatusItem '~F3~ View', kbF3, cmViewFile,
-     StatusItem '~F4~ Extr', kbF4, cmExtractTo,
-     StatusItem '~F5~ Copy', kbF5, cmCopyFiles,
-     StatusItem '~F6~ Test', kbF6, cmArcTest,
-     StatusItem '~F7~ Psw',  kbF7, cmSetPassword,
-     StatusItem '~F8~ Del', kbF8, cmPanelErase,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ User', main.UserMenu
+     StatusItem '~F3~ View', main.ViewFile
+     StatusItem '~F4~ Extr', key.ExtractTo.F4
+     StatusItem '~F5~ Copy', main.CopyFiles
+     StatusItem '~F6~ Test', key.ArcTest.F6
+     StatusItem '~F7~ Psw', key.SetPassword.F7
+     StatusItem '~F8~ Del', main.PanelErase
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~B~ Sort', kbAltB, cmSortBy,
-     StatusItem '-~-~ Look', kbAltMinus, cmSelectPreset,
-     StatusItem '-~C~ Drive', kbAltC, cmChangeDrive,
-     StatusItem '-~S~etup', kbAltS, cmPanelSortSetup,
-     StatusItem '-~L~ist', kbAltL, cmMakeList,
-     StatusItem '-~F7~ Find', kbAltF7, cmFindFile,
-     StatusItem '-~R~ Re-read', kbAltR, cmForceRescan,
-     StatusItem '-~Y~ Memory Info', kbAltY, cmMemoryInfo,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~B~ Sort', main.SortBy
+     StatusItem '-~-~ Look', main.SelectPreset
+     StatusItem '-~C~ Drive', main.ChangeDrive
+     StatusItem '-~S~etup', main.PanelSortSetup
+     StatusItem '-~L~ist', main.MakeList
+     StatusItem '-~F7~ Find', main.FindFile
+     StatusItem '-~R~ Re-read', main.ForceRescan
+     StatusItem '-~Y~ Memory Info', main.MemoryInfo
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F12~ Calendar', kbCtrlF12, cmCalendar,
-     StatusItem '+~L~ Info', kbCtrlL, cmDiskInfo,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F12~ Calendar', main.Calendar
+     StatusItem '+~L~ Info', main.DiskInfo
 ;$IFDEF NETINFO
-     StatusItem '+~N~ NetInfo', kbCtrlN, cmNetInfo,
+     StatusItem '+~N~ NetInfo', main.NetInfo
 ;$ENDIF
-     StatusItem '+~T~ Tree', kbCtrlT, cmDirTree,
-     StatusItem '+~Y~ Show', kbCtrlY, cmToggleShowMode,
+     StatusItem '+~T~ Tree', main.DirTree
+     StatusItem '+~Y~ Show', key.ToggleShowMode.CtrlY
 ;{SHIFT}
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Format', kbShiftF7, cmFormatDisk,
-     StatusItem ':~F8~ Erase', kbShiftF8, cmSingleDel,
+     StatusItem ':~F7~ Format', main.FormatDisk
+     StatusItem ':~F8~ Erase', main.SingleDel
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
-     StatusItem '^~H~ Full Directory Branch', kbCtrlAltH, cmDirBranchFull,
+     StatusItem '^~Z~ Maximize', main.Maxi
+     StatusItem '^~H~ Full Directory Branch', key.DirBranchFull.CtrlAltH
 ;{NO SHOW}
-     StatusItem '', kbAltI, cmDiskInfo,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbAltBack, cmDirHistory,
-     StatusItem '', kbAltSemicolon, cmToggleDescriptions,
-     StatusItem '', kbCtrlK, cmToggleDescriptions,
+     StatusItem '', key.DiskInfo.AltI
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', key.DirHistory.AltBack
+     StatusItem '', key.ToggleDescriptions.AltSemicolon
+     StatusItem '', key.ToggleDescriptions.CtrlK
 
   StatusDef hcDirTree, hcDirTree,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ User', kbF2, cmUserMenu,
-     StatusItem '~F5~ Copy', kbF5, cmCopyFiles,
-     StatusItem '~F6~ Ren', kbF6, cmMoveFiles,
-     StatusItem '~F7~ MkDir', kbF7, cmPanelMkDir,
-     StatusItem '~F8~ Del', kbF8, cmPanelErase,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ User', main.UserMenu
+     StatusItem '~F5~ Copy', main.CopyFiles
+     StatusItem '~F6~ Ren', main.MoveFiles
+     StatusItem '~F7~ MkDir', main.PanelMkDir
+     StatusItem '~F8~ Del', main.PanelErase
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F12~ Calendar', kbCtrlF12, cmCalendar,
-     StatusItem '+~R~e-read', kbCtrlR, cmForceRescan,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F12~ Calendar', main.Calendar
+     StatusItem '+~R~e-read', key.ForceRescan.CtrlR
 ;{SHIFT}
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Format', kbShiftF7, cmFormatDisk,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F7~ Format', main.FormatDisk
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{ALT}
-     StatusItem '-~Y~ Memory Info', kbAltY, cmMemoryInfo,
-     StatusItem '-~Z~ Zoom', kbAltZ, cmZoom,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~Y~ Memory Info', main.MemoryInfo
+     StatusItem '-~Z~ Zoom', main.Zoom
+     StatusItem '-~X~ Quit', main.Quit
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
-     StatusItem '^~F6~ Case', kbCtrlAltF6, cmChangeNameCase,
+     StatusItem '^~Z~ Maximize', main.Maxi
+     StatusItem '^~F6~ Case', main.ChangeNameCase
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbAltBack, cmDirHistory,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', key.DirHistory.AltBack
+     StatusItem '', main.Resize
 
   StatusDef hcView, hcView,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ (Un)Wrap', kbF2, cmUnWrap,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ (Un)Wrap', key.UnWrap.F2
 ;    StatusItem '~F3~ NextS', kbF3, cmNext2,
-     StatusItem '~F4~ Hex/Asc/Dmp', kbF4, cmHexMode,
-     StatusItem '~F5~ Goto', kbF5, cmGotoCell,
-     StatusItem '~F6~ Filter', kbF6, cmAddFilter,
-     StatusItem '~F7~ Search', kbF7, cmSearchFor,
-     StatusItem '~F8~ KeyMap', kbF8, cmSwitchKeyMapping,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F4~ Hex/Asc/Dmp', key.HexMode.F4
+     StatusItem '~F5~ Goto', key.GotoCell.F5
+     StatusItem '~F6~ Filter', key.AddFilter.F6
+     StatusItem '~F7~ Search', fixer.SearchFor
+     StatusItem '~F8~ KeyMap', editor.SwitchKeyMapping
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~Y~ Memory Info', kbAltY, cmMemoryInfo,
-     StatusItem '-~F7~ Reverse Search', kbAltF7, cmReverseSearch,
-     StatusItem '-~Z~ Zoom', kbAltZ, cmZoom,
+     StatusItem '-~Y~ Memory Info', main.MemoryInfo
+     StatusItem '-~F7~ Reverse Search', editor.ReverseSearch
+     StatusItem '-~Z~ Zoom', main.Zoom
 ;     StatusItem '-~A~ Manual dial', kbAltA, cmUndial,
-     StatusItem '-~E~ Edit', kbAltE, cmFileEdit,
+     StatusItem '-~E~ Edit', key.FileEdit.AltE
 ;     StatusItem '-~J~ Terminal', kbAltJ, cmTerminal,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F7~ Reverse Search', kbCtrlF7, cmReverseSearch,
-     StatusItem '+~L~ Cont. Search', kbCtrlL, cmContinueSearch,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F7~ Reverse Search', key.ReverseSearch.CtrlF7
+     StatusItem '+~L~ Cont. Search', key.ContinueSearch.CtrlL
 ;{SHIFT}
-     StatusItem ':~F2~ Store', kbShiftF2, cmSave,
-     StatusItem ':~F3~ Phone', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
-     StatusItem ':~F5~ Save as...', kbShiftF5, cmSaveAll,
-     StatusItem ':~F6~ XLat', kbShiftF6, cmLoadXlatTable,
-     StatusItem ':~F7~ Cont. Search', kbShiftF7, cmContinueSearch,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F2~ Store', key.Save.ShiftF2
+     StatusItem ':~F3~ Phone', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
+     StatusItem ':~F5~ Save as...', key.SaveAll.ShiftF5
+     StatusItem ':~F6~ XLat', key.LoadXlatTable.ShiftF6
+     StatusItem ':~F7~ Cont. Search', fixer.ContinueSearch
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
+     StatusItem '^~Z~ Maximize', main.Maxi
 ;{NO SHOW}
-     StatusItem '', kbCtrlEnter, cmContinueSearch,
-     StatusItem '', kbCtrlP, cmASCIITable,
-     StatusItem '', kbCtrlB, cmASCIITable,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.ContinueSearch.CtrlEnter
+     StatusItem '', editor.ASCIITable
+     StatusItem '', main.ASCIITable
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
   StatusDef hcDiskEditor, hcDiskEditor,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Hex', kbF2, cmHexMode,
-     StatusItem '~F3~ Dir', kbF3, cmDirMode,
-     StatusItem '~F4~ Text', kbF4, cmTextMode,
-     StatusItem '~F5~ FAT', kbF5, cmFATMode,
-     StatusItem '~F7~ Search', kbF7, cmSearchFor,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Hex', fixer.HexMode
+     StatusItem '~F3~ Dir', fixer.DirMode
+     StatusItem '~F4~ Text', fixer.TextMode
+     StatusItem '~F5~ FAT', fixer.FATMode
+     StatusItem '~F7~ Search', fixer.SearchFor
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~C~luster', kbAltC, cmFixCluster,
-     StatusItem '-~D~rive', kbAltD, cmFixDrive,
-     StatusItem '-~F~ile', kbAltF, cmFixFile,
-     StatusItem '-Di~R~ectory', kbAltR, cmFixDir,
-     StatusItem '-~S~ector', kbAltS, cmFixSector,
-     StatusItem '-~Z~ Zoom', kbAltZ, cmZoom,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~C~luster', fixer.FixCluster
+     StatusItem '-~D~rive', fixer.FixDrive
+     StatusItem '-~F~ile', fixer.FixFile
+     StatusItem '-Di~R~ectory', fixer.FixDir
+     StatusItem '-~S~ector', fixer.FixSector
+     StatusItem '-~Z~ Zoom', main.Zoom
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
 ;{SHIFT}
-     StatusItem ':~F2~ Store', kbShiftF2, cmSave,
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F2~ Store', key.Save.ShiftF2
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Continue Search', kbShiftF7, cmContinueSearch,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F7~ Continue Search', fixer.ContinueSearch
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbCtrlL, cmContinueSearch,
-     StatusItem '', kbCtrlEnter, cmContinueSearch,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.ContinueSearch.CtrlL
+     StatusItem '', key.ContinueSearch.CtrlEnter
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
   StatusDef hcDBView, hcDBView,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Fields', kbF2, cmShowFields,
-     StatusItem '~F3~ View memo', kbF3, cmShowMemo,
-     StatusItem '~F4~ Edit field', kbF4, cmEditDBField,
-     StatusItem '~F6~ Goto', kbF6, cmDBFGoto,
-     StatusItem '~F7~ Search', kbF7, cmSearchFor,
-     StatusItem '~F8~ KeyMap', kbF8, cmSwitchKeyMapping,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Fields', key.ShowFields.F2
+     StatusItem '~F3~ View memo', key.ShowMemo.F3
+     StatusItem '~F4~ Edit field', key.EditDBField.F4
+     StatusItem '~F6~ Goto', key.DBFGoto.F6
+     StatusItem '~F7~ Search', fixer.SearchFor
+     StatusItem '~F8~ KeyMap', editor.SwitchKeyMapping
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~F7~ Back search', kbAltF7, cmBackSearch,
-     StatusItem '-Memor~y~ info', kbAltY, cmMemoryInfo,
-     StatusItem '-~Z~oom', kbAltZ, cmZoom,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~F7~ Back search', key.BackSearch.AltF7
+     StatusItem '-Memor~y~ info', main.MemoryInfo
+     StatusItem '-~Z~oom', main.Zoom
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~I~ Insert record', kbCtrlI, cmInsertDBRec,
-     StatusItem '+~D~ Delete/Restore', kbCtrlD, cmDeleteDBRec,
-     StatusItem '+~F3~ New manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
+     StatusItem '+~I~ Insert record', key.InsertDBRec.CtrlI
+     StatusItem '+~D~ Delete/Restore', key.DeleteDBRec.CtrlD
+     StatusItem '+~F3~ New manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
 ;{SHIFT}
 ;{SHIFT}
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
-     StatusItem ':~F6~ XLat', kbShiftF6, cmLoadXlatTable,
-     StatusItem ':~F7~ Continue search', kbShiftF7, cmContinueSearch,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
+     StatusItem ':~F6~ XLat', key.LoadXlatTable.ShiftF6
+     StatusItem ':~F7~ Continue search', fixer.ContinueSearch
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
-     StatusItem '^~~ Move up', kbCtrlAltUp, cmUpDBRec,
-     StatusItem '^~~ Move down', kbCtrlAltDown, cmDownDBRec,
+     StatusItem '^~~ Move up', key.UpDBRec.CtrlAltUp
+     StatusItem '^~~ Move down', key.DownDBRec.CtrlAltDown
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
-     StatusItem '^Maximi~z~e', kbCtrlAltZ, cmMaxi,
+     StatusItem '^~X~ Restart', main.Restart
+     StatusItem '^Maximi~z~e', main.Maxi
 ;     StatusItem '^~F8~ Reanimator', kbCtrlAltF8, cmReanimator,
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbCtrlL, cmContinueSearch,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlM, cmMaxi,
+     StatusItem '', key.ContinueSearch.CtrlL
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
+     StatusItem '', key.Maxi.CtrlM
 
   StatusDef hcEditor, hcEditor,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp2,
-     StatusItem '~F2~ Save', kbF2, cmSaveText,
-     StatusItem '~F3~ Open', kbF3, cmLoadText,
+     StatusItem '~F1~ Help', key.Help2.F1
+     StatusItem '~F2~ Save', editor.SaveText
+     StatusItem '~F3~ Open', key.LoadText.F3
 ;    StatusItem '~F3~ NextS', kbF3, cmNext2,
-     StatusItem '~F5~ Block', kbF5, cmSwitchBlock,
-     StatusItem '~F6~ Fill', kbF6, cmDuplicateLine,
-     StatusItem '~F7~ Search', kbF7, cmStartSearch,
-     StatusItem '~F8~ KeyMap', kbF8, cmSwitchKeyMapping,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F5~ Block', key.SwitchBlock.F5
+     StatusItem '~F6~ Fill', key.DuplicateLine.F6
+     StatusItem '~F7~ Search', editor.StartSearch
+     StatusItem '~F8~ KeyMap', editor.SwitchKeyMapping
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~BkSp~ Undo', kbAltBack, cmUndo,
-     StatusItem '-~F7~ Rev. Search', kbAltF7, cmReverseSearch,
-     StatusItem '-~J~ustify', kbAltJ, cmFJustify,
-     StatusItem '-~C~enter',  kbAltC, cmFCenter,
-     StatusItem '-~L~eft', kbAltL, cmFLeft,
-     StatusItem '-~R~ight', kbAltR, cmFRight,
-     StatusItem '-~Z~oom', kbAltZ, cmZoom,
-     StatusItem '-~Tilde~ Redo', kbAltTilde, cmRedo,
-     StatusItem '', kbAltShiftBack, cmRedo,
-     StatusItem '-~V~ View', kbAltV, cmViewFile,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~BkSp~ Undo', editor.Undo
+     StatusItem '-~F7~ Rev. Search', editor.ReverseSearch
+     StatusItem '-~J~ustify', editor.FJustify
+     StatusItem '-~C~enter', editor.FCenter
+     StatusItem '-~L~eft', editor.FLeft
+     StatusItem '-~R~ight', editor.FRight
+     StatusItem '-~Z~oom', main.Zoom
+     StatusItem '-~Tilde~ Redo', editor.Redo
+     StatusItem '', key.Redo.AltShiftBack
+     StatusItem '-~V~ View', key.ViewFile.AltV
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F7~ Replace', kbCtrlF7, cmReplace,
-     StatusItem '+~F8~ Print', kbCtrlF8, cmPrintFileEd,
-     StatusItem '+~Y~ Delete line', kbCtrlY, cmDeleteLine,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F7~ Replace', editor.Replace
+     StatusItem '+~F8~ Print', editor.PrintFileEd
+     StatusItem '+~Y~ Delete line', key.DeleteLine.CtrlY
 ;{SHIFT}
-     StatusItem ':~F2~ Save as', kbShiftF2, cmSaveTextAs,
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
-     StatusItem ':~F7~ Cont. Search', kbShiftF7, cmContSearch,
-     StatusItem ':~F8~ Print Block', kbShiftF8, cmPrintBlock,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F2~ Save as', editor.SaveTextAs
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
+     StatusItem ':~F7~ Cont. Search', editor.ContSearch
+     StatusItem ':~F8~ Print Block', editor.PrintBlock
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
+     StatusItem '^~Z~ Maximize', main.Maxi
 ;{NO SHOW}
-     StatusItem '', kbCtrlAltZ, cmMaxi,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '', main.Maxi
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 ;{-$VOL}
-     StatusItem '', kbCtrlS, cmSaveText,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.SaveText.CtrlS
+     StatusItem '', main.Resize
 
   StatusDef hcScrollBack, hcScrollBack,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Save', kbF2, cmSBBStore,
-     StatusItem '~F5~ Grab', kbF10, cmSBBGrab,
-     StatusItem '~F7~ Search', kbF7, cmSearchFor,
-     StatusItem '~F8~ Kill',   kbF8, cmSBBKill,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Save', key.SBBStore.F2
+     StatusItem '~F5~ Grab', key.SBBGrab.F10
+     StatusItem '~F7~ Search', fixer.SearchFor
+     StatusItem '~F8~ Kill', key.SBBKill.F8
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 
   StatusDef hcTerminal, hcTerminal,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Send Text', kbF2, cmTermWrite,
-     StatusItem '~F3~ Capture', kbF3, cmTermLog,
-     StatusItem '~F4~ Send Break', kbF4, cmSendModemBreak,
-     StatusItem '~PgDn~ Receive', kbPgDn, cmReceiveFile,
-     StatusItem '~PgUp~ Send', kbPgUp, cmSendFile,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Send Text', key.TermWrite.F2
+     StatusItem '~F3~ Capture', key.TermLog.F3
+     StatusItem '~F4~ Send Break', key.SendModemBreak.F4
+     StatusItem '~PgDn~ Receive', key.ReceiveFile.PgDn
+     StatusItem '~PgUp~ Send', key.SendFile.PgUp
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-Scroll~B~ack', kbAltB, cmScrollBack,
-     StatusItem '-~I~nit Modem', kbAltI, cmSendInitModem,
-     StatusItem '-~H~ Disconnect', kbAltH, cmHangUp,
-     StatusItem '-~V~ Local Echo', kbAltV, cmTermVisible,
-     StatusItem '-~Z~ Zoom', kbAltZ, cmZoom,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-Scroll~B~ack', key.ScrollBack.AltB
+     StatusItem '-~I~nit Modem', key.SendInitModem.AltI
+     StatusItem '-~H~ Disconnect', key.HangUp.AltH
+     StatusItem '-~V~ Local Echo', key.TermVisible.AltV
+     StatusItem '-~Z~ Zoom', main.Zoom
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~Ins~ Grab', kbCtrlIns, cmSave,
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F9~ Setup', kbCtrlF9, cmShowMemo,
-     StatusItem '+~F12~ Calendar', kbCtrlF12, cmCalendar,
-     StatusItem '+~Z~ HangUp', kbCtrlZ, cmHangUp,
+     StatusItem '+~Ins~ Grab', key.Save.CtrlIns
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F9~ Setup', key.ShowMemo.CtrlF9
+     StatusItem '+~F12~ Calendar', main.Calendar
+     StatusItem '+~Z~ HangUp', key.HangUp.CtrlZ
 ;{SHIFT}
-     StatusItem ':~Ins~ Paste', kbShiftIns, cmOpen,
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~Ins~ Paste', key.Open.ShiftIns
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Format', kbShiftF7, cmFormatDisk,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F7~ Format', main.FormatDisk
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
+     StatusItem '^~Z~ Maximize', main.Maxi
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
   StatusDef hcWinMan, hcWinMan,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~Del~ Delete', kbDel, cmNo,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~Del~ Delete', key.No.Del
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', main.Resize
 
   StatusDef hcPhone, hcPhone,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~Ins~ Add', kbIns, cmInsertPhone,
-     StatusItem '~Del~ Delete', kbDel, cmDeletePhone,
-     StatusItem '~F4~ Edit', kbF4, cmEditPhone,
-     StatusItem '~F5~ Dial', kbF5, cmDialPhone,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~Ins~ Add', key.InsertPhone.Ins
+     StatusItem '~Del~ Delete', key.DeletePhone.Del
+     StatusItem '~F4~ Edit', key.EditPhone.F4
+     StatusItem '~F5~ Dial', key.DialPhone.F5
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', main.Resize
 
   StatusDef hcTetris, hcPentix,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ New game', kbF2, cmNewGame,
-     StatusItem '~F3~ Pause', kbF3, cmStop,
-     StatusItem '~F4~ Top 10', kbF4, cmShowHi,
-     StatusItem '~F5~ Setup', kbF5, cmSetup,
-     StatusItem '~+~ Level',  kbGrayPlus, cmTetrisIncLevel,
-     StatusItem '~*~ Preview', kbGrayAst, cmTetrisPreview,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ New game', key.NewGame.F2
+     StatusItem '~F3~ Pause', key.Stop.F3
+     StatusItem '~F4~ Top 10', key.ShowHi.F4
+     StatusItem '~F5~ Setup', key.Setup.F5
+     StatusItem '~+~ Level', key.TetrisIncLevel.GrayPlus
+     StatusItem '~*~ Preview', key.TetrisPreview.GrayAst
 ;{ALT}
-     StatusItem '-~N~ New Game', kbAltN, cmNewGame,
-     StatusItem '-~P~ Pause', kbAltP, cmStop,
-     StatusItem '-~T~ Top Ten', kbAltT, cmShowHi,
-     StatusItem '-~S~ Setup', kbAltS, cmSetup,
+     StatusItem '-~N~ New Game', key.NewGame.AltN
+     StatusItem '-~P~ Pause', key.Stop.AltP
+     StatusItem '-~T~ Top Ten', key.ShowHi.AltT
+     StatusItem '-~S~ Setup', key.Setup.AltS
      StatusItem '-~X~ Quit', kbNoKey, 0,
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F12~ Calendar', kbCtrlF12, cmCalendar,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F12~ Calendar', main.Calendar
 ;{SHIFT}
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Format', kbShiftF7, cmFormatDisk,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F7~ Format', main.FormatDisk
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbESC, cmClose,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', sheet.Close
+     StatusItem '', main.Resize
 
   StatusDef hcReanimator, hcReanimator,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F3~ View', kbF3, cmRViewFile,
-     StatusItem '~F5~ Reanimate', kbF5, cmReanimateFile,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F3~ View', key.RViewFile.F3
+     StatusItem '~F5~ Reanimate', key.ReanimateFile.F5
 ;{ALT}
-     StatusItem '-~C~ Change drive', kbAltC, cmRChDrive,
+     StatusItem '-~C~ Change drive', key.RChDrive.AltC
 ;{NO SHOW}
-     StatusItem '', kbSpace, cmMarkFile,
-     StatusItem '', kbGrayPlus, cmMarkFiles,
-     StatusItem '', kbGrayMinus, cmUnMarkFiles,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.MarkFile.Space
+     StatusItem '', key.MarkFiles.GrayPlus
+     StatusItem '', key.UnMarkFiles.GrayMinus
+     StatusItem '', main.Resize
 
   StatusDef hcSpreadSheet, hcSpreadSheet,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Save', kbF2, cmSave,
-     StatusItem '~F3~ Open', kbF3, cmOpen,
-     StatusItem '~F5~ Recalc', kbF5, cmRecalc,
-     StatusItem '~F6~ Goto', kbF6, cmGotoCell,
-     StatusItem '~F7~ Search', kbF7, cmFindCell,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Save', sheet.Save
+     StatusItem '~F3~ Open', key.Open.F3
+     StatusItem '~F5~ Recalc', key.Recalc.F5
+     StatusItem '~F6~ Goto', key.GotoCell.F6
+     StatusItem '~F7~ Search', key.FindCell.F7
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~I~ns Row', kbAltI, cmInsertLine,
-     StatusItem '-Ins ~C~ol', kbAltC, cmInsertColumn,
-     StatusItem '-De~L~ Row', kbAltL, cmDeleteLine,
-     StatusItem '-~D~el Col', kbAltD, cmDeleteColumn,
-     StatusItem '-~O~ Cell Format', kbAltO, cmChangeFormat,
-     StatusItem '-~S~eparators', kbAltS, cmToggleShowMode,
-     StatusItem '-~Y~ Memory Info', kbAltY, cmMemoryInfo,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~I~ns Row', key.InsertLine.AltI
+     StatusItem '-Ins ~C~ol', key.InsertColumn.AltC
+     StatusItem '-De~L~ Row', key.DeleteLine.AltL
+     StatusItem '-~D~el Col', key.DeleteColumn.AltD
+     StatusItem '-~O~ Cell Format', key.ChangeFormat.AltO
+     StatusItem '-~S~eparators', key.ToggleShowMode.AltS
+     StatusItem '-~Y~ Memory Info', main.MemoryInfo
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F12~ Calendar', kbCtrlF12, cmCalendar,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F12~ Calendar', main.Calendar
 ;{SHIFT}
-     StatusItem ':~F2~ Save', kbShiftF2, cmSaveSheetAs,
-     StatusItem ':~F3~ Export', kbShiftF3, cmImportToFile,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F2~ Save', sheet.SaveSheetAs
+     StatusItem ':~F3~ Export', key.ImportToFile.ShiftF3
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Format', kbShiftF7, cmFormatDisk,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F7~ Format', main.FormatDisk
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
    StatusDef hcDiskInfo, hcDiskInfo,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F4~ Edit DirInfo', kbF4, cmEditFile,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F4~ Edit DirInfo', main.EditFile
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{ALT}
-     StatusItem '-~Y~ Memory Info', kbAltY, cmMemoryInfo,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~Y~ Memory Info', main.MemoryInfo
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F12~ Calendar', kbCtrlF12, cmCalendar,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F12~ Calendar', main.Calendar
 ;{SHIFT}
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Format', kbShiftF7, cmFormatDisk,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F7~ Format', main.FormatDisk
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
+     StatusItem '^~Z~ Maximize', main.Maxi
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
    StatusDef hcNetInfo, hcNetInfo,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
 ;{SHIFT}
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{ALT}
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~X~ Quit', main.Quit
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
-     StatusItem '^~Z~ Maximize', kbCtrlAltZ, cmMaxi,
+     StatusItem '^~Z~ Maximize', main.Maxi
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
    StatusDef hcDesktop, hcDesktop,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F10~ Menu', key.Menu.F10
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 ;{ALT}
-     StatusItem '-~Y~ Memory Info', kbAltY, cmMemoryInfo,
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~Y~ Memory Info', main.MemoryInfo
+     StatusItem '-~X~ Quit', main.Quit
 ;{CTRL}
-     StatusItem '+~F3~ New Manager', kbCtrlF3, cmCreatePanel,
-     StatusItem '+~F4~ Close', kbCtrlF4, cmClose,
-     StatusItem '+~F6~ Calc', kbCtrlF6, cmCalculator,
-     StatusItem '+~F12~ Calendar', kbCtrlF12, cmCalendar,
+     StatusItem '+~F3~ New Manager', main.CreatePanel
+     StatusItem '+~F4~ Close', editor.Close
+     StatusItem '+~F6~ Calc', main.Calculator
+     StatusItem '+~F12~ Calendar', main.Calendar
 ;{SHIFT}
-     StatusItem ':~F3~ Phones', kbShiftF3, cmPhoneBook,
-     StatusItem ':~F4~ Edit...', kbShiftF4, cmXEditFile,
+     StatusItem ':~F3~ Phones', main.PhoneBook
+     StatusItem ':~F4~ Edit...', main.XEditFile
 ;    StatusItem ':~F6~ Reanimate', kbShiftF6, cmReanimator,
-     StatusItem ':~F7~ Format', kbShiftF7, cmFormatDisk,
-     StatusItem ':~F10~ Video', kbShiftF10, cmChangeMode,
+     StatusItem ':~F7~ Format', main.FormatDisk
+     StatusItem ':~F10~ Video', main.ChangeMode
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
   StatusDef hcLUserMenu, hcLUserMenu,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Global Menu', kbF2, cmGlobalUserMenu,
-     StatusItem '~F4~ Edit', kbF4, cmLocalMenuFileEdit,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Global Menu', key.GlobalUserMenu.F2
+     StatusItem '~F4~ Edit', key.LocalMenuFileEdit.F4
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', main.Resize
 
   StatusDef hcGUserMenu, hcGUserMenu,
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Local Menu', kbF2, cmUserMenu,
-     StatusItem '~F4~ Edit', kbF4, cmMenuFileEdit,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Local Menu', main.UserMenu
+     StatusItem '~F4~ Edit', key.MenuFileEdit.F4
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', main.Resize
 
   StatusDef hcAboutDialog, hcAboutDialog,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
 ;{csablak}
      StatusItem '~Click here for DOS Navigator (C) Team', kbNoKey, cmGetTeam,
 ;{ALT}
-     StatusItem '-~I~ - View DOS Navigator (C) Team', kbAltI, cmGetTeam,
+     StatusItem '-~I~ - View DOS Navigator (C) Team', key.GetTeam.AltI
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
 
   StatusDef hcTeam, hcTeam,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
 
   StatusDef hcCopyDialog, hcCopyDialog,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F10~ Tree', kbF10, cmTree,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F10~ Tree', key.Tree.F10
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
 
   StatusDef hcCDplayer, hcCDplayer,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~P~lay',           kbShortCut, cdPlay  ,
-     StatusItem '~S~top',           kbShortCut, cdStop  ,
-     StatusItem 'pa~U~se',          kbShortCut, cdPause ,
-     StatusItem '> ~N~ext',         kbShortCut, cdNext  ,
-     StatusItem '< pre~V~',         kbShortCut, cdPrev  ,
-     StatusItem '] ~F~orward',      kbShortCut, cdFFwd  ,
-     StatusItem '[ ~B~ackward',     kbShortCut, cdFrew  ,
-     StatusItem 'e~J~ect',          kbShortCut, cdEject ,
-     StatusItem '~Z~oom',           kbShortCut, cdZoom  ,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~P~lay', key.Play.ShortCut
+     StatusItem '~S~top', key.Stop.ShortCut
+     StatusItem 'pa~U~se', key.Pause.ShortCut
+     StatusItem '> ~N~ext', key.Next.ShortCut
+     StatusItem '< pre~V~', key.Prev.ShortCut
+     StatusItem '] ~F~orward', key.FFwd.ShortCut
+     StatusItem '[ ~B~ackward', key.Frew.ShortCut
+     StatusItem 'e~J~ect', key.Eject.ShortCut
+     StatusItem '~Z~oom', key.Zoom.ShortCut
 ;{ALT}
-     StatusItem '-~X~ Quit', kbAltX, cmQuit,
+     StatusItem '-~X~ Quit', main.Quit
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbF10, cmMenu,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', key.Menu.F10
+     StatusItem '', main.Resize
 
   StatusDef hcTreeDialog, hcTreeDialog,
 ;{BASE}
-     StatusItem '~F1~ Help',  kbF1, cmHelp,
-     StatusItem '~F7~ MkDir', kbF7, cmPanelMkDir,
-     StatusItem '~F8~ RmDir', kbF8, cmPanelErase,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F7~ MkDir', main.PanelMkDir
+     StatusItem '~F8~ RmDir', main.PanelErase
 ;{ALT}
-     StatusItem '-~C~ Change Drive', kbAltC, cmChangeDrive,
-     StatusItem '-~R~ Re-read', kbAltR, cmForceRescan,
+     StatusItem '-~C~ Change Drive', main.ChangeDrive
+     StatusItem '-~R~ Re-read', main.ForceRescan
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
 
   StatusDef hcLinkStatusWnd, hcLinkStatusWnd
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~F2~ Setup', kbF2, cmSetupModem,
-     StatusItem '~F10~ Menu', kbF10, cmMenu,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~F2~ Setup', key.SetupModem.F2
+     StatusItem '~F10~ Menu', key.Menu.F10
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
-     StatusItem '', kbCtrlF5, cmResize,
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
+     StatusItem '', main.Resize
 
 ;{JO}
   StatusDef hcCalendar, hcCalendar,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
      StatusItem '~Space~ Current date', KbNoKey, 0,
      StatusItem '~'#27'~ Prev day', KbNoKey, 0,
      StatusItem '~'#26'~ Next day',KbNoKey, 0,
@@ -1529,70 +1529,70 @@ STATUSLINE
 ;{CTRL}
      StatusItem '+~Left~ Previous month', KbNoKey, 0,
      StatusItem '+~Right~ Next month',KbNoKey, 0,
-     StatusItem '+~F5~ Size/Move', kbCtrlF5, cmResize,
+     StatusItem '+~F5~ Size/Move', main.Resize
 ;{ALT-CTRL}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbEsc, cmClose,
-     StatusItem '', kbCtrlF4, cmClose,
-     StatusItem '', kbF10, cmMenu,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '', sheet.Close
+     StatusItem '', editor.Close
+     StatusItem '', key.Menu.F10
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 ;{JO}
 
 ;{JO}
   StatusDef hcMsgViewer, hcMsgViewer,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
 ;{CTRL}
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbEsc, cmClose,
-     StatusItem '', kbCtrlF4, cmClose,
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbF10, cmMenu,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '', sheet.Close
+     StatusItem '', editor.Close
+     StatusItem '', main.Resize
+     StatusItem '', key.Menu.F10
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 ;{JO}
 
 ;{JO}
   StatusDef hcPktMsgViewer, hcPktMsgViewer,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
 ;{CTRL}
 ;{Alt+Ctrl}
 ;$IFDEF DPMI32
-     StatusItem '^~X~ Restart', kbCtrlAltX, cmRestart,
+     StatusItem '^~X~ Restart', main.Restart
 ;$ENDIF
 ;{NO SHOW}
-     StatusItem '', kbEsc, cmClose,
-     StatusItem '', kbCtrlF4, cmClose,
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbF10, cmMenu,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '', sheet.Close
+     StatusItem '', editor.Close
+     StatusItem '', main.Resize
+     StatusItem '', key.Menu.F10
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 ;{JO}
 
   StatusDef hcDialer, hcDialer,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 
 ; StatusDef hcFileAttr, hcFileAttr,
 ;    StatusItem '~F1~ Help', kbF1, cmHelp,
 ;    StatusItem '', kbCtrlDown, cmSkip,
 
   StatusDef hcCmdHistory, hcCmdHistory,
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
      StatusItem '~Space~ Mark/Unmark', kbNoKey, 0,
      StatusItem '~Del~ Delete', kbNoKey, 0,
      StatusItem '~<= =>~ Jump to marked', kbNoKey, 0,
@@ -1600,64 +1600,64 @@ STATUSLINE
      StatusItem '+~Enter~ Drop', kbNoKey, 0,
      StatusItem '+~<= =>~ Roll forward/bacward', kbNoKey, 0,
      StatusItem '-~~ Jump to marked', kbNoKey, 0,
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
 
   StatusDef hcViewHistory, hcViewHistory,
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
      StatusItem '~Space~ Mark/Unmark', kbNoKey, 0,
      StatusItem '~Del~ Delete', kbNoKey, 0,
      StatusItem '~<= =>~ Jump to marked', kbNoKey, 0,
      StatusItem ':~~ Swap items', kbNoKey, 0,
      StatusItem '+~<= =>~ Roll forward/bacward', kbNoKey, 0,
      StatusItem '-~~ Jump to marked', kbNoKey, 0,
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
 
   StatusDef hcEditHistory, hcEditHistory,
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
      StatusItem '~Space~ Mark/Unmark', kbNoKey, 0,
      StatusItem '~Del~ Delete', kbNoKey, 0,
      StatusItem '~<= =>~ Jump to marked', kbNoKey, 0,
      StatusItem ':~~ Swap items', kbNoKey, 0,
      StatusItem '+~<= =>~ Roll forward/bacward', kbNoKey, 0,
      StatusItem '-~~ Jump to marked', kbNoKey, 0,
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
 
   StatusDef hcDirHistory, hcDirHistory,
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
      StatusItem '~Space~ Mark/Unmark', kbNoKey, 0,
      StatusItem '~Del~ Delete', kbNoKey, 0,
      StatusItem '~<= =>~ Jump to marked', kbNoKey, 0,
      StatusItem ':~~ Swap items', kbNoKey, 0,
      StatusItem '+~<= =>~ Roll forward/bacward', kbNoKey, 0,
      StatusItem '-~~ Jump to marked', kbNoKey, 0,
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
 
   StatusDef hcAsciiChart, hcAsciiChart,
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~Esc~ Close', kbEsc, cmClose,
-     StatusItem '~Space~ Insert', kbSpace, cmYes,
-     StatusItem '~Enter~ Insert and close', kbEnter, cmOK,
-     StatusItem '+~Enter~ Insert', kbCtrlEnter, cmYes,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~Esc~ Close', sheet.Close
+     StatusItem '~Space~ Insert', key.Yes.Space
+     StatusItem '~Enter~ Insert and close', key.OK.Enter
+     StatusItem '+~Enter~ Insert', key.Yes.CtrlEnter
 
   StatusDef hcPanelSortSetup, hcPanelShowSetup,
-     StatusItem '~F1~ Help', kbF1, cmHelp,
-     StatusItem '~Ctrl-S~ Mark', kbCtrlS, cmToggleTagData,
-     StatusItem '+~S~ Mark', kbCtrlS, cmToggleTagData,
-     StatusItem '~Ctrl-A~ All', kbCtrlA, cmSelectAll,
-     StatusItem '+~A~ All', kbCtrlA, cmSelectAll,
+     StatusItem '~F1~ Help', key.Help.F1
+     StatusItem '~Ctrl-S~ Mark', key.ToggleTagData.CtrlS
+     StatusItem '+~S~ Mark', key.ToggleTagData.CtrlS
+     StatusItem '~Ctrl-A~ All', key.SelectAll.CtrlA
+     StatusItem '+~A~ All', key.SelectAll.CtrlA
 
   StatusDef 0, $FFFF,
 ;{BASE}
-     StatusItem '~F1~ Help', kbF1, cmHelp,
+     StatusItem '~F1~ Help', key.Help.F1
 ;{NO SHOW}
-     StatusItem '', kbCtrlF5, cmResize,
-     StatusItem '', kbCtrlF4, cmClose,
-     StatusItem '', kbF9, cmNext,
-     StatusItem '', kbShiftF9, cmPrev,
+     StatusItem '', main.Resize
+     StatusItem '', editor.Close
+     StatusItem '', key.Next.F9
+     StatusItem '', key.Prev.ShiftF9
 END
 
 DIALOG dlgConfirmations, 36, 13, 'Confirmations'
@@ -2556,6 +2556,7 @@ END
 
 DIALOG dlgMakeList, 69, 20, 'Make List File'
     HELPCTX hcMakeListFile
+    RESIZE NONE
     Label -1, 4, '╟───────────────────────────────────────────────────────────────────╢'
 #1  InputLine 14, 2, 64, 3, 255, hsMakeList
     Label 2, 2, '~F~ile name', ofPostProcess, ofPreProcess

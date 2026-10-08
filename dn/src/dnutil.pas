@@ -254,7 +254,7 @@ procedure PutInClipLong(const S: LongString);
 
 implementation
 
-uses DnPath,
+uses DnPath, DnActReg,
   SysUtils,
   DNRun,
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
@@ -1675,6 +1675,7 @@ procedure TDNApplication.InitMenuBar;
   begin
   GetExtent(R);
   R.B.Y := R.A.Y;
+  RegisterLanguageActions;
   MenuBar := TMenuBar(LoadResource(dlgMainMenu));
   if MenuBar = nil then
     FatalError('Invalid resource file.');

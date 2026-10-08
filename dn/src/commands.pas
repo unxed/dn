@@ -3169,7 +3169,8 @@ type
     dlgNameCase,
     dlgChScreenMode, {JO}
     dlgSetExportCsvFormat, {KV}
-    dlgSkipBadFile
+    dlgSkipBadFile,
+    dlgActions { the actions of the menus and the status lines (DnActions) }
     );
 
 implementation

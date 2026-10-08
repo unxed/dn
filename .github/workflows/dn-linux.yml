@@ -93,6 +93,7 @@ jobs:
               python3 tools/dn-linux-places.py out/dn
               python3 tools/dn-linux-find.py out/dn
               python3 tools/dn-linux-resize.py out/dn
+              python3 tools/dn-linux-dlgresize.py out/dn
               python3 tools/dn-linux-embterm.py out/dn
               python3 tools/dn-linux-kitty.py out/dn
           - name: stage 10 dialogs

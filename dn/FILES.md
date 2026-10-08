@@ -144,6 +144,8 @@ One file for the settings (2026-10-04): the image of the records that `dn.cfg` h
 | `dlgrecs.pas` (was `startupp`) | the records of the dialogs: list boxes, the savers (`TListBoxRec`, `TSaversData`); split from `startup.pas` to cut the circular uses |
 | `topview.pas` (was `topview_`) | the view that shows the top of a stack of windows and the sorted view (`TTopView`, `TSortView`) |
 | `regall.pas` | the registration of all the object types for the streams (the resource files) |
+| `dnactions.pas`, `dnactreg.pas` (ours) | the actions of the menus and the status lines (`TActionTable`: name, caption, command, key, key text, help context; the resource `dlgActions` that `rcp` makes from `resource/actions.dna`) and their registration in `TvActions` of tv3 at start |
+| `dlglayout.pas` (ours) | the dialogs of the resources that can be resized (`TResDialog`): the grow modes of their controls by a layout rule, the minimum size (docs/RESOURCES.md) |
 | `profile.pas`, `getconst.pas` | a buffered stream; the constants that the resource compiler reads |
 | `flightrec.pas` (ours) | the flight recorder: the log of a run, the facts, the ring of the last events, the report of a crash |
 | `evnames.pas` (generated) | the names of the commands and the keys for the log (`tools/gen-evnames.py`) |
