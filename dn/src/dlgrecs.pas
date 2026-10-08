@@ -117,7 +117,7 @@ const
 implementation
 uses
   osdep, basics, strutil, fileutil,
-  Lfn, CfgDir
+  Lfn, CfgDir, DnPath
   , Dos, SysUtils;
 
 begin
@@ -125,7 +125,7 @@ TempDir := '';
 TempFile := '';
 
 SourceDir := lFExpand(ParamStr(0));
-while SourceDir[Length(SourceDir)] <> '\' do
+while (SourceDir <> '') and not IsPathSep(SourceDir[Length(SourceDir)]) do
   SetLength(SourceDir, Length(SourceDir)-1);
 StartupDir := SourceDir;
 {SourceDir := Dos.GetEnv('DN')}

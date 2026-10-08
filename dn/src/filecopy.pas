@@ -82,7 +82,7 @@ function CopyDialog(var CopyDir: String; var Mask: String;
     MoveMode: Boolean; Files: TCollection;
     FromTemp: Byte; SourcePanel: TView; Link: Boolean): Boolean;
   { If the dialog ended successfully and not CopyPrn, then CopyDir
-   is surely non-empty, and there is always a '\' at the end.}
+   is surely non-empty, and there is always a PathSep at the end.}
 
 procedure CopyDirContent(Source, Destination: String;
     MoveMode, Forced: Boolean); {JO}
@@ -99,7 +99,7 @@ procedure CloseWriteStream;
     the entire unwritten part. `}
 
 implementation
-uses
+uses DnPath,
   FlightRec, mainapp, Startup, Messages, HistList, Commands,
   timeutil, Validate, TitleSet, UserMenu, Dos, DnIni,
   
@@ -336,7 +336,7 @@ constructor TDirName.Create(const AOld, ANew: String; ACopy: Boolean; AnOwn: PFi
   begin
   inherited Create;
   OldName := NewStr(AOld);
-  NewName := NewStr(fReplace('.\', '\', ANew));
+  NewName := NewStr(fReplace('.\', PathSep, ANew));
   CopyIt := ACopy;
   Own := AnOwn;
   Attr := AnAttr;
@@ -1555,7 +1555,7 @@ lbStartWrite:
     if CopyPrn then
       begin
       NName := CopyDir;
-      while NName[Length(NName)] = '\' do
+      while NName[Length(NName)] = PathSep do
         SetLength(NName, Length(NName)-1);
       S1 := lFExpand(FName); {Cat}
       S2 := lFExpand(NName); {Cat}
@@ -1890,7 +1890,7 @@ FileRead:
       SSS := MakeNormName(AddDir, SR.FullName);
       if SR.SR.Attr and Directory = 0 then
         begin
-        CopyFile(DirName+'\'+SR.FullName, Copy(AddDir,
+        CopyFile(DirName+PathSep+SR.FullName, Copy(AddDir,
             Length(CopyDir)+1, MaxStringLength), nil, SR.FullSize,
           SR.SR.Time, SR.SR.Attr);
         end;
@@ -1987,9 +1987,9 @@ FileRead:
       begin
       Info.Write(5, GetString(dlFCCheckingDirs));
 
-      if  (not CopyPrn) and (Dest <> '') and (Dest[Length(Dest)] <> '\')
+      if  (not CopyPrn) and (Dest <> '') and (Dest[Length(Dest)] <> PathSep)
       then
-        AddStr(Dest, '\');
+        AddStr(Dest, PathSep);
       q := MakeNormName(Dest, Name);
       if q[Length(q)] = '.' then
         SetLength(q, Length(q)-1);
@@ -2126,7 +2126,7 @@ TrueCopy:
         SR: lSearchRec;
         Drive: Byte;
       begin
-      if Dest[Length(Dest)] = '\' then
+      if Dest[Length(Dest)] = PathSep then
         SetLength(Dest, Length(Dest)-1);
       if Dest[Length(Dest)] = '.' then
         SetLength(Dest, Length(Dest)-1);
@@ -2206,8 +2206,8 @@ TrueCopy:
 
     function IsNetworkPath(const Path: String): Boolean; {KV}
       begin
-      IsNetworkPath := ((Length(Path) > 2) and (Path[1] = '\') and
-             (Path[2] = '\'));
+      IsNetworkPath := ((Length(Path) > 2) and (Path[1] = PathSep) and
+             (Path[2] = PathSep));
       end;
 
     label
@@ -2223,7 +2223,7 @@ TrueCopy:
       Red := [S[1]];
       end;
 
-    if CopyPrn or (S[1] = '\') then
+    if CopyPrn or (S[1] = PathSep) then
       FreeSpc := 0 // device or network address
     else
       begin
@@ -2323,7 +2323,7 @@ TryGetInfo:
       if P^.Attr and Marked = 0 then
         begin
         SSS := CnvString(P^.Owner);
-        if SSS[Length(SSS)] = '\' then
+        if SSS[Length(SSS)] = PathSep then
           SetLength(SSS, Length(SSS)-1);
         if Copy(CopyDir, 1, Length(SSS)) = SSS then
           Inhr := 0;
@@ -2733,7 +2733,7 @@ that in b09 D&D of a single file onto UpDir dots stopped working.
     l := I;
     while S[I] = '.' do
       Dec(I);
-    while S[I] = '\' do
+    while S[I] = PathSep do
       Dec(I);
     if l = I then
       Break;
@@ -2742,12 +2742,12 @@ that in b09 D&D of a single file onto UpDir dots stopped working.
   {/AK155 22-12-2002}
 
   {AK155 02-01-2003 As a result of the 22-12-2002 correction the last
-'\' was trimmed, which led, for example, to inability to
+PathSep was trimmed, which led, for example, to inability to
 copy into the disk root ('C:\' became 'C:' and we got
-copying into the current directory). Restoring '\' is done via ':=',
+copying into the current directory). Restoring PathSep is done via ':=',
 not via 'SetLength(S,I+1)', so as not to plant a mine for a possible
 future move from ShortString to AnsiString }
-  if  (Length(SSS) > I) and (SSS[I+1] = '\') then
+  if  (Length(SSS) > I) and (SSS[I+1] = PathSep) then
     S := Copy(SSS, 1, I+1);
   {/AK155 02-01-2003}
 
@@ -2792,7 +2792,7 @@ future move from ShortString to AnsiString }
     ClrIO;
     if Length(SSS) = 3 then
       begin
-      CopyDir := S+'\';
+      CopyDir := S+PathSep;
       Mask := x_x
       end
     else
@@ -2816,7 +2816,7 @@ with the entered name is created and files are copied into it.
         if IsDummyDir(S) or (not DEr and (SR.SR.Attr and Directory <> 0))
         then
           begin
-          CopyDir := S+'\';
+          CopyDir := S+PathSep;
           Mask := x_x;
           end
         else if (DEr and (Files.Count <> 1)
@@ -2828,7 +2828,7 @@ with the entered name is created and files are copied into it.
               CopyMode := cpmAppend;
             cmNo:
               begin
-              CopyDir := S+'\';
+              CopyDir := S+PathSep;
               Mask := x_x;
               end;
             else {case}

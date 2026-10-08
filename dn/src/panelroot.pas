@@ -1005,7 +1005,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
       if Drive.DriveType <> dtDisk then
         ReplaceDrive(FileName[1]);
       Message(Self, evCommand, cmInsertDrive, Drv);
-      if  (GetPath(PathInside) <> '\') and (Drive.DriveType = dtArc)
+      if  (GetPath(PathInside) <> PathSep) and (Drive.DriveType = dtArc)
       then
         begin
         Drive.lChDir(Copy(GetPath(PathInside), 2, 255));
@@ -1683,14 +1683,14 @@ WrongArc:
         if PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0 then
           if  (ShiftState and kbAltShift <> 0)
           then
-            S := lfGetShortFileName(PF^.Owner^)+'\'
+            S := lfGetShortFileName(PF^.Owner^)+PathSep
           else
-            S := PF^.Owner^+'\'
+            S := PF^.Owner^+PathSep
         else if (ShiftState and kbAltShift <> 0)
           then
-          S := PF^.Owner^+'\'
+          S := PF^.Owner^+PathSep
         else
-          S := lfGetShortFileName(PF^.Owner^)+'\'
+          S := lfGetShortFileName(PF^.Owner^)+PathSep
         
       else if ShiftState and 3 <> 0 then
         

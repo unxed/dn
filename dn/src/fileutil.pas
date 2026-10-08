@@ -81,11 +81,11 @@ procedure EraseTempFile(S: String); {piwamoto}
 function ValidDrive(dr: Char): Boolean;
 function GetDrive: Byte;
   {` Return the drive number of the active panel (0..25).
-    For network paths the result is 27 ('\'-'A') `}
+    For network paths the result is 27 (PathSep-'A') `}
 procedure GetMask(var m: String);
 function GetCurDrive: Char;
   {` Return the drive letter of the active panel ('A'..'Z').
-    For network paths the result is '\' `}
+    For network paths the result is PathSep `}
 function GetExt(const s: String): String;
   {` s - file name, possibly with a path. Result is the extension
    starting with a dot. If there is no extension - result is '.' `}
@@ -267,7 +267,7 @@ function  ExistDir(const DName: string): Boolean; {based on ExistFile}
 var
  Dirinfo:lsearchrec;
 begin
-  If (DName<>'') and (DName[Length(DName)]='\')
+  If (DName<>'') and (DName[Length(DName)]=PathSep)
   then lFindFirst(Copy(DName, 1, Length(DName)-1),Directory,DirInfo)
   else lFindFirst(DName,Directory,DirInfo);
  lFindClose(DirInfo);
@@ -824,7 +824,7 @@ function InDirFilter(Name, Filter: String): Boolean;
       Delete(S, 1, 1); {DelFC(S);}
     DelLeft(S);
     DelRight(S);
-    if  (S <> '') and (S[Length(S)] = '\')
+    if  (S <> '') and (S[Length(S)] = PathSep)
            and InMask(Name, Copy(S, 1, Length(S)-1))
     then
       Exit;
@@ -1027,10 +1027,10 @@ function GetSName(const S: String): String;
     begin
     if  (S[B] = '.') and (Pe = Length(S)+1) then
       Pe := B;
-    if S[B] in ['\', '/'] then
+    if S[B] in [PathSep, '/'] then
       Break;
     end;
-  if S[B] in ['\', '/'] then
+  if S[B] in [PathSep, '/'] then
     B := B+1
   else
     Pe := Pe-1; {JO}
@@ -1065,17 +1065,17 @@ function GetShortRelPath(Path: String): String;
   var
     CD: String;
   begin
-  if Path[Length(Path)] in ['\', '/'] then
+  if Path[Length(Path)] in [PathSep, '/'] then
     SetLength(Path, Length(Path)-1);
   Path := lfGetShortFileName(Path);
   lGetDir(0, CD);
-  if CD[Length(CD)] in ['\', '/'] then
+  if CD[Length(CD)] in [PathSep, '/'] then
     SetLength(CD, Length(CD)-1);
   CD := lfGetShortFileName(CD);
   if UpStrg(Copy(Path, 1, Length(CD))) = UpStrg(CD)
   then
     Delete(Path, 1, Length(CD));
-  if Path[1] in ['\', '/'] then
+  if Path[1] in [PathSep, '/'] then
     Delete(Path, 1, 1); {DelFC(Path);}
   GetShortRelPath := Path;
   end;
@@ -1086,18 +1086,18 @@ function GetLongRelPath(Path: String): String;
   var
     CD: String;
   begin
-  if Path[Length(Path)] in ['\', '/'] then
+  if Path[Length(Path)] in [PathSep, '/'] then
     SetLength(Path, Length(Path)-1);
   
   Path := lfGetLongFileName(Path);
   
   lGetDir(0, CD);
-  if CD[Length(CD)] in ['\', '/'] then
+  if CD[Length(CD)] in [PathSep, '/'] then
     SetLength(CD, Length(CD)-1);
   if UpStrg(Copy(Path, 1, Length(CD))) = UpStrg(CD)
   then
     Delete(Path, 1, Length(CD));
-  if Path[1] in ['\', '/'] then
+  if Path[1] in [PathSep, '/'] then
     Delete(Path, 1, 1); {DelFC(Path);}
   GetLongRelPath := Path;
   end;
@@ -1172,7 +1172,7 @@ function PathExist(s: String): Boolean;
   else
     begin
     S := lFExpand(S);
-    IsRoot := S[Length(s)] = '\';
+    IsRoot := S[Length(s)] = PathSep;
 
     Attr := AnyFileDir or (Directory shl 8);
     lFindFirst(S, Attr, SR);

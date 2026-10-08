@@ -1967,7 +1967,7 @@ procedure DoRenameSingle(PF: PFileRec; const S, S2: String; DlgRes: Word);
   label
     NameErr;
   begin
-  if PosChar('\', S) <> 0 then
+  if PosChar(PathSep, S) <> 0 then
     begin
     DosE := 123; // ERROR_INVALID_NAME
     goto NameErr;
@@ -2071,7 +2071,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   PIF.C[4] := P.GetColorW(2);
   
   PIF.SetData(S);
-  PIF.SetValidator(TFilterValidator.Create([#32..#255]-IllegalCharSet-['\', '/', '*', '?', '"']));
+  PIF.SetValidator(TFilterValidator.Create([#32..#255]-IllegalCharSet-[PathSep, '/', '*', '?', '"']));
   PIF.SelectAll(False);
 
   {AK155 So the command line does not steal the cursor, disable

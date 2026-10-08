@@ -101,7 +101,7 @@ const
   StrCleared: Boolean = False;
 
 implementation
-uses
+uses DnPath,
   Dos, Commands, mainapp, Dialogs, basics, strutil, fileutil,
   panelwinx, gadgets, 
   Startup, timeutil, Messages, DNUtil

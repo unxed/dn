@@ -166,7 +166,7 @@ var
 
 implementation
 
-uses
+uses DnPath,
   uselfn, osdep, Dos, Eraser, Drives, DNHelp, TitleSet,
   Lfn, DNUtil, mainapp, basics, strutil, DNUtf8, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, copyio, ArcView, CmdLine, histories, Archiver,
@@ -1995,7 +1995,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           ( (DNKeyCode(Event) = kbCtrlS) and (CmdLine.Str = '')) or
           ( (DNKeyCode(Event) = kbDoubleCtrl) and (FMSetup.Quick = pqsCtrl)) or
           ( IsTypedChar(Event) and
-            (Char(Event.CharCode) <> '\') and (FMSetup.Quick = pqsCaps) and
+            (Char(Event.CharCode) <> PathSep) and (FMSetup.Quick = pqsCaps) and
             (I and $40 <> 0)) or
           ( IsTypedChar(Event) and
             (ShiftState and 3 <> 0) and (ShiftState and 4 = 0) and

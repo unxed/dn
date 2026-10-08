@@ -70,11 +70,11 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   S1 := GetEnv('DNDLG');
   if S1 = '' then
     S1 := SourceDir;
-  if not (S1[Length(S1)] in ['\', '/']) then
-    S1 := S1+'\';
+  if not (S1[Length(S1)] in [PathSep, '/']) then
+    S1 := S1+PathSep;
   S2 := StartupDir;
-  if not (S2[Length(S2)] in ['\', '/']) then
-    S2 := S2+'\';
+  if not (S2[Length(S2)] in [PathSep, '/']) then
+    S2 := S2+PathSep;
   if  (not CheckForHelp) and (not ExistFile(S1+LI+'.dlg')) and
       (not ExistFile(S2+LI+'.dlg'))
   then
@@ -86,8 +86,8 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   if CheckForHelp then
     begin
     S1 := SourceDir;
-    if not (S1[Length(S1)] in ['\', '/']) then
-      S1 := S1+'\';
+    if not (S1[Length(S1)] in [PathSep, '/']) then
+      S1 := S1+PathSep;
     if  (not ExistFile(S1+LI+'.hlp')) and (not ExistFile(S2+LI+'.hlp'))
     then
       Exit

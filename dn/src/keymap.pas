@@ -157,13 +157,13 @@ procedure ConvToXlat(Conv: PCodeConv; L: Integer; var Xlat: TXLat);
 function BuildCodeTable(const S: string; var XlatCP: TXLatCP): Boolean;
   {` Builds XlatCP for codepage S. S may be either
   a number (then it is a codepage number) or an
-  xlt file name. If the file name has no path (detected by '\'),
+  xlt file name. If the file name has no path (detected by PathSep),
   the file is sought in the standard XLT directory. Result is success. `}
 
 function BuildABCSortXlat(const FN: string): Boolean;
   {` Builds ABCSortXlat for codepage FN. FN may be either
   a number (then it is a codepage number) or an
-  xlt file name. If the file name has no path (detected by '\'),
+  xlt file name. If the file name has no path (detected by PathSep),
   the file is sought in the standard XLT directory.
   If FN='' or on error, ABCSortXlat is the identity conversion.
   Result is success.
@@ -174,7 +174,7 @@ function BuildABCSortXlat(const FN: string): Boolean;
 function BuildLayoutConvXlat(const FN: string): Boolean;
   {` Builds LayoutConvXlat for codepage FN. FN may be either
   a number (then it is a codepage number) or an
-  xlt file name. If the file name has no path (detected by '\'),
+  xlt file name. If the file name has no path (detected by PathSep),
   the file is sought in the standard XLT directory.
   If FN='', LayoutConvXlat is the identity conversion.
   Result is success.
@@ -359,7 +359,7 @@ function ReadXlt(FN: string; var N: Integer): PCodeConv;
   N := 0;
   if FN <> '' then
     begin
-    if Pos('\', FN) = 0 then
+    if Pos(PathSep, FN) = 0 then
       FN := SourceDir+'xlt\' + FN;
     S := TDosStream.Create(FN, stOpenRead);
     if  (S.GetSize >= 2) and (S.GetSize <= 256*4) then

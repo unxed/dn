@@ -154,7 +154,7 @@ function GetFileName(var FileName: String; Mask, Title, ALabel: String;
 
 implementation
 
-uses
+uses DnPath,
   basics, Lfn, Messages, HistList, Math,
   Collect, Strings, fileerrors, Dos, mainapp, DNStdDlg, strutil, fileutil,
   editfile, histories, TvGlyphs

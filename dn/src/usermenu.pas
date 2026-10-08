@@ -748,7 +748,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
   I := Length(S);
   if Abort then
     goto 2;
-  while (I > 0) and (S[I] <> '\') do
+  while (I > 0) and (S[I] <> PathSep) do
     Dec(I);
   if I = 0 then
     goto 2;
@@ -757,7 +757,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
     if F <> nil then
       goto 1;
 
-    while (I > 2) and (S[I-1] <> '\') do
+    while (I > 2) and (S[I-1] <> PathSep) do
       begin
       Delete(S, I-1, 1);
       Dec(I);

@@ -58,7 +58,7 @@ procedure UnpackDiskImages(AOwner: Pointer; Files: TFilesCollection);
 
 implementation
 
-uses
+uses DnPath,
   Dos, Lfn, Messages, Views, Commands, Defines, Streams, mainapp, Drivers,
   strutil, fileutil, FileCopy, progress, timeutil
   , uselfn, Tree, Math
@@ -367,7 +367,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
         if DR.Attr and Directory <> 0 then
           begin
           if not IsDummyDir(Nm) then
-            ProcessDir(Dir+Nm+'\', DR.Clus, True); {JO}
+            ProcessDir(Dir+Nm+PathSep, DR.Clus, True); {JO}
           Continue;
           end;
         WriteFile(Dir, Nm, DR.Clus, DR.len, DR.Date, DR.Attr);

@@ -594,9 +594,9 @@ Rep:
     if S = '' then
       S := '.';
     S := lFExpand(S);
-    if (DTA.S[Length(DTA.S)] = '\') or IsDir(S) then
+    if (DTA.S[Length(DTA.S)] = PathSep) or IsDir(S) then
       MakeSlash(S);
-    if S[Length(S)] = '\' then
+    if S[Length(S)] = PathSep then
       begin
       CopyDir := S;
       Mask := x_x

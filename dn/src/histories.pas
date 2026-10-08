@@ -177,7 +177,7 @@ var
        the value 'Wrk', then the history will use the file DNWrk.HIS `}
 
 implementation
-uses
+uses DnPath,
   Lfn, Dos, Commands, mainapp, Dialogs, HistList,
   Startup, timeutil, Messages, DNUtil, DnIni,
   osdep, editwin, strutil,  fileutil, TvGlyphs,
@@ -625,13 +625,13 @@ function TTHistList.GetText(Item: LongInt; MaxLen: Integer): String;
   if not RolledFwd then
     begin
     WasSlash := False;
-    if FreeStr[Length(FreeStr)] = '\' then
+    if FreeStr[Length(FreeStr)] = PathSep then
       begin
       SetLength(FreeStr, Length(FreeStr)-1);
       WasSlash := True;
       end;
     if WasSlash then
-      FreeStr := Cut(FreeStr, Size.X-2) + '\'
+      FreeStr := Cut(FreeStr, Size.X-2) + PathSep
     else
       FreeStr := Cut(FreeStr, Size.X-1);
     end
@@ -832,7 +832,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   begin
   if InterfaceData.Options and ouiTrackDirs = 0 then
     Exit;
-  if  (S = '') or ((S[2] <> ':') and ((S[1] <> '\') or (S[2] <> '\')))
+  if  (S = '') or ((S[2] <> ':') and ((S[1] <> PathSep) or (S[2] <> PathSep)))
   then
     Exit;
   {Cat: added a check for network paths}
@@ -854,7 +854,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
     if  (DriveType = Integer(dtArvid)) or
         (DriveType = Integer(dtArc))
     then
-      AddStr(S, '\');
+      AddStr(S, PathSep);
     end;
   I := -1;
   P := DirHistory.FirstThat(IsThat);

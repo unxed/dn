@@ -1791,7 +1791,7 @@ function PosLastDot(StrToMake: String): Byte;
   for I := Length(StrToMake) downto 1 do
     begin
     case StrToMake[I] of
-      '\', '/':
+      PathSep, '/':
         Break;
       '.':
         begin

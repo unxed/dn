@@ -73,7 +73,7 @@ const
 
 implementation
 
-uses DNRun, FlightRec,
+uses DnPath, DNRun, FlightRec,
   
   
    realmode, 
@@ -105,7 +105,7 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
 
 //  free the directory
   if ActiveDir[2] = ':' then
-    ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
+    ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + PathSep));
 
   ChDir(SysOsPath(StartDir));
   end { AnsiExec };

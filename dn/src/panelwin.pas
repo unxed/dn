@@ -822,8 +822,8 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
     Message(Panel[N].AnyPanel, evCommand, cmGetDirName, @S);
     if S <> '' then
       begin
-      if not (S[Length(S)] in ['\', '/']) then
-        AddStr(S, '\');
+      if not (S[Length(S)] in [PathSep, '/']) then
+        AddStr(S, PathSep);
       S := SquashesName(S);
       Message(CommandLine, evCommand, cmInsertName, @S);
       end;

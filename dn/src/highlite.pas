@@ -167,7 +167,7 @@ const
 
 implementation
 
-uses
+uses DnPath,
   {Consts,} {Cat: why? compiles fine without it}
   Defines, { TCharSet }
   basics, { BreakChars }

@@ -1127,7 +1127,7 @@ Err:
       Desktop.Insert(PV);
       SetLength(TempExtrDir, Length(TempExtrDir)-1);
       Str1 := GetPath(TempExtrDir);
-      CopyDirContent(TempExtrDir+'\'+SCurDir, Str1, True, ForceMod);
+      CopyDirContent(TempExtrDir+PathSep+SCurDir, Str1, True, ForceMod);
       PV.Free;
     { delete the temporary directory with everything left in it}
       FRT := NewFileRec(GetName(TempExtrDir),
@@ -1141,7 +1141,7 @@ Err:
       lGetDir(0, DirToChange);
       LFN.lChDir(Str1);
       if ActiveDir[2] = ':' then {release the directory}
-        ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
+        ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + PathSep));
       Eraser.EraseFiles(FCT);
       LFN.lChDir(DirToChange);
       DirToChange := '';

@@ -271,7 +271,7 @@ function DocToUi(const S: AnsiString): AnsiString;
 
 implementation
 
-uses
+uses DnPath,
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, histories,
   timeutil, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile, editinfo
@@ -1675,9 +1675,9 @@ procedure TFileEditor.OpenFileAtCursor;
     IllegalCharSetDos =
       [';', ',', '=', '+', '<', '>', '|', '"', '[', ']', ' ', '*', '?'];
     Break2 = IllegalCharSet+['*', '?'];
-    Break1 = Break2+['\', '/'];
+    Break1 = Break2+[PathSep, '/'];
     Break4 = IllegalCharSetDos;
-    Break3 = Break4+['\', '/'];
+    Break3 = Break4+[PathSep, '/'];
 
   type
     TSetChar = set of Char;

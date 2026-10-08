@@ -62,7 +62,7 @@ procedure FRReset;
 
 implementation
 
-uses
+uses DnPath,
   SysUtils, osdep, TvScreen, TvCell, evnames;
 
 const
@@ -543,7 +543,7 @@ begin
     FRNote('crash', ClassName + ': ' + MessageText);
     if Dir = '' then
       Exit;
-    CrashDir := Dir + 'crash' + '\';
+    CrashDir := Dir + 'crash' + PathSep;
     ForceDirectories(OsName(CrashDir));
     Name := PickCrashName(CrashDir);
     {$I-}

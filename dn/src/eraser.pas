@@ -266,7 +266,7 @@ error. For unrelated refusals (e.g. Abort) Params.RC=0}
           Abort := True;
           Break
           end;
-        if FreeStr[Length(FreeStr)] = '\'
+        if FreeStr[Length(FreeStr)] = PathSep
         then
           TD.AtInsert(0, NewStr(Copy(FreeStr, 1, Length(FreeStr)-1)))
         else
@@ -531,7 +531,7 @@ DeleteDirDIZ:
     if PFileRec(Files.At(I))^.Attr and Directory <> 0 then
       begin
       PStr1 := NewStr('>'+MakeNormName(PFileRec(Files.At(I))^.Owner^,
-            PFileRec(Files.At(I))^.FlName[True])+'\');
+            PFileRec(Files.At(I))^.FlName[True])+PathSep);
       RereadCollection.Insert(PStr1);
       end;
     end;

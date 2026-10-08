@@ -221,7 +221,7 @@ var
 
 
 implementation
-uses
+uses DnPath,
   SysUtils,
   Lfn {DataCompBoy}, mainapp, strutil, fileutil, Startup, Dos, Messages, HistList, Commands, panelroot, filepanel
   , FViewer, editcore,
@@ -603,12 +603,12 @@ function FindFiles(var Files: TFilesCollection;
           AType.GetFile;
           if FileInfo.Last = 0 then
             begin
-            Replace('/', '\', FileInfo.FName);
+            Replace('/', PathSep, FileInfo.FName);
             with FileInfo do
               begin
-              if FName[1] <> '\' then
-                FName := '\'+FName;
-              if FName[Length(FName)] = '\' then
+              if FName[1] <> PathSep then
+                FName := PathSep+FName;
+              if FName[Length(FName)] = PathSep then
                 begin
                 SetLength(FName, Length(FName)-1);
                 Attr := Attr or Directory;
@@ -627,10 +627,10 @@ function FindFiles(var Files: TFilesCollection;
               begin
               if  (FileInfo.Attr and Directory) <> 0 then
                 begin
-                if FileInfo.FName[Length(FileInfo.FName)] = '\' then
+                if FileInfo.FName[Length(FileInfo.FName)] = PathSep then
                   PArcLastDir := NewStr(UpStrg(FileInfo.FName))
                 else
-                  PArcLastDir := NewStr(UpStrg(FileInfo.FName+'\'));
+                  PArcLastDir := NewStr(UpStrg(FileInfo.FName+PathSep));
                 Inc(MemReq, Length(PArcLastDir^)+1);
                 end;
               if  ( ( (FileInfo.Attr and Directory) = 0) or
@@ -685,7 +685,7 @@ function FindFiles(var Files: TFilesCollection;
                 Inc(MemReq, Length(PArcLastDir^)+1);
                 SetLength(LDir, Length(LDir)-1);
                 for I := Length(LDir) downto 1 do
-                  if LDir[I] = '\' then
+                  if LDir[I] = PathSep then
                     Break;
                 DrName := Copy(LDir, I+1, MaxStringLength);
                 SetLength(LDir, I);
@@ -775,7 +775,7 @@ NotArchive:
           if  (SR.SR.Attr and Directory <> 0) then
             begin
             if  (FindRec.Options and ffoRecursive <> 0) then
-              DirCol.Insert(NewStr(Path+SR.FullName+'\'))
+              DirCol.Insert(NewStr(Path+SR.FullName+PathSep))
             end
           else
             {JO}
@@ -806,12 +806,12 @@ Skip:
     begin
     MakeSlash(FN);
     if PathExist(FN+GetPath(FindRec.Mask))
-         and (Pos('\', FindRec.Mask) <> 0)
+         and (Pos(PathSep, FindRec.Mask) <> 0)
     then
       begin
       FN := FN+GetPath(FindRec.Mask);
-      while Pos('\', FindRec.Mask) <> 0 do
-        Delete(FindRec.Mask, 1, Pos('\', FindRec.Mask));
+      while Pos(PathSep, FindRec.Mask) <> 0 do
+        Delete(FindRec.Mask, 1, Pos(PathSep, FindRec.Mask));
       end;
     MakeSlash(FN);
     end;
@@ -847,7 +847,7 @@ Skip:
       for i := 1 to LCol.Count-1 do
         begin
         P1 := LCol.At(i);
-        if Pos(P0^+'\', P1^) = 1 then
+        if Pos(P0^+PathSep, P1^) = 1 then
           DisposeStr(P1) // remove the subdirectory
         else
           begin
@@ -1615,10 +1615,10 @@ procedure DosReread(Files: TFilesCollection; Dir: String;
 //JO:  remove everything that was in this directory, because it
 //     definitely no longer exists
           while j < Files.Count do
-            if (UpStrg(MakeNormName(p^.Owner^, p^.FlName[True])+'\')
+            if (UpStrg(MakeNormName(p^.Owner^, p^.FlName[True])+PathSep)
                      = UpStrg(Copy(PFileRec(Files.At(j))^.Owner^,
                                   1, Length(MakeNormName(p^.Owner^,
-                                           p^.FlName[True])+'\'))))
+                                           p^.FlName[True])+PathSep))))
             then
               begin
               Files.AtFree(j);
@@ -1801,7 +1801,7 @@ procedure TFindDrive.UseFile(P: PFileRec; Command: Word);
     I := PosChar(':', OwnArc);
     OwnArc := Copy(P^.Owner^, 1, I-1);
     PathInside := Copy(P^.Owner^, I+1, MaxStringLength);
-    if PathInside[1] = '\' then
+    if PathInside[1] = PathSep then
       Delete(PathInside, 1, 1);
     { detect the archive type}
     ArcFile := TBufStream.Create(OwnArc, stOpenRead, 512);
@@ -1859,7 +1859,7 @@ TryAgain:
       { Flash <<< }
       end;
     SS := MakeNormName(PathInside, P^.FlName[True]);
-    if SS[1] = '\' then
+    if SS[1] = PathSep then
       Delete(SS, 1, 1);
     S2 := OwnArc;
     
