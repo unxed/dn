@@ -3,7 +3,7 @@ MIT License
 Copyright (c) 2026 the authors of the dn project
 
 This license covers the code that we wrote: the tools (`tools/`, `audit/`, `bootstrap/tools/`), the project
-documentation, the files of `tv/` marked "MIT", and in `dn/` the files that the manifest
+documentation, the files of `tv/` except those marked "Translated from magiblot/tvision", and in `dn/` the files that the manifest
 `dn/PROVENANCE.md` lists as "Our files" (and the files that are added to `dn/` after the first commit and are not derived
 from the files of RIT Labs).
 

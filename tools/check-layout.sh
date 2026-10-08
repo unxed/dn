@@ -1,8 +1,7 @@
 #!/bin/sh
 # Checks the separation of the projects in this repository (see README.md):
 #  - tv/ does not use anything but its own units and the RTL;
-#  - every tv/src unit says where it comes from: "Translated from magiblot/tvision @"
-#    (then it points to COPYRIGHT.magiblot) or "MIT";
+#  - a tv/src unit that says "Translated from magiblot/tvision @" points to COPYRIGHT.magiblot;
 #  - tv/ does not mention dn/;
 #  - dn/ does not contain files of tv/ (same names) and no Borland sources by name;
 #  - dn/PROVENANCE.md (the origin of the files of dn/src) is up to date.
@@ -31,8 +30,6 @@ done
 for f in tv/src/*.pas; do
     if grep -q 'Translated from magiblot/tvision @' "$f"; then
         grep -q 'COPYRIGHT.magiblot' "$f" || err "$f is translated but does not point to COPYRIGHT.magiblot"
-    elif ! grep -q -e 'MIT' -e 'MIT' "$f"; then
-        err "$f has no origin note (Translated from magiblot/tvision @ ... / MIT)"
     fi
 done
 

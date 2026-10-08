@@ -84,8 +84,8 @@ backend, every failure in DN is a failure in DN.
 * Files above the gate are **excluded** (`bootstrap/exclude.list`, every entry has a reason) and replaced by our own unit with the same interface, or the
   matching procedure is **rewritten from a behavior specification** (never from the Borland text). The unit headers of `tv/` name the magiblot files and the commit
   that each unit was translated from.
-* `tools/check-layout.sh` keeps the two projects apart: `tv/` must not mention DN or use its units; every `tv/` unit has an origin note ("Translated
-  from…" or "MIT"); `dn/PROVENANCE.md` (class of every file: ours / carved / RIT / contributor / upstream without notice) must be up to date
+* `tools/check-layout.sh` keeps the two projects apart: `tv/` must not mention DN or use its units; a translated `tv/` unit has an origin note ("Translated
+  from…"); `dn/PROVENANCE.md` (class of every file: ours / carved / RIT / contributor / upstream without notice) must be up to date
   (`python3 bootstrap/tools/dn-manifest.py --check`).
 
 ---
