@@ -317,9 +317,9 @@ selection on the clipboard of the far2l terminal (the script checks it: PASS).
 
 **Confirmed by the owner (2026-10-03, the far2l terminal on Linux Mint, dist built from 18b36b9):** Ctrl+Ins copies and Shift+Ins pastes in the editor now. The red Shift+Ins check of `tools/dn-linux-far2l.py`
 (a block is selected when it pastes) stays as a note: a possible difference between pasting over a selected block and pasting without one; not seen by the owner.
-(2026-10-08: the script runs again with `tools/f2lterm.py`, the far2l terminal of the tests of dn, and is in CI (dn-linux.yml). The Shift+Ins check is
-red: the key event VK_INSERT with SHIFT_PRESSED toggles the insert mode in the editor (cursor height 100, as a plain Ins does) and nothing is pasted;
-Ctrl+Ins works. To look at: the way of Shift+Ins from a far2l key event to the editor of DN.)
+(2026-10-08: the script runs again with `tools/f2lterm.py`, the far2l terminal of the tests of dn, and is in CI (dn-linux.yml); all its checks pass.
+The cause of the red Shift+Ins: `TFileEditor.CalcMenu` read the system clipboard to enable Paste, the far2l terminal gives it only after a paste
+gesture, so Paste was off and Shift+Ins fell through to Ins. Paste now stays on while the system clipboard is used.)
 
 ## DOS: "save the desktop on exit" and "Save setup" (2026-10-03, started, not finished)
 
@@ -373,7 +373,7 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 
 ## Doubts and leftovers of 2026-10-06 (platform separation, archives, input)
 - Quick search of the panel: the display of a long search mask cut by bytes (`QuickSearchString`): fixed 2026-10-08, it cuts by characters (`tools/dn-linux-footer.py`); the Caps/Shift start modes take UTF-8 characters now (`IsTypedChar`) but no test drives them.
-- `uk_UA` in `tvlocale.pas` maps to cp866 (as glibc does); a DOS user with cp1125 would want 1125: make it a setting if asked.
+- `uk_UA` in `tvlocale.pas` maps to cp866 (the table of `localecp`); it is used only when the language of DN does not choose the page (the Ukrainian resources choose 1125). Owner, 2026-10-08: nothing to change.
 - `DefaultSortMode` of `dn.ini` applies only to a DN without a saved setup (`PanSetupFromConfig`); a user who saved the setup keeps what was saved.
 - The archivers on Windows are started through `COMSPEC /c` as before (`osrunwindows.pas`); only the Unix side needed the fix. Not driven by a test on Windows.
 - `ArcDrive.Exec` (arcview.pas) and `archiver.pas` still have the DOS 120/95-character command line limits and the `$DNn$.BAT` batch files of the swap mode; on Unix the swap mode (`SwapWhenExec`) must stay off.
