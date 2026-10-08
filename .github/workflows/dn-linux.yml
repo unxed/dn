@@ -1,7 +1,8 @@
 name: dn-linux
 # DN on Linux, built by tools/build.sh from the tree dn/src: x86_64 (native FPC), i386 (static, the cross compiler built from
 # the sources of FPC and cached) and aarch64. The build takes seconds; the time goes into the pty tests (they wait for the program),
-# so every group of tests is a job of its own and the jobs run side by side: the wall time is the time of the slowest group.
+# so every group of tests is a job of its own, the jobs run side by side, and the tests of a group run side by side too (tools/ci-par.sh):
+# the wall time is the time of the slowest test.
 on:
   workflow_dispatch:
   push:
@@ -16,6 +17,7 @@ on:
       - tools/dn-linux-*.py
       - tools/gen-archive-fixtures.py
       - tools/pty_screen.py
+      - tools/ci-par.sh
       - tools/build-fpc-i386-linux.sh
       - tools/build-fpc-aarch64-linux.sh
       - tools/gen-shim.py
@@ -53,15 +55,7 @@ jobs:
       - name: ${{ matrix.name }}
         env:
           CMDS: ${{ matrix.cmds }}
-        run: |
-          rc=0
-          while IFS= read -r c; do
-            [ -z "$c" ] && continue
-            echo "::group::$c"
-            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
-            echo "::endgroup::"
-          done <<< "$CMDS"
-          exit $rc
+        run: tools/ci-par.sh
 
   linux64-utf8:
     # DN with UTF-8 inside (the default of the build on Linux, -dDNUTF8): file operations in a pty and the UTF-8 checks, in groups that run side by side
@@ -126,15 +120,7 @@ jobs:
       - name: ${{ matrix.name }}
         env:
           CMDS: ${{ matrix.cmds }}
-        run: |
-          rc=0
-          while IFS= read -r c; do
-            [ -z "$c" ] && continue
-            echo "::group::$c"
-            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
-            echo "::endgroup::"
-          done <<< "$CMDS"
-          exit $rc
+        run: tools/ci-par.sh
 
   menusweep:
     # every item of the main menu, the submenus included, each from a fresh start: no fatal error and no path of DOS form; one job per language and half
@@ -145,22 +131,22 @@ jobs:
         include:
           - name: menusweep ENGLISH part 1 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 4 --part 1/2
+              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 8 --part 1/2
           - name: menusweep ENGLISH part 2 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 4 --part 2/2
+              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 8 --part 2/2
           - name: menusweep RUSSIAN part 1 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 4 --part 1/2
+              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 8 --part 1/2
           - name: menusweep RUSSIAN part 2 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 4 --part 2/2
+              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 8 --part 2/2
           - name: menusweep UKRAIN part 1 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 4 --part 1/2
+              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 8 --part 1/2
           - name: menusweep UKRAIN part 2 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 4 --part 2/2
+              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 8 --part 2/2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -172,15 +158,7 @@ jobs:
       - name: ${{ matrix.name }}
         env:
           CMDS: ${{ matrix.cmds }}
-        run: |
-          rc=0
-          while IFS= read -r c; do
-            [ -z "$c" ] && continue
-            echo "::group::$c"
-            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
-            echo "::endgroup::"
-          done <<< "$CMDS"
-          exit $rc
+        run: tools/ci-par.sh
 
   hotkeys:
     # the hot letters of the menus and of the dialogs on a Cyrillic layout (Alt and a Russian or Ukrainian letter)
@@ -191,10 +169,10 @@ jobs:
         include:
           - name: menus
             cmds: |
-              python3 tools/dn-linux-hotkeys.py out/dn -j 4
+              python3 tools/dn-linux-hotkeys.py out/dn -j 8
           - name: dialogs
             cmds: |
-              python3 tools/dn-linux-dialoghot.py out/dn -j 4
+              python3 tools/dn-linux-dialoghot.py out/dn -j 8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -206,15 +184,7 @@ jobs:
       - name: ${{ matrix.name }}
         env:
           CMDS: ${{ matrix.cmds }}
-        run: |
-          rc=0
-          while IFS= read -r c; do
-            [ -z "$c" ] && continue
-            echo "::group::$c"
-            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
-            echo "::endgroup::"
-          done <<< "$CMDS"
-          exit $rc
+        run: tools/ci-par.sh
 
   linux-aarch64:
     # DN on ARM64 Linux: a native build on an ARM runner (the compiler of the system), the same checks as for x86_64
@@ -240,15 +210,7 @@ jobs:
       - name: ${{ matrix.name }}
         env:
           CMDS: ${{ matrix.cmds }}
-        run: |
-          rc=0
-          while IFS= read -r c; do
-            [ -z "$c" ] && continue
-            echo "::group::$c"
-            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
-            echo "::endgroup::"
-          done <<< "$CMDS"
-          exit $rc
+        run: tools/ci-par.sh
 
   linux32:
     runs-on: ubuntu-24.04
@@ -282,12 +244,4 @@ jobs:
       - name: ${{ matrix.name }}
         env:
           CMDS: ${{ matrix.cmds }}
-        run: |
-          rc=0
-          while IFS= read -r c; do
-            [ -z "$c" ] && continue
-            echo "::group::$c"
-            bash -c "$c" || { echo "::error::failed: $c"; rc=1; }
-            echo "::endgroup::"
-          done <<< "$CMDS"
-          exit $rc
+        run: tools/ci-par.sh

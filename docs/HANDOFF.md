@@ -51,6 +51,11 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 7. Claims without checks. Rule: report what was verified and how; say what was not.
 8. CI after every push, cancelled by the next one. Rule: batch about ten changes, then read CI and fix in one batch.
 9. The audit was slow (a minute per run). Fixed: `build/audit-cache` keeps the indexes (seconds per run).
+10. The pty tests and the click-throughs (menu sweeps, hotkeys, acceptance) ran one after another, locally and in CI, with `-j 2`
+    or `-j 4`, while the machine was idle (load 0.1 of 4 CPUs): they wait for the program, not for the CPU. Rule: run them side by
+    side, everywhere and always: locally all of them at once (each with its own HOME, `xargs -P` or `&` + `wait`), the sweeps with
+    `-j 8` or more; in CI a matrix of groups and the tests of a group side by side (`tools/ci-par.sh` in dn). Check `uptime` before
+    choosing a lower number; a test that cannot run beside others is a bug of the test (a fixed path, a fixed tmux session name).
 
 ## How to
 
