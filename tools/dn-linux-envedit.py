@@ -20,8 +20,8 @@ def check(ok, what, info=''):
 
 
 out = os.path.abspath(sys.argv[1])
-for lang, keys, title, ok_keys in (('RUSSIAN', ['\x1bу', 'о'], 'Редактор переменных', ['\r', '\x1bK']),
-                                   ('UKRAIN', ['\x1bу', 'о'], '', ['\r'])):
+for lang, keys, title, ok_keys in (('RUSSIAN', ['\x1b\u0443', '\u043e'], '\u0420\u0435\u0434\u0430\u043a\u0442\u043e\u0440 \u043f\u0435\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0445', ['\r', '\x1bK']),
+                                   ('UKRAIN', ['\x1b\u0443', '\u043e'], '', ['\r'])):
     for ok_key in ok_keys:
         d = tempfile.mkdtemp(prefix='dnenv-')
         try:

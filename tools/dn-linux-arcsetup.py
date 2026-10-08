@@ -43,7 +43,7 @@ def open_dialog(d, w, lang):
 
 
 out = os.path.abspath(sys.argv[1])
-for lang, ok_keys in (('ENGLISH', ['\r']), ('RUSSIAN', ['\r', '\x1bк']), ('UKRAIN', ['\r', '\x1bк'])):
+for lang, ok_keys in (('ENGLISH', ['\r']), ('RUSSIAN', ['\r', '\x1b\u043a']), ('UKRAIN', ['\r', '\x1b\u043a'])):
     for key in ok_keys:
         d, w = install(out)
         try:

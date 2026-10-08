@@ -7,8 +7,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
 
 bad = 0
-TEXT = 'первая строка\nвторая строка мир\nтретья\n'
-WORD = 'мир'
+TEXT = '\u043f\u0435\u0440\u0432\u0430\u044f \u0441\u0442\u0440\u043e\u043a\u0430\n\u0432\u0442\u043e\u0440\u0430\u044f \u0441\u0442\u0440\u043e\u043a\u0430 \u043c\u0438\u0440\n\u0442\u0440\u0435\u0442\u044c\u044f\n'
+WORD = '\u043c\u0438\u0440'
 
 
 def check(ok, what, info=''):
@@ -36,7 +36,7 @@ try:
         t.send('\x1b', 0.5)
         t.send('\x1b[B', 0.3)                                   # b.txt
         t.send(key, 1.5)
-        check('первая' in t.text(), '%s: the Cyrillic text is shown' % name, t.text())
+        check('\u043f\u0435\u0440\u0432\u0430\u044f' in t.text(), '%s: the Cyrillic text is shown' % name, t.text())
         t.send('\x1b[18~', 0.8)                                 # F7
         t.send('\x15', 0.1)
         for ch in WORD:
@@ -46,7 +46,7 @@ try:
         t.pump(0.5, 2)
         text = t.text()
         if name.startswith('editor'):
-            m = re.search(r'(\d+):(\d+)\s*[═─]*\[', text)
+            m = re.search(r'(\d+):(\d+)\s*[\u2550\u2500]*\[', text)
             check(m is not None and m.group(1) == '2', '%s: the cursor is on the line with the word' % name, text)
         else:
             check('Fatal' not in text and t.alive() and WORD in text, '%s: the search ends with the word on the screen' % name, text)
