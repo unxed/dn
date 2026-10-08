@@ -30,7 +30,7 @@ The builds of DN are not kept in the repository: CI makes them from the sources 
   `release` by hand with the name of an existing tag. It builds every target from the tag (with the submodules `tv` and
   `tve`) and publishes one release with `dn-<tag>-<target>.tar.gz` (linux64, linux-aarch64, linux32) or `.zip` (win64,
   win32, dos, dos-utf8) and `SHA256SUMS.txt`.
-- **Nightly:** every push to `main` replaces the pre-release `nightly` (workflow `nightly`, archives `dn-<commit>-<target>`).
+- **Nightly:** a commit of `main` whose test workflows (`dn-linux`, `dn`, `dn-windows`, `dos-utf8`, those that its push started) all passed replaces the pre-release `nightly` (workflow `nightly`, gate `tools/nightly-gate.sh`, archives `dn-<commit>-<target>`).
 
 An archive holds the program, its resources (`*.lng`, `*.dlg`, `*.hlp`, `xlt/`), the default `dn.ini`, `README.TXT`,
 `BUILD.TXT` and the licence texts (DN: `LICENSE-DN.TXT`, `LICENSE-DN-FILES.md`, `PROVENANCE.md`; dn: `LICENSE.TXT`; tv3:

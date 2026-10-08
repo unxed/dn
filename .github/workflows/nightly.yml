@@ -1,25 +1,63 @@
 name: nightly
-# Every commit of main: DN for all the targets (Linux x86_64, ARM64, i386, Windows 64 and 32 bit, DOS with the code page and with UTF-8 inside)
-# goes to the pre-release "nightly" (the old one is replaced; nothing is committed). The builds are the same as in the other workflows (tools/build.sh); the packing is
-# tools/dn-pack.sh. A build that does not pass the tests of those workflows is still published here: it is a snapshot, not a release.
+# DN for all the targets (Linux x86_64, ARM64, i386, Windows 64 and 32 bit, DOS with the code page and with UTF-8 inside) goes to the pre-release
+# "nightly" (the old one is replaced; nothing is committed). The builds are the same as in the other workflows (tools/build.sh); the packing is
+# tools/dn-pack.sh.
+# Only a green commit of main is published: this workflow starts when one of the test workflows below completes on main, and the job "gate"
+# publishes the commit of that run only when every test workflow that was started by the push of the commit has completed with success. While
+# one of them is still queued or running, the gate stops without a build; the completion of that last workflow starts this workflow again,
+# and that run publishes. A commit that is not newer than the published one (an older commit whose tests ended late) is not published.
+# Run by hand (workflow_dispatch): the same gate for the head of the chosen branch (it must be a commit of main); "force" publishes it without the gate.
 on:
-  push:
+  workflow_run:
+    workflows: [dn-linux, dn, dn-windows, dos-utf8]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
+    inputs:
+      force:
+        description: Publish without the check of the test workflows
+        type: boolean
+        default: false
 
+# one run per commit at a time; a second completion of the same commit waits and then finds the commit published
 concurrency:
-  group: nightly
-  cancel-in-progress: true
+  group: nightly-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
+  actions: read
+
+env:
+  # the test workflows (the files in .github/workflows) whose runs of the push of a commit must all succeed; keep in step with
+  # on.workflow_run.workflows (those are the names of the same workflows)
+  REQUIRED: dn-linux.yml dn.yml dn-windows.yml dos-utf8.yml
 
 jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    outputs:
+      publish: ${{ steps.check.outputs.publish }}
+      sha: ${{ steps.check.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+        run: tools/nightly-gate.sh
+
   linux64:
+    needs: gate
+    if: needs.gate.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 zip
@@ -31,10 +69,13 @@ jobs:
           path: pack/*
 
   linux-aarch64:
+    needs: gate
+    if: needs.gate.outputs.publish == 'true'
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 zip
@@ -46,10 +87,13 @@ jobs:
           path: pack/*
 
   linux32:
+    needs: gate
+    if: needs.gate.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils python3 zip
@@ -70,6 +114,8 @@ jobs:
           path: pack/*
 
   windows:
+    needs: gate
+    if: needs.gate.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -78,6 +124,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils binutils-mingw-w64-x86-64 binutils-mingw-w64-i686 python3 zip
@@ -101,10 +148,13 @@ jobs:
           path: pack/*
 
   dos:
+    needs: gate
+    if: needs.gate.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make bzip2 git curl dosbox-x unzip python3 zip
@@ -134,25 +184,40 @@ jobs:
           path: pack/*
 
   publish:
-    needs: [linux64, linux-aarch64, linux32, windows, dos]
-    if: ${{ !cancelled() }}
+    needs: [gate, linux64, linux-aarch64, linux32, windows, dos]
+    if: ${{ !cancelled() && needs.gate.outputs.publish == 'true' }}
     runs-on: ubuntu-24.04
+    # the replacement of the release, one at a time over all the commits; the gate is asked again just before it
+    concurrency:
+      group: nightly-publish
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.gate.outputs.sha }}
       - uses: actions/download-artifact@v4
         with:
           pattern: nightly-*
           path: assets
           merge-multiple: true
-      - name: Replace the release "nightly"
+      - name: Check the commit again (a newer one may have been published meanwhile)
+        id: again
         env:
           GH_TOKEN: ${{ github.token }}
+          SHA: ${{ needs.gate.outputs.sha }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+        run: tools/nightly-gate.sh
+      - name: Replace the release "nightly"
+        if: steps.again.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ needs.gate.outputs.sha }}
         run: |
           set -eu
           ls -l assets
           [ -n "$(ls assets)" ] || { echo "nothing was built" >&2; exit 1; }
-          sha=$(git rev-parse --short HEAD)
+          short=$(git rev-parse --short "$SHA")
           gh release delete nightly --cleanup-tag --yes || true
-          gh release create nightly assets/* --prerelease --target "$GITHUB_SHA" \
-            --title "nightly $sha" \
-            --notes "The builds of the commit $GITHUB_SHA (every commit of main replaces this release). Snapshots: they can be unfinished. The targets that failed to build are not here."
+          gh release create nightly assets/* --prerelease --target "$SHA" \
+            --title "nightly $short" \
+            --notes "The builds of the commit $SHA of main, whose test workflows ($REQUIRED) passed (the next green commit replaces this release). Snapshots: they can be unfinished. The targets that failed to build are not here."
