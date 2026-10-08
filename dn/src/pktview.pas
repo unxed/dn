@@ -157,7 +157,7 @@ const
 implementation
 
 uses
-  DNHelp, fileutil, keymap, timeutil, Commands, mainapp, TvGlyphs
+  DNHelp, fileutil, keymap, timeutil, Commands, mainapp, TvGlyphs, TvCStr
 
   , osdep;
 
@@ -925,22 +925,22 @@ constructor TPktMsgViewer.Create(Buf: PCharArray; S1, S2, S3, S4: String;
     +Spaces(30)+'~Date~ :'+S4;
   View := TLabel.Create(R, S, nil);
   Insert(View);
-  PS1 := NewStr(DelChar(S, '~'));
+  PS1 := NewStr(StripTilde(S));
   R.Assign(1, 2, 79, 3);
   S := '~From~ :'+just(S1, 50, 2)+PktFromAddr;
   View := TLabel.Create(R, S, nil);
   Insert(View);
-  Ps2 := NewStr(DelChar(S, '~'));
+  Ps2 := NewStr(StripTilde(S));
   R.Assign(1, 3, 79, 4);
   S := '~To~   :'+just(S2, 50, 2)+'2:'+ItoS(TA.Net)+'/'+ItoS(TA.Node);
   View := TLabel.Create(R, S, nil);
   Insert(View);
-  Ps3 := NewStr(DelChar(S, '~'));
+  Ps3 := NewStr(StripTilde(S));
   R.Assign(1, 4, 79, 5);
   S := '~Subj~ :'+S3;
   View := TLabel.Create(R, S, nil);
   Insert(View);
-  Ps4 := NewStr(DelChar(S, '~'));
+  Ps4 := NewStr(StripTilde(S));
   SelectNext(False);
   end { TPktMsgViewer.Init };
 

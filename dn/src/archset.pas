@@ -59,7 +59,7 @@ implementation
 
 uses
   Defines, Startup, ArchDet, Dialogs, Views, Menus,
-  mainapp, strutil, Commands, profile, DnIni
+  mainapp, strutil, Commands, profile, DnIni, TvCStr
   ;
 
 procedure UpdateARH(Arch: TARJArchive);
@@ -141,7 +141,7 @@ procedure SetupArchive(ArchCommand: Word);
       S: String;
       FreeByte: byte;
     begin
-    S := fReplace('~', '', CnvString(LookUpMenu(MenuBar.Menu, ArcT,
+    S := StripTilde(CnvString(LookUpMenu(MenuBar.Menu, ArcT,
              dfByCommand)^.Name));
     FreeByte := PosChar('-', S);
     if FreeByte > 0 then
