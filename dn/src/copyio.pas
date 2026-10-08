@@ -529,7 +529,7 @@ Rep:
     DTA.SPLSiz := '';
     DTA.NumSect := '';
 
-    I := Byte(UpCase(S[1]));
+    I := Byte(DriveOf(S));
     if I in [65..90] then
       begin
       if  (SystemData.Drives[Char(I)] and 16) > 0 then

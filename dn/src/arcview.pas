@@ -1493,7 +1493,7 @@ procedure TArcDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean
   // extracted without a temporary subdirectory (default A: and B:)
   if  (DT.S <> '') and (Length(DT.S) >= 2) then
     begin
-    if DT.S[2] = ':' then
+    if HasDrives and (DT.S[2] = ':') then
       DDr := UpCase(DT.S[1])
     else
       DDr := #1; {any character not in 'A'..'Z'}
@@ -1501,7 +1501,7 @@ procedure TArcDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean
   else
     begin
     lGetDir(0, ExtrDir);
-    DDr := UpCase(ExtrDir[1]);
+    DDr := DriveOf(ExtrDir);
     ExtrDir := '';
     end;
   if  (DDr in ['A'..'Z']) and

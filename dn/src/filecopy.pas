@@ -336,7 +336,7 @@ constructor TDirName.Create(const AOld, ANew: String; ACopy: Boolean; AnOwn: PFi
   begin
   inherited Create;
   OldName := NewStr(AOld);
-  NewName := NewStr(fReplace('.\', DnSep, ANew));
+  NewName := NewStr(fReplace('.'+DnSep, DnSep, ANew));
   CopyIt := ACopy;
   Own := AnOwn;
   Attr := AnAttr;
@@ -1606,7 +1606,7 @@ lbStartWrite:
     Was := 0;
     ClrIO;
     lAssignFile(ReadStream, FName);
-    if S1[1] in CD_Drives then
+    if DriveOf(S1) in CD_Drives then
       Attr := Attr and not ReadOnly;
 
     FileMode := $40;
@@ -2219,8 +2219,8 @@ TrueCopy:
       Inhr := CreateDirInheritance(S, True);
       if Inhr = 0 then
         Inhr := Length(S);
-      Drv := Byte(UpCase(S[1]))-64;
-      Red := [S[1]];
+      Drv := Byte(DriveOf(S))-64;
+      Red := [DriveOf(S)];
       end;
 
     if CopyPrn or (S[1] = DnSep) then
@@ -2329,7 +2329,7 @@ TryGetInfo:
           Inhr := 0;
         RRC.Insert(NewStr(SSS));
         if P^.Attr and Directory <> 0 then
-          Red := Red+[UpCase(SSS[1])];
+          Red := Red+[DriveOf(SSS)];
         Files.ForEach(MakeMark);
         end;
       end { DoRemove };
@@ -2353,7 +2353,7 @@ TryGetInfo:
       s: String;
       i: Integer;
     begin
-    CD_Drives := CD_Drives+[UpCase(P^.Owner^[1])];
+    CD_Drives := CD_Drives+[DriveOf(P^.Owner^)];
     if  (CopyOptions and cpoDesc) <> 0 then
       GetDiz(P);
     end { DoReset };
@@ -2676,7 +2676,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
   DT.S3 := S4;
   with DT do
     begin
-    if DT.S3[2] = ':' then
+    if HasDrives and (DT.S3[2] = ':') then
       C := S3[1]
     else
       C := GetCurDrive;
