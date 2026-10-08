@@ -179,6 +179,10 @@ The rest of `dn/data` (`COLORS`, `DN.FLG`) is unused so far: check whether it is
 ## Found by looking at the Russian screens (2026-10-03)
 - The message boxes (F8 delete confirmation etc.) have the title `Confirm` and the buttons `Yes`/`No` in English in the Russian interface
   (both builds): the stock strings of `tv/` (`MessageBox`), not the language file of DN. To check where DN's own texts should go in.
+  **Done 2026-10-08:** `InitLngStream` (`mainapp.pas`) sets the texts of `TvMsgBox` (`MsgYesText` ... `MsgConfirmText`) from the strings of the
+  resources (`dlYesButton`, `dlMsgConfirm` ...); the English Cancel keeps the hot letter of tv/. Test `tools/dn-linux-msgbox.py` (the quit box in English,
+  Russian, Ukrainian: title, buttons, the hot letters). Left in tv3: the file dialog (`TvFileDlg`), the directory dialog (`TvChDir`) and the color
+  dialog (`TvColorSel`) have their button texts as constants; they need variables like those of `TvMsgBox` to be translated.
 - Fixed: after the move of the cursor the two redrawn lines of the panel were drawn by `WriteLineW` from a buffer of cells (garbage `♂ ◘` in the
   panel): a leftover of the conversion of the draw buffers to cells (commit 86cb12f), `flpanel.pas` now uses `WriteLineC`; the ops test has a check.
   Other leftovers of that kind may exist: the places that still hand cell buffers to the word-based `WriteLineW/WriteBufW` (the DBF viewer and

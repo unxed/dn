@@ -109,6 +109,7 @@ jobs:
               python3 tools/dn-linux-emptyhist.py out/dn
               python3 tools/dn-linux-dialogok.py out/dn
               python3 tools/dn-linux-cyrsearch.py out/dn
+              python3 tools/dn-linux-msgbox.py out/dn
               python3 tools/dn-linux-ux.py out/dn
               python3 tools/dn-linux-pathscan.py out/dn
     steps:

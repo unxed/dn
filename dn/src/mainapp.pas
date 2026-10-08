@@ -112,7 +112,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes, DNRun, DosHarness, TvCluster, TvKeys, TvSys, TvUtil;
+uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes, DNRun, DosHarness, TvCluster, TvKeys, TvSys, TvUtil, TvMsgBox;
 
 constructor TBackground.Create(const Bounds: TRect; APattern: Byte);
 begin
@@ -551,6 +551,7 @@ end;
 procedure InitLngStream;
 var
   PS, XS: TStream;
+  S: String;
 begin
   PS := OpenResourceStream('.lng');
   { the strings are read from memory: the file is copied (as the original does) }
@@ -576,6 +577,17 @@ begin
   LStringList := TStringList(PS.Get);
   if (PS.Status <> stOK) or (LStringList = nil) then
     ResourceFail('reading ' + LngId + '.lng');
+  { the titles and the buttons of the message and input boxes of tv/ in the language of the resources }
+  MsgYesText := GetString(dlYesButton);
+  MsgNoText := GetString(dlNoButton);
+  MsgOKText := GetString(dlOKButton);
+  S := GetString(dlCancelButton);
+  if StringReplace(S, '~', '', [rfReplaceAll]) <> StringReplace(MsgCancelText, '~', '', [rfReplaceAll]) then
+    MsgCancelText := S;         { the same word keeps the hot letter of tv/ }
+  MsgWarningText := GetString(dlMsgWarning);
+  MsgErrorText := GetString(dlMsgError);
+  MsgInformationText := GetString(dlMsgInformation);
+  MsgConfirmText := GetString(dlMsgConfirm);
 end;
 
 function GetString(Index: TStrIdx): String;
