@@ -57,7 +57,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | C.3 | `DropdownOnly` mode | none | n/a | C |
 | P.1 | File panels (the guideline says "f4 specific"): `Left`/`Right` jump a page; `Ctrl+Enter` inserts the file name | `Left`/`Right` move by one item in the columns (the Norton rule); `Ctrl+Enter` inserts the name (`filepanel.pas`, `panelroot.pas`); the keys do not change the active panel | conflict (kept) | C |
 | M.1 | The bar is activated by `F9` or `Alt+<char>` | `F10` and `Alt+<letter>`. `F9` is "next window" in the editor and the viewer (`cmNext`), and nothing in the panels | conflict (kept) | P:ux |
-| M.2 | `Left`/`Right` in the bar cycle the items and open their menus | fixed in `menus.pas`: opens the menu of the item moved to (before, only when a menu was open already) | conformant (fixed) | P:ux |
+| M.2 | `Left`/`Right` in the bar cycle the items and open their menus | `Left`/`Right` move the highlight along the bar, the menu opens with `Down` or `Enter` (the Norton rule); with a menu open they open the neighbour (M.5). Changing it moves every key route of the pty tests that goes `F10`, `Right`..., `Down` (ten scripts) and the keys of the users | conflict (kept) | P:ux (by hand) |
 | M.3 | `Down` or `Enter` opens the menu | yes | conformant | P:ux |
 | M.4 | `Esc` closes the drop-down and keeps the bar; the second `Esc` leaves the bar | one `Esc` leaves the whole menu (the Norton rule). `Esc` and `F10` arrive in the menu as the same command (`cmMenu`), so the two-step `Esc` cannot be added without telling them apart | conflict (kept) | P:ux (by hand) |
 | M.5 | In a drop-down `Left`/`Right` close it and open the neighbour | yes, except on an item with a submenu (`View`, `Edit` of the File menu): there `Right` opens the submenu first (`RightExpand`) | conformant (with that exception) | P:ux |
@@ -70,7 +70,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | X.4 | The wheel scrolls the component under the cursor | as in tv3 (the focused window scrolls) | gap | C |
 | R.1 | One action = one declaration (the registry `TvActions`) | DN keeps its resource tables (`dn.dnr`: menus, status lines, key maps); not migrated | gap | C |
 
-Count: 46 rows: **32 conformant** (some only for dialogs or input lines, as the cell says), **7 gap** (0.2, 0.3, D.4, E.7, M.7, X.4, R.1), **5 conflict** (G.2b, L.2, P.1, M.1, M.4), **2 n/a** (C.3, M.8).
+Count: 46 rows: **31 conformant** (some only for dialogs or input lines, as the cell says), **7 gap** (0.2, 0.3, D.4, E.7, M.7, X.4, R.1), **6 conflict** (G.2b, L.2, P.1, M.1, M.2, M.4), **2 n/a** (C.3, M.8).
 
 ## Other keys the guidelines touch
 
@@ -79,20 +79,25 @@ The F keys keep their DN meaning (F5 copy, F6 move, F7 make directory, F8 delete
 
 ## What this task changed in DN
 
-* `menus.pas`: `Left`/`Right` in the menu bar open the menu of the item moved to (M.2). A context (vertical) menu is not affected.
-* `tools/dn-linux-ux.py`: the pty test of the rules above (28 checks). `tools/dn-linux-pathscan.py`: the screens that show paths (below).
-* `tools/dn-linux-menusweep.py`, `tools/dn-linux-hotkeys.py`: the arrow route to an item follows M.2 (after `Right` the menu is open, the first `Down` is not needed).
+* No key of DN was changed. The new tv3 arrived with the pin and all the rules marked conformant above hold with it.
+* `tools/dn-linux-ux.py`: the pty test of those rules (26 checks). `tools/dn-linux-pathscan.py`: the screens that show paths (below).
+* A first try made `Left`/`Right` in the bar open the menu (M.2, two lines in `menus.pas`). It was taken back: `tools/dn-linux-ops.py` (5 of 42 checks: the Info
+  panel, the startup dialog, the saved desktop) and other scripts reach their dialogs with `F10`, `Right`, `Down`, which then opens the wrong item. M.2 is a conflict for the owner.
 
 ## Regressions from the new tv3
 
-Local run of the suite against a build with the new tv3 (before and after the change in `menus.pas`): `tools/dn-linux-ops.py` with `DN_OPS_UTF8=1` (42 checks),
+Local run of the suite against a build with the new tv3 : `tools/dn-linux-ops.py` with `DN_OPS_UTF8=1` (42 checks),
 tour, fsattrs, names, archives, arcmembers, hotkeys, dialoghot, dialogok, colors, scrollchars, setup, qsearch, menusweep (ENGLISH), `tools/dn-test.sh`,
 the python tests of `tools/tests`: all pass. The new tv3 behaviour that DN sees (the cursor of a radio group moves apart from its selection; `Esc` and `Enter` in
-the stock dialogs; `Ctrl+Tab`; far2l word movement) does not break a DN key. The old DN menus were the only part that did not follow (M.2, M.4).
+the stock dialogs; `Ctrl+Tab`; far2l word movement) does not break a DN key. The menu bar of DN is its own code and does not follow M.2 and M.4 (conflicts below).
 
 ## Conflicts that need a decision of the owner
 
-Nothing below was changed (except M.2 above, which is the guideline, cheap, and easy to take back: two lines in `menus.pas`).
+Nothing below was changed.
+
+0. **M.2, `Right` in the bar.** The guideline opens the menu of the next item; DN moves the highlight and opens with `Down`/`Enter`. Two lines in
+   `dn/src/menus.pas` (`AutoSelect := True` after `TrackKey` in `kbLeft`/`kbRight` when `Size.Y = 1`) give the guideline behaviour; then the key routes of ten pty scripts
+   (`F10`, `Right` x n, `Down` x (r+1)) lose the first `Down` (`menusweep` and `hotkeys` have `keys_for` / `arrow_keys`, the others spell it out).
 
 1. **M.4, `Esc` in a drop-down.** Norton Commander and DN: one `Esc` leaves the menu. The guideline: the drop-down closes, the bar stays. In DN `Esc` and `F10`
    are the same command inside the menu code; to follow the guideline `Esc` has to become its own event there. Not done, to keep the habit.

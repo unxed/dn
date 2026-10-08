@@ -2,7 +2,7 @@
 """The navigation guidelines of vtui (UX_GUIDELINES.md) on the Linux build of DN (a pty): tools/dn-linux-ux.py OUTDIR
 Esc closes the dialogs, Enter presses the default button also in an edit field, Space toggles a check box, the arrow keys move the cursor of a
 radio group without changing the selection and leave the group only at its boundary, Tab and Shift+Tab cycle, Ctrl+Tab / Ctrl+Shift+Tab walk the
-windows, Left / Right in the menu bar open the menu of the item, the F keys keep their DN meaning, Ctrl+Left / Ctrl+Right follow the word rules of far2l.
+windows, the F keys keep their DN meaning, Ctrl+Left / Ctrl+Right follow the word rules of far2l.
 What is kept as it is (Norton Commander habits) is listed in docs/UX-CONFORMANCE.md."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -124,9 +124,7 @@ def main():
         if 'Edit' in t.text().split('\n')[1]:
             keys(t, 'ESC')
 
-        # M.2/M.3: the menu bar
-        keys(t, 'F10 RIGHT')
-        check(row_of(t, 'Open') >= 0 or row_of(t, 'Find...') >= 0 or row_of(t, 'Make directory') >= 0, 'M.2: Right in the menu bar opens the menu of the next item', t.text())
+        # M.3/M.5: the menu bar (Right in the bar only moves the highlight, see M.2 in docs/UX-CONFORMANCE.md)
         keys(t, 'ESC ESC')
         keys(t, '\x1bd')
         check(row_of(t, 'Volume label') >= 0, 'the Disk menu is open (Alt-D)', t.text())

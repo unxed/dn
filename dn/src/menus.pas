@@ -730,11 +730,7 @@ q:
                 if RightExpand then
                   goto lEnter;
                 if ParentMenu = nil then
-                  begin
-                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
-                  if Size.Y = 1 then
-                    AutoSelect := True; { UX guideline: Left/Right in the bar open the menu of the item moved to }
-                  end
+                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight)
                 else
                   Action := DoReturn;
                 end;
@@ -743,11 +739,7 @@ q:
                 if LeftCollapse then
                   {nothing to do}
                 else if ParentMenu = nil then
-                  begin
-                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
-                  if Size.Y = 1 then
-                    AutoSelect := True;
-                  end
+                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight)
                 else
                   Action := DoReturn;
                 end;
