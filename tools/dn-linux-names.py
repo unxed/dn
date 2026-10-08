@@ -35,7 +35,11 @@ def install(out):
 
 
 def run(d, w, env=None):
-    e = {'DNLNG': 'ENGLISH', 'DN2': d}
+    # a TEMP of its own: DN unpacks a member of an archive into TEMP under the name of the member, so with the /tmp of the system
+    # the tests that run side by side unpack and remove each other's inner.zip
+    tmp = os.path.join(d, 'tmp')
+    os.makedirs(tmp, exist_ok=True)
+    e = {'DNLNG': 'ENGLISH', 'DN2': d, 'TEMP': tmp + os.sep}
     e.update(env or {})
     t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
     t.pump(1.5, 6)
@@ -139,6 +143,8 @@ def main():
             t.pump(1.0, 3)
         text = t.text()
         check('deep' in text and 'Fatal' not in text and 'Access violation' not in text, 'the inner archive is entered and shows its member', text)
+        check(not os.path.exists(os.path.join(w, 'inner.zip')) and os.path.exists(os.path.join(d, 'tmp', 'inner.zip')),
+              'the inner archive is unpacked into TEMP, not into the directory of the panel', str(os.listdir(w)))
         check(t.alive(), 'zip in zip: DN is alive', text)
         t.close(0.5)
     finally:
