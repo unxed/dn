@@ -70,6 +70,7 @@ jobs:
           - name: fsattrs
             cmds: |
               python3 tools/dn-linux-fsattrs.py out/dn
+              python3 tools/dn-linux-dotfiles.py out/dn
           - name: archives
             cmds: |
               python3 tools/dn-linux-archives.py out/dn

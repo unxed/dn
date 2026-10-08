@@ -228,10 +228,24 @@ const
     $1E, $30, $2E, $20, $12, $21, $22, $23, $17, $24, $25, $26, $32,
     $31, $18, $19, $10, $13, $1F, $14, $16, $2F, $11, $2D, $15, $2C);
 
+type
+  TPunctKey = record
+    Plain, Shifted: Char;
+    Scan: Byte;
+  end;
+
+const
+  { the keys of punctuation of the US layout and their scan codes }
+  PunctScan: array[0..8] of TPunctKey = (
+    (Plain: '['; Shifted: '{'; Scan: $1A), (Plain: ']'; Shifted: '}'; Scan: $1B), (Plain: ';'; Shifted: ':'; Scan: $27),
+    (Plain: ''''; Shifted: '"'; Scan: $28), (Plain: '`'; Shifted: '~'; Scan: $29), (Plain: '\'; Shifted: '|'; Scan: $2B),
+    (Plain: ','; Shifted: '<'; Scan: $33), (Plain: '.'; Shifted: '>'; Scan: $34), (Plain: '/'; Shifted: '?'; Scan: $35));
+
 function DNKeyCode(const Event: TEvent): LongInt;
 var
   Shift: LongInt;
   Key: LongInt;
+  I: Integer;
 begin
   Shift := 0;
   if (Event.ControlKeyState and 3) <> 0 then
@@ -249,6 +263,21 @@ begin
   if  ((Event.ControlKeyState and 4) <> 0) and ((Event.ControlKeyState and 8) = 0) and (Key >= 1) and (Key <= 26)
       and not (Key in [8, 9, 13]) then
     Key := Key or (LongInt(CtrlScan[Key]) shl 8);
+  { Alt and a key of punctuation: tv/ gives the character (a terminal sends ESC and the character), DN looks for the scan code of the key
+    (kbAltQuote = $082800); the character of the key with Shift adds Shift }
+  if ((Event.ControlKeyState and 8) <> 0) and (Key > $20) and (Key < $7F) then
+    for I := Low(PunctScan) to High(PunctScan) do
+      if Chr(Key) = PunctScan[I].Plain then
+      begin
+        Key := LongInt(PunctScan[I].Scan) shl 8;
+        Break;
+      end
+      else if Chr(Key) = PunctScan[I].Shifted then
+      begin
+        Key := LongInt(PunctScan[I].Scan) shl 8;
+        Shift := Shift or 3;
+        Break;
+      end;
   Result := Key or (Shift shl 16);
 end;
 

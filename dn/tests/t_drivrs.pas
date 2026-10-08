@@ -77,6 +77,16 @@ begin
   SetDNKeyCode(Ev, $034B00);
   Check((Ev.KeyCode = $4B00) and ((Ev.ControlKeyState and 15) = 3), 'SetDNKeyCode');
   Check(DNKeyCode(Ev) = $034B00, 'SetDNKeyCode and DNKeyCode are reverse to each other');
+  { Alt and a punctuation key from a terminal (ESC and the character): the scan code of the key }
+  Ev.ControlKeyState := 8;
+  Ev.KeyCode := Ord('''');
+  Check(DNKeyCode(Ev) = $082800, 'DNKeyCode: Alt-'' is kbAltQuote');
+  Ev.KeyCode := Ord('"');
+  Check(DNKeyCode(Ev) = $0B2800, 'DNKeyCode: Alt-" is kbAltShiftQuote');
+  Ev.KeyCode := Ord('/');
+  Check(DNKeyCode(Ev) = $083500, 'DNKeyCode: Alt-/ is kbAltSlash');
+  Ev.ControlKeyState := 0;
+  Check(DNKeyCode(Ev) = $00002F, 'DNKeyCode: / without Alt stays a character');
   { FormatStr }
   { the parameters are pointer-sized slots }
   T := 'file';

@@ -78,10 +78,16 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   (check the panel setting "hidden files" and the comparison `Name[1] = '.'` in the directory parse); Unix permissions and links are not shown in `Attr`.
   (Checked 2026-10-08: the broken links are listed (`tools/dn-linux-fsattrs.py`); the dot files are the hidden files of the RTL and DN shows
   them when the setting "show hidden files" of the panels (`fmsShowHidden`) is on. Owner, 2026-10-08: it is on by default on Unix builds
-  (`ShowHiddenByDefault` of `startup.pas`), off on DOS and Windows as in DN; a saved setup keeps its own value (`tools/dn-linux-fsattrs.py`). A dot file
-  is shown in the columns of a DOS name (an empty name, the extension `hidden`). Open: the key Alt-' of the panel (`kbAltQuote`), which switches the
-  setting, did nothing in the pty test (xterm sends `ESC '`); the dialog Options, File Manager, Setup switches it; after its OK the passive panel drops the dot
-  file at once, the active one kept it in the test until the next reread.)
+  (`ShowHiddenByDefault` of `startup.pas`), off on DOS and Windows as in DN; a saved setup keeps its own value (`tools/dn-linux-fsattrs.py`).)
+  **Fixed 2026-10-08** (`tools/dn-linux-dotfiles.py`, `dn/tests/t_dotname.pas`): a dot file was shown as an empty name with an extension (`.bashrc`:
+  the extension `bashrc`). Without drive letters (`HasDrives`) a dot with only dots before it in the name is a part of the name (`IsExtDot` of
+  `strutil`): `.bashrc` has no extension, `.config.bak` is the name `.config` with `bak`; `PosLastDot`, `lFSplit`, `GetSName`, `InMask` (the mask `*.`)
+  and the sort by extension use it; DOS and Windows split as before. The key Alt-' (`kbAltQuote`) did nothing: a terminal sends `ESC '` and tv/
+  gives the character with Alt, DN looks for the scan code; `DNKeyCode` maps Alt with a punctuation key of the US layout to its scan code
+  (`t_drivrs`). After the switch only the focused panel read its directory again (`cmPanelReread` to the application); now every window gets
+  `cmTotalReread` and the double window passes it to both panels (`UpdateConfig` of `boot.pas`).
+  Open: Gray+, Gray- and Gray* of the keypad come from a terminal (the pty test, xterm `ESC O k`) as the characters `+ - *` (tv/ `KeyFromLetter`), not as kbGrayPlus; the
+  selection by a mask is reachable only by the menu Panel, Select group, in a terminal.
 - Paths look like DOS (`C:\home\you`): drive C: is the root of the file system; show Unix paths after the move to UTF-8.
 - Case: names that are not on disk in the case DN asks for are looked up without regard to case (`SysOsPath`); two files that differ only by
   case, DN will not be able to tell apart.

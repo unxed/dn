@@ -849,7 +849,7 @@ function InMask(Name, Mask: String): Boolean;
     begin
     Result := True; Exit;
     end;
-  if Pos('.', Name) = 0 then
+  if (Pos('.', Name) = 0) or (not HasDrives and (PosLastDot(Name) > Length(Name))) then
     Name := Name + '.'; { Implied dot at the end of a name without extension }
   UpStr(Mask);
   UpStr(Name);
@@ -1140,7 +1140,7 @@ function GetSName(const S: String): String;
   Pe := Length(S)+1;
   for B := Length(S) downto 1 do
     begin
-    if  (S[B] = '.') and (Pe = Length(S)+1) then
+    if  (S[B] = '.') and (Pe = Length(S)+1) and IsExtDot(S, B) then
       Pe := B;
     if IsPathSep(S[B]) then
       Break;
