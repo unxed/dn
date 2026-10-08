@@ -84,7 +84,7 @@ dropping the letters would change the hot keys of the menu.
 ## What this task changed in DN
 
 * No key of DN was changed. The new tv3 arrived with the pin and all the rules marked conformant above hold with it.
-* `tools/dn-linux-ux.py`: the pty test of those rules (27 checks; with the 20 checks of the options below, 47). `tools/dn-linux-pathscan.py`: the screens that show paths (below).
+* `tools/dn-linux-ux.py`: the pty test of those rules (40 checks; with the 23 checks of the options below, 63). `tools/dn-linux-pathscan.py`: the screens that show paths (below).
 * A first try made `Left`/`Right` in the bar open the menu (M.2, two lines in `menus.pas`). It was taken back: `tools/dn-linux-ops.py` (5 of 42 checks: the Info
   panel, the startup dialog, the saved desktop) and other scripts reach their dialogs with `F10`, `Right`, `Down`, which then opens the wrong item. M.2 is now the
   option `MenuArrowsOpen` (off by default, so the routes hold).
