@@ -43,16 +43,17 @@ def case(out, setup, keys, d=None, quit=False):
     w = os.path.join(d, 'work')
     os.environ['DNLNG'] = 'ENGLISH'
     t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-    t.pump(1.5, 6)
-    t.send('\x1b', 0.5)
+    # the clock of the menu bar writes every second: wait for a screen that stays the same (settle), not for silence
+    t.settle(1.0, 6)
+    t.key('\x1b', 0.5)
     for k in keys.split():
-        t.send(K.get(k, k), 1.2)
-    t.pump(1.0, 3)
+        t.key(K.get(k, k), 0.8)
+    t.settle(1.0, 3)
     text = t.text()
     alive = t.alive()
     if quit:
-        t.send('\x1bx', 0.8)
-        t.send('\r', 0.8)
+        t.key('\x1bx', 0.8)
+        t.key('\r', 0.8)
         for _ in range(20):
             if not t.alive():
                 break
