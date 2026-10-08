@@ -1,7 +1,7 @@
 { DNRunDos: running an external program from DN on DOS (the backend of the facade DNRun).
   Moved from DNRun (platform separation, stage 3): the code is the same, only the place is new. The screen goes to the text mode with the user screen
   of Drivers (what the previous programs left; after the run the video memory is copied back there), the program runs through COMMAND.COM, a key returns to DN.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 {$mode objfpc}{$H-}
 unit DNRunDos;
 

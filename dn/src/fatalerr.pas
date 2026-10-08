@@ -1,6 +1,5 @@
 { fatalerr: what the program needs at the screen of a fatal error (dn.pas): the place of the address of the exception in the sources,
-  and the wait for a key. They were a part of the layer of Virtual Pascal (GetLocationInfo, SysKeyPressed, SysReadKey). Our own
-  code (MIT, see LICENSE). }
+  and the wait for a key. They were a part of the layer of Virtual Pascal (GetLocationInfo, SysKeyPressed, SysReadKey). MIT, see LICENSE. }
 unit fatalerr;
 
 {$mode objfpc}

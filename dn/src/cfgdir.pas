@@ -1,7 +1,7 @@
 { CfgDir: the directory of the files that the user changes (the settings, the desktop, the histories, the crash reports).
   The directory comes from OSSystem.OSConfigDir (the configuration of the user: ~/.config/dn, %APPDATA%\DN); DOS keeps the files next to the program. The first start
   after the move copies the files that a DN of the program directory made (the originals stay where they are).
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 unit CfgDir;
 
 {$mode objfpc}

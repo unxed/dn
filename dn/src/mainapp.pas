@@ -1,4 +1,4 @@
-{ mainapp: the application of DN (our unit; it replaces mainapp.PAS of the archive, which repeated the App of
+{ mainapp: the application of DN (it replaces mainapp.PAS of the archive, which repeated the App of
   Borland TV). The classes lie on TvApp (tv/), what DN adds is added here. The names are those that the
   sources of DN use (spec/dn-boundary-dnosp214.md).
 

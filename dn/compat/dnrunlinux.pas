@@ -3,7 +3,7 @@
   emulator of tv/ (TvVtRun: the keys go to the command, the screen stays as the user screen, Ctrl-O shows it); DN_EMBED_TERM=0 gives the terminal to
   /bin/sh -c as before (SysRunShell), Enter returns. DN_RUN_PAUSE: what happens when the command ends: 1 (default) "Press Enter", 0 back to the panels at once,
   2 the pause only when the status is not 0.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 {$mode objfpc}{$H-}
 unit DNRunLinux;
 

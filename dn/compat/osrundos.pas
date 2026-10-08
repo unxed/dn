@@ -1,6 +1,6 @@
 { OSRunDos: starting programs and restarting DN on DOS (the backend of the facade OSRun).
   Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 unit OSRunDos;
 
 {$mode objfpc}

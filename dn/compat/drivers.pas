@@ -1,4 +1,4 @@
-{ Drivers: the helpers of DN that lie between its sources and the units of tv/ (our unit; it replaces
+{ Drivers: the helpers of DN that lie between its sources and the units of tv/ (it replaces
   drivers.pas of the archive, which was the event manager and the screen of DN, based on Borland TV).
 
   Events, the mouse and the screen are done by tv/ (TvSys, TvScreen): the routines of the old event manager

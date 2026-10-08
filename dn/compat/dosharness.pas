@@ -1,6 +1,6 @@
 { DosHarness: the test aid of the DOS build (DNDUMP, DNKEYS, DNMOUSE: see below and tools/dn-dos-input.py), taken out of mainapp (platform separation, stage 3).
   The code is the same; it is called from TProgram.Idle of mainapp.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 {$mode objfpc}{$H-}{$POINTERMATH ON}
 unit DosHarness;
 

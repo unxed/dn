@@ -2,7 +2,7 @@
   cursor given by the lines of the cell; tv/ has cells with UTF-8 text and a caret size in percent. Here is the glue between
   them: ReadScreenCells makes the copy of the screen of tv/, WriteScreenCells puts cells of the copy back, the cursor
   routines convert the shape. (It was a part of the layer of Virtual Pascal, SysTv*; split out of osdep, which is the system
-  layer only.) MIT (see LICENSE). }
+  layer only.) MIT, see LICENSE. }
 unit dnscreen;
 
 {$mode objfpc}

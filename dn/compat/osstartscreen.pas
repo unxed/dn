@@ -1,6 +1,6 @@
 { OSStartScreen: the text screen of the program that started DN (DOS): copied at the start, before the application takes the screen over.
   Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 unit OSStartScreen;
 
 {$mode objfpc}

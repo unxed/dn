@@ -1,7 +1,7 @@
 { SPDX-License-Identifier: MIT }
 { Profile: GetPrivateProfileString and friends (the Windows names) over TvIni of tv/.
 
-  Our own unit: it replaces profile.pas of Matthias Koeppe (LGPL), which read and edited the file line by line. The file is read
+  It replaces profile.pas (it read and edited the file line by line). The file is read
   by TvIni in its "profile" way (the value is all that follows '='; a ';' in it is no comment) and written at once after a change,
   as the old unit did. The file that was used last stays open until another one is asked for or CloseProfile. }
 unit Profile;

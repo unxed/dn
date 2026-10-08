@@ -34,7 +34,7 @@ for line in open(os.path.join(root, 'bootstrap', 'carve.list'), encoding='utf-8'
 
 def head_class(path):
     head = '\n'.join(open(path, encoding='cp866', errors='replace').read().split('\n')[:60]).lower()
-    if 'mit (see license)' in head:                  # a unit written after the baseline: its head says so
+    if 'mit (see license)' in head or 'mit, see license' in head:   # a unit with the MIT notice of this project in its head
         return 'OURS'
     if 'rit research labs' in head or 'dos navigator open source' in head or 'dos navigator/2 open source' in head or 'dos navigator /2 osp' in head:
         return 'RIT'

@@ -1,6 +1,6 @@
 { OSSystem: the small calls of the system (devices, volume label, disk buffers, the speaker, memory): the stable facade used by the DN compatibility layer
   (osdep). The code of a target is in OSSystemDos or OSSystemOther.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 unit OSSystem;
 
 {$mode objfpc}

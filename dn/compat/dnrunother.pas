@@ -1,6 +1,6 @@
 { DNRunOther: running an external program from DN where DN has no screen of its own for the commands (Windows, the Unix systems other than Linux):
   the backend of the facade DNRun. The terminal is given to the shell for the command (SysRunShell), Enter returns.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 {$mode objfpc}{$H-}
 unit DNRunOther;
 

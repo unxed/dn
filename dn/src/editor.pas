@@ -47,7 +47,8 @@
 
 { The place for the plugins of the editor: TXFileEditor is the class that the windows create (a plugin can take over HandleCommand).
 
-  The commands themselves are in editcore. }
+  The commands themselves are in editcore.
+}
 {$I STDEFINE.INC}
 unit editor;
 

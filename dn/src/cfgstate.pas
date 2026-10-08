@@ -2,7 +2,7 @@
   is kept in dn.ini, in the section [Saved] (or [Saved<suffix>] for the environment variable DNCFG=<suffix>, as dn<suffix>.cfg
   was). One binary image of the records is cut into pieces of 96 bytes written as hex: Size=<bytes>, S0000=..., S0001=... DN writes
   the section at the exit, nobody edits it; the rest of dn.ini (the comments, the settings of the people) is not touched, the
-  files are read and written by the Profile unit as before. MIT (see LICENSE). }
+  files are read and written by the Profile unit as before. MIT, see LICENSE. }
 unit cfgstate;
 
 {$mode objfpc}

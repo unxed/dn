@@ -8,7 +8,7 @@
   A character is one column here: the wide characters (CJK) and the combining marks are not counted by their width
   yet (dn/TODO-later.md).
 
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 unit DNUtf8;
 
 interface

@@ -1,4 +1,4 @@
-{ The unit StrView of DN: a view with two lines of text (the information of a dialog: TDStringView), over tv/. }
+{ The unit StrView of DN: a view with two lines of text (the information of a dialog: TDStringView). }
 unit StrView;
 
 {$mode objfpc}{$H-}

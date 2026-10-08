@@ -11,7 +11,7 @@
   the file of the run off (a crash report is still written). Names of directories and of files appear in the facts and in the screen text: a person looks at the
   report before he hands it over.
 
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 unit FlightRec;
 
 {$mode objfpc}

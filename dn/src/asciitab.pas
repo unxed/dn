@@ -1,7 +1,5 @@
 { The unit ASCIITab of DN: the table of the characters (a window with a 32 x 8 table and a line that shows the
-  character that is under the cursor; Enter or a double click puts the character into the text that is being edited).
-  Built over tv/ with the API that DN uses (ASCIITable, fASCIITable, the classes for the streams); the
-  original is a copy of the ASCII table of the Borland demo and is in dn/exclude.list. }
+  character that is under the cursor; Enter or a double click puts the character into the text that is being edited). }
 {$mode objfpc}{$H-}
 unit ASCIITab;
 

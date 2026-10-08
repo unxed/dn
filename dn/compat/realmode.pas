@@ -1,4 +1,4 @@
-{ Dpmi32: calling real-mode interrupts from a 32-bit DPMI program (our unit; the VP one is not available).
+{ Dpmi32: calling real-mode interrupts from a 32-bit DPMI program (the VP one is not available).
   DN (LFN.pas) uses it to reach the DOS functions of the long file names (INT 21h AX=71xxh) and the
   clipboard (INT 2Fh). The names of the types and the routines are those of the VP unit, as DN uses them;
   the implementation lies on the go32 unit of the Free Pascal RTL (go32v2 only: on other targets the calls

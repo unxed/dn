@@ -1,6 +1,6 @@
 { OSSystemOther: the small calls of the system (devices, volume label, disk buffers, the speaker, memory) on Unix and Windows (the backend of the facade OSSystem).
   Moved from OSDep (platform separation, stage 3): the code is the same, only the place is new.
-  MIT (see LICENSE). }
+  MIT, see LICENSE. }
 unit OSSystemOther;
 
 {$mode objfpc}

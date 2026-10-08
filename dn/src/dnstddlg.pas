@@ -1,4 +1,4 @@
-{ DNStdDlg: the standard file dialogs of DN (our unit; it replaces DNStdDlg.pas of the archive, which repeated
+{ DNStdDlg: the standard file dialogs of DN (it replaces DNStdDlg.pas of the archive, which repeated
   StdDlg of Borland TV). The dialog is TFileDialog of tv/ (TvFileDlg); here are the functions that DN calls.
 
   Not done yet (TODO): the filter of DN (Mask like "*.Ops;-Pas.*;p*.d") is given to the dialog as it is, the

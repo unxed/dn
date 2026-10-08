@@ -52,7 +52,8 @@
   (SmartPad, the clipboard window), the history of the places in the files, the information line, and the streams of the desktop.
 
   The columns of this editor are cells of the screen (a tab is as wide as it looks, a wide character is two); the text is UTF-8 (a file in a code page is
-  converted when it is read and written back as it was). }
+  converted when it is read and written back as it was).
+}
 {$I STDEFINE.INC}
 unit editcore;
 

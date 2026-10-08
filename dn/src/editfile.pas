@@ -48,7 +48,8 @@
 { The files of the editor of DN: reading, writing, locking, and the streams of a window of the desktop.
 
   The reading and the writing are those of tve (TveFile): the character set of the file is found (UTF-8, UTF-16 with a mark, or a code
-  page chosen among DOS, Windows and KOI8-R), the line ends are kept as they were, and a file is written through a temporary file and a rename. }
+  page chosen among DOS, Windows and KOI8-R), the line ends are kept as they were, and a file is written through a temporary file and a rename.
+}
 {$I STDEFINE.INC}
 unit editfile;
 

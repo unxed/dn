@@ -1,4 +1,4 @@
-{ Messages: message boxes and input boxes of DN (our unit; it replaces messages.pas of the archive, which
+{ Messages: message boxes and input boxes of DN (it replaces messages.pas of the archive, which
   repeated MsgBox of Borland TV). The boxes are those of tv/ (TvMsgBox, TvInput); the flags are those of DN.
 
   Not done yet (TODO): the buttons mfNextDButton, mfAppendButton, mf2YesButton, mfAllButton have no

@@ -48,7 +48,8 @@
 { The two thin lines of an editor window: the information line at the bottom (the place of the cursor, the code of the character, the modes) and the
   line of the bookmarks at the left.
 
-  They only show what TFileEditor (editcore) knows, and turn a click on a part of the information line into the command of that part. }
+  They only show what TFileEditor (editcore) knows, and turn a click on a part of the information line into the command of that part.
+}
 {$I STDEFINE.INC}
 unit editinfo;
 
