@@ -81,7 +81,5 @@ dn_gen_shims() {
 dn_compile() {
     mkdir -p "$DN_OBJ"
     link=; [ -n "${2:-}" ] && link=-Cn
-    # tv/src/tvactions.pas has a comment inside a comment in its head, which the Delphi mode of DN does not read: it is compiled first in the mode of tv/
-    ( cd "$DN_OBJ" && PATH="${DN_PATH:+$DN_PATH:}$PATH" $DN_PPC $DN_OPTS -Mobjfpc $DN_UPATHS -FU"$DN_OBJ" -vewn "$here/tv/src/tvactions.pas" 2>&1 )
     ( cd "$DN_OBJ" && PATH="${DN_PATH:+$DN_PATH:}$PATH" $DN_PPC $DN_OPTS $DN_UPATHS -FU"$DN_OBJ" -FE"$DN_OBJ" $link -vewn "$DN_STAGE/$1" 2>&1 )
 }
