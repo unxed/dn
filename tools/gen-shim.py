@@ -46,6 +46,23 @@ def parse_unit(path):
     i = i0 + 1
     while i < i1:
         s = lines[i].rstrip()
+        # several constants on one line ("  A = 1;  B = 2;"): one declaration per line
+        if sect == 'const' and re.match(r'^  \w+\s*=', s):
+            parts, depth, quote, cur = [], 0, False, ''
+            for ch in re.sub(r'\{.*?\}', '', s):
+                if ch == "'":
+                    quote = not quote
+                elif not quote and ch in '([':
+                    depth += 1
+                elif not quote and ch in ')]':
+                    depth -= 1
+                cur += ch
+                if ch == ';' and depth == 0 and not quote:
+                    parts.append(cur.strip()); cur = ''
+            if len(parts) > 1 and not cur.strip() and all(re.match(r'^\w+\s*=', p) for p in parts):
+                lines[i:i + 1] = ['  ' + p for p in parts]
+                i1 += len(parts) - 1
+                s = lines[i]
         if re.match(r'^(const|type|var)\s*$', s, re.I):
             sect = s.strip().lower(); i += 1; continue
         m = re.match(r'^(function|procedure)\s+(\w+)', s, re.I)
