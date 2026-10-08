@@ -1824,6 +1824,13 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
     ClearEvent(Event);
     Exit(True);
     end;
+  { a typed character outside ASCII is text, never a key of the table below (U+2026 or U+03B2 would be taken for the codes of commands) }
+  if (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) and (Event.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
+    begin
+    TypeAt(UiToDoc(EventText(Event)));
+    ClearEvent(Event);
+    Exit(True);
+    end;
   Key := DNKeyCode(Event);
   case Key of
     kbCtrlAltShift1..kbCtrlAltShift9:
