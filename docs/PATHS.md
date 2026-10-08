@@ -8,13 +8,16 @@ and it has real faults (a Unix file name that holds a backslash is cut in two; "
 
 * A path inside DN is a path of the host. On Unix it is `/home/x/file`: no drive, the separator is `/`, the root is `/`. On DOS and Windows
   it stays `C:\DIR\FILE`, or `\\host\share\...`.
-* The one place that knows the difference is `dn/compat/dnpath.pas`: `DnSep`, `HasDrives`, `IsPathSep`, `PathRootLen`, `IsAbsPath`,
-  `NormalizeSep`. The rest of DN does not spell a separator or a drive letter. `tools/check-paths.py` (called by `tools/check-layout.sh`)
+* The rules of each system live in `TvPath` of tv3 (`tv/src/tvpath.pas`); `dn/compat/dnpath.pas` is a thin layer over it (`DnSep`,
+  `HasDrives`, `IsPathSep`, `PathRootLen`, `IsAbsPath`, `NormalizeSep`) with what only DN needs (`ArcSep`, `DriveOf`, `DriveRoot`,
+  `HasDriveLetter`, `IsQualified`). The rest of DN does not spell a separator or a drive letter. `tools/check-paths.py` (called by `tools/check-layout.sh`)
   counts the places that still do, against `tools/paths-baseline.txt`; the number may only fall.
 * The members of an archive keep `\` on every host (`ArcSep`): that is the format DN's archive code has always used, it is not a host path.
 * Code that needs drives (the drive menu, `D:` hotkeys, the drive bar of a panel) asks `HasDrives` and is absent on Unix. On Unix the
   places to go are mount points, home, `/`, bookmarks.
-* Text typed by the user is taken in either form on DOS and Windows; on Unix only `/` separates.
+* Text typed by the user is taken in either form on DOS and Windows; on Unix only `/` separates. The functions of the RTL that split or
+  expand a name (`ExtractFileName`, `ExtractFileDir`, `ExpandFileName`, `IncludeTrailingPathDelimiter`, `FSplit`, `FExpand`) take `\`
+  as a separator on Unix too: DN calls `lFSplit`, `lFExpand` and `TvPath` instead.
 
 ## Status (2026-10-08)
 
@@ -26,8 +29,13 @@ crash, startup, qsearch, sortmark, locale, resize, about, archives, arcmembers, 
 
 Done: the drive menu (Alt-F1, the tree, the new-window menu) lists the root, the home directory and the mount points of real devices
 (`/proc/mounts`) on a host without drives (`LoadPlaces` in fileutil.pas, test `tools/dn-linux-places.py`).
-Open: the drive bar `[ C * ]` still shows the virtual drive C on Unix; the ratchet baseline falls only as callers are converted; the Windows and DOS targets still have to be built
-and run with the new `lFExpand` (CI).
+Done: `DnPath` asks `TvPath`; `lFExpand` is `TvPath.PathExpandIn` from `ActiveDir` (or the current directory of the drive); the tests
+of a drive letter (`S[2] = ':'`) are `HasDriveLetter` and `IsQualified`, so on Unix the history of directories, the tree and the copy
+dialog of the file list take `/a/b`; the archive notation `ARC:\` uses `ArcSep`. The ratchet fell from 46 to 8: the sets of punctuation
+(word breaks, the characters a name may not hold), an escape of the highlighter and a call of DOS (`GetShare` in fsinfo.pas).
+Open: the drive bar `[ C * ]` still shows the virtual drive C on Unix; the Windows and DOS targets still have to be built and run with
+the new `lFExpand` (CI); the masks `*.*` and the switches `/X` of the command line (dnutil.pas, envutil.pas) are not counted by the
+ratchet.
 
 ## Order of work
 
@@ -45,4 +53,4 @@ the dialogs, the command line, the messages, the history, the file lists, the lo
 (`fpide/src`), tv3 (`tvchdir.pas` and the file dialogs) and tve. The audit has three parts: (1) a pty test that visits the screens of
 the Linux build and fails on a drive letter or a backslash in a path (`tools/dn-linux-pathscan.py`); (2) the ratchet `tools/check-paths.py`
 for dn (it falls only); (3) the same ratchet idea for fpide, tv3 and tve (`tools/check-paths.py` takes the roots). Findings are fixed in the
-caller, with `DnPath`, `ExtractFilePath`, `PathDelim` or `DirectorySeparator`, never by a special case for Linux in the output.
+caller, with `DnPath` or `TvPath`, never by a special case for Linux in the output.
