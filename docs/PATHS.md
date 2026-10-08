@@ -24,8 +24,9 @@ resource compiler files; the archive layer keeps its own separator (`ArcNormName
 backslash in a name is a letter. Checked: the unit tests (all 25 programs), the pty tests (editor, tour, clip, desktop, ops, find, setup, config,
 crash, startup, qsearch, sortmark, locale, resize, about, archives, arcmembers, names, kitty).
 
-Open: the drive bar `[ C * ]` and the drive menu (Alt-F1) still show the virtual drive C on Unix: they should show the root, the home
-directory and the mount points; the ratchet baseline falls only as callers are converted; the Windows and DOS targets still have to be built
+Done: the drive menu (Alt-F1, the tree, the new-window menu) lists the root, the home directory and the mount points of real devices
+(`/proc/mounts`) on a host without drives (`LoadPlaces` in fileutil.pas, test `tools/dn-linux-places.py`).
+Open: the drive bar `[ C * ]` still shows the virtual drive C on Unix; the ratchet baseline falls only as callers are converted; the Windows and DOS targets still have to be built
 and run with the new `lFExpand` (CI).
 
 ## Order of work

@@ -78,6 +78,16 @@ procedure EraseByName(const FName: String); {DataCompBoy}
 procedure EraseFile(const N: String); {DataCompBoy}
 procedure EraseTempFile(S: String); {piwamoto}
 {JO}
+const
+  MaxPlaces = 24;
+var
+  Places: array[1..MaxPlaces] of String;
+  PlaceCnt: Integer;
+procedure LoadPlaces;
+  {` Hosts without drive letters: fill Places with the root, the home
+    directory and the mount points of real devices `}
+function PlaceOf(const Dir: String): Integer;
+  {` Index of the place holding Dir (the longest match), 0 if none `}
 function ValidDrive(dr: Char): Boolean;
 function GetDrive: Byte;
   {` Return the drive number of the active panel (0..25).
@@ -416,6 +426,105 @@ procedure EraseTempFile(S: String);
     ClrIO;
     end;
   end { EraseTempFile };
+
+procedure LoadPlaces;
+  var
+    F: Text;
+    L, Dev, Mp: String;
+    H: String;
+  function NextField(var S: String): String;
+    var
+      I: Integer;
+    begin
+    I := Pos(' ', S);
+    if I = 0 then
+      I := Length(S)+1;
+    NextField := Copy(S, 1, I-1);
+    Delete(S, 1, I);
+    end;
+  function Unescape(const S: String): String;
+    var
+      I: Integer;
+      R: String;
+    begin
+    R := '';
+    I := 1;
+    while I <= Length(S) do
+      if (S[I] = Chr(92)) and (I+3 <= Length(S)) and (S[I+1] in ['0'..'3']) then
+        begin
+        R := R+Chr((Ord(S[I+1])-48)*64+(Ord(S[I+2])-48)*8+Ord(S[I+3])-48);
+        Inc(I, 4);
+        end
+      else
+        begin
+        R := R+S[I];
+        Inc(I);
+        end;
+    Unescape := R;
+    end;
+  procedure Add(const P: String);
+    var
+      I: Integer;
+    begin
+    if PlaceCnt >= MaxPlaces then
+      Exit;
+    for I := 1 to PlaceCnt do
+      if Places[I] = P then
+        Exit;
+    Inc(PlaceCnt);
+    Places[PlaceCnt] := P;
+    end;
+  begin
+  PlaceCnt := 0;
+  Add(DnSep);
+  H := GetEnv('HOME');
+  if (H <> '') and (H <> DnSep) then
+    begin
+    MakeNoSlash(H);
+    Add(H);
+    end;
+  {$I-}
+  Assign(F, '/proc/mounts');
+  Reset(F);
+  if IOResult = 0 then
+    begin
+    while not Eof(F) do
+      begin
+      ReadLn(F, L);
+      Dev := NextField(L);
+      Mp := Unescape(NextField(L));
+      if  (Copy(Dev, 1, 5) = '/dev/') and (Copy(Dev, 1, 9) <> '/dev/loop')
+        and (Mp <> '') and (Mp <> DnSep) and (Copy(Mp, 1, 5) <> '/boot')
+        and (Copy(Mp, 1, 5) <> '/snap')
+      then
+        Add(Mp);
+      end;
+    Close(F);
+    end;
+  if IOResult <> 0 then;
+  {$I+}
+  end { LoadPlaces };
+
+function PlaceOf(const Dir: String): Integer;
+  var
+    I, Best, BestLen, L: Integer;
+  begin
+  Best := 0;
+  BestLen := 0;
+  for I := 1 to PlaceCnt do
+    begin
+    L := Length(Places[I]);
+    if  (Copy(Dir, 1, L) = Places[I])
+      and ((L = 1) or (Length(Dir) = L) or (Dir[L+1] = DnSep))
+      and (L > BestLen)
+    then
+      begin
+      Best := I;
+      BestLen := L;
+      end;
+    end;
+  PlaceOf := Best;
+  end;
 
 function ValidDrive(dr: Char): Boolean;
   var

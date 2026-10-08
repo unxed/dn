@@ -1505,7 +1505,8 @@ WrongArc:
       end
    
       ;
-    lGetDir(Byte(DriveOf(S))-64, S);
+    if HasDrives or (S = '') or (S[1] <> DnSep) then
+      lGetDir(Byte(DriveOf(S))-64, S);          { a place of a one-tree host is a whole path }
     {S:=GetNormPath(S);} {removed by AK155}
     MakeNoSlash(S);
     DoChange(S);

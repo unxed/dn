@@ -1801,7 +1801,13 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       S := SelectDrive(R.A.X+(R.B.X-R.A.X) div 2, R.A.Y, #0, False);
       if S = '' then
         Exit;
-      S[1] := Char(Byte(S[1])-64);
+      if HasDrives then
+        S[1] := Char(Byte(S[1])-64)
+      else
+        begin
+        lChDir(S);
+        S := #3;
+        end;
       end;
     
     if TrashCan.ImVisible then

@@ -1081,7 +1081,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
     MaxSizeDig = 17;
 
   var
-    DrvCnt, I, J, K: Byte;
+    DrvCnt, InfoCnt, I, J, K: Byte;
     DrvStrArr: array [1..26] of TDriveRec;
     MaxFullSLength: Byte;
     SizeStr: String[MaxSizeDig];
@@ -1151,18 +1151,30 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
     Inc(N)
     end;
 
-  for C := 'Z' downto 'A' do
-    if ValidDrive(C) then
+  if HasDrives then
+    for C := 'Z' downto 'A' do
+      if ValidDrive(C) then
+        begin
+        Inc(DrvCnt);
+        DrvStrArr[DrvCnt].Dr := C;
+        DrvStrArr[DrvCnt].FullS := '~'+C+':~';
+        end;
+  if not HasDrives then
+    begin                           { one tree: places instead of drive letters }
+    LoadPlaces;
+    for I := PlaceCnt downto 1 do
       begin
       Inc(DrvCnt);
-      DrvStrArr[DrvCnt].Dr := C;
-      if HasDrives then
-        DrvStrArr[DrvCnt].FullS := '~'+C+':~'
-      else
-        DrvStrArr[DrvCnt].FullS := '~'+C+'~ '+DnSep;     { one tree: the root of the file system }
+      DrvStrArr[DrvCnt].Dr := Chr(64+I);
+      DrvStrArr[DrvCnt].FullS := '~'+Chr(64+I)+'~ '+CutH(Places[I], 40);
       end;
+    end;
+  if HasDrives then
+    InfoCnt := DrvCnt
+  else
+    InfoCnt := 0;
 
-  for I := 1 to DrvCnt do
+  for I := 1 to InfoCnt do
     begin
     with DrvStrArr[I] do
       if (InterfaceData.DrvInfType.ForDrives = 0) or
@@ -1209,10 +1221,10 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
     end;
 
   if Tabulated then
-    for I := 1 to DrvCnt do
+    for I := 1 to InfoCnt do
       DrvStrArr[I].FullS := AddSpace(DrvStrArr[I].FullS, MaxFullSLength);
 
-  for I := 1 to DrvCnt do
+  for I := 1 to InfoCnt do
     with DrvStrArr[I] do
       if (InterfaceData.DrvInfType.ForDrives = 0) or
         ((InterfaceData.DrvInfType.ForDrives and 1 <> 0) and
@@ -1236,11 +1248,11 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
         end;
 
   if Tabulated then
-    for I := 1 to DrvCnt do
+    for I := 1 to InfoCnt do
       if not (DrvStrArr[I].DT in [dtnLAN, dtnSubst]) then
         DrvStrArr[I].FullS := AddSpace(DrvStrArr[I].FullS, MaxFullSLength);
 
-  for I := 1 to DrvCnt do
+  for I := 1 to InfoCnt do
     with DrvStrArr[I] do
       if (InterfaceData.DrvInfType.ForDrives = 0) or
         ((InterfaceData.DrvInfType.ForDrives and 1 <> 0) and
@@ -1264,13 +1276,13 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
         end;
 
   if Tabulated then
-    for I := 1 to DrvCnt do
+    for I := 1 to InfoCnt do
       if not (DrvStrArr[I].DT in [dtnLAN, dtnSubst]) then
         DrvStrArr[I].FullS := AddSpace(DrvStrArr[I].FullS, MaxFullSLength);
 
   K := MaxSizeDig;
 
-  for I := 1 to DrvCnt do
+  for I := 1 to InfoCnt do
     with DrvStrArr[I] do
       if (InterfaceData.DrvInfType.ForDrives = 0) or
         ((InterfaceData.DrvInfType.ForDrives and 1 <> 0) and
@@ -1301,11 +1313,11 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
         end;
 
   if Tabulated then
-    for I := 1 to DrvCnt do
+    for I := 1 to InfoCnt do
       if not (DrvStrArr[I].DT in [dtnLAN, dtnSubst]) then
         Delete(DrvStrArr[I].FullS, MaxFullSLength+1, K-1);
 
-  for I := 1 to DrvCnt do
+  for I := 1 to InfoCnt do
     with DrvStrArr[I] do
       if DT = dtnLAN then
         FullS := FullS + ' ~'+GetShare(Dr)+'~'
@@ -1322,7 +1334,13 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
       Inc(N);
       end;
 
-  if not (Default in ['A'..'Z']) and not ((Default = '+') and (Lnk <> nil))
+  if not HasDrives then
+    begin
+    TmpS := '';
+    lGetDir(0, TmpS);
+    C := Chr(64+Max(1, PlaceOf(TmpS)));
+    end
+  else if not (Default in ['A'..'Z']) and not ((Default = '+') and (Lnk <> nil))
   then
     C := GetCurDrive
   else
@@ -1367,7 +1385,10 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   DisposeMenu(Menu);
   SelectDrive := '';
   if N > 1000 then
-    SelectDrive := Char(N-1000)+':';
+    if HasDrives then
+      SelectDrive := Char(N-1000)+':'
+    else if N-1064 <= PlaceCnt then
+      SelectDrive := Places[N-1064];
   if N = 1200 then
     SelectDrive := cTEMP_;
   

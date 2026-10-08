@@ -83,6 +83,9 @@ jobs:
       - name: Quick search of the panel with a character outside the code page
         if: success() || failure()
         run: python3 tools/dn-linux-qsearch.py out/dn
+      - name: The drive menu lists places on a host without drive letters
+        if: success() || failure()
+        run: python3 tools/dn-linux-places.py out/dn
       - name: Find File (Alt+F7) with a mask and with a text
         if: success() || failure()
         run: python3 tools/dn-linux-find.py out/dn

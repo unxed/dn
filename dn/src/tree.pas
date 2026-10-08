@@ -1237,7 +1237,8 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
     if S = '' then
       Exit;
     ClrIO;
-    lGetDir(Byte(DriveOf(S))-64, S);
+    if HasDrives or (S[1] <> DnSep) then
+      lGetDir(Byte(DriveOf(S))-64, S);          { a place of a one-tree host is a whole path }
     if Abort then
       Exit; {DataCompBoy}
     CurPath := S;
