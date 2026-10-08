@@ -56,7 +56,7 @@ def main():
 
         # the cursor moves: only the two lines of the panel are redrawn, they must be the same as in the other panel (the same directory)
         key('HOME'); key('DOWN')
-        rows = [l for l in t.text().split('\n') if 'newdir' in l or ' txt' in l]
+        rows = [l for l in t.text().split('\n') if ('newdir' in l or ' txt' in l) and '\u2502' in l]   # the lines of the files, not the line under the panel
         halves = [(l[1:20].strip(), l[51:70].strip()) for l in rows]
         check(rows and all(a_ == b_ for a_, b_ in halves) and '\u2642' not in t.text(), 'Down: the redrawn lines of the panel are not garbage (the same as in the other panel)', t.text())
 
