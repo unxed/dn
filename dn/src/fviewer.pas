@@ -1699,7 +1699,7 @@ when the cursor is on a directory AK155}
     SetLength(FileName, I-3);
     DirString := FileName;
     end
-  else if HasDrives and (I = 2) and (FileName[2] = ':') then
+  else if (I = 2) and HasDriveLetter(FileName) then
     DirString := FileName
       {this happens e.g. when restarting
      DN with a remembered Branch state at the drive root }

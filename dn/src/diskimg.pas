@@ -340,7 +340,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
             SetLength(VolumeLabel, 11); {VolumeLabel[0] := #11}
             Move(DR.Name[0], VolumeLabel[1], 11);
             DelRight(VolumeLabel);
-            VolumeLabel := VolumeLabel+'\';
+            VolumeLabel := VolumeLabel+DnSep;
             Break;
             end
           else

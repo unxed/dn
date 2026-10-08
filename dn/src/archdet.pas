@@ -60,7 +60,7 @@ function GetArchiveByTag(ID: Byte): TARJArchive;
 implementation
 
 uses
-  fmtzip, fmtlha, fmtrar, fmtace, fmtha, fmtcab,
+  DnPath, fmtzip, fmtlha, fmtrar, fmtace, fmtha, fmtcab,
   
   fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, fmttar, fmttgz,
   fmtzxz, fmtqrk, fmtufa, fmtis3, fmtsqz, fmthap, fmtzoo, fmtchz,
@@ -472,7 +472,7 @@ function HPKDetect: Boolean;
             S := S+C
         until C = #0;
         if I < P.noDirHdrs
-          then S := S +'\';
+          then S := S + ArcSep;
         PHPKRec(HPKCol.At(I))^.Name := NewStr(S);
         end;
       Exit;

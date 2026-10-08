@@ -1493,7 +1493,7 @@ procedure TArcDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolean
   // extracted without a temporary subdirectory (default A: and B:)
   if  (DT.S <> '') and (Length(DT.S) >= 2) then
     begin
-    if HasDrives and (DT.S[2] = ':') then
+    if HasDriveLetter(DT.S) then
       DDr := UpCase(DT.S[1])
     else
       DDr := #1; {any character not in 'A'..'Z'}
@@ -1712,7 +1712,7 @@ function ArcViewer(AName, VAName: String): Boolean;
   begin
   {JO: so we can jump to the found file in the archive from the search panel}
   PathInside := AName;
-  if PathInside[2] = ':' then
+  if HasDriveLetter(PathInside) then
     PathInside[2] := ';'; {JO: replace the colon with anything }
   I := PosChar(':', PathInside);
   if I > 0 then

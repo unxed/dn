@@ -2131,9 +2131,9 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       SD := S; {AK155}
       DelLeft(S);
       DelRight(S);
-      if S[2] = ':' then
+      if HasDriveLetter(S) then
         S[1] := UpCase(S[1]); {/Cat}
-      if  (Length(S) = 2) and (S[2] = ':') then
+      if  (S = '*:') or (HasDriveLetter(S) and (Length(S) = 2)) then
         begin
         if S[1] = '*' then
           S := cTEMP_

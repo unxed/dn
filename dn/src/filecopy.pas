@@ -1747,7 +1747,7 @@ FileRead:
       if I <> 0 then
         begin
         Drive := Byte('');
-        if FName[2] = ':' then
+        if HasDriveLetter(FName) then
           Drive := Byte(FName[1]);
         SysErrStopButton := True;
         I := SysErrorFunc(I, Drive-Byte('A'));
@@ -2154,7 +2154,7 @@ TrueCopy:
       if DosError <> 0 then
         begin
         Drive := Byte('');
-        if Source[2] = ':' then
+        if HasDriveLetter(Source) then
           Drive := Byte(Source[1]);
         SysErrorFunc(DosError, Drive-Byte('A'));
         {Abort will be set then}
@@ -2632,7 +2632,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
   if S4 <> '' then
     begin
     if  (Files.Count = 1) and
-      ((S4[2] = ':') and (Length(S4) > 2) or (Copy(S4, 1, 2) = '\\'))
+      HasDrives and IsQualified(S4) and (Length(S4) > 2)
         and (PFileRec(Files.At(0))^.Attr and Directory = 0)
     then
       S4 := MakeNormName(S4, PFileRec(Files.At(0))^.FlName[True]);
@@ -2648,7 +2648,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
   DT.S3 := S4;
   with DT do
     begin
-    if HasDrives and (DT.S3[2] = ':') then
+    if HasDriveLetter(DT.S3) then
       C := S3[1]
     else
       C := GetCurDrive;

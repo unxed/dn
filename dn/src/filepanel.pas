@@ -389,7 +389,7 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
         begin
         case ViewLine[P.X+1] of
           'A'..'Z':
-            Panel.ChDir(ViewLine[P.X+1]+':\');
+            Panel.ChDir(DriveRoot(ViewLine[P.X+1]));
           '}':
              Scroll(+1); // without this fast clicks on the bracket do not work
           '{':

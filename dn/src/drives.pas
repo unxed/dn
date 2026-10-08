@@ -314,7 +314,7 @@ procedure TDrive.ChangeRoot;
   else
     {/Cat}
     begin
-    lChDir(CurDir[1]+':\');
+    lChDir(DriveRoot(CurDir[1]));
     {
       if Abort then
         Exit;
@@ -624,11 +624,11 @@ procedure TDrive.lChDir(ADir: String);
     else
       {/Cat}
       begin
-      if  (Length(ATestDir) > 1) and (ATestDir[2] = ':') then
+      if HasDriveLetter(ATestDir) then
         Drive := ATestDir[1]
       else
         Drive := Char(GetDrive+Byte('A'));
-      S := Drive+':\';
+      S := DriveRoot(Drive);
       repeat
         ClrIO;
         NeedAbort := True;
@@ -684,10 +684,7 @@ procedure TDrive.lChDir(ADir: String);
     
     {CurDir:=CurDir;}Exit;
     end;
-  if HasDrives then
-    ADir := 'C:\'
-  else
-    ADir := DnSep;
+  ADir := DriveRoot('C');
   if ValidPath(ADir, False) then
     begin
     
@@ -696,7 +693,7 @@ procedure TDrive.lChDir(ADir: String);
     end;
   if HasDrives then
     begin
-    ADir := 'A:\';
+    ADir := DriveRoot('A');
     if ValidPath(ADir, False) then
       begin
       CurDir := ADir;

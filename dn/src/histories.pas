@@ -832,7 +832,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   begin
   if InterfaceData.Options and ouiTrackDirs = 0 then
     Exit;
-  if  (S = '') or ((S[2] <> ':') and ((S[1] <> DnSep) or (S[2] <> DnSep)))
+  if  (S = '') or not IsQualified(S)
   then
     Exit;
   {Cat: added a check for network paths}
