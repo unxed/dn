@@ -77,8 +77,11 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
 - Dot files (`.hidden`) and broken symbolic links are not visible in the panel: `FindFirst` returns them (except broken links), so DN itself hides them
   (check the panel setting "hidden files" and the comparison `Name[1] = '.'` in the directory parse); Unix permissions and links are not shown in `Attr`.
   (Checked 2026-10-08: the broken links are listed (`tools/dn-linux-fsattrs.py`); the dot files are the hidden files of the RTL and DN shows
-  them when the setting "show hidden files" of the panels (`fmsShowHidden`) is on; it is off by default, as in DN. Whether Unix wants it on by
-  default is a decision of the owner.)
+  them when the setting "show hidden files" of the panels (`fmsShowHidden`) is on. Owner, 2026-10-08: it is on by default on Unix builds
+  (`ShowHiddenByDefault` of `startup.pas`), off on DOS and Windows as in DN; a saved setup keeps its own value (`tools/dn-linux-fsattrs.py`). A dot file
+  is shown in the columns of a DOS name (an empty name, the extension `hidden`). Open: the key Alt-' of the panel (`kbAltQuote`), which switches the
+  setting, did nothing in the pty test (xterm sends `ESC '`); the dialog Options, File Manager, Setup switches it; after its OK the passive panel drops the dot
+  file at once, the active one kept it in the test until the next reread.)
 - Paths look like DOS (`C:\home\you`): drive C: is the root of the file system; show Unix paths after the move to UTF-8.
 - Case: names that are not on disk in the case DN asks for are looked up without regard to case (`SysOsPath`); two files that differ only by
   case, DN will not be able to tell apart.
@@ -358,7 +361,7 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - Users: the buttons are not as in the original DN (the default button was red, the others purple). Cause: the built-in `CColor` was the table of the OSP source (it is the scheme `jaroslaw.pal`: cyan on magenta, white on brown, white on
   bright red); the colors of the original DN are the scheme `default.pal` (white on dark gray, cyan for the default button, yellow hot letters, dark gray text of the check boxes) as in the reference screenshots.
   Now `palettes.CColor` is `default.pal`; `CColorOsp` keeps the old table; a palette that was saved with exactly the old table (nobody changed it) is replaced at the start (`ReadConfig`, `boot.pas`). The other schemes
-  are in `data/colors/` (Options -> Colors -> Load). Not compared pixel by pixel with the references: the input lines are black on the references and `9f` (white on light blue) in `default.pal`.
+  are in `data/colors/` (Options -> Colors -> Load). The input lines are white on black (`0F`, entry 50) as on the screenshot of DN/2 2.14 in `README.md` (the line of the Calculator); their selected text and the history arrow were `9F` (white on light blue) and are `3F` (2026-10-08: checked on the screen by `tools/dn-linux-colors.py`).
 - The selected (focused) button has the background of the path in the title of the active panel (cyan, `3F` white on cyan; was `9F` white on light blue): the entry 12 of the dialog palette (index 43 of `CColor` and of `default.pal`).
 - The active controls of a dialog that were blue are cyan like the selected button (`3F`): the selected text of an input line (51), the history arrow (53), the focused and normal items of a list (55, 56); the page of a scroll bar is `31`, the arrows and the thumb `3F` (35, 36). Guess by the screenshot of the user, not checked against the references.
 

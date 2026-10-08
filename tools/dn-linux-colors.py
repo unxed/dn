@@ -4,7 +4,9 @@ The rule (PLAN.md, the problems of the 2.20 alpha, item 3): an active (selected)
 of the active panel and the selected button. The screen of the terminal program (tools/pty_screen.py) keeps the colors of every cell, so they are checked:
   - the title of the active panel and the selected day of the calendar have the same colors;
   - today's date when it is the selected one is blue on teal (31), not black on dark gray (80; the unreadable 89 on a gray selection before);
-  - no cell of the calendar shows black on dark gray (an unreadable pair)."""
+  - no cell of the calendar shows black on dark gray (an unreadable pair);
+  - an input line of a dialog (the mask of Find File) is white on black (0F) as on the reference screens of DN, its selected text white on teal (3F),
+    and no cell of the dialog is white on light blue (9F)."""
 import datetime, os, re, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pty_screen import PtyTerm
@@ -13,6 +15,8 @@ bad = 0
 TEAL_WHITE = (('i', 15), ('i', 6))          # 3F
 TEAL_BLUE = (('i', 4), ('i', 6))             # 31 (the ANSI index of the DOS blue is 4)
 DULL = (('i', 0), ('i', 8))                  # 80
+WHITE_BLACK = (('i', 15), ('i', 0))          # 0F
+LIGHT_BLUE = ('i', 12)                       # the background of 9F (the ANSI index of the DOS light blue is 12)
 
 
 def check(ok, what, info=''):
@@ -82,6 +86,17 @@ try:
         check(pair(t, y, x) != DULL, 'today when it is not the selected day is not black on dark gray (80)', repr(pair(t, y, x)))
     box = [(yy, xx) for yy in range(7, 18) for xx in range(20, 70) if t.screen.cells[yy][xx][0].strip() and pair(t, yy, xx) == DULL]
     check(not box, 'no cell of the calendar is black on dark gray (80)', repr(box[:5]))
+    t.send('\x1b', 0.5)
+    t.send('\x1b[18;3~', 1.0)                           # Alt-F7: Find File
+    rows = t.text().split('\n')
+    mask = [(yy, l.index('*.*')) for yy, l in enumerate(rows) if 'File mask' in l and '*.*' in l]
+    check(bool(mask), 'Find File shows the input line of the mask', t.text())
+    if mask:
+        y, x = mask[0]
+        check(pair(t, y, x) == TEAL_WHITE, 'the selected text of an input line is white on teal (3F)', repr(pair(t, y, x)))
+        check(pair(t, y, x + 6) == WHITE_BLACK, 'an input line is white on black (0F)', repr(pair(t, y, x + 6)))
+        blue = [(yy, xx) for yy in range(len(rows)) for xx in range(100) if pair(t, yy, xx) and pair(t, yy, xx)[1] == LIGHT_BLUE]
+        check(not blue, 'no cell of the dialog is on light blue (9F)', repr(blue[:5]))
     t.send('\x1b', 0.3)
     t.close(0.3)
 finally:

@@ -96,7 +96,9 @@ const
   (Sign: 'DN OSP Desktop'#26#151#80; SignLen: 17; SignVer: 15180)
   ; 
   {Desktop for 1.51.08}
-  Security: Boolean = True;
+  { the panels list hidden files (dot files) by default on the systems without drive letters (Unix); a saved setup wins }
+  ShowHiddenByDefault = not HasDrives;
+  Security: Boolean = not ShowHiddenByDefault;
   ConfigModified: Boolean = False;
   SkyDelay: Byte = 1;
   CmdExt: String[4] = '.CMD'; {command-file extension}
@@ -300,6 +302,7 @@ const
     Show: fmsSortIndicator+
       Ord(HasDrives)*fmsDriveLine+
       fmsShowScrollBar+
+      Ord(ShowHiddenByDefault)*fmsShowHidden+
       fmsHiliteFiles;
     LFN_Wrap: 0; {Combo}
     LFN_Cut: 0; {Combo}
