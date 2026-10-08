@@ -22,7 +22,7 @@ type
   end;
 
 const
-  Commands: array[0..605] of TNameRec = (
+  Commands: array[0..602] of TNameRec = (
     (V: 0; N: 'cmValid'),
     (V: 1; N: 'cmQuit'),
     (V: 2; N: 'cmError'),
@@ -296,11 +296,8 @@ const
     (V: 3554; N: 'cmViewHistory'),
     (V: 3555; N: 'cmOpenClipBoard'),
     (V: 3556; N: 'cmShowTimeInfo'),
+    (V: 4001; N: 'cmSwitcherItem'),
     (V: 5100; N: 'cmVtEnded'),
-    (V: 5111; N: 'cmVtClipBlock'),
-    (V: 5112; N: 'cmVtClipRemote'),
-    (V: 5113; N: 'cmVtClipShare'),
-    (V: 5114; N: 'cmVtClipAlways'),
     (V: 5434; N: 'cmLoadDesk'),
     (V: 5435; N: 'cmSaveDesk'),
     (V: 5436; N: 'cmRetrieveSwp'),
