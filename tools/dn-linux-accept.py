@@ -442,6 +442,47 @@ def _csi_topleft_residue(text: str) -> bool:
     return len(row0) >= 4 and row0[:4] == '^[^[' and 'File' in row0
 
 
+_DRIVE_PREFIX = re.compile(r'(?<![A-Za-z])[A-Za-z]:(?=[\\/])')
+_BORDER_FILL = re.compile(r'[\u2500-\u257f ]+')
+
+
+def _path_notation_key(row: str) -> str:
+    """The row with the way a path is written taken out.
+
+    The frozen object build shows a panel path as C:\\tmp\\x, a build that
+    shows the Linux path shows /tmp/x (dn#23). A centred title also moves the
+    border fill by the difference in length. Drive letters, the slash kind and
+    the runs of border characters and blanks are removed, so two rows that say
+    the same thing in the two notations get the same key.
+    """
+    row = _DRIVE_PREFIX.sub('', row).replace('\\', '/')
+    return _BORDER_FILL.sub('', row)
+
+
+def path_notation_rows(ta: str, tb: str, ca: dict, cb: dict) -> set[int]:
+    """Rows that differ only in the notation of a path (dn#23).
+
+    A row qualifies when its text differs between the builds, is the same once
+    the notation is taken out, and uses the same set of cell attributes on both
+    sides; the colours of a title are still compared that way. Anything else on
+    the row, a changed word included, keeps the row in the comparison.
+    """
+    rows_a, rows_b = ta.splitlines(), tb.splitlines()
+    out = set()
+    for y in range(min(len(rows_a), len(rows_b))):
+        if rows_a[y] == rows_b[y]:
+            continue
+        if _path_notation_key(rows_a[y]) != _path_notation_key(rows_b[y]):
+            continue
+        if not any(c in rows_a[y] or c in rows_b[y] for c in ('\\', ':')):
+            continue
+        attrs_a = {v[1] for (yy, _), v in ca.items() if yy == y}
+        attrs_b = {v[1] for (yy, _), v in cb.items() if yy == y}
+        if attrs_a == attrs_b:
+            out.add(y)
+    return out
+
+
 def diff_snaps(a: dict, b: dict, limit: int = 12) -> list[str]:
     msgs = []
     if a['alive'] != b['alive'] or a['status'] != b['status']:
@@ -460,12 +501,16 @@ def diff_snaps(a: dict, b: dict, limit: int = 12) -> list[str]:
           if y not in skip_rows and not _in_fil_dir_span(fil_spans, y, x)}
     cb = {(y, x): (ch, attr) for y, x, ch, attr in mask_volatile(b['cells'], tb, csi_tl)
           if y not in skip_rows and not _in_fil_dir_span(fil_spans, y, x)}
+    path_rows = path_notation_rows(ta, tb, ca, cb)
     keys = sorted(set(ca) | set(cb))
     n = 0
     skipped = 0
     for k in keys:
         va, vb = ca.get(k), cb.get(k)
         if va == vb:
+            continue
+        if k[0] in path_rows:
+            skipped += 1
             continue
         cha = va[0] if va else None
         chb = vb[0] if vb else None
