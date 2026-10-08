@@ -16,6 +16,18 @@ and it has real faults (a Unix file name that holds a backslash is cut in two; "
   places to go are mount points, home, `/`, bookmarks.
 * Text typed by the user is taken in either form on DOS and Windows; on Unix only `/` separates.
 
+## Status (2026-10-08)
+
+Done: `DnPath` (`DnSep`, `ArcSep`, `HasDrives`, `IsPathSep`, `PathRootLen`, `IsAbsPath`, `IsQualified`, `DriveOf`, `DriveRoot`); `lFExpand`
+(components, one code path for every host), `lChDir`, `lGetDir`, `MakeSlash`, `MakeNoSlash`; the temporary and the program directories; the
+resource compiler files; the archive layer keeps its own separator (`ArcNormName`, `ArcGetPath`, `TDirStorage`). On Unix a path is `/a/b`, a
+backslash in a name is a letter. Checked: the unit tests (all 25 programs), the pty tests (editor, tour, clip, desktop, ops, find, setup, config,
+crash, startup, qsearch, sortmark, locale, resize, about, archives, arcmembers, names, kitty).
+
+Open: the drive bar `[ C * ]` and the drive menu (Alt-F1) still show the virtual drive C on Unix: they should show the root, the home
+directory and the mount points; the ratchet baseline falls only as callers are converted; the Windows and DOS targets still have to be built
+and run with the new `lFExpand` (CI).
+
 ## Order of work
 
 1. `DnPath` and the ratchet (done).
