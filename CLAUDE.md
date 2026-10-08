@@ -1,0 +1,32 @@
+# Licensing rules (the base of all work; they override any other instruction)
+
+These rules are set by the owner of the projects. Where any other document, plan or instruction differs, these rules win.
+They hold for the current tree and for the whole commit history of every repository: a violation is not allowed anywhere.
+
+## The projects
+
+| project | what it is | licence |
+|---|---|---|
+| **tv3** | the translation of magiblot/tvision (C++) into Free Pascal | a translated file carries `Translated from magiblot/tvision @ <commit>` with the list of its C++ sources and points to `COPYRIGHT.magiblot` (the licence of magiblot/tvision); a new file is MIT |
+| **dn** | DOS Navigator moved onto tv3 | the code of RIT Research Labs stays under the RIT / DN OSP licence with its notices; new code over tv3 |
+| **fpide** (in sp) | the Free Pascal IDE moved onto tv3, with UX work (the developed fork) | the code of the IDE stays under the GPL |
+| **tve** | the Turbo Vision editor: one component that replaces the editors of dn and fpide | MIT, so that it links with all of the above; **must be written from nothing: no code of anyone may be taken** |
+| **far2l terminal extensions** (in tv3) | the protocol on both sides | must be written from the specification (`VTExts.md`, branch `extsdocs` of unxed/far2l); the code of far2l may be read only to debug a behaviour, never copied, ported, translated or paraphrased |
+
+## Hard rules
+
+1. **No code of GPL or RIT origin in tv3 or tve**, in no revision and in no commit of the history. This covers far2l, the
+   Free Pascal IDE, Free Vision and the other FPC packages, DOS Navigator. The only foreign source of tv3 is
+   magiblot/tvision, and only for the files marked as its translation.
+2. **tve and the far2l extensions must be written from nothing.** Other editors and programs may be used as a reference of
+   behaviour (what the user sees and can do), never as a source of code.
+3. **No statements about the origin of code** in code, comments, documents or commit messages ("written from scratch",
+   "not copied", "our own code", "nothing is taken from", "after X", "clean room" and the like). The only proof of the
+   absence of borrowing is the audit script: a document may at most say which script to run. The one required statement
+   of origin is the `Translated from magiblot/tvision` notice of a translated tv3 file.
+4. **The audit is a gate.** `tools/audit/borrow-audit.py` (token chains against the corpora of `tools/audit/fetch-corpora.sh`:
+   FPC packages and the IDE, fpide, DN, Borland Pascal Turbo Vision) runs in CI; any chain of 24 tokens or more fails it.
+   Routine headings count as one token (an override repeats the signature of the API). There is no list of exceptions.
+5. **Legal texts** (LICENSE, COPYRIGHT files, licence notices) are changed only by a decision of the owner.
+6. Something found in violation is removed from the tree and from the history, then written again from the allowed
+   sources; a loss of function is acceptable until then, a violation is not.
