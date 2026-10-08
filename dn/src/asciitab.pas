@@ -1,24 +1,26 @@
 { The unit ASCIITab of DN: the table of the characters (a window with a 32 x 8 table and a line that shows the
-  character that is under the cursor; Enter or a double click puts the character into the text that is being edited). }
+  character that is under the cursor; Enter or a double click puts the character into the text that is being edited).
+  The views are those of tv/ TvAscii; here: the key codes of DN, the code as one byte of data, the text of the report,
+  the title, the help context and the palette of DN, and the modal run. }
 {$mode objfpc}{$H-}
 unit ASCIITab;
 
 interface
 
 uses
-  Views, Drivers, Streams;
+  Views, Drivers, Streams, TvAscii;
 
 const
   boundsASCII: TPoint = (X: 0; Y: 0);
   CharASCII: Char = #4;
-  AsciiTableCommandBase: Word = 910;
 
 type
-  { the table: the characters 0..255 in 8 rows of 32; the cursor is the current character (Data = its code) }
+  { the table: the characters 0..255 in 8 rows of 32; the cursor is the current character (Data = its code, a byte) }
 
-  TTable = class(TView)
-    procedure Draw; override;
-    procedure HandleEvent(var Event: TEvent); override;
+  TTable = class(TAsciiTable)
+    constructor Create(const Bounds: TRect);
+    function KeyAction(var Event: TEvent): TAsciiKey; override;
+    function TypedCode(var Event: TEvent): LongInt; override;
     function DataSize: Integer; override;
     procedure GetData(var Data); override;
     procedure SetData(var Data); override;
@@ -26,18 +28,15 @@ type
 
   { the line with the character, its decimal and hexadecimal code }
 
-  TReport = class(TView)
-    ASCIIChar: LongInt;
-    procedure HandleEvent(var Event: TEvent); override;
-    procedure Store(var S: TStream);
-    procedure Draw; override;
-    constructor Load(var S: TStream);
+  TReport = class(TAsciiReport)
+    procedure ReportParts(out Prefix, Rest: AnsiString); override;
   end;
 
-
-  TASCIIChart = class(TWindow)
+  TASCIIChart = class(TvAscii.TAsciiChart)
     destructor Destroy; override;
     procedure HandleEvent(var Event: TEvent); override;
+    function MakeTable(const Bounds: TRect): TAsciiTable; override;
+    function MakeReport(const Bounds: TRect): TAsciiReport; override;
     constructor Create(var R: TRect);
   end;
 
@@ -54,110 +53,44 @@ implementation
 uses
   SysUtils, basics, strutil, mainapp, Commands, DNHelp;
 
-const
-  cmCharacterFocused = 0;
-
 { --- TTable --- }
 
-procedure TTable.Draw;
-var
-  Buf: TDrawBuffer;
-  X, Y: Integer;
-  Color: Byte;
+constructor TTable.Create(const Bounds: TRect);
 begin
-  Color := Byte(GetColorW(6));
-  for Y := 0 to Size.Y - 1 do
-  begin
-    X := 0;
-    while X < Size.X do
-    begin
-      MoveChar(Buf[X], Chr((Y * 32 + X) and $FF), Color, 1);
-      Inc(X);
-    end;
-    WriteLineC(0, Y, Size.X, 1, Buf);
-  end;
-  ShowCursor;
+  inherited Create(Bounds);
+  MarkCursor := False;
 end;
 
-procedure TTable.HandleEvent(var Event: TEvent);
-
-  procedure Focused;
-  begin
-    MessageL(Owner, evBroadcast, AsciiTableCommandBase + cmCharacterFocused, Cursor.X + 32 * Cursor.Y);
-  end;
-
-  procedure Goto_(NX, NY: Integer);
-  begin
-    if NX < 0 then NX := 0;
-    if NX > Size.X - 1 then NX := Size.X - 1;
-    if NY < 0 then NY := 0;
-    if NY > Size.Y - 1 then NY := Size.Y - 1;
-    SetCursor(NX, NY);
-    Focused;
-  end;
-
-  procedure Choose;
-  begin
-    Message(Owner, evCommand, cmOK, nil);
-  end;
-
-var
-  Mouse: TPoint;
-  Code: LongInt;
+function TTable.KeyAction(var Event: TEvent): TAsciiKey;
 begin
-  if Event.What = evMouseDown then
-  begin
-    if (Event.EventFlags and meDoubleClick) <> 0 then
-    begin
-      Choose;
-      ClearEvent(Event);
-      Exit;
-    end;
-    repeat
-      if MouseInView(Event.Where) then
-      begin
-        MakeLocal(Event.Where, Mouse);
-        SetCursor(Mouse.X, Mouse.Y);
-        Focused;
-      end;
-    until not MouseEvent(Event, evMouseMove);
-    ClearEvent(Event);
-    Exit;
+  case DNKeyCode(Event) of
+    kbCtrlPgUp: Result := akFirst;
+    kbCtrlPgDn: Result := akLast;
+    kbCtrlHome, kbPgUp: Result := akColTop;
+    kbCtrlEnd, kbPgDn: Result := akColBottom;
+    kbHome: Result := akRowStart;
+    kbEnd: Result := akRowEnd;
+    kbUp: Result := akUp;
+    kbDown: Result := akDown;
+    kbLeft: Result := akLeft;
+    kbRight: Result := akRight;
+    kbCtrlUp: Result := akUp2;
+    kbCtrlDown: Result := akDown2;
+    kbCtrlLeft: Result := akLeft5;
+    kbCtrlRight: Result := akRight5;
+    kbEnter, kbCtrlB, kbCtrlP: Result := akPick;
+  else
+    Result := akNone;
   end;
-  if Event.What = evKeyDown then
-  begin
-    Code := DNKeyCode(Event);
-    case Code of
-      kbCtrlPgUp: Goto_(0, 0);
-      kbCtrlPgDn: Goto_(Size.X - 1, Size.Y - 1);
-      kbCtrlHome, kbPgUp: Goto_(Cursor.X, 0);
-      kbCtrlEnd, kbPgDn: Goto_(Cursor.X, Size.Y - 1);
-      kbHome: Goto_(0, Cursor.Y);
-      kbEnd: Goto_(Size.X - 1, Cursor.Y);
-      kbUp: Goto_(Cursor.X, Cursor.Y - 1);
-      kbDown: Goto_(Cursor.X, Cursor.Y + 1);
-      kbLeft: Goto_(Cursor.X - 1, Cursor.Y);
-      kbRight: Goto_(Cursor.X + 1, Cursor.Y);
-      kbCtrlUp: Goto_(Cursor.X, Cursor.Y - 2);
-      kbCtrlDown: Goto_(Cursor.X, Cursor.Y + 2);
-      kbCtrlLeft: Goto_(Cursor.X - 5, Cursor.Y);
-      kbCtrlRight: Goto_(Cursor.X + 5, Cursor.Y);
-      kbEnter, kbCtrlB, kbCtrlP: Choose;
-    else
-      { a character: the cursor goes to it and it is chosen }
-      if Event.CharCode > 0 then
-      begin
-        SetCursor(Event.CharCode mod 32, Event.CharCode div 32);
-        Focused;
-        Choose;
-      end
-      else
-        Exit;
-    end;
-    ClearEvent(Event);
-    Exit;
-  end;
-  inherited HandleEvent(Event);
+end;
+
+{ any character (a control character too) goes to its code and is chosen }
+function TTable.TypedCode(var Event: TEvent): LongInt;
+begin
+  if Event.CharCode > 0 then
+    Result := Event.CharCode
+  else
+    Result := -1;
 end;
 
 function TTable.DataSize: Integer;
@@ -167,93 +100,54 @@ end;
 
 procedure TTable.GetData(var Data);
 begin
-  Byte(Data) := Cursor.Y * 32 + Cursor.X;
+  Byte(Data) := Code;
 end;
 
 procedure TTable.SetData(var Data);
 begin
-  SetCursor(Byte(Data) mod 32, Byte(Data) div 32);
-  MessageL(Owner, evBroadcast, AsciiTableCommandBase + cmCharacterFocused, Cursor.X + 32 * Cursor.Y);
-  Owner.Redraw;
+  SetCode(Byte(Data));
+  if Owner <> nil then
+    Owner.Redraw;
 end;
 
 { --- TReport --- }
 
-constructor TReport.Load(var S: TStream);
+procedure TReport.ReportParts(out Prefix, Rest: AnsiString);
 begin
-  inherited Load(S);
-  S.Read(ASCIIChar, SizeOf(ASCIIChar));
-end;
-
-procedure TReport.Draw;
-var
-  Buf: TDrawBuffer;
-  Normal, Value: Byte;
-  T: String;
-begin
-  Normal := Byte(GetColorW(6));
-  Value := Byte(GetColorW(7));
-  MoveChar(Buf[0], ' ', Normal, Size.X);
-  T := ' Char:   Decimal: ' + Format('%3d', [ASCIIChar]) + ' Hex: ' + Format('%.2x', [ASCIIChar]);
-  MoveStr(Buf[0], T, Normal);
-  { the value fields in the color of the selection }
-  MoveChar(Buf[16], ' ', Value, 0);
-  if (ASCIIChar > 0) and (Size.X > 7) then
-    MoveChar(Buf[7], Chr(ASCIIChar and $FF), Value, 1);
-  WriteLineC(0, 0, Size.X, 1, Buf);
-end;
-
-procedure TReport.HandleEvent(var Event: TEvent);
-begin
-  inherited HandleEvent(Event);
-  if Event.What <> evBroadcast then Exit;
-  if Event.Command <> AsciiTableCommandBase + cmCharacterFocused then Exit;
-  ASCIIChar := Event.InfoLong;
-  DrawView;
-end;
-
-procedure TReport.Store(var S: TStream);
-begin
-  inherited Store(S);
-  S.Write(ASCIIChar, SizeOf(ASCIIChar));
+  Prefix := ' Char: ';
+  Rest := ' Decimal: ' + Format('%3d', [Code]) + ' Hex: ' + Format('%.2x', [Code]);
 end;
 
 { --- TASCIIChart --- }
 
 constructor TASCIIChart.Create(var R: TRect);
-var
-  Control: TView;
-  T: TRect;
 begin
-  R.Assign(0, 0, 34, 12);
-  inherited Create(R, GetString(dlASCIIChart), wnNoNumber);
-  Flags := Flags and not (wfGrow or wfZoom);
+  inherited Create(GetString(dlASCIIChart), False);
   Options := Options and ofTopSelect;
   HelpCtx := hcAsciiChart;
   Palette := wpGrayWindow;
-
-  { inside the frame: the line with the code at the bottom (one row), the table over it }
-  GetExtent(R);
-  R.Grow(-1, -1);
-  T.Assign(R.A.X, R.B.Y - 1, R.B.X, R.B.Y);
-  Control := TReport.Create(T);
-  Control.Options := Control.Options or ofFramed;
-  Control.EventMask := evBroadcast or Control.EventMask;
-  Insert(Control);
-  T.Assign(R.A.X, R.A.Y, R.B.X, R.B.Y - 2);
-  Control := TTable.Create(T);
-  Control.Options := Control.Options or ofSelectable or ofFramed;
-  Control.EventMask := $FFFF;
-  Control.BlockCursor;
-  Insert(Control);
-  Control.Select;
+  Table.EventMask := $FFFF;
   fASCIITable := True;
+end;
+
+function TASCIIChart.MakeTable(const Bounds: TRect): TAsciiTable;
+begin
+  Result := TTable.Create(Bounds);
+end;
+
+function TASCIIChart.MakeReport(const Bounds: TRect): TAsciiReport;
+begin
+  Result := TReport.Create(Bounds);
 end;
 
 procedure TASCIIChart.HandleEvent(var Event: TEvent);
 begin
-  { the commands end the modal state: cmOK (the character is chosen), cmYes, cmCancel (Esc, the close box) }
+  { the commands end the modal state: cmOK and the pick of the table (the character is chosen), cmYes, cmCancel (Esc,
+    the close box) }
   if (Event.What = evCommand) and ((State and sfModal) <> 0) then
+  begin
+    if Event.Command = AsciiCommandBase + acPicked then
+      Event.Command := cmOK;
     case Event.Command of
       cmOK, cmYes, cmCancel:
         begin
@@ -268,6 +162,7 @@ begin
           Exit;
         end;
     end;
+  end;
   if (Event.What = evKeyDown) and (DNKeyCode(Event) = kbEsc) and ((State and sfModal) <> 0) then
   begin
     EndModal(cmCancel);

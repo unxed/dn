@@ -53,7 +53,7 @@ interface
 
 uses
   Dos, Defines, objutil, Streams, Views, Drivers,
-  Collect, timeutil
+  Collect, timeutil, TvGadgets
   ;
 
 type
@@ -85,35 +85,20 @@ type
     end;
 
 const
-  LastHour: Word = $FF;
-  LastMin: Word = 0;
-
-const
   KeyMacroses: TCollection = nil;
   MacroRecord: Boolean = False;
 
 type
-  THeapView = class;
-  THeapView = class(TView)
-    OldMem: LongInt;
-    constructor Create(const Bounds: TRect);
-    procedure Update; override;
-    procedure Draw; override;
-    end;
+  THeapView = TvGadgets.THeapView;
 
-  TClockView = class;
-  TClockView = class(TView)
-    Refresh: Byte;
-    LastTime: DateTime;
-    LastSemi: Boolean;
-    TimeStr: String[16]; {-SSK (old version: string[12])}
-    OldXCoord: AInt; {-SSK}
-    OldShowSeconds: Boolean;
-    Utimer: TEventTimer;
+  { the clock of DN: the views of tv/ TvGadgets with the options of DN (ShowSeconds, BlinkSeparator, RightAlignClock
+    of dn.ini, the time format of the country); Shift shows the free memory, Ctrl or Alt the date; a double click opens
+    the calendar, a drag moves the clock }
+  TClockView = class(TvGadgets.TClockView)
     constructor Create(const Bounds: TRect);
+    function ClockText: AnsiString; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Update; override;
-    procedure Draw; override;
     end;
   
 procedure PrintFiles(Files: TCollection; Own: TView);
@@ -190,89 +175,77 @@ procedure TKeyMacros.Play;
     Inc(N);
     end;
   end;
-{------ Heap Window class -----------}
-
-constructor THeapView.Create(const Bounds: TRect);
-  begin
-  inherited Create(Bounds);
-  OldMem := 0;
-  end;
-
-procedure THeapView.Draw;
-  var
-    Row: TDrawBuffer;
-    Attr: Word;
-    Text: String;
-  begin
-  OldMem := MemAvail;
-  Attr := GetColorW(2);
-  Str(OldMem, Text);
-  MoveChar(Row[0], ' ', Attr, Size.X);
-  MoveStr(Row[0], Text, Attr);
-  WriteLineC(0, 0, Size.X, 1, Row);
-  end;
-procedure THeapView.Update;
-  begin
-  if  (OldMem <> MemAvail) then
-    DrawView;
-  end;
-
 {-------- ClockView class ---------}
 
-function LeadingZero(w: Word): String;
+{ the time in the format of the country (FormatTimeStr); without seconds the hours and the minutes }
+function DnClockFormat(H, M, S: Word; Seconds, Separator, Hour12: Boolean): AnsiString;
   begin
-  Str(w, Result);
-  if Length(Result) < 2 then
-    Result := '0' + Result;
+  Result := FormatTimeStr(H, M, S);
+  if not Seconds then
+    Result := Copy(Result, 1, 5);
+  if not Separator and (Length(Result) >= 3) then
+    Result[3] := ' ';
   end;
+
 constructor TClockView.Create(const Bounds: TRect);
-  var
-    s, hund: Word;
   begin
   inherited Create(Bounds);
-  FillChar(LastTime, SizeOf(LastTime), #$FF);
-  TimeStr := '';
-  Refresh := 1;
-  OldXCoord := -1;
-  OldShowSeconds := ShowSeconds;
+  Margin := 1;
+  PaletteStr := '';
+  FormatHook := @DnClockFormat;
   EventMask := evMouse or evMessage;
   Options := Options or ofTopSelect;
   GrowMode := gfGrowHiX;
-  GetTime(LastHour, LastMin, s, hund);
-  LastSemi := hund < 50;
+  ShowSeconds := DnIni.ShowSeconds;
+  BlinkSeparator := DnIni.BlinkSeparator;
+  RightAlign := RightAlignClock;
   RegisterToBackground(Self);
-  if ShowSeconds then
-    UpdTicks := 1000
-  else
-    UpdTicks := 500;
-  NewTimer(Utimer, 1200000+Random(1200000));
+  UpdTicks := 500;
   end;
 
-procedure TClockView.Draw;
+function TClockView.ClockText: AnsiString;
   var
-    B: TDrawBuffer;
-    C: Byte;
+    d, mn, y, DayWeek: Word;
+    SS: String[40];
   begin
-  Size.Y := 1;
-  C := GetColorW(1);
-  MoveChar(B[0], ' ', C, Size.X);
   if MacroRecord then
-    MoveStr(B[0], '>MACRO<', C)
-  else
     begin
-    if  (RightAlignClock = True) and
-        (Origin.X+Size.X <> ScreenWidth)
-    then
-      MoveTo(ScreenWidth-Size.X, Origin.Y);
-    if Length(TimeStr) <> Size.X then
-      begin
-      GrowTo(Length(TimeStr), 1);
-      Exit
-      end;
-    MoveStr(B[0], TimeStr, C);
+    Result := '>MACRO<';
+    if Size.X > Length(Result) then
+      Result := Result+StringOfChar(' ', Size.X-Length(Result));
+    Exit;
     end;
-  WriteLineC(0, 0, Size.X, 1, B);
-  end { TClockView.Draw };
+  if ShiftState and 7 = 0 then
+    begin
+    Result := inherited ClockText;
+    Exit;
+    end;
+  if ShiftState and 3 <> 0 then
+    begin
+    Result := ' '+FStr(MemAvail)+' ';
+    Exit;
+    end;
+  GetDate(y, mn, d, DayWeek);
+  MakeDateFull(d, mn, y, 0, 0, SS, ShowCentury);
+  if ShowCentury then
+    Result := Copy(SS, 1, 10)+' '
+  else
+    Result := Copy(SS, 1, 8)+' ';
+  if ShowDayOfWeek then
+    begin
+    {Cat: some odd problems...}
+    if  (Length(DaysOfWeek) <> 14) and (Length(DaysOfWeek) <> 21)
+    then
+      Result := ' '+Copy(GetString(stDaysWeek), 1+DayWeek*2, 2)
+        +' '+Result
+    else
+      Result := ' '+Copy(DaysOfWeek, 1+DayWeek*
+            (Length(DaysOfWeek) div 7), (Length(DaysOfWeek) div 7))
+        +' '+Result
+    end
+  else
+    Result := ' '+Result;
+  end { TClockView.ClockText };
 
 procedure TClockView.HandleEvent(var Event: TEvent);
   var
@@ -296,128 +269,29 @@ procedure TClockView.HandleEvent(var Event: TEvent);
       Exit
       end;
     
-    OldXCoord := -1; {-SSK}
     DragView(Event, dmDragMove, R, P, P);
     end;
   end;
 
 procedure TClockView.Update;
   var
-    h, m, s, hund: Word;
-    d, mn, y: Word;
-    SS: String[40];
-    Event: TEvent;
-    P: TView;
-    DayWeek: Byte;
-    R: TRect;
-    StdClockWidth: Byte;
-    Semi: Boolean;
+    T: Integer;
   begin
-  if ShowSeconds then
-    StdClockWidth := 10
+  ShowSeconds := DnIni.ShowSeconds;
+  BlinkSeparator := DnIni.BlinkSeparator;
+  RightAlign := RightAlignClock;
+  inherited Update;
+  if ShiftState and 7 <> 0 then
+    UpdTicks := 330
   else
-    StdClockWidth := 7;
-  GetTime(h, m, s, hund);
-  Semi := hund < 50;
-  if  (Abs(s-LastTime.Sec) >= Refresh) or (Semi <> LastSemi) then
     begin
-    GetDate(y, mn, d, hund);
-    if  (ShiftState and 7 <> 0)
-      
-      then
-      begin
-      if ShiftState and 3 <> 0 then
-        TimeStr := ' '+FStr(MemAvail)+' '
-      else
-        begin
-        MakeDateFull(d, mn, y, 0, 0, SS, ShowCentury);
-        if ShowCentury then
-          TimeStr := Copy(SS, 1, 10)+' '
-        else
-          TimeStr := Copy(SS, 1, 8)+' ';
-        if ShowDayOfWeek then
-          begin
-          DayWeek := hund; {DayOfWeek(Date)-1;}
-          {Cat: some odd problems...}
-          if  (Length(DaysOfWeek) <> 14) and (Length(DaysOfWeek) <> 21)
-          then
-            TimeStr := ' '+Copy(GetString(stDaysWeek), 1+DayWeek*2, 2)
-              +' '+TimeStr
-          else
-            TimeStr := ' '+Copy(DaysOfWeek, 1+DayWeek*
-                  (Length(DaysOfWeek) div 7), (Length(DaysOfWeek) div 7))
-              +' '+TimeStr
-          end
-        else
-          TimeStr := ' '+TimeStr;
-        end;
-      if not RightAlignClock then
-        begin
-        if OldXCoord = -1 then
-          OldXCoord := Origin.X;
-        if  (Origin.X+(Size.X shr 1)) > (ScreenWidth shr 1) then
-          R.Assign(OldXCoord+StdClockWidth-Length(TimeStr), Origin.y,
-            OldXCoord+StdClockWidth, Origin.y+Size.y)
-        else
-          R.Assign(OldXCoord, Origin.y,
-            OldXCoord+Length(TimeStr), Origin.y+Size.y);
-        Locate(R);
-        end;
-      UpdTicks := 330;
-      end
-    else
-      begin
-      if not RightAlignClock then
-        if not (OldXCoord = -1) then
-          begin {-SSK}
-          R.Assign(OldXCoord, Origin.y, OldXCoord+Length(TimeStr),
-             Origin.y+Size.y);
-          OldXCoord := -1;
-          Locate(R);
-          end; {-SSK}
-      if ShowSeconds then
-        UpdTicks := 1000
-      else
-        UpdTicks := 500;
-      with LastTime do
-        begin
-        Inc(LastMin);
-        Hour := h;
-        Min := m;
-        Sec := s;
-        Day := d;
-        Month := mn;
-        Year := y;
-        end;
-      LastSemi := Semi;
-      TimeStr := ' ' + FormatTimeStr(h, m, s) + ' ';
-      if not ShowSeconds then
-        TimeStr := Copy(TimeStr, 1, 6)+' '; {-$VIV}
-      {-SSK}
-      if BlinkSeparator and not (Semi or ShowSeconds) then
-        TimeStr[4] := ' ';
-      if ShowSeconds <> OldShowSeconds then
-        begin
-        if Origin.X > (ScreenWidth shr 1) then
-          begin
-          R.B.X := Origin.X+Size.X;
-          R.A.X := R.B.X-StdClockWidth
-          end
-        else
-          begin
-          R.A.X := Origin.X;
-          R.B.X := R.A.X+StdClockWidth
-          end;
-        R.A.y := Origin.y;
-        R.B.y := R.A.y+1;
-          Locate(R);
-        OldShowSeconds := ShowSeconds
-        end;
-      end;
-    DrawView;
-    end
-  else
-    UpdTicks := 1
+    T := MsToNextChange;
+    if T > 500 then
+      T := 500;
+    if T < 1 then
+      T := 1;
+    UpdTicks := T;
+    end;
   end { TClockView.Update };
 
 
