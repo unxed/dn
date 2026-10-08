@@ -70,7 +70,7 @@ const
   #$3E#$1E#$30#$38#$3E#$0F#$07#$0E#$87#$8F#$8F#$8B#$8F#$F0#$87#$70+
   #$8E#$30#$3F#$83#$8E#$38#$3F#$3A#$31#$3F#$70#$8F#$8B#$8A#$83#$82+
   #$8D#$9E#$8E#$8C#$89#$07#$7F#$03#$0F#$8F#$8F#$8E#$8F#$8D#$8B#$8A+
-  #$81#$80#$86#$80#$8E#$8A#$83#$8F#$8D#$8B#$8E#$8A#$70#$7F#$3F#$79+
+  #$89#$8D#$86#$8C#$8E#$8A#$83#$8F#$8D#$8B#$8E#$8A#$70#$7F#$3F#$79+
   #$31#$78#$7B#$3F#$3F#$4F#$4F#$70#$0F#$78#$7E#$48#$0E#$3F#$3F#$08+
   #$CF#$CE#$0F#$0E;
   { the table of the OSP source (data/colors/jaroslaw.pal: red and magenta buttons): the default of the builds before 2026-10-04; a palette saved with exactly this table is replaced by CColor at the start }
