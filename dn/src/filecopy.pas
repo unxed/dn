@@ -155,18 +155,6 @@ const
 var
   SeekPos: TFileSize;
 
-type
-  PDir = ^TDir;
-  TDir = record
-    Created: (sNone, sCreated, sErased);
-    XName, Name: PString;
-    end;
-
-  TDirCollection = class(TSortedCollection)
-    procedure FreeItem(P: Pointer); override;
-    function Compare(P1, P2: Pointer): Integer; override;
-    end;
-
 function MemAvail: LongInt;
   begin
   MemAvail := MemAdjust(Defines.MemAvail);
@@ -177,48 +165,6 @@ function MaxAvail: LongInt;
   MaxAvail := MemAdjust(Defines.MaxAvail);
   end;
 
-procedure TDirCollection.FreeItem(P: Pointer);
-  begin
-  if P <> nil then
-    with PDir(P)^ do
-      begin
-      DisposeStr(XName);
-      DisposeStr(Name);
-      Dispose(PDir(P));
-      end;
-  end;
-
-function TDirCollection.Compare(P1, P2: Pointer): Integer;
-  var
-    S1, S2: String;
-  begin
-  Compare := 1;
-  if PDir(P1)^.Name <> nil then
-    S1 := PDir(P1)^.Name^
-  else
-    S1 := '';
-  if PDir(P2)^.Name <> nil then
-    S2 := PDir(P2)^.Name^
-  else
-    S2 := '';
-  if S1 < S2 then
-    Compare := -1
-  else if S1 = S2 then
-    begin
-    if PDir(P1)^.XName <> nil then
-      S1 := PDir(P1)^.XName^
-    else
-      S1 := '';
-    if PDir(P2)^.XName <> nil then
-      S2 := PDir(P2)^.XName^
-    else
-      S2 := '';
-    if S1 < S2 then
-      Compare := -1
-    else if S1 = S2 then
-      Compare := 0
-    end
-  end { TDirCollection.Compare };
 
 procedure BeepAftercopy;
   var
@@ -2121,10 +2067,25 @@ TrueCopy:
 2:
       end { CopyI };
 
+    { The link Source as the link Dest (a move removes Source); -1 when the system does not copy links. An error is told and stops the copy. }
+    function CopyLinkOf(const Source, Dest: String): LongInt;
+      begin
+      Result := SysCopyLink(Source, Dest);
+      if (Result = 0) and (CopyOptions and cpoMove <> 0) then
+        Result := SysEraseLink(Source);
+      if Result > 0 then
+        begin
+        ForceDispatch;
+        MessageBox(^C+GetString(dlErrorWriting)+Cut(Dest, 40), nil, mfError+mfOKButton);
+        CopyCancel := True;
+        end;
+      end;
+
     procedure CopyF(Dest, Source: String; CopyIt: Boolean; Attr: Byte);
       var
         SR: lSearchRec;
         Drive: Byte;
+        LinkRC: LongInt;
       begin
       if Dest[Length(Dest)] = DnSep then
         SetLength(Dest, Length(Dest)-1);
@@ -2150,6 +2111,11 @@ TrueCopy:
           {!!!} not IsDummyDir(SR.SR.Name)
         then
           begin
+          { a link to a directory is copied as a link: its target is not entered (a loop of links would never end) }
+          LinkRC := -1;
+          if (SR.SR.Attr and SysLinkAttr <> 0) and not CopyPrn then
+            LinkRC := CopyLinkOf(MakeNormName(Source, SR.FullName), MakeNormName(Dest, SR.FullName));
+          if LinkRC < 0 then
             CopyI(Dest, MakeNormName(Source, SR.FullName), SR.FullName,
                nil,
               CopyIt, SR.SR.Attr)
@@ -2236,11 +2202,15 @@ TryGetInfo:
             Exit;
         end {case};
       end {if};
-    Dirs := TDirCollection.Create(10, 10);
+    Dirs := TCollection.Create(10, 10);   { of TDirName: freed as objects }
     for I := 0 to Files.Count-1 do
       begin
       P := Files.At(I);
-      if P.Attr and Directory <> 0 then
+      if (P.Attr and Directory <> 0) and (P.Attr and SysLinkAttr <> 0) and not CopyPrn
+        and (CopyLinkOf(MakeNormName(P.Owner^, P.FlName[True]), MakeNormName(CopyDir, MkName(P.FlName[True]))) >= 0)
+      then
+        { a link to a directory: copied (moved) as a link }
+      else if P.Attr and Directory <> 0 then
         begin
         FrPos := Dirs.Count;
         
