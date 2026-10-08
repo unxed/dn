@@ -19,9 +19,10 @@ Updated: 2026-10-07. Acceptance evidence at the head of that day: `dn-accept` gr
 - **Tests** (stage 4): the floor of [`docs/TEST-PLAN.md`](docs/TEST-PLAN.md) is met: every row has a test that runs in CI, or is parked there with a reason. CI at the head: `dn`, `layout`,
   `toolchain`, `dn-linux` (tour, file operations, archives, find, resize, links and permissions, desktop with an editor window, the configuration directory, the flight recorder, names with spaces / a missing directory / `DN_RUN_PAUSE` / a zip in a zip), `dn-windows` (win32 and win64, with and without UTF-8 inside), `dn-accept`
   (object vs class, 181 scenarios, and the UTF-8 build vs the code page build), `nightly`. DOS: `tools/dn-tour.sh`, `tools/dn-dos-input.py` (stock and patched DOSBox-X) by hand.
-- **Files of the user and diagnostics** (2026-10-07): the settings, the desktop and the histories live in `$XDG_CONFIG_HOME/dn` (`~/.config/dn`), `%APPDATA%\DN`, or next to the
-  program on DOS (`DN2` names one directory; the files of an older DN are copied once; `dn/src/cfgdir.pas`). The flight recorder (`dn/src/flightrec.pas`,
-  [`docs/CRASH-REPORTS.md`](docs/CRASH-REPORTS.md)) writes `dn.log` (keys by name, commands, directories, external programs, file operations; typed characters are not recorded) and,
+- **Files of the user and diagnostics** (2026-10-07): the settings, the desktop and the histories live in the configuration directory of each system (`TvAppDir` of tv3: `~/.config/dn`,
+  `~/Library/Application Support/dn`, `%APPDATA%\dn`), or next to the program on DOS (`DN2` names one directory; the files of an older DN are copied once;
+  `dn/src/cfgdir.pas`). The flight recorder (`dn/src/flightrec.pas`, [`docs/CRASH-REPORTS.md`](docs/CRASH-REPORTS.md)) writes, in the state directory
+  (`~/.local/state/dn`, `%LOCALAPPDATA%\dn`), `dn.log` (keys by name, commands, directories, external programs, file operations; typed characters are not recorded) and,
   at a crash, `crash/crashNNN.txt` with the call stack (lines of the sources), the state of the panels and views, the last events and the screen: hand these over to have a
   fault that nobody can reproduce looked at.
 - **DOS UTF-8 names** are tv3's now (`TvDos` switches `DOS-UTF8/NAMES` on, `TvDosNames` converts a name); the DOS tests of dn pass on a vanilla DOSBox-X `master`.

@@ -19,7 +19,6 @@ procedure BackendBeep(Frequency, Duration: LongInt);
 procedure BackendSerialTrace(const Msg: string);
 function BackendBatchExt: string;
 function BackendDefaultTempDir: string;
-function BackendConfigDir: string;
 function BackendDescribe: string;
 function BackendHasShortNames: Boolean;
 function BackendMemAvail: LongInt;
@@ -109,11 +108,6 @@ end;
 function BackendDefaultTempDir: string;
 begin
   Result := '';
-end;
-
-function BackendConfigDir: string;
-begin
-  Result := '';                { DOS: the files are next to the program }
 end;
 
 function BackendHasShortNames: Boolean;

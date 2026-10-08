@@ -1,6 +1,8 @@
 # Settings of dn.ini that need a word of explanation
 
-`dn.ini` lives in the configuration directory (`~/.config/dn/` on Linux, `DN2` overrides it). The comments in the file `dn/data/dn.ini` describe every
+`dn.ini` lives in the configuration directory (`TvAppDir.ConfigDir` of tv3: `$XDG_CONFIG_HOME/dn/`, else `~/.config/dn/`, on Linux and the BSDs;
+`~/Library/Application Support/dn/` on macOS; `%APPDATA%\dn\` on Windows; the directory of the program on DOS; `DN2` overrides it). Its parsed
+cache `dn.cbc` is in the cache directory (`$XDG_CACHE_HOME/dn/`, else `~/.cache/dn/`; `~/Library/Caches/dn/`; `%LOCALAPPDATA%\dn\`). The comments in the file `dn/data/dn.ini` describe every
 line; this page keeps the ones whose meaning is not obvious. The file is UTF-8.
 
 ## Scroll bar characters (section `[Interface]`)

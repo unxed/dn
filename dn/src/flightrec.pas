@@ -1,9 +1,9 @@
 { FlightRec: the flight recorder of DN. What a person needs to hand over to have a fault that nobody can reproduce looked at: the key facts of the run,
   the last things that were done (the keys, the mouse clicks, the commands, the external programs, the file operations) and, at a crash, the details.
 
-    <ConfigDir>/dn.log        the log of this run: one line per event, written at once (a hang or a kill leaves it); at the start the log of the
+    <StateDir>/dn.log         the log of this run: one line per event, written at once (a hang or a kill leaves it); at the start the log of the
                               run before becomes dn_prev.log (a run that did not end with the line "exit" is told in the new log)
-    <ConfigDir>/crash/crashNNN.txt   written at a crash: the exception and the call stack, the key facts, the state that the providers
+    <StateDir>/crash/crashNNN.txt    written at a crash: the exception and the call stack, the key facts, the state that the providers
                               (FRAddState) tell (the panels, the views), the last events, the text of the screen
 
   The typed characters are not recorded (they may be a password): the line says "<char>"; the keys that are named (F5, Ctrl+Q, Enter...) and the

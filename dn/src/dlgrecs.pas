@@ -153,13 +153,23 @@ if SourceDir = '' then
 MakeSlash(SourceDir);
 { the files that the user changes: his configuration directory, but DN2 (an explicit directory) keeps everything together as before }
 if Dos.GetEnv('DN2') = '' then
-  ConfigDir := UserConfigDir(SourceDir)
+  begin
+  ConfigDir := UserConfigDir(SourceDir);
+  StateDir := UserStateDir(ConfigDir);
+  CacheDir := UserCacheDir(ConfigDir);
+  end
 else
+  begin
   ConfigDir := SourceDir;
+  StateDir := SourceDir;
+  CacheDir := SourceDir;
+  end;
 
 StartupDir := lfGetLongFileName(StartupDir);
 SourceDir := lfGetLongFileName(SourceDir);
 ConfigDir := lfGetLongFileName(ConfigDir);
+StateDir := lfGetLongFileName(StateDir);
+CacheDir := lfGetLongFileName(CacheDir);
 TempDir := lfGetLongFileName(TempDir);
 TempFile := lfGetLongFileName(TempFile);
 

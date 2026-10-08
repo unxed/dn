@@ -57,7 +57,7 @@ procedure UpdateConfig;
 procedure DoStartup;
 
 procedure RUN_IT;
-{ Starts the flight recorder (the log in ConfigDir; flightrec.pas): the first call of the program. }
+{ Starts the flight recorder (the log in StateDir; flightrec.pas): the first call of the program. }
 procedure StartRecorder;
 
 procedure Error(const FileName: String; LineNo, Addr, Code: LongInt);
@@ -202,7 +202,7 @@ var
   I: Integer;
   Args: string;
 begin
-  FRStart(ConfigDir, 'DN ' + VersionName + ' build ' + VersionRev + ' compiled ' + VersionDate);
+  FRStart(StateDir, 'DN ' + VersionName + ' build ' + VersionRev + ' compiled ' + VersionDate);
   FRFact('os', OSDescribe);
   FRFact('program', {$I %FPCTARGETOS%} + '/' + {$I %FPCTARGETCPU%} + ' fpc ' + {$I %FPCVERSION%}
 {$IFDEF DNUTF8}
@@ -212,6 +212,8 @@ begin
 {$ENDIF}
     );
   FRFact('config dir', ConfigDir);
+  FRFact('state dir', StateDir);
+  FRFact('cache dir', CacheDir);
   FRFact('program dir', SourceDir);
   FRFact('start dir', StartupDir);
   Args := '';

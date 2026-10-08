@@ -1,5 +1,6 @@
 program t_cfgdir;
-{ Tests of src/cfgdir.pas: the directory of the files of the user is made, the files of a DN of the program directory are copied once. }
+{ Tests of src/cfgdir.pas: the directories of the user are made, the files of a DN of the program directory (and of an older directory) are copied once,
+  the logs and the crash reports move to the directory of the state, the cache of dn.ini of the directory of the settings goes. }
 {$mode objfpc}{$H-}
 uses SysUtils, Classes, CfgDir;
 {$I dntest.inc}
@@ -28,7 +29,7 @@ begin
 end;
 
 var
-  Root, Prog, Conf, R: string;
+  Root, Prog, Conf, R, Old, NewD, State, Cache: string;
 begin
   Root := GetTempDir + 't_cfgdir_' + IntToStr(GetProcessID) + DirectorySeparator;
   Prog := Root + 'prog' + DirectorySeparator;
@@ -58,5 +59,42 @@ begin
 
   { the same directory for both: nothing to copy; no directory of the user: the program directory }
   Check(UserConfigDirIn('', 'C:\prog\') = 'C:\prog\', 'no directory of the user: the directory of the program');
+
+  { an older directory of the settings (~/.config/dn on macOS) is copied first, then the program directory adds what it lacks }
+  Old := Root + 'old' + DirectorySeparator;
+  NewD := Root + 'new' + DirectorySeparator;
+  ForceDirectories(Old);
+  Put(Old + 'dn.ini', 'ini of the old dir');
+  Put(Prog + 'dn.mnu', 'menu');
+  UserConfigDirIn(NewD, Prog, Old);
+  Check(Get(NewD + 'dn.ini') = 'ini of the old dir', 'the older directory of the user wins over the program directory');
+  Check(not FileExists(NewD + 'dn.mnu'), 'nothing more once dn.ini is there');
+
+  { the state: the logs and the crash reports of the directory of the settings move }
+  State := Root + 'state' + DirectorySeparator + 'dn' + DirectorySeparator;
+  Put(Conf + 'dn.log', 'log');
+  Put(Conf + 'dn_prev.log', 'prev');
+  ForceDirectories(Conf + 'crash');
+  Put(Conf + 'crash' + DirectorySeparator + 'crash001.txt', 'report');
+  R := UserStateDirIn(State, Conf);
+  Check(DirectoryExists(State), 'the directory of the state is made');
+  Check((R <> '') and (R[Length(R)] = '/'), 'the state: a path with a separator at the end: ' + R);
+  Check((Get(State + 'dn.log') = 'log') and not FileExists(Conf + 'dn.log'), 'dn.log moves');
+  Check((Get(State + 'dn_prev.log') = 'prev') and not FileExists(Conf + 'dn_prev.log'), 'dn_prev.log moves');
+  Check((Get(State + 'crash' + DirectorySeparator + 'crash001.txt') = 'report') and not DirectoryExists(Conf + 'crash'), 'the crash reports move');
+  Put(Conf + 'dn.log', 'stale');
+  Put(State + 'dn.log', 'current');
+  UserStateDirIn(State, Conf);
+  Check(Get(State + 'dn.log') = 'current', 'a log that is there is not written over');
+  Check(UserStateDirIn('', Conf) = Conf, 'no directory of the state: that of the settings');
+  Check(MoveStateFiles(State, State) = 0, 'the same directory: nothing moves');
+
+  { the cache }
+  Cache := Root + 'cache' + DirectorySeparator + 'dn' + DirectorySeparator;
+  Put(Conf + 'dn.cbc', 'cache');
+  R := UserCacheDirIn(Cache, Conf);
+  Check(DirectoryExists(Cache) and (R <> '') and (R[Length(R)] = '/'), 'the directory of the cache is made: ' + R);
+  Check(not FileExists(Conf + 'dn.cbc'), 'the old cache of dn.ini goes');
+  Check(UserCacheDirIn('', Conf) = Conf, 'no directory of the cache: that of the settings');
   Finish;
 end.

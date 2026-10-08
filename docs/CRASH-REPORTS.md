@@ -6,14 +6,18 @@ was, in which state and what was done in the last minutes.
 
 ## Where the files are
 
-The directory of the settings of the user (the same as `dn.ini`):
+The directory of the state of the user (`TvAppDir.StateDir` of tv3):
 
 | System | Directory |
 |---|---|
-| Linux, macOS, BSD | `$XDG_CONFIG_HOME/dn/`, else `~/.config/dn/` |
-| Windows | `%APPDATA%\DN\` |
+| Linux, BSD | `$XDG_STATE_HOME/dn/`, else `~/.local/state/dn/` |
+| macOS | `~/Library/Application Support/dn/` |
+| Windows | `%LOCALAPPDATA%\dn\` |
 | DOS | the directory of the program |
 | `DN2` is set | the directory that `DN2` names |
+
+The logs and the reports that an older DN wrote into the directory of the settings (`~/.config/dn/`, `%APPDATA%\DN\`) are moved here at
+the first start. The fact `state dir` at the head of the log and of a report names the directory.
 
 | File | What is in it |
 |---|---|

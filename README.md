@@ -37,6 +37,18 @@ An archive holds the program, its resources (`*.lng`, `*.dlg`, `*.hlp`, `xlt/`),
 `LICENSE-TV.TXT`, `COPYRIGHT-TV-MAGIBLOT.TXT`, `THIRD-PARTY-NOTICES-TV.md`; tve: `LICENSE-TVE.TXT`; DOS: `cwsdpmi.exe` and
 `cwsdpmi.doc`). The packing is `tools/dn-pack.sh` (`tools/dn-notices.sh` writes the licence texts and `README.TXT`).
 
+Where DN keeps the files of the user (the places of each system, `TvAppDir` of tv3; `dn/src/cfgdir.pas`):
+
+| | settings (`dn.ini`, the desktop, the histories) | the log and the crash reports | the cache of `dn.ini` |
+|---|---|---|---|
+| Linux, BSD | `$XDG_CONFIG_HOME/dn` (`~/.config/dn`) | `$XDG_STATE_HOME/dn` (`~/.local/state/dn`) | `$XDG_CACHE_HOME/dn` (`~/.cache/dn`) |
+| macOS | `~/Library/Application Support/dn` | `~/Library/Application Support/dn` | `~/Library/Caches/dn` |
+| Windows | `%APPDATA%\dn` | `%LOCALAPPDATA%\dn` | `%LOCALAPPDATA%\dn` |
+| DOS | the directory of the program | the directory of the program | the directory of the program |
+
+The environment variable `DN2` names one directory for all of them. The first start copies the settings of an older DN from the directory of the
+program (and, on macOS, from `~/.config/dn`) and moves the logs and the crash reports out of the directory of the settings.
+
 ## Build DN with your own fpc
 
 For the common Linux habit `make` / `make install` there is a laconic root `Makefile`

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The flight recorder of DN (Linux, a pty): tools/dn-linux-crash.py OUTDIR
-  - the log of the run (dn.log in the configuration directory) has the facts and the keys; the typed characters are not in it;
+  - the log of the run (dn.log in the state directory, ~/.local/state/dn) has the facts and the keys; the typed characters are not in it;
   - an access violation (DN_TEST_CRASH=1: the key F12) makes a report crash/crash001.txt: the exception, the facts, the panels, the last
     events, the screen; the fatal screen names the file;
   - the log of a run goes to dn_prev.log at the next start; a run that was killed is told in the next log;
@@ -33,7 +33,7 @@ def install(out):
 
 
 def start(d, extra=None):
-    e = {'DNLNG': 'ENGLISH', 'DN2': '', 'HOME': os.path.join(d, 'home'), 'XDG_CONFIG_HOME': '', 'TERM': 'xterm'}
+    e = {'DNLNG': 'ENGLISH', 'DN2': '', 'HOME': os.path.join(d, 'home'), 'XDG_CONFIG_HOME': '', 'XDG_STATE_HOME': '', 'XDG_CACHE_HOME': '', 'TERM': 'xterm'}
     e.update(extra or {})
     t = PtyTerm(['./dn'], 100, 30, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'), env=e)
     t.pump(1.5, 6)
@@ -52,8 +52,8 @@ out = sys.argv[1]
 dirs = []
 try:
     d = install(out); dirs.append(d)
-    conf = os.path.join(d, 'home', '.config', 'dn')
-    log, prev, crash = (os.path.join(conf, n) for n in ('dn.log', 'dn_prev.log', os.path.join('crash', 'crash001.txt')))
+    state = os.path.join(d, 'home', '.local', 'state', 'dn')
+    log, prev, crash = (os.path.join(state, n) for n in ('dn.log', 'dn_prev.log', os.path.join('crash', 'crash001.txt')))
 
     # a run with a crash
     t = start(d, {'DN_TEST_CRASH': '1'})
@@ -71,7 +71,7 @@ try:
     r = read(crash)
     check('Exception ' in r and 'Access violation' in r, 'the report names the exception', r)
     check('TERM=xterm' in r, 'the report has the facts')
-    check('config dir=' in r and 'os=Linux' in r, 'the report tells the system and the directory of the settings')
+    check('config dir=' in r and 'state dir=' in r and 'os=Linux' in r, 'the report tells the system and the directories of the settings and of the state')
     check('--- panels' in r and 'active:' in r, 'the report tells the panels')
     check('kbDown' in r and 'kbTab' in r and 'kbF12' in r, 'the report has the last keys by name')
     check('<char>' in r, 'the typed characters are masked in the report')
@@ -108,7 +108,7 @@ try:
     check("'z'" in read(log), 'DN_LOG_KEYS=full records the characters', read(log)[:400])
 
     # no log of the run, the report still
-    shutil.rmtree(os.path.join(d, 'home', '.config'))
+    shutil.rmtree(state)
     t = start(d, {'DN_LOG': '0', 'DN_TEST_CRASH': '1'})
     t.send('\x1b', 0.5)
     t.send('\x1b[B', 0.3)

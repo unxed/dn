@@ -19,7 +19,6 @@ procedure BackendBeep(Frequency, Duration: LongInt);
 procedure BackendSerialTrace(const Msg: string);
 function BackendBatchExt: string;
 function BackendDefaultTempDir: string;
-function BackendConfigDir: string;
 function BackendDescribe: string;
 function BackendHasShortNames: Boolean;
 function BackendMemAvail: LongInt;
@@ -60,28 +59,6 @@ end;
 function BackendDefaultTempDir: string;
 begin
   Result := {$IFDEF UNIX}'/tmp/'{$ELSE}''{$ENDIF};
-end;
-
-function BackendConfigDir: string;
-var
-  Base: string;
-begin
-{$IFDEF UNIX}
-  Base := GetEnvironmentVariable('XDG_CONFIG_HOME');
-  if (Base = '') or (Base[1] <> '/') then
-  begin
-    Base := GetEnvironmentVariable('HOME');
-    if Base = '' then
-      Exit('');
-    Base := Base + '/.config';
-  end;
-  Result := Base + '/dn/';
-{$ELSE}
-  Base := GetEnvironmentVariable('APPDATA');
-  if Base = '' then
-    Exit('');
-  Result := Base + '\DN\';
-{$ENDIF}
 end;
 
 function BackendHasShortNames: Boolean;

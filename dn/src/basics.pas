@@ -239,8 +239,9 @@ var
     {` Directory where configs and histories live. With '\' at the end.
       Controlled by the DN2 env variable. `}
   ConfigDir: String;
-    {` Directory of the files that the user changes (dn.ini, the desktop, the histories, the crash reports). With '\' at the end. The configuration of the user
-      (~/.config/dn, %APPDATA%\DN) unless DN2 names a directory or the target keeps the files next to the program (DOS): then it is SourceDir. `}
+    {` Directory of the settings of the user (dn.ini, the desktop, the histories). With '\' at the end. The configuration directory of the user
+      (TvAppDir.ConfigDir: ~/.config/dn, %APPDATA%\dn) unless DN2 names a directory or the target keeps the files next to the program (DOS): then it is
+      SourceDir. `}
   TempDir: String;
     {` Temporary directory. With '\' at the end `}
   TempFile: String;
@@ -250,6 +251,11 @@ var
     {` Directory for temporary command files and lists,
     and under DPMI32 - for swap while an external program runs.
     With '\' at the end. Controlled by the DNSWAP env variable and the /S switch. `}
+  StateDir: String;
+    {` Directory of the log of the run and of the crash reports. With '\' at the end. TvAppDir.StateDir (~/.local/state/dn, %LOCALAPPDATA%\dn);
+      ConfigDir when it is SourceDir. `}
+  CacheDir: String;
+    {` Directory of the caches (TvAppDir.CacheDir: ~/.cache/dn, %LOCALAPPDATA%\dn); ConfigDir when it is SourceDir. With '\' at the end. `}
   {-DataCompBoy-}
 const
   DirToChange: String = ''; {DataCompBoy}

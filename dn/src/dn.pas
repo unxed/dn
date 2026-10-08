@@ -166,8 +166,8 @@ except
     CloseWriteStream;
     if CrashFile = '' then
       begin
-      { no directory for the log (it could not be made): the old way, a short text next to the settings }
-      CrashFile := ConfigDir+'dn.err';
+      { no directory for the log (it could not be made): the old way, a short text in the directory of the state }
+      CrashFile := StateDir+'dn.err';
 {$I-}
       Assign(DNErrFile, SysOsPath(CrashFile));
       ClrIO;
