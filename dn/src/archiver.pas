@@ -135,6 +135,8 @@ type
     function GetID: Byte; virtual;
     function GetSign: TStr4; virtual;
     destructor Destroy; override;
+    procedure DisposeStrings;
+      {` Frees the command strings; the settings dialog replaces them and the archive itself stays. `}
     end;
 
   TFileInfo = class;
@@ -500,6 +502,11 @@ function TARJArchive.GetVal(const Sign, AFile, Name, Default: PChar)
 
 destructor TARJArchive.Destroy;
   begin
+  DisposeStrings;
+  end { TARJArchive.Destroy };
+
+procedure TARJArchive.DisposeStrings;
+  begin
   DisposeStr(Packer);
   DisposeStr(UnPacker);
   DisposeStr(Extract);
@@ -523,8 +530,7 @@ destructor TARJArchive.Destroy;
   DisposeStr(NormalCompression);
   DisposeStr(GoodCompression);
   DisposeStr(UltraCompression);
-  { inherited Destroy;}
-  end { TARJArchive.Done };
+  end { TARJArchive.DisposeStrings };
 
 { ----------------------------- ARJ ------------------------------------}
 

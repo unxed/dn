@@ -1439,7 +1439,7 @@ CurTime:
     end;
 
   R.Assign(1, 1, 26, 8);
-  PInfo.Create(R);
+  PInfo := TWhileView.Create(R);
   PInfo.Top := GetString(dlSetAttr);
   PInfo.Bottom := '';
   PInfo.SetState(sfShadow, True);
@@ -2054,7 +2054,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
     R.B.X := P.Size.X+P.Origin.X+1;
   if R.B.X-P.Origin.X-P.Size.X = 0 then
     Inc(R.B.X);
-  PIF.Create(R, 255);
+  PIF := TInputFName.Create(R, 255);
   PIF.LC := GlyphChar(glLightV);
   PIF.RC := GlyphChar(glLightV);
   if P.Origin.X-R.A.X = 1 then

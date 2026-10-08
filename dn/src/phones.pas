@@ -598,7 +598,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     if  (Active = nil) or (List = nil) or (List.Count = 0) then
       Exit;
     P := List.At(Focused);
-    PPH.Create(P.Number^, P.Name, '', '');
+    PPH := TPhone.Create(P.Number^, P.Name, '', '');
     Owner.EndModal(cmDialPhone);
     end;
 
@@ -726,7 +726,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     then
       Exit;
     UpStr(S);
-    PC.Create(10, 10);
+    PC := TPhoneCollection.Create(10, 10);
     PC.Duplicates := True;
     Phones.ForEach(SearchDir);
     if PC.Count = 0 then
@@ -789,7 +789,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
           DelRight(S);
           if S <> '' then
             begin
-            Ph.Create(P, S, '', '');
+            Ph := TPhone.Create(P, S, '', '');
             if Active.Phones = nil then
               Active.Phones := TPhoneCollection.Create(10, 10);
             Active.Phones.Insert(Ph);

@@ -278,7 +278,7 @@ while true do
       PV.Free;
       DT.P := nil;
       D.SetData(DT); {NewList will free PC }
-      PC.Create(10, 10);
+      PC := TWindowCol.Create(10, 10);
       Desktop.ForEach(InsView);
       if PC.Count = 0 then
         Break;

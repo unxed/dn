@@ -547,6 +547,7 @@ destructor TDOSVar.Destroy;
 procedure TVarList.FocusItem(Item: LongInt);
   var
     P: TDOSVar;
+    S: String; { the data of an input line is a short string (255 characters): Value is an AnsiString and must not be written by Move }
   begin
   if  (PrevFocused >= 0) and
       (List <> nil) and (Focused < List.Count)
@@ -555,7 +556,10 @@ procedure TVarList.FocusItem(Item: LongInt);
   else
     P := nil;
   if P <> nil then
-    Line.GetData(P.Value);
+    begin
+    Line.GetData(S);
+    P.Value := S;
+    end;
   PrevFocused := Focused;
   inherited FocusItem(Item);
   if  (List <> nil) and (Focused < List.Count) then
@@ -564,7 +568,8 @@ procedure TVarList.FocusItem(Item: LongInt);
     P := nil;
   if  P <> nil then
     begin
-    Line.SetData(P.Value);
+    S := P.Value;
+    Line.SetData(S);
     Line.DrawView;
     end;
   end { TVarList.FocusItem };
@@ -583,6 +588,7 @@ function TVarList.GetText(Item: LongInt; MaxLen: Integer): String;
 procedure TVarList.HandleEvent(var Event: TEvent);
   var
     P: TDOSVar;
+    V: String;
 
   procedure DeleteVar;
     begin
@@ -649,7 +655,10 @@ procedure TVarList.HandleEvent(var Event: TEvent);
         cmOK:
           begin
           if P <> nil then
-            Line.GetData(P.Value);
+            begin
+            Line.GetData(V);
+            P.Value := V;
+            end;
           end;
         cmAddVariable:
           AppendVar;

@@ -217,7 +217,7 @@ procedure SetupArchive(ArchCommand: Word);
     DefaultArchiver := ArchCommand;
   with Arch do
     begin
-    Free;
+    DisposeStrings;
     Packer := NewStr(DT.Pack);
     UnPacker := NewStr(DT.Unpack);
     Extract := NewStr(DT.Extract);

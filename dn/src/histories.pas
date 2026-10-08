@@ -738,7 +738,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
       cmOK:
         begin
         ClearEvent(Event);
-        if Focused >= List.Count then
+        if (Focused < 0) or (Focused >= List.Count) then
           Exit;
         FreeStr := fDelLeft(fDelRight(Copy(CnvString(List.At(Focused)),
                  2, 255))); {-$VIV}
@@ -765,7 +765,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
                   deleting it is useless: it will be inserted again, but will
                   scramble the item numbering }
             end;
-          if Focused >= List.Count then
+          if (Focused < 0) or (Focused >= List.Count) then
             Exit;
           if Copy(CnvString(ItemStr(Focused)), 1, 1) = '+' then
             begin
@@ -787,7 +787,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
        cmNo: {go to}
           begin
           ClearEvent(Event);
-          if Focused >= List.Count then
+          if (Focused < 0) or (Focused >= List.Count) then
             Exit;
           if (Dlg = dlgDirectoryHistory) then
             DirToGo := Copy(CnvString(List.At(Focused)), 2,
@@ -1006,7 +1006,7 @@ function DirHistoryMenu: String;
 
   DT.I := TListBox(P).Focused;
   D.Free;
-  if I = cmOK then
+  if (I = cmOK) and (DT.I >= 0) and (DT.I < DirHistory.Count) then { an empty list: OK has nothing to give }
     DirHistoryMenu := Copy(CnvString(DirHistory.At(DT.I)), 2,
          MaxStringLength);
   end { DirHistoryMenu: };
@@ -1041,7 +1041,7 @@ procedure CmdHistory;
   DT.I := TListBox(P).Focused;
   D.Free;
 
-  if I = cmCancel then
+  if (I = cmCancel) or (CmdStrings.Count = 0) then { an empty list has no command to give }
     Exit;
   MessageKey(CommandLine, kbDown);
 
