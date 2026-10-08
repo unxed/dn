@@ -16,10 +16,10 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 | # | item | state |
 |---|---|---|
 | 1 | tve: the editor component, MIT (the rules of `CLAUDE.md`) | in dn and fpide; the history passes the audit; open: the remaining editor features of `tve/README.md` |
-| 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir` replace the duplicates; open: the clock (#19), the ASCII table (#18) |
+| 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir`, `TvAscii` (the ASCII table), `TvGadgets` (the clock and the heap view) replace the duplicates: done |
 | 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; the tvision PR (magiblot/tvision#241, branch `dos-utf8-names` of the fork): CI green; the owner follows it |
 | 4 | fpide: the ASCII splash removed | done |
-| 5 | the vtui UX guidelines in tv3, dn, fpide, tve | tables in `docs/UX-CONFORMANCE.md` (dn) and tv3; the rows marked gap are open |
+| 5 | the vtui UX guidelines in tv3, dn, fpide, tve | tables in `docs/UX-CONFORMANCE.md` (dn) and tv3; dn: no gap left (D.4 resizable dialogs, R.1 actions in `dn/src/resource/actions.dna`) |
 | 6 | fpide: other languages, Go first | Go done (template, gofmt, Delve); Python, Rust, C were never asked for |
 | 7 | sp as "Better Pascal" (safe / ext / fpide, one unit that gives everything) | `sp/PLAN.md`; the rename of the repository to bp is the last step |
 | 8 | no DOS/Windows path remnants on other systems ("C:" on Linux) | tv3 `TvPath`; tve and fpide use it; dn open (DnPath over TvPath); ratchet of `tools/check-paths.py` |
