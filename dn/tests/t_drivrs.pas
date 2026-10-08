@@ -8,9 +8,7 @@ var
   Ev: TEvent;
   Cells: array[0..9] of TScreenCell;
   S: String;
-{$IFDEF CPU32}
   T: String;
-{$ENDIF}
   P: array[0..3] of PtrInt;
 begin
   { cells of 16 bits }
@@ -80,20 +78,21 @@ begin
   Check((Ev.KeyCode = $4B00) and ((Ev.ControlKeyState and 15) = 3), 'SetDNKeyCode');
   Check(DNKeyCode(Ev) = $034B00, 'SetDNKeyCode and DNKeyCode are reverse to each other');
   { FormatStr }
-  { the parameters are 4-byte slots (as in Borland TV): a pointer fits only in a 32-bit program }
-{$IFDEF CPU32}
+  { the parameters are pointer-sized slots }
   T := 'file';
   P[0] := PtrInt(@T);
   P[1] := 42;
   FormatStr(S, 'name %s, %d items', P);
   Check(S = 'name file, 42 items', 'FormatStr %s %d');
-{$ENDIF}
   P[0] := 42;
   FormatStr(S, 'items %d', P);
   Check(S = 'items 42', 'FormatStr %d');
   P[0] := 7; P[1] := 255; P[2] := 255; P[3] := Ord('Z');
   FormatStr(S, '[%5d][%-4d][%x][%c][%%]', P);
   Check(S = '[    7][255 ][ff][Z][%]', 'FormatStr widths, %x, %c, %%');
+  P[0] := 2026; P[1] := 3; P[2] := 9;
+  FormatStr(S, '%04d%02d%02d', P);
+  Check(S = '20260309', 'FormatStr fills with zeros (a date of dBase)');
   { a 16-bit buffer holds one byte per cell: with UTF-8 inside the text goes in as the bytes of the code page }
   CpSelect(866);
   Utf8Enabled := True;

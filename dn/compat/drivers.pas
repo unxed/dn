@@ -11,7 +11,7 @@ unit Drivers;
 interface
 
 uses
-  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys, TvCell, TvColors, TvDrawBuf, TvText, TvUtf8, TvCodePg;
+  SysUtils, TvGeom, TvEvents, TvScreen, TvUtil, TvViews, TvSys, TvCell, TvColors, TvDrawBuf, TvText, TvUtf8, TvCodePg, TvFormat;
 
 type
   TEvent = TvEvents.TEvent;
@@ -144,8 +144,7 @@ function GetAltCode(Ch: Char): Word;
 function GetCtrlChar(KeyCode: Word): Char;
 function GetCtrlCode(Ch: Char): Word;
 
-{ Result := Format with %s (a pointer to a string), %d (a LongInt), %u, %x, %c, %% and a width (%-8s, %5d)
-  filled from Params: an array of 4-byte values, one per % item. }
+{ Result := Format with its % items filled from Params, an array of pointer-sized slots (TvFormat.FormatSlots). }
 procedure FormatStr(var Result: String; const Format: String; var Params);
 procedure PrintStr(const S: String);
 
@@ -377,73 +376,8 @@ end;
 { --- strings ------------------------------------------------------------------ }
 
 procedure FormatStr(var Result: String; const Format: String; var Params);
-type
-  { the slots of the parameters: numbers and pointers, as large as a pointer (32 bits in Virtual Pascal, and so for the
-    32-bit builds; 64 bits on x86_64 where the sources declare them as PtrInt: dn/edits/x64/10-param-slots.sed) }
-  PSlotArr = ^TSlotArr;
-  TSlotArr = array[0..255] of PtrInt;
-var
-  P: PSlotArr;
-  N, I, W, Len: Integer;
-  Left: Boolean;
-  S: String;
-  C: Char;
 begin
-  P := @Params;
-  N := 0;
-  Result := '';
-  I := 1;
-  Len := Length(Format);
-  while I <= Len do
-  begin
-    if Format[I] <> '%' then
-    begin
-      Result := Result + Format[I];
-      Inc(I);
-      Continue;
-    end;
-    Inc(I);
-    if I > Len then
-      Break;
-    if Format[I] = '%' then
-    begin
-      Result := Result + '%';
-      Inc(I);
-      Continue;
-    end;
-    Left := False;
-    W := 0;
-    if (I <= Len) and (Format[I] = '-') then
-    begin
-      Left := True;
-      Inc(I);
-    end;
-    while (I <= Len) and (Format[I] in ['0'..'9']) do
-    begin
-      W := W * 10 + Ord(Format[I]) - 48;
-      Inc(I);
-    end;
-    if I > Len then
-      Break;
-    C := Format[I];
-    Inc(I);
-    case C of
-      's': begin
-             if PtrUInt(P^[N]) = 0 then S := '' else S := PShortString(PtrUInt(P^[N]))^;
-             Inc(N);
-           end;
-      'd': begin Str(LongInt(P^[N]), S); Inc(N); end;
-      'u': begin Str(Cardinal(P^[N]), S); Inc(N); end;
-      'x': begin S := LowerCase(IntToHex(Cardinal(P^[N]), 1)); Inc(N); end;
-      'X': begin S := IntToHex(Cardinal(P^[N]), 1); Inc(N); end;
-      'c': begin S := Chr(Byte(P^[N])); Inc(N); end;
-    else
-      S := '%' + C;
-    end;
-    while Length(S) < W do
-      if Left then S := S + ' ' else S := ' ' + S;
-    Result := Result + S;
-  end;
+  FormatSlots(Result, Format, Params);
 end;
 
 procedure PrintStr(const S: String);
