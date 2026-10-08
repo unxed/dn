@@ -133,6 +133,10 @@ def main():
         text = t.text()
         check('inner' in text and 'Fatal' not in text, 'the outer archive is entered and shows the inner one', text)
         key(t, 'HOME'); key(t, 'DOWN'); key(t, 'ENTER', 2.0)
+        for _ in range(10):                          # the inner archive is unpacked first: slow on a loaded runner
+            if 'deep' in t.text():
+                break
+            t.pump(1.0, 3)
         text = t.text()
         check('deep' in text and 'Fatal' not in text and 'Access violation' not in text, 'the inner archive is entered and shows its member', text)
         check(t.alive(), 'zip in zip: DN is alive', text)
