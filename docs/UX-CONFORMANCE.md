@@ -68,10 +68,10 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | X.1 | Left click focuses / activates | yes | conformant | C |
 | X.2 | Double click is `Enter` | yes (panels, lists) | conformant | C |
 | X.3 | Right click for secondary actions in file panels | the right button marks files in the panels (the NC habit) | conformant | C |
-| X.4 | The wheel scrolls the component under the cursor | as in tv3 (the focused window scrolls) | gap | C |
+| X.4 | The wheel scrolls the component under the cursor | the windows: tv3 (`UxWheelUnderCursor`) gives the wheel to the window under the pointer (an editor that is not active scrolls). The two panels are one window: a panel takes the wheel itself and moves its own cursor (`filepanel.pas`), so the wheel over the panel that is not active moves that panel and the focus stays | conformant | P:ux |
 | R.1 | One action = one declaration (the registry `TvActions`) | DN keeps its resource tables (`dn.dnr`: menus, status lines, key maps); not migrated | gap | C |
 
-Count: 46 rows: **34 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **4 gap** (D.4, E.7, X.4, R.1), **6 conflict** (G.2b, L.2, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
+Count: 46 rows: **35 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **3 gap** (D.4, E.7, R.1), **6 conflict** (G.2b, L.2, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
 
 ## Other keys the guidelines touch
 
@@ -94,6 +94,8 @@ dropping the letters would change the hot keys of the menu.
 * 0.2, 0.3: the switcher of tv3 works in DN as it is (DN's desktop is tv3's); DN adds the names of the windows that have no title. `P:ux` answers the query of the
   keyboard protocol of Kitty and sends the presses and releases of that protocol.
 * M.7: the menus of DN (`menus.pas`) stop a held arrow at the end. `P:ux` sends the keys of the win32 input mode (a press with no release before it is a repeat).
+* X.4: before, the window of the panels gave the wheel to the first scroll bar it found (the active panel moved, wherever the pointer was). `P:ux` sends the
+  wheel of the SGR mouse reports over the panel that is not active and over an editor window that is not active (Window / Tile).
 
 ## Regressions from the new tv3
 

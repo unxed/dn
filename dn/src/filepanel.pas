@@ -166,7 +166,7 @@ var
 
 implementation
 
-uses DnPath,
+uses TvEvents, DnPath,
   uselfn, osdep, Dos, Eraser, Drives, DNHelp, TitleSet,
   Lfn, DNUtil, mainapp, basics, strutil, DNUtf8, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, copyio, ArcView, CmdLine, histories, Archiver,
@@ -1857,6 +1857,17 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
+  { X.4 of the vtui UX guidelines: the wheel over a panel moves that panel, also when the other one is active (the window would move the bar it finds first) }
+  if (Event.What = TvEvents.evMouseWheel) and (ScrollBar <> nil) and
+     ((Event.Wheel = TvEvents.mwUp) or (Event.Wheel = TvEvents.mwDown)) then
+    begin
+    if Event.Wheel = TvEvents.mwUp then
+      ScrollBar.SetValue(ScrollBar.Value-3*ScrollBar.ArStep)
+    else
+      ScrollBar.SetValue(ScrollBar.Value+3*ScrollBar.ArStep);
+    CE;
+    Exit;
+    end;
   CurPos := ScrollBar.Value;
   if Files <> nil
   then

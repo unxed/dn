@@ -3,7 +3,7 @@
 Esc closes the dialogs, Enter presses the default button also in an edit field, Space toggles a check box, the arrow keys move the cursor of a
 radio group without changing the selection and leave the group only at its boundary, Tab and Shift+Tab cycle, Ctrl+Tab / Ctrl+Shift+Tab walk the
 windows (with key releases: the list of the windows, the choice on the release of Ctrl), a held arrow stops at the end of a menu (with auto
-repeats), the F keys keep their DN meaning, Ctrl+Left / Ctrl+Right follow the word rules of far2l.
+repeats), the wheel scrolls what is under the pointer, the F keys keep their DN meaning, Ctrl+Left / Ctrl+Right follow the word rules of far2l.
 What is kept as it is (Norton Commander habits) is listed in docs/UX-CONFORMANCE.md.
 The options of the guideline keys (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck, [FilePanels]
 PanelArrowsPage): with the defaults DN keeps its keys; each option, set in dn.ini or in its setup dialog, gives the key of the guidelines."""
@@ -161,6 +161,35 @@ def held(d, w):
     t.send(release % 39, 0.3)
     check(end and chosen(t, True) == end, 'M.7: a held Right stops at the last item of the menu bar', t.text())
     keys(t, 'ESC ESC')
+    t.close(0.3)
+
+
+def wheel(d, w2):
+    """X.4: the wheel scrolls the component under the pointer: the panel that is not active, an editor window that is not active"""
+    t = start_ini(d, w2, '')
+    feet = lambda: next((l for l in reversed(t.text().split('\n')) if l.count('\u2551') >= 3 and ('UP--DIR' in l or '.txt' in l)), '')
+    before = feet()
+    half = len(before) // 2
+    for _ in range(3):
+        t.send('\x1b[<65;20;10M', 0.3)                # over the left panel (the right one is active)
+    after = feet()
+    check('f08.txt' in after[:half] and after[half:] == before[half:], 'X.4: the wheel over the panel that is not active moves that panel, the active one stays',
+          before + '\n' + after)
+    for _ in range(2):
+        t.send('\x1b[<64;20;10M', 0.3)
+    check('f02.txt' in feet()[:half], 'X.4: the wheel up moves it back', feet())
+    t.close(0.3)
+    w = os.path.join(d, 'wheel')
+    os.makedirs(w, exist_ok=True)
+    open(os.path.join(w, 'a1.txt'), 'w').write(''.join('line %03d\n' % i for i in range(200)))
+    open(os.path.join(w, 'a2.txt'), 'w').write(''.join('row %03d\n' % i for i in range(200)))
+    t = start(d, w)
+    keys(t, 'DOWN F4 CTAB DOWN DOWN F4', 0.6)
+    keys(t, '\x1bw t', 0.6)                           # Window / Tile: the two editors and the panels, the editor of a2.txt active at the bottom
+    y = row_of(t, 'a1.txt')
+    for _ in range(3):
+        t.send('\x1b[<65;20;%dM' % (y + 4), 0.3)       # over the editor of a1.txt
+    check(y >= 0 and row_of(t, 'line 009') == y + 2 and row_of(t, 'row 000') > y, 'X.4: the wheel over an editor window that is not active scrolls it', t.text())
     t.close(0.3)
 
 
@@ -396,6 +425,7 @@ def main():
             open(os.path.join(w2, 'f%02d.txt' % i), 'w').write('x')
         switcher(d, w)
         held(d, w)
+        wheel(d, w2)
         options(d, w, w2)
     finally:
         shutil.rmtree(d, ignore_errors=True)
