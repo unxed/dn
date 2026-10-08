@@ -215,7 +215,7 @@ function OtherFilePanel(P: TFilePanelRoot): TFilePanelRoot;
 
 implementation
 
-uses
+uses DnPath,
   Lfn, uselfn, basics, strutil, fileutil, envutil, osdep, FlightRec,
   Messages, mainapp, DNHelp, Startup, Commands, histories, HistList, paneldlgs,
   FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
@@ -939,7 +939,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
 
     {JO: so as to go to the found file in an archive from the find panel}
     PathInside := FileName;
-    if PathInside[2] = ':' then
+    if HasDrives and (PathInside[2] = ':') then
       PathInside[2] := ';'; {JO: replace the colon with anything }
     I := PosChar(':', PathInside);
     if I > 0 then
@@ -955,13 +955,13 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
     if Copy(Dr, 1, 5) = cLINK_ then
       Delete(Dr, 1, 5);
     MakeNoSlash(Dr);
-    if ((Dr[2] = ':') or (Copy(Dr, 1, 2) = '\\'))
+    if IsQualified(Dr)
          and not (Drive.DriveType in [dtDisk, dtLink, dtArc])
     then
       { switch from find panel, list etc. to disk }
       begin
       Drive.Free;
-      Drive := TDrive.Create(Byte(UpCase(Dr[1]))-64, Self);
+      Drive := TDrive.Create(Byte(DriveOf(Dr))-64, Self);
       end;
     {DirectoryName := GetNormPath(Dr);} {commented by AK155}
     IncDrawDisabled;
@@ -1461,7 +1461,7 @@ WrongArc:
       Abort := False;
       if Drive.DriveType <> dtDisk then
         begin
-        if not ReplaceDrive(S[1]) then
+        if not ReplaceDrive(DriveOf(S)) then
           Exit;
         end
       else
@@ -1505,7 +1505,7 @@ WrongArc:
       end
    
       ;
-    lGetDir(Byte(S[1])-64, S);
+    lGetDir(Byte(DriveOf(S))-64, S);
     {S:=GetNormPath(S);} {removed by AK155}
     MakeNoSlash(S);
     DoChange(S);
@@ -1536,11 +1536,11 @@ WrongArc:
         if Dr = nil then
           Exit;
         if Drive.DriveType <> dtDisk then
-          ReplaceDrive(S[1]);
+          ReplaceDrive(DriveOf(S));
         Message(Self, evCommand, cmInsertDrive, Dr);
         {end}
         end
-      else if S[Length(S)] = '\'
+      else if IsPathSep(S[Length(S)])
       then
         begin
         if not PathExist(S) then
@@ -1550,7 +1550,7 @@ WrongArc:
           Exit;
           end;
         if Drive.DriveType <> dtDisk then
-          ReplaceDrive(S[1]);
+          ReplaceDrive(DriveOf(S));
         Self.ChDir(S);
         end
       else
@@ -1562,7 +1562,7 @@ WrongArc:
           Exit;
           end;
         if Drive.DriveType <> dtDisk then
-          ReplaceDrive(S[1]);
+          ReplaceDrive(DriveOf(S));
         {JO: previously when going to a list from directory history the current }
         {    directory did not change and accordingly the list did not find     }
         {    files that were in its directory. To fix this                      }
@@ -1581,7 +1581,7 @@ WrongArc:
     if Drive.DriveType = dtLink then
       begin
       lGetDir(0, S);
-      ReplaceDrive(S[1]);
+      ReplaceDrive(DriveOf(S));
       RereadDir;
       end;
     end;
@@ -1814,7 +1814,7 @@ WrongArc:
         Exit;
         end;
       Drive.Free;
-      Drive := TDrive.Create(Byte(S[1])-64, Self);
+      Drive := TDrive.Create(Byte(DriveOf(S))-64, Self);
       SetupPanelFromDrive;
       DeltaX := 0;
       GotoFile(S);
@@ -2059,9 +2059,9 @@ WrongArc:
         if  (Drive.DriveType = dtDisk) then
           begin
           {JO: save in S the top-level directory name for the current}
-          s := Drive.CurDir+'\';
+          s := Drive.CurDir+PathSep;
           l := GetRootStart(s)+1;
-          s := Copy(s, l, PosChar('\', Copy(s, l, MaxStringLength))-1);
+          s := Copy(s, l, PosChar(PathSep, Copy(s, l, MaxStringLength))-1);
           end;
         Drive.ChangeRoot;
         ReadDirectory;

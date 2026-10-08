@@ -53,7 +53,7 @@ interface
 procedure LongCopy(Fn1: String);
 
 implementation
-uses
+uses DnPath,
   Lfn, Dos, Tree, osdep, basics, strutil, fileutil, TvGlyphs, FileCopy, mainapp,
   Messages, Views, Defines, Dialogs, Commands, Drivers, HistList,
   progress, Startup, timeutil, fileerrors, Math
@@ -647,7 +647,7 @@ Rep:
   NewMode := True;
   Fn1 := lFExpand(Fn1);
   lFSplit(Fn1, d, n, x);
-  dr1 := Byte(Fn1[1])-64;
+  dr1 := Byte(DriveOf(Fn1))-64;
   Cs := 0;
   Cd := 0;
   FileMode := $40;
@@ -722,7 +722,7 @@ _Abort_:
   Fn2 := lFExpand(Fn2);
   if Abort then
     goto _Abort_;
-  dr2 := Byte(Fn2[1])-64;
+  dr2 := Byte(DriveOf(Fn2))-64;
   if Fn1 = Fn2 then
     goto _Abort_;
 

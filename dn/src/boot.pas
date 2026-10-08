@@ -68,7 +68,7 @@ uses
    {Cat}
   
   
-  SysUtils, basics, strutil, fileutil, envutil, winsess, OSSystem,
+  SysUtils, basics, DnPath, strutil, fileutil, envutil, winsess, OSSystem,
   Startup, dlgrecs, Defines, Streams,
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
@@ -244,8 +244,8 @@ function BadTemp(var s: String): Boolean;
   BadTemp := True;
   if  (s = '') then
     Exit;
-  if not (s[Length(s)] in ['\', '/']) then
-    s := s+'\';
+  if not IsPathSep(s[Length(s)]) then
+    s := s+PathSep;
   ClrIO;
   if not PathExist(s) then
     Exit;

@@ -21,7 +21,7 @@ function OSMemAvail: LongInt;
 procedure OSSerialTrace(const Msg: string);
 { The extension of the files that DN writes for a command interpreter (the swap batch files, the list of files): .BAT on DOS, .CMD elsewhere. }
 function OSBatchExt: string;
-{ The directory for temporary files when neither DN.INI nor TEMP and TMP name one: C:\tmp\ on Unix (it is /tmp in the DN way of paths), '' elsewhere. }
+{ The directory for temporary files when neither DN.INI nor TEMP and TMP name one: /tmp/ on Unix , '' elsewhere. }
 function OSDefaultTempDir: string;
 { The directory for the files that the user changes (the settings, the desktop, the histories, the crash reports) as a path of the system with a separator at the end: the
   directory `dn` of the configuration of the user on Unix ($XDG_CONFIG_HOME or ~/.config), `DN` of %APPDATA% on Windows; '' when the target keeps them next to the program

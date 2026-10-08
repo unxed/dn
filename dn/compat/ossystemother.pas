@@ -59,7 +59,7 @@ end;
 
 function BackendDefaultTempDir: string;
 begin
-  Result := {$IFDEF UNIX}'C:\tmp\'{$ELSE}''{$ENDIF};
+  Result := {$IFDEF UNIX}'/tmp/'{$ELSE}''{$ENDIF};
 end;
 
 function BackendConfigDir: string;

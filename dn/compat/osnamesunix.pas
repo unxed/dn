@@ -157,19 +157,11 @@ end;
 
 function OsPath(const S: string): string;
 var
-  I: Integer;
   Raw: string;
 begin
-  Result := S;
-  if (Length(Result) >= 2) and (Result[2] = ':') and (UpCase(Result[1]) in ['A'..'Z']) then
-  begin
-    Delete(Result, 1, 2);
-    if Result = '' then
-      Result := '.';
-  end;
-  for I := 1 to Length(Result) do
-    if Result[I] = '\' then
-      Result[I] := '/';
+  Result := S;                { DN keeps the names of the host: no drive, "/" }
+  if Result = '' then
+    Result := '.';
   if NameConv and HasHigh(Result) then
   begin
     Raw := Result;

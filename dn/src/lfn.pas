@@ -257,7 +257,7 @@ implementation
 uses
   
   Strings, Commands {Cat}
-  , strutil, fileutil, Math
+  , strutil, fileutil, Math, DnPath
    ,Startup ,realmode 
   , dirwatch
   ;
@@ -1050,7 +1050,7 @@ function GetShareEnd(const S: String): Integer;
     SlashFound: Boolean;
   begin
   Result := 0;
-  if Copy(S, 1, 2) <> '\\' then
+  if not HasDrives or (Copy(S, 1, 2) <> '\\') then
     Exit;
   { look for '\' after '\\', and then to the end or to the second '\' }
   Result := 3;
@@ -1075,7 +1075,10 @@ function GetShareEnd(const S: String): Integer;
 
 function GetRootStart(const Path: String): Integer;
   begin
-  Result := Min(Length(Path)+1, Max(3, GetShareEnd(Path)+1));
+  if HasDrives then
+    Result := Min(Length(Path)+1, Max(3, GetShareEnd(Path)+1))
+  else
+    Result := Min(Length(Path)+1, 1);
   end;
 
 {AK155 22-11-2003 Reworked to account for UNC paths }
@@ -1093,7 +1096,7 @@ procedure lFSplit(const Path: String; var Dir, Name, ext: String);
   ext := '';
   DotPos := 0;
   SlashPos := 0;
-  if  (Length(Path) > 1) and (Path[2] = ':') then
+  if  HasDrives and (Length(Path) > 1) and (Path[2] = ':') then
     DriveEnd := 2
   else
     DriveEnd := GetShareEnd(Path);
@@ -1106,7 +1109,7 @@ procedure lFSplit(const Path: String; var Dir, Name, ext: String);
       if SlashPos <> 0 then
         Break;
       end;
-    if  (Path[B] = '\') and (SlashPos = 0) then
+    if  IsPathSep(Path[B]) and (SlashPos = 0) then
       begin
       SlashPos := B;
       if DotPos <> 0 then
@@ -1332,38 +1335,72 @@ procedure lRmDir(const Path: String);
 function lFExpand(Path: String): String;
   var
     D: Byte;
-    i, j: Integer;
+    RootLen, I, J, N: Integer;
+    Root, Rest, Name: String;
+    Parts: array of String;
   begin
-  for i := 1 to length(Path) do
-    if Path[i] = '/' then
-      Path[i] := '\';
+  Path := NormalizeSep(Path);
   if Path = '' then
     Result := ActiveDir
-  else if (Copy(Path, 2, 2) = ':\') or (Copy(Path, 1, 2) = '\\') then
-    Result := Path // full path
-  else if Path[1] = '\' then
-    Result := CurrentRoot + Path // from the root of the current drive/share
-  else if  (Length(Path) >= 2) and (Path[2] = ':') then
-    begin // relative path of the specified drive
-    D := Byte(UpCase(Path[1]))-Byte('A')+1;
-    Result := CurrentPaths[D] + Copy(Path, 3, 255);
+  else if HasDrives then
+    begin
+    if (Copy(Path, 2, 2) = ':\') or (Copy(Path, 1, 2) = '\\') then
+      Result := Path // full path
+    else if Path[1] = '\' then
+      Result := CurrentRoot + Path // from the root of the current drive/share
+    else if  (Length(Path) >= 2) and (Path[2] = ':') then
+      begin // relative path of the specified drive
+      D := Byte(UpCase(Path[1]))-Byte('A')+1;
+      Result := CurrentPaths[D] + Copy(Path, 3, 255);
+      end
+    else
+      Result := ActiveDir + Path; // relative path
     end
+  else if IsAbsPath(Path) then
+    Result := Path
   else
     Result := ActiveDir + Path; // relative path
-  MakeNoSlash(Result);
-  { Remove '\..' }
-  while True do
+  { the root stays as it is, the rest loses '.', '..' and the empty parts }
+  RootLen := PathRootLen(Result);
+  if RootLen = 0 then
+    RootLen := Min(2, Length(Result));
+  Root := Copy(Result, 1, RootLen);
+  Rest := Copy(Result, RootLen+1, MaxStringLength);
+  SetLength(Parts, 0);
+  N := 0;
+  I := 1;
+  while I <= Length(Rest) do
     begin
-    j := Pos('\..', Result);
-    if j = 0 then
-      Break;
-    i := j-1;
-    while (i <> 0) and (Result[i] <> '\') do
-      Dec(i);
-    Delete(Result, i+1, j-i+2);
+    J := I;
+    while (J <= Length(Rest)) and not IsPathSep(Rest[J]) do
+      Inc(J);
+    Name := Copy(Rest, I, J-I);
+    I := J+1;
+    if (Name = '') or (Name = '.') then
+      Continue;
+    if Name = '..' then
+      begin
+      if N > 0 then
+        Dec(N);
+      Continue;
+      end;
+    if N >= Length(Parts) then
+      SetLength(Parts, N+8);
+    Parts[N] := Name;
+    Inc(N);
     end;
-  Replace('.\', '', Result);
-  if Result[Length(Result)] = '.' then
+  Rest := '';
+  for I := 0 to N-1 do
+    begin
+    if I > 0 then
+      Rest := Rest + PathSep;
+    Rest := Rest + Parts[I];
+    end;
+  if (Rest <> '') and (Root <> '') and not IsPathSep(Root[Length(Root)]) and HasDrives and (Root[Length(Root)] <> ':') then
+    Root := Root + PathSep;           { \\host\share + dir }
+  Result := Root + Rest;
+  if (Rest = '') and (Length(Result) > 1) and IsPathSep(Result[Length(Result)]) and (Result[Length(Result)-1] <> ':')
+     and (PathRootLen(Result) < Length(Result)) then
     SetLength(Result, Length(Result)-1);
   end;
 
@@ -1376,12 +1413,17 @@ procedure lChDir(Path: String);
     begin
     ActiveDir := Path;
     MakeSlash(ActiveDir);
-    i := GetShareEnd(Path);
-    if i = 0 then
-      i := 2;
-    CurrentRoot := Copy(ActiveDir, 1, i);
-    if  (InOutRes = 0) and (Length(Path) > 2) and (Path[2] = ':') then
-      CurrentPaths[Byte(UpCase(Path[1]))-Byte('A')+1] := ActiveDir;
+    if HasDrives then
+      begin
+      i := GetShareEnd(Path);
+      if i = 0 then
+        i := 2;
+      CurrentRoot := Copy(ActiveDir, 1, i);
+      if  (InOutRes = 0) and (Length(Path) > 2) and (Path[2] = ':') then
+        CurrentPaths[Byte(UpCase(Path[1]))-Byte('A')+1] := ActiveDir;
+      end
+    else
+      CurrentRoot := '';
     end
   else
     InOutRes := DosError;
@@ -1391,6 +1433,11 @@ procedure lGetDir(D: Byte; var Path: String);
   label
     DelDlash;
   begin
+  if not HasDrives then
+    begin
+    Path := ActiveDir;           { one tree: the drive number means nothing }
+    goto DelDlash;
+    end;
   if D = 0 then
     begin
     Path := ActiveDir;
@@ -1430,7 +1477,8 @@ procedure InitPath;
     Inc(P[1]);
     end;
   SysGetDirDos(0, StartDir);
-  StartDir[1] := Upcase(StartDir[1]);
+  if HasDrives then
+    StartDir[1] := Upcase(StartDir[1]);
      //piwamoto: w32 shortcut may have c:\ as directory
      //but DN needs C:\ for internal use
   lChDir(StartDir);

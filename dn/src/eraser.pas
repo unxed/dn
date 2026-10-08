@@ -59,7 +59,7 @@ procedure SetVLabel;
 function ValidErase(Files: TCollection): Boolean;
 
 implementation
-uses dnscreen, FlightRec,
+uses DnPath, dnscreen, FlightRec,
   Defines, uselfn, Filediz,
   Dos, Lfn {DataCompBoy}, FilesCol, Commands, basics, strutil, fileutil,
   Startup, Messages, timeutil, Drivers, Tree,
@@ -288,7 +288,7 @@ TryDel:
         lRmDir(s);
         Params.RC := IOResult;
         if Params.RC <> 0 then
-          if SysErrorFunc(Params.RC, Byte(s[1])-Byte('A')) = 1 then
+          if SysErrorFunc(Params.RC, Byte(DriveOf(s))-Byte('A')) = 1 then
             goto TryDel;
         if Params.RC <> 0 then
           begin

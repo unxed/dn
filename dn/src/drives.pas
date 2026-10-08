@@ -145,7 +145,7 @@ const
 
 implementation
 uses
-  osdep, Lfn, uselfn, fsinfo,
+  osdep, DnPath, Lfn, uselfn, fsinfo,
   Startup, Tree, mainapp, FileCopy, Eraser, filepanel, Commands,
   Dialogs, FileFind, panelroot, Filediz, CmdLine
   , timeutil, Messages, dirwatch, Dos
@@ -292,7 +292,12 @@ procedure TDrive.ChangeRoot;
     B: Boolean;
   begin
   {Cat: check for a network path}
-  if CurDir[1] = '\' then
+  if not HasDrives then
+    begin
+    lChDir(PathSep);
+    lGetDir(0, CurDir);
+    end
+  else if CurDir[1] = '\' then
     begin
     B := False;
     for I := 3 to Length(CurDir) do
@@ -602,7 +607,9 @@ procedure TDrive.lChDir(ADir: String);
     NeedAbort := True;
     ATestDir := lFExpand(ATestDir);
     {Cat: check for a network path}
-    if  (Length(ATestDir) > 2) and (ATestDir[1] = '\')
+    if not HasDrives then
+      OK := True                    { one tree: nothing to probe before the directory itself }
+    else if  (Length(ATestDir) > 2) and (ATestDir[1] = '\')
          and (ATestDir[2] = '\')
     then
       begin
@@ -677,19 +684,24 @@ procedure TDrive.lChDir(ADir: String);
     
     {CurDir:=CurDir;}Exit;
     end;
-  ADir := 'C:\';
+  if HasDrives then
+    ADir := 'C:\'
+  else
+    ADir := PathSep;
   if ValidPath(ADir, False) then
     begin
     
     CurDir := ADir;
     Exit;
     end;
-  ADir := 'A:\';
-  if ValidPath(ADir, False) then
+  if HasDrives then
     begin
-    
-    CurDir := ADir;
-    Exit;
+    ADir := 'A:\';
+    if ValidPath(ADir, False) then
+      begin
+      CurDir := ADir;
+      Exit;
+      end;
     end;
   CurDir := '';
   end { TDrive.lChDir };

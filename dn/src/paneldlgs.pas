@@ -96,7 +96,7 @@ function FirstNameNum(P: TFilePanelRoot): LongInt;
   or 2 if it is present. `}
 
 implementation
-uses
+uses DnPath,
   dirwatch,
   Lfn, uselfn, Collect, timeutil, DnIni, HistList,
   basics, strutil, DNUtf8, fileutil, TvGlyphs, Dos, Defines, Dialogs,
@@ -2381,7 +2381,7 @@ function CM_ChangeDirectory(AFP: Pointer): String;
   else
     S := P.DirectoryName;
   CM_ChangeDirectory :=
-    ChangeDir(GetString(dlChangeDir), Byte(S[1])-64);
+    ChangeDir(GetString(dlChangeDir), Byte(DriveOf(S))-64);
   end;
 {-DataCompBoy-}
 

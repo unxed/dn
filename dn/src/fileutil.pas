@@ -203,7 +203,7 @@ uses
   
   strutil, Strings,
   Commands, mainapp, DnIni, panelroot, dnHelp
-  , osdep, keymap
+  , osdep, keymap, DnPath
   ;
 
 var
@@ -383,7 +383,7 @@ TryDel:
       lEraseFile(F);
       end;
     else {case}
-      if SysErrorFunc(rc, Byte(N[1])-Byte('A')) = 1 then
+      if SysErrorFunc(rc, Byte(DriveOf(N))-Byte('A')) = 1 then
         goto TryDel;
   end {case};
   ClrIO;
@@ -423,7 +423,10 @@ function ValidDrive(dr: Char): Boolean;
 
 function GetDrive: Byte;
   begin
-  Result := Byte(ActiveDir[1])-Byte('A');
+  if HasDrives then
+    Result := Byte(DriveOf(ActiveDir))-Byte('A')
+  else
+    Result := 2;                   { the one tree is "C" }
   end;
 
 procedure GetMask(var m: String);
@@ -1122,10 +1125,10 @@ function MakeNormName(const S, S1: String): String;
     Dec(j);
   if i > 0 then
     begin
-    if  (S[i] in ['\', '/']) then
+    if  IsPathSep(S[i]) then
       MakeNormName := Copy(S, 1, i)+Copy(S1, 1, j)
     else
-      MakeNormName := Copy(S, 1, i)+'\'+Copy(S1, 1, j);
+      MakeNormName := Copy(S, 1, i)+PathSep+Copy(S1, 1, j);
     end
   else
     MakeNormName := S1;
@@ -1412,14 +1415,14 @@ Finish:
 
 procedure MakeSlash(var S: String);
   begin
-  if (S <> '') and (S[Length(S)] <> '\') then
-    S := S + '\';
+  if (S <> '') and not IsPathSep(S[Length(S)]) then
+    S := S + PathSep;
   end;
 
 procedure MakeNoSlash(var S: String);
   begin
-  if (Length(S) > 1) and (S[Length(S)] in ['\', '/']) and
-     (S[Length(S)-1] <> ':')
+  if (Length(S) > 1) and IsPathSep(S[Length(S)]) and
+     (not HasDrives or (S[Length(S)-1] <> ':'))
   then
     SetLength(S, Length(S)-1);
   end;

@@ -27,7 +27,7 @@ function MoveUserFiles(const FromDir, ToDir: string): Integer;
 implementation
 
 uses
-  SysUtils, Classes, OSSystem, Lfn, osdep;
+  SysUtils, Classes, OSSystem, Lfn, osdep, DnPath;
 
 function CopyOne(const Src, Dst: string): Boolean;
 var
@@ -100,8 +100,8 @@ begin
   if From <> Os then
     MoveUserFiles(From, Os);
   Result := lFExpand(Os);
-  if (Result <> '') and (Result[Length(Result)] <> '\') then
-    Result := Result + '\';
+  if (Result <> '') and not IsPathSep(Result[Length(Result)]) then
+    Result := Result + PathSep;
 end;
 
 end.

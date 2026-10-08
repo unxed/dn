@@ -225,7 +225,7 @@ var
     end;
 
 implementation
-uses
+uses DnPath,
   Lfn, uselfn, Startup, Dos, DnIni, DNHelp,
   basics, strutil, fileutil, envutil,
   panelroot, mainapp, Messages, Commands, Drives, Eraser, Menus,
@@ -381,7 +381,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
   DC := TDirCollection.Create(10, 10);
   New(P);
   FillChar(P^, SizeOf(P^), 0);
-  P^.DirName[uLfn] := C+':\';
+  P^.DirName[uLfn] := DriveRoot(C);
   P^.Cluster := 0;
   P^.Level := 0;
   P^.Size := -1;
@@ -575,7 +575,7 @@ procedure TTreeReader.HandleEvent(var Event: TEvent);
       cmRereadTree:
         begin
         S := UpStrg(PString(Event.InfoPtr)^);
-        C := S[1];
+        C := DriveOf(S);
         if  (C in ['A'..'Z']) and (DrvTrees[C].C <> nil) then
           begin
           DrvTrees[C].C.Free;
@@ -613,7 +613,7 @@ analyze rc }
   if not PathExist(Path) then
     (*  if (rc <> 0) and (rc <> 5 {directory already exists}) {$IFDEF Win32} and (rc <> 183) {$ENDIF} then*)
     begin
-    if SysErrorFunc(rc, Byte(Path[1])-Byte('A')) = 1 then
+    if SysErrorFunc(rc, Byte(DriveOf(Path))-Byte('A')) = 1 then
       goto Start;
     rc := MessageBox(GetString(dlFCNoCreateDir)+Path, nil,
          mfError+mfOKButton);
@@ -997,7 +997,7 @@ constructor TTreeView.Load(S: TStream);
   S.ReadStrV(LastPath);
   {S.Read(LastPath[0], 1); S.Read(LastPath[1], Length(LastPath));}
   CurPath := LastPath;
-  Drive := Byte(LastPath[1])-64;
+  Drive := Byte(DriveOf(LastPath))-64;
   StopQuickSearch;
   DrawDisabled := False;
   LocateEnabled := True;
@@ -1237,7 +1237,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
     if S = '' then
       Exit;
     ClrIO;
-    lGetDir(Byte(S[1])-64, S);
+    lGetDir(Byte(DriveOf(S))-64, S);
     if Abort then
       Exit; {DataCompBoy}
     CurPath := S;
@@ -1866,7 +1866,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
     end;
   if not Abort and (ScrollBar <> nil) and (DC.Count > 0) then
     begin
-    lGetDir(Byte(CurPath[1])-64, CurPath);
+    lGetDir(Byte(DriveOf(CurPath))-64, CurPath);
     if Abort then
       Exit; {DataCompBoy}
     D := CurPath;

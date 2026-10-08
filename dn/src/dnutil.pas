@@ -253,7 +253,7 @@ procedure PutInClipLong(const S: LongString);
 
 implementation
 
-uses
+uses DnPath,
   SysUtils,
   DNRun,
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
@@ -1830,7 +1830,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     ClrIO;
     lChDir(S);
     ClrIO;
-    S[1] := Char(Byte(S[1])-64);
+    S[1] := Char(Byte(DriveOf(S))-64);
     P := TXDoubleWindow.Create(R, 0, Byte(S[1]));
     Message(P, evCommand, cmDirTree, nil);
     if Abort then

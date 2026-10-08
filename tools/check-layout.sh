@@ -56,5 +56,8 @@ python3 bootstrap/tools/dn-manifest.py --check >/dev/null || err "dn/PROVENANCE.
 # 6. the names of the commands and keys for the log of the flight recorder are made from the sources
 python3 tools/gen-evnames.py --check || err "dn/src/evnames.pas is not up to date (run tools/gen-evnames.py)"
 
+# 7. no new hand-spelled separators or drive letters (docs/PATHS.md)
+python3 tools/check-paths.py || err "paths are spelled by hand; use DnPath"
+
 [ "$fail" -eq 0 ] && echo "layout: ok"
 exit "$fail"

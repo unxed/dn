@@ -174,16 +174,10 @@ begin
 end;
 
 procedure SysGetDirDos(D: Byte; var S: string);
-var
-  I: Integer;
 begin
   S := NameFromOs(GetCurrentDir);
-  for I := 1 to Length(S) do
-    if S[I] = '/' then
-      S[I] := '\';
   if S = '' then
-    S := '\';
-  S := 'C:' + S;
+    S := '/';
 end;
 {$ELSE}
 function SysOsPath(const S: string): string;
