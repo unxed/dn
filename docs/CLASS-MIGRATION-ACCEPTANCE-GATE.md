@@ -269,3 +269,7 @@ matrix and cursor state at the same checkpoints.
 Status values are `pass`, `fail`, or `not applicable`; an untested row is not
 acceptable. Any rendering difference, wrong menu position, missing dispatch,
 changed side effect, crash, or teardown error keeps the gate open.
+
+## After the gate (2026-10-08)
+
+The gate stays **CLOSED**. Wanted changes of behaviour after the close make the screen differ from the frozen object revision (`OBJECT_DN_SHA`) by design: the host path instead of `C:\dir`, no drive line and a different drive menu on Unix (`docs/PATHS.md`), tve as the editor. `dn-accept` is therefore started by hand only (`workflow_dispatch`); the checks that run on every push are the unit tests, the pty tests (`dn-linux`), `dn-windows`, `toolchain` (DOS) and `layout`.

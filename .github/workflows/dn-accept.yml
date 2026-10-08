@@ -2,24 +2,10 @@ name: dn-accept
 # Object vs class acceptance gate (full UI click-through). Builds both baselines
 # once, then runs tools/dn-linux-accept.py in parallel shards on GitHub runners.
 on:
+  # The gate is CLOSED (docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md): object and class were equal cell by cell, 177/177. It compares with a frozen object
+  # revision, so a change of behaviour that is wanted (the paths of the host instead of C:\\dir, no drive line on Unix: docs/PATHS.md) differs
+  # from it by design. It runs by hand (to re-check a class change that must not change the screen), not on every push.
   workflow_dispatch:
-  push:
-    paths:
-      - dn/**
-      - tv/**
-      - tools/build.sh
-      - tools/dn-env.sh
-      - tools/dn-linux-accept.py
-      - tools/acceptance/**
-      - tools/pty_screen.py
-      - .github/workflows/dn-accept.yml
-  pull_request:
-    paths:
-      - dn/**
-      - tv/**
-      - tools/dn-linux-accept.py
-      - tools/acceptance/**
-      - .github/workflows/dn-accept.yml
 
 # One accept matrix per ref — newer pushes cancel older runs (runner budget).
 concurrency:
