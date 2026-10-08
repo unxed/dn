@@ -196,11 +196,11 @@ begin
   I := 1;
   while I <= Length(S) do
   begin
-    if (I + 2 <= Length(S)) and (UpCase(S[I]) in ['A'..'Z']) and (S[I + 1] = ':') and (S[I + 2] in ['\', '/'])
+    if (S[I] = '/')
       and ((I = 1) or (S[I - 1] in [' ', '"', '''', '>', '<', '=', '|', ';', '(', '&', '@'])) then
     begin
       Q := (I > 1) and (S[I - 1] = '"');
-      J := I + 2;
+      J := I + 1;
       while (J <= Length(S)) and (not Q or (S[J] <> '"')) and (Q or not (S[J] in [' ', '"', '''', '>', '<', '|', ';', '&', ')'])) do
         Inc(J);
       Result := Result + ShellEscape(OsPath(Copy(S, I, J - I)));

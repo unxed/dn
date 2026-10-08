@@ -1127,7 +1127,7 @@ Err:
       Desktop.Insert(PV);
       SetLength(TempExtrDir, Length(TempExtrDir)-1);
       Str1 := GetPath(TempExtrDir);
-      CopyDirContent(TempExtrDir+PathSep+SCurDir, Str1, True, ForceMod);
+      CopyDirContent(TempExtrDir+DnSep+SCurDir, Str1, True, ForceMod);
       PV.Free;
     { delete the temporary directory with everything left in it}
       FRT := NewFileRec(GetName(TempExtrDir),
@@ -1141,7 +1141,7 @@ Err:
       lGetDir(0, DirToChange);
       LFN.lChDir(Str1);
       if ActiveDir[2] = ':' then {release the directory}
-        ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + PathSep));
+        ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + DnSep));
       Eraser.EraseFiles(FCT);
       LFN.lChDir(DirToChange);
       DirToChange := '';
@@ -1986,7 +1986,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   procedure StoreColors;
     begin
-    FN := GetFileNameDialog(ConfigDir+'colors\*.pal',
+    FN := GetFileNameDialog(ConfigDir+'colors'+DnSep+'*.pal',
            GetString(dlStoreColorPal), GetString(dlFileName),
         fdOKButton+fdHelpButton, hsColors);
     if FN = '' then
@@ -2014,7 +2014,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
   { procedure LoadColors;
  begin
   asm int 3 end;
-  FN := GetFileNameDialog(ConfigDir+'colors\*.pal', GetString(dlLoadColorPal), GetString(dlFileName),
+  FN := GetFileNameDialog(ConfigDir+'colors'+DnSep+'*.pal', GetString(dlLoadColorPal), GetString(dlFileName),
                           fdOKButton + fdHelpButton, hsColors);
   if FN = '' then Exit;
   LoadPalFromFile(FN);
@@ -2027,10 +2027,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     begin
     More := True;
     None := False;
-    FN := GetFileNameMenu(ConfigDir+'colors\', '*.pal', '', True, More,
+    FN := GetFileNameMenu(ConfigDir+'colors'+DnSep, '*.pal', '', True, More,
          None);
     if More then
-      FN := GetFileNameDialog(ConfigDir+'colors\*.pal',
+      FN := GetFileNameDialog(ConfigDir+'colors'+DnSep+'*.pal',
              GetString(dlLoadColorPal), GetString(dlFileName),
           fdOKButton+fdHelpButton, hsColors);
     if FN = '' then

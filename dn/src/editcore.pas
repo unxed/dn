@@ -271,7 +271,7 @@ function DocToUi(const S: AnsiString): AnsiString;
 
 implementation
 
-uses DnPath,
+uses DnPath,{$IFNDEF DNUTF8} TvClip,{$ENDIF}
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, histories,
   timeutil, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile, editinfo

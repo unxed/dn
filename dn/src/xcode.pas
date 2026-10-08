@@ -38,7 +38,7 @@ type
     {`}
 
 implementation
-uses
+uses DnPath,
   basics, strutil, Lfn, DNStdDlg, mainapp, Commands, DnIni
   ;
 
@@ -104,7 +104,7 @@ procedure TXCoder.LoadXlatTable; {JO}
   None := KeyMap = kmXlat;
    if SkipXLatMenu then
      goto SkipMenu;
-  FN := GetFileNameMenu(SourceDir+'xlt\', '*.xlt', FN, True, More, None);
+  FN := GetFileNameMenu(SourceDir+'xlt'+DnSep, '*.xlt', FN, True, More, None);
   if None then
     begin
     UseKeyMap;
@@ -112,7 +112,7 @@ procedure TXCoder.LoadXlatTable; {JO}
     end;
   if More then
 SkipMenu:
-    FN := GetFileNameDialog(SourceDir+'xlt\*.xlt',
+    FN := GetFileNameDialog(SourceDir+'xlt'+DnSep+'*.xlt',
         GetString(dlSelectXLT),
         GetString(dlOpenFileName),
         fdOKButton+fdHelpButton,

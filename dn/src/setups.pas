@@ -135,7 +135,7 @@ const
    {`}
 
 implementation
-uses
+uses DnPath,
   Dos, Tree, Drives, basics, strutil, fileutil, TvGlyphs, Messages, DNHelp,
   linepos, DnIni, iniengine, country, keymap, dirwatch
   , lfn, mainapp, Validate, TvCodePg
@@ -738,7 +738,7 @@ procedure TSaversDialog.Awaken;
     Insert(NewStr(GlyphChar(glDot)+' Flash-light'));
     Insert(NewStr(GlyphChar(glDot)+' Clock'));
     Insert(NewStr(GlyphChar(glDot)+' Blackness'));
-    lFindFirst(SourceDir+'ssavers\*.SS', AnyFileDir, lSR);
+    lFindFirst(SourceDir+'ssavers'+DnSep+'*.SS', AnyFileDir, lSR);
     while DosError = 0 do
       begin
       Insert(NewStr(lSR.FullName));

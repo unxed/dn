@@ -10,10 +10,10 @@ interface
 const
   { the separator of the host: "/" on Unix, "\" on DOS and Windows }
 {$IFDEF UNIX}
-  PathSep = '/';
+  DnSep = '/';
   HasDrives = False;
 {$ELSE}
-  PathSep = '\';
+  DnSep = '\';
   HasDrives = True;
 {$ENDIF}
   { the separator inside an archive: DN has always kept the members of an archive with "\", on every host }
@@ -99,7 +99,7 @@ begin
   if HasDrives then
     Result := UpCase(C) + ':\'
   else
-    Result := PathSep;
+    Result := DnSep;
 end;
 
 function IsQualified(const S: string): Boolean;

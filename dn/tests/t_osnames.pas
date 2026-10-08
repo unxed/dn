@@ -23,8 +23,9 @@ begin
   Check((NameToOs(#$80) = #$80) and (NameFromOs(#$D0#$90) = #$D0#$90), 'NameConv = False: no conversion');
   NameConv := True;
 
-  Check(OsPath('C:\nonex\a.txt') = '/nonex/a.txt', 'the drive is dropped, the backslashes become slashes');
-  Check(OsPath('C:') = '.', 'a bare drive is the current directory');
+  Check(OsPath('/nonex/a.txt') = '/nonex/a.txt', 'a name of the host is kept as it is');
+  Check(OsPath('') = '.', 'an empty name is the current directory');
+  Check(OsPath('/nonex/a\b') = '/nonex/a\b', 'a backslash in a name of Unix is a letter');
 
   Dir := GetTempDir + 't_osnames_' + IntToStr(GetProcessID) + '/';
   ForceDirectories(Dir);
@@ -32,12 +33,12 @@ begin
   AssignFile(F, Real);
   Rewrite(F);
   CloseFile(F);
-  Check(OsPath('C:' + StringReplace(Dir, '/', '\', [rfReplaceAll]) + 'hello.txt') = Real, 'the case of an existing name is found');
+  Check(OsPath(Dir + 'hello.txt') = Real, 'the case of an existing name is found');
   DeleteFile(Real);
   RemoveDir(Dir);
 
-  Check(CommandLineToOs('ls C:\nonex\a') = 'ls /nonex/a', 'a path in a command line is converted');
-  Check(CommandLineToOs('7z x -y C:\nonex\a.7z @C:\nonex\$DN0$.LST') = '7z x -y /nonex/a.7z @/nonex/\$DN0\$.LST', 'a list file after the sign @ (the archivers), the $ of its name is not for the shell');
+  Check(CommandLineToOs('ls /nonex/a') = 'ls /nonex/a', 'a path in a command line is kept');
+  Check(CommandLineToOs('7z x -y /nonex/a.7z @/nonex/$DN0$.LST') = '7z x -y /nonex/a.7z @/nonex/\$DN0\$.LST', 'a list file after the sign @ (the archivers), the $ of its name is not for the shell');
   Check(CommandLineToOs('echo ' + #$80) = 'echo ' + #$D0#$90, 'a letter of the page in a command line is converted');
   Finish;
 end.

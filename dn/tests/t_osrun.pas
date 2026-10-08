@@ -42,7 +42,7 @@ begin
   Check(OSBatchExt = '.CMD', 'batch extension elsewhere');
 {$ENDIF}
 {$IFDEF UNIX}
-  Check(OSDefaultTempDir = 'C:\tmp\', 'default temporary directory of Unix (/tmp in the DN way)');
+  Check(OSDefaultTempDir = '/tmp/', 'default temporary directory of Unix');
 {$ELSE}
   Check(OSDefaultTempDir = '', 'no default temporary directory elsewhere');
 {$ENDIF}

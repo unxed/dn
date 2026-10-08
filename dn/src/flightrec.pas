@@ -543,7 +543,7 @@ begin
     FRNote('crash', ClassName + ': ' + MessageText);
     if Dir = '' then
       Exit;
-    CrashDir := Dir + 'crash' + PathSep;
+    CrashDir := Dir + 'crash' + DnSep;
     ForceDirectories(OsName(CrashDir));
     Name := PickCrashName(CrashDir);
     {$I-}

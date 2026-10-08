@@ -1995,7 +1995,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           ( (DNKeyCode(Event) = kbCtrlS) and (CmdLine.Str = '')) or
           ( (DNKeyCode(Event) = kbDoubleCtrl) and (FMSetup.Quick = pqsCtrl)) or
           ( IsTypedChar(Event) and
-            (Char(Event.CharCode) <> PathSep) and (FMSetup.Quick = pqsCaps) and
+            (Char(Event.CharCode) <> DnSep) and (FMSetup.Quick = pqsCaps) and
             (I and $40 <> 0)) or
           ( IsTypedChar(Event) and
             (ShiftState and 3 <> 0) and (ShiftState and 4 = 0) and

@@ -1005,7 +1005,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
       if Drive.DriveType <> dtDisk then
         ReplaceDrive(FileName[1]);
       Message(Self, evCommand, cmInsertDrive, Drv);
-      if  (GetPath(PathInside) <> PathSep) and (Drive.DriveType = dtArc)
+      if  (GetPath(PathInside) <> DnSep) and (Drive.DriveType = dtArc)
       then
         begin
         Drive.lChDir(Copy(GetPath(PathInside), 2, 255));
@@ -1683,14 +1683,14 @@ WrongArc:
         if PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0 then
           if  (ShiftState and kbAltShift <> 0)
           then
-            S := lfGetShortFileName(PF^.Owner^)+PathSep
+            S := lfGetShortFileName(PF^.Owner^)+DnSep
           else
-            S := PF^.Owner^+PathSep
+            S := PF^.Owner^+DnSep
         else if (ShiftState and kbAltShift <> 0)
           then
-          S := PF^.Owner^+PathSep
+          S := PF^.Owner^+DnSep
         else
-          S := lfGetShortFileName(PF^.Owner^)+PathSep
+          S := lfGetShortFileName(PF^.Owner^)+DnSep
         
       else if ShiftState and 3 <> 0 then
         
@@ -2059,9 +2059,9 @@ WrongArc:
         if  (Drive.DriveType = dtDisk) then
           begin
           {JO: save in S the top-level directory name for the current}
-          s := Drive.CurDir+PathSep;
+          s := Drive.CurDir+DnSep;
           l := GetRootStart(s)+1;
-          s := Copy(s, l, PosChar(PathSep, Copy(s, l, MaxStringLength))-1);
+          s := Copy(s, l, PosChar(DnSep, Copy(s, l, MaxStringLength))-1);
           end;
         Drive.ChangeRoot;
         ReadDirectory;

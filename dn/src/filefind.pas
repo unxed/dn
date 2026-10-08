@@ -775,7 +775,7 @@ NotArchive:
           if  (SR.SR.Attr and Directory <> 0) then
             begin
             if  (FindRec.Options and ffoRecursive <> 0) then
-              DirCol.Insert(NewStr(Path+SR.FullName+PathSep))
+              DirCol.Insert(NewStr(Path+SR.FullName+DnSep))
             end
           else
             {JO}
@@ -806,12 +806,12 @@ Skip:
     begin
     MakeSlash(FN);
     if PathExist(FN+GetPath(FindRec.Mask))
-         and (Pos(PathSep, FindRec.Mask) <> 0)
+         and (Pos(DnSep, FindRec.Mask) <> 0)
     then
       begin
       FN := FN+GetPath(FindRec.Mask);
-      while Pos(PathSep, FindRec.Mask) <> 0 do
-        Delete(FindRec.Mask, 1, Pos(PathSep, FindRec.Mask));
+      while Pos(DnSep, FindRec.Mask) <> 0 do
+        Delete(FindRec.Mask, 1, Pos(DnSep, FindRec.Mask));
       end;
     MakeSlash(FN);
     end;
@@ -847,7 +847,7 @@ Skip:
       for i := 1 to LCol.Count-1 do
         begin
         P1 := LCol.At(i);
-        if Pos(P0^+PathSep, P1^) = 1 then
+        if Pos(P0^+DnSep, P1^) = 1 then
           DisposeStr(P1) // remove the subdirectory
         else
           begin
@@ -1064,12 +1064,15 @@ Skip:
         SearchDataInBranch(SourceFC);
 {/JO}
     2:
-      SearchData(Copy(FN, 1, 3));
+      if HasDrives then
+        SearchData(Copy(FN, 1, 3))
+      else
+        SearchData(DnSep);
     3:
       for C := 'A' to 'Z' do
         if ValidDrive(C) then
           if  (C = UpCase(FN[1])) or (not SlowDrive(C)) then
-            SearchData(C+':\');
+            SearchData(DriveRoot(C));
   end {case};
 Common1:
   if MaxAvail <= LowMemSize then
@@ -1615,10 +1618,10 @@ procedure DosReread(Files: TFilesCollection; Dir: String;
 //JO:  remove everything that was in this directory, because it
 //     definitely no longer exists
           while j < Files.Count do
-            if (UpStrg(MakeNormName(p^.Owner^, p^.FlName[True])+PathSep)
+            if (UpStrg(MakeNormName(p^.Owner^, p^.FlName[True])+DnSep)
                      = UpStrg(Copy(PFileRec(Files.At(j))^.Owner^,
                                   1, Length(MakeNormName(p^.Owner^,
-                                           p^.FlName[True])+PathSep))))
+                                           p^.FlName[True])+DnSep))))
             then
               begin
               Files.AtFree(j);

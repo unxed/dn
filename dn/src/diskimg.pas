@@ -367,7 +367,7 @@ function UnpackImage(const FName, DestDir: String; PInfo: TWhileView)
         if DR.Attr and Directory <> 0 then
           begin
           if not IsDummyDir(Nm) then
-            ProcessDir(Dir+Nm+PathSep, DR.Clus, True); {JO}
+            ProcessDir(Dir+Nm+DnSep, DR.Clus, True); {JO}
           Continue;
           end;
         WriteFile(Dir, Nm, DR.Clus, DR.len, DR.Date, DR.Attr);

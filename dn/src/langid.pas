@@ -71,10 +71,10 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
   if S1 = '' then
     S1 := SourceDir;
   if not (IsPathSep(S1[Length(S1)])) then
-    S1 := S1+PathSep;
+    S1 := S1+DnSep;
   S2 := StartupDir;
   if not (IsPathSep(S2[Length(S2)])) then
-    S2 := S2+PathSep;
+    S2 := S2+DnSep;
   if  (not CheckForHelp) and (not ExistFile(S1+LI+'.dlg')) and
       (not ExistFile(S2+LI+'.dlg'))
   then
@@ -87,7 +87,7 @@ function ValidLngId(LI: String; CheckForHelp: Boolean): Boolean;
     begin
     S1 := SourceDir;
     if not (IsPathSep(S1[Length(S1)])) then
-      S1 := S1+PathSep;
+      S1 := S1+DnSep;
     if  (not ExistFile(S1+LI+'.hlp')) and (not ExistFile(S2+LI+'.hlp'))
     then
       Exit

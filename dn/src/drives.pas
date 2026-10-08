@@ -294,14 +294,14 @@ procedure TDrive.ChangeRoot;
   {Cat: check for a network path}
   if not HasDrives then
     begin
-    lChDir(PathSep);
+    lChDir(DnSep);
     lGetDir(0, CurDir);
     end
-  else if CurDir[1] = PathSep then
+  else if CurDir[1] = DnSep then
     begin
     B := False;
     for I := 3 to Length(CurDir) do
-      if CurDir[I] = PathSep then
+      if CurDir[I] = DnSep then
         if B then
           begin
           CurDir := Copy(CurDir, 1, I-1);
@@ -609,13 +609,13 @@ procedure TDrive.lChDir(ADir: String);
     {Cat: check for a network path}
     if not HasDrives then
       OK := True                    { one tree: nothing to probe before the directory itself }
-    else if  (Length(ATestDir) > 2) and (ATestDir[1] = PathSep)
-         and (ATestDir[2] = PathSep)
+    else if  (Length(ATestDir) > 2) and (ATestDir[1] = DnSep)
+         and (ATestDir[2] = DnSep)
     then
       begin
       OK := False;
       for I := 3 to Length(ATestDir) do
-        if ATestDir[I] = PathSep then
+        if ATestDir[I] = DnSep then
           begin
           OK := True;
           Break;
@@ -687,7 +687,7 @@ procedure TDrive.lChDir(ADir: String);
   if HasDrives then
     ADir := 'C:\'
   else
-    ADir := PathSep;
+    ADir := DnSep;
   if ValidPath(ADir, False) then
     begin
     

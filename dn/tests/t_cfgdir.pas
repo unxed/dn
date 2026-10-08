@@ -41,7 +41,7 @@ begin
 
   R := UserConfigDirIn(Conf, Prog);
   Check(DirectoryExists(Conf), 'the directory of the user is made');
-  Check((R <> '') and (R[Length(R)] = '\'), 'the result is a path of DN with a backslash at the end: ' + R);
+  Check((R <> '') and (R[Length(R)] = '/'), 'the result is a path of the host with a separator at the end: ' + R);
   Check(Get(Conf + 'dn.ini') = 'ini of the program dir', 'dn.ini is copied');
   Check(Get(Conf + 'dn.his') = 'histories', 'the histories are copied');
   Check(Get(Conf + 'colors' + DirectorySeparator + 'my.pal') = 'palette', 'the palettes are copied');

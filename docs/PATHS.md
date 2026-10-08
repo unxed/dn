@@ -8,7 +8,7 @@ and it has real faults (a Unix file name that holds a backslash is cut in two; "
 
 * A path inside DN is a path of the host. On Unix it is `/home/x/file`: no drive, the separator is `/`, the root is `/`. On DOS and Windows
   it stays `C:\DIR\FILE`, or `\\host\share\...`.
-* The one place that knows the difference is `dn/compat/dnpath.pas`: `PathSep`, `HasDrives`, `IsPathSep`, `PathRootLen`, `IsAbsPath`,
+* The one place that knows the difference is `dn/compat/dnpath.pas`: `DnSep`, `HasDrives`, `IsPathSep`, `PathRootLen`, `IsAbsPath`,
   `NormalizeSep`. The rest of DN does not spell a separator or a drive letter. `tools/check-paths.py` (called by `tools/check-layout.sh`)
   counts the places that still do, against `tools/paths-baseline.txt`; the number may only fall.
 * The members of an archive keep `\` on every host (`ArcSep`): that is the format DN's archive code has always used, it is not a host path.

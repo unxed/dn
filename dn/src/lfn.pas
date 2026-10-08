@@ -1393,11 +1393,11 @@ function lFExpand(Path: String): String;
   for I := 0 to N-1 do
     begin
     if I > 0 then
-      Rest := Rest + PathSep;
+      Rest := Rest + DnSep;
     Rest := Rest + Parts[I];
     end;
   if (Rest <> '') and (Root <> '') and not IsPathSep(Root[Length(Root)]) and HasDrives and (Root[Length(Root)] <> ':') then
-    Root := Root + PathSep;           { \\host\share + dir }
+    Root := Root + DnSep;           { \\host\share + dir }
   Result := Root + Rest;
   if (Rest = '') and (Length(Result) > 1) and IsPathSep(Result[Length(Result)]) and (Result[Length(Result)-1] <> ':')
      and (PathRootLen(Result) < Length(Result)) then

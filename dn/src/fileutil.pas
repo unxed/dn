@@ -81,11 +81,11 @@ procedure EraseTempFile(S: String); {piwamoto}
 function ValidDrive(dr: Char): Boolean;
 function GetDrive: Byte;
   {` Return the drive number of the active panel (0..25).
-    For network paths the result is 27 (PathSep-'A') `}
+    For network paths the result is 27 (DnSep-'A') `}
 procedure GetMask(var m: String);
 function GetCurDrive: Char;
   {` Return the drive letter of the active panel ('A'..'Z').
-    For network paths the result is PathSep `}
+    For network paths the result is DnSep `}
 function GetExt(const s: String): String;
   {` s - file name, possibly with a path. Result is the extension
    starting with a dot. If there is no extension - result is '.' `}
@@ -267,7 +267,7 @@ function  ExistDir(const DName: string): Boolean; {based on ExistFile}
 var
  Dirinfo:lsearchrec;
 begin
-  If (DName<>'') and (DName[Length(DName)]=PathSep)
+  If (DName<>'') and (DName[Length(DName)]=DnSep)
   then lFindFirst(Copy(DName, 1, Length(DName)-1),Directory,DirInfo)
   else lFindFirst(DName,Directory,DirInfo);
  lFindClose(DirInfo);
@@ -824,7 +824,7 @@ function InDirFilter(Name, Filter: String): Boolean;
       Delete(S, 1, 1); {DelFC(S);}
     DelLeft(S);
     DelRight(S);
-    if  (S <> '') and (S[Length(S)] = PathSep)
+    if  (S <> '') and (S[Length(S)] = DnSep)
            and InMask(Name, Copy(S, 1, Length(S)-1))
     then
       Exit;
@@ -1128,7 +1128,7 @@ function MakeNormName(const S, S1: String): String;
     if  IsPathSep(S[i]) then
       MakeNormName := Copy(S, 1, i)+Copy(S1, 1, j)
     else
-      MakeNormName := Copy(S, 1, i)+PathSep+Copy(S1, 1, j);
+      MakeNormName := Copy(S, 1, i)+DnSep+Copy(S1, 1, j);
     end
   else
     MakeNormName := S1;
@@ -1172,7 +1172,7 @@ function PathExist(s: String): Boolean;
   else
     begin
     S := lFExpand(S);
-    IsRoot := S[Length(s)] = PathSep;
+    IsRoot := S[Length(s)] = DnSep;
 
     Attr := AnyFileDir or (Directory shl 8);
     lFindFirst(S, Attr, SR);
@@ -1416,7 +1416,7 @@ Finish:
 procedure MakeSlash(var S: String);
   begin
   if (S <> '') and not IsPathSep(S[Length(S)]) then
-    S := S + PathSep;
+    S := S + DnSep;
   end;
 
 procedure MakeNoSlash(var S: String);

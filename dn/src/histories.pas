@@ -625,13 +625,13 @@ function TTHistList.GetText(Item: LongInt; MaxLen: Integer): String;
   if not RolledFwd then
     begin
     WasSlash := False;
-    if FreeStr[Length(FreeStr)] = PathSep then
+    if FreeStr[Length(FreeStr)] = DnSep then
       begin
       SetLength(FreeStr, Length(FreeStr)-1);
       WasSlash := True;
       end;
     if WasSlash then
-      FreeStr := Cut(FreeStr, Size.X-2) + PathSep
+      FreeStr := Cut(FreeStr, Size.X-2) + DnSep
     else
       FreeStr := Cut(FreeStr, Size.X-1);
     end
@@ -832,7 +832,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   begin
   if InterfaceData.Options and ouiTrackDirs = 0 then
     Exit;
-  if  (S = '') or ((S[2] <> ':') and ((S[1] <> PathSep) or (S[2] <> PathSep)))
+  if  (S = '') or ((S[2] <> ':') and ((S[1] <> DnSep) or (S[2] <> DnSep)))
   then
     Exit;
   {Cat: added a check for network paths}
@@ -854,7 +854,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
     if  (DriveType = Integer(dtArvid)) or
         (DriveType = Integer(dtArc))
     then
-      AddStr(S, PathSep);
+      AddStr(S, DnSep);
     end;
   I := -1;
   P := DirHistory.FirstThat(IsThat);

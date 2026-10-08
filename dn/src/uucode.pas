@@ -2303,10 +2303,10 @@ end;
         SetLength(S1, Length(S1)-1);
       if S <> '' then
         begin
-        if S[Length(S)] = PathSep then
+        if S[Length(S)] = DnSep then
           MakeNormName := S+S1
         else
-          MakeNormName := S+PathSep+S1;
+          MakeNormName := S+DnSep+S1;
         end
       else
         MakeNormName := S1;

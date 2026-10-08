@@ -67,7 +67,7 @@ try:
     check(not alive, 'run 2: DN ended', text)
     check(any(n.lower() == 'dn.dsk' for n in os.listdir(d)), 'run 2: dn.dsk is written at the exit', text)
     text, alive = run(d, w, '', wait_exit=False)                     # the panel is in sub
-    check(re.search(r'work\\sub', text) is not None, 'run 3: the next start restores the directory of the panel (work\\sub)', text)
+    check(re.search(r'work[\\\\/]sub', text) is not None, 'run 3: the next start restores the directory of the panel (work/sub)', text)
     # a window of the desktop (the editor): out of DN by the menu File -> Exit (Alt-X in an editor does not leave DN), the next start brings the editor back
     d, w = install(out)
     dirs.append(d)

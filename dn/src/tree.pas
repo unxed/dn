@@ -197,7 +197,7 @@ procedure FreeTree(C: Char);
 function GetDirLen(Dir: String): TSize; {DataCompBoy}
 function CreateDirInheritance(var S: String; Confirm: Boolean): Byte;
   {` Create a directory of any nesting. S is expanded with
-   lFExpand and appended with PathSep at the end, and that value
+   lFExpand and appended with DnSep at the end, and that value
    remains after the call.
      Result is the path length (i.e. substring of S) of the directory that
    contains the outermost created directory (without slash).
@@ -476,7 +476,7 @@ function FindDir(DC: TCollection; const Dir: String): Integer;
     end;
   repeat
     S := '';
-    while (D[1] <> PathSep) and (D <> '') do
+    while (D[1] <> DnSep) and (D <> '') do
       begin
       S := S+D[1];
       Delete(D, 1, 1); {DelFC(D)}
@@ -1145,7 +1145,7 @@ function MkFcFromDirRec(D: PDirRec; var FullName: String)
     fr: PFileRec;
   begin
   l := Length(FullName);
-  while FullName[l] <> PathSep do
+  while FullName[l] <> DnSep do
     Dec(l);
   SetLength(FullName, l-1);
   Result := TFilesCollection.Create(1, 1);
@@ -1180,7 +1180,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       I: Integer;
     begin
     SearchForMask := False;
-    if QSMask[1] = PathSep then
+    if QSMask[1] = DnSep then
       begin
       ScrollBar.SetValue(0);
       SearchForMask := True;
@@ -1526,7 +1526,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
             begin
             if QuickSearch then
               begin
-              if  (Char(Event.CharCode) = PathSep) and (QSMask <> '')
+              if  (Char(Event.CharCode) = DnSep) and (QSMask <> '')
               then
                 begin
                 CE;
@@ -1553,7 +1553,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
               InitQuickSearch(Self);
               DoQuickSearchEvent(Event);
               SearchForMask(0);
-              if QSMask = PathSep then
+              if QSMask = DnSep then
                 InitQuickSearch(Self);
               end;
             CE;
@@ -2131,10 +2131,10 @@ function CreateDirInheritance(var S: String; Confirm: Boolean): Byte;
     Exit;
   while I < Length(S) do
     begin
-    J := I;  // points to PathSep before the start of the name at the next level
+    J := I;  // points to DnSep before the start of the name at the next level
     repeat
       Inc(I);
-    until (S[I] = PathSep);
+    until (S[I] = DnSep);
      // I points to the first character past the end of the name
     M := Copy(S, 1, I-1); // full path of the next level
     ClrIO;

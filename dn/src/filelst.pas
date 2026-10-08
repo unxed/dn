@@ -58,7 +58,7 @@ function ParseAddress(Address: String; var Zone, Net, Node, Point: Word)
   : Boolean;
 
 implementation
-uses
+uses DnPath,
   Startup, Lfn, Messages, Defines, FilesCol, fileutil, strutil, UserMenu,
   basics, HistList, Commands, mainapp, DNUtil, Tree, Views, Drivers, Drives
   {, dnfuncs} {must be placed before Dos}
@@ -317,7 +317,7 @@ AddrError:
       Nm := Hex4(NN)+Hex4(ND)
     else
       begin
-      SS := MakeNormName(SS, Hex4(NN)+Hex4(ND)+'.PNT\');
+      SS := MakeNormName(SS, Hex4(NN)+Hex4(ND)+'.PNT'+DnSep);
       Nm := Hex8(PT);
       end;
     Xt := '.hlo';

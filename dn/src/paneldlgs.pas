@@ -1967,7 +1967,7 @@ procedure DoRenameSingle(PF: PFileRec; const S, S2: String; DlgRes: Word);
   label
     NameErr;
   begin
-  if PosChar(PathSep, S) <> 0 then
+  if PosChar(DnSep, S) <> 0 then
     begin
     DosE := 123; // ERROR_INVALID_NAME
     goto NameErr;

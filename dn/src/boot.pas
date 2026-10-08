@@ -85,7 +85,7 @@ var
 
 {AK155 Checking that the temp directory name is non-empty is not enough:
 also check that it exists and that files can be created and deleted in it.
-Side effect: s always ends with PathSep }
+Side effect: s always ends with DnSep }
 procedure TraceStartupGroup(const Stage, Name: String; Group: TGroup);
 var
   V, FirstView: TView;
@@ -245,7 +245,7 @@ function BadTemp(var s: String): Boolean;
   if  (s = '') then
     Exit;
   if not IsPathSep(s[Length(s)]) then
-    s := s+PathSep;
+    s := s+DnSep;
   ClrIO;
   if not PathExist(s) then
     Exit;

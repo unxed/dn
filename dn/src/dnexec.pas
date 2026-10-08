@@ -105,7 +105,7 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
 
 //  free the directory
   if ActiveDir[2] = ':' then
-    ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + PathSep));
+    ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + DnSep));
 
   ChDir(SysOsPath(StartDir));
   end { AnsiExec };

@@ -20,14 +20,9 @@ begin
   end;
 end;
 
-function Dn(const OsPath: string): string;           { a path of the system as a path of DN }
-var
-  I: Integer;
+function Dn(const OsPath: string): string;           { a path of the host is a path of DN }
 begin
   Result := OsPath;
-  for I := 1 to Length(Result) do
-    if Result[I] = '/' then
-      Result[I] := '\';
 end;
 
 function StateOfTest: AnsiString;

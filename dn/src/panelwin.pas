@@ -823,7 +823,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
     if S <> '' then
       begin
       if not (IsPathSep(S[Length(S)])) then
-        AddStr(S, PathSep);
+        AddStr(S, DnSep);
       S := SquashesName(S);
       Message(CommandLine, evCommand, cmInsertName, @S);
       end;

@@ -101,7 +101,7 @@ begin
     MoveUserFiles(From, Os);
   Result := lFExpand(Os);
   if (Result <> '') and not IsPathSep(Result[Length(Result)]) then
-    Result := Result + PathSep;
+    Result := Result + DnSep;
 end;
 
 end.

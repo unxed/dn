@@ -121,7 +121,7 @@ const
 
 implementation
 
-uses
+uses DnPath,
   Dos, DnExec, mainapp, basics, strutil, Startup, Commands, TvGlyphs,
    VideoMan
   ;
@@ -524,7 +524,7 @@ procedure CallExternalSaver(const FN: String);
   {/JO}
   SwapVectors;
   {  DoneSysError;} {X-Man}
-  AnsiExec(SourceDir+'ssavers\'+FN, '');
+  AnsiExec(SourceDir+'ssavers'+DnSep+FN, '');
   {  InitSysError;} {X-Man}
   SwapVectors;
   InitVideo;
