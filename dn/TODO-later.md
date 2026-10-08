@@ -317,8 +317,9 @@ selection on the clipboard of the far2l terminal (the script checks it: PASS).
 
 **Confirmed by the owner (2026-10-03, the far2l terminal on Linux Mint, dist built from 18b36b9):** Ctrl+Ins copies and Shift+Ins pastes in the editor now. The red Shift+Ins check of `tools/dn-linux-far2l.py`
 (a block is selected when it pastes) stays as a note: a possible difference between pasting over a selected block and pasting without one; not seen by the owner.
-(2026-10-08: the script does not start at the current pin of tv3: it imports `tv/tests/pty/f2lterm.py`, the far2l terminal of the tests, which
-tv3 no longer has. It needs that test terminal in tv3 again, or one of its own here.)
+(2026-10-08: the script runs again with `tools/f2lterm.py`, the far2l terminal of the tests of dn, and is in CI (dn-linux.yml). The Shift+Ins check is
+red: the key event VK_INSERT with SHIFT_PRESSED toggles the insert mode in the editor (cursor height 100, as a plain Ins does) and nothing is pasted;
+Ctrl+Ins works. To look at: the way of Shift+Ins from a far2l key event to the editor of DN.)
 
 ## DOS: "save the desktop on exit" and "Save setup" (2026-10-03, started, not finished)
 

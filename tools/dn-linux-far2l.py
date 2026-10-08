@@ -20,6 +20,7 @@ def check(ok, msg, t=None):
             print(t)
 
 d = tempfile.mkdtemp(prefix='dnf2l-')
+t = None
 try:
     for f in os.listdir(out):
         if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
@@ -50,7 +51,8 @@ try:
     t.send(key(True, 13, 0, 0x1C, 0x0D)); t.pump(1.5)
     check(b'\x1b_far2l0' in t.out, 'on the exit the extensions are switched off')
 finally:
-    t.close()
+    if t:
+        t.close()
     shutil.rmtree(d, ignore_errors=True)
 print('ALL OK' if not fails else '%d FAILED' % fails)
 sys.exit(1 if fails else 0)
