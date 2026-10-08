@@ -31,6 +31,7 @@ begin
   Check(DisplayPath('C:\') = '/', 'the root of the only disk is shown as /');
   Check(DisplayPath('C:') = '/', 'a bare drive is shown as the root');
   Check(DisplayPath('/home/x') = '/home/x', 'a path that is already a path of the system is not changed');
+  Check(DisplayPath('/home/a\b') = '/home/a\b', 'a backslash in a path of the host is a letter of a name');
   Check(DisplayPath('x:y\z') = 'y/z', 'any drive letter goes');
   Check(DisplayPath('C:\' + #$80 + '\a') = '/' + #$80 + '/a', 'the bytes of the page of DN are not touched');
 

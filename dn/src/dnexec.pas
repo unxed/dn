@@ -159,7 +159,7 @@ function Win32Program(const S: String): SmallWord;
     RealName := Copy(RealName, 2, Length(RealName)-2);
   RealName := lFExpand(RealName);
   DelRight(RealName);
-  FSplit(RealName, Dir, Name, Ext);
+  lFSplit(RealName, Dir, Name, Ext);
   UpStr(Ext);
   if Ext <> '.EXE' then
     Exit;

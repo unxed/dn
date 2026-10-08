@@ -1790,15 +1790,13 @@ function PosLastDot(StrToMake: String): Byte;
   begin
   for I := Length(StrToMake) downto 1 do
     begin
-    case StrToMake[I] of
-      '\', '/':
-        Break;
-      '.':
-        begin
-        PosLastDot := I;
-        Exit;
-        end;
-    end {case};
+    if IsPathSep(StrToMake[I]) then
+      Break;
+    if StrToMake[I] = '.' then
+      begin
+      PosLastDot := I;
+      Exit;
+      end;
     end;
   PosLastDot := Length(StrToMake)+1;
   end;

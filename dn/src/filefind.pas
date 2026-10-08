@@ -1666,9 +1666,9 @@ procedure DosReread(Files: TFilesCollection; Dir: String;
         begin
         j := 0;
         while j < Files.Count do
-          if (UpStrg(S+':\') =
+          if (UpStrg(S+':'+ArcSep) =
                         UpStrg(Copy(PFileRec(Files.At(j))^.Owner^,
-                               1, Length(S+':\'))))
+                               1, Length(S+':'+ArcSep))))
             then
               begin
               Files.AtFree(j);
@@ -1957,7 +1957,7 @@ procedure CopyToTempDrive(AFiles: TCollection; Own: TView; ArchiveName: String);
       if ArchiveName <> '' then
         begin
         if  (P^.Owner^ = '') then
-          l := NewStr(ArchiveName+':\')
+          l := NewStr(ArchiveName+':'+ArcSep)
         else
           l := NewStr(ArchiveName+':'+P^.Owner^);
         end
@@ -2222,7 +2222,7 @@ procedure TFindDrive.CopyFromArc(AFiles: TFilesCollection; Own: TView);
   // extracted without a temporary subdirectory (default A: and B:)
   if  (DT.S <> '') and (Length(DT.S) >= 2) then
     begin
-    if HasDrives and (DT.S[2] = ':') then
+    if HasDriveLetter(DT.S) then
       DDr := UpCase(DT.S[1])
     else
       DDr := #1; {any character not in 'A'..'Z'}

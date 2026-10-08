@@ -520,7 +520,7 @@ Rep:
     HistoryAdd(hsFBBCopy, lFExpand(a));
     GlobalMessage(evCommand, cmPushFirstName, @S);
     GlobalMessageL(evCommand, cmPushName, hsFBBCopy);
-    if S[2] <> ':' then
+    if not IsQualified(S) then
       S := '';
     if S = '' then
       S := HistoryStr(hsFBBCopy, 0);

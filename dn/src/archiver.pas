@@ -1215,7 +1215,7 @@ TryAgain:
       begin
       while (SIntern[Length(SIntern)] = '.') do
         SetLength(SIntern, Length(SIntern)-1);
-      while (SIntern[1] = '\') do
+      while (SIntern[1] = ArcSep) do
         Delete(SIntern, 1, 1);
       ArcMakeNoSlash(SIntern);
       SIntern := CnvString(Arc.SetPathInside)+
@@ -1309,7 +1309,7 @@ procedure UnarchiveFiles(const FName: String);
   // extract without a temporary subdirectory (by default A: and B:)
   if  (DT.S <> '') and (Length(DT.S) >= 2) then
     begin
-    if HasDrives and (DT.S[2] = ':') then
+    if HasDriveLetter(DT.S) then
       DDr := UpCase(DT.S[1])
     else
       DDr := #1; {any character not in 'A'..'Z'}

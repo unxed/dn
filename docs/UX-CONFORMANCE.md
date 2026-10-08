@@ -133,4 +133,4 @@ the history list of the copy dialog and of the command line, the attributes, the
 the copy dialog opened in it) and fails on `C:`, `C:\`, `\\server\share` or a backslash between names. `DN_SWEEP_PATHS=1 tools/dn-linux-menusweep.py` does the same
 for every item of the menu. Both are clean. In the code: the release of the current directory before a delete (archiver, delete after the extract, running a
 program) goes to the root of the host (`PathRootLen`) instead of `Copy(ActiveDir, 1, 2) + '\'`; `lfn.pas` fills the table of the current directories of the
-drives only where drives exist. The ratchet `tools/check-paths.py` fell from 55 to 46.
+drives only where drives exist. The ratchet `tools/check-paths.py` fell from 55 to 8.

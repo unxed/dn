@@ -1401,7 +1401,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           end;
         cmChangeTree:
           begin
-          if PString(Event.InfoPtr)^[2] <> ':' then
+          if not IsQualified(PString(Event.InfoPtr)^) then
             {Cat:warn there may be problems with network paths}
             begin
             CE;

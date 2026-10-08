@@ -734,7 +734,7 @@ procedure ViewPktHeader(MsgCount: SmallInt);
     D: TDialog;
   begin
   ReadPktHeader(PktFileName, W, s1, s2, s3);
-  S := GetString(dlPktFile)+FExpand(PktFileName)+#13+s1+#13+s2+#13+s3+#13+
+  S := GetString(dlPktFile)+lFExpand(PktFileName)+#13+s1+#13+s2+#13+s3+#13+
     {!!!'Packet Size: '+PrintUsing('###,###',GetFileSize(PktFileName))+' byte(s)'+#13+}
     GetString(dlPktMsg)+ItoS(MsgCount);
   D := PktHeaderDlg(S);
@@ -1048,7 +1048,7 @@ constructor TMsgViewerDlg.Create(FName: String);
     VS: TScrollBar;
   begin
   Desktop.GetExtent(R);
-  inherited Create(R, GetString(dlNetMailView)+FExpand(FName));
+  inherited Create(R, GetString(dlNetMailView)+lFExpand(FName));
   Options := Options or ofCentered;
   GrowMode := gfGrowHiX+gfGrowHiY;
   EventMask := $FFFF;

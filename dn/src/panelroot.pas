@@ -939,7 +939,7 @@ procedure TFilePanelRoot.CommandHandle(var Event: TEvent);
 
     {JO: so as to go to the found file in an archive from the find panel}
     PathInside := FileName;
-    if HasDrives and (PathInside[2] = ':') then
+    if HasDriveLetter(PathInside) then
       PathInside[2] := ';'; {JO: replace the colon with anything }
     I := PosChar(':', PathInside);
     if I > 0 then
@@ -1152,7 +1152,7 @@ WrongArc:
       with TArcDrive(Drive.Prev) do
         begin
         if CurDir = '' then
-          PDir := NewStr(ArcName+':\')
+          PDir := NewStr(ArcName+':'+ArcSep)
         else
           PDir := NewStr(ArcName+':'+CurDir)
         end;

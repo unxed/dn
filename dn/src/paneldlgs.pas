@@ -1676,7 +1676,7 @@ procedure CM_ArchiveFiles(AFP: Pointer);
   else
     S := '';
   {Cat}
-  FSplit(S, Dir, Name, Ext); {AK155: not sure this is needed }
+  lFSplit(S, Dir, Name, Ext); {AK155: not sure this is needed }
   MakeArchive(Name, PC, False, False, P);
   {/Cat}
   PC.DeleteAll;
