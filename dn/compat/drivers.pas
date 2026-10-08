@@ -327,17 +327,8 @@ end;
 { The next key event of the system without waiting (DN: the loops that can be stopped by Esc ask for it); the other events that come
   before it (the mouse) are dropped. }
 procedure GetKeyEvent(var Event: TEvent);
-var
-  N: Integer;
 begin
-  Event.What := evNothing;
-  for N := 1 to 256 do
-  begin
-    PollEvent(0, Event);
-    if (Event.What = evNothing) or ((Event.What and evKeyDown) <> 0) then
-      Exit;
-    Event.What := evNothing;
-  end;
+  PollKeyEvent(Event);
 end;
 
 procedure SetMouseSpeed(XS, YS: Byte);
@@ -721,22 +712,8 @@ begin
 end;
 
 function CStrLen(const S: String): Integer;
-var
-  I: Integer;
-  T: String;
 begin
-  if Utf8Enabled then
-  begin
-    T := '';
-    for I := 1 to Length(S) do
-      if S[I] <> '~' then
-        T := T + S[I];
-    Exit(TextWidthS(T));
-  end;
-  Result := 0;
-  for I := 1 to Length(S) do
-    if S[I] <> '~' then
-      Inc(Result);
+  Result := TvUtil.CStrLen(S);
 end;
 
 end.
