@@ -56,6 +56,8 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     side, everywhere and always: locally all of them at once (each with its own HOME, `xargs -P` or `&` + `wait`), the sweeps with
     `-j 8` or more; in CI a matrix of groups and the tests of a group side by side (`tools/ci-par.sh` in dn). Check `uptime` before
     choosing a lower number; a test that cannot run beside others is a bug of the test (a fixed path, a fixed tmux session name).
+11. "Later, after the other agent" for a task the owner asked for now. Rule: a task the owner asks for starts at once, in its own
+    worktree; a possible conflict with another agent is settled at the merge, not by waiting.
 
 ## How to
 
