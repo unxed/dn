@@ -31,7 +31,7 @@ def install(out):
 
 
 def cmdline(text):
-    return [l for l in text.split('\n') if l.startswith('C:\\')][:1]
+    return [l for l in text.split('\n') if l.startswith('/') and '>' in l][:1]
 
 
 out = os.path.abspath(sys.argv[1])

@@ -40,7 +40,7 @@ try:
     t.send('\x1b', 0.5)
 
     def line():
-        return [l for l in t.text().split('\n') if l.startswith('C:\\')][0].split('>', 1)[1]
+        return [l for l in t.text().split('\n') if l.startswith('/') and '>' in l][0].split('>', 1)[1]
 
     t.send('\x1b[97u', 0.3); t.send('\x1b[97;1:3u', 0.3)
     check(line() == 'a', 'a press and a release of a: one character', line())
