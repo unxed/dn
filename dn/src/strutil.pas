@@ -242,6 +242,9 @@ procedure CompressString(var S: LongString);
 {AK155}
 function PosLastDot(StrToMake: String): Byte;
   {` Position of the extension dot. If no extension - length plus 1 `}
+function IsExtDot(const S: String; I: Integer): Boolean;
+  {` True when the dot S[I] starts the extension of the name. With drive letters every dot does; else a dot that has
+     only dots before it in the name is a part of the name: ".bashrc" has no extension, ".config.bak" has "bak" `}
 function IsDummyDir(const DirName: String): Boolean;
 procedure CopyShortString(const s1, s2: ShortString);
   {` Copies a string according to its length, regardless of how
@@ -1794,11 +1797,28 @@ function PosLastDot(StrToMake: String): Byte;
       Break;
     if StrToMake[I] = '.' then
       begin
-      PosLastDot := I;
-      Exit;
+      if IsExtDot(StrToMake, I) then
+        begin
+        PosLastDot := I;
+        Exit;
+        end;
+      Break;
       end;
     end;
   PosLastDot := Length(StrToMake)+1;
+  end;
+
+function IsExtDot(const S: String; I: Integer): Boolean;
+  var
+    J: Integer;
+  begin
+  Result := True;
+  if HasDrives then
+    Exit;
+  J := I-1;
+  while (J >= 1) and (S[J] = '.') do
+    Dec(J);
+  Result := (J >= 1) and not IsPathSep(S[J]);
   end;
 
 function IsDummyDir(const DirName: String): Boolean;

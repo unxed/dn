@@ -1112,6 +1112,8 @@ procedure lFSplit(const Path: String; var Dir, Name, ext: String);
         Break;
       end;
     end;
+  if (DotPos <> 0) and not IsExtDot(Path, DotPos) then
+    DotPos := 0;
 
   if DotPos+SlashPos = 0 then
     if DriveEnd <> 0 then

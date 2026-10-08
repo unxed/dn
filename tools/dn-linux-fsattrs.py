@@ -93,8 +93,8 @@ def tree_dot(w):
 
 d, w, text, alive = case(out, tree_dot, '')
 dirs.append(d)
-# the panel shows `.hidden` in the columns of a DOS name: an empty name and the extension `hidden`, cut (`hid►`)
-check(alive and 'hid' in text and 'plain' in text, 'a fresh start lists a dot file in the panel', text)
+# the name and the extension of a dot file: tools/dn-linux-dotfiles.py
+check(alive and '.hidden' in text and 'plain' in text, 'a fresh start lists a dot file in the panel', text)
 # the check box "Show hidden files" of the dialog (the fifth of the group "Display", the fifth stop of Tab) off, OK; then Alt-X saves the setup
 d, w, text, alive = case(out, tree_dot, 'ALT-O f s TAB TAB TAB TAB DOWN DOWN DOWN DOWN SPACE ENTER', quit=True)
 dirs.append(d)

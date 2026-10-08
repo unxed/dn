@@ -567,10 +567,8 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
     const
       D1: Char = #0;
     begin
-    for B := Length(S1) downto 1 do
-      if S1[B] = '.' then
-        Break;
-    if  (B > 1) or (S1[1] = '.') then
+    B := PosLastDot(S1);
+    if B <= Length(S1) then
       begin
       E1 := @S1[B];
       SetLength(E1^, Length(S1)-B);
@@ -579,10 +577,8 @@ function TFilesCollection.Compare(Key1, Key2: Pointer): Integer;
     else
       E1 := @D1;
 
-    for B := Length(S2) downto 1 do
-      if S2[B] = '.' then
-        Break;
-    if  (B > 1) or (S2[1] = '.') then
+    B := PosLastDot(S2);
+    if B <= Length(S2) then
       begin
       E2 := @S2[B];
       SetLength(E2^, Length(S2)-B);
