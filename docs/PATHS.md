@@ -37,3 +37,12 @@ and run with the new `lFExpand` (CI).
 3. The callers, in batches, each batch checked by the pty tests (`tools/dn-linux-*.py`) and the unit tests: panels and tree, copy and
    find, the drive menu, archive layer.
 4. The baseline falls to what the DOS and Windows backends need.
+
+## Audit of the whole code base (stage 8b)
+
+A path on a host without drives never shows a drive letter (`C:`), a backslash or a `\\server\share` form: not in the panels, the titles,
+the dialogs, the command line, the messages, the history, the file lists, the log or the report of a crash. The same holds for fpide
+(`fpide/src`), tv3 (`tvchdir.pas` and the file dialogs) and tve. The audit has three parts: (1) a pty test that visits the screens of
+the Linux build and fails on a drive letter or a backslash in a path (`tools/dn-linux-pathscan.py`); (2) the ratchet `tools/check-paths.py`
+for dn (it falls only); (3) the same ratchet idea for fpide, tv3 and tve (`tools/check-paths.py` takes the roots). Findings are fixed in the
+caller, with `DnPath`, `ExtractFilePath`, `PathDelim` or `DirectorySeparator`, never by a special case for Linux in the output.

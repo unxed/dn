@@ -14,6 +14,8 @@ RES = os.path.join(HERE, '..', 'dn', 'src', 'resource', 'english', 'dn.dnr')
 # the items that are not opened (the names are in English): they leave DN, scan the disk, run a program or are not the same twice
 SKIP = ('Exit', 'Directory tree', 'Game', 'Trash Can', 'Trashcan', 'Edit OS Environment', 'Execute OS command', 'Screen rest', 'Screen grabber',
         'Find...', 'Directory Branch', 'Count directory length', 'Compare directories', 'Change drive', 'Free space', 'Disk information')
+# DN_SWEEP_PATHS=1: the items that show paths and drives are opened too (only the ones that leave DN or start a program stay out): the screens are scanned for paths of DOS form
+SKIP_PATHS = ('Exit', 'Game', 'Execute OS command', 'Screen rest', 'Screen grabber', 'Edit OS Environment')
 KEYS = {'ESC': '\x1b', 'ENTER': '\r', 'DOWN': '\x1b[B', 'RIGHT': '\x1b[C', 'F10': '\x1b[21~'}
 
 
@@ -43,6 +45,19 @@ def parse():
             else:
                 break
     return tree
+
+
+# a path of the DOS or Windows form on the screen of a Linux build: a drive letter with a colon and a backslash, a UNC name, a backslash between names
+PATH_FORM = re.compile(r'(?<![A-Za-z0-9])[A-Za-z]:\\|\\\\[A-Za-z0-9_.-]+\\|[A-Za-z0-9_.-]\\[A-Za-z0-9_.-]')
+
+
+def path_form(text):
+    """The first piece of a screen text that looks like a path of DOS or Windows, '' when there is none."""
+    for line in text.split('\n'):
+        m = PATH_FORM.search(line)
+        if m:
+            return line[max(0, m.start() - 20):m.end() + 20].strip()
+    return ''
 
 
 def title(s):
@@ -96,6 +111,9 @@ def one(job):
         t.pump(0.8, 2.5)
         text = t.text()
         bad = 'Fatal Error' in text or not t.alive()
+        form = path_form(text)
+        if form and not bad:
+            bad, text = True, 'PATH FORM: %s\n%s' % (form, text)
         for _ in range(4):
             if t.alive():
                 t.send(KEYS['ESC'], 0.15)
@@ -118,7 +136,7 @@ def main():
     jobs = []
     for m, top in enumerate(tree):
         for path, names in leaves(top['items'], [m], [title(top['name'])]):
-            if any(s.lower() in names[-1].lower() for s in SKIP):
+            if any(s.lower() in names[-1].lower() for s in (SKIP_PATHS if os.environ.get('DN_SWEEP_PATHS') else SKIP)):
                 continue
             for lang in langs:
                 jobs.append((out, lang, path, names))
@@ -130,7 +148,7 @@ def main():
                 bad += 1
                 print('FAIL %s %s %s' % (lang, ' > '.join(names), path), flush=True)
                 print('    | ' + '\n    | '.join(l[:100] for l in text.split('\n')[:8]), flush=True)
-    print('%d runs, %d with a fatal error' % (len(jobs), bad), flush=True)
+    print('%d runs, %d with a fatal error or a path of DOS form' % (len(jobs), bad), flush=True)
     sys.exit(1 if bad else 0)
 
 
