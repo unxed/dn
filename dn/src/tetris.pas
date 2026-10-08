@@ -855,10 +855,10 @@ procedure TGameView.HandleEvent;
                 CE;
                 end;
               else {case}
-                if  (Char(Event.CharCode) > #0) and (CommandLine <> nil) then
+                if  ((Char(Event.CharCode) > #0) or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80))) and (CommandLine <> nil) then
                   CommandLine.HandleEvent(Event);
             end
-          else if (Char(Event.CharCode) > #0) and (CommandLine <> nil) then
+          else if ((Char(Event.CharCode) > #0) or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80))) and (CommandLine <> nil) then
             CommandLine.HandleEvent(Event);
       end {case};
   end {case};

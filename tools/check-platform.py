@@ -20,6 +20,7 @@ BACKENDS = [
 
 # file -> why a target conditional is there (one line each; a new one needs a line here)
 ALLOWED = {
+    "dn/compat/dnpath.pas": "the one unit that knows the separator and the drives of the host (docs/PATHS.md)",
     "dn/src/dnrun.pas": "the facade selects the backend of the target (DNRunDos, DNRunLinux, DNRunOther): the only place",
     "dn/archives/fmt7z.pas": "the format works through host tools that exist on Unix (7z)",
     "dn/archives/fmtbz2.pas": "the format works through host tools / zstream of Unix (tar.bz2)",

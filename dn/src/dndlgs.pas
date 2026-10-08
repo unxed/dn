@@ -516,7 +516,7 @@ look very strange.
         kbAltDown, kbCtrlDown:
           OpenList;
         else
-          if (DNKeyCode(Event) and $FF0000 = 0) and (Char(Event.CharCode) > ' ')
+          if (DNKeyCode(Event) and $FF0000 = 0) and ((Char(Event.CharCode) > ' ') or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80)))
           then
             OpenList;
       end {case};

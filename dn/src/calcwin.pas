@@ -2048,7 +2048,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         kbAltRight:
           ExpandCol(CurCol);
         else {case}
-          if Char(Event.CharCode) > #31 then
+          if (Char(Event.CharCode) > #31) or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80)) then
             begin
             Marking := False;
             SetMark;

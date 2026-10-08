@@ -50,7 +50,7 @@ unit Startup;
 
 interface
 
-uses
+uses DnPath,
   Defines, Dos, Commands,
   Drivers, Collect, TvGlyphs
   ;
@@ -298,7 +298,7 @@ const
     Quick: pqsAlt;
     LRCtrlInDriveLine: fdlPassive;
     Show: fmsSortIndicator+
-      {$IFNDEF UNIX}fmsDriveLine+{$ENDIF}
+      Ord(HasDrives)*fmsDriveLine+
       fmsShowScrollBar+
       fmsHiliteFiles;
     LFN_Wrap: 0; {Combo}
