@@ -2,9 +2,7 @@
 Type=Application
 Name=DN
 GenericName=File Manager
-GenericName[ru]=Файловый менеджер
 Comment=DOS Navigator style two-panel file manager for the terminal
-Comment[ru]=Двухпанельный файловый менеджер в стиле DOS Navigator для терминала
 Exec=dn %F
 Icon=dn
 Terminal=true
