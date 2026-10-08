@@ -94,8 +94,8 @@ type
   private
     FLastUndo, FLastRedo: Integer;
     FLastSel, FLastMod: Boolean;
-    function HostCommand(Sender: TObject; Cmd: Integer): Boolean;
-    function LineAttrHook(Sender: TObject; Line: Int64; var Attr: TColorAttr): Boolean;
+    function HostCommand(Sender: TTveSender; Cmd: Integer): Boolean;
+    function LineAttrHook(Sender: TTveSender; Line: Int64; var Attr: TColorAttr): Boolean;
     procedure ClipSet(const Text: AnsiString; Column: Boolean);
     function ClipGet(out Text: AnsiString; out Column: Boolean): Boolean;
     function KeyDown(var Event: TEvent): Boolean;
@@ -783,7 +783,7 @@ function TFileEditor.ClassAttr(C: Integer): TColorAttr;
   AttrSetFg(Result, AttrFg(GetColor(N).Lo));
   end;
 
-function TFileEditor.LineAttrHook(Sender: TObject; Line: Int64; var Attr: TColorAttr): Boolean;
+function TFileEditor.LineAttrHook(Sender: TTveSender; Line: Int64; var Attr: TColorAttr): Boolean;
   begin
   Result := False;
   if EdOpt.HiliteLine and (Line = Editor.Line) then
@@ -974,7 +974,7 @@ function TFileEditor.HandleCommand(var Event: TEvent): Boolean;
 
 { --- the commands of tve that need the dialogs and the windows of DN --- }
 
-function TFileEditor.HostCommand(Sender: TObject; Cmd: Integer): Boolean;
+function TFileEditor.HostCommand(Sender: TTveSender; Cmd: Integer): Boolean;
   begin
   Result := True;
   case Cmd of
