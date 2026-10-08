@@ -6,10 +6,11 @@ Scenarios: mouse-menu (a click on File opens the menu), mouse-dir (a double clic
 the dialog), autosave (Options -> Startup: Autosave Desktop and Preserve directory, enter a directory, File -> Exit; the next start shows the directory),
 utf8-names-cp (the build with the code page inside, the DOS with UTF-8 names: Russian names are shown in cp866 and the directory is entered; needs the patched DOSBox-X, DN_DOS_PATCHED=1), files (the keys of the harness on real files: F7 makes a directory, F5 copies, F6 moves, F8 deletes; checked on the file system of the host), edit (F4 edits and F2 saves a real file, F3 views one), save-setup (Alt-K, a column, Store, OK, a restart), clipboard (the editor copies, a DOS program reads the DOS clipboard; needs nasm and DN_DOS_PATCHED=1), pages (chcp 437, 850, 852, 866, 1125: the frames, Russian on 866, Ukrainian on 1125), all of them by default. utf8-names-u8 (the build with UTF-8 inside, the DOS with UTF-8 names: F5 copies files with a Chinese and a Russian name; needs DN_DOS_PATCHED=1 and the build with DN_UTF8=1), names-cp-plain (the same names with the stock DOSBox-X, which has no UTF-8 provider: the DOS gives them in the code page; without DN_DOS_PATCHED=1), (The button "Save setup" of the panel setup dialogs is not driven: the saving of the settings of the dialogs is checked by the scenario autosave.)
 Needs: Xvfb, libX11 and libXtst (ctypes), dosbox-x (the package of Ubuntu is enough; DOSBOX_X=path to another). The tests of the UTF-8 names need a DOSBox-X with the UTF-8 DOS API (`master` since October 2026; before that the patches of
-docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names."""
+docs/patches): DN_DOS_PATCHED=1 adds the option `utf8 file names` and the scenario utf8-names.
+Several scenarios run side by side, each in a process of its own with its own Xvfb display (DN_XDISPLAY=:N: one display, the scenarios one after another)."""
 import ctypes, os, shutil, subprocess, sys, tempfile, time
 
-DISPLAY = os.environ.get('DN_XDISPLAY', ':97')
+DISPLAY = os.environ.get('DN_XDISPLAY', '')                 # empty: Xvfb chooses a free one
 DBX = os.environ.get('DOSBOX_X', 'dosbox-x')
 PATCHED = os.environ.get('DN_DOS_PATCHED') == '1'
 CW, CH = 9, 16                                   # a cell of the text screen of 80x25 in the window of 720x400
@@ -33,7 +34,23 @@ class Attr(ctypes.Structure):
 class Screen:
     """The X display and the pointer."""
     def __init__(self):
-        self.xvfb = subprocess.Popen(['Xvfb', DISPLAY, '-screen', '0', '1024x768x24'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        global DISPLAY
+        if DISPLAY:
+            self.xvfb = subprocess.Popen(['Xvfb', DISPLAY, '-screen', '0', '1024x768x24'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            # a free display number, chosen by Xvfb (the scenarios run side by side, each with its own display)
+            r, w = os.pipe()
+            self.xvfb = subprocess.Popen(['Xvfb', '-displayfd', str(w), '-screen', '0', '1024x768x24'], pass_fds=(w,),
+                                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            os.close(w)
+            num = b''
+            while not num.endswith(b'\n'):
+                c = os.read(r, 16)
+                if not c:
+                    break
+                num += c
+            os.close(r)
+            DISPLAY = ':' + num.decode().strip()
         for _ in range(50):
             self.d = x11.XOpenDisplay(DISPLAY.encode())
             if self.d:
@@ -354,12 +371,32 @@ def main():
         sys.exit(__doc__)
     src = os.path.abspath(sys.argv[1])
     names = sys.argv[2:] or list(SCEN)
-    work = os.path.join(tempfile.gettempdir(), 'dn-dos-input')
+    for n in names:
+        if n not in SCEN:
+            sys.exit('unknown scenario %s: %s' % (n, ' '.join(SCEN)))
+    if len(names) > 1 and not DISPLAY:
+        # the scenarios wait for the emulator, not for the CPU: each one runs in a process of its own (its own X display, work directory
+        # and HOME), all side by side; the output of each is printed when it ends
+        base = tempfile.mkdtemp(prefix='dn-dos-input-')
+        procs = []
+        for n in names:
+            home = os.path.join(base, 'home-' + n)
+            os.makedirs(home)
+            procs.append((n, subprocess.Popen([sys.executable, os.path.abspath(__file__), src, n], env=dict(os.environ, HOME=home),
+                                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)))
+        bad = []
+        for n, p in procs:
+            out = p.communicate()[0]
+            print('=== %s' % n)
+            print(out, end='', flush=True)
+            if p.returncode:
+                bad.append(n)
+        print('ALL OK (%d scenarios)' % len(names) if not bad else 'FAILED: ' + ' '.join(bad))
+        sys.exit(1 if bad else 0)
+    work = tempfile.mkdtemp(prefix='dn-dos-input-')
     screen = Screen()
     try:
         for n in names:
-            if n not in SCEN:
-                sys.exit('unknown scenario %s: %s' % (n, ' '.join(SCEN)))
             SCEN[n](src, work, screen)
     finally:
         screen.close()
