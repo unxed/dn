@@ -58,6 +58,9 @@ function SysGetVolumeLabel(Drive: Char): ShortString;
   names that exist is found (a name that does not exist is left as it is, so that it can be created). Elsewhere the name is
   returned as it is. }
 function SysOsPath(const S: string): string;
+{ A path of DN as the user of the system expects to read it: on Unix without the drive and with "/" ("C:\dev\shm\" is "/dev/shm/"), elsewhere as it
+  is. For the screen only (the title of a panel, issue #23); a path to open is SysOsPath. }
+function SysDisplayPath(const S: string): string;
 { The bytes of a text of DN (its code page) as the system wants them: UTF-8 on Unix (see NameToOs), else the text as it is. }
 function SysNameToOs(const S: string): string;
 { Convert a DN command line to the host shell's encoding and path syntax. }
@@ -153,6 +156,11 @@ begin
   Result := OsPath(S);
 end;
 
+function SysDisplayPath(const S: string): string;
+begin
+  Result := DisplayPath(S);
+end;
+
 function SysNameToOs(const S: string): string;
 begin
   Result := NameToOs(S);
@@ -187,6 +195,11 @@ begin
 {$ELSE}
   Result := S;
 {$ENDIF}
+end;
+
+function SysDisplayPath(const S: string): string;
+begin
+  Result := S;
 end;
 
 function SysNameToOs(const S: string): string;

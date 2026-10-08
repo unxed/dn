@@ -27,6 +27,13 @@ begin
   Check(OsPath('') = '', 'an empty name stays empty');
   Check(OsPath('/nonex/a\b') = '/nonex/a\b', 'a backslash in a name of Unix is a letter');
 
+  Check(DisplayPath('C:\dev\shm\') = '/dev/shm/', 'for the screen: the drive is dropped and the backslashes become slashes (issue #23)');
+  Check(DisplayPath('C:\') = '/', 'the root of the only disk is shown as /');
+  Check(DisplayPath('C:') = '/', 'a bare drive is shown as the root');
+  Check(DisplayPath('/home/x') = '/home/x', 'a path that is already a path of the system is not changed');
+  Check(DisplayPath('x:y\z') = 'y/z', 'any drive letter goes');
+  Check(DisplayPath('C:\' + #$80 + '\a') = '/' + #$80 + '/a', 'the bytes of the page of DN are not touched');
+
   Dir := GetTempDir + 't_osnames_' + IntToStr(GetProcessID) + '/';
   ForceDirectories(Dir);
   Real := Dir + 'Hello.TXT';

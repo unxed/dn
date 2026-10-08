@@ -17,6 +17,10 @@ function NameFromOs(const S: string): string;
 function NameToOs(const S: string): string;
 { a path of DN (A:\x\y, the page of DN) as a path of the system (the case of the existing names is found) }
 function OsPath(const S: string): string;
+{ a path of DN as the user of Unix expects to read it (issue #23): "C:\dev\shm\" is shown as "/dev/shm/". Only the spelling changes: the
+  drive is dropped and "\" becomes "/"; the bytes stay those of the page of DN and no file is looked up (unlike OsPath, which makes a path
+  to open) }
+function DisplayPath(const S: string): string;
 { a command line of DN: the paths in it are made system paths, the other bytes are converted as names }
 function CommandLineToOs(const S: string): string;
 
@@ -169,6 +173,20 @@ begin
     Exit;
   end;
   Result := ResolveCase(Result);
+end;
+
+function DisplayPath(const S: string): string;
+var
+  I: Integer;
+begin
+  Result := S;
+  if (Length(Result) >= 2) and (Result[2] = ':') and (UpCase(Result[1]) in ['A'..'Z']) then
+    Delete(Result, 1, 2);
+  if Result = '' then
+    Result := '/';
+  for I := 1 to Length(Result) do
+    if Result[I] = '\' then
+      Result[I] := '/';
 end;
 
 { a path in a command line is read by the shell: $ and ` in it (the list files of the archivers are named $DN0$.LST) keep their meaning with a backslash }
