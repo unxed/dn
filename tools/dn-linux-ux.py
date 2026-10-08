@@ -2,7 +2,8 @@
 """The navigation guidelines of vtui (UX_GUIDELINES.md) on the Linux build of DN (a pty): tools/dn-linux-ux.py OUTDIR
 Esc closes the dialogs, Enter presses the default button also in an edit field, Space toggles a check box, the arrow keys move the cursor of a
 radio group without changing the selection and leave the group only at its boundary, Tab and Shift+Tab cycle, Ctrl+Tab / Ctrl+Shift+Tab walk the
-windows, the F keys keep their DN meaning, Ctrl+Left / Ctrl+Right follow the word rules of far2l.
+windows (with key releases: the list of the windows, the choice on the release of Ctrl), a held arrow stops at the end of a menu (with auto
+repeats), the F keys keep their DN meaning, Ctrl+Left / Ctrl+Right follow the word rules of far2l.
 What is kept as it is (Norton Commander habits) is listed in docs/UX-CONFORMANCE.md.
 The options of the guideline keys (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck, [FilePanels]
 PanelArrowsPage): with the defaults DN keeps its keys; each option, set in dn.ini or in its setup dialog, gives the key of the guidelines."""
@@ -71,6 +72,96 @@ def footer(t):
     # the line of the panels that shows the current file of each panel
     rows = t.text().split('\n')
     return next((l for l in rows if 'UP--DIR' in l or '.txt' in l and '\u2551' in l and l.count('\u2551') >= 3), '')
+
+
+def switcher(d, w):
+    """0.2, 0.3: in a terminal that tells key releases (it answers the query of the keyboard protocol of Kitty) Ctrl+Tab opens the list of the
+    windows of tv3; the release of Ctrl chooses, Esc cancels. The window of the panels is listed by its name (it has no title)."""
+    w = os.path.join(d, 'switch')
+    os.makedirs(w, exist_ok=True)
+    open(os.path.join(w, 'one.txt'), 'w').write('x')
+    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'TV_WIN32_INPUT': '0'})
+    t.pump(1.5, 6)
+    check(b'\x1b[?u' in t.raw, '0.3: DN asks the terminal for the keyboard protocol of Kitty')
+    t.send(b'\x1b[?0u', 0.5)
+    keys(t, 'ESC DOWN F4')
+    edit = lambda: 'Edit' in t.text().split('\n')[1]
+    listed = lambda: sum(1 for l in t.text().split('\n') if '\u2502 Edit - ' in l or '\u2502 File Manager ' in l)
+    check(edit(), 'an editor window is open', t.text())
+    t.send(b'\x1b[9;5u', 0.6)
+    check(listed() == 2 and edit(), '0.2: Ctrl+Tab opens the list of the windows (the editor and the panels by name), the window stays', t.text())
+    t.send(b'\x1b[9;5:3u', 0.4)
+    check(listed() == 2, '0.3: the release of Tab does not close the list', t.text())
+    t.send(b'\x1b[57442;1:3u', 0.6)
+    check(listed() == 0 and not edit() and row_of(t, '..') >= 0, '0.3: the release of Ctrl closes the list and goes to the chosen window (the panels)', t.text())
+    t.send(b'\x1b[9;5u', 0.6)
+    opened = listed() == 2
+    t.send(b'\x1b[27u', 0.5)
+    check(opened and listed() == 0 and not edit(), '0.2: Esc closes the list and keeps the window', t.text())
+    t.send(b'\x1b[57442;1:3u', 0.4)
+    t.close(0.3)
+
+
+def chosen(t, bar=False):
+    """the text of the highlighted item of the open drop-down (bar: of the menu bar): the cell whose background differs from the others"""
+    from collections import Counter
+    rows = t.text().split('\n')
+    if bar:
+        items = [(t.screen.cells[0][x][1][1], x) for x in range(len(rows[0])) if rows[0][x] != ' ']
+    else:
+        top = next((i for i, l in enumerate(rows) if '\u250c' in l), -1)
+        if top < 0:
+            return None
+        x = rows[top].index('\u250c') + 2
+        items = []
+        for y in range(top + 1, len(rows)):
+            if '\u2514' in rows[y]:
+                break
+            items.append((t.screen.cells[y][x][1][1], y))
+    if not items:
+        return None
+    common = Counter(b for b, _ in items).most_common(1)[0][0]
+    hit = [p for b, p in items if b != common]
+    if not hit:
+        return None
+    if bar:
+        return rows[0][hit[0]:hit[-1] + 1].strip()
+    return rows[hit[0]][rows[top].index('\u250c') + 1:].split('\u2502')[0].strip()
+
+
+def held(d, w):
+    """M.7: in a terminal that tells the auto repeats (the win32 input mode) a held arrow stops at the end of a menu; a single press wraps"""
+    press, release = b'\x1b[%d;80;0;1;0;1_', b'\x1b[%d;80;0;0;0;1_'
+    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'TV_WIN32_INPUT': '1'})
+    t.pump(1.5, 6)
+    keys(t, 'ESC F10 DOWN')
+    first = chosen(t)
+    t.send(press % 40, 0.2)
+    t.send(release % 40, 0.3)
+    for _ in range(4):
+        t.send(press % 38, 0.1)                       # Up held from the second item (the first press moves, the repeats stop on the first)
+    t.send(release % 38, 0.3)
+    check(first and chosen(t) == first, 'M.7: a held Up stays on the first item of a menu', t.text())
+    t.send(press % 38, 0.2)
+    t.send(release % 38, 0.3)
+    last = chosen(t)
+    check(last and last != first, 'M.7: a single Up on the first item wraps to the last', t.text())
+    t.send(press % 40, 0.2)
+    t.send(release % 40, 0.3)
+    for _ in range(30):
+        t.send(press % 40, 0.1)                       # Down held from the first item
+    t.send(release % 40, 0.3)
+    check(chosen(t) == last, 'M.7: a held Down stops on the last item', t.text())
+    keys(t, 'ESC ESC F10')
+    t.send(press % 37, 0.2)
+    t.send(release % 37, 0.3)
+    end = chosen(t, True)
+    for _ in range(12):
+        t.send(press % 39, 0.1)                       # Right held in the bar from the last item (the first press wraps, the repeats stop)
+    t.send(release % 39, 0.3)
+    check(end and chosen(t, True) == end, 'M.7: a held Right stops at the last item of the menu bar', t.text())
+    keys(t, 'ESC ESC')
+    t.close(0.3)
 
 
 def options(d, w, w2):
@@ -303,6 +394,8 @@ def main():
         os.makedirs(w2)
         for i in range(60):
             open(os.path.join(w2, 'f%02d.txt' % i), 'w').write('x')
+        switcher(d, w)
+        held(d, w)
         options(d, w, w2)
     finally:
         shutil.rmtree(d, ignore_errors=True)

@@ -35,6 +35,7 @@ type
 
   TDesktop = class(TvApp.TDeskTop)
     procedure Clear;
+    procedure HandleEvent(var Event: TEvent); override;
   end;
 
   TProgram = class;
@@ -111,7 +112,7 @@ var
 
 implementation
 
-uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes, DNRun, DosHarness, TvCluster;
+uses basics, fileutil, langid, Videoman, osdep, OSStartScreen, dnscreen, TvHist, TvUtf8, TvCodePg, TvLocale, palettes, DNRun, DosHarness, TvCluster, TvKeys, TvSys, TvUtil;
 
 constructor TBackground.Create(const Bounds: TRect; APattern: Byte);
 begin
@@ -130,6 +131,60 @@ begin
     P.Free;
   end;
   Unlock;
+end;
+
+{ The list of the window switcher of tv3 (UX guidelines 0.2, 0.3) shows the titles of the windows; a window of DN with no title (the file
+  panels) is listed by the name it gives to cmGetName (as in the list of windows of Alt+0): the name is its title while the list is made. }
+procedure TDesktop.HandleEvent(var Event: TEvent);
+const
+  MaxNamed = 32;
+var
+  Names: array[1..MaxNamed] of ShortString;
+  Wins: array[1..MaxNamed] of TWindow;
+  Olds: array[1..MaxNamed] of PStr;
+  N, I: Integer;
+  P: TView;
+  K: TKey;
+  Back: Boolean;
+  IsKey: Boolean;
+begin
+  N := 0;
+  IsKey := False;
+  if (Event.What = evKeyDown) and UxSwitcher and UxCtrlTab and KeyUpAvailable then
+    if Assigned(OnSwitcherKey) then
+      IsKey := OnSwitcherKey(Event, Back)
+    else
+    begin
+      K := KeyMake(Event.KeyCode, Event.ControlKeyState);
+      IsKey := (K.Code = TvKeys.kbTab) and ((K.Mods and TvKeys.kbCtrlShift) <> 0);
+    end;
+  if IsKey and (Last <> nil) then
+  begin
+    P := Last;
+    repeat
+      if (P is TWindow) and (TWindow(P).GetTitle(40) = '') and (N < MaxNamed) then
+      begin
+        Inc(N);
+        Names[N] := '';
+        Message(P, evCommand, Commands.cmGetName, @Names[N]);
+        if Names[N] = '' then
+          Dec(N)
+        else
+        begin
+          Wins[N] := TWindow(P);
+          Olds[N] := Wins[N].Title;
+          Wins[N].Title := @Names[N];
+        end;
+      end;
+      P := P.Next;
+    until P = Last;
+  end;
+  try
+    inherited HandleEvent(Event);
+  finally
+    for I := 1 to N do
+      Wins[I].Title := Olds[I];
+  end;
 end;
 
 { As TProgram.Init of DN (the order matters: the status line, the menu and the desktop are inserted in this order, then the

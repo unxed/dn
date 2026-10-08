@@ -2,8 +2,8 @@
 
 The rules are those of [`UX_GUIDELINES.md`](https://github.com/unxed/vtui/blob/main/UX_GUIDELINES.md) of vtui (the word rules are in its `WORDNAV.md`).
 The same audit for tv3, tve and fpide is `tv3/docs/UX-CONFORMANCE.md` (the numbers of the rows are the same). This file is the audit of DN (DOS Navigator),
-Linux build, UTF-8 inside, against tv3 commit 62900cc (the switches `UxNavBoundary`, `UxMenuEsc`, `UxMenuAutoOpen`, `UxCtrlTab`, `UxEnterButton`,
-`UxWordNav`, the units `TvWordNav` and `TvActions`).
+Linux build, UTF-8 inside, against tv3 commit 652bd98 (the switches `UxNavBoundary`, `UxMenuEsc`, `UxMenuAutoOpen`, `UxCtrlTab`, `UxEnterButton`,
+`UxWordNav`, `UxSwitcher`, `UxMenuHeldStop`, `UxWheelUnderCursor`, the units `TvWordNav` and `TvActions`).
 
 What DN takes from tv3 and what it has of its own decides most of the table:
 
@@ -25,8 +25,8 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | # | Rule | DN | Verdict | Checked by |
 |---|---|---|---|---|
 | 0.1 | `Ctrl+Tab` / `Ctrl+Shift+Tab` walk the screens | the windows (panels, viewer, editors) are walked by the desktop of tv3 | conformant | P:ux |
-| 0.2 | A switcher overlay lists the titles | not done (as in tv3); DN has `Alt+0`, the list of windows | gap | C |
-| 0.3 | The switch is committed when `Ctrl` is released | immediate (no key-up on most terminals) | gap | C |
+| 0.2 | A switcher overlay lists the titles | where the terminal tells key releases (the win32 input mode, the far2l terminal, a terminal that answers the query of the keyboard protocol of Kitty): `Ctrl+Tab` opens the list of the windows of tv3 (`UxSwitcher`) in the middle of the screen, more presses walk it, `Esc` cancels. A window of DN with no title (the file panels) is listed by the name it gives in the list of `Alt+0` (`TDesktop.HandleEvent`, `mainapp.pas`). Elsewhere no list (0.3) | conformant (needs key releases) | P:ux |
+| 0.3 | The switch is committed when `Ctrl` is released | with the list: the release of `Ctrl` chooses (the release of `Tab` does not); a list that gets no release commits itself after 8 s (tv3). A terminal with no releases (xterm, tmux, the Linux console): the switch is at once, as before | conformant (needs key releases) | P:ux |
 | 1.1 | `Tab` / `Shift+Tab` move through the elements | dialogs: yes. The two panels: `Tab` changes the panel (the Norton rule) | conformant (dialogs) | P:ux |
 | 1.2 | The cycle wraps | yes | conformant | P:ux |
 | 2.1 | Arrows navigate inside a component | yes | conformant | P:ux |
@@ -63,7 +63,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | M.4 | `Esc` closes the drop-down and keeps the bar; the second `Esc` leaves the bar | default: one `Esc` leaves the whole menu (the Norton rule: the drop-down gives the key back to the bar). Option `MenuEscStep`: the drop-down keeps the `Esc`, the bar stays active with its highlight, the second `Esc` leaves it (`menus.pas`; `F10` still closes everything) | conflict (option `MenuEscStep`, default DN) | P:ux |
 | M.5 | In a drop-down `Left`/`Right` close it and open the neighbour | yes, except on an item with a submenu (`View`, `Edit` of the File menu): there `Right` opens the submenu first (`RightExpand`) | conformant (with that exception) | P:ux |
 | M.6 | `Up` on the first / `Down` on the last item wrap | yes | conformant | C |
-| M.7 | Held arrows stop at the end | not done (needs key-up events) | gap | C |
+| M.7 | Held arrows stop at the end | where the terminal tells the auto repeats (the win32 input mode, the far2l terminal, the keyboard protocol of Kitty): a held `Up` / `Down` stops at the first / last item of a drop-down, a held `Left` / `Right` at the ends of the bar; a single press still wraps. The menus of DN are their own code: `menus.pas` reads `kfRepeat` of the key event, asks for the repeats while a menu runs (`TvSys.KeyRepeatInfo`) and follows the switch of tv3 (`UxMenuHeldStop`). Elsewhere a held arrow wraps as before | conformant (needs auto repeat information) | P:ux |
 | M.8 | A context menu passes the focus on at its boundary | the popup menu is modal and wraps | n/a | C |
 | X.1 | Left click focuses / activates | yes | conformant | C |
 | X.2 | Double click is `Enter` | yes (panels, lists) | conformant | C |
@@ -71,7 +71,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | X.4 | The wheel scrolls the component under the cursor | as in tv3 (the focused window scrolls) | gap | C |
 | R.1 | One action = one declaration (the registry `TvActions`) | DN keeps its resource tables (`dn.dnr`: menus, status lines, key maps); not migrated | gap | C |
 
-Count: 46 rows: **31 conformant** (some only for dialogs or input lines, as the cell says), **7 gap** (0.2, 0.3, D.4, E.7, M.7, X.4, R.1), **6 conflict** (G.2b, L.2, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
+Count: 46 rows: **34 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **4 gap** (D.4, E.7, X.4, R.1), **6 conflict** (G.2b, L.2, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
 
 ## Other keys the guidelines touch
 
@@ -88,6 +88,12 @@ dropping the letters would change the hot keys of the menu.
 * A first try made `Left`/`Right` in the bar open the menu (M.2, two lines in `menus.pas`). It was taken back: `tools/dn-linux-ops.py` (5 of 42 checks: the Info
   panel, the startup dialog, the saved desktop) and other scripts reach their dialogs with `F10`, `Right`, `Down`, which then opens the wrong item. M.2 is now the
   option `MenuArrowsOpen` (off by default, so the routes hold).
+
+## The gap rows closed afterwards
+
+* 0.2, 0.3: the switcher of tv3 works in DN as it is (DN's desktop is tv3's); DN adds the names of the windows that have no title. `P:ux` answers the query of the
+  keyboard protocol of Kitty and sends the presses and releases of that protocol.
+* M.7: the menus of DN (`menus.pas`) stop a held arrow at the end. `P:ux` sends the keys of the win32 input mode (a press with no release before it is a repeat).
 
 ## Regressions from the new tv3
 

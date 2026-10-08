@@ -306,7 +306,7 @@ var
 
 implementation
 uses
-  TvSys, TvClip,
+  TvSys, TvClip, TvEvents, TvMenus,
   basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8, TvGlyphs
   , keymap, DnIni
   ;
@@ -489,6 +489,28 @@ function TMenuView.Execute: Word;
 
   procedure TrackKey(FindNext: Boolean);forward;
 
+  { M.7 of the UX guidelines: True when the key is an auto repeat (the terminal tells it) and the next named item in that direction would
+    wrap round, so that a held arrow stops at the end; a single press still wraps (TvMenus.UxMenuHeldStop) }
+  function HeldAtEnd(FindNext: Boolean): Boolean;
+    var
+      P: PMenuItem;
+    begin
+    Result := False;
+    if not TvMenus.UxMenuHeldStop or ((E.KeyFlags and TvEvents.kfRepeat) = 0) or (Current = nil) then
+      Exit;
+    if FindNext then
+      P := Current.Next
+    else
+      P := Menu^.Items;
+    while (P <> nil) and (P <> Current) do
+      begin
+      if P.Name <> nil then
+        Exit;
+      P := P.Next;
+      end;
+    Result := True;
+    end;
+
   procedure TrackMouse;
     var
       R: TRect;
@@ -621,9 +643,13 @@ q:
     W, H, L: Integer;
     R2: TRect;
     ExecDefault: Boolean;
+    SaveRepeatInfo: Boolean;
   label
     lEnter, lHotkey;
   begin { TMenuView.Execute: }
+  SaveRepeatInfo := TvSys.KeyRepeatInfo;
+  if TvMenus.UxMenuHeldStop then
+    TvSys.KeyRepeatInfo := True; { M.7: the terminal is asked to tell the auto repeats while a menu runs }
   LastActionIsExpand := False;
   AutoSelect := False;
   Result := 0;
@@ -701,7 +727,9 @@ q:
           else {case}
             case {CtrlToArrow}(DNKeyCode(E)) of
               kbUp, kbDown:
-                if Size.Y <> 1 then
+                if (Size.Y <> 1) and HeldAtEnd(DNKeyCode(E) = kbDown) then
+                  { a held arrow stops at the end }
+                else if Size.Y <> 1 then
                   begin
                   if {CtrlToArrow}(DNKeyCode(E)) = kbDown then
                     if not Going then
@@ -735,7 +763,8 @@ q:
                   goto lEnter;
                 if ParentMenu = nil then
                   begin
-                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
+                  if not HeldAtEnd(True) then
+                    TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
                   { MenuArrowsOpen (dn.ini): in the bar the arrow also opens the menu of the item }
                   if MenuArrowsOpen and (Size.Y = 1) then
                     AutoSelect := True;
@@ -749,7 +778,8 @@ q:
                   {nothing to do}
                 else if ParentMenu = nil then
                   begin
-                  TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
+                  if not HeldAtEnd(False) then
+                    TrackKey( {CtrlToArrow}(DNKeyCode(E)) = kbRight);
                   if MenuArrowsOpen and (Size.Y = 1) then
                     AutoSelect := True;
                   end
@@ -995,6 +1025,7 @@ lHotkey:
     DrawView;
     end;
   MenuActive := False;
+  TvSys.KeyRepeatInfo := SaveRepeatInfo;
   end { TMenuView.Execute: };
 
 function TMenuView.FindItem(Ch: Char): PMenuItem;
