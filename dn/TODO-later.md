@@ -245,7 +245,7 @@ The rest of `dn/data` (`COLORS`, `DN.FLG`) is unused so far: check whether it is
   How it was found: the traces of `Put`/`Get` of every nested object (positions in the file), then of the steps of `TDoubleWindow.Store/Load`; the first 5 builds only showed that DN reads 4 bytes less than it writes.
   Other classes of DN that call `GetSubViewPtr` after `inherited Load`: `calc`, `dbview`, `dndlgs`, `edwin` (the same fix helps them).
 - **Verified after the fix (DOS, DOSBox-X master with the guard):** panel sort by size (Alt-B), Options -> Save desktop (`DN.DSK`, 6628 bytes), restart, Options -> Load desktop: no error, the panel comes back in the size
-  order (the base start shows the extension order). The same code is in the Linux/Windows/aarch64 builds, where the bug was the same; their `dist/` are not rebuilt yet (a refresh of all `dist/` is due after the next fixes).
+  order (the base start shows the extension order). The same code is in the Linux/Windows/aarch64 builds, where the bug was the same; their builds come with the next release (workflow `release`).
 - **Checked (2026-10-03, Linux build, pty; `tools/dn-linux-ops.py`):** Options -> Startup -> "Autosave Desktop": `DN.DSK` is written at Alt-X, the option is kept in `DN.CFG`, the next start restores the desktop.
   The directory of the **active** disk panel is restored only together with "Preserve directory" (`TFilePanelRoot.Store`, `osuPreserveDir`): by design of DN, not a defect; the passive panel always keeps it. Not checked on DOS.
 - **Not checked yet:** "Save setup" (the button of the panel setup dialogs, `TSaveSetupButton.Press` in `fltools.pas`: only the presets 1..10 set `ConfigModified`, the active/passive targets live in the desktop), and the user screen after an external

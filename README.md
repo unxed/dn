@@ -23,9 +23,19 @@ Our new code, which is not part of the RIT Labs source files and their descendan
 
 ## Releases
 
-Push a tag `v*` (for example `v0.1.0-alpha`). The `release` workflow builds the
-linux64 DN and attaches `dn-<tag>-linux64.tar.gz` (binary plus dialog/language/help
-files) to a GitHub Release. Other platforms will follow in later steps of issue #1.
+The builds of DN are not kept in the repository: CI makes them from the sources and publishes them as GitHub Releases
+(https://github.com/unxed/dn/releases).
+
+- **Release:** push a tag `v*` (for example `v0.1.0-alpha`; a tag with `-` gives a pre-release), or run the workflow
+  `release` by hand with the name of an existing tag. It builds every target from the tag (with the submodules `tv` and
+  `tve`) and publishes one release with `dn-<tag>-<target>.tar.gz` (linux64, linux-aarch64, linux32) or `.zip` (win64,
+  win32, dos, dos-utf8) and `SHA256SUMS.txt`.
+- **Nightly:** every push to `main` replaces the pre-release `nightly` (workflow `nightly`, archives `dn-<commit>-<target>`).
+
+An archive holds the program, its resources (`*.lng`, `*.dlg`, `*.hlp`, `xlt/`), the default `dn.ini`, `README.TXT`,
+`BUILD.TXT` and the licence texts (DN: `LICENSE-DN.TXT`, `LICENSE-DN-FILES.md`, `PROVENANCE.md`; dn: `LICENSE.TXT`; tv3:
+`LICENSE-TV.TXT`, `COPYRIGHT-TV-MAGIBLOT.TXT`, `THIRD-PARTY-NOTICES-TV.md`; tve: `LICENSE-TVE.TXT`; DOS: `cwsdpmi.exe` and
+`cwsdpmi.doc`). The packing is `tools/dn-pack.sh` (`tools/dn-notices.sh` writes the licence texts and `README.TXT`).
 
 ## Build DN with your own fpc
 
@@ -36,7 +46,7 @@ that calls `tools/build.sh` and installs the binary plus resources under
 
 `make install` also puts a launcher entry (`share/applications/dn.desktop`, it starts DN in a
 terminal) and an icon (`share/icons/hicolor/scalable/apps/dn.svg`) under the same prefix, so DN
-shows up in the menu of a desktop environment. The sources of both are in `dist/desktop/`.
+shows up in the menu of a desktop environment. The sources of both are in `dn/data/desktop/`.
 
 The installed wrapper (when started as root) may check GitHub Releases every tenth
 run and stage an update for the next launch (`tools/dn-autoupdate.sh`, issue #4).
@@ -88,7 +98,7 @@ languages; `dn.exe` in DOSBox-X: two file panels with real file names, the menu 
 dialogs from the resources (copy, delete, make directory, choose drive), the viewer (F3) and the built-in editor (F4),
 disk information (Ctrl-L), the user screen (Ctrl-O: the screen that started DN and the output of the programs DN ran), running programs (Enter on a file), help (F1: the `*.HLP` files are made by
 our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not work:** the mouse was not checked, some keys, saving of the desktop. See
-`dn/TODO-later.md` and `dist/dos/screenshots/`. A run of the "tour" scenarios: `tools/dn-tour.sh`.
+`dn/TODO-later.md`. A run of the "tour" scenarios: `tools/dn-tour.sh`.
 
 1. **TV tests** (only `fpc` 3.2.x is needed):
 
@@ -101,9 +111,9 @@ our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not 
        python3 tools/dn-linux-tour.py out/linux64      # a tour by scenarios in a pty
        python3 tools/dn-linux-ops.py out/linux64       # F7/F5/F6/F8/F4 on real files, checked against the file system
 
-   Without building: `cd dist/linux && ./dn` (i386, a static ELF; description: `dist/linux/README.TXT`, screens: `dist/linux/screenshots/*.txt`).
+   Without building: the archives `linux64`, `linux32` (i386, a static ELF) and `linux-aarch64` of the [releases](#releases) (description: `README.TXT` in the archive).
    i386 from sources: `tools/build-fpc-i386-linux.sh PREFIX`, then `DN_LINUX=PREFIX tools/build.sh linux`.
-   ARM64 (aarch64) Linux: on an ARM machine the ordinary build (`tools/build.sh linux64`); cross from x86_64: `tools/build-fpc-aarch64-linux.sh PREFIX` (needs `binutils-aarch64-linux-gnu`), then `DN_AARCH64=PREFIX tools/build.sh aarch64`; checking without hardware: `PTY_RUN_PREFIX=qemu-aarch64-static python3 tools/dn-linux-ops.py out/aarch64` (package `qemu-user-static`), the tv tests: `TV_FPC=PREFIX/bin/fpc-aarch64-linux TV_RUN=qemu-aarch64-static tools/tv-test.sh`. A ready build: `dist/aarch64/`.
+   ARM64 (aarch64) Linux: on an ARM machine the ordinary build (`tools/build.sh linux64`); cross from x86_64: `tools/build-fpc-aarch64-linux.sh PREFIX` (needs `binutils-aarch64-linux-gnu`), then `DN_AARCH64=PREFIX tools/build.sh aarch64`; checking without hardware: `PTY_RUN_PREFIX=qemu-aarch64-static python3 tools/dn-linux-ops.py out/aarch64` (package `qemu-user-static`), the tv tests: `TV_FPC=PREFIX/bin/fpc-aarch64-linux TV_RUN=qemu-aarch64-static tools/tv-test.sh`. A ready build: the archive `linux-aarch64` of the [releases](#releases).
 
 0w. **DN on Windows** (cross build on Linux; needs `fpc`, `make`, `git`, `binutils-mingw-w64-x86-64` / `-i686`, `python3`):
 
@@ -112,7 +122,7 @@ our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not 
        python tools/dn-win-smoke.py out/win64       # on Windows: a real console (ConPTY), pip install pywinpty; in CI the workflow dn-windows
 
    DN on Windows is also UTF-8 inside (names in any script through the wide APIs); the old build with a code page: `DN_UTF8=0 tools/build.sh win64`.
-   Without building: `dist/win64/dn.exe`, `dist/win32/dn.exe` (description: `README.TXT` next to them; needs a Windows 10 1809+ console or Windows Terminal).
+   Without building: the archives `win64` and `win32` of the [releases](#releases) (description: `README.TXT` in the archive).
    Output on Windows goes through the Console API by default (`WriteConsoleOutputW`: works in wine and in Windows older than 10); `DN_WIN_OUTPUT=vt` turns on the former mode
    with VT sequences (a Windows 10 1809+ console / Windows Terminal). In wine the terminal of wine draws the bright background (the DN palette) unevenly, so there the background has no brightness; `DN_WIN_BRIGHT_BG=1|0` switches it. CI checks on real Windows (`tools/dn-win-smoke.py`).
 
@@ -144,9 +154,10 @@ our `tvhc` from `dnhelp.htx`, the window is `TvHelp`), exit (Alt-X). **Does not 
    Debugging: `tools/dn-trace-calls.py` / `tools/dn-trace-init.py` put traces into a **copy** of `dn/src` (`cp -r dn/src build/traced`),
    build with `DN_SRC=build/traced`. To look at the screen dump `SCR.DAT`: `python3 tools/render-dump.py SCR.DAT`.
 
-0. **Without building:** `dist/dos/` holds a ready DOS version (`dn.exe`, the resources, the DPMI host `cwsdpmi.exe`, the license texts,
-   `screenshots/`): mount the directory in DOSBox-X and run `dn` (see `dist/dos/README.TXT`). It is updated by the script
-   `tools/dn-dist.sh` at noticeable changes (`dist/dos`: the code page inside, any DOS; `dist/dos-utf8`: UTF-8 inside, asks the DOS for UTF-8 names and clipboard); it is built from the commit named in the message of the `dist` commit.
+0. **Without building:** the archives `dos` (the code page inside, any DOS) and `dos-utf8` (UTF-8 inside, asks the DOS for UTF-8
+   names and clipboard) of the [releases](#releases) hold a ready DOS version (`dn.exe`, the resources, the DPMI host `cwsdpmi.exe`,
+   the licence texts): unpack, mount the directory in DOSBox-X and run `dn` (see `README.TXT`). `tools/dn-dist.sh` makes the same
+   set with screenshots in DOSBox-X in the local directory `dist/dos` (ignored by git).
 
 5. **Try it by hand:** the directory `out/dos/` is a ready set for DOS (`dn.exe`, `cwsdpmi.exe`, `*.dlg`, `*.lng`):
    mount it in DOSBox-X (`mount c out/dos`, `c:`, `dn`) or copy it to a machine with DOS.

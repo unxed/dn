@@ -27,14 +27,14 @@ that became byte constants (to be named Unicode constants, see PLAN.md).
 | `dn/tests/t_dnutf8.pas`, `t_drivrs.pas`, `t_zipcharset.pas`, `tools/dn-linux-*.py`, `tools/test-zipcharset.py`, `tools/tests/test_source_encoding.py` | test data: Cyrillic names and text |
 | `docs/ZIP-CHARSET.md`, `docs/patches/`, `docs/TEXT-POLICY.md` | examples with Cyrillic file names and text |
 | `tools/fix-resource-lookalikes.py`, `tools/tests/test_text_policy.py`, `tools/tests/test_to_codepage.py`, `tools/tests/test_audit_encoding.py` | the tools and tests of the Cyrillic text itself (look-alike letters, the code page landing) |
-| `dist/*/screenshots/viewer.txt` | sample text for the viewer encodings |
 
 ## Allowed: not UTF-8 on purpose
 
 | Files | Why |
 |---|---|
-| `dn/data/xlt/`, `dist/*/xlt/` | the code page tables (data) |
-| `dist/*/dn.ini` | the old build in `dist/` (not rebuilt yet): the values `VertScrollBarChars` / `HorizScrollBarChars` hold bytes of a page. `dn/data/dn.ini` itself is UTF-8 (the scroll bar characters are glyphs `▲▼▒■▓`, DN turns them into the bytes of its page: `GlyphsToPage`); the comments (lines with `;`) are English, the test checks it |
+| `dn/data/xlt/` | the code page tables (data) |
+
+`dn/data/dn.ini` is UTF-8 (the scroll bar characters are glyphs `▲▼▒■▓`, DN turns them into the bytes of its page: `GlyphsToPage`); the comments (lines with `;`) are English, the test checks it.
 
 ## Not fixed (out of the scope of the cleanup; no decision yet)
 

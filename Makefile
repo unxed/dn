@@ -38,8 +38,8 @@ install: all
 	chmod 755 $(BINDIR)/dn
 	# Issue #22: a launcher entry and an icon, so DN starts from a desktop menu (in a terminal).
 	install -d $(APPDIR) $(ICONDIR)
-	install -m 644 dist/desktop/dn.desktop $(APPDIR)/dn.desktop
-	install -m 644 dist/desktop/dn.svg $(ICONDIR)/dn.svg
+	install -m 644 dn/data/desktop/dn.desktop $(APPDIR)/dn.desktop
+	install -m 644 dn/data/desktop/dn.svg $(ICONDIR)/dn.svg
 
 uninstall:
 	rm -f $(BINDIR)/dn $(APPDIR)/dn.desktop $(ICONDIR)/dn.svg

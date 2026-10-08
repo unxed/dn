@@ -1,7 +1,7 @@
 name: nightly
 # Every commit of main: DN for all the targets (Linux x86_64, ARM64, i386, Windows 64 and 32 bit, DOS with the code page and with UTF-8 inside)
-# goes to the release "nightly" (the old one is replaced). The builds are the same as in the other workflows (tools/build.sh); the packing is
-# tools/pack-nightly.sh. A build that does not pass the tests of those workflows is still published here: it is a snapshot, not a release.
+# goes to the pre-release "nightly" (the old one is replaced; nothing is committed). The builds are the same as in the other workflows (tools/build.sh); the packing is
+# tools/dn-pack.sh. A build that does not pass the tests of those workflows is still published here: it is a snapshot, not a release.
 on:
   push:
     branches: [main]
@@ -24,13 +24,13 @@ jobs:
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 zip
       - run: tools/build.sh linux64 out/dn
-      - run: tools/pack-nightly.sh out/dn linux64 tar pack
+      - run: tools/dn-pack.sh out/dn linux64 tar pack
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-linux64
           path: pack/*
 
-  linux-arm64:
+  linux-aarch64:
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
@@ -39,10 +39,10 @@ jobs:
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 zip
       - run: tools/build.sh linux64 out/dn
-      - run: tools/pack-nightly.sh out/dn linux-arm64 tar pack
+      - run: tools/dn-pack.sh out/dn linux-aarch64 tar pack
       - uses: actions/upload-artifact@v4
         with:
-          name: nightly-linux-arm64
+          name: nightly-linux-aarch64
           path: pack/*
 
   linux32:
@@ -63,7 +63,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: tools/build-fpc-i386-linux.sh ~/fpc-i386-linux
       - run: DN_LINUX=~/fpc-i386-linux tools/build.sh linux out/dn
-      - run: tools/pack-nightly.sh out/dn linux32 tar pack
+      - run: tools/dn-pack.sh out/dn linux32 tar pack
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-linux32
@@ -94,7 +94,7 @@ jobs:
         run: |
           if [ "${{ matrix.target }}" = win64 ]; then export DN_WIN=~/fpc-win64; else export DN_WIN32=~/fpc-win32; fi
           tools/build.sh ${{ matrix.target }} out/dn
-      - run: tools/pack-nightly.sh out/dn ${{ matrix.target }} zip pack
+      - run: tools/dn-pack.sh out/dn ${{ matrix.target }} zip pack
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-${{ matrix.target }}
@@ -126,15 +126,15 @@ jobs:
           tools/build.sh dos out/dos
           DN_UTF8=1 tools/build.sh dos out/dos-utf8
       - run: |
-          tools/pack-nightly.sh out/dos dos zip pack
-          tools/pack-nightly.sh out/dos-utf8 dos-utf8 zip pack
+          tools/dn-pack.sh out/dos dos zip pack
+          tools/dn-pack.sh out/dos-utf8 dos-utf8 zip pack
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-dos
           path: pack/*
 
   publish:
-    needs: [linux64, linux-arm64, linux32, windows, dos]
+    needs: [linux64, linux-aarch64, linux32, windows, dos]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     steps:

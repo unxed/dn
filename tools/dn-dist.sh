@@ -1,7 +1,7 @@
 #!/bin/sh
-# Makes dist/dos/: the DOS build of DN that can be tried without building it (DN.EXE for go32v2, the resources, the DPMI
-# host, the licence texts) and screenshots of it in DOSBox-X. Run it when something visible changed (not for every commit:
-# the binary is in git). usage: tools/dn-dist.sh   (the same environment as tools/build.sh dos: DN_PREFIX or DN_CROSS+DN_LINK)
+# Makes dist/dos/ (a local directory, ignored by git: the builds are published by the workflow release, never committed): the
+# DOS build of DN (dn.exe for go32v2, the resources, the DPMI host, the licence texts and README.TXT of tools/dn-notices.sh)
+# and screenshots of it in DOSBox-X. usage: tools/dn-dist.sh   (the same environment as tools/build.sh dos: DN_PREFIX or DN_CROSS+DN_LINK)
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 # DN_DIST_SUFFIX=-utf8 with DN_UTF8=1 makes dist/dos-utf8: the build with UTF-8 inside (it asks the DOS for UTF-8 names and clipboard: go2dos, DOSBox-X with the patches; its resources are in UTF-8)
@@ -16,11 +16,8 @@ cp "$work/run/dn.exe" "$dist/dn.exe"
 cp "$work"/run/*.dlg "$work"/run/*.lng "$work"/run/*.hlp "$dist/"
 rm -rf "$dist/xlt"; cp -r "$here/dn/data/xlt" "$dist/xlt"
 cp "$work/run/cwsdpmi.exe" "$dist/"
-# the documentation of CWSDPMI (its terms: the doc goes with the program)
-if [ ! -f "$dist/cwsdpmi.doc" ]; then
-    curl -fsSL --retry 4 -o "$work/csdpmi.zip" https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
-    unzip -q -j -o "$work/csdpmi.zip" bin/cwsdpmi.doc -d "$work"; mv "$work/cwsdpmi.doc" "$dist/cwsdpmi.doc"
-fi
+# the licence texts, README.TXT and the documentation of CWSDPMI (its terms: the doc goes with the program)
+"$here/tools/dn-notices.sh" "$dist" "dos${DN_DIST_SUFFIX:-}"
 # a screenshot: scen NAME SECONDS KEYS   (a clean directory: the state that DN saves would change the run)
 scen() {
     d=$work/$1; rm -rf "$d"; mkdir -p "$d"
@@ -45,12 +42,4 @@ scen copy 6 "011B,3F00"
 scen viewer 8 "011B,5000,5000,5000,5000,3D00"
 scen editor 24 "011B,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,3E00"
 ( cd "$dist" && sha256sum dn.exe *.dlg *.lng *.hlp cwsdpmi.exe > SHA256SUMS.TXT )
-if [ -n "${DN_DIST_SUFFIX:-}" ]; then
-    cat > "$dist/README.TXT" <<'EOT'
-DN with UTF-8 inside for DOS (the build DN_UTF8=1). It asks the DOS for the UTF-8 names of files (AMIS DOS-UTF8/NAMES) and the UTF-8 text of the clipboard
-(DOS-UTF8/CLIPBRD): go2dos, DOSBox-X with the patches (docs/patches of the repository unxed/dn, dn/TODO-later.md). On a DOS without them the names are what the DOS
-gives (the bytes of the code page; a name typed with other characters than ASCII is wrong) and the clipboard goes through the code page: use the plain build (dist/dos) there.
-TV_DOS_UTF8_NAMES=0 does not ask for the names, TV_DOS_UTF8_CLIP=0 not for the clipboard.
-EOT
-fi
 echo "dist/dos${DN_DIST_SUFFIX:-} is made: $(ls "$dist" | wc -l) files"

@@ -48,4 +48,4 @@ What lives in which file (map for newcomers): [`FILES.md`](FILES.md).
 The license in the DN OSP source headers (BSD-like, RIT Research Labs) requires: keep copyright
 notices; in binary form reproduce them in documentation; when mentioning the program in advertising, say “Based on Dos Navigator
 by RIT Research Labs”; code derived from DN must not be relicensed (including under GPL). These conditions apply to DN files and their derivatives, and to binary builds that contain DN code (that is, all `dn` builds):
-notices go in the build documentation (`dist/*/README.TXT`). They do not apply to our separate files (MIT).
+notices go in the build documentation (`README.TXT` and `LICENSE-DN.TXT` of every release archive, `tools/dn-notices.sh`). They do not apply to our separate files (MIT).

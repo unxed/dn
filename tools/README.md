@@ -16,10 +16,12 @@ One table instead of reading every header. Arguments are mostly environment vari
 | `build-fpc-windows.sh` | cross compilers to win32/win64 | dn-windows |
 | `gen-shim.py` | makes the "shim" units with the names of the Borland Turbo Vision units that DN uses | dn, dn-linux, dn-windows |
 
-## Distributions (`dist/`)
+## Distributions (GitHub Releases; `dist/` is a local directory, ignored by git)
 
 | Script | What it does | CI |
 |---|---|---|
+| `dn-pack.sh` | packs a build of `build.sh` into `dn-<tag or commit>-<target>.tar.gz`/`.zip` with the licence texts | release, nightly |
+| `dn-notices.sh` | writes the licence texts (DN, dn, tv3, tve, CWSDPMI for DOS) and `README.TXT` of a build | (via the others) |
 | `dn-dist.sh` | `dist/dos/`: dn.exe for DOS, resources, DPMI host, licences, screenshots | by hand |
 | `dn-linux-dist.sh` | `dist/linux`, `linux64`, `aarch64` with the screens of the pty tour | by hand |
 | `dn-win-dist.sh` | `dist/win64`, `dist/win32` | by hand |

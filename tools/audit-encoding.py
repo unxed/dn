@@ -23,7 +23,7 @@ C1 = re.compile("[\u0080-\u009f]")
 TEXT_SUFFIXES = {".pas", ".inc", ".pp", ".lpr", ".txt", ".md", ".htx", ".dnl", ".dnr", ".ini", ".py", ".sh", ".yml",
                  ".env", ".cfg", ".diz", ".ion", ".list", ".map", ".rw", ".sed", ".patch", ".flg"}
 # data in a code page on purpose (docs/TEXT-POLICY.md)
-BINARY_OK = (re.compile(r"/xlt/"), re.compile(r"^dist/[^/]+/dn\.ini$"))
+BINARY_OK = (re.compile(r"/xlt/"),)
 
 
 def git(*args, cwd=ROOT):

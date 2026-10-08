@@ -17,7 +17,6 @@ def _rx(*patterns):
 # docs/TEXT-POLICY.md: keep the two lists and the document in sync.
 CYRILLIC_OK = _rx(
     r"^dn/src/resource/(russian|ukrain)/",
-    r"^dist/[^/]+/screenshots/viewer\.txt$",
     r"^dn/archives/fmtain\.pas$",
     r"^dn/tests/t_(dnutf8|drivrs|zipcharset)\.pas$",
     r"^docs/ZIP-CHARSET\.md$",
@@ -27,8 +26,8 @@ CYRILLIC_OK = _rx(
     r"^tools/(dn-linux-(accept|far2l|locale|ops|sortmark)|dn-dos-input|test-zipcharset)\.py$",
     r"^tools/tests/test_source_encoding\.py$",
 )
-NOT_UTF8_OK = _rx(r"/xlt/", r"^dist/[^/]+/dn\.ini$")   # dist/ is the old build: its dn.ini still has page bytes
-INI = _rx(r"^dn/data/dn\.ini$", r"^dist/[^/]+/dn\.ini$")
+NOT_UTF8_OK = _rx(r"/xlt/")
+INI = _rx(r"^dn/data/dn\.ini$")
 
 
 def _any(rxs, path):
@@ -64,7 +63,7 @@ class TextPolicyTests(unittest.TestCase):
         self.assertEqual(bad, [], "Cyrillic outside docs/TEXT-POLICY.md")
 
     def test_ini_comments_are_english(self):
-        # dn/data/dn.ini is UTF-8; the old dist/ one holds page bytes in values and is read as CP866; comments must be free of Cyrillic
+        # dn/data/dn.ini is UTF-8; its comments must be free of Cyrillic
         bad = []
         for name, data in tracked_files():
             if not _any(INI, name):

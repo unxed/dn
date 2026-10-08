@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=DN
+GenericName=File Manager
+Comment=DOS Navigator style two-panel file manager for the terminal
+Exec=dn %F
+Icon=dn
+Terminal=true
+Categories=System;FileTools;FileManager;ConsoleOnly;
+Keywords=file;manager;commander;navigator;dos;
+StartupNotify=false

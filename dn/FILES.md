@@ -70,7 +70,7 @@ What is in `compat/` is not DN: it is what makes the code of DN run on a modern 
 | `diskinfo.pas`, `diskimg.pas` | disk information panels; disk-image helpers |
 
 ## The names of the files (a rule, 2026-10-04) and which file holds what
-All names are lower case (the sources, the directories, the files that the program reads and writes, `dist/`): the Linux file systems tell `DN.INI` from `dn.ini`, DOS does not care, and one case is enough. The names stay 8.3 where the program writes them (DOS).
+All names are lower case (the sources, the directories, the files that the program reads and writes, the release archives): the Linux file systems tell `DN.INI` from `dn.ini`, DOS does not care, and one case is enough. The names stay 8.3 where the program writes them (DOS).
 The names of the units are words without digits and underscores (a unit has the name of its file). Where a name is in capitals on purpose (`README`, `LICENSE`, `CWSDPMI`'s own texts) it is a document, not a file of the program.
 
 | What | File on disk (next to the program) | Written by | Read by |

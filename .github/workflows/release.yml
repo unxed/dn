@@ -1,16 +1,29 @@
 name: release
-# Tag v* → build linux64 DN and attach a tarball to a GitHub Release (issue #1, part 1).
+# A tag v* (or a run by hand with the name of an existing tag): DN for all the targets (Linux x86_64, ARM64, i386, Windows 64
+# and 32 bit, DOS with the code page and with UTF-8 inside), built from the sources of the tag with the submodules tv and tve
+# (tools/build.sh, the same builds as in the other workflows), packed by tools/dn-pack.sh with the licence texts and README.TXT,
+# and published as one GitHub Release with one archive per target and SHA256SUMS.txt. The builds are never committed.
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The tag to build and publish (it must exist), e.g. v0.1.0'
+        required: true
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
 permissions:
   contents: write
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+  # the revision shown in Help -> About
+  DN_BUILD_REV: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   linux64:
@@ -18,25 +31,149 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: refs/tags/${{ env.TAG }}
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
-      - name: Build DN (linux64 UTF-8)
-        run: tools/build.sh linux64 out/linux64
-      - name: Pack
-        run: |
-          set -euo pipefail
-          tag="${GITHUB_REF_NAME}"
-          staging="dn-${tag}-linux64"
-          mkdir -p "$staging"
-          cp -a out/linux64/dn "$staging/"
-          cp -a out/linux64/*.dlg out/linux64/*.lng out/linux64/*.hlp "$staging/" 2>/dev/null || true
-          if [ -d out/linux64/xlt ]; then cp -a out/linux64/xlt "$staging/"; fi
-          tar -czf "${staging}.tar.gz" "$staging"
-          ls -la "${staging}.tar.gz"
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+      - run: tools/build.sh linux64 "$RUNNER_TEMP/out/dn"
+      - run: tools/dn-pack.sh "$RUNNER_TEMP/out/dn" linux64 tar "$RUNNER_TEMP/pack" "$TAG"
+      - uses: actions/upload-artifact@v4
         with:
-          files: dn-${{ github.ref_name }}-linux64.tar.gz
-          generate_release_notes: true
-          fail_on_unmatched_files: true
+          name: release-linux64
+          path: ${{ runner.temp }}/pack/*
+
+  linux-aarch64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
+      # the fpc of the ARM64 runner: the native build (tools/build.sh linux64 builds for the host)
+      - run: tools/build.sh linux64 "$RUNNER_TEMP/out/dn"
+      - run: tools/dn-pack.sh "$RUNNER_TEMP/out/dn" linux-aarch64 tar "$RUNNER_TEMP/pack" "$TAG"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-linux-aarch64
+          path: ${{ runner.temp }}/pack/*
+
+  linux32:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils python3
+      - name: Cross compiler cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/fpc-i386-linux
+          key: fpc-i386-linux-${{ hashFiles('tools/build-fpc-i386-linux.sh') }}
+      - name: Build the cross compiler
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: tools/build-fpc-i386-linux.sh ~/fpc-i386-linux
+      - run: DN_LINUX=~/fpc-i386-linux tools/build.sh linux "$RUNNER_TEMP/out/dn"
+      - run: tools/dn-pack.sh "$RUNNER_TEMP/out/dn" linux32 tar "$RUNNER_TEMP/pack" "$TAG"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-linux32
+          path: ${{ runner.temp }}/pack/*
+
+  windows:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        target: [win64, win32]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make git binutils binutils-mingw-w64-x86-64 binutils-mingw-w64-i686 python3 zip
+      - name: Cross compiler cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/fpc-${{ matrix.target }}
+          key: fpc-${{ matrix.target }}-${{ hashFiles('tools/build-fpc-windows.sh') }}
+      - name: Build the cross compiler
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: tools/build-fpc-windows.sh ~/fpc-${{ matrix.target }} ${{ matrix.target }}
+      - name: Build DN
+        run: |
+          if [ "${{ matrix.target }}" = win64 ]; then export DN_WIN=~/fpc-win64; else export DN_WIN32=~/fpc-win32; fi
+          tools/build.sh ${{ matrix.target }} "$RUNNER_TEMP/out/dn"
+      - run: tools/dn-pack.sh "$RUNNER_TEMP/out/dn" ${{ matrix.target }} zip "$RUNNER_TEMP/pack" "$TAG"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: ${{ runner.temp }}/pack/*
+
+  dos:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc make bzip2 git curl dosbox-x unzip python3 zip
+      - name: Cross toolchain cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/fpc-go32v2
+          key: fpc-go32v2-${{ hashFiles('tools/build-fpc-go32v2.sh') }}
+      - name: Build cross toolchain
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: tools/build-fpc-go32v2.sh "${{ runner.temp }}/fpc-go32v2"
+      - name: Build DN for DOS (the code page inside) and DOS with UTF-8 inside
+        env:
+          DN_PREFIX: ${{ runner.temp }}/fpc-go32v2
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: |
+          tools/build.sh dos "$RUNNER_TEMP/out/dos"
+          DN_UTF8=1 tools/build.sh dos "$RUNNER_TEMP/out/dos-utf8"
+      - run: |
+          tools/dn-pack.sh "$RUNNER_TEMP/out/dos" dos zip "$RUNNER_TEMP/pack" "$TAG"
+          tools/dn-pack.sh "$RUNNER_TEMP/out/dos-utf8" dos-utf8 zip "$RUNNER_TEMP/pack" "$TAG"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-dos
+          path: ${{ runner.temp }}/pack/*
+
+  publish:
+    # only when every target was built: a release has all the archives
+    needs: [linux64, linux-aarch64, linux32, windows, dos]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: ${{ runner.temp }}/assets
+          merge-multiple: true
+      - name: Create the release (or replace its assets when it exists)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -eu
+          cd "$RUNNER_TEMP/assets"
+          n=$(ls | wc -l)
+          [ "$n" -eq 7 ] || { echo "expected 7 archives, got $n:" >&2; ls -l >&2; exit 1; }
+          sha256sum -- * > SHA256SUMS.txt
+          ls -l
+          set -- ./*
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" --clobber "$@"
+          else
+            pre=; case "$TAG" in *-*) pre=--prerelease;; esac      # v1.2.0-rc1 is a pre-release
+            gh release create "$TAG" --verify-tag --title "DN $TAG" --generate-notes $pre "$@"
+          fi
