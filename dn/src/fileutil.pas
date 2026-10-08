@@ -1205,7 +1205,7 @@ function PathExist(s: String): Boolean;
       begin { drive root }
       delete(S, Length(s), 1);
       end;
-    S := S + '\*.*';
+    S := S + DnSep + '*.*';
     lFindFirst(S, Attr, SR);
     Result := DosError in [0, 2, 18];
 FClose:

@@ -252,7 +252,7 @@ type
 
 implementation
 
-uses
+uses DnPath,
   Lfn, Dos, DNUtf8, osdep, Commands, DNHelp, strutil, fileutil, keymap, TvGlyphs
   , editcore, Macro, linepos, Math, Messages, mainapp, Startup, Dialogs,
   Decoder,  {piwamoto}
@@ -1694,12 +1694,12 @@ text data about the directory contents. Used in QuickView
 when the cursor is on a directory AK155}
   ReadDir := True;
   I := Length(FName);
-  if Copy(FName, I-2, 3) = '\..' then
+  if Copy(FName, I-2, 3) = DnSep+'..' then
     begin
     SetLength(FileName, I-3);
     DirString := FileName;
     end
-  else if (I = 2) and (FileName[2] = ':') then
+  else if HasDrives and (I = 2) and (FileName[2] = ':') then
     DirString := FileName
       {this happens e.g. when restarting
      DN with a remembered Branch state at the drive root }

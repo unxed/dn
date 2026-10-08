@@ -1884,7 +1884,7 @@ FileRead:
       L: LongInt;
     begin
     ClrIO;
-    lFindFirst(DirName+'\*.*', AnyFileDir, SR); {JO}
+    lFindFirst(DirName+DnSep+'*.*', AnyFileDir, SR); {JO}
     while (DosError = 0) and not Abort and not CopyCancel do
       begin
       SSS := MakeNormName(AddDir, SR.FullName);
@@ -2143,7 +2143,7 @@ TrueCopy:
         ClrIO;
         end;
       {/AK155}
-      lFindFirst(Source+'\*.*', AnyFileDir, SR); {JO}
+      lFindFirst(Source+DnSep+'*.*', AnyFileDir, SR); {JO}
       while (DosError = 0) and not Abort and not CopyCancel do
         begin
         if  (SR.SR.Attr and Directory <> 0) and

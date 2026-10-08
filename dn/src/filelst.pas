@@ -98,7 +98,7 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
     case Event.Command of
       cmYes:
         begin
-        InpLineReplace(TInputLine(DirectLink[2]), '!:!\!.!');
+        InpLineReplace(TInputLine(DirectLink[2]), '!:!'+DnSep+'!.!');
         ClearEvent(Event);
         Exit;
         end;
