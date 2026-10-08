@@ -90,6 +90,7 @@ jobs:
               python3 tools/dn-linux-names.py out/dn
               python3 tools/dn-linux-setup.py out/dn
               python3 tools/dn-linux-clip.py out/dn
+              python3 tools/dn-linux-far2l.py out/dn
               python3 tools/dn-linux-locale-utf8.py out/dn
           - name: panel, find, terminal
             cmds: |

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""DN with a terminal that speaks the far2l extensions (the far2l terminal: tv/tests/pty/f2lterm.py plays it): the reported failure was that in the far2l terminal
+"""DN with a terminal that speaks the far2l extensions (the far2l terminal: tools/f2lterm.py plays it): the reported failure was that in the far2l terminal
 Ctrl+Ins in the editor copied nothing (the terminal took the key for its own copy). Here the keys come as events: the text of the editor is selected and Ctrl+Ins puts it
 on the clipboard of the terminal; the clipboard of the terminal is pasted with Shift+Ins. usage: tools/dn-linux-far2l.py OUTDIR   (OUTDIR: the result of tools/build.sh linux64)"""
 import os, shutil, sys, tempfile, time
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
-sys.path.insert(0, os.path.join(here, '..', 'tv', 'tests', 'pty'))
 from pty_screen import Screen
 from f2lterm import Term, key
 
