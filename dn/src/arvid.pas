@@ -410,8 +410,8 @@ procedure TArvidDrive.lChDir(ADir: String);
   begin
   if ADir = #0 then
     Exit;
-  lFSplit(ADir, Dr, Nm, Xt);
-  if  (Nm = '.') and (Xt = '.') then
+  Dr := ArcGetPath(ADir);
+  if  ArcGetName(ADir) = '..' then
     begin
     if Dr <> '' then
       CurDir := Dr;
@@ -615,7 +615,7 @@ procedure TArvidDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boole
       Stream.Seek( {Cat:warn}Round(PF^.PSize));
       Stream.Read(FC, SizeOf(FC));
       Desc := AvtCellDesc(FC, Stream);
-      S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
+      S1 := ArcNormName('\'+CurDir, PF^.FlName[True]);
       S2 := MakeNormName(CopyDir, MkName(PF^.FlName[True], Mask));
       if Pos(S1, S2) = 1 then
         begin
@@ -713,7 +713,7 @@ procedure TArvidDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boole
     for I := 0 to AFiles.Count-1 do
       begin
       PF := AFiles.At(I);
-      S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
+      S1 := ArcNormName('\'+CurDir, PF^.FlName[True]);
       S2 := MakeNormName(CopyDir, MkName(Mask, PF^.FlName[True]));
       if  (PF^.Attr and Directory) = 0 then
         Writeln(T.T,
@@ -764,7 +764,7 @@ procedure TArvidDrive.ChangeUp(var S: String);
   begin
   if CurDir <> '' then
     begin
-    S := GetName(CurDir);
+    S := ArcGetName(CurDir);
     lChDir('..');
     Exit
     end;
@@ -1472,7 +1472,7 @@ procedure TArvidDrive.GetDirLength(PF: PFileRec);
     Exit;
   SaveDir := CurDir;
   LL := 0;
-  CurDir := MakeNormName(PF^.Owner^, PF^.FlName[True]);
+  CurDir := ArcNormName(PF^.Owner^, PF^.FlName[True]);
   SeekDirectory;
   P := WriteMsg(GetString(dlPleaseStandBy));
   if filetype = avdTdr then

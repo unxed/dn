@@ -141,6 +141,12 @@ function GetLongRelPath(Path: String): String;
 {-DataCompBoy-}
 function MakeFileName(S: String): String;
 function MakeNormName(const S, S1: String): String; {DataCompBoy}
+{ The same for the paths inside an archive: DN keeps them with ArcSep on every host. }
+function ArcNormName(const S, S1: String): String;
+procedure ArcMakeSlash(var S: String);
+procedure ArcMakeNoSlash(var S: String);
+function ArcGetPath(const S: String): String;
+function ArcGetName(const S: String): String;
 function GetFileAttr(const S: String): Word;
 function SetFileAttr(const S: String; Attr: Word): Word;
 function CorrectFile(const N: String): Boolean;
@@ -1412,6 +1418,48 @@ Finish:
   S1.Free;
   S2.Free;
   end { CompareFiles };
+
+function ArcNormName(const S, S1: String): String;
+  begin
+  if (S <> '') and (S[Length(S)] = ArcSep) then
+    Result := S+S1
+  else if S = '' then
+    Result := S1
+  else
+    Result := S+ArcSep+S1;
+  end;
+
+procedure ArcMakeSlash(var S: String);
+  begin
+  if (S <> '') and (S[Length(S)] <> ArcSep) then
+    S := S+ArcSep;
+  end;
+
+procedure ArcMakeNoSlash(var S: String);
+  begin
+  if (Length(S) > 1) and (S[Length(S)] = ArcSep) then
+    SetLength(S, Length(S)-1);
+  end;
+
+function ArcGetPath(const S: String): String;
+  var
+    I: Integer;
+  begin
+  I := Length(S);
+  while (I > 0) and (S[I] <> ArcSep) do
+    Dec(I);
+  Result := Copy(S, 1, I);
+  end;
+
+function ArcGetName(const S: String): String;
+  var
+    I: Integer;
+  begin
+  I := Length(S);
+  while (I > 0) and (S[I] <> ArcSep) do
+    Dec(I);
+  Result := Copy(S, I+1, MaxStringLength);
+  end;
 
 procedure MakeSlash(var S: String);
   begin

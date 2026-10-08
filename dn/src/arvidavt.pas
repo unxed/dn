@@ -765,7 +765,7 @@ function AvtDelFile(AvtDr: TArvidDrive; AName: String): Boolean;
     if  (filetype <> avdAvt) or (Length(AName) = 0) then
       goto 1;
     CurDir2 := CurDir;
-    MakeSlash(CurDir2);
+    ArcMakeSlash(CurDir2);
     if AName[1] <> '\' then
       begin
       AName := CurDir2+AName;
@@ -778,7 +778,7 @@ function AvtDelFile(AvtDr: TArvidDrive; AName: String): Boolean;
       CurDir := Dr;
       SeekDirectory;
       CurDir2 := CurDir;
-      MakeSlash(CurDir2);
+      ArcMakeSlash(CurDir2);
       if CurDir <> Dr then
         goto 1;
       end;
@@ -1198,7 +1198,7 @@ function AvtNewFile(
           end;
         if CreatedCellIsDir then
           begin
-          MakeSlash(CurDir);
+          ArcMakeSlash(CurDir);
           CurDir := CurDir+SS;
           CurLevel := Lv;
           Inc(Lv);
@@ -1219,7 +1219,7 @@ function AvtNewFile(
       Exit;
     NewCell := 0;
     CurDir2 := CurDir;
-    MakeSlash(CurDir2);
+    ArcMakeSlash(CurDir2);
     SaveCurDir := CurDir2;
     if AName[1] <> '\' then
       begin
@@ -1234,7 +1234,7 @@ function AvtNewFile(
       CurDir := Dr;
       SeekDirectory;
       CurDir2 := CurDir;
-      MakeSlash(CurDir2);
+      ArcMakeSlash(CurDir2);
       end;
     if CurDir2 <> '\' then
       Dr := Copy(Dr, Length(CurDir2)+1, Length(Dr));
@@ -1355,7 +1355,7 @@ procedure AvtSeekDirectory(AvtDr: TArvidDrive);
         CurDirPos := SavedCurDirPos;
         Break;
         end;
-      MakeSlash(CurDir);
+      ArcMakeSlash(CurDir);
       {      CurDir:=CurDir + Ansi_Ascii(SS);}
       CurDir := CurDir+SS;
       CurLevel := Lv;
@@ -1594,7 +1594,7 @@ procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
       for I := 0 to AFiles.Count-1 do
         begin
         PF := AFiles.At(I);
-        S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
+        S1 := ArcNormName('\'+CurDir, PF^.FlName[True]);
         S2 := MakeNormName(From, PF^.FlName[True]);
         if  (PF^.Attr and Directory) = 0 then
           Writeln(T.T,
@@ -1630,7 +1630,7 @@ procedure AvtCopyFilesInto(AvtDr: TArvidDrive; AFiles: TCollection;
       for I := 0 to AFiles.Count-1 do
         begin
         PF := AFiles.At(I);
-        S1 := MakeNormName('\'+CurDir, PF^.FlName[True]);
+        S1 := ArcNormName('\'+CurDir, PF^.FlName[True]);
         S2 := MakeNormName(From, PF^.FlName[True]);
         Desc := '';
         if  (PF^.DIZ <> nil) and (PF^.DIZ^.DIZText <> '') then

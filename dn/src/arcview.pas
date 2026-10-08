@@ -509,7 +509,7 @@ function TArcDrive.ReadArchive: Boolean;
         FileInfo.PSize, FileInfo.Date, FileInfo.Attr);
       if FileInfo.Attr and Directory <> 0
       then
-        Files.AddFile(MakeNormName(FileInfo.FName, '..'),
+        Files.AddFile(ArcNormName(FileInfo.FName, '..'),
           FileInfo.USize, FileInfo.PSize, FileInfo.Date, 0);
 
       if  (P <> nil) and TimerExpired(T) then
@@ -569,8 +569,8 @@ procedure TArcDrive.lChDir(ADir: String);
       LFN.lChDir(GetPath(ArcName));
     Exit;
     end;
-  lFSplit(ADir, Dr, Nm, Xt);
-  if Xt = '..' then
+  Dr := ArcGetPath(ADir);
+  if ArcGetName(ADir) = '..' then
     begin
     CurDir := Dr;
     while (CurDir <> '') and not (CurDir[Length(CurDir)] in ['\', '/'])
@@ -579,7 +579,7 @@ procedure TArcDrive.lChDir(ADir: String);
     end
   else
     CurDir := ADir;
-  MakeNoSlash(CurDir);
+  ArcMakeNoSlash(CurDir);
   if CurDir[1]<>'\' then
     CurDir:='\'+CurDir;
   CheckSlashDot(CurDir);
@@ -795,7 +795,7 @@ TryAgain:
       ;
     { Flash <<< }
     end;
-  SS := MakeNormName(P^.Owner^, P^.FlName[True]);
+  SS := ArcNormName(P^.Owner^, P^.FlName[True]);
   if SS[1] = '\' then
     Delete(SS, 1, 1); {DelFC(SS);}
   
@@ -811,7 +811,7 @@ TryAgain:
   
   {   DelDoubles('  ',S);} {piwamoto: files can have 2 spaces in names}
   TempFile := C+MakeNormName(TempDir, P^.FlName[True]);
-  Q := '|'+GetRealName+':'+MakeNormName(CurDir, P^.FlName[True]);
+  Q := '|'+GetRealName+':'+ArcNormName(CurDir, P^.FlName[True]);
 
   S2 := Copy(TempFile, 2, MaxStringLength);
 
@@ -1053,7 +1053,7 @@ procedure TArcDrive.ChangeUp(var S: String);
   begin
   if CurDir <> '' then
     begin
-    S := GetName(CurDir);
+    S := ArcGetName(CurDir);
     lChDir('..');
     Exit
     end;
@@ -1177,9 +1177,9 @@ function TArcDrive.MakeListFile(PC: TCollection; UseUnp: Boolean; var B: Boolean
     PF := PC.At(I);
     {JO: check for extracting from the archive search panel}
     if PathFoundInArc(PF^.Owner^) then
-      S1 := MakeNormName(GetArcOwn(PF^.Owner^), PF^.FlName[True])
+      S1 := ArcNormName(GetArcOwn(PF^.Owner^), PF^.FlName[True])
     else
-      S1 := MakeNormName(PF^.Owner^, PF^.FlName[True]);
+      S1 := ArcNormName(PF^.Owner^, PF^.FlName[True]);
     if S1[1] in ['\', '/'] then
       Delete(S1, 1, 1); {DelFC(S1);}
 
@@ -1266,7 +1266,7 @@ procedure TArcDrive.ExtractFiles(AFiles: TCollection; ExtrDir: String;
       SetLength(SCurDir, Length(SCurDir)-1);
     while (SCurDir <> '') and (SCurDir[1] = '\') do
       Delete(SCurDir, 1, 1);
-    MakeSlash(SCurDir);
+    ArcMakeSlash(SCurDir);
     if  (CnvString(AType.SetPathInside) <> '') then
       begin
       SCr := ' '+ CnvString(AType.SetPathInside)+
@@ -1761,9 +1761,9 @@ function ArcViewer(AName, VAName: String): Boolean;
     begin
     if Copy(PathInside, Length(PathInside)-1, 2) = '\.' then
       SetLength(PathInside, Length(PathInside)-2);
-    if  (GetPath(PathInside) <> '\') then
+    if  (ArcGetPath(PathInside) <> '\') then
       begin
-      P.lChDir(Copy(GetPath(PathInside), 2, 255));
+      P.lChDir(Copy(ArcGetPath(PathInside), 2, 255));
       Message(Application, evCommand, cmPanelReread, nil);
       end;
     end;

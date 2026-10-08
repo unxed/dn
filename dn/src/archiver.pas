@@ -1211,7 +1211,7 @@ TryAgain:
         SetLength(SIntern, Length(SIntern)-1);
       while (SIntern[1] = '\') do
         Delete(SIntern, 1, 1);
-      MakeNoSlash(SIntern);
+      ArcMakeNoSlash(SIntern);
       SIntern := CnvString(Arc.SetPathInside)+
         SquashesName(SIntern)+' ';
       end;
