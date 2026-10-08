@@ -129,7 +129,7 @@ def main():
         check(os.path.isdir(os.path.join(w, '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0434\u043b\u0438\u043d\u043d\u044b\u0445 \u0438\u043c\u0451\u043d')), 'the directory with the long Russian name is made')
 
         # Alt-F1, the drive menu, TEMP: (a temporary drive; the panel info was drawn with an empty list: collection error 213)
-        key('\x1b[1;3P'); key('DOWN'); key('ENTER', 1.0)
+        key('\x1b[1;3P'); key('END'); key('ENTER', 1.0)
         check('TEMP:' in t.text().split('\n')[1] and t.alive(), 'Alt-F1: the drive TEMP: opens without an error', t.text())
 
         # a command of the command line: the terminal is given to the shell, Enter returns to DN (it hung before)
