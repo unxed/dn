@@ -31,7 +31,7 @@ done
 for f in tv/src/*.pas; do
     if grep -q 'Translated from magiblot/tvision @' "$f"; then
         grep -q 'COPYRIGHT.magiblot' "$f" || err "$f is translated but does not point to COPYRIGHT.magiblot"
-    elif ! grep -q 'MIT' "$f"; then
+    elif ! grep -q -e 'MIT' -e 'MIT' "$f"; then
         err "$f has no origin note (Translated from magiblot/tvision @ ... / MIT)"
     fi
 done
