@@ -1140,8 +1140,13 @@ Err:
       Confirms := 0;
       lGetDir(0, DirToChange);
       LFN.lChDir(Str1);
-      if ActiveDir[2] = ':' then {release the directory}
-        ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + DnSep));
+      if PathRootLen(ActiveDir) > 0 then {release the directory: go to the root of the host}
+        begin
+        {$I-}
+        ChDir(SysOsPath(Copy(ActiveDir, 1, PathRootLen(ActiveDir))));
+        if IOResult <> 0 then;
+        {$I+}
+        end;
       Eraser.EraseFiles(FCT);
       LFN.lChDir(DirToChange);
       DirToChange := '';

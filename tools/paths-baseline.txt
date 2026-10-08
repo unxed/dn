@@ -1,12 +1,11 @@
 archdet.pas 1
-archiver.pas 4
+archiver.pas 2
 arcview.pas 2
 basics.pas 2
 calcwin.pas 1
 cmdline.pas 2
 diskimg.pas 1
-dnexec.pas 1
-dnutil.pas 3
+dnutil.pas 2
 drives.pas 3
 editcore.pas 2
 eraser.pas 1
@@ -15,7 +14,7 @@ filefind.pas 1
 fsinfo.pas 1
 fviewer.pas 1
 highlite.pas 1
-lfn.pas 19
+lfn.pas 14
 paneldlgs.pas 1
 panelroot.pas 1
 strutil.pas 1

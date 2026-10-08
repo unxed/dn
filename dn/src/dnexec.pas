@@ -104,8 +104,13 @@ procedure AnsiExec(const Path: String; const ComLine: AnsiString);
       ExecFlags = efAsync, nil, -1, -1, -1);
 
 //  free the directory
-  if ActiveDir[2] = ':' then
-    ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + DnSep));
+  if PathRootLen(ActiveDir) > 0 then
+    begin
+    {$I-}
+    ChDir(SysOsPath(Copy(ActiveDir, 1, PathRootLen(ActiveDir))));
+    if IOResult <> 0 then;
+    {$I+}
+    end;
 
   ChDir(SysOsPath(StartDir));
   end { AnsiExec };

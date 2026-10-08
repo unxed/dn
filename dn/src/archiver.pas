@@ -1493,8 +1493,13 @@ TryAgain:
     Confirms := 0;
     LFN.lChDir(S);
      {free the directory}
-    if ActiveDir[2] = ':' then
-      ChDir(SysOsPath(Copy(ActiveDir, 1, 2) + '\'));
+    if PathRootLen(ActiveDir) > 0 then
+      begin   { the root of the host (/ on Unix, C:\ on DOS and Windows, \\host\share\) }
+      {$I-}
+      ChDir(SysOsPath(Copy(ActiveDir, 1, PathRootLen(ActiveDir))));
+      if IOResult <> 0 then;
+      {$I+}
+      end;
     
     Eraser.EraseFiles(FCT);
     Confirms := OldConfirms;

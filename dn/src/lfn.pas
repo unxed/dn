@@ -218,9 +218,9 @@ procedure lGetDir(D: Byte; var Path: String);
 { Name expansion and splitting }
 function lFExpand(Path: String): String;
   {` expand Path relative to ActiveDir. If Path had
-  '/', they become '\' in the result.
+  '/', they become the separator of the host in the result.
   Dots . and .. are correctly removed; e.g. instead of C:\TEMP\$$$\..
-  you get C:\TEMP. Trailing '\' only at the drive root.`}
+  you get C:\TEMP. A trailing separator only at the root.`}
 procedure lFSplit(const Path: String; var Dir, Name, ext: String);
 
 
@@ -248,8 +248,8 @@ more honest than with a truncated name under which the file is inaccessible.
 remembering other current directories has to be done by us}
 var
   CurrentPaths: array[1..1+Byte('Z')-Byte('A')] of PathStr;
-  ActiveDir: String; // always with trailing '\'
-  CurrentRoot: String; // without trailing '\'; may be a share
+  ActiveDir: String; // always with a trailing separator
+  CurrentRoot: String; // without a trailing separator; may be a share
   StartDir: String;
 
 implementation
@@ -1052,7 +1052,7 @@ function GetShareEnd(const S: String): Integer;
   Result := 0;
   if not HasDrives or (Copy(S, 1, 2) <> '\\') then
     Exit;
-  { look for '\' after '\\', and then to the end or to the second '\' }
+  { look for a separator after the two leading ones, and then to the end or to the second one }
   Result := 3;
   SlashFound := False;
   while Result < Length(S) do
@@ -1068,7 +1068,7 @@ function GetShareEnd(const S: String): Integer;
   if not SlashFound then
     Result := 0;
   { This path is wrong: '\\' at the start is there,
-      but no '\' afterwards. Should somehow set an error flag,
+      but no separator afterwards. Should somehow set an error flag,
       but unclear how and for whom. }
   end { GetShareEnd };
 {/AK155 22-11-2003}
@@ -1470,11 +1470,14 @@ procedure InitPath;
   if DosError <> 0 then
     lApi := lDOS;
 
-  P := 'A:\';
-  for D := 1 to High(CurrentPaths) do
+  if HasDrives then
     begin
-    CurrentPaths[D] := P;
-    Inc(P[1]);
+    P := 'A:\';
+    for D := 1 to High(CurrentPaths) do
+      begin
+      CurrentPaths[D] := P;
+      Inc(P[1]);
+      end;
     end;
   SysGetDirDos(0, StartDir);
   if HasDrives then
