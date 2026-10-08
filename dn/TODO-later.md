@@ -76,6 +76,9 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
 - UTF-8 file names are shown as bytes in the code page (garbage instead of "file.txt"): solved by moving to UTF-8 inside DN (PLAN, item 4).
 - Dot files (`.hidden`) and broken symbolic links are not visible in the panel: `FindFirst` returns them (except broken links), so DN itself hides them
   (check the panel setting "hidden files" and the comparison `Name[1] = '.'` in the directory parse); Unix permissions and links are not shown in `Attr`.
+  (Checked 2026-10-08: the broken links are listed (`tools/dn-linux-fsattrs.py`); the dot files are the hidden files of the RTL and DN shows
+  them when the setting "show hidden files" of the panels (`fmsShowHidden`) is on; it is off by default, as in DN. Whether Unix wants it on by
+  default is a decision of the owner.)
 - Paths look like DOS (`C:\home\you`): drive C: is the root of the file system; show Unix paths after the move to UTF-8.
 - Case: names that are not on disk in the case DN asks for are looked up without regard to case (`SysOsPath`); two files that differ only by
   case, DN will not be able to tell apart.
@@ -87,6 +90,13 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   a directory (`/proc/self/root` made the scan of `C:\` endless). The panels still enter them (Enter on a link to a directory works);
   how the panels show a link (a mark, the target) is not done. Other scanners of DN (Find files, the size of a directory, the
   copy of a tree) may loop on a link cycle: check when they are used on `/`.
+  **Checked and fixed 2026-10-08** (`tools/dn-linux-fsattrs.py`): Find File found the files again and again through a link to `..`, F5 of a
+  directory with such a link copied without end, and **F8 of a directory that held a link to a directory deleted the files of the target**
+  (then failed on the link). Now a link to a directory is not entered by Find File (`filefind.pas`) and the size of a directory
+  (`CountDirLen`); the deletion removes the link (`SysEraseLink`: the RTL `Erase` refuses a link to a directory); F5/F6 make a link with the
+  same target (`SysCopyLink`; a move removes the old link; DOS and Windows keep the old behaviour). The same check found that **every F5 of a
+  directory ended in an access violation** after the copy (a regression of the class migration: the list of the directories was made as a
+  `TDirCollection` of records and held `TDirName` objects; `filecopy.pas`). Not checked: F6 of a directory with a link across file systems.
 ## Names of files and keyboard (Linux, code page build only: DN_UTF8=0), 2026-10-02 — the stop-gap before UTF-8 inside (now the default)
 ## Names of files and keyboard (Linux), 2026-10-02 — stop-gap until DN is UTF-8 inside
 - At the border with the file system (`vpsyslow.pas`: `NameFromOs`, `NameToOs`, `SysOsPath`) a name that is valid UTF-8 and has only
@@ -95,7 +105,8 @@ converted at every idle even when nobody reads it (cheap: 2000 cells).
   The real fix is PLAN.md item 4 (UTF-8 inside).
 - The tree (Disk > Directory tree) on `/` reads every directory (30 000 directories took 20 s here), a line "Reading directories: N   Esc - stop" is shown while it works (Esc aborts); `/proc` and `/sys` of the root are skipped.
 - `DN0.SWP` (the saved desktop) is written to the current directory when a command is run from the command line: it shows in the panel; the place
-  and the need of the file are to be decided.
+  and the need of the file are to be decided. (Checked 2026-10-08: a command of the command line runs in the embedded terminal and no file is
+  written to the current directory; the files of DN are in the configuration directory.)
 
 ## DOS: DN.EXE hangs in the DOSBox that is built into Wine (2026-10-02, reported by the owner; to be investigated)
 - Symptom: `dist/dos/DN.EXE` started in the DOSBox 0.74-3 of Wine ("Cpu speed: max 100% cycles, Frameskip 1") hangs at once: no output, only the
@@ -352,8 +363,8 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - Resources, DOS landing (`tools/to-codepage.py`, `docs/TEXT-POLICY.md`): English and Russian go to cp866, Ukrainian to cp1125 (`DN_CODEPAGE`, `DN_CODEPAGE_UKRAIN`). Not checked on a real DOS machine or in DOSBox-X: whether the DOS build of DN (without `-dDNUTF8`) treats the cp1125 letters (upper and lower case, sorting) right: its tables know cp866. The look-alike letters of the old texts are repaired (`tools/fix-resource-lookalikes.py`); left: a few Latin letters that stand alone and were not converted on purpose (`Track'a`, `a:b`, lists of extensions).
 
 - Cells hold UTF-8 for a code page byte of $80 and up (tv3 `ScInitChar`); the bytes below $20 and $7F stay raw and the writers turn them into the IBM glyphs. The stray `═` cells that made the first attempt fail (`f5_f6_f8` of `dn-accept`) came from DN, not from tv3: `TWhileView.Draw` (`progress.pas`) and `TCalcView.Draw` (`calcwin.pas`) wrote into the draw buffer through a record overlay (`absolute B`, a one-byte `C: Char`), which replaced the first byte of a UTF-8 cell and left the rest (`E2 95 90` became `C9 95 90`). Both now use `SetCellGlyph`. Do not write into a `TScreenCell` through an overlay: use `SetCellChar`, `SetCellGlyph`, `SetCellAttr`.
-- File times on Unix: `osdep.Fill` passed `TSearchRec.Time` (the Unix time on Unix) as a DOS packed time, so the panels showed garbage dates for files (`5.06.33  9:63`). Fixed 2026-10-06 (`SysFileTimeToDos`, test in `t_osdep`; the comparator of the gate gets the same fix by `backport_shared_object_fixes.py`). Not checked: `SetFTime`/`GetFTime` of `Dos` on Unix in copy, move and the file ages dialog (they use the unit `Dos` of the RTL, which should pack the DOS time itself), and the creation and access times of `TOSSearchRec` (0 on Unix).
-- `DumpAtExit` (`dosharness.pas`, was in `mainapp.pas`) is never called: the DOS harness writes `dnlog.txt` only if it is hooked; either hook it as an exit procedure or delete it.
+- File times on Unix: `osdep.Fill` passed `TSearchRec.Time` (the Unix time on Unix) as a DOS packed time, so the panels showed garbage dates for files (`5.06.33  9:63`). Fixed 2026-10-06 (`SysFileTimeToDos`, test in `t_osdep`; the comparator of the gate gets the same fix by `backport_shared_object_fixes.py`). Not checked: `SetFTime`/`GetFTime` of `Dos` on Unix in copy, move and the file ages dialog (they use the unit `Dos` of the RTL, which should pack the DOS time itself; checked by hand 2026-10-08: F5 keeps the modification time of the file, 2001-09-09 01:46:40 stayed exact; move and the file ages dialog not checked), and the creation and access times of `TOSSearchRec` (0 on Unix).
+- `DumpAtExit` (`dosharness.pas`, was in `mainapp.pas`) was never called: deleted 2026-10-08 (no script reads `dnlog.txt`; the flight recorder writes `dn.log` and the crash reports on DOS too).
 
 ## Doubts and leftovers of 2026-10-06 (platform separation, archives, input)
 - Quick search of the panel: the display of a long search mask cut by bytes (`QuickSearchString`): fixed 2026-10-08, it cuts by characters (`tools/dn-linux-footer.py`); the Caps/Shift start modes take UTF-8 characters now (`IsTypedChar`) but no test drives them.
