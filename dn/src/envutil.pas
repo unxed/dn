@@ -64,7 +64,7 @@ implementation
 
 uses
   basics, Dos,
-  strutil, linepos, Commands {Cat}
+  strutil, linepos, Commands {Cat}, DnPath
   ;
 
 function GetSTime: LongInt;
@@ -80,14 +80,12 @@ function FindParam(const S: String): Integer;
     I: Integer;
   begin
   FindParam := 0;
-  {$IFDEF UNIX}
-  { on Unix a word that starts with "/" is a path, the switches start with "-" }
-  if S[1] = '/' then
+  { without drive letters (Unix) a word that starts with "/" is a path, the switches start with "-" }
+  if (S[1] = '/') and not HasDrives then
     begin
     FindParam := FindParam('-'+Copy(S, 2, MaxStringLength));
     Exit;
     end;
-  {$ENDIF}
   for I := 1 to ParamCount do
     if S = Copy(UpStrg(ParamStr(I)), 1, Length(S)) then
       begin

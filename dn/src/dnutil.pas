@@ -623,7 +623,13 @@ procedure TDNApplication.EditCommandLineFiles;
     I: Integer;
     FileName: String;
     flj: Boolean;
+    SwitchChar: Char;
   begin
+  { a switch starts with "/" where there are drive letters, else with "-" ("/" begins a path) }
+  if HasDrives then
+    SwitchChar := '/'
+  else
+    SwitchChar := '-';
   flj := False;
   for I := 1 to ParamCount do
     begin
@@ -633,7 +639,7 @@ procedure TDNApplication.EditCommandLineFiles;
       FileName := ParamStr(I);
     if Pos('"', FileName) <> 0 then
       flj := not flj;
-    if  (FileName <> '') and (FileName[1] <> {$IFDEF UNIX}'-'{$ELSE}'/'{$ENDIF}) and not flj then
+    if  (FileName <> '') and (FileName[1] <> SwitchChar) and not flj then
       EditFile(True, DelSquashes(FileName));
     end;
   end;
