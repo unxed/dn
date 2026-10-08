@@ -7,7 +7,6 @@ unit DosHarness;
 interface
 
 procedure CheckScreenDump;
-procedure DumpAtExit;
 
 implementation
 
@@ -169,27 +168,6 @@ begin
     DosDumpScreen(Name);
     Halt(0);
   end;
-end;
-{$ELSE}
-begin
-end;
-{$ENDIF}
-
-{ A test aid (see CheckScreenDump): at the end of the program the exit code and the address of the error go to DNLOG.TXT
-  and the screen to the file named by DNDUMP (if it was not written yet). }
-procedure DumpAtExit;
-{$IFDEF GO32V2}
-var
-  T: Text;
-begin
-  if GetEnvironmentVariable('DNDUMP') = '' then
-    Exit;
-  Assign(T, 'dnlog.txt');
-  Rewrite(T);
-  Writeln(T, 'exit code ', ExitCode, ' error address ', IntToHex(PtrUInt(ErrorAddr), 8));
-  Close(T);
-  if DumpStart = 0 then
-    DosDumpScreen(GetEnvironmentVariable('DNDUMP'));
 end;
 {$ELSE}
 begin
