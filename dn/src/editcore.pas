@@ -860,8 +860,9 @@ procedure TFileEditor.CalcMenu;
     EnableCommands([cmRedo])
   else
     DisableCommands([cmRedo]);
-  if ((ClipBoard <> nil) and (ClipBoard.Count > 0)) or
-      ((SystemData.Options and ossUseSysClip <> 0) and GetWinClipSize)
+  { the clipboard of the system changes without a word to DN (and a terminal of the far2l extensions gives its text only right after the paste
+    key), so with it Paste stays on: a paste of an empty clipboard does nothing }
+  if ((ClipBoard <> nil) and (ClipBoard.Count > 0)) or (SystemData.Options and ossUseSysClip <> 0)
   then
     EnableCommands([cmPaste])
   else
