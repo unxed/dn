@@ -646,6 +646,8 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     begin
     lChangeFileName(N1, N2);
     DosErrorCode := IOResult;
+    if DosErrorCode = 18 then
+      DosErrorCode := 17;  { Unix: EXDEV (another file system) is NOT_SAME_DEVICE of DOS: the move is a copy and a delete }
     end;
 
 {--- start -------- Eugeny Zvyagintzev ---- 30-06-2005 -----}
