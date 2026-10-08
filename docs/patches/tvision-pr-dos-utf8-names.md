@@ -5,7 +5,7 @@ Everything is prepared in the fork `unxed/tvision`, branch `dos-utf8-names` (one
 
 https://github.com/magiblot/tvision/compare/master...unxed:tvision:dos-utf8-names?expand=1
 
-Before opening: if `magiblot/tvision` `master` has moved, press "Sync fork" on the fork (the branch has no conflicts with the 2026-10-08 `master`; it touches
+Before opening: if `magiblot/tvision` `master` has moved, press "Sync fork" on the fork (the branch is one commit on the `master` of the fork, which I could not compare with upstream from here; it touches
 `README.md`, `source/tvision/tapplica.cpp` and the new `source/tvision/dosutf8.cpp` only).
 
 **Title:** DOS: ask the DOS for UTF-8 file names when it offers them (AMIS DOS-UTF8/NAMES)
