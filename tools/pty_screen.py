@@ -264,6 +264,41 @@ class PtyTerm:
         os.write(self.fd, data)
         self.pump(settle)
 
+    CLOCK = re.compile(r'\d\d:\d\d:\d\d')
+
+    def settle(self, quiet=0.6, limit=8.0):
+        """reads what the program writes until the screen has not changed for `quiet` seconds (at most `limit` seconds); a clock
+        (hh:mm:ss, the one of the menu bar of DN writes every second) does not count as a change, so the wait ends without the limit"""
+        stop = time.time() + limit
+        last = self.CLOCK.sub('', self.text())
+        changed = time.time()
+        while True:
+            now = time.time()
+            left = min(changed + quiet, stop) - now
+            if left <= 0:
+                break
+            r, _, _ = select.select([self.fd], [], [], left)
+            if not r:
+                continue
+            try:
+                data = os.read(self.fd, 65536)
+            except OSError:
+                break
+            if not data:
+                break
+            self.raw += data
+            self.screen.feed(data)
+            cur = self.CLOCK.sub('', self.text())
+            if cur != last:
+                last, changed = cur, time.time()
+
+    def key(self, data, quiet=0.6, limit=8.0):
+        """sends the key and waits until the screen settles (see settle)"""
+        if isinstance(data, str):
+            data = data.encode()
+        os.write(self.fd, data)
+        self.settle(quiet, limit)
+
     def alive(self):
         """False when the program has ended (its status is in self.status)"""
         if self.status is not None:

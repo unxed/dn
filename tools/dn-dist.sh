@@ -18,7 +18,7 @@ rm -rf "$dist/xlt"; cp -r "$here/dn/data/xlt" "$dist/xlt"
 cp "$work/run/cwsdpmi.exe" "$dist/"
 # the licence texts, README.TXT and the documentation of CWSDPMI (its terms: the doc goes with the program)
 "$here/tools/dn-notices.sh" "$dist" "dos${DN_DIST_SUFFIX:-}"
-# a screenshot: scen NAME SECONDS KEYS   (a clean directory: the state that DN saves would change the run)
+# a screenshot: scen NAME SECONDS KEYS   (a clean directory: the state that DN saves would change the run; the screenshots are made side by side)
 scen() {
     d=$work/$1; rm -rf "$d"; mkdir -p "$d"
     cp "$dist"/dn.exe "$dist"/*.dlg "$dist"/*.lng "$dist"/*.hlp "$dist"/cwsdpmi.exe "$d/"
@@ -32,14 +32,15 @@ scen() {
         echo "no screen dump: $1" >&2
     fi
 }
-scen start 4 ""
-scen panels 5 "011B"
-scen menu 7 "011B,4400,1C0D"
-scen mkdir 6 "011B,4100"
-scen help 8 "011B,3B00"
-scen quit 6 "011B,A2D00"
-scen copy 6 "011B,3F00"
-scen viewer 8 "011B,5000,5000,5000,5000,3D00"
-scen editor 24 "011B,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,3E00"
+scen start 4 "" &
+scen panels 5 "011B" &
+scen menu 7 "011B,4400,1C0D" &
+scen mkdir 6 "011B,4100" &
+scen help 8 "011B,3B00" &
+scen quit 6 "011B,A2D00" &
+scen copy 6 "011B,3F00" &
+scen viewer 8 "011B,5000,5000,5000,5000,3D00" &
+scen editor 24 "011B,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,3E00" &
+wait
 ( cd "$dist" && sha256sum dn.exe *.dlg *.lng *.hlp cwsdpmi.exe > SHA256SUMS.TXT )
 echo "dist/dos${DN_DIST_SUFFIX:-} is made: $(ls "$dist" | wc -l) files"
