@@ -1805,13 +1805,14 @@ DIALOG dlgInterfaceSetup, 71, 22, 'Interface Setup'
       ITEM 'Track ~v~iewing history'
       ITEM 'Track ~d~irectories'
     END
-; the keys of the vtui UX guidelines (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck)
+; the keys of the vtui UX guidelines (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck, EditorWordNav)
     CheckBoxes 8, 8, 70, 10, ofPostProcess, ofPreProcess
       ITEM 'F9 opens menu'
       ITEM '←/→ open menus'
       ITEM 'Esc steps back'
       ITEM 'Home/End: list'
       ITEM 'Enter toggles'
+      ITEM 'Ctrl+←/→ words'
     END
     Label 2, 8, 'Keys:', ofPostProcess, ofPreProcess
     RadioButtons 2, 11, 23, 14, ofPostProcess, ofPreProcess

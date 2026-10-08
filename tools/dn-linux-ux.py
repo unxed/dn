@@ -5,7 +5,7 @@ radio group without changing the selection and leave the group only at its bound
 windows (with key releases: the list of the windows, the choice on the release of Ctrl), a held arrow stops at the end of a menu (with auto
 repeats), the wheel scrolls what is under the pointer, the F keys keep their DN meaning, Ctrl+Left / Ctrl+Right follow the word rules of far2l.
 What is kept as it is (Norton Commander habits) is listed in docs/UX-CONFORMANCE.md.
-The options of the guideline keys (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck, [FilePanels]
+The options of the guideline keys (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck, EditorWordNav, [FilePanels]
 PanelArrowsPage): with the defaults DN keeps its keys; each option, set in dn.ini or in its setup dialog, gives the key of the guidelines."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -267,6 +267,20 @@ def options(d, w, w2):
     check(os.path.isdir(os.path.join(w, 'enterdir')), 'G.2b EnterTogglesCheck=1: Enter in an input line still presses OK (D.1)', t.text())
     t.close(0.3)
 
+    # E.7: Ctrl+Left in the editor at the start of a line
+    we = os.path.join(d, 'words')
+    os.makedirs(we, exist_ok=True)
+    for ini, want, what in (('', 'foo  bar.Xbaz', 'E.7 default: Ctrl+Left at the start of a line goes to the last word of the line above (the word definition of the editor)'),
+                            ('[Interface]\nEditorWordNav=1', 'foo  bar.bazX', 'E.7 EditorWordNav=1: Ctrl+Left at the start of a line stops at the end of the line above (the word rules)')):
+        open(os.path.join(we, 'w.txt'), 'w').write('foo  bar.baz\n(qux)\n')
+        t = start_ini(d, we, ini)
+        keys(t, 'DOWN F4 DOWN HOME CLEFT X', 0.5)
+        check(row_of(t, want) >= 0, what, t.text())
+        keys(t, 'ESC')
+        t.pump(0.3, 1)
+        keys(t, 'n')
+        t.close(0.3)
+
     # P.1: Left/Right in a file panel (60 files: more than a page)
     t = start_ini(d, w2, '')
     keys(t, 'RIGHT')
@@ -288,7 +302,8 @@ def options(d, w, w2):
     # the options in the setup dialogs: the group "Keys" of the Interface setup and "Left/Right by page" of the File Manager setup
     t = start_ini(d, w2, '')
     keys(t, 'ALT-O c i')
-    check(row_of(t, 'Keys:') >= 0 and row_of(t, 'F9 opens menu') >= 0 and row_of(t, 'Enter toggles') >= 0, 'the Interface setup shows the group "Keys"', t.text())
+    check(row_of(t, 'Keys:') >= 0 and row_of(t, 'F9 opens menu') >= 0 and row_of(t, 'Enter toggles') >= 0 and row_of(t, 'Ctrl+\u2190/\u2192 words') >= 0,
+          'the Interface setup shows the group "Keys"', t.text())
     keys(t, 'TAB SPACE ENTER')
     keys(t, 'F9 DOWN')
     check(dropdown(t) and ini_value(d, 'F9OpensMenu') == '1', 'the Interface setup switches F9OpensMenu on (at once and in dn.ini)', t.text())
@@ -304,7 +319,8 @@ def options(d, w, w2):
     t = start(d, w2)
     keys(t, 'ALT-O c i')
     check('[X] F9 opens menu' in t.text(), 'the option is read back from dn.ini at the next start', t.text())
-    keys(t, 'ESC')
+    keys(t, 'TAB DOWN DOWN DOWN DOWN DOWN SPACE ENTER')
+    check(ini_value(d, 'EditorWordNav') == '1' and ini_value(d, 'F9OpensMenu') == '1', 'the Interface setup switches EditorWordNav on (the sixth item of "Keys")', t.text())
     t.close(0.3)
 
 

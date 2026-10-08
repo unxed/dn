@@ -108,6 +108,7 @@ const
   {}MenuEscStep: Boolean = False;       { M.4: Esc closes the open drop-down and keeps the bar; a second Esc leaves it }
   {}ListHomeEndItems: Boolean = False;  { L.2: Home/End in the lists go to the first/last item, not to the first/last row shown }
   {}EnterTogglesCheck: Boolean = False; { G.2b: Enter on a check box or a radio button toggles it instead of pressing the default button }
+  {}EditorWordNav: Boolean = False;     { E.7: the word movement of the editor (Ctrl+Left/Right) follows the word rules of the guidelines (WORDNAV.md) }
   {,'~~~~~~~~~~~~~~~~~~~~~~~~;~~~~~~~~~~~~;~~~~~~~~~~~~~~~~~~~~;~~~~~~~~~~~~~~~~~~`,}
   {;      Variable name      ;   Type     ; Default value      ;          Comments ;}
   { '._______________________;____________;____________________;___________________'}

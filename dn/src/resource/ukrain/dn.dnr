@@ -465,13 +465,14 @@ DIALOG dlgInterfaceSetup, 76, 22, 'Установки інтерфейса'
       ITEM 'Історія ~п~ерегляду файлів'
       ITEM '~І~сторія зміни каталогів'
     END
-; the keys of the vtui UX guidelines (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck)
+; the keys of the vtui UX guidelines (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck, EditorWordNav)
     CheckBoxes 11, 8, 75, 10, ofPostProcess, ofPreProcess
       ITEM 'F9 - меню'
       ITEM '←/→ розкривають'
       ITEM 'Esc - на крок'
       ITEM 'Home/End-список'
       ITEM 'Enter-позначка'
+      ITEM 'Ctrl+←/→ слова'
     END
     Label 2, 8, 'Клавіші:', ofPostProcess, ofPreProcess
     RadioButtons 2, 11, 23, 14, ofPostProcess, ofPreProcess

@@ -36,7 +36,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | D.1 | `Enter` presses the default button, also in an edit field | Make directory: the name, `Enter`, the directory is made | conformant | P:ux |
 | D.2 | `Esc` closes the window or dialog | copy, move, make directory, attributes; every dialog that the sweep opens is left with `Esc` | conformant | P:ux, P:sweep |
 | D.3 | `F1` opens the help of the focused element | `F1` in a modal dialog opens the topic of the dialog (the copy dialog) | conformant | P:ux |
-| D.4 | Drag the top border to move, the bottom right corner to resize | windows: yes; dialogs: movable, fixed size (as in tv3) | gap | C |
+| D.4 | Drag the top border to move, the bottom right corner to resize | windows: yes; dialogs: movable, fixed size (as in tv3: `TDialog` has no `wfGrow`). The 92 dialogs of DN come from the resources (`dn.dnr`, compiled by `rcp`), whose controls carry no grow modes: a bigger dialog would only show empty space. Needs grow modes in the resource format and a layout in every dialog | gap | C |
 | G.1 | Arrows move the cursor of a group, the selection does not change | radio buttons (cursor moves, `(.)` stays) and check boxes (nothing toggles) | conformant | P:ux |
 | G.2a | `Space` toggles / selects the item under the cursor | yes | conformant | P:ux |
 | G.2b | `Enter` toggles the item | default: `Enter` presses the default button (D.1 and this rule cannot both hold). Option `EnterTogglesCheck`: `Enter` on a check box or a radio button toggles it (DN turns it into `Space`; tv3 has no switch), from the other controls it still presses the default button | conflict (option `EnterTogglesCheck`, default DN) | P:ux |
@@ -52,7 +52,7 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | E.4 | `Shift` + a navigation key selects | yes | conformant | C |
 | E.5 | `Ctrl+C` and `Ctrl+Ins` copy | the input lines of tv3 copy on both | conformant (input lines) | C |
 | E.6 | A field opened with a value clears when typing starts | the copy dialog: the first typed letter replaces the name | conformant | P:ux (by hand) |
-| E.7 | The word movement of the multi-line editor follows the same rules | the editor has its own word definition (families A and B of tve) | gap (as tve) | C |
+| E.7 | The word movement of the multi-line editor follows the same rules | default: the word definition of the editor (`Ctrl+Left` at the start of a line goes to the last word of the line above). Option `EditorWordNav`: `Ctrl+Left` / `Ctrl+Right` (and the other keys of the commands "word left / right" of the key map) run the word movement of the guidelines of tve (`NavWordLeft` / `NavWordRight`: three classes, a stop at the start and the end of a line; with `Shift` the selecting ones, `editcore.pas`) | conflict (option `EditorWordNav`, default DN) | P:ux |
 | C.1 | `Ctrl+Down` opens the list of a combo box | the history of an input line: `Ctrl+Down` opens the list with the earlier entries | conformant | P:ux |
 | C.2 | A chosen item fills the field and focus returns to it | `THistory` of tv3 | conformant | C |
 | C.3 | `DropdownOnly` mode | none | n/a | C |
@@ -69,9 +69,9 @@ opened and left with `Esc`); `P:hot` = `tools/dn-linux-hotkeys.py` and `dn-linux
 | X.2 | Double click is `Enter` | yes (panels, lists) | conformant | C |
 | X.3 | Right click for secondary actions in file panels | the right button marks files in the panels (the NC habit) | conformant | C |
 | X.4 | The wheel scrolls the component under the cursor | the windows: tv3 (`UxWheelUnderCursor`) gives the wheel to the window under the pointer (an editor that is not active scrolls). The two panels are one window: a panel takes the wheel itself and moves its own cursor (`filepanel.pas`), so the wheel over the panel that is not active moves that panel and the focus stays | conformant | P:ux |
-| R.1 | One action = one declaration (the registry `TvActions`) | DN keeps its resource tables (`dn.dnr`: menus, status lines, key maps); not migrated | gap | C |
+| R.1 | One action = one declaration (the registry `TvActions`) | DN keeps its resource tables (`dn.dnr`: menus, status lines, key maps); not migrated. `TvActions` builds the items of `TvMenus` and the status keys of tv3, while the menu bar and the status lines of DN are its own `Menus` unit, read from the resources of each language (the captions are translated there) | gap | C |
 
-Count: 46 rows: **35 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **3 gap** (D.4, E.7, R.1), **6 conflict** (G.2b, L.2, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
+Count: 46 rows: **35 conformant** (some only for dialogs or input lines, as the cell says; 0.2, 0.3 and M.7 only where the terminal tells key releases or auto repeats), **2 gap** (D.4, R.1), **7 conflict** (G.2b, L.2, E.7, P.1, M.1, M.2, M.4: each has an option, off by default, that gives the guideline behaviour), **2 n/a** (C.3, M.8).
 
 ## Other keys the guidelines touch
 
@@ -94,6 +94,8 @@ dropping the letters would change the hot keys of the menu.
 * 0.2, 0.3: the switcher of tv3 works in DN as it is (DN's desktop is tv3's); DN adds the names of the windows that have no title. `P:ux` answers the query of the
   keyboard protocol of Kitty and sends the presses and releases of that protocol.
 * M.7: the menus of DN (`menus.pas`) stop a held arrow at the end. `P:ux` sends the keys of the win32 input mode (a press with no release before it is a repeat).
+* E.7: the word movement of the guidelines is in tve; `Ctrl+Left` / `Ctrl+Right` are keys that DN users know with the word definition of the editor, so it is
+  the option `EditorWordNav` (off by default), like the conflict rows.
 * X.4: before, the window of the panels gave the wheel to the first scroll bar it found (the active panel moved, wherever the pointer was). `P:ux` sends the
   wheel of the SGR mouse reports over the panel that is not active and over an editor window that is not active (Window / Tile).
 
@@ -117,9 +119,10 @@ edited in DN) and check boxes of the setup dialogs:
 | `[Interface] MenuEscStep` | same group: "Esc steps back" | M.4 | `Esc` closes the drop-down, the bar stays; a second `Esc` leaves it |
 | `[Interface] ListHomeEndItems` | same group: "Home/End: list" | L.2 | `Home`/`End` in the lists go to the first / last item (tv3 `UxListHomeEnd`) |
 | `[Interface] EnterTogglesCheck` | same group: "Enter toggles" | G.2b | `Enter` on a check box or a radio button toggles it |
+| `[Interface] EditorWordNav` | same group: "Ctrl+←/→ words" | E.7 | `Ctrl+Left`/`Ctrl+Right` in the editor move by the word rules of the guidelines (tve's `NavWordLeft`/`NavWordRight`) |
 | `[FilePanels] PanelArrowsPage` | Options / File Manager / Setup: "Left/Right by page" | P.1 | `Left`/`Right` in a file panel go a page up / down |
 
-All are `0` by default. `tools/dn-linux-ux.py` checks each one off (the DN key) and on (from `dn.ini`), and switches two of them in their dialogs.
+All are `0` by default. `tools/dn-linux-ux.py` checks each one off (the DN key) and on (from `dn.ini`), and switches three of them in their dialogs.
 The menus of DN are its own code (`menus.pas`), so tv3's `UxMenuEsc` and `UxMenuAutoOpen` do not apply; `F9` and `Enter` are handled in
 `TProgram.GetEvent` (`mainapp.pas`), the panel keys in `filepanel.pas`.
 

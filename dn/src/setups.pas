@@ -202,7 +202,7 @@ procedure SystemSetup;
 function GetUxKeys: Word;
   begin
   Result := Ord(F9OpensMenu) or Ord(MenuArrowsOpen) shl 1 or Ord(MenuEscStep) shl 2 or Ord(ListHomeEndItems) shl 3
-    or Ord(EnterTogglesCheck) shl 4;
+    or Ord(EnterTogglesCheck) shl 4 or Ord(EditorWordNav) shl 5;
   end;
 
 procedure SetUxKeys(W: Word);
@@ -212,6 +212,7 @@ procedure SetUxKeys(W: Word);
   MenuEscStep := W and 4 <> 0;
   ListHomeEndItems := W and 8 <> 0;
   EnterTogglesCheck := W and 16 <> 0;
+  EditorWordNav := W and 32 <> 0;
   end;
 
 procedure InterfaceSetup;
@@ -263,6 +264,7 @@ procedure InterfaceSetup;
   SaveDnIniSettings(@MenuEscStep);
   SaveDnIniSettings(@ListHomeEndItems);
   SaveDnIniSettings(@EnterTogglesCheck);
+  SaveDnIniSettings(@EditorWordNav);
   DoneIniEngine;
   end { InterfaceSetup };
 

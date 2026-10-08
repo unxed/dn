@@ -2813,7 +2813,8 @@ Hotkey is Alt-PgDn.
 {Keys:_} The keys of the UX guidelines of vtui where they differ from the
 keys of DN (Norton Commander). Turned off (the default), DN keeps its keys.
 They are also the lines F9OpensMenu, MenuArrowsOpen, MenuEscStep,
-ListHomeEndItems and EnterTogglesCheck of section [Interface] of dn.ini.
+ListHomeEndItems, EnterTogglesCheck and EditorWordNav of section [Interface]
+of dn.ini.
   {F9 opens menu:_} F9 opens the menu bar, as F10 does (F9 is then no longer
 "next window" in the editor and the viewer).
   {←/→ open menus:_} Left/Right in the menu bar open the menu of the item
@@ -2824,6 +2825,10 @@ a second Esc leaves it. Off: one Esc leaves both.
 and the last item. Off: to the first and the last row shown.
   {Enter toggles:_} Enter on a check box or a radio button toggles it. Off:
 Enter presses the default button of the dialog.
+  {Ctrl+←/→ words:_} Ctrl+Left/Right in the editor move by the word rules of
+the guidelines (spaces, dividers and words are three kinds of characters; a
+jump stops at the start and the end of a line); with Shift they select whole
+words. Off: the word definition of the editor.
 
 Block "Drive selection menu information"
 

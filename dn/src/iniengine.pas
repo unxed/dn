@@ -285,6 +285,7 @@ procedure Proceed(RegisterVar: TDoProc);
   RegisterVar(CSInterface, 'MenuEscStep', ikBool, SizeOf(MenuEscStep), @MenuEscStep);
   RegisterVar(CSInterface, 'ListHomeEndItems', ikBool, SizeOf(ListHomeEndItems), @ListHomeEndItems);
   RegisterVar(CSInterface, 'EnterTogglesCheck', ikBool, SizeOf(EnterTogglesCheck), @EnterTogglesCheck);
+  RegisterVar(CSInterface, 'EditorWordNav', ikBool, SizeOf(EditorWordNav), @EditorWordNav);
   {Clock}
   RegisterVar(CSClock, 'ShowSeconds', ikBool, SizeOf(ShowSeconds),
      @ShowSeconds);
