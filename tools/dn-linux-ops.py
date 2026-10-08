@@ -9,7 +9,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 F = {'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~', 'F10': '\x1b[21~',
      'DOWN': '\x1b[B', 'UP': '\x1b[A', 'ENTER': '\r', 'HOME': '\x1b[H', 'END': '\x1b[F', 'ESC': '\x1b', 'ALT-X': '\x1bx', 'TAB': '\t', 'CTRL-R': '\x12', 'INS': '\x1b[2~'}
@@ -42,8 +42,8 @@ def main():
         open(os.path.join(w, 'c.txt'), 'w').write('third\n')
         payload = os.urandom(3 * 1024 * 1024 + 123)       # more than 64K: the copy buffer (Word was 16 bits)
         open(os.path.join(w, 'z.txt'), 'wb').write(payload)
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         check(b'Error in country' not in t.raw, 'start: no country setup error (xlt next to the program)')
         t.send(F['ESC'], 0.5)
 
@@ -161,8 +161,8 @@ def main():
             for n in ('\u042f\u0431\u043b\u043e\u043a\u043e', '\u0430\u0440\u0431\u0443\u0437', '\u0410\u043b\u044c\u0444\u0430', '\u0431\u0435\u0442\u0430', 'Zeta'):
                 open(os.path.join(u, n), 'w').write('x')
             open(os.path.join(u, '\u0444\u0430\u0439\u043b.txt'), 'w').write('\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440\nsecond\n')
-            t = PtyTerm(['./dn'], 100, 30, cwd=u, exe=os.path.join(d, 'dn'))
-            t.pump(1.5, 6)
+            t = DnTerm(['./dn'], 100, 30, cwd=u, exe=os.path.join(d, 'dn'))
+            t.started()
             t.send(F['ESC'], 0.5)
             lines = [l for l in t.text().split('\n')]
             order = [n for n in ('Zeta', '\u0410\u043b\u044c\u0444\u0430', '\u0430\u0440\u0431\u0443\u0437', '\u0431\u0435\u0442\u0430', '\u042f\u0431\u043b\u043e\u043a\u043e')]
@@ -181,8 +181,8 @@ def main():
             os.makedirs(cj)
             for n in ('abc.txt', '\u65e5\u672c\u8a9e.txt', 'e\u0301x.txt'):
                 open(os.path.join(cj, n), 'w').write('x')
-            t = PtyTerm(['./dn'], 100, 30, cwd=cj, exe=os.path.join(d, 'dn'))
-            t.pump(1.5, 6)
+            t = DnTerm(['./dn'], 100, 30, cwd=cj, exe=os.path.join(d, 'dn'))
+            t.started()
             t.send(F['ESC'], 0.5)
             rows = {k: next((l for l in t.text().split('\n') if k in l), '') for k in ('abc', '\u65e5\u672c\u8a9e', 'ex')}     # the screen of the test has no cell for a combining mark
             ok = all(rows.values())
@@ -200,8 +200,8 @@ def main():
                     shutil.copy(os.path.join(out, f), ru)
                 elif f == 'xlt':
                     shutil.copytree(os.path.join(out, f), os.path.join(ru, f))
-            t = PtyTerm(['./dn'], 100, 30, env={'DNLNG': 'Russian'}, cwd=os.path.join(ru, 'w'), exe=os.path.join(ru, 'dn'))
-            t.pump(1.5, 6)
+            t = DnTerm(['./dn'], 100, 30, env={'DNLNG': 'Russian'}, cwd=os.path.join(ru, 'w'), exe=os.path.join(ru, 'dn'))
+            t.started()
             t.send(F['ESC'], 0.5)
             t.send('\x1b\u0444', 1.0)                                   # Alt-\u0444: the menu "\u0424\u0430\u0439\u043b"
             check('\u0421\u043c\u043e\u0442\u0440\u0435\u0442\u044c' in t.text(), 'UTF-8: Alt and a Cyrillic letter opens the menu', t.text())
@@ -219,8 +219,8 @@ def main():
             t.close(3)
 
             # the system clipboard: Edit/Copy of the editor puts the text on the clipboard of the terminal (OSC 52, UTF-8)
-            t = PtyTerm(['./dn'], 100, 30, env={'TERM': 'xterm-256color'}, cwd=u, exe=os.path.join(d, 'dn'))
-            t.pump(1.5, 6)
+            t = DnTerm(['./dn'], 100, 30, env={'TERM': 'xterm-256color'}, cwd=u, exe=os.path.join(d, 'dn'))
+            t.started()
             t.send(F['ESC'], 0.5)
             t.send(F['END'], 0.5)
             t.send(F['F4'], 1.2)
@@ -242,8 +242,8 @@ def main():
             os.makedirs(ed)
             fn = os.path.join(ed, 'f.txt')
             open(fn, 'w', encoding='utf-8').write('\u041f\u0440\u0438\u0432\u0435\u0442, \u043c\u0438\u0440\n\u0432\u0442\u043e\u0440\u0430\u044f \u2014 \u0441\u0442\u0440\u043e\u043a\u0430 \u00abx\u00bb\n')
-            t = PtyTerm(['./dn'], 100, 30, env={'TERM': 'xterm-256color'}, cwd=ed, exe=os.path.join(d, 'dn'))
-            t.pump(1.5, 6)
+            t = DnTerm(['./dn'], 100, 30, env={'TERM': 'xterm-256color'}, cwd=ed, exe=os.path.join(d, 'dn'))
+            t.started()
             t.send(F['ESC'], 0.5)
             t.send(F['DOWN'], 0.3)
             t.send(F['DOWN'], 0.3)
@@ -282,8 +282,8 @@ def main():
         dw = os.path.join(dd, 'work')
 
         def dsk_start():
-            tt = PtyTerm(['./dn'], 100, 30, cwd=dw, exe=os.path.join(dd, 'dn'))
-            tt.pump(1.5, 6)
+            tt = DnTerm(['./dn'], 100, 30, cwd=dw, exe=os.path.join(dd, 'dn'))
+            tt.started()
             tt.send(F['ESC'], 0.5)
             return tt
 

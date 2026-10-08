@@ -12,7 +12,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 F10, RIGHT = '\x1b[21~', '\x1b[C'
 EXPECTED_INI = '1a9b0b2b63ba27eb9324c3a09587ac337426756e174ba77f60ef05a8ab52ad9f'
@@ -59,8 +59,8 @@ def main():
         os.makedirs(w)
         open(os.path.join(w, 'a.txt'), 'w').write('x\n')
 
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(2.0, 8)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         before = t.text()
         check(panel_paths(before) >= 2 and has_listing(before),
               'configured start: panel headers and listing before any key', before)

@@ -5,7 +5,7 @@ Visits the Info panel, the drive menu, the tree, the find dialog and its results
 history lists, the user menu and the file attributes; every screen is scanned. Exit status 1 when a screen has such a path."""
 import os, re, shutil, sys, tempfile, zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 PATH_FORM = re.compile(r'(?<![A-Za-z0-9])[A-Za-z]:\\|\\\\[A-Za-z0-9_.-]+\\|[A-Za-z0-9_.-]\\[A-Za-z0-9_.-]')
 DRIVE = re.compile(r'(?<![A-Za-z0-9])[A-Za-z]:(?![A-Za-z0-9/])|\[ [A-Z] [*\s]?\]')
@@ -41,8 +41,8 @@ def main():
         with zipfile.ZipFile(os.path.join(w, 'z.zip'), 'w') as z:
             z.writestr('dir/in.txt', 'inside')
         for name, spec, *want in SCEN:
-            t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-            t.pump(1.5, 6)
+            t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+            t.started()
             t.send('\x1b', 0.5)
             for k in tok(spec):
                 t.send(k, 0.5)

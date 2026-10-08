@@ -6,7 +6,7 @@
   - TV_CLIPBOARD=0 keeps the copied text inside DN (no OSC 52)."""
 import base64, os, re, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -35,8 +35,8 @@ def install(out):
 def start(d, w, env=None):
     e = {'DNLNG': 'ENGLISH', 'DN2': d, 'TERM': 'xterm-256color'}
     e.update(env or {})
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
+    t.started()
     t.send('\x1b', 0.5)
     return t
 

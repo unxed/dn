@@ -4,7 +4,7 @@ A tree "work" with a.txt, sub/beta.txt (the text "needle"), sub/gamma.txt: the m
 The result panel shows the file names. The dialog and the screens are printed when a check fails (compact)."""
 import os, re, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 
 def brief(text):
@@ -24,8 +24,8 @@ def run(out, mask, text, want, not_want):
         open(os.path.join(w, 'sub', 'beta.txt'), 'w').write('a needle in it\n')
         open(os.path.join(w, 'sub', 'gamma.txt'), 'w').write('nothing here\n')
         os.environ['DNLNG'] = 'ENGLISH'
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         t.send('\x1b', 0.5)
         t.send('\x1b[18;3~', 1.0)                 # Alt+F7
         s_dlg = t.text()

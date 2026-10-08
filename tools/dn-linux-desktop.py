@@ -4,7 +4,7 @@ Run 1: Options -> Configuration -> Startup: Autosave Desktop and Preserve direct
 Run 3: the panel is in sub (the title of the panel), dn.dsk is on the disk. Runs 4 and 5: a window of the desktop, the editor, is saved and restored; runs 6 and 7: the viewer. The same scenario as `autosave` of tools/dn-dos-input.py."""
 import os, re, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 K = {'ENTER': '\r', 'ESC': '\x1b', 'TAB': '\t', 'DOWN': '\x1b[B', 'UP': '\x1b[A', 'RIGHT': '\x1b[C', 'F10': '\x1b[21~', 'SPACE': ' ', 'ALT-X': '\x1bx'}
 bad = 0
@@ -21,8 +21,8 @@ def check(ok, what, info=''):
 
 def run(d, w, keys, wait_exit=True):
     os.environ['DNLNG'] = 'ENGLISH'
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+    t.started()
     for k in keys.split():
         t.send(K.get(k, k), 0.8)
     t.pump(1.0, 3)

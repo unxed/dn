@@ -3,7 +3,7 @@
 Alt+F1 opens the menu, the home directory is chosen, and the panel shows it."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 def main(out):
     d = tempfile.mkdtemp(prefix='dnpl-')
@@ -18,8 +18,8 @@ def main(out):
         os.makedirs(w)
         os.environ['DNLNG'] = 'ENGLISH'
         os.environ['HOME'] = home
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         t.send('\x1b', 0.5)
         t.pump(0.5, 3)
         t.send('\x1b[1;3P', 1.0)                   # Alt+F1

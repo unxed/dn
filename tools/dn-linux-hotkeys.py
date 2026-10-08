@@ -8,7 +8,7 @@ Exit status 1 when a key does nothing or DN has a fatal error."""
 import os, re, shutil, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESDIR = os.path.join(HERE, '..', 'dn', 'src', 'resource')
@@ -132,8 +132,8 @@ def one(job):
     d = tempfile.mkdtemp(prefix='dnhot-')
     try:
         d, w = install(out, d)
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
-        t.pump(1.2, 5)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
+        t.started()
         t.send(KEYS['ESC'], 0.4)
         why = ''
         for i, k in enumerate(hot_keys(chain)):

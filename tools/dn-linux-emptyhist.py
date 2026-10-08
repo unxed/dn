@@ -5,7 +5,7 @@ list must give nothing and not stop the program: the directories dialog asked th
 did the same, and the buttons Edit and Delete of the commands list (Alt and a Cyrillic letter in the Russian interface, Del in any) took the item -1."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 KEYS = [('Alt-BkSp', '\x1b\x7f'), ('Alt-F8', '\x1b[19;3~'), ('Alt-PgUp', '\x1b[5;3~'), ('Alt-PgDn', '\x1b[6;3~')]
@@ -29,8 +29,8 @@ def run(out, lang, key, ok_key, what):
                 (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(d, f))
         w = os.path.join(d, 'work')
         os.makedirs(w)
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
+        t.started()
         t.send('\x1b', 0.5)
         before = t.text()
         t.send(key, 0.8)

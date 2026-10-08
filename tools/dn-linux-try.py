@@ -5,7 +5,7 @@ ARC=1 adds the archives 0arc.zip and 1arc.7z.
 The directory `work` (a.txt b.txt c.txt, sub/deep, dst/, big.txt, link.txt, ro.txt) is made in a temp directory, DN starts in it."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 import importlib.util
 spec = importlib.util.spec_from_file_location('tour', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dn-linux-tour.py'))
 KEYS = {'SHIFT-UP': '\x1b[1;2A', 'SHIFT-DOWN': '\x1b[1;2B', 'SHIFT-RIGHT': '\x1b[1;2C', 'SHIFT-LEFT': '\x1b[1;2D', 'F1': '\x1bOP', 'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~',
@@ -49,8 +49,8 @@ def main():
             import subprocess
             subprocess.run(['zip', '-q', '0arc.zip', 'a.txt', 'b.txt'], cwd=w)
             subprocess.run(['7z', 'a', '-bd', '-bso0', '1arc.7z', 'a.txt', 'b.txt'], cwd=w)
-        t = PtyTerm(['./dn'], cols, rows, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], cols, rows, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         t.send('\x1b', 0.5)
         for k in keys:
             t.send(KEYS.get(k, k), 0.7)

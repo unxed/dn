@@ -3,7 +3,7 @@
 Opens files with F4 and checks what the user sees and what lands on the disk."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -39,8 +39,8 @@ def install(out, files):
 
 def start(d, w):
     e = {'DNLNG': 'ENGLISH', 'DN2': d, 'TERM': 'xterm-256color'}
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
+    t.started()
     t.send('\x1b', 0.5)
     return t
 

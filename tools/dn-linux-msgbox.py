@@ -5,7 +5,7 @@ For each language the title and the buttons must be those of the resources, the 
 and the hot letter of Yes must end DN."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 # language: (title, yes, no, the hot letter of no, the hot letter of yes)
@@ -35,8 +35,8 @@ def start(out, lang):
             (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(d, f))
     w = os.path.join(d, 'work')
     os.makedirs(w)
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
+    t.started()
     t.send('\x1b', 0.5)
     return d, t
 

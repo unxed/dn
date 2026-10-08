@@ -4,7 +4,7 @@ an absolute path (a word that starts with "/"), a relative name, several files.
 usage: tools/dn-linux-args.py OUTDIR   (OUTDIR: the result of tools/build.sh linux64)"""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 fails = 0
 
@@ -27,9 +27,9 @@ def start(args):
     cfg = os.path.join(d, 'cfg')
     shutil.rmtree(cfg, ignore_errors=True)
     os.makedirs(cfg)
-    t = PtyTerm(['./dn'] + args, 100, 30, cwd=w, exe=os.path.join(d, 'dn'),
+    t = DnTerm(['./dn'] + args, 100, 30, cwd=w, exe=os.path.join(d, 'dn'),
                 env={'DNLNG': 'ENGLISH', 'DN2': d, 'HOME': cfg})
-    t.pump(2.0, 8)
+    t.started()
     t.send('\x1b', 1.0)                            # Esc: the box of the start
     t.pump(1.0, 4)
     return t

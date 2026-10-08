@@ -8,7 +8,7 @@ and drops it): the variable stayed nil. The places that hand-testing and the swe
   - the phone book (search, import, dial) had the same pattern (no pty scenario: it needs a phone book; the code is covered by the build)."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -38,8 +38,8 @@ try:
     os.makedirs(w)
     for n in ('a.txt', 'b.txt'):
         open(os.path.join(w, n), 'w').write('x')
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+    t.started()
     t.send('\x1b', 0.5)
     t.send('\x1b[B', 0.3)                                           # a.txt
     t.send('\x1b[2~', 0.3)

@@ -4,7 +4,7 @@ OEM / DN_UTF8=0 builds only: a UTF-8-inside binary shows every script and is ski
 usage: tools/dn-linux-locale.py OUTDIR   (OUTDIR: the result of tools/build.sh linux|linux64)"""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 CASES = [  # LANG, extra env, names that must be seen, names that must not be seen
     ('de_DE.UTF-8', {}, ['Größe', 'Ünï'], ['Привет']),   # 850: German letters, no Cyrillic
@@ -26,13 +26,13 @@ def run_case(lang, extra, want, notwant):
         for n in ('Größe', 'Привет'):
             os.makedirs(os.path.join(w, n))
         open(os.path.join(w, 'Ünï.txt'), 'w').close()
-        # PtyTerm inherits the runner env: a set LC_ALL (e.g. C.UTF-8 or en_US.UTF-8)
+        # DnTerm inherits the runner env: a set LC_ALL (e.g. C.UTF-8 or en_US.UTF-8)
         # would win over LANG in TvLocale.HostOemCodePage. Clear the locale vars first;
         # cases may put LC_CTYPE back via `extra` (see C.UTF-8 below).
         env = {'LC_ALL': '', 'LC_CTYPE': '', 'LANG': lang}
         env.update(extra)
-        t = PtyTerm(['./dn'], 100, 30, env=env, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, env=env, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         t.send('\x1b', 0.5)
         text = t.text()
         t.close(0.3)

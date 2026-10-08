@@ -6,7 +6,7 @@
   - a zip in a zip: the inner archive is entered and its member is listed."""
 import os, shutil, sys, tempfile, zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 F = {'F3': '\x1bOR', 'F5': '\x1b[15~', 'F7': '\x1b[18~', 'F8': '\x1b[19~', 'F10': '\x1b[21~', 'DOWN': '\x1b[B', 'UP': '\x1b[A', 'ENTER': '\r',
      'HOME': '\x1b[H', 'ESC': '\x1b', 'CTRL-R': '\x12', 'ALT-X': '\x1bx'}
@@ -37,8 +37,8 @@ def install(out):
 def run(d, w, env=None):
     e = {'DNLNG': 'ENGLISH', 'DN2': d}
     e.update(env or {})
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
+    t.started()
     t.send(F['ESC'], 0.5)
     return t
 

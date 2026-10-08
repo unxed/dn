@@ -6,7 +6,7 @@
     shown whole and no character is broken."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 LONG_ASCII = 'averyverylongname.txt'
@@ -43,8 +43,8 @@ try:
     os.makedirs(w)
     for n in (LONG_ASCII, MASK + '.txt'):
         open(os.path.join(w, n), 'w').close()
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+    t.started()
     t.send('\x1b', 0.5)
     t.send('\x1b[B', 0.6)                          # averyverylongname.txt
     f = footer(t)

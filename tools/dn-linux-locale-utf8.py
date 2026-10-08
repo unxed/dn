@@ -4,7 +4,7 @@ The names of files and the typed text are UTF-8 whatever the locale says (C, POS
 (a terminal that sends UTF-8 to a program that thinks it is Latin-1 is a mistake of the setup, not shown as a fault of DN)."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -40,8 +40,8 @@ try:
     for loc, utf8_ok in (('C', True), ('POSIX', True), ('ru_RU.KOI8-R', True), ('ru_RU.UTF-8', True), ('en_US.UTF-8', True), ('en_US.ISO-8859-1', False)):
         d, w = install(out); dirs.append(d)
         e = {'DNLNG': 'ENGLISH', 'DN2': d, 'LC_ALL': loc, 'LANG': loc, 'LC_CTYPE': loc}
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
+        t.started()
         t.send('\x1b', 0.5)
         text = t.text()
         check('\u0424\u0430\u0439\u043b' in text, '%s: a file with a Russian name is shown' % loc, text)

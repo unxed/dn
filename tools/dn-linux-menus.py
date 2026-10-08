@@ -5,7 +5,7 @@ The screens are kept in OUTDIR/menu-M-N.txt (M = the menu from 1, N = the item f
 import os, shutil, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 RIGHT, DOWN, ENTER, ESC, F10 = '\x1b[C', '\x1b[B', '\r', '\x1b', '\x1b[21~'
 MENUS = 7          # File Disk Utilities Panel Manager Options Window
@@ -23,8 +23,8 @@ def one(args):
         os.makedirs(os.path.join(w, 'sub'))
         for name in ('a.txt', 'b.txt'):
             open(os.path.join(w, name), 'w').write('file %s\n' % name)
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.2, 5)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         t.send(ESC, 0.4)
         t.send(F10, 0.4)
         for _ in range(m):

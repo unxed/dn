@@ -5,7 +5,7 @@
   - the archive panel still shows what the archive had (DN does not reread it after an add: Ctrl-R does)."""
 import os, shutil, sys, tempfile, zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -31,8 +31,8 @@ def install(out):
 
 
 def start(d, w):
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+    t.started()
     t.send('\x1b', 0.5)
     return t
 

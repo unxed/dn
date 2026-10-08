@@ -9,7 +9,7 @@ The options of the guideline keys (dn.ini [Interface] F9OpensMenu, MenuArrowsOpe
 PanelArrowsPage): with the defaults DN keeps its keys; each option, set in dn.ini or in its setup dialog, gives the key of the guidelines."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 K = {'ESC': '\x1b', 'ENTER': '\r', 'TAB': '\t', 'BTAB': '\x1b[Z', 'UP': '\x1b[A', 'DOWN': '\x1b[B', 'RIGHT': '\x1b[C', 'LEFT': '\x1b[D', 'SPACE': ' ',
      'F2': '\x1bOQ', 'F3': '\x1bOR', 'F4': '\x1bOS', 'F5': '\x1b[15~', 'F6': '\x1b[17~', 'F7': '\x1b[18~', 'F8': '\x1b[19~', 'F1': '\x1bOP', 'F10': '\x1b[21~',
@@ -40,8 +40,8 @@ def row_of(t, word):
 
 
 def start(d, w):
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+    t.started()
     t.send('\x1b', 0.5)
     return t
 
@@ -80,8 +80,8 @@ def switcher(d, w):
     w = os.path.join(d, 'switch')
     os.makedirs(w, exist_ok=True)
     open(os.path.join(w, 'one.txt'), 'w').write('x')
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'TV_WIN32_INPUT': '0'})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'TV_WIN32_INPUT': '0'})
+    t.started()
     check(b'\x1b[?u' in t.raw, '0.3: DN asks the terminal for the keyboard protocol of Kitty')
     t.send(b'\x1b[?0u', 0.5)
     keys(t, 'ESC DOWN F4')
@@ -132,8 +132,8 @@ def chosen(t, bar=False):
 def held(d, w):
     """M.7: in a terminal that tells the auto repeats (the win32 input mode) a held arrow stops at the end of a menu; a single press wraps"""
     press, release = b'\x1b[%d;80;0;1;0;1_', b'\x1b[%d;80;0;0;0;1_'
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'TV_WIN32_INPUT': '1'})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'TV_WIN32_INPUT': '1'})
+    t.started()
     keys(t, 'ESC F10 DOWN')
     first = chosen(t)
     t.send(press % 40, 0.2)
