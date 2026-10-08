@@ -17,9 +17,9 @@ function NameFromOs(const S: string): string;
 function NameToOs(const S: string): string;
 { a path of DN (A:\x\y, the page of DN) as a path of the system (the case of the existing names is found) }
 function OsPath(const S: string): string;
-{ a path of DN as the user of Unix expects to read it (issue #23): "C:\dev\shm\" is shown as "/dev/shm/". Only the spelling changes: the
-  drive is dropped and "\" becomes "/"; the bytes stay those of the page of DN and no file is looked up (unlike OsPath, which makes a path
-  to open) }
+{ a path of DN as the user of Unix expects to read it (issue #23): a path of the host ("/x") as it is; another one ("C:\dev\shm\", the
+  path inside an archive) without the drive and with "/" for "\". Only the spelling changes: the bytes stay those of the page of DN and
+  no file is looked up (unlike OsPath, which makes a path to open) }
 function DisplayPath(const S: string): string;
 { a command line of DN: the paths in it are made system paths, the other bytes are converted as names }
 function CommandLineToOs(const S: string): string;
@@ -27,7 +27,7 @@ function CommandLineToOs(const S: string): string;
 implementation
 
 uses
-  SysUtils, BaseUnix, TvCodePg, TvUtf8;
+  SysUtils, BaseUnix, TvCodePg, TvUtf8, TvPath;
 
 function PathExists(const P: string): Boolean;
 begin
@@ -134,7 +134,7 @@ begin
       if Dir = '' then
         Dir := '.';
       Found := False;
-      if SysUtils.FindFirst(IncludeTrailingPathDelimiter(Dir) + '*', faAnyFile, SR) = 0 then
+      if SysUtils.FindFirst(PathAddSep(Dir) + PathAllFiles, faAnyFile, SR) = 0 then
       begin
         repeat
           if SameText(SR.Name, Comp) then
@@ -180,6 +180,8 @@ var
   I: Integer;
 begin
   Result := S;
+  if PathIsRooted(Result) then
+    Exit;                     { a path of the host: a backslash in it is a character of a name }
   if (Length(Result) >= 2) and (Result[2] = ':') and (UpCase(Result[1]) in ['A'..'Z']) then
     Delete(Result, 1, 2);
   if Result = '' then

@@ -148,7 +148,7 @@ function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
 implementation
 
 uses
-  SysUtils, Dos, OSDisk, OSRun, OSSystem, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, DNErrLog, LineInfo
+  SysUtils, Dos, OSDisk, OSRun, OSSystem, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, TvPath, DNErrLog, LineInfo
 {$IFDEF GO32V2}, go32, TvDos, TvDosNames, OSStartScreen{$ENDIF}   { OSStartScreen: its initialization (the grab of the screen) must come before DosInit below }
 {$IFDEF UNIX}, BaseUnix, Unix, OSNamesUnix{$ENDIF}
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
@@ -352,7 +352,7 @@ function SysTempFileName(const Prefix, Ext: string): string;
 var
   Dir: string;
 begin
-  Dir := IncludeTrailingPathDelimiter(GetTempDir(False));
+  Dir := PathAddSep(GetTempDir(False));
   repeat
     Result := Dir + Prefix + IntToStr(Random($7FFF)) + Ext;
   until not FileExists(Result);
@@ -435,7 +435,7 @@ begin
     Searches[I] := nil;
     F.Handle := 0;
     { DOS tells "path not found" (3) from "no more files" (18): PathExist of DN takes any of 0, 2, 18 of a probe of DIR\*.* as "the directory exists" }
-    Dir := ExtractFileDir(Mask);
+    Dir := PathDelSep(PathDir(Mask));
     if Dir = '' then
       Dir := '.';
     if not DirectoryExists(Dir) then

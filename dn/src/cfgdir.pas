@@ -48,7 +48,7 @@ function MoveStateFiles(const FromDir, ToDir: string): Integer;
 implementation
 
 uses
-  SysUtils, Classes, TvAppDir, Lfn, osdep, DnPath;
+  SysUtils, Classes, TvAppDir, Lfn, osdep, DnPath, TvPath;
 
 function CopyOne(const Src, Dst: string): Boolean;
 var
@@ -89,7 +89,7 @@ end;
 
 function SameDir(const A, B: string): Boolean;
 begin
-  Result := WithSep(ExpandFileName(A)) = WithSep(ExpandFileName(B));
+  Result := WithSep(PathExpand(A)) = WithSep(PathExpand(B));
 end;
 
 { A directory of the system as a path of DN with the separator of DN at the end. }
