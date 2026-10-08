@@ -17,7 +17,7 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 |---|---|---|
 | 1 | tve: the editor component, MIT (the rules of `CLAUDE.md`) | in dn and fpide; the history passes the audit; open: the remaining editor features of `tve/README.md` |
 | 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir` replace the duplicates; open: the clock (#19), the ASCII table (#18) |
-| 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; the tvision PR (magiblot/tvision#241, branch `dos-utf8-names` of the fork) waits for the owner |
+| 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; the tvision PR (magiblot/tvision#241, branch `dos-utf8-names` of the fork): CI green; the owner follows it |
 | 4 | fpide: the ASCII splash removed | done |
 | 5 | the vtui UX guidelines in tv3, dn, fpide, tve | tables in `docs/UX-CONFORMANCE.md` (dn) and tv3; the rows marked gap are open |
 | 6 | fpide: other languages, Go first | Go done (template, gofmt, Delve); Python, Rust, C were never asked for |
