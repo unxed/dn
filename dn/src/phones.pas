@@ -142,10 +142,12 @@ procedure PhoneBook(Manual: Boolean);
     PC: TCollection;
     S: TBufStream;
     Stream: TStream;
+    {$PUSH}{$PACKRECORDS DEFAULT} { the layout of TvList.TListBoxRec }
     DT: record
       C: TCollection;
       n: Word;
       end;
+    {$POP}
     W: TWindow;
     I: Integer;
     SS: String;

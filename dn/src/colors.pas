@@ -193,10 +193,12 @@ procedure WindowManager;
     PC: TWindowCol;
     PV: TView;
     S: String;
+    {$PUSH}{$PACKRECORDS DEFAULT} { the layout of TvList.TListBoxRec }
     DT: record
       P: TCollection;
       n: Word;
       end;
+    {$POP}
     I, Num: Integer;
     Cmd: Word;
 
