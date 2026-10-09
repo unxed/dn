@@ -104,6 +104,7 @@ jobs:
               python3 tools/dn-linux-arcsetup.py out/dn
               python3 tools/dn-linux-envedit.py out/dn
               python3 tools/dn-linux-emptyhist.py out/dn
+              python3 tools/dn-linux-badconfig.py out/dn
               python3 tools/dn-linux-dialogok.py out/dn
               python3 tools/dn-linux-cyrsearch.py out/dn
               python3 tools/dn-linux-msgbox.py out/dn
