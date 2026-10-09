@@ -110,7 +110,6 @@ const
   BreakChars = [#9, #10, #13, #12, ' ', #0];
 
 function wSkipBlank(const S: String; i: Integer): Integer;
-  near;
   begin
   while (i <= Length(S)) and (S[i] in BreakChars) do
     Inc(i);
@@ -118,7 +117,6 @@ function wSkipBlank(const S: String; i: Integer): Integer;
   end;
 
 function wSkipText(const S: String; i: Integer): Integer;
-  near;
   begin
   while (i <= Length(S)) and not (S[i] in BreakChars) do
     Inc(i);

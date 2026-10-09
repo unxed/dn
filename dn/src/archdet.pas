@@ -124,7 +124,7 @@ function ZIPDetect: Boolean;
       ArcFile.Read(FilePos64, 4 + 4*Byte(ID = $06064B50));
       if FirstTime and
          (ID = $06054B50) and
-         (CompRec(FilePos64).Lo = $FFFFFFFF) then
+         (LongWord(CompRec(FilePos64).Lo) = $FFFFFFFF) then
         begin {search again for 06064B50 or 07064b50 in zip64 archive}
           FirstTime := False;
           FP := CompToFSize(ArcFile.GetPos - 21);

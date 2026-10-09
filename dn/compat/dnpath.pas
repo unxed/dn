@@ -78,18 +78,20 @@ end;
 
 function DriveRoot(C: Char): string;
 begin
-  if HasDrives then
-    Result := UpCase(C) + ':' + DnSep
-  else
-    Result := DnSep;
+{$IF HasDrives}
+  Result := UpCase(C) + ':' + DnSep;
+{$ELSE}
+  Result := DnSep;
+{$ENDIF}
 end;
 
 function IsQualified(const S: string): Boolean;
 begin
-  if HasDrives then
-    Result := TvPath.PathDrive(S) <> ''
-  else
-    Result := IsAbsPath(S);
+{$IF HasDrives}
+  Result := TvPath.PathDrive(S) <> '';
+{$ELSE}
+  Result := IsAbsPath(S);
+{$ENDIF}
 end;
 
 function NormalizeSep(const S: string): string;

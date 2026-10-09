@@ -65,6 +65,7 @@ function TTopView.GetPalette: TPalette;
 
 function TTopView.GetText(MaxWidth: Integer): String;
   begin
+  Result := '';
   end;
 
 procedure TTopView.Draw;

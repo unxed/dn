@@ -231,7 +231,6 @@ procedure MakeListFile(APP: Pointer; Files: TCollection);
     end;
 
   procedure MakeStr(D: String);
-    label Fail;
     var
       Drr: Boolean;
     begin

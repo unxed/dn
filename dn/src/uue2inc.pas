@@ -8,7 +8,7 @@ Written by Cat 2:5030/1326.13
 ******)
 
 {$I STDEFINE.INC}
-{$D-,E+,I-,L-,N+,Q-,R-,S-,Y-}
+{$D-,I-,Q-,R-,S-}
 
 interface
 
@@ -104,7 +104,6 @@ procedure CRC64(var Buf; Size: LongInt; var PrevSum: T64;
     i: LongInt;
 
   procedure AddByte(b: Byte);
-    near;
     begin
     with PrevSum do
       begin

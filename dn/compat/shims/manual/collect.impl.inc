@@ -176,6 +176,17 @@ begin
     Result := CompareText(PStr(Key1)^, PStr(Key2)^);
 end;
 
+function TNoStreamCollection.ReadItem(Ip: ipstream): Pointer;
+begin
+  Result := nil;
+  raise EStreamableError.Create(pstream.StreamableError.peNotRegistered, ClassName);
+end;
+
+procedure TNoStreamCollection.WriteItem(Item: Pointer; Os: opstream);
+begin
+  raise EStreamableError.Create(pstream.StreamableError.peNotRegistered, ClassName);
+end;
+
 function TObjCollection.ReadItem(Ip: ipstream): Pointer;
 begin
   Result := Ip.ReadPointer;

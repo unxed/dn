@@ -313,7 +313,7 @@ procedure NullXLAT(var X: TXlat);
     X[C] := C;
   end;
 
-procedure XLatLongStr(const InStr: LongString; var OutStr: LongString;
+procedure XLatLongStr(const InStr: LongString; out OutStr: LongString;
    const XLat: TXLat);
   var
     i: Longint;

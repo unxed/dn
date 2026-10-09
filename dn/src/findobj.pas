@@ -69,7 +69,7 @@ type
   TFindDir = class(TFindEntry)
     Pos: LongInt;
     constructor Create(const S: String; APos: LongInt);
-    function GetText: String; virtual;
+    function GetText: String; override;
     end;
 
   TFindFile = class(TFindEntry)
@@ -78,16 +78,16 @@ type
     Time: LongInt;
     constructor Create(const S: String; ASize, ATime: LongInt);
     destructor Destroy; override;
-    function GetText: String; virtual;
+    function GetText: String; override;
     end;
 
   TFindBox = class(TListBox)
-    function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
-    function IsSelected(Item: LongInt): Boolean; virtual;
+    function GetText(Item: LongInt; MaxLen: Integer): String; override;
+    function IsSelected(Item: LongInt): Boolean; override;
     end;
 
 const
-  FindList: TCollection = nil;
+  FindList: TNoStreamCollection = nil;
 
 implementation
 

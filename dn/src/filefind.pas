@@ -1069,10 +1069,11 @@ Skip:
         SearchDataInBranch(SourceFC);
 {/JO}
     2:
-      if HasDrives then
-        SearchData(Copy(FN, 1, 3))
-      else
-        SearchData(DnSep);
+{$IF HasDrives}
+      SearchData(Copy(FN, 1, 3));
+{$ELSE}
+      SearchData(DnSep);
+{$ENDIF}
     3:
       for C := 'A' to 'Z' do
         if ValidDrive(C) then

@@ -84,7 +84,7 @@ type
     end;
 
   TExtCollection = class;
-  TExtCollection = class(TSortedCollection)
+  TExtCollection = class(TNSSortedCollection)
     function Compare(Key1, Key2: Pointer): Integer; override;
     procedure FreeItem(Item: Pointer); override;
     end;
@@ -162,7 +162,7 @@ function TExtCollection.Compare(Key1, Key2: Pointer): Integer;
 
 procedure TExtCollection.FreeItem(Item: Pointer);
   begin
-  Dispose(Item);
+  Dispose(PExtItem(Item));
   end;
 
 procedure PutExtFilter(Filter: string; T: Integer);

@@ -1812,13 +1812,14 @@ function IsExtDot(const S: String; I: Integer): Boolean;
   var
     J: Integer;
   begin
+{$IF HasDrives}
   Result := True;
-  if HasDrives then
-    Exit;
+{$ELSE}
   J := I-1;
   while (J >= 1) and (S[J] = '.') do
     Dec(J);
   Result := (J >= 1) and not IsPathSep(S[J]);
+{$ENDIF}
   end;
 
 function IsDummyDir(const DirName: String): Boolean;

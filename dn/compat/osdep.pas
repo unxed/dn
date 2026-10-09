@@ -148,7 +148,7 @@ function SysExecute(Path, Args, Env: PChar; Async: Boolean; ReportPid: Pointer;
 implementation
 
 uses
-  SysUtils, Dos, OSDisk, OSRun, OSSystem, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, TvPath, DNErrLog, LineInfo
+  SysUtils, Dos, OSDisk, OSRun, OSSystem, TvCell, TvColors, TvScreen, TvEvents, TvSys, TvObjs, TvCodePg, TvUtf8, TvPath, DNErrLog
 {$IFDEF GO32V2}, go32, TvDos, TvDosNames, OSStartScreen{$ENDIF}   { OSStartScreen: its initialization (the grab of the screen) must come before DosInit below }
 {$IFDEF UNIX}, BaseUnix, Unix, OSNamesUnix{$ENDIF}
 {$IF DEFINED(UNIX) OR DEFINED(WINDOWS)}, TvUnix{$ENDIF};
@@ -386,6 +386,13 @@ begin
 end;
 {$ENDIF}
 
+{ the bit of a symbolic link in TSearchRec.Attr: SysUtils marks faSymLink as a symbol of some platforms only, but it has
+  the same value on every target of DN (where the system has no links, FindFirst never sets it), so the warning is off }
+{$PUSH}{$WARN 5044 OFF}
+const
+  FindLinkAttr = faSymLink;
+{$POP}
+
 procedure Fill(var F: TOSSearchRec; const R: SysUtils.TSearchRec; IsPChar: Boolean);
 var
   N: ShortString;
@@ -398,7 +405,7 @@ begin
   N := NameFromDos(N);
 {$ENDIF}
   F.Attr := Byte(R.Attr);
-  if R.Attr and faSymLink <> 0 then
+  if R.Attr and FindLinkAttr <> 0 then
     F.Attr := F.Attr or SysLinkAttr;
   F.Time := SysFileTimeToDos(R.Time);
   F.Size := R.Size;
@@ -428,7 +435,7 @@ begin
     Exit(4);                       { too many open files }
   New(Searches[I]);
   Mask := FixMask(SysOsPath(StrPas(Path)));
-  if SysUtils.FindFirst(Mask, Attr or faSymLink, Searches[I]^) <> 0 then
+  if SysUtils.FindFirst(Mask, Attr or FindLinkAttr, Searches[I]^) <> 0 then
   begin
     SysUtils.FindClose(Searches[I]^);
     Dispose(Searches[I]);

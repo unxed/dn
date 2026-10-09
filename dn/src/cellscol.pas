@@ -478,9 +478,9 @@ function TCellCollection.TSort(var Start: Integer): Boolean;
   { Topological sort. See D. Knuth, vol.1, 2.3.2.}
   P := 0; { initialize SucPool}
   N := Count;
-  QLinkSize := (N+1)*SizeOf(QLink^[0]);
+  QLinkSize := (N+1)*SizeOf(AWord);
   QLink := GetMem(QLinkSize);
-  TopSize := (N+1)*SizeOf(Top^[1]);
+  TopSize := (N+1)*SizeOf(AWord);
   Top := GetMem(TopSize);
   PoolCount := PoolUnit;
   SucPool := GetMem(PoolCount*SizeOf(SucPool^[1]));

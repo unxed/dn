@@ -55,7 +55,7 @@
 {                  via FIDOnet: 2:4614/9.25, 2:4614/24.99                    }
 {****************************************************************************}
 
-{$Q-,W-,E-,R-,T-,Y-,I-,A+,S-,F-,G+,X-,V-,B-,N-}
+{$Q-,W-,R-,T-,I-,A+,S-,F-,G+,X-,V-,B-}
 
 unit Decoder;
 
@@ -645,7 +645,7 @@ procedure ScanUp(var InstrData: XCHGData);
       MaxUpBytes := 25
     else
       MaxUpBytes := Offset;
-    TMP := Pointer(LongInt(MemBuff)+Offset-MaxUpBytes);
+    TMP := Pointer(PtrUInt(MemBuff)+PtrUInt(Offset-MaxUpBytes));
     {Start of decoding block}
     OldOffset := Offset;
     OldMemBuff := MemBuff;
@@ -697,16 +697,18 @@ function HexWp(A: Pointer): String;
   end;
 
 type
-  ___ = ^integer;
+  ___ = ^SmallInt;   { a signed displacement of 16 bits }
 function SHexWp(A: ___): String;
   var
     S: Char;
+    W: Word;
   begin
   if A^ < 0 then
     S := '-'
   else
     S := '+';
-  SHexWp := S+HexB(Hi(Abs(A^)))+HexB(Lo(Abs(A^)));
+  W := Abs(LongInt(A^));
+  SHexWp := S+HexB(Hi(W))+HexB(Lo(W));
   end;
 
 function HexW(A: Word): String;
@@ -1751,7 +1753,7 @@ SIB:
       CMax := 15
     else
       CMax := InstrMaxLen;
-    Move(Pointer(LongInt(MemBuff)+Offset)^, M, CMax);
+    Move(Pointer(PtrUInt(MemBuff)+PtrUInt(Offset))^, M, CMax);
     end;
 
   IPrefixes; {Scan for segment & instruction Prefixes}

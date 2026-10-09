@@ -107,7 +107,8 @@ const
     Selected: (List: nil; Focus: 0);
     Available: (List: nil; Focus: 0);
     Time: '5';
-    Mouse: True
+    Mouse: True;
+    _: 0
     );
   
 

@@ -60,7 +60,7 @@ procedure RUN_IT;
 { Starts the flight recorder (the log in StateDir; flightrec.pas): the first call of the program. }
 procedure StartRecorder;
 
-procedure Error(const FileName: String; LineNo, Addr, Code: LongInt);
+procedure Error(const FileName: String; LineNo: LongInt; Addr: PtrUInt; Code: LongInt);
 
 
 implementation
@@ -1010,7 +1010,7 @@ procedure RUN_IT;
 
 {Cat}
 
-procedure Error(const FileName: String; LineNo, Addr, Code: LongInt);
+procedure Error(const FileName: String; LineNo: LongInt; Addr: PtrUInt; Code: LongInt);
   begin
   if Addr <> 0 then
     begin

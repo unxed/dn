@@ -18,7 +18,7 @@ procedure WaitForKey;
 implementation
 
 uses
-  SysUtils, TvEvents, TvSys, LineInfo;
+  SysUtils, TvEvents, TvSys;
 
 function GetLocationInfo(Addr: Pointer; var FileName: ShortString; var LineNo: LongInt): Pointer;
 var

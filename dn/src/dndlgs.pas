@@ -431,7 +431,6 @@ constructor TComboBox.Create(var Bounds: TRect; AStrings: TSItem);
 
 procedure TComboBox.BuildMenu(AStrings: TSItem);
   var
-    i: Integer;
     LastItem: PMenuItem;
     Tail: ^PMenuItem;
     PrevSItem: TSItem;
@@ -444,7 +443,7 @@ procedure TComboBox.BuildMenu(AStrings: TSItem);
     Inc(Count);
     LastItem := NewItem(
       CenterStr(Copy(AStrings.Value^, 1, Size.X-2), Size.X-2),
-      '',  kbNoKey, 1600+i, 0, nil);
+      '',  kbNoKey, 1600+Count, 0, nil);
     Items[Count] := LastItem;
     Tail^ := LastItem;
     Tail := @LastItem.Next;
@@ -626,12 +625,13 @@ end;
 
 { /------------------ TNotepad -----------------\ }
 
+{ a page has no frame of a window: a TPageFrame (a plain view, not a TFrame, so not the Frame of the window) fills it }
 procedure TPage.InitFrame;
   var
     R: TRect;
   begin
   R := GetExtent;
-  Frame := TFrame(TPageFrame.Create(R));
+  Insert(TPageFrame.Create(R));
   end;
 
 function TPage.GetPalette: TPalette;

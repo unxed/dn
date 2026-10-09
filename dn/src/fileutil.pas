@@ -538,10 +538,11 @@ function ValidDrive(dr: Char): Boolean;
 
 function GetDrive: Byte;
   begin
-  if HasDrives then
-    Result := Byte(DriveOf(ActiveDir))-Byte('A')
-  else
-    Result := 2;                   { the one tree is "C" }
+{$IF HasDrives}
+  Result := Byte(DriveOf(ActiveDir))-Byte('A');
+{$ELSE}
+  Result := 2;                   { the one tree is "C" }
+{$ENDIF}
   end;
 
 procedure GetMask(var m: String);
@@ -1380,12 +1381,13 @@ procedure StopQuickSearch;
 
 procedure DoQuickSearch(Key: Word);
   begin
+  { Key is the code of 16 bits (the scan code, the character): the key codes of DN have the shift state above it }
   case Key of
-    kbCtrlLeft:
+    kbCtrlLeft and $FFFF:
       QSMask := QSMask + '>';
-    kbCtrlRight:
+    kbCtrlRight and $FFFF:
       QSMask := QSMaskPlusStar + '.';
-    kbBack:
+    kbBack and $FFFF:
       begin
       if QSMask <> '' then
 {$IFDEF DNUTF8}

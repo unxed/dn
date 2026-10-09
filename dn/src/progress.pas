@@ -90,7 +90,7 @@ type
     QuitNormal: Boolean;
     Top, Bottom: String[SizeOf(String)-1];
     constructor Create(const Bounds: TRect);
-    procedure Write(N: Integer; S: String);
+    procedure Write(N: Integer; S: String); overload;
     function GetPalette: TPalette; override;
     function Valid(C: Word): Boolean; override;
     procedure SetState(AState: Word; Enable: Boolean); override;

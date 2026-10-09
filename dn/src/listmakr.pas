@@ -18,6 +18,8 @@ type
     procedure Put(Key: AWord; S: String);
     procedure Write(Os: opstream); override;
     function StreamableName: ShortString; override;
+  protected
+    function Read(Ip: ipstream): Pointer; override;
   private
     Text: array of Byte;      { the strings, one after another (a length byte, the characters) }
     TextLen: LongInt;
@@ -91,6 +93,13 @@ end;
 function TStrListMaker.StreamableName: ShortString;
 begin
   Result := 'DNStrL.TStringList';
+end;
+
+{ what the maker writes is read back as a TStringList (the builder of the name): the maker itself is never read }
+function TStrListMaker.Read(Ip: ipstream): Pointer;
+begin
+  Result := nil;
+  raise EStreamableError.Create(pstream.StreamableError.peNotRegistered, ClassName);
 end;
 
 end.

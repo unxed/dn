@@ -60,14 +60,14 @@ type
   TTypeHolder = class;
 
   { Collection of PTypeHolders }
-  TValuesHolder = class(TCollection)
+  TValuesHolder = class(TNSCollection)
     function GetType(ID: String): TTypeHolder;
     function GetValue(S: String; var Complete: Boolean): LongInt;
     procedure Show;
     end;
 
   { Collection of PLngWords }
-  TTypeHolder = class(TSortedCollection)
+  TTypeHolder = class(TNSSortedCollection)
     TypeID: String[10];
     Mode: TTypeMode;
     constructor Create(ID: String; AMode: TTypeMode);

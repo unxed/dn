@@ -111,7 +111,7 @@ type
     end;
 
   TUserCollection = class;
-  TUserCollection = class(TCollection)
+  TUserCollection = class(TNSCollection)
     procedure FreeItem(P: Pointer); override;
     end;
 
@@ -949,7 +949,7 @@ type
     destructor Destroy; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
-    function Execute: Word; virtual;
+    function Execute: Word; override;
     end;
 
 const
@@ -1068,6 +1068,7 @@ function TGrabber.Execute: Word;
     else
       TinySlice;
   until ModalEnd;
+  Result := cmCancel;
   end;
 
 procedure TGrabber.HandleEvent(var Event: TEvent);

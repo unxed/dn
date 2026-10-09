@@ -58,7 +58,6 @@
  {$DEFINE EAOP}       {Extended Attributes operations in OS/2}
                       {Security Attributes operations in WinNT}
  
- {$Use32+}
  {$DEFINE QSORT}
  {.$DEFINE POGLSORT}
  {$DEFINE SpreadSheet}

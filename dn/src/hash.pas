@@ -58,7 +58,7 @@ type
 implementation
 
 const
-  EmptyIndex = $FFFFFFFF;
+  EmptyIndex = -1; { all the bits set: FillChar of $FF }
 
 constructor THash.Create(BaseColl: TCollection);
   var
@@ -91,6 +91,7 @@ procedure THash.Hash(Item: Pointer);
 
 function THash.Equal(Item1, Item2: Pointer): Boolean;
   begin
+  Result := False;
   RunError(211);
   end;
 

@@ -645,11 +645,13 @@ procedure TDNApplication.EditCommandLineFiles;
     SwitchChar: Char;
   begin
   { a switch starts with "/" where there are drive letters, else with "-" ("/" begins a path) }
-  if HasDrives then
-    SwitchChar := '/'
-  else
-    SwitchChar := '-';
+{$IF HasDrives}
+  SwitchChar := '/';
+{$ELSE}
+  SwitchChar := '-';
+{$ENDIF}
   flj := False;
+  FileName := '';
   for I := 1 to ParamCount do
     begin
     if flj then
@@ -1841,13 +1843,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       S := SelectDrive(R.A.X+(R.B.X-R.A.X) div 2, R.A.Y, #0, False);
       if S = '' then
         Exit;
-      if HasDrives then
-        S[1] := Char(Byte(S[1])-64)
-      else
-        begin
-        lChDir(S);
-        S := #3;
-        end;
+{$IF HasDrives}
+      S[1] := Char(Byte(S[1])-64);
+{$ELSE}
+      lChDir(S);
+      S := #3;
+{$ENDIF}
       end;
     
     if TrashCan.ImVisible then

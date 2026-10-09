@@ -231,7 +231,7 @@ function TFieldListBox.GetText(Item: LongInt; MaxLen: Integer): String;
     M: array[0..4] of Pointer;
   begin
   P := List.At(Item);
-  PtrInt(M[0]) := Item+1;
+  M[0] := Pointer(PtrUInt(Item+1));
   M[1] := @P^.Name;
   M[2] := @S1;
   M[3] := @S2;

@@ -233,10 +233,11 @@ function FixCrtMode(Mode: Word): Word;
     smMono, smCO80, smBW80:
       FixCrtMode := Mode;
     smNonStandard:
-      if NonStandardModes then
-        FixCrtMode := Mode
-      else
-        FixCrtMode := smCO80;
+{$IF NonStandardModes}
+      FixCrtMode := Mode;
+{$ELSE}
+      FixCrtMode := smCO80;
+{$ENDIF}
     else {case}
       FixCrtMode := smCO80;
   end {case};

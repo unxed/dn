@@ -78,7 +78,7 @@ type
   that is unlikely to be needed by anyone.
     function Execute: Word; override;
 }
-    procedure SetState(AState: Word; Enable: Boolean); virtual;
+    procedure SetState(AState: Word; Enable: Boolean); override;
     end;
 
 { the stream type of the editor commands of the resource (the first use of the editor registers it; a test registers it to load every key) }

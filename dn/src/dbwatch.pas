@@ -85,7 +85,7 @@ type
     end;
 
   TFieldCollection = class;
-  TFieldCollection = class(TCollection)
+  TFieldCollection = class(TNoStreamCollection)
     procedure FreeItem(P: Pointer); override;
     end;
 

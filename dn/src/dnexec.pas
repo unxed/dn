@@ -428,7 +428,7 @@ function ExecExtFile(const ExtFName: String; UserParams: PUserParams;
     I, J: Integer;
     Success, CD: Boolean;
     Local: Boolean;
-  label 1, 1111, RepeatLocal;
+  label 1111, RepeatLocal;
 
   begin
   ExecExtFile := False;

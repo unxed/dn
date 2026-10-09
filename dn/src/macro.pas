@@ -59,7 +59,7 @@ type
   TEditMacros = class;
   TEditMacros = class
     Name: PString;
-    Commands: TCollection;
+    Commands: TNSCollection;
     constructor Create(S: String; var F: TTextReader);
     procedure Play(Editor: TView);
     destructor Destroy; override;
@@ -75,26 +75,26 @@ type
 
   TMacroGoto = class;
   TMacroGoto = class(TMacroCommand)
-    procedure ExecCommand(Editor: TView); virtual;
+    procedure ExecCommand(Editor: TView); override;
     end;
 
   TMacroMark = class;
   TMacroMark = class(TMacroCommand)
     Mark: Boolean;
     constructor Create(AN: Integer; AMark: Boolean);
-    procedure ExecCommand(Editor: TView); virtual;
+    procedure ExecCommand(Editor: TView); override;
     end;
 
   TMacroString = class;
   TMacroString = class(TMacroCommand)
     S: PString;
     constructor Create(const AString: String; ARepetitions: Word);
-    procedure ExecCommand(Editor: TView); virtual;
+    procedure ExecCommand(Editor: TView); override;
     destructor Destroy; override;
     end;
 
   TIDCollection = class;
-  TIDCollection = class(TSortedCollection)
+  TIDCollection = class(TNSSortedCollection)
     function Compare(P1, P2: Pointer): Integer; override;
     end;
 
@@ -102,7 +102,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
 function InitHighLight
     (const FName: String;
     var HiLitePar: THighliteParams;
-    Macros: TCollection;
+    Macros: TNSCollection;
     EdOptions: PEditOptions): Boolean;
 
 implementation
@@ -366,7 +366,7 @@ constructor TEditMacros.Create(S: String; var F: TTextReader);
 
   begin { TEditMacros.Init }
   inherited Create;
-  Commands := TCollection.Create(10, 10);
+  Commands := TNSCollection.Create(10, 10);
   IDs := TIDCollection.Create(100, 10);
   MakeIDs;
   while (S <> '') and (S[1] = ' ') do
@@ -684,7 +684,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
     D: TDialog;
     P: TView;
     R: TRect;
-    PC: TCollection;
+    PC: TNoStreamCollection;
     I: LongInt;
 
   procedure MakeDialog;
@@ -772,7 +772,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
   begin { EditDOSEnvironment }
   if Env = nil then
     Exit;
-  PC := TCollection.Create(10, 10);
+  PC := TNoStreamCollection.Create(10, 10);
 
   I := 0;
   while Env^[I] <> 0 do
@@ -844,7 +844,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
 function InitHighLight
     (const FName: String;
     var HiLitePar: THighliteParams;
-    Macros: TCollection;
+    Macros: TNSCollection;
     EdOptions: PEditOptions): Boolean;
   var
     F: TTextReader;

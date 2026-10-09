@@ -50,7 +50,6 @@
 {AK155 = Alexey Korop, 2:461/155@fidonet}
 {Cat = Aleksej Kozlov, 2:5030/1326.13@fidonet}
 {Interface part from LFN.PAS}
-{$AlignRec-}
 
 {Cat
    05/12/2001 - attempt to fight a Windows quirk: the current
@@ -1071,10 +1070,11 @@ function GetShareEnd(const S: String): Integer;
 
 function GetRootStart(const Path: String): Integer;
   begin
-  if HasDrives then
-    Result := Min(Length(Path)+1, Max(3, GetShareEnd(Path)+1))
-  else
-    Result := Min(Length(Path)+1, 1);
+{$IF HasDrives}
+  Result := Min(Length(Path)+1, Max(3, GetShareEnd(Path)+1));
+{$ELSE}
+  Result := Min(Length(Path)+1, 1);
+{$ENDIF}
   end;
 
 {AK155 22-11-2003 Reworked to account for UNC paths }
@@ -1352,17 +1352,16 @@ procedure lChDir(Path: String);
     begin
     ActiveDir := Path;
     MakeSlash(ActiveDir);
-    if HasDrives then
-      begin
-      i := GetShareEnd(Path);
-      if i = 0 then
-        i := 2;
-      CurrentRoot := Copy(ActiveDir, 1, i);
-      if  (InOutRes = 0) and (Length(Path) > 2) and HasDriveLetter(Path) then
-        CurrentPaths[Byte(UpCase(Path[1]))-Byte('A')+1] := ActiveDir;
-      end
-    else
-      CurrentRoot := '';
+{$IF HasDrives}
+    i := GetShareEnd(Path);
+    if i = 0 then
+      i := 2;
+    CurrentRoot := Copy(ActiveDir, 1, i);
+    if  (InOutRes = 0) and (Length(Path) > 2) and HasDriveLetter(Path) then
+      CurrentPaths[Byte(UpCase(Path[1]))-Byte('A')+1] := ActiveDir;
+{$ELSE}
+    CurrentRoot := '';
+{$ENDIF}
     end
   else
     InOutRes := DosError;
@@ -1372,11 +1371,10 @@ procedure lGetDir(D: Byte; var Path: String);
   label
     DelDlash;
   begin
-  if not HasDrives then
-    begin
-    Path := ActiveDir;           { one tree: the drive number means nothing }
-    goto DelDlash;
-    end;
+{$IF not HasDrives}
+  Path := ActiveDir;           { one tree: the drive number means nothing }
+  goto DelDlash;
+{$ENDIF}
   if D = 0 then
     begin
     Path := ActiveDir;
@@ -1409,18 +1407,18 @@ procedure InitPath;
   if DosError <> 0 then
     lApi := lDOS;
 
-  if HasDrives then
+{$IF HasDrives}
+  P := DriveRoot('A');
+  for D := 1 to High(CurrentPaths) do
     begin
-    P := DriveRoot('A');
-    for D := 1 to High(CurrentPaths) do
-      begin
-      CurrentPaths[D] := P;
-      Inc(P[1]);
-      end;
+    CurrentPaths[D] := P;
+    Inc(P[1]);
     end;
+{$ENDIF}
   SysGetDirDos(0, StartDir);
-  if HasDrives then
-    StartDir[1] := Upcase(StartDir[1]);
+{$IF HasDrives}
+  StartDir[1] := Upcase(StartDir[1]);
+{$ENDIF}
      //piwamoto: w32 shortcut may have c:\ as directory
      //but DN needs C:\ for internal use
   lChDir(StartDir);

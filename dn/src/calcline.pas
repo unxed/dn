@@ -144,7 +144,7 @@ end;
 
 function TIndicator.GetPalette: TPalette;
   const
-    S: String[1] = CCluster;
+    S: String[Length(CCluster)] = CCluster;
   begin
   GetPalette := MakePalette(S);
   end;

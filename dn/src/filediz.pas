@@ -56,7 +56,7 @@ uses
   ;
 
 type
-  TDizNameProc = function (const N: string; TextStart: Integer): Boolean;
+  TDizNameProc = procedure (const N: string; TextStart: Integer);
   TDizLineProc = procedure;
   TDizEndProc = function: Boolean;
 var
@@ -388,7 +388,7 @@ var
   PGetDizName1, PGetDizName2: PFlName;
   GetDizText: LongString;
 
-function GetDizNameProc(const N: string; TextStart: Integer): Boolean;
+procedure GetDizNameProc(const N: string; TextStart: Integer);
   { For ReadFileList. Compare name and accept the first line }
   var
     I: Integer;
@@ -437,6 +437,7 @@ procedure GetDiz(FR: PFileRec);
     exit;
   if not OpenFileList(Container) then
     Exit;
+  FillChar(GetDizFull1, SizeOf(GetDizFull1), 0);
   for F := High(TUseLFN) downto Low(TUseLFN) do
     CopyShortString(UpStrg(FR^.FlName[F]), GetDizName1[F]);
   PGetDizName1 := @GetDizName1;
@@ -463,7 +464,7 @@ procedure SaveDizLineProc;
     end;
   end;
 
-function SaveDizNameProc(const N: string; TextStart: Integer): Boolean;
+procedure SaveDizNameProc(const N: string; TextStart: Integer);
   { For ReadFileList. Compare name; for this name skip the description,
     for others output the first line }
   var

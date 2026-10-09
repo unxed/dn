@@ -108,9 +108,9 @@ uses DnPath,
 
 type
   TSelectList = class(TListBox)
-    function IsSelected(I: LongInt): Boolean; virtual;
+    function IsSelected(I: LongInt): Boolean; override;
     procedure HandleEvent(var Event: TEvent); override;
-    function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
+    function GetText(Item: LongInt; MaxLen: Integer): String; override;
     end;
 
 procedure DrawViews(P: TFilePanelRoot);
@@ -1032,7 +1032,6 @@ procedure CM_CompareDirs(AFP, IP: Pointer);
       PF^.Selected := DT.S = 0;
     end;
 
-  label 1, 2;
 
   begin { CM_CompareDirs }
   DT.FMask := ComareDirsOptions.FMask;
@@ -2698,7 +2697,8 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
     SelectedItem: PMenuItem;
     R: TRect;
     PV: TView;
-    N, W: Word;
+    N: Word;
+    W: LongInt;
     PSetup: PPanelSetup;
     NameI: String;
     PC: TPanelClass;

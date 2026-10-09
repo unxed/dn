@@ -2248,7 +2248,7 @@ procedure TFileViewer.HandleEvent;
     P: TPoint;
     LR: Integer;
     I: Integer;
-    LLR, LFR: LongInt;
+    LLR: LongInt;
     ALLR, ALFR: TFileSize;
     F: lFile;
     Ch: Char;
@@ -2548,7 +2548,7 @@ DoSave:
                 begin
                 
                 WC := BufPos+FilePos;
-                while (FSizeMod(ALFR, HexPos) <> (WL mod HexPos)) and (LFR > 0)
+                while (FSizeMod(ALFR, HexPos) <> (WL mod HexPos)) and (ALFR > 0)
                 do
                   begin
                   ALFR := ALFR-1;

@@ -531,7 +531,7 @@ procedure MILoad(AED: TFileEditor; Ip: ipstream);
     SavedCursor := C;
     SavedMark := M;
     SavedMarks := Marks;
-    Macros := TCollection.Create(10, 10);
+    Macros := TNSCollection.Create(10, 10);
     MenuItemStr[True] := NewStr(GetString(dlMenuItemOn));
     MenuItemStr[False] := NewStr(GetString(dlMenuItemOff));
     end

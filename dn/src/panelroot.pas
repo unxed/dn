@@ -3113,7 +3113,7 @@ function TFilePanelRoot.CalcLengthWithoutName: Integer;
     i: Integer;
     L: Integer;
   begin
-  Result := CalcColPos($FFFFFFFF);
+  Result := CalcColPos($FFFF); { every column }
   end;
 
 function TFilePanelRoot.CalcNameLength: Integer;

@@ -848,8 +848,9 @@ TryAgain:
           The directory must be remembered on the drive that holds
           the temporary folder. On the drive that holds the archive
           with the viewed file, it will be remembered anyway. }
-    if HasDrives then
-      LFN.lChDir(Copy(TempDir, 1, 2));  { "C:" (the current directory of that drive); without drives the first two characters are no path }
+{$IF HasDrives}
+    LFN.lChDir(Copy(TempDir, 1, 2));  { "C:" (the current directory of that drive); without drives the first two characters are no path }
+{$ENDIF}
     lGetDir(0, DirToChange);
     LFN.lChDir(TempDir);
     DNLog('UseFile: exec [' + Unp + '] [' + S + '] temp [' + TempFile + ']');
@@ -1407,8 +1408,9 @@ TryAgain:
     The directory must be remembered on the drive that holds
     the temporary folder. On the drive that holds the archive
     with the viewed file, it will be remembered anyway. }
-  if HasDrives then
-    LFN.lChDir(Copy(TempExtrDir,1,2));  { "C:"; without drives the first two characters are no path }
+{$IF HasDrives}
+  LFN.lChDir(Copy(TempExtrDir,1,2));  { "C:"; without drives the first two characters are no path }
+{$ENDIF}
   lGetDir(0, DirToChange);
   LFN.lChDir(TempExtrDir);
  

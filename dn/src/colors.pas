@@ -64,7 +64,7 @@ type
     function GetText(Item, MaxLen: Integer): ShortString; override;
     end;
 
-  TWindowCol = class(TCollection)
+  TWindowCol = class(TNoStreamCollection)
     procedure FreeItem(Item: Pointer); override;
     end;
 
@@ -186,7 +186,6 @@ function TWindowList.GetText(Item, MaxLen: Integer): ShortString;
   end;
 
 procedure WindowManager;
-  label 1;
   var
     D: TDialog;
     R: TRect;

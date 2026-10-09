@@ -235,7 +235,7 @@ type
     end;
 
 const
-  ArvidDrives: TCollection = nil;
+  ArvidDrives: TNSCollection = nil;
   ArvidWithDN: Boolean = True;
 
 var
@@ -333,7 +333,7 @@ constructor TArvidDrive.Create(const AName: String);
     CurDir := ArcSep;
   SeekDirectory;
   if ArvidDrives = nil then
-    ArvidDrives := TCollection.Create($100, $100);
+    ArvidDrives := TNSCollection.Create($100, $100);
   ArvidDrives.Insert(Self);
   AddToDirectoryHistory(Name^+':'+CurDir, Integer(DriveType));
   end { TArvidDrive.Init };
@@ -475,7 +475,7 @@ function TArvidDrive.Read(Ip: ipstream): Pointer;
     goto 1;
   SeekDirectory;
   if ArvidDrives = nil then
-    ArvidDrives := TCollection.Create($100, $100);
+    ArvidDrives := TNSCollection.Create($100, $100);
   ArvidDrives.Insert(Self);
   end { TArvidDrive.Load };
 
@@ -1065,7 +1065,7 @@ procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
   procedure Add(P: Pointer; const Name: String);
     begin
     if FindList = nil then
-      FindList := TCollection.Create($100, $100);
+      FindList := TNoStreamCollection.Create($100, $100);
     if OOM or (not MemOK) or (MaxAvail < (FindList.Count+$200)*4) then
       begin
       TStreamable(P).Free;
@@ -1136,9 +1136,9 @@ procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
           FreeStr := '';
         if  (not SDesc or (Pos(DT.Text, FreeStr) > 0)) and
             ( (DT.o and 1 = 0) or
-              (FF.Time <= DateBefore) and (FF.Time >= DateAfter) and
-              (FF.Size >= SizeGreat) and (FF.Size <= SizeLess) and
-              ( (Attr = 0) or (FF.Attr and Attr <> 0)))
+              (DD.Time <= DateBefore) and (DD.Time >= DateAfter) and
+              (DD.Size >= SizeGreat) and (DD.Size <= SizeLess) and
+              ( (Attr = 0) or (DD.Attr and Attr <> 0)))
         then
           begin
           WasDir := True;

@@ -112,7 +112,7 @@ const
   MinYear = 1900;
   MaxYear = 2078;
   BadDate = $FFFF;
-  BadTime = $FFFFFFFF;
+  BadTime = -1; { $FFFFFFFF: Time is a LongInt }
   First2Months = 58; {1900 was not a leap year}
   SecondsInMinute = 60;
   SecondsInHour = 60*SecondsInMinute;

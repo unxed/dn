@@ -175,7 +175,7 @@ type
     {`2 Collection of descriptions from a description file. Used for
     fast lookup of descriptions by name when entering a directory.
     Names are stored in the collection in upper case. }
-  TDIZCol = class(TSortedCollection)
+  TDIZCol = class(TNSSortedCollection)
     procedure FreeItem(P: Pointer); override;
     function Compare(P1, P2: Pointer): Integer; override;
     end;
@@ -311,12 +311,11 @@ procedure TDrive.ChangeRoot;
     B: Boolean;
   begin
   {Cat: check for a network path}
-  if not HasDrives then
-    begin
-    lChDir(DnSep);
-    lGetDir(0, CurDir);
-    end
-  else if CurDir[1] = DnSep then
+{$IF not HasDrives}
+  lChDir(DnSep);
+  lGetDir(0, CurDir);
+{$ELSE}
+  if CurDir[1] = DnSep then
     begin
     B := False;
     for I := 3 to Length(CurDir) do
@@ -344,6 +343,7 @@ procedure TDrive.ChangeRoot;
         Exit;
       }
     end;
+{$ENDIF}
   end { TDrive.ChangeRoot };
 {-DataCompBoy-}
 
@@ -626,9 +626,10 @@ procedure TDrive.lChDir(ADir: String);
     NeedAbort := True;
     ATestDir := lFExpand(ATestDir);
     {Cat: check for a network path}
-    if not HasDrives then
-      OK := True                    { one tree: nothing to probe before the directory itself }
-    else if  (Length(ATestDir) > 2) and (ATestDir[1] = DnSep)
+{$IF not HasDrives}
+    OK := True;                   { one tree: nothing to probe before the directory itself }
+{$ELSE}
+    if  (Length(ATestDir) > 2) and (ATestDir[1] = DnSep)
          and (ATestDir[2] = DnSep)
     then
       begin
@@ -664,6 +665,7 @@ procedure TDrive.lChDir(ADir: String);
         Break;
       until False;
       end;
+{$ENDIF}
     if OK then
       repeat
         ClrIO;
@@ -710,15 +712,14 @@ procedure TDrive.lChDir(ADir: String);
     CurDir := ADir;
     Exit;
     end;
-  if HasDrives then
+{$IF HasDrives}
+  ADir := DriveRoot('A');
+  if ValidPath(ADir, False) then
     begin
-    ADir := DriveRoot('A');
-    if ValidPath(ADir, False) then
-      begin
-      CurDir := ADir;
-      Exit;
-      end;
+    CurDir := ADir;
+    Exit;
     end;
+{$ENDIF}
   CurDir := '';
   end { TDrive.lChDir };
 {-DataCompBoy-}
@@ -750,7 +751,7 @@ var
   PD: PDesc;
   IgnoreDiz: Boolean;
 
-function DizNameProc(const N: string; TextStart: Integer): Boolean;
+procedure DizNameProc(const N: string; TextStart: Integer);
   { For ReadFileList. Insert a collection element and the first line }
   var
     I: Integer;

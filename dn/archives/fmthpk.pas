@@ -77,7 +77,7 @@ type
 
   THPKCollection = class;
   PHPKCollection = THPKCollection;
-  THPKCollection = class(TCollection)
+  THPKCollection = class(TNSCollection)
     procedure FreeItem(P: Pointer); override;
     end;
 

@@ -1878,7 +1878,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     MaskSearch := False;
     end { MaskSearch };
 
-  label lbMakeUp, GotoKb, lbMakeDown;
+  label GotoKb;
 
   begin { TFilePanel.HandleEvent }
   
@@ -1927,8 +1927,8 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             (KeyCode = kbGrayAst and $FFFF)
           )
         ) or
-        ( ( (Event.KeyDown.CharScan.ScanCode < Hi(kbAlt1)) or
-            (Event.KeyDown.CharScan.ScanCode > Hi(kbAlt9))
+        ( ( (Event.KeyDown.CharScan.ScanCode < ((kbAlt1 shr 8) and $FF)) or
+            (Event.KeyDown.CharScan.ScanCode > ((kbAlt9 shr 8) and $FF))
           ) and
           (Char(Event.KeyDown.CharScan.CharCode) = #0) and
           (CmdLine.Str <> '') and

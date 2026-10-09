@@ -58,9 +58,9 @@ type
   TSSaver = class;
   TSSaver = class(TView)
     constructor Create(const Bounds: TRect);
-    function Execute: Word; virtual;
-    procedure Update; virtual;
-    procedure Draw; virtual;
+    function Execute: Word; override;
+    procedure Update; override;
+    procedure Draw; override;
     destructor Destroy; override;
     end;
 
@@ -183,7 +183,6 @@ destructor TSSaver.Destroy;
   end;
 
 constructor TStarSkySaver.Create;
-  label 1;
   var
     R: TRect;
     I, J: Integer;
@@ -249,7 +248,6 @@ procedure TStarSkySaver.Update;
     P: TPoint;
   const
     MM: array[0..1] of Integer = (-1, 1);
-  label 1;
 
   function MMM(X, Y: Integer): Integer;
     var
@@ -294,7 +292,6 @@ procedure TStarSkySaver.Update;
   end { TStarSkySaver.Update };
 
 constructor TProjector.Create;
-  label 1;
   var
     R: TRect;
     I, J: Integer;
@@ -455,8 +452,6 @@ procedure TClockSaver.Update;
     H, M, S, SS: Word;
     sX, sY: Integer;
     B: TDrawBuffer;
-  label
-    Skip;
   begin
   GetTime(H, M, S, SS);
   if  (S <> dS) or (M <> dM) or (H <> dH) or (dSS <> SS)

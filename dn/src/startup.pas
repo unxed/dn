@@ -71,29 +71,29 @@ const
   FBRPBSignature: array[1..5] of Char = 'FBRPB';
   NumSupportedConfigs = 9;
   ConfigSigns: array[1..NumSupportedConfigs] of TSignRec =
-    ( (Sign: 'DN2 Configuration'#26#001#36; SignLen: 20; SignVer: 00136),
+    ( (Sign: 'DN2 Configuration'#26#001#36; SignLen: 20; SignVer: 00136; HavVer: False),
     {Base configuration}
-      (Sign: 'DN2 Configuration'#26#151#05; SignLen: 20; SignVer: 15104),
+      (Sign: 'DN2 Configuration'#26#151#05; SignLen: 20; SignVer: 15104; HavVer: False),
     {Configuration for 1.51.04-0}
-      (Sign: 'DN2 Configuration'#26#151#42; SignLen: 20; SignVer: 15104),
+      (Sign: 'DN2 Configuration'#26#151#42; SignLen: 20; SignVer: 15104; HavVer: False),
     {Configuration for 1.51.04-1}
-      (Sign: 'DN2 Configuration'#26#151#42; SignLen: 20; SignVer: 15104),
+      (Sign: 'DN2 Configuration'#26#151#42; SignLen: 20; SignVer: 15104; HavVer: False),
     {Configuration for 1.51.04-2}
       (Sign: 'DN OSP Configuration'#26#151#42; SignLen: 23;
-       SignVer: 15104),
+       SignVer: 15104; HavVer: False),
       (Sign: 'DN OSP Configuration'#26#151#43; SignLen: 23;
-       SignVer: 15104),
+       SignVer: 15104; HavVer: False),
       (Sign: 'DN OSP Configuration'#26#151#50; SignLen: 23;
-       SignVer: 15105),
+       SignVer: 15105; HavVer: False),
     {Configuration for 1.51.05}
       (Sign: 'DN OSP Configuration'#26#151#51; SignLen: 23;
-       SignVer: 15105),
+       SignVer: 15105; HavVer: False),
     {Configuration for 1.51.05-2}
       (Sign: 'DN OSP Configuration'#26; SignLen: 21; SignVer: 15106;
        HavVer: True));
   {Configuration for 1.51.06+}
   DskSign: TSignRec =
-  (Sign: 'DN OSP Desktop'#26#151#81; SignLen: 17; SignVer: 15181)
+  (Sign: 'DN OSP Desktop'#26#151#81; SignLen: 17; SignVer: 15181; HavVer: False)
   ; 
   {Desktop for 1.51.08; #81: the streams of tv3, a desktop of another version is not read}
   { the panels list hidden files (dot files) by default on the systems without drive letters (Unix); a saved setup wins }

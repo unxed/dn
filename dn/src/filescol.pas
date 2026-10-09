@@ -154,6 +154,8 @@ type
     function StreamableName: ShortString; override;
     class function Build: TStreamable; static;
     procedure Write(Os: opstream); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
     procedure FreeItem(Item: Pointer); override;
     function Compare(Key1, Key2: Pointer): Integer; override;
     function FileCompare(Key1, Key2: Pointer): Integer;
@@ -515,6 +517,17 @@ procedure TFilesCollection.Write(Os: opstream);
       StoreFileRec(Os, At(I-1));
   Os.WriteBytes(Sel, SizeOf(Sel));
   end { TFilesCollection.Store };
+
+{ an item is a file record (PFileRec) }
+function TFilesCollection.ReadItem(Ip: ipstream): Pointer;
+  begin
+  Result := LoadFileRec(Ip);
+  end;
+
+procedure TFilesCollection.WriteItem(Item: Pointer; Os: opstream);
+  begin
+  StoreFileRec(Os, Item);
+  end;
 
 class function TFilesCollection.Build: TStreamable;
 begin
@@ -1046,8 +1059,6 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
     FreeSp: TQuad;
     Tabulated: Boolean;
 
-  label
-    InvSpace;
 
   function CutLongString(S: String): String;
     var
@@ -1159,28 +1170,25 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
     Inc(N)
     end;
 
-  if HasDrives then
-    for C := 'Z' downto 'A' do
-      if ValidDrive(C) then
-        begin
-        Inc(DrvCnt);
-        DrvStrArr[DrvCnt].Dr := C;
-        DrvStrArr[DrvCnt].FullS := '~'+C+':~';
-        end;
-  if not HasDrives then
-    begin                           { one tree: places instead of drive letters }
-    LoadPlaces;
-    for I := PlaceCnt downto 1 do
+{$IF HasDrives}
+  for C := 'Z' downto 'A' do
+    if ValidDrive(C) then
       begin
       Inc(DrvCnt);
-      DrvStrArr[DrvCnt].Dr := Chr(64+I);
-      DrvStrArr[DrvCnt].FullS := '~'+Chr(64+I)+'~ '+CutH(Places[I], 40);
+      DrvStrArr[DrvCnt].Dr := C;
+      DrvStrArr[DrvCnt].FullS := '~'+C+':~';
       end;
+  InfoCnt := DrvCnt;
+{$ELSE}
+  LoadPlaces;                       { one tree: places instead of drive letters }
+  for I := PlaceCnt downto 1 do
+    begin
+    Inc(DrvCnt);
+    DrvStrArr[DrvCnt].Dr := Chr(64+I);
+    DrvStrArr[DrvCnt].FullS := '~'+Chr(64+I)+'~ '+CutH(Places[I], 40);
     end;
-  if HasDrives then
-    InfoCnt := DrvCnt
-  else
-    InfoCnt := 0;
+  InfoCnt := 0;
+{$ENDIF}
 
   for I := 1 to InfoCnt do
     begin
@@ -1191,7 +1199,6 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
         begin
        {DriveNum := Byte(C)-64;}
         DT := GetDriveTypeNew(Dr);
-        if HasDrives then
         case DT of
           dtnFloppy:
             if (InterfaceData.DrvInfType.TypeShowFor and ditFloppy <> 0) then
@@ -1342,17 +1349,17 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
       Inc(N);
       end;
 
-  if not HasDrives then
-    begin
-    TmpS := '';
-    lGetDir(0, TmpS);
-    C := Chr(64+Max(1, PlaceOf(TmpS)));
-    end
-  else if not (Default in ['A'..'Z']) and not ((Default = '+') and (Lnk <> nil))
+{$IF not HasDrives}
+  TmpS := '';
+  lGetDir(0, TmpS);
+  C := Chr(64+Max(1, PlaceOf(TmpS)));
+{$ELSE}
+  if not (Default in ['A'..'Z']) and not ((Default = '+') and (Lnk <> nil))
   then
     C := GetCurDrive
   else
     C := Default;
+{$ENDIF}
   Menu := NewMenu(Items);
   R := Desktop.GetExtent;
   {-$VIV start}
@@ -1393,10 +1400,12 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   DisposeMenu(Menu);
   SelectDrive := '';
   if N > 1000 then
-    if HasDrives then
-      SelectDrive := Char(N-1000)+':'
-    else if N-1064 <= PlaceCnt then
+{$IF HasDrives}
+    SelectDrive := Char(N-1000)+':';
+{$ELSE}
+    if N-1064 <= PlaceCnt then
       SelectDrive := Places[N-1064];
+{$ENDIF}
   if N = 1200 then
     SelectDrive := cTEMP_;
   

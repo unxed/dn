@@ -107,8 +107,8 @@ type
     Info: TDStringView;
     destructor Destroy; override;
     procedure HandleEvent(var Event: TEvent); override;
-    function GetText(Item: LongInt; MaxLen: Integer): String; virtual;
-    function GetKey(const S: String): Pointer; virtual;
+    function GetText(Item: LongInt; MaxLen: Integer): String; override;
+    function GetKey(const S: String): Pointer; override;
     procedure SetList(Alpha: Boolean);
     {      procedure SetState(AState: Word; Enable: Boolean); virtual;}
     end;

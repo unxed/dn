@@ -54,6 +54,7 @@ function QueryCountryInfo: Boolean;
     DS_ := DosSeg; DX_ := 0;  {DS:DX -> buffer for returned info}
     end;
   intr_realmode(Regs, $21);
+  Result := Regs.flags_ and 1 = 0;  { the carry flag is the error }
   end;
 
 type
@@ -93,6 +94,7 @@ procedure GetSysCountryInfo;
 function QueryToAscii(CP: word; var ToAscii: TXLat): Boolean;
   begin
   NullXlat(ToAscii);
+  Result := False;  { the table of the code page is not asked from DOS: the identity table }
   end;
 
 function QueryABCSort(CP: Word; var ABCSortXlat: TXLat): Boolean;

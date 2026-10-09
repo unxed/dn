@@ -259,7 +259,7 @@ type
     destructor Destroy; override;
     end;
 
-  TLineQueue = class(TCollection)
+  TLineQueue = class(TNSCollection)
     procedure FreeItem(Item: Pointer); override;
     end;
 
@@ -439,7 +439,7 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     ToRead, ToWrite: TSize;
     CopyStartTime, CopyElapsedTime: LongInt; {John_SW 30-06-2005}
     CopyQueue: TLineQueue;
-    Dirs: TCollection;
+    Dirs: TNSCollection;
     iQueue: Integer;
     CurOldName, CurNewName: String;
     CurDate: LongInt;
@@ -937,7 +937,7 @@ Moreover, on a negative answer the created file remains
             if NFBigger then
               begin
               {--- finish -------- Eugeny Zvyagintzev ---- 29-08-2002 ----}
-              PS[1] := Pointer(LongInt(Drv+64));
+              PS[1] := Pointer(PtrUInt(Drv+64));
               PS[2] := P.OldName;
               lAssignFile(WriteStream, '');
               ForceDispatch;
@@ -2163,7 +2163,7 @@ TrueCopy:
       lFindClose(SR);
       end { CopyF };
 
-    label 1, 2;
+    label 1;
 
     function NoCheck(P_: Pointer): Boolean;
     var P: TDirName absolute P_;
@@ -2204,7 +2204,7 @@ TryGetInfo:
             Exit;
         end {case};
       end {if};
-    Dirs := TCollection.Create(10, 10);   { of TDirName: FreeItem of TCollection frees them }
+    Dirs := TNSCollection.Create(10, 10);   { of TDirName: FreeItem of TNSCollection frees them }
     for I := 0 to Files.Count-1 do
       begin
       P := Files.At(I);

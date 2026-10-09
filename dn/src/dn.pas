@@ -188,7 +188,7 @@ except
     Lines[0] := 'Fatal Error';
     Lines[1] := '-----------';
     Lines[2] := '';
-    Lines[3] := 'Exception 0' + Hex2(ExitCode) + 'h at address ' + Hex8(LongInt(ExceptAddr));
+    Lines[3] := 'Exception 0' + Hex2(ExitCode) + 'h at address ' + System.HexStr(ExceptAddr);
     Lines[4] := E.Message;
     if GetLocationInfo(ExceptAddr, FileName, LineNo) <> nil then
       Lines[5] := 'Source location: ' + FileName + ' line ' + IntToStr(LineNo)

@@ -208,7 +208,7 @@ type
     Tag: Byte; { for multiindex, only dB IV }
     end;
 
-  TDbfFieldCollection = class(TCollection)
+  TDbfFieldCollection = class(TNSCollection)
     {KV}
     procedure FreeItem(Item: Pointer); override;
     end;

@@ -271,7 +271,7 @@ begin
 end;
 }
 procedure ReadTree(C: Char; CountLen: Boolean);
-  label Rep, DRep;
+  label DRep;
   var
     P: PDirRec;
     DCEntry: Integer;
@@ -1211,7 +1211,6 @@ function MkFcFromDirRec(D: PDirRec; var FullName: String)
   end;
 
 procedure TTreeView.HandleCommand(var Event: TEvent);
-  label NoLoc;
   var
     CurPos, I: Integer;
     PD: PDirRec;
@@ -1512,7 +1511,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
         kbAlt1, kbAlt2, kbAlt3, kbAlt4, kbAlt5, kbAlt6, kbAlt7, kbAlt8,
          kbAlt9:
           begin
-          QuickChange(CnvString(DirsToChange[Event.KeyDown.CharScan.ScanCode-Hi(kbAlt1)]))
+          QuickChange(CnvString(DirsToChange[Event.KeyDown.CharScan.ScanCode-((kbAlt1 shr 8) and $FF)]))
           ;
           CE
           end;
@@ -1887,7 +1886,6 @@ end;
 {-DataCompBoy-}
 
 procedure TTreeView.ReadTree(CountLen: Boolean);
-  label Rep;
   var
     P: PDirRec;
     DCEntry: Integer;

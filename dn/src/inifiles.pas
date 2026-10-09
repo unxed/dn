@@ -64,7 +64,7 @@ type
   { Of course, these lines must not contain      }
   { strings with "=" or starting with "[".       }
   TIniSection = class;
-  TIniSection = class(TCollection)
+  TIniSection = class(TNSCollection)
     TheName: PString;
     constructor Create(const AName: String);
     destructor Destroy; override;
@@ -74,15 +74,15 @@ type
     function GetKeyAt(const Index: Integer): String;
     function GetValueAt(const Index: Integer): String;
     function Name: String;
-    procedure FreeItem(Item: Pointer); virtual;
-    procedure Insert(Item: Pointer); virtual;
+    procedure FreeItem(Item: Pointer); override;
+    procedure Insert(Item: Pointer); override;
     constructor Load(var S: TStream);
     procedure Store(var S: TStream); virtual;
     end;
 
   { Collection of TIniSections }
   TIniFile = class;
-  TIniFile = class(TCollection)
+  TIniFile = class(TNSCollection)
     Modified: Boolean;
     Name: PString;
     constructor Create(FileName: String; var AStatus: Integer);

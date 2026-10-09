@@ -489,7 +489,8 @@ procedure TDiskInfo.HandleEvent(var Event: TEvent);
 procedure TDiskInfo.Draw;
   var
     B: TDrawBuffer;
-    C, Y, X: Word;
+    C, Y: Word;
+    X: Integer;
     R: TRect;
     S1, S2: String[20];
     CC: Boolean;

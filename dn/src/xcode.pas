@@ -101,6 +101,7 @@ procedure TXCoder.LoadXlatTable; {JO}
   label
     SkipMenu;
   begin
+  FN := '';
   More := True;
   None := KeyMap = kmXlat;
    if SkipXLatMenu then

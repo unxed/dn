@@ -78,6 +78,7 @@ type
     function Get(Key: AWord): String;
     destructor Destroy; override;
     function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
     function StreamableName: ShortString; override;
     class function Build: TStreamable; static;
   public
@@ -106,6 +107,13 @@ function TStringList.Read(Ip: ipstream): Pointer;
 
 constructor TStringList.Create(AInit: TStreamableInit);
 begin
+end;
+
+{ the list reads its strings from the stream it was read from, when they are asked for: it is written only by
+  ListMakr.TStrListMaker (the resource compiler), never by itself }
+procedure TStringList.Write(Os: opstream);
+begin
+  raise EStreamableError.Create(pstream.StreamableError.peNotRegistered, ClassName);
 end;
 
 class function TStringList.Build: TStreamable;

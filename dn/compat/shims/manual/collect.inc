@@ -38,6 +38,16 @@ type
     class function Build: TStreamable; static;
   end;
 
+  { a collection that a list box shows (TListBox takes a TCollection) and that no stream holds: reading or writing
+    its items is the error peNotRegistered (EStreamableError), as for a TNSCollection }
+  TNoStreamCollection = class;
+
+  TNoStreamCollection = class(TCollection)
+  protected
+    function ReadItem(Ip: ipstream): Pointer; override;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
+  end;
+
   { not sorted: Insert appends }
   TUnSortedStrCollection = class;
 

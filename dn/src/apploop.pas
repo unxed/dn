@@ -104,7 +104,6 @@ procedure MyApp.GetEvent(var Event: TEvent);
     MacroPlaying: Boolean = False;
     MacroKey: Integer = 0;
     CurrentMacro: TKeyMacros = nil;
-    QuitEvent: TEvent = (What: evKeyDown; KeyDown: (KeyCode: kbAltX));
   begin
   
   
@@ -155,13 +154,13 @@ procedure MyApp.GetEvent(var Event: TEvent);
         ScreenGrabber(False);
         Exit
         end;
-      if  (Event.KeyDown.CharScan.ScanCode >= Hi(kbCtrlF1))
-             and (Event.KeyDown.CharScan.ScanCode <= Hi(kbCtrlF10))
+      if  (Event.KeyDown.CharScan.ScanCode >= ((kbCtrlF1 shr 8) and $FF))
+             and (Event.KeyDown.CharScan.ScanCode <= ((kbCtrlF10 shr 8) and $FF))
         and (Pointer(Current) = Pointer(MainApp.Desktop))
            and (ShiftState and 3 <> 0)
       then
         begin
-        if QuickExecExternal(Event.KeyDown.CharScan.ScanCode-Hi(kbCtrlF1)+1) then
+        if QuickExecExternal(Event.KeyDown.CharScan.ScanCode-((kbCtrlF1 shr 8) and $FF)+1) then
           begin
           Event.What := evCommand;
           Event.Message.Command := cmExecString;
@@ -173,11 +172,11 @@ procedure MyApp.GetEvent(var Event: TEvent);
         end;
       if  (ShiftState and 7 <> 0)
              and ((ShiftState and 4 = 0) or (ShiftState and 3 = 0)) and
-          (Event.KeyDown.CharScan.ScanCode >= Hi(kbAlt1))
-           and (Event.KeyDown.CharScan.ScanCode <= Hi(kbAlt9))
+          (Event.KeyDown.CharScan.ScanCode >= ((kbAlt1 shr 8) and $FF))
+           and (Event.KeyDown.CharScan.ScanCode <= ((kbAlt9 shr 8) and $FF))
       then
         begin
-        WW := Event.KeyDown.CharScan.ScanCode-Hi(kbAlt1);
+        WW := Event.KeyDown.CharScan.ScanCode-((kbAlt1 shr 8) and $FF);
         if ShiftState and 3 <> 0 then
           begin
           if KeyMacroses = nil then
@@ -247,7 +246,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         { F10 opens DN's menu bar.  Keep this explicit fallback because
           the status-line view is not the owner of the menu command. }
         if (Event.What = evKeyDown) and
-           ((DNKeyCode(Event) = kbF10) or (Event.KeyDown.CharScan.ScanCode = Hi(kbF10))) then
+           ((DNKeyCode(Event) = kbF10) or (Event.KeyDown.CharScan.ScanCode = ((kbF10 shr 8) and $FF))) then
           begin
           Event.What := evCommand;
           Event.Message.Command := cmMenu;

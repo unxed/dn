@@ -117,7 +117,7 @@ type
     OptimalFill: Boolean;
     TabReplace: Boolean;
     JustSaved: Boolean;
-    Macros: TCollection;
+    Macros: TNSCollection;
     Locker: TStream;
     InfoL, BMrk: TView;
     SavedCursor: TPoint;
@@ -409,7 +409,7 @@ constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TS
     end
   else if ClipBrd then
     FileName := '';
-  Macros := TCollection.Create(10, 10);
+  Macros := TNSCollection.Create(10, 10);
   MenuItemStr[True] := NewStr(GetString(dlMenuItemOn));
   MenuItemStr[False] := NewStr(GetString(dlMenuItemOff));
   ApplyOptions;
@@ -1562,27 +1562,34 @@ procedure TFileEditor.SetMarginsDialog;
       end;
     I: LongInt;
     J: Integer;
+    L, R, N: LongInt;   { the margins as typed: a negative number is checked before it goes to a Word }
   begin
   Data.S1 := ItoS(EdOpt.LeftSide);
   Data.S2 := ItoS(EdOpt.RightSide);
   Data.S3 := ItoS(EdOpt.InSide);
   if ExecResource(dlgEditorFormat, Data) = cmCancel then
     Exit;
+  L := EdOpt.LeftSide;
+  R := EdOpt.RightSide;
+  N := EdOpt.InSide;
   Val(Data.S1, I, J);
   if J = 0 then
-    EdOpt.LeftSide := I;
+    L := I;
   Val(Data.S2, I, J);
   if J = 0 then
-    EdOpt.RightSide := I;
+    R := I;
   Val(Data.S3, I, J);
   if J = 0 then
-    EdOpt.InSide := I;
-  if (EdOpt.LeftSide > EdOpt.RightSide) or (EdOpt.LeftSide < 0) then
-    EdOpt.LeftSide := 0;
-  if EdOpt.RightSide < 2 then
-    EdOpt.RightSide := 2;
-  if (EdOpt.InSide >= EdOpt.RightSide) or (EdOpt.InSide < 0) then
-    EdOpt.InSide := EdOpt.LeftSide;
+    N := I;
+  if (L > R) or (L < 0) then
+    L := 0;
+  if R < 2 then
+    R := 2;
+  if (N >= R) or (N < 0) then
+    N := L;
+  EdOpt.LeftSide := L;
+  EdOpt.RightSide := R;
+  EdOpt.InSide := N;
   ApplyOptions;
   end;
 
