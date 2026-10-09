@@ -69,6 +69,9 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     TvActions, the far2l extensions, the backends) stay in tv3 as new APIs (owner, 2026-10-09).
 14. A rule of the owner is applied as it is written; nobody who applies it makes an exception. A case where the rule seems
     impossible to follow goes to the owner; an agent stops and reports it.
+15. No match with any corpus (owner, 2026-10-09, final): a faithful translation of magiblot that matches Borland Turbo Vision (or any
+    corpus) is written again with other code, keeping the behaviour of magiblot, until the audit finds nothing. This is not asked
+    again; it is the rule.
 
 ## How to
 
