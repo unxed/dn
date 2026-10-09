@@ -32,9 +32,10 @@ def run(out, lang, key, ok_key, what):
         t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d, 'HOME': d})
         t.started()
         t.send('\x1b', 0.5)
-        before = t.text()
+        before = t.shape()                                      # the screen but the clock
         t.send(key, 0.8)
-        check(t.text() != before, '%s %s: the history opens' % (lang, what[0]), t.text())
+        t.until(lambda: t.shape() != before, 5)
+        check(t.shape() != before, '%s %s: the history opens' % (lang, what[0]), t.text())
         t.send(ok_key, 0.8)
         t.pump(0.4, 2)
         text = t.text()

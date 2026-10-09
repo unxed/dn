@@ -123,7 +123,8 @@ def install(out, d):
 
 
 def snapshot(t):
-    return [list(row) for row in t.screen.cells], (t.screen.x, t.screen.y)
+    """the cells (but the clock of the menu bar) and the cursor"""
+    return t.shape(), (t.screen.x, t.screen.y)
 
 
 def one(job):
@@ -139,6 +140,7 @@ def one(job):
         for i, k in enumerate(hot_keys(chain)):
             before = snapshot(t)
             t.send(k, 0.4)
+            t.until(lambda: snapshot(t) != before or not t.alive(), 5)     # a loaded machine answers late
             t.pump(0.4, 2)
             if not t.alive():
                 why = 'DN ended after %s' % repr(k)

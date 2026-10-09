@@ -21,7 +21,8 @@ HOT = ('i', 11)                                             # the color of a hot
 
 
 def snapshot(t):
-    return [[c for c in row] for row in t.screen.cells], (t.screen.x, t.screen.y)
+    """the cells (but the clock of the menu bar) and the cursor"""
+    return t.shape(), (t.screen.x, t.screen.y)
 
 
 def hot_cells(t, base):
@@ -71,6 +72,7 @@ def probe(job):
             for y, x, ch in todo:
                 before = snapshot(t)
                 t.send('\x1b' + ch, 0.5)
+                t.until(lambda: snapshot(t) != before or not t.alive(), 5)     # a loaded machine answers late
                 t.pump(0.3, 1.5)
                 if not t.alive():
                     bad.append((ch, 'DN ended'))
