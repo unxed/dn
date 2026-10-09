@@ -1180,9 +1180,9 @@ DIALOG dlgCopyDialog, 78, 15, 'Копіювання'
     HELPCTX hcCopyDialog
 #1  InputLine 2, 2, 74, 3, 255, hsFileCopyName
     RadioButtons 2, 5, 44, 11, ofPostProcess, ofPreProcess
-      ITEM '~П~ереписувати'
+      ITEM 'Перепи~с~увати'
       ITEM 'Дод~а~вати'
-      ITEM 'Продов~ж~увати'
+      ITEM 'Продо~в~жувати'
       ITEM 'П~р~опустити'
       ITEM 'О~б~новити'
       ITEM 'Запи~т~ати дію'
@@ -1202,8 +1202,8 @@ DIALOG dlgCopyDialog, 78, 15, 'Копіювання'
 ;$ENDIF
       ITEM 'В~и~даляти початкові файли'
     END
-    Button 8, 12, 20, 14, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 20, 12, 32, 14, '~В~ідміна', cmCancel, ofPostProcess, ofPreProcess
+    Button 8, 12, 20, 14, 'ОК', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button 20, 12, 32, 14, 'В~і~дміна', cmCancel, ofPostProcess, ofPreProcess
     Button 32, 12, 44, 14, 'Д~е~рево', cmTree, ofPostProcess, ofPreProcess
     Button 44, 12, 56, 14, 'Допомо~г~а', cmHelp, ofPostProcess, ofPreProcess
 END
@@ -2984,7 +2984,7 @@ DIALOG dlgWindowManager, 70, 14, 'Менеджер вікон'
   HELPCTX hcWinMan
   Button 57,3,69,5,  'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
   Button 57,5,69,7,  '~З~акрий', cmNo, bfNormal, ofPostProcess, ofPreProcess
-  Button 57,7,69,9, '~В~ідміна', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 57,7,69,9, 'В~і~дміна', cmCancel, bfNormal, ofPostProcess, ofPreProcess
   Button 57,11,69,13, 'Допомо~г~а', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
 

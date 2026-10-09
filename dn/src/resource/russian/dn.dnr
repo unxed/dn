@@ -1181,12 +1181,12 @@ DIALOG dlgCopyDialog, 78, 15, 'Копирование'
     HELPCTX hcCopyDialog
 #1  InputLine 2, 2, 74, 3, 255, hsFileCopyName
     RadioButtons 2, 5, 44, 11, ofPostProcess, ofPreProcess
-      ITEM 'Записывать ~п~оверх'
+      ITEM 'З~а~писывать поверх'
       ITEM 'До~б~авлять'
       ITEM 'Продол~ж~ать'
       ITEM 'П~р~опускать'
       ITEM 'Об~н~овлять'
-      ITEM 'З~а~прашивать действие'
+      ITEM 'Запра~ш~ивать действие'
     END
     Label 2,4, '~Ф~айлы с одинаковыми именами:'
 #2  CheckBoxes 45, 5, 76, 10, ofPostProcess, ofPreProcess
@@ -1203,7 +1203,7 @@ DIALOG dlgCopyDialog, 78, 15, 'Копирование'
 ;$ENDIF
       ITEM '~У~далять исходные файлы'
     END
-    Button 16, 12, 26, 14, 'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button 16, 12, 26, 14, 'ОК', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 26, 12, 36, 14, 'О~т~мена', cmCancel, ofPostProcess, ofPreProcess
     Button 36, 12, 46, 14, 'Д~е~рево', cmTree, ofPostProcess, ofPreProcess
     Button 46, 12, 56, 14, 'Помо~щ~ь', cmHelp, ofPostProcess, ofPreProcess
@@ -2999,7 +2999,7 @@ DIALOG dlgWindowManager, 70, 14, 'Менеджер окон'
   HELPCTX hcWinMan
   Button 58,3,68,5,  'О~К~', cmOK, bfDefault, ofPostProcess, ofPreProcess
   Button 58,5,68,7,  '~З~акрой', cmNo, bfNormal, ofPostProcess, ofPreProcess
-  Button 58,7,68,9, '~О~тмена', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 58,7,68,9, 'О~т~мена', cmCancel, bfNormal, ofPostProcess, ofPreProcess
   Button 58,11,68,13,'Помо~щ~ь', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
 

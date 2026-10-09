@@ -2549,9 +2549,9 @@ DIALOG dlgCopyDialog, 78, 15, 'Copy'
       ITEM 'Remove so~u~rce files'
     END
     Button 17, 12, 27, 14, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 27, 12, 37, 14, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 27, 12, 37, 14, 'Cance~l~', cmCancel, ofPostProcess, ofPreProcess
     Button 37, 12, 47, 14, '~T~ree', cmTree, ofPostProcess, ofPreProcess
-    Button 47, 12, 57, 14, 'He~l~p', cmHelp, ofPostProcess, ofPreProcess
+    Button 47, 12, 57, 14, 'Help', cmHelp, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgMakeList, 69, 20, 'Make List File'
