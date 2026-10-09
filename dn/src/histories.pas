@@ -52,7 +52,7 @@ unit histories;
 interface
 
 uses
-  Collect, Drivers, Defines, objutil, Streams, Views,
+  SysUtils, Collect, Drivers, Defines, objutil, Streams, Views,
   Drives, basics, keymap
   , DBView 
   ;
@@ -181,7 +181,7 @@ var
        the value 'Wrk', then the history will use the file DNWrk.HIS `}
 
 implementation
-uses DnPath,
+uses DnPath, FlightRec,
   Lfn, Dos, Commands, mainapp, Dialogs, HistList,
   Startup, timeutil, Messages, DNUtil, DnIni,
   osdep, editwin, strutil,  fileutil, TvGlyphs,
@@ -1078,7 +1078,8 @@ procedure CmdHistory;
   end { CmdHistory };
 
 const
-  HistoryFileSign = 'DN OSP History file'#13#10#26#1#51#05;
+  { the last byte is the version of the format: #06 since the streams of tv3; a file of another version is not read }
+  HistoryFileSign = 'DN OSP History file'#13#10#26#1#51#06;
 
   {-DataCompBoy-}
 procedure LoadHistories;
@@ -1095,12 +1096,21 @@ procedure LoadHistories;
     if FreeStr = HistoryFileSign then
       begin
       Ip := ipstream.Create(S);
-      HistoryLoad(Ip);
-      LoadCommands(Ip);
+      try
+        HistoryLoad(Ip);
+        LoadCommands(Ip);
+      except
+        { a damaged file: the histories start empty, the file is written again at the exit }
+        on E: Exception do
+          begin
+          FRNote('file', 'the histories were not read: ' + E.Message);
+          ClearHistories;
+          end;
+      end;
       Ip.Free;
       end
     else
-      MessageBox('Can''t load histories!', nil, mfOKButton);
+      FRNote('file', 'the histories are of another version: not read');
     end;
   S.Free;
   end { LoadHistories };

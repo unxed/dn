@@ -680,7 +680,18 @@ procedure DoStartup;
           begin
           I := i32(S.GetPos);
           Ip := ipstream.Create(S);
-          SaversData.Selected.List := PTextCollection(Ip.ReadPointer);
+          try
+            SaversData.Selected.List := PTextCollection(Ip.ReadPointer);
+          except
+            { a damaged list of the savers: none is selected; the place after the item is found again below }
+            on E: Exception do
+              begin
+              FRNote('file', 'the list of the savers was not read: ' + E.Message);
+              SaversData.Selected.List := nil;
+              S.Reset;
+              S.Seek(I);
+              end;
+          end;
           Ip.Free;
           if (S.Status <> stOK) or (S.GetPos <> I + L) then
             begin

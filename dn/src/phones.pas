@@ -52,7 +52,7 @@ unit Phones;
 interface
 
 uses
-  Defines, objutil, Streams, Drivers, Dialogs, Menus,
+  SysUtils, Defines, objutil, Streams, Drivers, Dialogs, Menus,
   Views, DNStdDlg, Collect, StrView
   ;
 
@@ -117,6 +117,7 @@ procedure PhoneBook(Manual: Boolean);
 
 implementation
 uses
+  FlightRec,
   mainapp, Startup, Commands, Messages, ObjType
   , DNHelp, basics, strutil, fileutil
   
@@ -141,19 +142,39 @@ function CryptWith(Pass, S: String): String;
 var
   PPH: TPhone;
 
-{ dn.phn: the collection of the phone book written by an opstream }
+const
+  { the head of dn.phn: the last byte is the version of the format; a file of another version is not read }
+  PhonesSign = 'DN Phone book'#26#1;
+
+{ dn.phn: PhonesSign, then the collection of the phone book written by an opstream }
 function LoadPhones: TCollection;
   var
     S: TBufStream;
     Ip: ipstream;
+    Sign: String;
   begin
   Result := nil;
   S := TBufStream.Create(ConfigDir+'dn.phn', stOpenRead, 1024);
-  if (S.Status = stOK) and (S.GetSize > 0) then
+  if (S.Status = stOK) and (S.GetSize > Length(PhonesSign)) then
     begin
-    Ip := ipstream.Create(S);
-    Result := TCollection(Ip.ReadPointer);
-    Ip.Free;
+    SetLength(Sign, Length(PhonesSign));
+    S.Read(Sign[1], Length(PhonesSign));
+    if Sign <> PhonesSign then
+      FRNote('file', 'the phone book is of another version: not read')
+    else
+      begin
+      Ip := ipstream.Create(S);
+      try
+        Result := TCollection(Ip.ReadPointer);
+      except
+        on E: Exception do
+          begin
+          FRNote('file', 'the phone book was not read: ' + E.Message);
+          Result := nil;
+          end;
+      end;
+      Ip.Free;
+      end;
     end;
   S.Free;
   end;
@@ -164,6 +185,7 @@ procedure SavePhones(C: TCollection);
     Os: opstream;
   begin
   S := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
+  S.Write(PhonesSign[1], Length(PhonesSign));
   Os := opstream.Create(S);
   Os.WritePointer(TStreamable(C));
   Os.Free;

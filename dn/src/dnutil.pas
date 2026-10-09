@@ -257,7 +257,7 @@ procedure PutInClipLong(const S: LongString);
 implementation
 
 uses DnPath, DnActReg,
-  SysUtils,
+  SysUtils, FlightRec,
   DNRun,
   Dos, Lfn, HelpKern, Menus, FileCopy, Math,
   DNHelp, DnIni, iniengine, cfgstate, DNErrLog, histories,
@@ -596,7 +596,13 @@ constructor TDNApplication.Create;
   if LoadStream = nil then
     LoadStream := PresentFile(ConfigDir+'dn'+GetEnv('DNDSK')+'.dsk');
   if LoadStream <> nil then
-    RetrieveDesktop('', LoadStream, True);
+    try
+      RetrieveDesktop('', LoadStream, True);
+    except
+      { a damaged desktop: DN starts with the default one }
+      on E: Exception do
+        FRNote('file', 'the desktop was not read: ' + E.Message);
+    end;
   InitDrivers;
 
   {-$VOL begin}
@@ -2764,7 +2770,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmHistoryList:
       CmdHistory;
     cmLoadDesk:
-      RetrieveDesktop(ConfigDir+'dn'+GetEnv('DNDSK')+'.dsk', nil, True);
+      try
+        RetrieveDesktop(ConfigDir+'dn'+GetEnv('DNDSK')+'.dsk', nil, True);
+      except
+        on E: Exception do
+          FRNote('file', 'the desktop was not read: ' + E.Message);
+      end;
     cmRetrieveSwp:
       ProcessTempFile(TempFileSWP);
     cmSaveDesk:

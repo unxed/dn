@@ -93,9 +93,9 @@ const
        HavVer: True));
   {Configuration for 1.51.06+}
   DskSign: TSignRec =
-  (Sign: 'DN OSP Desktop'#26#151#80; SignLen: 17; SignVer: 15180)
+  (Sign: 'DN OSP Desktop'#26#151#81; SignLen: 17; SignVer: 15181)
   ; 
-  {Desktop for 1.51.08}
+  {Desktop for 1.51.08; #81: the streams of tv3, a desktop of another version is not read}
   { the panels list hidden files (dot files) by default on the systems without drive letters (Unix); a saved setup wins }
   ShowHiddenByDefault = not HasDrives;
   Security: Boolean = not ShowHiddenByDefault;
