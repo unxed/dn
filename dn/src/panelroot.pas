@@ -3253,7 +3253,7 @@ procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean)
     begin
     X := CalcNameLength+1;
     if X-(DeltaX*Byte(Scroll)) > 0 then
-      PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := CellFromBIOS(SC);
+      PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := TScreenCell(Word(SC));
     end;
   i := Low(TFileColNumber);
   while Flags <> 0 do
@@ -3272,7 +3272,7 @@ procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean)
         if X > 250 then
           Exit;
         if X-(DeltaX*Byte(Scroll)) > 0 then
-          PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := CellFromBIOS(SC);
+          PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := TScreenCell(Word(SC));
         end;
       end;
     Flags := Flags shr 1;

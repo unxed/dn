@@ -60,11 +60,11 @@ var
   Used: Integer;
   B: Byte;
 begin
-  if ScIsWideTrail(Ch) then
+  if Ch.IsWideCharTrail then
     Exit(Ord(' '));
-  if ScLength(Ch) = 1 then
-    Exit(Ch.Text[0]);
-  S := ScText(Ch);
+  if Length(Ch.GetText) = 1 then
+    Exit(Ord(Ch.GetText[1]));
+  S := Ch.GetText;
   if (Length(S) > 0) and Utf8Decode(@S[1], Length(S), CP, Used) and (Used = Length(S)) then
   begin
     B := CpFromUnicode(CP);
@@ -131,7 +131,7 @@ begin
     if N > Size then
       N := Size;
     for I := 0 to N - 1 do
-      Row[I] := CellFromBIOS(CellCopy[Pos + I]);
+      Row[I] := TScreenCell(Word(CellCopy[Pos + I]));
     if TScreen.ScreenBuffer <> nil then
       Move(Row[0], (TScreen.ScreenBuffer + Y * TScreen.ScreenWidth + X)^, N * SizeOf(TScreenCell));
     ScreenWrite(X, Y, @Row[0], N);

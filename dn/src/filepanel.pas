@@ -865,9 +865,9 @@ Scroll:
             DrawAtIdx;
             Idx := (j+1)*LineLength;
             if Idx < Size.X then
-              B[Idx-1] := CellFromBIOS(CS)
+              B[Idx-1] := TScreenCell(Word(CS))
             else
-              B[Idx-1] := CellFromBIOS(CW);
+              B[Idx-1] := TScreenCell(Word(CW));
             Idx := j*LineLength;
             WriteLineC(Idx, i, LineLength-1, 1, B[Idx+DeltaX]);
             end;
@@ -901,9 +901,9 @@ Scroll:
       DrawAtIdx;
       Idx := (j+1)*LineLength;
       if Idx < Size.X then
-        B[Idx-1] := CellFromBIOS(CS)
+        B[Idx-1] := TScreenCell(Word(CS))
       else
-        B[Idx-1] := CellFromBIOS(CW);
+        B[Idx-1] := TScreenCell(Word(CW));
       end;
     WriteLineC(0, i, Size.X, 1, B[DeltaX]);
     end;
@@ -1090,7 +1090,7 @@ function MakeDivider(IV: TInfoView): Boolean;
       Panel.GetEmpty(B[I], C, True);
       Inc(I, Panel.LineLength);
       if I = Size.X then
-        B[I-1] := CellFromBIOS((C and $FF00)+GlyphByte(glLightH));
+        B[I-1] := TScreenCell(Word((C and $FF00)+GlyphByte(glLightH)));
       end;
     end;
   end;

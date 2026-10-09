@@ -330,8 +330,8 @@ procedure TGameInfo.Draw;
       for J := 1 to ColPo[Gm.NextFig] do
         if Figures[Gm.NextFig*5+J, 1] = I-4 then
           begin
-          B[Figures[Gm.NextFig*5+J, 2]*2+3] := CellFromBIOS(K);
-          B[Figures[Gm.NextFig*5+J, 2]*2+4] := CellFromBIOS(K);
+          B[Figures[Gm.NextFig*5+J, 2]*2+3] := TScreenCell(Word(K));
+          B[Figures[Gm.NextFig*5+J, 2]*2+4] := TScreenCell(Word(K));
           end;
       end;
     MoveGlyph(B[0], glLightV, C, 1);
@@ -692,7 +692,7 @@ procedure TGameView.Draw;
       for J := 1 to Shi do
         begin
         K := (J-1)*2;
-        B[K] := CellFromBIOS((Glass[I, J] shl 8)+219);
+        B[K] := TScreenCell(Word((Glass[I, J] shl 8)+219));
         B[K+1] := B[K];
         end;
       WriteLineC(0, I, Shi*2, 1, B);
@@ -701,8 +701,8 @@ procedure TGameView.Draw;
   if not Stop then
     begin
     K := (( (15-CurFig mod 7) shl 8)+219)*Byte(not HideFig);
-    B[0] := CellFromBIOS(K);
-    B[1] := CellFromBIOS(K);
+    B[0] := TScreenCell(Word(K));
+    B[1] := TScreenCell(Word(K));
     for I := 1 to ColPo[CurFig] do
       WriteBufC((X+Fig[I, 2])*2, Y+Fig[I, 1], 2, 1, B);
 

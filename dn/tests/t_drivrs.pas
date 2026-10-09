@@ -48,12 +48,12 @@ begin
   Utf8Enabled := False;
   S := #$A6#$A7;                                   { bytes of the code page (CP866 by default): one cell each, never read as UTF-8; the cell keeps the character as text }
   MoveStr(Cells[3], S, $07);
-  Check((Cells[3].Character.Text[0] = $D0) and (Cells[3].Character.Text[1] = $B6) and (Cells[4].Character.Text[1] = $B7),
+  Check((Ord(Cells[3].Character.GetText[1]) = $D0) and (Ord(Cells[3].Character.GetText[2]) = $B6) and (Ord(Cells[4].Character.GetText[2]) = $B7),
     'cells: the bytes of the code page are characters of the page (U+0436, U+0437)');
   Utf8Enabled := True;
   S := #$D0#$B6;                                   { UTF-8 }
   MoveStr(Cells[5], S, $07);
-  Check((Cells[5].Character.Text[0] = $D0) and (ScLength(Cells[5].Character) = 2), 'cells: UTF-8 is one cell when Utf8Enabled');
+  Check((Ord(Cells[5].Character.GetText[1]) = $D0) and (Length(Cells[5].Character.GetText) = 2), 'cells: UTF-8 is one cell when Utf8Enabled');
   SetCellAttr(Cells[0], $1F);
   SetCellChar(Cells[0], 65);
   Check((CellChar(Cells[0]) = 65) and (CellAttr(Cells[0]) = $1F), 'SetCellChar, SetCellAttr');

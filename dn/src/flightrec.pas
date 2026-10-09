@@ -509,14 +509,14 @@ begin
     for X := 0 to TScreen.ScreenWidth - 1 do
     begin
       C := TScreen.ScreenBuffer + (Y * TScreen.ScreenWidth + X);
-      if C^.Character.Meta shr 4 and scTrail <> 0 then
+      if C^.Character.IsWideCharTrail then
         Continue;
-      N := (C^.Character.Meta and $0F) + 1;
-      if (N = 1) and (C^.Character.Text[0] < 32) then
+      N := Length(C^.Character.GetText);
+      if (N = 1) and (Ord(C^.Character.GetText[1]) < 32) then
         Row := Row + ' '
       else
         for I := 0 to N - 1 do
-          Row := Row + Chr(C^.Character.Text[I]);
+          Row := Row + C^.Character.GetText[I + 1];
       if Length(Row) > 240 then
         Break;
     end;

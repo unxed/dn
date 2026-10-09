@@ -20,7 +20,7 @@ begin
   Check((Cells <> nil) and (Cells[0] = $0720) and (Cells[80 * 25 - 1] = $0720), 'ClearScreenCells: blanks, attribute 7');
   Cells[81] := $1E41;                                    { 'A' at (1,1) }
   WriteScreenCells(81, 1);
-  Check((TScreen.ScreenBuffer[81].Character.Text[0] = Ord('A')) and (Byte(TScreen.ScreenBuffer[81].Attribute) = $1E),
+  Check((Ord(TScreen.ScreenBuffer[81].Character.GetText[1]) = Ord('A')) and (Byte(TScreen.ScreenBuffer[81].Attribute) = $1E),
     'WriteScreenCells writes the cells to the screen of tv/');
   Cells := ReadScreenCells;
   Check(Cells[81] = $1E41, 'ReadScreenCells reads them back');

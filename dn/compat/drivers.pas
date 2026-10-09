@@ -715,7 +715,7 @@ begin
   for I := 0 to Count - 1 do
   begin
     if C <> #0 then
-      ScInitChar(P^.Character, Ord(C));
+      P^.Character.InitWithChar(Ord(C));
     if Attr <> 0 then
       P^.Attribute := TColorAttr(LongInt(Attr));
     Inc(P);
@@ -769,12 +769,13 @@ var
   I: Integer;
   P: PScreenCell;
   A: TColorAttr;
+  Buf: array[0..7] of Byte;
 begin
   P := @Dest;
   A := TColorAttr(LongInt(Attr));
   for I := 0 to Count - 1 do
   begin
-    ScInitCodePoint(P^.Character, CodePoint);
+    P^.Character.InitWithMultiByteChar(@Buf[0], Utf8Encode(CodePoint, @Buf[0]), False);
     P^.Attribute := A;
     Inc(P);
   end;
@@ -797,7 +798,7 @@ end;
 
 procedure SetCellChar(var Cell: TScreenCell; Ch: Byte);
 begin
-  ScInitChar(Cell.Character, Ch);
+  Cell.Character.InitWithChar(Ch);
 end;
 
 procedure SetCellAttr(var Cell: TScreenCell; Attr: Byte);
@@ -811,11 +812,11 @@ var
   CP: LongWord;
   Used: Integer;
 begin
-  { the cell holds UTF-8 (TvCell.ScInitChar turns a byte of the code page into its character): DN asks for the byte of the page (a line character, a letter) }
-  Result := Cell.Character.Text[0];
-  if ScLength(Cell.Character) > 1 then
+  { the cell holds UTF-8 (TScreenCharacter.InitWithChar turns a byte of the code page into its character): DN asks for the byte of the page (a line character, a letter) }
+  Result := Ord(Cell.Character.GetText[1]);
+  if Length(Cell.Character.GetText) > 1 then
   begin
-    S := ScText(Cell.Character);
+    S := Cell.Character.GetText;
     Result := Ord('?');
     if Utf8Decode(@S[1], Length(S), CP, Used) and (CpFromUnicode(CP) <> 0) then
       Result := CpFromUnicode(CP);
@@ -832,7 +833,7 @@ var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
-    PScreenCell(@Dest)[I] := CellFromBIOS(PWord(@Source)[I]);
+    PScreenCell(@Dest)[I] := TScreenCell(Word(PWord(@Source)[I]));
 end;
 
 function CStrLen(const S: String): Integer;

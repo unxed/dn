@@ -434,7 +434,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
         Inc(X, FileColWidht[psnShowDate]);
         if X >= 255 then
           Exit;
-        PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+        PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
         end;
       if Flags and TimeFlag <> 0 then
         begin
@@ -443,7 +443,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
         Inc(X, Length(S1)+1);
         if X >= 255 then
           Exit;
-        PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+        PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
         end;
       end;
     end;
@@ -474,7 +474,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     begin
     MoveCStr(PCellArray(@B)^[0], NameString, C);
     X := NameLen;
-    PCellArray(@B)^[X] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X] := TScreenCell(Word(Sc));
     Inc(X);
     end;
   if X >= 255 then
@@ -487,7 +487,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     Inc(X, FileColWidht[psnShowSize]);
     if X >= 255 then
       Exit;
-    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
     end;
 
   if Flags and psShowPacked <> 0 then
@@ -500,7 +500,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     Inc(X, FileColWidht[psnShowPacked]);
     if X >= 255 then
       Exit;
-    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
     end;
 
   if Flags and psShowRatio <> 0 then
@@ -514,7 +514,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     Inc(X, FileColWidht[psnShowRatio]);
     if X >= 255 then
       Exit;
-    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
     end;
 
   FormatDateTime(psShowDate, psShowTime, P^.FDate, P^.Yr);

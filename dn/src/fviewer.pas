@@ -933,9 +933,9 @@ procedure TViewScroll.Draw;
   C2 := GetColorW(2);
   MoveGlyph(B1[0], glShadeMedium, C1, Size.Y);
   i := GetPartCode;
-  B1[i] := CellFromBIOS(254+LongInt(C2*256));
-  B1[0] := CellFromBIOS(30+LongInt(C2*256));
-  B1[Size.Y-1] := CellFromBIOS(31+LongInt(C2*256));
+  B1[i] := TScreenCell(Word(254+LongInt(C2*256)));
+  B1[0] := TScreenCell(Word(30+LongInt(C2*256)));
+  B1[Size.Y-1] := TScreenCell(Word(31+LongInt(C2*256)));
   WriteBufC(0, 0, 1, Size.Y, B1);
   end;
 
