@@ -60,6 +60,15 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     worktree; a possible conflict with another agent is settled at the merge, not by waiting.
 12. Priority (owner, 2026-10-08): making every test that can run in parallel do so, locally and in CI, comes first; work that
     would interfere with it (edits of the workflows or of the test runners) waits until it is merged.
+13. The API (owner, 2026-10-09): tv3 is as magiblot/tvision (its only source): the same classes (Pascal classes), ancestors,
+    methods, constants, types and functions, in Pascal spelling (`TView::handleEvent` -> `TView.HandleEvent`). A difference is
+    made only where the magiblot form is impossible in Pascal (e.g. a C++ constructor is `Create`, the destructor `Destroy`;
+    C++ overloads by const), and each one is listed with the reason in `docs/API-NAMES.md` of tv3. Borland Turbo Vision and
+    Free Vision are not a reference. A form that only the programs on tv3 use (e.g. the slot form of `FormatStr`) lives in
+    their own shims. The units and items that magiblot does not have at all (TvPath, TvAppDir, TvCrc, TvCStr, TvAscii, TvGadgets,
+    TvActions, the far2l extensions, the backends) stay in tv3 as new APIs (owner, 2026-10-09).
+14. A rule of the owner is applied as it is written; nobody who applies it makes an exception. A case where the rule seems
+    impossible to follow goes to the owner; an agent stops and reports it.
 
 ## How to
 

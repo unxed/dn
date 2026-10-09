@@ -2,11 +2,38 @@
 """DN with a terminal that speaks the far2l extensions (the far2l terminal: tools/f2lterm.py plays it): the reported failure was that in the far2l terminal
 Ctrl+Ins in the editor copied nothing (the terminal took the key for its own copy). Here the keys come as events: the text of the editor is selected and Ctrl+Ins puts it
 on the clipboard of the terminal; the clipboard of the terminal is pasted with Shift+Ins. usage: tools/dn-linux-far2l.py OUTDIR   (OUTDIR: the result of tools/build.sh linux64)"""
-import os, shutil, sys, tempfile, time
+import os, select, shutil, sys, tempfile, time
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
 from pty_screen import Screen
 from f2lterm import Term, key
+from dn_wait import shape
+
+
+class F2lTerm(Term):
+    def pump(self, timeout=0.3, limit=None):
+        """Term.pump, but output that changes only the clock of the menu bar does not end the pause"""
+        stop = time.time() + (limit if limit is not None else timeout * 4 + 8)
+        end = time.time() + timeout
+        last = shape(self.screen)
+        while time.time() < end and time.time() < stop:
+            r, _, _ = select.select([self.fd], [], [], max(min(end, stop) - time.time(), 0))
+            if not r:
+                break
+            try:
+                data = os.read(self.fd, 65536)
+            except OSError:
+                break
+            if not data:
+                break
+            self.out += data
+            self.screen.feed(data)
+            self.scan(data)
+            cur = shape(self.screen)
+            if cur != last:
+                last = cur
+                end = time.time() + timeout
+
 
 LCTRL, SHIFT, LALT = 0x08, 0x10, 0x02
 out = os.path.abspath(sys.argv[1])
@@ -29,7 +56,7 @@ try:
     open(os.path.join(w, 'a.txt'), 'w').write('hello world\nsecond line\n')
     env = dict(os.environ, TERM='xterm-256color', TV_CONFIG_DIR=os.path.join(d, 'cfg'), LANG='C.UTF-8')
     env.pop('TV_FAR2L', None)
-    t = Term(os.path.join(d, 'dn'), env, w, screen=Screen(100, 30))
+    t = F2lTerm(os.path.join(d, 'dn'), env, w, screen=Screen(100, 30))
     def k(vk, ch=0, cs=0, sc=0, wait=0.6):
         t.send(key(True, ch, cs, sc, vk)); t.send(key(False, ch, cs, sc, vk)); t.pump(wait)
     t.pump(2.0)

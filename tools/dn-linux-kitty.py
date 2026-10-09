@@ -6,7 +6,7 @@
   - a key with the lock bits (Caps Lock, Num Lock) in the modifiers is the same key."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -35,8 +35,8 @@ out = os.path.abspath(sys.argv[1])
 dirs = []
 try:
     d, w = install(out); dirs.append(d)
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+    t.started()
     t.send('\x1b', 0.5)
 
     def line():

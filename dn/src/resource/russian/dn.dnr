@@ -460,7 +460,7 @@ DIALOG dlgInterfaceSetup, 76, 22, 'Установки интерфейса'
       ITEM '~А~втовыкл. командной строки'
       ITEM '~Б~ольшой курсор при вставке'
       ITEM 'Запоминать позицию ре~д~акторования'
-      ITEM 'Запоминать позицию пр~о~смотра'
+      ITEM 'Запоминать позицию просмо~т~ра'
       ITEM 'История ~р~едактирования файлов'
       ITEM 'История ~п~росмотра файлов'
       ITEM '~И~стория смены каталогов'
@@ -622,7 +622,7 @@ DIALOG dlgEditorDefaults, 59, 23, 'Установки редактора/про�
       ITEM '~А~втоотступ'
       ITEM 'Ав~т~оперенос'
       ITEM '~В~ыравнивать при переносе'
-      ITEM 'Верти~к~альный блок'
+      ITEM 'В~е~ртикальный блок'
       ITEM '~О~птимизация пробелов'
       ITEM 'Подсветка л~и~нии'
       ITEM 'Подсветка коло~н~ки'
@@ -1262,7 +1262,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'Вид файловых панелей'
       ITEM 'Время создания'
       ITEM 'Дата последнего доступа'
       ITEM 'Время последнего доступа'
-      ITEM '~О~писание'
+      ITEM 'Опи~с~ание'
       ITEM 'Путь'
 ;$IFDEF DualName
       ITEM 'Показывать длинное имя'
@@ -1379,7 +1379,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'Вид файловых панелей'
       ITEM 'В подвале (стр.4)'
       ITEM 'На разделителе'
     END
-    Label 33, 9, '~Д~линное имя', ofPostProcess, ofPreProcess
+    Label 33, 9, 'Длинное ~и~мя', ofPostProcess, ofPreProcess
     ComboBox 53, 10, 72, 11
       ITEM 'Не показывать'
       ITEM 'В подвале (стр.1)'
@@ -1406,7 +1406,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'Вид файловых панелей'
     END
     Label 38, 13, 'Разное', ofPostProcess, ofPreProcess
 
-#4  Button 60, 17, 73, 19, '~З~аписать', 0, bfNormal
+#4  Button 60, 17, 73, 19, 'За~п~исать', 0, bfNormal
     Button 39, 19, 50, 21, '~О~К', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 51, 19, 61, 21, 'Отмена', cmCancel, ofPostProcess, ofPreProcess
     Button 63, 19, 73, 21, 'Помощь', cmHelp, ofPostProcess, ofPreProcess
@@ -3287,7 +3287,7 @@ DIALOG dlgFMSetup, 76, 22, 'Установки Менеджера Файлов'
       ITEM 'Авто~-~смена каталогов'
       ITEM 'Пере~т~аскивание файлов мышью'
       ITEM 'Гуд~о~к после копирования'
-      ITEM '~В~ход в архивы по ~В~ВОДу'
+      ITEM '~В~ход в архивы по ВВОДу'
       ITEM 'Отметка файлов ~П~РОБЕЛом'
       ITEM 'DEL для ~у~даления файлов'
       ITEM 'Использовать клавиши ~/~'#26
@@ -3408,7 +3408,7 @@ DIALOG dlgDriveInfoSetup, 61, 14, 'Установки панели информ�
       ITEM '~С~вободное место на диске'
       ITEM '~М~етка диска'
 ;NEW
-      ITEM 'Се~р~ийный номер диска'
+      ITEM 'С~е~рийный номер диска'
       ITEM 'Фа~й~ловая система'
 ;-NEW
       ITEM 'Физическая ~п~амять'
@@ -3430,7 +3430,7 @@ DIALOG dlgStartupSetup, 70, 20, 'Процесс загрузки и выгруз
     HELPCTX hcOptionsStartup
     CheckBoxes 2, 3, 68, 5, ofPostProcess, ofPreProcess
       ITEM 'Авто ~з~апуск меню            '
-      ITEM '~В~осстанавливать ~в~идеорежим  '
+      ITEM '~В~осстанавливать видеорежим  '
       ITEM '~У~ничтожать историю команд   '
 ;$IFNDEF WIN32
       ITEM 'Установка ~п~алитры VGA       '

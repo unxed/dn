@@ -285,7 +285,7 @@ DIALOG dlgCountrySetup, 54, 22, 'Country information'
     InputLine 23, 9, 26, 10, 1, 0
     Label 2, 9, '~T~housands separator'
     InputLine 23, 10, 26, 11, 1, 0
-    Label 2, 10, 'D~e~cimal separator'
+    Label 2, 10, 'Decima~l~ separator'
     InputLine 23, 11, 26, 12, 1, 0
     Label 2, 11, 'C~u~rrency decimals'
     RadioButtons 38, 3, 52, 8
@@ -299,7 +299,7 @@ DIALOG dlgCountrySetup, 54, 22, 'Country information'
     InputLine 46, 9, 52, 10, 4, 0
     Label 28, 9, '~C~urrency symbol'
     InputLine 36, 11, 50, 12, 79, hsKbdToggleLayot
-    Label 26, 11, '~K~eyboard'
+    Label 26, 11, 'Key~b~oard'
     InputLine 36, 13, 50, 14, 79, hsWinCodeTable
     Label 16, 13, 'Alphabetic Sorting'
     InputLine 36, 15, 50, 16, 79, hsABCSortTable
@@ -1713,13 +1713,13 @@ END
 DIALOG dlgArchiveFiles, 64, 21, 'Archive files'
     HELPCTX hcArchiveFiles
     InputLine 15, 2, 58, 3, 255, hsFileCopyName
-    Label 3, 2, 'Archiv~e~ to', ofPostProcess, ofPreProcess
+    Label 3, 2, 'Archive to', ofPostProcess, ofPreProcess
     InputLine 3, 5, 15, 6, 40, 0, ofSecurity
     Label 3, 4, 'Pass~w~ord', ofPostProcess, ofPreProcess
     InputLine 19, 5, 36, 6, 80, hsAddOptions
     Label 19, 4, 'A~d~ditional options', ofPostProcess, ofPreProcess
     CheckBoxes 40, 4, 61, 11, ofPostProcess, ofPreProcess
-      ITEM 'Store path~n~ames'
+      ITEM 'Store pathnames'
       ITEM 'Mo~v~e files'
       ITEM 'Force mode'
       ITEM 'Solid'
@@ -1736,23 +1736,23 @@ DIALOG dlgArchiveFiles, 64, 21, 'Archive files'
       ITEM 'B~S~A'
       ITEM 'CA~B~'
       ITEM '~C~HZ'
-      ITEM '~H~A'
+      ITEM 'HA'
       ITEM 'HA~P~'
-      ITEM 'HP~K~'
+      ITEM 'HPK'
       ITEM 'H~Y~P'
       ITEM 'IS~3~'
       ITEM '~L~HA'
-      ITEM 'LI~M~'
+      ITEM 'LIM'
       ITEM '~Q~RK'
       ITEM '~R~AR'
       ITEM 'SQ~Z~'
       ITEM '~T~AR'
-      ITEM '~G~Z'
+      ITEM 'GZ'
       ITEM '~U~C2'
-      ITEM 'U~F~A'
+      ITEM 'UFA'
       ITEM 'Z~I~P'
       ITEM 'Z~O~O'
-      ITEM 'Z~X~Z'
+      ITEM 'ZXZ'
       ITEM '~7~Z'
       ITEM 'BZ2'
     END
@@ -1967,7 +1967,7 @@ DIALOG dlgEditorDefaults, 56, 23, 'Editor/Viewer Defaults'
       ITEM '~J~ustify on wrap'
       ITEM '~V~ertical blocks'
       ITEM 'Opti~m~al fill'
-      ITEM '~H~ighlight line'
+      ITEM 'Highlight lin~e~'
       ITEM 'H~i~ghlight column'
       ITEM '~P~ersistent blocks'
       ITEM '~O~verwrite blocks'
@@ -2528,9 +2528,9 @@ DIALOG dlgCopyDialog, 78, 15, 'Copy'
     RadioButtons 2, 5, 36, 11, ofPostProcess, ofPreProcess
       ITEM '~O~verwrite'
       ITEM 'A~p~pend'
-      ITEM 'Res~u~me'
+      ITEM 'R~e~sume'
       ITEM '~S~kip'
-      ITEM '~R~efresh'
+      ITEM 'Refres~h~'
       ITEM '~A~sk the action'
     END
     Label 2, 4, 'All files with the same names:', ofPostProcess, ofPreProcess
@@ -2973,7 +2973,7 @@ DIALOG dlgSetupArc, 78, 22, 'Archiver Setup'
     InputLine 70, 4, 76, 5, 20, 0
     Label 59, 4, '~A~dd files', ofPostProcess, ofPreProcess
     InputLine 16, 5, 22, 6, 20, 0
-    Label 4, 5, '~M~ove files', ofPostProcess, ofPreProcess
+    Label 4, 5, 'Mo~v~e files', ofPostProcess, ofPreProcess
     InputLine 45, 5, 51, 6, 20, 0
     Label 31, 5, '~D~elete files', ofPostProcess, ofPreProcess
     InputLine 70, 5, 76, 6, 20, 0
@@ -2987,9 +2987,9 @@ DIALOG dlgSetupArc, 78, 22, 'Archiver Setup'
     InputLine 16, 7, 22, 8, 20, 0
     Label 6, 7, 'Pass~w~ord', ofPostProcess, ofPreProcess
     InputLine 45, 7, 51, 8, 20, 0
-    Label 28, 7, 'Reco~v~ery record', ofPostProcess, ofPreProcess
+    Label 28, 7, 'Recover~y~ record', ofPostProcess, ofPreProcess
     InputLine 70, 7, 76, 8, 20, 0
-    Label 53, 7, 'Self-extracti~n~g', ofPostProcess, ofPreProcess
+    Label 53, 7, 'Self-extracting', ofPostProcess, ofPreProcess
     InputLine 16, 8, 22, 9, 20, 0
     Label 9, 8, 'S~o~lid', ofPostProcess, ofPreProcess
     InputLine 45, 8, 51, 9, 20, 0
@@ -3002,7 +3002,7 @@ DIALOG dlgSetupArc, 78, 22, 'Archiver Setup'
     InputLine 25, 12, 31, 13, 20, 0
     Label 16, 12, 'Fastest', ofPostProcess, ofPreProcess
     InputLine 41, 12, 47, 13, 20, 0
-    Label 35, 12, '~F~ast', ofPostProcess, ofPreProcess
+    Label 35, 12, 'Fast', ofPostProcess, ofPreProcess
     InputLine 9, 13, 15, 14, 20, 0
     Label 1, 13, '~N~ormal', ofPostProcess, ofPreProcess
     InputLine 25, 13, 31, 14, 20, 0
@@ -3142,14 +3142,14 @@ DIALOG dlgCalculator, 64, 16, 'Calculator'
    Label 2, 2, 'Ex~p~ression', ofPostProcess, ofPreProcess
 #2 RadioButtons 2,6,11,12, 0, 0
      ITEM '~D~EC'
-     ITEM '~H~EX'
+     ITEM 'HE~X~'
      ITEM '~B~IN'
      ITEM '~O~CT'
      ITEM '~E~XP'
      ITEM '~T~IME'
    END
    Label 2,5, '~F~orm', ofPostProcess, ofPreProcess
-   Button 1,13,14,15, '~E~valuate', cmCalcValue, bfDefault, ofPostProcess, ofPreProcess
+   Button 1,13,14,15, 'E~v~aluate', cmCalcValue, bfDefault, ofPostProcess, ofPreProcess
    Button 14,13,26,15, '~C~opy', cmCopyClip, bfBroadcast, ofPostProcess, ofPreProcess
    Button 26,13,41,15, 'P~r~ecision', cmChangeFormat, bfBroadcast, ofPostProcess, ofPreProcess
    Button 41,13,52,15, 'Close', cmCancel, bfBroadcast, ofPostProcess, ofPreProcess
@@ -3415,7 +3415,7 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
     HELPCTX hcFileMgrSetup
 ; Options
     CheckBoxes 1, 2, 35, 17, ofPostProcess, ofPreProcess
-      ITEM 'Auto c~h~ange directory '
+      ITEM 'Auto ~c~hange directory '
       ITEM 'Drag~-~and~-~drop'
       ITEM '~B~eep after copy'
       ITEM '~E~NTER opens archive'
@@ -3423,7 +3423,7 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
       ITEM '~D~EL erases file(s)'
       ITEM 'Use ~/~'#26' keys'
       ITEM '~A~lt difference'
-      ITEM 'BS - go to ~u~pper directory'
+      ITEM 'BS - go to u~p~per directory'
       ITEM 'Do not kill descriptions'
       ITEM 'Kill description containers'
       ITEM 'Always copy descriptions'
@@ -3461,7 +3461,7 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
       ITEM 'Sort type indicator'
       ITEM 'Drive ~l~ine'
       ITEM 'Scrollbar'
-      ITEM 'Files ~h~ighlight'
+      ITEM '~F~iles highlight'
       ITEM 'Show hidden files'
     END
     Label 38, 1, 'Display', ofPostProcess, ofPreProcess
@@ -3617,7 +3617,7 @@ DIALOG dlgSystemSetup, 72, 21, 'System Setup'
       ITEM 'OS~-~dependent Disk Access'
 ;$ENDIF
       ITEM '~C~lear R/O flag from CDRom'
-      ITEM 'A~d~vanced copy'
+      ITEM '~A~dvanced copy'
 ;$IFDEF DPMI32
       ITEM 'F~l~ush disk buffers'
 ;$ENDIF

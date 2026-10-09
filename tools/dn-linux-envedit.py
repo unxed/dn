@@ -5,7 +5,7 @@ hot letter, or Enter) keeps the changes and returns to the panels. The input lin
 of the variable with Move: the heap was overwritten and OK ended with an access violation."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -31,9 +31,9 @@ for lang, keys, title, ok_keys in (('RUSSIAN', ['\x1b\u0443', '\u043e'], '\u0420
                     (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(d, f))
             w = os.path.join(d, 'work')
             os.makedirs(w)
-            t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'),
+            t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'),
                         env={'DNLNG': lang, 'DN2': d, 'DN_ENV_TEST_VAR': 'some value'})
-            t.pump(1.5, 6)
+            t.started()
             t.send('\x1b', 0.5)
             before = t.text()
             for k in keys:

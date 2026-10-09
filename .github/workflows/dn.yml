@@ -13,6 +13,7 @@ on:
       - tools/class-gate.sh
       - tools/tests/test_class_gate.py
       - tools/gen-shim.py
+      - tools/ci-par.sh
       - audit/**
       - .github/workflows/dn.yml
   pull_request:
@@ -33,20 +34,33 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unrar unzip curl python3
       - name: Fetch the Borland reference
         run: audit/fetch_reference.sh
-      - name: Audit of dn/src, dn/archives, dn/compat (only names and numbers are printed)
+      - name: Audit of dn/src, dn/archives, dn/compat, side by side (only names and numbers are printed)
         run: |
-          for d in dn/src dn/archives dn/compat; do python3 audit/xclone.py --min 3 --ref audit/ref/list.txt $d; done > audit.txt
+          pids=
+          for d in src archives compat; do python3 audit/xclone.py --min 3 --ref audit/ref/list.txt dn/$d > audit-$d.txt & pids="$pids $!"; done
+          for p in $pids; do wait $p; done
+          cat audit-src.txt audit-archives.txt audit-compat.txt > audit.txt
           head -60 audit.txt
       - name: The gate (raw <= 10 % and maxrun < 48 for every file; the accepted exceptions are in audit/accepted.txt and are printed)
         run: |
           tail -1 audit.txt
           python3 audit/gate.py audit.txt
-      - name: Is dn/PROVENANCE.md up to date?
-        run: python3 bootstrap/tools/dn-manifest.py --check
-      - name: Pascal class-gate regressions
-        run: python3 -B -m unittest discover -s tools/tests -p 'test_class_gate.py'
-      - name: Pascal class gate (all tracked sources, including bootstrap; old construction idioms are blocking)
-        run: CLASS_GATE_STRICT=1 tools/class-gate.sh
+
+  gates:
+    # A job of its own, beside the audit (which waits for the download of the reference): the checks run side by side.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: dn/PROVENANCE.md up to date, the class-gate regressions, the Pascal class gate (all tracked sources, including bootstrap; old construction idioms are blocking)
+        env:
+          CMDS: |
+            python3 bootstrap/tools/dn-manifest.py --check
+            python3 -B -m unittest discover -s tools/tests -p 'test_class_gate.py'
+            CLASS_GATE_STRICT=1 tools/class-gate.sh
+        run: tools/ci-par.sh
 
   bootstrap:
     # The record of the path: the public archive -> bootstrap/run.sh -> the tree of the baseline commit (bootstrap/BASELINE).

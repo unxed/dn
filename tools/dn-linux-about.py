@@ -11,7 +11,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 ESC, ENTER, ALT_X = '\x1b', '\r', '\x1bx'
 ABOUT_MARKERS = ('Based on', 'DN/2 Open Source', 'FREEWARE', 'dnosp.ru')
@@ -68,7 +68,7 @@ def virgin_close(out, close_key, label):
         w = os.path.join(d, 'work')
         os.makedirs(w)
         open(os.path.join(w, 'a.txt'), 'w').write('x\n')
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
         shown = wait_about(t)
         during = t.text()
         check(shown, 'virgin: About visible before %s' % label, during)

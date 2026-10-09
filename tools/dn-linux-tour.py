@@ -6,9 +6,10 @@ import os
 import shutil
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 KEYS = {
     'SHIFT-UP': '\x1b[1;2A', 'SHIFT-DOWN': '\x1b[1;2B', 'SHIFT-RIGHT': '\x1b[1;2C', 'SHIFT-LEFT': '\x1b[1;2D', 
@@ -45,8 +46,8 @@ def run(out, name, spec, cols=100, rows=30):
         os.makedirs(os.path.join(d, 'work'))
         for n, c in (('a.txt', 'first file\nsecond line\n'), ('b.txt', 'other\n'), ('c.dat', '1234\n')):
             open(os.path.join(d, 'work', n), 'w').write(c)
-        t = PtyTerm(['./dn'], cols, rows, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], cols, rows, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'))
+        t.started()
         t.send('\x1b', 0.5)             # the beta notice (a box with OK) is closed by Esc
         for k in tokens(spec):
             t.send(k, 0.5)
@@ -67,10 +68,10 @@ def run(out, name, spec, cols=100, rows=30):
 def main():
     out = os.path.abspath(sys.argv[1])
     names = sys.argv[2:]
-    for name, spec in SCEN:
-        if names and name not in names:
-            continue
-        print('%-12s %s' % (name, run(out, name, spec)), flush=True)
+    todo = [(name, spec) for name, spec in SCEN if not names or name in names]
+    with ThreadPoolExecutor(max(len(todo), 1)) as ex:               # each scenario is a start of DN of its own: all at once
+        for (name, spec), res in zip(todo, ex.map(lambda s: run(out, *s), todo)):
+            print('%-12s %s' % (name, res), flush=True)
 
 
 main()

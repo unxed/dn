@@ -133,22 +133,22 @@ jobs:
         include:
           - name: menusweep ENGLISH part 1 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 8 --part 1/2
+              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 16 --part 1/2
           - name: menusweep ENGLISH part 2 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 8 --part 2/2
+              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 16 --part 2/2
           - name: menusweep RUSSIAN part 1 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 8 --part 1/2
+              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 16 --part 1/2
           - name: menusweep RUSSIAN part 2 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 8 --part 2/2
+              python3 tools/dn-linux-menusweep.py out/dn RUSSIAN -j 16 --part 2/2
           - name: menusweep UKRAIN part 1 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 8 --part 1/2
+              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 16 --part 1/2
           - name: menusweep UKRAIN part 2 of 2
             cmds: |
-              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 8 --part 2/2
+              python3 tools/dn-linux-menusweep.py out/dn UKRAIN -j 16 --part 2/2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -171,10 +171,10 @@ jobs:
         include:
           - name: menus
             cmds: |
-              python3 tools/dn-linux-hotkeys.py out/dn -j 8
+              python3 tools/dn-linux-hotkeys.py out/dn -j 16
           - name: dialogs
             cmds: |
-              python3 tools/dn-linux-dialoghot.py out/dn -j 8
+              python3 tools/dn-linux-dialoghot.py out/dn -j 16
     steps:
       - uses: actions/checkout@v4
         with:

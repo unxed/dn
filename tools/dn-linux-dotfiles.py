@@ -10,7 +10,7 @@ Each case is a start of DN in its own directory, with its own HOME."""
 import os, re, shutil, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 K = {'ENTER': '\r', 'TAB': '\t', 'DOWN': '\x1b[B', 'SPACE': ' ', 'ALT-O': '\x1bo', 'ALT-P': '\x1bp', 'ALT-QUOTE': "\x1b'"}
 SELECT_GROUP = 'ALT-P ' + 'DOWN ' * 7 + 'ENTER'          # Panel, the eighth item: Select group...
@@ -29,8 +29,8 @@ def case(out, names, keys):
         for n in names:
             open(os.path.join(w, n), 'w').write('x\n')
         env = {'DNLNG': 'ENGLISH', 'HOME': d, 'XDG_CONFIG_HOME': '', 'XDG_STATE_HOME': '', 'XDG_CACHE_HOME': ''}
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=env)
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=env)
+        t.started()
         for k in ['\x1b'] + keys.split():
             t.send(K.get(k, k), 0)
             t.pump(0.6, 2)                      # the clock of the menu bar writes every second: wait for a pause, not for silence

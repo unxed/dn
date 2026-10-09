@@ -7,7 +7,7 @@ the thumb and the bar that has nothing to scroll. They are written as Unicode te
   - the old form of the value (the bytes of a code page) is still read (it must not crash and the bar is drawn)."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -40,8 +40,8 @@ def bar(out, ini, files):
     """the column of the vertical scroll bar of the right panel: its characters from the top to the bottom"""
     d, w = install(out, ini, files)
     try:
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+        t.started()
         t.send('\x1b', 0.5)
         rows = t.text().split('\n')
         alive = t.alive()

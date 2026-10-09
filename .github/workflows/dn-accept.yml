@@ -1,6 +1,7 @@
 name: dn-accept
 # Object vs class acceptance gate (full UI click-through). Builds both baselines
-# once, then runs tools/dn-linux-accept.py in parallel shards on GitHub runners.
+# once, then runs tools/dn-linux-accept.py in parallel shards on GitHub runners,
+# four parts of a shard side by side on each runner.
 on:
   # The gate is CLOSED (docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md): object and class were equal cell by cell, 177/177. It compares with a frozen object
   # revision, so a change of behaviour that is wanted (the paths of the host instead of C:\dir, no drive line on Unix: docs/PATHS.md) differs
@@ -45,12 +46,12 @@ jobs:
           python3 class/tools/acceptance/backport_shared_object_fixes.py object
           git -C object -c core.whitespace=cr-at-eol diff --check
           git -C object diff --stat
-      - name: Build class DN
-        working-directory: class
-        run: tools/build.sh linux64 out/linux64-gate
-      - name: Build object DN
-        working-directory: object
-        run: tools/build.sh linux64 out/linux64-gate
+      - name: Build class DN and object DN side by side (each with a TMPDIR of its own, where tools/build.sh keeps the objects, the stage and the shims)
+        env:
+          CMDS: |
+            cd class && TMPDIR=$(mktemp -d) tools/build.sh linux64 out/linux64-gate
+            cd object && TMPDIR=$(mktemp -d) tools/build.sh linux64 out/linux64-gate
+        run: class/tools/ci-par.sh
       - uses: actions/upload-artifact@v4
         with:
           name: dn-accept-bins
@@ -92,15 +93,19 @@ jobs:
           ls -la out/object out/class
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3
-      - name: Acceptance shard ${{ matrix.shard }}/12
+      - name: Acceptance shard ${{ matrix.shard }}/12 (the scenarios of the shard in four parts side by side, --shard I/48)
         run: |
-          DN_ACCEPT_FAST=1 python3 tools/dn-linux-accept.py out/object out/class \
-            --shard ${{ matrix.shard }}/12 | tee accept-shard-${{ matrix.shard }}.log
+          s=${{ matrix.shard }}
+          export CMDS=$(for k in 0 1 2 3; do
+            echo "DN_ACCEPT_FAST=1 python3 tools/dn-linux-accept.py out/object out/class --shard $((s + 12 * k))/48 > accept-shard-$s-$k.log"
+          done)
+          tools/ci-par.sh || true      # the job summarize decides, by the SUMMARY lines of the logs
+          cat accept-shard-$s-*.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: accept-shard-${{ matrix.shard }}
-          path: accept-shard-${{ matrix.shard }}.log
+          path: accept-shard-${{ matrix.shard }}-*.log
 
   # The state that a run leaves for the next one is not a screen of a scenario: the desktop with an editor and a viewer window is saved, DN is left, and the
   # next start must bring the windows back, in the object build and in the class build alike (the load of the viewer was broken in the class build once).
@@ -123,11 +128,12 @@ jobs:
           chmod +x out/object/dn out/class/dn
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3
-      - name: The desktop, saved and restored (the editor, the viewer), the object build
-        run: python3 tools/dn-linux-desktop.py out/object
-      - name: The desktop, saved and restored (the editor, the viewer), the class build
-        if: success() || failure()
-        run: python3 tools/dn-linux-desktop.py out/class
+      - name: The desktop, saved and restored (the editor, the viewer), the object build and the class build side by side
+        env:
+          CMDS: |
+            python3 tools/dn-linux-desktop.py out/object
+            python3 tools/dn-linux-desktop.py out/class
+        run: tools/ci-par.sh
 
   # The same source in two builds: UTF-8 inside (the default) and the code page inside (DN_UTF8=0, the way DOS is built). Every scenario must give the same
   # cells in both (the screens differ only in the code page of the machine: it is one: the cells hold the characters). The area u8cp is run too; U8CP_SKIP of
@@ -140,10 +146,12 @@ jobs:
           submodules: true
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
-      - name: Build UTF-8 DN
-        run: tools/build.sh linux64 out/u8
-      - name: Build DN with the code page inside
-        run: DN_UTF8=0 tools/build.sh linux64 out/cp
+      - name: Build UTF-8 DN and DN with the code page inside, side by side (each with a TMPDIR of its own)
+        env:
+          CMDS: |
+            TMPDIR=$(mktemp -d) tools/build.sh linux64 out/u8
+            TMPDIR=$(mktemp -d) DN_UTF8=0 tools/build.sh linux64 out/cp
+        run: tools/ci-par.sh
       - uses: actions/upload-artifact@v4
         with:
           name: dn-u8cp-bins
@@ -188,16 +196,20 @@ jobs:
           ls -la out/u8 out/cp | head -30
       - name: Packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3
-      - name: UTF-8 build against the code page build, shard ${{ matrix.shard }}/6
+      - name: UTF-8 build against the code page build, shard ${{ matrix.shard }}/6 (in four parts side by side, --shard I/24)
         run: |
-          set -o pipefail
-          DN_ACCEPT_U8CP=1 DN_ACCEPT_FAST=1 python3 tools/dn-linux-accept.py out/u8 out/cp \
-            --shard ${{ matrix.shard }}/6 | tee u8cp-shard-${{ matrix.shard }}.log
+          s=${{ matrix.shard }}
+          export CMDS=$(for k in 0 1 2 3; do
+            echo "DN_ACCEPT_U8CP=1 DN_ACCEPT_FAST=1 python3 tools/dn-linux-accept.py out/u8 out/cp --shard $((s + 6 * k))/24 > u8cp-shard-$s-$k.log"
+          done)
+          rc=0; tools/ci-par.sh || rc=1
+          cat u8cp-shard-$s-*.log
+          exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: u8cp-shard-${{ matrix.shard }}
-          path: u8cp-shard-${{ matrix.shard }}.log
+          path: u8cp-shard-${{ matrix.shard }}-*.log
 
   summarize:
     needs: accept

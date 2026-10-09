@@ -4,7 +4,7 @@
 TV_WIN32_INPUT=0 the mode is not asked for. usage: tools/dn-linux-win32.py OUTDIR   (OUTDIR: the result of tools/build.sh linux|linux64)"""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 def w32(vk, uc=0, cs=0, sc=0):
     """a press and a release of a key"""
@@ -26,8 +26,8 @@ def start(env):
         if f == 'dn' or f.upper().endswith(('.LNG', '.DLG', '.HLP')):
             shutil.copy(os.path.join(out, f), d)
     w = os.path.join(d, 'work'); os.makedirs(w)
-    t = PtyTerm(['./dn'], 100, 30, env=env, cwd=w, exe=os.path.join(d, 'dn'))
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, env=env, cwd=w, exe=os.path.join(d, 'dn'))
+    t.started()
     return d, t
 
 d, t = start({'TV_WIN32_INPUT': '1'})

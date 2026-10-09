@@ -8,7 +8,7 @@
   - the environment variable DN2 names a directory for everything, as it always did."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -36,17 +36,14 @@ def run_dn(d, env, quit=False):
     """quit: DN exits by Alt-X (the cache of dn.ini is written at the exit), else the program is closed."""
     e = {'DNLNG': 'ENGLISH'}
     e.update(env)
-    t = PtyTerm(['./dn'], 100, 30, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'), env=e)
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'), env=e)
+    t.started()
     t.send('\x1b', 0.5)
     text = t.text()
     if quit:
         t.send('\x1bx', 0.8)
         t.send('\r', 0.8)
-        for _ in range(20):
-            if not t.alive():
-                break
-            t.pump(0.3, 1)
+        t.until(lambda: not t.alive(), 20)
     t.close(0.5)
     return text
 

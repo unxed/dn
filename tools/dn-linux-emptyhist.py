@@ -5,7 +5,7 @@ list must give nothing and not stop the program: the directories dialog asked th
 did the same, and the buttons Edit and Delete of the commands list (Alt and a Cyrillic letter in the Russian interface, Del in any) took the item -1."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm, side_by_side
 
 bad = 0
 KEYS = [('Alt-BkSp', '\x1b\x7f'), ('Alt-F8', '\x1b[19;3~'), ('Alt-PgUp', '\x1b[5;3~'), ('Alt-PgDn', '\x1b[6;3~')]
@@ -29,12 +29,13 @@ def run(out, lang, key, ok_key, what):
                 (shutil.copytree if os.path.isdir(src) else shutil.copy)(src, os.path.join(d, f))
         w = os.path.join(d, 'work')
         os.makedirs(w)
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d, 'HOME': d})
+        t.started()
         t.send('\x1b', 0.5)
-        before = t.text()
+        before = t.shape()                                      # the screen but the clock
         t.send(key, 0.8)
-        check(t.text() != before, '%s %s: the history opens' % (lang, what[0]), t.text())
+        t.until(lambda: t.shape() != before, 5)
+        check(t.shape() != before, '%s %s: the history opens' % (lang, what[0]), t.text())
         t.send(ok_key, 0.8)
         t.pump(0.4, 2)
         text = t.text()
@@ -45,10 +46,12 @@ def run(out, lang, key, ok_key, what):
 
 
 out = os.path.abspath(sys.argv[1])
+cases = []
 for name, key in KEYS:
-    run(out, 'ENGLISH', key, '\r', (name, 'Enter'))
-    run(out, 'ENGLISH', key, '\x1b[3~', (name, 'Del'))
+    cases.append(('ENGLISH', key, '\r', (name, 'Enter')))
+    cases.append(('ENGLISH', key, '\x1b[3~', (name, 'Del')))
 # the buttons of the commands list in Russian: Execute, Copy, Edit, Delete
 for letter in '\u0432\u043a\u0440\u0443':
-    run(out, 'RUSSIAN', '\x1b[19;3~', '\x1b' + letter, ('Alt-F8', 'Alt-' + letter))
+    cases.append(('RUSSIAN', '\x1b[19;3~', '\x1b' + letter, ('Alt-F8', 'Alt-' + letter)))
+side_by_side([lambda c=c: run(out, *c) for c in cases])          # every case is a start of its own: all at once
 sys.exit(1 if bad else 0)
