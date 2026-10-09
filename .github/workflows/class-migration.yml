@@ -9,6 +9,7 @@ on:
       - tools/gen-shim.py
       - tools/class_names.py
       - tools/source_encoding.py
+      - tools/ci-par.sh
       - tools/tests/**
       - .github/workflows/class-migration.yml
   pull_request:
@@ -18,6 +19,7 @@ on:
       - tools/gen-shim.py
       - tools/class_names.py
       - tools/source_encoding.py
+      - tools/ci-par.sh
       - tools/tests/**
       - .github/workflows/class-migration.yml
 
@@ -30,24 +32,27 @@ jobs:
           submodules: true
       - name: Compiler
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl python3
-      - name: tv3 prerequisite gate
-        run: tv/tools/class-gate.sh
-      - name: Pascal class-name conversion checks
-        run: python3 -B -m unittest discover -s tools/tests -p 'test_*.py'
-      - name: Class release and profile persistence
+      - name: tv3 prerequisite gate, Pascal class-name conversion checks, class release and profile persistence, side by side
         shell: bash
         run: |
-          test_work="$RUNNER_TEMP/dn-class-tests"
-          mkdir -p "$test_work/shims" "$test_work/units"
-          python3 tools/gen-shim.py dn/compat/shims/shims.map "$test_work/shims" tv/src
-          cd dn/tests
-          for name in t_objutil t_profile t_cfgstate; do
+          w="$RUNNER_TEMP/dn-class-tests"
+          mkdir -p "$w/shims"
+          python3 tools/gen-shim.py dn/compat/shims/shims.map "$w/shims" tv/src
+          # a test program: built in a directory of units of its own (the builds run at once), then run
+          t() {
+            mkdir -p "$w/$1" && cd dn/tests &&
             fpc -Mdelphi -Sh- -Rintel -Se300 -dDPMI32 -dLINUX \
               -Fu../compat/linux -Fu../compat -Fu../archives -Fu../src \
-              -Fu"$test_work/shims" -Fu../../tv/src \
+              -Fu"$w/shims" -Fu../../tv/src \
               -Fi. -Fi../compat/shims -Fi../src \
-              -FU"$test_work/units" -FE"$test_work/units" "$name.pas"
-            "$test_work/units/$name"
-          done
+              -FU"$w/$1" -FE"$w/$1" "$1.pas" &&
+            "$w/$1/$1"
+          }
+          export -f t; export w
+          CMDS="tv/tools/class-gate.sh
+          python3 -B -m unittest discover -s tools/tests -p 'test_*.py'
+          t t_objutil
+          t t_profile
+          t t_cfgstate" tools/ci-par.sh
       - name: tv3 gate after compilation
         run: tv/tools/class-gate.sh

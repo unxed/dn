@@ -12,6 +12,7 @@ on:
       - tools/build.sh
       - tools/dn-env.sh
       - tools/gen-shim.py
+      - tools/ci-par.sh
       - tv/**
       - .github/workflows/toolchain.yml
 
@@ -44,28 +45,15 @@ jobs:
           curl -fsSL --retry 4 -o csdpmi.zip https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
           unzip -j -o csdpmi.zip 'bin/CWSDPMI.EXE' -d out
           ls -l out
-      - name: Run in DOSBox-X (headless)
+      - name: Side by side, hello in DOSBox-X (headless) and DN for GO32V2 built, then the DOS user-screen persistence smoke
         env:
           SDL_VIDEODRIVER: dummy
           SDL_AUDIODRIVER: dummy
-        run: |
-          cd out
-          timeout 120 dosbox-x -silent -nogui -noconsole -defaultconf \
-            -c "mount c $PWD" -c "c:" -c "hello.exe > out.txt" -c "exit" || true
-          echo "--- out.txt:"; cat -v OUT.TXT
-          grep -q 'hello from go32v2' OUT.TXT
-      - name: Build DN for GO32V2
-        env:
           DN_PREFIX: ${{ runner.temp }}/fpc-go32v2
-        run: |
-          tools/build.sh dos out/dn-dos
-          file out/dn-dos/dn.exe
-      - name: DOS user-screen persistence smoke
-        env:
-          DOS_TIMEOUT: 40
-        run: |
-          tools/dn-tour.sh out/dn-dos userscr | tee out/dn-dos-userscr.log
-          grep -Eq '^userscr +ok$' out/dn-dos-userscr.log
+          CMDS: |
+            cd out && { timeout 120 dosbox-x -silent -nogui -noconsole -defaultconf -c "mount c $PWD" -c "c:" -c "hello.exe > out.txt" -c "exit" || true; } && echo "--- out.txt:" && cat -v OUT.TXT && grep -q 'hello from go32v2' OUT.TXT
+            tools/build.sh dos out/dn-dos && file out/dn-dos/dn.exe && { DOS_TIMEOUT=40 tools/dn-tour.sh out/dn-dos userscr > out/dn-dos-userscr.log; cat out/dn-dos-userscr.log; grep -Eq '^userscr +ok$' out/dn-dos-userscr.log; }
+        run: tools/ci-par.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
