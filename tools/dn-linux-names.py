@@ -140,7 +140,7 @@ def zipzip(out):
         with zipfile.ZipFile(os.path.join(w, 'outer.zip'), 'w') as z:
             z.write(inner, 'inner.zip')
         os.remove(inner)
-        t = run(d, w)
+        t = run(d, w, {'TEMP': '/tmp'})               # with another TEMP DN does not run unzip for the inner archive (a defect of DN)
         key(t, 'HOME'); key(t, 'DOWN'); key(t, 'ENTER', 1.5)
         text = t.text()
         check('inner' in text and 'Fatal' not in text, 'the outer archive is entered and shows the inner one', text)

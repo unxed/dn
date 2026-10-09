@@ -51,6 +51,11 @@ class DnTerm(PtyTerm):
         e.update(env or {})
         if exe and os.path.basename(exe) == 'dn' and 'DN2' not in e:
             e['DN2'] = os.path.dirname(os.path.abspath(exe))
+        # TEMP of its own, next to the copy of DN: DN writes files of fixed names there ($dntest.swp, $DN0$.LST), and the copies that run side by side
+        # (other tests too) took each other's files in the common /tmp
+        if exe and os.path.basename(exe) == 'dn' and 'TEMP' not in (env or {}):
+            e['TEMP'] = os.path.join(os.path.dirname(os.path.abspath(exe)), 'tmp')
+            os.makedirs(e['TEMP'], exist_ok=True)
         prog, argv0 = exe or cmd[0], cmd[0]
         prefix = e.get('PTY_RUN_PREFIX')                        # e.g. qemu-aarch64-static: the program is of another CPU
         if prefix:
