@@ -1639,58 +1639,48 @@ function TFilesHash.Equal(Item1, Item2: Pointer): Boolean;
 
 procedure TFilesCollection.DelDuplicates(var TotalInfo: TSize);
   var
-    i,j, DupeStart, k: Integer;
+    i, j: Integer;
     H: TFilesHash;
     S: TSize;
-    IsDupe: Boolean;
-    UseHash: Boolean;
+    Dupe: array of Boolean;
 
   begin
   if not Duplicates then
     Exit;
-  TotalInfo := 0;
-  H := nil;
-  UseHash := SortMode = psmUnsorted;
-  if UseHash then
+  { The dupes are first all found, with the items where they are (the hash keeps the indexes of the items), then deleted.
+    Dupes are possible after a search in a list panel with subdirectory traversal. }
+  SetLength(Dupe, Count);
+  if SortMode = psmUnsorted then
     begin
     H := TFilesHash.Create(Self);
-    if H.HT <> nil then
-      Exit; //! Probably out of memory, should report that
-    end;
-
-  { Each pack of dupes is first fully identified, then
-  deleted. Deleting one by one is incorrect, because after that
-  comparing the next with the previous (deleted) becomes incorrect.
-  For search results it happens to work,
-  only because search result records have UsageCount>1,
-  which there is no sense in relying on.}
-  { Do not assign nested functions to procedural variables: FPC nested
-    proc pointers do not carry the parent frame, so IsSortedDupe/IsUnsortedDupe
-    saw a garbage Items^ and AVed in Directory Branch (menu_4_5). }
-  j := 1; DupeStart := 1;
-  for i := 1 to Count-1 do
-    begin
-    if UseHash then
-      IsDupe := not H.AddItem(i)
-    else
-      IsDupe := SameFile(Items^[i-1], Items^[i]); { sorted: dupes are adjacent }
-    if not IsDupe then
+    if H.HT = nil then
       begin
-      for k := DupeStart to i-1 do
-        DelFileRec(PFileRec(Items^[k]));
-      DupeStart := i+1; // new candidate for start of a dupe pack
+      H.Free;           { out of memory: the dupes stay }
+      Exit;
+      end;
+    for i := 0 to Count-1 do
+      Dupe[i] := not H.AddItem(i);
+    H.Free;
+    end
+  else
+    for i := 1 to Count-1 do
+      Dupe[i] := SameFile(Items^[i-1], Items^[i]); { sorted: dupes are adjacent }
+  TotalInfo := 0;
+  j := 0;
+  for i := 0 to Count-1 do
+    if Dupe[i] then
+      DelFileRec(PFileRec(Items^[i]))
+    else
+      begin
       Items^[j] := Items^[i];
       S := PFileRec(Items^[j])^.Size;
       if S > 0 then {for a directory with unknown size Size=-1}
         TotalInfo := TotalInfo + S;
       Inc(j);
       end;
-    end;
   Count := j;
   Duplicates := False;
   { do not free the excess memory in Items^ }
-  if H <> nil then
-    H.Free;
   end;
 
 end.

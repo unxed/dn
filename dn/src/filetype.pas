@@ -180,9 +180,9 @@ procedure PutExtFilter(Filter: string; T: Integer);
       Dec(i);
     M := Copy(Filter, i+1, l-i);
     MZ := M;
-    for l := 1 to Length(MZ) do
-      if MZ[i] = '|' then
-        MZ[i] := '0';
+    for j := 1 to Length(MZ) do
+      if MZ[j] = '|' then
+        MZ[j] := '0';
     l := i-1;
     if ExtCollection.Search(@MZ, i) then
       { duplication: this must not happen }
