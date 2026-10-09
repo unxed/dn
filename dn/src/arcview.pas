@@ -729,7 +729,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
   F^.Attr := $8000 or F^.Attr;
   F^.PSize := {Round}(TPL);
   AFiles.AtInsert(0, F);
-  FD.DeleteAll;
+  FD.RemoveAll;
   FD.Free;
   end { TArcDrive.GetDirectory };
 {-DataCompBoy-}
@@ -1445,7 +1445,7 @@ TryAgain:
     LFN.lChDir(DirToChange);
     DirToChange := '';
     Confirms := OldConfirms;
-    FCT.DeleteAll;
+    FCT.RemoveAll;
     FCT.Free;
     if Inhr > 0 then
       begin

@@ -471,7 +471,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
 procedure TPrintManager.PrintFile(const FileName: String);
   begin
   if List = nil then
-    List := TStringCol.Create(10, 10);
+    Items := TStringCol.Create(10, 10);
   
   List.Insert(NewStr(lfGetLongFileName(FileName)));
   

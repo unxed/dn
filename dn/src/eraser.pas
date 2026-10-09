@@ -556,7 +556,7 @@ DeleteDirDIZ:
       RereadDirectory(S);
       end;
     end;
-  RereadCollection.DeleteAll;
+  RereadCollection.RemoveAll;
   RereadCollection.Free;
   {/Cat}
   GlobalMessage(evCommand, cmRereadInfo, nil);

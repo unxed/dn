@@ -578,16 +578,16 @@ begin
   if (PS.Status <> stOK) or (LStringList = nil) then
     ResourceFail('reading ' + LngId + '.lng');
   { the titles and the buttons of the message and input boxes of tv/ in the language of the resources }
-  MsgYesText := GetString(dlYesButton);
-  MsgNoText := GetString(dlNoButton);
-  MsgOKText := GetString(dlOKButton);
+  MsgBoxText.YesText := GetString(dlYesButton);
+  MsgBoxText.NoText := GetString(dlNoButton);
+  MsgBoxText.OkText := GetString(dlOKButton);
   S := GetString(dlCancelButton);
-  if StringReplace(S, '~', '', [rfReplaceAll]) <> StringReplace(MsgCancelText, '~', '', [rfReplaceAll]) then
-    MsgCancelText := S;         { the same word keeps the hot letter of tv/ }
-  MsgWarningText := GetString(dlMsgWarning);
-  MsgErrorText := GetString(dlMsgError);
-  MsgInformationText := GetString(dlMsgInformation);
-  MsgConfirmText := GetString(dlMsgConfirm);
+  if StringReplace(S, '~', '', [rfReplaceAll]) <> StringReplace(MsgBoxText.CancelText, '~', '', [rfReplaceAll]) then
+    MsgBoxText.CancelText := S;         { the same word keeps the hot letter of tv/ }
+  MsgBoxText.WarningText := GetString(dlMsgWarning);
+  MsgBoxText.ErrorText := GetString(dlMsgError);
+  MsgBoxText.InformationText := GetString(dlMsgInformation);
+  MsgBoxText.ConfirmText := GetString(dlMsgConfirm);
 end;
 
 function GetString(Index: TStrIdx): String;

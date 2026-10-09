@@ -1162,7 +1162,7 @@ Err:
       LFN.lChDir(DirToChange);
       DirToChange := '';
       Confirms := OldConfirms;
-      FCT.DeleteAll;
+      FCT.RemoveAll;
       FCT.Free;
       end;
     if PJ <> nil then begin FreeMem(PJ, Length(PJ^)+1); PJ := nil; end;
@@ -1619,7 +1619,7 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
       end;
     if  (InterfaceData.Options and ouiStoreEditorPosition <> 0) then
       begin
-      if not TempBounds.Empty then
+      if not TempBounds.IsEmpty then
         R := TempBounds
       else
         begin

@@ -292,7 +292,7 @@ procedure TPhoneBox.SetList(Alpha: Boolean);
            and ((Ph.Password = '') or (Ph.Encrypted))
     then
       Ph.Phones.ForEach(InsertPhone);
-    Ph.Phones.DeleteAll;
+    Ph.Phones.RemoveAll;
     end { DoPhones };
 
   begin { TPhoneBox.SetList }
@@ -325,7 +325,7 @@ procedure TPhoneBox.SetList(Alpha: Boolean);
     Phones := PC;
     end;
   AlphaMode := Alpha;
-  List := nil;
+  Items := nil;
   NewLisT(Phones);
   end { TPhoneBox.SetList };
 
@@ -396,7 +396,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     C := List;
     if C = nil then
       C := TPhoneCollection.Create(10, 10);
-    List := nil;
+    Items := nil;
     R.A.X := Focused;
     if Append then
       C.Insert(TPhoneDir.Create(Dt.Password, Dt.Name, Dt.Memo1, Dt.Memo2))
@@ -408,7 +408,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       Ph.Memo1 := NewStr(Dt.Memo1);
       DisposeStr(Ph.Memo2);
       Ph.Memo2 := NewStr(Dt.Memo2);
-      C.AtDelete(Focused);
+      C.AtRemove(Focused);
       TSortedCollection(C).Search(Ph, Focused);
       C.AtInsert(Focused, Ph);
       end;
@@ -466,7 +466,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     C := List;
     if C = nil then
       C := TPhoneCollection.Create(10, 10);
-    List := nil;
+    Items := nil;
     R.A.X := Focused;
     if not Append and (C.Count > Focused) then
       C.AtFree(Focused);
@@ -515,7 +515,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     C := List;
     if C = nil then
       C := TPhoneCollection.Create(10, 10);
-    List := nil;
+    Items := nil;
     I := Focused;
 
     P1 := TPhoneDir.Create(Dt.Password, Dt.Name, Dt.Memo1, Dt.Memo2);
@@ -563,7 +563,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     C := List;
     if C = nil then
       C := TPhoneCollection.Create(10, 10);
-    List := nil;
+    Items := nil;
     I := Focused;
     C.Insert(TPhone.Create(DT.Number, DT.Name, DT.Memo1, DT.Memo2));
     Owner.Lock;
@@ -632,7 +632,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
        end;
   *)
       Active := PD;
-      List := nil;
+      Items := nil;
       NewLisT(PD.Phones);
       if  (List = nil) then
         begin
@@ -678,12 +678,12 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
 
       if SearchMode and (List <> nil) then
         begin
-        List.DeleteAll;
+        List.RemoveAll;
         List.Free;
-        List := nil;
+        Items := nil;
         end;
       SearchMode := False;
-      List := nil;
+      Items := nil;
       NewLisT(Phones);
       FocusItem(Phones.IndexOf(Active));
       Active := nil;
@@ -736,12 +736,12 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       end;
     if SearchMode then
       begin
-      List.DeleteAll;
+      List.RemoveAll;
       List.Free;
-      List := nil
+      Items := nil
       end;
     SearchMode := True;
-    List := nil;
+    Items := nil;
     if Active = nil then
       Active := Phones.At(Focused);
     PC.AtInsert(0, TPhone.Create(' ', '..', GetString(dlPhonesUpDir), ''));
@@ -842,7 +842,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       PV.Free;
     MessageBox(^C+ItoS(M)+GetString(dlPB_CnvReport), nil,
        mfInformation+mfOKButton);
-    List := nil;
+    Items := nil;
     NewLisT(Active.Phones);
     F.Free;
     Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);

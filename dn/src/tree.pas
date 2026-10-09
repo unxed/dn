@@ -973,7 +973,7 @@ destructor TTreeView.Destroy;
   begin
   if DC <> nil then
     begin
-    DC.DeleteAll;
+    DC.RemoveAll;
     DC.Free;
     DC := nil;
     end;
@@ -1107,7 +1107,7 @@ procedure TTreeView.CollapseBranch(N: Integer);
     begin
     while (I < DC.Count-1) and (P^.Level < PDirRec(DC.At(I+1))^.Level)
     do
-      DC.AtDelete(I+1);
+      DC.AtRemove(I+1);
     end
   else
     begin
@@ -1273,7 +1273,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       end;
     if not B then
       begin
-      DC.DeleteAll;
+      DC.RemoveAll;
       for I := 1 to Dirs.Count do
         DC.Insert(Dirs.At(I-1));
       end
@@ -1842,7 +1842,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
   Abort := False;
   if DC <> nil then
     begin
-    DC.DeleteAll;
+    DC.RemoveAll;
     DC.Free;
     end;
   DC := GetDirCollection(CurPath[1], CountLen);
@@ -1989,7 +1989,7 @@ procedure TTreeView.Reread(CountLen: Boolean);
     I, M: Integer;
   begin
   DrawDisabled := True;
-  DC.DeleteAll;
+  DC.RemoveAll;
   DC.Free;
   DC := nil;
   M := ScrollBar.Value;

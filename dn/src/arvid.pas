@@ -390,7 +390,7 @@ destructor TArvidDrive.Destroy;
   begin
   if ArvidDrives <> nil then
     begin
-    ArvidDrives.Delete(Self);
+    ArvidDrives.Remove(Self);
     if ArvidDrives.Count = 0 then
       ArvidDrives.Free;
     ArvidDrives := nil;
@@ -1352,7 +1352,7 @@ procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
     R.A.X := Desktop.ExecView(D);
     R.A.Y := PL.Focused;
 
-    PL.List := nil;
+    PL.Items := nil;
 
     D.Free;
 

@@ -3547,7 +3547,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
     P: TView;
     PV: TFileViewer;
   begin
-  if LastViewerBounds.Empty or (InterfaceData.Options and
+  if LastViewerBounds.IsEmpty or (InterfaceData.Options and
        ouiStoreViewerPosition = 0)
   then
     begin

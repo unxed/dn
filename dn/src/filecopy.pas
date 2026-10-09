@@ -2930,7 +2930,7 @@ procedure CopyDirContent(Source, Destination: String;
     cpoMove*Byte(MoveMode), False, False);
   NotifyResume;
   Dec(SkyEnabled);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   end { CopyDirContent };
 {/JO}

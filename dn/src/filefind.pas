@@ -743,7 +743,7 @@ function FindFiles(var Files: TFilesCollection;
             end;
         until (FileInfo.Last > 0)
            or CtrlBreakHit or CancelSearch or (MAvail <= MemReq);
-        ArcDirs.DeleteAll;
+        ArcDirs.RemoveAll;
         ArcDirs.Free;
         CtrlBreakHit := False;
 NotArchive:
@@ -2265,7 +2265,7 @@ procedure TFindDrive.CopyFromArc(AFiles: TFilesCollection; Own: TView);
       if UpStrg(FR^.Owner^) = CurArcName then
         begin
         FCCur.AtInsert(FCCur.Count, FR);
-        AFiles.AtDelete(I);
+        AFiles.AtRemove(I);
         end
       else
         Inc(I);
@@ -2284,7 +2284,7 @@ procedure TFindDrive.CopyFromArc(AFiles: TFilesCollection; Own: TView);
         Drv.Free;
         end;
       end;
-    FCCur.DeleteAll;
+    FCCur.RemoveAll;
     FCCur.Free;
   until AFiles.Count = 0;
   end { TFindDrive.CopyFromArc };
@@ -2335,13 +2335,13 @@ procedure TFindDrive.CopyFiles(AFiles: TCollection; Own: TView; MoveMode: Boolea
     begin
     if Prev <> nil then
       Prev.CopyFiles(FC_Disk, Own, MoveMode);
-    FC_Disk.DeleteAll;
+    FC_Disk.RemoveAll;
     FC_Disk.Free;
     end;
   if FC_Arc <> nil then
     begin
     CopyFromArc(FC_Arc, Own);
-    FC_Arc.DeleteAll;
+    FC_Arc.RemoveAll;
     FC_Arc.Free;
     end;
   end { TFindDrive.CopyFiles };

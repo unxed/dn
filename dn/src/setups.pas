@@ -642,7 +642,7 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
             begin
             List.Insert(NewStr(PS^));
             S := List;
-            List := nil;
+            Items := nil;
             NewLisT(S);
             end;
           end;
@@ -655,7 +655,7 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
           begin
           S := List;
           S.AtFree(F);
-          List := nil;
+          Items := nil;
           Owner.Lock;
           NewLisT(S);
           if  (F > 0) and (F >= List.Count) then

@@ -485,7 +485,7 @@ procedure AddCommand(const LastCommand: String);
       P := CmdStrings.At(I);
       if Copy(CnvString(P), 2, MaxStringLength) = LastCommand then
         begin
-        CmdStrings.AtDelete(I);
+        CmdStrings.AtRemove(I);
         CmdStrings.Insert(P);
         goto 1;
         end;
@@ -536,7 +536,7 @@ Message(CommandLine, evCommand, cmExecCommandLine, nil);
       if CmdStrings.Count <= 0 then
         Break;
       M.AtInsert(0, CmdStrings.At(CmdStrings.Count-1));
-      CmdStrings.AtDelete(CmdStrings.Count-1);
+      CmdStrings.AtRemove(CmdStrings.Count-1);
       end;
     CmdStrings.Free;
     CmdStrings := M;
@@ -807,7 +807,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
 
 destructor TTHistList.Destroy;
   begin
-  List := nil;
+  Items := nil;
   inherited Destroy;
   end;
 
@@ -859,7 +859,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   I := -1;
   P := DirHistory.FirstThat(IsThat);
   if P <> nil then
-    DirHistory.AtDelete(I)
+    DirHistory.AtRemove(I)
   else
     P := NewStr(' '+S);
   if P <> nil then

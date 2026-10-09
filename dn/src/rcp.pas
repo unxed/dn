@@ -1499,7 +1499,7 @@ procedure ProcessDLGs;
   Writeln(#13'Writing ', OutDlgFileName);
   TheRF.Free;
 
-  IDs.DeleteAll;
+  IDs.RemoveAll;
   IDs.Free;
   end { ProcessDLGs };
 {-DataCompBoy-}

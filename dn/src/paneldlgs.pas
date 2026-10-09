@@ -923,7 +923,7 @@ procedure CM_CopyFiles(AFP: Pointer; MoveMode, Single: Boolean);
   if FC = nil then
     Exit;
   P.Drive.CopyFiles(FC, P, MoveMode);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   end;
 
@@ -1109,7 +1109,7 @@ procedure CM_EraseFiles(AFP: Pointer; Single: Boolean);
   if  (FC = nil) or (P.Drive = nil) then
     Exit;
   P.Drive.EraseFiles(FC);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   P.RedrawPanelInfoDir;
   P.SendLocated;
@@ -1134,7 +1134,7 @@ procedure CM_MakeList(AFP: Pointer);
   if FC = nil then
     Exit;
   MakeListFile(P, FC);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   P.RedrawPanelInfoDir;
   end { CM_MakeList };
@@ -1650,7 +1650,7 @@ procedure CM_CopyTemp(AFP: Pointer);
   if FC = nil then
     Exit;
   GlobalEvent(evBroadcast, cmCopyToTemp, @C);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   end;
 
@@ -1679,7 +1679,7 @@ procedure CM_ArchiveFiles(AFP: Pointer);
   lFSplit(S, Dir, Name, Ext); {AK155: not sure this is needed }
   MakeArchive(Name, PC, False, False, P);
   {/Cat}
-  PC.DeleteAll;
+  PC.RemoveAll;
   end { CM_ArchiveFiles };
 {-DataCompBoy-}
 
@@ -2601,7 +2601,7 @@ procedure CM_ChangeCase(AFP: Pointer);
 
   if ExecResource(dlgNameCase, ChangeNamesCaseOptions) = cmCancel then
     begin
-    FC.DeleteAll;
+    FC.RemoveAll;
     FC.Free;
     Exit;
     end;
@@ -2615,7 +2615,7 @@ procedure CM_ChangeCase(AFP: Pointer);
        and (ChangeNamesCaseOptions.ext = 0)
   then
     begin
-    FC.DeleteAll;
+    FC.RemoveAll;
     FC.Free;
     Exit;
     end;
@@ -2660,7 +2660,7 @@ procedure CM_ChangeCase(AFP: Pointer);
   Abort := False;
   MessageL(P, evCommand, cmPanelReread, 0);
   Info.Free;
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   end { CM_ChangeCase };
 

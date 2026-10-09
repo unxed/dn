@@ -1279,7 +1279,7 @@ WrongArc:
     Drive.HandleCommand(W, FC);
     if FC <> nil then
       begin
-      FC.DeleteAll;
+      FC.RemoveAll;
       FC.Free;
       end;
     end { HandleCommand };
@@ -2371,7 +2371,7 @@ WrongArc:
     if FC.Count <> 0 then
       begin
       UUDecode(FC);
-      FC.DeleteAll;
+      FC.RemoveAll;
       end;
     FC.Free;
     end;

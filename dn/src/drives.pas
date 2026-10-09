@@ -1211,7 +1211,7 @@ function TDrive.OpenDirectory(const Dir: String;
   while (I >= 0) and (not Abort) and (MAvail > MemReq) do
     begin
     P := DirsToProcess.At(I);
-    DirsToProcess.AtDelete(I);
+    DirsToProcess.AtRemove(I);
     Dirs.Insert(P);
     ReadDir(P);
     if TimerExpired(tmr) then

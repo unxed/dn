@@ -1503,7 +1503,7 @@ TryAgain:
     
     Eraser.EraseFiles(FCT);
     Confirms := OldConfirms;
-    FCT.DeleteAll;
+    FCT.RemoveAll;
     FCT.Free;
     
     ChDir(SysOsPath(StartDir));
