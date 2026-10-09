@@ -4,10 +4,13 @@ Every item of the main menu that opens a dialog is opened from a fresh start (by
 items that exist only on some systems shift the arrows, so another dialog may open; it does not matter here). The hot letters of the dialog are found on the screen (the cells that the
 dialog drew with the color of a hot letter: cyan, a letter that differs from both neighbours). Alt+<that letter> (Esc and the letter in UTF-8) is sent
 for each of them; the screen (the cells, their colors and the cursor) must change: a check box is switched, a button acts, the focus moves. A letter that
-does nothing is a defect (the letter does not match: a Latin letter in a Russian word, a Cyrillic letter in a Latin one, the case...). When a dialog is
-closed by a letter the item is opened again for the letters that are left.
+does nothing is a defect (the letter does not match: a Latin letter in a Russian word, a Cyrillic letter in a Latin one, the case...). Every frame that DN
+writes counts, so a button that is shown pressed and released (an action with nothing else to show, e.g. Delete in an empty list) has answered. A letter
+that does nothing after other letters is tried again first in a fresh dialog (the letter before may have moved the focus to its control already).
+The same letter (either case) on two controls of a dialog is a defect too: Alt+that letter reaches only one of them. When a dialog is closed or changed
+by a letter the item is opened again for the letters that are left.
 Exit status 1 when a letter does nothing or DN has a fatal error."""
-import os, shutil, sys, tempfile
+import os, re, select, shutil, sys, tempfile, time
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dn_wait import DnTerm
@@ -23,6 +26,37 @@ HOT = ('i', 11)                                             # the color of a hot
 def snapshot(t):
     """the cells (but the clock of the menu bar) and the cursor"""
     return t.shape(), (t.screen.x, t.screen.y)
+
+
+FRAME = re.compile(rb'(?=\x1b\[\?25l)')                     # DN hides the cursor at the start of every frame it writes
+
+
+def answers(t, key, before, wait=5.0):
+    """sends `key`; True when a frame that DN wrote in the next `wait` seconds differs from `before` (a pressed button is drawn and released
+    within one read: each frame is fed and compared alone); then reads until the screen is quiet"""
+    os.write(t.fd, key.encode())
+    end = time.time() + wait
+    seen = False
+    while not seen and t.alive():
+        left = end - time.time()
+        if left <= 0:
+            break
+        r, _, _ = select.select([t.fd], [], [], left)
+        if not r:
+            break
+        try:
+            data = os.read(t.fd, 65536)
+        except OSError:
+            break
+        if not data:
+            break
+        t.raw += data
+        for part in FRAME.split(data):
+            t.screen.feed(part)
+            if not seen and snapshot(t) != before:
+                seen = True
+    t.pump(0.3, 1.5)
+    return seen
 
 
 def hot_cells(t, base):
@@ -60,30 +94,37 @@ def probe(job):
     d = tempfile.mkdtemp(prefix='dnhd-')
     done, bad, found = set(), [], 0
     try:
-        for attempt in range(8):
+        for attempt in range(40):
             t, base, d = start(out, lang, path, chain, d)
             cells = hot_cells(t, base)
+            if attempt == 0:
+                letters = [ch.lower() for _, _, ch in cells]
+                for ch in sorted(set(c for c in letters if letters.count(c) > 1)):
+                    bad.append((ch, 'on %d controls' % letters.count(ch)))
             found = max(found, len(cells))
             todo = [c for c in cells if c not in done]
             if not todo:
                 t.close(0.2)
                 break
             closed = False
+            fresh = True                                  # no letter has acted in this copy of the dialog yet
             for y, x, ch in todo:
                 before = snapshot(t)
-                t.send('\x1b' + ch, 0.5)
-                t.until(lambda: snapshot(t) != before or not t.alive(), 5)     # a loaded machine answers late
-                t.pump(0.3, 1.5)
+                acted = answers(t, '\x1b' + ch, before)
                 if not t.alive():
                     bad.append((ch, 'DN ended'))
                     done.add((y, x, ch))
                     closed = True
                     break
+                if not acted:
+                    if fresh:
+                        bad.append((ch, 'nothing happened'))
+                        done.add((y, x, ch))
+                        continue
+                    closed = True                         # the letters before may have done its work: try it first in a fresh dialog
+                    break
                 done.add((y, x, ch))
-                after = snapshot(t)
-                if after == before:
-                    bad.append((ch, 'nothing happened'))
-                    continue
+                fresh = False
                 if 'Fatal Error' in t.text():
                     bad.append((ch, 'fatal error'))
                     closed = True
