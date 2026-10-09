@@ -726,7 +726,7 @@ constructor TSaversDialog.Create;
 
   R := TRect.Create(20, 15, 55, 16);
   Control := TCheckBoxes.Create(R,
-        NewSItem(GetString(dlSSUse_M_ouse), nil));
+        TSItem.Create(GetString(dlSSUse_M_ouse), nil));
   Insert(Control);
 
   R := TRect.Create(7, 17, 17, 19);

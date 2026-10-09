@@ -72,8 +72,8 @@ type
     Count: Word; { do not separate from Selected! See Load,Store}
     Menu: PMenu;
     Items: array[1..10] of PMenuItem; // direct references into the menu
-    constructor Create(var Bounds: TRect; AStrings: PSItem);
-    procedure BuildMenu(AStrings: PSItem);
+    constructor Create(var Bounds: TRect; AStrings: TSItem);
+    procedure BuildMenu(AStrings: TSItem);
     destructor Destroy; override;
     procedure SetState(AState: Word; Enable: Boolean); override;
     procedure Draw; override;
@@ -383,7 +383,7 @@ procedure THexLine.Draw;
 
 { /------------------ TComboBox ----------------\ }
 
-constructor TComboBox.Create(var Bounds: TRect; AStrings: PSItem);
+constructor TComboBox.Create(var Bounds: TRect; AStrings: TSItem);
   begin
   inherited Create(Bounds);
   Options := ofSelectable;
@@ -391,12 +391,12 @@ constructor TComboBox.Create(var Bounds: TRect; AStrings: PSItem);
   Selected := 1;
   end;
 
-procedure TComboBox.BuildMenu(AStrings: PSItem);
+procedure TComboBox.BuildMenu(AStrings: TSItem);
   var
     i: Integer;
     LastItem: PMenuItem;
     Tail: ^PMenuItem;
-    PrevSItem: PSItem;
+    PrevSItem: TSItem;
   begin
   Menu := NewMenu(nil);
   Tail := @Menu^.Items;
@@ -405,15 +405,14 @@ procedure TComboBox.BuildMenu(AStrings: PSItem);
     begin
     Inc(Count);
     LastItem := NewItem(
-      CenterStr(Copy(AStrings^.Value^, 1, Size.X-2), Size.X-2),
+      CenterStr(Copy(AStrings.Value^, 1, Size.X-2), Size.X-2),
       '',  kbNoKey, 1600+i, 0, nil);
     Items[Count] := LastItem;
     Tail^ := LastItem;
     Tail := @LastItem.Next;
-    DisposeStr(AStrings^.Value);
     PrevSItem := AStrings;
-    AStrings := AStrings^.Next;
-    Dispose(PrevSItem);
+    AStrings := AStrings.Next;
+    PrevSItem.Free;
     end;
   end;
 

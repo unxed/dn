@@ -1058,9 +1058,9 @@ procedure ProcessDLGs;
       end;
 
     {-DataCompBoy-}
-    function GetItems: PSItem;
+    function GetItems: TSItem;
       var
-        P, PP: PSItem;
+        P, PP: TSItem;
         S: String;
         K: Integer;
       begin
@@ -1079,13 +1079,13 @@ procedure ProcessDLGs;
           begin
           if PP = nil then
             begin
-            P := NewSItem(Token(S, i), nil);
+            P := TSItem.Create(Token(S, i), nil);
             PP := P
             end
           else
             begin
-            P^.Next := NewSItem(Token(S, i), nil);
-            P := P^.Next
+            P.Next := TSItem.Create(Token(S, i), nil);
+            P := P.Next
             end;
           end
         else if IsThis(idEND) then

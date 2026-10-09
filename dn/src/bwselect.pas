@@ -59,7 +59,7 @@ type
   T_BWSelector = class(TMonoSelector)
     SelType: TColorSel; {Is't a selector of Foreground color ? }
     constructor Create(var Bounds: TRect; ASelType: TColorSel;
-         AStrings: PSItem);
+         AStrings: TSItem);
     procedure HandleEvent(var Event: TEvent); override;
     procedure NewColor; virtual;
     end;
@@ -67,7 +67,7 @@ type
 implementation
 
 constructor T_BWSelector.Create(var Bounds: TRect; ASelType: TColorSel;
-    AStrings: PSItem);
+    AStrings: TSItem);
   begin
   SelType := ASelType;
   inherited Create(Bounds);
