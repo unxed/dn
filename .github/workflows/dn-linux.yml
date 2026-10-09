@@ -172,9 +172,15 @@ jobs:
           - name: menus
             cmds: |
               python3 tools/dn-linux-hotkeys.py out/dn -j 16
-          - name: dialogs
+          - name: dialogs ENGLISH
             cmds: |
-              python3 tools/dn-linux-dialoghot.py out/dn -j 16
+              python3 tools/dn-linux-dialoghot.py out/dn ENGLISH -j 16
+          - name: dialogs RUSSIAN
+            cmds: |
+              python3 tools/dn-linux-dialoghot.py out/dn RUSSIAN -j 16
+          - name: dialogs UKRAIN
+            cmds: |
+              python3 tools/dn-linux-dialoghot.py out/dn UKRAIN -j 16
     steps:
       - uses: actions/checkout@v4
         with:
