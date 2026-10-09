@@ -155,7 +155,7 @@ begin
       IsKey := OnSwitcherKey(Event, Back)
     else
     begin
-      K := KeyMake(Event.KeyDown.KeyCode, Event.KeyDown.ControlKeyState);
+      K := TKey.Create(Event.KeyDown.KeyCode, Event.KeyDown.ControlKeyState);
       IsKey := (K.Code = TvKeys.kbTab) and ((K.Mods and TvKeys.kbCtrlShift) <> 0);
     end;
   if IsKey and (Last <> nil) then
