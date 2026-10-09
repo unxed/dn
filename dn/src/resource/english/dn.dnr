@@ -272,12 +272,12 @@ DIALOG dlgCountrySetup, 54, 22, 'Country information'
       ITEM '~D~ay-Month-Year'
       ITEM '~Y~ear-Month-Day'
       END
-    Label 2, 2, 'Date format'
+    Label 2, 2, 'Date ~f~ormat'
     RadioButtons 24, 3, 36, 5
       ITEM '~1~2 hour'
       ITEM '~2~4 hour'
       END
-    Label 23, 2, 'Time format'
+    Label 23, 2, 'Time f~o~rmat'
     InputLine 23, 7, 26, 8, 1, 0
     Label 2, 7, 'D~a~te separator'
     InputLine 23, 8, 26, 9, 1, 0
@@ -301,14 +301,14 @@ DIALOG dlgCountrySetup, 54, 22, 'Country information'
     InputLine 36, 11, 50, 12, 79, hsKbdToggleLayot
     Label 26, 11, 'Key~b~oard'
     InputLine 36, 13, 50, 14, 79, hsWinCodeTable
-    Label 16, 13, 'Alphabetic Sorting'
+    Label 16, 13, 'Al~p~habetic Sorting'
     InputLine 36, 15, 50, 16, 79, hsABCSortTable
     Label 30, 15, '~W~IN:'
     InputLine 2, 17, 50, 18, 255, hsCodeTables
     Label 1, 16, 'Additional codetabl~e~s'
     Button 27, 6, 37, 8, '~S~ystem', cmYes
     Button 7, 19, 17, 21, 'O~K~', cmOK, bfDefault
-    Button 22, 19, 32, 21, 'Cancel', cmCancel
+    Button 22, 19, 32, 21, 'Ca~n~cel', cmCancel
     Button 37, 19, 47, 21, '~H~elp', cmHelp
 END
 
@@ -1673,7 +1673,7 @@ DIALOG dlgConfirmations, 36, 13, 'Confirmations'
       ITEM 'E~x~it confirmation'
     END
     Button 3, 10, 13, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 13,10, 23, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 13,10, 23, 12, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
     Button 23,10, 33, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -1694,10 +1694,10 @@ DIALOG dlgAdvanceSearch, 55, 15, 'Advanced search'
       ITEM 'H~i~dden'
       ITEM 'R~e~ad-only'
     END
-    Label 3, 10, 'Attributes', ofPostProcess, ofPreProcess
+    Label 3, 10, 'A~t~tributes', ofPostProcess, ofPreProcess
     Button 40, 2, 53, 4, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 40, 5, 53, 7, '~C~lear all', cmClearData, ofPostProcess, ofPreProcess
-    Button 40, 8, 53, 10, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 40, 8, 53, 10, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
     Button 40, 11, 53, 13, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -1706,7 +1706,7 @@ DIALOG dlgReenterPassword, 39, 7, 'Re-enter Password'
     InputLine 12, 2, 37, 3, 40, 0, ofSecurity
     Label 2, 2, '~P~assword', ofPostProcess, ofPreProcess
     Button 7, 4, 17, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 17, 4, 27, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 17, 4, 27, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 27, 4, 37, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -1784,7 +1784,7 @@ DIALOG dlgMouseSetup, 39, 13, 'Mouse Setup'
     END
     Label 3, 8, '~O~ptions', ofPostProcess, ofPreProcess
     Button 27, 3, 37, 5, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 27, 5, 37, 7, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 27, 5, 37, 7, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 27, 9, 37, 11, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -1807,17 +1807,17 @@ DIALOG dlgInterfaceSetup, 71, 22, 'Interface Setup'
     END
 ; the keys of the vtui UX guidelines (dn.ini [Interface] F9OpensMenu, MenuArrowsOpen, MenuEscStep, ListHomeEndItems, EnterTogglesCheck, EditorWordNav)
     CheckBoxes 8, 8, 70, 10, ofPostProcess, ofPreProcess
-      ITEM 'F9 opens menu'
-      ITEM '←/→ open menus'
-      ITEM 'Esc steps back'
+      ITEM '~F~9 opens menu'
+      ITEM '←/→ ~o~pen menus'
+      ITEM 'Esc ste~p~s back'
       ITEM 'Home/End: list'
-      ITEM 'Enter toggles'
-      ITEM 'Ctrl+←/→ words'
+      ITEM 'Enter to~g~gles'
+      ITEM 'Ct~r~l+←/→ words'
     END
-    Label 2, 8, 'Keys:', ofPostProcess, ofPreProcess
+    Label 2, 8, 'Ke~y~s:', ofPostProcess, ofPreProcess
     RadioButtons 2, 11, 23, 14, ofPostProcess, ofPreProcess
       ITEM 'For all drives'
-      ITEM 'For all, except:'
+      ITEM 'For all, e~x~cept:'
       ITEM 'For none'
     END
     InputLine 24, 12, 29, 13, 30, 0
@@ -1860,10 +1860,10 @@ DIALOG dlgInterfaceSetup, 71, 22, 'Interface Setup'
     Label 63, 11, 'Free', ofPostProcess, ofPreProcess
     Label 63, 12, 'space', ofPostProcess, ofPreProcess
     CheckBoxes 2, 16, 31, 18, ofPostProcess, ofPreProcess
-      ITEM 'Quick access directories'
-      ITEM 'Number of files on TEMP'
+      ITEM '~Q~uick access directories'
+      ITEM '~N~umber of files on TEMP'
     END
-    Label 2, 15, 'Additionally include:', ofPostProcess, ofPreProcess
+    Label 2, 15, 'Additionally ~i~nclude:', ofPostProcess, ofPreProcess
     CheckBoxes 2, 19, 31, 20, ofPostProcess, ofPreProcess
       ITEM 'Tabulated view'
     END
@@ -1882,18 +1882,18 @@ DIALOG dlgSetupTerminal, 56, 15, 'Terminal Options'
       ITEM 'VT~5~2'
       ITEM 'VT~1~02'
     END
-    Label 3, 2, 'Emulation', ofPostProcess, ofPreProcess
+    Label 3, 2, 'E~m~ulation', ofPostProcess, ofPreProcess
     CheckBoxes 24, 3, 53, 11, ofPostProcess, ofPreProcess
       ITEM '<~E~NTER> = CR/LF'
       ITEM '^~L~ clears screen '
       ITEM 'L~o~cal echo'
       ITEM 'Auto-~Z~Modem download'
-      ITEM 'I~n~sert mode'
+      ITEM 'Inse~r~t mode'
       ITEM '~C~heck CD while transfer'
       ITEM 'Connect ~S~ound'
       ITEM 'Co~n~trols in capture'
     END
-    Label 24, 2, 'Options', ofPostProcess, ofPreProcess
+    Label 24, 2, 'O~p~tions', ofPostProcess, ofPreProcess
     Button 19, 12, 29, 14, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 31, 12, 41, 14, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
     Button 43, 12, 53, 14, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
@@ -1907,7 +1907,7 @@ DIALOG dlgSetupModem, 66, 21, 'Communication Setup'
       ITEM 'COM~3~'
       ITEM 'COM~4~'
     END
-    Label 3, 2, 'Port', ofPostProcess, ofPreProcess
+    Label 3, 2, 'Por~t~', ofPostProcess, ofPreProcess
     RadioButtons 14, 3, 48, 7, ofPostProcess, ofPreProcess
       ITEM '300'
       ITEM '1200'
@@ -1923,15 +1923,15 @@ DIALOG dlgSetupModem, 66, 21, 'Communication Setup'
     Label 16, 2, '~B~aud rate', ofPostProcess, ofPreProcess
 
     RadioButtons 49, 3, 63, 7, ofPostProcess, ofPreProcess
-      ITEM 'Default'
-      ITEM 'Custom'
-      ITEM 'FOSSIL'
-      ITEM 'INT 14h'
+      ITEM 'De~f~ault'
+      ITEM 'C~u~stom'
+      ITEM 'FOSSI~L~'
+      ITEM 'I~N~T 14h'
     END
     Label 49, 2, '~P~ort layout'
     InputLine 27, 8, 31, 9, 2, 0
-    Label 20, 8, 'IRQ:', ofPostProcess, ofPreProcess
-    Label 3, 8, 'Custom layout: ', ofPostProcess, ofPreProcess
+    Label 20, 8, 'IR~Q~:', ofPostProcess, ofPreProcess
+    Label 3, 8, '~C~ustom layout: ', ofPostProcess, ofPreProcess
     InputLine 42, 8, 47, 9, 3, 0
     Label 35, 8, 'Port:', ofPostProcess, ofPreProcess
 
@@ -1952,7 +1952,7 @@ DIALOG dlgSetupModem, 66, 21, 'Communication Setup'
     InputLine 23, 18, 28, 19, 4, 0
     Label 2, 18, '~R~edial after (sec):', ofPostProcess, ofPreProcess
     Button 30, 18, 40, 20, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 41, 18, 51, 20, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 41, 18, 51, 20, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
     Button 52, 18, 62, 20, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -1975,9 +1975,9 @@ DIALOG dlgEditorDefaults, 56, 23, 'Editor/Viewer Defaults'
 ; {-$VOL} {Tab Replace}
       ITEM 'Tab Replace'
     END
-    Label 2, 1, 'Editor options', ofPostProcess, ofPreProcess
+    Label 2, 1, 'E~d~itor options', ofPostProcess, ofPreProcess
     CheckBoxes 17,  9, 54, 11, ofPostProcess, ofPreProcess
-      ITEM 'Syntax highlight   '
+      ITEM 'S~y~ntax highlight   '
       ITEM 'SmartTab'
     END
     CheckBoxes 2, 12, 24, 19, ofPostProcess, ofPreProcess
@@ -2023,7 +2023,7 @@ DIALOG dlgAppendNumber, 44, 13, 'Add Number'
     Label 1, 6, '~M~emo', ofPostProcess, ofPreProcess
     InputLine 2, 8, 42, 9, 50, 0
     Button 10, 10, 20, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 21, 10, 31, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 21, 10, 31, 12, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 32, 10, 42, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2037,7 +2037,7 @@ DIALOG dlgEditNumber, 44, 13, 'Edit Number'
     Label 1, 6, '~M~emo', ofPostProcess, ofPreProcess
     InputLine 2, 8, 42, 9, 50, 0
     Button 10, 10, 20, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 21, 10, 31, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 21, 10, 31, 12, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 32, 10, 42, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2051,7 +2051,7 @@ DIALOG dlgAppendDirectory, 44, 13, 'Add Phone Group'
     Label 1, 6, '~M~emo', ofPostProcess, ofPreProcess
     InputLine 2, 8, 42, 9, 50, 0
     Button 10, 10, 20, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 21, 10, 31, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 21, 10, 31, 12, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 32, 10, 42, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2065,7 +2065,7 @@ DIALOG dlgEditDirectory, 44, 13, 'Edit Phone Group'
     Label 1, 6, '~M~emo', ofPostProcess, ofPreProcess
     InputLine 2, 8, 42, 9, 50, 0
     Button 10, 10, 20, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 21, 10, 31, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 21, 10, 31, 12, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 32, 10, 42, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2078,14 +2078,14 @@ DIALOG dlgPrinterSetup, 48, 14, 'Printer Setup'
       ITEM 'LPT~4~'
       ITEM '~F~ile'
       ITEM '~N~UL'
-      ITEM 'COM1'
-      ITEM 'COM2'
-      ITEM 'COM3'
+      ITEM '~C~OM1'
+      ITEM 'C~O~M2'
+      ITEM 'CO~M~3'
       ITEM 'COM4'
-      ITEM 'Custom 1:'
-      ITEM 'Custom 2:'
+      ITEM 'C~u~stom 1:'
+      ITEM 'Cu~s~tom 2:'
     END
-    Label 2, 2, 'Device', ofPostProcess, ofPreProcess
+    Label 2, 2, '~D~evice', ofPostProcess, ofPreProcess
     InputLine 26, 7, 46, 8, 255, 0
     InputLine 26, 8, 46, 9, 255, 0
     InputLine 26, 3, 46, 4, 255, 0
@@ -2093,7 +2093,7 @@ DIALOG dlgPrinterSetup, 48, 14, 'Printer Setup'
     InputLine 26, 5, 46, 6, 255, 0
     Label 26, 4, '~E~nding string', ofPostProcess, ofPreProcess
     Button 14, 10, 24, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 25, 10, 35, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 25, 10, 35, 12, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
     Button 36, 10, 46, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2111,7 +2111,7 @@ DIALOG dlgGameSetup, 53, 15, 'Setup game'
       ITEM '~9~ - Madness'
       ITEM '1~0~ - Sanitarium'
     END
-    Label 3, 2, 'Level', ofPostProcess, ofPreProcess
+    Label 3, 2, '~L~evel', ofPostProcess, ofPreProcess
     RadioButtons 30, 3, 50, 5, ofPostProcess, ofPreProcess
       ITEM 'Classic ~t~etris'
       ITEM 'Penti~x~'
@@ -2122,7 +2122,7 @@ DIALOG dlgGameSetup, 53, 15, 'Setup game'
     END
     Label 30, 6, '~O~ptions', ofPostProcess, ofPreProcess
     Button 41, 10, 51, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 41, 12, 51, 14, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 41, 12, 51, 14, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgDbFind, 55, 12, 'Search'
@@ -2132,20 +2132,20 @@ DIALOG dlgDbFind, 55, 12, 'Search'
     CheckBoxes 12, 4, 32, 5, ofPostProcess, ofPreProcess
       ITEM '~C~ase sensitive'
     END
-    Label 3, 4, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 4, '~O~ptions', ofPostProcess, ofPreProcess
     RadioButtons 12, 6, 33, 8, ofPostProcess, ofPreProcess
       ITEM '~I~n cursor field'
       ITEM '~A~ll fields'
     END
-    Label 5, 6, 'Scope', ofPostProcess, ofPreProcess
+    Label 5, 6, '~S~cope', ofPostProcess, ofPreProcess
     RadioButtons 35, 5, 53, 8, ofPostProcess, ofPreProcess
       ITEM '~F~orward'
       ITEM '~B~ackward'
       ITEM '~E~ntire scope'
     END
-    Label 35, 4, 'Direction', ofPostProcess, ofPreProcess
+    Label 35, 4, '~D~irection', ofPostProcess, ofPreProcess
     Button 14, 9, 24, 11, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 26, 9, 36, 11, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 26, 9, 36, 11, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
     Button 38, 9, 48, 11, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2159,16 +2159,16 @@ DIALOG dlgReplaceCell, 52, 17, 'Replace in spreadsheet'
       ITEM '~S~tring'
       ITEM '~V~alue'
     END
-    Label 3, 8, 'Search as', ofPostProcess, ofPreProcess
+    Label 3, 8, 'S~e~arch as', ofPostProcess, ofPreProcess
     CheckBoxes 20, 9, 49, 12, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~C~ase sesitive'
       ITEM '~W~hole words only'
       ITEM '~N~o prompt on replace'
     END
-    Label 20, 8, 'Options', ofPostProcess, ofPreProcess
+    Label 20, 8, '~O~ptions', ofPostProcess, ofPreProcess
     Button 2, 14, 12, 16, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 13, 14, 27, 16, 'Change ~a~ll', cmYes, ofPostProcess, ofPreProcess
-    Button 28, 14, 38, 16, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 28, 14, 38, 16, 'Cance~l~', cmCancel, ofPostProcess, ofPreProcess
     Button 39, 14, 49, 16, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2180,14 +2180,14 @@ DIALOG dlgFindCell, 49, 13, 'Find in spreadsheet'
       ITEM '~S~tring'
       ITEM '~V~alue'
     END
-    Label 3, 5, 'Search as', ofPostProcess, ofPreProcess
+    Label 3, 5, 'Search ~a~s', ofPostProcess, ofPreProcess
     CheckBoxes 20, 6, 46, 8, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~C~ase sesitive'
       ITEM '~W~hole words only'
     END
-    Label 20, 5, 'Options', ofPostProcess, ofPreProcess
+    Label 20, 5, '~O~ptions', ofPostProcess, ofPreProcess
     Button 12, 10, 22, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 24, 10, 34, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 24, 10, 34, 12, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
     Button 36, 10, 46, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2196,7 +2196,7 @@ DIALOG dlgGotoCellNumber, 41, 7, 'Go to Cell Number'
     InputLine 27, 2, 35, 3, 6, hsGotoCell
     Label 4, 2, '~E~nter new cell number', ofPostProcess, ofPreProcess
     Button 2, 4, 12, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 15, 4, 25, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 15, 4, 25, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 28, 4, 38, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2212,13 +2212,13 @@ DIALOG dlgSetCellFormat, 42, 17, 'Cell/Block format'
       ITEM 'Perce~n~t'
       ITEM 'D~o~nt display'
     END
-    Label 3, 2, 'Display as', ofPostProcess, ofPreProcess
+    Label 3, 2, 'D~i~splay as', ofPostProcess, ofPreProcess
     RadioButtons 3, 9, 21, 12, ofFramed, ofPostProcess, ofPreProcess
       ITEM 'Le~f~t'
       ITEM '~R~ight'
       ITEM 'Cen~t~ered'
     END
-    Label 3, 8, 'Justify', ofPostProcess, ofPreProcess
+    Label 3, 8, '~J~ustify', ofPostProcess, ofPreProcess
     InputLine 23, 9, 39, 10, 2, 0, ofFramed
     Label 23, 8, '~D~ecimals', ofPostProcess, ofPreProcess
     CheckBoxes 23, 11, 39, 12, ofFramed, ofPostProcess, ofPreProcess
@@ -2276,7 +2276,7 @@ DIALOG dlgHighlightGroups, 78, 18, 'Highlight groups'
     ColorPoint 11, 12, 174
 
     Button 24, 15, 34, 17, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 34, 15, 44, 17, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 34, 15, 44, 17, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 44, 15, 54, 17, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2285,7 +2285,7 @@ DIALOG dlgGotoLine, 34, 7, 'Goto Line'
     InputLine 16, 2, 28, 3, 10, hsdbSearch
     Label 3, 2, '~L~ine number', ofPostProcess, ofPreProcess
     Button 2, 4, 12, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 12, 4, 22, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 12, 4, 22, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 22, 4, 32, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2294,7 +2294,7 @@ DIALOG dlgGotoAddress, 34, 7, 'Goto Address'
     InputLine 12, 2, 28, 3, 9, hsdbSearch
     Label 3, 2, '~A~ddress', ofPostProcess, ofPreProcess
     Button 2, 4, 12, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 12, 4, 22, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 12, 4, 22, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 22, 4, 32, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2307,7 +2307,7 @@ DIALOG dlgEditorFormat, 39, 11, 'Format Margins'
     InputLine 20, 6, 37, 7, 6, 0
     Label 2, 6, '~P~aragraph', ofPostProcess, ofPreProcess
     Button 7, 8, 17, 10, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 17, 8, 27, 10, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 17, 8, 27, 10, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 27, 8, 37, 10, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2322,12 +2322,12 @@ DIALOG dlgEditorFind, 55, 16, 'Find'
       ITEM '~R~egular expression'
 ;$ENDIF
     END
-    Label 3, 4, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 4, 'O~p~tions', ofPostProcess, ofPreProcess
     RadioButtons 30, 5, 52, 7, ofPostProcess, ofPreProcess
       ITEM 'Forwar~d~'
       ITEM '~B~ackward'
     END
-    Label 30, 4, 'Direction', ofPostProcess, ofPreProcess
+    Label 30, 4, 'D~i~rection', ofPostProcess, ofPreProcess
     RadioButtons 3, 10, 27, 12, ofPostProcess, ofPreProcess
       ITEM '~G~lobal'
       ITEM '~S~elected text'
@@ -2337,10 +2337,10 @@ DIALOG dlgEditorFind, 55, 16, 'Find'
       ITEM '~E~ntire scope'
       ITEM '~F~rom cursor'
     END
-    Label 30, 9, 'Origin', ofPostProcess, ofPreProcess
+    Label 30, 9, 'Origi~n~', ofPostProcess, ofPreProcess
     Button 22, 13, 32, 15, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 32, 13, 42, 15, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
-    Button 42, 13, 52, 15, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
+    Button 32, 13, 42, 15, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
+    Button 42, 13, 52, 15, 'He~l~p', cmHelp, ofPostProcess, ofPreProcess
     InputLine 17, 2, 49, 3, 250, hsFindText
     Label 3, 2, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 17, 3, 49, 4
@@ -2359,12 +2359,12 @@ DIALOG dlgEditorReplace, 55, 18, 'Replace'
       ITEM '~R~egular expression'
 ;$ENDIF
     END
-    Label 3, 6, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 6, '~O~ptions', ofPostProcess, ofPreProcess
     RadioButtons 30, 7, 52, 9, ofPostProcess, ofPreProcess
       ITEM 'Forwar~d~'
       ITEM '~B~ackward'
     END
-    Label 30, 6, 'Direction', ofPostProcess, ofPreProcess
+    Label 30, 6, 'D~i~rection', ofPostProcess, ofPreProcess
     RadioButtons 3, 12, 27, 14, ofPostProcess, ofPreProcess
       ITEM '~G~lobal'
       ITEM '~S~elected text'
@@ -2377,8 +2377,8 @@ DIALOG dlgEditorReplace, 55, 18, 'Replace'
     Label 30, 11, 'Origin', ofPostProcess, ofPreProcess
     Button 6,  15, 16, 17, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 16, 15, 32, 17, 'Change ~a~ll', cmYes, ofPostProcess, ofPreProcess
-    Button 32, 15, 42, 17, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
-    Button 42, 15, 52, 17, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
+    Button 32, 15, 42, 17, 'Cance~l~', cmCancel, ofPostProcess, ofPreProcess
+    Button 42, 15, 52, 17, 'Help', cmHelp, ofPostProcess, ofPreProcess
     InputLine 17, 2, 49, 3, 250, hsFindText
     Label 3, 2, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 17, 3, 49, 4
@@ -2401,7 +2401,7 @@ DIALOG dlgFileFind, 56, 19, 'Find File'
     InputLine 16, 4, 51, 5, 255, hsFindText
     Label 2, 4, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 16, 5, 51, 6
-    Label 2, 5, '  ~H~ex string', ofPostProcess, ofPreProcess
+    Label 2, 5, '  He~x~ string', ofPostProcess, ofPreProcess
     CheckBoxes 3, 7, 51, 11, ofPostProcess, ofPreProcess
       ITEM 'Adva~n~ced search'
       ITEM 'Do not sort res~u~lt'
@@ -2411,17 +2411,17 @@ DIALOG dlgFileFind, 56, 19, 'Find File'
       ITEM '~W~hole words'
       ITEM 'All c~o~de pages'
 ;$IFDEF REGEXP
-      ITEM 'Regular expression'
+      ITEM 'Re~g~ular expression'
 ;$ENDIF
     END
-    Label 3, 6, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 6, 'Opt~i~ons', ofPostProcess, ofPreProcess
     RadioButtons 3, 13, 51, 15, ofPostProcess, ofPreProcess
       ITEM 'Current ~d~irectory'
       ITEM 'Se~l~ected'
       ITEM '~E~ntire disk'
       ITEM '~A~ll drives'
     END
-    Label 3, 12, 'Scope', ofPostProcess, ofPreProcess
+    Label 3, 12, 'Sco~p~e', ofPostProcess, ofPreProcess
     Button  3, 16, 13, 18, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 14, 16, 29, 18, 'Ad~v~anced...', cmSearchAdvance, ofPostProcess, ofPreProcess
     Button 30, 16, 40, 18, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
@@ -2439,10 +2439,10 @@ DIALOG dlgArcFileFind, 52, 11, 'Find File in Archive'
       ITEM 'Do not sort res~u~lt'
       ITEM '~R~ecursive search'
     END
-    Label 3, 4, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 4, '~O~ptions', ofPostProcess, ofPreProcess
     Button  3,  8, 13, 10, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 13,  8, 28, 10, 'Ad~v~anced...', cmSearchAdvance, ofPostProcess, ofPreProcess
-    Button 28,  8, 38, 10, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 28,  8, 38, 10, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 38,  8, 48, 10, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2453,7 +2453,7 @@ DIALOG dlgFoundFileFind, 56, 18, 'Find File in '
     InputLine 16, 4, 53, 5, 255, hsFindText
     Label 2, 4, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 16, 5, 51, 6
-    Label 2, 5, '  ~H~ex string', ofPostProcess, ofPreProcess
+    Label 2, 5, '  He~x~ string', ofPostProcess, ofPreProcess
     CheckBoxes 3, 7, 53, 11, ofPostProcess, ofPreProcess
       ITEM 'Adva~n~ced search'
       ITEM 'Do not sort res~u~lt'
@@ -2463,18 +2463,18 @@ DIALOG dlgFoundFileFind, 56, 18, 'Find File in '
       ITEM '~W~hole words'
       ITEM 'All c~o~de pages'
 ;$IFDEF REGEXP
-      ITEM 'Regular expression'
+      ITEM 'Re~g~ular expression'
 ;$ENDIF
     END
-    Label 3, 6, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 6, 'Opt~i~ons', ofPostProcess, ofPreProcess
     RadioButtons 3, 13, 51, 14, ofPostProcess, ofPreProcess
       ITEM '~E~ntire panel'
       ITEM 'Se~l~ected'
     END
-    Label 3, 12, 'Scope', ofPostProcess, ofPreProcess
+    Label 3, 12, 'Sco~p~e', ofPostProcess, ofPreProcess
     Button  3, 15, 13, 17, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 14, 15, 29, 17, 'Ad~v~anced...', cmSearchAdvance, ofPostProcess, ofPreProcess
-    Button 30, 15, 40, 17, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 30, 15, 40, 17, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
     Button 41, 15, 51, 17, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
     InputLine 1, 1, 1, 1, 1, 0
 END
@@ -2489,10 +2489,10 @@ DIALOG dlgFoundArcFileFind, 52, 11, 'Find File in '
       ITEM 'Adva~n~ced search'
       ITEM 'Do not sort res~u~lt'
     END
-    Label 3, 4, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 4, '~O~ptions', ofPostProcess, ofPreProcess
     Button  3,  8, 13, 10, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 13,  8, 28, 10, 'Ad~v~anced...', cmSearchAdvance, ofPostProcess, ofPreProcess
-    Button 28,  8, 38, 10, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 28,  8, 38, 10, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 38,  8, 48, 10, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2505,7 +2505,7 @@ DIALOG dlgMkDir, 69, 7, 'Make directory'
     Button 12, 4, 22, 6, '~L~owStr', cmNo, ofPostProcess, ofPreProcess
 ;$ENDIF
     Button 38, 4, 48, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 48, 4, 58, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 48, 4, 58, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 58, 4, 68, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2517,8 +2517,8 @@ DIALOG dlgRenFl, 70, 7, 'Quick file rename'
     Button 2, 4, 12, 6, '~U~pStr', cmYes, ofPostProcess, ofPreProcess
     Button 12, 4, 22, 6, '~L~owStr', cmNo, ofPostProcess, ofPreProcess
 ;$ENDIF
-    Button 38, 4, 48, 6, 'OK', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 48, 4, 58, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 38, 4, 48, 6, '~O~K', cmOK, bfDefault, ofPostProcess, ofPreProcess
+    Button 48, 4, 58, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 58, 4, 68, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2533,7 +2533,7 @@ DIALOG dlgCopyDialog, 78, 15, 'Copy'
       ITEM 'Refres~h~'
       ITEM '~A~sk the action'
     END
-    Label 2, 4, 'All files with the same names:', ofPostProcess, ofPreProcess
+    Label 2, 4, 'All files ~w~ith the same names:', ofPostProcess, ofPreProcess
 #2  CheckBoxes 38, 5, 70, 10, ofPostProcess, ofPreProcess
       ITEM 'Check ~f~ree disk space'
       ITEM '~V~erify disk writes'
@@ -2549,7 +2549,7 @@ DIALOG dlgCopyDialog, 78, 15, 'Copy'
       ITEM 'Remove so~u~rce files'
     END
     Button 17, 12, 27, 14, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 27, 12, 37, 14, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 27, 12, 37, 14, 'Cance~l~', cmCancel, ofPostProcess, ofPreProcess
     Button 37, 12, 47, 14, '~T~ree', cmTree, ofPostProcess, ofPreProcess
     Button 47, 12, 57, 14, 'Help', cmHelp, ofPostProcess, ofPreProcess
 END
@@ -2561,7 +2561,7 @@ DIALOG dlgMakeList, 69, 20, 'Make List File'
 #1  InputLine 14, 2, 64, 3, 255, hsMakeList
     Label 2, 2, '~F~ile name', ofPostProcess, ofPreProcess
     InputLine 14, 6, 64, 7, 255, hsMakeListHeader
-    Label 2, 6, '~H~eader', ofPostProcess, ofPreProcess
+    Label 2, 6, 'Hea~d~er', ofPostProcess, ofPreProcess
     RadioButtons 14, 7, 64, 8, ofPostProcess, ofPreProcess
       ITEM 'Au~t~o'
       ITEM 'I~n~sert text'
@@ -2583,7 +2583,7 @@ DIALOG dlgMakeList, 69, 20, 'Make List File'
       ITEM 'Insert f~i~les'
     END
     Button 27, 17, 37, 19, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 38, 17, 48, 19, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 38, 17, 48, 19, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 49, 17, 59, 19, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2603,17 +2603,17 @@ DIALOG dlgPanelShowSetup, 74, 22, 'File Panel appearance'
       ITEM 'Packing ~r~atio, %'
       ITEM '~D~ate'
       ITEM '~T~ime'
-      ITEM 'Creation date'
+      ITEM 'Creatio~n~ date'
       ITEM 'Creation time'
       ITEM 'Last acc. date'
       ITEM 'Last acc. time'
       ITEM 'D~e~scription'
-      ITEM 'Path'
+      ITEM 'Pat~h~'
 ;$IFDEF DualName
       ITEM 'Show LFN'
 ;$ENDIF
     END
-    Label 1, 1, 'Columns', ofPostProcess, ofPreProcess
+    Label 1, 1, 'Col~u~mns', ofPostProcess, ofPreProcess
 
     ComboBox 17, 14, 30, 15
       ITEM 'aS Is'
@@ -2647,7 +2647,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'File Panel appearance'
     CheckBoxes 23, 20, 27, 21, ofPostProcess, ofPreProcess
       ITEM ''
     END
-    Label 1, 20, 'Never for directories', ofPostProcess, ofPreProcess
+    Label 1, 20, 'Ne~v~er for directories', ofPostProcess, ofPreProcess
 
     StaticText 43, 1, 72, 2, 'Divider and Footer'
     ComboBox 52, 2, 72, 3
@@ -2658,7 +2658,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'File Panel appearance'
       ITEM 'In footer (line 4)'
       ITEM 'On separator'
     END
-    Label 31, 2,  'File information'
+    Label 31, 2,  '~F~ile information'
 
     ComboBox 41, 3, 63, 4
 ;$IFDEF DualName
@@ -2705,7 +2705,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'File Panel appearance'
       ITEM 'In footer (line 4)'
       ITEM 'On separator'
     END
-    Label 31, 7, 'Packing info', ofPostProcess, ofPreProcess
+    Label 31, 7, 'Packin~g~ info', ofPostProcess, ofPreProcess
 #3  ComboBox 52, 8, 72, 9
       ITEM 'Do not display'
       ITEM 'In footer (line 1)'
@@ -2734,7 +2734,7 @@ DIALOG dlgPanelShowSetup, 74, 22, 'File Panel appearance'
       ITEM 'On separator'
       ITEM 'Brief on separator'
     END
-    Label 31, 10, 'Directory info', ofPostProcess, ofPreProcess
+    Label 31, 10, 'Director~y~ info', ofPostProcess, ofPreProcess
     ComboBox 52, 11, 72, 12
       ITEM 'Do not display'
       ITEM 'In footer (line 1)'
@@ -2763,20 +2763,20 @@ DIALOG dlgSavePanelSetup, 46, 18, 'Save panel settings'
       ITEM '~D~rive'
       ITEM '~L~ist'
       ITEM 'A~r~chive'
-      ITEM 'ARVID'
+      ITEM 'AR~V~ID'
       ITEM '~A~ll'
     END
-    Label 3, 1, 'Panel type'
+    Label 3, 1, '~P~anel type'
 
 #2  CheckBoxes 20, 2, 44, 14
-      ITEM '~C~urrent panel'
+      ITEM 'C~u~rrent panel'
       ITEM '~O~pposite panel'
     END
-    Label 20, 1, 'Block of settings'
+    Label 20, 1, '~B~lock of settings'
     Button 7, 13, 20, 15, '~C~heck all', cmSelectAll
 
     Button 2, 15, 16,  17, 'O~K~', cmOK, bfDefault
-    Button 17, 15, 28, 17, 'Cancel', cmCancel
+    Button 17, 15, 28, 17, 'Ca~n~cel', cmCancel
     Button 29, 15, 41, 17, '~H~elp', cmHelp
 END
 
@@ -2801,16 +2801,16 @@ DIALOG dlgFileAttr, 53, 15, 'File Attributes'
 ;   Label 52, 7, 'Date', ofPostProcess, ofPreProcess
 
     Button 2, 12, 12, 14, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 15,12, 26, 14, 'Current', cmYes, ofPostProcess, ofPreProcess
-    Button 29,12, 38, 14, 'Blank', cmNo, ofPostProcess, ofPreProcess
-    Button 41,12, 51, 14, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 15,12, 26, 14, '~C~urrent', cmYes, ofPostProcess, ofPreProcess
+    Button 29,12, 38, 14, '~B~lank', cmNo, ofPostProcess, ofPreProcess
+    Button 41,12, 51, 14, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
 ;   Button 55,11, 63, 13, 'Next', cmSkip, ofPostProcess, ofPreProcess
     CheckBoxes 4, 4, 21, 10, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~R~ead-Only'
       ITEM '~H~idden'
       ITEM '~S~ystem'
-      ITEM 'Volume label'
-      ITEM 'Directory'
+      ITEM '~V~olume label'
+      ITEM 'D~i~rectory'
       ITEM '~A~rchive'
     END
     selectback
@@ -2823,7 +2823,7 @@ DIALOG dlgFilesAttr, 57, 15, 'File Attributes'
     InputLine 29, 4, 41, 5, 8, 0
     Label 31, 2, '~T~ime', ofPostProcess, ofPreProcess
     InputLine 43, 4, 55, 5, 10, 0
-    Label 45, 2, '~D~ate', ofPostProcess, ofPreProcess
+    Label 45, 2, 'Date', ofPostProcess, ofPreProcess
 
     StaticText 37, 6, 46, 7, 'Creation:'
     InputLine 29, 7, 41, 8, 8, 0
@@ -2838,18 +2838,18 @@ DIALOG dlgFilesAttr, 57, 15, 'File Attributes'
 ;   Label 57, 7, 'Date', ofPostProcess, ofPreProcess
 
     Button 4, 12, 14, 14, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 17,12, 28, 14, 'Current', cmYes, ofPostProcess, ofPreProcess
-    Button 31,12, 40, 14, 'Blank', cmNo, ofPostProcess, ofPreProcess
-    Button 43,12, 53, 14, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 17,12, 28, 14, '~C~urrent', cmYes, ofPostProcess, ofPreProcess
+    Button 31,12, 40, 14, '~B~lank', cmNo, ofPostProcess, ofPreProcess
+    Button 43,12, 53, 14, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
     CheckBoxes 3, 4, 8, 10, ofFramed, ofPostProcess, ofPreProcess
-      ITEM '~R~ead-Only'
-      ITEM '~H~idden'
-      ITEM '~S~ystem'
-      ITEM '~V~olume label'
-      ITEM '~D~irectory'
-      ITEM '~A~rchive'
+      ITEM 'Read-~O~nly'
+      ITEM 'H~i~dden'
+      ITEM 'Syste~m~'
+      ITEM 'Vol~u~me label'
+      ITEM 'Director~y~'
+      ITEM 'Archive'
     END
-    Label 3, 3, 'Set', ofPostProcess, ofPreProcess
+    Label 3, 3, 'S~e~t', ofPostProcess, ofPreProcess
     CheckBoxes 9, 4, 26, 10, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~R~ead-Only'
       ITEM '~H~idden'
@@ -2858,7 +2858,7 @@ DIALOG dlgFilesAttr, 57, 15, 'File Attributes'
       ITEM '~D~irectory'
       ITEM '~A~rchive'
     END
-    Label 9, 3, 'Clear', ofPostProcess, ofPreProcess
+    Label 9, 3, 'C~l~ear', ofPostProcess, ofPreProcess
     selectback
     selectback
 END
@@ -2872,7 +2872,7 @@ DIALOG dlgCompareDirs, 40, 17, 'Compare directories'
       ITEM 'Compare ~c~ontents'
       ITEM 'Compa~r~e case'
     END
-    Label 3, 2, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 2, '~O~ptions', ofPostProcess, ofPreProcess
 ; {-$VOL begin}
     InputLine 3, 10, 35, 11, 255, hsFindMask
     Label 3, 9, '~F~ile masks', ofPostProcess, ofPreProcess
@@ -2881,10 +2881,10 @@ DIALOG dlgCompareDirs, 40, 17, 'Compare directories'
       ITEM 'S~e~lect '
       ITEM '~U~nselect'
     END
-    Label 3, 12, 'Selection mode', ofPostProcess, ofPreProcess
+    Label 3, 12, 'Selection ~m~ode', ofPostProcess, ofPreProcess
     Button 28, 3, 38, 5, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 28, 5, 38, 7, 'Sa~v~e', cmYes, ofPostProcess, ofPreProcess
-    Button 28, 7, 38, 9, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 28, 7, 38, 9, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
     Button 28, 13, 38, 15, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2893,7 +2893,7 @@ DIALOG dlgSetPassword, 39, 7, 'Enter Password'
     InputLine 12, 2, 37, 3, 40, 0, ofSecurity
     Label 2, 2, '~P~assword', ofPostProcess, ofPreProcess
     Button 7, 4, 17, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 17, 4, 27, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 17, 4, 27, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 27, 4, 37, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2905,7 +2905,7 @@ DIALOG dlgLoginPassword, 44, 10, 'Enter User name and Password'
     Label 2, 4, '~P~assword:', ofPostProcess, ofPreProcess
 #1  StaticText 2, 5, 42, 6, ^C'Wrong name or password'
     Button 7, 7, 17, 9, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 17, 7, 27, 9, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 17, 7, 27, 9, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 27, 7, 37, 9, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -2922,7 +2922,7 @@ DIALOG dlgExtract, 49, 14, 'Extract files'
     InputLine 12, 9, 45, 10, 30, 0, ofSecurity
     Label 2, 9, 'P~a~ssword', ofPostProcess, ofPreProcess
     Button 8, 11, 18, 13, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 18, 11, 28, 13, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 18, 11, 28, 13, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 28, 11, 38, 13, '~T~ree', cmTree, ofPostProcess, ofPreProcess
     Button 38, 11, 48, 13, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
@@ -2933,7 +2933,7 @@ DIALOG dlgCommandsHistory, 78, 17, 'Commands history'
     Button 24, 14, 34, 16, '~D~rop', cmYes, ofPostProcess, ofPreProcess
     Button 34, 14, 44, 16, '~E~dit', cmOK, bfBroadcast, ofPostProcess, ofPreProcess
     Button 44, 14, 54, 16, '~K~ill', cmYes, bfBroadcast, ofPostProcess, ofPreProcess
-    Button 54, 14, 64, 16, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 54, 14, 64, 16, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgDirectoryHistory, 78, 17, 'Directories History'
@@ -2941,7 +2941,7 @@ DIALOG dlgDirectoryHistory, 78, 17, 'Directories History'
     Button 13, 14, 24, 16, '~G~o to', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 25, 14, 42, 16, '~D~elete record', cmYes, bfBroadcast, ofPostProcess, ofPreProcess
     Button 43, 14, 55, 16, '~S~tand at', cmNo, bfBroadcast, ofPostProcess, ofPreProcess
-    Button 56, 14, 66, 16, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 56, 14, 66, 16, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgEditHistory, 78, 17, 'File Edit History'
@@ -2949,7 +2949,7 @@ DIALOG dlgEditHistory, 78, 17, 'File Edit History'
     Button 14, 14, 24, 16, '~O~pen', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 25, 14, 42, 16, '~D~elete record', cmYes, bfBroadcast, ofPostProcess, ofPreProcess
     Button 43, 14, 55, 16, '~S~tand at', cmNo, bfBroadcast, ofPostProcess, ofPreProcess
-    Button 56, 14, 66, 16, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 56, 14, 66, 16, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgViewHistory, 78, 17, 'File View History'
@@ -2957,7 +2957,7 @@ DIALOG dlgViewHistory, 78, 17, 'File View History'
     Button 14, 14, 24, 16, '~O~pen', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 25, 14, 42, 16, '~D~elete record', cmYes, bfBroadcast, ofPostProcess, ofPreProcess
     Button 43, 14, 55, 16, '~S~tand at', cmNo, bfBroadcast, ofPostProcess, ofPreProcess
-    Button 56, 14, 66, 16, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 56, 14, 66, 16, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgSetupArc, 78, 22, 'Archiver Setup'
@@ -2993,7 +2993,7 @@ DIALOG dlgSetupArc, 78, 22, 'Archiver Setup'
     InputLine 16, 8, 22, 9, 20, 0
     Label 9, 8, 'S~o~lid', ofPostProcess, ofPreProcess
     InputLine 45, 8, 51, 9, 20, 0
-    Label 28, 8, 'Recurse SubDirs', ofPostProcess, ofPreProcess
+    Label 28, 8, 'Recurse Su~b~Dirs', ofPostProcess, ofPreProcess
     InputLine 70, 8, 76, 9, 20, 0
     Label 53, 8, 'Set path inside', ofPostProcess, ofPreProcess
     StaticText 4, 10, 21, 11, 'Compression type:'
@@ -3047,7 +3047,7 @@ DIALOG dlgSelect, 27, 9, 'Select'
       ITEM '~E~xcept mask'
     END
     Button 2, 6, 12, 8, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 13, 6, 23, 8, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 13, 6, 23, 8, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgUnselect, 27, 9, 'Unselect'
@@ -3058,7 +3058,7 @@ DIALOG dlgUnselect, 27, 9, 'Unselect'
       ITEM '~E~xcept mask'
     END
     Button 2, 6, 12, 8, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 13, 6, 23, 8, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 13, 6, 23, 8, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgUUDecode, 49, 11, 'UU Decode'
@@ -3071,7 +3071,7 @@ DIALOG dlgUUDecode, 49, 11, 'UU Decode'
       ITEM '~S~ave broken files'
     END
     Button  7, 8, 17, 10, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 17, 8, 27, 10, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 17, 8, 27, 10, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
     Button 27, 8, 37, 10, '~T~ree', cmTree, ofPostProcess, ofPreProcess
     Button 37, 8, 47, 10, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
@@ -3091,7 +3091,7 @@ DIALOG dlgUUEncode, 60, 17, 'UU Encode'
       ITEM '~N~one'
       ITEM 'of Entire ~i~nput file'
       ITEM 'of Each ~s~ection'
-      ITEM 'of Eac~h~ line'
+      ITEM '~o~f Each line'
       ITEM 'Advanced ~6~4-bit'
     END
     Label 32, 4, '~C~hecksum level', ofPostProcess, ofPreProcess
@@ -3103,7 +3103,7 @@ DIALOG dlgUUEncode, 60, 17, 'UU Encode'
       ITEM '~U~NIX'
 ;     ITEM '<CR> only'
     END
-    Label 2, 11, '~T~arget file format', ofPostProcess, ofPreProcess
+    Label 2, 11, 'Ta~r~get file format', ofPostProcess, ofPreProcess
 
     Button 14, 14, 24, 16, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 24, 14, 34, 16, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
@@ -3113,7 +3113,7 @@ END
 
 DIALOG dlgPhoneBook, 58, 20, 'Phone Book'
   HELPCTX hcPhone
-  Button 3,15,14,17, '~R~eturn', cmNo, bfDefault, ofPostProcess, ofPreProcess
+  Button 3,15,14,17, 'Re~t~urn', cmNo, bfDefault, ofPostProcess, ofPreProcess
   Button 3,15,14,17, 'Ente~r~', cmOK, bfDefault, ofPostProcess, ofPreProcess
   Button 14,15,24,17, '~D~ial', cmDialPhone, bfNormal, ofPostProcess, ofPreProcess
   Button 24,15,33,17, '~A~dd', cmInsertPhone, bfNormal, ofPostProcess, ofPreProcess
@@ -3123,7 +3123,7 @@ DIALOG dlgPhoneBook, 58, 20, 'Phone Book'
   Button 13,17,23,19, '~S~earch', cmSearchPhone, bfNormal, ofPostProcess, ofPreProcess
   Button 23,17,33,19, '~I~mport', cmImportPhones, bfNormal, ofPostProcess, ofPreProcess
   Button 33,17,43,19, 'D~u~pe', cmCopyPhone, bfNormal, ofPostProcess, ofPreProcess
-  Button 43,17,53,19, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 43,17,53,19, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
 END
 
 
@@ -3132,7 +3132,7 @@ DIALOG dlgManualDial, 47, 7, 'Manual Dial'
   InputLine 16, 2, 42, 3, 255, hsManualPhone
   Label 2, 2, '~P~hone number', ofPostProcess, ofPreProcess
   Button 8, 4, 18, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-  Button 18, 4, 28, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+  Button 18, 4, 28, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
   Button 28, 4, 38, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -3152,7 +3152,7 @@ DIALOG dlgCalculator, 64, 16, 'Calculator'
    Button 1,13,14,15, 'E~v~aluate', cmCalcValue, bfDefault, ofPostProcess, ofPreProcess
    Button 14,13,26,15, '~C~opy', cmCopyClip, bfBroadcast, ofPostProcess, ofPreProcess
    Button 26,13,41,15, 'P~r~ecision', cmChangeFormat, bfBroadcast, ofPostProcess, ofPreProcess
-   Button 41,13,52,15, 'Close', cmCancel, bfBroadcast, ofPostProcess, ofPreProcess
+   Button 41,13,52,15, 'C~l~ose', cmCancel, bfBroadcast, ofPostProcess, ofPreProcess
    Button 52,13,62,15, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
 
@@ -3176,14 +3176,14 @@ DIALOG dlgCalcFormat, 28, 18, 'Precision'
    Label 1, 12, '~T~IME', ofPostProcess, ofPreProcess
    StaticText 12, 12, 26, 13, 'fractal digits'
    Button 3,15,13,17, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-   Button 15,15,25,17, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+   Button 15,15,25,17, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgWindowManager, 70, 14, 'Windows Manager'
   HELPCTX hcWinMan
   Button 58,3,68,5,  'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
   Button 58,5,68,7,  'C~l~ose', cmNo, bfNormal, ofPostProcess, ofPreProcess
-  Button 58,7,68,9, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 58,7,68,9, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
   Button 58,11,68,13,'~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
 
@@ -3192,7 +3192,7 @@ DIALOG dlgVolumeLabel, 32, 7, 'Set Volume Label'
   InputLine 2, 3, 16, 4, 12, 0
   Label 2, 2, '~L~abel', ofPostProcess, ofPreProcess
   Button 20,2,30,4, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-  Button 20,4,30,6, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 20,4,30,6, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgEditEnvironment, 57, 20, 'OS Environment Variables Editor'
@@ -3204,16 +3204,16 @@ DIALOG dlgEditEnvironment, 57, 20, 'OS Environment Variables Editor'
   Button 45, 5,55, 7, '~R~ename', cmYes, bfBroadcast, ofPostProcess, ofPreProcess
   Button 45, 7,55, 9, '~A~ppend', cmOK, bfBroadcast, ofPostProcess, ofPreProcess
   Button 45, 9,55,11,'~D~elete', cmNo, bfBroadcast, ofPostProcess, ofPreProcess
-  Button 45,11,55,13,'Cancel', cmCancel, bfNormal
+  Button 45,11,55,13,'~C~ancel', cmCancel, bfNormal
   Button 45,13,55,15,'~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgTetrisWinner, 50, 7, 'You have entered Top Ten!'
   HELPCTX hcTetrisWinner
   InputLine 20, 2, 45, 3, 30, hsTetris
-  Label 2, 2, 'Enter your name:', ofPostProcess, ofPreProcess
+  Label 2, 2, '~E~nter your name:', ofPostProcess, ofPreProcess
   Button 17, 4, 27, 6, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-  Button 27, 4, 37, 6, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+  Button 27, 4, 37, 6, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
   Button 37, 4, 47, 6, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -3230,10 +3230,10 @@ DIALOG dlgSplitFile, 50, 15, 'Split file'
   Label 2, 9, 'Section s~i~ze:', ofPostProcess, ofPreProcess
 
   InputLine 25, 10, 46, 11, 10, hsFBBCopyNum
-  Label 2, 10, 'Number of sections:', ofPostProcess, ofPreProcess
+  Label 2, 10, '~N~umber of sections:', ofPostProcess, ofPreProcess
 
   Button 8, 12, 18, 14, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-  Button 18,12, 28, 14, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 18,12, 28, 14, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
   Button 28,12, 38, 14, '~T~ree', cmTree, bfNormal, ofPostProcess, ofPreProcess
   Button 38,12, 48, 14, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
@@ -3243,7 +3243,7 @@ DIALOG dlgCombineFile, 50, 8, 'Combine file'
   InputLine 2, 3, 46, 4, 255, hsFBBCopy
   Label 2, 2, 'To ~d~irectory/file', ofPostProcess, ofPreProcess
   Button 8, 5, 18, 7, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-  Button 18,5, 28, 7, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 18,5, 28, 7, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
   Button 28,5, 38, 7, '~T~ree', cmTree, bfNormal, ofPostProcess, ofPreProcess
   Button 38,5, 48, 7, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
@@ -3251,9 +3251,9 @@ END
 DIALOG dlgNextSection, 76, 8, 'File recombination'
   HELPCTX hcPath
   InputLine 2, 3, 72, 2, 255, hsFBBCopy
-  Label 2, 2, 'Section %D is required. Replace media and/or modify the path below', ofPostProcess, ofPreProcess
+  Label 2, 2, '~S~ection %D is required. Replace media and/or modify the path below', ofPostProcess, ofPreProcess
   Button 34, 5, 44, 7, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-  Button 44, 5, 54, 7, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+  Button 44, 5, 54, 7, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
   Button 54, 5, 64, 7, '~T~ree', cmTree, bfNormal, ofPostProcess, ofPreProcess
   Button 64, 5, 74, 7, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 END
@@ -3280,15 +3280,15 @@ DIALOG dlgOverwriteQuery, 64, 13, 'Confirm'
     Button 25, 10, 35, 12, 'Res~u~me', cmSave, bfNormal, ofPostProcess
     Button 35, 10, 45, 12, '~R~ename', cmOK, bfNormal, ofPostProcess
     Button 45, 10, 53, 12, '~S~kip', cmSkip, bfNormal, ofPostProcess
-    Button 53, 10, 63, 12, 'Cancel', cmCancel, bfNormal, ofPostProcess
+    Button 53, 10, 63, 12, '~C~ancel', cmCancel, bfNormal, ofPostProcess
 END
 
 DIALOG dlgQueryAbort, 40, 10, 'Confirm'
     HELPCTX hcQueryAbort
     StaticText 8, 2, 38, 3, 'Abort operation?'
     CheckBoxes 3, 6, 38, 8, ofPostProcess
-      ITEM 'Write data that been read'
-      ITEM 'Save incomplete file'
+      ITEM '~W~rite data that been read'
+      ITEM '~S~ave incomplete file'
     END
     Button  6, 4, 16, 6, Yes, cmYes, bfDefault, ofPostProcess
     Button 24, 4, 34, 6, No, cmNo, bfNormal, ofPostProcess
@@ -3301,7 +3301,7 @@ DIALOG dlgAppendQuery, 60, 13, 'Select'
 
     Button  3, 10, 16, 12, '~D~irectory', cmNo, bfDefault, ofPostProcess
     Button 23, 10, 33, 12, '~A~ppend', cmYes, bfNormal, ofPostProcess
-    Button 46, 10, 56, 12, 'Cancel', cmCancel, bfNormal, ofPostProcess
+    Button 46, 10, 56, 12, '~C~ancel', cmCancel, bfNormal, ofPostProcess
 END
 
 DIALOG dlgAdvancedFilter, 56, 20, 'Filter'
@@ -3313,7 +3313,7 @@ DIALOG dlgAdvancedFilter, 56, 20, 'Filter'
     Label 3, 4, 'E~x~tensions'
 #3  Button  2, 15, 16, 17, '~S~how', cmYes, bfDefault, ofPostProcess, ofPreProcess
 #4  Button  13, 17, 21, 19, 'O~K~', cmOk, bfNormal, ofPostProcess, ofPreProcess
-#5  Button 29, 17, 41, 19, 'Close', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+#5  Button 29, 17, 41, 19, '~C~lose', cmCancel, bfNormal, ofPostProcess, ofPreProcess
 #6  Button 17, 15, 28, 17, '~H~ide', cmNo, bfNormal, ofPostProcess, ofPreProcess
 #7  Button 29, 15, 41, 17, 'St~o~re', 0, bfNormal
 END
@@ -3323,7 +3323,7 @@ DIALOG dlgViewerFind, 50, 15, 'Find'
     InputLine 2, 3, 44, 4, 250, hsViewFind
     Label 2, 2, '~S~earch for', ofPostProcess, ofPreProcess
     HexLine 2, 5, 44, 6
-    Label 2, 4, '~H~ex string', ofPostProcess, ofPreProcess
+    Label 2, 4, 'H~e~x string', ofPostProcess, ofPreProcess
 
     CheckBoxes 2,7,24,11, ofPostProcess
       ITEM '~C~ase sensitive'
@@ -3333,16 +3333,16 @@ DIALOG dlgViewerFind, 50, 15, 'Find'
       ITEM '~R~egular expression'
 ;$ENDIF
     END
-    Label 2, 6, 'Options', ofPostProcess, ofPreProcess
+    Label 2, 6, 'O~p~tions', ofPostProcess, ofPreProcess
 
     RadioButtons 26,8,44,10, ofPostProcess
       ITEM '~F~orward'
       ITEM '~B~ackward'
     END
-    Label 26, 7, 'Direction', ofPostProcess, ofPreProcess
+    Label 26, 7, '~D~irection', ofPostProcess, ofPreProcess
 
     Button 17,12,27,14, '~O~K', cmOK, bfDefault, ofPostProcess
-    Button 27,12,37,14, 'Cancel', cmCancel, bfNormal, ofPostProcess
+    Button 27,12,37,14, 'Ca~n~cel', cmCancel, bfNormal, ofPostProcess
     Button 37,12,47,14, '~H~elp', cmHelp, bfNormal, ofPostProcess
 END
 
@@ -3358,14 +3358,14 @@ DIALOG dlgPanelSortSetup, 59, 21, 'Sorting'
       ITEM '~D~escription'
       ITEM '~U~nsorted'
     END
-    Label 2, 2, 'Sort by...', ofPostProcess, ofPreProcess
+    Label 2, 2, 'Sort ~b~y...', ofPostProcess, ofPreProcess
     CheckBoxes 2, 13, 28, 17, ofPostProcess, ofPreProcess
       ITEM 'Sort by ~p~ath'
       ITEM 'Sort by ~g~roup'
       ITEM 'In~v~erted order'
       ITEM 'D~i~rectories by name'
     END
-    Label 2, 12, 'Sorting features', ofPostProcess, ofPreProcess
+    Label 2, 12, 'Sorting ~f~eatures', ofPostProcess, ofPreProcess
     StaticText 34, 2, 49, 3, 'Put to the top:'
     ComboBox 34, 3, 53, 4
       ITEM 'None'
@@ -3400,14 +3400,14 @@ DIALOG dlgPanelSortSetup, 59, 21, 'Sorting'
     END
     Label 31, 6, '~4~', ofPostProcess, ofPreProcess
 #2  RadioButtons 33, 9, 49, 12, ofPostProcess, ofPreProcess
-      ITEM 'Alphabetic'
-      ITEM 'Upper case'
-      ITEM 'Lower case'
+      ITEM 'A~l~phabetic'
+      ITEM 'Uppe~r~ case'
+      ITEM 'Lo~w~er case'
     END
-    Label 33, 8, 'File names comparing', ofPostProcess, ofPreProcess
+    Label 33, 8, 'File na~m~es comparing', ofPostProcess, ofPreProcess
 #1  Button 45, 16, 57, 18, 'St~o~re', 0
     Button 27, 18, 37, 20, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 37, 18, 47, 20, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 37, 18, 47, 20, 'Canc~e~l', cmCancel, ofPostProcess, ofPreProcess
     Button 47, 18, 57, 20, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -3424,16 +3424,16 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
       ITEM 'Use ~/~'#26' keys'
       ITEM '~A~lt difference'
       ITEM 'BS - go to u~p~per directory'
-      ITEM 'Do not kill descriptions'
-      ITEM 'Kill description containers'
-      ITEM 'Always copy descriptions'
-      ITEM 'Drive line autorefresh'
+      ITEM 'Do ~n~ot kill descriptions'
+      ITEM 'K~i~ll description containers'
+      ITEM 'Alwa~y~s copy descriptions'
+      ITEM 'D~r~ive line autorefresh'
       ITEM 'Panel autorefresh'
 ;$IFDEF DualName
       ITEM 'Desriptions by Short names'
 ;$ENDIF
     END
-    Label 1, 1, 'Behavior', ofPostProcess, ofPreProcess
+    Label 1, 1, 'Beha~v~ior', ofPostProcess, ofPreProcess
 
 ; PanelArrowsPage (dn.ini [FilePanels]): the keys of the vtui UX guidelines in the panels
     CheckBoxes 1, 17, 35, 18, ofPostProcess, ofPreProcess
@@ -3458,11 +3458,11 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
 
 ; Show
     CheckBoxes 38, 2, 68, 7, ofPostProcess, ofPreProcess
-      ITEM 'Sort type indicator'
+      ITEM 'Sort ~t~ype indicator'
       ITEM 'Drive ~l~ine'
       ITEM 'Scrollbar'
       ITEM '~F~iles highlight'
-      ITEM 'Show hidden files'
+      ITEM 'Sh~o~w hidden files'
     END
     Label 38, 1, 'Display', ofPostProcess, ofPreProcess
 
@@ -3488,7 +3488,7 @@ DIALOG dlgFMSetup, 76, 22, 'File Manager Setup'
       ITEM 'Highlight'
       ITEM 'Do not show'
     END
-    Label 35, 11, ' └─ Common part', ofPostProcess, ofPreProcess
+    Label 35, 11, ' └─ Co~m~mon part', ofPostProcess, ofPreProcess
 
 ; TagChar
     InputLine 46, 12, 49, 13, 1, 0
@@ -3551,9 +3551,9 @@ DIALOG dlgDriveInfoSetup, 55, 14, 'Information Panel Setup'
 ;$ENDIF
       ITEM '~I~nformation file'
     END
-    Label 2, 2, 'Items to display'
+    Label 2, 2, 'Items t~o~ display'
     Button 23, 11, 33, 13, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 33, 11, 43, 13, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 33, 11, 43, 13, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 43, 11, 53, 13, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -3567,7 +3567,7 @@ DIALOG dlgStartupSetup, 60, 20, 'Startup'
       ITEM '~F~orce VGA palette   '
 ;$ENDIF
     END
-    Label 2, 2, 'Startup options', ofPostProcess, ofPreProcess
+    Label 2, 2, '~S~tartup options', ofPostProcess, ofPreProcess
 
     CheckBoxes 2, 7, 58, 9, ofPostProcess, ofPreProcess
       ITEM '~I~nactivity hour exit'
@@ -3576,10 +3576,10 @@ DIALOG dlgStartupSetup, 60, 20, 'Startup'
       ITEM '~P~reserve directory  '
 ;     ITEM 'Restore ~V~GA palette '
     END
-    Label 2, 6, 'Shutdown options', ofPostProcess, ofPreProcess
+    Label 2, 6, 'Shutdown ~o~ptions', ofPostProcess, ofPreProcess
 
     Button 34, 17, 44, 19, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 46, 17, 56, 19, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 46, 17, 56, 19, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
 END
 
 DIALOG dlgArvidFileFind, 50, 13, 'Find File in ARVID'
@@ -3592,10 +3592,10 @@ DIALOG dlgArvidFileFind, 50, 13, 'Find File in ARVID'
       ITEM '~A~dvanced search'
       ITEM '~S~earch in other ARVID catalogs'
     END
-    Label 3, 6, 'Options', ofPostProcess, ofPreProcess
+    Label 3, 6, '~O~ptions', ofPostProcess, ofPreProcess
     Button  3, 10, 13, 12, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 13, 10, 28, 12, 'Ad~v~anced...', cmSearchAdvance, ofPostProcess, ofPreProcess
-    Button 28, 10, 38, 12, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 28, 10, 38, 12, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 38, 10, 48, 12, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -3641,16 +3641,16 @@ DIALOG dlgSystemSetup, 72, 21, 'System Setup'
       ITEM 'Check free s~p~ace'
       ITEM 'Unpack to dri~v~e directly'
     END
-    Label 8, 13, 'Current drive options', ofPostProcess, ofPreProcess
+    Label 8, 13, 'Current drive option~s~', ofPostProcess, ofPreProcess
 
     InputLine 63, 13, 70, 14, 5, 0
-    Label 43, 13, 'Copy buffer limit:', ofPostProcess, ofPreProcess
+    Label 43, 13, 'Copy ~b~uffer limit:', ofPostProcess, ofPreProcess
 
     InputLine 63, 15, 70, 16, 3, 0
-    Label 38, 15, 'Force default archiver:', ofPostProcess, ofPreProcess
+    Label 38, 15, 'Fo~r~ce default archiver:', ofPostProcess, ofPreProcess
 
     Button 40, 18, 50, 20, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 50, 18, 60, 20, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 50, 18, 60, 20, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
     Button 60, 18, 70, 20, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -3662,12 +3662,12 @@ DIALOG dlgAdvancedCOMSetup, 45, 15, 'Advanced Port Setup'
       ITEM '~6~'
       ITEM '~5~'
     END
-    Label 3, 2, 'Data bits', ofPostProcess, ofPreProcess
+    Label 3, 2, 'Data ~b~its', ofPostProcess, ofPreProcess
     RadioButtons 3, 7, 18, 8, ofPostProcess, ofPreProcess
       ITEM '~1~'
       ITEM '~2~'
     END
-    Label 3, 6, 'Stop bits', ofPostProcess, ofPreProcess
+    Label 3, 6, 'S~t~op bits', ofPostProcess, ofPreProcess
     RadioButtons 20, 3, 31, 8, ofPostProcess, ofPreProcess
       ITEM '~N~one'
       ITEM '~O~dd'
@@ -3675,19 +3675,19 @@ DIALOG dlgAdvancedCOMSetup, 45, 15, 'Advanced Port Setup'
       ITEM '~M~ark'
       ITEM '~S~pace'
     END
-    Label 20, 2, 'Parity', ofPostProcess, ofPreProcess
+    Label 20, 2, '~P~arity', ofPostProcess, ofPreProcess
     CheckBoxes 3, 11, 18, 13, ofPostProcess, ofPreProcess
       ITEM '~C~TS/RTS'
       ITEM '~D~TR/DSR'
     END
-    Label 6, 10, 'Hardware', ofPostProcess, ofPreProcess
+    Label 6, 10, 'H~a~rdware', ofPostProcess, ofPreProcess
     StaticText 10, 9, 28, 10, '┌─ Flow Control ─┐'
     CheckBoxes 19, 11, 33, 13, ofPostProcess, ofPreProcess
       ITEM '~X~on/Xoff'
     END
-    Label 22, 10, 'Software', ofPostProcess, ofPreProcess
+    Label 22, 10, 'So~f~tware', ofPostProcess, ofPreProcess
     Button 33, 2, 43, 4, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 33, 5, 43, 7, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 33, 5, 43, 7, 'Cance~l~', cmCancel, ofPostProcess, ofPreProcess
     Button 33, 8, 43, 10, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 
@@ -3832,11 +3832,11 @@ DIALOG dlgFTNInfo, 55, 8, 'FTN Info'
     HELPCTX hcFTNInfo
 
     InputLine  2, 3, 53, 4, 255, 0
-    Label 1, 1, 'If you are an FTN member, please enter your primary'
+    Label 1, 1, '~I~f you are an FTN member, please enter your primary'
     Label 1, 2, 'FTN address, a comma, and the default outbound path'
 
     Button 23, 5, 33, 7, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 33, 5, 43, 7, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 33, 5, 43, 7, '~C~ancel', cmCancel, ofPostProcess, ofPreProcess
     Button 43, 5, 53, 7, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 ;DataCompBoy
@@ -3846,11 +3846,11 @@ DIALOG dlgSrchFailed, 56, 8, 'Search failed'
     HELPCTX hcSrchFailed
 
     ParamText 2, 2, 39, 3, 'File %s not found.',1
-    Label 1, 3, 'The search paths in dn.spf may require configuration'
+    Label 1, 3, '~T~he search paths in dn.spf may require configuration'
 
     Button 15, 5, 25, 7, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 25, 5, 35, 7, 'Create', cmNo, ofPostProcess, ofPreProcess
-    Button 35, 5, 54, 7, 'Configure paths', cmYes, ofPostProcess, ofPreProcess
+    Button 25, 5, 35, 7, '~C~reate', cmNo, ofPostProcess, ofPreProcess
+    Button 35, 5, 54, 7, 'Configure ~p~aths', cmYes, ofPostProcess, ofPreProcess
 END
 ;DataCompBoy
 
@@ -4030,7 +4030,7 @@ DIALOG dlgSetupColumnsDisk, 70, 21, 'Columns setup - Drive'
       ITEM 'UPPER'
       ITEM 'Combined'
     END
-    Label 2, 16, 'Files:', ofPostProcess, ofPreProcess
+    Label 2, 16, '~F~iles:', ofPostProcess, ofPreProcess
 
     ComboBox 17, 17, 30, 18
       ITEM 'aS Is'
@@ -4039,10 +4039,10 @@ DIALOG dlgSetupColumnsDisk, 70, 21, 'Columns setup - Drive'
       ITEM 'UPPER'
       ITEM 'Combined'
     END
-    Label 2, 17, 'Directoryes:', ofPostProcess, ofPreProcess
+    Label 2, 17, '~D~irectoryes:', ofPostProcess, ofPreProcess
 
     Button 17, 19, 27, 21, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 29, 19, 39, 21, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+    Button 29, 19, 39, 21, '~C~ancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
     Button 41, 19, 51, 21, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 
 ;    SelectBack
@@ -4205,25 +4205,25 @@ DIALOG dlgSetupColumnsFind, 70, 21, 'Columns setup - Search'
     InputLine 63, 12, 68, 13, 3, 0
 
     RadioButtons 2, 15, 68, 16, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM '~a~S Is'
+      ITEM '~l~ower'
+      ITEM '~C~apitalized'
+      ITEM '~U~PPER'
+      ITEM 'C~o~mbined'
     END
-    Label 2, 14, 'File name case:', ofPostProcess, ofPreProcess
+    Label 2, 14, '~F~ile name case:', ofPostProcess, ofPreProcess
 
     RadioButtons 2, 17, 68, 18, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM 'aS ~I~s'
+      ITEM 'lo~w~er'
+      ITEM 'Ca~p~italized'
+      ITEM 'UPP~E~R'
+      ITEM 'Co~m~bined'
     END
-    Label 2, 16, 'Directory name case:', ofPostProcess, ofPreProcess
+    Label 2, 16, '~D~irectory name case:', ofPostProcess, ofPreProcess
 
     Button 17, 18, 27, 20, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 29, 18, 39, 20, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+    Button 29, 18, 39, 20, 'Ca~n~cel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
     Button 41, 18, 51, 20, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 
 ;    SelectBack
@@ -4386,25 +4386,25 @@ DIALOG dlgSetupColumnsTemp, 70, 21, 'Columns setup - TEMP'
     InputLine 63, 12, 68, 13, 3, 0
 
     RadioButtons 2, 15, 68, 16, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM '~a~S Is'
+      ITEM '~l~ower'
+      ITEM '~C~apitalized'
+      ITEM '~U~PPER'
+      ITEM 'C~o~mbined'
     END
-    Label 2, 14, 'File name case:', ofPostProcess, ofPreProcess
+    Label 2, 14, '~F~ile name case:', ofPostProcess, ofPreProcess
 
     RadioButtons 2, 17, 68, 18, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM 'aS ~I~s'
+      ITEM 'lo~w~er'
+      ITEM 'Ca~p~italized'
+      ITEM 'UPP~E~R'
+      ITEM 'Co~m~bined'
     END
-    Label 2, 16, 'Directory name case:', ofPostProcess, ofPreProcess
+    Label 2, 16, '~D~irectory name case:', ofPostProcess, ofPreProcess
 
     Button 17, 18, 27, 20, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 29, 18, 39, 20, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+    Button 29, 18, 39, 20, 'Ca~n~cel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
     Button 41, 18, 51, 20, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 
 ;    SelectBack
@@ -4534,25 +4534,25 @@ DIALOG dlgSetupColumnsArch, 70, 18, 'Columns setup - Archive'
     InputLine 63, 9, 68,10, 3, 0
 
     RadioButtons 2, 12, 68, 13, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM '~a~S Is'
+      ITEM '~l~ower'
+      ITEM '~C~apitalized'
+      ITEM '~U~PPER'
+      ITEM 'C~o~mbined'
     END
-    Label 2, 11, 'File name case:', ofPostProcess, ofPreProcess
+    Label 2, 11, '~F~ile name case:', ofPostProcess, ofPreProcess
 
     RadioButtons 2, 14, 68, 15, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM 'aS ~I~s'
+      ITEM 'lo~w~er'
+      ITEM 'Ca~p~italized'
+      ITEM 'UPP~E~R'
+      ITEM 'Co~m~bined'
     END
-    Label 2, 13, 'Directory name case:', ofPostProcess, ofPreProcess
+    Label 2, 13, '~D~irectory name case:', ofPostProcess, ofPreProcess
 
     Button 17, 15, 27, 17, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 29, 15, 39, 17, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+    Button 29, 15, 39, 17, 'Ca~n~cel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
     Button 41, 15, 51, 17, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 
 ;    SelectBack
@@ -4671,25 +4671,25 @@ DIALOG dlgSetupColumnsArvd, 70, 17, 'Columns setup - ARVID'
     InputLine 63, 8, 68, 9, 3, 0
 
     RadioButtons 2, 11, 68, 12, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM '~a~S Is'
+      ITEM '~l~ower'
+      ITEM '~C~apitalized'
+      ITEM '~U~PPER'
+      ITEM 'C~o~mbined'
     END
-    Label 2, 10, 'File name case:', ofPostProcess, ofPreProcess
+    Label 2, 10, '~F~ile name case:', ofPostProcess, ofPreProcess
 
     RadioButtons 2, 13, 68, 14, ofPostProcess, ofPreProcess
-      ITEM 'aS Is'
-      ITEM 'lower'
-      ITEM 'Capitalized'
-      ITEM 'UPPER'
-      ITEM 'Combined'
+      ITEM 'aS ~I~s'
+      ITEM 'lo~w~er'
+      ITEM 'Ca~p~italized'
+      ITEM 'UPP~E~R'
+      ITEM 'Co~m~bined'
     END
-    Label 2, 12, 'Directory name case:', ofPostProcess, ofPreProcess
+    Label 2, 12, '~D~irectory name case:', ofPostProcess, ofPreProcess
 
     Button 17, 14, 27, 16, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 29, 14, 39, 16, 'Cancel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
+    Button 29, 14, 39, 16, 'Ca~n~cel', cmCancel, bfNormal, ofPostProcess, ofPreProcess
     Button 41, 14, 51, 16, '~H~elp', cmHelp, bfNormal, ofPostProcess, ofPreProcess
 
 ;    SelectBack
@@ -4700,26 +4700,26 @@ END
 DIALOG dlgNameCase, 40, 12, 'Change names case'
     HelpCtx hcChangeNameCase
     RadioButtons 2, 3, 22, 8, ofPostProcess, ofPreProcess
-      ITEM 'LoNg FIle nAMe'
+      ITEM 'LoNg FIle n~A~Me'
 ;      ITEM 'No change'
-      ITEM 'long file name'
-      ITEM 'Long file name'
-      ITEM 'Long File Name'
-      ITEM 'LONG FILE NAME'
+      ITEM 'long ~f~ile name'
+      ITEM 'Long file na~m~e'
+      ITEM 'Lon~g~ File Name'
+      ITEM 'LONG F~I~LE NAME'
     END
     Label 2, 2, '~N~ame', ofPostProcess, ofPreProcess
     RadioButtons 24, 3, 38, 8, ofPostProcess, ofPreProcess
-      ITEM 'LoNg eXt'
+      ITEM 'LoNg ~e~Xt'
 ;      ITEM 'No change'
-      ITEM 'long ext'
-      ITEM 'Long ext'
-      ITEM 'Long Ext'
+      ITEM 'long ex~t~'
+      ITEM '~L~ong ext'
+      ITEM 'L~o~ng Ext'
       ITEM 'LONG EXT'
     END
     Label 24, 2, 'E~x~tension', ofPostProcess, ofPreProcess
     Button  4, 9, 14, 11,  'O~K~',  cmOK,     bfDefault, ofPostProcess, ofPreProcess
-    Button 15, 9, 25, 11, 'Cancel', cmCancel, bfNormal,  ofPostProcess, ofPreProcess
-    Button 26, 9, 36, 11,  'Help',  cmHelp,   bfNormal,  ofPostProcess, ofPreProcess
+    Button 15, 9, 25, 11, '~C~ancel', cmCancel, bfNormal,  ofPostProcess, ofPreProcess
+    Button 26, 9, 36, 11,  '~H~elp',  cmHelp,   bfNormal,  ofPostProcess, ofPreProcess
 END
 ;DataCompBoy
 ;JO
@@ -4744,7 +4744,7 @@ DIALOG dlgChScreenMode, 34, 12, 'Change Screen Mode'
     InputLine 26, 4, 31, 5, 3, 0
     StaticText 24, 4, 25, 5, 'x'
     Button 7, 9, 17, 11, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 17, 9, 27, 11, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 17, 9, 27, 11, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
 END
 ;JO
 
@@ -4754,17 +4754,17 @@ DIALOG dlgSetExportCsvFormat, 46, 16, 'CSV Export Format'
     InputLine 25, 2, 28, 3, 1, 0, ofFramed
     Label 2, 2, '~C~olumn separator:', ofPostProcess, ofPreProcess
     RadioButtons 2, 5, 44, 7, ofFramed, ofPostProcess, ofPreProcess
-      ITEM 'As is (number value)'
-      ITEM 'Formatted string value'
+      ITEM 'As ~i~s (number value)'
+      ITEM 'Formatted ~s~tring value'
     END
     Label 3, 4, '~N~umber format:', ofPostProcess, ofPreProcess
     RadioButtons 2, 9, 44, 11, ofFramed, ofPostProcess, ofPreProcess
-      ITEM 'As string'
-      ITEM 'As calculated value'
+      ITEM '~A~s string'
+      ITEM 'As calculated ~v~alue'
     END
     Label 3, 8, '~F~ormula format:', ofPostProcess, ofPreProcess
     Button 11, 13, 21, 15, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 25, 13, 35, 15, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 25, 13, 35, 15, 'Canc~e~l', cmCancel, ofPostProcess, ofPreProcess
 END
 ;KV
 
@@ -4776,7 +4776,7 @@ DIALOG dlgDBFGoto, 41, 9, 'Go to row/column'
     InputLine 17, 4, 35, 5, 10, hsDBFGotoCol
     Label 3, 4, '~C~olumn name', ofPostProcess, ofPreProcess
     Button  9, 6, 19, 8, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
-    Button 19, 6, 29, 8, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
+    Button 19, 6, 29, 8, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
     Button 29, 6, 39, 8, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
 END
 ;{--- finish -------- Eugeny Zvyagintzev ---- 31-07-2002 ----}
