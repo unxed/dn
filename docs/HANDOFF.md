@@ -60,6 +60,10 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     worktree; a possible conflict with another agent is settled at the merge, not by waiting.
 12. Priority (owner, 2026-10-08): making every test that can run in parallel do so, locally and in CI, comes first; work that
     would interfere with it (edits of the workflows or of the test runners) waits until it is merged.
+13. The API (owner, 2026-10-09): copyright does not cover an API, and new names make the porting of other programs harder.
+    tv3 keeps the names and the signatures of the Turbo Vision API that programs know (Borland Pascal Turbo Vision / Free Vision,
+    e.g. `FormatStr(var Result; const Format; var Params)`); only the implementation and the wording are its own. A new name is
+    for a new API only (`TvPath`, `TvAppDir`).
 
 ## How to
 
