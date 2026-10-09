@@ -2821,7 +2821,7 @@ of dn.ini.
 they move to. Off: they only move the highlight, Down or Enter opens it.
   {Esc steps back:_} Esc closes the open menu and the menu bar stays active;
 a second Esc leaves it. Off: one Esc leaves both.
-  {Home/End: list:_} Home/End in the lists of the dialogs go to the first
+  {Home/End-list:_} Home/End in the lists of the dialogs go to the first
 and the last item. Off: to the first and the last row shown.
   {Enter toggles:_} Enter on a check box or a radio button toggles it. Off:
 Enter presses the default button of the dialog.

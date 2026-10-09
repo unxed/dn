@@ -144,6 +144,9 @@ type
   TIniErrors = class;
   TIniErrors = class(TCollection)
     procedure FreeItem(Item: Pointer); override;
+  protected
+    function ReadItem(Ip: ipstream): Pointer; override;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
     end;
 
 const
@@ -154,6 +157,16 @@ procedure TIniErrors.FreeItem(Item: Pointer);
     P: PIniError absolute Item;
   begin
   Dispose(P);
+  end;
+
+{ the list of the errors is not kept in a stream }
+function TIniErrors.ReadItem(Ip: ipstream): Pointer;
+  begin
+  Result := nil;
+  end;
+
+procedure TIniErrors.WriteItem(Item: Pointer; Os: opstream);
+  begin
   end;
 
 procedure AddIniError(Size: Byte; Group: PChar; Parameter: PChar);
