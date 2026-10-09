@@ -182,11 +182,29 @@ def cyrillic(out):
     return d
 
 
+def smartpad(out):
+    # the date line of SmartPad: LineChar of dn.ini (196, a byte of the code page) is the frame line on the screen and in the UTF-8 file
+    d, w = install(out, {'a.txt': b'x\n'})
+    t = start(d, w)
+    t.send(K['F10'], 0.5)
+    for _ in range(8):
+        t.send(K['DOWN'], 0.2)
+    t.send(K['ENTER'], 1.5)
+    check('SmartPad' in t.text() and '─' * 6 + '<' in t.text(), 'SmartPad shows the date line drawn with the frame line', t.text())
+    t.send(K['ESC'], 1.0)
+    names = [os.path.join(r, n) for r, _, fs in os.walk(d) for n in fs if n.lower() == 'smartpad.dn']
+    data = disk(*os.path.split(names[0])) if names else b''
+    check(data.startswith(('─' * 6 + '<').encode('utf-8')), 'the date line is saved as UTF-8', repr(data[:40]))
+    check(t.alive(), 'DN is alive', t.text())
+    t.close(0.3)
+    return d
+
+
 def part(out, fn):
     d = fn(out)
     shutil.rmtree(d, ignore_errors=True)
 
 
 out = os.path.abspath(sys.argv[1])
-side_by_side([lambda fn=fn: part(out, fn) for fn in (basics, more, cyrillic)])      # each in a directory of its own, all at once
+side_by_side([lambda fn=fn: part(out, fn) for fn in (basics, more, cyrillic, smartpad)])      # each in a directory of its own, all at once
 sys.exit(1 if bad else 0)

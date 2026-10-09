@@ -309,12 +309,19 @@ function DocToUi(const S: AnsiString): AnsiString;
 {$ENDIF}
   end;
 
+{ a byte of the code page (a key without text, the table of the characters, the line of SmartPad) as the UTF-8 of its character, in both builds }
 function UiToDocByte(B: Byte): AnsiString;
+  var
+    Buf: array[0..7] of Byte;
+    N: Integer;
   begin
   if B < 128 then
     Result := Char(B)
   else
-    Result := UiToDoc(Char(B));
+    begin
+    N := CpToUtf8(B, @Buf[0]);
+    SetString(Result, PChar(@Buf[0]), N);
+    end;
   end;
 
 function ClipboardText: AnsiString;
