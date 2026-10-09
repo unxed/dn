@@ -3000,7 +3000,7 @@ DIALOG dlgEditEnvironment, 57, 20, 'Редактор змінних оточен
   HELPCTX hcEnvEditor
 ; StaticText 3, 15, 55, 17, ^C'Попередження: довжина значення змінної оточення'^M^C'на цей момент обмежена 255 символами'
   LongInputLine 12, 17, 55, 18, 16383, 0
-  Label 2, 17, '~З~начення', ofPostProcess, ofPreProcess
+  Label 2, 17, 'Зн~а~чення', ofPostProcess, ofPreProcess
   Button 43, 3,55, 5, O~K~, cmOK, bfDefault, ofPostProcess, ofPreProcess
   Button 43, 5,55, 7, '~Н~азвати', cmYes, bfBroadcast, ofPostProcess, ofPreProcess
   Button 43, 7,55, 9, '~Д~одати', cmOK, bfBroadcast, ofPostProcess, ofPreProcess
