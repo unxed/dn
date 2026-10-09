@@ -64,7 +64,8 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     The reference of the API of tv3 is magiblot/tvision (its only source): the names of its classes, methods, constants and
     functions, in Pascal spelling (`TView::handleEvent` -> `TView.HandleEvent`). Only the implementation and the wording are tv3's
     own. All of it is classes: magiblot's C++ classes become Pascal classes with the same names, ancestors and methods (a C++
-    constructor is `Create`, the destructor `Destroy`). A new name is for a new API only (`TvPath`, `TvAppDir`). Other libraries (Borland Turbo Vision, Free Vision) are not a
+    constructor is `Create`, the destructor `Destroy`). No exceptions for the convenience of one caller: a form that only the
+    programs on tv3 use (e.g. the slot form of `FormatStr`) lives in their own shims. A new name is for a new API only (`TvPath`, `TvAppDir`). Other libraries (Borland Turbo Vision, Free Vision) are not a
     reference of names.
 
 ## How to
