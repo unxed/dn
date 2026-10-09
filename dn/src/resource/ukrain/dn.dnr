@@ -297,7 +297,7 @@ DIALOG dlgCountrySetup, 54, 22, 'Інформація про країну'
       END
     Label 38, 2, '~Ф~ормат валюти'
     InputLine 46, 9, 52, 10, 4, 0
-    Label 28, 9, '~В~алютний символ'
+    Label 28, 9, 'Ва~л~ютний символ'
     InputLine 36, 11, 50, 12, 79, hsKbdToggleLayot
     Label 24, 11, '~К~лавіатура'
     InputLine 36, 13, 50, 14, 79, hsWinCodeTable
@@ -379,7 +379,7 @@ DIALOG dlgArchiveFiles, 68, 21, 'Архівування файлів'
     InputLine 19, 5, 36, 6, 80, hsAddOptions
     Label 19, 4, 'Дод. уст~а~новки', ofPostProcess, ofPreProcess
     CheckBoxes 40, 4, 66, 11, ofPostProcess, ofPreProcess
-      ITEM 'Запам''ятовувати ~ш~ляхи'
+      ITEM 'Запам''ятовувати ш~л~яхи'
       ITEM 'П~е~реносити файли'
       ITEM 'При~с~корений режим'
       ITEM '~Б~езперервний'
@@ -435,7 +435,7 @@ END
 DIALOG dlgMouseSetup, 41, 13, 'Установки мишки'
     HELPCTX hcMouseSetup
     MouseSCROLLBAR 3, 3, 26, 4
-    Label 2, 2, '~Г~ориз. чутливість', ofPostProcess, ofPreProcess
+    Label 2, 2, 'Го~р~из. чутливість', ofPostProcess, ofPreProcess
     MouseSCROLLBAR 3, 6, 26, 7
     Label 2, 5, '~В~ерт. чутливість', ofPostProcess, ofPreProcess
     CheckBoxes 2, 9, 29, 11, ofPostProcess, ofPreProcess
@@ -452,15 +452,15 @@ END
 DIALOG dlgInterfaceSetup, 76, 22, 'Установки інтерфейса'
     HELPCTX hcInterfaceSetup
     CheckBoxes 2, 2, 72, 8, ofPostProcess, ofPreProcess
-      ITEM '~Г~одинник'
+      ITEM 'Годи~н~ник'
       ITEM 'Сховати ~м~еню'
-      ITEM 'Сховати ~р~ядок статусу'
+      ITEM 'Сховати рядок ~с~татусу'
       ITEM '~E~SC - показати екран ДОС'
       ITEM 'Сховати к~о~мандний рядок'
       ITEM '~А~втовимик. командного рядка'
       ITEM '~В~еликий курсор при вставці'
       ITEM 'Запам''ятов. позицію ре~д~агування'
-      ITEM 'Запам''ятов. позицію пере~г~ляду'
+      ITEM 'Запам''ятов. позицію перег~л~яду'
       ITEM 'Історія ~р~едагування файлів'
       ITEM 'Історія ~п~ерегляду файлів'
       ITEM '~І~сторія зміни каталогів'
@@ -618,11 +618,11 @@ DIALOG dlgEditorDefaults, 59, 23, 'Установки редактора/пер�
     CheckBoxes 2, 2, 57, 9, ofPostProcess, ofPreProcess
       ITEM '~Р~езервні файли'
       ITEM 'Відст~у~п при забої'
-      ITEM 'Авто~Д~ужки'
+      ITEM 'АвтоДу~ж~ки'
       ITEM '~А~втовідступ'
       ITEM 'Ав~т~оперенос'
       ITEM '~В~ирівнювати при переносі'
-      ITEM 'Верти~к~альний блок'
+      ITEM 'В~е~ртикальний блок'
       ITEM '~О~птимізація пробілів'
       ITEM 'Підсвічування л~і~нії'
       ITEM 'Підсвічуван. коло~н~ки'
@@ -1261,7 +1261,7 @@ DIALOG dlgPanelShowSetup, 76, 22, 'Вигляд файлової панелі'
       ITEM 'Час створення'
       ITEM 'Дата ост.доступу'
       ITEM 'Час ост.доступу'
-      ITEM '~О~пис'
+      ITEM 'Оп~и~с'
       ITEM 'Шлях'
 ;$IFDEF DualName
       ITEM 'Показувати довге ім''я'
@@ -1403,7 +1403,7 @@ DIALOG dlgPanelShowSetup, 76, 22, 'Вигляд файлової панелі'
     END
     Label 38, 13, 'Різне', ofPostProcess, ofPreProcess
 
-#4  Button 59, 17, 72, 19, '~З~аписати', 0, bfNormal
+#4  Button 59, 17, 72, 19, 'За~п~исати', 0, bfNormal
     Button 37, 19, 47, 21, '~О~К', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 48, 19, 59, 21, 'Відміна', cmCancel, ofPostProcess, ofPreProcess
     Button 60, 19, 72, 21, 'Допомога', cmHelp, ofPostProcess, ofPreProcess
@@ -1519,7 +1519,7 @@ DIALOG dlgCompareDirs, 42, 17, 'Порівняти каталоги'
       ITEM 'Порівняти ~р~озмір'
       ITEM 'Порівняти ~ч~ас'
       ITEM 'Порівняти ~а~трибути'
-      ITEM 'Порівняти ~в~міст'
+      ITEM 'Порівняти вмі~с~т'
       ITEM 'Порівняти регіс~т~р'
     END
     Label 3, 2, 'Опції', ofPostProcess, ofPreProcess
@@ -1619,9 +1619,9 @@ DIALOG dlgSetupArc, 78, 22, 'Установки архіватора'
     InputLine 15, 4, 21, 5, 20, 0
     Label 7, 4, '~Д~обути', ofPostProcess, ofPreProcess
     InputLine 46, 4, 52, 5, 20, 0
-    Label 28, 4, 'Д~о~бути з шляхами', ofPostProcess, ofPreProcess
+    Label 28, 4, 'Добути з ш~л~яхами', ofPostProcess, ofPreProcess
     InputLine 70, 4, 76, 5, 20, 0
-    Label 60, 4, '~Д~одати', ofPostProcess, ofPreProcess
+    Label 60, 4, 'Додат~и~', ofPostProcess, ofPreProcess
     InputLine 15, 5, 21, 6, 20, 0
     Label 4, 5, 'П~е~ренести', ofPostProcess, ofPreProcess
     InputLine 46, 5, 52, 6, 20, 0
@@ -1631,7 +1631,7 @@ DIALOG dlgSetupArc, 78, 22, 'Установки архіватора'
     InputLine 15, 6, 21, 7, 20, 0
     Label 3, 6,  'Приск~о~рено', ofPostProcess, ofPreProcess
     InputLine 46, 6, 52, 7, 20, 0
-    Label 30, 6, '~В~ключити шляхи', ofPostProcess, ofPreProcess
+    Label 30, 6, 'Вкл~ю~чити шляхи', ofPostProcess, ofPreProcess
     InputLine 70, 6, 76, 7, 20, 0
     Label 53, 6, 'Виклю~ч~ити шляхи', ofPostProcess, ofPreProcess
     InputLine 15, 7, 21, 8, 20, 0
@@ -1648,15 +1648,15 @@ DIALOG dlgSetupArc, 78, 22, 'Установки архіватора'
     Label 53, 8, 'Внутрішній шлях', ofPostProcess, ofPreProcess
     StaticText 5, 10, 23, 11, 'Тип компресії:'
     InputLine 13, 12, 19, 13, 20, 0
-    Label 1, 12, 'Без с~т~иску', ofPostProcess, ofPreProcess
+    Label 1, 12, 'Без сти~с~ку', ofPostProcess, ofPreProcess
     InputLine 31, 12, 37, 13, 20, 0
-    Label 19, 12, 'Най~ш~видша', ofPostProcess, ofPreProcess
+    Label 19, 12, '~Н~айшвидша', ofPostProcess, ofPreProcess
     InputLine 48, 12, 54, 13, 20, 0
     Label 39, 12, '~Ш~видка', ofPostProcess, ofPreProcess
     InputLine 13, 13, 19, 14, 20, 0
-    Label 2, 13, '~Н~ормальна', ofPostProcess, ofPreProcess
+    Label 2, 13, 'Нор~м~альна', ofPostProcess, ofPreProcess
     InputLine 31, 13, 37, 14, 20, 0
-    Label 23, 13, '~Д~обра', ofPostProcess, ofPreProcess
+    Label 23, 13, 'До~б~ра', ofPostProcess, ofPreProcess
     InputLine 48, 13, 54, 14, 20, 0
     Label 37, 13, 'Найкраща', ofPostProcess, ofPreProcess
     StaticText 59, 10, 75, 11, 'Список файлів:'
@@ -3213,7 +3213,7 @@ DIALOG dlgPanelSortSetup, 64, 21, 'Сортування'
     Label 2, 2, 'Сортувати за...', ofPostProcess, ofPreProcess
     CheckBoxes 2, 13, 28, 17, ofPostProcess, ofPreProcess
       ITEM 'Сортувати за ~ш~ляхом'
-      ITEM 'Сортувати за ~г~рупою'
+      ITEM 'Сортувати за гр~у~пою'
       ITEM 'З~в~оротний порядок'
       ITEM 'Ка~т~алоги за іменем'
     END
@@ -3270,7 +3270,7 @@ DIALOG dlgFMSetup, 76, 22, 'Установки Менеджера Файлів'
       ITEM 'Авто~-~зміна каталогів'
       ITEM 'Пере~т~ягування файлів мишею'
       ITEM 'Гуд~о~к після копіювання'
-      ITEM '~В~хід в архіви по ~В~ВОДу'
+      ITEM '~В~хід в архіви по ВВОДу'
       ITEM 'Відмітка файлів ~П~РОБІЛом'
       ITEM 'DEL для в~и~далення файлів'
       ITEM 'Використовувати клавіші ~/~'#26
@@ -3392,7 +3392,7 @@ DIALOG dlgDriveInfoSetup, 61, 14, 'Установки панелі інформ�
       ITEM '~В~ільне місце на диску'
       ITEM '~М~ітка диска'
 ;NEW
-      ITEM 'Се~р~ійний номер диска'
+      ITEM 'С~е~рійний номер диска'
       ITEM 'Фа~й~лова система'
 ;-NEW
       ITEM 'Фізична ~п~ам''ять'
@@ -3415,7 +3415,7 @@ DIALOG dlgStartupSetup, 70, 20, 'Процес завантаження та ви
     CheckBoxes 2, 3, 68, 5, ofPostProcess, ofPreProcess
       ITEM 'Авто ~з~апуск меню            '
       ITEM '~В~ідновлювати відеорежим  '
-      ITEM '~З~нищувати історію команд   '
+      ITEM 'З~н~ищувати історію команд   '
 ;$IFNDEF WIN32
       ITEM 'Установка ~п~алітри VGA       '
 ;$ENDIF
