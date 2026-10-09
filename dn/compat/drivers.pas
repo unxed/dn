@@ -690,7 +690,7 @@ begin
   P := @Buf;
   for I := 0 to Num - 1 do
   begin
-    P^.Attribute := AttrFromBIOS(Attr);
+    P^.Attribute := TColorAttr(LongInt(Attr));
     Inc(P);
   end;
 end;
@@ -717,7 +717,7 @@ begin
     if C <> #0 then
       ScInitChar(P^.Character, Ord(C));
     if Attr <> 0 then
-      P^.Attribute := AttrFromBIOS(Attr);
+      P^.Attribute := TColorAttr(LongInt(Attr));
     Inc(P);
   end;
 end;
@@ -728,7 +728,7 @@ var
   N: Integer;
 begin
   B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
-  N := B.MoveStrS(0, Str, AttrFromBIOS(Attr), Length(Str));
+  N := B.MoveStrS(0, Str, TColorAttr(LongInt(Attr)), Length(Str));
   if N > 0 then
     Move(B.Data^, Dest, N * SizeOf(TScreenCell));
   B.Free;
@@ -741,8 +741,8 @@ var
   N: Integer;
 begin
   B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
-  P.Lo := AttrFromBIOS(Attrs and $FF);
-  P.Hi := AttrFromBIOS(Attrs shr 8);
+  P[0] := TColorAttr(LongInt(Attrs and $FF));
+  P[1] := TColorAttr(LongInt(Attrs shr 8));
   N := B.MoveCStrS(0, Str, P, Length(Str));
   if N > 0 then
     Move(B.Data^, Dest, N * SizeOf(TScreenCell));
@@ -771,7 +771,7 @@ var
   A: TColorAttr;
 begin
   P := @Dest;
-  A := AttrFromBIOS(Attr);
+  A := TColorAttr(LongInt(Attr));
   for I := 0 to Count - 1 do
   begin
     ScInitCodePoint(P^.Character, CodePoint);
@@ -802,7 +802,7 @@ end;
 
 procedure SetCellAttr(var Cell: TScreenCell; Attr: Byte);
 begin
-  Cell.Attribute := AttrFromBIOS(Attr);
+  Cell.Attribute := TColorAttr(LongInt(Attr));
 end;
 
 function CellChar(const Cell: TScreenCell): Byte;
@@ -824,7 +824,7 @@ end;
 
 function CellAttr(const Cell: TScreenCell): Byte;
 begin
-  Result := AttrAsBIOSByte(Cell.Attribute);
+  Result := Byte(Cell.Attribute);
 end;
 
 procedure WordsToCells(var Dest: TScreenCell; const Source; Count: Integer);

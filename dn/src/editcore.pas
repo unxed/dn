@@ -781,7 +781,7 @@ function TFileEditor.ClassAttr(C: Integer): TColorAttr;
     else
       Exit;
   end;
-  AttrSetFg(Result, AttrFg(GetColor(N).Lo));
+  Result.SetForeground((GetColor(N)[0]).GetForeground);
   end;
 
 function TFileEditor.LineAttrHook(Sender: TTveSender; Line: Int64; var Attr: TColorAttr): Boolean;
@@ -789,7 +789,7 @@ function TFileEditor.LineAttrHook(Sender: TTveSender; Line: Int64; var Attr: TCo
   Result := False;
   if EdOpt.HiliteLine and (Line = Editor.Line) then
     begin
-    Attr := GetColor(4).Lo;
+    Attr := GetColor(4)[0];
     Result := True;
     end;
   end;

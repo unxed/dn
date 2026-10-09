@@ -155,7 +155,7 @@ procedure ChangeColors;
       N := 255;
     SetLength(S, N);
     for I := 1 to N do
-      S[I] := Char(AttrToBIOS(CurPal[I]));
+      S[I] := Char(CurPal[I].ToBIOS);
     SystemColors[appPalette] := S;
     Application.Redraw; { Redraw application with new palette }
     end;

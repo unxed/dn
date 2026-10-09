@@ -104,7 +104,7 @@ begin
   for I := 0 to N - 1 do
   begin
     if C <> nil then
-      CellCopy[I] := CellToBiosChar(C^.Character) or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
+      CellCopy[I] := CellToBiosChar(C^.Character) or (Word(Byte(C^.Attribute)) shl 8)
     else
       CellCopy[I] := $0720;
     if C <> nil then
