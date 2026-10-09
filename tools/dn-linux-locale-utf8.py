@@ -4,7 +4,7 @@ The names of files and the typed text are UTF-8 whatever the locale says (C, POS
 (a terminal that sends UTF-8 to a program that thinks it is Latin-1 is a mistake of the setup, not shown as a fault of DN)."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from dn_wait import DnTerm
+from dn_wait import DnTerm, side_by_side
 
 bad = 0
 
@@ -34,12 +34,10 @@ def cmdline(text):
     return [l for l in text.split('\n') if l.startswith('/') and '>' in l][:1]
 
 
-out = os.path.abspath(sys.argv[1])
-dirs = []
-try:
-    for loc, utf8_ok in (('C', True), ('POSIX', True), ('ru_RU.KOI8-R', True), ('ru_RU.UTF-8', True), ('en_US.UTF-8', True), ('en_US.ISO-8859-1', False)):
-        d, w = install(out); dirs.append(d)
-        e = {'DNLNG': 'ENGLISH', 'DN2': d, 'LC_ALL': loc, 'LANG': loc, 'LC_CTYPE': loc}
+def one(out, loc, utf8_ok):
+    d, w = install(out)
+    try:
+        e = {'DNLNG': 'ENGLISH', 'DN2': d, 'HOME': d, 'LC_ALL': loc, 'LANG': loc, 'LC_CTYPE': loc}
         t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
         t.started()
         t.send('\x1b', 0.5)
@@ -59,7 +57,10 @@ try:
             check(os.path.isdir(os.path.join(w, '\u041a\u0430\u0442\u0430\u043b\u043e\u0433')), '%s: a directory with a Russian name is made through a dialog' % loc, t.text())
         check(t.alive() and 'Fatal' not in t.text(), '%s: DN is alive' % loc)
         t.close(0.3)
-finally:
-    for d in dirs:
+    finally:
         shutil.rmtree(d, ignore_errors=True)
+
+
+out = os.path.abspath(sys.argv[1])
+side_by_side([lambda c=c: one(out, *c) for c in (('C', True), ('POSIX', True), ('ru_RU.KOI8-R', True), ('ru_RU.UTF-8', True), ('en_US.UTF-8', True), ('en_US.ISO-8859-1', False))])      # each locale in a directory of its own, all at once
 sys.exit(1 if bad else 0)

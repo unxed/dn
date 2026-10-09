@@ -22,14 +22,25 @@ from pty_screen import PtyTerm
 CLOCK = re.compile(r'\d{1,2}:\d\d(:\d\d)?')
 
 
+def shape(screen):
+    """the screen without the clock: the text of the rows (the times of the top row masked) and the attributes"""
+    rows = [''.join(c for c, _ in row) for row in screen.cells]
+    if rows:
+        rows[0] = CLOCK.sub('#', rows[0])
+    return rows, [[a for _, a in row] for row in screen.cells], screen.alt
+
+
 class DnTerm(PtyTerm):
+    def __init__(self, cmd, cols=80, rows=25, env=None, cwd=None, exe=None):
+        # the temporary files of DN have fixed names (/tmp/$DN0$.LST): a copy of DN that runs beside others gets a TEMP of its own, next to it
+        env = dict(env or {})
+        if exe and 'TEMP' not in env and 'TEMP' not in os.environ:
+            env['TEMP'] = os.path.join(os.path.dirname(os.path.abspath(exe)), 'tmp')
+            os.makedirs(env['TEMP'], exist_ok=True)
+        super().__init__(cmd, cols, rows, env=env, cwd=cwd, exe=exe)
+
     def shape(self):
-        """the screen without the clock: the text of the rows (the times of the top row masked) and the attributes"""
-        s = self.screen
-        rows = [''.join(c for c, _ in row) for row in s.cells]
-        if rows:
-            rows[0] = CLOCK.sub('#', rows[0])
-        return rows, [[a for _, a in row] for row in s.cells], s.alt
+        return shape(self.screen)
 
     def pump(self, timeout=0.3, limit=8.0):
         """reads what the program writes until the screen (but the clock) has not changed for `timeout` seconds
@@ -58,7 +69,7 @@ class DnTerm(PtyTerm):
                 last = cur
                 end = time.time() + timeout
 
-    def started(self, quiet=1.0, timeout=20.0):
+    def started(self, quiet=1.0, timeout=60.0):
         """waits for the first screen of the program and then for a pause of `quiet` seconds; True when something is drawn"""
         end = time.time() + timeout
         while not self.text().strip():
@@ -68,14 +79,18 @@ class DnTerm(PtyTerm):
         self.pump(quiet, max(end - time.time(), quiet))
         return True
 
-    def wait_text(self, text, timeout=10.0):
-        """reads until `text` is on the screen; True when it is"""
+    def until(self, cond, timeout=10.0):
+        """reads until cond() is true (at most `timeout` seconds); True when it is"""
         end = time.time() + timeout
-        while text not in self.text():
+        while not cond():
             if time.time() >= end:
                 return False
-            self.pump(0.05, max(min(0.2, end - time.time()), 0.01))
+            self.pump(0.2, max(min(0.5, end - time.time()), 0.01))
         return True
+
+    def wait_text(self, text, timeout=10.0):
+        """reads until `text` is on the screen; True when it is"""
+        return self.until(lambda: text in self.text(), timeout)
 
 
 class _Out:

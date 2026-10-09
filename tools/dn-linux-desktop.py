@@ -27,10 +27,7 @@ def run(d, w, keys, wait_exit=True):
     t.pump(1.0, 3)
     text = t.text()
     if wait_exit:
-        for _ in range(20):
-            if not t.alive():
-                break
-            t.pump(0.3, 1)
+        t.until(lambda: not t.alive(), 20)
     alive = t.alive()
     t.close(0.3)
     return text, alive

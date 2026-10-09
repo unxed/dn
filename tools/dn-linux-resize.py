@@ -19,10 +19,8 @@ def check(ok, what, scr=''):
 
 def settle(t, cols, rows):
     t.resize(cols, rows)
-    for _ in range(12):
-        t.pump(0.4, 2)
-        if 'F1 Help' in t.screen.lines()[rows - 1]:
-            break
+    t.pump(0.4, 2)
+    t.until(lambda: 'F1 Help' in t.screen.lines()[rows - 1], 22)
     return t.text()
 
 

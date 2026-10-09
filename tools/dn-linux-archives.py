@@ -201,11 +201,8 @@ def view_edit_smoke(
         if label == 'F4':
             # F4 in an archive is "Extr" (the key bar says so): DN (the object build too) extracts the member to the directory of the other panel
             # at once, or shows the Extract dialog; either is right, nothing else is checked
-            for _ in range(10):
-                if 'extract' in scr.lower() or os.path.exists(os.path.join(w, expect_member + '.txt')):
-                    break
-                t.pump(0.5, 2)
-                scr = t.text()
+            t.until(lambda: 'extract' in t.text().lower() or os.path.exists(os.path.join(w, expect_member + '.txt')), 20)
+            scr = t.text()
             if 'extract' in scr.lower():
                 print('PASS %s/F4: the Extract dialog is shown' % name, flush=True)
             elif os.path.exists(os.path.join(w, expect_member + '.txt')):
@@ -220,11 +217,8 @@ def view_edit_smoke(
                 '%s/%s: opened content/chrome' % (name, label),
                 scr,
             )
-        for _ in range(12):                          # the extraction by the unpacker takes a moment
-            if 'hello from fixture' in scr.lower() or not t.alive():
-                break
-            t.pump(0.5, 2)
-            scr = t.text()
+        t.until(lambda: 'hello from fixture' in t.text().lower() or not t.alive(), 24)     # the extraction by the unpacker takes a moment
+        scr = t.text()
         if label == 'F4':
             t.send(KEYS['ESC'], 0.6)
             t.send(KEYS['ESC'], 0.4)
@@ -328,10 +322,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         t.send(w + '/', 0.6)                    # the destination typed (the first typed text replaces the one that is there)
         dlg2 = t.text()
         t.send('\r', 1.5)
-        for _ in range(8):
-            t.pump(0.5, 2)
-            if os.path.exists(os.path.join(w, 'inside.txt')):
-                break
+        t.until(lambda: os.path.exists(os.path.join(w, 'inside.txt')), 16)
         scr = t.text()
         check(t.alive(), '%s/F5 real: alive' % name, scr)
         got = os.path.join(w, 'inside.txt')
@@ -382,10 +373,7 @@ def delete_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, ti
         t.send('\x1b[19~', 1.5)                # F8
         dlg = t.text()
         t.send('\r', 1.5)
-        for _ in range(8):
-            t.pump(0.5, 2)
-            if 'inside.txt' not in members(os.path.join(w, name)):
-                break
+        t.until(lambda: 'inside.txt' not in members(os.path.join(w, name)), 16)
         scr = t.text()
         check(t.alive(), '%s/F8 real: alive' % name, scr)
         if 'inside.txt' in members(os.path.join(w, name)):
@@ -441,10 +429,7 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         dlg = t.text()
         t.send('\r', 1.5)                              # the Copy dialog: OK; the dialog Archive files follows
         t.send('\r', 1.5)                              # Archive files: OK
-        for _ in range(8):
-            t.pump(0.5, 2)
-            if 'added.zzz' in members(os.path.join(w, name)):
-                break
+        t.until(lambda: 'added.zzz' in members(os.path.join(w, name)), 16)
         scr = t.text()
         check(t.alive(), '%s/F5 add: alive' % name, scr)
         if 'added.zzz' in members(os.path.join(w, name)):

@@ -5,7 +5,7 @@
   - the archive panel still shows what the archive had (DN does not reread it after an add: Ctrl-R does)."""
 import os, shutil, sys, tempfile, zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from dn_wait import DnTerm
+from dn_wait import DnTerm, side_by_side
 
 bad = 0
 
@@ -31,7 +31,7 @@ def install(out):
 
 
 def start(d, w):
-    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'HOME': d})
     t.started()
     t.send('\x1b', 0.5)
     return t
@@ -42,11 +42,9 @@ def names(path):
         return sorted(z.namelist())
 
 
-out = os.path.abspath(sys.argv[1])
-dirs = []
-try:
+def delete(out):
     # delete: the active panel enters a.zip (the order of the panel: .., a.zip), the cursor on the first member after .., F8, Yes
-    d, w = install(out); dirs.append(d)
+    d, w = install(out)
     with zipfile.ZipFile(os.path.join(w, 'a.zip'), 'w') as z:
         z.writestr('x.txt', 'xx\n')
         z.writestr('y.txt', 'yy\n')
@@ -59,10 +57,15 @@ try:
     check(names(os.path.join(w, 'a.zip')) == ['y.txt'], 'the member is deleted from the archive and the other stays', str(names(os.path.join(w, 'a.zip'))))
     check(t.alive() and 'Fatal' not in t.text(), 'DN is alive after the delete', t.text())
     t.close(0.3)
+    return [d]
 
+
+def add(out):
+    dirs = []
     # add: the left panel enters a.zip, the right one has new.txt: F5, the archiver dialog, Enter
     if shutil.which('zip'):
-        d, w = install(out); dirs.append(d)
+        d, w = install(out)
+        dirs.append(d)
         with zipfile.ZipFile(os.path.join(w, 'a.zip'), 'w') as z:
             z.writestr('x.txt', 'xx\n')
         open(os.path.join(w, 'new.txt'), 'w').write('brand new\n')
@@ -85,7 +88,14 @@ try:
         t.close(0.3)
     else:
         print('SKIP the add: no zip program')
-finally:
-    for d in dirs:
+    return dirs
+
+
+def part(out, fn):
+    for d in fn(out):
         shutil.rmtree(d, ignore_errors=True)
+
+
+out = os.path.abspath(sys.argv[1])
+side_by_side([lambda fn=fn: part(out, fn) for fn in (delete, add)])          # each in a directory of its own, both at once
 sys.exit(1 if bad else 0)

@@ -43,10 +43,7 @@ def one(args):
             # does Esc get us out (twice: a dialog, a menu)? then Alt-X ends the program
             t.send(ESC, 0.4); t.send(ESC, 0.4)
             t.send('\x1bx', 0.5); t.send(ENTER, 0.7)
-            for _ in range(10):                       # the end may take a moment when many copies run side by side
-                if not t.alive():
-                    break
-                t.pump(0.3, 0.5)
+            t.until(lambda: not t.alive(), 5)         # the end may take a moment when many copies run side by side
             if t.alive():
                 verdict = 'did not quit after Esc Esc Alt-X Enter'
         open(os.path.join(out, 'menu-%d-%d.txt' % (m, n)), 'w').write(text + '\n')

@@ -158,7 +158,7 @@ def one(job):
 
 def main():
     args = sys.argv[1:]
-    jobs_n = 4
+    jobs_n = 16
     if '-j' in args:
         i = args.index('-j')
         jobs_n = int(args[i + 1])

@@ -43,10 +43,7 @@ def run_dn(d, env, quit=False):
     if quit:
         t.send('\x1bx', 0.8)
         t.send('\r', 0.8)
-        for _ in range(20):
-            if not t.alive():
-                break
-            t.pump(0.3, 1)
+        t.until(lambda: not t.alive(), 20)
     t.close(0.5)
     return text
 

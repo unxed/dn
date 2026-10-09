@@ -3,7 +3,7 @@
 Opens files with F4 and checks what the user sees and what lands on the disk."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from dn_wait import DnTerm
+from dn_wait import DnTerm, side_by_side
 
 bad = 0
 
@@ -38,7 +38,7 @@ def install(out, files):
 
 
 def start(d, w):
-    e = {'DNLNG': 'ENGLISH', 'DN2': d, 'TERM': 'xterm-256color'}
+    e = {'DNLNG': 'ENGLISH', 'DN2': d, 'TERM': 'xterm-256color', 'HOME': d}
     t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=e)
     t.started()
     t.send('\x1b', 0.5)
@@ -68,14 +68,12 @@ def disk(w, n):
         return fh.read()
 
 
-out = os.path.abspath(sys.argv[1])
-dirs = []
-try:
+def basics(out):
     # a.txt: three lines; b.txt: Cyrillic in UTF-8; c.txt: a code page file (cp1251); d.txt: CRLF
     d, w = install(out, {'a.txt': b'one two three\nfoo bar foo\nlast line\n',
                          'b.txt': '\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440\n'.encode('utf-8'),
                          'c.txt': '\u043f\u0440\u0438\u0432\u0435\u0442\n'.encode('cp1251'),
-                         'd.txt': b'x\r\ny\r\n'}); dirs.append(d)
+                         'd.txt': b'x\r\ny\r\n'})
     t = start(d, w)
     edit(t, 1)
     check('Edit - ' in t.text() and 'a.txt' in t.text() and 'one two three' in t.text(), 'F4 opens the file in an editor window', t.text())
@@ -135,9 +133,11 @@ try:
     check(disk(w, 'a.txt') == b'one two three\nfoo bar foo\nlast line\n', 'the file is unchanged', repr(disk(w, 'a.txt')))
     check(t.alive(), 'DN is alive', t.text())
     t.close(0.3)
+    return d
 
+def more(out):
     # more: replace all, chords, line commands
-    d, w = install(out, {'a.txt': b'one two three\nfoo bar foo\nlast line\n'}); dirs.append(d)
+    d, w = install(out, {'a.txt': b'one two three\nfoo bar foo\nlast line\n'})
     t = start(d, w)
     edit(t, 1)
     t.send(K['CF7'], 0.8)
@@ -153,9 +153,11 @@ try:
     t.send(K['F2'], 0.8)
     check(b'foo bar foo\nfoo bar foo' in disk(w, 'a.txt'), 'the copy is saved', repr(disk(w, 'a.txt')))
     t.close(0.3)
+    return d
 
+def cyrillic(out):
     # Cyrillic UTF-8, code page, CRLF
-    d, w = install(out, {'b.txt': '\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440\n'.encode('utf-8'), 'c.txt': '\u043f\u0440\u0438\u0432\u0435\u0442\n'.encode('cp1251'), 'd.txt': b'x\r\ny\r\n'}); dirs.append(d)
+    d, w = install(out, {'b.txt': '\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440\n'.encode('utf-8'), 'c.txt': '\u043f\u0440\u0438\u0432\u0435\u0442\n'.encode('cp1251'), 'd.txt': b'x\r\ny\r\n'})
     t = start(d, w)
     edit(t, 1)
     check('\u043f\u0440\u0438\u0432\u0435\u0442 \u043c\u0438\u0440' in t.text() and 'UTF' in t.text(), 'a UTF-8 file is shown as it is (UTF)', t.text())
@@ -177,7 +179,14 @@ try:
     check(disk(w, 'd.txt') == b'ax\r\ny\r\n', 'CRLF line ends are kept', repr(disk(w, 'd.txt')))
     check('CrLf' in t.text(), 'the information line says CrLf', t.text())
     t.close(0.3)
-finally:
-    for d in dirs:
-        shutil.rmtree(d, ignore_errors=True)
+    return d
+
+
+def part(out, fn):
+    d = fn(out)
+    shutil.rmtree(d, ignore_errors=True)
+
+
+out = os.path.abspath(sys.argv[1])
+side_by_side([lambda fn=fn: part(out, fn) for fn in (basics, more, cyrillic)])      # each in a directory of its own, all at once
 sys.exit(1 if bad else 0)
