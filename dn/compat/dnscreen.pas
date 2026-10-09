@@ -146,7 +146,7 @@ end;
 procedure SyncScreenCopyAfterDraw;
 begin
 {$IF NOT DEFINED(DNUTF8) AND NOT DEFINED(UNIX)}
-  WriteScreenCells(0, ScreenWidth * ScreenHeight);
+  WriteScreenCells(0, TScreen.ScreenWidth * TScreen.ScreenHeight);
 {$ENDIF}
 end;
 
