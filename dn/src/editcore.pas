@@ -1837,7 +1837,7 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
   { a typed character outside ASCII is text, never a key of the table below (U+2026 or U+03B2 would be taken for the codes of commands) }
   if (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) and (Event.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
     begin
-    TypeAt(UiToDoc(EventText(Event)));
+    TypeAt(EventText(Event));           { the text of a key is UTF-8 in both builds }
     ClearEvent(Event);
     Exit(True);
     end;
@@ -1947,13 +1947,13 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
       Exit(True);
       end;
   end;
-  { a character to type: its text, else the character of the code page of DN }
+  { a character to type: its text (UTF-8 in both builds), else the character of the code page of DN }
   if (Event.TextLength > 0) and (Event.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
     begin
     T := EventText(Event);
     if (T <> '') and (Byte(T[1]) >= 32) then
       begin
-      TypeAt(UiToDoc(T));
+      TypeAt(T);
       ClearEvent(Event);
       Exit(True);
       end;
