@@ -10,6 +10,7 @@ on:
       - tools/check-layout.sh
       - tools/check-platform.py
       - tools/ci-par.sh
+      - tools/tests/**
       - .github/workflows/layout.yml
 jobs:
   layout:
