@@ -159,7 +159,7 @@ procedure ChangeColors;
     SystemColors[appPalette] := S;
     Application.Redraw; { Redraw application with new palette }
     end;
-  CurPal := nil;
+  CurPal := Default(TPalette);
   if VGASystem then
     GetPalette(VGA_palette);
   end;
