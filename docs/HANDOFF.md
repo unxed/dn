@@ -1,4 +1,4 @@
-# Handoff: the state of the work (2026-10-08)
+# Handoff: the state of the work (2026-10-09)
 
 Read `CLAUDE.md` first: the licensing rules are the base of all work and override everything here.
 
@@ -6,33 +6,42 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 
 | repo | state |
 |---|---|
-| tv3 | history from one root commit `652bd98`; head `199026b` (main = the work branch); the far2l extensions on both sides; CI job `generated`; the audit is manual (`tools/audit/run.sh`) |
-| tve | head `2871737` (main = the work branch); the audit is manual (`tools/audit/run.sh`) |
-| dn | tv3 `199026b` and tve `2871737` pinned; the options for the UX rules that contradict the DN keys (`docs/UX-CONFORMANCE.md`, all off by default); releases by `release.yml`, snapshots by `nightly.yml` |
-| sp | fpide pins the same tv3 and tve; the configuration in the platform directories (`tests/accept/test_config.py`) |
+| tv3 | head `356feaa` (main): the API of magiblot/tvision (classes, names, streams, platform classes; the differences in `docs/API-NAMES.md`); the far2l extensions on both sides; CI job `generated`; the audit is manual (`tools/audit/run.sh`) and prints `AUDIT PASS` |
+| tve | head `9fb9e31` (main), on the new tv3 API; the audit prints `AUDIT PASS` |
+| dn | main pins tv3 `356feaa` and tve `9fb9e31`; builds for Linux, DOS (both builds) and Windows; acceptance: the UTF-8 build against the code-page build (`dn-accept.yml`, `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`); releases by `release.yml`, snapshots by `nightly.yml` (green commits of main only) |
+| sp | main pins the same tv3 and tve; fpide on the new API; the repository is to be renamed to bp (the last step) |
+| tv (old) | history rewritten: main has a README that points to tv3 |
+
+The work branches `claude/nifty-rubin-7v0d9z` of all repositories are merged into main; the owner deletes them (the proxy
+of the agents cannot delete refs), and the two extra branches of unxed/tv.
 
 ## The plan of the owner and where each item is
 
 | # | item | state |
 |---|---|---|
-| 1 | tve: the editor component, MIT (the rules of `CLAUDE.md`) | in dn and fpide; the history passes the audit; open: the remaining editor features of `tve/README.md` |
-| 2 | what dn and fpide both use moves to tv3 | `tv3/SHARED-CODE.md`, `tv3/docs/DEDUP-AUDIT.md`; new MIT units `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir`, `TvAscii` (the ASCII table), `TvGadgets` (the clock and the heap view) replace the duplicates: done |
-| 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; the tvision PR (magiblot/tvision#241, branch `dos-utf8-names` of the fork): CI green; the owner follows it |
+| 1 | tve: the editor component, MIT (the rules of `CLAUDE.md`) | done: in dn and fpide; the features of `tve/README.md` are closed; word wrap |
+| 2 | what dn and fpide both use moves to tv3 | done: `TvFormat`, `TvCrc`, `TvCStr`, `TvPath`, `TvAppDir`, `TvAscii`, `TvGadgets`, `TvActions` |
+| 3 | UTF-8 in DOS builds (dosbox-x PR 6632) through tv3 | done; magiblot/tvision#241 is out of the plan (the owner follows it) |
 | 4 | fpide: the ASCII splash removed | done |
-| 5 | the vtui UX guidelines in tv3, dn, fpide, tve | tables in `docs/UX-CONFORMANCE.md` (dn) and tv3; dn: no gap left (D.4 resizable dialogs, R.1 actions in `dn/src/resource/actions.dna`) |
-| 6 | fpide: other languages, Go first | Go done (template, gofmt, Delve); Python, Rust, C were never asked for |
-| 7 | sp as "Better Pascal" (safe / ext / fpide, one unit that gives everything) | `sp/PLAN.md`; the rename of the repository to bp is the last step |
-| 8 | no DOS/Windows path remnants on other systems ("C:" on Linux) | tv3 `TvPath`; tve and fpide use it; dn open (DnPath over TvPath); ratchet of `tools/check-paths.py` |
+| 5 | the vtui UX guidelines in tv3, dn, fpide, tve | done: `docs/UX-CONFORMANCE.md`; the rules that contradict the DN keys are options, off by default |
+| 6 | fpide: other languages, Go first | Go done (build, vet, test, gofmt, Delve) |
+| 7 | sp as "Better Pascal" (safe / ext / fpide, one unit) | done (`sp/PLAN.md`); the rename to bp is the last step |
+| 8 | no DOS/Windows path remnants on other systems | done: tv3 `TvPath`; dn, tve, fpide over it; `tools/check-paths.py` |
 | 9 | English in all code, texts and docs | done (`tools/text-policy.py` in CI) |
-| 10 | dn leftovers (PLAN.md, MIGRATION-STATUS) | open |
-| 11 | word wrap (reference: f4), xlat (reference: far2l, behaviour only) | done |
-| 12 | the four DN editor files `editcore`, `editfile`, `editinfo`, `editor` hold code of the old editor of DN | they are DN code under the RIT licence with its notice; they stay as they are (owner, 2026-10-08) |
+| 10 | dn leftovers | done; what needs the owner is in `dn/TODO-later.md` |
+| 11 | word wrap, xlat | done |
+| 12 | the four DN editor files `editcore`, `editfile`, `editinfo`, `editor` | DN code under the RIT licence with its notice; they stay (owner, 2026-10-08) |
+| 13 | tv3 API = magiblot/tvision (rule 13 below) | done in tv3, tve, dn, fpide |
+| 14 | the hot letters of the dialogs: a free letter of the label for every item, no repeats | done in the three languages; `tools/tests/test_hotletters.py` and the dialog sweep in CI |
+| 15 | every pty test and click-through side by side, locally and in CI | done in all four repositories (`tools/ci-par.sh`, sweeps with `-j 16`) |
+| 16 | a ticket for magiblot/tvision on the bug of TStatusLine (fixed in tv3) | the text was given to the owner |
 
 ## Legal state (what the audit and the rewrite established)
 
 - tv3: the audit (`tools/audit/run.sh`) of the tree and of the history prints `AUDIT PASS`; the history starts at one root commit.
 - tve: the audit (`tools/audit/run.sh`) of every version of every file of the history prints `AUDIT PASS`.
-- dn: the history has no statements of origin and no copy of the old tv3; the RIT code keeps its notices.
+- dn: the history has no statements of origin and no copy of the old tv3; the RIT code keeps its notices; its own gate
+  (`audit/xclone.py`, `audit/gate.py`) against Borland Turbo Vision passes (CI `dn.yml`).
 - Old SHAs of the rewritten histories may still be reachable on GitHub by their hash: only GitHub support can purge
   them (a request by the owner).
 
