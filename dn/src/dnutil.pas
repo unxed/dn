@@ -320,7 +320,7 @@ constructor TDataSaver.Create;
   var
     R: TRect;
   begin
-  R.Assign(0, 0, 0, 0);
+  R := TRect.Create(0, 0, 0, 0);
   inherited Create(R);
   SetState(sfVisible, False);
   Options := Options and not ofSelectable;
@@ -489,7 +489,7 @@ function CheckExit: Boolean;
   begin
   { if FormatWindow <> nil then begin CheckExit := False; Exit; end;}
   Event.What := evCommand;
-  Event.Command := cmQuit;
+  Event.Message.Command := cmQuit;
   CheckExit := Desktop.FirstThat(FindQuit) = nil;
   end;
 
@@ -539,7 +539,7 @@ constructor TDNApplication.Create;
   begin
   for C := 'A' to 'Z' do
     DrvTrees[C].C := nil;
-  LastViewerBounds.Assign(0, 0, 0, 0);
+  LastViewerBounds := TRect.Create(0, 0, 0, 0);
 
   if RunFirst then
     ClearSwap;
@@ -548,7 +548,7 @@ constructor TDNApplication.Create;
 
   LoadHistories;
 
-  GetExtent(R);
+  R := GetExtent;
   if ShowSeconds then
     R.A.X := R.B.X-10
   else
@@ -559,7 +559,7 @@ constructor TDNApplication.Create;
     Clock.Hide;
   TClockView(Clock).Update;
 
-  MainApp.Desktop.GetExtent(R);
+  R := MainApp.Desktop.GetExtent;
   Dec(R.B.Y);
   Dec(R.B.X);
   R.A.Y := R.B.Y-3;
@@ -608,7 +608,7 @@ constructor TDNApplication.Create;
   if RunMenu then
     begin
     Event.What := evCommand;
-    Event.Command := cmUserMenu;
+    Event.Message.Command := cmUserMenu;
     PutEvent(Event);
     end;
   if ExistFile(SwpDir+'dn'+ItoS(DNNumber)+'.swp') then
@@ -652,12 +652,12 @@ procedure TDNApplication.InitCommandLine;
   HideCL := (InterfaceData.Options and ouiHideCmdline <> 0)
      or HideCommandLine;
 
-  R.Assign(0, 0, 0, 0);
+  R := TRect.Create(0, 0, 0, 0);
   TreeReader := TTreeReader.Create(R);
   Insert(TreeReader);
   TreeReader.Hide;
 
-  GetExtent(R);
+  R := GetExtent;
 
   R.A.Y := R.B.Y-1-Byte(InterfaceData.Options and ouiHideStatus = 0);
   R.B.Y := R.A.Y+1-Byte(HideCL);
@@ -748,8 +748,8 @@ destructor TDNApplication.Destroy;
 procedure TDNApplication.EventError(var Event: TEvent);
   begin
   
-  if  (Event.What = evMouseMove) and (Event.Where.Y = 0)
-       and (Event.Where.X = Size.X-1)
+  if  (Event.What = evMouseMove) and (Event.Mouse.Where.Y = 0)
+       and (Event.Mouse.Where.X = Size.X-1)
     and (SSaver = nil) and SaversData.Mouse
   then
     InsertIdler;
@@ -1051,8 +1051,8 @@ procedure TDNApplication.ProcessTempFile(TFStr: String);
       if Q <> '' then
         TempFile := TempFile+'|'+Q;
       Event.What := evCommand;
-      Event.Command := CC;
-      Event.InfoPtr := @TempFile;
+      Event.Message.Command := CC;
+      Event.Message.InfoPtr := @TempFile;
       PutEvent(Event);
       end;
 {AK155 27-10-2004 Removed clearing RunMenu, since its only
@@ -1180,9 +1180,9 @@ Err:
     S.Read(OldAppSize, SizeOf(Size));
     S.Read(OldDskSize, SizeOf(Size));
     LoadIndexes(S);
-    GetExtent(SaveBounds);
+    SaveBounds := GetExtent;
     MainApp.Desktop.Clear;
-    BB := not (OldDskSize.Equals(MainApp.Desktop.Size));
+    BB := not ((OldDskSize = MainApp.Desktop.Size));
     if BB then
       begin
       MainApp.Desktop.Hide;
@@ -1219,8 +1219,7 @@ Err:
     //     otherwise panel sizes will not adjust to the video mode
     if BB then
       begin
-      R.Assign(0, Byte(InterfaceData.Options and ouiHideMenu = 0),
-         Size.X, Size.Y
+      R := TRect.Create(0, Byte(InterfaceData.Options and ouiHideMenu = 0), Size.X, Size.Y
         -Byte(InterfaceData.Options and ouiHideStatus = 0)
         -Byte(not HideCommandLine));
       MainApp.Desktop.ChangeBounds(R);
@@ -1228,15 +1227,15 @@ Err:
       end;
     end;
   MainApp.Desktop.Redraw;
-  GetBounds(R);
+  R := GetBounds;
   if  (Clock.Size.X <= 0) or (Clock.Size.Y <= 0)
        or not R.Contains(Clock.Origin)
   then
     begin
     if ShowSeconds then
-      R.Assign(Size.X-10, 0, Size.X, 1)
+      R := TRect.Create(Size.X-10, 0, Size.X, 1)
     else
-      R.Assign(Size.X-7, 0, Size.X, 1);
+      R := TRect.Create(Size.X-7, 0, Size.X, 1);
     Clock.Locate(R);
     end;
   S.Free;
@@ -1281,14 +1280,14 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
     S.Write(TempBounds, SizeOf(TempBounds));
     S.Write(TrashCan.ImVisible, 1); 
     S.Put(KeyMacroses);
-    Clock.GetBounds(R);
+    R := Clock.GetBounds;
     if R.A.X > (ScreenWidth shr 1) then
       R.A.X := R.B.X-10
     else
       R.B.X := R.A.X+10;
     S.Write(R, SizeOf(R));
     
-    TrashCan.GetBounds(R);
+    R := TrashCan.GetBounds;
     if TrashCan.ImVisible then
       S.Write(R, SizeOf(R));
     
@@ -1390,8 +1389,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
       if  (Q = vmDB) and (W <> nil) then
         with P^, W do
           begin
-          R.Assign(fOrigin.X, fOrigin.Y, fOrigin.X+fSize.X,
-             fOrigin.Y+fSize.Y);
+          R := TRect.Create(fOrigin.X, fOrigin.Y, fOrigin.X+fSize.X, fOrigin.Y+fSize.Y);
           AdjustToDesktopSize(R, fDeskSize);
           Locate(R);
           with TDBWindow(W).P do
@@ -1412,8 +1410,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
       if  ( (Q = vmSpread) or (Q = vmSpreadSL)) and (W <> nil) then
         with P^, W do
           begin
-          R.Assign(fOrigin.X, fOrigin.Y, fOrigin.X+fSize.X,
-             fOrigin.Y+fSize.Y);
+          R := TRect.Create(fOrigin.X, fOrigin.Y, fOrigin.X+fSize.X, fOrigin.Y+fSize.Y);
           AdjustToDesktopSize(R, fDeskSize);
           Locate(R);
           with TCalcWindow(W).CalcView do
@@ -1480,9 +1477,7 @@ db:
       if i >= 0 then
         begin
         P := ViewHistory.At(i);
-        R.Assign(P^.fOrigin.X, P^.fOrigin.Y,
-          P^.fOrigin.X+P^.fSize.X,
-          P^.fOrigin.Y+P^.fSize.Y);
+        R := TRect.Create(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X, P^.fOrigin.Y+P^.fSize.Y);
         AdjustToDesktopSize(R, P^.fDeskSize);
         W.Locate(R);
         with V, P^ do
@@ -1535,7 +1530,7 @@ db:
   fr := CreateFileRec(FileName);
   FillChar(up, SizeOf(up), 0);
   up.Active := fr;
-  MainApp.Desktop.GetExtent(R);
+  R := MainApp.Desktop.GetExtent;
   Abort := False;
   if  (ReuseViewers > 0)
     and (Message(MainApp.Desktop, evBroadcast, cmFindView, @FileName) <> nil)
@@ -1623,13 +1618,13 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
         R := TempBounds
       else
         begin
-        MainApp.Desktop.GetExtent(R);
+        R := MainApp.Desktop.GetExtent;
         LastEditDeskSize := MainApp.Desktop.Size
         end;
       AdjustToDesktopSize(R, LastEditDeskSize);
       end
     else
-      MainApp.Desktop.GetExtent(R);
+      R := MainApp.Desktop.GetExtent;
     W := TEditWindow.Create(R, FileName);
     if  (W <> nil) and (W.Valid(cmValid)) then
       begin
@@ -1647,8 +1642,7 @@ procedure TDNApplication.EditFile(Intern: Boolean; FileName: String);
       if I >= 0 then
         begin
         P := EditHistory.At(I);
-        R.Assign(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X,
-           P^.fOrigin.Y+P^.fSize.Y);
+        R := TRect.Create(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X, P^.fOrigin.Y+P^.fSize.Y);
         AdjustToDesktopSize(R, P^.fDeskSize);
         W.Locate(R);
         V.ApplyRecord(P, InterfaceData.Options and ouiStoreEditorPosition <> 0);
@@ -1673,7 +1667,7 @@ procedure TDNApplication.InitMenuBar;
   var
     R: TRect;
   begin
-  GetExtent(R);
+  R := GetExtent;
   R.B.Y := R.A.Y;
   RegisterLanguageActions;
   MainApp.MenuBar := TMenuBar(LoadResource(dlgMainMenu));
@@ -1689,7 +1683,7 @@ procedure TDNApplication.InitStatusLine;
   var
     R: TRect;
   begin
-  GetExtent(R);
+  R := GetExtent;
   R.A.Y := R.B.Y;
   R.Move(0, -1);
   MainApp.StatusLine := TStatusLine(LoadResource(dlgStatusLine));
@@ -1704,7 +1698,7 @@ procedure TDNApplication.InitDesktop;
   WS := 0;
   HideCommandLine := (WS and cdnHideCmdLine <> 0);
   DisableCommands(DblWndCommands);
-  GetExtent(R);
+  R := GetExtent;
   if InterfaceData.Options and ouiHideMenu = 0 then
     Inc(R.A.Y);
   if InterfaceData.Options and ouiHideStatus = 0 then
@@ -1811,7 +1805,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     var
       S: String;
     begin
-    MainApp.Desktop.GetExtent(R);
+    R := MainApp.Desktop.GetExtent;
     S := #0;
     if ChDrive then
       begin
@@ -1846,7 +1840,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     var
       S: String;
     begin
-    MainApp.Desktop.GetExtent(R);
+    R := MainApp.Desktop.GetExtent;
     S := ChangeDir(GetString(dlSelectDirectory), 0);
     if S = '' then
       Exit;
@@ -1979,7 +1973,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
   {-DataCompBoy-}
   procedure LoadSheet(const SheetName: String);
     begin
-    MainApp.Desktop.GetExtent(R);
+    R := MainApp.Desktop.GetExtent;
     MainApp.Desktop.Insert(ValidView(TCalcWindow.Create(R, SheetName)));
     end;
   {-DataCompBoy-}
@@ -2247,7 +2241,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
 
   procedure Rebound;
     begin
-    GetExtent(R);
+    R := GetExtent;
     if InterfaceData.Options and ouiHideMenu = 0 then
       Inc(R.A.Y);
     if SystemData.Options and ouiHideStatus = 0 then
@@ -2263,9 +2257,9 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     begin
     if ExecResource(dlgAdvanceSearch, AdvanceSearchData) = cmOK then
       begin
-      TView(MainApp.Desktop.Current {Event.InfoPtr}).GetData(FindRec);
+      TView(MainApp.Desktop.Current {Event.Message.InfoPtr}).GetData(FindRec);
       FindRec.Options := FindRec.Options or ffoAdvanced;
-      TView(MainApp.Desktop.Current {Event.InfoPtr}).SetData(FindRec);
+      TView(MainApp.Desktop.Current {Event.Message.InfoPtr}).SetData(FindRec);
       end;
     ClearEvent(Event);
     end;
@@ -2297,10 +2291,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       Msg(erNoQuickDirs, nil, mfWarning+mfCancelButton);
       Exit;
       end;
-    R.Assign(MainApp.Application.Size.X div 2-J div 2,
-      MainApp.Application.Size.Y div 2-Q div 2,
-      MainApp.Application.Size.X div 2+J div 2+J mod 2,
-      MainApp.Application.Size.Y div 2+Q div 2+Q mod 2);
+    R := TRect.Create(MainApp.Application.Size.X div 2-J div 2, MainApp.Application.Size.Y div 2-Q div 2, MainApp.Application.Size.X div 2+J div 2+J mod 2, MainApp.Application.Size.Y div 2+Q div 2+Q mod 2);
     Menu := NewMenu(Items);
     P := TMenuBox.Create(R, Menu, nil);
     P.Options := P.Options or ofCentered;
@@ -2345,7 +2336,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     if CommandLine = nil then
       Exit;
     B := (not CommandLine.GetState(sfVisible)) and (Str <> '');
-    GetExtent(R);
+    R := GetExtent;
     if InterfaceData.Options and ouiHideMenu = 0 then
       Inc(R.A.Y);
     if InterfaceData.Options and ouiHideStatus = 0 then
@@ -2370,10 +2361,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     begin
     { PShortString: Message(@ShortString); a plain PString cast has been
       compiled as AnsiString→ShortString here and AVed on Enter for .txt. }
-    if Event.InfoPtr = nil then
+    if Event.Message.InfoPtr = nil then
       S := ''
     else
-      S := PShortString(Event.InfoPtr)^;
+      S := PShortString(Event.Message.InfoPtr)^;
     if
       not TryRunSession(S)
         and CheckExit  {JO}
@@ -2388,10 +2379,10 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     var
       S: String;
     begin
-    if Event.InfoPtr = nil then
+    if Event.Message.InfoPtr = nil then
       S := ''
     else
-      S := PShortString(Event.InfoPtr)^;
+      S := PShortString(Event.Message.InfoPtr)^;
     if not TryRunSession(S)
         and CheckExit  {JO}
       then
@@ -2494,7 +2485,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
           end;
         Menu := NewMenu(Current);
         Menu^.Default := Default;
-        MainApp.Desktop.GetExtent(R);
+        R := MainApp.Desktop.GetExtent;
         R.A.X := ((R.A.X+R.B.X) div 2)-8;
         R.B.X := R.A.X+16;
         R.A.Y := ((R.A.Y+R.B.Y-L.Count) div 2)-1;
@@ -2532,7 +2523,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     end { ChLngId };
 
   begin { TDNApplication.HandleCommand }
-  case Event.Command of
+  case Event.Message.Command of
     cmFirstTimePanel:
       OpenWindow(False);
     cmSearchAdvance:
@@ -2541,7 +2532,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       DoQuickChange;
     
     cmFilePrint:
-      PrintFile(PString(Event.InfoPtr)^);
+      PrintFile(PString(Event.Message.InfoPtr)^);
     
     
     cmSetupPrinter:
@@ -2562,7 +2553,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       SetHighlightGroups;
     
     cmDBFView:
-      InsertWindow(TDBWindow.Create(CnvString(Event.InfoPtr), FileIsDBF));
+      InsertWindow(TDBWindow.Create(CnvString(Event.Message.InfoPtr), FileIsDBF));
     
     
     cmNewTable:
@@ -2571,8 +2562,8 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       OpenSheet;
     cmWKZView:
       begin
-      MainApp.Desktop.GetExtent(R);
-      InsertWindow(TCalcWindow.Create(R, CnvString(Event.InfoPtr)));
+      R := MainApp.Desktop.GetExtent;
+      InsertWindow(TCalcWindow.Create(R, CnvString(Event.Message.InfoPtr)));
       end;
     
     
@@ -2582,16 +2573,16 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     
     cmTextView, cmHexView:
       begin
-      ST := CnvString(Event.InfoPtr);
+      ST := CnvString(Event.Message.InfoPtr);
       W := PosChar('|', ST);
       if W > 0
       then
         InsertWindow(TFileWindow.Create(Copy(ST, 1, W-1),
               Copy(ST, W+1, MaxStringLength),
-              Event.Command = cmHexView))
+              Event.Message.Command = cmHexView))
       else
         InsertWindow(TFileWindow.Create(ST, ST,
-              Event.Command = cmHexView))
+              Event.Message.Command = cmHexView))
       end;
     
     cmSystemSetup:
@@ -2633,7 +2624,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmWindowManager:
       WindowManager;
     cmUserMenu, cmGlobalUserMenu:
-      if  (ExecUserMenu(Event.Command = cmGlobalUserMenu)) then
+      if  (ExecUserMenu(Event.Message.Command = cmGlobalUserMenu)) then
         begin
         ST := FreeStr;
         
@@ -2645,7 +2636,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
           if RunMenu then
             begin
             Event.What := evCommand;
-            Event.Command := cmUserMenu;
+            Event.Message.Command := cmUserMenu;
             PutEvent(Event);
             end;
           end;
@@ -2684,17 +2675,17 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmClearDesktop:
       GlobalMessage(evCommand, cmClose, nil);
     cmFileView:
-      ViewFile(False, False, CnvString(Event.InfoPtr));
+      ViewFile(False, False, CnvString(Event.Message.InfoPtr));
     cmFileEdit:
-      EditFile(True, CnvString(Event.InfoPtr));
-    {cmViewFilter: ViewFile(true, true, CnvString(Event.InfoPtr));}
+      EditFile(True, CnvString(Event.Message.InfoPtr));
+    {cmViewFilter: ViewFile(true, true, CnvString(Event.Message.InfoPtr));}
     cmViewFilter:
-      ViewFile(False, True, CnvString(Event.InfoPtr));
+      ViewFile(False, True, CnvString(Event.Message.InfoPtr));
     {JO for recognizing filtered files as archives}
     cmIntFileView:
-      ViewFile(True, False, CnvString(Event.InfoPtr));
+      ViewFile(True, False, CnvString(Event.Message.InfoPtr));
     cmIntFileEdit:
-      EditFile(False, CnvString(Event.InfoPtr));
+      EditFile(False, CnvString(Event.Message.InfoPtr));
     cmEditQuickRun:
       EditFile(True, Copy(ConfigDir, 1, Byte(ShiftState and 3 =
            0)*MaxStringLength)+'dn.xrn');
@@ -2796,7 +2787,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmUpdateArcFile:
       UpdateARH(nil);
     cmLoConfigArchiver..cmHiConfigArchiver:
-      SetupArchive(Event.Command);
+      SetupArchive(Event.Message.Command);
     cmFMSetup:
       DoFMSetup;
     cmDriveInfoSetup:
@@ -2822,7 +2813,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmGetTeam:
       if MainApp.Desktop.TopView.HelpCtx = hcAboutDialog then
         begin
-        MainApp.Desktop.TopView.GetExtent(R);
+        R := MainApp.Desktop.TopView.GetExtent;
         R.Grow(-1, -2);
         Dec(R.B.Y, 2);
         TeamView := TTeamView.Create(R);
@@ -2847,12 +2838,12 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmGetCmpNfo:
       begin
       ClearEvent(Event);
-      Event.InfoPtr := WriteMsg(GetString(dlComparing));
+      Event.Message.InfoPtr := WriteMsg(GetString(dlComparing));
       end;
     cmNewStrColl:
       begin
       ClearEvent(Event);
-      Event.InfoPtr := TStringCollection.Create($80, $40, False);
+      Event.Message.InfoPtr := TStringCollection.Create($80, $40, False);
       end;
     cmHelp:
       begin
@@ -2914,7 +2905,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmClearData:
       begin
       FillChar(FreeStr, SizeOf(FreeStr), 0);
-      TView(Event.InfoPtr).Owner.SetData(FreeStr);
+      TView(Event.Message.InfoPtr).Owner.SetData(FreeStr);
       ClearEvent(Event);
       end;
     cmChLngId:

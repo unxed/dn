@@ -149,7 +149,7 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
           end;
       end {case};
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmLookForPanels, cmGetUserParams, cmGetUserParamsWL,
         cmChangeDrv,
         cmIsRightPanel:
@@ -159,7 +159,7 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
           end;
       end {case};
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmChangeDirectory:
           begin {AK155 This message can really come ONLY
             from the tree, so comparing with dtTree is, to put it mildly,

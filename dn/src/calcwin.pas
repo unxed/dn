@@ -362,7 +362,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   P.GrowMode := gfGrowHiX;
   Insert(P);
 
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.B.Y := R.A.Y+1;
   P := TView(LoadResource(dlgWkzMenuBar));
@@ -370,7 +370,7 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   P.GrowMode := gfGrowHiX;
   Insert(P);
 
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   Inc(R.A.Y);
   R.B.Y := R.A.Y+1;
@@ -380,13 +380,13 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   P.Options := P.Options or ofSelectable;
   Insert(P);
 
-  R.Assign(1, 2, 7, 4);
+  R := TRect.Create(1, 2, 7, 4);
   P1 := TInfoView.Create(R);
   TInfoView(P1).InfoStr := '';
   TInfoView(P1).InfoAttr := GetColorW(9);
   Insert(P1);
 
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   Inc(R.A.Y, 2);
   CalcView := TCalcView.Create(R, TCalcInput(P), P1,
@@ -420,15 +420,15 @@ procedure TCalcWindow.HandleEvent(var Event: TEvent);
   begin
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmClose, cmQuit:
           if not CalcView.AskSave then
             ClearEvent(Event);
       end {case};
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmFindView:
-          if PString(Event.InfoPtr)^ = CnvString(CalcView.SName) then
+          if PString(Event.Message.InfoPtr)^ = CnvString(CalcView.SName) then
             begin
             Self.Select;
             ClearEvent(Event);
@@ -672,7 +672,7 @@ procedure TCalcView.SetState(AState: Word; Enable: Boolean);
       end;
   if Owner <> nil then
     begin
-    GetBounds(Bounds);
+    Bounds := GetBounds;
     DisposeStr(TWindow(Owner).Title);
     if SName <> nil then
       TWindow(Owner).Title := NewStr(Cut(SName^,
@@ -1692,9 +1692,9 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
   CurCol := Delta.X+Cur.X;
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmGetName:
-          PString(Event.InfoPtr)^:= 'Speadsheet - '+SName^;
+          PString(Event.Message.InfoPtr)^:= 'Speadsheet - '+SName^;
         cmImportToFile:
           begin
           ExportToFile;
@@ -2048,21 +2048,21 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
         kbAltRight:
           ExpandCol(CurCol);
         else {case}
-          if (Char(Event.CharCode) > #31) or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80)) then
+          if (Char(Event.KeyDown.CharScan.CharCode) > #31) or ((Event.KeyDown.CharScan.CharCode = 0) and (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80)) then
             begin
             Marking := False;
             SetMark;
             DrawView;
             TWindow(Owner).SelectNext(True);
-            Event.InfoPtr := CalcInput;
+            Event.Message.InfoPtr := CalcInput;
             CalcInput.PutEvent(Event);
             ClearEvent(Event)
             end;
       end {case};
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmScrollBarChanged:
-          if Event.InfoPtr = HScroll then
+          if Event.Message.InfoPtr = HScroll then
             begin
             CheckMark;
             Delta.X := HScroll.Value;
@@ -2070,7 +2070,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             DrawView;
             Exit
             end
-          else if Event.InfoPtr = VScroll then
+          else if Event.Message.InfoPtr = VScroll then
             begin
             CheckMark;
             Delta.Y := VScroll.Value;
@@ -2237,7 +2237,7 @@ procedure TCalcView.LoadSheet(FName: String);
     S: TStream;
     Bounds: TRect;
   begin
-  GetBounds(Bounds);
+  Bounds := GetBounds;
   if Modified and not AskSave then
     Exit;
   if Cells <> nil then
@@ -2308,7 +2308,7 @@ procedure TCalcView.SaveSheetAs;
     PP: Pointer;
     Bounds: TRect;
   begin
-  GetBounds(Bounds);
+  Bounds := GetBounds;
   PP := @FName;
   if GetFileName(FName, '*.WKZ', GetString(dlSaveFileAs),
       GetString(dlSaveFileAs), fdOKButton {, hsSaveSheetAs, 0})

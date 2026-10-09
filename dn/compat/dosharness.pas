@@ -66,15 +66,15 @@ begin
     Inc(MouseSent);
     DNTrace('mouse entry ' + Entry);
     FillChar(Ev, SizeOf(Ev), 0);
-    Ev.Buttons := mbLeftButton;
+    Ev.Mouse.Buttons := mbLeftButton;
     if (Entry <> '') and (Entry[1] = 'R') then
     begin
-      Ev.Buttons := mbRightButton;
+      Ev.Mouse.Buttons := mbRightButton;
       Delete(Entry, 1, 1);
     end;
     if Copy(Entry, 1, 2) = 'DD' then
     begin
-      Ev.EventFlags := meDoubleClick;
+      Ev.Mouse.EventFlags := meDoubleClick;
       Delete(Entry, 1, 1);
     end;
     if Entry = '' then
@@ -88,10 +88,10 @@ begin
     end;
     Delete(Entry, 1, 1);
     I := Pos(':', Entry);
-    Ev.Where.X := StrToIntDef(Copy(Entry, 1, I - 1), 0);
-    Ev.Where.Y := StrToIntDef(Copy(Entry, I + 1, 9), 0);
+    Ev.Mouse.Where.X := StrToIntDef(Copy(Entry, 1, I - 1), 0);
+    Ev.Mouse.Where.Y := StrToIntDef(Copy(Entry, I + 1, 9), 0);
     Application.PutEvent(Ev);
-    DNTrace('mouse event ' + IntToHex(Ev.What, 2) + ' at ' + IntToStr(Ev.Where.X) + ',' + IntToStr(Ev.Where.Y));
+    DNTrace('mouse event ' + IntToHex(Ev.What, 2) + ' at ' + IntToStr(Ev.Mouse.Where.X) + ',' + IntToStr(Ev.Mouse.Where.Y));
   end;
   { DOSBox-X without a display reports Alt as pressed (bit 3 of the shift flags at 0040:0017): clear the flags, the keys are
     those of a person who holds nothing }
@@ -128,13 +128,13 @@ begin
   begin
     { the trace of a dump that is blank: the state of the screen of TV and of the hooks of the backend }
     N := 0;
-    if TvScreen.ScreenBuffer <> nil then
+    if TvScreen.TScreen.ScreenBuffer <> nil then
       for I := 0 to ScreenWidth * ScreenHeight - 1 do
-        if not (PByte(TvScreen.ScreenBuffer)[I * SizeOf(TScreenCell)] in [0, 32]) then
+        if not (PByte(TvScreen.TScreen.ScreenBuffer)[I * SizeOf(TScreenCell)] in [0, 32]) then
           Inc(N);
     DNTrace('dump: screen ' + IntToStr(ScreenWidth) + 'x' + IntToStr(ScreenHeight) + ', non-blank cells in the buffer: ' + IntToStr(N) +
       ', hook set: ' + BoolToStr(Assigned(OnScreenWrite), True) + ', locks: app ' + IntToStr(Application.LockFlag) + ' desktop ' +
-      IntToStr(Desktop.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application.Buffer = TvScreen.ScreenBuffer, True));
+      IntToStr(Desktop.LockFlag) + ', app buffer = screen: ' + BoolToStr(Application.Buffer = TvScreen.TScreen.ScreenBuffer, True));
     { the help context decides what the status line shows }
     DNTrace('mouse driver: ' + BoolToStr(DosMousePresent, True));
     DNTrace('idle calls: ' + IntToStr(IdleCount) + ' shift state ' + IntToHex(ShiftState, 2) + ' ' + IntToHex(ShiftState2, 2) + ' old ' + IntToHex(OldShiftState, 2));

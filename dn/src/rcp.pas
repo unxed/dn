@@ -872,7 +872,7 @@ procedure ProcessDLGs;
       R: TRect;
     begin
     PM := CompileStatus;
-    R.Assign(0, 0, 80, 1);
+    R := TRect.Create(0, 0, 80, 1);
     StatusLine := TStatusLine.Create(R, PM);
     StoreResource(StatusLine, dlgStatusLine);
     StatusLine.Free;
@@ -1004,7 +1004,7 @@ procedure ProcessDLGs;
       var
         P: THistory;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := TInputLine.Create(R, GetID(Token(S, i)));
       D.Insert(PV);
@@ -1022,7 +1022,7 @@ procedure ProcessDLGs;
       var
         P: THistory;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := TLongInputLine.Create(R, GetID(Token(S, i)));
       D.Insert(PV);
@@ -1034,7 +1034,7 @@ procedure ProcessDLGs;
     {-DataCompBoy-}
     procedure MakeHexLine;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := THexLine.Create(R, TInputLine(PV));
       D.Insert(PV);
@@ -1100,14 +1100,14 @@ procedure ProcessDLGs;
 
     procedure MakeCheckBoxes;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TCheckBoxes.Create(R, GetItems);
       D.Insert(PV);
       end;
 
     procedure MakeDriveCheckBoxes;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TCurrDriveInfo.Create(R, GetItems);
       D.Insert(PV);
       with PV do
@@ -1119,14 +1119,14 @@ procedure ProcessDLGs;
 
     procedure MakeRadioButtons;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TRadioButtons.Create(R, GetItems);
       D.Insert(PV);
       end;
 
     procedure MakeComboBox;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TComboBox.Create(R, GetItems);
       D.Insert(PV);
       end;
@@ -1144,7 +1144,7 @@ procedure ProcessDLGs;
         Flags, Options: Word;
         CmD: Word;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       K := Token(S, i);
       CmD := GetID(Token(S, i));
       Flags := 0;
@@ -1173,7 +1173,7 @@ procedure ProcessDLGs;
 
     procedure MakeScrollBar(Mouse: Boolean);
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       if Mouse then
         LastSB := TMouseBar.Create(R)
       else
@@ -1183,21 +1183,21 @@ procedure ProcessDLGs;
 
     procedure MakeListBox;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TListBox.Create(R, GetID(Token(S, i)), LastSB);
       D.Insert(PV);
       end;
 
     procedure MakeStaticText;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TStaticText.Create(R, Token(S, i));
       D.Insert(PV);
       end;
 
     procedure MakeParamText;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); PV := TParamText.Create(R, TkS[1], TkL[2]) end;
       D.Insert(PV);
       end;
@@ -1293,7 +1293,7 @@ procedure ProcessDLGs;
     if not DLGs.Search(T, J) then
       Error('Unknown Resource ID: '+T.Name);
     ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
-    begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R.Assign(0, 0, TkL[1], TkL[2]) end;
+    begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R := TRect.Create(0, 0, TkL[1], TkL[2]) end;
     if ID = dlgSystemSetup then
       begin
       D := TSysDialog.Create(R, Token(S, I));

@@ -65,19 +65,19 @@ begin
   { the typed characters are not recorded }
   FillChar(E, SizeOf(E), 0);
   E.What := evKeyDown;
-  E.Text[0] := 's'; E.Text[1] := 'e'; E.TextLength := 1;
-  E.KeyCode := $1F73;
+  E.KeyDown.Text[0] := 's'; E.KeyDown.Text[1] := 'e'; E.KeyDown.TextLength := 1;
+  E.KeyDown.KeyCode := $1F73;
   FRNoteEvent(E);
   Check(Pos('<char>', FRRecent(1)) > 0, 'a typed character is masked');
   Check(Pos('''s''', FRRecent(1)) = 0, 'a typed character is not in the log');
   FillChar(E, SizeOf(E), 0);
   E.What := evKeyDown;
-  E.KeyCode := kbF5;
+  E.KeyDown.KeyCode := kbF5;
   FRNoteEvent(E);
   Check(Pos('kbF5', FRRecent(1)) > 0, 'a named key is recorded by its name');
   FillChar(E, SizeOf(E), 0);
   E.What := evCommand;
-  E.Command := 1;
+  E.Message.Command := 1;
   FRNoteEvent(E);
   Check(Pos('cmQuit', FRRecent(1)) > 0, 'a command is recorded by its name');
   FillChar(E, SizeOf(E), 0);

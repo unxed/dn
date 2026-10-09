@@ -12,7 +12,7 @@ var
 
 begin
   { a type, its methods and a constant of the shim are those of tv/ }
-  R.Assign(1, 2, 11, 5);
+  R := TRect.Create(1, 2, 11, 5);
   Check((R.A.X = 1) and (R.B.Y = 5) and (SizeOf(TRect) = SizeOf(TvGeom.TRect)), 'TRect through the shim');
   Check((cmQuit = TvViews.cmQuit) and (sfVisible = TvViews.sfVisible), 'constants');
   Ph := phPostProcess;

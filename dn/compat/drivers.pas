@@ -75,14 +75,14 @@ var
   OldCursorPos: Word;
   DownButtons: Byte;
   { the size of the screen: the low halves of the variables of TvScreen (little endian) }
-  ScreenWidth: Word absolute TvScreen.ScreenWidth;
-  ScreenHeight: Word absolute TvScreen.ScreenHeight;
+  ScreenWidth: Word absolute TvScreen.TScreen.ScreenWidth;
+  ScreenHeight: Word absolute TvScreen.TScreen.ScreenHeight;
   { TODO: DN reads and writes the screen as an array of 16-bit cells; the buffer of tv/ has other cells }
   { the screen of DN: 16-bit cells (character + attribute), a copy of the screen of tv/ that SysTvGetSrcBuf (osdep) makes and
     mainapp refreshes at every idle; DN reads it (user screen, screen savers) and writes back with SysTvShowBuf. NOT the buffer of
     TvScreen (that one has the cells of tv/) }
   ScreenBuffer: Pointer = nil;
-  CursorLines: Word absolute TvScreen.CursorLines;
+  CursorLines: Word absolute TvScreen.TScreen.CursorLines;
 
 { The key code of an event in the form of DN: the low word is the code of Turbo Vision (scan code * 256 + character),
   bits 16..19 are the state of the shift keys (1 and 2: shift, 4: ctrl, 8: alt; the shifts together are 3), as in
@@ -248,10 +248,10 @@ var
   I: Integer;
 begin
   Shift := 0;
-  if (Event.ControlKeyState and 3) <> 0 then
+  if (Event.KeyDown.ControlKeyState and 3) <> 0 then
     Shift := 3;
-  Shift := Shift or (Event.ControlKeyState and 12);
-  Key := Event.KeyCode;
+  Shift := Shift or (Event.KeyDown.ControlKeyState and 12);
+  Key := Event.KeyDown.KeyCode;
   { tv/ has its own codes for these four (magiblot: kbCtrlIns $0400, kbShiftIns $0500, kbCtrlDel $0600, kbShiftDel $0700); DN knows the scan codes of the BIOS:
     without this Ctrl+Ins (copy), Shift+Ins (paste), Ctrl+Del and Shift+Del were not the keys DN looks for (the menu hotkeys, the editor) }
   case Key of
@@ -260,12 +260,12 @@ begin
     $0600: Key := $9300;
     $0700: Key := $5300;
   end;
-  if  ((Event.ControlKeyState and 4) <> 0) and ((Event.ControlKeyState and 8) = 0) and (Key >= 1) and (Key <= 26)
+  if  ((Event.KeyDown.ControlKeyState and 4) <> 0) and ((Event.KeyDown.ControlKeyState and 8) = 0) and (Key >= 1) and (Key <= 26)
       and not (Key in [8, 9, 13]) then
     Key := Key or (LongInt(CtrlScan[Key]) shl 8);
   { Alt and a key of punctuation: tv/ gives the character (a terminal sends ESC and the character), DN looks for the scan code of the key
     (kbAltQuote = $082800); the character of the key with Shift adds Shift }
-  if ((Event.ControlKeyState and 8) <> 0) and (Key > $20) and (Key < $7F) then
+  if ((Event.KeyDown.ControlKeyState and 8) <> 0) and (Key > $20) and (Key < $7F) then
     for I := Low(PunctScan) to High(PunctScan) do
       if Chr(Key) = PunctScan[I].Plain then
       begin
@@ -284,15 +284,15 @@ end;
 procedure SetEventDouble(var Event: TEvent; Value: Boolean);
 begin
   if Value then
-    Event.EventFlags := Event.EventFlags or 2
+    Event.Mouse.EventFlags := Event.Mouse.EventFlags or 2
   else
-    Event.EventFlags := Event.EventFlags and not Word(2);
+    Event.Mouse.EventFlags := Event.Mouse.EventFlags and not Word(2);
 end;
 
 procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
 begin
-  Event.KeyCode := Word(Code);
-  Event.ControlKeyState := (Event.ControlKeyState and not Word($F)) or Word((Code shr 16) and $F);
+  Event.KeyDown.KeyCode := Word(Code);
+  Event.KeyDown.ControlKeyState := (Event.KeyDown.ControlKeyState and not Word($F)) or Word((Code shr 16) and $F);
 end;
 
 function MessageKey(Receiver: TView; Code: LongInt): Pointer;
@@ -307,7 +307,7 @@ begin
   SetDNKeyCode(Event, Code);
   Receiver.HandleEvent(Event);
   if Event.What = evNothing then
-    Result := Event.InfoPtr;
+    Result := Event.Message.InfoPtr;
 end;
 
 procedure InitDrivers;

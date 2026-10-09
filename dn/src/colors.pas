@@ -226,12 +226,12 @@ cmWindowManager is disabled.
 *)
   D := TDialog(LoadResource(dlgWindowManager));
 
-  R.Assign(D.Size.X-13, 3, D.Size.X-12, D.Size.Y-2);
+  R := TRect.Create(D.Size.X-13, 3, D.Size.X-12, D.Size.Y-2);
   PV := TScrollBar.Create(R);
   PV.Options := PV.Options or ofPostProcess or ofSecurity;
   D.Insert(PV);
 
-  R.Assign(2, 3, D.Size.X-13, D.Size.Y-2);
+  R := TRect.Create(2, 3, D.Size.X-13, D.Size.Y-2);
   PV := TWindowList.Create(R, 1, TScrollBar(PV));
   PV.Options := PV.Options or ofPostProcess or ofSecurity;
   TListBox(PV).NewLisT(PC);
@@ -255,7 +255,7 @@ cmWindowManager is disabled.
   TListBox(PV).Focused := Num; {-$VIV--}
   D.Insert(PV);
 
-  R.Assign(2, 2, 45, 3);
+  R := TRect.Create(2, 2, 45, 3);
   PV := TLabel.Create(R, GetString(dlWindowsLabel), PV);
   D.Insert(PV);
 

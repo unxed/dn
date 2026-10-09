@@ -391,7 +391,7 @@ function AppendQuery(const S: String): Word;
   begin
   D := TDialog(LoadResource(dlgAppendQuery));
   D.Options := D.Options or ofCentered;
-  R.Assign(2, 4, D.Size.X-2, 5);
+  R := TRect.Create(2, 4, D.Size.X-2, 5);
   P := TStaticText.Create(R, ^C+S);
   D.Insert(P);
   AppendQuery := Desktop.ExecView(D);
@@ -419,9 +419,9 @@ type
 procedure TOverriteDialog.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
-  if (Event.What = evCommand) and (Event.Command = cmSave) then
+  if (Event.What = evCommand) and (Event.Message.Command = cmSave) then
      begin { "Continue" button }
-     EndModal(Event.Command);
+     EndModal(Event.Message.Command);
      ClearEvent(Event);
      end;
   end;
@@ -579,7 +579,7 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     else
       L2 := PredSpace(L2, Length(L1));
     D := TDialog(LoadResource(dlgOverwriteQuery));
-    D.GetExtent(R);
+    R := D.GetExtent;
     R.Grow(-1, -1);
     Inc(R.A.Y);
     D.Options := D.Options or ofCentered;
@@ -2371,7 +2371,7 @@ qqqq:
   ToDo := 0;
   ToDoCopy := 0;
   ToDoClusCopy := 0;
-  R.Assign(0,0,60,15); {John_SW 30-06-2005}
+  R := TRect.Create(0, 0, 60, 15); {John_SW 30-06-2005}
   Info := TWhileView.Create(R);
   if CopyOptions and cpoMove <> 0 then
     Info.Top := GetString(dlFCMove)
@@ -2549,7 +2549,7 @@ function CopyDialog(var CopyDir: String; var Mask: String; var CopyOpt: Word; va
         DisposeStr(Title);
         Title := NewStr(GetString(dlFCMove));
         end;
-      R.Assign(2, 1, Size.X-3, 2);
+      R := TRect.Create(2, 1, Size.X-3, 2);
       Insert(TLabel.Create(R, DialogLabel, DirectLink[1]));
       {JO}
       if  (FMSetup.Options and fmoAlwaysCopyDesc = 0) and

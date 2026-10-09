@@ -319,7 +319,7 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
   StDelta := 0;
   if Display then
     begin
-    R.Assign(1, 1, 30, 9);
+    R := TRect.Create(1, 1, 30, 9);
     Info := TWhileView.Create(R);
     Info.Top := GetString(dlSearching)+' "'+Cut(SearchString.What, 40)
       +'"';
@@ -573,7 +573,7 @@ procedure TViewInfo.HandleEvent(var Event: TEvent);
   if  (Event.What = evMouseDown) then
     with Viewer do
       begin
-      Self.MakeLocal(Event.Where, P);
+      P := Self.MakeLocal(Event.Mouse.Where);
       if  (ViewMode = vmHex) then
         begin
         if P.X < 3*HexPos+9+3 then
@@ -592,16 +592,16 @@ procedure TViewInfo.HandleEvent(var Event: TEvent);
         else if P.X < 22 then
           begin
           BookMark := P.X-13;
-          if  (Event.Buttons and mbRightButton <> 0) or
+          if  (Event.Mouse.Buttons and mbRightButton <> 0) or
               (MarkPos[BookMark+1].Y <> -1)
           then
             with Ev do
               begin
               What := evCommand;
-              if  (Event.Buttons and mbRightButton <> 0) then
-                Command := cmPlaceMarker1+BookMark
+              if  (Event.Mouse.Buttons and mbRightButton <> 0) then
+                Message.Command := cmPlaceMarker1+BookMark
               else
-                Command := cmGoToMarker1+BookMark;
+                Message.Command := cmGoToMarker1+BookMark;
               PutEvent(Ev);
               end;
           end
@@ -621,16 +621,16 @@ procedure TViewInfo.HandleEvent(var Event: TEvent);
         else if P.X < 16 then
           begin
           BookMark := P.X-7;
-          if  (Event.Buttons and mbRightButton <> 0) or
+          if  (Event.Mouse.Buttons and mbRightButton <> 0) or
               (MarkPos[BookMark+1].Y <> -1)
           then
             with Ev do
               begin
               What := evCommand;
-              if  (Event.Buttons and mbRightButton <> 0) then
-                Command := cmPlaceMarker1+BookMark
+              if  (Event.Mouse.Buttons and mbRightButton <> 0) then
+                Message.Command := cmPlaceMarker1+BookMark
               else
-                Command := cmGoToMarker1+BookMark;
+                Message.Command := cmGoToMarker1+BookMark;
               PutEvent(Ev);
               end;
           end
@@ -800,10 +800,10 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmChangeValue:
           begin
-          Value := PComp(Event.InfoPtr)^;
+          Value := PComp(Event.Message.InfoPtr)^;
           DrawView;
           ClearEvent(Event)
           end;
@@ -813,15 +813,15 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
       if MaxV > 0 then
         begin
 
-        MakeLocal(Event.Where, P);
-        GetExtent(Extent);
+        P := MakeLocal(Event.Mouse.Where);
+        Extent := GetExtent;
         {if (Value * (Size.Y-3)) div MaxV + 1 = P.Y then}
         if GetPartCode = P.Y then
           {JO}
           begin
           RD := P.Y;
           repeat
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             Tracking := Extent.Contains(P);
             if Tracking then
               begin
@@ -849,14 +849,14 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
           Exit;
           end;
 
-        MakeLocal(Event.Where, P);
+        P := MakeLocal(Event.Mouse.Where);
         RD := RepeatDelay;
         RepeatDelay := 0;
         SP := GetPartCode;
         if P.Y = 0 then
           begin
           repeat
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y >= -1)
                  and (P.Y <= 1)
             then
@@ -866,7 +866,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
         else if P.Y = Size.Y-1 then
           begin
           repeat
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y >= Size.Y-2)
                  and (P.Y <= Size.Y)
             then
@@ -878,7 +878,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
           RepeatDelay := RD;
           repeat
             GetPartCode;
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y < SP) then
               MessageKey(Owner, kbPgUp);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
@@ -888,7 +888,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
           RepeatDelay := RD;
           repeat
             GetPartCode;
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y > SP) then
               MessageKey(Owner, kbPgDn);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
@@ -990,7 +990,7 @@ procedure TDFileViewer.ChangeFile(FR: PFileRec);
 
 procedure TDFileViewer.HandleEvent(var Event: TEvent);
   begin
-  if (Event.What = evCommand) and (Event.Command = cmFileEdit) then
+  if (Event.What = evCommand) and (Event.Message.Command = cmFileEdit) then
     begin
    {! AK155 10.01.05 The jump-to-editor command in the description
     viewer panel is probably sensible. We should actually
@@ -2061,9 +2061,9 @@ procedure TFileViewer.SeekBof;
   Seek(0);
   if ViewMode = vmAsm
   then
-    Cur.Assign(10, 0)
+    Cur := Point(10, 0)
   else
-    Cur.Assign(0, 0);
+    Cur := Point(0, 0);
   XDelta := 0;
   DrawView
   end;
@@ -2381,10 +2381,10 @@ procedure TFileViewer.HandleEvent;
       end;
     case Event.What of
       evBroadcast:
-        case Event.Command of
+        case Event.Message.Command of
           cmFindView:
-            if  (PString(Event.InfoPtr)^ = FileName) or
-                (PString(Event.InfoPtr)^ = VFileName)
+            if  (PString(Event.Message.InfoPtr)^ = FileName) or
+                (PString(Event.Message.InfoPtr)^ = VFileName)
             then
               if (Owner <> nil) and not QuickView then
                 begin
@@ -2404,7 +2404,7 @@ DoSave:
                 end;
           cmReleaseFile:
             begin
-            if UpStrg(FileName) = UpStrg(PString(Event.InfoPtr)^) then
+            if UpStrg(FileName) = UpStrg(PString(Event.Message.InfoPtr)^) then
               begin
               ReadFile('', '', True);
               {if not QuickView then Message(Owner, evCommand, cmClose, nil);}
@@ -2412,7 +2412,7 @@ DoSave:
             end;
         end {case};
       evCommand:
-        case Event.Command of
+        case Event.Message.Command of
           cmFileEdit:
             if DelSpaces(FileName) <> '' then
               begin
@@ -2443,7 +2443,7 @@ DoSave:
               end;
           cmPlaceMarker1..cmPlaceMarker9:
             begin
-            I := Event.Command-cmPlaceMarker1+1;
+            I := Event.Message.Command-cmPlaceMarker1+1;
             if  (I >= 1) and (I <= 9) then
               begin
               with MarkPos[I] do
@@ -2469,7 +2469,7 @@ DoSave:
             end;
           cmGoToMarker1..cmGoToMarker9:
             begin
-            I := Event.Command-cmGoToMarker1+1;
+            I := Event.Message.Command-cmGoToMarker1+1;
             if  (I >= 1) and (I <= 9) and (MarkPos[I].Y <> -1) then
               begin
               Cur.X := MarkPos[I].X mod 256;
@@ -2507,7 +2507,7 @@ DoSave:
               if (I <> 0) or (ALLR < 0) then
                 Exit;
               ALFR := ALLR;
-              Cur.Assign(0, 0);
+              Cur := Point(0, 0);
               {JO} 
               if ViewMode <> vmAsm then
                 begin
@@ -2550,13 +2550,13 @@ DoSave:
           cmGetName:
             if VFileName <> ''
             then
-              PString(Event.InfoPtr)^:= GetString(dlViewFile)+' - '+
+              PString(Event.Message.InfoPtr)^:= GetString(dlViewFile)+' - '+
                 (VFileName)
             else
-              PString(Event.InfoPtr)^:= GetString(dlViewFile);
+              PString(Event.Message.InfoPtr)^:= GetString(dlViewFile);
           cmLoadViewFile:
             begin
-            ChangeFile(Event.InfoPtr);
+            ChangeFile(Event.Message.InfoPtr);
             CE;
             end;
           cmClose, cmQuit, cmKillUsed:
@@ -2570,7 +2570,7 @@ DoSave:
           cmReverseSearch,
           cmContinueSearch:
             begin
-            ContinueSearch(Event.Command = cmReverseSearch);
+            ContinueSearch(Event.Message.Command = cmReverseSearch);
             CE
             end;
           cmHexMode:
@@ -2637,8 +2637,8 @@ DoSave:
           cmScrollBarChanged:
             begin
             Desktop.Lock;
-            Seek(PComp(Event.InfoPtr)^);
-            if  (ViewMode = vmText) and (Event.InfoLong <> 0) then
+            Seek(PComp(Event.Message.InfoPtr)^);
+            if  (ViewMode = vmText) and (Event.Message.InfoLong <> 0) then
               begin
               { move to the start of the line, but so
                  as not to shift the cursor slider upward }
@@ -2958,18 +2958,18 @@ DoSave:
 KBCheck:
               if Event.What <> evNothing then
                 begin
-                if  (Char(Event.CharCode) = #11) and not CtrlK then
+                if  (Char(Event.KeyDown.CharScan.CharCode) = #11) and not CtrlK then
                   begin
                   CtrlK := True;
                   CE;
                   end
                 else if CtrlK then
                   begin
-                  Ch := Char(Event.CharCode);
+                  Ch := Char(Event.KeyDown.CharScan.CharCode);
                   if  (Ch >= '1') and (Ch <= '9') then
                     begin
                     Event.What := evCommand;
-                    Event.Command := cmPlaceMarker1+Ord(Ch)-Ord('1');
+                    Event.Message.Command := cmPlaceMarker1+Ord(Ch)-Ord('1');
                     PutEvent(Event);
                     end;
                   CtrlK := False;
@@ -2984,41 +2984,41 @@ KBCheck:
                  //    for jumping to bookmarks
                     
                     kbAlt1:
-                      Event.Command := cmPlaceMarker1;
+                      Event.Message.Command := cmPlaceMarker1;
                     kbAlt2:
-                      Event.Command := cmPlaceMarker2;
+                      Event.Message.Command := cmPlaceMarker2;
                     kbAlt3:
-                      Event.Command := cmPlaceMarker3;
+                      Event.Message.Command := cmPlaceMarker3;
                     kbAlt4:
-                      Event.Command := cmPlaceMarker4;
+                      Event.Message.Command := cmPlaceMarker4;
                     kbAlt5:
-                      Event.Command := cmPlaceMarker5;
+                      Event.Message.Command := cmPlaceMarker5;
                     kbAlt6:
-                      Event.Command := cmPlaceMarker6;
+                      Event.Message.Command := cmPlaceMarker6;
                     kbAlt7:
-                      Event.Command := cmPlaceMarker7;
+                      Event.Message.Command := cmPlaceMarker7;
                     kbAlt8:
-                      Event.Command := cmPlaceMarker8;
+                      Event.Message.Command := cmPlaceMarker8;
                     kbAlt9:
-                      Event.Command := cmPlaceMarker9;
+                      Event.Message.Command := cmPlaceMarker9;
                     kbCtrl1:
-                      Event.Command := cmGoToMarker1;
+                      Event.Message.Command := cmGoToMarker1;
                     kbCtrl2:
-                      Event.Command := cmGoToMarker2;
+                      Event.Message.Command := cmGoToMarker2;
                     kbCtrl3:
-                      Event.Command := cmGoToMarker3;
+                      Event.Message.Command := cmGoToMarker3;
                     kbCtrl4:
-                      Event.Command := cmGoToMarker4;
+                      Event.Message.Command := cmGoToMarker4;
                     kbCtrl5:
-                      Event.Command := cmGoToMarker5;
+                      Event.Message.Command := cmGoToMarker5;
                     kbCtrl6:
-                      Event.Command := cmGoToMarker6;
+                      Event.Message.Command := cmGoToMarker6;
                     kbCtrl7:
-                      Event.Command := cmGoToMarker7;
+                      Event.Message.Command := cmGoToMarker7;
                     kbCtrl8:
-                      Event.Command := cmGoToMarker8;
+                      Event.Message.Command := cmGoToMarker8;
                     kbCtrl9:
-                      Event.Command := cmGoToMarker9;
+                      Event.Message.Command := cmGoToMarker9;
                     else {case}
                       goto NotKb;
                   end {case};
@@ -3028,24 +3028,24 @@ KBCheck:
                   Exit;
                   end;
 NotKb:
-                if  (Char(Event.CharCode) = #17) and not CtrlQ then
+                if  (Char(Event.KeyDown.CharScan.CharCode) = #17) and not CtrlQ then
                   begin
                   CtrlQ := True;
                   CE;
                   end
                 else if CtrlQ then
                   begin
-                  Ch := Char(Event.CharCode);
+                  Ch := Char(Event.KeyDown.CharScan.CharCode);
                   if  (Ch >= '1') and (Ch <= '9') then
                     begin
                     Event.What := evCommand;
-                    Event.Command := cmGoToMarker1+Ord(Ch)-Ord('1');
+                    Event.Message.Command := cmGoToMarker1+Ord(Ch)-Ord('1');
                     PutEvent(Event);
                     end;
                   CtrlQ := False;
                   CE;
                   end
-                else if (Char(Event.CharCode) >= #32) and not NoEdit then
+                else if (Char(Event.KeyDown.CharScan.CharCode) >= #32) and not NoEdit then
                   begin
                   {GRM!}
                   if  ( (ViewMode = vmHex) and (Buf <> nil) and
@@ -3079,11 +3079,11 @@ NotKb:
                       end;
                     if HexEdit then
                       begin
-                      Event.CharCode := Byte(UpCase(Char(Event.CharCode)));
-                      if Char(Event.CharCode) in ['A'..'F', '0'..'9'] then
+                      Event.KeyDown.CharScan.CharCode := Byte(UpCase(Char(Event.KeyDown.CharScan.CharCode)));
+                      if Char(Event.KeyDown.CharScan.CharCode) in ['A'..'F', '0'..'9'] then
                         begin
                         BufModified := True;
-                        I := PosChar(Char(Event.CharCode), HexStr)-1;
+                        I := PosChar(Char(Event.KeyDown.CharScan.CharCode), HexStr)-1;
                         
                         if  (ViewMode <> vmAsm) then
                           {JO}
@@ -3115,9 +3115,9 @@ NotKb:
                     else
                       begin
                       BufModified := True;
-                      Event.CharCode := Byte(XCoder.XLatCP[FromAscii][Char(Event.CharCode)]);
+                      Event.KeyDown.CharScan.CharCode := Byte(XCoder.XLatCP[FromAscii][Char(Event.KeyDown.CharScan.CharCode)]);
                       Char(Buf^[Cur.X+Cur.Y*HexPos+BufPos])
-                         := Char(Event.CharCode);
+                         := Char(Event.KeyDown.CharScan.CharCode);
                       MessageKey(Self, kbRight);
                       CE
                       end;
@@ -3130,11 +3130,11 @@ NotKb:
         LR := RepeatDelay;
         LLR := AutoRepeat;
         repeat
-          MakeLocal(Event.Where, P);
+          P := MakeLocal(Event.Mouse.Where);
           I := Abs((Size.Y shr 1)-P.Y);
           if I = 0 then
             RepeatDelay := 0
-          else if MouseInView(Event.Where) then
+          else if MouseInView(Event.Mouse.Where) then
             begin
             RepeatDelay := 6-Round((I/(Size.Y shr 1))*6);
             AutoRepeat := RepeatDelay;
@@ -3551,7 +3551,7 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
        ouiStoreViewerPosition = 0)
   then
     begin
-    Desktop.GetExtent(LastViewerBounds);
+    LastViewerBounds := Desktop.GetExtent;
     LastViewerDeskSize := Desktop.Size;
     end;
   R := LastViewerBounds;
@@ -3560,21 +3560,21 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
      0);
   Flags := Flags or wfMaxi;
   Options := Options or ofTileable;
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.A.X := R.B.X;
   Inc(R.B.X);
   P := TViewScroll.Create(R);
   P.GrowMode := gfGrowHiX+gfGrowLoX+gfGrowHiY;
   Insert(P);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   PV := TFileViewer.Create(R, nil, FileName, VFileName, P, False, Hex);
   Insert(PV); {Must insert even on error for later checking }
   if not PV.isValid then
     {AK155}
     Exit;
-  GetExtent(R);
+  R := GetExtent;
   Inc(R.A.X);
   R.A.Y := R.B.Y-1;
   Dec(R.B.X, 2);
@@ -3588,7 +3588,7 @@ procedure TFileWindow.ChangeBounds(const Bounds: TRect);
   inherited ChangeBounds(Bounds);
   if not GetState(sfModal) then
     begin
-    GetBounds(LastViewerBounds);
+    LastViewerBounds := GetBounds;
     LastViewerDeskSize := Desktop.Size;
     end;
   end;

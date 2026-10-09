@@ -38,7 +38,7 @@ constructor TUserSaver.Create(ACheck: Boolean);
   var
     R: TRect;
   begin
-  R.Assign(0, 0, 0, 0);
+  R := TRect.Create(0, 0, 0, 0);
   inherited Create(R);
   CheckIO := ACheck;
   SetState(sfVisible, False);

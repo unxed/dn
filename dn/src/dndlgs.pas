@@ -238,8 +238,8 @@ procedure THexLine.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evBroadcast:
-      if  (Event.Command = cmUpdateHexViews) and
-          (Event.InfoPtr = InputLine)
+      if  (Event.Message.Command = cmUpdateHexViews) and
+          (Event.Message.InfoPtr = InputLine)
       then
         CED;
     evKeyDown:
@@ -298,7 +298,7 @@ procedure THexLine.HandleEvent(var Event: TEvent);
         kbTab, kbShiftTab, kbESC, kbEnter:
           ;
         else {case}
-          case UpCase(Char(Event.CharCode)) of
+          case UpCase(Char(Event.KeyDown.CharScan.CharCode)) of
             '0'..'9', 'A'..'F':
               begin
               if  (CurX = InputLine.MaxLen-1) and Sec then
@@ -311,11 +311,11 @@ procedure THexLine.HandleEvent(var Event: TEvent);
                 S := S+#0;
               if Sec then
                 S[CurX+1] := Char((Byte(S[CurX+1]) and $F0) or
-                           (Pos(UpCase(Char(Event.CharCode)),
+                           (Pos(UpCase(Char(Event.KeyDown.CharScan.CharCode)),
                         HexStr)-1))
               else
                 S[CurX+1] := Char((Byte(S[CurX+1]) and $F) or
-                           (Pos(UpCase(Char(Event.CharCode)),
+                           (Pos(UpCase(Char(Event.KeyDown.CharScan.CharCode)),
                         HexStr)-1) shl 4);
               InputLine.Data^:= Copy(S, 1, InputLine.MaxLen);
               InputLine.DrawView;
@@ -329,7 +329,7 @@ procedure THexLine.HandleEvent(var Event: TEvent);
               CED;
               end;
             else {case}
-              if GetState(sfFocused) and (Char(Event.CharCode) > #0) then
+              if GetState(sfFocused) and (Char(Event.KeyDown.CharScan.CharCode) > #0) then
                 CE;
           end {case};
       end {case};
@@ -465,8 +465,8 @@ with the corresponding menu item. Insert the menu into the application,
 because if inserted into the dialog, in some palettes the colors
 look very strange.
 }
-    R.Assign(-2,-Selected,0,0);
-    MakeGlobal(R.A, R.A);
+    R := TRect.Create(-2, -Selected, 0, 0);
+    R.A := MakeGlobal(R.A);
     if R.A.Y < 0 then
       begin
       Dec(R.B.Y, R.A.Y);
@@ -516,7 +516,7 @@ look very strange.
         kbAltDown, kbCtrlDown:
           OpenList;
         else
-          if (DNKeyCode(Event) and $FF0000 = 0) and ((Char(Event.CharCode) > ' ') or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80)))
+          if (DNKeyCode(Event) and $FF0000 = 0) and ((Char(Event.KeyDown.CharScan.CharCode) > ' ') or ((Event.KeyDown.CharScan.CharCode = 0) and (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80)))
           then
             OpenList;
       end {case};
@@ -582,7 +582,7 @@ procedure TPage.InitFrame;
   var
     R: TRect;
   begin
-  GetExtent(R);
+  R := GetExtent;
   Frame := TFrame(TPageFrame.Create(R));
   end;
 
@@ -678,7 +678,7 @@ procedure TNotepad.InitFrame;
   var
     R: TRect;
   begin
-  GetExtent(R);
+  R := GetExtent;
   Frame := TFrame(TNotepadFrame.Create(R));
   end;
 
@@ -686,7 +686,7 @@ function TNotepad.NewPage(const ATitle: String): TPage;
   var
     R: TRect;
   begin
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.B.X := BookmarkStart;
   Result := TPage.Create(R, '');

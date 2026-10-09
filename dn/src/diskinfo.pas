@@ -335,7 +335,7 @@ procedure TDiskInfo.InsertDriveView;
     { Such analysis is very ugly; it would be better to virtualize
     the info-panel header the way its contents are virtualized }
 
-  R.Assign(0, Origin.Y-1, 0, Origin.Y);
+  R := TRect.Create(0, Origin.Y-1, 0, Origin.Y);
     { On Y - onto the frame, and DriveView.Draw handles X each time }
   DriveView := TDriveView.Create(R);
   DriveView.Panel := Self;
@@ -384,7 +384,7 @@ procedure TDiskInfo.ReadData;
   Abort := False;
   with TFilePanelRoot(OtherPanel) do
     Drive.GetDirInfo(Info);
-  Delta.Assign(0, 0);
+  Delta := Point(0, 0);
   end;
 
 procedure TDiskInfo.HandleEvent(var Event: TEvent);
@@ -436,7 +436,7 @@ procedure TDiskInfo.HandleEvent(var Event: TEvent);
         end;
     end
   else if (Event.What = evCommand) then
-    case Event.Command of
+    case Event.Message.Command of
       cmEditFile:
         begin
         ClearEvent(Event);
@@ -460,7 +460,7 @@ procedure TDiskInfo.HandleEvent(var Event: TEvent);
       cmInfoPresent:
         begin
         ClearEvent(Event);
-        Event.InfoPtr := Owner
+        Event.Message.InfoPtr := Owner
         end;
       cmRereadInfo:
         begin

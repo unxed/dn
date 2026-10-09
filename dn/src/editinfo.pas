@@ -115,13 +115,13 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   if Event.What <> evMouseDown then
     Exit;
-  Owner.MakeLocal(Event.Where, T);
+  T := Owner.MakeLocal(Event.Mouse.Where);
   if T.X >= Owner.Size.X-2 then
     begin
     TWindow(Owner).Frame.HandleEvent(Event);
     Exit;
     end;
-  MakeLocal(Event.Where, T);
+  T := MakeLocal(Event.Mouse.Where);
   P := EditorOf(Self);
   Part := 0;
   for I := ipLine to ipBottom do
@@ -155,7 +155,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
         begin
         I := T.X-Parts[ipMarks].A-1;
         if (I >= 0) and (I <= 8) then
-          if (Event.Buttons and mbRightButton <> 0) then
+          if (Event.Mouse.Buttons and mbRightButton <> 0) then
             Cmd := cmPlaceMarker1+I
           else if P.MarkPos[I+1].X >= 0 then
             Cmd := cmGoToMarker1+I;
@@ -164,7 +164,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
   if Cmd <> 0 then
     begin
     Event.What := evCommand;
-    Event.Command := Cmd;
+    Event.Message.Command := Cmd;
     PutEvent(Event);
     end;
   ClearEvent(Event);

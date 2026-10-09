@@ -531,8 +531,8 @@ function GetDirLen(Dir: String): TSize; {DataCompBoy}
       Event: TEvent;
     begin
     Event.What := evCommand;
-    Event.Command := cmRereadTree;
-    Event.InfoPtr := @Dir;
+    Event.Message.Command := cmRereadTree;
+    Event.Message.InfoPtr := @Dir;
     if P <> nil then
       P.HandleEvent(Event);
     end;
@@ -571,10 +571,10 @@ procedure TTreeReader.HandleEvent(var Event: TEvent);
 
   if  (Event.What = evCommand)
   then
-    case Event.Command of
+    case Event.Message.Command of
       cmRereadTree:
         begin
-        S := UpStrg(PString(Event.InfoPtr)^);
+        S := UpStrg(PString(Event.Message.InfoPtr)^);
         C := DriveOf(S);
         if  (C in ['A'..'Z']) and (DrvTrees[C].C <> nil) then
           begin
@@ -697,7 +697,7 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
     S: String;
     R: TRect;
   begin
-  R.Assign(1, 1, 50, 18);
+  R := TRect.Create(1, 1, 50, 18);
   Abort := False;
   ChangeDir := '';
   D := TTreeDialog.Create(R, ATitle, Drv);
@@ -731,7 +731,7 @@ constructor TTreeInfoView.Create(R: TRect; ATree: TTreeView);
 procedure TTreeInfoView.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
-  if  (Event.What = evBroadcast) and (Event.Command = cmDirChanged) then
+  if  (Event.What = evBroadcast) and (Event.Message.Command = cmDirChanged) then
     begin
     MakeDown;
     DrawView
@@ -817,7 +817,7 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
     R.Grow(24+R.A.X-R.B.X, 0);
   if R.B.Y-R.A.Y < 8 then
     R.B.Y := R.A.Y+8;
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R1 := R;
   Dec(R1.B.X, 14);
@@ -840,23 +840,23 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
   P := TDTreeInfoView.Create(R1, TTreeView(Tree));
   Insert(P);
 
-  R1.Assign(R.B.X-13, R.A.Y+1, R.B.X-1, R.A.Y+3);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+1, R.B.X-1, R.A.Y+3);
   P := TButton.Create(R1, GetString(dlOKButton), cmOK, bfDefault);
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+4, R.B.X-1, R.A.Y+6);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+4, R.B.X-1, R.A.Y+6);
   P := TButton.Create(R1, GetString(dlDriveButton), cmChangeDrive,
          bfBroadcast);
   {P^.Options := P^.Options and not ofSelectable;}
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+7, R.B.X-1, R.A.Y+9);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+7, R.B.X-1, R.A.Y+9);
   P := TButton.Create(R1, GetString(dlRereadButton), cmPanelReread,
          bfBroadcast);
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+10, R.B.X-1, R.A.Y+12);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+10, R.B.X-1, R.A.Y+12);
   P := TButton.Create(R1, GetString(dlMkDirButton), cmPanelMkDir,
          bfBroadcast);
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+13, R.B.X-1, R.A.Y+15);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+13, R.B.X-1, R.A.Y+15);
   P := TButton.Create(R1, GetString(dlCancelButton), cmCancel, 0);
   Insert(P);
   SelectNext(False);
@@ -888,18 +888,18 @@ constructor TTreeWindow.Create(const Bounds: TRect);
     S: TScrollBar;
   begin
   inherited Create(Bounds, GetString(dlTreeTitle), 0);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.A.X := R.B.X;
   Inc(R.B.X);
   S := StandardScrollBar(sbVertical+sbHandleKeyboard);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   Dec(R.B.Y, 2);
   P := TTreePanel.Create(R, 0, True, S);
   Insert(P);
 
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.A.Y := R.B.Y-2;
   P := TTreeInfoView.Create(R, TTreeView(P));
@@ -1231,8 +1231,8 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
     begin
     T.X := Size.X div 2;
     T.Y := 1;
-    MakeGlobal(T, T);
-    Desktop.MakeLocal(T, T);
+    T := MakeGlobal(T);
+    T := Desktop.MakeLocal(T);
     S := SelectDrive(T.X, T.Y, CurPath[1], False);
     if S = '' then
       Exit;
@@ -1341,13 +1341,13 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
   begin { TTreeView.HandleCommand }
   CurPos := ScrollBar.Value;
   {P := DC.At(CurPos);}
-  if QuickSearch and (Event.What = evKeyDown) and (Char(Event.CharCode) < #32)
+  if QuickSearch and (Event.What = evKeyDown) and (Char(Event.KeyDown.CharScan.CharCode) < #32)
     and (DNKeyCode(Event) <> kbBack) and (DNKeyCode(Event) <> kbCtrlEnter)
   then
     CancelSearch;
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
 
         cmPanelErase:
           EraseDir;
@@ -1367,8 +1367,8 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           CE;
           end;
         cmFindTree:
-          if Char(Event.InfoPtr^) = LastPath[1] then
-            Char(Event.InfoPtr^) := #0;
+          if Char(Event.Message.InfoPtr^) = LastPath[1] then
+            Char(Event.Message.InfoPtr^) := #0;
         cmRevert:
           begin
           ScrollBar.SetValue(CurNum);
@@ -1380,7 +1380,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           begin
           if Dirs = nil then
             Exit;
-          if CurPath[1] = PString(Event.InfoPtr)^[1] then
+          if CurPath[1] = PString(Event.Message.InfoPtr)^[1] then
             Reread(False);
           if Valid(0) then
             begin
@@ -1401,7 +1401,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           end;
         cmChangeTree:
           begin
-          if not IsQualified(PString(Event.InfoPtr)^) then
+          if not IsQualified(PString(Event.Message.InfoPtr)^) then
             {Cat:warn there may be problems with network paths}
             begin
             CE;
@@ -1410,7 +1410,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           CurPath[1] := UpCase(CurPath[1]);
           LastPath[1] := UpCase(LastPath[1]);
           LocateEnabled := True;
-          LastPath := PString(Event.InfoPtr)^;
+          LastPath := PString(Event.Message.InfoPtr)^;
           if Dirs = nil then
             begin
             WasChanged := CurPath[1] <> LastPath[1];
@@ -1454,16 +1454,16 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           Message(Owner, evBroadcast, cmDirChanged, @CurPath);
           end;
         cmGetName:
-          PString(Event.InfoPtr)^:= GetString(dlTreeTitle);
+          PString(Event.Message.InfoPtr)^:= GetString(dlTreeTitle);
         cmGetDirName:
-          PString(Event.InfoPtr)^:= GetDirName(ScrollBar.Value);
+          PString(Event.Message.InfoPtr)^:= GetDirName(ScrollBar.Value);
       end {case};
     evKeyDown:
       case DNKeyCode(Event) of
         kbAlt1, kbAlt2, kbAlt3, kbAlt4, kbAlt5, kbAlt6, kbAlt7, kbAlt8,
          kbAlt9:
           begin
-          QuickChange(CnvString(DirsToChange[Event.ScanCode-Hi(kbAlt1)]))
+          QuickChange(CnvString(DirsToChange[Event.KeyDown.CharScan.ScanCode-Hi(kbAlt1)]))
           ;
           CE
           end;
@@ -1519,15 +1519,15 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
               CE
               end;
         else {case}
-          if (Char(Event.CharCode) >= #32)
+          if (Char(Event.KeyDown.CharScan.CharCode) >= #32)
 {$IFDEF DNUTF8}
-             or ((Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80))
+             or ((Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80))
 {$ENDIF}
           then
             begin
             if QuickSearch then
               begin
-              if  (Char(Event.CharCode) = DnSep) and (QSMask <> '')
+              if  (Char(Event.KeyDown.CharScan.CharCode) = DnSep) and (QSMask <> '')
               then
                 begin
                 CE;
@@ -1562,27 +1562,27 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       end {case};
     {-DataCompBoy-}
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmPanelReread,
         cmPanelMkDir,
         cmChangeDrive:
-          Message(Self, evCommand, Event.Command, nil);
+          Message(Self, evCommand, Event.Message.Command, nil);
         cmTreeChanged:
           begin
           if  (Dirs <> nil)
-               and (PString(Event.InfoPtr)^[1] = CurPath[1])
+               and (PString(Event.Message.InfoPtr)^[1] = CurPath[1])
           then
             Reread(False);
           end;
         cmDropped:
           begin
-          MP := PCopyRec(Event.InfoPtr)^.Where;
+          MP := PCopyRec(Event.Message.InfoPtr)^.Where;
           if not MouseInView(MP) then
             begin
             CE;
             Exit;
             end;
-          MakeLocal(MP, MP);
+          MP := MakeLocal(MP);
           I := Delta.Y+MP.Y;
           if I >= DC.Count then
             begin
@@ -1590,12 +1590,12 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
             Exit;
             end;
           CopyDirName := GetDirName(I);
-          if PCopyRec(Event.InfoPtr)^.Owner <> nil then
+          if PCopyRec(Event.Message.InfoPtr)^.Owner <> nil then
             begin
             Ev.What := evBroadcast;
-            Ev.Command := cmUnArchive;
-            Ev.InfoPtr := Event.InfoPtr;
-            PCopyRec(Event.InfoPtr)^.Owner.HandleEvent(Ev);
+            Ev.Message.Command := cmUnArchive;
+            Ev.Message.InfoPtr := Event.Message.InfoPtr;
+            PCopyRec(Event.Message.InfoPtr)^.Owner.HandleEvent(Ev);
             if Ev.What = evNothing then
               begin
               CE;
@@ -1608,13 +1608,13 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
                    cmIsRightPanel, Self) <> nil)
           else
             RevertBar := False;
-          CopyFiles(PCopyRec(Event.InfoPtr)^.FC,
-             PCopyRec(Event.InfoPtr)^.Owner,
+          CopyFiles(PCopyRec(Event.Message.InfoPtr)^.FC,
+             PCopyRec(Event.Message.InfoPtr)^.Owner,
             ShiftState and 3 <> 0, 0);
           CE;
           end;
         cmScrollBarChanged:
-          if ScrollBar = Event.InfoPtr then
+          if ScrollBar = Event.Message.InfoPtr then
             begin
             DrawView;
             CE;
@@ -1629,7 +1629,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       end {case};
     evMouseDown:
       begin
-      MakeLocal(Event.Where, MP);
+      MP := MakeLocal(Event.Mouse.Where);
       if MP.Y+Delta.Y < DC.Count then
         begin
         PD := DC.At(MP.Y+Delta.Y);
@@ -1647,7 +1647,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           {if (MP.X >= P^.Level*3 + 1 + 3*Byte(P^.Level>0) + Delta.X) and
                       (MP.X <= P^.Level*3 + 2 + 3*Byte(P^.Level>0) + Delta.X + Length(P^.Name)) then}
           begin
-          if ((Event.EventFlags and 2) <> 0) and not Parital then
+          if ((Event.Mouse.EventFlags and 2) <> 0) and not Parital then
             begin
             ScrollBar.SetValue(MP.Y+Delta.Y);
             Message(Owner, evCommand, cmOK, nil);
@@ -1657,7 +1657,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           RepeatDelay := 0;
           MouseTracking := True;
           repeat
-            MakeLocal(Event.Where, MP);
+            MP := MakeLocal(Event.Mouse.Where);
             if  (MP.X > 0) and (MP.X < Size.X) then
               ScrollBar.SetValue(MP.Y+Delta.Y);
           until not MouseEvent(Event, evMouseAuto+evMouseMove);
@@ -2036,7 +2036,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
            <> nil)
     else
       RevertBar := False;
-    CopyFiles(FC, nil, Event.Command = cmMoveFiles, 0);
+    CopyFiles(FC, nil, Event.Message.Command = cmMoveFiles, 0);
     FC.Free;
     FC := nil;
     lChDir(OldDir);
@@ -2048,7 +2048,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmMoveFiles, cmCopyFiles:
           CopyDir;
       end {case};

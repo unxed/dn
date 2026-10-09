@@ -734,7 +734,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
         end;
     end
   else if (Event.What = evBroadcast) then
-    case Event.Command of
+    case Event.Message.Command of
       cmOK:
         begin
         ClearEvent(Event);
@@ -882,11 +882,11 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): TDialog;
   begin
   D := TDialog(LoadResource(Dlg));
 
-  R.Assign(D.Size.X-3, 2, D.Size.X-2, 13);
+  R := TRect.Create(D.Size.X-3, 2, D.Size.X-2, 13);
   P := TScrollBar.Create(R);
   D.Insert(P);
 
-  R.Assign(2, 2, D.Size.X-3, 13);
+  R := TRect.Create(2, 2, D.Size.X-3, 13);
   L := TTHistList.Create(R, 1, TScrollBar(P));
   L.Dlg := Dlg; {AK155: see TTHistList.HandleEvent, cmYes }
   D.Insert(L);

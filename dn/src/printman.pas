@@ -145,20 +145,20 @@ constructor TPMWindow.Create(R: TRect);
   begin
   inherited Create(R, GetString(dlPManagerTitle));
   Number := GetNum;
-  R.Assign(Size.X-13, 1, Size.X-12, Size.Y-4);
+  R := TRect.Create(Size.X-13, 1, Size.X-12, Size.Y-4);
   P := TScrollBar.Create(R);
   Insert(P);
-  R.Assign(2, Size.Y-4, Size.X-14, Size.Y-2);
+  R := TRect.Create(2, Size.Y-4, Size.X-14, Size.Y-2);
   S := TPrintStatus.Create(R);
   Insert(S);
-  R.Assign(2, 1, Size.X-13, Size.Y-4);
+  R := TRect.Create(2, 1, Size.X-13, Size.Y-4);
   P := TPrintManager.Create(R, S, TScrollBar(P));
   Insert(P);
-  R.Assign(Size.X-12, 2, Size.X-2, 4);
+  R := TRect.Create(Size.X-12, 2, Size.X-2, 4);
   Insert(TButton.Create(R, GetString(dlDeleteButton), cmOK, 0));
-  R.Assign(Size.X-12, 4, Size.X-2, 6);
+  R := TRect.Create(Size.X-12, 4, Size.X-2, 6);
   Insert(TButton.Create(R, GetString(dlCloseButton), cmClose, 0));
-  R.Assign(Size.X-12, 6, Size.X-2, 8);
+  R := TRect.Create(Size.X-12, 6, Size.X-2, 8);
   Insert(TButton.Create(R, GetString(dlPauseButton), cmNo, 0));
   SelectNext(False);
   HelpCtx := hcPrintManager;
@@ -423,11 +423,11 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmGetName:
-          PString(Event.InfoPtr)^:= GetString(dlPManagerTitle);
+          PString(Event.Message.InfoPtr)^:= GetString(dlPManagerTitle);
         cmClose:
-          Event.InfoPtr := nil;
+          Event.Message.InfoPtr := nil;
         cmNo:
           begin
           Paused := not Paused;
@@ -669,7 +669,7 @@ procedure PrintFile(const S: String);
     W: TView;
     R: TRect;
   begin
-  R.Assign(0, 0, 50, 9);
+  R := TRect.Create(0, 0, 50, 9);
   if Printer = nil then
     begin
     W := Application.ValidView(TPMWindow.Create(R));

@@ -166,11 +166,11 @@ procedure TIndicator.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
   if  (Event.What = evBroadcast) then
-    case Event.Command of
+    case Event.Message.Command of
       cmSetValue:
         begin
         CalcError := False;
-        Value := PCReal(Event.InfoPtr)^;
+        Value := PCReal(Event.Message.InfoPtr)^;
         Draw;
         CE
         end;
@@ -182,8 +182,8 @@ procedure TIndicator.HandleEvent(var Event: TEvent);
       cmCancel:
         begin
         Event.What := evCommand;
-        Event.Command := cmClose;
-        Event.InfoPtr := nil;
+        Event.Message.Command := cmClose;
+        Event.Message.InfoPtr := nil;
         PutEvent(Event);
         CE
         end;
@@ -334,14 +334,14 @@ procedure TCalcLine.HandleEvent(var Event: TEvent);
       GetData(FreeStr);
       HistoryAdd(hsCalcLine, FreeStr);
       Event.What := evCommand;
-      Event.Command := cmClose;
-      Event.InfoPtr := nil;
+      Event.Message.Command := cmClose;
+      Event.Message.InfoPtr := nil;
       PutEvent(Event);
       ClearEvent(Event);
       end;
     end
   else if (Event.What = evCommand) then
-    case Event.Command of
+    case Event.Message.Command of
       cmCalcValue:
         begin
         ClearEvent(Event);
@@ -349,7 +349,7 @@ procedure TCalcLine.HandleEvent(var Event: TEvent);
         end;
       cmGetName:
         begin
-        PString(Event.InfoPtr)^:= GetString(dlCalculator);
+        PString(Event.Message.InfoPtr)^:= GetString(dlCalculator);
         ClearEvent(Event);
         end;
     end {case};
@@ -432,7 +432,7 @@ procedure InsertCalc;
 
     ObjChangeType(Dlg.DirectLink[1], Pointer(System.TClass(TCalcLine)));
 
-    R.Assign(12, 6, Dlg.Size.X-2, 12);
+    R := TRect.Create(12, 6, Dlg.Size.X-2, 12);
     Indicator := TIndicator.Create(R);
     Indicator.Options := Indicator.Options or ofFramed;
     Indicator.CalcLine := TCalcLine(Dlg.DirectLink[1]);

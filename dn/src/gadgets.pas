@@ -260,9 +260,9 @@ procedure TClockView.HandleEvent(var Event: TEvent);
       ClearEvent(Event);
       Exit;
       end;
-    Application.GetBounds(R);
+    R := Application.GetBounds;
     
-    if ((Event.EventFlags and 2) <> 0) then
+    if ((Event.Mouse.EventFlags and 2) <> 0) then
       begin
       InsertCalendar;
       ClearEvent(Event);
@@ -340,25 +340,25 @@ procedure TTrashCan.HandleEvent(var Event: TEvent);
     SavedConfirms: Word;
   begin
   inherited HandleEvent(Event);
-  if (Event.What = evBroadcast) and (Event.Command = cmDropped) then
+  if (Event.What = evBroadcast) and (Event.Message.Command = cmDropped) then
     begin
     SavedConfirms := Confirms;
     if (Confirms and cfMouseConfirm) = 0 then
       Confirms := 0;
-    Message(PCopyRec(Event.InfoPtr)^.Owner, evCommand, cmEraseGroup, PCopyRec(Event.InfoPtr)^.FC);
+    Message(PCopyRec(Event.Message.InfoPtr)^.Owner, evCommand, cmEraseGroup, PCopyRec(Event.Message.InfoPtr)^.FC);
     Confirms := SavedConfirms;
     ClearEvent(Event);
     end;
   if Event.What <> evMouseDown then
     Exit;
-  if not ((Event.EventFlags and 2) <> 0) then
+  if not ((Event.Mouse.EventFlags and 2) <> 0) then
     begin
-    Owner.GetExtent(Limits);
+    Limits := Owner.GetExtent;
     DragView(Event, dmDragMove, Limits, Size, Size);
     Exit;
     end;
-  Event.InfoPtr := nil;
-  Event.Command := cmReanimator;
+  Event.Message.InfoPtr := nil;
+  Event.Message.Command := cmReanimator;
   Event.What := evCommand;
   PutEvent(Event);
   ClearEvent(Event);

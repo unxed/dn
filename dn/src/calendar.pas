@@ -518,14 +518,14 @@ constructor TCalendarWindow.Create;
   else
     SundayFirst := not ((UpStrg(ActiveLanguage) = 'RUSSIAN') or
           (UpStrg(ActiveLanguage) = 'UKRAIN'));
-  R.Assign(1, 1, CalendarViewWidth+3, CalendarViewHeight+3);
+  R := TRect.Create(1, 1, CalendarViewWidth+3, CalendarViewHeight+3);
   inherited Create(R, GetString(dlcTitle), 0);
   Options := Options or ofVersion20;
   GrowMode := 0;
   Flags := Flags and not (wfZoom+wfGrow) or (wfMove+wfClose);
   { Not resizeable }
   MoveTo(25, 7);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   CalendarView := TCalendarView.Create(R);
   Insert(CalendarView);
@@ -546,9 +546,9 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
 
     evCommand:
       repeat
-        case Event.Command of
+        case Event.Message.Command of
           cmGetName:
-            PString(Event.InfoPtr)^:= GetString(dlcTitle);
+            PString(Event.Message.InfoPtr)^:= GetString(dlcTitle);
           else {case}
             break; { skip ClearEvent without using goto statement }
         end {case};
@@ -564,7 +564,7 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
           begin
           InterfaceStr := CalendarView.GetDateText;
           Event.What := evCommand;
-          Event.Command := cmInsertText;
+          Event.Message.Command := cmInsertText;
           if Application <> nil then
             Application.PutEvent(Event);
           ClearEvent(Event);
@@ -779,16 +779,16 @@ procedure TCalendarView.HandleEvent(var Event: TEvent);
     begin
     if Event.What and (evMouseDown+evMouseAuto) <> 0 then
       begin
-      MakeLocal(Event.Where, Point);
+      Point := MakeLocal(Event.Mouse.Where);
       if Point.Y = 0 then
         repeat
           case Point.X of
 
             18, 19, 20:
               begin
-              if  (Event.Buttons and mbLeftButton) <> 0 then
+              if  (Event.Mouse.Buttons and mbLeftButton) <> 0 then
                 PrevMonth
-              else if (Event.Buttons and mbRightButton) <> 0 then
+              else if (Event.Mouse.Buttons and mbRightButton) <> 0 then
                 PrevYear
               else
                 break;
@@ -796,9 +796,9 @@ procedure TCalendarView.HandleEvent(var Event: TEvent);
 
             21, 22, 23:
               begin
-              if  (Event.Buttons and mbLeftButton) <> 0 then
+              if  (Event.Mouse.Buttons and mbLeftButton) <> 0 then
                 NextMonth
-              else if (Event.Buttons and mbRightButton) <> 0 then
+              else if (Event.Mouse.Buttons and mbRightButton) <> 0 then
                 NextYear
               else
                 break;

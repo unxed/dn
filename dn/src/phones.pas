@@ -176,10 +176,10 @@ procedure PhoneBook(Manual: Boolean);
     D.ForEach(DoSearchButton);
     ReturnButton.Hide;
     PV := D.StandardScrollBar(sbVertical+sbHandleKeyboard);
-    R.Assign(D.Size.X-3, 3, D.Size.X-2, 12);
+    R := TRect.Create(D.Size.X-3, 3, D.Size.X-2, 12);
     PV.Locate(R);
 
-    R.Assign(2, 3, D.Size.X-3, 12);
+    R := TRect.Create(2, 3, D.Size.X-3, 12);
     PL := TPhoneBox.Create(R, 1, TScrollBar(PV));
     PL.Options := PL.Options or ofPostProcess;
     S := TBufStream.Create(ConfigDir+'dn.phn', stOpenRead, 1024);
@@ -203,7 +203,7 @@ procedure PhoneBook(Manual: Boolean);
     PL.NewLisT(PC);
 
     D.Insert(PL);
-    R.Assign(2, 2, 53, 3);
+    R := TRect.Create(2, 2, 53, 3);
 
     PL.GroupLabel := TLabel.Create(R, GetString(dlPhonesLabelGroup), PL);
     D.Insert(PL.GroupLabel);
@@ -215,7 +215,7 @@ procedure PhoneBook(Manual: Boolean);
 
     D.Insert(PL);
     {D.Insert(PV);}
-    R.Assign(2, 12, D.Size.X-2, 14);
+    R := TRect.Create(2, 12, D.Size.X-2, 14);
     PV := TDStringView.Create(R);
     TDStringView(PV).S1 := '';
     TDStringView(PV).S2 := '';
@@ -878,9 +878,9 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
   WasBroad := Event.What = evBroadcast;
   case Event.What of
     evMouseDown:
-      if ((Event.EventFlags and 2) <> 0) then
+      if ((Event.Mouse.EventFlags and 2) <> 0) then
         begin
-        if Event.Buttons and mbRightButton = 0 then
+        if Event.Mouse.Buttons and mbRightButton = 0 then
           MessageKey(Owner, kbEnter)
         else
           MessageKey(Owner, kbSpace);
@@ -978,7 +978,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
           end;
       end {case};
     evKeyDown:
-      if Char(Event.CharCode) = ' ' then
+      if Char(Event.KeyDown.CharScan.CharCode) = ' ' then
         DialPhone
       else if (Active <> nil) then
         case DNKeyCode(Event) of

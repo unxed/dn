@@ -1261,7 +1261,7 @@ procedure TDrive.DrvFindFile(FC: TFilesCollection);
   Files := TFilesCollection.Create($10, $10);
   Files.SortMode := psmLongName;
   Directories := TStringCollection.Create(30, 30, False);
-  R.Assign(1, 1, 40, 10);
+  R := TRect.Create(1, 1, 40, 10);
   Inc(SkyEnabled);
   PInfo := TWhileView.Create(R);
   PInfo.Options := PInfo.Options or ofSelectable or ofCentered;
@@ -1293,8 +1293,8 @@ procedure RereadDirectory(Dir: String);
   procedure Action(View: TView);
     begin
     Event.What := evCommand;
-    Event.Command := cmRereadDir;
-    Event.InfoPtr := @Dir;
+    Event.Message.Command := cmRereadDir;
+    Event.Message.InfoPtr := @Dir;
     View.HandleEvent(Event);
     end;
 

@@ -282,16 +282,16 @@ var
   Name: string;
   I: Integer;
 begin
-  Name := KeyCodeName(E.KeyCode);
-  if (Name <> '') and (E.TextLength <= 1) then
+  Name := KeyCodeName(E.KeyDown.KeyCode);
+  if (Name <> '') and (E.KeyDown.TextLength <= 1) then
     Result := Name
-  else if E.TextLength > 0 then
+  else if E.KeyDown.TextLength > 0 then
   begin
     if KeysFull then
     begin
       Result := '''';
-      for I := 0 to E.TextLength - 1 do
-        Result := Result + E.Text[I];
+      for I := 0 to E.KeyDown.TextLength - 1 do
+        Result := Result + E.KeyDown.Text[I];
       Result := Result + '''';
     end
     else
@@ -300,13 +300,13 @@ begin
       Result := Name + ' ' + Result;
   end
   else
-    Result := '$' + Hex4(E.KeyCode);
-  if E.ControlKeyState and $0F <> 0 then
+    Result := '$' + Hex4(E.KeyDown.KeyCode);
+  if E.KeyDown.ControlKeyState and $0F <> 0 then
   begin
     Result := Result + ' [';
-    if E.ControlKeyState and 3 <> 0 then Result := Result + 'S';
-    if E.ControlKeyState and 4 <> 0 then Result := Result + 'C';
-    if E.ControlKeyState and 8 <> 0 then Result := Result + 'A';
+    if E.KeyDown.ControlKeyState and 3 <> 0 then Result := Result + 'S';
+    if E.KeyDown.ControlKeyState and 4 <> 0 then Result := Result + 'C';
+    if E.KeyDown.ControlKeyState and 8 <> 0 then Result := Result + 'A';
     Result := Result + ']';
   end;
 end;
@@ -331,18 +331,18 @@ begin
       FRNote('key', KeyText(Event) + Ctx);
     evMouseDown:
       begin
-        Where := '(' + Num(Event.Where.X) + ',' + Num(Event.Where.Y) + ') buttons ' + Num(Event.Buttons);
-        if Event.EventFlags and meDoubleClick <> 0 then
+        Where := '(' + Num(Event.Mouse.Where.X) + ',' + Num(Event.Mouse.Where.Y) + ') buttons ' + Num(Event.Mouse.Buttons);
+        if Event.Mouse.EventFlags and meDoubleClick <> 0 then
           Where := Where + ' double';
         FRNote('mouse', Where + Ctx);
       end;
     evCommand:
       begin
-        Name := CommandName(Event.Command);
+        Name := CommandName(Event.Message.Command);
         if Name = '' then
-          Name := '#' + Num(Event.Command)
+          Name := '#' + Num(Event.Message.Command)
         else
-          Name := Name + ' #' + Num(Event.Command);
+          Name := Name + ' #' + Num(Event.Message.Command);
         FRNote('cmd', Name + Ctx);
       end;
   end;
@@ -498,17 +498,17 @@ var
   Row: string;
   Len: Integer;
 begin
-  if (ScreenBuffer = nil) or (ScreenWidth <= 0) or (ScreenHeight <= 0) then
+  if (TScreen.ScreenBuffer = nil) or (TScreen.ScreenWidth <= 0) or (TScreen.ScreenHeight <= 0) then
   begin
     Writeln(T, '(no screen)');
     Exit;
   end;
-  for Y := 0 to ScreenHeight - 1 do
+  for Y := 0 to TScreen.ScreenHeight - 1 do
   begin
     Row := '';
-    for X := 0 to ScreenWidth - 1 do
+    for X := 0 to TScreen.ScreenWidth - 1 do
     begin
-      C := ScreenBuffer + (Y * ScreenWidth + X);
+      C := TScreen.ScreenBuffer + (Y * TScreen.ScreenWidth + X);
       if C^.Character.Meta shr 4 and scTrail <> 0 then
         Continue;
       N := (C^.Character.Meta and $0F) + 1;

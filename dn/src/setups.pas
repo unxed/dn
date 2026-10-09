@@ -236,7 +236,7 @@ procedure InterfaceSetup;
       InterfaceData.DrvInfType := Data.DrvInfType;
       SetUxKeys(Data.UxKeys);
       ApplyUxOptions;
-      GetExtent(R);
+      R := GetExtent;
       if InterfaceData.Options and ouiHideMenu = 0 then
         Inc(R.A.Y);
       if InterfaceData.Options and ouiHideStatus = 0 then
@@ -516,14 +516,14 @@ procedure TCurrDriveInfo.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
   if  (Event.What = evBroadcast)
-       and (Event.Command = cmScrollBarChanged)
+       and (Event.Message.Command = cmScrollBarChanged)
   then
     begin
     W := TSysDialog(Owner).LocalData.Drives[Char
-          (Byte('A')+TScrollBar(Event.InfoPtr).Value)];
+          (Byte('A')+TScrollBar(Event.Message.InfoPtr).Value)];
     SetData(W);
     end
-  else if (Event.What = evKeyDown) and (Char(Event.CharCode) = ' ')
+  else if (Event.What = evKeyDown) and (Char(Event.KeyDown.CharScan.CharCode) = ' ')
          and (Owner.Current.ClassType = TListBox)
   then
     Press(0);
@@ -630,7 +630,7 @@ procedure TSaversListBox.HandleEvent(var Event: TEvent);
     end;
   begin
   if Event.What = evBroadcast then
-    case Event.Command of
+    case Event.Message.Command of
       cmYes:
         begin
         Owner.GetData(LocalData);
@@ -675,75 +675,75 @@ constructor TSaversDialog.Create;
     D: TDialog;
     Control, Labl, Histry: TView;
   begin
-  R.Assign(0, 0, 57, 20);
+  R := TRect.Create(0, 0, 57, 20);
   inherited Create(R, GetString(dlScreenSaverSetup));
   Options := Options or ofCentered or ofValidate;
   HelpCtx := hcSavers;
-  R.Assign(19, 3, 20, 13);
+  R := TRect.Create(19, 3, 20, 13);
   Control := TScrollBar.Create(R);
   Insert(Control);
 
-  R.Assign(2, 3, 19, 13);
+  R := TRect.Create(2, 3, 19, 13);
   Control := TSaversListBox.Create(R, 1, TScrollBar(Control));
   Insert(Control);
 
-  R.Assign(2, 2, 18, 3);
+  R := TRect.Create(2, 2, 18, 3);
   Labl := TLabel.Create(R, GetString(dlSS_S_electedSavers), Control);
   Insert(Labl);
 
-  R.Assign(20, 6, 36, 8);
+  R := TRect.Create(20, 6, 36, 8);
   Control := TButton.Create(R, GetString(dlSS_A_dd), cmYes,
          bfNormal+bfBroadcast);
   Insert(Control);
 
-  R.Assign(20, 8, 36, 10);
+  R := TRect.Create(20, 8, 36, 10);
   Control := TButton.Create(R, GetString(dlSS_R_emove), cmNo,
          bfNormal+bfBroadcast);
   Insert(Control);
 
-  R.Assign(54, 3, 55, 13);
+  R := TRect.Create(54, 3, 55, 13);
   Control := TScrollBar.Create(R);
   Insert(Control);
 
-  R.Assign(37, 3, 54, 13);
+  R := TRect.Create(37, 3, 54, 13);
   Control := TListBox.Create(R, 1, TScrollBar(Control));
   Insert(Control);
 
-  R.Assign(37, 2, 54, 3);
+  R := TRect.Create(37, 2, 54, 3);
   Labl := TLabel.Create(R, GetString(dlSSA_v_ailableSavers), Control);
   Insert(Labl);
 
-  R.Assign(2, 15, 18, 16);
+  R := TRect.Create(2, 15, 18, 16);
   Control := TInputLine.Create(R, 3);
   TInputline(Control).SetValidator(TRangeValidator.Create(1, 254));
   { X-Man }
   Control.Options := Control.Options or ofValidate;
   Insert(Control);
 
-  R.Assign(2, 14, 18, 15);
+  R := TRect.Create(2, 14, 18, 15);
   Labl := TLabel.Create(R, GetString(dlSS_T_ime), Control);
   Insert(Labl);
 
-  R.Assign(20, 15, 55, 16);
+  R := TRect.Create(20, 15, 55, 16);
   Control := TCheckBoxes.Create(R,
         NewSItem(GetString(dlSSUse_M_ouse), nil));
   Insert(Control);
 
-  R.Assign(7, 17, 17, 19);
+  R := TRect.Create(7, 17, 17, 19);
   Control := TButton.Create(R, GetString(dlOKButton), cmOK, bfDefault);
   Insert(Control);
 
-  R.Assign(17, 17, 28, 19);
+  R := TRect.Create(17, 17, 28, 19);
   Control := TButton.Create(R, GetString(dlCancelButton), cmCancel,
          bfNormal);
   Insert(Control);
 
-  R.Assign(28, 17, 40, 19);
+  R := TRect.Create(28, 17, 40, 19);
   Control := TButton.Create(R, GetString(dlHelpButton), cmHelp,
          bfNormal);
   Insert(Control);
 
-  R.Assign(40, 17, 50, 19);
+  R := TRect.Create(40, 17, 50, 19);
   Control := TButton.Create(R, GetString(dlTestButton), cmTest,
          bfNormal);
   Insert(Control);
@@ -758,7 +758,7 @@ procedure TSaversDialog.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmTest:
           begin
           ClearEvent(Event);

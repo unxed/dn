@@ -466,7 +466,7 @@ function TArcDrive.ReadArchive: Boolean;
   if Files = nil then
     Exit;
   P := nil;
-  R.Assign(1, 1, 30, 10);
+  R := TRect.Create(1, 1, 30, 10);
   {P := WriteMsg(GetString(dlArcReadArc));}
   Ln := ArcFile.GetSize+1;
   Cancel := False;
@@ -1748,8 +1748,8 @@ function ArcViewer(AName, VAName: String): Boolean;
       Exit;
     end;
   E.What := evCommand;
-  E.Command := cmInsertDrive;
-  E.InfoPtr := P;
+  E.Message.Command := cmInsertDrive;
+  E.Message.InfoPtr := P;
   Desktop.HandleEvent(E);
   if E.What <> evNothing then
     begin

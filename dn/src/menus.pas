@@ -496,7 +496,7 @@ function TMenuView.Execute: Word;
       P: PMenuItem;
     begin
     Result := False;
-    if not TvMenus.UxMenuHeldStop or ((E.KeyFlags and TvEvents.kfRepeat) = 0) or (Current = nil) then
+    if not TvMenus.UxMenuHeldStop or ((E.KeyDown.KeyFlags and TvEvents.kfRepeat) = 0) or (Current = nil) then
       Exit;
     if FindNext then
       P := Current.Next
@@ -516,7 +516,7 @@ function TMenuView.Execute: Word;
       R: TRect;
     label q;
     begin
-    MakeLocal(E.Where, Mouse);
+    Mouse := MakeLocal(E.Mouse.Where);
     if Size.Y > 1 then
       begin {new begin}
       if Mouse.Y = 0 then
@@ -608,7 +608,7 @@ q:
     begin
     if  (ParentMenu <> nil) and (ParentMenu.Size.Y = 1) then
       begin
-      ParentMenu.MakeLocal(E.Where, Mouse);
+      Mouse := ParentMenu.MakeLocal(E.Mouse.Where);
       ParentMenu.GetItemRect(ParentMenu.Current, R);
       MouseInOwner := R.Contains(Mouse);
       end
@@ -621,7 +621,7 @@ q:
       P: TMenuView;
     begin
     P := ParentMenu;
-    while (P <> nil) and not P.MouseInView(E.Where) do
+    while (P <> nil) and not P.MouseInView(E.Mouse.Where) do
       P := P.ParentMenu;
     MouseInMenus := P <> nil;
     end;
@@ -663,7 +663,7 @@ q:
     GetEvent(E);
     case E.What of
       evMouseDown:
-        if  (MouseInView(E.Where) or MouseInOwner) then
+        if  (MouseInView(E.Mouse.Where) or MouseInOwner) then
           begin
           TrackMouse;
           if Size.Y = 1 then
@@ -701,19 +701,19 @@ q:
         else
           Going := False; {new}
       evMouseMove:
-        if  (E.Buttons <> 0) then
+        if  (E.Mouse.Buttons <> 0) then
           begin
           TrackMouse;
-          if not (MouseInView(E.Where) or MouseInOwner) and
+          if not (MouseInView(E.Mouse.Where) or MouseInOwner) and
             MouseInMenus
           then
             Action := DoReturn;
           end;
       evMouseAuto:
-        if  (E.Buttons <> 0) then
+        if  (E.Mouse.Buttons <> 0) then
           begin
           TrackMouse;
-          if not (MouseInView(E.Where) or MouseInOwner) and
+          if not (MouseInView(E.Mouse.Where) or MouseInOwner) and
             MouseInMenus
           then
             Action := DoReturn;
@@ -900,7 +900,7 @@ lHotkey:
                 Target := Self;
                 Ch := Drivers.GetAltChar(DNKeyCode(E));
                 if Ch = #0 then
-                  Ch := Char(E.CharCode)
+                  Ch := Char(E.KeyDown.CharScan.CharCode)
                 else
                   Target := TopMenu;
                 P := Target.FindItem(Ch);
@@ -932,7 +932,7 @@ lHotkey:
             end {case }
         end {case}; {new}
       evCommand:
-        if  (E.Command = cmMenu) or (E.Command = cmMainMenu) then
+        if  (E.Message.Command = cmMenu) or (E.Message.Command = cmMainMenu) then
           begin
           AutoSelect := False;
           if not Frst then
@@ -1119,11 +1119,11 @@ procedure TMenuView.HandleEvent(var Event: TEvent);
   procedure DoSelect;
     begin
     PutEvent(Event);
-    Event.Command := Owner.ExecView(Self);
-    if  (Event.Command <> 0) and CommandEnabled(Event.Command) then
+    Event.Message.Command := Owner.ExecView(Self);
+    if  (Event.Message.Command <> 0) and CommandEnabled(Event.Message.Command) then
       begin
       Event.What := evCommand;
-      Event.InfoPtr := nil;
+      Event.Message.InfoPtr := nil;
       PutEvent(Event);
       end;
     ClearEvent(Event);
@@ -1154,17 +1154,17 @@ GrayPlus, GrayMinus, F2, F10, F11, F12 }
           if  (P <> nil) and CommandEnabled(P^.Command) then
             begin
             Event.What := evCommand;
-            Event.Command := P^.Command;
-            Event.InfoPtr := nil;
+            Event.Message.Command := P^.Command;
+            Event.Message.InfoPtr := nil;
             PutEvent(Event);
             ClearEvent(Event);
             end;
           end;
       evCommand:
-        if (Event.Command = cmMenu) or (Event.Command = cmMainMenu) then
+        if (Event.Message.Command = cmMenu) or (Event.Message.Command = cmMainMenu) then
           DoSelect;
       evBroadcast:
-        if Event.Command = cmCommandSetChanged then
+        if Event.Message.Command = cmCommandSetChanged then
           begin
           CallDraw := False;
           UpdateMenu(Menu);
@@ -1329,7 +1329,7 @@ procedure TMenuBar.GetItemRect(Item: PMenuItem; var R: TRect);
   var
     P: PMenuItem;
   begin
-  R.Assign(1, 0, 1, 1);
+  R := TRect.Create(1, 0, 1, 1);
   P := Menu^.Items;
   while True do
     begin
@@ -1527,9 +1527,9 @@ procedure TMenuBox.GetItemRect(Item: PMenuItem; var R: TRect);
     P := P^.Next;
     end;
   if  (P = nil) then
-    R.Assign(0, 0, 0, 0)
+    R := TRect.Create(0, 0, 0, 0)
   else
-    R.Assign(2, Y, Size.X-2, Y+1);
+    R := TRect.Create(2, Y, Size.X-2, Y+1);
   end;
 
 function TMenuBox.Execute: Word;
@@ -1563,8 +1563,8 @@ function TMenuBox.Execute: Word;
       P := P^.Next;
       end;
     end;
-  GetBounds(R);
-  Owner.GetExtent(R2); {new begin}
+  R := GetBounds;
+  R2 := Owner.GetExtent; {new begin}
   if Options and ofCenterX <> 0 then
     begin
     R.A.X := (R2.B.X-R2.A.X-W) div 2;
@@ -1630,8 +1630,8 @@ procedure TMenuPopup.HandleEvent(var Event: TEvent);
       if  (P <> nil) and (CommandEnabled(P^.Command)) then
         begin
         Event.What := evCommand;
-        Event.Command := P^.Command;
-        Event.InfoPtr := nil;
+        Event.Message.Command := P^.Command;
+        Event.Message.InfoPtr := nil;
         PutEvent(Event);
         ClearEvent(Event);
         end
@@ -1926,7 +1926,7 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
       begin
       T := nil;
       repeat
-        MakeLocal(Event.Where, Mouse);
+        Mouse := MakeLocal(Event.Mouse.Where);
         if T <> ItemMouseIsIn then
           begin
           T := ItemMouseIsIn;
@@ -1936,8 +1936,8 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
       if  (T <> nil) and CommandEnabled(T^.Command) then
         begin
         Event.What := evCommand;
-        Event.Command := T^.Command;
-        Event.InfoPtr := nil;
+        Event.Message.Command := T^.Command;
+        Event.Message.InfoPtr := nil;
         PutEvent(Event);
         end;
       ClearEvent(Event);
@@ -1957,23 +1957,23 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
           CommandEnabled(T^.Command) or
             (T^.KeyCode = kbShortCut) and
 {$IFDEF DNUTF8}
-            HotMatches(S, PosChar('~', S)+1, Char(Event.CharCode))
+            HotMatches(S, PosChar('~', S)+1, Char(Event.KeyDown.CharScan.CharCode))
 {$ELSE}
             (UpCaseArray[S[PosChar('~', S)+1]] =
-             UpCaseArray[Char(Event.CharCode)])
+             UpCaseArray[Char(Event.KeyDown.CharScan.CharCode)])
 {$ENDIF}
         then
           begin
           Event.What := evCommand;
-          Event.Command := T^.Command;
-          Event.InfoPtr := nil;
+          Event.Message.Command := T^.Command;
+          Event.Message.InfoPtr := nil;
           Exit;
           end;
         T := T^.Next;
         end;
       end;
     evBroadcast:
-      if Event.Command = cmCommandSetChanged then
+      if Event.Message.Command = cmCommandSetChanged then
         DrawView;
   end {case};
   end { TStatusLine.HandleEvent };

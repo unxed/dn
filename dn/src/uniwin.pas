@@ -110,7 +110,7 @@ procedure TUniWindow.InitFrame;
   var
     R: TRect;
   begin
-  R.Assign(0, 0, Size.X, Size.Y);
+  R := TRect.Create(0, 0, Size.X, Size.Y);
   Frame := TEditFrame.Create(R);
   end;
 
@@ -119,7 +119,7 @@ function TUniWindow.MakeScrollBar(AOptions: Word): TScrollBar;
     P: TEditScrollBar;
     R: TRect;
   begin
-  GetExtent(R);
+  R := GetExtent;
   if AOptions and sbVertical <> 0
   then
     begin

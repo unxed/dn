@@ -651,7 +651,7 @@ procedure TVarList.HandleEvent(var Event: TEvent);
     P := nil;
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmOK:
           begin
           if P <> nil then
@@ -668,7 +668,7 @@ procedure TVarList.HandleEvent(var Event: TEvent);
           DeleteVar;
       end {case};
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmOK:
           AppendVar;
         cmNo:
@@ -734,7 +734,7 @@ procedure EditDOSEnvironment(Env: PByteArray);
       exit;
       end;
 
-    R.Assign(2, 2, 43, 3);
+    R := TRect.Create(2, 2, 43, 3);
     Labl := TLabel.Create(R, GetString(dlEnvVarLabel), PL);
     D.Insert(Labl);
 

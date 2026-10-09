@@ -64,28 +64,28 @@ begin
   { the key codes of DN: the shift state in bits 16..19 }
   FillChar(Ev, SizeOf(Ev), 0);
   Ev.What := evKeyDown;
-  Ev.KeyCode := $4B00;
+  Ev.KeyDown.KeyCode := $4B00;
   Check(DNKeyCode(Ev) = $004B00, 'DNKeyCode: Left');
-  Ev.ControlKeyState := 2;
+  Ev.KeyDown.ControlKeyState := 2;
   Check(DNKeyCode(Ev) = $034B00, 'DNKeyCode: Shift-Left (any shift is 3)');
-  Ev.ControlKeyState := 4;
-  Ev.KeyCode := $7300;
+  Ev.KeyDown.ControlKeyState := 4;
+  Ev.KeyDown.KeyCode := $7300;
   Check(DNKeyCode(Ev) = $047300, 'DNKeyCode: Ctrl-Left');
-  Ev.ControlKeyState := 8 or $40;
-  Ev.KeyCode := $9B00;
+  Ev.KeyDown.ControlKeyState := 8 or $40;
+  Ev.KeyDown.KeyCode := $9B00;
   Check(DNKeyCode(Ev) = $089B00, 'DNKeyCode: Alt-Left (the other flags do not count)');
   SetDNKeyCode(Ev, $034B00);
-  Check((Ev.KeyCode = $4B00) and ((Ev.ControlKeyState and 15) = 3), 'SetDNKeyCode');
+  Check((Ev.KeyDown.KeyCode = $4B00) and ((Ev.KeyDown.ControlKeyState and 15) = 3), 'SetDNKeyCode');
   Check(DNKeyCode(Ev) = $034B00, 'SetDNKeyCode and DNKeyCode are reverse to each other');
   { Alt and a punctuation key from a terminal (ESC and the character): the scan code of the key }
-  Ev.ControlKeyState := 8;
-  Ev.KeyCode := Ord('''');
+  Ev.KeyDown.ControlKeyState := 8;
+  Ev.KeyDown.KeyCode := Ord('''');
   Check(DNKeyCode(Ev) = $082800, 'DNKeyCode: Alt-'' is kbAltQuote');
-  Ev.KeyCode := Ord('"');
+  Ev.KeyDown.KeyCode := Ord('"');
   Check(DNKeyCode(Ev) = $0B2800, 'DNKeyCode: Alt-" is kbAltShiftQuote');
-  Ev.KeyCode := Ord('/');
+  Ev.KeyDown.KeyCode := Ord('/');
   Check(DNKeyCode(Ev) = $083500, 'DNKeyCode: Alt-/ is kbAltSlash');
-  Ev.ControlKeyState := 0;
+  Ev.KeyDown.ControlKeyState := 0;
   Check(DNKeyCode(Ev) = $00002F, 'DNKeyCode: / without Alt stays a character');
   { FormatStr }
   { the parameters are pointer-sized slots }

@@ -189,7 +189,7 @@ constructor TStarSkySaver.Create;
     I, J: Integer;
   begin
   Randomize;
-  Application.GetExtent(R);
+  R := Application.GetExtent;
   inherited Create(R);
   NumSkyStars := 2*Size.X-64;
   for I := 1 to NumSkyStars do
@@ -280,7 +280,7 @@ procedure TStarSkySaver.Update;
         Stat := MMM(X, Y);
         P.X := X div StarSkyMult;
         P.Y := Y div StarSkyMult;
-        MakeGlobal(P, P);
+        P := MakeGlobal(P);
         if not MouseInView(P) or (DX = 0) and (DY = 0) then
           begin
           InitStar(I);
@@ -303,7 +303,7 @@ constructor TProjector.Create;
   if MaxAvail < I then
     Fail;
   Randomize;
-  Application.GetExtent(R);
+  R := Application.GetExtent;
   inherited Create(R);
   GetMem(Screen, I);
   Move(ScreenBuffer^, Screen^, I);
@@ -417,7 +417,7 @@ constructor TClockSaver.Create;
   var
     R: TRect;
   begin
-  Application.GetExtent(R);
+  R := Application.GetExtent;
   inherited Create(R);
   X := Size.X div 2-3;
   Y := Size.Y div 2;
@@ -545,8 +545,8 @@ procedure CallExternalSaver(const FN: String);
   if DosError = 0 then
     begin
     Event.What := evCommand;
-    Event.Command := cmValid;
-    Event.InfoPtr := nil;
+    Event.Message.Command := cmValid;
+    Event.Message.InfoPtr := nil;
     Application.PutEvent(Event);
     end;
   end { CallExternalSaver };

@@ -82,9 +82,9 @@ procedure T_BWSelector.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
   if GetState(sfVisible) then
-    if  (Event.What = evBroadcast) and (Event.Command = cmColorSet) then
+    if  (Event.What = evBroadcast) and (Event.Message.Command = cmColorSet) then
       begin
-      Value := Event.InfoByte;
+      Value := Event.Message.InfoByte;
       case SelType of
         csForeground:
           for i := 0 to 3 do

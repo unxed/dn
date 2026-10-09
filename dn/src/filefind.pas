@@ -417,8 +417,8 @@ function FindFiles(var Files: TFilesCollection;
     if PInfo = nil then
       Exit;
     Application.GetEvent(Event);
-    if  (Event.What = evCommand) and (Event.Command = cmCancel) and
-        (Event.InfoPtr = PInfo.But)
+    if  (Event.What = evCommand) and (Event.Message.Command = cmCancel) and
+        (Event.Message.InfoPtr = PInfo.But)
     then
       begin
       PInfo.ClearEvent(Event);
@@ -426,7 +426,7 @@ function FindFiles(var Files: TFilesCollection;
            mfYesNoConfirm) = cmYes;
       end;
     if  (Event.What <> evNothing)
-           and not ((Event.What = evCommand) and (Event.Command = cmQuit))
+           and not ((Event.What = evCommand) and (Event.Message.Command = cmQuit))
     then
       Application.HandleEvent(Event);
     end;
@@ -2492,7 +2492,7 @@ procedure TFindDrive.DrvFindFile(FC: TFilesCollection);
   FFiles := TFilesCollection.Create($10, $10);
   FFiles.SortMode := psmLongName;
   Directories := TStringCollection.Create(30, 30, False);
-  R.Assign(1, 1, 40, 10);
+  R := TRect.Create(1, 1, 40, 10);
   Inc(SkyEnabled);
   PInfo := TWhileView.Create(R);
   PInfo.Options := PInfo.Options or ofSelectable or ofCentered;

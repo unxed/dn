@@ -105,10 +105,10 @@ procedure TColorView.HandleEvent(var Event: TEvent);
     begin
     OldColor := Color2Display;
     repeat
-      if MouseInView(Event.Where) then
+      if MouseInView(Event.Mouse.Where) then
         begin
-        R.Assign(5, 1, 17, 5);
-        MakeLocal(Event.Where, Mouse);
+        R := TRect.Create(5, 1, 17, 5);
+        Mouse := MakeLocal(Event.Mouse.Where);
         if R.Contains(Mouse) then
           begin
           Dec(Mouse.X, 5);
@@ -183,27 +183,27 @@ constructor TColorVGADialog.Create;
     S: String;
   begin
 
-  R.Assign(6, 0, 56, 22);
+  R := TRect.Create(6, 0, 56, 22);
   inherited Create(R, GetString(dlColors_VGA));
   Options := Options or ofCentered;
-  R.Assign(21, 2, 22, 18);
+  R := TRect.Create(21, 2, 22, 18);
   Control := TScrollBar.Create(R);
   Insert(Control);
 
-  R.Assign(3, 2, 21, 18);
+  R := TRect.Create(3, 2, 21, 18);
   TT := TListBox.Create(R, 1, TScrollBar(Control));
   {   TT.HelpCtx := hcHelp;}
   Insert(TT);
 
-  R.Assign(2, 1, 17, 2);
+  R := TRect.Create(2, 1, 17, 2);
   Labl := TLabel.Create(R, GetString(dlColors_P_alette), TT);
   Insert(Labl);
 
-  R.Assign(25, 12, 47, 18);
+  R := TRect.Create(25, 12, 47, 18);
   TV := TColorView.Create(R);
   Insert(TV);
 
-  R.Assign(24, 11, 38, 12);
+  R := TRect.Create(24, 11, 38, 12);
   Color := TRegLabel.Create(R, GetString(dlColorsColor_), nil);
   Insert(Color);
 
@@ -212,58 +212,58 @@ constructor TColorVGADialog.Create;
     appPalette = apColor
   then
     begin
-    R.Assign(25, 3, 47, 4);
+    R := TRect.Create(25, 3, 47, 4);
     TS[1] := TScrollBar.Create(R);
     Insert(TS[1]);
 
-    R.Assign(24, 2, 45, 3);
+    R := TRect.Create(24, 2, 45, 3);
     TL[1] := TRegLabel.Create(R, GetString(dlColors_R_ed), TS[1]);
     Insert(TL[1]);
 
-    R.Assign(25, 6, 47, 7);
+    R := TRect.Create(25, 6, 47, 7);
     TS[2] := TScrollBar.Create(R);
     Insert(TS[2]);
 
-    R.Assign(24, 5, 45, 6);
+    R := TRect.Create(24, 5, 45, 6);
     TL[2] := TRegLabel.Create(R, GetString(dlColors_G_reen), TS[2]);
     Insert(TL[2]);
 
-    R.Assign(25, 9, 47, 10);
+    R := TRect.Create(25, 9, 47, 10);
     TS[3] := TScrollBar.Create(R);
     Insert(TS[3]);
 
-    R.Assign(24, 8, 45, 9);
+    R := TRect.Create(24, 8, 45, 9);
     TL[3] := TRegLabel.Create(R, GetString(dlColors_B_lue), TS[3]);
     Insert(TL[3]);
     end
   else
     begin
-    R.Assign(25, 6, 47, 7);
+    R := TRect.Create(25, 6, 47, 7);
     TS[1] := TScrollBar.Create(R);
     Insert(TS[1]);
 
-    R.Assign(24, 5, 45, 6);
+    R := TRect.Create(24, 5, 45, 6);
     TL[1] := TRegLabel.Create(R, GetString(dlColors_G_ray), TS[1]);
     Insert(TL[1]);
     end;
 
   S := GetString(dlColors_D_efault);
-  R.Assign(2, 19, 4+Length(S), 21);
+  R := TRect.Create(2, 19, 4+Length(S), 21);
   Control := TButton.Create(R, S, cmYes, bfBroadcast+bfNormal);
   Insert(Control);
 
-  R.Assign(18, 19, 28, 21);
+  R := TRect.Create(18, 19, 28, 21);
   Control := TButton.Create(R, GetString(dlOKButton), cmOK, bfDefault);
   Control.HelpCtx := cmOK;
   Insert(Control);
 
-  R.Assign(28, 19, 38, 21);
+  R := TRect.Create(28, 19, 38, 21);
   Control := TButton.Create(R, GetString(dlCancelButton), cmCancel,
          bfNormal);
   Control.HelpCtx := cmCancel;
   Insert(Control);
 
-  R.Assign(38, 19, 48, 21);
+  R := TRect.Create(38, 19, 48, 21);
   Control := TButton.Create(R, GetString(dlHelpButton), cmHelp,
          bfNormal);
   Insert(Control);
@@ -298,7 +298,7 @@ procedure TColorVGADialog.HandleEvent(var Event: TEvent);
         appPalette = apColor)
     do
       {for I:=1 to 3 do}
-      if Event.InfoPtr = TS[I] then
+      if Event.Message.InfoPtr = TS[I] then
         begin
         L := TS[I];
         Break;
@@ -374,7 +374,7 @@ procedure TColorVGADialog.HandleEvent(var Event: TEvent);
   ThisProcedureExecuteFirstTime := False;
 
   if Event.What = evBroadcast then
-    case Event.Command of
+    case Event.Message.Command of
       cmYes:
         begin
         ResetVGApalette(False);
@@ -382,7 +382,7 @@ procedure TColorVGADialog.HandleEvent(var Event: TEvent);
         end;
       cmColorMouseSelection:
         begin
-        TT.FocusItem(Event.InfoByte);
+        TT.FocusItem(Event.Message.InfoByte);
         UpdateColor
         end;
       cmListItemSelected:

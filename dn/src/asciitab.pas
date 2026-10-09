@@ -87,8 +87,8 @@ end;
 { any character (a control character too) goes to its code and is chosen }
 function TTable.TypedCode(var Event: TEvent): LongInt;
 begin
-  if Event.CharCode > 0 then
-    Result := Event.CharCode
+  if Event.KeyDown.CharScan.CharCode > 0 then
+    Result := Event.KeyDown.CharScan.CharCode
   else
     Result := -1;
 end;
@@ -146,12 +146,12 @@ begin
     the close box) }
   if (Event.What = evCommand) and ((State and sfModal) <> 0) then
   begin
-    if Event.Command = AsciiCommandBase + acPicked then
-      Event.Command := cmOK;
-    case Event.Command of
+    if Event.Message.Command = AsciiCommandBase + acPicked then
+      Event.Message.Command := cmOK;
+    case Event.Message.Command of
       cmOK, cmYes, cmCancel:
         begin
-          EndModal(Event.Command);
+          EndModal(Event.Message.Command);
           ClearEvent(Event);
           Exit;
         end;

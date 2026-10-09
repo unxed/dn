@@ -183,9 +183,9 @@ uses TvEvents, DnPath,
 { A key that types a character: of the code page (CharCode), or in the build DNUTF8 a character outside the page (the UTF-8 text of the event) }
 function IsTypedChar(const Event: TEvent): Boolean;
   begin
-  Result := (Char(Event.CharCode) >= #32) and (Char(Event.CharCode) <= #254);
+  Result := (Char(Event.KeyDown.CharScan.CharCode) >= #32) and (Char(Event.KeyDown.CharScan.CharCode) <= #254);
 {$IFDEF DNUTF8}
-  if (not Result) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) then
+  if (not Result) and (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80) then
     Result := True;
 {$ENDIF}
   end;
@@ -316,7 +316,7 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
     if Manager.PanelZoomed then
       T := Manager.Panel[pRight].AnyPanel.GetState(sfSelected);
     TargetPanel := Manager.Panel[T].AnyPanel;
-    if (Event.Buttons and mbLeftButton <> 0) or
+    if (Event.Mouse.Buttons and mbLeftButton <> 0) or
       not TargetPanel.GetState(sfVisible)
     then { left mouse button or operation on a hidden panel:
            hide/show, like Ctrl-F1/F2}
@@ -342,13 +342,13 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmDropped:
-          if MouseInView(PCopyRec(Event.InfoPtr)^.Where) then
+          if MouseInView(PCopyRec(Event.Message.InfoPtr)^.Where) then
             begin
             Event.What := evNothing;
             ClrIO;
-            MakeLocal(PCopyRec(Event.InfoPtr)^.Where, P);
+            P := MakeLocal(PCopyRec(Event.Message.InfoPtr)^.Where);
             if ViewLine[P.X+1] = ' ' then
               {Dec(P.X);}
               begin { between letters - ignore. This is better than missing }
@@ -370,22 +370,22 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
                      cmIsRightPanel, Panel) <> nil)
             else
               RevertBar := False;
-            Message(PCopyRec(Event.InfoPtr)^.Owner,
+            Message(PCopyRec(Event.Message.InfoPtr)^.Owner,
               evBroadcast, cmCopyCollection,
-              PCopyRec(Event.InfoPtr)^.FC);
+              PCopyRec(Event.Message.InfoPtr)^.FC);
             SkipCopyDialog := False;
             end;
       end {case};
     evMouseDown:
       begin
       ClrIO;
-      MakeLocal(Event.Where, P);
+      P := MakeLocal(Event.Mouse.Where);
       if ViewLine[P.X+1] = ' ' then
         {Dec(P.X);}
         begin { between letters - ignore. This is better than missing }
         ClearEvent(Event); Exit;
         end;
-      if ((Event.EventFlags and 2) <> 0) then
+      if ((Event.Mouse.EventFlags and 2) <> 0) then
         begin
         case ViewLine[P.X+1] of
           'A'..'Z':
@@ -538,7 +538,7 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
        CurrentDirectory := DirectoryName;
        Event.What := evKeyDown;
        SetDNKeyCode(Event, kbTab);
-       Event.InfoPtr := nil;
+       Event.Message.InfoPtr := nil;
        PutEvent(Event);
       end;
 *)
@@ -959,7 +959,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
     FC.Insert(CopyFileRec(Panel.Files.At(Panel.ScrollBar.Value)));
     if P.X < Length(S) then
       Dec(P.X);
-    MakeGlobal(P, P);
+    P := MakeGlobal(P);
     DragMover(@P, S, FC, @C);
     CE;
     end;
@@ -978,7 +978,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
       if PF^.Selected then
         FC.Insert(CopyFileRec(PF)); {DataCompBoy}
       end;
-    MakeGlobal(P, P);
+    P := MakeGlobal(P);
     DragMover(@P, ItoS(Panel.SelNum)+GetString(dlSelectedFiles), FC, @C);
     CE;
     end;
@@ -995,7 +995,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
       for I := Start to N+Start-1 do
         FC.AtInsert(FC.Count, CopyFileRec(PFileRec(At(I))));
       end;
-    MakeGlobal(P, P);
+    P := MakeGlobal(P);
     DragMover(@P, ItoS(N)+' '+GetString(dlDIFiles), FC, @C);
     CE;
     end;
@@ -1009,7 +1009,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
     if Panel.Files.Count = 0 then
       Exit;
     C.Owner := Panel;
-    MakeLocal(Event.Where, P);
+    P := MakeLocal(Event.Mouse.Where);
     Y := 0;
     if Y = P.Y then
       begin { mouse in the separator }
@@ -1036,7 +1036,7 @@ procedure TInfoView.HandleEvent(var Event: TEvent);
         begin
         with Panel do
           begin
-          MSelect := Event.Buttons and mbRightButton <> 0;
+          MSelect := Event.Mouse.Buttons and mbRightButton <> 0;
           if MSelect then
             begin
             SelectFlag := not PFileRec
@@ -1743,7 +1743,7 @@ procedure TDirView.HandleEvent(var Event: TEvent);
   case Event.What of
     evMouseDown:
       begin
-      MakeLocal(Event.Where, P);
+      P := MakeLocal(Event.Mouse.Where);
       S := GetText(255);
       if Length(S) > Size.X then
         I := 0
@@ -1791,18 +1791,18 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
       PF: PFileRec;
       I, OSM: LongInt;
     begin
-    if  (Files.Count = 0) or (Event.InfoPtr = nil) then
+    if  (Files.Count = 0) or (Event.Message.InfoPtr = nil) then
       Exit;
     OSM := TFilesCollection(Files).SortMode;
     TFilesCollection(Files).SortMode := fcmPreciseCompare;
     for I := 0 to Files.Count-1 do
-      if Files.FileCompare(Files.At(I), Event.InfoPtr) = 0 then
+      if Files.FileCompare(Files.At(I), Event.Message.InfoPtr) = 0 then
         goto 1; {-$VOL}
     TFilesCollection(Files).SortMode := OSM;
     Exit;
 1:
     TFilesCollection(Files).SortMode := OSM;
-    PF := {Event.InfoPtr}Files.At(I);
+    PF := {Event.Message.InfoPtr}Files.At(I);
     with PF^ do
       if Selected then
         begin
@@ -1859,9 +1859,9 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     Exit;
   { X.4 of the vtui UX guidelines: the wheel over a panel moves that panel, also when the other one is active (the window would move the bar it finds first) }
   if (Event.What = TvEvents.evMouseWheel) and (ScrollBar <> nil) and
-     ((Event.Wheel = TvEvents.mwUp) or (Event.Wheel = TvEvents.mwDown)) then
+     ((Event.Mouse.Wheel = TvEvents.mwUp) or (Event.Mouse.Wheel = TvEvents.mwDown)) then
     begin
-    if Event.Wheel = TvEvents.mwUp then
+    if Event.Mouse.Wheel = TvEvents.mwUp then
       ScrollBar.SetValue(ScrollBar.Value-3*ScrollBar.ArStep)
     else
       ScrollBar.SetValue(ScrollBar.Value+3*ScrollBar.ArStep);
@@ -1897,10 +1897,10 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             (KeyCode = kbGrayAst and $FFFF)
           )
         ) or
-        ( ( (Event.ScanCode < Hi(kbAlt1)) or
-            (Event.ScanCode > Hi(kbAlt9))
+        ( ( (Event.KeyDown.CharScan.ScanCode < Hi(kbAlt1)) or
+            (Event.KeyDown.CharScan.ScanCode > Hi(kbAlt9))
           ) and
-          (Char(Event.CharCode) = #0) and
+          (Char(Event.KeyDown.CharScan.CharCode) = #0) and
           (CmdLine.Str <> '') and
           ( ( (I and 3 <> 0) xor (FMSetup.Options and fmoUseArrows = 0)) and
             ( (KeyCode = kbRight and $FFFF) or (KeyCode = kbLeft and
@@ -1922,7 +1922,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
   I := ShiftState2;
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmDoSendLocated:
           SendLocated;
         cmGetDirName,
@@ -1938,13 +1938,13 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             if (PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0) =
                (ShiftState and kbAltShift <> 0)
             then
-              PString(Event.InfoPtr)^:= lfGetShortFileName(DirectoryName)
+              PString(Event.Message.InfoPtr)^:= lfGetShortFileName(DirectoryName)
             else
               
-              PString(Event.InfoPtr)^:= DirectoryName;
+              PString(Event.Message.InfoPtr)^:= DirectoryName;
             end
           else if ScrollBar.Value < Files.Count then
-            PString(Event.InfoPtr)^:= PFileRec
+            PString(Event.Message.InfoPtr)^:= PFileRec
                 (Files.At(ScrollBar.Value))^.Owner^;
           ClearEvent(Event);
           end;
@@ -1967,7 +1967,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
       begin
       if QuickSearch then
         begin
-        if Char(Event.CharCode) = #27 then
+        if Char(Event.KeyDown.CharScan.CharCode) = #27 then
           begin
           StopQuickSearch;
           InfoView.DrawView;
@@ -1985,9 +1985,9 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
             (DNKeyCode(Event) = kbBackUp)
         then
           goto GotoKb;
-        if (Char(Event.CharCode) > #31) or
+        if (Char(Event.KeyDown.CharScan.CharCode) > #31) or
 {$IFDEF DNUTF8}
-              ((Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80)) or
+              ((Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80)) or
 {$ENDIF}
               (DNKeyCode(Event) = kbBack) or
               (DNKeyCode(Event) = kbBackUp) or
@@ -2012,7 +2012,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
           ( (DNKeyCode(Event) = kbCtrlS) and (CmdLine.Str = '')) or
           ( (DNKeyCode(Event) = kbDoubleCtrl) and (FMSetup.Quick = pqsCtrl)) or
           ( IsTypedChar(Event) and
-            (Char(Event.CharCode) <> DnSep) and (FMSetup.Quick = pqsCaps) and
+            (Char(Event.KeyDown.CharScan.CharCode) <> DnSep) and (FMSetup.Quick = pqsCaps) and
             (I and $40 <> 0)) or
           ( IsTypedChar(Event) and
             (ShiftState and 3 <> 0) and (ShiftState and 4 = 0) and
@@ -2139,7 +2139,7 @@ GotoKb:
             if CurPos < Files.Count then
               begin
               StopQuickSearch;
-              if  (Char(Event.CharCode) = ' ') and ((CmdLine.Str <> '') or
+              if  (Char(Event.KeyDown.CharScan.CharCode) = ' ') and ((CmdLine.Str <> '') or
                     (FMSetup.Options and fmoSpaceToggle = 0))
               then
                 Exit;
@@ -2177,7 +2177,7 @@ GotoKb:
         end;
       end; {evKeyDown}
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmFindForced,
         cmInsertDrive,
         cmUnArchive,
@@ -2186,7 +2186,7 @@ GotoKb:
           CommandHandle(Event);
 
         cmScrollBarChanged:
-          if ScrollBar = Event.InfoPtr then
+          if ScrollBar = Event.Message.InfoPtr then
             begin
             if ScrollBar.ForceScroll or WheelEvent then
               Inc(Delta, ScrollBar.Step);

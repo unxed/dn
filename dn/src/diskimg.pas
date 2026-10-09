@@ -511,7 +511,7 @@ procedure DoIt(AOwner: Pointer; AFiles: TFilesCollection;
     lGetDir(0, ADestPath);
   ADestPath := MakeNormName(ADestPath, '');
 
-  R.Assign(1, 1, 26, 10);
+  R := TRect.Create(1, 1, 26, 10);
   PInfo := TWhileView.Create(R);
   PInfo.Top := GetString(dlImage);
   Desktop.Insert(PInfo);

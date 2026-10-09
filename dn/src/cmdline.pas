@@ -191,14 +191,14 @@ function WholeChars(const S: String): String;                { without a charact
 function TypedText(const Event: TEvent): String;
   begin
 {$IFDEF DNUTF8}
-  if (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) then
+  if (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80) then
     begin
-    SetLength(Result, Min(Event.TextLength, 255));
-    Move(Event.Text[0], Result[1], Length(Result));
+    SetLength(Result, Min(Event.KeyDown.TextLength, 255));
+    Move(Event.KeyDown.Text[0], Result[1], Length(Result));
     Exit;
     end;
 {$ENDIF}
-  Result := Char(Event.CharCode);
+  Result := Char(Event.KeyDown.CharScan.CharCode);
   end;
 
 const
@@ -352,7 +352,7 @@ procedure TCommandLine.Update;
     Exit;
   P.X := CellsIn(Copy(Str, DeltaX+1, CurX-DeltaX))+Min(Length(Dir), 50);
   P.Y := 0;
-  MakeGlobal(P, P);
+  P := MakeGlobal(P);
   //AK155  BB := not Overwrite  xor (InterfaceData.Options and ouiBlockInsertCursor <> 0);
   {AK155 cursor-mode setup calls are harmless under OS/2,
 but under Win32 cause nasty cursor flicker. So I try
@@ -471,14 +471,14 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
   case Event.What of
     evMouseDown, evMouseAuto:
       begin
-      if ((Event.EventFlags and 2) <> 0) then
+      if ((Event.Mouse.EventFlags and 2) <> 0) then
         begin
         Message(Application, evCommand, cmHistoryList, nil);
         CE
         end;
-      MakeLocal(Event.Where, P);
+      P := MakeLocal(Event.Mouse.Where);
       if P.X >= Min(Length(Dir), 50) then
-        if Event.Buttons and mbRightButton <> 0 then
+        if Event.Mouse.Buttons and mbRightButton <> 0 then
           begin
           if P.X < (Size.X-Min(Length(Dir), 50)) div 2
           then
@@ -494,7 +494,7 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
           end;
       end;
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmRereadInfo:
           begin
           GetDir;
@@ -504,7 +504,7 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
         cmInsertName:
           if InterfaceData.Options and ouiHideCmdline = 0 then
             begin
-            S := String(Event.InfoPtr^);
+            S := String(Event.Message.InfoPtr^);
             {AK155: handling long names with spaces.}
             if  (CurX > 0) and not (Str[CurX] in Separators)
               {and not (S[1] = '"')}
@@ -632,11 +632,11 @@ RIT Labs DN also wobbled but seemed to fetch correctly.
       begin
 {$IFDEF DNUTF8}
       { a character that the code page of the locale lacks (Russian under en_US.UTF-8) has no CharCode, but it has the text: it is typed like the others (TypedText) }
-      if (Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) and (Event.ControlKeyState and 12 = 0) then
-        Event.CharCode := $80;
+      if (Event.KeyDown.CharScan.CharCode = 0) and (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80) and (Event.KeyDown.ControlKeyState and 12 = 0) then
+        Event.KeyDown.CharScan.CharCode := $80;
 {$ENDIF}
       if InterfaceData.Options and ouiHideCmdline = 0 then
-        case Char(Event.CharCode) of
+        case Char(Event.KeyDown.CharScan.CharCode) of
           ^V:
             begin
             Overwrite := not Overwrite;
@@ -897,7 +897,7 @@ RIT Labs DN also wobbled but seemed to fetch correctly.
 constructor TCmdWindow.Create(R: TRect);
 begin
  inherited Create(R, 'Command Line', 0);
- GetExtent(R);
+ R := GetExtent;
  Palette := wpCyanWindow;
  R.Grow(-1, -1);
  Insert(PCmdLine.Create(R));

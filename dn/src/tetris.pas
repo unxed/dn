@@ -235,32 +235,32 @@ constructor TGameWindow.Create;
     Gm: TGameView;
     Hi, Info: TGameInfo;
   begin
-  Desktop.GetBounds(R);
+  R := Desktop.GetBounds;
   Vis := R.B.Y-R.A.Y - 4;
   if TetrisRec.S = 1 then
     Vis := Min(22, Vis) {Pentix}
   else
     Vis := Min(19, Vis) {Tetris};
-  R.Assign(1, 1, 30+Shi*2, 4+Vis);
+  R := TRect.Create(1, 1, 30+Shi*2, 4+Vis);
   inherited Create(R, GetString(dlGameTitle));
   Number := GetNum;
   HelpCtx := hcTetris+TetrisRec.S;
   Options := Options or ofCentered;
-  R.Assign(2, 2, 2+Shi*2, 2+Vis);
+  R := TRect.Create(2, 2, 2+Shi*2, 2+Vis);
   Gm := TGameView.Create(R);
   Insert(Gm);
-  R.Assign(4+Shi*2, 1, 27+Shi*2, Vis-3);
+  R := TRect.Create(4+Shi*2, 1, 27+Shi*2, Vis-3);
   Info := TGameInfo.Create(R);
   Insert(Info);
   Info.Gm := Gm;
   Gm.Info := Info;
-  R.Assign(4+Shi*2, Vis-2, 15+Shi*2, Vis);
+  R := TRect.Create(4+Shi*2, Vis-2, 15+Shi*2, Vis);
   Insert(TButton.Create(R, GetString(dlNewButton), cmNewGame, 0));
-  R.Assign(15+Shi*2, Vis-2, 26+Shi*2, Vis);
+  R := TRect.Create(15+Shi*2, Vis-2, 26+Shi*2, Vis);
   Insert(TButton.Create(R, GetString(dlSetupButton), cmSetup, 0));
-  R.Assign(4+Shi*2, Vis, 15+Shi*2, Vis+2);
+  R := TRect.Create(4+Shi*2, Vis, 15+Shi*2, Vis+2);
   Insert(TButton.Create(R, GetString(dlTop10Button), cmShowHi, 0));
-  R.Assign(15+Shi*2, Vis, 26+Shi*2, Vis+2);
+  R := TRect.Create(15+Shi*2, Vis, 26+Shi*2, Vis+2);
   Insert(TButton.Create(R, GetString(dlPauseButton), cmStop, 0));
   SelectNext(False);
   end { TGameWindow.Init };
@@ -445,7 +445,7 @@ procedure TGameView.ShowScores;
     PP: Boolean;
   begin
   D := TDialog(LoadResource(TDlgIdx(Byte(dlgTetrisTop10)+Byte(Pentix))));
-  R.Assign(2, 4, D.Size.X-2, 14);
+  R := TRect.Create(2, 4, D.Size.X-2, 14);
   P := TView.Create(R);
   P.Options := P.Options or ofFramed;
   D.Insert(P);
@@ -464,7 +464,7 @@ procedure TGameView.ShowScores;
         end
       else
         S := '';
-      R.Assign(2, 3+I, D.Size.X-2, 4+I);
+      R := TRect.Create(2, 3+I, D.Size.X-2, 4+I);
       D.Insert(TLabel.Create(R, S, nil));
       end;
   PP := Stop;
@@ -766,9 +766,9 @@ procedure TGameView.HandleEvent;
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmGetName:
-          PString(Event.InfoPtr)^:= GetString(dlGameTitle);
+          PString(Event.Message.InfoPtr)^:= GetString(dlGameTitle);
         cmStop:
           begin
           if ValidMove(0, 0) then
@@ -855,10 +855,10 @@ procedure TGameView.HandleEvent;
                 CE;
                 end;
               else {case}
-                if  ((Char(Event.CharCode) > #0) or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80))) and (CommandLine <> nil) then
+                if  ((Char(Event.KeyDown.CharScan.CharCode) > #0) or ((Event.KeyDown.CharScan.CharCode = 0) and (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80))) and (CommandLine <> nil) then
                   CommandLine.HandleEvent(Event);
             end
-          else if ((Char(Event.CharCode) > #0) or ((Event.CharCode = 0) and (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80))) and (CommandLine <> nil) then
+          else if ((Char(Event.KeyDown.CharScan.CharCode) > #0) or ((Event.KeyDown.CharScan.CharCode = 0) and (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80))) and (CommandLine <> nil) then
             CommandLine.HandleEvent(Event);
       end {case};
   end {case};
@@ -888,7 +888,7 @@ procedure TGameView.ReadFig;
 
 procedure TGameWindow.HandleEvent(var Event: TEvent);
   begin
-  if  (Event.What = evKeyDown) and (Char(Event.CharCode) = ' ') then
+  if  (Event.What = evKeyDown) and (Char(Event.KeyDown.CharScan.CharCode) = ' ') then
     SetDNKeyCode(Event, kbDown);
   inherited HandleEvent(Event);
   end;

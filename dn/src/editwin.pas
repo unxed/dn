@@ -144,7 +144,7 @@ constructor TEditWindow.Load(var S: TStream);
   if  (Intern = nil) or (AInfo = nil) or (ABookLine = nil) then
     {Cat}
     Fail;
-R.Assign(1, 1, Size.X - 1, 2);
+R := TRect.Create(1, 1, Size.X - 1, 2);
   MenuBar := TMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
     MenuBar.Locate(R);
@@ -177,11 +177,11 @@ R.Assign(1, 1, Size.X - 1, 2);
 var rr: TRect;
 begin
  inherited ChangeBounds(R);
- Intern^.HScroll.GetBounds(rr); RR.B.X:=Size.X - 2;
+ rr := Intern^.HScroll.GetBounds; RR.B.X:=Size.X - 2;
  Intern^.HScroll.SetBounds(rr);
  if not (Intern^.SmartPad or GetState(sfModal)) then
     begin
-      GetBounds(TempBounds);
+      TempBounds := GetBounds;
       LastEditDeskSize := Desktop.Size;
     end;
 end;
@@ -225,14 +225,14 @@ constructor TEditWindow.Create(R: TRect; FileName: String);
   Options := Options or ofTileable;
   Flags := Flags or wfMaxi;
 
-R.Assign(1, 1, Size.X - 1, 2);
+R := TRect.Create(1, 1, Size.X - 1, 2);
   MenuBar := TMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
     MenuBar.Locate(R);
   Insert(MenuBar);
 
   {MenuBar.Options := MenuBar.Options or ofPostProcess;}
-R.Assign(1, 2, Size.X - 1, Size.Y - 1);
+R := TRect.Create(1, 2, Size.X - 1, Size.Y - 1);
 
   Intern := TXFileEditor.Create(R,
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
@@ -253,10 +253,10 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
     begin
     Fail;                      { a failing constructor of a class destroys the instance itself: a Free before it destroyed it twice }
     end;
-R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
+R := TRect.Create(2, Size.Y - 1, Size.X - 2, Size.Y);
   AInfo := TInfoLine.Create(R);
   InsertBefore(AInfo, First);
-  GetExtent(R);
+  R := GetExtent;
   R.B.X := R.A.X+1;
   Inc(R.A.Y, 2);
   Dec(R.B.Y);

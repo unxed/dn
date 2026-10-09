@@ -1329,11 +1329,11 @@ procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
     if D = nil then
       Exit;
 
-    R.Assign(58, 1, 59, 13);
+    R := TRect.Create(58, 1, 59, 13);
     P := TScrollBar.Create(R);
     D.Insert(P);
 
-    R.Assign(2, 1, 58, 13);
+    R := TRect.Create(2, 1, 58, 13);
     PL := TFindBox.Create(R, 1, TScrollBar(P));
     PL.NewLisT(FindList);
     D.Insert(PL);
@@ -1343,7 +1343,7 @@ procedure TArvidDrive.DrvFindFile(FC: TFilesCollection);
       FindList.ForEach(DoCount);
 
     FreeStr := FStr(R.A.X)+GetString(dlFilesFound);
-    R.Assign(1, 13, 1+Length(FreeStr), 14);
+    R := TRect.Create(1, 13, 1+Length(FreeStr), 14);
     P := TStaticText.Create(R, FreeStr);
     P.Options := P.Options or ofCenterX;
     D.Insert(P);

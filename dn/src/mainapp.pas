@@ -155,7 +155,7 @@ begin
       IsKey := OnSwitcherKey(Event, Back)
     else
     begin
-      K := KeyMake(Event.KeyCode, Event.ControlKeyState);
+      K := KeyMake(Event.KeyDown.KeyCode, Event.KeyDown.ControlKeyState);
       IsKey := (K.Code = TvKeys.kbTab) and ((K.Mods and TvKeys.kbCtrlShift) <> 0);
     end;
   if IsKey and (Last <> nil) then
@@ -196,11 +196,11 @@ var
 begin
   MainApp.Application := Self;
   InitScreen;
-  R.Assign(0, 0, ScreenWidth, ScreenHeight);
+  R := TRect.Create(0, 0, ScreenWidth, ScreenHeight);
   TGroup(Self).Create(R);
   State := sfVisible or sfSelected or sfFocused or sfModal or sfExposed;
   Options := 0;
-  Buffer := TvScreen.ScreenBuffer;
+  Buffer := TvScreen.TScreen.ScreenBuffer;
   InitStatusLine;
   InitMenuBar;
   InitDeskTop;
@@ -270,8 +270,8 @@ begin
     if F9OpensMenu and (DNKeyCode(Event) = Commands.kbF9) then
     begin { M.1: F9 opens the menu bar, as F10 does }
       Event.What := evCommand;
-      Event.Command := Commands.cmMenu;
-      Event.InfoPtr := nil;
+      Event.Message.Command := Commands.cmMenu;
+      Event.Message.InfoPtr := nil;
     end
     else if EnterTogglesCheck and (DNKeyCode(Event) = Commands.kbEnter) and FocusedIsCluster(Self) then
       { G.2b: Enter on a check box or a radio button toggles it (it becomes Space); from the other controls it presses the default button }
@@ -279,14 +279,14 @@ begin
   { as in Turbo Vision: the status line sees the keys and the clicks on it }
   if (Event.What <> evNothing) and (MainApp.StatusLine <> nil) then
     if ((Event.What and evKeyDown) <> 0) or
-       (((Event.What and evMouseDown) <> 0) and MainApp.StatusLine.MouseInView(Event.Where)) then
+       (((Event.What and evMouseDown) <> 0) and MainApp.StatusLine.MouseInView(Event.Mouse.Where)) then
       MainApp.StatusLine.HandleEvent(Event);
   { the state of the shift keys is that of keyboard and mouse events: the field is not set in the messages (commands, broadcasts) }
   if (Event.What and (evKeyDown or evMouse)) <> 0 then
   begin
     OldShiftState := ShiftState;
-    ShiftState := Byte(Event.ControlKeyState);
-    ShiftState2 := Byte(Event.ControlKeyState shr 8);
+    ShiftState := Byte(Event.KeyDown.ControlKeyState);
+    ShiftState2 := Byte(Event.KeyDown.ControlKeyState shr 8);
   end;
 end;
 
@@ -487,8 +487,8 @@ var
 begin
   FillChar(E, SizeOf(E), 0);
   E.What := What;
-  E.Command := Command;
-  E.InfoPtr := InfoPtr;
+  E.Message.Command := Command;
+  E.Message.InfoPtr := InfoPtr;
   Application.PutEvent(E);
 end;
 
@@ -526,12 +526,12 @@ begin
     end;
   if Wd > 60 then
     Wd := 60;
-  R.Assign(0, 0, Wd + 6, Lines + 4);
+  R := TRect.Create(0, 0, Wd + 6, Lines + 4);
   if Desktop <> nil then
     R.Move((Desktop.Size.X - (R.B.X - R.A.X)) div 2, (Desktop.Size.Y - (R.B.Y - R.A.Y)) div 2);
   W := TWriteWin.Create(R, '', wnNoNumber);
   W.Flags := 0;
-  R.Assign(2, 1, Wd + 4, Lines + 3);
+  R := TRect.Create(2, 1, Wd + 4, Lines + 3);
   T := TStaticText.Create(R, Text);
   W.Insert(T);
   if Desktop <> nil then

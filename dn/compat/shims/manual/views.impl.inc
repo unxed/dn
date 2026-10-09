@@ -76,11 +76,11 @@ begin
     Exit;
   ClearEvent(Event);
   Event.What := What;
-  Event.Command := Command;
-  Event.InfoLong := InfoLng;
+  Event.Message.Command := Command;
+  Event.Message.InfoLong := InfoLng;
   Receiver.HandleEvent(Event);
   if Event.What = evNothing then
-    Result := Event.InfoPtr;
+    Result := Event.Message.InfoPtr;
 end;
 
 var

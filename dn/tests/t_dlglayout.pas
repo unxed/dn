@@ -6,7 +6,7 @@ uses SysUtils, TvGeom, TvViews, TvWindow, TvDialog, TvInput, TvList, DlgLayout;
 
 function MakeR(AX, AY, BX, BY: Integer): TRect;
 begin
-  Result.Assign(AX, AY, BX, BY);
+  Result := TRect.Create(AX, AY, BX, BY);
 end;
 
 var
