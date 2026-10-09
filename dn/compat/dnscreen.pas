@@ -134,7 +134,7 @@ begin
       Row[I] := TScreenCell(Word(CellCopy[Pos + I]));
     if TScreen.ScreenBuffer <> nil then
       Move(Row[0], (TScreen.ScreenBuffer + Y * TScreen.ScreenWidth + X)^, N * SizeOf(TScreenCell));
-    ScreenWrite(X, Y, @Row[0], N);
+    THardwareInfo.ScreenWrite(X, Y, @Row[0], N);
     Inc(Pos, N);
     Dec(Size, N);
   end;
@@ -164,8 +164,8 @@ procedure GetCursorType(var Y1, Y2: Integer; var Visible: Boolean);
 var
   H: Integer;
 begin
-  Visible := CaretSize > 0;
-  H := (CaretSize * FontHeight + 99) div 100;
+  Visible := THardwareInfo.IsCaretVisible;
+  H := (THardwareInfo.GetCaretSize * FontHeight + 99) div 100;
   if H < 1 then
     H := 1;
   Y2 := FontHeight - 1;
@@ -175,16 +175,16 @@ end;
 procedure SetCursorType(Y1, Y2: Integer; Visible: Boolean);
 begin
   if not Visible then
-    SetCaretSize(0)
+    THardwareInfo.SetCaretSize(0)
   else if Y2 >= Y1 then
-    SetCaretSize((Y2 - Y1 + 1) * 100 div FontHeight)
+    THardwareInfo.SetCaretSize((Y2 - Y1 + 1) * 100 div FontHeight)
   else
-    SetCaretSize(TScreen.CursorLines);
+    THardwareInfo.SetCaretSize(TScreen.CursorLines);
 end;
 
 procedure MoveCursorTo(X, Y: Word);
 begin
-  SetCaretPosition(X, Y);
+  THardwareInfo.SetCaretPosition(X, Y);
 end;
 
 procedure GetCursorXY(var X, Y: Word);

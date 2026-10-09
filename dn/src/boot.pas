@@ -68,7 +68,7 @@ uses
    {Cat}
   
   
-  SysUtils, basics, DnPath, strutil, fileutil, envutil, winsess, OSSystem,
+  SysUtils, TvSys, basics, DnPath, strutil, fileutil, envutil, winsess, OSSystem,
   Startup, dlgrecs, Defines, Streams,
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
@@ -340,7 +340,7 @@ procedure UpdateConfig;
 
   {TempDir := SystemData.Temp;}
 
-  MouseReverse := MouseData.Options and omsReverse <> 0;
+  TEventQueue.MouseReverse := MouseData.Options and omsReverse <> 0;
   Security := Startup.FMSetup.Show and fmsShowHidden = 0;
 
   { the files shown depend on the setting "show hidden files": every panel reads its directory again, the passive one too }

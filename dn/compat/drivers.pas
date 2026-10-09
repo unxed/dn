@@ -39,9 +39,7 @@ const
   DoubleCtrlUnlock: Boolean = True;
   ButtonCount: Byte = 0;
   MouseEvents: Boolean = False;
-  MouseReverse: Boolean = False;
   MouseButtons: Byte = 0;
-  DoubleDelay: Word = 8;
   RepeatDelay: Word = 8;
   AutoRepeat: Word = 1;
   UserScreen: Pointer = nil;
@@ -193,17 +191,17 @@ implementation
 
 function GetCursorSize: Word;
 begin
-  Result := CaretSize;
+  Result := THardwareInfo.GetCaretSize;
 end;
 
 procedure ShowCursor;
 begin
-  SetCaretSize(CursorLines);
+  THardwareInfo.SetCaretSize(CursorLines);
 end;
 
 procedure HideCursor;
 begin
-  SetCaretSize(0);
+  THardwareInfo.SetCaretSize(0);
 end;
 
 function SetVideoMode(Cols, Rows: Word): Boolean;
@@ -356,7 +354,7 @@ end;
   before it (the mouse) are dropped. }
 procedure GetKeyEvent(var Event: TEvent);
 begin
-  PollKeyEvent(Event);
+  TEventQueue.GetKeyEvent(Event);
 end;
 
 procedure SetMouseSpeed(XS, YS: Byte);

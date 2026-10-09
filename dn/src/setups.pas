@@ -145,7 +145,7 @@ const
    {`}
 
 implementation
-uses DnPath,
+uses TvSys, DnPath,
   Dos, Tree, Drives, basics, strutil, fileutil, TvGlyphs, Messages, DNHelp,
   linepos, DnIni, iniengine, country, keymap, dirwatch
   , lfn, mainapp, Validate, TvCodePg
@@ -310,7 +310,7 @@ procedure MouseSetup;
     DoneEvents;
     InitEvents;
     end;
-  MouseReverse := MouseData.Options and omsReverse <> 0;
+  TEventQueue.MouseReverse := MouseData.Options and omsReverse <> 0;
   SetMouseSpeed(MouseData.HSense, MouseData.VSense);
   Message(Application, evCommand, cmUpdateConfig, nil);
   end;
