@@ -4,7 +4,7 @@ Ctrl+S, the typed text "Győ" (the key has no CharCode, only the UTF-8 text), En
 The same in the tree of the panel (Alt+F10)."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 def run(out, open_tree):
     d = tempfile.mkdtemp(prefix='dnqs-')
@@ -17,8 +17,8 @@ def run(out, open_tree):
         open(os.path.join(w, 'alpha'), 'w').close()
         open(os.path.join(w, 'zeta'), 'w').close()
         os.environ['DNLNG'] = 'ENGLISH'
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
-        t.pump(1.5, 6)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t.started()
         t.send('\x1b', 0.5)
         t.pump(0.5, 3)
         head0 = '\n'.join(t.text().split('\n')[:3])

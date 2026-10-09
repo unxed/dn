@@ -10,7 +10,7 @@ Exit status 1 when a letter does nothing or DN has a fatal error."""
 import os, shutil, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = open(os.path.join(HERE, 'dn-linux-hotkeys.py'), encoding='utf-8').read().rsplit('\nmain()', 1)[0]
@@ -21,7 +21,8 @@ HOT = ('i', 11)                                             # the color of a hot
 
 
 def snapshot(t):
-    return [[c for c in row] for row in t.screen.cells], (t.screen.x, t.screen.y)
+    """the cells (but the clock of the menu bar) and the cursor"""
+    return t.shape(), (t.screen.x, t.screen.y)
 
 
 def hot_cells(t, base):
@@ -44,8 +45,8 @@ def hot_cells(t, base):
 
 def start(out, lang, path, chain, d):
     d, w = NS['install'](out, d)
-    t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
-    t.pump(1.2, 5)
+    t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
+    t.started()
     t.send('\x1b', 0.4)
     base = [[c for c in row] for row in t.screen.cells]
     for k in (NS['hot_keys'](chain) if chain else NS['arrow_keys'](path)):
@@ -71,6 +72,7 @@ def probe(job):
             for y, x, ch in todo:
                 before = snapshot(t)
                 t.send('\x1b' + ch, 0.5)
+                t.until(lambda: snapshot(t) != before or not t.alive(), 5)     # a loaded machine answers late
                 t.pump(0.3, 1.5)
                 if not t.alive():
                     bad.append((ch, 'DN ended'))
@@ -100,7 +102,7 @@ def probe(job):
 
 def main():
     args = sys.argv[1:]
-    jobs_n = 4
+    jobs_n = 16
     if '-j' in args:
         i = args.index('-j')
         jobs_n = int(args[i + 1])

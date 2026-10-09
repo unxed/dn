@@ -4,7 +4,7 @@
   - a column is switched on, Store saves the setup (the dialog "Save panel settings"), OK; after DN is left and started again the dialog shows the column on."""
 import os, shutil, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -53,8 +53,8 @@ def click(t, pattern):
 
 
 def start(d, w, lang):
-    t = PtyTerm(['./dn'], 80, 25, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 80, 25, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d})
+    t.started()
     t.send('\x1b', 0.5)
     return t
 

@@ -7,7 +7,7 @@
   - DN_LOG_KEYS=full records the characters, DN_LOG=0 writes no log (a crash report is still made)."""
 import os, shutil, signal, sys, tempfile, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 bad = 0
 
@@ -35,8 +35,8 @@ def install(out):
 def start(d, extra=None):
     e = {'DNLNG': 'ENGLISH', 'DN2': '', 'HOME': os.path.join(d, 'home'), 'XDG_CONFIG_HOME': '', 'XDG_STATE_HOME': '', 'XDG_CACHE_HOME': '', 'TERM': 'xterm'}
     e.update(extra or {})
-    t = PtyTerm(['./dn'], 100, 30, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'), env=e)
-    t.pump(1.5, 6)
+    t = DnTerm(['./dn'], 100, 30, cwd=os.path.join(d, 'work'), exe=os.path.join(d, 'dn'), env=e)
+    t.started()
     return t
 
 

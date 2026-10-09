@@ -16,7 +16,7 @@ import tempfile
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pty_screen import PtyTerm
+from dn_wait import DnTerm
 
 KEYS = {
     'ENTER': '\r',
@@ -54,6 +54,12 @@ def copy_dn(out: str, d: str) -> None:
             shutil.copytree(src, os.path.join(d, 'xlt'))
 
 
+def dn_env(d: str) -> dict:
+    """HOME and TEMP of their own: the temporary files of DN have fixed names (TEMP/$DN0$.LST), the cases run side by side"""
+    os.makedirs(os.path.join(d, 'tmp'), exist_ok=True)
+    return {'HOME': d, 'TEMP': os.path.join(d, 'tmp')}
+
+
 def check(cond: bool, msg: str, scr: str = '') -> None:
     if cond:
         print('PASS', msg, flush=True)
@@ -64,7 +70,7 @@ def check(cond: bool, msg: str, scr: str = '') -> None:
         raise SystemExit(1)
 
 
-def quit_dn(t: PtyTerm) -> None:
+def quit_dn(t: DnTerm) -> None:
     t.send(KEYS['ALT-X'], 0.4)
     t.send(KEYS['ENTER'], 0.6)
     try:
@@ -73,8 +79,8 @@ def quit_dn(t: PtyTerm) -> None:
         pass
 
 
-def open_archive(t: PtyTerm, name: str, expect_member: str, title_hint: str) -> str:
-    t.pump(1.5, 6)
+def open_archive(t: DnTerm, name: str, expect_member: str, title_hint: str) -> str:
+    t.started()
     t.send(KEYS['ESC'], 0.3)
     t.send(KEYS['HOME'], 0.15)
     t.send(KEYS['DOWN'], 0.2)
@@ -82,7 +88,12 @@ def open_archive(t: PtyTerm, name: str, expect_member: str, title_hint: str) -> 
     entered = False
     for attempt in range(2):
         if not entered:
-            t.send(KEYS['ENTER'], 2.5)
+            t.send(KEYS['ENTER'], 0.3)
+            t0 = time.time()                    # the unpacker lists the archive: until the panel of the archive is shown
+            while time.time() - t0 < 10.0 and not ((title_hint and title_hint in t.text()) or
+                                                   expect_member.lower() in t.text().lower()):
+                t.pump(0.3, 1)
+            t.pump(0.5, 2)
         t0 = time.time()
         while time.time() - t0 < 4.0:
             t.pump(0.3, 1)
@@ -128,7 +139,7 @@ def enter_archive(
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['ENTER'], 1.0)
@@ -160,7 +171,7 @@ def view_edit_smoke(
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
         os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
@@ -196,11 +207,8 @@ def view_edit_smoke(
         if label == 'F4':
             # F4 in an archive is "Extr" (the key bar says so): DN (the object build too) extracts the member to the directory of the other panel
             # at once, or shows the Extract dialog; either is right, nothing else is checked
-            for _ in range(10):
-                if 'extract' in scr.lower() or os.path.exists(os.path.join(w, expect_member + '.txt')):
-                    break
-                t.pump(0.5, 2)
-                scr = t.text()
+            t.until(lambda: 'extract' in t.text().lower() or os.path.exists(os.path.join(w, expect_member + '.txt')), 20)
+            scr = t.text()
             if 'extract' in scr.lower():
                 print('PASS %s/F4: the Extract dialog is shown' % name, flush=True)
             elif os.path.exists(os.path.join(w, expect_member + '.txt')):
@@ -215,11 +223,8 @@ def view_edit_smoke(
                 '%s/%s: opened content/chrome' % (name, label),
                 scr,
             )
-        for _ in range(12):                          # the extraction by the unpacker takes a moment
-            if 'hello from fixture' in scr.lower() or not t.alive():
-                break
-            t.pump(0.5, 2)
-            scr = t.text()
+        t.until(lambda: 'hello from fixture' in t.text().lower() or not t.alive(), 24)     # the extraction by the unpacker takes a moment
+        scr = t.text()
         if label == 'F4':
             t.send(KEYS['ESC'], 0.6)
             t.send(KEYS['ESC'], 0.4)
@@ -255,7 +260,7 @@ def extract_smoke(
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
@@ -312,7 +317,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         old_path = os.environ['PATH']
         os.environ['PATH'] = bindir + os.pathsep + old_path
         os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         os.environ['PATH'] = old_path
         del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
@@ -323,10 +328,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         t.send(w + '/', 0.6)                    # the destination typed (the first typed text replaces the one that is there)
         dlg2 = t.text()
         t.send('\r', 1.5)
-        for _ in range(8):
-            t.pump(0.5, 2)
-            if os.path.exists(os.path.join(w, 'inside.txt')):
-                break
+        t.until(lambda: os.path.exists(os.path.join(w, 'inside.txt')), 16)
         scr = t.text()
         check(t.alive(), '%s/F5 real: alive' % name, scr)
         got = os.path.join(w, 'inside.txt')
@@ -370,17 +372,14 @@ def delete_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, ti
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
         t.send('\x1b[19~', 1.5)                # F8
         dlg = t.text()
         t.send('\r', 1.5)
-        for _ in range(8):
-            t.pump(0.5, 2)
-            if 'inside.txt' not in members(os.path.join(w, name)):
-                break
+        t.until(lambda: 'inside.txt' not in members(os.path.join(w, name)), 16)
         scr = t.text()
         check(t.alive(), '%s/F8 real: alive' % name, scr)
         if 'inside.txt' in members(os.path.join(w, name)):
@@ -424,7 +423,7 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         old_path = os.environ['PATH']
         os.environ['PATH'] = bindir + os.pathsep + old_path
         os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
-        t = PtyTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         os.environ['PATH'] = old_path
         del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
@@ -436,10 +435,7 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         dlg = t.text()
         t.send('\r', 1.5)                              # the Copy dialog: OK; the dialog Archive files follows
         t.send('\r', 1.5)                              # Archive files: OK
-        for _ in range(8):
-            t.pump(0.5, 2)
-            if 'added.zzz' in members(os.path.join(w, name)):
-                break
+        t.until(lambda: 'added.zzz' in members(os.path.join(w, name)), 16)
         scr = t.text()
         check(t.alive(), '%s/F5 add: alive' % name, scr)
         if 'added.zzz' in members(os.path.join(w, name)):
@@ -456,7 +452,69 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         shutil.rmtree(d, ignore_errors=True)
 
 
+FUNCS = {'enter': enter_archive, 'view': view_edit_smoke, 'f5': extract_smoke, 'f5real': extract_real, 'f8real': delete_real,
+         'f5add': add_real}
+
+
+def jobs(names: list) -> list:
+    """the cases in the order of the report: (title, function, arguments after the fixture directory)"""
+    res = []
+    for name, member, title in (
+        ('simple.zip', 'inside', 'ZIP:'),
+        ('simple.7z', 'inside', '7Z:'),
+        ('simple.tar', 'inside', 'TAR:'),
+        ('simple.tgz', 'inside', 'TGZ:'),
+        ('simple.tar.gz', 'inside', 'TGZ:'),
+        ('simple.tar.bz2', 'inside', 'BZ2:'),
+        ('simple.tar.xz', 'inside', 'XZ:'),
+        ('simple.txz', 'inside', 'XZ:'),
+        ('outer.zip', 'inner', 'ZIP:'),
+    ):
+        if name not in names:
+            res.append(('SKIP %s (not generated)' % name, None, None))
+            continue
+        res.append(('CASE ' + name, 'enter', [name, member, title]))
+    for name, member, title in (
+        ('simple.zip', 'inside', 'ZIP:'),
+        ('simple.tgz', 'inside', 'TGZ:'),
+        ('simple.tar.bz2', 'inside', 'BZ2:'),
+        ('simple.tar.xz', 'inside', 'XZ:'),
+    ):
+        if name not in names:
+            res.append(('SKIP %s F3/F4 (not generated)' % name, None, None))
+            continue
+        res.append(('CASE %s F3' % name, 'view', [name, member, title, KEYS['F3'], 'F3']))
+        res.append(('CASE %s F4' % name, 'view', [name, member, title, KEYS['F4'], 'F4']))
+    for name, member, title in (
+        ('simple.zip', 'inside', 'ZIP:'),
+        ('simple.tgz', 'inside', 'TGZ:'),
+        ('simple.tar.xz', 'inside', 'XZ:'),
+        ('simple.7z', 'inside', '7Z:'),
+        ('simple.tar', 'inside', 'TAR:'),
+        ('simple.tar.bz2', 'inside', 'BZ2:'),
+    ):
+        if name not in names:
+            res.append(('SKIP %s F5 (not generated)' % name, None, None))
+            continue
+        res.append(('CASE %s F5' % name, 'f5', [name, member, title]))
+        res.append(('CASE %s F5 real' % name, 'f5real', [name, member, title]))
+        if name == 'simple.zip':
+            res.append(('CASE %s F8 real' % name, 'f8real', [name, member, title]))
+            res.append(('CASE %s F5 add' % name, 'f5add', [name, member, title]))
+    return res
+
+
+def one(out: str, fix: str, func: str, args: list) -> int:
+    """a single case (a process of its own: run by main side by side with the others); 3 on a soft failure, 1 (check) on a hard one"""
+    FUNCS[func](out, fix, *args)
+    return 3 if SOFT_FAILS else 0
+
+
 def main() -> int:
+    if len(sys.argv) >= 2 and sys.argv[1] == '--one':          # --one OUTDIR FIXDIR JSON: [function, arguments]
+        import json
+        func, args = json.loads(sys.argv[4])
+        return one(sys.argv[2], sys.argv[3], func, args)
     if len(sys.argv) < 2:
         print('usage: dn-linux-archives.py OUTDIR', file=sys.stderr)
         return 2
@@ -471,58 +529,33 @@ def main() -> int:
         if only:
             names = [n for n in names if n in only.split()]
         print('FIXTURES', ' '.join(names), flush=True)
-        cases = [
-            ('simple.zip', 'inside', 'ZIP:'),
-            ('simple.7z', 'inside', '7Z:'),
-            ('simple.tar', 'inside', 'TAR:'),
-            ('simple.tgz', 'inside', 'TGZ:'),
-            ('simple.tar.gz', 'inside', 'TGZ:'),
-            ('simple.tar.bz2', 'inside', 'BZ2:'),
-            ('simple.tar.xz', 'inside', 'XZ:'),
-            ('simple.txz', 'inside', 'XZ:'),
-            ('outer.zip', 'inner', 'ZIP:'),
-        ]
-        for name, member, title in cases:
-            if name not in names:
-                print('SKIP', name, '(not generated)', flush=True)
-                continue
-            print('CASE', name, flush=True)
-            enter_archive(out, fix, name, member, title)
-        for name, member, title in (
-            ('simple.zip', 'inside', 'ZIP:'),
-            ('simple.tgz', 'inside', 'TGZ:'),
-            ('simple.tar.bz2', 'inside', 'BZ2:'),
-            ('simple.tar.xz', 'inside', 'XZ:'),
-        ):
-            if name not in names:
-                print('SKIP', name, 'F3/F4 (not generated)', flush=True)
-                continue
-            print('CASE', name, 'F3', flush=True)
-            view_edit_smoke(out, fix, name, member, title, KEYS['F3'], 'F3')
-            print('CASE', name, 'F4', flush=True)
-            view_edit_smoke(out, fix, name, member, title, KEYS['F4'], 'F4')
-        for name, member, title in (
-            ('simple.zip', 'inside', 'ZIP:'),
-            ('simple.tgz', 'inside', 'TGZ:'),
-            ('simple.tar.xz', 'inside', 'XZ:'),
-            ('simple.7z', 'inside', '7Z:'),
-            ('simple.tar', 'inside', 'TAR:'),
-            ('simple.tar.bz2', 'inside', 'BZ2:'),
-        ):
-            if name not in names:
-                print('SKIP', name, 'F5 (not generated)', flush=True)
-                continue
-            print('CASE', name, 'F5', flush=True)
-            extract_smoke(out, fix, name, member, title)
-            print('CASE', name, 'F5 real', flush=True)
-            extract_real(out, fix, name, member, title)
-            if name == 'simple.zip':
-                print('CASE', name, 'F8 real', flush=True)
-                delete_real(out, fix, name, member, title)
-                print('CASE', name, 'F5 add', flush=True)
-                add_real(out, fix, name, member, title)
-        if SOFT_FAILS:
-            print('F5 real FAILED for:', SOFT_FAILS, flush=True)
+        import json
+        from concurrent.futures import ThreadPoolExecutor
+
+        def run(job):
+            title, func, args = job
+            if func is None:
+                return None
+            return subprocess.run([sys.executable, '-u', os.path.abspath(__file__), '--one', out, fix, json.dumps([func, args])],
+                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        todo = jobs(names)
+        hard = soft = 0
+        with ThreadPoolExecutor(len(todo)) as ex:                 # every case is a start of DN in a directory of its own: all at once
+            for (title, func, args), r in zip(todo, ex.map(run, todo)):
+                print(title, flush=True)
+                if r is None:
+                    continue
+                print(r.stdout, end='', flush=True)
+                if r.returncode == 3:
+                    soft += 1
+                elif r.returncode:
+                    hard += 1
+        if hard:
+            print('FAILED cases: %d' % hard, flush=True)
+            return 1
+        if soft:
+            print('F5 real FAILED for: %d cases (SOFTFAIL above)' % soft, flush=True)
             return 1
         print('ALL OK', flush=True)
         return 0
