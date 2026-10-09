@@ -534,7 +534,7 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
     P: TView;
     Data: record
       List: Pointer {TCollection};
-      Focused: Integer;
+      Focused: Word;
       end;
   begin
   R := TRect.Create(1, 1, 50, 18);

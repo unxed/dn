@@ -75,11 +75,11 @@ type
 
   TListBoxRec = record
     List: TCollection;
-    Focus: Integer
+    Focus: Word
     end;
   TTextListboxRec = record
     List: PTextCollection;
-    Focus: Integer
+    Focus: Word
     end;
 
   
