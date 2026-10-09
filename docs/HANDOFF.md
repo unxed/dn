@@ -6,10 +6,10 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 
 | repo | state |
 |---|---|
-| tv3 | head `0fd692d` (main; dn and bp pin `356feaa`, the same code): the API of magiblot/tvision (classes, names, streams, platform classes; the differences in `docs/API-NAMES.md`); the far2l extensions on both sides; CI job `generated`; the audit is manual (`tools/audit/run.sh`) and prints `AUDIT PASS` |
-| tve | head `95c676c` (main; dn and bp pin `9fb9e31`, the same code), on the new tv3 API; the audit prints `AUDIT PASS` |
-| dn | main pins tv3 `356feaa` and tve `9fb9e31`; builds for Linux, DOS (both builds) and Windows; acceptance: the UTF-8 build against the code-page build (`dn-accept.yml`, `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`); releases by `release.yml`, snapshots by `nightly.yml` (green commits of main only) |
-| bp (was sp) | main pins the same tv3 and tve; fpide on the new API; the links point to `unxed/bp` (the owner renames the repository in its settings) |
+| tv3 | head `9f153cb` (main, pinned by dn and bp): the API of magiblot/tvision (classes, names, streams, platform classes; the differences in `docs/API-NAMES.md`); TNSCollection/TNSSortedCollection as the non-stream bases; a stream error raises EStreamableError; builds without warnings; the far2l extensions on both sides; CI job `generated`; the audit is manual (`tools/audit/run.sh`) and prints `AUDIT PASS` |
+| tve | head `dac0a82` (main, pinned by dn and bp): builds without warnings; persistent blocks end the selection when Shift is released; the audit prints `AUDIT PASS` |
+| dn | builds without warnings for Linux, DOS (both builds) and Windows; the settings of another version or damaged are skipped (heads with a version, guarded loads; `tools/dn-linux-badconfig.py`); acceptance: the UTF-8 build against the code-page build (`dn-accept.yml`, `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`); releases by `release.yml`, snapshots by `nightly.yml` (green commits of main only) |
+| bp (was sp) | main `40260cd`: fpide builds without warnings; the build fetches tv/ and tve/; Alt with a letter of another layout is the shortcut of the Latin key (editor and menus); the links point to `unxed/bp` |
 | tv (old) | history rewritten: main has a README that points to tv3 |
 
 The work branches `claude/nifty-rubin-7v0d9z` of all repositories are merged into main; the owner deletes them (the proxy
