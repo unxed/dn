@@ -82,9 +82,11 @@ type
       {` Depends on the panel type; introduced just in case to
       make future new panel types easier. `}
     
-    constructor Create(ADrive: Byte; AOwner: Pointer);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); virtual;
+    constructor Create(ADrive: Byte; AOwner: Pointer); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure KillUse; virtual;
     procedure lChDir(ADir: String); virtual; {DataCompBoy}
     function GetDir: String; virtual; {DataCompBoy}
@@ -135,6 +137,8 @@ type
     procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
     function GetDriveLetter: Char; virtual;
       {` For choosing a drive letter in the drive line and drive menu `}
+    public
+      constructor Create(AInit: TStreamableInit); overload;
     end;
 
 procedure RereadDirectory(Dir: String);
@@ -236,14 +240,15 @@ constructor TDrive.Create(ADrive: Byte; AOwner: Pointer);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TDrive.Load(S: TStream);
+function TDrive.Read(Ip: ipstream): Pointer;
   begin
+  Result := Self;
   inherited Create;
-  Prev := TDrive(S.Get);
-  S.ReadStrV(CurDir);
-  {S.Read(CurDir[0], 1); S.Read(CurDir[1], Length(CurDir));}
+  Prev := TDrive(Ip.ReadPointer);
+  ReadStrV(Ip, CurDir);
+  {Ip.ReadBytes(CurDir[0], 1); Ip.ReadBytes(CurDir[1], Length(CurDir));}
   
-  S.Read(ColAllowed, SizeOf(ColAllowed));
+  Ip.ReadBytes(ColAllowed, SizeOf(ColAllowed));
   
   DriveType := dtDisk;
   NoMemory := False;
@@ -251,13 +256,27 @@ constructor TDrive.Load(S: TStream);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TDrive.Store(S: TStream);
+procedure TDrive.Write(Os: opstream);
   begin
-  S.Put(Prev);
-  S.WriteStr(@CurDir); {S.Write(CurDir, Length(CurDir)+1);}
+  Os.WritePointer(Prev);
+  Os.WriteString(@CurDir); {Os.WriteBytes(CurDir, Length(CurDir)+1);}
   
-  S.Write(ColAllowed, SizeOf(ColAllowed));
+  Os.WriteBytes(ColAllowed, SizeOf(ColAllowed));
   end;
+
+constructor TDrive.Create(AInit: TStreamableInit);
+begin
+end;
+
+class function TDrive.Build: TStreamable;
+begin
+  Result := TDrive.Create(streamableInit);
+end;
+
+function TDrive.StreamableName: ShortString;
+begin
+  Result := 'Drives.TDrive';
+end;
 {-DataCompBoy-}
 
 destructor TDrive.Destroy;

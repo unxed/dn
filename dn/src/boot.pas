@@ -400,6 +400,7 @@ procedure DoStartup;
   function ReadConfig: LongInt;
     var
       S: TMemoryStream;
+      Ip: ipstream;
       CFGVer: AWord;
       ID: AWord;
       L: AWord;
@@ -678,7 +679,9 @@ procedure DoStartup;
         cfgSavers:
           begin
           I := i32(S.GetPos);
-          SaversData.Selected.List := PTextCollection(S.Get);
+          Ip := ipstream.Create(S);
+          SaversData.Selected.List := PTextCollection(Ip.ReadPointer);
+          Ip.Free;
           if (S.Status <> stOK) or (S.GetPos <> I + L) then
             begin
             S.Reset;

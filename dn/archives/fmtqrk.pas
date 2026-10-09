@@ -57,10 +57,12 @@ type
   TQuArkArchive = class;
   PQuarkArchive = TQuArkArchive;
   TQuArkArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -178,5 +180,16 @@ procedure TQuArkArchive.GetFile;
   FileInfo.PSize := FH1.PackSize;
   ArcFile.Seek(ArcFile.GetPos+FH1.PackSize);
   end { TQuArkArchive.GetFile };
+
+
+class function TQuArkArchive.Build: TStreamable;
+begin
+  Result := TQuArkArchive.Create(streamableInit);
+end;
+
+function TQuArkArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtqrk.TQuArkArchive';
+end;
 
 end.

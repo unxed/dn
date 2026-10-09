@@ -85,11 +85,13 @@ type
   reality the panels have no borders at all.) }
   TSeparator = class(TView)
     OldX, OldW: AInt;
-    constructor Create(const R: TRect; AH: Integer);
+    constructor Create(const R: TRect; AH: Integer); overload;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
   {`}
 
@@ -109,11 +111,11 @@ type
     SinglePanel: Boolean;
       {` Whether the panel was the only one before maximization `}
     isValid: Boolean;
-    constructor Create(const Bounds: TRect; ANumber, ADrive: Integer);
+    constructor Create(const Bounds: TRect; ANumber, ADrive: Integer); overload;
     procedure InitPanel(N: TPanelNum; R: TRect);
     procedure InitInterior;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
     procedure SwitchView(dtType: Byte);
       {`Make the inactive panel of the given type if it currently has
       a different type; and if it is already that type - make the panel
@@ -333,7 +335,7 @@ procedure TDoubleWindow.ChangeBounds(const Bounds: TRect);
     end;
   end { TDoubleWindow.ChangeBounds };
 
-constructor TDoubleWindow.Load(S: TStream);
+function TDoubleWindow.Read(Ip: ipstream): Pointer;
   const
     SaveBlockLen =
       SizeOf(OldBounds) +
@@ -345,29 +347,30 @@ constructor TDoubleWindow.Load(S: TStream);
   var
     N: TPanelNum;
   begin
-  inherited Load(S);
-  S.Read(OldBounds, SaveBlockLen);
-  GetSubViewPtr(S, Separator);
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(OldBounds, SaveBlockLen);
+  Separator := Ip.ReadPointer;
   for N := pLeft to pRight do
     with Panel[N] do
       begin
-      S.Read(PanelType, SizeOf(PanelType)+SizeOf(Drive));
-      GetSubViewPtr(S, FilePanel);
+      Ip.ReadBytes(PanelType, SizeOf(PanelType)+SizeOf(Drive));
+      FilePanel := Ip.ReadPointer;
       if FilePanel = nil then
-        Fail;
+        begin Free; Result := nil; Exit end;
       AnyPanel := FilePanel;
       FilePanel.SelfNum := N;
       end;
   PassivePanel := OtherFilePanel(ActivePanel);
 
   if NonFilePanelType <> 0 then
-    GetSubViewPtr(S, Panel[NonFilePanel].AnyPanel);
+    Panel[NonFilePanel].AnyPanel := Ip.ReadPointer;
 
   {Cat}
   if  (Separator = nil)
     or (Panel[pLeft].AnyPanel = nil) or (Panel[pRight].AnyPanel = nil)
   then
-    Fail;
+    begin Free; Result := nil; Exit end;
   {/Cat}
 
   case NonFilePanelType of
@@ -393,7 +396,7 @@ constructor TDoubleWindow.Load(S: TStream);
   isValid := True;
   end { TDoubleWindow.Load };
 
-procedure TDoubleWindow.Store(S: TStream);
+procedure TDoubleWindow.Write(Os: opstream);
   const
     SaveBlockLen =
       SizeOf(OldBounds) +
@@ -405,17 +408,17 @@ procedure TDoubleWindow.Store(S: TStream);
   var
     N: TPanelNum;
   begin
-  inherited Store(S);
-  S.Write(OldBounds, SaveBlockLen);
-  PutSubViewPtr(S, Separator);
+  inherited Write(Os);
+  Os.WriteBytes(OldBounds, SaveBlockLen);
+  Os.WritePointer(Separator);
   for N := pLeft to pRight do
     with Panel[N] do
       begin
-      S.Write(PanelType, SizeOf(PanelType)+SizeOf(Drive));
-      PutSubViewPtr(S, FilePanel);
+      Os.WriteBytes(PanelType, SizeOf(PanelType)+SizeOf(Drive));
+      Os.WritePointer(FilePanel);
       end;
   if NonFilePanelType <> 0 then
-    PutSubViewPtr(S, Panel[NonFilePanel].AnyPanel);
+    Os.WritePointer(Panel[NonFilePanel].AnyPanel);
   end { TDoubleWindow.Store };
 
 
@@ -1135,17 +1138,28 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
 
 { --------------------------- TSeparator ----------------------------- }
 
-constructor TSeparator.Load(S: TStream);
+function TSeparator.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  S.Read(OldX, 4);
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(OldX, 4);
   end;
 
-procedure TSeparator.Store(S: TStream);
+procedure TSeparator.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(OldX, 4);
+  inherited Write(Os);
+  Os.WriteBytes(OldX, 4);
   end;
+
+class function TSeparator.Build: TStreamable;
+begin
+  Result := TSeparator.Create(streamableInit);
+end;
+
+function TSeparator.StreamableName: ShortString;
+begin
+  Result := 'panelwin.TSeparator';
+end;
 
 constructor TSeparator.Create(const R: TRect; AH: Integer);
   begin

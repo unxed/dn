@@ -59,10 +59,12 @@ type
   TZOOArchive = class;
   PZOOArchive = TZOOArchive;
   TZOOArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -202,5 +204,16 @@ procedure TZOOArchive.GetFile;
     end;
   ArcFile.Seek(P.NextHDR);
   end { TZOOArchive.GetFile };
+
+
+class function TZOOArchive.Build: TStreamable;
+begin
+  Result := TZOOArchive.Create(streamableInit);
+end;
+
+function TZOOArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtzoo.TZOOArchive';
+end;
 
 end.

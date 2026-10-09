@@ -108,6 +108,8 @@ destructor TIdxResource.Destroy;
   end;
 
 function TIdxResource.Get(Key: TDlgIdx): TStreamable;
+  var
+    Ip: ipstream;
 
   procedure Chk;
     begin
@@ -119,7 +121,9 @@ function TIdxResource.Get(Key: TDlgIdx): TStreamable;
   Chk;
   Stream.Seek(Index^[Integer(Key)]);
   Chk;
-  Get := Stream.Get;
+  Ip := ipstream.Create(Stream);
+  Get := TStreamable(Ip.ReadPointer);
+  Ip.Free;
   Chk;
   end;
 
@@ -133,11 +137,15 @@ constructor TIdxMaker.Create(AStream: TStream);
   end;
 
 procedure TIdxMaker.Put(Item: TStreamable; Key: TDlgIdx);
+  var
+    Os: opstream;
   begin
   if Count <= Integer(Key) then
     Count := Integer(Key)+1;
   Index^[Integer(Key)] := i32(TempStream.GetPos);
-  TempStream.Put(Item);
+  Os := opstream.Create(TempStream);
+  Os.WritePointer(Item);
+  Os.Free;
   if TempStream.Status <> stOK then
     begin
     Writeln('Cannot write entry #', Integer(Key));

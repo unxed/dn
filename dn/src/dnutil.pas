@@ -113,8 +113,8 @@ type
     procedure RetrieveDesktop(const FileName: String; LS: TStream;
          LoadColors: Boolean); {DataCompBoy}
     procedure SaveDesktop(const FileName: String); {DataCompBoy}
-    procedure LoadDesktop(var S: TStream);
-    procedure StoreDesktop(var S: TStream);
+    procedure LoadDesktop(Ip: ipstream);
+    procedure StoreDesktop(Os: opstream);
     procedure ChgColors;
     procedure EventError(var Event: TEvent); override;
     procedure HandleCommand(var Event: TEvent);
@@ -229,9 +229,11 @@ type
   TDataSaver = class;
 
   TDataSaver = class(TView)
-    constructor Create;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    constructor Create; overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     destructor Destroy; override;
     end;
 
@@ -288,7 +290,7 @@ uses DnPath, DnActReg,
 
 { Load and Store Palette routines }
 
-procedure LoadIndexes(var S: TStream);
+procedure LoadIndexes(S: TStream);
   var
     ColorSize: Byte;
   begin
@@ -303,7 +305,7 @@ procedure LoadIndexes(var S: TStream);
     end;
   end;
 
-procedure StoreIndexes(var S: TStream);
+procedure StoreIndexes(S: TStream);
   var
     ColorSize: Byte;
   begin
@@ -341,31 +343,32 @@ const
           variables in one operation - in our source they are consecutive,
           but the compiler may think otherwise}
 
-constructor TDataSaver.Load(S: TStream);
+function TDataSaver.Read(Ip: ipstream): Pointer;
   var
     D, L: AWord;
     Q, Q2: LongInt;
   begin
+  Result := Self;
   if DataSaver <> nil then
     DataSaver.Free;
   DataSaver := nil;
-  inherited Load(S);
+  inherited Read(Ip);
   DataSaver := Self;
   repeat
-    S.Read(D, SizeOf(D));
+    Ip.ReadBytes(D, SizeOf(D));
     if D = 0 then
       Break;
-    S.Read(L, SizeOf(L));
+    Ip.ReadBytes(L, SizeOf(L));
     case D of
       dskViewerBounds:
-        S.Read(LastViewerBounds, L);
+        Ip.ReadBytes(LastViewerBounds, L);
       dskViewerFind:
-        S.Read(FViewer.SearchString, L);
+        Ip.ReadBytes(FViewer.SearchString, L);
       dskEditorFind:
-        S.Read(editcore.SearchData, L);
+        Ip.ReadBytes(editcore.SearchData, L);
       dskHideCmdLine:
         begin
-        S.Read(HideCommandLine, L);
+        Ip.ReadBytes(HideCommandLine, L);
         if  (CommandLine <> nil)
              and (CommandLine.GetState(sfVisible) and HideCommandLine)
         then
@@ -374,10 +377,10 @@ constructor TDataSaver.Load(S: TStream);
       dskTempContents2:
         if TempFiles = nil then
           begin
-          TempDirs := TStringCollection(S.Get);
+          TempDirs := TStringCollection(Ip.ReadPointer);
           if TempDirs = nil then
             Continue;
-          S.Read(Q, SizeOf(Q));
+          Ip.ReadBytes(Q, SizeOf(Q));
           if Q >= 0 then
             begin
             TempFiles := TFilesCollection.Create(Q+1, $10);
@@ -385,18 +388,18 @@ constructor TDataSaver.Load(S: TStream);
             TempFiles.Duplicates := False;
             {TempFiles.Owner := Self;}
             for Q2 := 0 to Q do
-              TempFiles.AtInsert(Q2, LoadFileRecOwn(S, TempDirs));
+              TempFiles.AtInsert(Q2, LoadFileRecOwn(Ip, TempDirs));
             end;
           end
         else
-          S.Seek(S.GetPos+L);
+          Ip.RdBuf.Seek(Ip.RdBuf.GetPos+L);
       else {case}
-        S.Seek(S.GetPos+L);
+        Ip.RdBuf.Seek(Ip.RdBuf.GetPos+L);
     end {case};
   until D = 0;
   end { TDataSaver.Load };
 
-procedure TDataSaver.Store(S: TStream);
+procedure TDataSaver.Write(Os: opstream);
 
   var
     D: AWord;
@@ -404,28 +407,28 @@ procedure TDataSaver.Store(S: TStream);
 
   procedure StoreBlock(I: AWord; var B; Sz: AWord);
     begin
-    S.Write(I, SizeOf(I));
-    S.Write(Sz, SizeOf(Sz));
-    S.Write(B, Sz);
+    Os.WriteBytes(I, SizeOf(I));
+    Os.WriteBytes(Sz, SizeOf(Sz));
+    Os.WriteBytes(B, Sz);
     end;
 
   procedure MarkP(Blk: AWord);
     begin
-    S.Write(Blk, SizeOf(Blk));
-    S.Write(Blk, SizeOf(Blk));
-    SPos := i32(S.GetPos);
+    Os.WriteBytes(Blk, SizeOf(Blk));
+    Os.WriteBytes(Blk, SizeOf(Blk));
+    SPos := i32(Os.RdBuf.GetPos);
     end;
 
   procedure UnMark;
     begin
-    i := i32(S.GetPos)-SPos;
-    S.Seek(SPos-SizeOf(AWord));
-    S.Write(i, SizeOf(AWord));
-    S.Seek(S.GetSize);
+    i := i32(Os.RdBuf.GetPos)-SPos;
+    Os.RdBuf.Seek(SPos-SizeOf(AWord));
+    Os.WriteBytes(i, SizeOf(AWord));
+    Os.RdBuf.Seek(Os.RdBuf.GetSize);
     end;
 
   begin { TDataSaver.Store }
-  inherited Store(S);
+  inherited Write(Os);
   HideCommandLine := (CommandLine <> nil)
        and not CommandLine.GetState(sfVisible);
   StoreBlock(dskViewerFind, FViewer.SearchString,
@@ -438,19 +441,29 @@ procedure TDataSaver.Store(S: TStream);
   if  (TempFiles <> nil) and (TempFiles.Count <> 0) then
     begin
     MarkP(dskTempContents2);
-    S.Put(TempDirs);
+    Os.WritePointer(TempDirs);
     if TempDirs <> nil then
       begin
       Q := TempFiles.Count-1;
-      S.Write(Q, SizeOf(Q));
+      Os.WriteBytes(Q, SizeOf(Q));
       for Q2 := 0 to Q do
-        StoreFileRecOwn(S, TempFiles.At(Q2), TempDirs);
+        StoreFileRecOwn(Os, TempFiles.At(Q2), TempDirs);
       UnMark;
       end;
     end;
   D := 0;
-  S.Write(D, SizeOf(D));
+  Os.WriteBytes(D, SizeOf(D));
   end { TDataSaver.Store };
+
+class function TDataSaver.Build: TStreamable;
+begin
+  Result := TDataSaver.Create(streamableInit);
+end;
+
+function TDataSaver.StreamableName: ShortString;
+begin
+  Result := 'DNUtil.TDataSaver';
+end;
 
 destructor TDataSaver.Destroy;
   begin
@@ -789,6 +802,7 @@ procedure WriteConfig;
   
   var
     S: TMemoryStream;
+    Os: opstream;
     I: AWord;
     SPos: LongInt;
     OldCfg: File;
@@ -832,7 +846,9 @@ procedure WriteConfig;
   StoreBlock(cfgNewSaversData, SaversData.Time,
        SizeOf(SaversData)-SizeOf(SaversData.Selected)*2);
   MarkP(cfgSavers);
-  S.Put(SaversData.Selected.List);
+  Os := opstream.Create(S);
+  Os.WritePointer(SaversData.Selected.List);
+  Os.Free;
   UnMark;
   
   StoreBlock(cfgSystemColors, SystemColors, SizeOf(SystemColors));
@@ -893,7 +909,7 @@ procedure WriteConfig;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TDNApplication.LoadDesktop(var S: TStream);
+procedure TDNApplication.LoadDesktop(Ip: ipstream);
   var
     P: TView;
     PP: TView;
@@ -904,10 +920,10 @@ procedure TDNApplication.LoadDesktop(var S: TStream);
     begin
     MainApp.Desktop.Clear;
     repeat
-      P := TView(S.Get);
+      P := TView(Ip.ReadPointer);
 
       {Cat}
-      if S.Status <> stOK then
+      if Ip.RdBuf.Status <> stOK then
         begin
         ErrMsg(erCantReadDesktop);
         Break;
@@ -931,7 +947,7 @@ procedure TDNApplication.LoadDesktop(var S: TStream);
         if SaveState and sfVisible <> 0 then
           P.Show;
         end;
-    until { P = nil;}S.GetPos = S.GetSize;
+    until { P = nil;}Ip.RdBuf.GetPos = Ip.RdBuf.GetSize;
     {AK155: P = nil happens e.g. when a remembered view cannot be opened;
       that is no reason to lose all other settings }
     end;
@@ -941,7 +957,7 @@ procedure TDNApplication.LoadDesktop(var S: TStream);
   end { TDNApplication.LoadDesktop };
 {-DataCompBoy-}
 
-procedure TDNApplication.StoreDesktop(var S: TStream);
+procedure TDNApplication.StoreDesktop(Os: opstream);
   var
     Pal: PString;
 
@@ -958,7 +974,7 @@ procedure TDNApplication.StoreDesktop(var S: TStream);
       and (P.ClassType <> TWriteWin)
       and (P.ClassType <> THelpWindow)
     then
-      S.Put(P);
+      Os.WritePointer(P);
     end;
 
   begin
@@ -966,12 +982,12 @@ procedure TDNApplication.StoreDesktop(var S: TStream);
     DataSaver := TDataSaver.Create;
   if DataSaver <> nil then
     begin
-    S.Put(DataSaver);
+    Os.WritePointer(DataSaver);
     DataSaver.Free;
     DataSaver := nil;
     end;
   MainApp.Desktop.ForEach(WriteView);
-  S.Put(nil);
+  Os.WritePointer(nil);
   end { TDNApplication.StoreDesktop };
 
 function CacheLngId: String;
@@ -1067,6 +1083,7 @@ viewing a file from an archive
 procedure TDNApplication.RetrieveDesktop(const FileName: String; LS: TStream; LoadColors: Boolean);
   var
     S: TStream;
+    Ip: ipstream;
     Sign: String[MaxSignLen];
     B, BB: Boolean;
     SM: Word;
@@ -1095,6 +1112,7 @@ procedure TDNApplication.RetrieveDesktop(const FileName: String; LS: TStream; Lo
     S := TBufStream.Create(FileName, stOpenRead, 4096)
   else
     S := LS;
+  Ip := ipstream.Create(S);
   if not MainApp.Desktop.Valid(cmClose) then
     Exit;
 if (S.Status <> stOK) or (S.GetSize < SizeOf(DskSign))
@@ -1103,23 +1121,23 @@ Err:
     ErrMsg(erCantReadDesktop)
   else
     begin
-    S.Read(Sign[1], DskSign.SignLen);
+    Ip.ReadBytes(Sign[1], DskSign.SignLen);
     Sign[0] := Char(DskSign.SignLen);
     if Sign <> DskSign.Sign then
       goto Err;
-    PS := PString(PAnsiString(S.ReadStr));
+    PS := PString(PAnsiString(Ip.ReadString));
     if PS <> nil then
       lChDir(PS^);
     if PS <> nil then begin FreeMem(PS, Length(PS^)+1); PS := nil; end;
 
-    PJ := PString(PAnsiString(S.ReadStr));
+    PJ := PString(PAnsiString(Ip.ReadString));
     if  (PJ <> nil) and (PJ^ <> '') then
       ProcessTempFile(PJ^);
     if PJ <> nil then begin FreeMem(PJ, Length(PJ^)+1); PJ := nil; end;
 
 //JO: 31-05-2006 - procedure to move files from the temporary
 //                 subdirectory after running the archiver
-    PJ := PString(PAnsiString(S.ReadStr));
+    PJ := PString(PAnsiString(Ip.ReadString));
     if  (PJ <> nil) and (PJ^ <> '') and (Pos('|', PJ^) > 0)  then
       begin
       ForceMod := False;
@@ -1168,7 +1186,7 @@ Err:
     if PJ <> nil then begin FreeMem(PJ, Length(PJ^)+1); PJ := nil; end;
 
 //JO: 8-06-2006 - restore the start directory
-    PJ := PString(PAnsiString(S.ReadStr));
+    PJ := PString(PAnsiString(Ip.ReadString));
     if  (PJ <> nil) and (PJ^ <> '') then
       begin
       StartDir := PJ^;
@@ -1176,10 +1194,10 @@ Err:
       end;
     if PJ <> nil then begin FreeMem(PJ, Length(PJ^)+1); PJ := nil; end;
 
-    S.Read(SM, SizeOf(SM));
-    S.Read(OldAppSize, SizeOf(Size));
-    S.Read(OldDskSize, SizeOf(Size));
-    LoadIndexes(S);
+    Ip.ReadBytes(SM, SizeOf(SM));
+    Ip.ReadBytes(OldAppSize, SizeOf(Size));
+    Ip.ReadBytes(OldDskSize, SizeOf(Size));
+    LoadIndexes(Ip.RdBuf);
     SaveBounds := GetExtent;
     MainApp.Desktop.Clear;
     BB := not ((OldDskSize = MainApp.Desktop.Size));
@@ -1192,29 +1210,29 @@ Err:
       MainApp.Desktop.ChangeBounds(R);
       end;
     {LoadDesktop(S);} {Cat: moved to the very end}
-    S.Read(TempBounds, SizeOf(TempBounds));
-    {S.Read(ArcBounds, SizeOf(TempBounds));}
-    S.Read(TrashCan.ImVisible, 1); 
-    KeyMacroses := TCollection(S.Get);
-    S.Read(R, SizeOf(R));
+    Ip.ReadBytes(TempBounds, SizeOf(TempBounds));
+    {Ip.ReadBytes(ArcBounds, SizeOf(TempBounds));}
+    Ip.ReadBytes(TrashCan.ImVisible, 1); 
+    KeyMacroses := TCollection(Ip.ReadPointer);
+    Ip.ReadBytes(R, SizeOf(R));
     if not ShowSeconds then
       if R.A.X > (ScreenWidth shr 1) then
         Inc(R.A.X, 3)
       else
         Dec(R.B.X, 3);
     Clock.Locate(R);
-    {S.Read(ArcFlags, 4);}
+    {Ip.ReadBytes(ArcFlags, 4);}
     
     if TrashCan.ImVisible then
       begin
       TrashCan.Show;
-      S.Read(R, SizeOf(R));
+      Ip.ReadBytes(R, SizeOf(R));
       TrashCan.Locate(R)
       end;
     
     if PreserveMenuPositions then
-      LoadMenuDefaults(MainApp.MenuBar.Menu, S);
-    LoadDesktop(S);
+      LoadMenuDefaults(MainApp.MenuBar.Menu, Ip);
+    LoadDesktop(Ip);
     // JO: the block below must _definitely_ be _after_ LoadDesktop,
     //     otherwise panel sizes will not adjust to the video mode
     if BB then
@@ -1238,6 +1256,7 @@ Err:
       R := TRect.Create(Size.X-7, 0, Size.X, 1);
     Clock.Locate(R);
     end;
+  Ip.Free;
   S.Free;
   ActivateView(MainApp.Desktop.Current);
   GlobalMessage(evCommand, cmRereadForced, nil);
@@ -1248,6 +1267,7 @@ Err:
 procedure TDNApplication.SaveDesktop(const FileName: String);
   var
     S: TStream;
+    Os: opstream;
     F: lFile;
     B: Boolean;
     PP: Pointer;
@@ -1256,56 +1276,59 @@ procedure TDNApplication.SaveDesktop(const FileName: String);
   begin { TDNApplication.SaveDesktop }
   ClrIO;
   S := TBufStream.Create(FileName, stCreate, 2048);
+  Os := opstream.Create(S);
   if (S.Status = stOK) then
     begin
-    S.Write(DskSign.Sign[1], DskSign.SignLen);
-    S.WriteStr(@DirToChange);
+    Os.WriteBytes(DskSign.Sign[1], DskSign.SignLen);
+    Os.WriteString(@DirToChange);
    
-    S.WriteStr(@TempFile);
-    S.WriteStr(@DirToMoveContent); //destination directory when extracting
+    Os.WriteString(@TempFile);
+    Os.WriteString(@DirToMoveContent); //destination directory when extracting
                                     //via a temporary subdirectory
     if StartDir[1] = '<' then
       begin
       System.Delete(StartDir, 1, 1);
-      S.WriteStr(@StartDir); //directory from which DN/2 was started
+      Os.WriteString(@StartDir); //directory from which DN/2 was started
       end
     else
-      S.WriteStr(@NullStr);
+      Os.WriteString(@NullStr);
    
-    S.Write(ScreenMode, SizeOf(Word));
-    S.Write(Size, SizeOf(Size));
-    S.Write(MainApp.Desktop.Size, SizeOf(Size));
-    StoreIndexes(S);
+    Os.WriteBytes(ScreenMode, SizeOf(Word));
+    Os.WriteBytes(Size, SizeOf(Size));
+    Os.WriteBytes(MainApp.Desktop.Size, SizeOf(Size));
+    StoreIndexes(Os.RdBuf);
     {StoreDesktop(S);} {Cat: moved to the very end}
-    S.Write(TempBounds, SizeOf(TempBounds));
-    S.Write(TrashCan.ImVisible, 1); 
-    S.Put(KeyMacroses);
+    Os.WriteBytes(TempBounds, SizeOf(TempBounds));
+    Os.WriteBytes(TrashCan.ImVisible, 1); 
+    Os.WritePointer(KeyMacroses);
     R := Clock.GetBounds;
     if R.A.X > (ScreenWidth shr 1) then
       R.A.X := R.B.X-10
     else
       R.B.X := R.A.X+10;
-    S.Write(R, SizeOf(R));
+    Os.WriteBytes(R, SizeOf(R));
     
     R := TrashCan.GetBounds;
     if TrashCan.ImVisible then
-      S.Write(R, SizeOf(R));
+      Os.WriteBytes(R, SizeOf(R));
     
     if PreserveMenuPositions then
-      StoreMenuDefaults(MainApp.MenuBar.Menu, S);
-    StoreDesktop(S);
+      StoreMenuDefaults(MainApp.MenuBar.Menu, Os);
+    StoreDesktop(Os);
     if S.Status <> stOK then
       begin
       PP := @FileName;
       Msg(erCantCreateFile, @PP, mfOKButton+mfError);
       //    MessageBox('S.Status    = '+ItoS(S.Status)+#13+
       //               'S.ErrorInfo = '+ItoS(S.ErrorInfo), nil, mfOkButton);
+      Os.Free;
       S.Free;
       lAssignFile(F, FileName);
       lEraseFile(F);
       Exit;
       end;
     end;
+  Os.Free;
   S.Free;
   end { TDNApplication.SaveDesktop };
 {-DataCompBoy-}

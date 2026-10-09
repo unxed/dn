@@ -57,10 +57,12 @@ type
   TLIMArchive = class;
   PLIMArchive = TLIMArchive;
   TLIMArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -212,5 +214,16 @@ procedure TLIMArchive.GetFile;
     goto 1;
   ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { TLIMArchive.GetFile };
+
+
+class function TLIMArchive.Build: TStreamable;
+begin
+  Result := TLIMArchive.Create(streamableInit);
+end;
+
+function TLIMArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtlim.TLIMArchive';
+end;
 
 end.

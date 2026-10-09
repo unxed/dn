@@ -124,10 +124,12 @@ type
     SavedMark: TRect;
     SavedMarks: TPosArray;
     MenuItemStr: array[Boolean] of PString;
-    constructor Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TScrollBar; var FileName: String);
-    constructor Load(S: TStream);
+    constructor Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TScrollBar; var FileName: String); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     destructor Destroy; override;
-    procedure Store(S: TStream); override;
+    procedure Write(Os: opstream); override;
     procedure Awaken; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
@@ -413,12 +415,13 @@ constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TS
   ApplyOptions;
   end;
 
-constructor TFileEditor.Load(S: TStream);
+function TFileEditor.Read(Ip: ipstream): Pointer;
   begin
-  inherited LoadWith(S, TTveDoc.Create, True);
+  Result := Self;
+  inherited Read(Ip);
   HelpCtx := hcEditor;
   isValid := True;
-  MILoad(Self, S);
+  MILoad(Self, Ip);
   ApplyOptions;
   end;
 
@@ -449,11 +452,21 @@ destructor TFileEditor.Destroy;
   inherited Destroy;
   end;
 
-procedure TFileEditor.Store(S: TStream);
+procedure TFileEditor.Write(Os: opstream);
   begin
-  inherited Store(S);
-  MIStore(Self, S);
+  inherited Write(Os);
+  MIStore(Self, Os);
   end;
+
+class function TFileEditor.Build: TStreamable;
+begin
+  Result := TFileEditor.Create(streamableInit, TTveDoc.Create, True);
+end;
+
+function TFileEditor.StreamableName: ShortString;
+begin
+  Result := 'editcore.TFileEditor';
+end;
 
 procedure TFileEditor.Awaken;
   begin
@@ -1661,14 +1674,14 @@ procedure TFileEditor.PrintText(Block: Boolean);
       M := M+T[I]
     else
       begin
-      Write(F, DocToUi(M));
+      System.Write(F, DocToUi(M));
       M := T[I];
       end;
     Inc(I);
     end;
-  Write(F, DocToUi(M));
+  System.Write(F, DocToUi(M));
   if not Block then
-    Write(F, #12);
+    System.Write(F, #12);
   Close(F);
   Message(Application, evCommand, cmFilePrint, @FName);
   end;

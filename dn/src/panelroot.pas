@@ -104,9 +104,9 @@ type
       {` Coordinates for D&D `}
     _Tmr1: TEventTimer;
     constructor Create(const Bounds: TRect; ADrive: Integer;
-         AScrBar: PMyScrollBar);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+         AScrBar: PMyScrollBar); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
     destructor Destroy; override;
     procedure Awaken; override;
     procedure CommandHandle(var Event: TEvent);
@@ -286,29 +286,30 @@ constructor TFilePanelRoot.Create(const Bounds: TRect; ADrive: Integer; AScrBar:
   DecDrawDisabled;
   end { TFilePanelRoot.Init };
 
-constructor TFilePanelRoot.Load(S: TStream);
+function TFilePanelRoot.Read(Ip: ipstream): Pointer;
   var
     I: LongInt;
     dumm: array[1..20] of Byte;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   NewTimer(_Tmr1, 0);
   ChangeLocked := False;
-  GetPeerViewPtr(S, ScrollBar);
-  GetPeerViewPtr(S, DirView);
-  GetPeerViewPtr(S, InfoView);
-  GetPeerViewPtr(S, DriveLine);
-  GetPeerViewPtr(S, SortView);
-  Drive := TDrive(S.Get);
+  ScrollBar := Ip.ReadPointer;
+  DirView := Ip.ReadPointer;
+  InfoView := Ip.ReadPointer;
+  DriveLine := Ip.ReadPointer;
+  SortView := Ip.ReadPointer;
+  Drive := TDrive(Ip.ReadPointer);
   if Drive = nil then
     Drive := TDrive.Create(0, Self)
   else
     Drive.Panel := Self;
   SetupPanelFromDrive;
-  S.Read(PresetNum, SizeOf(PresetNum));
-  S.Read(PanelSetupSet, SizeOf(PanelSetupSet));
-  S.Read(PrevPresetNum, SizeOf(PrevPresetNum));
-  S.Read(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
+  Ip.ReadBytes(PresetNum, SizeOf(PresetNum));
+  Ip.ReadBytes(PanelSetupSet, SizeOf(PanelSetupSet));
+  Ip.ReadBytes(PrevPresetNum, SizeOf(PrevPresetNum));
+  Ip.ReadBytes(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
 
  
     Drive.RereadDirectory('');
@@ -317,10 +318,10 @@ constructor TFilePanelRoot.Load(S: TStream);
     Drive.SizeX := Size.X;
     DirectoryName := Drive.GetDir;
     end;
-  S.Read(Delta, 2);
+  Ip.ReadBytes(Delta, 2);
   OldDelta := -1;
   PosChanged := False;
-  S.Read(ForceReading, 1);
+  Ip.ReadBytes(ForceReading, 1);
 //JO: 11-05-2006 - the lines commented out below were still in the RIT Labs
 //    version; What they are for is not entirely clear, but their presence
 //    causes this long-standing glitch: when loading a find panel or branch
@@ -329,7 +330,7 @@ constructor TFilePanelRoot.Load(S: TStream);
 //    extra slowdowns are noticeable at first glance, and given that
 //    in the Init constructor Files is not initialized, it can also
 //    be left uninitialized in Load
-{ Files := PFilesCollection(S.Get);
+{ Files := PFilesCollection(Ip.ReadPointer);
   if Files <> nil then
     for I := 0 to Files^.Count-1 do
       PFileRec(Files^.At(I))^.Owner := @Drive^.CurDir;} {DataCompBoy}
@@ -360,28 +361,28 @@ procedure TFilePanelRoot.Awaken;
 *)
   end;
 
-procedure TFilePanelRoot.Store(S: TStream);
+procedure TFilePanelRoot.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, ScrollBar);
-  PutPeerViewPtr(S, DirView);
-  PutPeerViewPtr(S, InfoView);
-  PutPeerViewPtr(S, DriveLine);
-  PutPeerViewPtr(S, SortView);
+  inherited Write(Os);
+  Os.WritePointer(ScrollBar);
+  Os.WritePointer(DirView);
+  Os.WritePointer(InfoView);
+  Os.WritePointer(DriveLine);
+  Os.WritePointer(SortView);
   if  (ActivePanel <> Self) or (Drive.DriveType <> dtDisk)
     or (StartupData.Unload and osuPreserveDir <> 0)
   then
-    S.Put(Drive)
+    Os.WritePointer(Drive)
   else
-    S.Put(nil);
-  S.Write(PresetNum, SizeOf(PresetNum));
-  S.Write(PanelSetupSet, SizeOf(PanelSetupSet));
-  S.Write(PrevPresetNum, SizeOf(PrevPresetNum));
-  S.Write(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
-  S.Write(Delta, 2);
-  S.Write(ForceReading, 1);
+    Os.WritePointer(nil);
+  Os.WriteBytes(PresetNum, SizeOf(PresetNum));
+  Os.WriteBytes(PanelSetupSet, SizeOf(PanelSetupSet));
+  Os.WriteBytes(PrevPresetNum, SizeOf(PrevPresetNum));
+  Os.WriteBytes(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
+  Os.WriteBytes(Delta, 2);
+  Os.WriteBytes(ForceReading, 1);
  {PFilesCollection(Files).Selected := ScrollBar^.Value;
-  S.Put(Files);} //JO: 11-05-2006 - see the comment to TFilePanelRoot.Load;
+  Os.WritePointer(Files);} //JO: 11-05-2006 - see the comment to TFilePanelRoot.Load;
   end { TFilePanelRoot.Store };
 
 function TFilePanelRoot.Valid(Command: Word): Boolean;

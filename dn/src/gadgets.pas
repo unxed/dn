@@ -63,25 +63,30 @@ type
 
   TTrashCan = class(TView)
     ImVisible: Boolean;
-    constructor Create(const R: TRect);
+    constructor Create(const R: TRect); overload;
     function GetPalette: TPalette; override;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure SetState(AState: Word; Enable: Boolean); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
   
 
   TKeyMacros = class;
-  TKeyMacros = class
+  TKeyMacros = class(TStreamable)
     Keys: PWordArray;
     Count: AInt;
     Limit: AInt;
-    constructor Create;
-    constructor Load(S: TStream);
+    constructor Create; overload;
+    constructor Create(AInit: TStreamableInit); overload;
+    function Read(Ip: ipstream): Pointer; override;
     destructor Destroy; override;
     procedure Play;
     procedure PutKey(KeyCode: LongInt);
-    procedure Store(S: TStream);
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -129,21 +134,35 @@ destructor TKeyMacros.Destroy;
   inherited Destroy;
   end;
 
-constructor TKeyMacros.Load(S: TStream);
+function TKeyMacros.Read(Ip: ipstream): Pointer;
   begin
-  inherited Create;
-  S.Read(Limit, SizeOf(Limit)*2);
+  Result := Self;
+  Ip.ReadBytes(Limit, SizeOf(Limit)*2);
   Keys := GetMem(SizeOf(Word)*Limit);
   if Keys = nil then
-    Fail;
-  S.Read(Keys^, SizeOf(Word)*Count);
+    begin Free; Result := nil; Exit end;
+  Ip.ReadBytes(Keys^, SizeOf(Word)*Count);
   end;
 
-procedure TKeyMacros.Store(S: TStream);
+procedure TKeyMacros.Write(Os: opstream);
   begin
-  S.Write(Limit, SizeOf(Limit)*2);
-  S.Write(Keys^, SizeOf(Word)*Count);
+  Os.WriteBytes(Limit, SizeOf(Limit)*2);
+  Os.WriteBytes(Keys^, SizeOf(Word)*Count);
   end;
+
+constructor TKeyMacros.Create(AInit: TStreamableInit);
+begin
+end;
+
+class function TKeyMacros.Build: TStreamable;
+begin
+  Result := TKeyMacros.Create(streamableInit);
+end;
+
+function TKeyMacros.StreamableName: ShortString;
+begin
+  Result := 'gadgets.TKeyMacros';
+end;
 
 procedure TKeyMacros.PutKey(KeyCode: LongInt);
   var
@@ -415,5 +434,16 @@ procedure PrintFiles(Files: TCollection; Own: TView);
   end { PrintFiles };
 
 {-DataCompBoy-}
+
+
+class function TTrashCan.Build: TStreamable;
+begin
+  Result := TTrashCan.Create(streamableInit);
+end;
+
+function TTrashCan.StreamableName: ShortString;
+begin
+  Result := 'gadgets.TTrashCan';
+end;
 
 end.

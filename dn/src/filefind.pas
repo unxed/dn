@@ -148,8 +148,10 @@ type
     ListFile: PString;
     UpFile: PFileRec; {DataCompBoy}
     AMask, AWhat: PString;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure NewUpFile;
     constructor Create(const AName: String; ADirs: TCollection;
          AFiles: TFilesCollection); overload;
@@ -192,8 +194,10 @@ type
   TTempDrive = class(TFindDrive)
     {Cat: this type is exposed via the plugin model; change with extreme care!}
     constructor Create; overload;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure CopyFilesInto(AFiles: TCollection; Own: TView;
          MoveMode: Boolean); override;
     function GetRealName: String; override;
@@ -1327,24 +1331,25 @@ procedure TFindDrive.NewUpFile;
        Directory, nil); {DataCompBoy}
   end;
 
-constructor TFindDrive.Load(S: TStream);
+function TFindDrive.Read(Ip: ipstream): Pointer;
   var
     I: LongInt;
     Q, Q2: LongInt;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   isDisposable := True;
-  S.Read(DriveType, SizeOf(DriveType));
-  AMask := S.ReadStr;
-  AWhat := S.ReadStr;
-  Dirs := TSortedCollection(S.Get);
-  S.Read(I, SizeOf(I));
+  Ip.ReadBytes(DriveType, SizeOf(DriveType));
+  AMask := Ip.ReadString;
+  AWhat := Ip.ReadString;
+  Dirs := TSortedCollection(Ip.ReadPointer);
+  Ip.ReadBytes(I, SizeOf(I));
   if I < 0 then
     I := 0;
   if Dirs = nil then
-    Fail;
+    begin Free; Result := nil; Exit end;
 
-  S.Read(Q, SizeOf(Q));
+  Ip.ReadBytes(Q, SizeOf(Q));
   if Q >= 0 then
     begin
     Files := TFilesCollection.Create(Q+1, $10);
@@ -1353,39 +1358,49 @@ constructor TFindDrive.Load(S: TStream);
     Files.Panel := Self.Panel;
     for Q2 := 0 to Q do
       begin
-      Files.AtInsert(Q2, LoadFileRecOwn(S, Dirs));
+      Files.AtInsert(Q2, LoadFileRecOwn(Ip, Dirs));
       {     if PFileRec(Files.At(Q2))^.Owner = nil then
         PFileRec(Files.At(Q2))^.Owner := NewStr('---:---'); }
       end;
     end;
 
-  ListFile := S.ReadStr;
+  ListFile := Ip.ReadString;
   NewUpFile;
   UpFile^.Owner := Dirs.At(I);
   end { TFindDrive.Load };
 
-procedure TFindDrive.Store(S: TStream);
+procedure TFindDrive.Write(Os: opstream);
   var
     I: LongInt;
     Q: LongInt;
   begin
-  inherited Store(S);
-  S.Write(DriveType, SizeOf(DriveType));
-  S.WriteStr(AMask);
-  S.WriteStr(AWhat);
-  S.Put(Dirs);
+  inherited Write(Os);
+  Os.WriteBytes(DriveType, SizeOf(DriveType));
+  Os.WriteString(AMask);
+  Os.WriteString(AWhat);
+  Os.WritePointer(Dirs);
   I := Dirs.IndexOf(UpFile^.Owner);
-  S.Write(I, SizeOf(I));
+  Os.WriteBytes(I, SizeOf(I));
   if Files = nil then
     Q := -1 {John_SW  22-03-2003}
   else
     Q := Files.Count-1;
-  S.Write(Q, SizeOf(Q));
+  Os.WriteBytes(Q, SizeOf(Q));
 
   for I := 0 to Q do
-    StoreFileRecOwn(S, Files.At(I), Dirs);
-  S.WriteStr(ListFile);
+    StoreFileRecOwn(Os, Files.At(I), Dirs);
+  Os.WriteString(ListFile);
   end;
+
+class function TFindDrive.Build: TStreamable;
+begin
+  Result := TFindDrive.Create(streamableInit);
+end;
+
+function TFindDrive.StreamableName: ShortString;
+begin
+  Result := 'FileFind.TFindDrive';
+end;
 
 destructor TFindDrive.Destroy;
   begin
@@ -2036,22 +2051,23 @@ constructor TTempDrive.Create;
   UpFile^.Owner := S; {DataCompBoy}
   end { TTempDrive.Init };
 
-constructor TTempDrive.Load(S: TStream);
+function TTempDrive.Read(Ip: ipstream): Pointer;
   { var Q, Q2: LongInt;}
   begin
+  Result := Self;
   (*
-  inherited Load(S);
-  S.Read(DriveType,SizeOf(DriveType));
-  Dirs := TSortedCollection(S.Get);
+  inherited Read(Ip);
+  Ip.ReadBytes(DriveType,SizeOf(DriveType));
+  Dirs := TSortedCollection(Ip.ReadPointer);
   if Dirs = nil then Dirs := TStringCollection.Create(10, 10, False);
 
-  S.Read(Q, SizeOf(Q));
+  Ip.ReadBytes(Q, SizeOf(Q));
   if Q >= 0 then begin
    Files := PFilesCollection.Create($10, $10);
    Files.SortMode := psmLongName;
    Files.Duplicates := False;
 {  Files.Owner := Self;}
-   for Q2:=0 to Q do Files.AtInsert(Q2, LoadFileRecOwn(S, Dirs));
+   for Q2:=0 to Q do Files.AtInsert(Q2, LoadFileRecOwn(Ip, Dirs));
   end else begin
    NewTemp;
    Files := TempFiles;
@@ -2060,10 +2076,10 @@ constructor TTempDrive.Load(S: TStream);
   TempFiles := Files;
   TempDirs  := Dirs;
   NewUpFile;
-  UpFile^.Owner := S.ReadStr;
+  UpFile^.Owner := Ip.ReadString;
   UpFile^.OwnerDisposible:=true; *)
 
-  inherited Load(S);
+  inherited Read(Ip);
   if TempDirs = nil then
     TempDirs := TStringCollection.Create(10, 10, False);
   if TempFiles = nil then
@@ -2075,24 +2091,34 @@ constructor TTempDrive.Load(S: TStream);
   DriveType := dtTemp;
   ListFile := nil;
   NewUpFile;
-  UpFile^.Owner := S.ReadStr;
+  UpFile^.Owner := Ip.ReadString;
   end { TTempDrive.Load };
 
-procedure TTempDrive.Store(S: TStream);
+procedure TTempDrive.Write(Os: opstream);
   var
     I: LongInt;
     Q: LongInt;
   begin
-  inherited Store(S);
-  { S.Write(DriveType,SizeOf(DriveType));
-  S.Put(Dirs);
+  inherited Write(Os);
+  { Os.WriteBytes(DriveType,SizeOf(DriveType));
+  Os.WritePointer(Dirs);
 
   if Files=nil then Q:=-1
                else Q:=Files.Count - 1;
-  S.Write(Q, SizeOf(Q));
-  for I := 0 to Q do StoreFileRecOwn(S, Files.At(I), Dirs);}
-  S.WriteStr(UpFile^.Owner)
+  Os.WriteBytes(Q, SizeOf(Q));
+  for I := 0 to Q do StoreFileRecOwn(Os, Files.At(I), Dirs);}
+  Os.WriteString(UpFile^.Owner)
   end;
+
+class function TTempDrive.Build: TStreamable;
+begin
+  Result := TTempDrive.Create(streamableInit);
+end;
+
+function TTempDrive.StreamableName: ShortString;
+begin
+  Result := 'FileFind.TTempDrive';
+end;
 
 procedure TTempDrive.CopyFilesInto(AFiles: TCollection; Own: TView; MoveMode: Boolean);
   begin

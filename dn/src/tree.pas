@@ -59,27 +59,33 @@ type
   TTreeWindow = class;
 
   TTreeWindow = class(TWindow)
-    constructor Create(const Bounds: TRect);
+    constructor Create(const Bounds: TRect); overload;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
 
   TTreeReader = class;
 
   TTreeReader = class(TView)
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TTreeDialog = class;
   TTreeDialog = class(TDialog)
     Tree: TView;
     isValid: Boolean;
-    constructor Create(R: TRect; const ATitle: String; ADrive: Byte);
+    constructor Create(R: TRect; const ATitle: String; ADrive: Byte); overload;
     {procedure HandleEvent(var Event: TEvent); override;}
     function GetPalette: TPalette; override;
     function Valid(Command: Word): Boolean; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   PDirRec = ^TDirRec;
@@ -111,9 +117,11 @@ type
     LocateEnabled, MouseTracking, WasChanged: Boolean;
     InfoView: TView;
     constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
-        ScrBar: TScrollBar);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+        ScrBar: TScrollBar); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function Valid(Command: Word): Boolean; override;
     function Expanded(P: PDirRec; i: Integer): Boolean;
     procedure SetState(AState: Word; Enable: Boolean); override;
@@ -137,6 +145,8 @@ type
 
   TTreePanel = class(TTreeView)
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TTreeInfoView = class;
@@ -145,12 +155,14 @@ type
     Tree: TTreeView;
     Down: String;
     Loaded: Boolean;
-    constructor Create(R: TRect; ATree: TTreeView);
+    constructor Create(R: TRect; ATree: TTreeView); overload;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure MakeDown;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function GetPalette: TPalette; override;
     destructor Destroy; override;
     end;
@@ -166,10 +178,12 @@ type
   THTreeView = class(TTreePanel)
     Info: TView;
     constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
-        ScrBar: TScrollBar);
+        ScrBar: TScrollBar); overload;
     procedure ChangeBounds(const Bounds: TRect); override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function GetPalette: TPalette; override;
     procedure SetState(AState: Word; Enable: Boolean); override;
     destructor Destroy; override;
@@ -178,8 +192,10 @@ type
   TDirCollection = class;
   TDirCollection = class(TCollection)
     procedure FreeItem(P: Pointer); override;
-    function GetItem(S: TStream): Pointer; override;
-    procedure PutItem(S: TStream; Item: Pointer); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 function ChangeDir(ATitle: TTitleStr; Drv: Byte): String; {DataCompBoy}
@@ -738,18 +754,29 @@ procedure TTreeInfoView.HandleEvent(var Event: TEvent);
     end;
   end;
 
-constructor TTreeInfoView.Load(S: TStream);
+function TTreeInfoView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Tree);
+  Result := Self;
+  inherited Read(Ip);
+  Tree := Ip.ReadPointer;
   Loaded := True;
   end;
 
-procedure TTreeInfoView.Store(S: TStream);
+procedure TTreeInfoView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Tree);
+  inherited Write(Os);
+  Os.WritePointer(Tree);
   end;
+
+class function TTreeInfoView.Build: TStreamable;
+begin
+  Result := TTreeInfoView.Create(streamableInit);
+end;
+
+function TTreeInfoView.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeInfoView';
+end;
 
 function TTreeInfoView.GetPalette: TPalette;
   const
@@ -906,16 +933,27 @@ constructor TTreeWindow.Create(const Bounds: TRect);
   Insert(P);
   end { TTreeWindow.Init };
 
-constructor TTreeWindow.Load(S: TStream);
+function TTreeWindow.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   TTreeView(Current).ReadAfterLoad;
   end;
 
-procedure TTreeWindow.Store(S: TStream);
+procedure TTreeWindow.Write(Os: opstream);
   begin
-  inherited Store(S);
+  inherited Write(Os);
   end;
+
+class function TTreeWindow.Build: TStreamable;
+begin
+  Result := TTreeWindow.Create(streamableInit);
+end;
+
+function TTreeWindow.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeWindow';
+end;
 
 function TTreeWindow.GetPalette: TPalette;
   const
@@ -987,15 +1025,16 @@ function TTreeView.GetPalette: TPalette;
   GetPalette := MakePalette(S);
   end;
 
-constructor TTreeView.Load(S: TStream);
+function TTreeView.Read(Ip: ipstream): Pointer;
   var
     P: Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, ScrollBar);
-  S.Read(Parital, 1);
-  S.ReadStrV(LastPath);
-  {S.Read(LastPath[0], 1); S.Read(LastPath[1], Length(LastPath));}
+  Result := Self;
+  inherited Read(Ip);
+  ScrollBar := Ip.ReadPointer;
+  Ip.ReadBytes(Parital, 1);
+  ReadStrV(Ip, LastPath);
+  {Ip.ReadBytes(LastPath[0], 1); Ip.ReadBytes(LastPath[1], Length(LastPath));}
   CurPath := LastPath;
   Drive := Byte(DriveOf(LastPath))-64;
   StopQuickSearch;
@@ -1022,13 +1061,23 @@ function THTreeView.GetPalette: TPalette;
   GetPalette := MakePalette(S);
   end;
 
-procedure TTreeView.Store(S: TStream);
+procedure TTreeView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, ScrollBar);
-  S.Write(Parital, 1);
-  S.WriteStr(@LastPath); {S.Write(LastPath, Length(LastPath)+1);}
+  inherited Write(Os);
+  Os.WritePointer(ScrollBar);
+  Os.WriteBytes(Parital, 1);
+  Os.WriteString(@LastPath); {Os.WriteBytes(LastPath, Length(LastPath)+1);}
   end;
+
+class function TTreeView.Build: TStreamable;
+begin
+  Result := TTreeView.Create(streamableInit);
+end;
+
+function TTreeView.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeView';
+end;
 
 function TTreeView.Valid(Command: Word): Boolean;
   begin
@@ -1805,26 +1854,36 @@ procedure TDirCollection.FreeItem(P: Pointer);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TDirCollection.PutItem(S: TStream; Item: Pointer);
+procedure TDirCollection.WriteItem(Item: Pointer; Os: opstream);
   begin
-  S.Write(Item^, SizeOf(TDirRec));
+  Os.WriteBytes(Item^, SizeOf(TDirRec));
   end;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-function TDirCollection.GetItem(S: TStream): Pointer;
+function TDirCollection.ReadItem(Ip: ipstream): Pointer;
   var
     Item: PDirRec;
   begin
   New(Item);
-  S.Read(Item^, SizeOf(TDirRec));
+  Ip.ReadBytes(Item^, SizeOf(TDirRec));
   if  (Item^.NumFiles < 0) or (Item^.Size < 0) then
     begin
     Item^.NumFiles := 0;
     Item^.NumFiles := 0;
     end;
-  GetItem := Item;
+  Result := Item;
   end;
+
+class function TDirCollection.Build: TStreamable;
+begin
+  Result := TDirCollection.Create(streamableInit);
+end;
+
+function TDirCollection.StreamableName: ShortString;
+begin
+  Result := 'Tree.TDirCollection';
+end;
 {-DataCompBoy-}
 
 procedure TTreeView.ReadTree(CountLen: Boolean);
@@ -2061,17 +2120,28 @@ constructor THTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; S
   Info := nil;
   end;
 
-constructor THTreeView.Load(S: TStream);
+function THTreeView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Info);
+  Result := Self;
+  inherited Read(Ip);
+  Info := Ip.ReadPointer;
   end;
 
-procedure THTreeView.Store(S: TStream);
+procedure THTreeView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Info);
+  inherited Write(Os);
+  Os.WritePointer(Info);
   end;
+
+class function THTreeView.Build: TStreamable;
+begin
+  Result := THTreeView.Create(streamableInit);
+end;
+
+function THTreeView.StreamableName: ShortString;
+begin
+  Result := 'Tree.THTreeView';
+end;
 
 procedure THTreeView.ChangeBounds(const Bounds: TRect);
   var
@@ -2163,5 +2233,36 @@ function CreateDirInheritance(var S: String; Confirm: Boolean): Byte;
     end;
   end { CreateDirInheritance };
 {-DataCompBoy-}
+
+
+class function TTreeReader.Build: TStreamable;
+begin
+  Result := TTreeReader.Create(streamableInit);
+end;
+
+function TTreeReader.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeReader';
+end;
+
+class function TTreePanel.Build: TStreamable;
+begin
+  Result := TTreePanel.Create(streamableInit);
+end;
+
+function TTreePanel.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreePanel';
+end;
+
+class function TTreeDialog.Build: TStreamable;
+begin
+  Result := TTreeDialog.Create(streamableInit);
+end;
+
+function TTreeDialog.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeDialog';
+end;
 
 end.

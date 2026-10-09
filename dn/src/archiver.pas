@@ -90,7 +90,7 @@ type
     end;
 
   TARJArchive = class;
-  TARJArchive = class
+  TARJArchive = class(TStreamable)
     Packer,
     UnPacker,
     Extract,
@@ -126,8 +126,11 @@ type
     
     UseLFN: Boolean; {Checkbox}
     
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    constructor Create(AInit: TStreamableInit); overload;
     procedure Save;
     function GetVal(const Sign, AFile, Name, Default: PChar): String;
     constructor Create;
@@ -143,8 +146,10 @@ type
   TFileInfo = class(TSortedCollection)
     function Compare(P1, P2: Pointer): Integer; override;
     procedure FreeItem(Item: Pointer); override;
-    procedure PutItem(S: TStream; Item: Pointer); override;
-    function GetItem(S: TStream): Pointer; override;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   
@@ -313,90 +318,115 @@ function TFileInfo.Compare(P1, P2: Pointer): Integer;
     Compare := 1-2*Integer(UpStrg(F1^.FName^) > UpStrg(F2^.FName^));
   end;
 
-procedure TFileInfo.PutItem(S: TStream; Item: Pointer);
+procedure TFileInfo.WriteItem(Item: Pointer; Os: opstream);
   begin
-  S.WriteStr(PArcFile(Item)^.FName);
-  S.Write(PArcFile(Item)^.Select,
+  Os.WriteString(PArcFile(Item)^.FName);
+  Os.WriteBytes(PArcFile(Item)^.Select,
        SizeOf(Boolean)+SizeOf(AWord)+3*SizeOf(LongInt));
   end;
 
-function TFileInfo.GetItem(S: TStream): Pointer;
+function TFileInfo.ReadItem(Ip: ipstream): Pointer;
   var
     P: PArcFile;
   begin
   New(P);
-  P^.FName := S.ReadStr;
-  S.Read(P^.Select, SizeOf(Boolean)+SizeOf(AWord)+3*SizeOf(LongInt));
-  GetItem := P;
+  P^.FName := Ip.ReadString;
+  Ip.ReadBytes(P^.Select, SizeOf(Boolean)+SizeOf(AWord)+3*SizeOf(LongInt));
+  Result := P;
   end;
+
+class function TFileInfo.Build: TStreamable;
+begin
+  Result := TFileInfo.Create(streamableInit);
+end;
+
+function TFileInfo.StreamableName: ShortString;
+begin
+  Result := 'Archiver.TFileInfo';
+end;
 
 { --------------------------- All archives -------------------------------- }
 
-constructor TARJArchive.Load(S: TStream);
+function TARJArchive.Read(Ip: ipstream): Pointer;
   begin
-  Packer := S.ReadStr;
-  UnPacker := S.ReadStr;
-  Extract := S.ReadStr;
-  ExtractWP := S.ReadStr;
-  Add := S.ReadStr;
-  Move := S.ReadStr;
-  Delete := S.ReadStr;
-  Garble := S.ReadStr;
-  Test := S.ReadStr;
-  IncludePaths := S.ReadStr;
-  ExcludePaths := S.ReadStr;
-  ForceMode := S.ReadStr;
-  RecoveryRec := S.ReadStr;
-  SelfExtract := S.ReadStr;
-  Solid := S.ReadStr;
-  RecurseSubDirs := S.ReadStr;
-  SetPathInside := S.ReadStr;
-  StoreCompression := S.ReadStr;
-  FastestCompression := S.ReadStr;
-  FastCompression := S.ReadStr;
-  NormalCompression := S.ReadStr;
-  GoodCompression := S.ReadStr;
-  UltraCompression := S.ReadStr;
-  ComprListChar := S.ReadStr;
-  ExtrListChar := S.ReadStr;
-  {S.Read(ListChar, SizeOf(ListChar) +
+  Result := Self;
+  Packer := Ip.ReadString;
+  UnPacker := Ip.ReadString;
+  Extract := Ip.ReadString;
+  ExtractWP := Ip.ReadString;
+  Add := Ip.ReadString;
+  Move := Ip.ReadString;
+  Delete := Ip.ReadString;
+  Garble := Ip.ReadString;
+  Test := Ip.ReadString;
+  IncludePaths := Ip.ReadString;
+  ExcludePaths := Ip.ReadString;
+  ForceMode := Ip.ReadString;
+  RecoveryRec := Ip.ReadString;
+  SelfExtract := Ip.ReadString;
+  Solid := Ip.ReadString;
+  RecurseSubDirs := Ip.ReadString;
+  SetPathInside := Ip.ReadString;
+  StoreCompression := Ip.ReadString;
+  FastestCompression := Ip.ReadString;
+  FastCompression := Ip.ReadString;
+  NormalCompression := Ip.ReadString;
+  GoodCompression := Ip.ReadString;
+  UltraCompression := Ip.ReadString;
+  ComprListChar := Ip.ReadString;
+  ExtrListChar := Ip.ReadString;
+  {Ip.ReadBytes(ListChar, SizeOf(ListChar) +
                    SizeOf(Swap) +
                    SizeOf(UseLFN));}
 
   end { TARJArchive.Load };
 
-procedure TARJArchive.Store(S: TStream);
+procedure TARJArchive.Write(Os: opstream);
   begin
-  S.WriteStr(Packer);
-  S.WriteStr(UnPacker);
-  S.WriteStr(Extract);
-  S.WriteStr(ExtractWP);
-  S.WriteStr(Add);
-  S.WriteStr(Move);
-  S.WriteStr(Delete);
-  S.WriteStr(Garble);
-  S.WriteStr(Test);
-  S.WriteStr(IncludePaths);
-  S.WriteStr(ExcludePaths);
-  S.WriteStr(ForceMode);
-  S.WriteStr(RecoveryRec);
-  S.WriteStr(SelfExtract);
-  S.WriteStr(Solid);
-  S.WriteStr(RecurseSubDirs);
-  S.WriteStr(SetPathInside);
-  S.WriteStr(StoreCompression);
-  S.WriteStr(FastestCompression);
-  S.WriteStr(FastCompression);
-  S.WriteStr(NormalCompression);
-  S.WriteStr(GoodCompression);
-  S.WriteStr(UltraCompression);
-  S.WriteStr(ComprListChar);
-  S.WriteStr(ExtrListChar);
-  { S.Write(ListChar, SizeOf(ListChar) +
+  Os.WriteString(Packer);
+  Os.WriteString(UnPacker);
+  Os.WriteString(Extract);
+  Os.WriteString(ExtractWP);
+  Os.WriteString(Add);
+  Os.WriteString(Move);
+  Os.WriteString(Delete);
+  Os.WriteString(Garble);
+  Os.WriteString(Test);
+  Os.WriteString(IncludePaths);
+  Os.WriteString(ExcludePaths);
+  Os.WriteString(ForceMode);
+  Os.WriteString(RecoveryRec);
+  Os.WriteString(SelfExtract);
+  Os.WriteString(Solid);
+  Os.WriteString(RecurseSubDirs);
+  Os.WriteString(SetPathInside);
+  Os.WriteString(StoreCompression);
+  Os.WriteString(FastestCompression);
+  Os.WriteString(FastCompression);
+  Os.WriteString(NormalCompression);
+  Os.WriteString(GoodCompression);
+  Os.WriteString(UltraCompression);
+  Os.WriteString(ComprListChar);
+  Os.WriteString(ExtrListChar);
+  { Os.WriteBytes(ListChar, SizeOf(ListChar) +
                     SizeOf(Swap) +
                     SizeOf(UseLFN));}
 
   end { TARJArchive.Store };
+
+constructor TARJArchive.Create(AInit: TStreamableInit);
+begin
+end;
+
+class function TARJArchive.Build: TStreamable;
+begin
+  Result := TARJArchive.Create(streamableInit);
+end;
+
+function TARJArchive.StreamableName: ShortString;
+begin
+  Result := 'Archiver.TARJArchive';
+end;
 
 {const
   BooleanStr: array[boolean] of string[2] = ('0'#0, '1'#0);}

@@ -33,12 +33,14 @@ type
     FDay: Byte;
     RomanEaster: integer;
     OrthodoxEaster: integer;
-    constructor Create(Bounds: TRect);
-    constructor Load(var S: TStream);
+    constructor Create(Bounds: TRect); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     destructor Destroy; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
-    procedure Store(var S: TStream);
+    procedure Write(Os: opstream); override;
     procedure NextYear;
     procedure PrevYear;
     procedure NextMonth;
@@ -58,12 +60,14 @@ type
 
   TCalendarWindow = class(TWindow)
     CalendarView: TCalendarView;
-    constructor Create;
+    constructor Create; overload;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Awaken; override;
     function GetTitle(MaxSize: integer): TTitleStr; override;
     destructor Destroy; override;
     function GetPalette: TPalette; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 procedure InsertCalendar;
@@ -620,20 +624,21 @@ constructor TCalendarView.Create(Bounds: TRect);
   DrawView;
   end;
 
-constructor TCalendarView.Load(var S: TStream);
+function TCalendarView.Read(Ip: ipstream): Pointer;
   var
     H, y, m, d: word;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   GetDate(y, m, d, H);
   CurYear := y;
   CurMonth := Lo(m);
   CurDay := Lo(d);
   UpdTicks := 20;
   RegisterToBackground(Self);
-  S.Read(Year, SizeOf(Year));
-  S.Read(Month, SizeOf(Month));
-  S.Read(FDay, SizeOf(FDay));
+  Ip.ReadBytes(Year, SizeOf(Year));
+  Ip.ReadBytes(Month, SizeOf(Month));
+  Ip.ReadBytes(FDay, SizeOf(FDay));
   Days := DaysInMonth(Month, Year);
   YearChanged;
   DrawView;
@@ -864,19 +869,29 @@ procedure TCalendarView.HandleEvent(var Event: TEvent);
     end;
   end { TCalendarView.HandleEvent };
 
-procedure TCalendarView.Store(var S: TStream);
+procedure TCalendarView.Write(Os: opstream);
   var
     Rec: packed record
       Y: AWord;
       M, D: Byte;
       end;
   begin
-  inherited Store(S);
+  inherited Write(Os);
   Rec.Y := Year;
   Rec.M := Month;
   Rec.D := FDay;
-  S.Write(Rec, SizeOf(Rec));
+  Os.WriteBytes(Rec, SizeOf(Rec));
   end;
+
+class function TCalendarView.Build: TStreamable;
+begin
+  Result := TCalendarView.Create(streamableInit);
+end;
+
+function TCalendarView.StreamableName: ShortString;
+begin
+  Result := 'Calendar.TCalendarView';
+end;
 procedure TCalendarView.NextYear;
   begin
   if Year < MaxYear then
@@ -1099,5 +1114,16 @@ procedure InsertCalendar;
   else
     Calend.Select;
   end;
+
+
+class function TCalendarWindow.Build: TStreamable;
+begin
+  Result := TCalendarWindow.Create(streamableInit);
+end;
+
+function TCalendarWindow.StreamableName: ShortString;
+begin
+  Result := 'Calendar.TCalendarWindow';
+end;
 
 end.

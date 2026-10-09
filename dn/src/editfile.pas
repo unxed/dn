@@ -66,8 +66,8 @@ procedure MILoadFile(AED: TFileEditor; Name: String);
 procedure MILockFile(AED: TFileEditor);
 procedure MIUnLockFile(AED: TFileEditor);
 
-procedure MIStore(AED: TFileEditor; S: TStream);
-procedure MILoad(AED: TFileEditor; S: TStream);
+procedure MIStore(AED: TFileEditor; Os: opstream);
+procedure MILoad(AED: TFileEditor; Ip: ipstream);
 procedure MIAwaken(AED: TFileEditor);
 
 const
@@ -440,45 +440,45 @@ procedure MISaveFileAs(AED: TFileEditor);
 
 { --- the desktop: what is kept of the editor when DN is left and given back when it starts again --- }
 
-procedure MIStore(AED: TFileEditor; S: TStream);
+procedure MIStore(AED: TFileEditor; Os: opstream);
   var
     M: TRect;
     B: Byte;
   begin
   with AED do
     begin
-    PutPeerViewPtr(S, InfoL);
-    PutPeerViewPtr(S, BMrk);
-    S.WriteStr(@EditName);
-    S.Write(SmartPad, SizeOf(SmartPad));
-    S.Write(ClipBrd, SizeOf(ClipBrd));
-    S.Write(EdOpt.LeftSide, 6);
-    S.Write(EdOpt.HiLite, 1);
-    S.Write(EdOpt.HiliteColumn, SizeOf(EdOpt.HiliteColumn));
-    S.Write(EdOpt.HiliteLine, SizeOf(EdOpt.HiliteLine));
-    S.Write(EdOpt.AutoIndent, SizeOf(EdOpt.AutoIndent));
+    Os.WritePointer(InfoL);
+    Os.WritePointer(BMrk);
+    Os.WriteString(@EditName);
+    Os.WriteBytes(SmartPad, SizeOf(SmartPad));
+    Os.WriteBytes(ClipBrd, SizeOf(ClipBrd));
+    Os.WriteBytes(EdOpt.LeftSide, 6);
+    Os.WriteBytes(EdOpt.HiLite, 1);
+    Os.WriteBytes(EdOpt.HiliteColumn, SizeOf(EdOpt.HiliteColumn));
+    Os.WriteBytes(EdOpt.HiliteLine, SizeOf(EdOpt.HiliteLine));
+    Os.WriteBytes(EdOpt.AutoIndent, SizeOf(EdOpt.AutoIndent));
     B := Ord(VertBlock);
-    S.Write(B, 1);
-    S.Write(EdOpt.BackIndent, SizeOf(EdOpt.BackIndent));
-    S.Write(EdOpt.AutoJustify, SizeOf(EdOpt.AutoJustify));
-    S.Write(OptimalFill, SizeOf(OptimalFill));
-    S.Write(EdOpt.AutoWrap, SizeOf(EdOpt.AutoWrap));
-    S.Write(EdOpt.AutoBrackets, SizeOf(EdOpt.AutoBrackets));
-    S.Write(TabReplace, SizeOf(TabReplace));
-    S.Write(EdOpt.SmartTab, SizeOf(EdOpt.SmartTab));
-    S.Write(DrawMode, SizeOf(DrawMode));
+    Os.WriteBytes(B, 1);
+    Os.WriteBytes(EdOpt.BackIndent, SizeOf(EdOpt.BackIndent));
+    Os.WriteBytes(EdOpt.AutoJustify, SizeOf(EdOpt.AutoJustify));
+    Os.WriteBytes(OptimalFill, SizeOf(OptimalFill));
+    Os.WriteBytes(EdOpt.AutoWrap, SizeOf(EdOpt.AutoWrap));
+    Os.WriteBytes(EdOpt.AutoBrackets, SizeOf(EdOpt.AutoBrackets));
+    Os.WriteBytes(TabReplace, SizeOf(TabReplace));
+    Os.WriteBytes(EdOpt.SmartTab, SizeOf(EdOpt.SmartTab));
+    Os.WriteBytes(DrawMode, SizeOf(DrawMode));
     B := Ord(Wrap);
-    S.Write(B, 1);
+    Os.WriteBytes(B, 1);
     B := Ord(InsertMode);
-    S.Write(B, 1);
-    S.Write(Cursor, SizeOf(Cursor));
+    Os.WriteBytes(B, 1);
+    Os.WriteBytes(Cursor, SizeOf(Cursor));
     M := Mark;
-    S.Write(M, SizeOf(M));
-    S.Write(GetMarks, SizeOf(TPosArray));
+    Os.WriteBytes(M, SizeOf(M));
+    Os.WriteBytes(GetMarks, SizeOf(TPosArray));
     end
   end;
 
-procedure MILoad(AED: TFileEditor; S: TStream);
+procedure MILoad(AED: TFileEditor; Ip: ipstream);
   var
     SS: PString;
     M: TRect;
@@ -489,9 +489,9 @@ procedure MILoad(AED: TFileEditor; S: TStream);
   begin
   with AED do
     begin
-    GetPeerViewPtr(S, InfoL);
-    GetPeerViewPtr(S, BMrk);
-    SS := S.ReadStr;
+    InfoL := Ip.ReadPointer;
+    BMrk := Ip.ReadPointer;
+    SS := Ip.ReadString;
     if SS = nil then
       EditName := ''
     else
@@ -499,35 +499,35 @@ procedure MILoad(AED: TFileEditor; S: TStream);
       EditName := SS^;
       DisposeStr(SS);
       end;
-    S.Read(SmartPad, SizeOf(SmartPad));
-    S.Read(ClipBrd, SizeOf(ClipBrd));
+    Ip.ReadBytes(SmartPad, SizeOf(SmartPad));
+    Ip.ReadBytes(ClipBrd, SizeOf(ClipBrd));
     if SmartPad then
       SmartWindowPtr := @Owner;
     if ClipBrd then
       ClipboardWindowPtr := @Owner;
-    S.Read(EdOpt.LeftSide, 6);
-    S.Read(EdOpt.HiLite, 1);
-    S.Read(EdOpt.HiliteColumn, SizeOf(EdOpt.HiliteColumn));
-    S.Read(EdOpt.HiliteLine, SizeOf(EdOpt.HiliteLine));
-    S.Read(EdOpt.AutoIndent, SizeOf(EdOpt.AutoIndent));
-    S.Read(B, 1);
+    Ip.ReadBytes(EdOpt.LeftSide, 6);
+    Ip.ReadBytes(EdOpt.HiLite, 1);
+    Ip.ReadBytes(EdOpt.HiliteColumn, SizeOf(EdOpt.HiliteColumn));
+    Ip.ReadBytes(EdOpt.HiliteLine, SizeOf(EdOpt.HiliteLine));
+    Ip.ReadBytes(EdOpt.AutoIndent, SizeOf(EdOpt.AutoIndent));
+    Ip.ReadBytes(B, 1);
     VertBlock := B <> 0;
-    S.Read(EdOpt.BackIndent, SizeOf(EdOpt.BackIndent));
-    S.Read(EdOpt.AutoJustify, SizeOf(EdOpt.AutoJustify));
-    S.Read(OptimalFill, SizeOf(OptimalFill));
-    S.Read(EdOpt.AutoWrap, SizeOf(EdOpt.AutoWrap));
-    S.Read(EdOpt.AutoBrackets, SizeOf(EdOpt.AutoBrackets));
-    S.Read(TabReplace, SizeOf(TabReplace));
-    S.Read(EdOpt.SmartTab, SizeOf(EdOpt.SmartTab));
-    S.Read(DM, SizeOf(DM));
+    Ip.ReadBytes(EdOpt.BackIndent, SizeOf(EdOpt.BackIndent));
+    Ip.ReadBytes(EdOpt.AutoJustify, SizeOf(EdOpt.AutoJustify));
+    Ip.ReadBytes(OptimalFill, SizeOf(OptimalFill));
+    Ip.ReadBytes(EdOpt.AutoWrap, SizeOf(EdOpt.AutoWrap));
+    Ip.ReadBytes(EdOpt.AutoBrackets, SizeOf(EdOpt.AutoBrackets));
+    Ip.ReadBytes(TabReplace, SizeOf(TabReplace));
+    Ip.ReadBytes(EdOpt.SmartTab, SizeOf(EdOpt.SmartTab));
+    Ip.ReadBytes(DM, SizeOf(DM));
     DrawMode := DM;
-    S.Read(B, 1);
+    Ip.ReadBytes(B, 1);
     Wrap := B <> 0;
-    S.Read(B, 1);
+    Ip.ReadBytes(B, 1);
     InsertMode := B <> 0;
-    S.Read(C, SizeOf(C));
-    S.Read(M, SizeOf(M));
-    S.Read(Marks, SizeOf(TPosArray));
+    Ip.ReadBytes(C, SizeOf(C));
+    Ip.ReadBytes(M, SizeOf(M));
+    Ip.ReadBytes(Marks, SizeOf(TPosArray));
     SavedCursor := C;
     SavedMark := M;
     SavedMarks := Marks;

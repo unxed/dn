@@ -65,6 +65,8 @@ type
     procedure HandleEvent(var Event: TEvent); override;
     function GetPalette: TPalette; override;
     procedure DrawTop(var B: TScreenCell); virtual;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TPanelBottomDnD = record
@@ -89,7 +91,7 @@ type
       {` For each footer line, starting from the separator,
        the sequence of procedures that form that line.
        Each sequence ends with nil.`}
-    constructor Create(const R: TRect);
+    constructor Create(const R: TRect); overload;
     procedure Compile(Value: Word;
       FullProc, BriefProc: TFooterProc);
     procedure CompileShowOptions;
@@ -99,8 +101,10 @@ type
         fills DnD with coordinates of lines from which D&D is possible.
         The first is used in TFilePanelRoot.ChangeBounds,
         the second in HandleEvent}
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     end;
@@ -109,6 +113,8 @@ type
   TDirView = class(TTopView)
     procedure HandleEvent(var Event: TEvent); override;
     function GetText(MaxWidth: Integer): String; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TDriveLine = class;
@@ -119,13 +125,15 @@ type
     ViewLine: String[60];
     CharDelta: AInt;
     LogDrvMap: LongInt; {Cat}
-    constructor Create(const R: TRect; APanel: TFilePanel);
+    constructor Create(const R: TRect; APanel: TFilePanel); overload;
     procedure MakeDriveLine;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure Refresh; {Cat}
     procedure Update; override;
      {` AK155 18.03.2005 Previously the disk-line auto-update setting
@@ -209,12 +217,13 @@ constructor TDriveLine.Create(const R: TRect; APanel: TFilePanel);
   RegisterToBackground(Self);
   end;
 
-constructor TDriveLine.Load(S: TStream);
+function TDriveLine.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   MakeDriveLine;
   CharDelta := 1;
-  GetPeerViewPtr(S, Panel);
+  Panel := Ip.ReadPointer;
   UpdTicks := 3000;
   RegisterToBackground(Self);
   end;
@@ -426,11 +435,21 @@ procedure TDriveLine.HandleEvent(var Event: TEvent);
   end {case};
   end { TDriveLine.HandleEvent };
 
-procedure TDriveLine.Store(S: TStream);
+procedure TDriveLine.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Panel);
+  inherited Write(Os);
+  Os.WritePointer(Panel);
   end;
+
+class function TDriveLine.Build: TStreamable;
+begin
+  Result := TDriveLine.Create(streamableInit);
+end;
+
+function TDriveLine.StreamableName: ShortString;
+begin
+  Result := 'filepanel.TDriveLine';
+end;
 
 procedure TDriveLine.Refresh;
   var
@@ -920,17 +939,28 @@ constructor TInfoView.Create(const R: TRect);
   EventMask := evMouse;
   end;
 
-constructor TInfoView.Load(S: TStream);
+function TInfoView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Panel);
+  Result := Self;
+  inherited Read(Ip);
+  Panel := Ip.ReadPointer;
   end;
 
-procedure TInfoView.Store(S: TStream);
+procedure TInfoView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Panel);
+  inherited Write(Os);
+  Os.WritePointer(Panel);
   end;
+
+class function TInfoView.Build: TStreamable;
+begin
+  Result := TInfoView.Create(streamableInit);
+end;
+
+function TInfoView.StreamableName: ShortString;
+begin
+  Result := 'filepanel.TInfoView';
+end;
 
 procedure TInfoView.HandleEvent(var Event: TEvent);
   var
@@ -2240,6 +2270,27 @@ GotoKb:
   end {case};
   end { TFilePanel.HandleEvent };
 {-DataCompBoy-}
+
+
+class function TFilePanel.Build: TStreamable;
+begin
+  Result := TFilePanel.Create(streamableInit);
+end;
+
+function TFilePanel.StreamableName: ShortString;
+begin
+  Result := 'filepanel.TFilePanel';
+end;
+
+class function TDirView.Build: TStreamable;
+begin
+  Result := TDirView.Create(streamableInit);
+end;
+
+function TDirView.StreamableName: ShortString;
+begin
+  Result := 'filepanel.TDirView';
+end;
 
 end.
 

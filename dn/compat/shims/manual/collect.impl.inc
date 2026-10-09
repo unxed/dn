@@ -65,20 +65,30 @@ begin
     DisposeStr(PStr(Item));
 end;
 
-function TStringCollection.GetItem(S: TStream): Pointer;
+function TStringCollection.ReadItem(Ip: ipstream): Pointer;
 begin
   if LongStrings then
-    Result := S.ReadLongStr
+    Result := ReadLongStr(Ip)
   else
-    Result := S.ReadStr;
+    Result := Ip.ReadString;
 end;
 
-procedure TStringCollection.PutItem(S: TStream; Item: Pointer);
+procedure TStringCollection.WriteItem(Item: Pointer; Os: opstream);
 begin
   if LongStrings then
-    S.WriteLongStr(PLongString(Item))
+    WriteLongStr(Os, PLongString(Item))
   else
-    S.WriteStr(PStr(Item));
+    Os.WriteString(PStr(Item));
+end;
+
+function TStringCollection.StreamableName: ShortString;
+begin
+  Result := 'Collect.TStringCollection';
+end;
+
+class function TStringCollection.Build: TStreamable;
+begin
+  Result := TStringCollection.Create(streamableInit);
 end;
 
 procedure TUnSortedStrCollection.Insert(Item: Pointer);
@@ -112,30 +122,50 @@ begin
     DisposeStr(PStr(Item));
 end;
 
-function TLineCollection.GetItem(S: TStream): Pointer;
+function TLineCollection.ReadItem(Ip: ipstream): Pointer;
 begin
   if LongStrings then
-    Result := S.ReadLongStr
+    Result := ReadLongStr(Ip)
   else
-    Result := S.ReadStr;
+    Result := Ip.ReadString;
 end;
 
-procedure TLineCollection.PutItem(S: TStream; Item: Pointer);
+procedure TLineCollection.WriteItem(Item: Pointer; Os: opstream);
 begin
   if LongStrings then
-    S.WriteLongStr(PLongString(Item))
+    WriteLongStr(Os, PLongString(Item))
   else
-    S.WriteStr(PStr(Item));
+    Os.WriteString(PStr(Item));
 end;
 
-function TStrCollection.GetItem(S: TStream): Pointer;
+function TLineCollection.StreamableName: ShortString;
 begin
-  Result := S.StrRead;
+  Result := 'Collect.TLineCollection';
 end;
 
-procedure TStrCollection.PutItem(S: TStream; Item: Pointer);
+class function TLineCollection.Build: TStreamable;
 begin
-  S.StrWrite(PChar(Item));
+  Result := TLineCollection.Create(streamableInit);
+end;
+
+function TStrCollection.ReadItem(Ip: ipstream): Pointer;
+begin
+  Result := StrRead(Ip);
+end;
+
+procedure TStrCollection.WriteItem(Item: Pointer; Os: opstream);
+begin
+  StrWrite(Os, PChar(Item));
+end;
+
+function TStrCollection.StreamableName: ShortString;
+begin
+  Result := 'Collect.TStrCollection';
+end;
+
+class function TStrCollection.Build: TStreamable;
+begin
+  Result := TStrCollection.Create(streamableInit);
 end;
 
 function TDirCol.Compare(Key1, Key2: Pointer): Integer;
@@ -144,4 +174,24 @@ begin
     Result := CompareText(PLongString(Key1)^, PLongString(Key2)^)
   else
     Result := CompareText(PStr(Key1)^, PStr(Key2)^);
+end;
+
+function TObjCollection.ReadItem(Ip: ipstream): Pointer;
+begin
+  Result := Ip.ReadPointer;
+end;
+
+procedure TObjCollection.WriteItem(Item: Pointer; Os: opstream);
+begin
+  Os.WritePointer(TStreamable(Item));
+end;
+
+function TObjCollection.StreamableName: ShortString;
+begin
+  Result := 'Collect.TObjCollection';
+end;
+
+class function TObjCollection.Build: TStreamable;
+begin
+  Result := TObjCollection.Create(streamableInit);
 end;

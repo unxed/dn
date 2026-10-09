@@ -81,9 +81,11 @@ type
       { File panel this info panel is linked to }
     DriveView: TDriveView;
       { Drive/share in the upper frame. See InsertDriveView and Done }
-    constructor Create(R: TRect; Panel: TView{TFilePanelRoot});
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    constructor Create(R: TRect; Panel: TView{TFilePanelRoot}); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure InsertDriveView;
       { For disk info create DriveView and insert into Owner }
     procedure ReadData;
@@ -98,6 +100,8 @@ type
     InfoPanel: TDiskInfo;
     function GetText(MaxWidth: Integer): String; override;
     destructor Destroy; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 function CountDirLen(const Dir: String; Recurse: Boolean;
@@ -303,19 +307,30 @@ procedure DispInfo(var Info: TDiskInfoRec);
   FillChar(Info, SizeOf(Info), 0);
   end { DispInfo };
 
-constructor TDiskInfo.Load(S: TStream);
+function TDiskInfo.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  S.Read(Delta, SizeOf(Delta));
-  GetPeerViewPtr(S, DriveView);
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(Delta, SizeOf(Delta));
+  DriveView := Ip.ReadPointer;
   end;
 
-procedure TDiskInfo.Store(S: TStream);
+procedure TDiskInfo.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(Delta, SizeOf(Delta));
-  PutPeerViewPtr(S, DriveView);
+  inherited Write(Os);
+  Os.WriteBytes(Delta, SizeOf(Delta));
+  Os.WritePointer(DriveView);
   end;
+
+class function TDiskInfo.Build: TStreamable;
+begin
+  Result := TDiskInfo.Create(streamableInit);
+end;
+
+function TDiskInfo.StreamableName: ShortString;
+begin
+  Result := 'DiskInfo.TDiskInfo';
+end;
 
 constructor TDiskInfo.Create(R: TRect; Panel: TView);
   begin
@@ -831,5 +846,16 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
     B.FileSys := NewStr(GetString(dlDIFileSys) + FileSys+'~');
   end { ReadDiskInfo };
 {-DataCompBoy-}
+
+
+class function TDriveView.Build: TStreamable;
+begin
+  Result := TDriveView.Create(streamableInit);
+end;
+
+function TDriveView.StreamableName: ShortString;
+begin
+  Result := 'DiskInfo.TDriveView';
+end;
 
 end.

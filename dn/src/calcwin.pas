@@ -76,9 +76,11 @@ type
 
   TCalcWindow = class(TUniWindow)
     CalcView: TCalcView;
-    constructor Create(Bounds: TRect; AName: String); {DataCompBoy}
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Create(Bounds: TRect; AName: String); overload; {DataCompBoy}
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure HandleEvent(var Event: TEvent); override;
     destructor Destroy; override;
     end;
@@ -100,11 +102,13 @@ type
     SName: PString; {DataCompBoy}
     constructor Create(Bounds: TRect;
         AInfo: TCalcInput; ACellInfo: TInfoView;
-        AHScroll, AVScroll: TScrollBar);
+        AHScroll, AVScroll: TScrollBar); overload;
     destructor Destroy; override;
 
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
 
     procedure Draw; override;
     function Valid(Command: Word): Boolean; override;
@@ -136,8 +140,10 @@ type
 
   TCalcInput = class(TInputLine)
     CalcView: TCalcView;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     end;
@@ -147,6 +153,8 @@ type
     InfoAttr: Byte;
     procedure SetInfo(S: String; Attr: Byte);
     procedure Draw; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 function GetFileName(var FileName: String; Mask, Title, ALabel: String;
@@ -397,24 +405,35 @@ constructor TCalcWindow.Create(Bounds: TRect; AName: String);
   end { TCalcWindow.Init };
 {-DataCompBoy-}
 
-constructor TCalcWindow.Load(var S: TStream);
+function TCalcWindow.Read(Ip: ipstream): Pointer;
   var
     R: TRect;
     P: TView;
     P1: TInfoView;
   begin
-  inherited Load(S);
-  GetSubViewPtr(S, CalcView);
+  Result := Self;
+  inherited Read(Ip);
+  CalcView := Ip.ReadPointer;
   if CalcView = nil then
     {Cat}
-    Fail;
+    begin Free; Result := nil; Exit end;
   end;
 
-procedure TCalcWindow.Store(var S: TStream);
+procedure TCalcWindow.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutSubViewPtr(S, CalcView);
+  inherited Write(Os);
+  Os.WritePointer(CalcView);
   end;
+
+class function TCalcWindow.Build: TStreamable;
+begin
+  Result := TCalcWindow.Create(streamableInit);
+end;
+
+function TCalcWindow.StreamableName: ShortString;
+begin
+  Result := 'calcwin.TCalcWindow';
+end;
 
 procedure TCalcWindow.HandleEvent(var Event: TEvent);
   begin
@@ -446,17 +465,28 @@ destructor TCalcWindow.Destroy;
 
 {-----------------------------    TCalcInput     ---------------------------}
 
-constructor TCalcInput.Load(var S: TStream);
+function TCalcInput.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, CalcView);
+  Result := Self;
+  inherited Read(Ip);
+  CalcView := Ip.ReadPointer;
   end;
 
-procedure TCalcInput.Store(var S: TStream);
+procedure TCalcInput.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, CalcView);
+  inherited Write(Os);
+  Os.WritePointer(CalcView);
   end;
+
+class function TCalcInput.Build: TStreamable;
+begin
+  Result := TCalcInput.Create(streamableInit);
+end;
+
+function TCalcInput.StreamableName: ShortString;
+begin
+  Result := 'calcwin.TCalcInput';
+end;
 
 function TCalcInput.GetPalette: TPalette;
   const
@@ -617,34 +647,45 @@ constructor TCalcView.Create(Bounds: TRect; AInfo: TCalcInput; ACellInfo: TInfoV
   SName := nil;
   end { TCalcView.Init };
 
-constructor TCalcView.Load(var S: TStream);
+function TCalcView.Read(Ip: ipstream): Pointer;
   var
     R: TRect;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, CalcInput);
-  GetPeerViewPtr(S, CellInfo);
-  GetPeerViewPtr(S, HScroll);
-  GetPeerViewPtr(S, VScroll);
-  S.Read(Delta, SizeOf(Delta)*3);
-  S.Read(NumC, 6); {###}
-  SName := S.ReadStr;
+  Result := Self;
+  inherited Read(Ip);
+  CalcInput := Ip.ReadPointer;
+  CellInfo := Ip.ReadPointer;
+  HScroll := Ip.ReadPointer;
+  VScroll := Ip.ReadPointer;
+  Ip.ReadBytes(Delta, SizeOf(Delta)*3);
+  Ip.ReadBytes(NumC, 6); {###}
+  SName := Ip.ReadString;
   LoadSheet(SName^);
   FocusEvent.What := evNothing;
   ReCalc(True);
   end;
 
-procedure TCalcView.Store(var S: TStream);
+procedure TCalcView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, CalcInput);
-  PutPeerViewPtr(S, CellInfo);
-  PutPeerViewPtr(S, HScroll);
-  PutPeerViewPtr(S, VScroll);
-  S.Write(Delta, SizeOf(Delta)*3);
-  S.Write(NumC, 6); {###}
-  S.WriteStr(SName);
+  inherited Write(Os);
+  Os.WritePointer(CalcInput);
+  Os.WritePointer(CellInfo);
+  Os.WritePointer(HScroll);
+  Os.WritePointer(VScroll);
+  Os.WriteBytes(Delta, SizeOf(Delta)*3);
+  Os.WriteBytes(NumC, 6); {###}
+  Os.WriteString(SName);
   end;
+
+class function TCalcView.Build: TStreamable;
+begin
+  Result := TCalcView.Create(streamableInit);
+end;
+
+function TCalcView.StreamableName: ShortString;
+begin
+  Result := 'calcwin.TCalcView';
+end;
 
 function TCalcView.Valid(Command: Word): Boolean;
   begin
@@ -1238,7 +1279,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
                 ( ( (P.Options and coFormula) <> 0) and (not
                    CalcFormulaFlag))
             then
-              Write(F.T, P.S)
+              System.Write(F.T, P.S)
             else if ((P.Options and 3) = coValue) or
                 ( ( (P.Options and coFormula) <> 0) and
                  CalcFormulaFlag)
@@ -1259,13 +1300,13 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
                 if S[Length(S)] = '.' then
                   SetLength(S, Length(S)-1);
                 end;
-              Write(F.T, S);
+              System.Write(F.T, S);
               end
             else
-              Write(F.T, P.S); {This code not use}
+              System.Write(F.T, P.S); {This code not use}
             end;
           if CurCol < MaxCol then
-            Write(F.T, ColSeparator);
+            System.Write(F.T, ColSeparator);
           end;
         Writeln(F.T);
         end;
@@ -1548,14 +1589,14 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
             Inc(K, ColWidth[I]);
             end;
         if K <= L1 then
-          Write(F.T, System.Copy(S, 1, K))
+          System.Write(F.T, System.Copy(S, 1, K))
         else
           begin
           if K > 255 then
             L := 255
           else
             L := K;
-          Write(F.T, System.Copy(S, 1, L));
+          System.Write(F.T, System.Copy(S, 1, L));
           repeat
             Dec(K, L);
             if K > 255 then
@@ -1564,7 +1605,7 @@ procedure TCalcView.HandleEvent(var Event: TEvent);
               L := K;
             if L <= 0 then
               Break;
-            Write(F.T, Strg(' ', L));
+            System.Write(F.T, Strg(' ', L));
           until K <= 0;
           end;
         Inc(I);
@@ -3461,5 +3502,16 @@ procedure TExcelWriter.WriteNUMBER(const Data: Double;
   CDefXlsNUMBER.Num := Data;
   inherited Write(CDefXlsNUMBER, SizeOf(CDefXlsNUMBER));
   end;
+
+
+class function TInfoView.Build: TStreamable;
+begin
+  Result := TInfoView.Create(streamableInit);
+end;
+
+function TInfoView.StreamableName: ShortString;
+begin
+  Result := 'calcwin.TInfoView';
+end;
 
 end.

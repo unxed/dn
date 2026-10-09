@@ -14,6 +14,8 @@ type
     S1, S2: String[50];
     function GetPalette: TPalette; override;
     procedure Draw; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
 implementation
@@ -35,6 +37,17 @@ end;
 function TDStringView.GetPalette: TPalette;
 begin
   Result := MakePalette(#30);
+end;
+
+
+class function TDStringView.Build: TStreamable;
+begin
+  Result := TDStringView.Create(streamableInit);
+end;
+
+function TDStringView.StreamableName: ShortString;
+begin
+  Result := 'StrView.TDStringView';
 end;
 
 end.

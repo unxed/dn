@@ -56,10 +56,12 @@ type
   TZIPArchive = class;
   PZIPArchive = TZIPArchive;
   TZIPArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -395,6 +397,17 @@ procedure TZIPArchive.GetFile;
     ArcFile.Seek(FP);
     end;
   end { TZIPArchive.GetFile };
+
+
+class function TZIPArchive.Build: TStreamable;
+begin
+  Result := TZIPArchive.Create(streamableInit);
+end;
+
+function TZIPArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtzip.TZIPArchive';
+end;
 
 end.
 

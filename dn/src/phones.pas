@@ -58,35 +58,43 @@ uses
 
 type
   TPhoneCollection = class(TSortedCollection)
-    constructor Create(ALimit, ADelta: LongInt);
-    constructor Load(var S: TStream);
-    constructor ShortLoad(var S: TStream);
-    procedure ShortStore(var S: TStream);
+    constructor Create(ALimit, ADelta: LongInt); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    function ReadItem(Ip: ipstream): Pointer; override;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
     function Compare(P1, P2: Pointer): Integer; override;
     procedure FreeItem(Item: Pointer); override;
     end;
 
-  TPhoneDir = class
+  TPhoneDir = class(TStreamable)
     Name: String[30];
     Memo1: PString;
     Memo2: PString;
     Password: String[15];
     Phones: TCollection;
     Encrypted: Boolean;
-    constructor Create(const APassword, AName, AMemo1, AMemo2: String);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Create(const APassword, AName, AMemo1, AMemo2: String); overload;
+    constructor Create(AInit: TStreamableInit); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     destructor Destroy; override;
     end;
 
-  TPhone = class
+  TPhone = class(TStreamable)
     Name: String[30];
     Memo1: PString;
     Memo2: PString;
     Number: PString;
-    constructor Create(const ANumber, AName, AMemo1, AMemo2: String);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Create(const ANumber, AName, AMemo1, AMemo2: String); overload;
+    constructor Create(AInit: TStreamableInit); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     destructor Destroy; override;
     end;
 
@@ -132,6 +140,35 @@ function CryptWith(Pass, S: String): String;
 
 var
   PPH: TPhone;
+
+{ dn.phn: the collection of the phone book written by an opstream }
+function LoadPhones: TCollection;
+  var
+    S: TBufStream;
+    Ip: ipstream;
+  begin
+  Result := nil;
+  S := TBufStream.Create(ConfigDir+'dn.phn', stOpenRead, 1024);
+  if (S.Status = stOK) and (S.GetSize > 0) then
+    begin
+    Ip := ipstream.Create(S);
+    Result := TCollection(Ip.ReadPointer);
+    Ip.Free;
+    end;
+  S.Free;
+  end;
+
+procedure SavePhones(C: TCollection);
+  var
+    S: TBufStream;
+    Os: opstream;
+  begin
+  S := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
+  Os := opstream.Create(S);
+  Os.WritePointer(TStreamable(C));
+  Os.Free;
+  S.Free;
+  end;
 
 procedure PhoneBook(Manual: Boolean);
   var
@@ -182,17 +219,7 @@ procedure PhoneBook(Manual: Boolean);
     R := TRect.Create(2, 3, D.Size.X-3, 12);
     PL := TPhoneBox.Create(R, 1, TScrollBar(PV));
     PL.Options := PL.Options or ofPostProcess;
-    S := TBufStream.Create(ConfigDir+'dn.phn', stOpenRead, 1024);
-    PC := nil;
-    PC := TCollection(S.Get);
-    if PC = nil then
-      begin
-      S.Reset;
-      S.Seek(0);
-      Stream := S;
-      PC := TCollection(TPhoneCollection.ShortLoad(Stream));
-      end;
-    S.Free;
+    PC := LoadPhones;
     if PC = nil then
       PC := TPhoneCollection.Create(10, 10);
     PC.Pack;
@@ -307,17 +334,7 @@ procedure TPhoneBox.SetList(Alpha: Boolean);
       end
     else
       begin
-      S := TBufStream.Create(ConfigDir+'dn.phn', stOpenRead, 1024);
-      PC := nil;
-      PC := TPhoneCollection(S.Get);
-      if PC = nil then
-        begin
-        S.Reset;
-        S.Seek(0);
-        Stream := S;
-        PC := TPhoneCollection.ShortLoad(Stream);
-        end;
-      S.Free;
+      PC := TPhoneCollection(LoadPhones);
       if PC = nil then
         PC := TPhoneCollection.Create(10, 10);
       end;
@@ -416,16 +433,8 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     NewLisT(C);
     FocusItem(R.A.X);
     Owner.UnLock;
-    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
     Phones := C;
-    if Phones.Count > 16380 then
-      Stream.Put(Phones)
-    else
-      begin
-      BaseStream := Stream;
-      TPhoneCollection(Phones).ShortStore(BaseStream);
-      end;
-    Stream.Free;
+    SavePhones(Phones);
     end { EditDirectory };
 
   procedure EditNumber(Append: Boolean);
@@ -476,15 +485,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     FocusItem(R.A.X);
     Owner.UnLock;
     Active.Phones := C;
-    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
-    if Phones.Count > 16380 then
-      Stream.Put(Phones)
-    else
-      begin
-      BaseStream := Stream;
-      TPhoneCollection(Phones).ShortStore(BaseStream);
-      end;
-    Stream.Free;
+    SavePhones(Phones);
     end { EditNumber };
 
   procedure CopyDirectory;
@@ -525,16 +526,8 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     NewLisT(C);
     FocusItem(I);
     Owner.UnLock;
-    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
     Phones := C;
-    if Phones.Count > 16380 then
-      Stream.Put(Phones)
-    else
-      begin
-      BaseStream := Stream;
-      TPhoneCollection(Phones).ShortStore(BaseStream);
-      end;
-    Stream.Free;
+    SavePhones(Phones);
     end { CopyDirectory };
 
   procedure CopyPhones;
@@ -571,15 +564,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     FocusItem(I);
     Owner.UnLock;
     Active.Phones := C;
-    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
-    if Phones.Count > 16380 then
-      Stream.Put(Phones)
-    else
-      begin
-      BaseStream := Stream;
-      TPhoneCollection(Phones).ShortStore(BaseStream);
-      end;
-    Stream.Free;
+    SavePhones(Phones);
     end { CopyPhones };
 
   procedure CE;
@@ -642,15 +627,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
         NewLisT(C);
         Owner.UnLock;
         Active.Phones := C;
-        Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
-        if Phones.Count > 16380 then
-          Stream.Put(Phones)
-        else
-          begin
-          BaseStream := Stream;
-          TPhoneCollection(Phones).ShortStore(BaseStream);
-          end;
-        Stream.Free;
+        SavePhones(Phones);
         DrawView;
         Exit;
         end;
@@ -845,15 +822,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     Items := nil;
     NewLisT(Active.Phones);
     F.Free;
-    Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
-    if Phones.Count > 16380 then
-      Stream.Put(Phones)
-    else
-      begin
-      BaseStream := Stream;
-      TPhoneCollection(Phones).ShortStore(BaseStream);
-      end;
-    Stream.Free;
+    SavePhones(Phones);
     end { ImportPhones };
 
   procedure CopyItem;
@@ -966,15 +935,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
             SetRange(List.Count);
             DrawView;
             end;
-          Stream := TBufStream.Create(ConfigDir+'dn.phn', stCreate, 1024);
-          if Phones.Count > 16380 then
-            Stream.Put(Phones)
-          else
-            begin
-            BaseStream := Stream;
-            TPhoneCollection(Phones).ShortStore(BaseStream);
-            end;
-          Stream.Free;
+          SavePhones(Phones);
           end;
       end {case};
     evKeyDown:
@@ -1079,72 +1040,33 @@ constructor TPhoneCollection.Create(ALimit, ADelta: LongInt);
   Duplicates := True;
   end;
 
-constructor TPhoneCollection.Load(var S: TStream);
+function TPhoneCollection.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   Duplicates := True;
   Sort;
   end;
 
-const
-  VObjType: AWord = otPhone;
-  VObjType2: AWord = otPhoneDir;
-  VObjType3: AWord = otPhoneCollection;
-procedure TPhoneCollection.ShortStore(var S: TStream);
-  var
-    TCount, TLimit, TDelta: AInt;
-  procedure DoPutItem(P: Pointer);
-    begin
-    if TPhone(P) is TPhone then
-      begin
-      S.Write(VObjType, 2);
-      TPhone(P).Store(S);
-      end
-    else if TPhoneDir(P) is TPhoneDir then
-      begin
-      S.Write(VObjType2, 2);
-      TPhoneDir(P).Store(S);
-      end;
-    end;
-  begin
-  TCount := Count;
-  TLimit := Limit;
-  TDelta := Delta;
-  S.Write(VObjType3, 2);
-  S.Write(Count, 2);
-  S.Write(Limit, 2);
-  S.Write(Delta, 2);
-  ForEach(DoPutItem);
-  S.Write(Duplicates, SizeOf(Duplicates));
-  end { TPhoneCollection.ShortStore };
+class function TPhoneCollection.Build: TStreamable;
+begin
+  Result := TPhoneCollection.Create(streamableInit);
+end;
 
-constructor TPhoneCollection.ShortLoad(var S: TStream);
-  var
-    q: AWord;
-    C, I: Integer;
-    ACount, ALimit, ADelta: AInt;
+function TPhoneCollection.StreamableName: ShortString;
+begin
+  Result := 'Phones.TPhoneCollection';
+end;
+
+function TPhoneCollection.ReadItem(Ip: ipstream): Pointer;
   begin
-  S.Read(q, 2);
-  if q <> otPhoneCollection then
-    Fail;
-  S.Read(ACount, SizeOf(AInt));
-  S.Read(ALimit, SizeOf(AInt));
-  S.Read(ADelta, SizeOf(AInt));
-  inherited Create(ALimit, ADelta);
-  SetLimit(ACount);
-  for I := 0 to ACount-1 do
-    begin
-    S.Read(q, 2);
-    if q = otPhone then
-      AtInsert(I, TPhone.Load(S))
-    else if q = otPhoneDir then
-      AtInsert(I, TPhoneDir.Load(S))
-    else
-      Break;
-    end;
-  S.Read(Duplicates, SizeOf(Boolean));
-  Sort;
-  end { TPhoneCollection.ShortLoad };
+  Result := Ip.ReadPointer;
+  end;
+
+procedure TPhoneCollection.WriteItem(Item: Pointer; Os: opstream);
+  begin
+  Os.WritePointer(TStreamable(Item));
+  end;
 
 function TPhoneCollection.Compare(P1, P2: Pointer): Integer;
   begin
@@ -1176,22 +1098,37 @@ constructor TPhone.Create(const ANumber, AName, AMemo1, AMemo2: String);
   Memo2 := NewStr(AMemo2);
   end;
 
-constructor TPhone.Load(var S: TStream);
+function TPhone.Read(Ip: ipstream): Pointer;
   begin
-  Number := S.ReadStr;
-  S.ReadStrV(Name);
-  {S.Read(Name[0],1); S.Read(Name[1], Byte(Name[0]);}
-  Memo1 := S.ReadStr;
-  Memo2 := S.ReadStr;
+  Result := Self;
+  Number := Ip.ReadString;
+  ReadStrV(Ip, Name);
+  {Ip.ReadBytes(Name[0],1); Ip.ReadBytes(Name[1], Byte(Name[0]);}
+  Memo1 := Ip.ReadString;
+  Memo2 := Ip.ReadString;
   end;
 
-procedure TPhone.Store(var S: TStream);
+procedure TPhone.Write(Os: opstream);
   begin
-  S.WriteStr(Number);
-  S.WriteStr(@Name);
-  S.WriteStr(Memo1);
-  S.WriteStr(Memo2);
+  Os.WriteString(Number);
+  Os.WriteString(@Name);
+  Os.WriteString(Memo1);
+  Os.WriteString(Memo2);
   end;
+
+constructor TPhone.Create(AInit: TStreamableInit);
+  begin
+  end;
+
+class function TPhone.Build: TStreamable;
+begin
+  Result := TPhone.Create(streamableInit);
+end;
+
+function TPhone.StreamableName: ShortString;
+begin
+  Result := 'Phones.TPhone';
+end;
 
 destructor TPhone.Destroy;
   begin
@@ -1232,50 +1169,53 @@ procedure CryptCol(Col: TCollection; Pass: String);
     Col.ForEach(CryptPhone);
   end;
 
-constructor TPhoneDir.Load(var S: TStream);
+function TPhoneDir.Read(Ip: ipstream): Pointer;
   var
     Q: TFileSize;
   begin
-  S.ReadStrV(Name);
-  {S.Read(Name[0],1); S.Read(Name[1], Byte(Name[0]);}
-  Memo1 := S.ReadStr;
-  Memo2 := S.ReadStr;
-  S.Read(Password, 1);
-  S.Read(Password[1], Byte(Password[0]));
+  Result := Self;
+  ReadStrV(Ip, Name);
+  {Ip.ReadBytes(Name[0],1); Ip.ReadBytes(Name[1], Byte(Name[0]);}
+  Memo1 := Ip.ReadString;
+  Memo2 := Ip.ReadString;
+  Ip.ReadBytes(Password, 1);
+  Ip.ReadBytes(Password[1], Byte(Password[0]));
   Password := CryptWith('NaViGaToR', Password);
-  Q := S.GetPos;
-  Phones := nil;
-  Phones := TCollection(S.Get);
-  if Phones = nil then
-    begin
-    S.Status := stOK;
-    S.Seek(Q);
-    Phones := TCollection(TPhoneCollection.ShortLoad(S));
-    end;
+  Phones := TCollection(Ip.ReadPointer);
   if Phones <> nil then
     CryptCol(Phones, Password);
   Encrypted := False;
   end { TPhoneDir.Load };
 
-procedure TPhoneDir.Store(var S: TStream);
+procedure TPhoneDir.Write(Os: opstream);
   begin
-  S.WriteStr(@Name);
-  S.WriteStr(Memo1);
-  S.WriteStr(Memo2);
+  Os.WriteString(@Name);
+  Os.WriteString(Memo1);
+  Os.WriteString(Memo2);
   Password := CryptWith('NaViGaToR', Password);
-  S.Write(Password, 1);
-  S.Write(Password[1], Byte(Password[0]));
+  Os.WriteBytes(Password, 1);
+  Os.WriteBytes(Password[1], Byte(Password[0]));
   Password := CryptWith('NaViGaToR', Password);
   if Phones <> nil then
     CryptCol(Phones, Password);
-  if Phones <> nil then
-    if Phones.Count > 16380 then
-      S.Put(Phones)
-    else
-      TPhoneCollection(Phones).ShortStore(S);
+  Os.WritePointer(Phones);
   if Phones <> nil then
     CryptCol(Phones, Password);
   end;
+
+constructor TPhoneDir.Create(AInit: TStreamableInit);
+  begin
+  end;
+
+class function TPhoneDir.Build: TStreamable;
+begin
+  Result := TPhoneDir.Create(streamableInit);
+end;
+
+function TPhoneDir.StreamableName: ShortString;
+begin
+  Result := 'Phones.TPhoneDir';
+end;
 
 destructor TPhoneDir.Destroy;
   begin

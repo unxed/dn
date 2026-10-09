@@ -76,31 +76,41 @@ type
     procedure Awaken; override;
     destructor Destroy; override;
     procedure GetData(var Rec); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TCurrDriveInfo = class(TCheckBoxes)
     procedure HandleEvent(var Event: TEvent); override;
     procedure Press(Item: Integer); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TMouseBar = class(TScrollBar)
-    constructor Create(var Bounds: TRect);
+    constructor Create(var Bounds: TRect); overload;
     procedure SetData(var Rec); override;
     procedure GetData(var Rec); override;
     function DataSize: Integer; override;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   
   TSaversDialog = class(TDialog)
-    constructor Create;
+    constructor Create; overload;
     procedure HandleEvent(var Event: TEvent); override;
     destructor Destroy; override;
     procedure Awaken; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TSaversListBox = class(TListBox)
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
   
 
@@ -815,6 +825,57 @@ function MakeSaversDialog: TDialog;
   MakeSaversDialog := TSaversDialog.Create;
   end;
 
+
+
+class function TSysDialog.Build: TStreamable;
+begin
+  Result := TSysDialog.Create(streamableInit);
+end;
+
+function TSysDialog.StreamableName: ShortString;
+begin
+  Result := 'Setups.TSysDialog';
+end;
+
+class function TCurrDriveInfo.Build: TStreamable;
+begin
+  Result := TCurrDriveInfo.Create(streamableInit);
+end;
+
+function TCurrDriveInfo.StreamableName: ShortString;
+begin
+  Result := 'Setups.TCurrDriveInfo';
+end;
+
+class function TMouseBar.Build: TStreamable;
+begin
+  Result := TMouseBar.Create(streamableInit);
+end;
+
+function TMouseBar.StreamableName: ShortString;
+begin
+  Result := 'Setups.TMouseBar';
+end;
+
+class function TSaversDialog.Build: TStreamable;
+begin
+  Result := TSaversDialog.Create(streamableInit);
+end;
+
+function TSaversDialog.StreamableName: ShortString;
+begin
+  Result := 'Setups.TSaversDialog';
+end;
+
+class function TSaversListBox.Build: TStreamable;
+begin
+  Result := TSaversListBox.Create(streamableInit);
+end;
+
+function TSaversListBox.StreamableName: ShortString;
+begin
+  Result := 'Setups.TSaversListBox';
+end;
 
 end.
 

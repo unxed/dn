@@ -57,10 +57,12 @@ type
   TACEArchive = class;
   PACEArchive = TACEArchive;
   TACEArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -221,5 +223,16 @@ procedure TACEArchive.GetFile;
     FileInfo.Attr := FileInfo.Attr or Hidden;
   ArcFile.Seek(CompToFSize(FP + P.HeadSize + FileInfo.PSize + 4));
   end { TACEArchive.GetFile };
+
+
+class function TACEArchive.Build: TStreamable;
+begin
+  Result := TACEArchive.Create(streamableInit);
+end;
+
+function TACEArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtace.TACEArchive';
+end;
 
 end.

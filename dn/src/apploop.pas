@@ -182,7 +182,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
           begin
           if KeyMacroses = nil then
             begin
-            KeyMacroses := TCollection.Create(10, 10);
+            KeyMacroses := TObjCollection.Create(10, 10);
             for W := 1 to 10 do
               KeyMacroses.Insert(nil);
             end;

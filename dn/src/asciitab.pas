@@ -18,18 +18,22 @@ type
   { the table: the characters 0..255 in 8 rows of 32; the cursor is the current character (Data = its code, a byte) }
 
   TTable = class(TAsciiTable)
-    constructor Create(const Bounds: TRect);
+    constructor Create(const Bounds: TRect); overload;
     function KeyAction(var Event: TEvent): TAsciiKey; override;
     function TypedCode(var Event: TEvent): LongInt; override;
     function DataSize: Integer; override;
     procedure GetData(var Data); override;
     procedure SetData(var Data); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
   { the line with the character, its decimal and hexadecimal code }
 
   TReport = class(TAsciiReport)
     procedure ReportParts(out Prefix, Rest: AnsiString); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
   TASCIIChart = class(TvAscii.TAsciiChart)
@@ -37,7 +41,9 @@ type
     procedure HandleEvent(var Event: TEvent); override;
     function MakeTable(const Bounds: TRect): TAsciiTable; override;
     function MakeReport(const Bounds: TRect): TAsciiReport; override;
-    constructor Create(var R: TRect);
+    constructor Create(var R: TRect); overload;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
 { Shows the table; the chosen character is sent to the program as a key. }
@@ -211,6 +217,37 @@ begin
   P.Free;
   if CR <> nil then
     CR.Select;
+end;
+
+
+class function TTable.Build: TStreamable;
+begin
+  Result := TTable.Create(streamableInit);
+end;
+
+function TTable.StreamableName: ShortString;
+begin
+  Result := 'ASCIITab.TTable';
+end;
+
+class function TReport.Build: TStreamable;
+begin
+  Result := TReport.Create(streamableInit);
+end;
+
+function TReport.StreamableName: ShortString;
+begin
+  Result := 'ASCIITab.TReport';
+end;
+
+class function TASCIIChart.Build: TStreamable;
+begin
+  Result := TASCIIChart.Create(streamableInit);
+end;
+
+function TASCIIChart.StreamableName: ShortString;
+begin
+  Result := 'ASCIITab.TASCIIChart';
 end;
 
 end.

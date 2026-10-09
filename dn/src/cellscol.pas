@@ -85,13 +85,18 @@ type
     function Get(Col: Byte; Row: AInt): PCellrec;
     procedure SetValue(Col, Row: Integer; AValue: CReal);
     procedure DelItem(Col, Row: Integer);
-    procedure PutItem(var S: TStream; Item: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
+    { a cell in the files of the sheets (ShortStore, ShortLoad) }
+    procedure PutCell(S: TStream; Item: Pointer);
+    function GetCell(S: TStream): Pointer;
     function MakeFormatString(AValue: CReal): String;
     function Compare(K1, K2: Pointer): Integer; override;
     function TSort(var Start: Integer): Boolean; {AK155}
     procedure ForRectangle(AX: Byte; AY: AInt; {AK155}
         BX: Byte; BY: AInt; Action: Pointer); {see the comment at the body!}
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
  Real = Double; 
@@ -152,7 +157,7 @@ procedure TCellCollection.ShortStore(var S: TStream);
     TCount, TLimit, TDelta: AInt;
   procedure DoPutItem(P: Pointer);
     begin
-    PutItem(S, P);
+    PutCell(S, P);
     end;
   begin
   TCount := Count;
@@ -181,7 +186,7 @@ constructor TCellCollection.ShortLoad(var S: TStream);
   inherited Create(ALimit, ADelta);
   SetLimit(ACount);
   for I := 0 to ACount-1 do
-    AtInsert(I, GetItem(S));
+    AtInsert(I, GetCell(S));
   S.Read(Duplicates, SizeOf(Boolean));
   end;
 
@@ -292,7 +297,17 @@ function TCellCollection.ReplaceItem
 as Real, not CReal (with overflow checking).
 For the current version the values in the file are not needed.}
 
-procedure TCellCollection.PutItem(var S: TStream; Item: Pointer);
+procedure TCellCollection.WriteItem(Item: Pointer; Os: opstream);
+  begin
+  PutCell(Os.RdBuf, Item);
+  end;
+
+function TCellCollection.ReadItem(Ip: ipstream): Pointer;
+  begin
+  Result := GetCell(Ip.RdBuf);
+  end;
+
+procedure TCellCollection.PutCell(S: TStream; Item: Pointer);
   var
     P: PCellrec absolute Item;
     R: Real;
@@ -310,7 +325,7 @@ procedure TCellCollection.PutItem(var S: TStream; Item: Pointer);
   S.Write(P^.S, 1+Length(P^.S));
   end;
 
-function TCellCollection.GetItem(var S: TStream): Pointer;
+function TCellCollection.GetCell(S: TStream): Pointer;
   var
     R: TCellRec;
     l: Integer;
@@ -322,6 +337,16 @@ function TCellCollection.GetItem(var S: TStream): Pointer;
   Result := GetMem(l);
   Move(R, Result^, l);
   end;
+
+class function TCellCollection.Build: TStreamable;
+begin
+  Result := TCellCollection.Create(streamableInit);
+end;
+
+function TCellCollection.StreamableName: ShortString;
+begin
+  Result := 'CellsCol.TCellCollection';
+end;
 
 function TCellCollection.Get(Col: Byte; Row: AInt): PCellrec;
   var

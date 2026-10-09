@@ -51,16 +51,18 @@ interface
 
 uses
   Archiver
-  ;
+  , Defines;
 
 type
   TLHAArchive = class;
   PLHAArchive = TLHAArchive;
   TLHAArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -78,7 +80,7 @@ type
 
 implementation
 uses
-  basics, strutil, Defines, objutil, Streams, Dos, timeutil, Math
+  basics, strutil, objutil, Streams, Dos, timeutil, Math
   ;
 
 { ----------------------------- LHA ------------------------------------}
@@ -214,5 +216,16 @@ procedure TLHAArchive.GetFile;
     end;
   ArcFile.Seek(FP+P.PackedSize);
   end { TLHAArchive.GetFile };
+
+
+class function TLHAArchive.Build: TStreamable;
+begin
+  Result := TLHAArchive.Create(streamableInit);
+end;
+
+function TLHAArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtlha.TLHAArchive';
+end;
 
 end.

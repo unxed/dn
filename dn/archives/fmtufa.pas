@@ -57,10 +57,12 @@ type
   TUFAArchive = class;
   PUFAArchive = TUFAArchive;
   TUFAArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -174,5 +176,16 @@ procedure TUFAArchive.GetFile;
   FileInfo.Date := FH.DateTime;
   ArcFile.Seek(ArcFile.GetPos+FH.PackSize);
   end { TUFAArchive.GetFile };
+
+
+class function TUFAArchive.Build: TStreamable;
+begin
+  Result := TUFAArchive.Create(streamableInit);
+end;
+
+function TUFAArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtufa.TUFAArchive';
+end;
 
 end.

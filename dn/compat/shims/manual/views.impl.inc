@@ -52,6 +52,16 @@ begin
   end;
 end;
 
+function TMyScrollBar.StreamableName: ShortString;
+begin
+  Result := 'Views.TMyScrollBar';
+end;
+
+class function TMyScrollBar.Build: TStreamable;
+begin
+  Result := TMyScrollBar.Create(streamableInit);
+end;
+
 procedure TMyScrollBar.Draw;
 var
   S: String[5];

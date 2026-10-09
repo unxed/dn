@@ -168,15 +168,16 @@ function GetWord(S: String; No: Integer): String; { Word #No of S }
     GetWord := '';
   end;
 
-const
-  RStringList: TStreamRec =
-    (ObjType: otStringList; VmtLink: 0; Load: nil; Store: nil; Next: nil);
+var
+  StringListRegistered: Boolean = False;
 
   {-DataCompBoy-}
 procedure ProcessDLs(Enable: Boolean);
   var
     DLs: TTypeHolder;
     SLM: TStrListMaker;
+    Os: opstream;
+    Ip: ipstream;
     Fail: Boolean;
     F: lText;
     S, S1: String;
@@ -307,7 +308,9 @@ procedure ProcessDLs(Enable: Boolean);
     if DLStream.Status <> stOK then
       Error('Cannot create file '+OutLngFileName);
     Writeln('Writing ', OutLngFileName);
-    DLStream.Put(SLM);
+    Os := opstream.Create(DLStream);
+    Os.WritePointer(SLM);
+    Os.Free;
     if DLStream.Status <> stOK then
       begin
       DLStream.Free;
@@ -318,9 +321,13 @@ procedure ProcessDLs(Enable: Boolean);
       DLStream.Free;
     SLM.Free;
     end;
-  ReRegisterType(RStringList);
+  if not StringListRegistered then
+    TStreamableClass.Create('DNStrL.TStringList', @DNStrL.TStringList.Build);
+  StringListRegistered := True;
   DLStream := TBufStream.Create(SysOsPath(OutLngFileName), stOpenRead, 512);
-  LStringList := TStringList(DLStream.Get);
+  Ip := ipstream.Create(DLStream);
+  LStringList := TStringList(Ip.ReadPointer);
+  Ip.Free;
   if  (LStringList = nil) and Enable then
     begin
     DLStream.Free;
@@ -402,19 +409,25 @@ var
   EditCommands: array[1..MaxCommands] of TEditCommand;
 
 type
+  { the table of the editor commands: DN reads it as EditWin.TEditSaver }
   TEditSaver = class(TStreamable)
     constructor Create;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
-const
-  REditSaver: TStreamRec = (ObjType: 12335; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-
-constructor TEditSaver.Load(S: TStream);
+class function TEditSaver.Build: TStreamable;
   begin
-  S.Read(NumCommands, SizeOf(NumCommands));
-  S.Read(EditCommands, SizeOf(TEditCommand)*NumCommands);
+  Result := TEditSaver.Create;
+  end;
+
+function TEditSaver.Read(Ip: ipstream): Pointer;
+  begin
+  Result := Self;
+  Ip.ReadBytes(NumCommands, SizeOf(NumCommands));
+  Ip.ReadBytes(EditCommands, SizeOf(TEditCommand)*NumCommands);
   end;
 
 constructor TEditSaver.Create;
@@ -422,10 +435,15 @@ constructor TEditSaver.Create;
   inherited Create;
   end;
 
-procedure TEditSaver.Store(S: TStream);
+procedure TEditSaver.Write(Os: opstream);
   begin
-  S.Write(NumCommands, SizeOf(NumCommands));
-  S.Write(EditCommands, SizeOf(TEditCommand)*NumCommands);
+  Os.WriteBytes(NumCommands, SizeOf(NumCommands));
+  Os.WriteBytes(EditCommands, SizeOf(TEditCommand)*NumCommands);
+  end;
+
+function TEditSaver.StreamableName: ShortString;
+  begin
+  Result := 'EditWin.TEditSaver';
   end;
 
 {-DataCompBoy-}
@@ -1588,36 +1606,7 @@ Same:
     CutWord := S;
   end;
 
-function Build_RStringList(S: TStream): TStreamable;
 begin
-  Result := TStreamable(DNStrL.TStringList.Load(S));
-end;
-
-function Build_REditSaver(S: TStream): TStreamable;
-begin
-  Result := TStreamable(TEditSaver.Load(S));
-end;
-
-procedure Store_REditSaver(P: TStreamable; S: TStream);
-begin
-  TEditSaver(P).Store(S);
-end;
-
-procedure SetStreamRecs_rcp;
-begin
-
-  RStringList.VmtLink := PtrUInt(System.TClass(DNStrL.TStringList));
-  RStringList.Load := @Build_RStringList;
-
-  REditSaver.VmtLink := PtrUInt(System.TClass(TEditSaver));
-  REditSaver.Load := @Build_REditSaver;
-
-  REditSaver.Store := @Store_REditSaver;
-
-end;
-
-begin
-SetStreamRecs_rcp;
 Writeln(#13'Resource Compiler for DN OSP 1.51.07a+  Version 1.08');
 Writeln('Copyright(C) 1994,95 RIT Research Labs');
 Writeln('Copyright(C) 1995 AxoN(R)Soft');
@@ -1655,9 +1644,8 @@ else
   Error('Invalid parameter "'+FreeStr+'".');
 {/Cat}
 
-RegisterType(RStrListMaker);
 RegisterAll;
-RegisterType(REditSaver);
+TStreamableClass.Create('EditWin.TEditSaver', @TEditSaver.Build);
 
 Types := TValuesHolder.Create(10, 10);
 InitParser;
@@ -1723,7 +1711,6 @@ repeat
       LStringList := nil;
       end;
     DLStream.Free;
-    ReRegisterType(RStrListMaker);
     CleanupTypes;
     LList := CutWord(LList, 1);
     end

@@ -196,14 +196,16 @@ type
     {this for AVT: location of directory cell.
                                CurDirPos for AVT is position of a root node}
 
-    constructor Create(const AName: String);
+    constructor Create(const AName: String); overload;
     procedure lChDir(ADir: String); override;
     function GetDir: String; override;
     function GetDirectory(
          const FileMask: String;
         var TotalInfo: TSize): TFilesCollection; override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure RereadDirectory(S: String); override;
     procedure KillUse; override;
     procedure UseFile(P: PFileRec; Command: Word); override;
@@ -445,20 +447,21 @@ function TArvidDrive.GetDir: String;
     GetDir := 'AVT:'+Nm+ArcSep+CurDir;
   end;
 
-constructor TArvidDrive.Load(S: TStream);
+function TArvidDrive.Read(Ip: ipstream): Pointer;
   label 1;
   begin
+  Result := Self;
   inherited Create(0, nil);
-  inherited Load(S);
+  inherited Read(Ip);
   DriveType := dtArvid;
-  S.Read(KillAfterUse, 1);
-  Name := S.ReadStr;
+  Ip.ReadBytes(KillAfterUse, 1);
+  Name := Ip.ReadString;
   Stream := TBufStream.Create(Name^, stOpen, 2048);
   if Stream.Status <> stOK then
     begin
 1:
     { Classes: Fail already runs Destroy. }
-    Fail;
+    begin Free; Result := nil; Exit end;
     end;
   Stream.Read(AVT, SizeOf(AVT));
   if Stream.Status <> stOK then
@@ -476,12 +479,22 @@ constructor TArvidDrive.Load(S: TStream);
   ArvidDrives.Insert(Self);
   end { TArvidDrive.Load };
 
-procedure TArvidDrive.Store(S: TStream);
+procedure TArvidDrive.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(KillAfterUse, 1);
-  S.WriteStr(Name);
+  inherited Write(Os);
+  Os.WriteBytes(KillAfterUse, 1);
+  Os.WriteString(Name);
   end;
+
+class function TArvidDrive.Build: TStreamable;
+begin
+  Result := TArvidDrive.Create(streamableInit);
+end;
+
+function TArvidDrive.StreamableName: ShortString;
+begin
+  Result := 'Arvid.TArvidDrive';
+end;
 
 procedure TArvidDrive.RereadDirectory(S: String);
   begin

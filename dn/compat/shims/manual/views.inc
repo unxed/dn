@@ -60,6 +60,10 @@ type
   PMyScrollBar = TMyScrollBar;
   TMyScrollBar = class(TScrollBar)
     procedure Draw; override;
+  protected
+    function StreamableName: ShortString; override;
+  public
+    class function Build: TStreamable; static;
   end;
 
   { the video buffer of DN: 80x25 cells of 16 bits }

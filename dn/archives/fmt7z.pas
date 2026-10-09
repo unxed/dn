@@ -75,7 +75,7 @@ unit fmt7z; {7-Zip}
 interface
 uses
   Archiver
-  ;
+  , Defines;
 
 type
   TS7ZArchive = class;
@@ -83,17 +83,19 @@ type
   TS7ZArchive = class(TARJArchive)
     ListFileName: String;
     ListFile: System.Text;
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
     destructor Destroy; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
 uses
   SysUtils,
-  basics, strutil, fileutil, Defines, objutil, Streams, Dos, DnExec, osdep
+  basics, strutil, fileutil, objutil, Streams, Dos, DnExec, osdep
   ;
 
 { --- 7-Zip implemented by piwamoto --- }
@@ -233,5 +235,16 @@ destructor TS7ZArchive.Destroy;
     end;
   inherited Destroy;
   end;
+
+
+class function TS7ZArchive.Build: TStreamable;
+begin
+  Result := TS7ZArchive.Create(streamableInit);
+end;
+
+function TS7ZArchive.StreamableName: ShortString;
+begin
+  Result := 'fmt7z.TS7ZArchive';
+end;
 
 end.

@@ -72,7 +72,7 @@ type
     Count: Word; { do not separate from Selected! See Load,Store}
     Menu: PMenu;
     Items: array[1..10] of PMenuItem; // direct references into the menu
-    constructor Create(var Bounds: TRect; AStrings: TSItem);
+    constructor Create(var Bounds: TRect; AStrings: TSItem); overload;
     procedure BuildMenu(AStrings: TSItem);
     destructor Destroy; override;
     procedure SetState(AState: Word; Enable: Boolean); override;
@@ -82,17 +82,21 @@ type
     function DataSize: Integer; override;
     procedure GetData(var Rec); override;
     procedure SetData(var Rec); override;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
 
   THexLine = class(TView)
     InputLine: TInputLine;
     DeltaX, CurX: Integer;
     Sec: Boolean;
-    constructor Create(R: TRect; AInputLine: TInputLine);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Create(R: TRect; AInputLine: TInputLine); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
     end;
@@ -103,19 +107,23 @@ type
     ParamCount: AInt;
     ParamList: Pointer;
     constructor Create(var Bounds: TRect; const AText: String;
-        AParamCount: AInt);
-    constructor Load(var S: TStream);
+        AParamCount: AInt); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     function DataSize: Integer; override;
     procedure GetText(var S: String); override;
     procedure SetData(var Rec); override;
-    procedure Store(var S: TStream);
+    procedure Write(Os: opstream); override;
     end;
 
   TBookmark = class(TLabel)
     {` Notebook page bookmark with TNotepas pages }
-    constructor Create(var Bounds: TRect; AText: String; ALink: TView);
+    constructor Create(var Bounds: TRect; AText: String; ALink: TView); overload;
     procedure Draw; override;
     procedure FocusLink; virtual;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TPage = class(TDialog)
@@ -125,13 +133,17 @@ type
     procedure InitFrame; override;
     procedure HandleEvent(var Event: TEvent); override;
     function GetPalette: TPalette; override;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
 
   TPageFrame = class(TView)
     function GetPalette: TPalette; override;
     procedure Draw; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
     {<dialogs.001>}
@@ -141,11 +153,13 @@ type
     ActivePage: Integer;
     NumPages: Integer;
     constructor Create(var Bounds: TRect; ATitle: TTitleStr;
-      ABookmarkStart: integer);
+      ABookmarkStart: integer); overload;
     function NewPage(const ATitle: String): TPage;
     procedure InitFrame; override;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure GetData(var Rec); override;
     procedure SetData(var Rec); override;
     end;
@@ -153,6 +167,8 @@ type
   TNotepadFrame = class(TFrame)
     procedure FrameLine(var FrameBuf: TvDrawBuf.TDrawBuffer; Y, N: Integer; Color: TColorAttr); virtual;
     function GetTitleWidth: integer; virtual;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -164,10 +180,11 @@ constructor TParamText.Create(var Bounds: TRect; const AText: String;
   ParamCount := AParamCount;
   end;
 
-constructor TParamText.Load(var S: TStream);
+function TParamText.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  S.Read(ParamCount, SizeOf(AInt));
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(ParamCount, SizeOf(AInt));
   end;
 
 function TParamText.DataSize: Integer;
@@ -189,11 +206,21 @@ procedure TParamText.SetData(var Rec);
   DrawView;
   end;
 
-procedure TParamText.Store(var S: TStream);
+procedure TParamText.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(ParamCount, SizeOf(AInt));
+  inherited Write(Os);
+  Os.WriteBytes(ParamCount, SizeOf(AInt));
   end;
+
+class function TParamText.Build: TStreamable;
+begin
+  Result := TParamText.Create(streamableInit);
+end;
+
+function TParamText.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.TParamText';
+end;
 
 { TLabel }
 
@@ -207,17 +234,28 @@ constructor THexLine.Create(R: TRect; AInputLine: TInputLine);
   InputLine := AInputLine;
   end;
 
-constructor THexLine.Load(var S: TStream);
+function THexLine.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, InputLine);
+  Result := Self;
+  inherited Read(Ip);
+  InputLine := Ip.ReadPointer;
   end;
 
-procedure THexLine.Store(var S: TStream);
+procedure THexLine.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, InputLine);
+  inherited Write(Os);
+  Os.WritePointer(InputLine);
   end;
+
+class function THexLine.Build: TStreamable;
+begin
+  Result := THexLine.Create(streamableInit);
+end;
+
+function THexLine.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.THexLine';
+end;
 
 procedure THexLine.HandleEvent(var Event: TEvent);
   procedure CE;
@@ -539,20 +577,21 @@ procedure TComboBox.SetData(var Rec);
   DrawView;
   end;
 
-constructor TComboBox.Load(var S: TStream);
+function TComboBox.Read(Ip: ipstream): Pointer;
   var
     i: Integer;
     PLastItem: ^PMenuItem;
     LastItem: PMenuItem;
     P: PString;
   begin
-  inherited Load(S);
-  S.Read(Selected, 2*SizeOf(Word)); // including Count
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(Selected, 2*SizeOf(Word)); // including Count
   Menu := NewMenu(nil);
   PLastItem := @Menu^.Items;
   for i := 1 to Count do
     begin
-    P := S.ReadStr;
+    P := Ip.ReadString;
     LastItem := NewItem(Copy(P^, 1, Size.X-2),
       '',  kbNoKey, 1600+i, 0, nil);
     DisposeStr(P);
@@ -563,15 +602,25 @@ constructor TComboBox.Load(var S: TStream);
   Selected := 1;
   end;
 
-procedure TComboBox.Store(var S: TStream);
+procedure TComboBox.Write(Os: opstream);
   var
     i: Integer;
   begin
-  inherited Store(S);
-  S.Write(Selected, 2*SizeOf(Selected)); // including Count
+  inherited Write(Os);
+  Os.WriteBytes(Selected, 2*SizeOf(Selected)); // including Count
   for i := 1 to Count do
-    S.WriteStr(Items[i]^.Name);
+    Os.WriteString(Items[i]^.Name);
   end;
+
+class function TComboBox.Build: TStreamable;
+begin
+  Result := TComboBox.Create(streamableInit);
+end;
+
+function TComboBox.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.TComboBox';
+end;
 
 { \------------------ TComboBox ----------------/ }
 
@@ -629,19 +678,30 @@ SelectPage:
   inherited HandleEvent(Event);
   end {TPage.HandleEvent};
 
-constructor TPage.Load(var S: TStream);
+function TPage.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Bookmark);
-  GetPeerViewPtr(S, PrevPage);
+  Result := Self;
+  inherited Read(Ip);
+  Bookmark := Ip.ReadPointer;
+  PrevPage := Ip.ReadPointer;
   end;
 
-procedure TPage.Store(var S: TStream);
+procedure TPage.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Bookmark);
-  PutPeerViewPtr(S, PrevPage);
+  inherited Write(Os);
+  Os.WritePointer(Bookmark);
+  Os.WritePointer(PrevPage);
   end;
+
+class function TPage.Build: TStreamable;
+begin
+  Result := TPage.Create(streamableInit);
+end;
+
+function TPage.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.TPage';
+end;
 
 constructor TBookmark.Create(var Bounds: TRect; AText: String; ALink: TView);
   begin
@@ -701,31 +761,42 @@ function TNotepad.NewPage(const ATitle: String): TPage;
   Insert(TBookmark.Create(R, ATitle, Result));
   end {TNotepad.NewPage};
 
-constructor TNotepad.Load(var S: TStream);
+function TNotepad.Read(Ip: ipstream): Pointer;
   var
     i: Integer;
   const
     L = SizeOf(BookmarkStart) + SizeOf(ActivePage) + SizeOf(NumPages);
   begin
-  inherited Load(S);
-  S.Read(BookmarkStart, L);
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(BookmarkStart, L);
   for i := 0 to NumPages-1 do
-    GetSubViewPtr(S, Page[i]);
+    Page[i] := Ip.ReadPointer;
   Page[0].Bookmark.FocusLink;
   end;
 
-procedure TNotepad.Store(var S: TStream);
+procedure TNotepad.Write(Os: opstream);
   var
     i: Integer;
   const
     L = SizeOf(BookmarkStart) + SizeOf(ActivePage) + SizeOf(NumPages);
   begin
-  inherited Store(S);
-  S.Write(BookmarkStart, L);
+  inherited Write(Os);
+  Os.WriteBytes(BookmarkStart, L);
   for i := 0 to NumPages-1 do
-    PutSubViewPtr(S, Page[i]);
-  S.Write(BookmarkStart, L);
+    Os.WritePointer(Page[i]);
+  Os.WriteBytes(BookmarkStart, L);
   end;
+
+class function TNotepad.Build: TStreamable;
+begin
+  Result := TNotepad.Create(streamableInit);
+end;
+
+function TNotepad.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.TNotepad';
+end;
 
 procedure TNotepad.GetData(var Rec);
   type
@@ -843,5 +914,36 @@ procedure TPageFrame.Draw;
   end;
 
 { \------------------ TNotepad -----------------/ }
+
+
+class function TBookmark.Build: TStreamable;
+begin
+  Result := TBookmark.Create(streamableInit);
+end;
+
+function TBookmark.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.TBookmark';
+end;
+
+class function TPageFrame.Build: TStreamable;
+begin
+  Result := TPageFrame.Create(streamableInit);
+end;
+
+function TPageFrame.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.TPageFrame';
+end;
+
+class function TNotepadFrame.Build: TStreamable;
+begin
+  Result := TNotepadFrame.Create(streamableInit);
+end;
+
+function TNotepadFrame.StreamableName: ShortString;
+begin
+  Result := 'DNDlgs.TNotepadFrame';
+end;
 
 end.

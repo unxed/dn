@@ -69,12 +69,16 @@ type
 
   TEditScrollBar = class(TScrollBar)
     function GetPalette: TPalette; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   { TEditFrame }
 
   TEditFrame = class(TFrame)
     function GetPalette: TPalette; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -151,5 +155,26 @@ function TUniWindow.ReactOnCmd: Boolean;
   begin
   ReactOnCmd := True
   end;
+
+
+class function TEditScrollBar.Build: TStreamable;
+begin
+  Result := TEditScrollBar.Create(streamableInit);
+end;
+
+function TEditScrollBar.StreamableName: ShortString;
+begin
+  Result := 'UniWin.TEditScrollBar';
+end;
+
+class function TEditFrame.Build: TStreamable;
+begin
+  Result := TEditFrame.Create(streamableInit);
+end;
+
+function TEditFrame.StreamableName: ShortString;
+begin
+  Result := 'UniWin.TEditFrame';
+end;
 
 end.

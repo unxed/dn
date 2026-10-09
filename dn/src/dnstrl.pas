@@ -77,28 +77,46 @@ type
   public
     function Get(Key: AWord): String;
     destructor Destroy; override;
-    constructor Load(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+  public
+    constructor Create(AInit: TStreamableInit); overload;
     end;
 
 implementation
 
-constructor TStringList.Load(S: TStream);
+function TStringList.Read(Ip: ipstream): Pointer;
   var
     Size: AWord;
     N: LongInt;
   begin
-  inherited Create;
-  Stream := S;
-  S.Read(Size, SizeOf(Size));
-  BasePos := i32(S.GetPos);
-  S.Seek(Size + BasePos);
-  S.Read(IndexSize, SizeOf(IndexSize));
+  Result := Self;
+  Stream := Ip.RdBuf;
+  Ip.ReadBytes(Size, SizeOf(Size));
+  BasePos := i32(Ip.RdBuf.GetPos);
+  Ip.RdBuf.Seek(Size + BasePos);
+  Ip.ReadBytes(IndexSize, SizeOf(IndexSize));
   N := IndexSize;
   N := N * SizeOf(TStrIndexRec);
   GetMem(Index, N);
   if N > 0 then
-    S.Read(Index^, N);
+    Ip.ReadBytes(Index^, N);
   end;
+
+constructor TStringList.Create(AInit: TStreamableInit);
+begin
+end;
+
+class function TStringList.Build: TStreamable;
+begin
+  Result := TStringList.Create(streamableInit);
+end;
+
+function TStringList.StreamableName: ShortString;
+begin
+  Result := 'DNStrL.TStringList';
+end;
 
 destructor TStringList.Destroy;
   begin

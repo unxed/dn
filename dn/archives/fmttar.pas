@@ -57,10 +57,12 @@ type
   TTARArchive = class;
   PTARArchive = TTARArchive;
   TTARArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -230,5 +232,16 @@ procedure TTARArchive.GetFile;
   ArcFile.Seek(CompToFSize(ArcFile.GetPos + FileInfo.PSize -
                             W + BlkSize*Byte(W<>0)));
   end { TTARArchive.GetFile };
+
+
+class function TTARArchive.Build: TStreamable;
+begin
+  Result := TTARArchive.Create(streamableInit);
+end;
+
+function TTARArchive.StreamableName: ShortString;
+begin
+  Result := 'fmttar.TTARArchive';
+end;
 
 end.

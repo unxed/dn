@@ -57,10 +57,12 @@ type
   THYPArchive = class;
   PHYPArchive = THYPArchive;
   THYPArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -187,5 +189,16 @@ procedure THYPArchive.GetFile;
   ArcFile.Read(FileInfo.FName[1], P.NameLen);
   ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { THYPArchive.GetFile };
+
+
+class function THYPArchive.Build: TStreamable;
+begin
+  Result := THYPArchive.Create(streamableInit);
+end;
+
+function THYPArchive.StreamableName: ShortString;
+begin
+  Result := 'fmthyp.THYPArchive';
+end;
 
 end.

@@ -131,7 +131,7 @@ type
     VerticalScrollBar: TDBScrollBar;
     HorizontalScrollBar: TDBScrollBar;
     XCoder: TXCoder;
-    constructor Create(R: TRect; const FName: String; var FileIsDBF: Boolean);
+    constructor Create(R: TRect; const FName: String; var FileIsDBF: Boolean); overload;
     {DataCompBoy}
     function Valid(Command: Word): Boolean; override;
     function GetRecord(N: LongInt): Pointer;
@@ -140,8 +140,10 @@ type
     destructor Destroy; override;
     procedure Draw; override;
     function GetPalette: TPalette; override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function Failed(var FileIsDBF: Boolean): Boolean;
     end;
 
@@ -165,11 +167,15 @@ type
     procedure Draw; override;
     {Constructor Load(var S : Tstream);
        Procedure Store(var S : TStream);}
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TFieldListBox = class;
   TFieldListBox = class(TListBox)
     function GetText(Item: LongInt; MaxLen: Integer): String; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TDBWindow = class;
@@ -180,11 +186,13 @@ type
     HSB: TDBScrollBar;
     RealName: String;
     {--- start -------- Eugeny Zvyagintzev ---------}
-    constructor Create(FName: String; var FileIsDBF: Boolean);
+    constructor Create(FName: String; var FileIsDBF: Boolean); overload;
     {--- finish -------- Eugeny Zvyagintzev ---------}
     function GetPalette: TPalette; override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure SetState(AState: Word; Enable: Boolean); override;
     {John_SW 14-03-2003}
     destructor Destroy; override;
@@ -377,15 +385,15 @@ constructor TDBViewer.Create(R: TRect; const FName: String; var FileIsDBF: Boole
   end;
 {-DataCompBoy-}
 
-procedure TDBViewer.Store(S: TStream);
+procedure TDBViewer.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(KillAfterUse, SizeOf(KillAfterUse));
-  S.WriteStr(SearchString);
-  S.WriteStr(FileName);
-  S.Write(Delta, SizeOf(Delta));
-  S.Write(Pos, SizeOf(Pos));
-  XCoder.Store(S);
+  inherited Write(Os);
+  Os.WriteBytes(KillAfterUse, SizeOf(KillAfterUse));
+  Os.WriteString(SearchString);
+  Os.WriteString(FileName);
+  Os.WriteBytes(Delta, SizeOf(Delta));
+  Os.WriteBytes(Pos, SizeOf(Pos));
+  XCoder.Write(Os);
   end;
 
 function DateToHuman(const S: String): String;
@@ -451,23 +459,35 @@ function TDBViewer.Failed(var FileIsDBF: Boolean): Boolean;
   FileIsDBF := isValid;
   end { TDBViewer.Failed };
 
-constructor TDBViewer.Load(S: TStream);
+function TDBViewer.Read(Ip: ipstream): Pointer;
   var
     FileIsDBF: Boolean;
   begin
-  inherited Load(S);
-  S.Read(KillAfterUse, SizeOf(KillAfterUse));
-  SearchString := S.ReadStr;
-  FileName := S.ReadStr;
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(KillAfterUse, SizeOf(KillAfterUse));
+  SearchString := Ip.ReadString;
+  FileName := Ip.ReadString;
 
   if Failed(FileIsDBF) then
-    Fail;
+    begin Free; Result := nil; Exit end;
 
-  S.Read(Delta, SizeOf(Delta));
-  S.Read(Pos, SizeOf(Pos));
+  Ip.ReadBytes(Delta, SizeOf(Delta));
+  Ip.ReadBytes(Pos, SizeOf(Pos));
 
-  XCoder := TXCoder.Load(S);   { a class: the constructor makes the instance }
+  XCoder := TXCoder.Create(8);
+  XCoder.Read(Ip);
   end;
+
+class function TDBViewer.Build: TStreamable;
+begin
+  Result := TDBViewer.Create(streamableInit);
+end;
+
+function TDBViewer.StreamableName: ShortString;
+begin
+  Result := 'DBView.TDBViewer';
+end;
 
 destructor TDBViewer.Destroy;
   begin
@@ -1592,18 +1612,19 @@ constructor TDBWindow.Create(FName: String; var FileIsDBF: Boolean);
   P.Indicator := P1;
   end { TDBWindow.Init };
 
-constructor TDBWindow.Load(S: TStream);
+function TDBWindow.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetSubViewPtr(S, P);
-  GetSubViewPtr(S, P1);
+  Result := Self;
+  inherited Read(Ip);
+  P := Ip.ReadPointer;
+  P1 := Ip.ReadPointer;
   P1.DBViewer := P;
   P.Indicator := P1;
-  GetSubViewPtr(S, VSB);
+  VSB := Ip.ReadPointer;
   VSB.DBViewer := P;
   VSB.ScrollBarType := sbVertical;
   P.VerticalScrollBar := VSB;
-  GetSubViewPtr(S, HSB);
+  HSB := Ip.ReadPointer;
   HSB.DBViewer := P;
   HSB.ScrollBarType := sbHorizontal;
   P.HorizontalScrollBar := HSB;
@@ -1611,14 +1632,24 @@ constructor TDBWindow.Load(S: TStream);
   Redraw;
   end;
 
-procedure TDBWindow.Store(S: TStream);
+procedure TDBWindow.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutSubViewPtr(S, P);
-  PutSubViewPtr(S, P1);
-  PutSubViewPtr(S, VSB);
-  PutSubViewPtr(S, HSB);
+  inherited Write(Os);
+  Os.WritePointer(P);
+  Os.WritePointer(P1);
+  Os.WritePointer(VSB);
+  Os.WritePointer(HSB);
   end;
+
+class function TDBWindow.Build: TStreamable;
+begin
+  Result := TDBWindow.Create(streamableInit);
+end;
+
+function TDBWindow.StreamableName: ShortString;
+begin
+  Result := 'DBView.TDBWindow';
+end;
 
 {--- start -------- Eugeny Zvyagintzev ---- 14-03-2003 ----}
 procedure TDBWindow.SetState(AState: Word; Enable: Boolean);
@@ -1639,5 +1670,26 @@ destructor TDBWindow.Destroy;
   end;
 
 
+
+
+class function TDBIndicator.Build: TStreamable;
+begin
+  Result := TDBIndicator.Create(streamableInit);
+end;
+
+function TDBIndicator.StreamableName: ShortString;
+begin
+  Result := 'DBView.TDBIndicator';
+end;
+
+class function TFieldListBox.Build: TStreamable;
+begin
+  Result := TFieldListBox.Create(streamableInit);
+end;
+
+function TFieldListBox.StreamableName: ShortString;
+begin
+  Result := 'DBView.TFieldListBox';
+end;
 
 end.

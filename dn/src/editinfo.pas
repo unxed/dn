@@ -60,13 +60,17 @@ uses
 
 type
   TInfoLine = class(TView)
-    constructor Create(const R: TRect);
+    constructor Create(const R: TRect); overload;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TBookmarkLine = class(TView)
     procedure Draw; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -329,5 +333,26 @@ procedure TBookmarkLine.Draw;
     WriteLineW(0, I, Size.X, 1, B);
     end;
   end;
+
+
+class function TInfoLine.Build: TStreamable;
+begin
+  Result := TInfoLine.Create(streamableInit);
+end;
+
+function TInfoLine.StreamableName: ShortString;
+begin
+  Result := 'editinfo.TInfoLine';
+end;
+
+class function TBookmarkLine.Build: TStreamable;
+begin
+  Result := TBookmarkLine.Create(streamableInit);
+end;
+
+function TBookmarkLine.StreamableName: ShortString;
+begin
+  Result := 'editinfo.TBookmarkLine';
+end;
 
 end.

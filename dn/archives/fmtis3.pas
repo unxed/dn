@@ -59,10 +59,12 @@ type
   TIS3Archive = class(TARJArchive)
     FoldersOffs: LongInt; {!!s}
     FilesNumber: LongInt;
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -232,5 +234,16 @@ procedure TIS3Archive.GetFile;
   Dec(FilesNumber);
   ArcFile.Seek(FP+SizeOf(P)+P.NameLen+13);
   end { TIS3Archive.GetFile };
+
+
+class function TIS3Archive.Build: TStreamable;
+begin
+  Result := TIS3Archive.Create(streamableInit);
+end;
+
+function TIS3Archive.StreamableName: ShortString;
+begin
+  Result := 'fmtis3.TIS3Archive';
+end;
 
 end.

@@ -74,8 +74,10 @@ var
 type
 
   TGameWindow = class(TDialog)
-    constructor Create;
+    constructor Create; overload;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 
@@ -107,9 +109,11 @@ type
       StLv, EndLv: Byte;
       Score: LongInt;
       end;
-    constructor Create(R: TRect);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Create(R: TRect); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     procedure NewGame;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
@@ -130,8 +134,10 @@ type
     Hc, Gm: TGameView;
     function GetPalette: TPalette; override;
     procedure Draw; override;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
 
 const
@@ -265,17 +271,28 @@ constructor TGameWindow.Create;
   SelectNext(False);
   end { TGameWindow.Init };
 
-constructor TGameInfo.Load(var S: TStream);
+function TGameInfo.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Gm);
+  Result := Self;
+  inherited Read(Ip);
+  Gm := Ip.ReadPointer;
   end;
 
-procedure TGameInfo.Store(var S: TStream);
+procedure TGameInfo.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Gm);
+  inherited Write(Os);
+  Os.WritePointer(Gm);
   end;
+
+class function TGameInfo.Build: TStreamable;
+begin
+  Result := TGameInfo.Create(streamableInit);
+end;
+
+function TGameInfo.StreamableName: ShortString;
+begin
+  Result := 'Tetris.TGameInfo';
+end;
 
 function TGameInfo.GetPalette: TPalette;
   const
@@ -371,7 +388,7 @@ procedure TGameInfo.Draw;
   WriteLineC(0, 14, Size.X, 1, B);
   end { TGameInfo.Draw };
 
-constructor TGameView.Create;
+constructor TGameView.Create(R: TRect);
   var
     I, J: Integer;
     S: TDosStream;
@@ -474,21 +491,32 @@ procedure TGameView.ShowScores;
   D.Free;
   end { TGameView.ShowScores };
 
-constructor TGameView.Load(var S: TStream);
+function TGameView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Info);
-  S.Read(Glass, SizeOf(Self)-SizeOf(TView)-SizeOf(TView));
+  Result := Self;
+  inherited Read(Ip);
+  Info := Ip.ReadPointer;
+  Ip.ReadBytes(Glass, SizeOf(Self)-SizeOf(TView)-SizeOf(TView));
   Game := Self;
   RegisterToBackground(Self);
   end;
 
-procedure TGameView.Store(var S: TStream);
+procedure TGameView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Info);
-  S.Write(Glass, SizeOf(Self)-SizeOf(TView)-SizeOf(TView));
+  inherited Write(Os);
+  Os.WritePointer(Info);
+  Os.WriteBytes(Glass, SizeOf(Self)-SizeOf(TView)-SizeOf(TView));
   end;
+
+class function TGameView.Build: TStreamable;
+begin
+  Result := TGameView.Create(streamableInit);
+end;
+
+function TGameView.StreamableName: ShortString;
+begin
+  Result := 'Tetris.TGameView';
+end;
 
 destructor TGameView.Destroy;
   begin
@@ -894,6 +922,15 @@ procedure TGameWindow.HandleEvent(var Event: TEvent);
   end;
 
 
+class function TGameWindow.Build: TStreamable;
+begin
+  Result := TGameWindow.Create(streamableInit);
+end;
+
+function TGameWindow.StreamableName: ShortString;
+begin
+  Result := 'Tetris.TGameWindow';
+end;
 
 begin
 end.

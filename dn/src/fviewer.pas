@@ -79,6 +79,8 @@ type
     procedure Draw; override;
     function GetSize: Integer;
     procedure DrawPos(Pos: Integer);
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   { TFileViewer }
@@ -127,9 +129,11 @@ type
     HiLitePar: THighliteParams;
     constructor Create(const Bounds: TRect; AStream: TStream;
         const AFileName, AVFileName: String;
-        ASB: TView; Quick, Hex: Boolean); {DataCompBoy}
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+        ASB: TView; Quick, Hex: Boolean); overload; {DataCompBoy}
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     destructor Destroy; override;
     procedure Draw; override;
     function ReadFile(const FName, VFName: String; NewStream: Boolean)
@@ -168,6 +172,8 @@ type
     {`2 Quick View`}
   TQFileViewer = class(THFileViewer)
     procedure ChangeFile(FR: PFileRec); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TDFileViewer = class;
@@ -176,6 +182,8 @@ type
   TDFileViewer = class(THFileViewer)
     procedure HandleEvent(var Event: TEvent); override;
     procedure ChangeFile(FR: PFileRec); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TNFileViewer = class;
@@ -188,9 +196,11 @@ type
   TViewInfo = class;
   TViewInfo = class(TView)
     Viewer: TFileViewer;
-    constructor Create(const R: TRect; AViewer: TFileViewer);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    constructor Create(const R: TRect; AViewer: TFileViewer); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     end;
@@ -198,11 +208,13 @@ type
   TFileWindow = class;
 
   TFileWindow = class(TWindow)
-    constructor Create(const FileName, VFileName: String; Hex: Boolean);
+    constructor Create(const FileName, VFileName: String; Hex: Boolean); overload;
     {DataCompBoy}
     function GetPalette: TPalette; override;
     function ReactOnCmd: Boolean; virtual;
     procedure ChangeBounds(const Bounds: TRect); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -450,17 +462,28 @@ constructor TViewInfo.Create(const R: TRect; AViewer: TFileViewer);
   EventMask := evMouse;
   end;
 
-constructor TViewInfo.Load(S: TStream);
+function TViewInfo.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Viewer);
+  Result := Self;
+  inherited Read(Ip);
+  Viewer := Ip.ReadPointer;
   end;
 
-procedure TViewInfo.Store(S: TStream);
+procedure TViewInfo.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Viewer);
+  inherited Write(Os);
+  Os.WritePointer(Viewer);
   end;
+
+class function TViewInfo.Build: TStreamable;
+begin
+  Result := TViewInfo.Create(streamableInit);
+end;
+
+function TViewInfo.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TViewInfo';
+end;
 
 procedure TViewInfo.Draw;
   var
@@ -1137,29 +1160,31 @@ destructor TFileViewer.Destroy;
   inherited Destroy;
   end;
 
-constructor TFileViewer.Load(S: TStream);
+function TFileViewer.Read(Ip: ipstream): Pointer;
   var
     FP: TFileSize;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   NoEdit := False;
   BufModified := False;
-  GetPeerViewPtr(S, SB);
-  GetPeerViewPtr(S, Info);
-  S.ReadStrV(FileName);
-  {S.Read(FileName[0], 1); S.Read(FileName[1], Length(FileName));}
-  S.ReadStrV(VFileName);
-  {S.Read(VFileName[0], 1); S.Read(VFileName[1], Length(VFileName));}
-  S.Read(FP, SizeOf(FP));
-  S.Read(QuickView, 1);
-  S.Read(Wrap, 1);
+  SB := Ip.ReadPointer;
+  Info := Ip.ReadPointer;
+  ReadStrV(Ip, FileName);
+  {Ip.ReadBytes(FileName[0], 1); Ip.ReadBytes(FileName[1], Length(FileName));}
+  ReadStrV(Ip, VFileName);
+  {Ip.ReadBytes(VFileName[0], 1); Ip.ReadBytes(VFileName[1], Length(VFileName));}
+  Ip.ReadBytes(FP, SizeOf(FP));
+  Ip.ReadBytes(QuickView, 1);
+  Ip.ReadBytes(Wrap, 1);
   {???}
-  S.Read(FakeKillAfterUse, 1);
+  Ip.ReadBytes(FakeKillAfterUse, 1);
   KillAfterUse := False;
-  S.Read(Filter, 1);
-  S.Read(ViewMode, 2);
-  XCoder := TXCoder.Load(S);   { a class: the constructor makes the instance }
-  S.Read(MarkPos, SizeOf(MarkPos));
+  Ip.ReadBytes(Filter, 1);
+  Ip.ReadBytes(ViewMode, 2);
+  XCoder := TXCoder.Create(8);
+  XCoder.Read(Ip);
+  Ip.ReadBytes(MarkPos, SizeOf(MarkPos));
   Fl := nil;
   Buf := nil;
   isValid := True;
@@ -1181,24 +1206,34 @@ constructor TFileViewer.Load(S: TStream);
     end;
   end { TFileViewer.Load };
 
-procedure TFileViewer.Store;
+class function TFileViewer.Build: TStreamable;
+begin
+  Result := TFileViewer.Create(streamableInit);
+end;
+
+function TFileViewer.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TFileViewer';
+end;
+
+procedure TFileViewer.Write(Os: opstream);
   var
     FP: TFileSize;
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, SB);
-  PutPeerViewPtr(S, Info);
-  S.WriteStr(@FileName); {S.Write(FileName[0], 1 + Length(FileName));}
-  S.WriteStr(@VFileName); {S.Write(VFileName[0], 1 + Length(VFileName));}
+  inherited Write(Os);
+  Os.WritePointer(SB);
+  Os.WritePointer(Info);
+  Os.WriteString(@FileName); {Os.WriteBytes(FileName[0], 1 + Length(FileName));}
+  Os.WriteString(@VFileName); {Os.WriteBytes(VFileName[0], 1 + Length(VFileName));}
   FP := FilePos+LongInt(BufPos);
-  S.Write(FP, SizeOf(FP));
-  S.Write(QuickView, 1);
-  S.Write(Wrap, 1);
-  S.Write(FakeKillAfterUse, 1);
-  S.Write(Filter, 1);
-  S.Write(ViewMode, 2);
-  XCoder.Store(S);
-  S.Write(MarkPos, SizeOf(MarkPos));
+  Os.WriteBytes(FP, SizeOf(FP));
+  Os.WriteBytes(QuickView, 1);
+  Os.WriteBytes(Wrap, 1);
+  Os.WriteBytes(FakeKillAfterUse, 1);
+  Os.WriteBytes(Filter, 1);
+  Os.WriteBytes(ViewMode, 2);
+  XCoder.Write(Os);
+  Os.WriteBytes(MarkPos, SizeOf(MarkPos));
   end;
 
 procedure XDumpStr(var S: String; var B; Addr: Int64; Count: Integer;
@@ -3597,5 +3632,46 @@ function TFileWindow.ReactOnCmd: Boolean;
   begin
   ReactOnCmd := True
   end;
+
+
+class function TFileWindow.Build: TStreamable;
+begin
+  Result := TFileWindow.Create(streamableInit);
+end;
+
+function TFileWindow.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TFileWindow';
+end;
+
+class function TViewScroll.Build: TStreamable;
+begin
+  Result := TViewScroll.Create(streamableInit);
+end;
+
+function TViewScroll.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TViewScroll';
+end;
+
+class function TQFileViewer.Build: TStreamable;
+begin
+  Result := TQFileViewer.Create(streamableInit);
+end;
+
+function TQFileViewer.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TQFileViewer';
+end;
+
+class function TDFileViewer.Build: TStreamable;
+begin
+  Result := TDFileViewer.Create(streamableInit);
+end;
+
+function TDFileViewer.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TDFileViewer';
+end;
 
 end.

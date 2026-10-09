@@ -21,8 +21,9 @@ type
       Name of a predefined encoding or of a loaded
       xlt table file without path `}
     constructor Create(AMaxCodeTagLen: Byte);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    { the fields in a stream (a part of the viewer that has the coder) }
+    procedure Read(Ip: ipstream);
+    procedure Write(Os: opstream);
     procedure UseToAscii;
       {` Set everything to kmXlat from XLatCP[ToAscii]`}
     procedure UseKeyMap;
@@ -52,27 +53,27 @@ constructor TXCoder.Create(AMaxCodeTagLen: Byte);
   MaxCodeTagLen := AMaxCodeTagLen;
   end;
 
-procedure TXCoder.Store(S: TStream);
+procedure TXCoder.Write(Os: opstream);
   begin
-  S.Write(KeyMap, SizeOf(KeyMap));
-  S.Write(MaxCodeTagLen, SizeOf(MaxCodeTagLen));
-  S.Write(CodeTag, SizeOf(CodeTag));
+  Os.WriteBytes(KeyMap, SizeOf(KeyMap));
+  Os.WriteBytes(MaxCodeTagLen, SizeOf(MaxCodeTagLen));
+  Os.WriteBytes(CodeTag, SizeOf(CodeTag));
   if KeyMap = kmXlat then
-    S.Write(XLatCP[ToAscii], SizeOf(TXLat));
+    Os.WriteBytes(XLatCP[ToAscii], SizeOf(TXLat));
   end;
 
-constructor TXCoder.Load(S: TStream);
+procedure TXCoder.Read(Ip: ipstream);
   var
     FName: PString;
   begin
-  S.Read(KeyMap, SizeOf(KeyMap));
-  S.Read(MaxCodeTagLen, SizeOf(MaxCodeTagLen));
-  S.Read(CodeTag, SizeOf(CodeTag));
+  Ip.ReadBytes(KeyMap, SizeOf(KeyMap));
+  Ip.ReadBytes(MaxCodeTagLen, SizeOf(MaxCodeTagLen));
+  Ip.ReadBytes(CodeTag, SizeOf(CodeTag));
   if KeyMap <> kmXlat then
     UseKeyMap
   else
     begin
-    S.Read(XLatCP[ToAscii], SizeOf(TXLat));
+    Ip.ReadBytes(XLatCP[ToAscii], SizeOf(TXLat));
     UseToAscii;
     end;
   end;

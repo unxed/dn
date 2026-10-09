@@ -59,9 +59,11 @@ type
   T_BWSelector = class(TMonoSelector)
     SelType: TColorSel; {Is't a selector of Foreground color ? }
     constructor Create(var Bounds: TRect; ASelType: TColorSel;
-         AStrings: TSItem);
+         AStrings: TSItem); overload;
     procedure HandleEvent(var Event: TEvent); override;
     procedure NewColor; virtual;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -118,5 +120,16 @@ procedure T_BWSelector.NewColor;
 
 { TColorDisplay }
 
+
+
+class function T_BWSelector.Build: TStreamable;
+begin
+  Result := T_BWSelector.Create(streamableInit);
+end;
+
+function T_BWSelector.StreamableName: ShortString;
+begin
+  Result := 'bwselect.T_BWSelector';
+end;
 
 end.

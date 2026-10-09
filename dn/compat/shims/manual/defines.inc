@@ -64,6 +64,15 @@ type
   PXLat = ^TXlat;
   TXlat = array[Char] of Char;
 
+{ The strings of DN in the streams (ipstream, opstream): a ShortString read into a variable; an AnsiString (a 32-bit length and the
+  characters; nil is written as the empty string); a zero-terminated string (a 16-bit length, nil as 0). }
+procedure ReadStrV(Ip: ipstream; var S: ShortString);
+function ReadLongStr(Ip: ipstream): PLongString;
+procedure ReadLongStrV(Ip: ipstream; var S: LongString);
+procedure WriteLongStr(Os: opstream; P: PLongString);
+function StrRead(Ip: ipstream): PChar;
+procedure StrWrite(Os: opstream; P: PChar);
+
 procedure Beep(Freq, Dur: LongInt);
 { The free memory of the heap and its largest free block (bytes; VP and BP have them built in). }
 function MemAvail: LongInt;

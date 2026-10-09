@@ -28,7 +28,9 @@ type
   TBackground = class;
 
   TBackground = class(TvApp.TBackground)
-    constructor Create(const Bounds: TRect; APattern: Byte);
+    constructor Create(const Bounds: TRect; APattern: Byte); overload;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
   TDesktop = class;
@@ -36,6 +38,8 @@ type
   TDesktop = class(TvApp.TDeskTop)
     procedure Clear;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
   TProgram = class;
@@ -550,6 +554,7 @@ end;
 
 procedure InitLngStream;
 var
+  Ip: ipstream;
   PS, XS: TStream;
   S: String;
 begin
@@ -574,7 +579,9 @@ begin
   end;
   LngStream := PS;
   PS.Seek(0);
-  LStringList := TStringList(PS.Get);
+  Ip := ipstream.Create(PS);
+  LStringList := TStringList(Ip.ReadPointer);
+  Ip.Free;
   if (PS.Status <> stOK) or (LStringList = nil) then
     ResourceFail('reading ' + LngId + '.lng');
   { the titles and the buttons of the message and input boxes of tv/ in the language of the resources }
@@ -630,6 +637,27 @@ function CommandHidden(Command: Word): Boolean;
 begin
   Result := ((Command = cmGame) and not EnableGame) or (Command = cmPlayCD) or (Command = cmSystemInfo) or
     (Command = cmMemoryInfo);
+end;
+
+
+class function TBackground.Build: TStreamable;
+begin
+  Result := TBackground.Create(streamableInit);
+end;
+
+function TBackground.StreamableName: ShortString;
+begin
+  Result := 'mainapp.TBackground';
+end;
+
+class function TDesktop.Build: TStreamable;
+begin
+  Result := TDesktop.Create(streamableInit);
+end;
+
+function TDesktop.StreamableName: ShortString;
+begin
+  Result := 'mainapp.TDesktop';
 end;
 
 initialization

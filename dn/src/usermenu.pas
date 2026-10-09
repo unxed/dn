@@ -71,19 +71,23 @@ type
 
   TUserView = class(TScroller)
     Grabbing: Boolean;
-    constructor Create(const R: TRect; H, V: TScrollBar);
+    constructor Create(const R: TRect; H, V: TScrollBar); overload;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure ChangeBounds(const Bounds: TRect); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TUserWindow = class;
 
   TUserWindow = class(TWindow)
     OldScreenWidth: Word;
-    constructor Create;
+    constructor Create; overload;
     procedure CalcBounds(var Bounds: TRect; Delta: TPoint); override;
     procedure SetState(AState: Word; Enable: Boolean); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -1360,5 +1364,26 @@ RL:
 
   end { QuickExecExternal };
 {-DataCompBoy-}
+
+
+class function TUserWindow.Build: TStreamable;
+begin
+  Result := TUserWindow.Create(streamableInit);
+end;
+
+function TUserWindow.StreamableName: ShortString;
+begin
+  Result := 'UserMenu.TUserWindow';
+end;
+
+class function TUserView.Build: TStreamable;
+begin
+  Result := TUserView.Create(streamableInit);
+end;
+
+function TUserView.StreamableName: ShortString;
+begin
+  Result := 'UserMenu.TUserView';
+end;
 
 end.
