@@ -273,3 +273,11 @@ changed side effect, crash, or teardown error keeps the gate open.
 ## After the gate (2026-10-08)
 
 The gate stays **CLOSED**. Wanted changes of behaviour after the close make the screen differ from the frozen object revision (`OBJECT_DN_SHA`) by design: the host path instead of `C:\dir`, no drive line and a different drive menu on Unix (`docs/PATHS.md`), tve as the editor. `dn-accept` is therefore started by hand only (`workflow_dispatch`); the checks that run on every push are the unit tests, the pty tests (`dn-linux`), `dn-windows`, `toolchain` (DOS) and `layout`.
+
+## The object baseline is gone (2026-10-09)
+
+The object build of the gate was DN `b4916b8` with the old tv repository at `521d064`. The units of that tv were removed from every
+commit of its history (they had code in common with other projects), so the baseline cannot be built any more. The gate stays closed
+with its result (177/177); `.github/workflows/dn-accept.yml` and `tools/accept-local.sh` now compare the UTF-8 build with the build
+with the code page inside.
+

@@ -41,8 +41,6 @@ INSTALL = '/tmp/dn-accept-install-%d' % os.getpid()
 WORK_ROOT = '/tmp/dn-accept-shared-%d' % os.getpid()
 
 # Object baseline pins (acceptance gate).
-OBJECT_DN_SHA = 'b4916b874989d7b35660d02cf935dc5f0db7a656'
-OBJECT_TV_SHA = '521d06479198789deeaa6fda287236ca83ba4051'
 
 KEYS = {
     'SHIFT-UP': '\x1b[1;2A', 'SHIFT-DOWN': '\x1b[1;2B', 'SHIFT-RIGHT': '\x1b[1;2C', 'SHIFT-LEFT': '\x1b[1;2D', 

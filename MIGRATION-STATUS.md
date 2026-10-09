@@ -44,7 +44,7 @@ The other scripts and what each one checks: [`tools/README.md`](tools/README.md)
 
 Work goes to `main`. `tv/` is the submodule `unxed/tv3`; a change to it is made and tested there (a branch of that repository), then the pointer is moved here.
 The `tv/` pointer of `main` is on `main` of `unxed/tv3` (`claude/dos-names` was merged into it on 2026-10-07 together with the clipboard and far2l work that was already there: `1bb5290`). The merged branches `claude/glyphs` and `claude/dos-names` of tv3 are still on GitHub: the token of this work cannot delete a branch (HTTP 403), the owner deletes them in the web interface.
-The object baseline of the gate is pinned in `tools/dn-linux-accept.py` (`OBJECT_DN_SHA`, `OBJECT_TV_SHA`).
+The object baseline of the gate cannot be built any more (docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md, last section).
 
 ## Open items
 
