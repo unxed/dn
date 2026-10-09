@@ -57,7 +57,7 @@ From `dn/TODO-refactoring.md` candidates, **in 3.0 this stage only**:
 
 Out of scope for this stage (post-3.0 / TODO-later unless owner moves them):
 
-- Full Safe Pascal (`unxed/sp`) migration.
+- Full Safe Pascal (`unxed/bp`) migration.
 - Mass rename of every historical abbreviation (`SysXXX`, Russian stems).
 - Dropping `osdep` / rewriting callers’ DOS error conventions.
 

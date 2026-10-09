@@ -6,10 +6,10 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 
 | repo | state |
 |---|---|
-| tv3 | head `356feaa` (main): the API of magiblot/tvision (classes, names, streams, platform classes; the differences in `docs/API-NAMES.md`); the far2l extensions on both sides; CI job `generated`; the audit is manual (`tools/audit/run.sh`) and prints `AUDIT PASS` |
-| tve | head `9fb9e31` (main), on the new tv3 API; the audit prints `AUDIT PASS` |
+| tv3 | head `0fd692d` (main; dn and bp pin `356feaa`, the same code): the API of magiblot/tvision (classes, names, streams, platform classes; the differences in `docs/API-NAMES.md`); the far2l extensions on both sides; CI job `generated`; the audit is manual (`tools/audit/run.sh`) and prints `AUDIT PASS` |
+| tve | head `95c676c` (main; dn and bp pin `9fb9e31`, the same code), on the new tv3 API; the audit prints `AUDIT PASS` |
 | dn | main pins tv3 `356feaa` and tve `9fb9e31`; builds for Linux, DOS (both builds) and Windows; acceptance: the UTF-8 build against the code-page build (`dn-accept.yml`, `docs/CLASS-MIGRATION-ACCEPTANCE-GATE.md`); releases by `release.yml`, snapshots by `nightly.yml` (green commits of main only) |
-| sp | main pins the same tv3 and tve; fpide on the new API; the repository is to be renamed to bp (the last step) |
+| bp (was sp) | main pins the same tv3 and tve; fpide on the new API; the links point to `unxed/bp` (the owner renames the repository in its settings) |
 | tv (old) | history rewritten: main has a README that points to tv3 |
 
 The work branches `claude/nifty-rubin-7v0d9z` of all repositories are merged into main; the owner deletes them (the proxy
@@ -25,7 +25,7 @@ of the agents cannot delete refs), and the two extra branches of unxed/tv.
 | 4 | fpide: the ASCII splash removed | done |
 | 5 | the vtui UX guidelines in tv3, dn, fpide, tve | done: `docs/UX-CONFORMANCE.md`; the rules that contradict the DN keys are options, off by default |
 | 6 | fpide: other languages, Go first | Go done (build, vet, test, gofmt, Delve) |
-| 7 | sp as "Better Pascal" (safe / ext / fpide, one unit) | done (`sp/PLAN.md`); the rename to bp is the last step |
+| 7 | sp as "Better Pascal" (safe / ext / fpide, one unit) | done (`PLAN.md` of bp); the repository is `unxed/bp` |
 | 8 | no DOS/Windows path remnants on other systems | done: tv3 `TvPath`; dn, tve, fpide over it; `tools/check-paths.py` |
 | 9 | English in all code, texts and docs | done (`tools/text-policy.py` in CI) |
 | 10 | dn leftovers | done; what needs the owner is in `dn/TODO-later.md` |

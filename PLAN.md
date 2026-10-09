@@ -446,7 +446,7 @@ Russian heading until that is translated). Remaining: `PLAN.md`, `bootstrap/READ
 **Added to the plan (2026-10-03, owner): full English translation of all content in `tv` and `sp`** (same work, same rules: at the end, separate commits per directory, code unchanged):
 - **`unxed/tv`:** `DESIGN.md` (405 lines; `README.md` already translated), comments in all `.pas`/`.inc`/scripts: `src/`, `tests/`, `demo/`, `dostests/`, `tools/`, and also test message texts.
   Check: unit binary images without debug info do not change; all `tv/tests` and `dostests` tests give the same result.
-- **`unxed/sp`:** `SPEC.md` (648 lines), `README.md`, `DN-ADOPTION.md`, `fpc-utf8/README.md`, comments in `safe.pas`, `safethreads.pas`, `tests/*.pas`, `tests/run.sh`, `.github/workflows/ci.yml`.
+- **`unxed/bp`:** `SPEC.md` (648 lines), `README.md`, `DN-ADOPTION.md`, `fpc-utf8/README.md`, comments in `safe.pas`, `safethreads.pas`, `tests/*.pas`, `tests/run.sh`, `.github/workflows/ci.yml`.
   For `SPEC.md` this is also a user-facing cost: the specification is attached to prompts, and English text is more reliable for models and readable outside the Russian-speaking circle; translate the rules card (§0) first.
   Check: `tests/run.sh` and CI green; `safe.pas`/`safethreads.pas` build to the same binaries without debug info (comments do not affect code); `SAFE-S*`/`SAFE-R*` identifier names and message texts are already English and do not change.
   Order: `SPEC.md` §0 and §2 → `README.md` → rest of `SPEC.md` → code comments → `DN-ADOPTION.md`.
@@ -454,7 +454,7 @@ Russian heading until that is translated). Remaining: `PLAN.md`, `bootstrap/READ
 ## Safe Pascal as DN's coding style (proposed by owner 2026-10-03)
 
 The concept and plan for converting DN (stages S0–S10 per RUP, measuring violations, ideas from Zig, doubts) moved to a separate repository
-**[unxed/sp](https://github.com/unxed/sp)**: `SPEC.md` (specification), `safe.pas` (library, MIT), `DN-ADOPTION.md` (this plan). Step status is tracked there.
+**[unxed/bp](https://github.com/unxed/bp)**: `SPEC.md` (specification), `safe.pas` (library, MIT), `DN-ADOPTION.md` (this plan). Step status is tracked there.
 Briefly: owner decision (2026-10-03) — convert DN to this style as a final refactoring step or earlier; order "(c) safe new code next to old → (a) extend to `object` → (b) `class` as fallback";
 first S1 (`tools/safe-census.py` in this repository, S1–S4, S9 violation counter over `dn/src` and `tv/src`), S2 (`safe.pas` in `dn/third_party/` with an entry in `dn/PROVENANCE.md`).
 Measurement as of 2026-10-03: `object` 230/75 vs `class` 1/0 (dn/tv); `New(` 843/103, `Dispose(` 421/39, `GetMem` 45/25.
@@ -463,7 +463,7 @@ Measurement as of 2026-10-03: `object` 230/75 vs `class` 1/0 (dn/tv); `New(` 843
 
 **State:** everything committed and pushed. `dn` (`main`): CI green on latest commits; `dist/` for all six targets rebuilt with the desktop load fix (`8f4f379`, `6361988`).
 DOSBox-X (fork `unxed/dosbox-x`): branches `claude/amis-utf8-clipboard`, `claude/utf8-names` (PR #6632, CI waiting for maintainer approval to run), `claude/fix-extdevice-loop` (hang fix for
-`DOS_CheckExtDevice`; PR #6634 opened by owner). [`unxed/sp`](https://github.com/unxed/sp) (v0.5, MIT; formerly `safe-pascal/` in `unxed/sandbox`, PR #4): another chat also works on it; pull `main` before editing.
+`DOS_CheckExtDevice`; PR #6634 opened by owner). [`unxed/bp`](https://github.com/unxed/bp) (v0.5, MIT; formerly `safe-pascal/` in `unxed/sandbox`, PR #4): another chat also works on it; pull `main` before editing.
 
 **What was done in the session (briefly):** aarch64; UTF-8 names and clipboard for go2dos and DOSBox-X (AMIS); DN-DOS under DOSBox-X `master` (hang was in the emulator); `TGroup.GetSubViewPtr` fix (desktop load);
 English for `README.md` and `tv/README.md`; Safe Pascal: S0–S10 order above, MIT license, v0.5 specification and goals table.
@@ -479,7 +479,7 @@ Order clarified by owner 2026-10-03 (evening):
 5. **Safe Pascal for DN:** steps S1–S10 (section above), starting with `tools/safe-census.py`.
 6. **UTF-8 on DOS via our DOS and `COMMAND.COM`** (needed, not urgent): go2dos and our `COMMAND.COM` use the UTF-8 API (`DOS-UTF8/NAMES`, `CLIPBRD`); DN for DOS — too (currently the DN DOS build stays on the code page);
    on DOS without a provider — name conversion at the boundary.
-7. **Plan tail:** English for `PLAN.md`, `bootstrap/README.md`, `dn/README.md`, part of `dn/TODO-later.md`; then comments in sources; full translation of `unxed/tv` and `unxed/sp` (see "Plan tail" above).
+7. **Plan tail:** English for `PLAN.md`, `bootstrap/README.md`, `dn/README.md`, part of `dn/TODO-later.md`; then comments in sources; full translation of `unxed/tv` and `unxed/bp` (see "Plan tail" above).
 
 **History of `unxed/dn`, `unxed/sp`, and `unxed/tv` was rewritten (2026-10-03, owner).** `dn` and `sp`: Ivan Sorokin co-author added to all Claude commits (hashes changed, contents and dates the same; branch `utf8-inside` rewritten together with `main`);
 `tv`: instead of a single "Initial upload" dump, the history of the `tv/` directory from `dn` was restored (95 commits up to `dn` b8f2bd1 + a clarifying commit), file contents the same.
