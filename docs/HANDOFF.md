@@ -67,6 +67,9 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     constructor is `Create`, the destructor `Destroy`). No exceptions for the convenience of one caller: a form that only the
     programs on tv3 use (e.g. the slot form of `FormatStr`) lives in their own shims. A new name is for a new API only (`TvPath`, `TvAppDir`). Other libraries (Borland Turbo Vision, Free Vision) are not a
     reference of names.
+14. Exceptions (owner, 2026-10-09): a rule of the owner is applied as it is written. No exception is made by the one who applies it:
+    when a rule seems to get in the way, the question goes to the owner ("rule X, case Y: an exception?"); without a yes there is none.
+    An agent that meets such a case stops and reports it.
 
 ## How to
 
