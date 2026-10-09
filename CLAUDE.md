@@ -9,7 +9,7 @@ They hold for the current tree and for the whole commit history of every reposit
 |---|---|---|
 | **tv3** | the translation of magiblot/tvision (C++) into Free Pascal | a translated file carries `Translated from magiblot/tvision @ <commit>` with the list of its C++ sources and points to `COPYRIGHT.magiblot` (the licence of magiblot/tvision); a new file is MIT |
 | **dn** | DOS Navigator moved onto tv3 | the code of RIT Research Labs stays under the RIT / DN OSP licence with its notices; new code over tv3 |
-| **fpide** (in sp) | the Free Pascal IDE moved onto tv3, with UX work (the developed fork) | the code of the IDE stays under the GPL |
+| **fpide** (in bp) | the Free Pascal IDE moved onto tv3, with UX work (the developed fork) | the code of the IDE stays under the GPL |
 | **tve** | the Turbo Vision editor: one component that replaces the editors of dn and fpide | MIT, so that it links with all of the above; **must be written from nothing: no code of anyone may be taken** |
 | **far2l terminal extensions** (in tv3) | the protocol on both sides | must be written from the specification (`VTExts.md`, branch `extsdocs` of unxed/far2l); the code of far2l may be read only to debug a behaviour, never copied, ported, translated or paraphrased |
 
