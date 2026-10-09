@@ -29,7 +29,7 @@ const
   CGrayWindow = #24#25#26#27#28#29#30#31;
 
 type
-  TPhase = TPhaseType;
+  TPhase = TView.PhaseType;
   { A row of cells of tv/ (as TDrawBuffer of tv/, but an array: DN addresses the cells by number): the buffer of Turbo Vision for Borland Pascal
     made of the cells of tv/, so that a cell holds any text (UTF-8, wide characters). The procedures Move* of Drivers fill it (they use the text
     functions of tv/, TvText); it is written to the screen by WriteBufC/WriteLineC of TView. A buffer of 16-bit words (low byte: the
