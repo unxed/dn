@@ -60,16 +60,14 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
     worktree; a possible conflict with another agent is settled at the merge, not by waiting.
 12. Priority (owner, 2026-10-08): making every test that can run in parallel do so, locally and in CI, comes first; work that
     would interfere with it (edits of the workflows or of the test runners) waits until it is merged.
-13. The API (owner, 2026-10-09): copyright does not cover an API, and new names make the porting of other programs harder.
-    The reference of the API of tv3 is magiblot/tvision (its only source): the names of its classes, methods, constants and
-    functions, in Pascal spelling (`TView::handleEvent` -> `TView.HandleEvent`). Only the implementation and the wording are tv3's
-    own. All of it is classes: magiblot's C++ classes become Pascal classes with the same names, ancestors and methods (a C++
-    constructor is `Create`, the destructor `Destroy`). No exceptions for the convenience of one caller: a form that only the
-    programs on tv3 use (e.g. the slot form of `FormatStr`) lives in their own shims. A new name is for a new API only (`TvPath`, `TvAppDir`). Other libraries (Borland Turbo Vision, Free Vision) are not a
-    reference of names.
-14. Exceptions (owner, 2026-10-09): a rule of the owner is applied as it is written. No exception is made by the one who applies it:
-    when a rule seems to get in the way, the question goes to the owner ("rule X, case Y: an exception?"); without a yes there is none.
-    An agent that meets such a case stops and reports it.
+13. The API (owner, 2026-10-09): tv3 is as magiblot/tvision (its only source): the same classes (Pascal classes), ancestors,
+    methods, constants, types and functions, in Pascal spelling (`TView::handleEvent` -> `TView.HandleEvent`). A difference is
+    made only where the magiblot form is impossible in Pascal (e.g. a C++ constructor is `Create`, the destructor `Destroy`;
+    C++ overloads by const), and each one is listed with the reason in `docs/API-NAMES.md` of tv3. Borland Turbo Vision and
+    Free Vision are not a reference. A form that only the programs on tv3 use (e.g. the slot form of `FormatStr`) lives in
+    their own shims.
+14. A rule of the owner is applied as it is written; nobody who applies it makes an exception. A case where the rule seems
+    impossible to follow goes to the owner; an agent stops and reports it.
 
 ## How to
 
