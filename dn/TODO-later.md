@@ -32,8 +32,9 @@ was not done now.
   value is "shifted" at run time).
 - `{$PACKRECORDS 1}` is added to STDEFINE.INC (vpc.cfg: `$AlignRec-`): the data records of the dialogs (TSysData...) must
   be byte-aligned. It also packs the `object`s of DN units (VP aligns objects by `$AlignData+`): check if it matters.
-- tv `TListBoxRec` is `packed` with a LongInt `Selection` (DN: Integer, 32 bits in the Delphi mode). The Word of the
-  original TV is not kept; `TvList.ListBoxOwnsList` (default True, TV) is set to False by DNApp: TListBox.Done of DN does
+- tv `TListBoxRec` is a plain record (natural alignment) with a Word `Selection`; the list box records of DN (dlgrecs, the local
+  records of colors, phones, dbview) are declared with `{$PACKRECORDS DEFAULT}` to have its size; dlgrecs checks the size at compile time;
+  `TvList.ListBoxOwnsList` (default True, TV) is set to False by DNApp: TListBox.Done of DN does
   not dispose the list (TSysDialog.Done does it).
 
 ## Seen in DOSBox-X (2026-10-02), not done yet

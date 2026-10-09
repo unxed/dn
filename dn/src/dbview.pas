@@ -552,10 +552,12 @@ procedure TDBViewer.GetInfo(StrIdx: TStrIdx);
     R: TRect;
     D: TDialog;
     P: TView;
+    {$PUSH}{$PACKRECORDS DEFAULT} { the layout of TvList.TListBoxRec }
     Data: record
       List: Pointer {TCollection};
-      Focused: Integer;
+      Focused: Word;
       end;
+    {$POP}
   begin
   R := TRect.Create(1, 1, 50, 18);
   D := TDialog.Create(R, GetString(StrIdx)+Cut(FileName^, 20));
