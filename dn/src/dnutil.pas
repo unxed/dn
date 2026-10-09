@@ -1823,7 +1823,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     ST: String;
     FileIsDBF: Boolean;
     HFile: THelpFile;
-    HelpStrm: TDosStream;
+    HelpStrm: fpstream;
   procedure OpenWindow(ChDrive: Boolean);
     var
       S: String;
@@ -2880,14 +2880,14 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
          would never get here }
       if  (not HelpInUse) or (HelpWnd = nil) or not IsOnDesktop(HelpWnd) then
         begin { create the help window }
-        HelpStrm := TDosStream.Create(SourceDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked});
-        if (HelpStrm.Status <> stOK) and (SourceDir<> StartupDir)
+        HelpStrm := fpstream.Create(SourceDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked});
+        if (HelpStrm.Good = 0) and (SourceDir<> StartupDir)
         then
           begin
           HelpStrm.Free;
-          HelpStrm := TDosStream.Create(StartupDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked});
+          HelpStrm := fpstream.Create(StartupDir+HelpLngId+'.hlp', stOpenRead {stOpenPacked});
           end;
-        if HelpStrm.Status <> stOK then
+        if HelpStrm.Good = 0 then
           begin
           HelpStrm.Free;
           Msg(erCantOpenHelp, nil, mfError+mfOKButton);

@@ -85,32 +85,8 @@ uses
   , editwin
   , DNDlgs, DNStrL, bwselect, DlgLayout, DnActions;
 
-{ The classes of DN in the streams (opstream, ipstream), by their names (the classes of tv/ register themselves in their units).
-  The help topics of tv/ keep the byte streams of TvObjs: RegisterType. }
-
-var
-  RHelpTopic: TStreamRec = (ObjType: otHelpTopic; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-  RHelpIndex: TStreamRec = (ObjType: otHelpIndex; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-
-function Build_RHelpTopic(S: TStream): TStreamable;
-begin
-  Result := TStreamable(HelpKern.THelpTopic.Load(S));
-end;
-
-procedure Store_RHelpTopic(P: TStreamable; S: TStream);
-begin
-  HelpKern.THelpTopic(P).Store(S);
-end;
-
-function Build_RHelpIndex(S: TStream): TStreamable;
-begin
-  Result := TStreamable(HelpKern.THelpIndex.Load(S));
-end;
-
-procedure Store_RHelpIndex(P: TStreamable; S: TStream);
-begin
-  HelpKern.THelpIndex(P).Store(S);
-end;
+{ The classes of DN in the streams (opstream, ipstream), by their names (the classes of tv/ register themselves in their units,
+  the help topics too: THelpTopic and THelpIndex of TvHelp, through HelpKern). }
 
 procedure Reg(const Name: ShortString; Build: TStreamableBuilder);
 begin
@@ -249,14 +225,6 @@ begin
   Reg('Collect.TStrCollection', @Collect.TStrCollection.Build);
   Reg('Views.TMyScrollBar', @Views.TMyScrollBar.Build);
   Reg('Dialogs.TLongInputLine', @Dialogs.TLongInputLine.Build);
-  RHelpTopic.VmtLink := PtrUInt(System.TClass(HelpKern.THelpTopic));
-  RHelpTopic.Load := @Build_RHelpTopic;
-  RHelpTopic.Store := @Store_RHelpTopic;
-  RHelpIndex.VmtLink := PtrUInt(System.TClass(HelpKern.THelpIndex));
-  RHelpIndex.Load := @Build_RHelpIndex;
-  RHelpIndex.Store := @Store_RHelpIndex;
-  RegisterType(RHelpTopic);
-  RegisterType(RHelpIndex);
 end;
 
 end.
