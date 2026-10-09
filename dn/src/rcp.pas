@@ -168,15 +168,16 @@ function GetWord(S: String; No: Integer): String; { Word #No of S }
     GetWord := '';
   end;
 
-const
-  RStringList: TStreamRec =
-    (ObjType: otStringList; VmtLink: 0; Load: nil; Store: nil; Next: nil);
+var
+  StringListRegistered: Boolean = False;
 
   {-DataCompBoy-}
 procedure ProcessDLs(Enable: Boolean);
   var
     DLs: TTypeHolder;
     SLM: TStrListMaker;
+    Os: opstream;
+    Ip: ipstream;
     Fail: Boolean;
     F: lText;
     S, S1: String;
@@ -307,7 +308,9 @@ procedure ProcessDLs(Enable: Boolean);
     if DLStream.Status <> stOK then
       Error('Cannot create file '+OutLngFileName);
     Writeln('Writing ', OutLngFileName);
-    DLStream.Put(SLM);
+    Os := opstream.Create(DLStream);
+    Os.WritePointer(SLM);
+    Os.Free;
     if DLStream.Status <> stOK then
       begin
       DLStream.Free;
@@ -318,9 +321,13 @@ procedure ProcessDLs(Enable: Boolean);
       DLStream.Free;
     SLM.Free;
     end;
-  ReRegisterType(RStringList);
+  if not StringListRegistered then
+    TStreamableClass.Create('DNStrL.TStringList', @DNStrL.TStringList.Build);
+  StringListRegistered := True;
   DLStream := TBufStream.Create(SysOsPath(OutLngFileName), stOpenRead, 512);
-  LStringList := TStringList(DLStream.Get);
+  Ip := ipstream.Create(DLStream);
+  LStringList := TStringList(Ip.ReadPointer);
+  Ip.Free;
   if  (LStringList = nil) and Enable then
     begin
     DLStream.Free;
@@ -402,19 +409,25 @@ var
   EditCommands: array[1..MaxCommands] of TEditCommand;
 
 type
+  { the table of the editor commands: DN reads it as EditWin.TEditSaver }
   TEditSaver = class(TStreamable)
     constructor Create;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
-const
-  REditSaver: TStreamRec = (ObjType: 12335; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-
-constructor TEditSaver.Load(S: TStream);
+class function TEditSaver.Build: TStreamable;
   begin
-  S.Read(NumCommands, SizeOf(NumCommands));
-  S.Read(EditCommands, SizeOf(TEditCommand)*NumCommands);
+  Result := TEditSaver.Create;
+  end;
+
+function TEditSaver.Read(Ip: ipstream): Pointer;
+  begin
+  Result := Self;
+  Ip.ReadBytes(NumCommands, SizeOf(NumCommands));
+  Ip.ReadBytes(EditCommands, SizeOf(TEditCommand)*NumCommands);
   end;
 
 constructor TEditSaver.Create;
@@ -422,10 +435,15 @@ constructor TEditSaver.Create;
   inherited Create;
   end;
 
-procedure TEditSaver.Store(S: TStream);
+procedure TEditSaver.Write(Os: opstream);
   begin
-  S.Write(NumCommands, SizeOf(NumCommands));
-  S.Write(EditCommands, SizeOf(TEditCommand)*NumCommands);
+  Os.WriteBytes(NumCommands, SizeOf(NumCommands));
+  Os.WriteBytes(EditCommands, SizeOf(TEditCommand)*NumCommands);
+  end;
+
+function TEditSaver.StreamableName: ShortString;
+  begin
+  Result := 'EditWin.TEditSaver';
   end;
 
 {-DataCompBoy-}
@@ -872,7 +890,7 @@ procedure ProcessDLGs;
       R: TRect;
     begin
     PM := CompileStatus;
-    R.Assign(0, 0, 80, 1);
+    R := TRect.Create(0, 0, 80, 1);
     StatusLine := TStatusLine.Create(R, PM);
     StoreResource(StatusLine, dlgStatusLine);
     StatusLine.Free;
@@ -1004,7 +1022,7 @@ procedure ProcessDLGs;
       var
         P: THistory;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := TInputLine.Create(R, GetID(Token(S, i)));
       D.Insert(PV);
@@ -1022,7 +1040,7 @@ procedure ProcessDLGs;
       var
         P: THistory;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := TLongInputLine.Create(R, GetID(Token(S, i)));
       D.Insert(PV);
@@ -1034,7 +1052,7 @@ procedure ProcessDLGs;
     {-DataCompBoy-}
     procedure MakeHexLine;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       R.B.Y := R.A.Y+1;
       PV := THexLine.Create(R, TInputLine(PV));
       D.Insert(PV);
@@ -1058,9 +1076,9 @@ procedure ProcessDLGs;
       end;
 
     {-DataCompBoy-}
-    function GetItems: PSItem;
+    function GetItems: TSItem;
       var
-        P, PP: PSItem;
+        P, PP: TSItem;
         S: String;
         K: Integer;
       begin
@@ -1079,13 +1097,13 @@ procedure ProcessDLGs;
           begin
           if PP = nil then
             begin
-            P := NewSItem(Token(S, i), nil);
+            P := TSItem.Create(Token(S, i), nil);
             PP := P
             end
           else
             begin
-            P^.Next := NewSItem(Token(S, i), nil);
-            P := P^.Next
+            P.Next := TSItem.Create(Token(S, i), nil);
+            P := P.Next
             end;
           end
         else if IsThis(idEND) then
@@ -1100,14 +1118,14 @@ procedure ProcessDLGs;
 
     procedure MakeCheckBoxes;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TCheckBoxes.Create(R, GetItems);
       D.Insert(PV);
       end;
 
     procedure MakeDriveCheckBoxes;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TCurrDriveInfo.Create(R, GetItems);
       D.Insert(PV);
       with PV do
@@ -1119,14 +1137,14 @@ procedure ProcessDLGs;
 
     procedure MakeRadioButtons;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TRadioButtons.Create(R, GetItems);
       D.Insert(PV);
       end;
 
     procedure MakeComboBox;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TComboBox.Create(R, GetItems);
       D.Insert(PV);
       end;
@@ -1144,7 +1162,7 @@ procedure ProcessDLGs;
         Flags, Options: Word;
         CmD: Word;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       K := Token(S, i);
       CmD := GetID(Token(S, i));
       Flags := 0;
@@ -1173,7 +1191,7 @@ procedure ProcessDLGs;
 
     procedure MakeScrollBar(Mouse: Boolean);
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       if Mouse then
         LastSB := TMouseBar.Create(R)
       else
@@ -1183,21 +1201,21 @@ procedure ProcessDLGs;
 
     procedure MakeListBox;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TListBox.Create(R, GetID(Token(S, i)), LastSB);
       D.Insert(PV);
       end;
 
     procedure MakeStaticText;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       PV := TStaticText.Create(R, Token(S, i));
       D.Insert(PV);
       end;
 
     procedure MakeParamText;
       begin
-      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R.Assign(TkL[1], TkL[2], TkL[3], TkL[4]) end;
+      begin TkL[1] := GetID(Token(S, i)); TkL[2] := GetID(Token(S, i)); TkL[3] := GetID(Token(S, i)); TkL[4] := GetID(Token(S, i)); R := TRect.Create(TkL[1], TkL[2], TkL[3], TkL[4]) end;
       begin TkS[1] := Token(S, i); TkL[2] := GetID(Token(S, i)); PV := TParamText.Create(R, TkS[1], TkL[2]) end;
       D.Insert(PV);
       end;
@@ -1293,7 +1311,7 @@ procedure ProcessDLGs;
     if not DLGs.Search(T, J) then
       Error('Unknown Resource ID: '+T.Name);
     ID := TDlgIdx(TLngWord(DLGs.At(J)).l);
-    begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R.Assign(0, 0, TkL[1], TkL[2]) end;
+    begin TkL[1] := GetID(Token(S, I)); TkL[2] := GetID(Token(S, I)); R := TRect.Create(0, 0, TkL[1], TkL[2]) end;
     if ID = dlgSystemSetup then
       begin
       D := TSysDialog.Create(R, Token(S, I));
@@ -1499,7 +1517,7 @@ procedure ProcessDLGs;
   Writeln(#13'Writing ', OutDlgFileName);
   TheRF.Free;
 
-  IDs.DeleteAll;
+  IDs.RemoveAll;
   IDs.Free;
   end { ProcessDLGs };
 {-DataCompBoy-}
@@ -1588,36 +1606,7 @@ Same:
     CutWord := S;
   end;
 
-function Build_RStringList(S: TStream): TStreamable;
 begin
-  Result := TStreamable(DNStrL.TStringList.Load(S));
-end;
-
-function Build_REditSaver(S: TStream): TStreamable;
-begin
-  Result := TStreamable(TEditSaver.Load(S));
-end;
-
-procedure Store_REditSaver(P: TStreamable; S: TStream);
-begin
-  TEditSaver(P).Store(S);
-end;
-
-procedure SetStreamRecs_rcp;
-begin
-
-  RStringList.VmtLink := PtrUInt(System.TClass(DNStrL.TStringList));
-  RStringList.Load := @Build_RStringList;
-
-  REditSaver.VmtLink := PtrUInt(System.TClass(TEditSaver));
-  REditSaver.Load := @Build_REditSaver;
-
-  REditSaver.Store := @Store_REditSaver;
-
-end;
-
-begin
-SetStreamRecs_rcp;
 Writeln(#13'Resource Compiler for DN OSP 1.51.07a+  Version 1.08');
 Writeln('Copyright(C) 1994,95 RIT Research Labs');
 Writeln('Copyright(C) 1995 AxoN(R)Soft');
@@ -1655,9 +1644,8 @@ else
   Error('Invalid parameter "'+FreeStr+'".');
 {/Cat}
 
-RegisterType(RStrListMaker);
 RegisterAll;
-RegisterType(REditSaver);
+TStreamableClass.Create('EditWin.TEditSaver', @TEditSaver.Build);
 
 Types := TValuesHolder.Create(10, 10);
 InitParser;
@@ -1723,7 +1711,6 @@ repeat
       LStringList := nil;
       end;
     DLStream.Free;
-    ReRegisterType(RStrListMaker);
     CleanupTypes;
     LList := CutWord(LList, 1);
     end

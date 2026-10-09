@@ -68,7 +68,7 @@ uses
    {Cat}
   
   
-  SysUtils, basics, DnPath, strutil, fileutil, envutil, winsess, OSSystem,
+  SysUtils, TvSys, basics, DnPath, strutil, fileutil, envutil, winsess, OSSystem,
   Startup, dlgrecs, Defines, Streams,
   Setups, DNUtil, Drivers, Commands, mainapp, Messages, Lfn, Dos, panelroot,
   UserMenu, CmdLine, FilesCol, Views, ArcView, FileFind,
@@ -318,8 +318,8 @@ procedure UpdateConfig;
     begin
     FillChar(Event, SizeOf(Event), 0);
     Event.What := evCommand;
-    Event.Command := cmTotalReread;
-    Event.InfoPtr := @NotAPath;
+    Event.Message.Command := cmTotalReread;
+    Event.Message.InfoPtr := @NotAPath;
     View.HandleEvent(Event);
     end;
 
@@ -340,7 +340,7 @@ procedure UpdateConfig;
 
   {TempDir := SystemData.Temp;}
 
-  MouseReverse := MouseData.Options and omsReverse <> 0;
+  TEventQueue.MouseReverse := MouseData.Options and omsReverse <> 0;
   Security := Startup.FMSetup.Show and fmsShowHidden = 0;
 
   { the files shown depend on the setting "show hidden files": every panel reads its directory again, the passive one too }
@@ -400,6 +400,7 @@ procedure DoStartup;
   function ReadConfig: LongInt;
     var
       S: TMemoryStream;
+      Ip: ipstream;
       CFGVer: AWord;
       ID: AWord;
       L: AWord;
@@ -678,7 +679,9 @@ procedure DoStartup;
         cfgSavers:
           begin
           I := i32(S.GetPos);
-          SaversData.Selected.List := PTextCollection(S.Get);
+          Ip := ipstream.Create(S);
+          SaversData.Selected.List := PTextCollection(Ip.ReadPointer);
+          Ip.Free;
           if (S.Status <> stOK) or (S.GetPos <> I + L) then
             begin
             S.Reset;
@@ -892,7 +895,7 @@ procedure RUN_IT;
     )
   ;
 
-  TempBounds.Assign(0, 0, 0, 0);
+  TempBounds := TRect.Create(0, 0, 0, 0);
 
   RegisterAll;
   DoStartup;
@@ -954,22 +957,22 @@ procedure RUN_IT;
   if DDTimer > 0 then
     begin
     Ev.What := evCommand;
-    Ev.Command := cmShowTimeInfo;
+    Ev.Message.Command := cmShowTimeInfo;
     MyApplication.PutEvent(Ev);
     end;
 
   with MyApplication do
     begin
     Lock;
-    MenuBar.MakeFirst;
+    MainApp.MenuBar.MakeFirst;
     Desktop.MakeFirst;
     Clock.MakeFirst;
     UnLock;
     end;
   { TGroup.Buffer stores TvScreen cells; Drivers.ScreenBuffer is the
     two-byte DOS-compatible copy and must not be used as its backing store. }
-  MyApplication.Buffer := TvScreen.ScreenBuffer;
-  R.Assign(0, 0, ScreenWidth, ScreenHeight);
+  MyApplication.Buffer := TvScreen.TScreen.ScreenBuffer;
+  R := TRect.Create(0, 0, ScreenWidth, ScreenHeight);
   MyApplication.ChangeBounds(R);
   MyApplication.Draw;
   ReadScreenCells; { issue #6: sync the 16-bit copy that WriteScreenCells outputs; otherwise a stale copy overwrites the panels }

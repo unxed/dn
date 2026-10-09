@@ -95,7 +95,7 @@ procedure TMakeListDlg.HandleEvent(var Event: TEvent);
   begin
   if Event.What = evCommand then
     begin
-    case Event.Command of
+    case Event.Message.Command of
       cmYes:
         begin
         InpLineReplace(TInputLine(DirectLink[2]), '!:!'+DnSep+'!.!');

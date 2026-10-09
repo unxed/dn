@@ -61,11 +61,13 @@ type
     TarData: TMemoryStream;
     TarMode: Boolean;
     GzDone: Boolean;
-    constructor Create;
+    constructor Create; overload;
     destructor Destroy; override;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -344,5 +346,16 @@ procedure TTGZArchive.GetFile;
   FileInfo.Last := 0;
   GzDone := True;
   end { TTGZArchive.GetFile };
+
+
+class function TTGZArchive.Build: TStreamable;
+begin
+  Result := TTGZArchive.Create(streamableInit);
+end;
+
+function TTGZArchive.StreamableName: ShortString;
+begin
+  Result := 'fmttgz.TTGZArchive';
+end;
 
 end.

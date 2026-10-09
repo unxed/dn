@@ -60,13 +60,17 @@ uses
 
 type
   TInfoLine = class(TView)
-    constructor Create(const R: TRect);
+    constructor Create(const R: TRect); overload;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TBookmarkLine = class(TView)
     procedure Draw; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -115,13 +119,13 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   if Event.What <> evMouseDown then
     Exit;
-  Owner.MakeLocal(Event.Where, T);
+  T := Owner.MakeLocal(Event.Mouse.Where);
   if T.X >= Owner.Size.X-2 then
     begin
     TWindow(Owner).Frame.HandleEvent(Event);
     Exit;
     end;
-  MakeLocal(Event.Where, T);
+  T := MakeLocal(Event.Mouse.Where);
   P := EditorOf(Self);
   Part := 0;
   for I := ipLine to ipBottom do
@@ -155,7 +159,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
         begin
         I := T.X-Parts[ipMarks].A-1;
         if (I >= 0) and (I <= 8) then
-          if (Event.Buttons and mbRightButton <> 0) then
+          if (Event.Mouse.Buttons and mbRightButton <> 0) then
             Cmd := cmPlaceMarker1+I
           else if P.MarkPos[I+1].X >= 0 then
             Cmd := cmGoToMarker1+I;
@@ -164,7 +168,7 @@ procedure TInfoLine.HandleEvent(var Event: TEvent);
   if Cmd <> 0 then
     begin
     Event.What := evCommand;
-    Event.Command := Cmd;
+    Event.Message.Command := Cmd;
     PutEvent(Event);
     end;
   ClearEvent(Event);
@@ -329,5 +333,26 @@ procedure TBookmarkLine.Draw;
     WriteLineW(0, I, Size.X, 1, B);
     end;
   end;
+
+
+class function TInfoLine.Build: TStreamable;
+begin
+  Result := TInfoLine.Create(streamableInit);
+end;
+
+function TInfoLine.StreamableName: ShortString;
+begin
+  Result := 'editinfo.TInfoLine';
+end;
+
+class function TBookmarkLine.Build: TStreamable;
+begin
+  Result := TBookmarkLine.Create(streamableInit);
+end;
+
+function TBookmarkLine.StreamableName: ShortString;
+begin
+  Result := 'editinfo.TBookmarkLine';
+end;
 
 end.

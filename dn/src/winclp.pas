@@ -150,7 +150,7 @@ function SetWinClip(PC: TLineCollection): Boolean;
   Result := False;
   if PC = nil then
     Exit;
-  ClipboardSetText(LinesText(PC));
+  TClipboard.SetText(LinesText(PC));
   Result := True;
   end;
 

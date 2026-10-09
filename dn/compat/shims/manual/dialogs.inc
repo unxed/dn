@@ -25,4 +25,8 @@ type
   TLongInputLine = class;
 
   TLongInputLine = class(TInputLine)
+  protected
+    function StreamableName: ShortString; override;
+  public
+    class function Build: TStreamable; static;
   end;

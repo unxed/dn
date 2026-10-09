@@ -1407,7 +1407,7 @@ procedure DoQuickSearch(Key: Word);
 procedure DoQuickSearchEvent(const Event: TEvent);
   begin
 {$IFDEF DNUTF8}
-  if (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) then
+  if (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80) then
     begin
     QSMask := QSMask + EventText(Event);
     Exit;

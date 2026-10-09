@@ -130,21 +130,25 @@ type
   TEditHistoryCol = class;
   TEditHistoryCol = class(TCollection)
     function IndexOf(P: Pointer): LongInt; override;
-    procedure PutItem(S: TStream; P: Pointer); override;
-    function GetItem(S: TStream): Pointer; override;
+    procedure WriteItem(P: Pointer; Os: opstream); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
     procedure FreeItem(P: Pointer); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TViewHistoryCol = class;
   TViewHistoryCol = class(TEditHistoryCol)
-    procedure PutItem(S: TStream; P: Pointer); override;
-    function GetItem(S: TStream): Pointer; override;
+    procedure WriteItem(P: Pointer; Os: opstream); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
     procedure FreeItem(P: Pointer); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 procedure AddToDirectoryHistory(S: String; DriveType: Integer);
-procedure SaveCommands(var S: TStream);
-procedure LoadCommands(var S: TStream);
+procedure SaveCommands(Os: opstream);
+procedure LoadCommands(Ip: ipstream);
 procedure CmdHistory;
 {DataCompBoy
 procedure InitCommands;
@@ -232,21 +236,31 @@ function TEditHistoryCol.IndexOf(P: Pointer): LongInt;
     end;
   end;
 
-procedure TEditHistoryCol.PutItem(S: TStream; P: Pointer);
+procedure TEditHistoryCol.WriteItem(P: Pointer; Os: opstream);
   begin
-  S.WriteStr(PEditRecord(P)^.FName);
-  S.Write(PEditRecord(P)^.fOrigin, SizeOf(TEditRecord)-SizeOf(PString));
+  Os.WriteString(PEditRecord(P)^.FName);
+  Os.WriteBytes(PEditRecord(P)^.fOrigin, SizeOf(TEditRecord)-SizeOf(PString));
   end;
 
-function TEditHistoryCol.GetItem(S: TStream): Pointer;
+function TEditHistoryCol.ReadItem(Ip: ipstream): Pointer;
   var
     R: PEditRecord;
   begin
   New(R);
-  GetItem := R;
-  R^.FName := S.ReadStr;
-  S.Read(R^.fOrigin, SizeOf(TEditRecord)-SizeOf(PString));
+  Result := R;
+  R^.FName := Ip.ReadString;
+  Ip.ReadBytes(R^.fOrigin, SizeOf(TEditRecord)-SizeOf(PString));
   end;
+
+class function TEditHistoryCol.Build: TStreamable;
+begin
+  Result := TEditHistoryCol.Create(streamableInit);
+end;
+
+function TEditHistoryCol.StreamableName: ShortString;
+begin
+  Result := 'histories.TEditHistoryCol';
+end;
 
 procedure TEditHistoryCol.FreeItem(P: Pointer);
   begin
@@ -257,21 +271,31 @@ procedure TEditHistoryCol.FreeItem(P: Pointer);
     end;
   end;
 
-procedure TViewHistoryCol.PutItem(S: TStream; P: Pointer);
+procedure TViewHistoryCol.WriteItem(P: Pointer; Os: opstream);
   begin
-  S.WriteStr(PViewRecord(P)^.FName);
-  S.Write(PViewRecord(P)^.fOrigin, SizeOf(TViewRecord)-SizeOf(PString));
+  Os.WriteString(PViewRecord(P)^.FName);
+  Os.WriteBytes(PViewRecord(P)^.fOrigin, SizeOf(TViewRecord)-SizeOf(PString));
   end;
 
-function TViewHistoryCol.GetItem(S: TStream): Pointer;
+function TViewHistoryCol.ReadItem(Ip: ipstream): Pointer;
   var
     R: PViewRecord;
   begin
   New(R);
-  GetItem := R;
-  R^.FName := S.ReadStr;
-  S.Read(R^.fOrigin, SizeOf(TViewRecord)-SizeOf(PString));
+  Result := R;
+  R^.FName := Ip.ReadString;
+  Ip.ReadBytes(R^.fOrigin, SizeOf(TViewRecord)-SizeOf(PString));
   end;
+
+class function TViewHistoryCol.Build: TStreamable;
+begin
+  Result := TViewHistoryCol.Create(streamableInit);
+end;
+
+function TViewHistoryCol.StreamableName: ShortString;
+begin
+  Result := 'histories.TViewHistoryCol';
+end;
 
 procedure TViewHistoryCol.FreeItem(P: Pointer);
   begin
@@ -485,7 +509,7 @@ procedure AddCommand(const LastCommand: String);
       P := CmdStrings.At(I);
       if Copy(CnvString(P), 2, MaxStringLength) = LastCommand then
         begin
-        CmdStrings.AtDelete(I);
+        CmdStrings.AtRemove(I);
         CmdStrings.Insert(P);
         goto 1;
         end;
@@ -518,7 +542,7 @@ begin
  CurString := 0;
 end;
 }
-procedure SaveCommands(var S: TStream);
+procedure SaveCommands(Os: opstream);
   var
     I, J: Integer;
     S1, S2: String;
@@ -536,34 +560,34 @@ Message(CommandLine, evCommand, cmExecCommandLine, nil);
       if CmdStrings.Count <= 0 then
         Break;
       M.AtInsert(0, CmdStrings.At(CmdStrings.Count-1));
-      CmdStrings.AtDelete(CmdStrings.Count-1);
+      CmdStrings.AtRemove(CmdStrings.Count-1);
       end;
     CmdStrings.Free;
     CmdStrings := M;
     end;
-  S.Put(CmdStrings);
+  Os.WritePointer(CmdStrings);
   if InterfaceData.Options and ouiTrackDirs <> 0 then
-    S.Put(DirHistory)
+    Os.WritePointer(DirHistory)
   else
-    S.Put(nil);
+    Os.WritePointer(nil);
   if InterfaceData.Options and ouiTrackEditors <> 0 then
-    S.Put(EditHistory)
+    Os.WritePointer(EditHistory)
   else
-    S.Put(nil);
+    Os.WritePointer(nil);
   if InterfaceData.Options and ouiTrackViewers <> 0 then
-    S.Put(ViewHistory)
+    Os.WritePointer(ViewHistory)
   else
-    S.Put(nil);
+    Os.WritePointer(nil);
   end { SaveCommands };
 
-procedure LoadCommands(var S: TStream);
+procedure LoadCommands(Ip: ipstream);
   var
     I: Integer;
   begin
-  CmdStrings := TCollection(S.Get);
-  DirHistory := TCollection(S.Get);
-  EditHistory := TCollection(S.Get);
-  ViewHistory := TCollection(S.Get);
+  CmdStrings := TCollection(Ip.ReadPointer);
+  DirHistory := TCollection(Ip.ReadPointer);
+  EditHistory := TCollection(Ip.ReadPointer);
+  ViewHistory := TCollection(Ip.ReadPointer);
 
   if CmdStrings <> nil then
     CurString := CmdStrings.Count
@@ -734,7 +758,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
         end;
     end
   else if (Event.What = evBroadcast) then
-    case Event.Command of
+    case Event.Message.Command of
       cmOK:
         begin
         ClearEvent(Event);
@@ -807,7 +831,7 @@ procedure TTHistList.HandleEvent(var Event: TEvent);
 
 destructor TTHistList.Destroy;
   begin
-  List := nil;
+  Items := nil;
   inherited Destroy;
   end;
 
@@ -859,7 +883,7 @@ procedure AddToDirectoryHistory(S: String; DriveType: Integer);
   I := -1;
   P := DirHistory.FirstThat(IsThat);
   if P <> nil then
-    DirHistory.AtDelete(I)
+    DirHistory.AtRemove(I)
   else
     P := NewStr(' '+S);
   if P <> nil then
@@ -882,11 +906,11 @@ function GetDialog(Dlg: TDlgIdx; var List: Pointer): TDialog;
   begin
   D := TDialog(LoadResource(Dlg));
 
-  R.Assign(D.Size.X-3, 2, D.Size.X-2, 13);
+  R := TRect.Create(D.Size.X-3, 2, D.Size.X-2, 13);
   P := TScrollBar.Create(R);
   D.Insert(P);
 
-  R.Assign(2, 2, D.Size.X-3, 13);
+  R := TRect.Create(2, 2, D.Size.X-3, 13);
   L := TTHistList.Create(R, 1, TScrollBar(P));
   L.Dlg := Dlg; {AK155: see TTHistList.HandleEvent, cmYes }
   D.Insert(L);
@@ -1060,6 +1084,7 @@ const
 procedure LoadHistories;
   var
     S: TStream;
+    Ip: ipstream;
     A: AWord;
   begin
   S := TBufStream.Create(ConfigDir+'dn'+HistNameSuffix+'.his', stOpenRead, 2048);
@@ -1069,8 +1094,10 @@ procedure LoadHistories;
     SetLength(FreeStr, Length(HistoryFileSign));
     if FreeStr = HistoryFileSign then
       begin
-      HistoryLoad(S);
-      LoadCommands(S);
+      Ip := ipstream.Create(S);
+      HistoryLoad(Ip);
+      LoadCommands(Ip);
+      Ip.Free;
       end
     else
       MessageBox('Can''t load histories!', nil, mfOKButton);
@@ -1083,6 +1110,7 @@ procedure LoadHistories;
 procedure SaveHistories;
   var
     S: TStream;
+    Os: opstream;
     A: AWord;
   begin
   S := TBufStream.Create(ConfigDir+'dn'+HistNameSuffix+'.his', stCreate, 2048);
@@ -1090,8 +1118,10 @@ procedure SaveHistories;
     begin
     FreeStr := HistoryFileSign;
     S.Write(FreeStr[1], Length(HistoryFileSign));
-    HistoryStore(S);
-    SaveCommands(S);
+    Os := opstream.Create(S);
+    HistoryStore(Os);
+    SaveCommands(Os);
+    Os.Free;
     end;
   S.Free;
   end;

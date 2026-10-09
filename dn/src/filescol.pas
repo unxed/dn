@@ -150,8 +150,10 @@ type
     SortMode: Byte;
     Selected: LongInt;
     Panel: Pointer; {TFilePanel}
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure FreeItem(Item: Pointer); override;
     function Compare(Key1, Key2: Pointer): Integer; override;
     function FileCompare(Key1, Key2: Pointer): Integer;
@@ -194,11 +196,11 @@ function NewFileRec(const LFN, Name: String; Size: TSize;
      AOwner: PString): PFileRec; {DataCompBoy}
 
 procedure DelFileRec(var FR: PFileRec); {DataCompBoy}
-function LoadFileRec(var s: TStream): PFileRec; {DataCompBoy}
-procedure StoreFileRec(var s: TStream; fr: PFileRec); {DataCompBoy}
-function LoadFileRecOwn(var s: TStream; Dirs: TCollection): PFileRec;
+function LoadFileRec(Ip: ipstream): PFileRec; {DataCompBoy}
+procedure StoreFileRec(Os: opstream; fr: PFileRec); {DataCompBoy}
+function LoadFileRecOwn(Ip: ipstream; Dirs: TCollection): PFileRec;
   {` Read the record, then the index in Dirs and fill Owner`}
-procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: TCollection);
+procedure StoreFileRecOwn(Os: opstream; fr: PFileRec; Dirs: TCollection);
   {` Write the record and then the owner index into Dirs`}
 function PackedDate(P: PFileRec): LongInt; {DataCompBoy}
 function PackedCreationDate(P: PFileRec): LongInt; {JO}
@@ -372,105 +374,105 @@ procedure DelFileRec(var FR: PFileRec);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-function LoadFileRec(var s: TStream): PFileRec;
+function LoadFileRec(Ip: ipstream): PFileRec;
   var
     P: PFileRec;
     l: Byte;
     FullLen: LongInt;
   begin
-  s.Read(l, SizeOf(l)); {long name length}
+  Ip.ReadBytes(l, SizeOf(l)); {long name length}
   { FullLen := TFileRecFixedSize+l;}
   FullLen := SizeOf(TFileRec);
   GetMem(P, FullLen);
   FillChar(P^, FullLen, 0);
   with P^ do
     begin
-    s.Read(Size, SizeOf(Size));
-    s.Read(PSize, SizeOf(PSize));
-    s.Read(Yr, SizeOf(Yr));
-    s.Read(YrCreat, SizeOf(YrCreat));
-    s.Read(YrLAcc, SizeOf(YrLAcc));
-    s.Read(TType, SizeOf(TType));
-    s.Read(Attr, SizeOf(Attr));
-    s.Read(Second, SizeOf(Second));
-    s.Read(SecondCreat, SizeOf(SecondCreat));
-    s.Read(SecondLAcc, SizeOf(SecondLAcc));
-    s.Read(Selected, SizeOf(Selected));
-    s.Read(FDate, SizeOf(FDate));
-    s.Read(FDateCreat, SizeOf(FDateCreat));
-    s.Read(FDateLAcc, SizeOf(FDateLAcc));
+    Ip.ReadBytes(Size, SizeOf(Size));
+    Ip.ReadBytes(PSize, SizeOf(PSize));
+    Ip.ReadBytes(Yr, SizeOf(Yr));
+    Ip.ReadBytes(YrCreat, SizeOf(YrCreat));
+    Ip.ReadBytes(YrLAcc, SizeOf(YrLAcc));
+    Ip.ReadBytes(TType, SizeOf(TType));
+    Ip.ReadBytes(Attr, SizeOf(Attr));
+    Ip.ReadBytes(Second, SizeOf(Second));
+    Ip.ReadBytes(SecondCreat, SizeOf(SecondCreat));
+    Ip.ReadBytes(SecondLAcc, SizeOf(SecondLAcc));
+    Ip.ReadBytes(Selected, SizeOf(Selected));
+    Ip.ReadBytes(FDate, SizeOf(FDate));
+    Ip.ReadBytes(FDateCreat, SizeOf(FDateCreat));
+    Ip.ReadBytes(FDateLAcc, SizeOf(FDateLAcc));
     
-    s.Read(FlName[False], SizeOf(FlName[False]));
+    Ip.ReadBytes(FlName[False], SizeOf(FlName[False]));
     
-    s.Read(FlName[True], l+1);
+    Ip.ReadBytes(FlName[True], l+1);
     UsageCount := 1;
     end;
   LoadFileRec := P;
   end { LoadFileRec };
 
-procedure StoreFileRec(var s: TStream; fr: PFileRec);
+procedure StoreFileRec(Os: opstream; fr: PFileRec);
   var
     l: Byte;
   begin
   with fr^ do
     begin
     l := Length(FlName[True]);
-    s.Write(l, SizeOf(l));
-    s.Write(Size, SizeOf(Size));
-    s.Write(PSize, SizeOf(PSize));
-    s.Write(Yr, SizeOf(Yr));
-    s.Write(YrCreat, SizeOf(YrCreat));
-    s.Write(YrLAcc, SizeOf(YrLAcc));
-    s.Write(TType, SizeOf(TType));
-    s.Write(Attr, SizeOf(Attr));
-    s.Write(Second, SizeOf(Second));
-    s.Write(SecondCreat, SizeOf(SecondCreat));
-    s.Write(SecondLAcc, SizeOf(SecondLAcc));
-    s.Write(Selected, SizeOf(Selected));
-    s.Write(FDate, SizeOf(FDate));
-    s.Write(FDateCreat, SizeOf(FDateCreat));
-    s.Write(FDateLAcc, SizeOf(FDateLAcc));
+    Os.WriteBytes(l, SizeOf(l));
+    Os.WriteBytes(Size, SizeOf(Size));
+    Os.WriteBytes(PSize, SizeOf(PSize));
+    Os.WriteBytes(Yr, SizeOf(Yr));
+    Os.WriteBytes(YrCreat, SizeOf(YrCreat));
+    Os.WriteBytes(YrLAcc, SizeOf(YrLAcc));
+    Os.WriteBytes(TType, SizeOf(TType));
+    Os.WriteBytes(Attr, SizeOf(Attr));
+    Os.WriteBytes(Second, SizeOf(Second));
+    Os.WriteBytes(SecondCreat, SizeOf(SecondCreat));
+    Os.WriteBytes(SecondLAcc, SizeOf(SecondLAcc));
+    Os.WriteBytes(Selected, SizeOf(Selected));
+    Os.WriteBytes(FDate, SizeOf(FDate));
+    Os.WriteBytes(FDateCreat, SizeOf(FDateCreat));
+    Os.WriteBytes(FDateLAcc, SizeOf(FDateLAcc));
     
-    s.Write(FlName[False], SizeOf(FlName[False]));
+    Os.WriteBytes(FlName[False], SizeOf(FlName[False]));
     
-    s.Write(FlName[True], l+1);
+    Os.WriteBytes(FlName[True], l+1);
     end
   end { StoreFileRec };
 {-DataCompBoy-}
 
-function LoadFileRecOwn(var s: TStream; Dirs: TCollection): PFileRec;
+function LoadFileRecOwn(Ip: ipstream; Dirs: TCollection): PFileRec;
   var
     w: LongInt;
   begin
-  Result := LoadFileRec(s);
+  Result := LoadFileRec(Ip);
   if Result <> nil then
     begin
-    s.Read(w, SizeOf(w));
+    Ip.ReadBytes(w, SizeOf(w));
     Result^.Owner := Dirs.At(w);
     end;
   end;
 
-procedure StoreFileRecOwn(var s: TStream; fr: PFileRec; Dirs: TCollection)
+procedure StoreFileRecOwn(Os: opstream; fr: PFileRec; Dirs: TCollection)
   ; {DataCompBoy}
   var
     w: LongInt;
   begin
-  StoreFileRec(s, fr);
+  StoreFileRec(Os, fr);
   w := Dirs.IndexOf(fr^.Owner);
-  s.Write(w, SizeOf(w));
+  Os.WriteBytes(w, SizeOf(w));
   end;
 
 {-DataCompBoy-}
-constructor TFilesCollection.Load(S: TStream);
+function TFilesCollection.Read(Ip: ipstream): Pointer;
   var
     C, I: LongInt;
   begin
-  inherited Load(S);
-  S.Read(Count, SizeOf(Count));
-  S.Read(Limit, SizeOf(Limit));
-  S.Read(Delta, SizeOf(Delta));
+  Result := Self;
+  Ip.ReadBytes(Count, SizeOf(Count));
+  Ip.ReadBytes(Limit, SizeOf(Limit));
+  Ip.ReadBytes(Delta, SizeOf(Delta));
   if  (Count > Limit) or (Delta < 0) then
-    Fail;
+    begin Free; Result := nil; Exit end;
   C := Count;
   I := Limit;
   Count := 0;
@@ -478,19 +480,19 @@ constructor TFilesCollection.Load(S: TStream);
   SetLimit(I);
   for I := 0 to C-1 do
     begin
-    AtInsert(I, LoadFileRec(S));
-    if  (S.Status <> stOK) then
+    AtInsert(I, LoadFileRec(Ip));
+    if Ip.Fail <> 0 then
       begin
       SetLimit(0);
-      Fail;
+      begin Free; Result := nil; Exit end;
       end;
     end;
-  S.Read(Selected, SizeOf(Selected));
+  Ip.ReadBytes(Selected, SizeOf(Selected));
   end { TFilesCollection.Load };
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TFilesCollection.Store(S: TStream);
+procedure TFilesCollection.Write(Os: opstream);
   var
     I, J, Sel: LongInt;
   begin
@@ -504,15 +506,25 @@ procedure TFilesCollection.Store(S: TStream);
       end;
   I := Count;
   Count := J;
-  S.Write(Count, SizeOf(Count));
-  S.Write(Limit, SizeOf(Limit));
-  S.Write(Delta, SizeOf(Delta));
+  Os.WriteBytes(Count, SizeOf(Count));
+  Os.WriteBytes(Limit, SizeOf(Limit));
+  Os.WriteBytes(Delta, SizeOf(Delta));
   Count := I;
   for I := 1 to Count do
     if  (I-1 = Selected) or (PFileRec(At(I-1))^.Selected) then
-      StoreFileRec(S, At(I-1));
-  S.Write(Sel, SizeOf(Sel));
+      StoreFileRec(Os, At(I-1));
+  Os.WriteBytes(Sel, SizeOf(Sel));
   end { TFilesCollection.Store };
+
+class function TFilesCollection.Build: TStreamable;
+begin
+  Result := TFilesCollection.Create(streamableInit);
+end;
+
+function TFilesCollection.StreamableName: ShortString;
+begin
+  Result := 'FilesCol.TFilesCollection';
+end;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
@@ -1342,7 +1354,7 @@ function SelectDrive(X, Y: Integer; Default: Char; IncludeTemp: Boolean) : Strin
   else
     C := Default;
   Menu := NewMenu(Items);
-  Desktop.GetExtent(R);
+  R := Desktop.GetExtent;
   {-$VIV start}
   X := X-(MaxL div 2);
   if  (X+MaxL+4) > R.B.X then

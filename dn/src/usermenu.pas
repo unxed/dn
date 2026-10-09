@@ -71,19 +71,23 @@ type
 
   TUserView = class(TScroller)
     Grabbing: Boolean;
-    constructor Create(const R: TRect; H, V: TScrollBar);
+    constructor Create(const R: TRect; H, V: TScrollBar); overload;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure ChangeBounds(const Bounds: TRect); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TUserWindow = class;
 
   TUserWindow = class(TWindow)
     OldScreenWidth: Word;
-    constructor Create;
+    constructor Create; overload;
     procedure CalcBounds(var Bounds: TRect; Delta: TPoint); override;
     procedure SetState(AState: Word; Enable: Boolean); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -115,11 +119,11 @@ constructor TUserWindow.Create;
   var
     R: TRect;
   begin
-  Desktop.GetExtent(R);
+  R := Desktop.GetExtent;
   R.Grow(1, 1);
   inherited Create(R, GetString(dlOutputTitle), 0);
   OldScreenWidth := ScreenWidth;
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   Insert(TUserView.Create(R,
            StandardScrollBar(sbHorizontal+sbHandleKeyboard),
@@ -135,7 +139,7 @@ procedure TUserWindow.CalcBounds(var Bounds: TRect; Delta: TPoint);
     inherited CalcBounds(Bounds, Delta);
     Exit
     end;
-  Desktop.GetExtent(Bounds);
+  Bounds := Desktop.GetExtent;
   Bounds.Grow(1, 2);
   Inc(Bounds.B.Y);
   OldScreenWidth := ScreenWidth;
@@ -150,9 +154,9 @@ procedure TUserWindow.SetState(AState: Word; Enable: Boolean);
     begin
     SetState(sfActive, Enable);
     if Enable then
-      EnableCommands([cmHideLeft, cmHideRight, cmHideInactive])
+      EnableCommands(CommandSetOf([cmHideLeft, cmHideRight, cmHideInactive]))
     else
-      DisableCommands([cmHideLeft, cmHideRight, cmHideInactive]);
+      DisableCommands(CommandSetOf([cmHideLeft, cmHideRight, cmHideInactive]));
     end;
   end;
 
@@ -199,24 +203,24 @@ procedure TUserView.HandleEvent(var Event: TEvent);
   SetLimit(ScreenWidth, ScreenHeight);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         {cmGrabscreen: begin ClearEvent(Event); if Execute = cmOK then  end;}
         cmGetName:
-          PString(Event.InfoPtr)^:= GetString(dlOutputTitle);
+          PString(Event.Message.InfoPtr)^:= GetString(dlOutputTitle);
         cmShowOutput, cmHideRight, cmHideLeft:
           begin
-          if Event.Command <> cmShowOutput then
+          if Event.Message.Command <> cmShowOutput then
             begin
-            if Event.Command = cmHideLeft then
-              Event.Command := cmPostHideLeft
+            if Event.Message.Command = cmHideLeft then
+              Event.Message.Command := cmPostHideLeft
             else
-              Event.Command := cmPostHideRight;
+              Event.Message.Command := cmPostHideRight;
             PutEvent(Event);
             end;
           if Owner.GetState(sfSelected) then
             Message(Owner, evCommand, cmClose, nil)
           else
-            TView(Event.InfoPtr^) := Owner;
+            TView(Event.Message.InfoPtr^) := Owner;
           ClearEvent(Event);
           end;
       end {case};
@@ -828,7 +832,7 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
       if SItems = nil then
         Break;
       Menu := NewMenu(SItems);
-      Application.GetExtent(R);
+      R := Application.GetExtent;
       R.A.X := 0;
       R.B.X := NW;
       R.B.Y := Min(R.B.Y, NI);
@@ -846,9 +850,9 @@ function ExecUserMenu(DoGlobal: Boolean): Boolean;
         if I = cmEditMenu then
           begin
           Event.What := evCommand;
-          Event.Command := Byte(not DoGlobal)*cmLocalMenuFileEdit+
+          Event.Message.Command := Byte(not DoGlobal)*cmLocalMenuFileEdit+
             Byte(DoGlobal)*cmMenuFileEdit;
-          Event.InfoPtr := nil;
+          Event.Message.InfoPtr := nil;
           Application.PutEvent(Event);
           end;
         Break;
@@ -981,7 +985,7 @@ constructor TGrabber.Create;
   var
     BB: TRect;
   begin
-  Application.GetExtent(BB);
+  BB := Application.GetExtent;
   inherited Create(BB);
   R.A := Top;
   R.B := Bot;
@@ -1360,5 +1364,26 @@ RL:
 
   end { QuickExecExternal };
 {-DataCompBoy-}
+
+
+class function TUserWindow.Build: TStreamable;
+begin
+  Result := TUserWindow.Create(streamableInit);
+end;
+
+function TUserWindow.StreamableName: ShortString;
+begin
+  Result := 'UserMenu.TUserWindow';
+end;
+
+class function TUserView.Build: TStreamable;
+begin
+  Result := TUserView.Create(streamableInit);
+end;
+
+function TUserView.StreamableName: ShortString;
+begin
+  Result := 'UserMenu.TUserView';
+end;
 
 end.

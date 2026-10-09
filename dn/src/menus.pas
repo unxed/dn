@@ -133,8 +133,8 @@ type
        TMenuBar. No need to build such traps. Classes have
        the 'is' operator, but records have no equivalent, so we have to
        improvise. }
-    constructor Create(var Bounds: TRect);
-    constructor Load(S: TStream);
+    constructor Create(var Bounds: TRect); overload;
+    function Read(Ip: ipstream): Pointer; override;
     function Execute: Word; override;
       { AK155 21.05.2005 (ak50521a.dif) Added Disabled field handling.
         Before, a Disabled item was drawn dim in Draw, but
@@ -150,7 +150,7 @@ type
     function HotKey(KeyCode: LongInt): PMenuItem;
     function NewSubView(var Bounds: TRect; AMenu: PMenu;
         AParentMenu: TMenuView): TMenuView; virtual;
-    procedure Store(S: TStream);
+    procedure Write(Os: opstream); override;
     function RightExpand: Boolean; virtual;
       { on kbRight open submenu }
     function LeftCollapse: Boolean; virtual;
@@ -170,11 +170,13 @@ type
   TMenuBar = class;
 
   TMenuBar = class(TMenuView)
-    constructor Create(var Bounds: TRect; AMenu: PMenu);
+    constructor Create(var Bounds: TRect; AMenu: PMenu); overload;
     destructor Destroy; override;
     procedure Draw; override;
     procedure GetItemRect(Item: PMenuItem; var R: TRect); override;
     function Execute: Word; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   { TMenuBox class }
@@ -193,12 +195,14 @@ type
     TopItem: PMenuItem;
     ComboBoxPal: Boolean;
     constructor Create(var Bounds: TRect; AMenu: PMenu;
-        AParentMenu: TMenuView);
+        AParentMenu: TMenuView); overload;
     procedure Draw; override;
     procedure GetItemRect(Item: PMenuItem; var R: TRect); override;
     function Execute: Word; override;
     function RightExpand: Boolean; override;
     function LeftCollapse: Boolean; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   { TMenuPopup class }
@@ -214,8 +218,10 @@ type
   TMenuPopup = class;
 
   TMenuPopup = class(TMenuBox)
-    constructor Create(var Bounds: TRect; AMenu: PMenu);
+    constructor Create(var Bounds: TRect; AMenu: PMenu); overload;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   { TStatusItem }
@@ -252,14 +258,16 @@ type
   TStatusLine = class(TView)
     Items: PStatusItem;
     Defs: PStatusDef;
-    constructor Create(var Bounds: TRect; ADefs: PStatusDef);
-    constructor Load(S: TStream);
+    constructor Create(var Bounds: TRect; ADefs: PStatusDef); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     destructor Destroy; override;
     procedure Draw; override;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
     function Hint(AHelpCtx: Word): String; virtual;
-    procedure Store(S: TStream);
+    procedure Write(Os: opstream); override;
     procedure Update; override;
   private
     procedure DrawSelect(Selected: PStatusItem);
@@ -294,8 +302,8 @@ function LookUpMenu(Menu: PMenu; idCheckItem: Word; Flags: Word)
   : PMenuItem;
 function MenuIndexOf(Menu: PMenu; idCheckItem: PMenuItem): Word;
 
-procedure StoreMenuDefaults(Menu: PMenu; var S: TStream);
-procedure LoadMenuDefaults(Menu: PMenu; var S: TStream);
+procedure StoreMenuDefaults(Menu: PMenu; Os: opstream);
+procedure LoadMenuDefaults(Menu: PMenu; Ip: ipstream);
 
 const
   MenuActive: Boolean = False;
@@ -424,7 +432,7 @@ constructor TMenuView.Create(var Bounds: TRect);
   EventMask := EventMask or evBroadcast;
   end;
 
-constructor TMenuView.Load(S: TStream);
+function TMenuView.Read(Ip: ipstream): Pointer;
 
   function DoLoadMenu: PMenu;
     var
@@ -436,7 +444,7 @@ constructor TMenuView.Load(S: TStream);
     New(Menu);
     Last := @Menu^.Items;
     Item := nil;
-    S.Read(Tok, 1);
+    Ip.ReadBytes(Tok, 1);
     while Tok <> 0 do
       begin
       New(Item);
@@ -444,22 +452,22 @@ constructor TMenuView.Load(S: TStream);
       Last := @Item^.Next;
       with Item^ do
         begin
-        Name := S.ReadStr;
-        S.Read(Command, SizeOf(Command));
-        S.Read(Flags, SizeOf(Flags));
-        S.Read(KeyCode, SizeOf(KeyCode));
-        S.Read(HelpCtx, SizeOf(HelpCtx));
+        Name := Ip.ReadString;
+        Ip.ReadBytes(Command, SizeOf(Command));
+        Ip.ReadBytes(Flags, SizeOf(Flags));
+        Ip.ReadBytes(KeyCode, SizeOf(KeyCode));
+        Ip.ReadBytes(HelpCtx, SizeOf(HelpCtx));
         if  (Name <> nil) then
           begin
           Param := nil;
           if (Flags and miParam) <> 0 then
-            Param := S.ReadStr;
+            Param := Ip.ReadString;
           SubMenu := nil;
           if (Flags and miSubmenu) <> 0 then
             SubMenu := DoLoadMenu;
           end;
         end;
-      S.Read(Tok, 1);
+      Ip.ReadBytes(Tok, 1);
       end;
     Last^:= nil;
     Menu^.Default := Menu^.Items;
@@ -467,7 +475,8 @@ constructor TMenuView.Load(S: TStream);
     end { DoLoadMenu: };
 
   begin { TMenuView.Load }
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   Menu := DoLoadMenu;
   end { TMenuView.Load };
 
@@ -496,7 +505,7 @@ function TMenuView.Execute: Word;
       P: PMenuItem;
     begin
     Result := False;
-    if not TvMenus.UxMenuHeldStop or ((E.KeyFlags and TvEvents.kfRepeat) = 0) or (Current = nil) then
+    if not TvMenus.UxMenuHeldStop or ((E.KeyDown.KeyFlags and TvEvents.kfRepeat) = 0) or (Current = nil) then
       Exit;
     if FindNext then
       P := Current.Next
@@ -516,7 +525,7 @@ function TMenuView.Execute: Word;
       R: TRect;
     label q;
     begin
-    MakeLocal(E.Where, Mouse);
+    Mouse := MakeLocal(E.Mouse.Where);
     if Size.Y > 1 then
       begin {new begin}
       if Mouse.Y = 0 then
@@ -608,7 +617,7 @@ q:
     begin
     if  (ParentMenu <> nil) and (ParentMenu.Size.Y = 1) then
       begin
-      ParentMenu.MakeLocal(E.Where, Mouse);
+      Mouse := ParentMenu.MakeLocal(E.Mouse.Where);
       ParentMenu.GetItemRect(ParentMenu.Current, R);
       MouseInOwner := R.Contains(Mouse);
       end
@@ -621,7 +630,7 @@ q:
       P: TMenuView;
     begin
     P := ParentMenu;
-    while (P <> nil) and not P.MouseInView(E.Where) do
+    while (P <> nil) and not P.MouseInView(E.Mouse.Where) do
       P := P.ParentMenu;
     MouseInMenus := P <> nil;
     end;
@@ -663,7 +672,7 @@ q:
     GetEvent(E);
     case E.What of
       evMouseDown:
-        if  (MouseInView(E.Where) or MouseInOwner) then
+        if  (MouseInView(E.Mouse.Where) or MouseInOwner) then
           begin
           TrackMouse;
           if Size.Y = 1 then
@@ -701,19 +710,19 @@ q:
         else
           Going := False; {new}
       evMouseMove:
-        if  (E.Buttons <> 0) then
+        if  (E.Mouse.Buttons <> 0) then
           begin
           TrackMouse;
-          if not (MouseInView(E.Where) or MouseInOwner) and
+          if not (MouseInView(E.Mouse.Where) or MouseInOwner) and
             MouseInMenus
           then
             Action := DoReturn;
           end;
       evMouseAuto:
-        if  (E.Buttons <> 0) then
+        if  (E.Mouse.Buttons <> 0) then
           begin
           TrackMouse;
-          if not (MouseInView(E.Where) or MouseInOwner) and
+          if not (MouseInView(E.Mouse.Where) or MouseInOwner) and
             MouseInMenus
           then
             Action := DoReturn;
@@ -900,7 +909,7 @@ lHotkey:
                 Target := Self;
                 Ch := Drivers.GetAltChar(DNKeyCode(E));
                 if Ch = #0 then
-                  Ch := Char(E.CharCode)
+                  Ch := Char(E.KeyDown.CharScan.CharCode)
                 else
                   Target := TopMenu;
                 P := Target.FindItem(Ch);
@@ -932,7 +941,7 @@ lHotkey:
             end {case }
         end {case}; {new}
       evCommand:
-        if  (E.Command = cmMenu) or (E.Command = cmMainMenu) then
+        if  (E.Message.Command = cmMenu) or (E.Message.Command = cmMainMenu) then
           begin
           AutoSelect := False;
           if not Frst then
@@ -1119,11 +1128,11 @@ procedure TMenuView.HandleEvent(var Event: TEvent);
   procedure DoSelect;
     begin
     PutEvent(Event);
-    Event.Command := Owner.ExecView(Self);
-    if  (Event.Command <> 0) and CommandEnabled(Event.Command) then
+    Event.Message.Command := Owner.ExecView(Self);
+    if  (Event.Message.Command <> 0) and CommandEnabled(Event.Message.Command) then
       begin
       Event.What := evCommand;
-      Event.InfoPtr := nil;
+      Event.Message.InfoPtr := nil;
       PutEvent(Event);
       end;
     ClearEvent(Event);
@@ -1154,17 +1163,17 @@ GrayPlus, GrayMinus, F2, F10, F11, F12 }
           if  (P <> nil) and CommandEnabled(P^.Command) then
             begin
             Event.What := evCommand;
-            Event.Command := P^.Command;
-            Event.InfoPtr := nil;
+            Event.Message.Command := P^.Command;
+            Event.Message.InfoPtr := nil;
             PutEvent(Event);
             ClearEvent(Event);
             end;
           end;
       evCommand:
-        if (Event.Command = cmMenu) or (Event.Command = cmMainMenu) then
+        if (Event.Message.Command = cmMenu) or (Event.Message.Command = cmMainMenu) then
           DoSelect;
       evBroadcast:
-        if Event.Command = cmCommandSetChanged then
+        if Event.Message.Command = cmCommandSetChanged then
           begin
           CallDraw := False;
           UpdateMenu(Menu);
@@ -1214,7 +1223,7 @@ function TMenuView.NewSubView(var Bounds: TRect; AMenu: PMenu;
   NewSubView := TMenuBox.Create(Bounds, AMenu, AParentMenu);
   end;
 
-procedure TMenuView.Store(S: TStream);
+procedure TMenuView.Write(Os: opstream);
 
   procedure DoStoreMenu(Menu: PMenu);
     var
@@ -1227,16 +1236,16 @@ procedure TMenuView.Store(S: TStream);
       begin
       with Item^ do
         begin
-        S.Write(Tok, 1);
-        S.WriteStr(Name);
-        S.Write(Command, SizeOf(Command));
-        S.Write(Flags, SizeOf(Flags));
-        S.Write(KeyCode, SizeOf(KeyCode));
-        S.Write(HelpCtx, SizeOf(HelpCtx));
+        Os.WriteBytes(Tok, 1);
+        Os.WriteString(Name);
+        Os.WriteBytes(Command, SizeOf(Command));
+        Os.WriteBytes(Flags, SizeOf(Flags));
+        Os.WriteBytes(KeyCode, SizeOf(KeyCode));
+        Os.WriteBytes(HelpCtx, SizeOf(HelpCtx));
         if  (Name <> nil) then
           begin
           if (Flags and miParam) <> 0 then
-            S.WriteStr(Param);
+            Os.WriteString(Param);
           if (Flags and miSubmenu) <> 0 then
             DoStoreMenu(SubMenu);
           end;
@@ -1244,11 +1253,11 @@ procedure TMenuView.Store(S: TStream);
       Item := Item^.Next;
       end;
     Tok := 0;
-    S.Write(Tok, 1);
+    Os.WriteBytes(Tok, 1);
     end { DoStoreMenu };
 
   begin { TMenuView.Store }
-  inherited Store(S);
+  inherited Write(Os);
   DoStoreMenu(Menu);
   end { TMenuView.Store };
 
@@ -1329,7 +1338,7 @@ procedure TMenuBar.GetItemRect(Item: PMenuItem; var R: TRect);
   var
     P: PMenuItem;
   begin
-  R.Assign(1, 0, 1, 1);
+  R := TRect.Create(1, 0, 1, 1);
   P := Menu^.Items;
   while True do
     begin
@@ -1527,9 +1536,9 @@ procedure TMenuBox.GetItemRect(Item: PMenuItem; var R: TRect);
     P := P^.Next;
     end;
   if  (P = nil) then
-    R.Assign(0, 0, 0, 0)
+    R := TRect.Create(0, 0, 0, 0)
   else
-    R.Assign(2, Y, Size.X-2, Y+1);
+    R := TRect.Create(2, Y, Size.X-2, Y+1);
   end;
 
 function TMenuBox.Execute: Word;
@@ -1563,8 +1572,8 @@ function TMenuBox.Execute: Word;
       P := P^.Next;
       end;
     end;
-  GetBounds(R);
-  Owner.GetExtent(R2); {new begin}
+  R := GetBounds;
+  R2 := Owner.GetExtent; {new begin}
   if Options and ofCenterX <> 0 then
     begin
     R.A.X := (R2.B.X-R2.A.X-W) div 2;
@@ -1630,8 +1639,8 @@ procedure TMenuPopup.HandleEvent(var Event: TEvent);
       if  (P <> nil) and (CommandEnabled(P^.Command)) then
         begin
         Event.What := evCommand;
-        Event.Command := P^.Command;
-        Event.InfoPtr := nil;
+        Event.Message.Command := P^.Command;
+        Event.Message.InfoPtr := nil;
         PutEvent(Event);
         ClearEvent(Event);
         end
@@ -1654,7 +1663,7 @@ constructor TStatusLine.Create(var Bounds: TRect; ADefs: PStatusDef);
   FindItems;
   end;
 
-constructor TStatusLine.Load(S: TStream);
+function TStatusLine.Read(Ip: ipstream): Pointer;
 
   function DoLoadStatusItems: PStatusItem;
     var
@@ -1664,15 +1673,15 @@ constructor TStatusLine.Load(S: TStream);
     begin
     Cur := nil;
     Last := @First;
-    S.Read(Count, SizeOf(AInt));
+    Ip.ReadBytes(Count, SizeOf(AInt));
     while Count > 0 do
       begin
       New(Cur);
       Last^:= Cur;
       Last := @Cur^.Next;
-      Cur^.Text := S.ReadStr;
-      S.Read(Cur^.KeyCode, SizeOf(Cur^.KeyCode));
-      S.Read(Cur^.Command, SizeOf(Cur^.Command));
+      Cur^.Text := Ip.ReadString;
+      Ip.ReadBytes(Cur^.KeyCode, SizeOf(Cur^.KeyCode));
+      Ip.ReadBytes(Cur^.Command, SizeOf(Cur^.Command));
       Dec(Count);
       end;
     Last^:= nil;
@@ -1687,13 +1696,13 @@ constructor TStatusLine.Load(S: TStream);
       Count: AInt;
     begin
     Last := @First;
-    S.Read(Count, SizeOf(AInt));
+    Ip.ReadBytes(Count, SizeOf(AInt));
     while Count > 0 do
       begin
       New(Cur);
       Last^:= Cur;
       Last := @Cur^.Next;
-      S.Read(Cur^.Min, 2*SizeOf(Word));
+      Ip.ReadBytes(Cur^.Min, 2*SizeOf(Word));
       Cur^.Items := DoLoadStatusItems;
       Dec(Count);
       end;
@@ -1702,7 +1711,8 @@ constructor TStatusLine.Load(S: TStream);
     end;
 
   begin { TStatusLine.Load }
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   Defs := DoLoadStatusDefs;
   FindItems;
   end { TStatusLine.Load };
@@ -1926,7 +1936,7 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
       begin
       T := nil;
       repeat
-        MakeLocal(Event.Where, Mouse);
+        Mouse := MakeLocal(Event.Mouse.Where);
         if T <> ItemMouseIsIn then
           begin
           T := ItemMouseIsIn;
@@ -1936,8 +1946,8 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
       if  (T <> nil) and CommandEnabled(T^.Command) then
         begin
         Event.What := evCommand;
-        Event.Command := T^.Command;
-        Event.InfoPtr := nil;
+        Event.Message.Command := T^.Command;
+        Event.Message.InfoPtr := nil;
         PutEvent(Event);
         end;
       ClearEvent(Event);
@@ -1957,23 +1967,23 @@ procedure TStatusLine.HandleEvent(var Event: TEvent);
           CommandEnabled(T^.Command) or
             (T^.KeyCode = kbShortCut) and
 {$IFDEF DNUTF8}
-            HotMatches(S, PosChar('~', S)+1, Char(Event.CharCode))
+            HotMatches(S, PosChar('~', S)+1, Char(Event.KeyDown.CharScan.CharCode))
 {$ELSE}
             (UpCaseArray[S[PosChar('~', S)+1]] =
-             UpCaseArray[Char(Event.CharCode)])
+             UpCaseArray[Char(Event.KeyDown.CharScan.CharCode)])
 {$ENDIF}
         then
           begin
           Event.What := evCommand;
-          Event.Command := T^.Command;
-          Event.InfoPtr := nil;
+          Event.Message.Command := T^.Command;
+          Event.Message.InfoPtr := nil;
           Exit;
           end;
         T := T^.Next;
         end;
       end;
     evBroadcast:
-      if Event.Command = cmCommandSetChanged then
+      if Event.Message.Command = cmCommandSetChanged then
         DrawView;
   end {case};
   end { TStatusLine.HandleEvent };
@@ -1986,7 +1996,7 @@ function TStatusLine.Hint(AHelpCtx: Word): String;
     Hint := '';
   end;
 
-procedure TStatusLine.Store(S: TStream);
+procedure TStatusLine.Write(Os: opstream);
 
   procedure DoStoreStatusItems(Cur: PStatusItem);
     var
@@ -2000,12 +2010,12 @@ procedure TStatusLine.Store(S: TStream);
       Inc(Count);
       T := T^.Next
       end;
-    S.Write(Count, SizeOf(AInt));
+    Os.WriteBytes(Count, SizeOf(AInt));
     while Cur <> nil do
       begin
-      S.WriteStr(Cur^.Text);
-      S.Write(Cur^.KeyCode, SizeOf(Cur^.KeyCode));
-      S.Write(Cur^.Command, SizeOf(Cur^.Command));
+      Os.WriteString(Cur^.Text);
+      Os.WriteBytes(Cur^.KeyCode, SizeOf(Cur^.KeyCode));
+      Os.WriteBytes(Cur^.Command, SizeOf(Cur^.Command));
       Cur := Cur^.Next;
       end;
     end;
@@ -2022,12 +2032,12 @@ procedure TStatusLine.Store(S: TStream);
       Inc(Count);
       T := T^.Next
       end;
-    S.Write(Count, SizeOf(AInt));
+    Os.WriteBytes(Count, SizeOf(AInt));
     while Cur <> nil do
       begin
       with Cur^ do
         begin
-        S.Write(Min, SizeOf(Word)*2);
+        Os.WriteBytes(Min, SizeOf(Word)*2);
         DoStoreStatusItems(Items);
         end;
       Cur := Cur^.Next;
@@ -2035,9 +2045,19 @@ procedure TStatusLine.Store(S: TStream);
     end { DoStoreStatusDefs };
 
   begin { TStatusLine.Store }
-  inherited Store(S);
+  inherited Write(Os);
   DoStoreStatusDefs(Defs);
   end { TStatusLine.Store };
+
+class function TStatusLine.Build: TStreamable;
+begin
+  Result := TStatusLine.Create(streamableInit);
+end;
+
+function TStatusLine.StreamableName: ShortString;
+begin
+  Result := 'Menus.TStatusLine';
+end;
 
 procedure TStatusLine.Update;
   var
@@ -2150,7 +2170,7 @@ function MenuIndexOf(Menu: PMenu; idCheckItem: PMenuItem): Word; {new}
       end
   end;
 
-procedure StoreMenuDefaults(Menu: PMenu; var S: TStream); {new}
+procedure StoreMenuDefaults(Menu: PMenu; Os: opstream); {new}
   var
     Item: PMenuItem;
     I: Word;
@@ -2159,19 +2179,19 @@ procedure StoreMenuDefaults(Menu: PMenu; var S: TStream); {new}
     with Menu^ do
       begin
       I := MenuIndexOf(Menu, Default);
-      S.Write(I, SizeOf(I));
+      Os.WriteBytes(I, SizeOf(I));
       Item := Items;
       if Item <> nil then
         repeat
           if  (Item^.Flags and miSubmenu <> 0) and (Item^.Name <> nil)
           then
-            StoreMenuDefaults(Item^.SubMenu, S);
+            StoreMenuDefaults(Item^.SubMenu, Os);
           Item := Item^.Next;
         until (Item = nil);
       end
   end;
 
-procedure LoadMenuDefaults(Menu: PMenu; var S: TStream); {new}
+procedure LoadMenuDefaults(Menu: PMenu; Ip: ipstream); {new}
   var
     Item: PMenuItem;
     I: Word;
@@ -2179,17 +2199,48 @@ procedure LoadMenuDefaults(Menu: PMenu; var S: TStream); {new}
   if Menu <> nil then
     with Menu^ do
       begin
-      S.Read(I, SizeOf(I));
+      Ip.ReadBytes(I, SizeOf(I));
       Default := LookUpMenu(Menu, I, dfByPosition);
       Item := Items;
       if Item <> nil then
         repeat
           if  (Item^.Flags and miSubmenu <> 0) and (Item^.Name <> nil)
           then
-            LoadMenuDefaults(Item^.SubMenu, S);
+            LoadMenuDefaults(Item^.SubMenu, Ip);
           Item := Item^.Next;
         until (Item = nil);
       end
   end;
+
+
+class function TMenuBar.Build: TStreamable;
+begin
+  Result := TMenuBar.Create(streamableInit);
+end;
+
+function TMenuBar.StreamableName: ShortString;
+begin
+  Result := 'Menus.TMenuBar';
+end;
+
+class function TMenuBox.Build: TStreamable;
+begin
+  Result := TMenuBox.Create(streamableInit);
+end;
+
+function TMenuBox.StreamableName: ShortString;
+begin
+  Result := 'Menus.TMenuBox';
+end;
+
+class function TMenuPopup.Build: TStreamable;
+begin
+  Result := TMenuPopup.Create(streamableInit);
+end;
+
+function TMenuPopup.StreamableName: ShortString;
+begin
+  Result := 'Menus.TMenuPopup';
+end;
 
 end.

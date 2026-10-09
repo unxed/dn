@@ -1,7 +1,7 @@
 { What DN calls differently from tv/ (the interface part of the unit Views). }
 type
-  TCommandSet = TvViews.TCommandSet;
-  TPalette = TvViews.TPalette;
+  { the command set of the Pascal API: a set of the commands 0..255 (CommandSetOf gives the TCommandSet of tv/) }
+  TCommandBytes = set of Byte;
 
   { DN units see these through Views (in the original they came with the Views of DN); same meaning as in Defines }
   AInt = SmallInt;
@@ -29,7 +29,7 @@ const
   CGrayWindow = #24#25#26#27#28#29#30#31;
 
 type
-  TPhase = TPhaseType;
+  TPhase = TView.PhaseType;
   { A row of cells of tv/ (as TDrawBuffer of tv/, but an array: DN addresses the cells by number): the buffer of Turbo Vision for Borland Pascal
     made of the cells of tv/, so that a cell holds any text (UTF-8, wide characters). The procedures Move* of Drivers fill it (they use the text
     functions of tv/, TvText); it is written to the screen by WriteBufC/WriteLineC of TView. A buffer of 16-bit words (low byte: the
@@ -60,6 +60,10 @@ type
   PMyScrollBar = TMyScrollBar;
   TMyScrollBar = class(TScrollBar)
     procedure Draw; override;
+  protected
+    function StreamableName: ShortString; override;
+  public
+    class function Build: TStreamable; static;
   end;
 
   { the video buffer of DN: 80x25 cells of 16 bits }
@@ -79,3 +83,9 @@ function GetNum: Integer;
 
 { Updates the periodic views now: those whose time has come (All = False) or all of them. }
 procedure UpdateAll(All: Boolean);
+
+function CommandSetOf(const Commands: TCommandBytes): TCommandSet;
+
+{ the palette of the Pascal API: a string of color indices (TPalette.Create of tv/), and the number of its entries }
+function MakePalette(const S: ShortString): TPalette;
+function PaletteSize(const P: TPalette): Integer;

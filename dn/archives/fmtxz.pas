@@ -65,11 +65,13 @@ type
     TarData: Streams.TMemoryStream;
     TarMode: Boolean;
     XzDone: Boolean;
-    constructor Create;
+    constructor Create; overload;
     destructor Destroy; override;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -324,5 +326,16 @@ procedure TXZArchive.GetFile;
   ArcFile.Seek(ArcFile.GetSize);
   XzDone := True;
   end { TXZArchive.GetFile };
+
+
+class function TXZArchive.Build: TStreamable;
+begin
+  Result := TXZArchive.Create(streamableInit);
+end;
+
+function TXZArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtxz.TXZArchive';
+end;
 
 end.

@@ -164,13 +164,13 @@ procedure TPercentGauge.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   if Event.What <> evBroadcast then
     Exit;
-  if Event.Command = cmUpdateGauge then
-    UpdateView(Event.InfoLong)
-  else if Event.Command = cmAddGauge then
-    AddProgress(Event.InfoLong)
-  else if Event.Command = cmResetGauge then
+  if Event.Message.Command = cmUpdateGauge then
+    UpdateView(Event.Message.InfoLong)
+  else if Event.Message.Command = cmAddGauge then
+    AddProgress(Event.Message.InfoLong)
+  else if Event.Message.Command = cmResetGauge then
     begin
-    MaxValue := Event.InfoLong;
+    MaxValue := Event.Message.InfoLong;
     UpdateView(0);
     end;
   end;
@@ -193,7 +193,7 @@ procedure TWhileView.InsBut;
   var
     R: TRect;
   begin
-  R.Assign(1, Size.Y-3, 13, Size.Y-1);
+  R := TRect.Create(1, Size.Y-3, 13, Size.Y-1);
   But := TButton.Create(R, GetString(dlStop), cmCancel, bfDefault);
   But.Options := But.Options or ofCenterX;
   Insert(But);
@@ -284,7 +284,7 @@ procedure TWhileView.SetState(AState: Word; Enable: Boolean);
     SetState(sfActive, Enable);
     if Top <> '' then
       SetTitle(Top);
-    WindowCommands := [cmNext, cmPrev];
+    WindowCommands := CommandSetOf([cmNext, cmPrev]);
     if Enable then
       EnableCommands(WindowCommands)
     else
@@ -311,7 +311,7 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
       ClearEvent(Event);
       Exit;
       end;
-    Desktop.GetExtent(R);
+    R := Desktop.GetExtent;
     Inc(R.A.Y, Size.Y-1);
     SetState(sfDragging, True);
     DrawView;
@@ -320,15 +320,15 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
     end;
 
   begin
-  Owner.GetExtent(R);
+  R := Owner.GetExtent;
   case Event.What of
     evKeyDown:
       case DNKeyCode(Event) of
         kbESC, kbEnter:
           begin
           Event.What := evCommand;
-          Event.Command := cmCancel;
-          Event.InfoPtr := But;
+          Event.Message.Command := cmCancel;
+          Event.Message.InfoPtr := But;
           if Application <> nil then
             Application.PutEvent(Event);
           ClearEvent(Event);
@@ -360,14 +360,14 @@ procedure TWhileView.HandleEvent(var Event: TEvent);
       end {case};
     evMouseDown:
       begin
-      MakeLocal(Event.Where, P);
+      P := MakeLocal(Event.Mouse.Where);
       if P.Y = 0 then
         MoveView;
       end;
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmGetName:
-          PString(Event.InfoPtr)^:= Top;
+          PString(Event.Message.InfoPtr)^:= Top;
         cmResize:
           MoveView;
         cmClose, cmQuit:
@@ -482,8 +482,8 @@ procedure DispatchEvents(InfoView: TWhileView; var CancelParam: Boolean);
     Event: TEvent;
   begin
   Application.GetEvent(Event);
-  if  (Event.What = evCommand) and (Event.Command = cmCancel) and
-      (Event.InfoPtr = InfoView.But) or
+  if  (Event.What = evCommand) and (Event.Message.Command = cmCancel) and
+      (Event.Message.InfoPtr = InfoView.But) or
       (Event.What = evKeyDown) and (DNKeyCode(Event) = kbESC)
   then
     begin
@@ -494,8 +494,8 @@ procedure DispatchEvents(InfoView: TWhileView; var CancelParam: Boolean);
     { and not ((Event.What = evKeyDown) and
     (DNKeyCode(Event) = kbEnter))}
     then
-    {and InfoView.MouseInView(Event.Where)
-    or (Event.What = evKeyDown) and ((Event.ScanCode=kbAltS) or (Event.))
+    {and InfoView.MouseInView(Event.Mouse.Where)
+    or (Event.What = evKeyDown) and ((Event.KeyDown.CharScan.ScanCode=kbAltS) or (Event.))
     then Application}InfoView.HandleEvent(Event);
   end;
 

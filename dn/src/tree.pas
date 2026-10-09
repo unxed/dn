@@ -59,27 +59,33 @@ type
   TTreeWindow = class;
 
   TTreeWindow = class(TWindow)
-    constructor Create(const Bounds: TRect);
+    constructor Create(const Bounds: TRect); overload;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
 
   TTreeReader = class;
 
   TTreeReader = class(TView)
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TTreeDialog = class;
   TTreeDialog = class(TDialog)
     Tree: TView;
     isValid: Boolean;
-    constructor Create(R: TRect; const ATitle: String; ADrive: Byte);
+    constructor Create(R: TRect; const ATitle: String; ADrive: Byte); overload;
     {procedure HandleEvent(var Event: TEvent); override;}
     function GetPalette: TPalette; override;
     function Valid(Command: Word): Boolean; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   PDirRec = ^TDirRec;
@@ -111,9 +117,11 @@ type
     LocateEnabled, MouseTracking, WasChanged: Boolean;
     InfoView: TView;
     constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
-        ScrBar: TScrollBar);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+        ScrBar: TScrollBar); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function Valid(Command: Word): Boolean; override;
     function Expanded(P: PDirRec; i: Integer): Boolean;
     procedure SetState(AState: Word; Enable: Boolean); override;
@@ -137,6 +145,8 @@ type
 
   TTreePanel = class(TTreeView)
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TTreeInfoView = class;
@@ -145,12 +155,14 @@ type
     Tree: TTreeView;
     Down: String;
     Loaded: Boolean;
-    constructor Create(R: TRect; ATree: TTreeView);
+    constructor Create(R: TRect; ATree: TTreeView); overload;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure MakeDown;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function GetPalette: TPalette; override;
     destructor Destroy; override;
     end;
@@ -166,10 +178,12 @@ type
   THTreeView = class(TTreePanel)
     Info: TView;
     constructor Create(R: TRect; ADrive: Integer; ParitalView: Boolean;
-        ScrBar: TScrollBar);
+        ScrBar: TScrollBar); overload;
     procedure ChangeBounds(const Bounds: TRect); override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function GetPalette: TPalette; override;
     procedure SetState(AState: Word; Enable: Boolean); override;
     destructor Destroy; override;
@@ -178,8 +192,10 @@ type
   TDirCollection = class;
   TDirCollection = class(TCollection)
     procedure FreeItem(P: Pointer); override;
-    function GetItem(S: TStream): Pointer; override;
-    procedure PutItem(S: TStream; Item: Pointer); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
+    procedure WriteItem(Item: Pointer; Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 function ChangeDir(ATitle: TTitleStr; Drv: Byte): String; {DataCompBoy}
@@ -531,8 +547,8 @@ function GetDirLen(Dir: String): TSize; {DataCompBoy}
       Event: TEvent;
     begin
     Event.What := evCommand;
-    Event.Command := cmRereadTree;
-    Event.InfoPtr := @Dir;
+    Event.Message.Command := cmRereadTree;
+    Event.Message.InfoPtr := @Dir;
     if P <> nil then
       P.HandleEvent(Event);
     end;
@@ -571,10 +587,10 @@ procedure TTreeReader.HandleEvent(var Event: TEvent);
 
   if  (Event.What = evCommand)
   then
-    case Event.Command of
+    case Event.Message.Command of
       cmRereadTree:
         begin
-        S := UpStrg(PString(Event.InfoPtr)^);
+        S := UpStrg(PString(Event.Message.InfoPtr)^);
         C := DriveOf(S);
         if  (C in ['A'..'Z']) and (DrvTrees[C].C <> nil) then
           begin
@@ -697,7 +713,7 @@ function ChangeDir(ATitle: TTitleStr; Drv: Byte): String;
     S: String;
     R: TRect;
   begin
-  R.Assign(1, 1, 50, 18);
+  R := TRect.Create(1, 1, 50, 18);
   Abort := False;
   ChangeDir := '';
   D := TTreeDialog.Create(R, ATitle, Drv);
@@ -731,25 +747,36 @@ constructor TTreeInfoView.Create(R: TRect; ATree: TTreeView);
 procedure TTreeInfoView.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
-  if  (Event.What = evBroadcast) and (Event.Command = cmDirChanged) then
+  if  (Event.What = evBroadcast) and (Event.Message.Command = cmDirChanged) then
     begin
     MakeDown;
     DrawView
     end;
   end;
 
-constructor TTreeInfoView.Load(S: TStream);
+function TTreeInfoView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Tree);
+  Result := Self;
+  inherited Read(Ip);
+  Tree := Ip.ReadPointer;
   Loaded := True;
   end;
 
-procedure TTreeInfoView.Store(S: TStream);
+procedure TTreeInfoView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Tree);
+  inherited Write(Os);
+  Os.WritePointer(Tree);
   end;
+
+class function TTreeInfoView.Build: TStreamable;
+begin
+  Result := TTreeInfoView.Create(streamableInit);
+end;
+
+function TTreeInfoView.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeInfoView';
+end;
 
 function TTreeInfoView.GetPalette: TPalette;
   const
@@ -817,7 +844,7 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
     R.Grow(24+R.A.X-R.B.X, 0);
   if R.B.Y-R.A.Y < 8 then
     R.B.Y := R.A.Y+8;
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R1 := R;
   Dec(R1.B.X, 14);
@@ -840,23 +867,23 @@ constructor TTreeDialog.Create(R: TRect; const ATitle: String; ADrive: Byte);
   P := TDTreeInfoView.Create(R1, TTreeView(Tree));
   Insert(P);
 
-  R1.Assign(R.B.X-13, R.A.Y+1, R.B.X-1, R.A.Y+3);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+1, R.B.X-1, R.A.Y+3);
   P := TButton.Create(R1, GetString(dlOKButton), cmOK, bfDefault);
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+4, R.B.X-1, R.A.Y+6);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+4, R.B.X-1, R.A.Y+6);
   P := TButton.Create(R1, GetString(dlDriveButton), cmChangeDrive,
          bfBroadcast);
   {P^.Options := P^.Options and not ofSelectable;}
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+7, R.B.X-1, R.A.Y+9);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+7, R.B.X-1, R.A.Y+9);
   P := TButton.Create(R1, GetString(dlRereadButton), cmPanelReread,
          bfBroadcast);
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+10, R.B.X-1, R.A.Y+12);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+10, R.B.X-1, R.A.Y+12);
   P := TButton.Create(R1, GetString(dlMkDirButton), cmPanelMkDir,
          bfBroadcast);
   Insert(P);
-  R1.Assign(R.B.X-13, R.A.Y+13, R.B.X-1, R.A.Y+15);
+  R1 := TRect.Create(R.B.X-13, R.A.Y+13, R.B.X-1, R.A.Y+15);
   P := TButton.Create(R1, GetString(dlCancelButton), cmCancel, 0);
   Insert(P);
   SelectNext(False);
@@ -888,34 +915,45 @@ constructor TTreeWindow.Create(const Bounds: TRect);
     S: TScrollBar;
   begin
   inherited Create(Bounds, GetString(dlTreeTitle), 0);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.A.X := R.B.X;
   Inc(R.B.X);
   S := StandardScrollBar(sbVertical+sbHandleKeyboard);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   Dec(R.B.Y, 2);
   P := TTreePanel.Create(R, 0, True, S);
   Insert(P);
 
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.A.Y := R.B.Y-2;
   P := TTreeInfoView.Create(R, TTreeView(P));
   Insert(P);
   end { TTreeWindow.Init };
 
-constructor TTreeWindow.Load(S: TStream);
+function TTreeWindow.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   TTreeView(Current).ReadAfterLoad;
   end;
 
-procedure TTreeWindow.Store(S: TStream);
+procedure TTreeWindow.Write(Os: opstream);
   begin
-  inherited Store(S);
+  inherited Write(Os);
   end;
+
+class function TTreeWindow.Build: TStreamable;
+begin
+  Result := TTreeWindow.Create(streamableInit);
+end;
+
+function TTreeWindow.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeWindow';
+end;
 
 function TTreeWindow.GetPalette: TPalette;
   const
@@ -973,7 +1011,7 @@ destructor TTreeView.Destroy;
   begin
   if DC <> nil then
     begin
-    DC.DeleteAll;
+    DC.RemoveAll;
     DC.Free;
     DC := nil;
     end;
@@ -987,15 +1025,16 @@ function TTreeView.GetPalette: TPalette;
   GetPalette := MakePalette(S);
   end;
 
-constructor TTreeView.Load(S: TStream);
+function TTreeView.Read(Ip: ipstream): Pointer;
   var
     P: Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, ScrollBar);
-  S.Read(Parital, 1);
-  S.ReadStrV(LastPath);
-  {S.Read(LastPath[0], 1); S.Read(LastPath[1], Length(LastPath));}
+  Result := Self;
+  inherited Read(Ip);
+  ScrollBar := Ip.ReadPointer;
+  Ip.ReadBytes(Parital, 1);
+  ReadStrV(Ip, LastPath);
+  {Ip.ReadBytes(LastPath[0], 1); Ip.ReadBytes(LastPath[1], Length(LastPath));}
   CurPath := LastPath;
   Drive := Byte(DriveOf(LastPath))-64;
   StopQuickSearch;
@@ -1022,13 +1061,23 @@ function THTreeView.GetPalette: TPalette;
   GetPalette := MakePalette(S);
   end;
 
-procedure TTreeView.Store(S: TStream);
+procedure TTreeView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, ScrollBar);
-  S.Write(Parital, 1);
-  S.WriteStr(@LastPath); {S.Write(LastPath, Length(LastPath)+1);}
+  inherited Write(Os);
+  Os.WritePointer(ScrollBar);
+  Os.WriteBytes(Parital, 1);
+  Os.WriteString(@LastPath); {Os.WriteBytes(LastPath, Length(LastPath)+1);}
   end;
+
+class function TTreeView.Build: TStreamable;
+begin
+  Result := TTreeView.Create(streamableInit);
+end;
+
+function TTreeView.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeView';
+end;
 
 function TTreeView.Valid(Command: Word): Boolean;
   begin
@@ -1107,7 +1156,7 @@ procedure TTreeView.CollapseBranch(N: Integer);
     begin
     while (I < DC.Count-1) and (P^.Level < PDirRec(DC.At(I+1))^.Level)
     do
-      DC.AtDelete(I+1);
+      DC.AtRemove(I+1);
     end
   else
     begin
@@ -1231,8 +1280,8 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
     begin
     T.X := Size.X div 2;
     T.Y := 1;
-    MakeGlobal(T, T);
-    Desktop.MakeLocal(T, T);
+    T := MakeGlobal(T);
+    T := Desktop.MakeLocal(T);
     S := SelectDrive(T.X, T.Y, CurPath[1], False);
     if S = '' then
       Exit;
@@ -1273,7 +1322,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       end;
     if not B then
       begin
-      DC.DeleteAll;
+      DC.RemoveAll;
       for I := 1 to Dirs.Count do
         DC.Insert(Dirs.At(I-1));
       end
@@ -1341,13 +1390,13 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
   begin { TTreeView.HandleCommand }
   CurPos := ScrollBar.Value;
   {P := DC.At(CurPos);}
-  if QuickSearch and (Event.What = evKeyDown) and (Char(Event.CharCode) < #32)
+  if QuickSearch and (Event.What = evKeyDown) and (Char(Event.KeyDown.CharScan.CharCode) < #32)
     and (DNKeyCode(Event) <> kbBack) and (DNKeyCode(Event) <> kbCtrlEnter)
   then
     CancelSearch;
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
 
         cmPanelErase:
           EraseDir;
@@ -1367,8 +1416,8 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           CE;
           end;
         cmFindTree:
-          if Char(Event.InfoPtr^) = LastPath[1] then
-            Char(Event.InfoPtr^) := #0;
+          if Char(Event.Message.InfoPtr^) = LastPath[1] then
+            Char(Event.Message.InfoPtr^) := #0;
         cmRevert:
           begin
           ScrollBar.SetValue(CurNum);
@@ -1380,7 +1429,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           begin
           if Dirs = nil then
             Exit;
-          if CurPath[1] = PString(Event.InfoPtr)^[1] then
+          if CurPath[1] = PString(Event.Message.InfoPtr)^[1] then
             Reread(False);
           if Valid(0) then
             begin
@@ -1401,7 +1450,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           end;
         cmChangeTree:
           begin
-          if not IsQualified(PString(Event.InfoPtr)^) then
+          if not IsQualified(PString(Event.Message.InfoPtr)^) then
             {Cat:warn there may be problems with network paths}
             begin
             CE;
@@ -1410,7 +1459,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           CurPath[1] := UpCase(CurPath[1]);
           LastPath[1] := UpCase(LastPath[1]);
           LocateEnabled := True;
-          LastPath := PString(Event.InfoPtr)^;
+          LastPath := PString(Event.Message.InfoPtr)^;
           if Dirs = nil then
             begin
             WasChanged := CurPath[1] <> LastPath[1];
@@ -1454,16 +1503,16 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           Message(Owner, evBroadcast, cmDirChanged, @CurPath);
           end;
         cmGetName:
-          PString(Event.InfoPtr)^:= GetString(dlTreeTitle);
+          PString(Event.Message.InfoPtr)^:= GetString(dlTreeTitle);
         cmGetDirName:
-          PString(Event.InfoPtr)^:= GetDirName(ScrollBar.Value);
+          PString(Event.Message.InfoPtr)^:= GetDirName(ScrollBar.Value);
       end {case};
     evKeyDown:
       case DNKeyCode(Event) of
         kbAlt1, kbAlt2, kbAlt3, kbAlt4, kbAlt5, kbAlt6, kbAlt7, kbAlt8,
          kbAlt9:
           begin
-          QuickChange(CnvString(DirsToChange[Event.ScanCode-Hi(kbAlt1)]))
+          QuickChange(CnvString(DirsToChange[Event.KeyDown.CharScan.ScanCode-Hi(kbAlt1)]))
           ;
           CE
           end;
@@ -1519,15 +1568,15 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
               CE
               end;
         else {case}
-          if (Char(Event.CharCode) >= #32)
+          if (Char(Event.KeyDown.CharScan.CharCode) >= #32)
 {$IFDEF DNUTF8}
-             or ((Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80))
+             or ((Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80))
 {$ENDIF}
           then
             begin
             if QuickSearch then
               begin
-              if  (Char(Event.CharCode) = DnSep) and (QSMask <> '')
+              if  (Char(Event.KeyDown.CharScan.CharCode) = DnSep) and (QSMask <> '')
               then
                 begin
                 CE;
@@ -1562,27 +1611,27 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       end {case};
     {-DataCompBoy-}
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmPanelReread,
         cmPanelMkDir,
         cmChangeDrive:
-          Message(Self, evCommand, Event.Command, nil);
+          Message(Self, evCommand, Event.Message.Command, nil);
         cmTreeChanged:
           begin
           if  (Dirs <> nil)
-               and (PString(Event.InfoPtr)^[1] = CurPath[1])
+               and (PString(Event.Message.InfoPtr)^[1] = CurPath[1])
           then
             Reread(False);
           end;
         cmDropped:
           begin
-          MP := PCopyRec(Event.InfoPtr)^.Where;
+          MP := PCopyRec(Event.Message.InfoPtr)^.Where;
           if not MouseInView(MP) then
             begin
             CE;
             Exit;
             end;
-          MakeLocal(MP, MP);
+          MP := MakeLocal(MP);
           I := Delta.Y+MP.Y;
           if I >= DC.Count then
             begin
@@ -1590,12 +1639,12 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
             Exit;
             end;
           CopyDirName := GetDirName(I);
-          if PCopyRec(Event.InfoPtr)^.Owner <> nil then
+          if PCopyRec(Event.Message.InfoPtr)^.Owner <> nil then
             begin
             Ev.What := evBroadcast;
-            Ev.Command := cmUnArchive;
-            Ev.InfoPtr := Event.InfoPtr;
-            PCopyRec(Event.InfoPtr)^.Owner.HandleEvent(Ev);
+            Ev.Message.Command := cmUnArchive;
+            Ev.Message.InfoPtr := Event.Message.InfoPtr;
+            PCopyRec(Event.Message.InfoPtr)^.Owner.HandleEvent(Ev);
             if Ev.What = evNothing then
               begin
               CE;
@@ -1608,13 +1657,13 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
                    cmIsRightPanel, Self) <> nil)
           else
             RevertBar := False;
-          CopyFiles(PCopyRec(Event.InfoPtr)^.FC,
-             PCopyRec(Event.InfoPtr)^.Owner,
+          CopyFiles(PCopyRec(Event.Message.InfoPtr)^.FC,
+             PCopyRec(Event.Message.InfoPtr)^.Owner,
             ShiftState and 3 <> 0, 0);
           CE;
           end;
         cmScrollBarChanged:
-          if ScrollBar = Event.InfoPtr then
+          if ScrollBar = Event.Message.InfoPtr then
             begin
             DrawView;
             CE;
@@ -1629,7 +1678,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
       end {case};
     evMouseDown:
       begin
-      MakeLocal(Event.Where, MP);
+      MP := MakeLocal(Event.Mouse.Where);
       if MP.Y+Delta.Y < DC.Count then
         begin
         PD := DC.At(MP.Y+Delta.Y);
@@ -1647,7 +1696,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           {if (MP.X >= P^.Level*3 + 1 + 3*Byte(P^.Level>0) + Delta.X) and
                       (MP.X <= P^.Level*3 + 2 + 3*Byte(P^.Level>0) + Delta.X + Length(P^.Name)) then}
           begin
-          if ((Event.EventFlags and 2) <> 0) and not Parital then
+          if ((Event.Mouse.EventFlags and 2) <> 0) and not Parital then
             begin
             ScrollBar.SetValue(MP.Y+Delta.Y);
             Message(Owner, evCommand, cmOK, nil);
@@ -1657,7 +1706,7 @@ procedure TTreeView.HandleCommand(var Event: TEvent);
           RepeatDelay := 0;
           MouseTracking := True;
           repeat
-            MakeLocal(Event.Where, MP);
+            MP := MakeLocal(Event.Mouse.Where);
             if  (MP.X > 0) and (MP.X < Size.X) then
               ScrollBar.SetValue(MP.Y+Delta.Y);
           until not MouseEvent(Event, evMouseAuto+evMouseMove);
@@ -1805,26 +1854,36 @@ procedure TDirCollection.FreeItem(P: Pointer);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TDirCollection.PutItem(S: TStream; Item: Pointer);
+procedure TDirCollection.WriteItem(Item: Pointer; Os: opstream);
   begin
-  S.Write(Item^, SizeOf(TDirRec));
+  Os.WriteBytes(Item^, SizeOf(TDirRec));
   end;
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-function TDirCollection.GetItem(S: TStream): Pointer;
+function TDirCollection.ReadItem(Ip: ipstream): Pointer;
   var
     Item: PDirRec;
   begin
   New(Item);
-  S.Read(Item^, SizeOf(TDirRec));
+  Ip.ReadBytes(Item^, SizeOf(TDirRec));
   if  (Item^.NumFiles < 0) or (Item^.Size < 0) then
     begin
     Item^.NumFiles := 0;
     Item^.NumFiles := 0;
     end;
-  GetItem := Item;
+  Result := Item;
   end;
+
+class function TDirCollection.Build: TStreamable;
+begin
+  Result := TDirCollection.Create(streamableInit);
+end;
+
+function TDirCollection.StreamableName: ShortString;
+begin
+  Result := 'Tree.TDirCollection';
+end;
 {-DataCompBoy-}
 
 procedure TTreeView.ReadTree(CountLen: Boolean);
@@ -1842,7 +1901,7 @@ procedure TTreeView.ReadTree(CountLen: Boolean);
   Abort := False;
   if DC <> nil then
     begin
-    DC.DeleteAll;
+    DC.RemoveAll;
     DC.Free;
     end;
   DC := GetDirCollection(CurPath[1], CountLen);
@@ -1959,18 +2018,18 @@ procedure TTreeView.SetState(AState: Word; Enable: Boolean);
   inherited SetState(AState, Enable);
   if  (AState and sfFocused <> 0) and not Enable then
     if Parital then
-      DisableCommands([cmCopyFiles, cmPanelErase, cmMoveFiles,
+      DisableCommands(CommandSetOf([cmCopyFiles, cmPanelErase, cmMoveFiles,
          cmPanelMkDir,
-        cmChangeDrive, cmPanelReread]);
+        cmChangeDrive, cmPanelReread]));
   if AState and (sfFocused or sfActive or sfSelected) <> 0 then
     if Owner.GetState(sfActive) and GetState(sfSelected) then
       begin
       if ScrollBar <> nil then
         ScrollBar.Show;
       if Parital then
-        EnableCommands([cmCopyFiles, cmPanelErase, cmMoveFiles,
+        EnableCommands(CommandSetOf([cmCopyFiles, cmPanelErase, cmMoveFiles,
            cmPanelReread,
-          cmPanelMkDir, cmChangeDrive]);
+          cmPanelMkDir, cmChangeDrive]));
       {EventMask := EventMask or evBroadcast;}
       DrawView
       end
@@ -1989,7 +2048,7 @@ procedure TTreeView.Reread(CountLen: Boolean);
     I, M: Integer;
   begin
   DrawDisabled := True;
-  DC.DeleteAll;
+  DC.RemoveAll;
   DC.Free;
   DC := nil;
   M := ScrollBar.Value;
@@ -2036,7 +2095,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
            <> nil)
     else
       RevertBar := False;
-    CopyFiles(FC, nil, Event.Command = cmMoveFiles, 0);
+    CopyFiles(FC, nil, Event.Message.Command = cmMoveFiles, 0);
     FC.Free;
     FC := nil;
     lChDir(OldDir);
@@ -2048,7 +2107,7 @@ procedure TTreePanel.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmMoveFiles, cmCopyFiles:
           CopyDir;
       end {case};
@@ -2061,17 +2120,28 @@ constructor THTreeView.Create(R: TRect; ADrive: Integer; ParitalView: Boolean; S
   Info := nil;
   end;
 
-constructor THTreeView.Load(S: TStream);
+function THTreeView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Info);
+  Result := Self;
+  inherited Read(Ip);
+  Info := Ip.ReadPointer;
   end;
 
-procedure THTreeView.Store(S: TStream);
+procedure THTreeView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Info);
+  inherited Write(Os);
+  Os.WritePointer(Info);
   end;
+
+class function THTreeView.Build: TStreamable;
+begin
+  Result := THTreeView.Create(streamableInit);
+end;
+
+function THTreeView.StreamableName: ShortString;
+begin
+  Result := 'Tree.THTreeView';
+end;
 
 procedure THTreeView.ChangeBounds(const Bounds: TRect);
   var
@@ -2163,5 +2233,36 @@ function CreateDirInheritance(var S: String; Confirm: Boolean): Byte;
     end;
   end { CreateDirInheritance };
 {-DataCompBoy-}
+
+
+class function TTreeReader.Build: TStreamable;
+begin
+  Result := TTreeReader.Create(streamableInit);
+end;
+
+function TTreeReader.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeReader';
+end;
+
+class function TTreePanel.Build: TStreamable;
+begin
+  Result := TTreePanel.Create(streamableInit);
+end;
+
+function TTreePanel.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreePanel';
+end;
+
+class function TTreeDialog.Build: TStreamable;
+begin
+  Result := TTreeDialog.Create(streamableInit);
+end;
+
+function TTreeDialog.StreamableName: ShortString;
+begin
+  Result := 'Tree.TTreeDialog';
+end;
 
 end.

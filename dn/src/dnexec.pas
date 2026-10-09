@@ -247,8 +247,8 @@ procedure ExecStringRR(S: AnsiString; const WS: String; RR: Boolean); {JO}
     begin
     DDTimer := GetCurMSec - DDTimer;
     EV.What := evCommand;
-    EV.Command := cmShowTimeInfo;
-    EV.InfoPtr := nil;
+    EV.Message.Command := cmShowTimeInfo;
+    EV.Message.InfoPtr := nil;
     Application.PutEvent(EV);
     end;
   I := DosError;

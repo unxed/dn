@@ -52,6 +52,16 @@ begin
   end;
 end;
 
+function TMyScrollBar.StreamableName: ShortString;
+begin
+  Result := 'Views.TMyScrollBar';
+end;
+
+class function TMyScrollBar.Build: TStreamable;
+begin
+  Result := TMyScrollBar.Create(streamableInit);
+end;
+
 procedure TMyScrollBar.Draw;
 var
   S: String[5];
@@ -76,11 +86,11 @@ begin
     Exit;
   ClearEvent(Event);
   Event.What := What;
-  Event.Command := Command;
-  Event.InfoLong := InfoLng;
+  Event.Message.Command := Command;
+  Event.Message.InfoLong := InfoLng;
   Receiver.HandleEvent(Event);
   if Event.What = evNothing then
-    Result := Event.InfoPtr;
+    Result := Event.Message.InfoPtr;
 end;
 
 var
@@ -118,4 +128,25 @@ begin
   for I := 0 to High(Background) do
     if Background[I].View <> nil then
       Background[I].View.Update;
+end;
+
+function CommandSetOf(const Commands: TCommandBytes): TCommandSet;
+var
+  C: Byte;
+begin
+  Result := Default(TCommandSet);
+  for C in Commands do
+    Result := Result + C;
+end;
+
+function MakePalette(const S: ShortString): TPalette;
+begin
+  Result := TPalette.Create(PChar(@S[1]), Length(S));
+end;
+
+function PaletteSize(const P: TPalette): Integer;
+begin
+  Result := Length(P.Data) - 1;
+  if Result < 0 then
+    Result := 0;
 end;

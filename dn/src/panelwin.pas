@@ -85,11 +85,13 @@ type
   reality the panels have no borders at all.) }
   TSeparator = class(TView)
     OldX, OldW: AInt;
-    constructor Create(const R: TRect; AH: Integer);
+    constructor Create(const R: TRect; AH: Integer); overload;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
   {`}
 
@@ -109,11 +111,11 @@ type
     SinglePanel: Boolean;
       {` Whether the panel was the only one before maximization `}
     isValid: Boolean;
-    constructor Create(const Bounds: TRect; ANumber, ADrive: Integer);
+    constructor Create(const Bounds: TRect; ANumber, ADrive: Integer); overload;
     procedure InitPanel(N: TPanelNum; R: TRect);
     procedure InitInterior;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
     procedure SwitchView(dtType: Byte);
       {`Make the inactive panel of the given type if it currently has
       a different type; and if it is already that type - make the panel
@@ -184,7 +186,7 @@ constructor TDoubleWindow.Create(const Bounds: TRect; ANumber, ADrive: Integer);
     ADrive := 0;
   Panel[pLeft].Drive := ADrive;
   Panel[pRight].Drive := ADrive;
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, 0);
   R.A.X := R.B.X div 2;
   R.B.X := R.A.X+2;
@@ -281,10 +283,10 @@ procedure TDoubleWindow.ChangeBounds(const Bounds: TRect);
   begin
   D.X := Bounds.B.X-Bounds.A.X-Size.X;
   D.Y := Bounds.B.Y-Bounds.A.Y-Size.Y;
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, 0);
   R.A.X := (R.B.X*Separator.OldX) div Separator.OldW;
-  if D.EqualsXY(0, 0) and (R.A.X = Separator.Origin.X) then
+  if (D = Point(0, 0)) and (R.A.X = Separator.Origin.X) then
     begin
     SetBounds(Bounds);
     DrawView;
@@ -293,10 +295,10 @@ procedure TDoubleWindow.ChangeBounds(const Bounds: TRect);
     begin
     FreeBuffer;
     SetBounds(Bounds);
-    GetExtent(Clip);
+    Clip := GetExtent;
     GetBuffer;
     Lock;
-    GetExtent(R);
+    R := GetExtent;
     Frame.ChangeBounds(R);
     SVisible := Separator.GetState(sfVisible);
     for N := pLeft to pRight do
@@ -306,7 +308,7 @@ procedure TDoubleWindow.ChangeBounds(const Bounds: TRect);
           begin
           if SVisible then
             Separator.Hide;
-          GetExtent(R);
+          R := GetExtent;
           R.Grow(-1, -1);
           Panel[not N].AnyPanel.ChangeBounds(R);
           goto 1;
@@ -314,16 +316,16 @@ procedure TDoubleWindow.ChangeBounds(const Bounds: TRect);
       end;
     if not SVisible then
       Separator.Show;
-    GetExtent(R);
+    R := GetExtent;
     R.Grow(-1, 0);
     R.A.X := (R.B.X*Separator.OldX) div Separator.OldW;
     R.B.X := R.A.X+2;
     Separator.ChangeBounds(R);
-    GetExtent(R);
+    R := GetExtent;
     R.Grow(-1, -1);
     R.A.X := (R.B.X*Separator.OldX) div Separator.OldW+2;
     Panel[pRight].AnyPanel.ChangeBounds(R);
-    GetExtent(R);
+    R := GetExtent;
     R.Grow(-1, -1);
     R.B.X := (R.B.X*Separator.OldX) div Separator.OldW;
     Panel[pLeft].AnyPanel.ChangeBounds(R);
@@ -333,7 +335,7 @@ procedure TDoubleWindow.ChangeBounds(const Bounds: TRect);
     end;
   end { TDoubleWindow.ChangeBounds };
 
-constructor TDoubleWindow.Load(S: TStream);
+function TDoubleWindow.Read(Ip: ipstream): Pointer;
   const
     SaveBlockLen =
       SizeOf(OldBounds) +
@@ -345,29 +347,30 @@ constructor TDoubleWindow.Load(S: TStream);
   var
     N: TPanelNum;
   begin
-  inherited Load(S);
-  S.Read(OldBounds, SaveBlockLen);
-  GetSubViewPtr(S, Separator);
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(OldBounds, SaveBlockLen);
+  Separator := Ip.ReadPointer;
   for N := pLeft to pRight do
     with Panel[N] do
       begin
-      S.Read(PanelType, SizeOf(PanelType)+SizeOf(Drive));
-      GetSubViewPtr(S, FilePanel);
+      Ip.ReadBytes(PanelType, SizeOf(PanelType)+SizeOf(Drive));
+      FilePanel := Ip.ReadPointer;
       if FilePanel = nil then
-        Fail;
+        begin Free; Result := nil; Exit end;
       AnyPanel := FilePanel;
       FilePanel.SelfNum := N;
       end;
   PassivePanel := OtherFilePanel(ActivePanel);
 
   if NonFilePanelType <> 0 then
-    GetSubViewPtr(S, Panel[NonFilePanel].AnyPanel);
+    Panel[NonFilePanel].AnyPanel := Ip.ReadPointer;
 
   {Cat}
   if  (Separator = nil)
     or (Panel[pLeft].AnyPanel = nil) or (Panel[pRight].AnyPanel = nil)
   then
-    Fail;
+    begin Free; Result := nil; Exit end;
   {/Cat}
 
   case NonFilePanelType of
@@ -393,7 +396,7 @@ constructor TDoubleWindow.Load(S: TStream);
   isValid := True;
   end { TDoubleWindow.Load };
 
-procedure TDoubleWindow.Store(S: TStream);
+procedure TDoubleWindow.Write(Os: opstream);
   const
     SaveBlockLen =
       SizeOf(OldBounds) +
@@ -405,17 +408,17 @@ procedure TDoubleWindow.Store(S: TStream);
   var
     N: TPanelNum;
   begin
-  inherited Store(S);
-  S.Write(OldBounds, SaveBlockLen);
-  PutSubViewPtr(S, Separator);
+  inherited Write(Os);
+  Os.WriteBytes(OldBounds, SaveBlockLen);
+  Os.WritePointer(Separator);
   for N := pLeft to pRight do
     with Panel[N] do
       begin
-      S.Write(PanelType, SizeOf(PanelType)+SizeOf(Drive));
-      PutSubViewPtr(S, FilePanel);
+      Os.WriteBytes(PanelType, SizeOf(PanelType)+SizeOf(Drive));
+      Os.WritePointer(FilePanel);
       end;
   if NonFilePanelType <> 0 then
-    PutSubViewPtr(S, Panel[NonFilePanel].AnyPanel);
+    Os.WritePointer(Panel[NonFilePanel].AnyPanel);
   end { TDoubleWindow.Store };
 
 
@@ -560,7 +563,7 @@ procedure TDoubleWindow.SwitchView(dtType: Byte);
   Selected := Panel[pRight].AnyPanel.GetState(sfSelected);
   N := not Selected;
   VisibleN := Panel[N].AnyPanel.GetState(sfVisible);
-  Panel[N].AnyPanel.GetBounds(R1);
+  R1 := Panel[N].AnyPanel.GetBounds;
 
   { If a non-file panel existed - it must be destroyed in any case.
 If it existed and was exactly of type dtType, then restore
@@ -624,7 +627,7 @@ procedure TDoubleWindow.InitInterior;
     RP: array[TPanelNum] of TRect;
     N: TPanelNum;
   begin
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   RP[pRight] := R;
   RP[pLeft] := R;
@@ -650,7 +653,7 @@ procedure TDoubleWindow.SwitchPanel(N: TPanelNum);
   if PanelZoomed or not Panel[not N].AnyPanel.GetState(sfVisible) then
     Exit;
   Lock;
-  GetBounds(R);
+  R := GetBounds;
   ThisPanel := Panel[N].AnyPanel;
   if ThisPanel.GetState(sfVisible) then
     begin // hide
@@ -698,12 +701,12 @@ procedure TDoubleWindow.ChangeDrv(N: TPanelNum);
   PanelVisible := ThisPanel.GetState(sfVisible);
   if (NonFilePanelType <> 0) and (N = NonFilePanel) then
     begin
-    ThisPanel.GetBounds(R);
+    R := ThisPanel.GetBounds;
     R.A.Y := 1;
     R.B.Y := Size.Y;
     Panel[N].FilePanel.Locate(R);
     end;
-  GetBounds(R);
+  R := GetBounds;
   if not PanelVisible or (Panel[N].PanelType <> dtPanel) then
     begin
     with ThisPanel do
@@ -725,7 +728,7 @@ procedure TDoubleWindow.ChangeDrv(N: TPanelNum);
         with Panel[NonFilePanel].AnyPanel do
           begin
           PanelSelected := GetState(sfSelected);
-          GetBounds(R1);
+          R1 := GetBounds;
           Hide;
           Free;
           end;
@@ -777,7 +780,7 @@ procedure TDoubleWindow.ToggleViewMaxiState(P: TView; Other: TPanelNum);
     SinglePanel := not Panel[Other].AnyPanel.GetState(sfVisible);
     if not SinglePanel then
       SwitchPanel(Other);
-    GetBounds(OldPanelBounds);
+    OldPanelBounds := GetBounds;
     ChangeBounds(OldBounds);
     PanelZoomed := True;
     end
@@ -851,7 +854,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
       Sp.OldW := Size.X;
       X := Sp.Origin.X + D + 1;
       Sp.OldX := Min(Max(X, 0), Sp.OldW);
-      GetBounds(R);
+      R := GetBounds;
       ChangeBounds(R);
       CE;
       end;
@@ -920,25 +923,25 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           InsertPath(pRight);
       end {case};
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmLookForPanels:
           ClearEvent(Event);
         cmGetUserParams, cmGetUserParamsWL:
           begin
           PP := Panel[not Selected].FilePanel;
           AP := Panel[Selected].FilePanel;
-          with PUserParams(Event.InfoPtr)^ do
+          with PUserParams(Event.Message.InfoPtr)^ do
             begin
-            AP.GetUserParams(Active, ActiveList, Event.Command =
+            AP.GetUserParams(Active, ActiveList, Event.Message.Command =
                cmGetUserParamsWL);
-            PP.GetUserParams(Passive, PassiveList, Event.Command =
+            PP.GetUserParams(Passive, PassiveList, Event.Message.Command =
                cmGetUserParamsWL);
             end;
           CE;
           end;
         cmChangeDirectory:
           begin
-          Panel[Selected].FilePanel.ChDir(PString(Event.InfoPtr)^);
+          Panel[Selected].FilePanel.ChDir(PString(Event.Message.InfoPtr)^);
           CE;
           end;
         cmChangeDrv: {command line like C: or *: }
@@ -948,11 +951,11 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           ClearEvent(Event);
           end;
         cmIsRightPanel:
-          if Event.InfoPtr = Panel[pRight].FilePanel then
+          if Event.Message.InfoPtr = Panel[pRight].FilePanel then
             ClearEvent(Event);
       end {case};
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
 
         cmSwitchOther:
           if not PanelZoomed then
@@ -965,8 +968,8 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           { Flash 05-02-2004 >>> }
           if Panel[Selected].PanelType = dtQView then
             begin
-            GetBounds(OldBounds);
-            GetBounds(OldPanelBounds);
+            OldBounds := GetBounds;
+            OldPanelBounds := GetBounds;
             if (Size.X < Desktop.Size.X) or PanelZoomed then
               Message(Self, evCommand, cmMaxi, nil);
             end;
@@ -988,22 +991,22 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           end;
         cmGetName:
           begin
-          PString(Event.InfoPtr)^:= GetString(dlFileManager);
-          K := (55-Length(PString(Event.InfoPtr)^)) div 2;
+          PString(Event.Message.InfoPtr)^:= GetString(dlFileManager);
+          K := (55-Length(PString(Event.Message.InfoPtr)^)) div 2;
           for N := pLeft to pRight do
             begin
             S := '??'; // in case the window does not handle cmGetName
             Message(Panel[N].AnyPanel, evCommand, cmGetName, @S);
-            PString(Event.InfoPtr)^:= PString(Event.InfoPtr)^+
+            PString(Event.Message.InfoPtr)^:= PString(Event.Message.InfoPtr)^+
               Cut((S),K);
             if N = pLeft then
-              PString(Event.InfoPtr)^:= PString(Event.InfoPtr)^+',';
+              PString(Event.Message.InfoPtr)^:= PString(Event.Message.InfoPtr)^+',';
             end;
           CE
           end;
         cmPostHideRight, cmPostHideLeft: {Ctrl-F1/F2 from UserScreen}
           begin
-          N := Event.Command = cmPostHideRight;
+          N := Event.Message.Command = cmPostHideRight;
           if not Visible[N] then
             begin
             SwitchPanel(N);
@@ -1015,7 +1018,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
           end;
         cmChangeInactive: {in search panel Shift-Enter }
           begin
-          Event.Command := cmFindGotoFile;
+          Event.Message.Command := cmFindGotoFile;
           with Panel[not Selected] do
             begin
             FilePanel.HandleEvent(Event);
@@ -1060,7 +1063,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
             Panel[NonFilePanel].AnyPanel.HandleEvent(Event);
         cmHideLeft, cmHideRight:
           begin
-          N := Event.Command = cmHideRight;
+          N := Event.Message.Command = cmHideRight;
           if Visible[N] and not Visible[not N] then
             Message(Application, evCommand, cmShowOutput, nil)
           else
@@ -1110,7 +1113,7 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
               begin
               if not Visible[N] then
                 SwitchPanel(N);
-              Panel[N].AnyPanel.GetBounds(WR[N]);
+              WR[N] := Panel[N].AnyPanel.GetBounds;
               WR[N].B.Y := Size.Y-1;
               end;
             WPanel := Panel[pLeft];
@@ -1135,17 +1138,28 @@ procedure TDoubleWindow.HandleCommand(var Event: TEvent);
 
 { --------------------------- TSeparator ----------------------------- }
 
-constructor TSeparator.Load(S: TStream);
+function TSeparator.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  S.Read(OldX, 4);
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(OldX, 4);
   end;
 
-procedure TSeparator.Store(S: TStream);
+procedure TSeparator.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(OldX, 4);
+  inherited Write(Os);
+  Os.WriteBytes(OldX, 4);
   end;
+
+class function TSeparator.Build: TStreamable;
+begin
+  Result := TSeparator.Create(streamableInit);
+end;
+
+function TSeparator.StreamableName: ShortString;
+begin
+  Result := 'panelwin.TSeparator';
+end;
 
 constructor TSeparator.Create(const R: TRect; AH: Integer);
   begin
@@ -1166,12 +1180,12 @@ procedure TSeparator.HandleEvent(var Event: TEvent);
   case Event.What of
     evMouseDown:
       begin
-      MakeLocal(Event.Where, P);
+      P := MakeLocal(Event.Mouse.Where);
       B := P.X;
       RD := RepeatDelay;
       RepeatDelay := 0;
       repeat
-        Owner.MakeLocal(Event.Where, P);
+        P := Owner.MakeLocal(Event.Mouse.Where);
         if  (P.X >= 1) and (P.X < Owner.Size.X-2) then
           begin
           OldX := P.X+1-B;

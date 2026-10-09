@@ -39,9 +39,7 @@ const
   DoubleCtrlUnlock: Boolean = True;
   ButtonCount: Byte = 0;
   MouseEvents: Boolean = False;
-  MouseReverse: Boolean = False;
   MouseButtons: Byte = 0;
-  DoubleDelay: Word = 8;
   RepeatDelay: Word = 8;
   AutoRepeat: Word = 1;
   UserScreen: Pointer = nil;
@@ -75,14 +73,14 @@ var
   OldCursorPos: Word;
   DownButtons: Byte;
   { the size of the screen: the low halves of the variables of TvScreen (little endian) }
-  ScreenWidth: Word absolute TvScreen.ScreenWidth;
-  ScreenHeight: Word absolute TvScreen.ScreenHeight;
+  ScreenWidth: Word absolute TvScreen.TScreen.ScreenWidth;
+  ScreenHeight: Word absolute TvScreen.TScreen.ScreenHeight;
   { TODO: DN reads and writes the screen as an array of 16-bit cells; the buffer of tv/ has other cells }
   { the screen of DN: 16-bit cells (character + attribute), a copy of the screen of tv/ that SysTvGetSrcBuf (osdep) makes and
     mainapp refreshes at every idle; DN reads it (user screen, screen savers) and writes back with SysTvShowBuf. NOT the buffer of
     TvScreen (that one has the cells of tv/) }
   ScreenBuffer: Pointer = nil;
-  CursorLines: Word absolute TvScreen.CursorLines;
+  CursorLines: Word absolute TvScreen.TScreen.CursorLines;
 
 { The key code of an event in the form of DN: the low word is the code of Turbo Vision (scan code * 256 + character),
   bits 16..19 are the state of the shift keys (1 and 2: shift, 4: ctrl, 8: alt; the shifts together are 3), as in
@@ -144,7 +142,7 @@ function GetAltCode(Ch: Char): Word;
 function GetCtrlChar(KeyCode: Word): Char;
 function GetCtrlCode(Ch: Char): Word;
 
-{ Result := Format with its % items filled from Params, an array of pointer-sized slots (TvFormat.FormatSlots). }
+{ Result := Format with its % items filled from Params, an array of pointer-sized slots (converted for TvFormat.FormatStr). }
 procedure FormatStr(var Result: String; const Format: String; var Params);
 procedure PrintStr(const S: String);
 
@@ -193,17 +191,17 @@ implementation
 
 function GetCursorSize: Word;
 begin
-  Result := CaretSize;
+  Result := THardwareInfo.GetCaretSize;
 end;
 
 procedure ShowCursor;
 begin
-  SetCaretSize(CursorLines);
+  THardwareInfo.SetCaretSize(CursorLines);
 end;
 
 procedure HideCursor;
 begin
-  SetCaretSize(0);
+  THardwareInfo.SetCaretSize(0);
 end;
 
 function SetVideoMode(Cols, Rows: Word): Boolean;
@@ -248,10 +246,10 @@ var
   I: Integer;
 begin
   Shift := 0;
-  if (Event.ControlKeyState and 3) <> 0 then
+  if (Event.KeyDown.ControlKeyState and 3) <> 0 then
     Shift := 3;
-  Shift := Shift or (Event.ControlKeyState and 12);
-  Key := Event.KeyCode;
+  Shift := Shift or (Event.KeyDown.ControlKeyState and 12);
+  Key := Event.KeyDown.KeyCode;
   { tv/ has its own codes for these four (magiblot: kbCtrlIns $0400, kbShiftIns $0500, kbCtrlDel $0600, kbShiftDel $0700); DN knows the scan codes of the BIOS:
     without this Ctrl+Ins (copy), Shift+Ins (paste), Ctrl+Del and Shift+Del were not the keys DN looks for (the menu hotkeys, the editor) }
   case Key of
@@ -260,12 +258,12 @@ begin
     $0600: Key := $9300;
     $0700: Key := $5300;
   end;
-  if  ((Event.ControlKeyState and 4) <> 0) and ((Event.ControlKeyState and 8) = 0) and (Key >= 1) and (Key <= 26)
+  if  ((Event.KeyDown.ControlKeyState and 4) <> 0) and ((Event.KeyDown.ControlKeyState and 8) = 0) and (Key >= 1) and (Key <= 26)
       and not (Key in [8, 9, 13]) then
     Key := Key or (LongInt(CtrlScan[Key]) shl 8);
   { Alt and a key of punctuation: tv/ gives the character (a terminal sends ESC and the character), DN looks for the scan code of the key
     (kbAltQuote = $082800); the character of the key with Shift adds Shift }
-  if ((Event.ControlKeyState and 8) <> 0) and (Key > $20) and (Key < $7F) then
+  if ((Event.KeyDown.ControlKeyState and 8) <> 0) and (Key > $20) and (Key < $7F) then
     for I := Low(PunctScan) to High(PunctScan) do
       if Chr(Key) = PunctScan[I].Plain then
       begin
@@ -284,15 +282,15 @@ end;
 procedure SetEventDouble(var Event: TEvent; Value: Boolean);
 begin
   if Value then
-    Event.EventFlags := Event.EventFlags or 2
+    Event.Mouse.EventFlags := Event.Mouse.EventFlags or 2
   else
-    Event.EventFlags := Event.EventFlags and not Word(2);
+    Event.Mouse.EventFlags := Event.Mouse.EventFlags and not Word(2);
 end;
 
 procedure SetDNKeyCode(var Event: TEvent; Code: LongInt);
 begin
-  Event.KeyCode := Word(Code);
-  Event.ControlKeyState := (Event.ControlKeyState and not Word($F)) or Word((Code shr 16) and $F);
+  Event.KeyDown.KeyCode := Word(Code);
+  Event.KeyDown.ControlKeyState := (Event.KeyDown.ControlKeyState and not Word($F)) or Word((Code shr 16) and $F);
 end;
 
 function MessageKey(Receiver: TView; Code: LongInt): Pointer;
@@ -307,7 +305,7 @@ begin
   SetDNKeyCode(Event, Code);
   Receiver.HandleEvent(Event);
   if Event.What = evNothing then
-    Result := Event.InfoPtr;
+    Result := Event.Message.InfoPtr;
 end;
 
 procedure InitDrivers;
@@ -356,7 +354,7 @@ end;
   before it (the mouse) are dropped. }
 procedure GetKeyEvent(var Event: TEvent);
 begin
-  PollKeyEvent(Event);
+  TEventQueue.GetKeyEvent(Event);
 end;
 
 procedure SetMouseSpeed(XS, YS: Byte);
@@ -404,9 +402,170 @@ end;
 
 { --- strings ------------------------------------------------------------------ }
 
+{ The slots become an array of const for TvFormat.FormatStr: each % item of Format is written again as an item of
+  SysUtils.Format with its argument. What Format cannot write the same way is passed as text: %c as a string, %x and %X
+  as the digits (Format has no lower case hex and fills hex with at most 31 zeros), an unknown item as itself. }
 procedure FormatStr(var Result: String; const Format: String; var Params);
+type
+  TSlots = array[0..(MaxInt div SizeOf(PtrInt)) - 1] of PtrInt;
+var
+  Slots: ^TSlots;
+  Next, I, Start, Width, N: Integer;
+  Left, Zero: Boolean;
+  Conv: Char;
+  Fmt: AnsiString;
+  Args: array of TVarRec;
+  Texts: array of ShortString;
+  Nums: array of Int64;
+  V: LongInt;
+  P: PShortString;
+  Hex: AnsiString;
+
+  function Take: PtrInt;
+  begin
+    Result := Slots^[Next];
+    Inc(Next);
+  end;
+
+  function Literal(const S: AnsiString): AnsiString;
+  begin
+    Result := StringReplace(S, '%', '%%', [rfReplaceAll]);
+  end;
+
+  procedure AddText(const S: ShortString);
+  begin
+    Texts[N] := S;
+    Args[N].VType := vtString;
+    Args[N].VString := @Texts[N];
+    Inc(N);
+  end;
+
+  procedure AddNum(X: Int64);
+  begin
+    Nums[N] := X;
+    Args[N].VType := vtInt64;
+    Args[N].VInt64 := @Nums[N];
+    Inc(N);
+  end;
+
+  { the item %[-][width]Spec; Format fills at most 255 characters, the rest of a wider item is a literal text of spaces }
+  procedure Item(const Spec: ShortString);
+  var
+    W: Integer;
+  begin
+    W := Width;
+    if W > 255 then
+      W := 255;
+    if not Left then
+      Fmt := Fmt + StringOfChar(' ', Width - W);
+    Fmt := Fmt + '%';
+    if Left then
+      Fmt := Fmt + '-';
+    if W > 0 then
+      Fmt := Fmt + IntToStr(W);
+    Fmt := Fmt + Spec;
+    if Left then
+      Fmt := Fmt + StringOfChar(' ', Width - W);
+  end;
+
 begin
-  FormatSlots(Result, Format, Params);
+  Slots := @Params;
+  Next := 0;
+  N := 0;
+  SetLength(Args, Length(Format));
+  SetLength(Texts, Length(Format));
+  SetLength(Nums, Length(Format));
+  Fmt := '';
+  I := 1;
+  while I <= Length(Format) do
+  begin
+    if Format[I] <> '%' then
+    begin
+      Fmt := Fmt + Format[I];
+      Inc(I);
+      Continue;
+    end;
+    Start := I;
+    Inc(I);
+    Left := (I <= Length(Format)) and (Format[I] = '-');
+    if Left then
+      Inc(I);
+    Zero := (I <= Length(Format)) and (Format[I] = '0');
+    if Zero then
+      Inc(I);
+    Zero := Zero and not Left;
+    Width := 0;
+    while (I <= Length(Format)) and (Format[I] in ['0'..'9']) do
+    begin
+      if Width < 1000 then
+        Width := Width * 10 + Ord(Format[I]) - Ord('0');
+      Inc(I);
+    end;
+    if I > Length(Format) then
+    begin
+      Fmt := Fmt + Literal(Copy(Format, Start, MaxInt));
+      Break;
+    end;
+    Conv := Format[I];
+    Inc(I);
+    case Conv of
+      '%':
+        Fmt := Fmt + '%%';
+      's':
+        begin
+          P := PShortString(Pointer(Take));
+          if P = nil then
+            AddText('')
+          else
+            AddText(P^);
+          Item('s');
+        end;
+      'c':
+        begin
+          AddText(Chr(Byte(Take)));
+          Item('s');
+        end;
+      'd', 'u':
+        begin
+          if Conv = 'd' then
+          begin
+            V := LongInt(Take);
+            AddNum(V);
+          end
+          else
+          begin
+            V := 0;
+            AddNum(LongWord(Take));
+          end;
+          if Zero and (Width > 0) then
+          begin
+            if V < 0 then
+              Fmt := Fmt + '%.' + IntToStr(Width - 1) + 'd'
+            else
+              Fmt := Fmt + '%.' + IntToStr(Width) + 'd';
+          end
+          else
+            Item('d');
+        end;
+      'x', 'X':
+        begin
+          Hex := IntToHex(LongWord(Take), 1);
+          if Conv = 'x' then
+            Hex := LowerCase(Hex);
+          if Zero and (Length(Hex) < Width) then
+            Hex := StringOfChar('0', Width - Length(Hex)) + Hex;
+          AddText(Hex);
+          if Zero then
+            Fmt := Fmt + '%s'
+          else
+            Item('s');
+        end;
+    else
+      Fmt := Fmt + Literal(Copy(Format, Start, I - Start));
+    end;
+  end;
+  SetLength(Args, N);
+  Result := TvFormat.FormatStr(Fmt, Args);
 end;
 
 procedure PrintStr(const S: String);
@@ -529,7 +688,7 @@ begin
   P := @Buf;
   for I := 0 to Num - 1 do
   begin
-    P^.Attribute := AttrFromBIOS(Attr);
+    P^.Attribute := TColorAttr(LongInt(Attr));
     Inc(P);
   end;
 end;
@@ -554,9 +713,9 @@ begin
   for I := 0 to Count - 1 do
   begin
     if C <> #0 then
-      ScInitChar(P^.Character, Ord(C));
+      P^.Character.InitWithChar(Ord(C));
     if Attr <> 0 then
-      P^.Attribute := AttrFromBIOS(Attr);
+      P^.Attribute := TColorAttr(LongInt(Attr));
     Inc(P);
   end;
 end;
@@ -567,7 +726,7 @@ var
   N: Integer;
 begin
   B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
-  N := B.MoveStrS(0, Str, AttrFromBIOS(Attr), Length(Str));
+  N := B.MoveStrS(0, Str, TColorAttr(LongInt(Attr)), Length(Str));
   if N > 0 then
     Move(B.Data^, Dest, N * SizeOf(TScreenCell));
   B.Free;
@@ -580,8 +739,8 @@ var
   N: Integer;
 begin
   B := TvDrawBuf.TDrawBuffer.Create(Length(Str));
-  P.Lo := AttrFromBIOS(Attrs and $FF);
-  P.Hi := AttrFromBIOS(Attrs shr 8);
+  P[0] := TColorAttr(LongInt(Attrs and $FF));
+  P[1] := TColorAttr(LongInt(Attrs shr 8));
   N := B.MoveCStrS(0, Str, P, Length(Str));
   if N > 0 then
     Move(B.Data^, Dest, N * SizeOf(TScreenCell));
@@ -608,12 +767,13 @@ var
   I: Integer;
   P: PScreenCell;
   A: TColorAttr;
+  Buf: array[0..7] of Byte;
 begin
   P := @Dest;
-  A := AttrFromBIOS(Attr);
+  A := TColorAttr(LongInt(Attr));
   for I := 0 to Count - 1 do
   begin
-    ScInitCodePoint(P^.Character, CodePoint);
+    P^.Character.InitWithMultiByteChar(@Buf[0], Utf8Encode(CodePoint, @Buf[0]), False);
     P^.Attribute := A;
     Inc(P);
   end;
@@ -636,12 +796,12 @@ end;
 
 procedure SetCellChar(var Cell: TScreenCell; Ch: Byte);
 begin
-  ScInitChar(Cell.Character, Ch);
+  Cell.Character.InitWithChar(Ch);
 end;
 
 procedure SetCellAttr(var Cell: TScreenCell; Attr: Byte);
 begin
-  Cell.Attribute := AttrFromBIOS(Attr);
+  Cell.Attribute := TColorAttr(LongInt(Attr));
 end;
 
 function CellChar(const Cell: TScreenCell): Byte;
@@ -650,11 +810,11 @@ var
   CP: LongWord;
   Used: Integer;
 begin
-  { the cell holds UTF-8 (TvCell.ScInitChar turns a byte of the code page into its character): DN asks for the byte of the page (a line character, a letter) }
-  Result := Cell.Character.Text[0];
-  if ScLength(Cell.Character) > 1 then
+  { the cell holds UTF-8 (TScreenCharacter.InitWithChar turns a byte of the code page into its character): DN asks for the byte of the page (a line character, a letter) }
+  Result := Ord(Cell.Character.GetText[1]);
+  if Length(Cell.Character.GetText) > 1 then
   begin
-    S := ScText(Cell.Character);
+    S := Cell.Character.GetText;
     Result := Ord('?');
     if Utf8Decode(@S[1], Length(S), CP, Used) and (CpFromUnicode(CP) <> 0) then
       Result := CpFromUnicode(CP);
@@ -663,7 +823,7 @@ end;
 
 function CellAttr(const Cell: TScreenCell): Byte;
 begin
-  Result := AttrAsBIOSByte(Cell.Attribute);
+  Result := Byte(Cell.Attribute);
 end;
 
 procedure WordsToCells(var Dest: TScreenCell; const Source; Count: Integer);
@@ -671,7 +831,7 @@ var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
-    PScreenCell(@Dest)[I] := CellFromBIOS(PWord(@Source)[I]);
+    PScreenCell(@Dest)[I] := TScreenCell(Word(PWord(@Source)[I]));
 end;
 
 function CStrLen(const S: String): Integer;

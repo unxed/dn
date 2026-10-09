@@ -61,6 +61,8 @@ type
     procedure SetValues(SetSelf: Boolean);
     procedure Awaken; override;
     destructor Destroy; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TIndicator = class(TView)
@@ -69,9 +71,11 @@ type
     Value: CReal;
     SResult: array[0..5] of String[40];
     CalcError: Boolean;
-    constructor Create(var R: TRect);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    constructor Create(var R: TRect); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
     procedure WrtT(X: CReal; var S: String);
@@ -112,19 +116,30 @@ constructor TIndicator.Create(var R: TRect);
   Value := 0;
   end;
 
-constructor TIndicator.Load(var S: TStream);
+function TIndicator.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, CalcLine);
-  GetPeerViewPtr(S, Radio);
+  Result := Self;
+  inherited Read(Ip);
+  CalcLine := Ip.ReadPointer;
+  Radio := Ip.ReadPointer;
   end;
 
-procedure TIndicator.Store(var S: TStream);
+procedure TIndicator.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, CalcLine);
-  PutPeerViewPtr(S, Radio);
+  inherited Write(Os);
+  Os.WritePointer(CalcLine);
+  Os.WritePointer(Radio);
   end;
+
+class function TIndicator.Build: TStreamable;
+begin
+  Result := TIndicator.Create(streamableInit);
+end;
+
+function TIndicator.StreamableName: ShortString;
+begin
+  Result := 'calcline.TIndicator';
+end;
 
 
 function TIndicator.GetPalette: TPalette;
@@ -166,11 +181,11 @@ procedure TIndicator.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
   if  (Event.What = evBroadcast) then
-    case Event.Command of
+    case Event.Message.Command of
       cmSetValue:
         begin
         CalcError := False;
-        Value := PCReal(Event.InfoPtr)^;
+        Value := PCReal(Event.Message.InfoPtr)^;
         Draw;
         CE
         end;
@@ -182,8 +197,8 @@ procedure TIndicator.HandleEvent(var Event: TEvent);
       cmCancel:
         begin
         Event.What := evCommand;
-        Event.Command := cmClose;
-        Event.InfoPtr := nil;
+        Event.Message.Command := cmClose;
+        Event.Message.InfoPtr := nil;
         PutEvent(Event);
         CE
         end;
@@ -334,14 +349,14 @@ procedure TCalcLine.HandleEvent(var Event: TEvent);
       GetData(FreeStr);
       HistoryAdd(hsCalcLine, FreeStr);
       Event.What := evCommand;
-      Event.Command := cmClose;
-      Event.InfoPtr := nil;
+      Event.Message.Command := cmClose;
+      Event.Message.InfoPtr := nil;
       PutEvent(Event);
       ClearEvent(Event);
       end;
     end
   else if (Event.What = evCommand) then
-    case Event.Command of
+    case Event.Message.Command of
       cmCalcValue:
         begin
         ClearEvent(Event);
@@ -349,7 +364,7 @@ procedure TCalcLine.HandleEvent(var Event: TEvent);
         end;
       cmGetName:
         begin
-        PString(Event.InfoPtr)^:= GetString(dlCalculator);
+        PString(Event.Message.InfoPtr)^:= GetString(dlCalculator);
         ClearEvent(Event);
         end;
     end {case};
@@ -432,7 +447,7 @@ procedure InsertCalc;
 
     ObjChangeType(Dlg.DirectLink[1], Pointer(System.TClass(TCalcLine)));
 
-    R.Assign(12, 6, Dlg.Size.X-2, 12);
+    R := TRect.Create(12, 6, Dlg.Size.X-2, 12);
     Indicator := TIndicator.Create(R);
     Indicator.Options := Indicator.Options or ofFramed;
     Indicator.CalcLine := TCalcLine(Dlg.DirectLink[1]);
@@ -452,5 +467,16 @@ procedure InsertCalc;
   else
     Calc.Select;
   end { InsertCalc };
+
+
+class function TCalcLine.Build: TStreamable;
+begin
+  Result := TCalcLine.Create(streamableInit);
+end;
+
+function TCalcLine.StreamableName: ShortString;
+begin
+  Result := 'calcline.TCalcLine';
+end;
 
 end.

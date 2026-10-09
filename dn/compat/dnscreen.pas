@@ -60,11 +60,11 @@ var
   Used: Integer;
   B: Byte;
 begin
-  if ScIsWideTrail(Ch) then
+  if Ch.IsWideCharTrail then
     Exit(Ord(' '));
-  if ScLength(Ch) = 1 then
-    Exit(Ch.Text[0]);
-  S := ScText(Ch);
+  if Length(Ch.GetText) = 1 then
+    Exit(Ord(Ch.GetText[1]));
+  S := Ch.GetText;
   if (Length(S) > 0) and Utf8Decode(@S[1], Length(S), CP, Used) and (Used = Length(S)) then
   begin
     B := CpFromUnicode(CP);
@@ -78,10 +78,10 @@ function GetScreenMode(Size: PSysPoint; Flag: Boolean): Word;
 begin
   if Size <> nil then
   begin
-    Size^.X := ScreenWidth;
-    Size^.Y := ScreenHeight;
+    Size^.X := TScreen.ScreenWidth;
+    Size^.Y := TScreen.ScreenHeight;
   end;
-  if ScreenHeight > 25 then
+  if TScreen.ScreenHeight > 25 then
     Result := $0103
   else
     Result := 3;
@@ -89,7 +89,7 @@ end;
 
 function SetScreenSize(Cols, Rows: Word): Boolean;
 begin
-  Result := (ScreenWidth = Cols) and (ScreenHeight = Rows);
+  Result := (TScreen.ScreenWidth = Cols) and (TScreen.ScreenHeight = Rows);
 end;
 
 function ReadScreenCells: Pointer;
@@ -97,14 +97,14 @@ var
   I, N: Integer;
   C: PScreenCell;
 begin
-  N := ScreenWidth * ScreenHeight;
+  N := TScreen.ScreenWidth * TScreen.ScreenHeight;
   if Length(CellCopy) <> N then
     SetLength(CellCopy, N);
-  C := ScreenBuffer;
+  C := TScreen.ScreenBuffer;
   for I := 0 to N - 1 do
   begin
     if C <> nil then
-      CellCopy[I] := CellToBiosChar(C^.Character) or (Word(AttrAsBIOSByte(C^.Attribute)) shl 8)
+      CellCopy[I] := CellToBiosChar(C^.Character) or (Word(Byte(C^.Attribute)) shl 8)
     else
       CellCopy[I] := $0720;
     if C <> nil then
@@ -120,21 +120,21 @@ var
   Row: array of TScreenCell;
   X, Y, N, I: Integer;
 begin
-  if (ScreenWidth <= 0) or (Length(CellCopy) = 0) then
+  if (TScreen.ScreenWidth <= 0) or (Length(CellCopy) = 0) then
     Exit;
-  SetLength(Row, ScreenWidth);
+  SetLength(Row, TScreen.ScreenWidth);
   while (Size > 0) and (Pos < Length(CellCopy)) do
   begin
-    Y := Pos div ScreenWidth;
-    X := Pos mod ScreenWidth;
-    N := ScreenWidth - X;
+    Y := Pos div TScreen.ScreenWidth;
+    X := Pos mod TScreen.ScreenWidth;
+    N := TScreen.ScreenWidth - X;
     if N > Size then
       N := Size;
     for I := 0 to N - 1 do
-      Row[I] := CellFromBIOS(CellCopy[Pos + I]);
-    if ScreenBuffer <> nil then
-      Move(Row[0], (ScreenBuffer + Y * ScreenWidth + X)^, N * SizeOf(TScreenCell));
-    ScreenWrite(X, Y, @Row[0], N);
+      Row[I] := TScreenCell(Word(CellCopy[Pos + I]));
+    if TScreen.ScreenBuffer <> nil then
+      Move(Row[0], (TScreen.ScreenBuffer + Y * TScreen.ScreenWidth + X)^, N * SizeOf(TScreenCell));
+    THardwareInfo.ScreenWrite(X, Y, @Row[0], N);
     Inc(Pos, N);
     Dec(Size, N);
   end;
@@ -154,7 +154,7 @@ procedure ClearScreenCells;
 var
   I: Integer;
 begin
-  SetLength(CellCopy, ScreenWidth * ScreenHeight);
+  SetLength(CellCopy, TScreen.ScreenWidth * TScreen.ScreenHeight);
   for I := 0 to High(CellCopy) do
     CellCopy[I] := $0720;
   WriteScreenCells(0, Length(CellCopy));
@@ -164,8 +164,8 @@ procedure GetCursorType(var Y1, Y2: Integer; var Visible: Boolean);
 var
   H: Integer;
 begin
-  Visible := CaretSize > 0;
-  H := (CaretSize * FontHeight + 99) div 100;
+  Visible := THardwareInfo.IsCaretVisible;
+  H := (THardwareInfo.GetCaretSize * FontHeight + 99) div 100;
   if H < 1 then
     H := 1;
   Y2 := FontHeight - 1;
@@ -175,16 +175,16 @@ end;
 procedure SetCursorType(Y1, Y2: Integer; Visible: Boolean);
 begin
   if not Visible then
-    SetCaretSize(0)
+    THardwareInfo.SetCaretSize(0)
   else if Y2 >= Y1 then
-    SetCaretSize((Y2 - Y1 + 1) * 100 div FontHeight)
+    THardwareInfo.SetCaretSize((Y2 - Y1 + 1) * 100 div FontHeight)
   else
-    SetCaretSize(CursorLines);
+    THardwareInfo.SetCaretSize(TScreen.CursorLines);
 end;
 
 procedure MoveCursorTo(X, Y: Word);
 begin
-  SetCaretPosition(X, Y);
+  THardwareInfo.SetCaretPosition(X, Y);
 end;
 
 procedure GetCursorXY(var X, Y: Word);

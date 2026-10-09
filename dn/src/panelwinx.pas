@@ -60,6 +60,8 @@ type
     procedure SetState(AState: Word; Enable: Boolean); override;
     function GetPalette: TPalette; override;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -91,10 +93,10 @@ procedure TXDoubleWindow.SetState(AState: Word; Enable: Boolean);
       begin
       Current.SetState(sfSelected, True);
         // so that ActivePanel and PassivePanel are set
-      EnableCommands(DblWndCommands)
+      EnableCommands(CommandSetOf(DblWndCommands))
       end
     else
-      DisableCommands(DblWndCommands);
+      DisableCommands(CommandSetOf(DblWndCommands));
     end
     
   else if TrashCan.ImVisible then
@@ -149,7 +151,7 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
           end;
       end {case};
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmLookForPanels, cmGetUserParams, cmGetUserParamsWL,
         cmChangeDrv,
         cmIsRightPanel:
@@ -159,7 +161,7 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
           end;
       end {case};
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmChangeDirectory:
           begin {AK155 This message can really come ONLY
             from the tree, so comparing with dtTree is, to put it mildly,
@@ -231,4 +233,15 @@ procedure TXDoubleWindow.HandleEvent(var Event: TEvent);
   if  (Event.What <> evNothing) and CE then
     inherited HandleEvent(Event);
   end { TXDoubleWindow.HandleEvent };
+
+class function TXDoubleWindow.Build: TStreamable;
+begin
+  Result := TXDoubleWindow.Create(streamableInit);
+end;
+
+function TXDoubleWindow.StreamableName: ShortString;
+begin
+  Result := 'panelwinx.TXDoubleWindow';
+end;
+
 end.

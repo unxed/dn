@@ -82,9 +82,11 @@ type
       {` Depends on the panel type; introduced just in case to
       make future new panel types easier. `}
     
-    constructor Create(ADrive: Byte; AOwner: Pointer);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); virtual;
+    constructor Create(ADrive: Byte; AOwner: Pointer); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure KillUse; virtual;
     procedure lChDir(ADir: String); virtual; {DataCompBoy}
     function GetDir: String; virtual; {DataCompBoy}
@@ -135,6 +137,8 @@ type
     procedure ReadDescrptions(FilesC: TFilesCollection); virtual;
     function GetDriveLetter: Char; virtual;
       {` For choosing a drive letter in the drive line and drive menu `}
+    public
+      constructor Create(AInit: TStreamableInit); overload;
     end;
 
 procedure RereadDirectory(Dir: String);
@@ -236,14 +240,15 @@ constructor TDrive.Create(ADrive: Byte; AOwner: Pointer);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TDrive.Load(S: TStream);
+function TDrive.Read(Ip: ipstream): Pointer;
   begin
+  Result := Self;
   inherited Create;
-  Prev := TDrive(S.Get);
-  S.ReadStrV(CurDir);
-  {S.Read(CurDir[0], 1); S.Read(CurDir[1], Length(CurDir));}
+  Prev := TDrive(Ip.ReadPointer);
+  ReadStrV(Ip, CurDir);
+  {Ip.ReadBytes(CurDir[0], 1); Ip.ReadBytes(CurDir[1], Length(CurDir));}
   
-  S.Read(ColAllowed, SizeOf(ColAllowed));
+  Ip.ReadBytes(ColAllowed, SizeOf(ColAllowed));
   
   DriveType := dtDisk;
   NoMemory := False;
@@ -251,13 +256,27 @@ constructor TDrive.Load(S: TStream);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-procedure TDrive.Store(S: TStream);
+procedure TDrive.Write(Os: opstream);
   begin
-  S.Put(Prev);
-  S.WriteStr(@CurDir); {S.Write(CurDir, Length(CurDir)+1);}
+  Os.WritePointer(Prev);
+  Os.WriteString(@CurDir); {Os.WriteBytes(CurDir, Length(CurDir)+1);}
   
-  S.Write(ColAllowed, SizeOf(ColAllowed));
+  Os.WriteBytes(ColAllowed, SizeOf(ColAllowed));
   end;
+
+constructor TDrive.Create(AInit: TStreamableInit);
+begin
+end;
+
+class function TDrive.Build: TStreamable;
+begin
+  Result := TDrive.Create(streamableInit);
+end;
+
+function TDrive.StreamableName: ShortString;
+begin
+  Result := 'Drives.TDrive';
+end;
 {-DataCompBoy-}
 
 destructor TDrive.Destroy;
@@ -434,7 +453,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
         Inc(X, FileColWidht[psnShowDate]);
         if X >= 255 then
           Exit;
-        PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+        PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
         end;
       if Flags and TimeFlag <> 0 then
         begin
@@ -443,7 +462,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
         Inc(X, Length(S1)+1);
         if X >= 255 then
           Exit;
-        PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+        PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
         end;
       end;
     end;
@@ -474,7 +493,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     begin
     MoveCStr(PCellArray(@B)^[0], NameString, C);
     X := NameLen;
-    PCellArray(@B)^[X] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X] := TScreenCell(Word(Sc));
     Inc(X);
     end;
   if X >= 255 then
@@ -487,7 +506,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     Inc(X, FileColWidht[psnShowSize]);
     if X >= 255 then
       Exit;
-    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
     end;
 
   if Flags and psShowPacked <> 0 then
@@ -500,7 +519,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     Inc(X, FileColWidht[psnShowPacked]);
     if X >= 255 then
       Exit;
-    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
     end;
 
   if Flags and psShowRatio <> 0 then
@@ -514,7 +533,7 @@ procedure TDrive.GetFull(var B: TScreenCell; P: PFileRec; C, Sc: Word);
     Inc(X, FileColWidht[psnShowRatio]);
     if X >= 255 then
       Exit;
-    PCellArray(@B)^[X-1] := CellFromBIOS(Sc);
+    PCellArray(@B)^[X-1] := TScreenCell(Word(Sc));
     end;
 
   FormatDateTime(psShowDate, psShowTime, P^.FDate, P^.Yr);
@@ -1211,7 +1230,7 @@ function TDrive.OpenDirectory(const Dir: String;
   while (I >= 0) and (not Abort) and (MAvail > MemReq) do
     begin
     P := DirsToProcess.At(I);
-    DirsToProcess.AtDelete(I);
+    DirsToProcess.AtRemove(I);
     Dirs.Insert(P);
     ReadDir(P);
     if TimerExpired(tmr) then
@@ -1261,7 +1280,7 @@ procedure TDrive.DrvFindFile(FC: TFilesCollection);
   Files := TFilesCollection.Create($10, $10);
   Files.SortMode := psmLongName;
   Directories := TStringCollection.Create(30, 30, False);
-  R.Assign(1, 1, 40, 10);
+  R := TRect.Create(1, 1, 40, 10);
   Inc(SkyEnabled);
   PInfo := TWhileView.Create(R);
   PInfo.Options := PInfo.Options or ofSelectable or ofCentered;
@@ -1293,8 +1312,8 @@ procedure RereadDirectory(Dir: String);
   procedure Action(View: TView);
     begin
     Event.What := evCommand;
-    Event.Command := cmRereadDir;
-    Event.InfoPtr := @Dir;
+    Event.Message.Command := cmRereadDir;
+    Event.Message.InfoPtr := @Dir;
     View.HandleEvent(Event);
     end;
 

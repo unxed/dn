@@ -28,7 +28,9 @@ type
   TBackground = class;
 
   TBackground = class(TvApp.TBackground)
-    constructor Create(const Bounds: TRect; APattern: Byte);
+    constructor Create(const Bounds: TRect; APattern: Byte); overload;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
   TDesktop = class;
@@ -36,6 +38,8 @@ type
   TDesktop = class(TvApp.TDeskTop)
     procedure Clear;
     procedure HandleEvent(var Event: TEvent); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
   end;
 
   TProgram = class;
@@ -90,8 +94,8 @@ procedure AdjustToDesktopSize(var R: TRect; OldDeskSize: TPoint);
 
 var
   { the same variables as in TvApp (the instances there are the same) }
-  Application: TProgram absolute TvApp.Application;
-  Desktop: TDesktop absolute TvApp.DeskTop;
+  Application: TProgram absolute TvApp.TProgram.Application;
+  Desktop: TDesktop absolute TvApp.TProgram.DeskTop;
   { the menu bar and the status line of DN (the unit Menus of DN, not those of tv/); set by InitMenuBar and InitStatusLine
     of TDNApplication, put into the program by TProgram.Init }
   StatusLine: Menus.TStatusLine = nil;
@@ -105,7 +109,7 @@ var
   Resource: TIdxResource = nil;
   { the palettes of the program (the strings of attributes): those of DN (DNPalet), set in the initialization }
   CColor, CBlackWhite, CMonochrome: ShortString;
-  appPalette: Integer absolute TvApp.AppPalette;
+  appPalette: Integer absolute TvApp.TProgram.AppPalette;
   SystemColors: array[0..2] of ShortString absolute TvApp.SystemColors;
   { a procedure that prepares a dialog for ExecResource; ExecResource clears it }
   PreExecuteDialog: procedure(D: TView) = nil;
@@ -155,7 +159,7 @@ begin
       IsKey := OnSwitcherKey(Event, Back)
     else
     begin
-      K := KeyMake(Event.KeyCode, Event.ControlKeyState);
+      K := TKey.Create(Event.KeyDown.KeyCode, Event.KeyDown.ControlKeyState);
       IsKey := (K.Code = TvKeys.kbTab) and ((K.Mods and TvKeys.kbCtrlShift) <> 0);
     end;
   if IsKey and (Last <> nil) then
@@ -194,27 +198,27 @@ constructor TProgram.Create;
 var
   R: TRect;
 begin
-  Application := Self;
+  MainApp.Application := Self;
   InitScreen;
-  R.Assign(0, 0, ScreenWidth, ScreenHeight);
+  R := TRect.Create(0, 0, ScreenWidth, ScreenHeight);
   TGroup(Self).Create(R);
   State := sfVisible or sfSelected or sfFocused or sfModal or sfExposed;
   Options := 0;
-  Buffer := TvScreen.ScreenBuffer;
+  Buffer := TvScreen.TScreen.ScreenBuffer;
   InitStatusLine;
   InitMenuBar;
   InitDeskTop;
-  if StatusLine <> nil then
-    Insert(StatusLine);
-  if MenuBar <> nil then
-    Insert(MenuBar);
-  if Desktop <> nil then
-    Insert(Desktop);
+  if MainApp.StatusLine <> nil then
+    Insert(MainApp.StatusLine);
+  if MainApp.MenuBar <> nil then
+    Insert(MainApp.MenuBar);
+  if MainApp.Desktop <> nil then
+    Insert(MainApp.Desktop);
   InitCommandLine;
-  if StatusLine <> nil then
-    StatusLine.GrowTo(StatusLine.Size.X, 1);
-  if MenuBar <> nil then
-    MenuBar.GrowTo(MenuBar.Size.X, 1);
+  if MainApp.StatusLine <> nil then
+    MainApp.StatusLine.GrowTo(MainApp.StatusLine.Size.X, 1);
+  if MainApp.MenuBar <> nil then
+    MainApp.MenuBar.GrowTo(MainApp.MenuBar.Size.X, 1);
   NewTimer(IdleSecs, 0);
 end;
 
@@ -224,12 +228,12 @@ end;
   group in one go). }
 destructor TProgram.Destroy;
 begin
-  MenuBar := nil;
-  StatusLine := nil;
-  Desktop := nil;
+  MainApp.MenuBar := nil;
+  MainApp.StatusLine := nil;
+  MainApp.Desktop := nil;
   Buffer := nil;
   inherited Destroy;
-  Application := nil;
+  MainApp.Application := nil;
 end;
 
 procedure TProgram.ActivateView(P: TView);
@@ -270,23 +274,23 @@ begin
     if F9OpensMenu and (DNKeyCode(Event) = Commands.kbF9) then
     begin { M.1: F9 opens the menu bar, as F10 does }
       Event.What := evCommand;
-      Event.Command := Commands.cmMenu;
-      Event.InfoPtr := nil;
+      Event.Message.Command := Commands.cmMenu;
+      Event.Message.InfoPtr := nil;
     end
     else if EnterTogglesCheck and (DNKeyCode(Event) = Commands.kbEnter) and FocusedIsCluster(Self) then
       { G.2b: Enter on a check box or a radio button toggles it (it becomes Space); from the other controls it presses the default button }
       MakeKeyEvent(Event, Word(Commands.kbSpace), 0);
   { as in Turbo Vision: the status line sees the keys and the clicks on it }
-  if (Event.What <> evNothing) and (StatusLine <> nil) then
+  if (Event.What <> evNothing) and (MainApp.StatusLine <> nil) then
     if ((Event.What and evKeyDown) <> 0) or
-       (((Event.What and evMouseDown) <> 0) and StatusLine.MouseInView(Event.Where)) then
-      StatusLine.HandleEvent(Event);
+       (((Event.What and evMouseDown) <> 0) and MainApp.StatusLine.MouseInView(Event.Mouse.Where)) then
+      MainApp.StatusLine.HandleEvent(Event);
   { the state of the shift keys is that of keyboard and mouse events: the field is not set in the messages (commands, broadcasts) }
   if (Event.What and (evKeyDown or evMouse)) <> 0 then
   begin
     OldShiftState := ShiftState;
-    ShiftState := Byte(Event.ControlKeyState);
-    ShiftState2 := Byte(Event.ControlKeyState shr 8);
+    ShiftState := Byte(Event.KeyDown.ControlKeyState);
+    ShiftState2 := Byte(Event.KeyDown.ControlKeyState shr 8);
   end;
 end;
 
@@ -296,9 +300,9 @@ begin
   CheckScreenDump;                 { the test harness of the DOS build (DosHarness): inject DNKEYS and stop after DNDUMPSEC; nothing elsewhere }
   if Drivers.ScreenBuffer <> nil then
     ReadScreenCells;               { the copy of the screen that DN reads }
-  if StatusLine <> nil then
+  if MainApp.StatusLine <> nil then
   begin
-    StatusLine.Update;
+    MainApp.StatusLine.Update;
   end;
   RunBackground;
 end;
@@ -487,8 +491,8 @@ var
 begin
   FillChar(E, SizeOf(E), 0);
   E.What := What;
-  E.Command := Command;
-  E.InfoPtr := InfoPtr;
+  E.Message.Command := Command;
+  E.Message.InfoPtr := InfoPtr;
   Application.PutEvent(E);
 end;
 
@@ -526,12 +530,12 @@ begin
     end;
   if Wd > 60 then
     Wd := 60;
-  R.Assign(0, 0, Wd + 6, Lines + 4);
+  R := TRect.Create(0, 0, Wd + 6, Lines + 4);
   if Desktop <> nil then
     R.Move((Desktop.Size.X - (R.B.X - R.A.X)) div 2, (Desktop.Size.Y - (R.B.Y - R.A.Y)) div 2);
   W := TWriteWin.Create(R, '', wnNoNumber);
   W.Flags := 0;
-  R.Assign(2, 1, Wd + 4, Lines + 3);
+  R := TRect.Create(2, 1, Wd + 4, Lines + 3);
   T := TStaticText.Create(R, Text);
   W.Insert(T);
   if Desktop <> nil then
@@ -550,6 +554,7 @@ end;
 
 procedure InitLngStream;
 var
+  Ip: ipstream;
   PS, XS: TStream;
   S: String;
 begin
@@ -574,20 +579,22 @@ begin
   end;
   LngStream := PS;
   PS.Seek(0);
-  LStringList := TStringList(PS.Get);
+  Ip := ipstream.Create(PS);
+  LStringList := TStringList(Ip.ReadPointer);
+  Ip.Free;
   if (PS.Status <> stOK) or (LStringList = nil) then
     ResourceFail('reading ' + LngId + '.lng');
   { the titles and the buttons of the message and input boxes of tv/ in the language of the resources }
-  MsgYesText := GetString(dlYesButton);
-  MsgNoText := GetString(dlNoButton);
-  MsgOKText := GetString(dlOKButton);
+  MsgBoxText.YesText := GetString(dlYesButton);
+  MsgBoxText.NoText := GetString(dlNoButton);
+  MsgBoxText.OkText := GetString(dlOKButton);
   S := GetString(dlCancelButton);
-  if StringReplace(S, '~', '', [rfReplaceAll]) <> StringReplace(MsgCancelText, '~', '', [rfReplaceAll]) then
-    MsgCancelText := S;         { the same word keeps the hot letter of tv/ }
-  MsgWarningText := GetString(dlMsgWarning);
-  MsgErrorText := GetString(dlMsgError);
-  MsgInformationText := GetString(dlMsgInformation);
-  MsgConfirmText := GetString(dlMsgConfirm);
+  if StringReplace(S, '~', '', [rfReplaceAll]) <> StringReplace(MsgBoxText.CancelText, '~', '', [rfReplaceAll]) then
+    MsgBoxText.CancelText := S;         { the same word keeps the hot letter of tv/ }
+  MsgBoxText.WarningText := GetString(dlMsgWarning);
+  MsgBoxText.ErrorText := GetString(dlMsgError);
+  MsgBoxText.InformationText := GetString(dlMsgInformation);
+  MsgBoxText.ConfirmText := GetString(dlMsgConfirm);
 end;
 
 function GetString(Index: TStrIdx): String;
@@ -630,6 +637,27 @@ function CommandHidden(Command: Word): Boolean;
 begin
   Result := ((Command = cmGame) and not EnableGame) or (Command = cmPlayCD) or (Command = cmSystemInfo) or
     (Command = cmMemoryInfo);
+end;
+
+
+class function TBackground.Build: TStreamable;
+begin
+  Result := TBackground.Create(streamableInit);
+end;
+
+function TBackground.StreamableName: ShortString;
+begin
+  Result := 'mainapp.TBackground';
+end;
+
+class function TDesktop.Build: TStreamable;
+begin
+  Result := TDesktop.Create(streamableInit);
+end;
+
+function TDesktop.StreamableName: ShortString;
+begin
+  Result := 'mainapp.TDesktop';
 end;
 
 initialization

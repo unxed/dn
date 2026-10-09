@@ -126,7 +126,7 @@ begin
         Cells[Y * ScreenWidth + X] := $0720;
   end;
   WriteScreenCells(0, ScreenWidth * ScreenHeight);
-  SetCaretSize(0);
+  THardwareInfo.SetCaretSize(0);
 end;
 
 begin

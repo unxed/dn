@@ -58,10 +58,12 @@ type
   PRARArchive = TRARArchive;
   TRARArchive = class(TARJArchive)
     VersionToExtr: Byte;
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -381,5 +383,16 @@ procedure TRARArchive.GetFile;
       VersionToExtr := P.Ver;
     end;
   end { TRARArchive.GetFile };
+
+
+class function TRARArchive.Build: TStreamable;
+begin
+  Result := TRARArchive.Create(streamableInit);
+end;
+
+function TRARArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtrar.TRARArchive';
+end;
 
 end.

@@ -59,8 +59,10 @@ uses
 type
   TStringCol = class(TCollection)
     procedure FreeItem(P: Pointer); override;
-    procedure PutItem(var S: TStream; P: Pointer); virtual;
-    function GetItem(var S: TStream): Pointer; virtual;
+    procedure WriteItem(P: Pointer; Os: opstream); override;
+    function ReadItem(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 
@@ -78,9 +80,11 @@ type
     BufCount: Word;
     PrintDevice: TDosStream;
     constructor Create(var Bounds: TRect; AStatus: TView;
-         AScrollBar: TScrollBar);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+         AScrollBar: TScrollBar); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     function PrintBuffer(Num: Word): Boolean;
     procedure HandleEvent(var Event: TEvent); override;
     procedure PrintFile(const FileName: String);
@@ -96,13 +100,17 @@ type
   TPrintStatus = class(TView)
     Print: TPrintManager;
     procedure Draw; override;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     end;
 
 
   TPMWindow = class(TDialog)
-    constructor Create(R: TRect);
+    constructor Create(R: TRect); overload;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -128,15 +136,25 @@ procedure TStringCol.FreeItem(P: Pointer);
   DisposeStr(PString(P));
   end;
 
-procedure TStringCol.PutItem(var S: TStream; P: Pointer);
+procedure TStringCol.WriteItem(P: Pointer; Os: opstream);
   begin
-  S.WriteStr(P);
+  Os.WriteString(P);
   end;
 
-function TStringCol.GetItem(var S: TStream): Pointer;
+function TStringCol.ReadItem(Ip: ipstream): Pointer;
   begin
-  GetItem := S.ReadStr;
+  Result := Ip.ReadString;
   end;
+
+class function TStringCol.Build: TStreamable;
+begin
+  Result := TStringCol.Create(streamableInit);
+end;
+
+function TStringCol.StreamableName: ShortString;
+begin
+  Result := 'PrintMan.TStringCol';
+end;
 
 constructor TPMWindow.Create(R: TRect);
   var
@@ -145,36 +163,47 @@ constructor TPMWindow.Create(R: TRect);
   begin
   inherited Create(R, GetString(dlPManagerTitle));
   Number := GetNum;
-  R.Assign(Size.X-13, 1, Size.X-12, Size.Y-4);
+  R := TRect.Create(Size.X-13, 1, Size.X-12, Size.Y-4);
   P := TScrollBar.Create(R);
   Insert(P);
-  R.Assign(2, Size.Y-4, Size.X-14, Size.Y-2);
+  R := TRect.Create(2, Size.Y-4, Size.X-14, Size.Y-2);
   S := TPrintStatus.Create(R);
   Insert(S);
-  R.Assign(2, 1, Size.X-13, Size.Y-4);
+  R := TRect.Create(2, 1, Size.X-13, Size.Y-4);
   P := TPrintManager.Create(R, S, TScrollBar(P));
   Insert(P);
-  R.Assign(Size.X-12, 2, Size.X-2, 4);
+  R := TRect.Create(Size.X-12, 2, Size.X-2, 4);
   Insert(TButton.Create(R, GetString(dlDeleteButton), cmOK, 0));
-  R.Assign(Size.X-12, 4, Size.X-2, 6);
+  R := TRect.Create(Size.X-12, 4, Size.X-2, 6);
   Insert(TButton.Create(R, GetString(dlCloseButton), cmClose, 0));
-  R.Assign(Size.X-12, 6, Size.X-2, 8);
+  R := TRect.Create(Size.X-12, 6, Size.X-2, 8);
   Insert(TButton.Create(R, GetString(dlPauseButton), cmNo, 0));
   SelectNext(False);
   HelpCtx := hcPrintManager;
   end { TPMWindow.Init };
 
-constructor TPrintStatus.Load(var S: TStream);
+function TPrintStatus.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Print);
+  Result := Self;
+  inherited Read(Ip);
+  Print := Ip.ReadPointer;
   end;
 
-procedure TPrintStatus.Store(var S: TStream);
+procedure TPrintStatus.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Printer);
+  inherited Write(Os);
+  Os.WritePointer(Printer);
   end;
+
+class function TPrintStatus.Build: TStreamable;
+begin
+  Result := TPrintStatus.Create(streamableInit);
+end;
+
+function TPrintStatus.StreamableName: ShortString;
+begin
+  Result := 'PrintMan.TPrintStatus';
+end;
 
 procedure TPrintStatus.Draw;
   var
@@ -340,13 +369,14 @@ function TPrintManager.SetDestination: Boolean;
   SetDestination := True;
   end { TPrintManager.SetDestination };
 
-constructor TPrintManager.Load(var S: TStream);
+function TPrintManager.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Status);
-  OutName := S.ReadStr;
-  S.Read(Paused, 1);
-  S.Read(FilePos, 4);
+  Result := Self;
+  inherited Read(Ip);
+  Status := Ip.ReadPointer;
+  OutName := Ip.ReadString;
+  Ip.ReadBytes(Paused, 1);
+  Ip.ReadBytes(FilePos, 4);
   PrintDevice := TDosStream.Create(OutName^, stCreate);
   BufSize := MaxBufCount;
   GetMem(Buffer, BufSize);
@@ -373,14 +403,24 @@ constructor TPrintManager.Load(var S: TStream);
   RegisterToBackground(Self);
   end { TPrintManager.Load };
 
-procedure TPrintManager.Store(var S: TStream);
+procedure TPrintManager.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Status);
-  S.WriteStr(OutName);
-  S.Write(Paused, 1);
-  S.Write(FilePos, 4);
+  inherited Write(Os);
+  Os.WritePointer(Status);
+  Os.WriteString(OutName);
+  Os.WriteBytes(Paused, 1);
+  Os.WriteBytes(FilePos, 4);
   end;
+
+class function TPrintManager.Build: TStreamable;
+begin
+  Result := TPrintManager.Create(streamableInit);
+end;
+
+function TPrintManager.StreamableName: ShortString;
+begin
+  Result := 'PrintMan.TPrintManager';
+end;
 
 destructor TPrintManager.Destroy;
   begin
@@ -423,11 +463,11 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmGetName:
-          PString(Event.InfoPtr)^:= GetString(dlPManagerTitle);
+          PString(Event.Message.InfoPtr)^:= GetString(dlPManagerTitle);
         cmClose:
-          Event.InfoPtr := nil;
+          Event.Message.InfoPtr := nil;
         cmNo:
           begin
           Paused := not Paused;
@@ -471,7 +511,7 @@ procedure TPrintManager.HandleEvent(var Event: TEvent);
 procedure TPrintManager.PrintFile(const FileName: String);
   begin
   if List = nil then
-    List := TStringCol.Create(10, 10);
+    Items := TStringCol.Create(10, 10);
   
   List.Insert(NewStr(lfGetLongFileName(FileName)));
   
@@ -669,7 +709,7 @@ procedure PrintFile(const S: String);
     W: TView;
     R: TRect;
   begin
-  R.Assign(0, 0, 50, 9);
+  R := TRect.Create(0, 0, 50, 9);
   if Printer = nil then
     begin
     W := Application.ValidView(TPMWindow.Create(R));
@@ -684,5 +724,16 @@ procedure PrintFile(const S: String);
     Printer.PrintFile(S);
   end;
 
+
+
+class function TPMWindow.Build: TStreamable;
+begin
+  Result := TPMWindow.Create(streamableInit);
+end;
+
+function TPMWindow.StreamableName: ShortString;
+begin
+  Result := 'PrintMan.TPMWindow';
+end;
 
 end.

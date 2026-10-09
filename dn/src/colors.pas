@@ -155,11 +155,11 @@ procedure ChangeColors;
       N := 255;
     SetLength(S, N);
     for I := 1 to N do
-      S[I] := Char(AttrToBIOS(CurPal[I]));
+      S[I] := Char(CurPal[I].ToBIOS);
     SystemColors[appPalette] := S;
     Application.Redraw; { Redraw application with new palette }
     end;
-  CurPal := nil;
+  CurPal := Default(TPalette);
   if VGASystem then
     GetPalette(VGA_palette);
   end;
@@ -193,10 +193,12 @@ procedure WindowManager;
     PC: TWindowCol;
     PV: TView;
     S: String;
+    {$PUSH}{$PACKRECORDS DEFAULT} { the layout of TvList.TListBoxRec }
     DT: record
       P: TCollection;
       n: Word;
       end;
+    {$POP}
     I, Num: Integer;
     Cmd: Word;
 
@@ -226,12 +228,12 @@ cmWindowManager is disabled.
 *)
   D := TDialog(LoadResource(dlgWindowManager));
 
-  R.Assign(D.Size.X-13, 3, D.Size.X-12, D.Size.Y-2);
+  R := TRect.Create(D.Size.X-13, 3, D.Size.X-12, D.Size.Y-2);
   PV := TScrollBar.Create(R);
   PV.Options := PV.Options or ofPostProcess or ofSecurity;
   D.Insert(PV);
 
-  R.Assign(2, 3, D.Size.X-13, D.Size.Y-2);
+  R := TRect.Create(2, 3, D.Size.X-13, D.Size.Y-2);
   PV := TWindowList.Create(R, 1, TScrollBar(PV));
   PV.Options := PV.Options or ofPostProcess or ofSecurity;
   TListBox(PV).NewLisT(PC);
@@ -255,7 +257,7 @@ cmWindowManager is disabled.
   TListBox(PV).Focused := Num; {-$VIV--}
   D.Insert(PV);
 
-  R.Assign(2, 2, 45, 3);
+  R := TRect.Create(2, 2, 45, 3);
   PV := TLabel.Create(R, GetString(dlWindowsLabel), PV);
   D.Insert(PV);
 

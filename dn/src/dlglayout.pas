@@ -20,7 +20,7 @@ uses
   TvGeom, TvObjs, TvViews, TvWindow, TvDialog;
 
 const
-  { a bit of TView.GrowMode in the resource stream only: the grow mode was given by the resource (GROW); TResDialog.Load
+  { a bit of TView.GrowMode in the resource stream only: the grow mode was given by the resource (GROW); TResDialog.Read
     takes it off }
   gfExplicit = $80;
   { TResDialog.Resize: the directions the dialog may grow in; rzAuto = as the layout finds }
@@ -31,11 +31,14 @@ const
   rzAuto = $FF;
 
 type
+  { in the stream after the fields of TDialog: Resize and the nine DirectLink (pointers to the controls) }
   TResDialog = class(TDialog)
     Resize: Byte;
-    constructor Create(const Bounds: TRect; const ATitle: ShortString);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    constructor Create(const Bounds: TRect; const ATitle: ShortString); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure SetState(AState: Word; Enable: Boolean); override;
     procedure SizeLimits(out Min, Max: TPoint); override;
     { gives the controls their grow modes; called once, when the dialog is first inserted }
@@ -100,13 +103,16 @@ begin
   Resize := rzAuto;
 end;
 
-constructor TResDialog.Load(S: TStream);
+function TResDialog.Read(Ip: ipstream): Pointer;
 var
   P: TView;
   N: Integer;
 begin
-  inherited Load(S);
-  S.Read(Resize, SizeOf(Resize));
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(Resize, SizeOf(Resize));
+  for N := Low(DirectLink) to High(DirectLink) do
+    DirectLink[N] := TView(Ip.ReadPointer);
   N := 0;
   P := First;
   while P <> nil do
@@ -122,10 +128,24 @@ begin
   end;
 end;
 
-procedure TResDialog.Store(S: TStream);
+procedure TResDialog.Write(Os: opstream);
+var
+  I: Integer;
 begin
-  inherited Store(S);
-  S.Write(Resize, SizeOf(Resize));
+  inherited Write(Os);
+  Os.WriteBytes(Resize, SizeOf(Resize));
+  for I := Low(DirectLink) to High(DirectLink) do
+    Os.WritePointer(DirectLink[I]);
+end;
+
+class function TResDialog.Build: TStreamable;
+begin
+  Result := TResDialog.Create(streamableInit);
+end;
+
+function TResDialog.StreamableName: ShortString;
+begin
+  Result := 'DlgLayout.TResDialog';
 end;
 
 function TResDialog.IsExplicit(P: TView): Boolean;

@@ -394,7 +394,7 @@ TryDel:
   Abort := False;
   ClrIO;
   CtrlBreakHit := False; {JO}
-  R.Assign(1, 1, 26, 9);
+  R := TRect.Create(1, 1, 26, 9);
   PInfo := TWhileView.Create(R);
   PInfo.Top := GetString(dlErase);
   DOSMode := True;
@@ -556,7 +556,7 @@ DeleteDirDIZ:
       RereadDirectory(S);
       end;
     end;
-  RereadCollection.DeleteAll;
+  RereadCollection.RemoveAll;
   RereadCollection.Free;
   {/Cat}
   GlobalMessage(evCommand, cmRereadInfo, nil);

@@ -32,8 +32,9 @@ was not done now.
   value is "shifted" at run time).
 - `{$PACKRECORDS 1}` is added to STDEFINE.INC (vpc.cfg: `$AlignRec-`): the data records of the dialogs (TSysData...) must
   be byte-aligned. It also packs the `object`s of DN units (VP aligns objects by `$AlignData+`): check if it matters.
-- tv `TListBoxRec` is `packed` with a LongInt `Selection` (DN: Integer, 32 bits in the Delphi mode). The Word of the
-  original TV is not kept; `TvList.ListBoxOwnsList` (default True, TV) is set to False by DNApp: TListBox.Done of DN does
+- tv `TListBoxRec` is a plain record (natural alignment) with a Word `Selection`; the list box records of DN (dlgrecs, the local
+  records of colors, phones, dbview) are declared with `{$PACKRECORDS DEFAULT}` to have its size; dlgrecs checks the size at compile time;
+  `TvList.ListBoxOwnsList` (default True, TV) is set to False by DNApp: TListBox.Done of DN does
   not dispose the list (TSysDialog.Done does it).
 
 ## Seen in DOSBox-X (2026-10-02), not done yet
@@ -201,7 +202,7 @@ The rest of `dn/data` (`COLORS`, `DN.FLG`) is unused so far: check whether it is
 ## Found by looking at the Russian screens (2026-10-03)
 - The message boxes (F8 delete confirmation etc.) have the title `Confirm` and the buttons `Yes`/`No` in English in the Russian interface
   (both builds): the stock strings of `tv/` (`MessageBox`), not the language file of DN. To check where DN's own texts should go in.
-  **Done 2026-10-08:** `InitLngStream` (`mainapp.pas`) sets the texts of `TvMsgBox` (`MsgYesText` ... `MsgConfirmText`) from the strings of the
+  **Done 2026-10-08:** `InitLngStream` (`mainapp.pas`) sets the texts of `TvMsgBox` (`MsgBoxText.YesText` ... `MsgBoxText.ConfirmText`) from the strings of the
   resources (`dlYesButton`, `dlMsgConfirm` ...); the English Cancel keeps the hot letter of tv/. Test `tools/dn-linux-msgbox.py` (the quit box in English,
   Russian, Ukrainian: title, buttons, the hot letters). Left in tv3: the file dialog (`TvFileDlg`), the directory dialog (`TvChDir`) and the color
   dialog (`TvColorSel`) have their button texts as constants; they need variables like those of `TvMsgBox` to be translated.
@@ -376,7 +377,7 @@ memory model, costs an emulator feature; (b) needs the 16-bit memory model for ~
 - Text cleanup leftovers (what is allowed to stay and what is not fixed yet): `docs/TEXT-POLICY.md`, section "Not fixed".
 - Resources, DOS landing (`tools/to-codepage.py`, `docs/TEXT-POLICY.md`): English and Russian go to cp866, Ukrainian to cp1125 (`DN_CODEPAGE`, `DN_CODEPAGE_UKRAIN`). Not checked on a real DOS machine or in DOSBox-X: whether the DOS build of DN (without `-dDNUTF8`) treats the cp1125 letters (upper and lower case, sorting) right: its tables know cp866. The look-alike letters of the old texts are repaired (`tools/fix-resource-lookalikes.py`); left: a few Latin letters that stand alone and were not converted on purpose (`Track'a`, `a:b`, lists of extensions).
 
-- Cells hold UTF-8 for a code page byte of $80 and up (tv3 `ScInitChar`); the bytes below $20 and $7F stay raw and the writers turn them into the IBM glyphs. The stray `═` cells that made the first attempt fail (`f5_f6_f8` of `dn-accept`) came from DN, not from tv3: `TWhileView.Draw` (`progress.pas`) and `TCalcView.Draw` (`calcwin.pas`) wrote into the draw buffer through a record overlay (`absolute B`, a one-byte `C: Char`), which replaced the first byte of a UTF-8 cell and left the rest (`E2 95 90` became `C9 95 90`). Both now use `SetCellGlyph`. Do not write into a `TScreenCell` through an overlay: use `SetCellChar`, `SetCellGlyph`, `SetCellAttr`.
+- Cells hold UTF-8 for a code page byte of $80 and up (tv3 `TScreenCharacter.InitWithChar`); the bytes below $20 and $7F stay raw and the writers turn them into the IBM glyphs. The stray `═` cells that made the first attempt fail (`f5_f6_f8` of `dn-accept`) came from DN, not from tv3: `TWhileView.Draw` (`progress.pas`) and `TCalcView.Draw` (`calcwin.pas`) wrote into the draw buffer through a record overlay (`absolute B`, a one-byte `C: Char`), which replaced the first byte of a UTF-8 cell and left the rest (`E2 95 90` became `C9 95 90`). Both now use `SetCellGlyph`. Do not write into a `TScreenCell` through an overlay: use `SetCellChar`, `SetCellGlyph`, `SetCellAttr`.
 - File times on Unix: `osdep.Fill` passed `TSearchRec.Time` (the Unix time on Unix) as a DOS packed time, so the panels showed garbage dates for files (`5.06.33  9:63`). Fixed 2026-10-06 (`SysFileTimeToDos`, test in `t_osdep`; the comparator of the gate gets the same fix by `backport_shared_object_fixes.py`). Not checked: `SetFTime`/`GetFTime` of `Dos` on Unix in copy, move and the file ages dialog (they use the unit `Dos` of the RTL, which should pack the DOS time itself; checked by hand 2026-10-08: F5 and F6 to another file system keep the modification time of the file, 2001-09-09 01:46:40 stayed exact; the file ages dialog not checked), and the creation and access times of `TOSSearchRec` (0 on Unix).
 - `DumpAtExit` (`dosharness.pas`, was in `mainapp.pas`) was never called: deleted 2026-10-08 (no script reads `dnlog.txt`; the flight recorder writes `dn.log` and the crash reports on DOS too).
 

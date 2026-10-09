@@ -57,10 +57,12 @@ type
   TSQZArchive = class;
   PSQZArchive = TSQZArchive;
   TSQZArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -191,5 +193,16 @@ procedure TSQZArchive.GetFile;
     end;
   ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { TSQZArchive.GetFile };
+
+
+class function TSQZArchive.Build: TStreamable;
+begin
+  Result := TSQZArchive.Create(streamableInit);
+end;
+
+function TSQZArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtsqz.TSQZArchive';
+end;
 
 end.

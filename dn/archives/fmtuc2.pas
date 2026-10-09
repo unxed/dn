@@ -51,7 +51,7 @@ interface
 
 uses
   Archiver
-  ;
+  , Defines;
 
 type
   TUC2Archive = class;
@@ -60,11 +60,13 @@ type
     ListFileName: String;
     ListFile: System.Text;
     BaseDir: String;
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
     destructor Destroy; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -299,6 +301,17 @@ destructor TUC2Archive.Destroy;
     end;
   inherited Destroy;
   end;
+
+
+class function TUC2Archive.Build: TStreamable;
+begin
+  Result := TUC2Archive.Create(streamableInit);
+end;
+
+function TUC2Archive.StreamableName: ShortString;
+begin
+  Result := 'fmtuc2.TUC2Archive';
+end;
 
 end.
 

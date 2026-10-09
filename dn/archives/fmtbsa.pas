@@ -57,10 +57,12 @@ type
   TBSAArchive = class;
   PBSAArchive = TBSAArchive;
   TBSAArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -186,5 +188,16 @@ procedure TBSAArchive.GetFile;
   ArcFile.Read(FileInfo.FName[1], P.NameLen);
   ArcFile.Seek(ArcFile.GetPos+P.PackedSize+1);
   end { TBSAArchive.GetFile };
+
+
+class function TBSAArchive.Build: TStreamable;
+begin
+  Result := TBSAArchive.Create(streamableInit);
+end;
+
+function TBSAArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtbsa.TBSAArchive';
+end;
 
 end.

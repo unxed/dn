@@ -57,10 +57,12 @@ type
   THAArchive = class;
   PHAArchive = THAArchive;
   THAArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -196,5 +198,16 @@ procedure THAArchive.GetFile;
     end;
   ArcFile.Seek(FP);
   end { THAArchive.GetFile };
+
+
+class function THAArchive.Build: TStreamable;
+begin
+  Result := THAArchive.Create(streamableInit);
+end;
+
+function THAArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtha.THAArchive';
+end;
 
 end.

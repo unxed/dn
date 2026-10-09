@@ -104,9 +104,9 @@ type
       {` Coordinates for D&D `}
     _Tmr1: TEventTimer;
     constructor Create(const Bounds: TRect; ADrive: Integer;
-         AScrBar: PMyScrollBar);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+         AScrBar: PMyScrollBar); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
     destructor Destroy; override;
     procedure Awaken; override;
     procedure CommandHandle(var Event: TEvent);
@@ -286,29 +286,30 @@ constructor TFilePanelRoot.Create(const Bounds: TRect; ADrive: Integer; AScrBar:
   DecDrawDisabled;
   end { TFilePanelRoot.Init };
 
-constructor TFilePanelRoot.Load(S: TStream);
+function TFilePanelRoot.Read(Ip: ipstream): Pointer;
   var
     I: LongInt;
     dumm: array[1..20] of Byte;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   NewTimer(_Tmr1, 0);
   ChangeLocked := False;
-  GetPeerViewPtr(S, ScrollBar);
-  GetPeerViewPtr(S, DirView);
-  GetPeerViewPtr(S, InfoView);
-  GetPeerViewPtr(S, DriveLine);
-  GetPeerViewPtr(S, SortView);
-  Drive := TDrive(S.Get);
+  ScrollBar := Ip.ReadPointer;
+  DirView := Ip.ReadPointer;
+  InfoView := Ip.ReadPointer;
+  DriveLine := Ip.ReadPointer;
+  SortView := Ip.ReadPointer;
+  Drive := TDrive(Ip.ReadPointer);
   if Drive = nil then
     Drive := TDrive.Create(0, Self)
   else
     Drive.Panel := Self;
   SetupPanelFromDrive;
-  S.Read(PresetNum, SizeOf(PresetNum));
-  S.Read(PanelSetupSet, SizeOf(PanelSetupSet));
-  S.Read(PrevPresetNum, SizeOf(PrevPresetNum));
-  S.Read(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
+  Ip.ReadBytes(PresetNum, SizeOf(PresetNum));
+  Ip.ReadBytes(PanelSetupSet, SizeOf(PanelSetupSet));
+  Ip.ReadBytes(PrevPresetNum, SizeOf(PrevPresetNum));
+  Ip.ReadBytes(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
 
  
     Drive.RereadDirectory('');
@@ -317,10 +318,10 @@ constructor TFilePanelRoot.Load(S: TStream);
     Drive.SizeX := Size.X;
     DirectoryName := Drive.GetDir;
     end;
-  S.Read(Delta, 2);
+  Ip.ReadBytes(Delta, 2);
   OldDelta := -1;
   PosChanged := False;
-  S.Read(ForceReading, 1);
+  Ip.ReadBytes(ForceReading, 1);
 //JO: 11-05-2006 - the lines commented out below were still in the RIT Labs
 //    version; What they are for is not entirely clear, but their presence
 //    causes this long-standing glitch: when loading a find panel or branch
@@ -329,7 +330,7 @@ constructor TFilePanelRoot.Load(S: TStream);
 //    extra slowdowns are noticeable at first glance, and given that
 //    in the Init constructor Files is not initialized, it can also
 //    be left uninitialized in Load
-{ Files := PFilesCollection(S.Get);
+{ Files := PFilesCollection(Ip.ReadPointer);
   if Files <> nil then
     for I := 0 to Files^.Count-1 do
       PFileRec(Files^.At(I))^.Owner := @Drive^.CurDir;} {DataCompBoy}
@@ -360,28 +361,28 @@ procedure TFilePanelRoot.Awaken;
 *)
   end;
 
-procedure TFilePanelRoot.Store(S: TStream);
+procedure TFilePanelRoot.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, ScrollBar);
-  PutPeerViewPtr(S, DirView);
-  PutPeerViewPtr(S, InfoView);
-  PutPeerViewPtr(S, DriveLine);
-  PutPeerViewPtr(S, SortView);
+  inherited Write(Os);
+  Os.WritePointer(ScrollBar);
+  Os.WritePointer(DirView);
+  Os.WritePointer(InfoView);
+  Os.WritePointer(DriveLine);
+  Os.WritePointer(SortView);
   if  (ActivePanel <> Self) or (Drive.DriveType <> dtDisk)
     or (StartupData.Unload and osuPreserveDir <> 0)
   then
-    S.Put(Drive)
+    Os.WritePointer(Drive)
   else
-    S.Put(nil);
-  S.Write(PresetNum, SizeOf(PresetNum));
-  S.Write(PanelSetupSet, SizeOf(PanelSetupSet));
-  S.Write(PrevPresetNum, SizeOf(PrevPresetNum));
-  S.Write(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
-  S.Write(Delta, 2);
-  S.Write(ForceReading, 1);
+    Os.WritePointer(nil);
+  Os.WriteBytes(PresetNum, SizeOf(PresetNum));
+  Os.WriteBytes(PanelSetupSet, SizeOf(PanelSetupSet));
+  Os.WriteBytes(PrevPresetNum, SizeOf(PrevPresetNum));
+  Os.WriteBytes(PrevPanelSetupSet, SizeOf(PrevPanelSetupSet));
+  Os.WriteBytes(Delta, 2);
+  Os.WriteBytes(ForceReading, 1);
  {PFilesCollection(Files).Selected := ScrollBar^.Value;
-  S.Put(Files);} //JO: 11-05-2006 - see the comment to TFilePanelRoot.Load;
+  Os.WritePointer(Files);} //JO: 11-05-2006 - see the comment to TFilePanelRoot.Load;
   end { TFilePanelRoot.Store };
 
 function TFilePanelRoot.Valid(Command: Word): Boolean;
@@ -1124,24 +1125,24 @@ WrongArc:
     var
       PDir: PString;
     begin
-    if ChangeLocked or (Event.InfoPtr = nil) then
+    if ChangeLocked or (Event.Message.InfoPtr = nil) then
       Exit;
     DriveLetter := Drive.GetDriveLetter;
-    if  (TDrive(Event.InfoPtr).DriveType = dtTemp) and
+    if  (TDrive(Event.Message.InfoPtr).DriveType = dtTemp) and
         (Drive.DriveType = dtTemp)
     then
       begin
       CE;
       Exit
       end;
-    if TDrive(Event.InfoPtr).DriveType in [dtDisk, dtNet, dtLink] then
+    if TDrive(Event.Message.InfoPtr).DriveType in [dtDisk, dtNet, dtLink] then
       begin
       if Drive <> nil then
         Drive.Free;
       Drive := nil
       end;
-    TDrive(Event.InfoPtr).Prev := Drive;
-    Drive := Event.InfoPtr;
+    TDrive(Event.Message.InfoPtr).Prev := Drive;
+    Drive := Event.Message.InfoPtr;
     Drive.Panel := Self;
     SetupPanelFromDrive;
 
@@ -1186,7 +1187,7 @@ WrongArc:
 
   procedure EraseGroup;
     begin
-    Drive.EraseFiles(Event.InfoPtr);
+    Drive.EraseFiles(Event.Message.InfoPtr);
     CE;
     end;
 
@@ -1265,7 +1266,7 @@ WrongArc:
       FC: TCollection;
       W: Word;
     begin
-    W := Event.Command;
+    W := Event.Message.Command;
     CE;
     FC := nil;
     case W of
@@ -1279,7 +1280,7 @@ WrongArc:
     Drive.HandleCommand(W, FC);
     if FC <> nil then
       begin
-      FC.DeleteAll;
+      FC.RemoveAll;
       FC.Free;
       end;
     end { HandleCommand };
@@ -1352,9 +1353,9 @@ WrongArc:
       S: String;
       dum: PFileRec;
     begin
-    GetUserParams(dum, PString(Event.InfoPtr)^, False);
+    GetUserParams(dum, PString(Event.Message.InfoPtr)^, False);
     S := PF^.FlName[uLfn];
-    PString(Event.InfoPtr)^:= S+' '+CnvString(Event.InfoPtr);
+    PString(Event.Message.InfoPtr)^:= S+' '+CnvString(Event.Message.InfoPtr);
     end;
 
   procedure _DoPush(a: Boolean);
@@ -1365,12 +1366,12 @@ WrongArc:
     if not GetState(sfVisible) then
       Exit;
     if a and (Drive.DriveType <> dtDisk) then
-      PString(Event.InfoPtr)^:= CurrentDirectory
+      PString(Event.Message.InfoPtr)^:= CurrentDirectory
     else
       begin
       S := Drive.GetRealName;
       if  (S <> '') and (S <> CurrentDirectory) then
-        PString(Event.InfoPtr)^:= S;
+        PString(Event.Message.InfoPtr)^:= S;
       end;
     end;
 
@@ -1380,7 +1381,7 @@ WrongArc:
     begin
     S := Drive.GetInternalName;
     if  (S <> '') then
-      PString(Event.InfoPtr)^:= S;
+      PString(Event.Message.InfoPtr)^:= S;
     end;
 
   {-DataCompBoy-}
@@ -1389,7 +1390,7 @@ WrongArc:
       S, S1: String;
       I: LongInt;
     begin
-    S := CnvString(Event.InfoPtr);
+    S := CnvString(Event.Message.InfoPtr);
     S1 := S;
     if S[1] = '>' then // flag for rereading subdirectories in a branch
       S := Copy(S, 2, MaxStringLength);
@@ -1423,7 +1424,7 @@ WrongArc:
     begin
     S := Drive.GetRealName;
     if S <> '' then
-      HistoryAdd(Event.InfoByte, S);
+      HistoryAdd(Event.Message.InfoByte, S);
     end;
 
 { Change disk via Alt-F1/F2 menu }
@@ -1443,11 +1444,11 @@ WrongArc:
       MPos.Y := Origin.Y+Size.Y div 2 {-$VIV} {-$X-Man}
     else
       MPos.Y := Origin.Y+1; {-$X-Man}
-    Owner.MakeGlobal(MPos, MPos);
+    MPos := Owner.MakeGlobal(MPos);
     S := SelectDrive(MPos.X, MPos.Y, DriveLetter, True);
     if S = cTEMP_ then
       begin
-      Event.InfoPtr := TTempDrive.Create;
+      Event.Message.InfoPtr := TTempDrive.Create;
       InsertDrive;
       Exit;
       end
@@ -1495,11 +1496,11 @@ WrongArc:
     if ChangeLocked then
       Exit;
     StopQuickSearch;
-    S := CnvString(Event.InfoPtr);
+    S := CnvString(Event.Message.InfoPtr);
     CE;
     if S = cTEMP_ then
       begin
-      Event.InfoPtr := TTempDrive.Create;
+      Event.Message.InfoPtr := TTempDrive.Create;
       InsertDrive;
       Exit;
       end
@@ -2257,7 +2258,7 @@ WrongArc:
         if CurPos < Files.Count then
           begin
           StopQuickSearch;
-          if  (Char(Event.CharCode) = ' ') and ((CmdLine.Str <> '') or
+          if  (Char(Event.KeyDown.CharScan.CharCode) = ' ') and ((CmdLine.Str <> '') or
                 (FMSetup.Options and fmoSpaceToggle = 0))
           then
             Exit;
@@ -2305,7 +2306,7 @@ WrongArc:
     var
       I: LongInt;
     begin
-    if  (PF <> nil) and (PF^.Selected xor (Event.Command = cmSingleTag))
+    if  (PF <> nil) and (PF^.Selected xor (Event.Message.Command = cmSingleTag))
     then
       I := kbIns
     else
@@ -2352,7 +2353,7 @@ WrongArc:
     ForceReading := False;
     DeltaX := 0;
     PDr := Drive;
-    Drive := Event.InfoPtr;
+    Drive := Event.Message.InfoPtr;
     Drive.Prev := PDr.Prev;
     PDr.Prev := nil;
     PDr.Free;
@@ -2371,7 +2372,7 @@ WrongArc:
     if FC.Count <> 0 then
       begin
       UUDecode(FC);
-      FC.DeleteAll;
+      FC.RemoveAll;
       end;
     FC.Free;
     end;
@@ -2420,7 +2421,7 @@ WrongArc:
     PF := nil;
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmToggleDescriptions:
           begin
           CM_ToggleDescriptions(Self);
@@ -2451,7 +2452,7 @@ WrongArc:
           _TagUntag;
         cmQuickChange1..cmQuickChange9:
           begin
-          DoChange(CnvString(DirsToChange[Event.Command-cmQuickChange1]));
+          DoChange(CnvString(DirsToChange[Event.Message.Command-cmQuickChange1]));
           CE;
           end;
         cmPanelMakeList:
@@ -2497,13 +2498,13 @@ WrongArc:
               And cmFindTree itself should also be figured out }
           if  (Drive^.DriveType = dtDisk) and
               (PanelFlags and fmiDirLen <> 0) and
-              (Char(Event.InfoPtr^) = DirectoryName[1])
+              (Char(Event.Message.InfoPtr^) = DirectoryName[1])
           then
-            Char(Event.InfoPtr^) := #0*);
+            Char(Event.Message.InfoPtr^) := #0*);
         cmInsertFile:
           if Files <> nil then
             begin
-            Files.AtInsert(Files.Count, Event.InfoPtr);
+            Files.AtInsert(Files.Count, Event.Message.InfoPtr);
             ScrollBar.SetParams(ScrollBar.Value, 0, Files.Count-1,
                 (Size.Y-Byte(ColumnTitles))*
                 ( (Size.X+1) div LineLength), 1);
@@ -2514,11 +2515,11 @@ WrongArc:
           begin
           if Files <> nil then
             if Files.Count >= CurPos then
-              Drive.UseFile(Files.At(CurPos), 22000+Event.Command);
+              Drive.UseFile(Files.At(CurPos), 22000+Event.Message.Command);
           CE;
           end;
         cmInsertDrive:
-          if Event.InfoPtr <> nil then
+          if Event.Message.InfoPtr <> nil then
             InsertDrive
           else
             CE;
@@ -2527,7 +2528,7 @@ WrongArc:
          cmFileTextView:
           begin
           if isSeldir then
-            case Event.Command of
+            case Event.Message.Command of
               cmViewFile, cmIntViewFile:
                 if Drive.DriveType <> dtArc then
                   CountLen
@@ -2541,7 +2542,7 @@ WrongArc:
             end { case }
           else
             begin
-            ViewFile(Event.Command);
+            ViewFile(Event.Message.Command);
             CE;
             end;
           end;
@@ -2610,7 +2611,7 @@ WrongArc:
           _DoPushIntern;
         cmPanelCompare:
           begin
-          CM_CompareDirs(Self, Event.InfoPtr);
+          CM_CompareDirs(Self, Event.Message.InfoPtr);
           Recount;
           CE
           end;
@@ -2637,10 +2638,10 @@ WrongArc:
         cmCopyFiles, cmMoveFiles, cmSingleCopy, cmSingleRename:
           begin
           CM_CopyFiles(Self,
-              (Event.Command = cmMoveFiles) or
-              (Event.Command = cmSingleRename),
-              (Event.Command = cmSingleCopy) or
-              (Event.Command = cmSingleRename));
+              (Event.Message.Command = cmMoveFiles) or
+              (Event.Message.Command = cmSingleRename),
+              (Event.Message.Command = cmSingleCopy) or
+              (Event.Message.Command = cmSingleRename));
           CE
           end;
         cmPanelInvertSel:
@@ -2664,8 +2665,8 @@ WrongArc:
         cmTotalReread:
           if GetState(sfVisible) or (Drive.DriveType <> dtDisk) then
             begin
-            if Event.InfoPtr <> nil then
-              Drive.RereadDirectory(PString(Event.InfoPtr)^)
+            if Event.Message.InfoPtr <> nil then
+              Drive.RereadDirectory(PString(Event.Message.InfoPtr)^)
             else
               Drive.RereadDirectory('');
             RereadDir;
@@ -2737,12 +2738,12 @@ WrongArc:
           end;
         cmChangeDirectory:
           begin
-          Self.ChDir(PString(Event.InfoPtr)^);
+          Self.ChDir(PString(Event.Message.InfoPtr)^);
           CE;
           end;
         cmStandAt:
           begin
-          GotoFile(PString(Event.InfoPtr)^);
+          GotoFile(PString(Event.Message.InfoPtr)^);
           CE;
           end;
         cmChangeDir:
@@ -2762,7 +2763,7 @@ WrongArc:
           _CloseLinked;
         cmSetFAttr, cmSingleAttr:
           begin
-          CM_SetAttributes(Self, Event.Command = cmSingleAttr, CurPos);
+          CM_SetAttributes(Self, Event.Message.Command = cmSingleAttr, CurPos);
           CE
           end;
         
@@ -2788,7 +2789,7 @@ WrongArc:
         cmFindGotoFile:
           begin
           PanSetup^.FileMask := x_x;
-          GotoFile(PString(Event.InfoPtr)^);
+          GotoFile(PString(Event.Message.InfoPtr)^);
           CE;
           Owner.Select;
           Select;
@@ -2804,7 +2805,7 @@ WrongArc:
     evKeyDown:
       _CheckKB;
     evBroadcast:
-      case Event.Command of
+      case Event.Message.Command of
         cmFindForced:
           if ForceReading then
             _FindForced;
@@ -2813,18 +2814,18 @@ WrongArc:
         cmUnArchive:
           if Drive.DriveType = dtArc then
             begin
-            Drive.CopyFiles(PCopyRec(Event.InfoPtr)^.FC, Self, True);
+            Drive.CopyFiles(PCopyRec(Event.Message.InfoPtr)^.FC, Self, True);
             CE;
             end;
         cmCopyCollection:
           if Drive.DriveType < dtArcFind then
             begin
-            Drive.CopyFiles(Event.InfoPtr, Self, ShiftState and 7 <> 0);
+            Drive.CopyFiles(Event.Message.InfoPtr, Self, ShiftState and 7 <> 0);
             CE;
             end;
         cmDropped:
-        if MouseInView(PCopyRec(Event.InfoPtr)^.Where) or
-          DirView.MouseInView(PCopyRec(Event.InfoPtr)^.Where)
+        if MouseInView(PCopyRec(Event.Message.InfoPtr)^.Where) or
+          DirView.MouseInView(PCopyRec(Event.Message.InfoPtr)^.Where)
             //AK155 5-02-2004
         then
             begin
@@ -2832,7 +2833,7 @@ WrongArc:
               dtFind, dtArcFind:
                 ;
               else {case}
-                CM_Dropped(Self, Event.InfoPtr);
+                CM_Dropped(Self, Event.Message.InfoPtr);
             end {case};
             CE;
             end;
@@ -2840,7 +2841,7 @@ WrongArc:
         (*AK155 19-06-2002. Something like this never happens, it seems. An almost identical
 piece is in filepanel, and that one actually works. And if that piece
 is commented out, DN glitches, but control still never gets here.
-                 cmScrollBarChanged: if ScrollBar = Event.InfoPtr then begin
+                 cmScrollBarChanged: if ScrollBar = Event.Message.InfoPtr then begin
                                       if MSelect then
                                         begin
                                          if Files<>nil then begin
@@ -2869,8 +2870,8 @@ is commented out, DN glitches, but control still never gets here.
       if Files.Count = 0 then
         Exit;
       StopQuickSearch; {AK155}
-      MSelect := Event.Buttons and mbRightButton <> 0;
-      MakeLocal(Event.Where, MPos);
+      MSelect := Event.Mouse.Buttons and mbRightButton <> 0;
+      MPos := MakeLocal(Event.Mouse.Where);
       if 
          (PanSetup.Show.ColumnsMask and psLFN_InColumns = 0) or
            { Short-name column width does not change }
@@ -2895,11 +2896,11 @@ is commented out, DN glitches, but control still never gets here.
           MSelect := False;
           Exit;
           end;
-        MakeLocal(Event.Where, MPos);
+        MPos := MakeLocal(Event.Mouse.Where);
         CurPos := Delta+(MPos.X div LineLength)
               *(Size.Y-Byte(ColumnTitles))
           +MPos.Y-Byte(ColumnTitles);
-        if ((Event.EventFlags and 2) <> 0) then
+        if ((Event.Mouse.EventFlags and 2) <> 0) then
           begin
           MSelect := False;
           CE;
@@ -2968,8 +2969,8 @@ is commented out, DN glitches, but control still never gets here.
             Exit;
             end;
           repeat
-            MakeLocal(Event.Where, MPos);
-            if MouseInView(Event.Where) then
+            MPos := MakeLocal(Event.Mouse.Where);
+            if MouseInView(Event.Mouse.Where) then
               begin
               CurPos := Delta+(MPos.X div LineLength)
                     *(Size.Y-Byte(ColumnTitles))
@@ -3001,7 +3002,7 @@ is commented out, DN glitches, but control still never gets here.
                    {Owner.ReDraw;}
                    DrawView;
                    MouseEvent(Event, evMouseMove+evMouseUp);
-                   MakeLocal(Event.Where, MPos);
+                   MPos := MakeLocal(Event.Mouse.Where);
                   Until Event.What=evMouseUp;
                   CE;
                  end*)
@@ -3017,7 +3018,7 @@ is commented out, DN glitches, but control still never gets here.
             end;
           Owner.Redraw;
           MouseEvent(Event, evMouseMove+evMouseUp);
-          MakeLocal(Event.Where, MPos);
+          MPos := MakeLocal(Event.Mouse.Where);
         until Event.What = evMouseUp;
         CE;
         end;
@@ -3253,7 +3254,7 @@ procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean)
     begin
     X := CalcNameLength+1;
     if X-(DeltaX*Byte(Scroll)) > 0 then
-      PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := CellFromBIOS(SC);
+      PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := TScreenCell(Word(SC));
     end;
   i := Low(TFileColNumber);
   while Flags <> 0 do
@@ -3272,7 +3273,7 @@ procedure TFilePanelRoot.GetEmpty(var B: TScreenCell; SC: Word; Scroll: Boolean)
         if X > 250 then
           Exit;
         if X-(DeltaX*Byte(Scroll)) > 0 then
-          PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := CellFromBIOS(SC);
+          PCellArray(@B)^[X-(DeltaX*Byte(Scroll))-1] := TScreenCell(Word(SC));
         end;
       end;
     Flags := Flags shr 1;
@@ -3382,7 +3383,7 @@ procedure TFilePanelRoot.Rebound;
   var
     R: TRect;
   begin
-  GetBounds(R);
+  R := GetBounds;
   R.A.Y := 1;
   R.B.Y := Owner.Size.Y-1;
   ChangeBounds(R);

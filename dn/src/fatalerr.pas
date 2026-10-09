@@ -46,7 +46,7 @@ begin
   Start := GetTickCount64;
   repeat
     Sleep(20);
-    TvSys.PollEvent(0, E);
+    TEventQueue.GetKeyEvent(E);
     if Auto and (GetTickCount64 - Start > 3000) then
       Exit;
   until E.What = evKeyDown;

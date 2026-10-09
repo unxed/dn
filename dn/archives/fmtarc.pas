@@ -57,10 +57,12 @@ type
   TARCArchive = class;
   PARCArchive = TARCArchive;
   TARCArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -182,5 +184,16 @@ procedure TARCArchive.GetFile;
   FileInfo.Date := (P.Date shr 16) or (P.Date shl 16);
   ArcFile.Seek(ArcFile.GetPos+P.PackedSize);
   end { TARCArchive.GetFile };
+
+
+class function TARCArchive.Build: TStreamable;
+begin
+  Result := TARCArchive.Create(streamableInit);
+end;
+
+function TARCArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtarc.TARCArchive';
+end;
 
 end.

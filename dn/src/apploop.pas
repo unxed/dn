@@ -87,7 +87,7 @@ procedure PostQuitMessage;
   begin
   w95locked := True;
   Event.What := evCommand;
-  Event.Command := cmQuit;
+  Event.Message.Command := cmQuit;
   TDNApplication(Application).HandleCommand(Event);
   if w95locked then
     MyApplication.HandleEvent(Event);
@@ -104,7 +104,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
     MacroPlaying: Boolean = False;
     MacroKey: Integer = 0;
     CurrentMacro: TKeyMacros = nil;
-    QuitEvent: TEvent = (What: evKeyDown; KeyCode: kbAltX);
+    QuitEvent: TEvent = (What: evKeyDown; KeyDown: (KeyCode: kbAltX));
   begin
   
   
@@ -115,7 +115,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
   inherited GetEvent(Event);
   FRNoteEvent(Event);                { the flight recorder: the keys, the clicks and the commands }
   { a test aid (tools/dn-linux-crash.py): with DN_TEST_CRASH set, F12 is an access violation }
-  if (Event.What = evKeyDown) and (Event.KeyCode = kbF12) and (GetEnv('DN_TEST_CRASH') <> '') then
+  if (Event.What = evKeyDown) and (Event.KeyDown.KeyCode = kbF12) and (GetEnv('DN_TEST_CRASH') <> '') then
     PInteger(nil)^ := 1;
   if MacroPlaying and ((Event.What = evKeyDown) or (Event.What =
          evNothing))
@@ -131,14 +131,14 @@ procedure MyApp.GetEvent(var Event: TEvent);
       if  (NeedLocated > 0) and (GetSTime-NeedLocated > 30) then
         begin
         NeedLocated := 0;
-        Message(Desktop, evCommand, cmDoSendLocated, nil);
+        Message(MainApp.Desktop, evCommand, cmDoSendLocated, nil);
         end;
     evKeyDown:
       begin
       {          if (DNKeyCode(Event) = kbAltQ) and Desktop.GetState(sfFocused) then begin OpenSmartpad; ClearEvent(Event) end;}
 {$IFDEF DNUTF8}
       { a character outside the code page has no key code, but it has the text (the editor puts it into the table of the document) }
-      if (DNKeyCode(Event) = kbNoKey) and (Event.TextLength = 0) then
+      if (DNKeyCode(Event) = kbNoKey) and (Event.KeyDown.TextLength = 0) then
 {$ELSE}
       if DNKeyCode(Event) = kbNoKey then
 {$ENDIF}
@@ -155,17 +155,17 @@ procedure MyApp.GetEvent(var Event: TEvent);
         ScreenGrabber(False);
         Exit
         end;
-      if  (Event.ScanCode >= Hi(kbCtrlF1))
-             and (Event.ScanCode <= Hi(kbCtrlF10))
-        and (Pointer(Current) = Pointer(Desktop))
+      if  (Event.KeyDown.CharScan.ScanCode >= Hi(kbCtrlF1))
+             and (Event.KeyDown.CharScan.ScanCode <= Hi(kbCtrlF10))
+        and (Pointer(Current) = Pointer(MainApp.Desktop))
            and (ShiftState and 3 <> 0)
       then
         begin
-        if QuickExecExternal(Event.ScanCode-Hi(kbCtrlF1)+1) then
+        if QuickExecExternal(Event.KeyDown.CharScan.ScanCode-Hi(kbCtrlF1)+1) then
           begin
           Event.What := evCommand;
-          Event.Command := cmExecString;
-          Event.InfoPtr := @QuickExecExternalStr;
+          Event.Message.Command := cmExecString;
+          Event.Message.InfoPtr := @QuickExecExternalStr;
           end
         else
           Event.What := evNothing;
@@ -173,16 +173,16 @@ procedure MyApp.GetEvent(var Event: TEvent);
         end;
       if  (ShiftState and 7 <> 0)
              and ((ShiftState and 4 = 0) or (ShiftState and 3 = 0)) and
-          (Event.ScanCode >= Hi(kbAlt1))
-           and (Event.ScanCode <= Hi(kbAlt9))
+          (Event.KeyDown.CharScan.ScanCode >= Hi(kbAlt1))
+           and (Event.KeyDown.CharScan.ScanCode <= Hi(kbAlt9))
       then
         begin
-        WW := Event.ScanCode-Hi(kbAlt1);
+        WW := Event.KeyDown.CharScan.ScanCode-Hi(kbAlt1);
         if ShiftState and 3 <> 0 then
           begin
           if KeyMacroses = nil then
             begin
-            KeyMacroses := TCollection.Create(10, 10);
+            KeyMacroses := TObjCollection.Create(10, 10);
             for W := 1 to 10 do
               KeyMacroses.Insert(nil);
             end;
@@ -221,7 +221,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         {Cat}
         begin
         Event.What := evCommand;
-        Event.Command := cmFileTextView;
+        Event.Message.Command := cmFileTextView;
         Exit;
         end;
       {/AK155}
@@ -230,7 +230,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         {Cat}
         begin
         Event.What := evCommand;
-        Event.Command := cmListOfDirs;
+        Event.Message.Command := cmListOfDirs;
         Exit;
         end;
       if MsgActive then
@@ -242,23 +242,23 @@ procedure MyApp.GetEvent(var Event: TEvent);
         begin
         if MacroRecord and (CurrentMacro <> nil) then
           CurrentMacro.PutKey(DNKeyCode(Event));
-        if  (StatusLine <> nil) then
-          StatusLine.HandleEvent(Event);
+        if  (MainApp.StatusLine <> nil) then
+          MainApp.StatusLine.HandleEvent(Event);
         { F10 opens DN's menu bar.  Keep this explicit fallback because
           the status-line view is not the owner of the menu command. }
         if (Event.What = evKeyDown) and
-           ((DNKeyCode(Event) = kbF10) or (Event.ScanCode = Hi(kbF10))) then
+           ((DNKeyCode(Event) = kbF10) or (Event.KeyDown.CharScan.ScanCode = Hi(kbF10))) then
           begin
           Event.What := evCommand;
-          Event.Command := cmMenu;
-          Event.InfoPtr := nil;
+          Event.Message.Command := cmMenu;
+          Event.Message.InfoPtr := nil;
           end;
         end;
       end;
   end {case};
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmTree,
         cmGetTeam,
         cmHelp,
@@ -354,25 +354,25 @@ procedure MyApp.HandleEvent(var Event: TEvent);
   begin
   if Event.What = evMouseDown
   then
-    if  (Event.Where.Y = 0) and (Event.Buttons and mbLeftButton <> 0)
+    if  (Event.Mouse.Where.Y = 0) and (Event.Mouse.Buttons and mbLeftButton <> 0)
     then
-      MenuBar.HandleEvent(Event);
+      MainApp.MenuBar.HandleEvent(Event);
   if Event.What <> evNothing then
     inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmUpdateConfig:
           begin
           UpdateConfig;
           WriteConfig;
           end;
         cmMenuOn:
-          if  (Event.InfoPtr = MenuBar) then
-            UpView(MenuBar);
+          if  (Event.Message.InfoPtr = MainApp.MenuBar) then
+            UpView(MainApp.MenuBar);
         cmMenuOff:
-          if  (Event.InfoPtr = MenuBar) then
-            UpView(Desktop);
+          if  (Event.Message.InfoPtr = MainApp.MenuBar) then
+            UpView(MainApp.Desktop);
         
         cmEnvEdit:
           EditDOSEnvironment(Environment);

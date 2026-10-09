@@ -73,14 +73,16 @@ type
   TTextCollection = TLineCollection;
   {/Cat}
 
+{$PUSH}{$PACKRECORDS DEFAULT} { the layout of TvList.TListBoxRec: the size that TListBox.DataSize copies }
   TListBoxRec = record
     List: TCollection;
-    Focus: Integer
+    Focus: Word
     end;
   TTextListboxRec = record
     List: PTextCollection;
-    Focus: Integer
+    Focus: Word
     end;
+{$POP}
 
   
   TSaversData = record
@@ -118,7 +120,14 @@ implementation
 uses
   osdep, basics, strutil, fileutil,
   Lfn, CfgDir, DnPath
-  , Dos, SysUtils;
+  , Dos, SysUtils, TvList;
+
+type
+  TTvListBoxRec = TvList.TListBoxRec;
+
+{$IF (SizeOf(TListBoxRec) <> SizeOf(TTvListBoxRec)) or (SizeOf(TTextListboxRec) <> SizeOf(TTvListBoxRec))}
+  {$ERROR the list box records of the dialogs differ from TvList.TListBoxRec}
+{$ENDIF}
 
 begin
 TempDir := '';

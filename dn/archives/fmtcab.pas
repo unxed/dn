@@ -58,10 +58,12 @@ type
   PCABArchive = TCABArchive;
   TCABArchive = class(TARJArchive)
     FilesNumber: LongInt;
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -211,5 +213,16 @@ procedure TCABArchive.GetFile;
   FileInfo.Date := (FH.DateTime shr 16) or (FH.DateTime shl 16);
   FileInfo.Last := 0;
   end { TCABArchive.GetFile };
+
+
+class function TCABArchive.Build: TStreamable;
+begin
+  Result := TCABArchive.Create(streamableInit);
+end;
+
+function TCABArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtcab.TCABArchive';
+end;
 
 end.

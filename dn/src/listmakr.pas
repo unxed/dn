@@ -1,5 +1,5 @@
 { The unit ListMakr of DN: TStrListMaker collects the strings of a language (Put(number, text)) and writes them to a stream
-  in the form that TStringList (DNStrL) reads: the size of the strings, the strings, the number of the index records, the
+  in the form that TStringList (DNStrL) reads, under its name 'DNStrL.TStringList': the size of the strings, the strings, the number of the index records, the
   records (the first number, the count of up to 16 consecutive numbers, the offset of their first string). Used by the
   resource compiler (rcp.pas). }
 unit ListMakr;
@@ -16,16 +16,14 @@ type
     constructor Create(AStrSize, AIndexSize: AWord);
     destructor Destroy; override;
     procedure Put(Key: AWord; S: String);
-    procedure Store(S: TStream);
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
   private
     Text: array of Byte;      { the strings, one after another (a length byte, the characters) }
     TextLen: LongInt;
     Runs: array of TStrIndexRec;  { the index: the runs of consecutive keys, up to 16 in a run }
     RunCount: LongInt;
   end;
-
-var
-  RStrListMaker: TStreamRec;
 
 implementation
 
@@ -78,31 +76,21 @@ begin
   Inc(TextLen, N);
 end;
 
-procedure TStrListMaker.Store(S: TStream);
+procedure TStrListMaker.Write(Os: opstream);
 var
   Sz, Cnt: AWord;
 begin
   Sz := TextLen;
   Cnt := RunCount;
-  S.Write(Sz, SizeOf(Sz));
-  if TextLen > 0 then S.Write(Text[0], TextLen);
-  S.Write(Cnt, SizeOf(Cnt));
-  if RunCount > 0 then S.Write(Runs[0], RunCount * SizeOf(TStrIndexRec));
+  Os.WriteBytes(Sz, SizeOf(Sz));
+  if TextLen > 0 then Os.WriteBytes(Text[0], TextLen);
+  Os.WriteBytes(Cnt, SizeOf(Cnt));
+  if RunCount > 0 then Os.WriteBytes(Runs[0], RunCount * SizeOf(TStrIndexRec));
 end;
 
-function BuildNothing(S: TStream): TStreamable;
+function TStrListMaker.StreamableName: ShortString;
 begin
-  Result := nil;
+  Result := 'DNStrL.TStringList';
 end;
 
-procedure StoreMaker(P: TStreamable; S: TStream);
-begin
-  TStrListMaker(P).Store(S);
-end;
-
-initialization
-  RStrListMaker.ObjType := otStrListMaker;
-  RStrListMaker.VmtLink := PtrUInt(TClass(TStrListMaker));
-  RStrListMaker.Load := @BuildNothing;
-  RStrListMaker.Store := @StoreMaker;
 end.

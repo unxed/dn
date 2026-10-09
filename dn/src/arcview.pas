@@ -75,8 +75,10 @@ type
     Password: String;
     constructor Create(const AName, VAName: String); overload;
     constructor Create(PC: TDirStorage; const AName, VAName: String);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure RereadDirectory(S: String); override; {DataCompBoy}
     procedure KillUse; override;
     function ReadArchive: Boolean;
@@ -317,30 +319,31 @@ constructor TArcDrive.Create(PC: TDirStorage; const AName, VAName: String);
 {-DataCompBoy-}
 
 {-DataCompBoy-}
-constructor TArcDrive.Load(S: TStream);
+function TArcDrive.Read(Ip: ipstream): Pointer;
   var
     SR: lSearchRec;
   label
     Failure;
   begin
-  inherited Load(S);
-  S.ReadStrV(ArcName);
-  {S.Read(ArcName[0],1); S.Read(ArcName[1],Length(ArcName));}
+  Result := Self;
+  inherited Read(Ip);
+  ReadStrV(Ip, ArcName);
+  {Ip.ReadBytes(ArcName[0],1); Ip.ReadBytes(ArcName[1],Length(ArcName));}
   {Cat}
-  S.ReadStrV(VArcName);
-  {S.Read(VArcName[0],1); S.Read(VArcName[1],Length(VArcName));}
+  ReadStrV(Ip, VArcName);
+  {Ip.ReadBytes(VArcName[0],1); Ip.ReadBytes(VArcName[1],Length(VArcName));}
   {/Cat}
-  S.Read(FakeKillAfterUse, 1);
+  Ip.ReadBytes(FakeKillAfterUse, 1);
   {temporary}
   KillAfterUse := False;
-  S.ReadStrV(Password);
-  {S.Read(Password[0],1); S.Read(Password[1],Length(Password));}
-  S.Read(ArcDate, SizeOf(ArcDate)+SizeOf(ArcSize));
+  ReadStrV(Ip, Password);
+  {Ip.ReadBytes(Password[0],1); Ip.ReadBytes(Password[1],Length(Password));}
+  Ip.ReadBytes(ArcDate, SizeOf(ArcDate)+SizeOf(ArcSize));
   ForceRescan := False;
   DriveType := dtArc;
   ArcFileName := ArcName;
   VArcFileName := VArcName;
-  Files := TDirStorage(S.Get);
+  Files := TDirStorage(Ip.ReadPointer);
     { AK155 File data must be read from the stream regardless
     of whether the archive itself is found and whether it needs rereading,
     otherwise further stream reading will get out of sync }
@@ -372,11 +375,11 @@ Failure:
       if Files <> nil then
         Files.Free;
       Files := nil;
-      S.Read(ForceRescan, 1);
-      Fail;
+      Ip.ReadBytes(ForceRescan, 1);
+      begin Free; Result := nil; Exit end;
       end;
     end;
-  S.Read(ForceRescan, 1);
+  Ip.ReadBytes(ForceRescan, 1);
   end { TArcDrive.Load };
 {-DataCompBoy-}
 
@@ -388,18 +391,28 @@ procedure TArcDrive.KillUse;
     EraseTempFile(ArcName);
   end;
 
-procedure TArcDrive.Store(S: TStream);
+procedure TArcDrive.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.WriteStr(@ArcName); {S.Write(ArcName[0],1 + Length(ArcName));}
-  S.WriteStr(@VArcName); {S.Write(VArcName[0],1 + Length(VArcName));}
+  inherited Write(Os);
+  Os.WriteString(@ArcName); {Os.WriteBytes(ArcName[0],1 + Length(ArcName));}
+  Os.WriteString(@VArcName); {Os.WriteBytes(VArcName[0],1 + Length(VArcName));}
   {Cat}
-  S.Write(KillAfterUse, 1);
-  S.WriteStr(@Password); {S.Write(Password[0],1 + Length(Password));}
-  S.Write(ArcDate, SizeOf(ArcDate)+SizeOf(ArcSize));
-  S.Put(Files);
-  S.Write(ForceRescan, 1);
+  Os.WriteBytes(KillAfterUse, 1);
+  Os.WriteString(@Password); {Os.WriteBytes(Password[0],1 + Length(Password));}
+  Os.WriteBytes(ArcDate, SizeOf(ArcDate)+SizeOf(ArcSize));
+  Os.WritePointer(Files);
+  Os.WriteBytes(ForceRescan, 1);
   end;
+
+class function TArcDrive.Build: TStreamable;
+begin
+  Result := TArcDrive.Create(streamableInit);
+end;
+
+function TArcDrive.StreamableName: ShortString;
+begin
+  Result := 'ArcView.TArcDrive';
+end;
 
 destructor TArcDrive.Destroy;
   begin
@@ -466,7 +479,7 @@ function TArcDrive.ReadArchive: Boolean;
   if Files = nil then
     Exit;
   P := nil;
-  R.Assign(1, 1, 30, 10);
+  R := TRect.Create(1, 1, 30, 10);
   {P := WriteMsg(GetString(dlArcReadArc));}
   Ln := ArcFile.GetSize+1;
   Cancel := False;
@@ -729,7 +742,7 @@ function TArcDrive.GetDirectory( const FileMask: String; var TotalInfo: TSize): 
   F^.Attr := $8000 or F^.Attr;
   F^.PSize := {Round}(TPL);
   AFiles.AtInsert(0, F);
-  FD.DeleteAll;
+  FD.RemoveAll;
   FD.Free;
   end { TArcDrive.GetDirectory };
 {-DataCompBoy-}
@@ -943,7 +956,7 @@ the Windows debugger or the Windows RTL? Hopefully the former. }
             SS1[J] := #$20; {JO: replace the temporary character with spaces}
         Writeln(T.T, '@'+S+' '+SS1);
       until CmdLineOK;
-      Write(T.T, '@del '+EX);
+      System.Write(T.T, '@del '+EX);
       Close(T.T);
       S := EX;
       end {if B}
@@ -1445,7 +1458,7 @@ TryAgain:
     LFN.lChDir(DirToChange);
     DirToChange := '';
     Confirms := OldConfirms;
-    FCT.DeleteAll;
+    FCT.RemoveAll;
     FCT.Free;
     if Inhr > 0 then
       begin
@@ -1748,8 +1761,8 @@ function ArcViewer(AName, VAName: String): Boolean;
       Exit;
     end;
   E.What := evCommand;
-  E.Command := cmInsertDrive;
-  E.InfoPtr := P;
+  E.Message.Command := cmInsertDrive;
+  E.Message.InfoPtr := P;
   Desktop.HandleEvent(E);
   if E.What <> evNothing then
     begin

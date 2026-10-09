@@ -124,10 +124,12 @@ type
     SavedMark: TRect;
     SavedMarks: TPosArray;
     MenuItemStr: array[Boolean] of PString;
-    constructor Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TScrollBar; var FileName: String);
-    constructor Load(S: TStream);
+    constructor Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TScrollBar; var FileName: String); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     destructor Destroy; override;
-    procedure Store(S: TStream); override;
+    procedure Write(Os: opstream); override;
     procedure Awaken; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
@@ -413,12 +415,13 @@ constructor TFileEditor.Create(const Bounds: TRect; AHScrollBar, AVScrollBar: TS
   ApplyOptions;
   end;
 
-constructor TFileEditor.Load(S: TStream);
+function TFileEditor.Read(Ip: ipstream): Pointer;
   begin
-  inherited LoadWith(S, TTveDoc.Create, True);
+  Result := Self;
+  inherited Read(Ip);
   HelpCtx := hcEditor;
   isValid := True;
-  MILoad(Self, S);
+  MILoad(Self, Ip);
   ApplyOptions;
   end;
 
@@ -449,11 +452,21 @@ destructor TFileEditor.Destroy;
   inherited Destroy;
   end;
 
-procedure TFileEditor.Store(S: TStream);
+procedure TFileEditor.Write(Os: opstream);
   begin
-  inherited Store(S);
-  MIStore(Self, S);
+  inherited Write(Os);
+  MIStore(Self, Os);
   end;
+
+class function TFileEditor.Build: TStreamable;
+begin
+  Result := TFileEditor.Create(streamableInit, TTveDoc.Create, True);
+end;
+
+function TFileEditor.StreamableName: ShortString;
+begin
+  Result := 'editcore.TFileEditor';
+end;
 
 procedure TFileEditor.Awaken;
   begin
@@ -517,7 +530,7 @@ function TFileEditor.GetMark: TRect;
     end;
 
   begin
-  Result.Assign(0, 0, 0, 0);
+  Result := TRect.Create(0, 0, 0, 0);
   if not Editor.HasSelection then
     Exit;
   Kind := Editor.SelKind;
@@ -788,7 +801,7 @@ function TFileEditor.ClassAttr(C: Integer): TColorAttr;
     else
       Exit;
   end;
-  AttrSetFg(Result, AttrFg(GetColor(N).Lo));
+  Result.SetForeground((GetColor(N)[0]).GetForeground);
   end;
 
 function TFileEditor.LineAttrHook(Sender: TTveSender; Line: Int64; var Attr: TColorAttr): Boolean;
@@ -796,7 +809,7 @@ function TFileEditor.LineAttrHook(Sender: TTveSender; Line: Int64; var Attr: TCo
   Result := False;
   if EdOpt.HiliteLine and (Line = Editor.Line) then
     begin
-    Attr := GetColor(4).Lo;
+    Attr := GetColor(4)[0];
     Result := True;
     end;
   end;
@@ -851,29 +864,29 @@ procedure TFileEditor.CalcMenu;
   FLastMod := Doc.Modified;
   if (Owner = nil) or (TEditWindow(Owner).MenuBar = nil) then
     Exit;
-  BlkC := [cmCopy, cmCut, cmClear, cmBlockWrite, cmFJustify,
+  BlkC := CommandSetOf([cmCopy, cmCut, cmClear, cmBlockWrite, cmFJustify,
      cmCopyBlock, cmMoveBlock,
     cmFRight, cmFLeft, cmFCenter, cmPrintBlock, cmCalcBlock, cmSortBlock,
-    cmRevSortBlock, cmIndentBlock, cmUnIndentBlock];
+    cmRevSortBlock, cmIndentBlock, cmUnIndentBlock]);
   if FLastSel then
     EnableCommands(BlkC)
   else
     DisableCommands(BlkC);
   if FLastUndo > 0 then
-    EnableCommands([cmUndo])
+    EnableCommands(CommandSetOf([cmUndo]))
   else
-    DisableCommands([cmUndo]);
+    DisableCommands(CommandSetOf([cmUndo]));
   if FLastRedo > 0 then
-    EnableCommands([cmRedo])
+    EnableCommands(CommandSetOf([cmRedo]))
   else
-    DisableCommands([cmRedo]);
+    DisableCommands(CommandSetOf([cmRedo]));
   { the clipboard of the system changes without a word to DN (and a terminal of the far2l extensions gives its text only right after the paste
     key), so with it Paste stays on: a paste of an empty clipboard does nothing }
   if ((ClipBoard <> nil) and (ClipBoard.Count > 0)) or (SystemData.Options and ossUseSysClip <> 0)
   then
-    EnableCommands([cmPaste])
+    EnableCommands(CommandSetOf([cmPaste]))
   else
-    DisableCommands([cmPaste]);
+    DisableCommands(CommandSetOf([cmPaste]));
   if OptMenu <> nil then
     begin
     MI := OptMenu^.Items;
@@ -912,7 +925,7 @@ procedure TFileEditor.SetState(AState: Word; Enable: Boolean);
       if VScroll <> nil then
         VScroll.Show;
       DrawView;
-      EnableCommands([cmViewFile]);
+      EnableCommands(CommandSetOf([cmViewFile]));
       end
     else
       begin
@@ -1264,7 +1277,7 @@ function TFileEditor.CommandOf(Cmd: Word; var Event: TEvent): Boolean;
     cmPrintBlock: PrintText(True);
     cmGetName:
       begin
-      Event.InfoPtr := @EditName;
+      Event.Message.InfoPtr := @EditName;
       Result := False;
       end;
     { text }
@@ -1290,7 +1303,7 @@ function TFileEditor.CommandOf(Cmd: Word; var Event: TEvent): Boolean;
     cmEditCrMode: EolMode := cfCR;
     cmPlayMacro:
       begin
-      Ch := Event.InfoLong;
+      Ch := Event.Message.InfoLong;
       PlayMacro(Ch);
       end;
     cmSelectMacro: SelectMacro;
@@ -1487,7 +1500,7 @@ procedure TFileEditor.DoReplace(const Opt: TTveSearchOptions);
     J := cmYes;
     if Ask then
       begin
-      T.Assign(0, 0, 40, 8);
+      T := TRect.Create(0, 0, 40, 8);
       if Editor.Line-TopLine < Size.Y div 2 then
         T.A.Y := Desktop.Size.Y-18
       else
@@ -1661,14 +1674,14 @@ procedure TFileEditor.PrintText(Block: Boolean);
       M := M+T[I]
     else
       begin
-      Write(F, DocToUi(M));
+      System.Write(F, DocToUi(M));
       M := T[I];
       end;
     Inc(I);
     end;
-  Write(F, DocToUi(M));
+  System.Write(F, DocToUi(M));
   if not Block then
-    Write(F, #12);
+    System.Write(F, #12);
   Close(F);
   Message(Application, evCommand, cmFilePrint, @FName);
   end;
@@ -1748,7 +1761,7 @@ procedure TFileEditor.OpenFileAtCursor;
   if Line = '' then
     Exit;
   Res := '';
-  R.Assign(0, 0, 20, 7);
+  R := TRect.Create(0, 0, 20, 7);
   Info := TWhileView.Create(R);
   Info.Write(1, Copy(GetString(dlPleaseStandBy), 4, 255));
   Desktop.Insert(Info);
@@ -1830,12 +1843,12 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
   if fASCIITable then
     begin
     { a character of the table of the characters: the byte of the code page of DN }
-    TypeAt(UiToDocByte(Byte(Event.CharCode)));
+    TypeAt(UiToDocByte(Byte(Event.KeyDown.CharScan.CharCode)));
     ClearEvent(Event);
     Exit(True);
     end;
   { a typed character outside ASCII is text, never a key of the table below (U+2026 or U+03B2 would be taken for the codes of commands) }
-  if (Event.TextLength > 0) and (Byte(Event.Text[0]) >= $80) and (Event.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
+  if (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80) and (Event.KeyDown.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
     begin
     TypeAt(EventText(Event));           { the text of a key is UTF-8 in both builds }
     ClearEvent(Event);
@@ -1872,25 +1885,25 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
   for I := 1 to MaxCommands do
     with EditCommands[I] do
       begin
-      if CC1[1] = Char(Event.CharCode) then
+      if CC1[1] = Char(Event.KeyDown.CharScan.CharCode) then
         begin
         EvStr[1] := CC1[1];
         if CC1[2] <> #0 then
           begin
           KeyEvent(Event);
           XlatPlain(Event);
-          EvStr[2] := Char(Event.CharCode);
+          EvStr[2] := Char(Event.KeyDown.CharScan.CharCode);
           end;
         Break;
         end;
-      if CC2[1] = Char(Event.CharCode) then
+      if CC2[1] = Char(Event.KeyDown.CharScan.CharCode) then
         begin
         EvStr[1] := CC2[1];
         if CC2[2] <> #0 then
           begin
           KeyEvent(Event);
           XlatPlain(Event);
-          EvStr[2] := Char(Event.CharCode);
+          EvStr[2] := Char(Event.KeyDown.CharScan.CharCode);
           end;
         Break;
         end;
@@ -1912,7 +1925,7 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
     begin
     { the keys with Shift move and select: the command of the table is the same, the selecting one is run here (the command does not know the key) }
     Sel := 0;
-    if ((Key shr 16) and 3 <> 0) or (Event.ControlKeyState and kbShift <> 0) then
+    if ((Key shr 16) and 3 <> 0) or (Event.KeyDown.ControlKeyState and kbShift <> 0) then
       case EditCommands[I].C of
         cmMoveUp: Sel := tcSelUp;
         cmMoveDown: Sel := tcSelDown;
@@ -1948,7 +1961,7 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
       end;
   end;
   { a character to type: its text (UTF-8 in both builds), else the character of the code page of DN }
-  if (Event.TextLength > 0) and (Event.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
+  if (Event.KeyDown.TextLength > 0) and (Event.KeyDown.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
     begin
     T := EventText(Event);
     if (T <> '') and (Byte(T[1]) >= 32) then
@@ -1958,9 +1971,9 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
       Exit(True);
       end;
     end
-  else if (Char(Event.CharCode) > #31) and (Key <> kbShiftGrayPlus) and (Key <> kbShiftGrayMinus) then
+  else if (Char(Event.KeyDown.CharScan.CharCode) > #31) and (Key <> kbShiftGrayPlus) and (Key <> kbShiftGrayMinus) then
     begin
-    TypeAt(UiToDocByte(Byte(Event.CharCode)));
+    TypeAt(UiToDocByte(Byte(Event.KeyDown.CharScan.CharCode)));
     ClearEvent(Event);
     Exit(True);
     end;
@@ -1976,7 +1989,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
         ClearEvent(Event);
         Exit;
         end;
-      if CommandOf(Event.Command, Event) then
+      if CommandOf(Event.Message.Command, Event) then
         begin
         ClearEvent(Event);
         Exit;
@@ -1986,8 +1999,8 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
       if KeyDown(Event) then
         Exit;
     evBroadcast:
-      if Event.Command = cmFindEdit then
-        if PString(Event.InfoPtr)^ = EditName then
+      if Event.Message.Command = cmFindEdit then
+        if PString(Event.Message.InfoPtr)^ = EditName then
           if Owner <> nil then
             begin
             Owner.Select;
@@ -2083,7 +2096,7 @@ procedure OpenEditor;
       fdOpenButton+fdHelpButton, hsEditOpen);
   if S = '' then
     Exit;
-  Desktop.GetExtent(R);
+  R := Desktop.GetExtent;
   Application.InsertWindow(TEditWindow.Create(R, S));
   end;
 
@@ -2154,7 +2167,7 @@ procedure OpenSmartpad;
   if (SmartWindow <> nil) and SmartWindow.GetState(sfModal) then
     Exit;
   PV := Application.TopView;
-  Desktop.GetExtent(R);
+  R := Desktop.GetExtent;
   R.Grow(-2, -2);
   if SmartWindow <> nil then
     begin
@@ -2183,7 +2196,7 @@ procedure OpenSmartpad;
   if I >= 0 then
     begin
     P := EditHistory.At(I);
-    R.Assign(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X, P^.fOrigin.Y+P^.fSize.Y);
+    R := TRect.Create(P^.fOrigin.X, P^.fOrigin.Y, P^.fOrigin.X+P^.fSize.X, P^.fOrigin.Y+P^.fSize.Y);
     AdjustToDesktopSize(R, P^.fDeskSize);
     SmartWindow.Locate(R);
     V.ApplyRecord(P, True);
@@ -2212,7 +2225,7 @@ procedure OpenClipBoard;
   if (ClipboardWindow <> nil) and ClipboardWindow.GetState(sfModal) then
     Exit;
   PV := Application.TopView;
-  Desktop.GetExtent(R);
+  R := Desktop.GetExtent;
   if ClipboardWindow <> nil then
     begin
     if PV <> Application then

@@ -19,8 +19,8 @@ type
     isValid: Boolean;
     constructor Create(ACheck: Boolean);
     destructor Destroy; override;
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
     function Valid(Command: Word): Boolean; override;
     end;
 
@@ -38,7 +38,7 @@ constructor TUserSaver.Create(ACheck: Boolean);
   var
     R: TRect;
   begin
-  R.Assign(0, 0, 0, 0);
+  R := TRect.Create(0, 0, 0, 0);
   inherited Create(R);
   CheckIO := ACheck;
   SetState(sfVisible, False);
@@ -59,13 +59,14 @@ function TUserSaver.Valid(Command: Word): Boolean;
   Valid := isValid
   end;
 
-constructor TUserSaver.Load(var S: TStream);
+function TUserSaver.Read(Ip: ipstream): Pointer;
   var
     I: Byte;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   DataSaver := Self;
-  S.Read(SSize, 4*SizeOf(AInt)+SizeOf(Boolean));
+  Ip.ReadBytes(SSize, 4*SizeOf(AInt)+SizeOf(Boolean));
   if UserScreen <> nil then
     FreeMem(UserScreen, UserScreenSize);
   UserScreenSize := SSize;
@@ -73,7 +74,7 @@ constructor TUserSaver.Load(var S: TStream);
   UserScreen := GetMem(SSize);
   OldCursorShape := CShape;
   OldCursorPos := CPos;
-  S.Read(UserScreen^, SSize);
+  Ip.ReadBytes(UserScreen^, SSize);
   Screen := nil;
   isValid := False;
   I := 0;
@@ -88,11 +89,11 @@ destructor TUserSaver.Destroy;
   inherited Destroy;
   end;
 
-procedure TUserSaver.Store(var S: TStream);
+procedure TUserSaver.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(SSize, 4*SizeOf(AInt)+SizeOf(Boolean));
-  S.Write(Screen^, SSize);
+  inherited Write(Os);
+  Os.WriteBytes(SSize, 4*SizeOf(AInt)+SizeOf(Boolean));
+  Os.WriteBytes(Screen^, SSize);
   end;
 
 procedure InsertUserSaver(ACheck: Boolean);

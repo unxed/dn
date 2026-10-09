@@ -11,8 +11,8 @@ type
   {`2 Base type for text shown in the panel title. }
   TTopView = class(TView)
     Panel: TView; //actually TFilePanel
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
     procedure Draw; override;
       {` Text is centered without overlapping the manager
       window control `}
@@ -26,8 +26,10 @@ type
     {`2 Current panel sort indicated by a letter in the top-left corner `}
   TSortView = class(TView)
     Panel: TView; //actually TFilePanel;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     end;
@@ -41,16 +43,17 @@ uses
 const
   CTopView = #11#12;
 
-constructor TTopView.Load(S: TStream);
+function TTopView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Panel);
+  Result := Self;
+  inherited Read(Ip);
+  Panel := Ip.ReadPointer;
   end;
 
-procedure TTopView.Store(S: TStream);
+procedure TTopView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Panel);
+  inherited Write(Os);
+  Os.WritePointer(Panel);
   end;
 
 function TTopView.GetPalette: TPalette;
@@ -95,7 +98,7 @@ procedure TTopView.Draw;
   else { left panel, pin to the window number }
     inc(R.A.X, 4);
   R.B.X := R.A.X + StrCols(S);
-  GetBounds(OldR);
+  OldR := GetBounds;
   if not MemEqual(R, OldR, SizeOf(R)) then
     begin
     Locate(R); { This will recurse, so do not draw a second time }
@@ -111,17 +114,28 @@ procedure TTopView.Draw;
 
 { ---------------------------- TSortView ------------------------------ }
 
-constructor TSortView.Load(S: TStream);
+function TSortView.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Panel);
+  Result := Self;
+  inherited Read(Ip);
+  Panel := Ip.ReadPointer;
   end;
 
-procedure TSortView.Store(S: TStream);
+procedure TSortView.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Panel);
+  inherited Write(Os);
+  Os.WritePointer(Panel);
   end;
+
+class function TSortView.Build: TStreamable;
+begin
+  Result := TSortView.Create(streamableInit);
+end;
+
+function TSortView.StreamableName: ShortString;
+begin
+  Result := 'topview.TSortView';
+end;
 
 {$IFDEF DNUTF8}
 { the bytes of the character of S that starts at P (the sort letters of the language are UTF-8: the Russian ones are two bytes each) }
@@ -155,7 +169,7 @@ procedure TSortView.Draw;
   begin
   if (Size.X <> 1) or (Size.Y <> 1) then
     begin
-    GetBounds(R);
+    R := GetBounds;
     R.B.X := R.A.X;
     Dec(R.A.X);
     R.B.Y := R.A.Y + 1;

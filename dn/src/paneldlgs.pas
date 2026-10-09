@@ -154,7 +154,7 @@ procedure TSelectList.HandleEvent(var Event: TEvent);
   var P: PString absolute P_;
     begin
     if P <> nil then
-      case Char(Event.CharCode) of
+      case Char(Event.KeyDown.CharScan.CharCode) of
         '*':
           if P^[1] = ' ' then
             P^[1] := FMSetup.TagChar[1]
@@ -170,13 +170,13 @@ procedure TSelectList.HandleEvent(var Event: TEvent);
   begin { TSelectList.HandleEvent }
   case Event.What of
     evMouseDown:
-      if Event.Buttons and mbRightButton <> 0 then
+      if Event.Mouse.Buttons and mbRightButton <> 0 then
         begin
         inherited HandleEvent(Event);
         Invert;
         end;
     evKeyDown:
-      case Char(Event.CharCode) of
+      case Char(Event.KeyDown.CharScan.CharCode) of
         ' ':
           begin
           SetDNKeyCode(Event, kbDown);
@@ -274,7 +274,7 @@ procedure TSaveSetupDialg.HandleEvent(var Event: TEvent);
   var
     T: TCheckBoxes;
   begin
-  if (Event.What = evCommand) and (Event.Command = cmSelectAll) then
+  if (Event.What = evCommand) and (Event.Message.Command = cmSelectAll) then
     begin
     T := TCheckBoxes(DirectLink[2]);
     with T do
@@ -357,7 +357,7 @@ procedure TSaveSetupButton.Press;
   begin
   PresetNum := ActivePanel.PresetNum;
   PanelClass := Ord(dt2pc[ActivePanel.Drive.DriveType]);
-  EnableCommands([cmOK]); { The filter dialog may have disabled it }
+  EnableCommands(CommandSetOf([cmOK])); { The filter dialog may have disabled it }
   SavePresetData.ForClass := PanelClass;
   SavePresetData.Target := 1 shl (PresetNum-1);
   @PreExecuteDialog := @PrepareSaveSetupDialog;
@@ -448,7 +448,7 @@ procedure TShowDialog.HandleEvent(var Event: TEvent);
           end;
       end {case};
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmSelectAll:
           begin
           if TaggedDataOnly then
@@ -505,10 +505,10 @@ procedure TExtSelList.SetState(AState: Word; Enable: Boolean);
   begin
   if Enable and (Astate and sfSelected <> 0) then
     begin
-    Owner.EnableCommands([cmYes, cmNo]);
+    Owner.EnableCommands(CommandSetOf([cmYes, cmNo]));
     OkButton.MakeDefault(False);
     AddButton.MakeDefault(True);
-    Owner.DisableCommands([cmOK]);
+    Owner.DisableCommands(CommandSetOf([cmOK]));
     end;
   inherited SetState(AState, Enable);
   end;
@@ -526,10 +526,10 @@ procedure TFilterLine.SetState(AState: Word; Enable: Boolean);
   begin
   if Enable and (Astate and sfSelected <> 0) then
     begin
-    Owner.EnableCommands([cmOK]);
+    Owner.EnableCommands(CommandSetOf([cmOK]));
     AddButton.MakeDefault(False);
     OkButton.MakeDefault(True);
-    Owner.DisableCommands([cmYes, cmNo]);
+    Owner.DisableCommands(CommandSetOf([cmYes, cmNo]));
     end;
   inherited SetState(AState, Enable);
   end;
@@ -541,7 +541,7 @@ function TFilterDialog.OwnDataAddress(P: PPanelSetup): Pointer;
 
 destructor TFilterDialog.Destroy;
   begin
-  EnableCommands([cmOK, cmYes, cmNo]);
+  EnableCommands(CommandSetOf([cmOK, cmYes, cmNo]));
   inherited Destroy;
   end;
 
@@ -923,7 +923,7 @@ procedure CM_CopyFiles(AFP: Pointer; MoveMode, Single: Boolean);
   if FC = nil then
     Exit;
   P.Drive.CopyFiles(FC, P, MoveMode);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   end;
 
@@ -1109,7 +1109,7 @@ procedure CM_EraseFiles(AFP: Pointer; Single: Boolean);
   if  (FC = nil) or (P.Drive = nil) then
     Exit;
   P.Drive.EraseFiles(FC);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   P.RedrawPanelInfoDir;
   P.SendLocated;
@@ -1134,7 +1134,7 @@ procedure CM_MakeList(AFP: Pointer);
   if FC = nil then
     Exit;
   MakeListFile(P, FC);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   P.RedrawPanelInfoDir;
   end { CM_MakeList };
@@ -1302,7 +1302,7 @@ CurTime:
       (*  works, but crashes after the nth time
  cmSkip:
       begin
-       Dlg.EnableCommands([cmYes, cmNo]);
+       Dlg.EnableCommands(CommandSetOf([cmYes, cmNo]));
        Dlg.Free;
        NotifyResume; {Cat}
        MessageKey(Application, kbDown);
@@ -1313,7 +1313,7 @@ CurTime:
       cmCancel:
         begin
         
-        Dlg.EnableCommands([cmYes, cmNo]);
+        Dlg.EnableCommands(CommandSetOf([cmYes, cmNo]));
         
         Dlg.Free;
         NotifyResume; {Cat}
@@ -1322,7 +1322,7 @@ CurTime:
     end {case};
     Dlg.GetData(D);
     
-    Dlg.EnableCommands([cmYes, cmNo]);
+    Dlg.EnableCommands(CommandSetOf([cmYes, cmNo]));
     
     Dlg.Free;
     D.C := {39}$FF;
@@ -1438,7 +1438,7 @@ CurTime:
 
     end;
 
-  R.Assign(1, 1, 26, 8);
+  R := TRect.Create(1, 1, 26, 8);
   PInfo := TWhileView.Create(R);
   PInfo.Top := GetString(dlSetAttr);
   PInfo.Bottom := '';
@@ -1630,7 +1630,7 @@ procedure CM_SetShowParms(AFP: Pointer);
        (Drive.DizOwner = '')
     then
       Drive.ReadDescrptions(Files);;
-    GetBounds(R);
+    R := GetBounds;
     R.A.Y := 1;
     R.B.Y := Owner.Size.Y-1;
     ChangeBounds(R);
@@ -1650,7 +1650,7 @@ procedure CM_CopyTemp(AFP: Pointer);
   if FC = nil then
     Exit;
   GlobalEvent(evBroadcast, cmCopyToTemp, @C);
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   end;
 
@@ -1679,7 +1679,7 @@ procedure CM_ArchiveFiles(AFP: Pointer);
   lFSplit(S, Dir, Name, Ext); {AK155: not sure this is needed }
   MakeArchive(Name, PC, False, False, P);
   {/Cat}
-  PC.DeleteAll;
+  PC.RemoveAll;
   end { CM_ArchiveFiles };
 {-DataCompBoy-}
 
@@ -1793,13 +1793,13 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
 
   begin
   {Application.BFSpeed;}
-  Desktop.MakeLocal(P^, R.A);
+  R.A := Desktop.MakeLocal(P^);
   Mover := TDragger.Create(R, Text);
   Desktop.Insert(Mover);
-  Desktop.GetExtent(R);
-  Event.Where := P^;
+  R := Desktop.GetExtent;
+  Event.Mouse.Where := P^;
   Event.What := evMouseDown;
-  Event.Buttons := mbLeftButton;
+  Event.Mouse.Buttons := mbLeftButton;
   SetEventDouble(Event, False);
   Mover.DragView(Event, dmDragMove, R, Mover.Size, Mover.Size);
   R.A := Mover.Origin;
@@ -1809,7 +1809,7 @@ procedure DragMover(AP: Pointer; Text: String; AFC, AC: Pointer);
     during dragging; see TView.DragView}
     begin
     C^.FC := FC;
-    Desktop.MakeGlobal(R.A, R.A);
+    R.A := Desktop.MakeGlobal(R.A);
     C^.Where := R.A;
     Message(Desktop.FirstThat(ContainsMouse), evBroadcast, cmDropped, C);
     end;
@@ -1873,7 +1873,7 @@ procedure CM_DragDropper(AFP: Pointer; CurPos: Integer; EV: Pointer);
     S := Cut(PFileRec(FC.At(0)).FlName[uLfn], 20)
   else
     S := ItoS(FC.Count)+GetString(dlSelectedFiles);
-  DragMover(@TEvent(EV^).Where, S, FC, @C);
+  DragMover(@TEvent(EV^).Mouse.Where, S, FC, @C);
   end { CM_DragDropper };
 
 procedure CM_Dropped(AFP, EI: Pointer);
@@ -1891,7 +1891,7 @@ procedure CM_Dropped(AFP, EI: Pointer);
   else
     RevertBar := False;
   MPos := PCopyRec(EI).Where;
-  P.MakeLocal(MPos, MPos);
+  MPos := P.MakeLocal(MPos);
   ColumnTitles := (P.Pansetup.Show.MiscOptions and 2) <> 0;
   I := P.Delta+(MPos.X div P.LineLength)
         *(P.Size.Y-Byte(ColumnTitles))
@@ -1924,8 +1924,8 @@ procedure CM_Dropped(AFP, EI: Pointer);
       Exit;
       end;
     Ev.What := evBroadcast;
-    Ev.Command := cmUnArchive;
-    Ev.InfoPtr := EI;
+    Ev.Message.Command := cmUnArchive;
+    Ev.Message.InfoPtr := EI;
     PCopyRec(EI).Owner.HandleEvent(Ev);
     if Ev.What = evNothing then
       Exit;
@@ -2039,14 +2039,14 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
   
   if  (P.PanSetup.Show.ColumnsMask and psLFN_InColumns = 0)
   then
-    R.Assign(0, 0, 13, 1)
+    R := TRect.Create(0, 0, 13, 1)
   else
     
    if (P.LFNLen < 250)
   then
-    R.Assign(0, 0, P.LFNLen+1, 1)
+    R := TRect.Create(0, 0, P.LFNLen+1, 1)
   else
-    R.Assign(P.CalcLengthWithoutName, 0, 255, 1);
+    R := TRect.Create(P.CalcLengthWithoutName, 0, 255, 1);
   R.Move(P.LastCurPos.X, P.LastCurPos.Y);
   R.Move(P.Origin.X, 0);
   Dec(R.A.X);
@@ -2116,7 +2116,7 @@ procedure CM_RenameSingleL(AFP, PEV: Pointer);
       }
       Event^.What := evKeyDown;
       SetDNKeyCode(Event^, DlgRes);
-      Event^.InfoPtr := nil;
+      Event^.Message.InfoPtr := nil;
       P.PutEvent(Event^);
       end;
 *)
@@ -2253,10 +2253,10 @@ procedure CM_SortBy(AFP: Pointer);
   Menu^.Default := DefPM;
 
   W := 16;
-  Desktop.GetExtent(R);
+  R := Desktop.GetExtent;
   R.A := P.Origin;
-  P.Owner.MakeGlobal(R.A, R.A);
-  Desktop.MakeLocal(R.A, R.A);
+  R.A := P.Owner.MakeGlobal(R.A);
+  R.A := Desktop.MakeLocal(R.A);
   if R.A.X < 0 then
     R.A.X := 0
   else if R.A.X+W > R.B.X then
@@ -2601,7 +2601,7 @@ procedure CM_ChangeCase(AFP: Pointer);
 
   if ExecResource(dlgNameCase, ChangeNamesCaseOptions) = cmCancel then
     begin
-    FC.DeleteAll;
+    FC.RemoveAll;
     FC.Free;
     Exit;
     end;
@@ -2615,7 +2615,7 @@ procedure CM_ChangeCase(AFP: Pointer);
        and (ChangeNamesCaseOptions.ext = 0)
   then
     begin
-    FC.DeleteAll;
+    FC.RemoveAll;
     FC.Free;
     Exit;
     end;
@@ -2650,7 +2650,7 @@ procedure CM_ChangeCase(AFP: Pointer);
       Exit;
   end {case};
 
-  R.Assign(0, 0, 20, 7);
+  R := TRect.Create(0, 0, 20, 7);
   Info := TWhileView.Create(R);
   Info.Write(1, Copy(GetString(dlPleaseStandBy), 4, MaxStringLength));
   Desktop.Insert(Info);
@@ -2660,7 +2660,7 @@ procedure CM_ChangeCase(AFP: Pointer);
   Abort := False;
   MessageL(P, evCommand, cmPanelReread, 0);
   Info.Free;
-  FC.DeleteAll;
+  FC.RemoveAll;
   FC.Free;
   end { CM_ChangeCase };
 
@@ -2746,10 +2746,10 @@ procedure CM_SelectColumn(AFP: Pointer); {JO}
 
   N := 9;
   W := 15;
-  Desktop.GetExtent(R);
+  R := Desktop.GetExtent;
   R.A := P.Origin;
-  P.Owner.MakeGlobal(R.A, R.A);
-  Desktop.MakeLocal(R.A, R.A);
+  R.A := P.Owner.MakeGlobal(R.A);
+  R.A := Desktop.MakeLocal(R.A);
   if R.A.X < 0 then
     R.A.X := 0
   else if R.A.X+W > R.B.X then

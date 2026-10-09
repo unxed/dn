@@ -81,9 +81,11 @@ type
       { File panel this info panel is linked to }
     DriveView: TDriveView;
       { Drive/share in the upper frame. See InsertDriveView and Done }
-    constructor Create(R: TRect; Panel: TView{TFilePanelRoot});
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    constructor Create(R: TRect; Panel: TView{TFilePanelRoot}); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure InsertDriveView;
       { For disk info create DriveView and insert into Owner }
     procedure ReadData;
@@ -98,6 +100,8 @@ type
     InfoPanel: TDiskInfo;
     function GetText(MaxWidth: Integer): String; override;
     destructor Destroy; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 function CountDirLen(const Dir: String; Recurse: Boolean;
@@ -303,19 +307,30 @@ procedure DispInfo(var Info: TDiskInfoRec);
   FillChar(Info, SizeOf(Info), 0);
   end { DispInfo };
 
-constructor TDiskInfo.Load(S: TStream);
+function TDiskInfo.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  S.Read(Delta, SizeOf(Delta));
-  GetPeerViewPtr(S, DriveView);
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(Delta, SizeOf(Delta));
+  DriveView := Ip.ReadPointer;
   end;
 
-procedure TDiskInfo.Store(S: TStream);
+procedure TDiskInfo.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(Delta, SizeOf(Delta));
-  PutPeerViewPtr(S, DriveView);
+  inherited Write(Os);
+  Os.WriteBytes(Delta, SizeOf(Delta));
+  Os.WritePointer(DriveView);
   end;
+
+class function TDiskInfo.Build: TStreamable;
+begin
+  Result := TDiskInfo.Create(streamableInit);
+end;
+
+function TDiskInfo.StreamableName: ShortString;
+begin
+  Result := 'DiskInfo.TDiskInfo';
+end;
 
 constructor TDiskInfo.Create(R: TRect; Panel: TView);
   begin
@@ -335,7 +350,7 @@ procedure TDiskInfo.InsertDriveView;
     { Such analysis is very ugly; it would be better to virtualize
     the info-panel header the way its contents are virtualized }
 
-  R.Assign(0, Origin.Y-1, 0, Origin.Y);
+  R := TRect.Create(0, Origin.Y-1, 0, Origin.Y);
     { On Y - onto the frame, and DriveView.Draw handles X each time }
   DriveView := TDriveView.Create(R);
   DriveView.Panel := Self;
@@ -384,7 +399,7 @@ procedure TDiskInfo.ReadData;
   Abort := False;
   with TFilePanelRoot(OtherPanel) do
     Drive.GetDirInfo(Info);
-  Delta.Assign(0, 0);
+  Delta := Point(0, 0);
   end;
 
 procedure TDiskInfo.HandleEvent(var Event: TEvent);
@@ -436,7 +451,7 @@ procedure TDiskInfo.HandleEvent(var Event: TEvent);
         end;
     end
   else if (Event.What = evCommand) then
-    case Event.Command of
+    case Event.Message.Command of
       cmEditFile:
         begin
         ClearEvent(Event);
@@ -460,7 +475,7 @@ procedure TDiskInfo.HandleEvent(var Event: TEvent);
       cmInfoPresent:
         begin
         ClearEvent(Event);
-        Event.InfoPtr := Owner
+        Event.Message.InfoPtr := Owner
         end;
       cmRereadInfo:
         begin
@@ -831,5 +846,16 @@ procedure ReadDiskInfo(Dr: String; var B: TDiskInfoRec);
     B.FileSys := NewStr(GetString(dlDIFileSys) + FileSys+'~');
   end { ReadDiskInfo };
 {-DataCompBoy-}
+
+
+class function TDriveView.Build: TStreamable;
+begin
+  Result := TDriveView.Create(streamableInit);
+end;
+
+function TDriveView.StreamableName: ShortString;
+begin
+  Result := 'DiskInfo.TDriveView';
+end;
 
 end.

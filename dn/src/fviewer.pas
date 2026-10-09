@@ -79,6 +79,8 @@ type
     procedure Draw; override;
     function GetSize: Integer;
     procedure DrawPos(Pos: Integer);
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   { TFileViewer }
@@ -127,9 +129,11 @@ type
     HiLitePar: THighliteParams;
     constructor Create(const Bounds: TRect; AStream: TStream;
         const AFileName, AVFileName: String;
-        ASB: TView; Quick, Hex: Boolean); {DataCompBoy}
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+        ASB: TView; Quick, Hex: Boolean); overload; {DataCompBoy}
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     destructor Destroy; override;
     procedure Draw; override;
     function ReadFile(const FName, VFName: String; NewStream: Boolean)
@@ -168,6 +172,8 @@ type
     {`2 Quick View`}
   TQFileViewer = class(THFileViewer)
     procedure ChangeFile(FR: PFileRec); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TDFileViewer = class;
@@ -176,6 +182,8 @@ type
   TDFileViewer = class(THFileViewer)
     procedure HandleEvent(var Event: TEvent); override;
     procedure ChangeFile(FR: PFileRec); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
   TNFileViewer = class;
@@ -188,9 +196,11 @@ type
   TViewInfo = class;
   TViewInfo = class(TView)
     Viewer: TFileViewer;
-    constructor Create(const R: TRect; AViewer: TFileViewer);
-    constructor Load(S: TStream);
-    procedure Store(S: TStream); override;
+    constructor Create(const R: TRect; AViewer: TFileViewer); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure Draw; override;
     procedure HandleEvent(var Event: TEvent); override;
     end;
@@ -198,11 +208,13 @@ type
   TFileWindow = class;
 
   TFileWindow = class(TWindow)
-    constructor Create(const FileName, VFileName: String; Hex: Boolean);
+    constructor Create(const FileName, VFileName: String; Hex: Boolean); overload;
     {DataCompBoy}
     function GetPalette: TPalette; override;
     function ReactOnCmd: Boolean; virtual;
     procedure ChangeBounds(const Bounds: TRect); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
@@ -319,7 +331,7 @@ function SearchFileStr( F: TStream; var XLAT: TXlat; const What: String; Pos: TF
   StDelta := 0;
   if Display then
     begin
-    R.Assign(1, 1, 30, 9);
+    R := TRect.Create(1, 1, 30, 9);
     Info := TWhileView.Create(R);
     Info.Top := GetString(dlSearching)+' "'+Cut(SearchString.What, 40)
       +'"';
@@ -450,17 +462,28 @@ constructor TViewInfo.Create(const R: TRect; AViewer: TFileViewer);
   EventMask := evMouse;
   end;
 
-constructor TViewInfo.Load(S: TStream);
+function TViewInfo.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  GetPeerViewPtr(S, Viewer);
+  Result := Self;
+  inherited Read(Ip);
+  Viewer := Ip.ReadPointer;
   end;
 
-procedure TViewInfo.Store(S: TStream);
+procedure TViewInfo.Write(Os: opstream);
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, Viewer);
+  inherited Write(Os);
+  Os.WritePointer(Viewer);
   end;
+
+class function TViewInfo.Build: TStreamable;
+begin
+  Result := TViewInfo.Create(streamableInit);
+end;
+
+function TViewInfo.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TViewInfo';
+end;
 
 procedure TViewInfo.Draw;
   var
@@ -573,7 +596,7 @@ procedure TViewInfo.HandleEvent(var Event: TEvent);
   if  (Event.What = evMouseDown) then
     with Viewer do
       begin
-      Self.MakeLocal(Event.Where, P);
+      P := Self.MakeLocal(Event.Mouse.Where);
       if  (ViewMode = vmHex) then
         begin
         if P.X < 3*HexPos+9+3 then
@@ -592,16 +615,16 @@ procedure TViewInfo.HandleEvent(var Event: TEvent);
         else if P.X < 22 then
           begin
           BookMark := P.X-13;
-          if  (Event.Buttons and mbRightButton <> 0) or
+          if  (Event.Mouse.Buttons and mbRightButton <> 0) or
               (MarkPos[BookMark+1].Y <> -1)
           then
             with Ev do
               begin
               What := evCommand;
-              if  (Event.Buttons and mbRightButton <> 0) then
-                Command := cmPlaceMarker1+BookMark
+              if  (Event.Mouse.Buttons and mbRightButton <> 0) then
+                Message.Command := cmPlaceMarker1+BookMark
               else
-                Command := cmGoToMarker1+BookMark;
+                Message.Command := cmGoToMarker1+BookMark;
               PutEvent(Ev);
               end;
           end
@@ -621,16 +644,16 @@ procedure TViewInfo.HandleEvent(var Event: TEvent);
         else if P.X < 16 then
           begin
           BookMark := P.X-7;
-          if  (Event.Buttons and mbRightButton <> 0) or
+          if  (Event.Mouse.Buttons and mbRightButton <> 0) or
               (MarkPos[BookMark+1].Y <> -1)
           then
             with Ev do
               begin
               What := evCommand;
-              if  (Event.Buttons and mbRightButton <> 0) then
-                Command := cmPlaceMarker1+BookMark
+              if  (Event.Mouse.Buttons and mbRightButton <> 0) then
+                Message.Command := cmPlaceMarker1+BookMark
               else
-                Command := cmGoToMarker1+BookMark;
+                Message.Command := cmGoToMarker1+BookMark;
               PutEvent(Ev);
               end;
           end
@@ -800,10 +823,10 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   case Event.What of
     evCommand:
-      case Event.Command of
+      case Event.Message.Command of
         cmChangeValue:
           begin
-          Value := PComp(Event.InfoPtr)^;
+          Value := PComp(Event.Message.InfoPtr)^;
           DrawView;
           ClearEvent(Event)
           end;
@@ -813,15 +836,15 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
       if MaxV > 0 then
         begin
 
-        MakeLocal(Event.Where, P);
-        GetExtent(Extent);
+        P := MakeLocal(Event.Mouse.Where);
+        Extent := GetExtent;
         {if (Value * (Size.Y-3)) div MaxV + 1 = P.Y then}
         if GetPartCode = P.Y then
           {JO}
           begin
           RD := P.Y;
           repeat
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             Tracking := Extent.Contains(P);
             if Tracking then
               begin
@@ -849,14 +872,14 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
           Exit;
           end;
 
-        MakeLocal(Event.Where, P);
+        P := MakeLocal(Event.Mouse.Where);
         RD := RepeatDelay;
         RepeatDelay := 0;
         SP := GetPartCode;
         if P.Y = 0 then
           begin
           repeat
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y >= -1)
                  and (P.Y <= 1)
             then
@@ -866,7 +889,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
         else if P.Y = Size.Y-1 then
           begin
           repeat
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y >= Size.Y-2)
                  and (P.Y <= Size.Y)
             then
@@ -878,7 +901,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
           RepeatDelay := RD;
           repeat
             GetPartCode;
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y < SP) then
               MessageKey(Owner, kbPgUp);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
@@ -888,7 +911,7 @@ procedure TViewScroll.HandleEvent(var Event: TEvent);
           RepeatDelay := RD;
           repeat
             GetPartCode;
-            MakeLocal(Event.Where, P);
+            P := MakeLocal(Event.Mouse.Where);
             if  (P.X >= -1) and (P.X <= 1) and (P.Y > SP) then
               MessageKey(Owner, kbPgDn);
           until not MouseEvent(Event, evMouseMove+evMouseAuto);
@@ -933,9 +956,9 @@ procedure TViewScroll.Draw;
   C2 := GetColorW(2);
   MoveGlyph(B1[0], glShadeMedium, C1, Size.Y);
   i := GetPartCode;
-  B1[i] := CellFromBIOS(254+LongInt(C2*256));
-  B1[0] := CellFromBIOS(30+LongInt(C2*256));
-  B1[Size.Y-1] := CellFromBIOS(31+LongInt(C2*256));
+  B1[i] := TScreenCell(Word(254+LongInt(C2*256)));
+  B1[0] := TScreenCell(Word(30+LongInt(C2*256)));
+  B1[Size.Y-1] := TScreenCell(Word(31+LongInt(C2*256)));
   WriteBufC(0, 0, 1, Size.Y, B1);
   end;
 
@@ -990,7 +1013,7 @@ procedure TDFileViewer.ChangeFile(FR: PFileRec);
 
 procedure TDFileViewer.HandleEvent(var Event: TEvent);
   begin
-  if (Event.What = evCommand) and (Event.Command = cmFileEdit) then
+  if (Event.What = evCommand) and (Event.Message.Command = cmFileEdit) then
     begin
    {! AK155 10.01.05 The jump-to-editor command in the description
     viewer panel is probably sensible. We should actually
@@ -1119,7 +1142,7 @@ constructor TFileViewer.Create(const Bounds: TRect; AStream: TStream;
 
 destructor TFileViewer.Destroy;
   begin
-  EnableCommands([cmUnWrap]);
+  EnableCommands(CommandSetOf([cmUnWrap]));
   if Buf <> nil then
     FreeMem(Buf, BufSize);
   Buf := nil;
@@ -1137,29 +1160,31 @@ destructor TFileViewer.Destroy;
   inherited Destroy;
   end;
 
-constructor TFileViewer.Load(S: TStream);
+function TFileViewer.Read(Ip: ipstream): Pointer;
   var
     FP: TFileSize;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   NoEdit := False;
   BufModified := False;
-  GetPeerViewPtr(S, SB);
-  GetPeerViewPtr(S, Info);
-  S.ReadStrV(FileName);
-  {S.Read(FileName[0], 1); S.Read(FileName[1], Length(FileName));}
-  S.ReadStrV(VFileName);
-  {S.Read(VFileName[0], 1); S.Read(VFileName[1], Length(VFileName));}
-  S.Read(FP, SizeOf(FP));
-  S.Read(QuickView, 1);
-  S.Read(Wrap, 1);
+  SB := Ip.ReadPointer;
+  Info := Ip.ReadPointer;
+  ReadStrV(Ip, FileName);
+  {Ip.ReadBytes(FileName[0], 1); Ip.ReadBytes(FileName[1], Length(FileName));}
+  ReadStrV(Ip, VFileName);
+  {Ip.ReadBytes(VFileName[0], 1); Ip.ReadBytes(VFileName[1], Length(VFileName));}
+  Ip.ReadBytes(FP, SizeOf(FP));
+  Ip.ReadBytes(QuickView, 1);
+  Ip.ReadBytes(Wrap, 1);
   {???}
-  S.Read(FakeKillAfterUse, 1);
+  Ip.ReadBytes(FakeKillAfterUse, 1);
   KillAfterUse := False;
-  S.Read(Filter, 1);
-  S.Read(ViewMode, 2);
-  XCoder := TXCoder.Load(S);   { a class: the constructor makes the instance }
-  S.Read(MarkPos, SizeOf(MarkPos));
+  Ip.ReadBytes(Filter, 1);
+  Ip.ReadBytes(ViewMode, 2);
+  XCoder := TXCoder.Create(8);
+  XCoder.Read(Ip);
+  Ip.ReadBytes(MarkPos, SizeOf(MarkPos));
   Fl := nil;
   Buf := nil;
   isValid := True;
@@ -1181,24 +1206,34 @@ constructor TFileViewer.Load(S: TStream);
     end;
   end { TFileViewer.Load };
 
-procedure TFileViewer.Store;
+class function TFileViewer.Build: TStreamable;
+begin
+  Result := TFileViewer.Create(streamableInit);
+end;
+
+function TFileViewer.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TFileViewer';
+end;
+
+procedure TFileViewer.Write(Os: opstream);
   var
     FP: TFileSize;
   begin
-  inherited Store(S);
-  PutPeerViewPtr(S, SB);
-  PutPeerViewPtr(S, Info);
-  S.WriteStr(@FileName); {S.Write(FileName[0], 1 + Length(FileName));}
-  S.WriteStr(@VFileName); {S.Write(VFileName[0], 1 + Length(VFileName));}
+  inherited Write(Os);
+  Os.WritePointer(SB);
+  Os.WritePointer(Info);
+  Os.WriteString(@FileName); {Os.WriteBytes(FileName[0], 1 + Length(FileName));}
+  Os.WriteString(@VFileName); {Os.WriteBytes(VFileName[0], 1 + Length(VFileName));}
   FP := FilePos+LongInt(BufPos);
-  S.Write(FP, SizeOf(FP));
-  S.Write(QuickView, 1);
-  S.Write(Wrap, 1);
-  S.Write(FakeKillAfterUse, 1);
-  S.Write(Filter, 1);
-  S.Write(ViewMode, 2);
-  XCoder.Store(S);
-  S.Write(MarkPos, SizeOf(MarkPos));
+  Os.WriteBytes(FP, SizeOf(FP));
+  Os.WriteBytes(QuickView, 1);
+  Os.WriteBytes(Wrap, 1);
+  Os.WriteBytes(FakeKillAfterUse, 1);
+  Os.WriteBytes(Filter, 1);
+  Os.WriteBytes(ViewMode, 2);
+  XCoder.Write(Os);
+  Os.WriteBytes(MarkPos, SizeOf(MarkPos));
   end;
 
 procedure XDumpStr(var S: String; var B; Addr: Int64; Count: Integer;
@@ -1309,7 +1344,7 @@ procedure TFileViewer.Draw;
   case ViewMode of
     vmHex:
       begin
-      DisableCommands([cmUnWrap]);
+      DisableCommands(CommandSetOf([cmUnWrap]));
       HexPos := (Size.X-12) div 4;
       if HexPos <= 0 then
         HexPos := 1;
@@ -1439,7 +1474,7 @@ procedure TFileViewer.Draw;
       end;
     vmDump:
       begin
-      DisableCommands([cmUnWrap]);
+      DisableCommands(CommandSetOf([cmUnWrap]));
       HideCursor;
       HexPos := ((Size.X-10) div 16)*16;
       if HexPos < 16 then
@@ -1490,7 +1525,7 @@ procedure TFileViewer.Draw;
     {GRM!}
     vmAsm:
       begin
-      DisableCommands([cmUnWrap]);
+      DisableCommands(CommandSetOf([cmUnWrap]));
       XDelta := 0;
       L := FilePos+LongInt(BufPos);
       D.MemBuff := Buf;
@@ -1532,7 +1567,7 @@ procedure TFileViewer.Draw;
     else {case}
       begin {vmText}
       ExposedLine := 0;
-      EnableCommands([cmUnWrap]);
+      EnableCommands(CommandSetOf([cmUnWrap]));
       {ak155        HideCursor;}
       { possibly shift XDelta so the found text becomes visible,
 and determine its X-position (accounting for tabs) for later highlighting }
@@ -2061,9 +2096,9 @@ procedure TFileViewer.SeekBof;
   Seek(0);
   if ViewMode = vmAsm
   then
-    Cur.Assign(10, 0)
+    Cur := Point(10, 0)
   else
-    Cur.Assign(0, 0);
+    Cur := Point(0, 0);
   XDelta := 0;
   DrawView
   end;
@@ -2381,10 +2416,10 @@ procedure TFileViewer.HandleEvent;
       end;
     case Event.What of
       evBroadcast:
-        case Event.Command of
+        case Event.Message.Command of
           cmFindView:
-            if  (PString(Event.InfoPtr)^ = FileName) or
-                (PString(Event.InfoPtr)^ = VFileName)
+            if  (PString(Event.Message.InfoPtr)^ = FileName) or
+                (PString(Event.Message.InfoPtr)^ = VFileName)
             then
               if (Owner <> nil) and not QuickView then
                 begin
@@ -2404,7 +2439,7 @@ DoSave:
                 end;
           cmReleaseFile:
             begin
-            if UpStrg(FileName) = UpStrg(PString(Event.InfoPtr)^) then
+            if UpStrg(FileName) = UpStrg(PString(Event.Message.InfoPtr)^) then
               begin
               ReadFile('', '', True);
               {if not QuickView then Message(Owner, evCommand, cmClose, nil);}
@@ -2412,7 +2447,7 @@ DoSave:
             end;
         end {case};
       evCommand:
-        case Event.Command of
+        case Event.Message.Command of
           cmFileEdit:
             if DelSpaces(FileName) <> '' then
               begin
@@ -2443,7 +2478,7 @@ DoSave:
               end;
           cmPlaceMarker1..cmPlaceMarker9:
             begin
-            I := Event.Command-cmPlaceMarker1+1;
+            I := Event.Message.Command-cmPlaceMarker1+1;
             if  (I >= 1) and (I <= 9) then
               begin
               with MarkPos[I] do
@@ -2469,7 +2504,7 @@ DoSave:
             end;
           cmGoToMarker1..cmGoToMarker9:
             begin
-            I := Event.Command-cmGoToMarker1+1;
+            I := Event.Message.Command-cmGoToMarker1+1;
             if  (I >= 1) and (I <= 9) and (MarkPos[I].Y <> -1) then
               begin
               Cur.X := MarkPos[I].X mod 256;
@@ -2507,7 +2542,7 @@ DoSave:
               if (I <> 0) or (ALLR < 0) then
                 Exit;
               ALFR := ALLR;
-              Cur.Assign(0, 0);
+              Cur := Point(0, 0);
               {JO} 
               if ViewMode <> vmAsm then
                 begin
@@ -2550,13 +2585,13 @@ DoSave:
           cmGetName:
             if VFileName <> ''
             then
-              PString(Event.InfoPtr)^:= GetString(dlViewFile)+' - '+
+              PString(Event.Message.InfoPtr)^:= GetString(dlViewFile)+' - '+
                 (VFileName)
             else
-              PString(Event.InfoPtr)^:= GetString(dlViewFile);
+              PString(Event.Message.InfoPtr)^:= GetString(dlViewFile);
           cmLoadViewFile:
             begin
-            ChangeFile(Event.InfoPtr);
+            ChangeFile(Event.Message.InfoPtr);
             CE;
             end;
           cmClose, cmQuit, cmKillUsed:
@@ -2570,7 +2605,7 @@ DoSave:
           cmReverseSearch,
           cmContinueSearch:
             begin
-            ContinueSearch(Event.Command = cmReverseSearch);
+            ContinueSearch(Event.Message.Command = cmReverseSearch);
             CE
             end;
           cmHexMode:
@@ -2637,8 +2672,8 @@ DoSave:
           cmScrollBarChanged:
             begin
             Desktop.Lock;
-            Seek(PComp(Event.InfoPtr)^);
-            if  (ViewMode = vmText) and (Event.InfoLong <> 0) then
+            Seek(PComp(Event.Message.InfoPtr)^);
+            if  (ViewMode = vmText) and (Event.Message.InfoLong <> 0) then
               begin
               { move to the start of the line, but so
                  as not to shift the cursor slider upward }
@@ -2958,18 +2993,18 @@ DoSave:
 KBCheck:
               if Event.What <> evNothing then
                 begin
-                if  (Char(Event.CharCode) = #11) and not CtrlK then
+                if  (Char(Event.KeyDown.CharScan.CharCode) = #11) and not CtrlK then
                   begin
                   CtrlK := True;
                   CE;
                   end
                 else if CtrlK then
                   begin
-                  Ch := Char(Event.CharCode);
+                  Ch := Char(Event.KeyDown.CharScan.CharCode);
                   if  (Ch >= '1') and (Ch <= '9') then
                     begin
                     Event.What := evCommand;
-                    Event.Command := cmPlaceMarker1+Ord(Ch)-Ord('1');
+                    Event.Message.Command := cmPlaceMarker1+Ord(Ch)-Ord('1');
                     PutEvent(Event);
                     end;
                   CtrlK := False;
@@ -2984,41 +3019,41 @@ KBCheck:
                  //    for jumping to bookmarks
                     
                     kbAlt1:
-                      Event.Command := cmPlaceMarker1;
+                      Event.Message.Command := cmPlaceMarker1;
                     kbAlt2:
-                      Event.Command := cmPlaceMarker2;
+                      Event.Message.Command := cmPlaceMarker2;
                     kbAlt3:
-                      Event.Command := cmPlaceMarker3;
+                      Event.Message.Command := cmPlaceMarker3;
                     kbAlt4:
-                      Event.Command := cmPlaceMarker4;
+                      Event.Message.Command := cmPlaceMarker4;
                     kbAlt5:
-                      Event.Command := cmPlaceMarker5;
+                      Event.Message.Command := cmPlaceMarker5;
                     kbAlt6:
-                      Event.Command := cmPlaceMarker6;
+                      Event.Message.Command := cmPlaceMarker6;
                     kbAlt7:
-                      Event.Command := cmPlaceMarker7;
+                      Event.Message.Command := cmPlaceMarker7;
                     kbAlt8:
-                      Event.Command := cmPlaceMarker8;
+                      Event.Message.Command := cmPlaceMarker8;
                     kbAlt9:
-                      Event.Command := cmPlaceMarker9;
+                      Event.Message.Command := cmPlaceMarker9;
                     kbCtrl1:
-                      Event.Command := cmGoToMarker1;
+                      Event.Message.Command := cmGoToMarker1;
                     kbCtrl2:
-                      Event.Command := cmGoToMarker2;
+                      Event.Message.Command := cmGoToMarker2;
                     kbCtrl3:
-                      Event.Command := cmGoToMarker3;
+                      Event.Message.Command := cmGoToMarker3;
                     kbCtrl4:
-                      Event.Command := cmGoToMarker4;
+                      Event.Message.Command := cmGoToMarker4;
                     kbCtrl5:
-                      Event.Command := cmGoToMarker5;
+                      Event.Message.Command := cmGoToMarker5;
                     kbCtrl6:
-                      Event.Command := cmGoToMarker6;
+                      Event.Message.Command := cmGoToMarker6;
                     kbCtrl7:
-                      Event.Command := cmGoToMarker7;
+                      Event.Message.Command := cmGoToMarker7;
                     kbCtrl8:
-                      Event.Command := cmGoToMarker8;
+                      Event.Message.Command := cmGoToMarker8;
                     kbCtrl9:
-                      Event.Command := cmGoToMarker9;
+                      Event.Message.Command := cmGoToMarker9;
                     else {case}
                       goto NotKb;
                   end {case};
@@ -3028,24 +3063,24 @@ KBCheck:
                   Exit;
                   end;
 NotKb:
-                if  (Char(Event.CharCode) = #17) and not CtrlQ then
+                if  (Char(Event.KeyDown.CharScan.CharCode) = #17) and not CtrlQ then
                   begin
                   CtrlQ := True;
                   CE;
                   end
                 else if CtrlQ then
                   begin
-                  Ch := Char(Event.CharCode);
+                  Ch := Char(Event.KeyDown.CharScan.CharCode);
                   if  (Ch >= '1') and (Ch <= '9') then
                     begin
                     Event.What := evCommand;
-                    Event.Command := cmGoToMarker1+Ord(Ch)-Ord('1');
+                    Event.Message.Command := cmGoToMarker1+Ord(Ch)-Ord('1');
                     PutEvent(Event);
                     end;
                   CtrlQ := False;
                   CE;
                   end
-                else if (Char(Event.CharCode) >= #32) and not NoEdit then
+                else if (Char(Event.KeyDown.CharScan.CharCode) >= #32) and not NoEdit then
                   begin
                   {GRM!}
                   if  ( (ViewMode = vmHex) and (Buf <> nil) and
@@ -3079,11 +3114,11 @@ NotKb:
                       end;
                     if HexEdit then
                       begin
-                      Event.CharCode := Byte(UpCase(Char(Event.CharCode)));
-                      if Char(Event.CharCode) in ['A'..'F', '0'..'9'] then
+                      Event.KeyDown.CharScan.CharCode := Byte(UpCase(Char(Event.KeyDown.CharScan.CharCode)));
+                      if Char(Event.KeyDown.CharScan.CharCode) in ['A'..'F', '0'..'9'] then
                         begin
                         BufModified := True;
-                        I := PosChar(Char(Event.CharCode), HexStr)-1;
+                        I := PosChar(Char(Event.KeyDown.CharScan.CharCode), HexStr)-1;
                         
                         if  (ViewMode <> vmAsm) then
                           {JO}
@@ -3115,9 +3150,9 @@ NotKb:
                     else
                       begin
                       BufModified := True;
-                      Event.CharCode := Byte(XCoder.XLatCP[FromAscii][Char(Event.CharCode)]);
+                      Event.KeyDown.CharScan.CharCode := Byte(XCoder.XLatCP[FromAscii][Char(Event.KeyDown.CharScan.CharCode)]);
                       Char(Buf^[Cur.X+Cur.Y*HexPos+BufPos])
-                         := Char(Event.CharCode);
+                         := Char(Event.KeyDown.CharScan.CharCode);
                       MessageKey(Self, kbRight);
                       CE
                       end;
@@ -3130,11 +3165,11 @@ NotKb:
         LR := RepeatDelay;
         LLR := AutoRepeat;
         repeat
-          MakeLocal(Event.Where, P);
+          P := MakeLocal(Event.Mouse.Where);
           I := Abs((Size.Y shr 1)-P.Y);
           if I = 0 then
             RepeatDelay := 0
-          else if MouseInView(Event.Where) then
+          else if MouseInView(Event.Mouse.Where) then
             begin
             RepeatDelay := 6-Round((I/(Size.Y shr 1))*6);
             AutoRepeat := RepeatDelay;
@@ -3547,11 +3582,11 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
     P: TView;
     PV: TFileViewer;
   begin
-  if LastViewerBounds.Empty or (InterfaceData.Options and
+  if LastViewerBounds.IsEmpty or (InterfaceData.Options and
        ouiStoreViewerPosition = 0)
   then
     begin
-    Desktop.GetExtent(LastViewerBounds);
+    LastViewerBounds := Desktop.GetExtent;
     LastViewerDeskSize := Desktop.Size;
     end;
   R := LastViewerBounds;
@@ -3560,21 +3595,21 @@ constructor TFileWindow.Create(const FileName, VFileName: String; Hex: Boolean);
      0);
   Flags := Flags or wfMaxi;
   Options := Options or ofTileable;
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   R.A.X := R.B.X;
   Inc(R.B.X);
   P := TViewScroll.Create(R);
   P.GrowMode := gfGrowHiX+gfGrowLoX+gfGrowHiY;
   Insert(P);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   PV := TFileViewer.Create(R, nil, FileName, VFileName, P, False, Hex);
   Insert(PV); {Must insert even on error for later checking }
   if not PV.isValid then
     {AK155}
     Exit;
-  GetExtent(R);
+  R := GetExtent;
   Inc(R.A.X);
   R.A.Y := R.B.Y-1;
   Dec(R.B.X, 2);
@@ -3588,7 +3623,7 @@ procedure TFileWindow.ChangeBounds(const Bounds: TRect);
   inherited ChangeBounds(Bounds);
   if not GetState(sfModal) then
     begin
-    GetBounds(LastViewerBounds);
+    LastViewerBounds := GetBounds;
     LastViewerDeskSize := Desktop.Size;
     end;
   end;
@@ -3597,5 +3632,46 @@ function TFileWindow.ReactOnCmd: Boolean;
   begin
   ReactOnCmd := True
   end;
+
+
+class function TFileWindow.Build: TStreamable;
+begin
+  Result := TFileWindow.Create(streamableInit);
+end;
+
+function TFileWindow.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TFileWindow';
+end;
+
+class function TViewScroll.Build: TStreamable;
+begin
+  Result := TViewScroll.Create(streamableInit);
+end;
+
+function TViewScroll.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TViewScroll';
+end;
+
+class function TQFileViewer.Build: TStreamable;
+begin
+  Result := TQFileViewer.Create(streamableInit);
+end;
+
+function TQFileViewer.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TQFileViewer';
+end;
+
+class function TDFileViewer.Build: TStreamable;
+begin
+  Result := TDFileViewer.Create(streamableInit);
+end;
+
+function TDFileViewer.StreamableName: ShortString;
+begin
+  Result := 'FViewer.TDFileViewer';
+end;
 
 end.

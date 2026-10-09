@@ -1615,7 +1615,7 @@ procedure DecodeStr(var Src, Dst);
       Get_String;
       if not EndOfFile then
         begin
-        R.Assign(0, 0, 40, 12);
+        R := TRect.Create(0, 0, 40, 12);
         PI := TWhileView.Create(R);
         PI.Top := GetString(dlUUDecode);
         PI.Write(1, GetString(dlUUDecodingTo)+Cut(InputFileName, 40));
@@ -2484,7 +2484,7 @@ beg:
       GetMem(DskBuf, OutBufSize);
       GetMem(SouBuf, sss);
 
-      R.Assign(0, 0, 40, 9);
+      R := TRect.Create(0, 0, 40, 9);
       PI := TWhileView.Create(R);
       PI.Top := GetString(dlUUEncode);
       PI.Write(1, GetString(dlUUEncoding)+Cut(FName, 40));

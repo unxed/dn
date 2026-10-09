@@ -552,8 +552,8 @@ procedure SetScrMode(Mode: Word);
     begin
     if Mode = ScreenMode then
       goto Ex;
-    GetExtent(R1);
-    Clock.GetBounds(A);
+    R1 := GetExtent;
+    A := Clock.GetBounds;
     if not SetScreenMode(Mode) then
       begin
       SetBlink(CurrentBlink);
@@ -565,7 +565,7 @@ procedure SetScrMode(Mode: Word);
          mfError+mfOKButton);
       Exit;
       end;
-    GetExtent(R);
+    R := GetExtent;
     A.A.X := Round(A.A.X*R.B.X/R1.B.X);
     if A.B.Y = R1.B.Y then
       A.A.Y := R.B.Y-1

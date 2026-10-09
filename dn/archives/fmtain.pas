@@ -51,7 +51,7 @@ interface
 
 uses
   Archiver
-  ;
+  , Defines;
 
 type
   TAINArchive = class;
@@ -59,10 +59,12 @@ type
   TAINArchive = class(TARJArchive)
     ListFileName: String;
     ListFile: System.Text;
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
@@ -240,5 +242,16 @@ procedure TAINArchive.GetFile;
   DT.Sec := StoI(Copy(s, 7, 4));
   PackTime(DT, FileInfo.Date);
   end { TAINArchive.GetFile };
+
+
+class function TAINArchive.Build: TStreamable;
+begin
+  Result := TAINArchive.Create(streamableInit);
+end;
+
+function TAINArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtain.TAINArchive';
+end;
 
 end.

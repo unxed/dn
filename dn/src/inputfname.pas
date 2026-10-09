@@ -66,9 +66,11 @@ type
 
   TColorPoint = class(TView)
     Color: Byte;
-    constructor Create(var ABounds: TRect; AColor: Byte);
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream); virtual;
+    constructor Create(var ABounds: TRect; AColor: Byte); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     procedure Draw; override;
     end;
 
@@ -125,17 +127,28 @@ constructor TColorPoint.Create(var ABounds: TRect; AColor: Byte);
   Color := AColor;
   end;
 
-constructor TColorPoint.Load(var S: TStream);
+function TColorPoint.Read(Ip: ipstream): Pointer;
   begin
-  inherited Load(S);
-  S.Read(Color, SizeOf(Color));
+  Result := Self;
+  inherited Read(Ip);
+  Ip.ReadBytes(Color, SizeOf(Color));
   end;
 
-procedure TColorPoint.Store(var S: TStream);
+procedure TColorPoint.Write(Os: opstream);
   begin
-  inherited Store(S);
-  S.Write(Color, SizeOf(Color));
+  inherited Write(Os);
+  Os.WriteBytes(Color, SizeOf(Color));
   end;
+
+class function TColorPoint.Build: TStreamable;
+begin
+  Result := TColorPoint.Create(streamableInit);
+end;
+
+function TColorPoint.StreamableName: ShortString;
+begin
+  Result := 'inputfname.TColorPoint';
+end;
 
 procedure TColorPoint.Draw;
   var

@@ -57,10 +57,12 @@ type
   TCHZArchive = class;
   PCHZArchive = TCHZArchive;
   TCHZArchive = class(TARJArchive)
-    constructor Create;
+    constructor Create; overload;
     procedure GetFile; override;
     function GetID: Byte; override;
     function GetSign: TStr4; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 type
@@ -208,5 +210,16 @@ procedure TCHZArchive.GetFile;
   FileInfo.FName := CDir+FileInfo.FName;
   ArcFile.Seek(FP+P.PackedSize);
   end { TCHZArchive.GetFile };
+
+
+class function TCHZArchive.Build: TStreamable;
+begin
+  Result := TCHZArchive.Create(streamableInit);
+end;
+
+function TCHZArchive.StreamableName: ShortString;
+begin
+  Result := 'fmtchz.TCHZArchive';
+end;
 
 end.

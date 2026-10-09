@@ -511,7 +511,7 @@ Rep:
       D := TDialog(LoadResource(dlgSplitFile));
 
     // Dialog line 1 must be empty — the file name is inserted there
-    R.Assign(0, 1, Length(aa)+Length(aaa), 2);
+    R := TRect.Create(0, 1, Length(aa)+Length(aaa), 2);
     P := TStaticText.Create(R, aa+aaa);
     P.Options := P.Options or ofCenterX;
     D.Insert(P);
@@ -726,7 +726,7 @@ _Abort_:
   if Fn1 = Fn2 then
     goto _Abort_;
 
-  R.Assign(1, 1, 36, 13);
+  R := TRect.Create(1, 1, 36, 13);
   PInfo := TWhileView.Create(R);
   if PInfo = nil then
     goto _Abort_;

@@ -47,9 +47,9 @@ var
 begin
   Result := '';
   D := TFileDialog.Create(Mask, Title, Name, Buttons, HistoryId);
-  if Application <> nil then
+  if TProgram.Application <> nil then
   begin
-    R := Application.ExecView(D);
+    R := TProgram.Application.ExecView(D);
     if R <> cmCancel then
       Result := D.GetFileName;
   end;

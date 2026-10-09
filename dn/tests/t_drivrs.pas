@@ -48,12 +48,12 @@ begin
   Utf8Enabled := False;
   S := #$A6#$A7;                                   { bytes of the code page (CP866 by default): one cell each, never read as UTF-8; the cell keeps the character as text }
   MoveStr(Cells[3], S, $07);
-  Check((Cells[3].Character.Text[0] = $D0) and (Cells[3].Character.Text[1] = $B6) and (Cells[4].Character.Text[1] = $B7),
+  Check((Ord(Cells[3].Character.GetText[1]) = $D0) and (Ord(Cells[3].Character.GetText[2]) = $B6) and (Ord(Cells[4].Character.GetText[2]) = $B7),
     'cells: the bytes of the code page are characters of the page (U+0436, U+0437)');
   Utf8Enabled := True;
   S := #$D0#$B6;                                   { UTF-8 }
   MoveStr(Cells[5], S, $07);
-  Check((Cells[5].Character.Text[0] = $D0) and (ScLength(Cells[5].Character) = 2), 'cells: UTF-8 is one cell when Utf8Enabled');
+  Check((Ord(Cells[5].Character.GetText[1]) = $D0) and (Length(Cells[5].Character.GetText) = 2), 'cells: UTF-8 is one cell when Utf8Enabled');
   SetCellAttr(Cells[0], $1F);
   SetCellChar(Cells[0], 65);
   Check((CellChar(Cells[0]) = 65) and (CellAttr(Cells[0]) = $1F), 'SetCellChar, SetCellAttr');
@@ -64,28 +64,28 @@ begin
   { the key codes of DN: the shift state in bits 16..19 }
   FillChar(Ev, SizeOf(Ev), 0);
   Ev.What := evKeyDown;
-  Ev.KeyCode := $4B00;
+  Ev.KeyDown.KeyCode := $4B00;
   Check(DNKeyCode(Ev) = $004B00, 'DNKeyCode: Left');
-  Ev.ControlKeyState := 2;
+  Ev.KeyDown.ControlKeyState := 2;
   Check(DNKeyCode(Ev) = $034B00, 'DNKeyCode: Shift-Left (any shift is 3)');
-  Ev.ControlKeyState := 4;
-  Ev.KeyCode := $7300;
+  Ev.KeyDown.ControlKeyState := 4;
+  Ev.KeyDown.KeyCode := $7300;
   Check(DNKeyCode(Ev) = $047300, 'DNKeyCode: Ctrl-Left');
-  Ev.ControlKeyState := 8 or $40;
-  Ev.KeyCode := $9B00;
+  Ev.KeyDown.ControlKeyState := 8 or $40;
+  Ev.KeyDown.KeyCode := $9B00;
   Check(DNKeyCode(Ev) = $089B00, 'DNKeyCode: Alt-Left (the other flags do not count)');
   SetDNKeyCode(Ev, $034B00);
-  Check((Ev.KeyCode = $4B00) and ((Ev.ControlKeyState and 15) = 3), 'SetDNKeyCode');
+  Check((Ev.KeyDown.KeyCode = $4B00) and ((Ev.KeyDown.ControlKeyState and 15) = 3), 'SetDNKeyCode');
   Check(DNKeyCode(Ev) = $034B00, 'SetDNKeyCode and DNKeyCode are reverse to each other');
   { Alt and a punctuation key from a terminal (ESC and the character): the scan code of the key }
-  Ev.ControlKeyState := 8;
-  Ev.KeyCode := Ord('''');
+  Ev.KeyDown.ControlKeyState := 8;
+  Ev.KeyDown.KeyCode := Ord('''');
   Check(DNKeyCode(Ev) = $082800, 'DNKeyCode: Alt-'' is kbAltQuote');
-  Ev.KeyCode := Ord('"');
+  Ev.KeyDown.KeyCode := Ord('"');
   Check(DNKeyCode(Ev) = $0B2800, 'DNKeyCode: Alt-" is kbAltShiftQuote');
-  Ev.KeyCode := Ord('/');
+  Ev.KeyDown.KeyCode := Ord('/');
   Check(DNKeyCode(Ev) = $083500, 'DNKeyCode: Alt-/ is kbAltSlash');
-  Ev.ControlKeyState := 0;
+  Ev.KeyDown.ControlKeyState := 0;
   Check(DNKeyCode(Ev) = $00002F, 'DNKeyCode: / without Alt stays a character');
   { FormatStr }
   { the parameters are pointer-sized slots }

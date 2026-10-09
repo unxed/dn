@@ -93,9 +93,11 @@ type
     CurPos: LongInt;
     TotalLength, TotalCLength: TSize;
     vSavePos, vSize{!!s}: LongInt;
-    constructor Create;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    constructor Create; overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
+    procedure Write(Os: opstream); override;
     destructor Destroy; override;
     procedure AddFile(FName: String; Size, CSize: TSize; Date: LongInt;
          Attr: Byte);
@@ -112,6 +114,8 @@ type
     procedure vTruncate;
     procedure FixError;
     procedure TryStream(Sz: LongInt);
+  public
+    constructor Create(AInit: TStreamableInit); overload;
     end;
 
 const
@@ -357,20 +361,21 @@ procedure TDirStorage.UpdateRecord;
     end;
   end;
 
-constructor TDirStorage.Load(S: TStream);
+function TDirStorage.Read(Ip: ipstream): Pointer;
   var
     P, L: LongInt; {!!s}
   begin
-  S.Read(Dirs, SizeOf(Dirs));
-  S.Read(Files, SizeOf(Files));
-  S.Read(TotalLength, SizeOf(TotalLength));
-  S.Read(TotalCLength, SizeOf(TotalCLength));
-  S.Read(L, SizeOf(L));
+  Result := Self;
+  Ip.ReadBytes(Dirs, SizeOf(Dirs));
+  Ip.ReadBytes(Files, SizeOf(Files));
+  Ip.ReadBytes(TotalLength, SizeOf(TotalLength));
+  Ip.ReadBytes(TotalCLength, SizeOf(TotalCLength));
+  Ip.ReadBytes(L, SizeOf(L));
   vSize := L;
   TryStream(L);
-  P := i32(S.GetPos);
+  P := i32(Ip.RdBuf.GetPos);
   repeat
-    Stream.CopyFrom(S, L);
+    Stream.CopyFrom(Ip.RdBuf, L);
     if Stream.Status = stOK then
       Break
     else
@@ -378,26 +383,40 @@ constructor TDirStorage.Load(S: TStream);
       Stream.Free;
       Stream := nil;
       TryStream(L);
-      S.Seek(P);
+      Ip.RdBuf.Seek(P);
       end;
   until False;
   end { TDirStorage.Load };
 
-procedure TDirStorage.Store(S: TStream);
+procedure TDirStorage.Write(Os: opstream);
   var
     L: LongInt;
   begin
   AddFile(#0, 0, 0, 0, 0);
-  S.Write(Dirs, SizeOf(Dirs));
-  S.Write(Files, SizeOf(Files));
-  S.Write(TotalLength, SizeOf(TotalLength));
-  S.Write(TotalCLength, SizeOf(TotalCLength));
+  Os.WriteBytes(Dirs, SizeOf(Dirs));
+  Os.WriteBytes(Files, SizeOf(Files));
+  Os.WriteBytes(TotalLength, SizeOf(TotalLength));
+  Os.WriteBytes(TotalCLength, SizeOf(TotalCLength));
   L := vSize;
-  S.Write(L, SizeOf(L));
+  Os.WriteBytes(L, SizeOf(L));
   vSeek(0);
   Stream.Status := stOK;
-  S.CopyFrom(Stream, vSize);
+  Os.RdBuf.CopyFrom(Stream, vSize);
   end;
+
+constructor TDirStorage.Create(AInit: TStreamableInit);
+begin
+end;
+
+class function TDirStorage.Build: TStreamable;
+begin
+  Result := TDirStorage.Create(streamableInit);
+end;
+
+function TDirStorage.StreamableName: ShortString;
+begin
+  Result := 'FStorage.TDirStorage';
+end;
 
 {-DataCompBoy-}
 procedure TDirStorage.DeleteFile(P: PFileRec);

@@ -56,19 +56,34 @@ interface
 
 uses
   Drivers, editcore
-  ;
+  , Defines;
 
 type
   TXFileEditor = class(TFileEditor)
     {Cat: this type is in the plugin model; change with extreme care!}
     function HandleCommand(var Event: TEvent): Boolean; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
+
+uses
+  TveDoc;
 
 function TXFileEditor.HandleCommand(var Event: TEvent): Boolean;
   begin
   Result := inherited HandleCommand(Event);
   end;
+
+class function TXFileEditor.Build: TStreamable;
+begin
+  Result := TXFileEditor.Create(streamableInit, TTveDoc.Create, True);
+end;
+
+function TXFileEditor.StreamableName: ShortString;
+begin
+  Result := 'Editor.TXFileEditor';
+end;
 
 end.

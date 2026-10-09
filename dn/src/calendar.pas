@@ -33,12 +33,14 @@ type
     FDay: Byte;
     RomanEaster: integer;
     OrthodoxEaster: integer;
-    constructor Create(Bounds: TRect);
-    constructor Load(var S: TStream);
+    constructor Create(Bounds: TRect); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     destructor Destroy; override;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Draw; override;
-    procedure Store(var S: TStream);
+    procedure Write(Os: opstream); override;
     procedure NextYear;
     procedure PrevYear;
     procedure NextMonth;
@@ -58,12 +60,14 @@ type
 
   TCalendarWindow = class(TWindow)
     CalendarView: TCalendarView;
-    constructor Create;
+    constructor Create; overload;
     procedure HandleEvent(var Event: TEvent); override;
     procedure Awaken; override;
     function GetTitle(MaxSize: integer): TTitleStr; override;
     destructor Destroy; override;
     function GetPalette: TPalette; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 procedure InsertCalendar;
@@ -518,14 +522,14 @@ constructor TCalendarWindow.Create;
   else
     SundayFirst := not ((UpStrg(ActiveLanguage) = 'RUSSIAN') or
           (UpStrg(ActiveLanguage) = 'UKRAIN'));
-  R.Assign(1, 1, CalendarViewWidth+3, CalendarViewHeight+3);
+  R := TRect.Create(1, 1, CalendarViewWidth+3, CalendarViewHeight+3);
   inherited Create(R, GetString(dlcTitle), 0);
   Options := Options or ofVersion20;
   GrowMode := 0;
   Flags := Flags and not (wfZoom+wfGrow) or (wfMove+wfClose);
   { Not resizeable }
   MoveTo(25, 7);
-  GetExtent(R);
+  R := GetExtent;
   R.Grow(-1, -1);
   CalendarView := TCalendarView.Create(R);
   Insert(CalendarView);
@@ -546,9 +550,9 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
 
     evCommand:
       repeat
-        case Event.Command of
+        case Event.Message.Command of
           cmGetName:
-            PString(Event.InfoPtr)^:= GetString(dlcTitle);
+            PString(Event.Message.InfoPtr)^:= GetString(dlcTitle);
           else {case}
             break; { skip ClearEvent without using goto statement }
         end {case};
@@ -564,7 +568,7 @@ procedure TCalendarWindow.HandleEvent(var Event: TEvent);
           begin
           InterfaceStr := CalendarView.GetDateText;
           Event.What := evCommand;
-          Event.Command := cmInsertText;
+          Event.Message.Command := cmInsertText;
           if Application <> nil then
             Application.PutEvent(Event);
           ClearEvent(Event);
@@ -620,20 +624,21 @@ constructor TCalendarView.Create(Bounds: TRect);
   DrawView;
   end;
 
-constructor TCalendarView.Load(var S: TStream);
+function TCalendarView.Read(Ip: ipstream): Pointer;
   var
     H, y, m, d: word;
   begin
-  inherited Load(S);
+  Result := Self;
+  inherited Read(Ip);
   GetDate(y, m, d, H);
   CurYear := y;
   CurMonth := Lo(m);
   CurDay := Lo(d);
   UpdTicks := 20;
   RegisterToBackground(Self);
-  S.Read(Year, SizeOf(Year));
-  S.Read(Month, SizeOf(Month));
-  S.Read(FDay, SizeOf(FDay));
+  Ip.ReadBytes(Year, SizeOf(Year));
+  Ip.ReadBytes(Month, SizeOf(Month));
+  Ip.ReadBytes(FDay, SizeOf(FDay));
   Days := DaysInMonth(Month, Year);
   YearChanged;
   DrawView;
@@ -779,16 +784,16 @@ procedure TCalendarView.HandleEvent(var Event: TEvent);
     begin
     if Event.What and (evMouseDown+evMouseAuto) <> 0 then
       begin
-      MakeLocal(Event.Where, Point);
+      Point := MakeLocal(Event.Mouse.Where);
       if Point.Y = 0 then
         repeat
           case Point.X of
 
             18, 19, 20:
               begin
-              if  (Event.Buttons and mbLeftButton) <> 0 then
+              if  (Event.Mouse.Buttons and mbLeftButton) <> 0 then
                 PrevMonth
-              else if (Event.Buttons and mbRightButton) <> 0 then
+              else if (Event.Mouse.Buttons and mbRightButton) <> 0 then
                 PrevYear
               else
                 break;
@@ -796,9 +801,9 @@ procedure TCalendarView.HandleEvent(var Event: TEvent);
 
             21, 22, 23:
               begin
-              if  (Event.Buttons and mbLeftButton) <> 0 then
+              if  (Event.Mouse.Buttons and mbLeftButton) <> 0 then
                 NextMonth
-              else if (Event.Buttons and mbRightButton) <> 0 then
+              else if (Event.Mouse.Buttons and mbRightButton) <> 0 then
                 NextYear
               else
                 break;
@@ -864,19 +869,29 @@ procedure TCalendarView.HandleEvent(var Event: TEvent);
     end;
   end { TCalendarView.HandleEvent };
 
-procedure TCalendarView.Store(var S: TStream);
+procedure TCalendarView.Write(Os: opstream);
   var
     Rec: packed record
       Y: AWord;
       M, D: Byte;
       end;
   begin
-  inherited Store(S);
+  inherited Write(Os);
   Rec.Y := Year;
   Rec.M := Month;
   Rec.D := FDay;
-  S.Write(Rec, SizeOf(Rec));
+  Os.WriteBytes(Rec, SizeOf(Rec));
   end;
+
+class function TCalendarView.Build: TStreamable;
+begin
+  Result := TCalendarView.Create(streamableInit);
+end;
+
+function TCalendarView.StreamableName: ShortString;
+begin
+  Result := 'Calendar.TCalendarView';
+end;
 procedure TCalendarView.NextYear;
   begin
   if Year < MaxYear then
@@ -1099,5 +1114,16 @@ procedure InsertCalendar;
   else
     Calend.Select;
   end;
+
+
+class function TCalendarWindow.Build: TStreamable;
+begin
+  Result := TCalendarWindow.Create(streamableInit);
+end;
+
+function TCalendarWindow.StreamableName: ShortString;
+begin
+  Result := 'Calendar.TCalendarWindow';
+end;
 
 end.

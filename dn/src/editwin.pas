@@ -66,10 +66,12 @@ type
     MenuBar: TMenuBar;
     UpMenu: PMenu;
     ModalEnd: Boolean;
-    constructor Create(R: TRect; FileName: String);
-    constructor Load(var S: TStream);
+    constructor Create(R: TRect; FileName: String); overload;
+    function Read(Ip: ipstream): Pointer; override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     //    procedure ChangeBounds(const R: TRect); virtual;
-    procedure Store(var S: TStream);
+    procedure Write(Os: opstream); override;
 {AK155 04/04/2006
   Execute is unused anywhere; unclear why it is needed.
   Probably added for a modal editor window, but
@@ -90,32 +92,49 @@ uses
   ;
 
 type
-  TEditSaver = class
-    constructor Load(var S: TStream);
-    procedure Store(var S: TStream);
+  { the table of the editor commands in the resources (rcp writes it under the same name) }
+  TEditSaver = class(TStreamable)
+    constructor Create(AInit: TStreamableInit);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 const
-  REditSaver: TStreamRec = (ObjType: 12335; VmtLink: 0; Load: nil; Store: nil; Next: nil);
-
   Registered: Boolean = False;
 
-constructor TEditSaver.Load(var S: TStream);
+constructor TEditSaver.Create(AInit: TStreamableInit);
   begin
-  S.Read(MaxCommands, SizeOf(MaxCommands));
-  S.Read(EditCommands, SizeOf(TEditCommand)*MaxCommands);
   end;
 
-procedure TEditSaver.Store(var S: TStream);
+function TEditSaver.StreamableName: ShortString;
   begin
-  S.Write(MaxCommands, SizeOf(MaxCommands));
-  S.Write(EditCommands, SizeOf(TEditCommand)*MaxCommands);
+  Result := 'EditWin.TEditSaver';
+  end;
+
+class function TEditSaver.Build: TStreamable;
+  begin
+  Result := TEditSaver.Create(streamableInit);
+  end;
+
+function TEditSaver.Read(Ip: ipstream): Pointer;
+  begin
+  Result := Self;
+  Ip.ReadBytes(MaxCommands, SizeOf(MaxCommands));
+  Ip.ReadBytes(EditCommands, SizeOf(TEditCommand)*MaxCommands);
+  end;
+
+procedure TEditSaver.Write(Os: opstream);
+  begin
+  Os.WriteBytes(MaxCommands, SizeOf(MaxCommands));
+  Os.WriteBytes(EditCommands, SizeOf(TEditCommand)*MaxCommands);
   end;
 
 procedure RegisterEditSaver;
   begin
   if not Registered then
-    RegisterType(REditSaver);
+    TStreamableClass.Create('EditWin.TEditSaver', @TEditSaver.Build);
   Registered := True;
   end;
 
@@ -131,20 +150,21 @@ procedure LoadCommands;
     end;
   end;
 
-constructor TEditWindow.Load(var S: TStream);
+function TEditWindow.Read(Ip: ipstream): Pointer;
   var
     PI: PMenuItem;
     R: TRect;
   begin
-  inherited Load(S);
-  GetSubViewPtr(S, Intern);
-  GetSubViewPtr(S, AInfo);
-  GetSubViewPtr(S, ABookLine); {-$VIV}
-  { GetSubViewPtr(S, MenuBar);} (*X-Man*)
+  Result := Self;
+  inherited Read(Ip);
+  Intern := Ip.ReadPointer;
+  AInfo := Ip.ReadPointer;
+  ABookLine := Ip.ReadPointer; {-$VIV}
+  { MenuBar := Ip.ReadPointer;} (*X-Man*)
   if  (Intern = nil) or (AInfo = nil) or (ABookLine = nil) then
     {Cat}
-    Fail;
-R.Assign(1, 1, Size.X - 1, 2);
+    begin Free; Result := nil; Exit end;
+R := TRect.Create(1, 1, Size.X - 1, 2);
   MenuBar := TMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
     MenuBar.Locate(R);
@@ -177,11 +197,11 @@ R.Assign(1, 1, Size.X - 1, 2);
 var rr: TRect;
 begin
  inherited ChangeBounds(R);
- Intern^.HScroll.GetBounds(rr); RR.B.X:=Size.X - 2;
+ rr := Intern^.HScroll.GetBounds; RR.B.X:=Size.X - 2;
  Intern^.HScroll.SetBounds(rr);
  if not (Intern^.SmartPad or GetState(sfModal)) then
     begin
-      GetBounds(TempBounds);
+      TempBounds := GetBounds;
       LastEditDeskSize := Desktop.Size;
     end;
 end;
@@ -201,18 +221,28 @@ function TEditWindow.Execute: Word;
   until ModalEnd;
   end;
 *)
-procedure TEditWindow.Store(var S: TStream);
+procedure TEditWindow.Write(Os: opstream);
   var
     Parts: array[0..2] of TView;
     I: Integer;
   begin
-  inherited Store(S);
+  inherited Write(Os);
   Parts[0] := Intern;
   Parts[1] := AInfo;
   Parts[2] := ABookLine;
   for I := 0 to 2 do
-    PutSubViewPtr(S, Parts[I]);
+    Os.WritePointer(Parts[I]);
   end;
+
+class function TEditWindow.Build: TStreamable;
+begin
+  Result := TEditWindow.Create(streamableInit);
+end;
+
+function TEditWindow.StreamableName: ShortString;
+begin
+  Result := 'editwin.TEditWindow';
+end;
 
 { TEditWindow }
 constructor TEditWindow.Create(R: TRect; FileName: String);
@@ -225,14 +255,14 @@ constructor TEditWindow.Create(R: TRect; FileName: String);
   Options := Options or ofTileable;
   Flags := Flags or wfMaxi;
 
-R.Assign(1, 1, Size.X - 1, 2);
+R := TRect.Create(1, 1, Size.X - 1, 2);
   MenuBar := TMenuBar(LoadResource(dlgEditorMenu));
   if MenuBar <> nil then
     MenuBar.Locate(R);
   Insert(MenuBar);
 
   {MenuBar.Options := MenuBar.Options or ofPostProcess;}
-R.Assign(1, 2, Size.X - 1, Size.Y - 1);
+R := TRect.Create(1, 2, Size.X - 1, Size.Y - 1);
 
   Intern := TXFileEditor.Create(R,
         MakeScrollBar(sbHorizontal+sbHandleKeyboard),
@@ -253,10 +283,10 @@ R.Assign(1, 2, Size.X - 1, Size.Y - 1);
     begin
     Fail;                      { a failing constructor of a class destroys the instance itself: a Free before it destroyed it twice }
     end;
-R.Assign(2, Size.Y - 1, Size.X - 2, Size.Y);
+R := TRect.Create(2, Size.Y - 1, Size.X - 2, Size.Y);
   AInfo := TInfoLine.Create(R);
   InsertBefore(AInfo, First);
-  GetExtent(R);
+  R := GetExtent;
   R.B.X := R.A.X+1;
   Inc(R.A.Y, 2);
   Dec(R.B.Y);
@@ -274,28 +304,4 @@ procedure TEditWindow.SetState(AState: Word; Enable: Boolean);
   Redraw;
   end;
 
-function Build_REditSaver(S: TStream): TStreamable;
-begin
-  { Match TLoadProc (value, not var): a var parameter would treat the
-    TStream reference as a pointer-to-pointer and corrupt Load. }
-  Result := TStreamable(TEditSaver.Load(S));
-end;
-
-procedure Store_REditSaver(P: TStreamable; S: TStream);
-begin
-  TEditSaver(P).Store(S);
-end;
-
-procedure SetStreamRecs_edwin;
-begin
-
-  REditSaver.VmtLink := PtrUInt(System.TClass(TEditSaver));
-  REditSaver.Load := @Build_REditSaver;
-
-  REditSaver.Store := @Store_REditSaver;
-
-end;
-
-initialization
-  SetStreamRecs_edwin;
 end.

@@ -59,15 +59,17 @@ type
   T_BWSelector = class(TMonoSelector)
     SelType: TColorSel; {Is't a selector of Foreground color ? }
     constructor Create(var Bounds: TRect; ASelType: TColorSel;
-         AStrings: PSItem);
+         AStrings: TSItem); overload;
     procedure HandleEvent(var Event: TEvent); override;
     procedure NewColor; virtual;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     end;
 
 implementation
 
 constructor T_BWSelector.Create(var Bounds: TRect; ASelType: TColorSel;
-    AStrings: PSItem);
+    AStrings: TSItem);
   begin
   SelType := ASelType;
   inherited Create(Bounds);
@@ -82,9 +84,9 @@ procedure T_BWSelector.HandleEvent(var Event: TEvent);
   begin
   inherited HandleEvent(Event);
   if GetState(sfVisible) then
-    if  (Event.What = evBroadcast) and (Event.Command = cmColorSet) then
+    if  (Event.What = evBroadcast) and (Event.Message.Command = cmColorSet) then
       begin
-      Value := Event.InfoByte;
+      Value := Event.Message.InfoByte;
       case SelType of
         csForeground:
           for i := 0 to 3 do
@@ -118,5 +120,16 @@ procedure T_BWSelector.NewColor;
 
 { TColorDisplay }
 
+
+
+class function T_BWSelector.Build: TStreamable;
+begin
+  Result := T_BWSelector.Create(streamableInit);
+end;
+
+function T_BWSelector.StreamableName: ShortString;
+begin
+  Result := 'bwselect.T_BWSelector';
+end;
 
 end.

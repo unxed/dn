@@ -10,7 +10,7 @@ unit DnActions;
 interface
 
 uses
-  TvObjs;
+  TvObjs, Defines;
 
 type
   TDnAction = record
@@ -25,8 +25,10 @@ type
   TActionTable = class(TStreamable)
     Items: array of TDnAction;
     constructor Create;
-    constructor Load(S: TStream);
-    procedure Store(S: TStream);
+    function Read(Ip: ipstream): Pointer; override;
+    procedure Write(Os: opstream); override;
+    function StreamableName: ShortString; override;
+    class function Build: TStreamable; static;
     function Count: Integer;
     { -1 if there is no such name (case does not matter) }
     function IndexOf(const AName: String): Integer;
@@ -43,52 +45,52 @@ begin
   inherited Create;
 end;
 
-procedure WriteS(S: TStream; const V: String);
-var
-  L: Byte;
+class function TActionTable.Build: TStreamable;
 begin
-  L := Length(V);
-  S.Write(L, 1);
-  if L > 0 then
-    S.Write(V[1], L);
+  Result := TActionTable.Create;
 end;
 
-constructor TActionTable.Load(S: TStream);
+function TActionTable.StreamableName: ShortString;
+begin
+  Result := 'DnActions.TActionTable';
+end;
+
+function TActionTable.Read(Ip: ipstream): Pointer;
 var
   N: LongInt;
   I: Integer;
 begin
-  inherited Create;
-  S.Read(N, SizeOf(N));
+  Result := Self;
+  Ip.ReadBytes(N, SizeOf(N));
   SetLength(Items, N);
   for I := 0 to N - 1 do
     with Items[I] do
     begin
-      S.ReadStrV(Name);
-      S.ReadStrV(Caption);
-      S.ReadStrV(KeyText);
-      S.Read(Command, SizeOf(Command));
-      S.Read(KeyCode, SizeOf(KeyCode));
-      S.Read(HelpCtx, SizeOf(HelpCtx));
+      ReadStrV(Ip, Name);
+      ReadStrV(Ip, Caption);
+      ReadStrV(Ip, KeyText);
+      Ip.ReadBytes(Command, SizeOf(Command));
+      Ip.ReadBytes(KeyCode, SizeOf(KeyCode));
+      Ip.ReadBytes(HelpCtx, SizeOf(HelpCtx));
     end;
 end;
 
-procedure TActionTable.Store(S: TStream);
+procedure TActionTable.Write(Os: opstream);
 var
   N: LongInt;
   I: Integer;
 begin
   N := Length(Items);
-  S.Write(N, SizeOf(N));
+  Os.WriteBytes(N, SizeOf(N));
   for I := 0 to N - 1 do
     with Items[I] do
     begin
-      WriteS(S, Name);
-      WriteS(S, Caption);
-      WriteS(S, KeyText);
-      S.Write(Command, SizeOf(Command));
-      S.Write(KeyCode, SizeOf(KeyCode));
-      S.Write(HelpCtx, SizeOf(HelpCtx));
+      Os.WriteString(Name);
+      Os.WriteString(Caption);
+      Os.WriteString(KeyText);
+      Os.WriteBytes(Command, SizeOf(Command));
+      Os.WriteBytes(KeyCode, SizeOf(KeyCode));
+      Os.WriteBytes(HelpCtx, SizeOf(HelpCtx));
     end;
 end;
 
