@@ -18,9 +18,9 @@ begin
   Ph := phPostProcess;
   Check(Ph = TvViews.phPostProcess, 'the members of an enumeration are constants of the shim');
   { a variable of the shim is the variable of tv/ itself }
-  ShowMarkers := True;
-  Check(TvViews.ShowMarkers, 'a variable is the same memory');
-  ShowMarkers := False;
+  UxWheelUnderCursor := False;
+  Check(not TvViews.UxWheelUnderCursor, 'a variable is the same memory');
+  UxWheelUnderCursor := True;
   { a routine of the shim calls that of tv/ }
   ClearEvent(E);
   E.What := evCommand;

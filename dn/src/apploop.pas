@@ -131,7 +131,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
       if  (NeedLocated > 0) and (GetSTime-NeedLocated > 30) then
         begin
         NeedLocated := 0;
-        Message(Desktop, evCommand, cmDoSendLocated, nil);
+        Message(MainApp.Desktop, evCommand, cmDoSendLocated, nil);
         end;
     evKeyDown:
       begin
@@ -157,7 +157,7 @@ procedure MyApp.GetEvent(var Event: TEvent);
         end;
       if  (Event.ScanCode >= Hi(kbCtrlF1))
              and (Event.ScanCode <= Hi(kbCtrlF10))
-        and (Pointer(Current) = Pointer(Desktop))
+        and (Pointer(Current) = Pointer(MainApp.Desktop))
            and (ShiftState and 3 <> 0)
       then
         begin
@@ -242,8 +242,8 @@ procedure MyApp.GetEvent(var Event: TEvent);
         begin
         if MacroRecord and (CurrentMacro <> nil) then
           CurrentMacro.PutKey(DNKeyCode(Event));
-        if  (StatusLine <> nil) then
-          StatusLine.HandleEvent(Event);
+        if  (MainApp.StatusLine <> nil) then
+          MainApp.StatusLine.HandleEvent(Event);
         { F10 opens DN's menu bar.  Keep this explicit fallback because
           the status-line view is not the owner of the menu command. }
         if (Event.What = evKeyDown) and
@@ -356,7 +356,7 @@ procedure MyApp.HandleEvent(var Event: TEvent);
   then
     if  (Event.Where.Y = 0) and (Event.Buttons and mbLeftButton <> 0)
     then
-      MenuBar.HandleEvent(Event);
+      MainApp.MenuBar.HandleEvent(Event);
   if Event.What <> evNothing then
     inherited HandleEvent(Event);
   case Event.What of
@@ -368,11 +368,11 @@ procedure MyApp.HandleEvent(var Event: TEvent);
           WriteConfig;
           end;
         cmMenuOn:
-          if  (Event.InfoPtr = MenuBar) then
-            UpView(MenuBar);
+          if  (Event.InfoPtr = MainApp.MenuBar) then
+            UpView(MainApp.MenuBar);
         cmMenuOff:
-          if  (Event.InfoPtr = MenuBar) then
-            UpView(Desktop);
+          if  (Event.InfoPtr = MainApp.MenuBar) then
+            UpView(MainApp.Desktop);
         
         cmEnvEdit:
           EditDOSEnvironment(Environment);

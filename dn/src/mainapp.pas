@@ -90,8 +90,8 @@ procedure AdjustToDesktopSize(var R: TRect; OldDeskSize: TPoint);
 
 var
   { the same variables as in TvApp (the instances there are the same) }
-  Application: TProgram absolute TvApp.Application;
-  Desktop: TDesktop absolute TvApp.DeskTop;
+  Application: TProgram absolute TvApp.TProgram.Application;
+  Desktop: TDesktop absolute TvApp.TProgram.DeskTop;
   { the menu bar and the status line of DN (the unit Menus of DN, not those of tv/); set by InitMenuBar and InitStatusLine
     of TDNApplication, put into the program by TProgram.Init }
   StatusLine: Menus.TStatusLine = nil;
@@ -105,7 +105,7 @@ var
   Resource: TIdxResource = nil;
   { the palettes of the program (the strings of attributes): those of DN (DNPalet), set in the initialization }
   CColor, CBlackWhite, CMonochrome: ShortString;
-  appPalette: Integer absolute TvApp.AppPalette;
+  appPalette: Integer absolute TvApp.TProgram.AppPalette;
   SystemColors: array[0..2] of ShortString absolute TvApp.SystemColors;
   { a procedure that prepares a dialog for ExecResource; ExecResource clears it }
   PreExecuteDialog: procedure(D: TView) = nil;
@@ -194,7 +194,7 @@ constructor TProgram.Create;
 var
   R: TRect;
 begin
-  Application := Self;
+  MainApp.Application := Self;
   InitScreen;
   R.Assign(0, 0, ScreenWidth, ScreenHeight);
   TGroup(Self).Create(R);
@@ -204,17 +204,17 @@ begin
   InitStatusLine;
   InitMenuBar;
   InitDeskTop;
-  if StatusLine <> nil then
-    Insert(StatusLine);
-  if MenuBar <> nil then
-    Insert(MenuBar);
-  if Desktop <> nil then
-    Insert(Desktop);
+  if MainApp.StatusLine <> nil then
+    Insert(MainApp.StatusLine);
+  if MainApp.MenuBar <> nil then
+    Insert(MainApp.MenuBar);
+  if MainApp.Desktop <> nil then
+    Insert(MainApp.Desktop);
   InitCommandLine;
-  if StatusLine <> nil then
-    StatusLine.GrowTo(StatusLine.Size.X, 1);
-  if MenuBar <> nil then
-    MenuBar.GrowTo(MenuBar.Size.X, 1);
+  if MainApp.StatusLine <> nil then
+    MainApp.StatusLine.GrowTo(MainApp.StatusLine.Size.X, 1);
+  if MainApp.MenuBar <> nil then
+    MainApp.MenuBar.GrowTo(MainApp.MenuBar.Size.X, 1);
   NewTimer(IdleSecs, 0);
 end;
 
@@ -224,12 +224,12 @@ end;
   group in one go). }
 destructor TProgram.Destroy;
 begin
-  MenuBar := nil;
-  StatusLine := nil;
-  Desktop := nil;
+  MainApp.MenuBar := nil;
+  MainApp.StatusLine := nil;
+  MainApp.Desktop := nil;
   Buffer := nil;
   inherited Destroy;
-  Application := nil;
+  MainApp.Application := nil;
 end;
 
 procedure TProgram.ActivateView(P: TView);
@@ -277,10 +277,10 @@ begin
       { G.2b: Enter on a check box or a radio button toggles it (it becomes Space); from the other controls it presses the default button }
       MakeKeyEvent(Event, Word(Commands.kbSpace), 0);
   { as in Turbo Vision: the status line sees the keys and the clicks on it }
-  if (Event.What <> evNothing) and (StatusLine <> nil) then
+  if (Event.What <> evNothing) and (MainApp.StatusLine <> nil) then
     if ((Event.What and evKeyDown) <> 0) or
-       (((Event.What and evMouseDown) <> 0) and StatusLine.MouseInView(Event.Where)) then
-      StatusLine.HandleEvent(Event);
+       (((Event.What and evMouseDown) <> 0) and MainApp.StatusLine.MouseInView(Event.Where)) then
+      MainApp.StatusLine.HandleEvent(Event);
   { the state of the shift keys is that of keyboard and mouse events: the field is not set in the messages (commands, broadcasts) }
   if (Event.What and (evKeyDown or evMouse)) <> 0 then
   begin
@@ -296,9 +296,9 @@ begin
   CheckScreenDump;                 { the test harness of the DOS build (DosHarness): inject DNKEYS and stop after DNDUMPSEC; nothing elsewhere }
   if Drivers.ScreenBuffer <> nil then
     ReadScreenCells;               { the copy of the screen that DN reads }
-  if StatusLine <> nil then
+  if MainApp.StatusLine <> nil then
   begin
-    StatusLine.Update;
+    MainApp.StatusLine.Update;
   end;
   RunBackground;
 end;
