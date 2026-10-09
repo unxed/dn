@@ -61,9 +61,10 @@ Read `CLAUDE.md` first: the licensing rules are the base of all work and overrid
 12. Priority (owner, 2026-10-08): making every test that can run in parallel do so, locally and in CI, comes first; work that
     would interfere with it (edits of the workflows or of the test runners) waits until it is merged.
 13. The API (owner, 2026-10-09): copyright does not cover an API, and new names make the porting of other programs harder.
-    tv3 keeps the names and the signatures of the Turbo Vision API that programs know (Borland Pascal Turbo Vision / Free Vision,
-    e.g. `FormatStr(var Result; const Format; var Params)`); only the implementation and the wording are its own. A new name is
-    for a new API only (`TvPath`, `TvAppDir`).
+    The reference of the API of tv3 is magiblot/tvision (its only source): the names of its classes, methods, constants and
+    functions, in Pascal spelling (`TView::handleEvent` -> `TView.HandleEvent`). Only the implementation and the wording are tv3's
+    own. A new name is for a new API only (`TvPath`, `TvAppDir`). Other libraries (Borland Turbo Vision, Free Vision) are not a
+    reference of names.
 
 ## How to
 
