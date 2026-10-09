@@ -645,10 +645,7 @@ def run_one(out: str, work: str, spec: str, area: str = '',
 
 # DN_ACCEPT_U8CP=1: the two builds are the UTF-8 build and the code page build (DN_UTF8=0) of the same source, not the object and the class build.
 # The scenarios of the area u8cp are then run too, and the ones below are left out: the difference is in the data, not in a bug.
-U8CP_SKIP = {
-    # dn.ini is UTF-8 in both builds (docs/TEXT-POLICY.md); the editor of the code page build shows its bytes by the page of the document
-    'menu_6_9',
-}
+U8CP_SKIP: set[str] = set()
 
 
 def selected_scenarios(area: str | None, only: set[str], shard: tuple[int, int] | None):
