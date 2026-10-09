@@ -351,7 +351,7 @@ DIALOG dlgAdvanceSearch, 55, 15, 'Расширенный поиск'
     CheckBoxes 3, 11, 39, 13, ofPostProcess, ofPreProcess
       ITEM 'А~р~хив'
       ITEM 'С~и~стемный'
-      ITEM 'С~к~рытый'
+      ITEM '~С~крытый'
       ITEM 'Только ~ч~тение'
     END
     Label 3, 10, '~А~трибуты', ofPostProcess, ofPreProcess
@@ -786,7 +786,7 @@ END
 DIALOG dlgDbFind, 55, 12, 'Поиск'
     HELPCTX hcDBSearch
     InputLine 19, 2, 50, 3, 250, hsdbSearch
-    Label 2, 2, 'Искать ~т~екст', ofPostProcess, ofPreProcess
+    Label 2, 2, '~И~скать текст', ofPostProcess, ofPreProcess
     CheckBoxes 12, 4, 32, 5, ofPostProcess, ofPreProcess
       ITEM '~Р~азличать рег.'
     END
@@ -813,7 +813,7 @@ DIALOG dlgReplaceCell, 52, 17, 'Замена'
     InputLine 3, 3, 45, 4, 240, hsFindCellPattern, ofFramed
     Label 3, 2,'~О~бразец', ofPostProcess, ofPreProcess
     InputLine 3, 6, 45, 7, 240, hsReplacePattern, ofFramed
-    Label 3, 5, '~З~аменить на', ofPostProcess, ofPreProcess
+    Label 3, 5, 'З~а~менить на', ofPostProcess, ofPreProcess
     RadioButtons 3, 9, 18, 11, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~С~троки'
       ITEM 'З~н~ачения'
@@ -864,13 +864,13 @@ END
 DIALOG dlgSetCellFormat, 42, 17, 'Ячейка/блок Формат'
     HELPCTX hcSetCellFormat
     RadioButtons 3, 3, 39, 7, ofFramed, ofPostProcess, ofPreProcess
-      ITEM '~К~ак есть'
-      ITEM '~Д~есятичный'
-      ITEM '~З~апятая'
-      ITEM 'Э~к~спонента'
+      ITEM 'Как ~е~сть'
+      ITEM 'Де~с~ятичный'
+      ITEM 'Зап~я~тая'
+      ITEM '~Э~кспонента'
       ITEM '~Л~огический'
       ITEM 'В~а~лютный'
-      ITEM 'Процен~т~'
+      ITEM 'Про~ц~ент'
       ITEM 'Ск~р~ыть'
     END
     Label 3, 2, 'П~о~казать', ofPostProcess, ofPreProcess
@@ -1111,7 +1111,7 @@ DIALOG dlgFoundFileFind, 54, 18, 'Поиск файла в '
     CheckBoxes 3, 7, 51, 11, ofPostProcess, ofPreProcess
       ITEM 'Р~а~сширенный поиск'
       ITEM '~Н~е сортировать'
-      ITEM 'Поиск в катало~г~ах'
+      ITEM 'Поиск ~в~ каталогах'
       ITEM '~П~оиск в архивах'
       ITEM '~Р~азличать регистр'
       ITEM 'Полные ~с~лова'
@@ -1416,7 +1416,7 @@ DIALOG dlgSavePanelSetup, 46, 18, 'Записать настройки пане�
     HELPCTX hcSavePanelSetup
 #1  RadioButtons 2, 2, 14, 7
       ITEM '~Д~иск'
-      ITEM '~С~писок'
+      ITEM 'С~п~исок'
       ITEM '~А~рхив'
       ITEM 'АРВ~И~Д'
       ITEM '~В~се'
@@ -1497,12 +1497,12 @@ DIALOG dlgFilesAttr, 59, 15, 'Атрибуты файлов'
     Button 33,12, 42, 14, 'С~б~рос', cmNo, ofPostProcess, ofPreProcess
     Button 45,12, 55, 14, '~О~тмена', cmCancel, ofPostProcess, ofPreProcess
     CheckBoxes 3, 4, 8, 10, ofFramed, ofPostProcess, ofPreProcess
-      ITEM '~Т~олько чтение'
-      ITEM '~С~крытый'
-      ITEM 'С~и~стемный'
-      ITEM '~М~етка тома'
-      ITEM 'Катало~г~'
-      ITEM '~А~рхивный'
+      ITEM 'Только ~ч~тение'
+      ITEM 'Ск~р~ытый'
+      ITEM 'Систем~н~ый'
+      ITEM 'Метка тома'
+      ITEM 'Ката~л~ог'
+      ITEM 'Ар~х~ивный'
     END
     CheckBoxes 9, 4, 27, 10, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~Т~олько чтение'
@@ -1568,7 +1568,7 @@ DIALOG dlgExtract, 49, 14, 'Извлечь файлы'
     InputLine 13, 2, 44, 3, 255, hsFileCopyName
     Label 2, 2, '~И~звлечь в', ofPostProcess, ofPreProcess
     CheckBoxes 3, 4, 47, 8, ofPostProcess, ofPreProcess
-      ITEM 'Извлечь с именем ~п~ути'
+      ITEM 'Извлечь ~с~ именем пути'
       ITEM 'Только ~т~естирование'
       ITEM '~У~скоренно'
       ITEM 'Через ~в~ременный каталог'
@@ -2930,7 +2930,7 @@ END
 
 DIALOG dlgPhoneBook, 62, 20, 'Телефонная книжка'
   HELPCTX hcPhone
-  Button 1,15,14,17, '~В~ыйти~', cmNo, bfDefault, ofPostProcess, ofPreProcess
+  Button 1,15,14,17, 'В~ы~йти~', cmNo, bfDefault, ofPostProcess, ofPreProcess
   Button 1,15,14,17, '~В~ойти', cmOK, bfDefault, ofPostProcess, ofPreProcess
   Button 14,15,25,17, '~Н~абрать', cmDialPhone, bfNormal, ofPostProcess, ofPreProcess
   Button 25,15,37,17, '~Д~обавить', cmInsertPhone, bfNormal, ofPostProcess, ofPreProcess
@@ -3108,7 +3108,7 @@ END
 DIALOG dlgUUEncode, 60, 17, 'UU-кодирование'
     HELPCTX hcUUEncode
     InputLine 16, 2, 55, 3, 255, hsUUEncode
-    Label 2, 2, '~К~одировать в', ofPostProcess, ofPreProcess
+    Label 2, 2, 'Код~и~ровать в', ofPostProcess, ofPreProcess
     CheckBoxes 2, 5, 31, 8, ofPostProcess, ofPreProcess
       ITEM 'Время и дата со~з~дания'
       ITEM 'Табли~ц~а символов'
@@ -3197,7 +3197,7 @@ DIALOG dlgViewerFind, 50, 15, 'Поиск'
     CheckBoxes 2,7,30,11, ofPostProcess
       ITEM '~Р~азличать ~р~егистр'
       ITEM 'Поиск отдельных ~с~лов'
-      ITEM '~В~се кодировки'
+      ITEM 'Все ~к~одировки'
 ;$IFDEF REGEXP
       ITEM 'Ре~г~улярное выражение'
 ;$ENDIF
@@ -3484,7 +3484,7 @@ DIALOG dlgSystemSetup, 72, 21, 'Системные установки'
 ;$IFNDEF VIRTUALPASCAL
       ITEM '"~Б~ыстрый" запуск программ'
       ITEM '~О~тключить XMS/EMS'
-      ITEM '~А~втоконтроль доступа к диску'
+      ITEM 'Автоконтро~л~ь доступа к диску'
 ;$ENDIF
       ITEM 'С~н~имать атрибут R/O на CD-ROM'
       ITEM 'Рас~ш~иренное копирование'

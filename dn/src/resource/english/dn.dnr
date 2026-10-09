@@ -1888,7 +1888,7 @@ DIALOG dlgSetupTerminal, 56, 15, 'Terminal Options'
       ITEM '^~L~ clears screen '
       ITEM 'L~o~cal echo'
       ITEM 'Auto-~Z~Modem download'
-      ITEM 'I~n~sert mode'
+      ITEM 'Inse~r~t mode'
       ITEM '~C~heck CD while transfer'
       ITEM 'Connect ~S~ound'
       ITEM 'Co~n~trols in capture'
@@ -2340,7 +2340,7 @@ DIALOG dlgEditorFind, 55, 16, 'Find'
     Label 30, 9, 'Origi~n~', ofPostProcess, ofPreProcess
     Button 22, 13, 32, 15, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 32, 13, 42, 15, 'C~a~ncel', cmCancel, ofPostProcess, ofPreProcess
-    Button 42, 13, 52, 15, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
+    Button 42, 13, 52, 15, 'He~l~p', cmHelp, ofPostProcess, ofPreProcess
     InputLine 17, 2, 49, 3, 250, hsFindText
     Label 3, 2, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 17, 3, 49, 4
@@ -2378,7 +2378,7 @@ DIALOG dlgEditorReplace, 55, 18, 'Replace'
     Button 6,  15, 16, 17, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 16, 15, 32, 17, 'Change ~a~ll', cmYes, ofPostProcess, ofPreProcess
     Button 32, 15, 42, 17, 'Cance~l~', cmCancel, ofPostProcess, ofPreProcess
-    Button 42, 15, 52, 17, '~H~elp', cmHelp, ofPostProcess, ofPreProcess
+    Button 42, 15, 52, 17, 'Help', cmHelp, ofPostProcess, ofPreProcess
     InputLine 17, 2, 49, 3, 250, hsFindText
     Label 3, 2, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 17, 3, 49, 4
@@ -2401,7 +2401,7 @@ DIALOG dlgFileFind, 56, 19, 'Find File'
     InputLine 16, 4, 51, 5, 255, hsFindText
     Label 2, 4, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 16, 5, 51, 6
-    Label 2, 5, '  ~H~ex string', ofPostProcess, ofPreProcess
+    Label 2, 5, '  He~x~ string', ofPostProcess, ofPreProcess
     CheckBoxes 3, 7, 51, 11, ofPostProcess, ofPreProcess
       ITEM 'Adva~n~ced search'
       ITEM 'Do not sort res~u~lt'
@@ -2453,7 +2453,7 @@ DIALOG dlgFoundFileFind, 56, 18, 'Find File in '
     InputLine 16, 4, 53, 5, 255, hsFindText
     Label 2, 4, '~T~ext to find', ofPostProcess, ofPreProcess
     HexLine 16, 5, 51, 6
-    Label 2, 5, '  ~H~ex string', ofPostProcess, ofPreProcess
+    Label 2, 5, '  He~x~ string', ofPostProcess, ofPreProcess
     CheckBoxes 3, 7, 53, 11, ofPostProcess, ofPreProcess
       ITEM 'Adva~n~ced search'
       ITEM 'Do not sort res~u~lt'
@@ -2561,7 +2561,7 @@ DIALOG dlgMakeList, 69, 20, 'Make List File'
 #1  InputLine 14, 2, 64, 3, 255, hsMakeList
     Label 2, 2, '~F~ile name', ofPostProcess, ofPreProcess
     InputLine 14, 6, 64, 7, 255, hsMakeListHeader
-    Label 2, 6, '~H~eader', ofPostProcess, ofPreProcess
+    Label 2, 6, 'Hea~d~er', ofPostProcess, ofPreProcess
     RadioButtons 14, 7, 64, 8, ofPostProcess, ofPreProcess
       ITEM 'Au~t~o'
       ITEM 'I~n~sert text'
@@ -2769,7 +2769,7 @@ DIALOG dlgSavePanelSetup, 46, 18, 'Save panel settings'
     Label 3, 1, '~P~anel type'
 
 #2  CheckBoxes 20, 2, 44, 14
-      ITEM '~C~urrent panel'
+      ITEM 'C~u~rrent panel'
       ITEM '~O~pposite panel'
     END
     Label 20, 1, '~B~lock of settings'
@@ -2823,7 +2823,7 @@ DIALOG dlgFilesAttr, 57, 15, 'File Attributes'
     InputLine 29, 4, 41, 5, 8, 0
     Label 31, 2, '~T~ime', ofPostProcess, ofPreProcess
     InputLine 43, 4, 55, 5, 10, 0
-    Label 45, 2, '~D~ate', ofPostProcess, ofPreProcess
+    Label 45, 2, 'Date', ofPostProcess, ofPreProcess
 
     StaticText 37, 6, 46, 7, 'Creation:'
     InputLine 29, 7, 41, 8, 8, 0
@@ -2842,12 +2842,12 @@ DIALOG dlgFilesAttr, 57, 15, 'File Attributes'
     Button 31,12, 40, 14, '~B~lank', cmNo, ofPostProcess, ofPreProcess
     Button 43,12, 53, 14, 'Ca~n~cel', cmCancel, ofPostProcess, ofPreProcess
     CheckBoxes 3, 4, 8, 10, ofFramed, ofPostProcess, ofPreProcess
-      ITEM '~R~ead-Only'
-      ITEM '~H~idden'
-      ITEM '~S~ystem'
-      ITEM '~V~olume label'
-      ITEM '~D~irectory'
-      ITEM '~A~rchive'
+      ITEM 'Read-~O~nly'
+      ITEM 'H~i~dden'
+      ITEM 'Syste~m~'
+      ITEM 'Vol~u~me label'
+      ITEM 'Director~y~'
+      ITEM 'Archive'
     END
     Label 3, 3, 'S~e~t', ofPostProcess, ofPreProcess
     CheckBoxes 9, 4, 26, 10, ofFramed, ofPostProcess, ofPreProcess
@@ -3091,7 +3091,7 @@ DIALOG dlgUUEncode, 60, 17, 'UU Encode'
       ITEM '~N~one'
       ITEM 'of Entire ~i~nput file'
       ITEM 'of Each ~s~ection'
-      ITEM 'of Eac~h~ line'
+      ITEM '~o~f Each line'
       ITEM 'Advanced ~6~4-bit'
     END
     Label 32, 4, '~C~hecksum level', ofPostProcess, ofPreProcess
@@ -3103,7 +3103,7 @@ DIALOG dlgUUEncode, 60, 17, 'UU Encode'
       ITEM '~U~NIX'
 ;     ITEM '<CR> only'
     END
-    Label 2, 11, '~T~arget file format', ofPostProcess, ofPreProcess
+    Label 2, 11, 'Ta~r~get file format', ofPostProcess, ofPreProcess
 
     Button 14, 14, 24, 16, 'O~K~', cmOK, bfDefault, ofPostProcess, ofPreProcess
     Button 24, 14, 34, 16, 'Cancel', cmCancel, ofPostProcess, ofPreProcess
@@ -3113,7 +3113,7 @@ END
 
 DIALOG dlgPhoneBook, 58, 20, 'Phone Book'
   HELPCTX hcPhone
-  Button 3,15,14,17, '~R~eturn', cmNo, bfDefault, ofPostProcess, ofPreProcess
+  Button 3,15,14,17, 'Re~t~urn', cmNo, bfDefault, ofPostProcess, ofPreProcess
   Button 3,15,14,17, 'Ente~r~', cmOK, bfDefault, ofPostProcess, ofPreProcess
   Button 14,15,24,17, '~D~ial', cmDialPhone, bfNormal, ofPostProcess, ofPreProcess
   Button 24,15,33,17, '~A~dd', cmInsertPhone, bfNormal, ofPostProcess, ofPreProcess
@@ -3323,7 +3323,7 @@ DIALOG dlgViewerFind, 50, 15, 'Find'
     InputLine 2, 3, 44, 4, 250, hsViewFind
     Label 2, 2, '~S~earch for', ofPostProcess, ofPreProcess
     HexLine 2, 5, 44, 6
-    Label 2, 4, '~H~ex string', ofPostProcess, ofPreProcess
+    Label 2, 4, 'H~e~x string', ofPostProcess, ofPreProcess
 
     CheckBoxes 2,7,24,11, ofPostProcess
       ITEM '~C~ase sensitive'

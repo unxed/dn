@@ -786,7 +786,7 @@ END
 DIALOG dlgDbFind, 55, 12, 'Пошук'
     HELPCTX hcDBSearch
     InputLine 19, 2, 50, 3, 250, hsdbSearch
-    Label 2, 2, 'Шукати ~т~екст', ofPostProcess, ofPreProcess
+    Label 2, 2, '~Ш~укати текст', ofPostProcess, ofPreProcess
     CheckBoxes 12, 4, 32, 5, ofPostProcess, ofPreProcess
       ITEM '~Р~озрізняти рег.'
     END
@@ -811,11 +811,11 @@ END
 DIALOG dlgReplaceCell, 52, 17, 'Заміна'
     HELPCTX hcReplaceCell
     InputLine 3, 3, 45, 4, 240, hsFindCellPattern, ofFramed
-    Label 3, 2,'~З~разок', ofPostProcess, ofPreProcess
+    Label 3, 2,'Зразок', ofPostProcess, ofPreProcess
     InputLine 3, 6, 45, 7, 240, hsReplacePattern, ofFramed
-    Label 3, 5, '~З~амінити на', ofPostProcess, ofPreProcess
+    Label 3, 5, 'За~м~інити на', ofPostProcess, ofPreProcess
     RadioButtons 3, 9, 18, 11, ofFramed, ofPostProcess, ofPreProcess
-      ITEM '~Р~ядки'
+      ITEM 'Р~я~дки'
       ITEM 'З~н~ачення'
     END
     Label 3, 8, '~П~ошук', ofPostProcess, ofPreProcess
@@ -837,7 +837,7 @@ DIALOG dlgFindCell, 49, 13, 'Пошук'
     InputLine 3, 3, 42, 4, 240, hsFindCellPattern, ofFramed
     Label 3, 2,'~З~разок', ofPostProcess, ofPreProcess
     RadioButtons 3, 6, 18, 8, ofFramed, ofPostProcess, ofPreProcess
-      ITEM '~Р~ядок'
+      ITEM 'Р~я~док'
       ITEM 'З~н~ачення'
     END
     Label 3, 5, '~И~скать', ofPostProcess, ofPreProcess
@@ -864,12 +864,12 @@ DIALOG dlgSetCellFormat, 42, 17, 'Клітина/блок Формат'
     HELPCTX hcSetCellFormat
     RadioButtons 3, 3, 39, 7, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~Я~к є'
-      ITEM '~Д~есятковий'
-      ITEM '~К~ома'
-      ITEM 'Е~к~спонента'
+      ITEM 'Д~е~сятковий'
+      ITEM 'Ко~м~а'
+      ITEM 'Експо~н~ента'
       ITEM '~Л~огічний'
       ITEM 'В~а~лютний'
-      ITEM 'Відсо~т~ок'
+      ITEM 'Від~с~оток'
       ITEM 'С~х~овати'
     END
     Label 3, 2, 'П~о~казати', ofPostProcess, ofPreProcess
@@ -969,9 +969,9 @@ DIALOG dlgEditorFind, 57, 16, 'Пошук'
     CheckBoxes 3, 5, 29, 9, ofPostProcess, ofPreProcess
       ITEM '~Р~озрізняти регістр'
       ITEM 'Пошук ~о~кремих слів'
-      ITEM 'У всіх код~у~ваннях'
+      ITEM 'У в~с~іх кодуваннях'
 ;$IFDEF REGEXP
-      ITEM 'Ре~г~улярний вираз'
+      ITEM 'Регу~л~ярний вираз'
 ;$ENDIF
     END
     Label 3, 4, 'Оп~ц~ії', ofPostProcess, ofPreProcess
@@ -1008,7 +1008,7 @@ DIALOG dlgEditorReplace, 57, 18, 'Заміна'
       ITEM 'Пошук ~о~кремих слів'
       ITEM '~З~апрос про заміну'
 ;$IFDEF REGEXP
-      ITEM 'Ре~г~улярний вираз'
+      ITEM 'Рег~у~лярний вираз'
 ;$ENDIF
     END
     Label 3, 6, 'Оп~ц~ії', ofPostProcess, ofPreProcess
@@ -1019,7 +1019,7 @@ DIALOG dlgEditorReplace, 57, 18, 'Заміна'
     Label 31, 6, 'Н~а~прям заміни', ofPostProcess, ofPreProcess
 
     RadioButtons 3, 12, 29, 14, ofPostProcess, ofPreProcess
-      ITEM 'У~в~есь текст'
+      ITEM 'Уве~с~ь текст'
       ITEM 'Від~м~ічений текст'
     END
     Label 3, 11, 'О~б~ласть заміни', ofPostProcess, ofPreProcess
@@ -1052,11 +1052,11 @@ DIALOG dlgFileFind, 56, 19, 'Пошук файла'
     InputLine 16, 2, 51, 3, 255, hsFindMask
     Label 2, 2, 'Маска ~Ф~айла', ofPostProcess, ofPreProcess
     InputLine 16, 4, 51, 5, 255, hsFindText
-    Label 2, 4, '~Ш~укати текст', ofPostProcess, ofPreProcess
+    Label 2, 4, 'Ш~у~кати текст', ofPostProcess, ofPreProcess
     HexLine 16, 5, 51, 6
     Label 2, 5, '        Код~и~', ofPostProcess, ofPreProcess
     CheckBoxes 3, 7, 51, 11, ofPostProcess, ofPreProcess
-      ITEM 'Р~о~зширений пошук'
+      ITEM 'Ро~з~ширений пошук'
       ITEM '~Н~е сортувати'
       ITEM 'Р~е~курсивний пошук'
       ITEM '~П~ошук в архівах'
@@ -1064,7 +1064,7 @@ DIALOG dlgFileFind, 56, 19, 'Пошук файла'
       ITEM 'Повні ~с~лова'
       ITEM 'У всіх к~о~дуваннях'
 ;$IFDEF REGEXP
-      ITEM 'Ре~г~улярний вираз'
+      ITEM 'Регул~я~рний вираз'
 ;$ENDIF
     END
     Label 3, 6, 'Оп~ц~ії', ofPostProcess, ofPreProcess
@@ -1104,19 +1104,19 @@ DIALOG dlgFoundFileFind, 54, 18, 'Пошук файла у '
     InputLine 16, 2, 51, 3, 255, hsFindMask
     Label 2, 2, 'Маска ~Ф~айла', ofPostProcess, ofPreProcess
     InputLine 16, 4, 51, 5, 255, hsFindText
-    Label 2, 4, '~Ш~укати текст', ofPostProcess, ofPreProcess
+    Label 2, 4, 'Шукати ~т~екст', ofPostProcess, ofPreProcess
     HexLine 16, 5, 49, 6
     Label 2, 5, '        Код~и~', ofPostProcess, ofPreProcess
     CheckBoxes 3, 7, 51, 11, ofPostProcess, ofPreProcess
-      ITEM 'Р~о~зширений пошук'
+      ITEM 'Ро~з~ширений пошук'
       ITEM '~Н~е сортувати'
-      ITEM 'Пошук у катало~г~ах'
+      ITEM 'Пошук ~у~ каталогах'
       ITEM '~П~ошук в архівах'
       ITEM '~Р~озрізняти регістр'
       ITEM 'Повні ~с~лова'
       ITEM 'У всіх к~о~дуваннях'
 ;$IFDEF REGEXP
-      ITEM 'Ре~г~улярний вираз'
+      ITEM 'Р~е~гулярний вираз'
 ;$ENDIF
     END
     Label 3, 6, 'Оп~ц~ії', ofPostProcess, ofPreProcess
@@ -1413,7 +1413,7 @@ DIALOG dlgSavePanelSetup, 46, 18, 'Записати настройки пане�
     HELPCTX hcSavePanelSetup
 #1  RadioButtons 2, 2, 14, 7
       ITEM '~Д~иск'
-      ITEM '~С~писок'
+      ITEM 'С~п~исок'
       ITEM '~А~рхів'
       ITEM 'А~Р~ВІД'
       ITEM '~В~сі'
@@ -1493,12 +1493,12 @@ DIALOG dlgFilesAttr, 59, 15, 'Атрибути файлів'
     Button 31,12, 42, 14, 'Ски~н~ути', cmNo, ofPostProcess, ofPreProcess
     Button 44,12, 55, 14, '~В~ідміна', cmCancel, ofPostProcess, ofPreProcess
     CheckBoxes 3, 4, 8, 10, ofFramed, ofPostProcess, ofPreProcess
-      ITEM '~Т~ільки читання'
-      ITEM '~С~хований'
-      ITEM 'С~и~стемний'
-      ITEM '~М~ітка тому'
-      ITEM 'Катало~г~'
-      ITEM '~А~рхівний'
+      ITEM 'Т~і~льки читання'
+      ITEM 'С~х~ований'
+      ITEM 'Системни~й~'
+      ITEM 'Мітка т~о~му'
+      ITEM 'Ката~л~ог'
+      ITEM 'А~р~хівний'
     END
     CheckBoxes 9, 4, 28, 10, ofFramed, ofPostProcess, ofPreProcess
       ITEM '~Т~ільки читання'
@@ -1562,7 +1562,7 @@ END
 DIALOG dlgExtract, 51, 14, 'Добути файли'
     HELPCTX hcExtract
     InputLine 13, 2, 46, 3, 255, hsFileCopyName
-    Label 2, 2, '~Д~обути в', ofPostProcess, ofPreProcess
+    Label 2, 2, 'Д~о~бути в', ofPostProcess, ofPreProcess
     CheckBoxes 3, 4, 47, 8, ofPostProcess, ofPreProcess
       ITEM 'Добути з іменем ~ш~ляху'
       ITEM 'Тільки ~т~естування'
@@ -3091,16 +3091,16 @@ END
 DIALOG dlgUUEncode, 60, 17, 'UU-кодування'
     HELPCTX hcUUEncode
     InputLine 16, 2, 55, 3, 255, hsUUEncode
-    Label 2, 2, '~К~одувати в', ofPostProcess, ofPreProcess
+    Label 2, 2, 'К~о~дувати в', ofPostProcess, ofPreProcess
     CheckBoxes 2, 5, 31, 8, ofPostProcess, ofPreProcess
-      ITEM 'Час та дата ство~р~ення'
+      ITEM '~Ч~ас та дата створення'
       ITEM 'Табли~ц~я символів'
       ITEM 'С~т~атистика'
     END
     Label 2, 4, 'Ін~ф~ормація про файл', ofPostProcess, ofPreProcess
     RadioButtons 32, 5, 58, 10, ofPostProcess, ofPreProcess
       ITEM '~Н~е рахувати'
-      ITEM 'Всьо~г~о файла'
+      ITEM 'В~с~ього файла'
       ITEM 'Ко~ж~ної секції'
       ITEM 'Кожної ~л~інії'
       ITEM 'Розширені (~6~4-біт)'
@@ -3173,16 +3173,16 @@ END
 DIALOG dlgViewerFind, 50, 15, 'Пошук'
     HELPCTX hcViewerFind
     InputLine 2, 3, 44, 4, 250, hsViewFind
-    Label 2, 2, '~Ш~укати текст', ofPostProcess, ofPreProcess
+    Label 2, 2, 'Шукати ~т~екст', ofPostProcess, ofPreProcess
     HexLine 2, 5, 44, 6
     Label 2, 4, '~Ш~істнадцятковий рядок', ofPostProcess, ofPreProcess
 
     CheckBoxes 2,7,30,11, ofPostProcess
       ITEM '~Р~озрізняти ~р~егістр'
       ITEM 'Пошук окремих ~с~лів'
-      ITEM '~В~сі кодування'
+      ITEM 'Всі ~к~одування'
 ;$IFDEF REGEXP
-      ITEM 'Ре~г~улярний вираз'
+      ITEM 'Р~е~гулярний вираз'
 ;$ENDIF
     END
     Label 2, 6, '~О~пції', ofPostProcess, ofPreProcess
@@ -3440,7 +3440,7 @@ DIALOG dlgArvidFileFind, 52, 13, 'Пошук файла'
     InputLine 16, 2, 47, 3, 255, 109
     Label 2, 2, 'Маска ~Ф~айла', ofPostProcess, ofPreProcess
     InputLine 16, 4, 47, 5, 255, 110
-    Label 2, 4, '~О~пис', ofPostProcess, ofPreProcess
+    Label 2, 4, 'Оп~и~с', ofPostProcess, ofPreProcess
     CheckBoxes 3, 7, 49, 9, ofPostProcess, ofPreProcess
       ITEM 'Р~о~ширений пошук'
       ITEM '~П~ошук в інших каталогах ARVID'
@@ -3465,9 +3465,9 @@ DIALOG dlgSystemSetup, 72, 21, 'Системні установки'
       ITEM 'Вбудований ~р~едактор'
       ITEM 'Текстовий бу~ф~ер системи'
 ;$IFNDEF VIRTUALPASCAL
-      ITEM '"~Ш~видкий" запуск програм'
+      ITEM '"Швидки~й~" запуск програм'
       ITEM '~В~ідключити XMS/EMS'
-      ITEM '~А~втоконтроль доступу до диска'
+      ITEM 'Авт~о~контроль доступу до диска'
 ;$ENDIF
       ITEM '~З~німати атрибут R/O на CD-ROM'
       ITEM 'Роз~ш~ирене копіювання'
