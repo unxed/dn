@@ -34,6 +34,11 @@ def shape(screen):
     return rows, [[a for _, a in row] for row in screen.cells], screen.alt
 
 
+# exec -a keeps argv[0]; an exec that fails with "Text file busy" (a copy of the program that another thread still has open: the child of
+# a fork made by another thread between the copy and its close) is tried again
+EXEC = 'shopt -s execfail; for i in 1 2 3 4 5 6 7 8 9 10; do exec -a "$0" "$@"; sleep 0.3; done; exit 127'
+
+
 class DnTerm(PtyTerm):
     def __init__(self, cmd, cols=80, rows=25, env=None, cwd=None, exe=None):
         """as PtyTerm, but the program is started by subprocess (setsid -c makes the pty its terminal): pty.fork runs Python in the child,
@@ -46,10 +51,6 @@ class DnTerm(PtyTerm):
         e.update(env or {})
         if exe and os.path.basename(exe) == 'dn' and 'DN2' not in e:
             e['DN2'] = os.path.dirname(os.path.abspath(exe))
-        # the temporary files of DN have fixed names (/tmp/$DN0$.LST): a copy of DN that runs beside others gets a TEMP of its own, next to it
-        if exe and os.path.basename(exe) == 'dn' and 'TEMP' not in e:
-            e['TEMP'] = os.path.join(os.path.dirname(os.path.abspath(exe)), 'tmp')
-            os.makedirs(e['TEMP'], exist_ok=True)
         prog, argv0 = exe or cmd[0], cmd[0]
         prefix = e.get('PTY_RUN_PREFIX')                        # e.g. qemu-aarch64-static: the program is of another CPU
         if prefix:
@@ -58,8 +59,7 @@ class DnTerm(PtyTerm):
             rest = list(cmd[1:])
         master, slave = os.openpty()
         fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', rows, cols, 0, 0))
-        # exec -a keeps argv[0] as the test gave it (./dn), the path of the program is `prog`
-        self.proc = subprocess.Popen(['setsid', '-c', 'bash', '-c', 'exec -a "$0" "$@"', argv0, prog] + rest,
+        self.proc = subprocess.Popen(['setsid', '-c', 'bash', '-c', EXEC, argv0, prog] + rest,
                                      stdin=slave, stdout=slave, stderr=slave, cwd=cwd, env=e)
         os.close(slave)
         self.pid, self.fd = self.proc.pid, master

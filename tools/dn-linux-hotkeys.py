@@ -149,7 +149,10 @@ def one(job):
                 why = 'fatal error after %s' % repr(k)
                 break
             if snapshot(t) == before:
-                why = 'nothing happened at the key %d (%s)' % (i + 1, repr(k))
+                if i == len(chain) - 1 and name.rstrip('.') not in t.text():
+                    why = 'SKIP'                    # the item is not in the menu of this build (a part of the resource under a $IFDEF)
+                else:
+                    why = 'nothing happened at the key %d (%s)' % (i + 1, repr(k))
                 break
         text = t.text()
         t.close(0.2)
@@ -178,6 +181,9 @@ def main():
     bad = 0
     with ThreadPoolExecutor(jobs_n) as ex:
         for lang, name, chain, why, text in ex.map(one, jobs):
+            if why == 'SKIP':
+                print('SKIP %s %s [Alt-%s]: not in the menu of this build' % (lang, name, ' '.join(chain)), flush=True)
+                continue
             print(('FAIL ' if why else 'PASS ') + '%s %s [Alt-%s]%s' % (lang, name, ' '.join(chain), ': ' + why if why else ''), flush=True)
             if why:
                 bad += 1

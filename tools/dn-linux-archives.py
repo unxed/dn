@@ -54,6 +54,12 @@ def copy_dn(out: str, d: str) -> None:
             shutil.copytree(src, os.path.join(d, 'xlt'))
 
 
+def dn_env(d: str) -> dict:
+    """HOME and TEMP of their own: the temporary files of DN have fixed names (TEMP/$DN0$.LST), the cases run side by side"""
+    os.makedirs(os.path.join(d, 'tmp'), exist_ok=True)
+    return {'HOME': d, 'TEMP': os.path.join(d, 'tmp')}
+
+
 def check(cond: bool, msg: str, scr: str = '') -> None:
     if cond:
         print('PASS', msg, flush=True)
@@ -133,7 +139,7 @@ def enter_archive(
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
-        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'HOME': d})
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['ENTER'], 1.0)
@@ -165,7 +171,7 @@ def view_edit_smoke(
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
         os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
-        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'HOME': d})
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
@@ -254,7 +260,7 @@ def extract_smoke(
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
-        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'HOME': d})
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
@@ -311,7 +317,7 @@ def extract_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, t
         old_path = os.environ['PATH']
         os.environ['PATH'] = bindir + os.pathsep + old_path
         os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
-        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'HOME': d})
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         os.environ['PATH'] = old_path
         del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
@@ -366,7 +372,7 @@ def delete_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, ti
         w = os.path.join(d, 'work')
         os.makedirs(w)
         shutil.copy(os.path.join(fixture_dir, name), os.path.join(w, name))
-        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'HOME': d})
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         open_archive(t, name, expect_member, title_hint)
         t.send(KEYS['HOME'], 0.15)
         t.send(KEYS['DOWN'], 0.2)
@@ -417,7 +423,7 @@ def add_real(dn_out: str, fixture_dir: str, name: str, expect_member: str, title
         old_path = os.environ['PATH']
         os.environ['PATH'] = bindir + os.pathsep + old_path
         os.environ['DN_LOG_FILE'] = os.path.join(d, 'dn.log')
-        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'HOME': d})
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env=dn_env(d))
         os.environ['PATH'] = old_path
         del os.environ['DN_LOG_FILE']
         open_archive(t, name, expect_member, title_hint)
