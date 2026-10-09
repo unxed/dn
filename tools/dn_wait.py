@@ -8,10 +8,14 @@ output that changes only the clock (a time such as 23:36:43 in the top row) does
   t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'))
   t.send(F5, 1.5)           # back after 1.5 s without a change of the screen, not after 8 s
 """
+import io
 import os
 import re
 import select
+import sys
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from pty_screen import PtyTerm
 
@@ -72,3 +76,51 @@ class DnTerm(PtyTerm):
                 return False
             self.pump(0.05, max(min(0.2, end - time.time()), 0.01))
         return True
+
+
+class _Out:
+    """sys.stdout of side_by_side: what a part prints goes to the buffer of its thread"""
+    def __init__(self, real):
+        self.real, self.local = real, threading.local()
+
+    def write(self, s):
+        buf = getattr(self.local, 'buf', None)
+        return (buf or self.real).write(s)
+
+    def flush(self):
+        if getattr(self.local, 'buf', None) is None:
+            self.real.flush()
+
+    def __getattr__(self, name):
+        return getattr(self.real, name)
+
+
+def side_by_side(parts):
+    """runs the functions `parts` at once, each in a thread (each must use a directory and a HOME of its own); what a part prints is
+    printed when it ends, in the order of the parts; returns their results (an exception of a part is raised after all have ended)"""
+    real = sys.stdout
+    out = _Out(real)
+    sys.stdout = out
+
+    def run(fn):
+        out.local.buf = io.StringIO()
+        try:
+            return fn(), None, out.local.buf.getvalue()
+        except BaseException as e:            # SystemExit of a check too
+            return None, e, out.local.buf.getvalue()
+        finally:
+            out.local.buf = None
+
+    try:
+        with ThreadPoolExecutor(max(len(parts), 1)) as ex:
+            res = []
+            for r, e, text in ex.map(run, parts):
+                real.write(text)
+                real.flush()
+                res.append((r, e))
+    finally:
+        sys.stdout = real
+    for r, e in res:
+        if e is not None:
+            raise e
+    return [r for r, _ in res]

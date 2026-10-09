@@ -5,7 +5,7 @@ Visits the Info panel, the drive menu, the tree, the find dialog and its results
 history lists, the user menu and the file attributes; every screen is scanned. Exit status 1 when a screen has such a path."""
 import os, re, shutil, sys, tempfile, zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from dn_wait import DnTerm
+from dn_wait import DnTerm, side_by_side
 
 PATH_FORM = re.compile(r'(?<![A-Za-z0-9])[A-Za-z]:\\|\\\\[A-Za-z0-9_.-]+\\|[A-Za-z0-9_.-]\\[A-Za-z0-9_.-]')
 DRIVE = re.compile(r'(?<![A-Za-z0-9])[A-Za-z]:(?![A-Za-z0-9/])|\[ [A-Z] [*\s]?\]')
@@ -26,9 +26,8 @@ def tok(spec):
         yield KEYS.get(s, s) if s not in ('RIGHT',) else '\x1b[C'
 
 
-def main():
-    out = os.path.abspath(sys.argv[1])
-    bad = 0
+def scenario(out, name, spec, want):
+    """one start of DN in a directory of its own; True when the screen has no path of DOS form"""
     d = tempfile.mkdtemp(prefix='dnpath-')
     try:
         for f in os.listdir(out):
@@ -40,29 +39,33 @@ def main():
         open(os.path.join(w, 'a.txt'), 'w').write('x')
         with zipfile.ZipFile(os.path.join(w, 'z.zip'), 'w') as z:
             z.writestr('dir/in.txt', 'inside')
-        for name, spec, *want in SCEN:
-            t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d})
-            t.started()
-            t.send('\x1b', 0.5)
-            for k in tok(spec):
-                t.send(k, 0.5)
-            t.pump(0.5, 3)
-            text = t.text()
-            hit = ''
-            for line in text.split('\n'):
-                m = PATH_FORM.search(line) or DRIVE.search(line)
-                if m:
-                    hit = line[max(0, m.start() - 20):m.end() + 20].strip()
-                    break
-            ok = t.alive() and not hit and 'Fatal Error' not in text and all(x in text for x in want)
-            print(('PASS ' if ok else 'FAIL ') + 'no DOS path on the screen: ' + name, flush=True)
-            if not ok:
-                bad += 1
-                print('    | ' + (hit or 'dead') + '\n' + text, flush=True)
-            t.close(0.3)
+        t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': 'ENGLISH', 'DN2': d, 'HOME': d})
+        t.started()
+        t.send('\x1b', 0.5)
+        for k in tok(spec):
+            t.send(k, 0.5)
+        t.pump(0.5, 3)
+        text = t.text()
+        hit = ''
+        for line in text.split('\n'):
+            m = PATH_FORM.search(line) or DRIVE.search(line)
+            if m:
+                hit = line[max(0, m.start() - 20):m.end() + 20].strip()
+                break
+        ok = t.alive() and not hit and 'Fatal Error' not in text and all(x in text for x in want)
+        print(('PASS ' if ok else 'FAIL ') + 'no DOS path on the screen: ' + name, flush=True)
+        if not ok:
+            print('    | ' + (hit or 'dead') + '\n' + text, flush=True)
+        t.close(0.3)
+        return ok
     finally:
         shutil.rmtree(d, ignore_errors=True)
-    sys.exit(1 if bad else 0)
+
+
+def main():
+    out = os.path.abspath(sys.argv[1])
+    res = side_by_side([lambda s=s: scenario(out, s[0], s[1], s[2:]) for s in SCEN])     # every scenario is a start of its own: all at once
+    sys.exit(0 if all(res) else 1)
 
 
 main()

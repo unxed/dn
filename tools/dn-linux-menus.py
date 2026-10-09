@@ -43,6 +43,10 @@ def one(args):
             # does Esc get us out (twice: a dialog, a menu)? then Alt-X ends the program
             t.send(ESC, 0.4); t.send(ESC, 0.4)
             t.send('\x1bx', 0.5); t.send(ENTER, 0.7)
+            for _ in range(10):                       # the end may take a moment when many copies run side by side
+                if not t.alive():
+                    break
+                t.pump(0.3, 0.5)
             if t.alive():
                 verdict = 'did not quit after Esc Esc Alt-X Enter'
         open(os.path.join(out, 'menu-%d-%d.txt' % (m, n)), 'w').write(text + '\n')
@@ -55,7 +59,7 @@ def one(args):
 
 def main():
     out = os.path.abspath(sys.argv[1])
-    workers = int(sys.argv[2]) if len(sys.argv) > 2 else 4
+    workers = int(sys.argv[2]) if len(sys.argv) > 2 else 16
     jobs = [(out, m, n) for m in range(1, MENUS + 1) for n in range(1, ITEMS + 1)]
     bad = 0
     with ThreadPoolExecutor(workers) as ex:

@@ -6,6 +6,7 @@ import os
 import shutil
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
 from dn_wait import DnTerm
@@ -67,10 +68,10 @@ def run(out, name, spec, cols=100, rows=30):
 def main():
     out = os.path.abspath(sys.argv[1])
     names = sys.argv[2:]
-    for name, spec in SCEN:
-        if names and name not in names:
-            continue
-        print('%-12s %s' % (name, run(out, name, spec)), flush=True)
+    todo = [(name, spec) for name, spec in SCEN if not names or name in names]
+    with ThreadPoolExecutor(max(len(todo), 1)) as ex:               # each scenario is a start of DN of its own: all at once
+        for (name, spec), res in zip(todo, ex.map(lambda s: run(out, *s), todo)):
+            print('%-12s %s' % (name, res), flush=True)
 
 
 main()
