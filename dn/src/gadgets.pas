@@ -367,7 +367,7 @@ procedure TTrashCan.SetState(AState: Word; Enable: Boolean);
   begin
   inherited SetState(AState, Enable);
   if AState and sfSelected <> 0 then
-    EnableCommands([cmNext, cmPrev]);
+    EnableCommands(CommandSetOf([cmNext, cmPrev]));
   if  (AState and (sfSelected+sfFocused+sfDragging) <> 0) then
     DrawView;
   end;

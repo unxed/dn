@@ -357,7 +357,7 @@ procedure TSaveSetupButton.Press;
   begin
   PresetNum := ActivePanel.PresetNum;
   PanelClass := Ord(dt2pc[ActivePanel.Drive.DriveType]);
-  EnableCommands([cmOK]); { The filter dialog may have disabled it }
+  EnableCommands(CommandSetOf([cmOK])); { The filter dialog may have disabled it }
   SavePresetData.ForClass := PanelClass;
   SavePresetData.Target := 1 shl (PresetNum-1);
   @PreExecuteDialog := @PrepareSaveSetupDialog;
@@ -505,10 +505,10 @@ procedure TExtSelList.SetState(AState: Word; Enable: Boolean);
   begin
   if Enable and (Astate and sfSelected <> 0) then
     begin
-    Owner.EnableCommands([cmYes, cmNo]);
+    Owner.EnableCommands(CommandSetOf([cmYes, cmNo]));
     OkButton.MakeDefault(False);
     AddButton.MakeDefault(True);
-    Owner.DisableCommands([cmOK]);
+    Owner.DisableCommands(CommandSetOf([cmOK]));
     end;
   inherited SetState(AState, Enable);
   end;
@@ -526,10 +526,10 @@ procedure TFilterLine.SetState(AState: Word; Enable: Boolean);
   begin
   if Enable and (Astate and sfSelected <> 0) then
     begin
-    Owner.EnableCommands([cmOK]);
+    Owner.EnableCommands(CommandSetOf([cmOK]));
     AddButton.MakeDefault(False);
     OkButton.MakeDefault(True);
-    Owner.DisableCommands([cmYes, cmNo]);
+    Owner.DisableCommands(CommandSetOf([cmYes, cmNo]));
     end;
   inherited SetState(AState, Enable);
   end;
@@ -541,7 +541,7 @@ function TFilterDialog.OwnDataAddress(P: PPanelSetup): Pointer;
 
 destructor TFilterDialog.Destroy;
   begin
-  EnableCommands([cmOK, cmYes, cmNo]);
+  EnableCommands(CommandSetOf([cmOK, cmYes, cmNo]));
   inherited Destroy;
   end;
 
@@ -1302,7 +1302,7 @@ CurTime:
       (*  works, but crashes after the nth time
  cmSkip:
       begin
-       Dlg.EnableCommands([cmYes, cmNo]);
+       Dlg.EnableCommands(CommandSetOf([cmYes, cmNo]));
        Dlg.Free;
        NotifyResume; {Cat}
        MessageKey(Application, kbDown);
@@ -1313,7 +1313,7 @@ CurTime:
       cmCancel:
         begin
         
-        Dlg.EnableCommands([cmYes, cmNo]);
+        Dlg.EnableCommands(CommandSetOf([cmYes, cmNo]));
         
         Dlg.Free;
         NotifyResume; {Cat}
@@ -1322,7 +1322,7 @@ CurTime:
     end {case};
     Dlg.GetData(D);
     
-    Dlg.EnableCommands([cmYes, cmNo]);
+    Dlg.EnableCommands(CommandSetOf([cmYes, cmNo]));
     
     Dlg.Free;
     D.C := {39}$FF;

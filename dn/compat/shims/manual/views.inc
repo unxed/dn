@@ -1,7 +1,7 @@
 { What DN calls differently from tv/ (the interface part of the unit Views). }
 type
-  TCommandSet = TvViews.TCommandSet;
-  TPalette = TvViews.TPalette;
+  { the command set of the Pascal API: a set of the commands 0..255 (CommandSetOf gives the TCommandSet of tv/) }
+  TCommandBytes = set of Byte;
 
   { DN units see these through Views (in the original they came with the Views of DN); same meaning as in Defines }
   AInt = SmallInt;
@@ -79,3 +79,5 @@ function GetNum: Integer;
 
 { Updates the periodic views now: those whose time has come (All = False) or all of them. }
 procedure UpdateAll(All: Boolean);
+
+function CommandSetOf(const Commands: TCommandBytes): TCommandSet;

@@ -91,10 +91,10 @@ procedure TXDoubleWindow.SetState(AState: Word; Enable: Boolean);
       begin
       Current.SetState(sfSelected, True);
         // so that ActivePanel and PassivePanel are set
-      EnableCommands(DblWndCommands)
+      EnableCommands(CommandSetOf(DblWndCommands))
       end
     else
-      DisableCommands(DblWndCommands);
+      DisableCommands(CommandSetOf(DblWndCommands));
     end
     
   else if TrashCan.ImVisible then

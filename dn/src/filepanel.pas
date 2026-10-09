@@ -572,7 +572,7 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
   if  (AState and sfActive <> 0) then
     if not Enable then
       begin
-      DisableCommands(PanelCommands);
+      DisableCommands(CommandSetOf(PanelCommands));
       if not GetState(sfActive+sfSelected) and
           (ScrollBar <> nil) and ScrollBar.GetState(sfVisible)
       then
@@ -580,7 +580,7 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
       DoDraw := True;
       end
     else
-      EnableCommands(PanelCommands);
+      EnableCommands(CommandSetOf(PanelCommands));
   if  (AState and sfSelected <> 0) and Enable then
     begin
     ActivePanel := Self;
@@ -610,13 +610,13 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
       else if Drive.DriveType = dtArc
       then
         Drive.lChDir(#0);
-      EnableCommands(PanelCommands);
+      EnableCommands(CommandSetOf(PanelCommands));
       end;
   if GetState(sfFocused) then
     begin
     if AState and sfFocused <> 0 then
       DrawView;
-    EnableCommands(PanelCommands);
+    EnableCommands(CommandSetOf(PanelCommands));
     if  (ScrollBar <> nil) and not ScrollBar.GetState(sfVisible) then
       begin
       ScrollBar.Show;
@@ -633,7 +633,7 @@ procedure TFilePanel.SetState(AState: Word; Enable: Boolean);
       then
         Drive.lChDir(#0);
       DoDraw := True;
-      EnableCommands(PanelCommands)
+      EnableCommands(CommandSetOf(PanelCommands))
       end
     else
       begin

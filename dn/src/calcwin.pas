@@ -663,7 +663,7 @@ procedure TCalcView.SetState(AState: Word; Enable: Boolean);
       begin
       HScroll.GrowTo(HScroll.Size.X, 1);
       VScroll.GrowTo(1, VScroll.Size.Y);
-      EnableCommands([cmUndo, cmCut, cmCopy, cmPaste, cmClear]);
+      EnableCommands(CommandSetOf([cmUndo, cmCut, cmCopy, cmPaste, cmClear]));
       end
     else
       begin

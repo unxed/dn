@@ -1697,7 +1697,7 @@ procedure TDNApplication.InitDesktop;
   begin
   WS := 0;
   HideCommandLine := (WS and cdnHideCmdLine <> 0);
-  DisableCommands(DblWndCommands);
+  DisableCommands(CommandSetOf(DblWndCommands));
   R := GetExtent;
   if InterfaceData.Options and ouiHideMenu = 0 then
     Inc(R.A.Y);

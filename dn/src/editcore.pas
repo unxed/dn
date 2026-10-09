@@ -844,29 +844,29 @@ procedure TFileEditor.CalcMenu;
   FLastMod := Doc.Modified;
   if (Owner = nil) or (TEditWindow(Owner).MenuBar = nil) then
     Exit;
-  BlkC := [cmCopy, cmCut, cmClear, cmBlockWrite, cmFJustify,
+  BlkC := CommandSetOf([cmCopy, cmCut, cmClear, cmBlockWrite, cmFJustify,
      cmCopyBlock, cmMoveBlock,
     cmFRight, cmFLeft, cmFCenter, cmPrintBlock, cmCalcBlock, cmSortBlock,
-    cmRevSortBlock, cmIndentBlock, cmUnIndentBlock];
+    cmRevSortBlock, cmIndentBlock, cmUnIndentBlock]);
   if FLastSel then
     EnableCommands(BlkC)
   else
     DisableCommands(BlkC);
   if FLastUndo > 0 then
-    EnableCommands([cmUndo])
+    EnableCommands(CommandSetOf([cmUndo]))
   else
-    DisableCommands([cmUndo]);
+    DisableCommands(CommandSetOf([cmUndo]));
   if FLastRedo > 0 then
-    EnableCommands([cmRedo])
+    EnableCommands(CommandSetOf([cmRedo]))
   else
-    DisableCommands([cmRedo]);
+    DisableCommands(CommandSetOf([cmRedo]));
   { the clipboard of the system changes without a word to DN (and a terminal of the far2l extensions gives its text only right after the paste
     key), so with it Paste stays on: a paste of an empty clipboard does nothing }
   if ((ClipBoard <> nil) and (ClipBoard.Count > 0)) or (SystemData.Options and ossUseSysClip <> 0)
   then
-    EnableCommands([cmPaste])
+    EnableCommands(CommandSetOf([cmPaste]))
   else
-    DisableCommands([cmPaste]);
+    DisableCommands(CommandSetOf([cmPaste]));
   if OptMenu <> nil then
     begin
     MI := OptMenu^.Items;
@@ -905,7 +905,7 @@ procedure TFileEditor.SetState(AState: Word; Enable: Boolean);
       if VScroll <> nil then
         VScroll.Show;
       DrawView;
-      EnableCommands([cmViewFile]);
+      EnableCommands(CommandSetOf([cmViewFile]));
       end
     else
       begin

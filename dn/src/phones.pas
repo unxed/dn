@@ -248,8 +248,8 @@ function TPhoneBox.GetKey(const S: String): Pointer;
 begin
  Inherited SetState(AState, Enable);
  if (Active <> nil) and ((State And sfFocused)<>0) then
-   if (Focused=0) then DisableCommands([cmDialPhone, cmImportPhones])
-                  else EnableCommands([cmDialPhone, cmImportPhones])
+   if (Focused=0) then DisableCommands(CommandSetOf([cmDialPhone, cmImportPhones]))
+                  else EnableCommands(CommandSetOf([cmDialPhone, cmImportPhones]))
 end;
 }
 procedure TPhoneBox.SetList(Alpha: Boolean);
@@ -618,7 +618,7 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
       if not CheckPassword(PD) then
         Exit;
 
-      DisableCommands([cmDialPhone, cmImportPhones]);
+      DisableCommands(CommandSetOf([cmDialPhone, cmImportPhones]));
       GroupLabel.Hide;
       ItemLabel.Show;
       EnterButton.Hide;
@@ -1023,26 +1023,26 @@ procedure TPhoneBox.HandleEvent(var Event: TEvent);
     end;
   if Active = nil then
     begin
-    DisableCommands([cmDialPhone, cmImportPhones]);
-    EnableCommands([cmPhoneBookMode, cmCopyPhone]);
+    DisableCommands(CommandSetOf([cmDialPhone, cmImportPhones]));
+    EnableCommands(CommandSetOf([cmPhoneBookMode, cmCopyPhone]));
     Owner.Redraw
     end
   else
     begin
-    DisableCommands([cmPhoneBookMode]);
-    EnableCommands([cmImportPhones]);
+    DisableCommands(CommandSetOf([cmPhoneBookMode]));
+    EnableCommands(CommandSetOf([cmImportPhones]));
     if Focused = 0 then
-      DisableCommands([cmDialPhone, cmCopyPhone])
+      DisableCommands(CommandSetOf([cmDialPhone, cmCopyPhone]))
     else
-      EnableCommands([cmDialPhone, cmCopyPhone]);
+      EnableCommands(CommandSetOf([cmDialPhone, cmCopyPhone]));
     Owner.Redraw
     end;
 
   if SearchMode then
-    DisableCommands([cmInsertPhone, cmDeletePhone, cmEditPhone,
-       cmImportPhones])
+    DisableCommands(CommandSetOf([cmInsertPhone, cmDeletePhone, cmEditPhone,
+       cmImportPhones]))
   else
-    EnableCommands([cmInsertPhone, cmDeletePhone, cmEditPhone]);
+    EnableCommands(CommandSetOf([cmInsertPhone, cmDeletePhone, cmEditPhone]));
 
   end { TPhoneBox.HandleEvent };
 

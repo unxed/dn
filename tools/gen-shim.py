@@ -83,7 +83,8 @@ def parse_unit(path):
             # a declaration may go on over several lines until a line that ends with ';' outside brackets
             text = rest
             depth = text.count('(') - text.count(')') + text.count('[') - text.count(']')
-            kind_is_record = re.match(r'(packed\s+)?(object|record|class)\b', rest.strip(), re.I)
+            kind_is_record = re.match(r'(packed\s+)?(object|record|class)\b', rest.strip(), re.I) \
+                and not re.match(r'class\s*(\(.*\))?\s*;|class\s+of\b', rest.strip(), re.I)   # a forward declaration, a class reference
             while i + 1 < i1 and (depth > 0 or not re.search(r';\s*(\{.*\})?\s*$', text) or
                                   (kind_is_record and not re.search(r'^  end;', lines[i], re.I) and
                                    not re.match(r'^\s*end\s*;', lines[i], re.I))):

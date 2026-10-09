@@ -284,7 +284,7 @@ procedure TWhileView.SetState(AState: Word; Enable: Boolean);
     SetState(sfActive, Enable);
     if Top <> '' then
       SetTitle(Top);
-    WindowCommands := [cmNext, cmPrev];
+    WindowCommands := CommandSetOf([cmNext, cmPrev]);
     if Enable then
       EnableCommands(WindowCommands)
     else

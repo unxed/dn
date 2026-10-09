@@ -1959,18 +1959,18 @@ procedure TTreeView.SetState(AState: Word; Enable: Boolean);
   inherited SetState(AState, Enable);
   if  (AState and sfFocused <> 0) and not Enable then
     if Parital then
-      DisableCommands([cmCopyFiles, cmPanelErase, cmMoveFiles,
+      DisableCommands(CommandSetOf([cmCopyFiles, cmPanelErase, cmMoveFiles,
          cmPanelMkDir,
-        cmChangeDrive, cmPanelReread]);
+        cmChangeDrive, cmPanelReread]));
   if AState and (sfFocused or sfActive or sfSelected) <> 0 then
     if Owner.GetState(sfActive) and GetState(sfSelected) then
       begin
       if ScrollBar <> nil then
         ScrollBar.Show;
       if Parital then
-        EnableCommands([cmCopyFiles, cmPanelErase, cmMoveFiles,
+        EnableCommands(CommandSetOf([cmCopyFiles, cmPanelErase, cmMoveFiles,
            cmPanelReread,
-          cmPanelMkDir, cmChangeDrive]);
+          cmPanelMkDir, cmChangeDrive]));
       {EventMask := EventMask or evBroadcast;}
       DrawView
       end

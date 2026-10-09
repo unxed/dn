@@ -606,9 +606,9 @@ procedure FilesCopy(Files: TCollection; SourcePanel: TView;
     D.SetData(AcceptAll);
     ObjChangeType(D, TClass(TOverriteDialog));
     if OldS >= NewS then
-      D.DisableCommands([cmSave]);
+      D.DisableCommands(CommandSetOf([cmSave]));
     I := Desktop.ExecView(D);
-    D.EnableCommands([cmSave]);
+    D.EnableCommands(CommandSetOf([cmSave]));
     MsgActive := False;
     NewTimer(Timer, 0);
 

@@ -150,9 +150,9 @@ procedure TUserWindow.SetState(AState: Word; Enable: Boolean);
     begin
     SetState(sfActive, Enable);
     if Enable then
-      EnableCommands([cmHideLeft, cmHideRight, cmHideInactive])
+      EnableCommands(CommandSetOf([cmHideLeft, cmHideRight, cmHideInactive]))
     else
-      DisableCommands([cmHideLeft, cmHideRight, cmHideInactive]);
+      DisableCommands(CommandSetOf([cmHideLeft, cmHideRight, cmHideInactive]));
     end;
   end;
 

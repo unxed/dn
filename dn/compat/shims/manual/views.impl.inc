@@ -119,3 +119,12 @@ begin
     if Background[I].View <> nil then
       Background[I].View.Update;
 end;
+
+function CommandSetOf(const Commands: TCommandBytes): TCommandSet;
+var
+  C: Byte;
+begin
+  Result := Default(TCommandSet);
+  for C in Commands do
+    Result := Result + C;
+end;

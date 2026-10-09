@@ -1119,7 +1119,7 @@ constructor TFileViewer.Create(const Bounds: TRect; AStream: TStream;
 
 destructor TFileViewer.Destroy;
   begin
-  EnableCommands([cmUnWrap]);
+  EnableCommands(CommandSetOf([cmUnWrap]));
   if Buf <> nil then
     FreeMem(Buf, BufSize);
   Buf := nil;
@@ -1309,7 +1309,7 @@ procedure TFileViewer.Draw;
   case ViewMode of
     vmHex:
       begin
-      DisableCommands([cmUnWrap]);
+      DisableCommands(CommandSetOf([cmUnWrap]));
       HexPos := (Size.X-12) div 4;
       if HexPos <= 0 then
         HexPos := 1;
@@ -1439,7 +1439,7 @@ procedure TFileViewer.Draw;
       end;
     vmDump:
       begin
-      DisableCommands([cmUnWrap]);
+      DisableCommands(CommandSetOf([cmUnWrap]));
       HideCursor;
       HexPos := ((Size.X-10) div 16)*16;
       if HexPos < 16 then
@@ -1490,7 +1490,7 @@ procedure TFileViewer.Draw;
     {GRM!}
     vmAsm:
       begin
-      DisableCommands([cmUnWrap]);
+      DisableCommands(CommandSetOf([cmUnWrap]));
       XDelta := 0;
       L := FilePos+LongInt(BufPos);
       D.MemBuff := Buf;
@@ -1532,7 +1532,7 @@ procedure TFileViewer.Draw;
     else {case}
       begin {vmText}
       ExposedLine := 0;
-      EnableCommands([cmUnWrap]);
+      EnableCommands(CommandSetOf([cmUnWrap]));
       {ak155        HideCursor;}
       { possibly shift XDelta so the found text becomes visible,
 and determine its X-position (accounting for tabs) for later highlighting }

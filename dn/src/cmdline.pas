@@ -379,9 +379,9 @@ procedure TCommandLine.SetState(AState: Word; Enable: Boolean);
     begin
     DrawView;
     if Enable then
-      EnableCommands([cmNext, cmPrev])
+      EnableCommands(CommandSetOf([cmNext, cmPrev]))
     else
-      DisableCommands([cmNext, cmPrev])
+      DisableCommands(CommandSetOf([cmNext, cmPrev]))
     end
   end;
 
