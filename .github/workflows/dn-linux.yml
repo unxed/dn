@@ -202,9 +202,9 @@ jobs:
         run: tools/build.sh linux64 out/dn
       - name: The size
         run: |
-          size out/dn
-          ls -l out/dn
-          echo "mini linux64: $(stat -c %s out/dn) bytes" >> "$GITHUB_STEP_SUMMARY"
+          size out/dn/dn
+          ls -l out/dn/dn
+          echo "mini linux64: $(stat -c %s out/dn/dn) bytes" >> "$GITHUB_STEP_SUMMARY"
       - name: ${{ matrix.name }}
         env:
           CMDS: ${{ matrix.cmds }}
