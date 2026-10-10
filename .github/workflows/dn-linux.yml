@@ -57,6 +57,31 @@ jobs:
           CMDS: ${{ matrix.cmds }}
         run: tools/ci-par.sh
 
+  linux64-release:
+    # the build of a release (DN_RELEASE=1: -O2, smart linking, no symbols and no line information): the optimizer finds what the test builds hide
+    # (an uninitialized byte read with a Word written into an Integer); the main tests run on it
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3
+      - name: Build DN as a release
+        run: DN_RELEASE=1 tools/build.sh linux64 out/dn && ls -l out/dn/dn
+      - name: The main tests on the release build
+        env:
+          CMDS: |
+            python3 tools/dn-linux-tour.py out/dn | tee tour.txt && ! grep -v ' ok$' tour.txt
+            python3 tools/dn-linux-ops.py out/dn
+            python3 tools/dn-linux-editor.py out/dn
+            python3 tools/dn-linux-badconfig.py out/dn
+            python3 tools/dn-linux-desktop.py out/dn
+            python3 tools/dn-linux-crash.py out/dn
+            python3 tools/dn-linux-dialoghot.py out/dn ENGLISH -j 16
+            python3 tools/dn-linux-dialoghot.py out/dn RUSSIAN -j 16
+        run: tools/ci-par.sh
+
   linux64-utf8:
     # DN with UTF-8 inside (the default of the build on Linux, -dDNUTF8): file operations in a pty and the UTF-8 checks, in groups that run side by side
     runs-on: ubuntu-24.04

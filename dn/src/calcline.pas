@@ -165,7 +165,7 @@ function GetNValue(L: LongInt; A: Integer): String;
 
 procedure TIndicator.HandleEvent(var Event: TEvent);
   var
-    SelectedForm: Integer;
+    SelectedForm: Word;              { the data of the radio buttons is a Word }
     s: string;
     sCalcFormat: array[Low(TCalcFormat)..High(TCalcFormat)] of string[2];
     i, n, iErr: Integer;
@@ -392,7 +392,7 @@ destructor TCalcLine.Destroy;
 procedure TCalcLine.SetValues(SetSelf: Boolean);
   var
     R: CReal;
-    SelectedForm: Integer;
+    SelectedForm: Word;              { the data of the radio buttons is a Word }
     S: String;
   begin
   GetData(S);
