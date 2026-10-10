@@ -65,6 +65,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 zip
       - run: tools/build.sh linux64 out/dn
       - run: tools/dn-pack.sh out/dn linux64 tar pack
+      # the mini build (dn/build.env, DN_OPT_mini)
+      - run: DN_MINI=1 tools/build.sh linux64 out/mini
+      - run: tools/dn-pack.sh out/mini linux64-mini tar pack
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-linux64
