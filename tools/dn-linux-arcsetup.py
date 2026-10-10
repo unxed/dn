@@ -9,6 +9,7 @@ from dn_wait import DnTerm, side_by_side
 
 bad = 0
 KEYS = {'RIGHT': '\x1b[C', 'DOWN': '\x1b[B', 'ENTER': '\r', 'F10': '\x1b[21~'}
+MINI = os.environ.get('DN_MINI') == '1'      # the mini build (dn/build.env): fewer archivers in the menu
 
 
 def check(ok, what, info=''):
@@ -35,8 +36,9 @@ def open_dialog(d, w, lang):
     t = DnTerm(['./dn'], 100, 30, cwd=w, exe=os.path.join(d, 'dn'), env={'DNLNG': lang, 'DN2': d, 'HOME': d})
     t.started()
     t.send('\x1b', 0.5)
-    # the menu Options (the sixth of the bar after the system one), the submenu Archives (the fourth item), the item ZIP (the 25th)
-    for k in ['F10'] + ['RIGHT'] * 6 + ['DOWN'] * 4 + ['ENTER'] + ['DOWN'] * 24 + ['ENTER']:
+    # the menu Options (the sixth of the bar after the system one), the submenu Archives (the fourth item), the item ZIP (the 25th; the 9th
+    # in the mini build: ARJ, CAB, LHA, RAR, TAR, GZ, ZIP after the two items of the setup)
+    for k in ['F10'] + ['RIGHT'] * 6 + ['DOWN'] * 4 + ['ENTER'] + ['DOWN'] * (8 if MINI else 24) + ['ENTER']:
         t.send(KEYS[k], 0.25)
     t.pump(0.8, 3)
     return t

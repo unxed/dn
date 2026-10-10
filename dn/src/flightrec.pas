@@ -338,7 +338,8 @@ begin
       end;
     evCommand:
       begin
-        Name := CommandName(Event.Message.Command);
+        { the mini build has no table of the names of the commands (evnames): the number only }
+        Name := {$IFDEF DN_MINI} '' {$ELSE} CommandName(Event.Message.Command) {$ENDIF};
         if Name = '' then
           Name := '#' + Num(Event.Message.Command)
         else

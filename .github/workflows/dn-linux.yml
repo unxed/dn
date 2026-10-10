@@ -150,6 +150,66 @@ jobs:
           CMDS: ${{ matrix.cmds }}
         run: tools/ci-par.sh
 
+  mini:
+    # the mini build (DN_MINI=1: dn/build.env, DN_OPT_mini; a release without the parts that a file manager can do without): its size, and the
+    # tests of what it keeps; a test skips the checks of a part that the mini build does not have (DN_MINI=1 in its environment)
+    runs-on: ubuntu-24.04
+    env:
+      DN_MINI: '1'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: tour, ops, editor
+            cmds: |
+              python3 tools/dn-linux-tour.py out/dn | tee tour.txt && ! grep -v ' ok$' tour.txt
+              DN_OPS_UTF8=1 python3 tools/dn-linux-ops.py out/dn
+              python3 tools/dn-linux-editor.py out/dn
+              python3 tools/dn-linux-embterm.py out/dn
+          - name: files and archives
+            cmds: |
+              python3 tools/dn-linux-fsattrs.py out/dn
+              python3 tools/dn-linux-dotfiles.py out/dn
+              python3 tools/dn-linux-archives.py out/dn
+              python3 tools/dn-linux-arcmembers.py out/dn
+              python3 tools/dn-linux-arcsetup.py out/dn
+              python3 tools/dn-linux-names.py out/dn
+              python3 tools/dn-linux-find.py out/dn
+              python3 tools/dn-linux-qsearch.py out/dn
+              python3 tools/dn-linux-sortmark.py out/dn
+          - name: desktop, setup, dialogs
+            cmds: |
+              python3 tools/dn-linux-desktop.py out/dn
+              python3 tools/dn-linux-config.py out/dn
+              python3 tools/dn-linux-crash.py out/dn
+              python3 tools/dn-linux-setup.py out/dn
+              python3 tools/dn-linux-colors.py out/dn
+              python3 tools/dn-linux-dialogok.py out/dn
+              python3 tools/dn-linux-msgbox.py out/dn
+              python3 tools/dn-linux-badconfig.py out/dn
+              python3 tools/dn-linux-ux.py out/dn
+          - name: menus
+            cmds: |
+              python3 tools/dn-linux-menusweep.py out/dn ENGLISH -j 16
+              python3 tools/dn-linux-hotkeys.py out/dn -j 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fp-compiler fp-units-rtl fp-units-fcl fp-units-base fp-units-misc python3 p7zip-full xz-utils zip unzip
+      - name: Build the mini DN (one command)
+        run: tools/build.sh linux64 out/dn
+      - name: The size
+        run: |
+          size out/dn
+          ls -l out/dn
+          echo "mini linux64: $(stat -c %s out/dn) bytes" >> "$GITHUB_STEP_SUMMARY"
+      - name: ${{ matrix.name }}
+        env:
+          CMDS: ${{ matrix.cmds }}
+        run: tools/ci-par.sh
+
   menusweep:
     # every item of the main menu, the submenus included, each from a fresh start: no fatal error and no path of DOS form; one job per language and half
     runs-on: ubuntu-24.04

@@ -637,6 +637,19 @@ function CommandHidden(Command: Word): Boolean;
 begin
   Result := ((Command = cmGame) and not EnableGame) or (Command = cmPlayCD) or (Command = cmSystemInfo) or
     (Command = cmMemoryInfo);
+  {$IFDEF DN_MINI}
+  { the mini build (dn/build.env, DN_OPT_mini): the commands of the parts that it is built without; their menu items are taken out
+    (menus.PruneHiddenItems) }
+  case Command of
+    cmGame, cmCalculator, cmCalcBlock, cmSheetLoad, cmNewTable, cmViewWKZ, cmWKZView, cmCalendar, cmASCIITable, cmSpecChar,
+    cmPhoneBook, cmSetupModem, cmTerminal, cmTerminalDefaults, cmUndial, cmHangUp, cmNavyLink,
+    cmViewDBF, cmDBFView, cmUUEncodeFile, cmUUDecodeFile, cmPrintFile, cmFilePrint, cmSetupPrinter, cmPrintFileEd, cmPrintBlock,
+    cmUnpDiskImg,
+    cmConfigACE, cmConfigHA, cmConfigAIN, cmConfigARC, cmConfigBS2, cmConfigBSA, cmConfigCHZ, cmConfigHAP, cmConfigHPK,
+    cmConfigHYP, cmConfigIS3, cmConfigLIM, cmConfigQUARK, cmConfigSQZ, cmConfigUC2, cmConfigUFA, cmConfigZOO, cmConfigZXZ:
+      Result := True;
+  end;
+  {$ENDIF}
 end;
 
 

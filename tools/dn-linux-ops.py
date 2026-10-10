@@ -148,11 +148,15 @@ def session(out, d):
     key('F10'); [key('\x1b[C', 0.2) for _ in range(5)]; [key('DOWN', 0.2) for _ in range(3)]; key('ENTER', 1.0)
     check(t.alive() and 'Current directory' in t.text(), 'the Info panel is on', t.text())
 
-    # the screen of the user: Ctrl-O shows what the commands drew (the emulator of tv/), a key leaves it
-    key('\x0f', 1.0)
-    check('shown-ok' in t.text() and 'ran-ok' in t.text(), 'Ctrl-O: the screen of the commands (the command line and its output)', t.text())
-    key('x', 1.0)
-    check('Name' in t.text() and t.alive(), 'a key leaves the screen of the user: the panels are back', t.text())
+    # the screen of the user: Ctrl-O shows what the commands drew (the emulator of tv/), a key leaves it; the mini build (DN_MINI=1,
+    # dn/build.env) has no emulator: the commands draw on the terminal itself
+    if os.environ.get('DN_MINI') == '1':
+        print('SKIP Ctrl-O, the screen of the commands: the mini build (DN_MINI=1) has no embedded terminal', flush=True)
+    else:
+        key('\x0f', 1.0)
+        check('shown-ok' in t.text() and 'ran-ok' in t.text(), 'Ctrl-O: the screen of the commands (the command line and its output)', t.text())
+        key('x', 1.0)
+        check('Name' in t.text() and t.alive(), 'a key leaves the screen of the user: the panels are back', t.text())
 
     key('ALT-X'); key('ENTER', 1.5)
     scr = t.text()

@@ -263,17 +263,22 @@ uses DnPath, DnActReg,
   DNHelp, DnIni, iniengine, cfgstate, DNErrLog, histories,
   VideoMan, panelwin, Messages, HistList, FileFind,
   
+  {$IFNDEF DN_MINI}
   Phones, 
   ASCIITab,
   Tetris, 
   Calendar,  {JO}
   calcwin, CellsCol, 
   DBView, DBWatch, 
+  {$ENDIF}
    ArchRead,  
+  {$IFNDEF DN_MINI}
   Arvid, 
   PrintMan, 
   
-  calcline, Collect, {-$VIV}
+  calcline,
+  {$ENDIF}
+  Collect, {-$VIV}
   DnExec,
   Setups, RegAll, panelwinx,
   Idlers, panelroot, WinClp,
@@ -1055,10 +1060,12 @@ procedure TDNApplication.ProcessTempFile(TFStr: String);
     case TFStr[1] of
       '-':
         CC := cmIntFileView;
+      {$IFNDEF DN_MINI}
       '=':
         CC := cmDBFView;
       '>':
         CC := cmWKZView;
+      {$ENDIF}
       '<':
         CC := cmTextView;
       '|':
@@ -1391,7 +1398,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
     else
       Q := -1;
     XT := UpStrg(GetExt(FileName));
-    
+    {$IFNDEF DN_MINI}
     if  (XT = '.DBF') or (Q = vmDB) then
       begin
       {--- start -------- Eugeny Zvyagintzev ---------}
@@ -1459,7 +1466,7 @@ procedure TDNApplication.ViewFile(AltExt, NoExtFile: Boolean;
           end;
       goto db;
       end;
-    
+    {$ENDIF}
 
     SpecialIntView := ArcViewer(FileName, RN);
     Exit;
@@ -2000,6 +2007,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     end;
 
   
+  {$IFNDEF DN_MINI}
   {-DataCompBoy-}
   procedure LoadSheet(const SheetName: String);
     begin
@@ -2020,6 +2028,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
       LoadSheet(FN);
     end;
   {-DataCompBoy-}
+  {$ENDIF}
   
 
   var
@@ -2561,12 +2570,14 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmListOfDirs:
       DoQuickChange;
     
+    {$IFNDEF DN_MINI}
     cmFilePrint:
       PrintFile(PString(Event.Message.InfoPtr)^);
     
     
     cmSetupPrinter:
       SetupPrinter;
+    {$ENDIF}
     
     cmOpenSmartpad:
       OpenSmartpad;
@@ -2582,6 +2593,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmHighlightGroups:
       SetHighlightGroups;
     
+    {$IFNDEF DN_MINI}
     cmDBFView:
       InsertWindow(TDBWindow.Create(CnvString(Event.Message.InfoPtr), FileIsDBF));
     
@@ -2599,6 +2611,7 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     
     cmPhoneBook:
       PhoneBook(False);
+    {$ENDIF}
     
     
     cmTextView, cmHexView:
@@ -2685,19 +2698,23 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     
     cmChScreenMode:
       SelectVideoModeDialog;
+    {$IFNDEF DN_MINI}
     cmASCIITable:
       ASCIITable;
+    {$ENDIF}
     cmAbout:
       begin
       ClearEvent(Event);
       MessageBoxAbout;
       Exit;
       end;
+    {$IFNDEF DN_MINI}
     cmCalculator:
       InsertCalc;
     
     cmCalendar:
       InsertCalendar; {JO}
+    {$ENDIF}
     
     
     cmRefresh:
@@ -2834,11 +2851,13 @@ procedure TDNApplication.HandleCommand(var Event: TEvent);
     cmStoreColors:
       StoreColors;
     
+    {$IFNDEF DN_MINI}
     cmGame:
       if Game = nil then
         InsertWindow(TGameWindow.Create)
       else
         Game.Owner.Select;
+    {$ENDIF}
     
     {From  GetEvent}
 

@@ -179,8 +179,9 @@ uses TvEvents, DnPath,
   Lfn, DNUtil, mainapp, basics, strutil, DNUtf8, fileutil, envutil, Startup, FileCopy, Messages, Menus, DiskInfo, Dialogs, Commands,
   HistList, Tree, copyio, ArcView, CmdLine, histories, Archiver,
   gadgets, progress, FileFind, paneldlgs, DnIni, panelwinx, panelwin, Filediz, TvGlyphs
-  
+  {$IFNDEF DN_MINI}
   , UUCode
+  {$ENDIF}
    {, Crt}
   , timeutil
   , panelsetup, Math

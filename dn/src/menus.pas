@@ -314,6 +314,7 @@ var
 
 implementation
 uses
+  {$IFDEF DN_MINI} TvViews, {$ENDIF}
   TvSys, TvClip, TvEvents, TvMenus,
   basics, strutil, fileutil, Commands, DNHelp, mainapp, DNUtf8, TvGlyphs
   , keymap, DnIni
@@ -422,6 +423,73 @@ procedure DisposeMenu(Menu: PMenu);
     end;
   end { DisposeMenu };
 
+{$IFDEF DN_MINI}
+{ The mini build: the items of the commands that it does not have (mainapp.CommandHidden) are taken out of a menu that is read
+  from the resources, and so are the lines that are left doubled or at an end. }
+procedure PruneHiddenItems(Menu: PMenu);
+  var
+    P, Prev, N: PMenuItem;
+
+  function Hidden(P: PMenuItem): Boolean;
+    begin
+    Result := (P^.Name <> nil) and (P^.Flags and miSubmenu = 0) and (P^.Command <> 0) and
+      Assigned(CommandHiddenHook) and CommandHiddenHook(P^.Command);
+    end;
+
+  procedure Remove(P: PMenuItem);
+    begin
+    if Prev = nil then
+      Menu^.Items := P^.Next
+    else
+      Prev^.Next := P^.Next;
+    if Menu^.Default = P then
+      Menu^.Default := Menu^.Items;
+    if P^.Name <> nil then
+      begin
+      DisposeStr(P^.Name);
+      DisposeStr(P^.Param);
+      end;
+    Dispose(P);
+    end;
+
+  begin
+  if Menu = nil then
+    Exit;
+  P := Menu^.Items;
+  while P <> nil do
+    begin
+    if (P^.Name <> nil) and (P^.Flags and miSubmenu <> 0) then
+      PruneHiddenItems(P^.SubMenu);
+    P := P^.Next;
+    end;
+  { the items, and a line at the start or after another line }
+  Prev := nil;
+  P := Menu^.Items;
+  while P <> nil do
+    begin
+    N := P^.Next;
+    if Hidden(P) or ((P^.Name = nil) and ((Prev = nil) or (Prev^.Name = nil))) then
+      Remove(P)
+    else
+      Prev := P;
+    P := N;
+    end;
+  { a line at the end }
+  if (Prev <> nil) and (Prev^.Name = nil) then
+    begin
+    P := Prev;
+    Prev := nil;
+    N := Menu^.Items;
+    while N <> P do
+      begin
+      Prev := N;
+      N := N^.Next;
+      end;
+    Remove(P);
+    end;
+  end { PruneHiddenItems };
+{$ENDIF}
+
 { TMenuView }
 
 constructor TMenuView.Create(var Bounds: TRect);
@@ -478,6 +546,9 @@ function TMenuView.Read(Ip: ipstream): Pointer;
   Result := Self;
   inherited Read(Ip);
   Menu := DoLoadMenu;
+  {$IFDEF DN_MINI}
+  PruneHiddenItems(Menu);
+  {$ENDIF}
   end { TMenuView.Load };
 
 function TMenuView.Execute: Word;

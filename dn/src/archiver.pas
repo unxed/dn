@@ -768,6 +768,31 @@ function CheckForSpaces(S: String): Boolean;
   end;
 { Flash <<< }
 
+{$IFDEF DN_MINI}
+{ The mini build: the buttons of the archivers that it does not have (ArchDet.GetArchiveByTag gives nil for them) are disabled in the
+  dialog "Archive files" (its buttons are in the order of the tags arcXXX). }
+function IsArchiverButtons(P: TView): Boolean;
+  begin
+  Result := (P is TRadioButtons) and (TRadioButtons(P).Strings <> nil) and (TRadioButtons(P).Strings.Count > arcBZ2);
+  end;
+
+procedure PrepareArchiveDialog(D: TView);
+  var
+    P: TView;
+    I: Integer;
+    M: LongWord;
+  begin
+  P := TDialog(D).FirstThat(IsArchiverButtons);
+  if P = nil then
+    Exit;
+  M := 0;
+  for I := 0 to TRadioButtons(P).Strings.Count-1 do
+    if not (I in [arcARJ, arcCAB, arcLHA, arcRAR, arcZIP, arcTAR, arcTGZ, arc7Z, arcBZ2, arcXZ]) then
+      M := M or (LongWord(1) shl I);
+  TRadioButtons(P).SetButtonState(M, False);
+  end;
+{$ENDIF}
+
 {-DataCompBoy-}
 procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Boolean; Owner: Pointer);
 
@@ -1161,7 +1186,9 @@ procedure MakeArchive(S: String; Files: TCollection; MoveMode, AddToExisting: Bo
   repeat
     
 TryAgain:
-    
+    {$IFDEF DN_MINI}
+    @PreExecuteDialog := @PrepareArchiveDialog;
+    {$ENDIF}
     if ExecResource(dlgArchiveFiles, D) <> cmOK then
       Exit;
     AID := (D.Mode and 255) or (D.Options shl 8);

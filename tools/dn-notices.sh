@@ -1,6 +1,6 @@
 #!/bin/sh
 # Writes the licence texts and README.TXT that every published build of DN carries: tools/dn-notices.sh DEST TARGET
-#   TARGET  linux, linux64, aarch64, win32, win64, dos or dos-utf8 (the names of tools/build.sh or of tools/dn-pack.sh)
+#   TARGET  linux, linux64, aarch64, win32, win64, dos or dos-utf8 (the names of tools/build.sh or of tools/dn-pack.sh); NAME-mini: the mini build
 # The files (all of them must exist: a missing one is an error):
 #   LICENSE.TXT                  the MIT license of the dn project (LICENSE)
 #   LICENSE-DN.TXT               the licence of the DN code (RIT Research Labs), the notice from the head of its files
@@ -109,6 +109,16 @@ EOS
     fi
     ;;
 *) echo "dn-notices: unknown target $target" >&2; exit 2 ;;
+esac
+case "$target" in *-mini)
+    cat <<'EOS'
+
+This is the mini build (DN_MINI=1 of tools/build.sh): a smaller program without the game, the calculator and the spreadsheet,
+the phone book, Arvid, UUE, the DBF viewer, the disassembler of the viewer, the printing, the calendar, the ASCII table, the
+disk images, the embedded terminal (a command gets the terminal itself) and the archive formats other than ARJ, CAB, LHA, RAR,
+ZIP, TAR, GZ, 7Z, BZ2 and XZ.
+EOS
+    ;;
 esac
 cat <<EOS
 

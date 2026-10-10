@@ -114,7 +114,9 @@ uses
   Tree, Messages, mainapp, basics, strutil, fileutil, TvGlyphs,
    {AK155}
   FilesCol, Startup, DnIni, FileCopy, Eraser, Commands
+  {$IFNDEF DN_MINI}
   , Calendar 
+  {$ENDIF}
   ; {-$VIV}
 
 constructor TKeyMacros.Create;
@@ -280,14 +282,14 @@ procedure TClockView.HandleEvent(var Event: TEvent);
       Exit;
       end;
     R := Application.GetBounds;
-    
+    {$IFNDEF DN_MINI}
     if ((Event.Mouse.EventFlags and 2) <> 0) then
       begin
       InsertCalendar;
       ClearEvent(Event);
       Exit
       end;
-    
+    {$ENDIF}
     DragView(Event, dmDragMove, R, P, P);
     end;
   end;

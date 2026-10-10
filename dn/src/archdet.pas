@@ -60,11 +60,12 @@ function GetArchiveByTag(ID: Byte): TARJArchive;
 implementation
 
 uses
-  DnPath, fmtzip, fmtlha, fmtrar, fmtace, fmtha, fmtcab,
-  
-  fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, fmttar, fmttgz,
+  DnPath, fmtzip, fmtlha, fmtrar, {$IFNDEF DN_MINI} fmtace, fmtha, {$ENDIF} fmtcab,
+  {$IFNDEF DN_MINI}
+  fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, {$ENDIF} fmttar, fmttgz,
+  {$IFNDEF DN_MINI}
   fmtzxz, fmtqrk, fmtufa, fmtis3, fmtsqz, fmthap, fmtzoo, fmtchz,
-  fmtuc2, fmtain, fmt7z,  fmtbz2, fmtxz,
+  fmtuc2, fmtain, {$ENDIF} fmt7z,  fmtbz2, fmtxz,
   
   profile, Defines, Streams, strutil, fileutil,
   Messages,
@@ -197,6 +198,7 @@ function RARDetect: Boolean;
   ArcFile.Seek(ArcPos);
   end { RARDetect: };
 
+{$IFNDEF DN_MINI}
 function ACEDetect: Boolean;
   var
     ACESign: array[0..6] of Char;
@@ -213,7 +215,9 @@ function ACEDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function HADetect: Boolean;
   var
     S: array[0..3] of Char;
@@ -233,6 +237,7 @@ function HADetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
 function ARJDetect: Boolean; {fixed by piwamoto}
   var
@@ -279,6 +284,7 @@ function CABDetect: Boolean;
   end { CABDetect: };
 
 
+{$IFNDEF DN_MINI}
 function ArcDetect: Boolean;
   var
     P: ARCHdr;
@@ -316,7 +322,9 @@ function ArcDetect: Boolean;
     More;
   ArcFile.Seek(ArcPos);
   end { ArcDetect: };
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function BSADetect: Boolean;
   var
     M: array[1..4] of Char;
@@ -326,7 +334,9 @@ function BSADetect: Boolean;
          = #0) and (M[3] = #$AE));
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function BS2Detect: Boolean;
   var
     ID: LongInt;
@@ -335,7 +345,9 @@ function BS2Detect: Boolean;
   BS2Detect := ((ArcFile.Status = stOK) and (ID = $425303D4));
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function HYPDetect: Boolean;
   var
     ID: LongInt;
@@ -345,7 +357,9 @@ function HYPDetect: Boolean;
          or (ID = $2554531A {^Z'ST%'})));
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function LIMDetect: Boolean;
 {4C 4D 1A 08 00 -- -- -- -- -- -- -- -- 23 F1}
 {check for these bytes at start of archive for detection}
@@ -364,7 +378,9 @@ function LIMDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function HPKDetect: Boolean;
   var
     B: Byte;
@@ -480,6 +496,7 @@ function HPKDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end { HPKDetect: };
+{$ENDIF}
 
 function TARDetect: Boolean;
   var
@@ -513,6 +530,7 @@ function TGZDetect: Boolean;
   ArcFile.Seek(ArcPos);
   end;
 
+{$IFNDEF DN_MINI}
 function ZXZDetect: Boolean;
   var
     P: ZXZHdr;
@@ -531,7 +549,9 @@ function ZXZDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function QuArkDetect: Boolean;
   var
     ID: LongInt;
@@ -545,7 +565,9 @@ function QuArkDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function UFADetect: Boolean;
   var
     ID: LongInt;
@@ -565,7 +587,9 @@ function UFADetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function IS3Detect: Boolean;
   var
     ID: LongInt;
@@ -578,7 +602,9 @@ function IS3Detect: Boolean;
   else
     ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function SQZDetect: Boolean;
   var
     ID: LongInt;
@@ -595,7 +621,9 @@ function SQZDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function HAPDetect: Boolean;
   var
     ID: LongInt;
@@ -610,7 +638,9 @@ function HAPDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function ZOODetect: Boolean;
   var
     ID: LongInt;
@@ -624,7 +654,9 @@ function ZOODetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function CHZDetect: Boolean;
   var
     ID: LongInt;
@@ -637,7 +669,9 @@ function CHZDetect: Boolean;
     CHZDetect := True;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function UC2Detect: Boolean;
   var
     ID: LongInt;
@@ -650,7 +684,9 @@ function UC2Detect: Boolean;
   else
     ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
+{$IFNDEF DN_MINI}
 function AINDetect: Boolean;
   var
     AinHdr: array[0..21] of Byte;
@@ -672,6 +708,7 @@ function AINDetect: Boolean;
     end;
   ArcFile.Seek(ArcPos);
   end;
+{$ENDIF}
 
 Function S7ZDetect: Boolean;
   var
@@ -712,6 +749,34 @@ Function XZDetect: Boolean;
   end;
 
 
+{$IFDEF DN_MINI}
+function DetectArchive: TARJArchive;
+  begin
+  if ARJDetect then
+    DetectArchive := TARJArchive.Create
+  else if CABDetect then
+    DetectArchive := PCABArchive.Create
+  else if LHADetect then
+    DetectArchive := PLHAArchive.Create
+  else if RARDetect then
+    DetectArchive := PRARArchive.Create
+  else if ZIPDetect then
+    DetectArchive := PZIPArchive.Create
+  else if TARDetect then
+    DetectArchive := PTARArchive.Create
+  else if TGZDetect then
+    DetectArchive := PTGZArchive.Create
+  else if S7ZDetect then
+    DetectArchive := PS7ZArchive.Create
+  else if BZ2Detect then
+    DetectArchive := PBZ2Archive.Create
+  else if XZDetect then
+    DetectArchive := PXZArchive.Create
+  else
+    DetectArchive := nil;
+  CloseProfile;
+  end { DetectArchive };
+{$ELSE}
 function DetectArchive: TARJArchive;
   begin
   if ACEDetect then
@@ -779,7 +844,35 @@ function DetectArchive: TARJArchive;
   
   CloseProfile;
   end { DetectArchive };
+{$ENDIF}
 
+{$IFDEF DN_MINI}
+function GetArchiveTagBySign(Sign: TStr4): Byte;
+  begin
+  if Sign = sigARJ then
+    GetArchiveTagBySign := arcARJ
+  else if Sign = sigCAB then
+    GetArchiveTagBySign := arcCAB
+  else if Sign = sigLHA then
+    GetArchiveTagBySign := arcLHA
+  else if Sign = sigRAR then
+    GetArchiveTagBySign := arcRAR
+  else if Sign = sigZIP then
+    GetArchiveTagBySign := arcZIP
+  else if Sign = sigTAR then
+    GetArchiveTagBySign := arcTAR
+  else if Sign = sigTGZ then
+    GetArchiveTagBySign := arcTGZ
+  else if sign = sig7Z  then
+    GetArchiveTagBySign := arc7Z
+  else if sign = sigBZ2 then
+    GetArchiveTagBySign := arcBZ2
+  else if sign = sigXZ then
+    GetArchiveTagBySign := arcXZ
+  else
+    GetArchiveTagBySign := arcUNK;
+  end { GetArchiveTagBySign };
+{$ELSE}
 function GetArchiveTagBySign(Sign: TStr4): Byte;
   begin
   if Sign = sigACE then
@@ -846,7 +939,36 @@ function GetArchiveTagBySign(Sign: TStr4): Byte;
     GetArchiveTagBySign := arcUNK;
   
   end { GetArchiveTagBySign };
+{$ENDIF}
 
+{$IFDEF DN_MINI}
+function GetArchiveByTag(ID: Byte): TARJArchive;
+  begin
+  if ID = arcARJ then
+    GetArchiveByTag := TARJArchive.Create
+  else if ID = arcCAB then
+    GetArchiveByTag := PCABArchive.Create
+  else if ID = arcLHA then
+    GetArchiveByTag := PLHAArchive.Create
+  else if ID = arcRAR then
+    GetArchiveByTag := PRARArchive.Create
+  else if ID = arcZIP then
+    GetArchiveByTag := PZIPArchive.Create
+  else if ID = arcTAR then
+    GetArchiveByTag := PTARArchive.Create
+  else if ID = arcTGZ then
+    GetArchiveByTag := PTGZArchive.Create
+  else if ID = arc7Z  then
+    GetArchiveByTag := PS7ZArchive.Create
+  else if ID = arcBZ2 then
+    GetArchiveByTag := PBZ2Archive.Create
+  else if ID = arcXZ then
+    GetArchiveByTag := PXZArchive.Create
+  else
+    GetArchiveByTag := nil;
+  CloseProfile;
+  end { GetArchiveByTag };
+{$ELSE}
 function GetArchiveByTag(ID: Byte): TARJArchive;
   begin
   if ID = arcACE then
@@ -914,5 +1036,6 @@ function GetArchiveByTag(ID: Byte): TARJArchive;
   
   CloseProfile;
   end { GetArchiveByTag };
+{$ENDIF}
 
 end.

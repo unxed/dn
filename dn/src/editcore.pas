@@ -277,7 +277,7 @@ implementation
 uses DnPath,{$IFNDEF DNUTF8} TvClip,{$ENDIF}
   Messages, mainapp, Dos, Lfn, strutil, fileutil, Startup,
   progress, FViewer, HistList, Macro, Editor, WinClp, DNUtil, histories,
-  timeutil, FileCopy, ASCIITab, DnIni, findspf, editwin, editfile, editinfo
+  timeutil, FileCopy, {$IFNDEF DN_MINI} ASCIITab, {$ENDIF} DnIni, findspf, editwin, editfile, editinfo
 , TvCodePg, TvUtf8, TvGlyphs, TvCharset, TvKeys, TvXlat
 , osdep, DNStdDlg, Dialogs, DNHelp, Math, fileerrors
 , TveBuf, TveEditor, TveCmds, TveBlocks, TveExtras, TveLang, TveHl, TveLayout, TveFile
@@ -1077,8 +1077,10 @@ procedure TFileEditor.CalcBlock;
   var
     R: AnsiString;
   begin
+  {$IFNDEF DN_MINI}
   if TveExtras.CalcBlock(Editor, R) and (R <> '') then
     ClipSet(R, False);
+  {$ENDIF}
   end;
 
 procedure TFileEditor.InsertDateTime(Time: Boolean);
@@ -1273,8 +1275,10 @@ function TFileEditor.CommandOf(Cmd: Word; var Event: TEvent): Boolean;
     cmSaveText: MISaveFile(Self);
     cmSaveTextAs: MISaveFileAs(Self);
     cmLoadText: MIOpenFile(Self);
+    {$IFNDEF DN_MINI}
     cmPrintFileEd: PrintText(False);
     cmPrintBlock: PrintText(True);
+    {$ENDIF}
     cmGetName:
       begin
       Event.Message.InfoPtr := @EditName;
@@ -1283,7 +1287,9 @@ function TFileEditor.CommandOf(Cmd: Word; var Event: TEvent): Boolean;
     { text }
     cmInsertDate: InsertDateTime(False);
     cmInsertTime: InsertDateTime(True);
+    {$IFNDEF DN_MINI}
     cmSpecChar, cmASCIITable: ASCIITable;
+    {$ENDIF}
     cmSwitchDrawMode: SwitchDraw;
     cmSwitchKeyMapping: SwitchCharset;
     cmSyncClipOut: SyncClipOut;
@@ -1847,6 +1853,7 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
     N, Sel: Integer;
   begin
   Result := False;
+  {$IFNDEF DN_MINI}
   if fASCIITable then
     begin
     { a character of the table of the characters: the byte of the code page of DN }
@@ -1854,6 +1861,7 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
     ClearEvent(Event);
     Exit(True);
     end;
+  {$ENDIF}
   { a typed character outside ASCII is text, never a key of the table below (U+2026 or U+03B2 would be taken for the codes of commands) }
   if (Event.KeyDown.TextLength > 0) and (Byte(Event.KeyDown.Text[0]) >= $80) and (Event.KeyDown.ControlKeyState and (kbCtrlShift or kbAltShift) = 0) then
     begin

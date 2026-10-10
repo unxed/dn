@@ -56,19 +56,21 @@ implementation
 uses
   panelwin, topview, dlgrecs, strview,
   
-  fmtzip, fmtlha, fmtrar, fmtace, fmtha, fmtcab,
-  
-  fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, fmttar,
+  fmtzip, fmtlha, fmtrar, {$IFNDEF DN_MINI} fmtace, fmtha, {$ENDIF} fmtcab,
+  {$IFNDEF DN_MINI}
+  fmtarc, fmtbsa, fmtbs2, fmthyp, fmtlim, fmthpk, {$ENDIF} fmttar,
+  {$IFNDEF DN_MINI}
   fmtzxz, fmtqrk, fmtain, fmtchz, fmthap, fmtis3, fmtsqz,
-  fmtuc2, fmtufa, fmtzoo, fmttgz, fmt7z,  fmtbz2, fmtxz,
+  fmtuc2, fmtufa, fmtzoo, {$ENDIF} fmttgz, fmt7z,  fmtbz2, fmtxz,
   
-  
+  {$IFNDEF DN_MINI}
   Arvid,
-  
-  Archiver, ArcView, ASCIITab, calcline, Collect, DiskInfo, mainapp,
+  {$ENDIF}
+  Archiver, ArcView, {$IFNDEF DN_MINI} ASCIITab, calcline, {$ENDIF} Collect, DiskInfo, mainapp,
   DNStdDlg, DNUtil, Drives, editinfo, Editor, FileFind, FilesCol,
   filepanel, FStorage, FViewer, gadgets, histories, editcore, Startup,
   Tree, UniWin, UserMenu, panelwinx, HelpKern,
+  {$IFNDEF DN_MINI}
   calcwin, CellsCol, 
   Calendar, 
   DBView, 
@@ -77,6 +79,7 @@ uses
   Tetris, 
   
   Phones, 
+  {$ENDIF}
   
   
   ColorSel,
@@ -99,6 +102,7 @@ begin
   Reg('fmtlha.TLHAArchive', @fmtlha.TLHAArchive.Build);
   Reg('fmtrar.TRARArchive', @fmtrar.TRARArchive.Build);
   Reg('fmtcab.TCABArchive', @fmtcab.TCABArchive.Build);
+  {$IFNDEF DN_MINI}
   Reg('fmtace.TACEArchive', @fmtace.TACEArchive.Build);
   Reg('fmtha.THAArchive', @fmtha.THAArchive.Build);
   Reg('fmtarc.TARCArchive', @fmtarc.TARCArchive.Build);
@@ -107,8 +111,10 @@ begin
   Reg('fmthyp.THYPArchive', @fmthyp.THYPArchive.Build);
   Reg('fmtlim.TLIMArchive', @fmtlim.TLIMArchive.Build);
   Reg('fmthpk.THPKArchive', @fmthpk.THPKArchive.Build);
+  {$ENDIF}
   Reg('fmttar.TTARArchive', @fmttar.TTARArchive.Build);
   Reg('fmttgz.TTGZArchive', @fmttgz.TTGZArchive.Build);
+  {$IFNDEF DN_MINI}
   Reg('fmtzxz.TZXZArchive', @fmtzxz.TZXZArchive.Build);
   Reg('fmtqrk.TQuArkArchive', @fmtqrk.TQuArkArchive.Build);
   Reg('fmtufa.TUFAArchive', @fmtufa.TUFAArchive.Build);
@@ -119,12 +125,14 @@ begin
   Reg('fmtchz.TCHZArchive', @fmtchz.TCHZArchive.Build);
   Reg('fmtuc2.TUC2Archive', @fmtuc2.TUC2Archive.Build);
   Reg('fmtain.TAINArchive', @fmtain.TAINArchive.Build);
+  {$ENDIF}
   Reg('fmt7z.TS7ZArchive', @fmt7z.TS7ZArchive.Build);
   Reg('fmtbz2.TBZ2Archive', @fmtbz2.TBZ2Archive.Build);
   Reg('fmtxz.TXZArchive', @fmtxz.TXZArchive.Build);
   Reg('Archiver.TARJArchive', @Archiver.TARJArchive.Build);
   Reg('Archiver.TFileInfo', @Archiver.TFileInfo.Build);
   Reg('ArcView.TArcDrive', @ArcView.TArcDrive.Build);
+  {$IFNDEF DN_MINI}
   Reg('Arvid.TArvidDrive', @Arvid.TArvidDrive.Build);
   Reg('ASCIITab.TTable', @ASCIITab.TTable.Build);
   Reg('ASCIITab.TReport', @ASCIITab.TReport.Build);
@@ -138,12 +146,15 @@ begin
   Reg('Calendar.TCalendarWindow', @Calendar.TCalendarWindow.Build);
   Reg('calcline.TCalcLine', @calcline.TCalcLine.Build);
   Reg('calcline.TIndicator', @calcline.TIndicator.Build);
+  {$ENDIF}
   Reg('DNStrL.TStringList', @DNStrL.TStringList.Build);
   Reg('bwselect.T_BWSelector', @bwselect.T_BWSelector.Build);
+  {$IFNDEF DN_MINI}
   Reg('DBView.TDBWindow', @DBView.TDBWindow.Build);
   Reg('DBView.TDBViewer', @DBView.TDBViewer.Build);
   Reg('DBView.TDBIndicator', @DBView.TDBIndicator.Build);
   Reg('DBView.TFieldListBox', @DBView.TFieldListBox.Build);
+  {$ENDIF}
   Reg('DlgLayout.TResDialog', @DlgLayout.TResDialog.Build);
   Reg('DNDlgs.THexLine', @DNDlgs.THexLine.Build);
   Reg('DNDlgs.TComboBox', @DNDlgs.TComboBox.Build);
@@ -189,6 +200,7 @@ begin
   Reg('editcore.TFileEditor', @editcore.TFileEditor.Build);
   Reg('editwin.TEditWindow', @editwin.TEditWindow.Build);
   Reg('StrView.TDStringView', @StrView.TDStringView.Build);
+  {$IFNDEF DN_MINI}
   Reg('Phones.TPhone', @Phones.TPhone.Build);
   Reg('Phones.TPhoneDir', @Phones.TPhoneDir.Build);
   Reg('Phones.TPhoneCollection', @Phones.TPhoneCollection.Build);
@@ -196,14 +208,17 @@ begin
   Reg('PrintMan.TPrintManager', @PrintMan.TPrintManager.Build);
   Reg('PrintMan.TPrintStatus', @PrintMan.TPrintStatus.Build);
   Reg('PrintMan.TPMWindow', @PrintMan.TPMWindow.Build);
+  {$ENDIF}
   Reg('Setups.TSysDialog', @Setups.TSysDialog.Build);
   Reg('Setups.TCurrDriveInfo', @Setups.TCurrDriveInfo.Build);
   Reg('Setups.TMouseBar', @Setups.TMouseBar.Build);
   Reg('Setups.TSaversDialog', @Setups.TSaversDialog.Build);
   Reg('Setups.TSaversListBox', @Setups.TSaversListBox.Build);
+  {$IFNDEF DN_MINI}
   Reg('Tetris.TGameWindow', @Tetris.TGameWindow.Build);
   Reg('Tetris.TGameView', @Tetris.TGameView.Build);
   Reg('Tetris.TGameInfo', @Tetris.TGameInfo.Build);
+  {$ENDIF}
   Reg('Tree.TTreeView', @Tree.TTreeView.Build);
   Reg('Tree.TTreeReader', @Tree.TTreeReader.Build);
   Reg('Tree.TTreeWindow', @Tree.TTreeWindow.Build);
