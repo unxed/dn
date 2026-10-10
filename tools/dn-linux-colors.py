@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dn_wait import DnTerm
 
 bad = 0
+MINI = os.environ.get('DN_MINI') == '1'      # the mini build (dn/build.env): no calendar
 TEAL_WHITE = (('i', 15), ('i', 6))          # 3F
 TEAL_BLUE = (('i', 4), ('i', 6))             # 31 (the ANSI index of the DOS blue is 4)
 DULL = (('i', 0), ('i', 8))                  # 80
@@ -67,25 +68,28 @@ try:
     # the title of the active panel: the path on the top border (white on teal)
     p = [pair(t, 1, x) for x in range(1, 99) if t.screen.cells[1][x][0] == '/']
     check(TEAL_WHITE in p, 'the path in the title of the active panel is white on teal (3F)', repr(set(p)))
-    t.send('\x1bu', 0.5)                                # Utilities
-    t.send('n', 0.8)                                    # Calendar
-    check('Calendar' in t.text(), 'the calendar opens (Utilities, Calendar)', t.text())
-    today = datetime.date.today()
-    cell = day_cell(t, today.day)
-    check(cell is not None, 'the calendar shows today (%d)' % today.day, t.text())
-    if cell:
-        y, x = cell
-        check(pair(t, y, x) == TEAL_BLUE, 'today when it is the selected day: blue on teal (31)', repr(pair(t, y, x)))
-        step = -1 if today.day > 1 else 1               # the other day of the same month
-        t.send('\x1b[D' if step < 0 else '\x1b[C', 0.5)
-        other = day_cell(t, today.day + step)
-        if other:
-            check(pair(t, *other) == TEAL_WHITE, 'the selected day is white on teal (3F)', repr(pair(t, *other)))
-        else:
-            check(False, 'the neighbour day is shown', t.text())
-        check(pair(t, y, x) != DULL, 'today when it is not the selected day is not black on dark gray (80)', repr(pair(t, y, x)))
-    box = [(yy, xx) for yy in range(7, 18) for xx in range(20, 70) if t.screen.cells[yy][xx][0].strip() and pair(t, yy, xx) == DULL]
-    check(not box, 'no cell of the calendar is black on dark gray (80)', repr(box[:5]))
+    if MINI:
+        print('SKIP the calendar: the mini build (DN_MINI=1) has none', flush=True)
+    else:
+        t.send('\x1bu', 0.5)                                # Utilities
+        t.send('n', 0.8)                                    # Calendar
+        check('Calendar' in t.text(), 'the calendar opens (Utilities, Calendar)', t.text())
+        today = datetime.date.today()
+        cell = day_cell(t, today.day)
+        check(cell is not None, 'the calendar shows today (%d)' % today.day, t.text())
+        if cell:
+            y, x = cell
+            check(pair(t, y, x) == TEAL_BLUE, 'today when it is the selected day: blue on teal (31)', repr(pair(t, y, x)))
+            step = -1 if today.day > 1 else 1               # the other day of the same month
+            t.send('\x1b[D' if step < 0 else '\x1b[C', 0.5)
+            other = day_cell(t, today.day + step)
+            if other:
+                check(pair(t, *other) == TEAL_WHITE, 'the selected day is white on teal (3F)', repr(pair(t, *other)))
+            else:
+                check(False, 'the neighbour day is shown', t.text())
+            check(pair(t, y, x) != DULL, 'today when it is not the selected day is not black on dark gray (80)', repr(pair(t, y, x)))
+        box = [(yy, xx) for yy in range(7, 18) for xx in range(20, 70) if t.screen.cells[yy][xx][0].strip() and pair(t, yy, xx) == DULL]
+        check(not box, 'no cell of the calendar is black on dark gray (80)', repr(box[:5]))
     t.send('\x1b', 0.5)
     t.send('\x1b[18;3~', 1.0)                           # Alt-F7: Find File
     rows = t.text().split('\n')

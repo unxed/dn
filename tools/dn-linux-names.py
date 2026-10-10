@@ -165,6 +165,9 @@ def main():
     out = os.path.abspath(sys.argv[1])
     parts = [lambda c=c: run_pause(out, *c) for c in (('1', 'echo hello-from-dn', True), ('0', 'echo hello-from-dn', False),
                                                       ('2', 'echo hello-from-dn', False), ('2', 'echo hello-from-dn; false', True))]
+    if os.environ.get('DN_MINI') == '1':        # the mini build (dn/build.env) has no embedded terminal: DN_RUN_PAUSE is its setting
+        print('SKIP DN_RUN_PAUSE: the mini build (DN_MINI=1) has no embedded terminal', flush=True)
+        parts = []
     side_by_side(parts + [lambda fn=fn: fn(out) for fn in (spaces, missing, zipzip)])      # each in a directory of its own, all at once
     print('%d checks, %d failed' % (count, fails))
     sys.exit(1 if fails else 0)
