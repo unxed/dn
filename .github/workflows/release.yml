@@ -24,6 +24,8 @@ env:
   TAG: ${{ inputs.tag || github.ref_name }}
   # the revision shown in Help -> About
   DN_BUILD_REV: ${{ inputs.tag || github.ref_name }}
+  # optimized, smart-linked, without symbols and line information (dn/build.env, DN_OPT_release)
+  DN_RELEASE: '1'
 
 jobs:
   linux64:
