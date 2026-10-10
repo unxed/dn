@@ -5,7 +5,7 @@
 #   linux64 the fpc of the host (FPC=path to use another)
 #   aarch64 DN_AARCH64=PREFIX of tools/build-fpc-aarch64-linux.sh (the cross compiler for aarch64-linux)
 #   win64   DN_WIN=PREFIX of tools/build-fpc-windows.sh PREFIX win64 (the cross compiler for x86_64-win64); win32: DN_WIN32=PREFIX of the same script with win32
-# DN_EXTRA: more options (e.g. -gl: line numbers). DN_RELEASE=1: the build of a release (DN_OPT_release of dn/build.env, no -gl).   Result: DN_PPC (the compiler and its target options), DN_PATH (the directories for PATH:
+# DN_EXTRA: more options (e.g. -gl: line numbers). DN_RELEASE=1: the build of a release (DN_OPT_release of dn/build.env, no -gl). DN_MINI=1: the mini build (a release with DN_OPT_mini).   Result: DN_PPC (the compiler and its target options), DN_PATH (the directories for PATH:
 # binutils), DN_UPATHS (the unit and include directories), DN_OPTS, DN_OBJ (where the objects go), DN_GEN (the generated shim units).
 . "$here/dn/build.env"
 case "${DN_TARGET:-}" in
@@ -46,6 +46,13 @@ case "$DN_TARGET" in
     aarch64) DN_FPC_COMMON=$(echo "$DN_FPC_COMMON" | sed 's/ -Rintel//') ;;
     linux64) case "$($DN_PPC -iTP 2>/dev/null)" in x86_64|i386) ;; *) DN_FPC_COMMON=$(echo "$DN_FPC_COMMON" | sed 's/ -Rintel//') ;; esac ;;
 esac
+# the mini build (DN_MINI=1): a release without the parts of dn/build.env DN_OPT_mini (-dDN_MINI: the games, the calculator and the
+# spreadsheet, the phone book, Arvid, UUE, the DBF viewer, the disassembler of the viewer, the printing, the calendar, the ASCII table, the
+# disk images, the embedded terminal, the rare archive formats)
+if [ "${DN_MINI:-0}" = 1 ]; then
+    DN_RELEASE=1
+    DN_OPT="$DN_OPT $DN_OPT_mini"
+fi
 # a release (DN_RELEASE=1): the options of dn/build.env for it, without the line information
 if [ "${DN_RELEASE:-0}" = 1 ]; then
     DN_OPT="$(echo " $DN_OPT " | sed 's/ -gl / /g') $DN_OPT_release"
@@ -55,6 +62,7 @@ tmp=${TMPDIR:-/tmp}
 case "${DN_EXTRA:-}" in *-dDNUTF8*) dn_objsfx=-utf8;; *) dn_objsfx=;; esac
 case "$DN_OPT ${DN_EXTRA:-}" in *-gl*) dn_objsfx=$dn_objsfx-gl;; esac
 [ "${DN_RELEASE:-0}" = 1 ] && dn_objsfx=$dn_objsfx-rel
+[ "${DN_MINI:-0}" = 1 ] && dn_objsfx=$dn_objsfx-mini
 DN_OBJ=${DN_OBJ:-$tmp/dn-obj-$DN_TARGET$dn_objsfx}
 DN_GEN=${DN_GEN:-$tmp/dn-gen}
 DN_OPTS="$DN_FPC_COMMON $DN_OPT ${DN_EXTRA:-}"

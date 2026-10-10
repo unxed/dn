@@ -63,10 +63,11 @@ uses
   Startup, Dialogs, gadgets, panelwin, Messages, HistList,
   FileFind, Commands, Tree, FViewer, CmdLine, copyio, DNStdDlg,
   FilesCol, UserMenu, Colors, editcore, Editor, Macro,
-  ArcView, HelpFile, Validate, ASCIITab, timeutil, Drives, Archiver,
-  ArchSet, ArchDet, Setups, DNUtil, panelwinx, histories, calcline,
-  DnIni, Collect, objutil, Views, Scroller, evaluator,
+  ArcView, HelpFile, Validate, {$IFNDEF DN_MINI} ASCIITab, {$ENDIF} timeutil, Drives, Archiver,
+  ArchSet, ArchDet, Setups, DNUtil, panelwinx, histories, {$IFNDEF DN_MINI} calcline, {$ENDIF}
+  DnIni, Collect, objutil, Views, Scroller, {$IFNDEF DN_MINI} evaluator, {$ENDIF}
   HelpKern, VideoMan
+  {$IFNDEF DN_MINI}
   , calcwin, CellsCol 
   , DBView, DBWatch 
   
@@ -74,6 +75,7 @@ uses
   , PrintMan 
   , Calendar  {JO}
   , Phones 
+  {$ENDIF}
   , Idlers 
   , ColorSel, ColorVGA
   

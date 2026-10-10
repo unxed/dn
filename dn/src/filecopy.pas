@@ -103,7 +103,7 @@ uses DnPath,
   FlightRec, mainapp, Startup, Messages, HistList, Commands,
   timeutil, Validate, TitleSet, UserMenu, Dos, DnIni,
   
-  osdep, dnscreen, TvGlyphs, Filediz , ArvidAvt ,
+  osdep, dnscreen, TvGlyphs, Filediz , {$IFNDEF DN_MINI} ArvidAvt , {$ENDIF}
   dirwatch, fsinfo, basics, strutil, fileutil,
   progress, FileFind, Math,
   DNUtil, Tree, Archiver, Drives, DiskInfo
@@ -2742,10 +2742,10 @@ future move from ShortString to AnsiString }
     begin
     if ArchiveFiles(S, Files, MoveMode, SourcePanel) then
       Exit;
-    
+    {$IFNDEF DN_MINI}
     if CopyFilesToArvid(S, Files, MoveMode, SourcePanel) then
       Exit;
-    
+    {$ENDIF}
     if UpStrg(Copy(S, 1, PosChar(':', S))) = cTEMP_ then
       begin
       CopyToTempDrive(Files, SourcePanel, '');

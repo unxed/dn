@@ -158,14 +158,14 @@ implementation
 uses DnPath,
   osdep, Eraser, DNErrLog, TvGlyphs,
   Menus, mainapp, Messages, Dialogs, progress, FileCopy, Startup,
-  Arvid, timeutil, VideoMan, DnExec, FileFind
+  {$IFNDEF DN_MINI} Arvid, {$ENDIF} timeutil, VideoMan, DnExec, FileFind
   , UserMenu {JO: for hiding panels while extracting }
   , fmtzip {JO: for CentralDirRecPresent}
 
   , panelsetup, panelroot, dirwatch, Drivers
   , Lfn, uselfn, Tree, Dos, histories, HistList, filepanel
   , basics, strutil, fileutil, ArchDet
-  , fmtrar, fmtace
+  , fmtrar {$IFNDEF DN_MINI}, fmtace {$ENDIF}
   ;
 
 const
@@ -1753,11 +1753,12 @@ function ArcViewer(AName, VAName: String): Boolean;
     to stop pointless further attempts in the viewer. }
   if P = nil then
     begin
-    
+    {$IFNDEF DN_MINI}
     Xt := UpStrg(GetExt(AName));
     if  (Xt = '.TDR') or (Xt = '.AVT')
     then
       P := TArvidDrive.Create(AName);
+    {$ENDIF}
     if P = nil then
       
       Exit;
@@ -1836,10 +1837,12 @@ procedure TArcDrive.GetDirInfo(var B: TDiskInfoRec);
     B.VolumeID := NewStr
             (GetString(dlDIVersionToExtract)+RtoS(PRARArchive(AType).
           VersionToExtr/10, 4, 2)+'~');
+  {$IFNDEF DN_MINI}
   if AType.GetID = arcACE then
     B.VolumeID := NewStr
           (GetString(dlDIVersionToExtract)+RtoS(ACEVerToExtr/10, 4,
          2)+'~');
+  {$ENDIF}
 
   end { TArcDrive.GetDirInfo };
 

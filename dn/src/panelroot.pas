@@ -218,16 +218,17 @@ implementation
 uses DnPath,
   Lfn, uselfn, basics, strutil, fileutil, envutil, osdep, FlightRec,
   Messages, mainapp, DNHelp, Startup, Commands, histories, HistList, paneldlgs,
-  FileFind, CmdLine, ArcView, Archiver, DiskImg, DiskInfo, FileCopy,
+  FileFind, CmdLine, ArcView, Archiver, {$IFNDEF DN_MINI} DiskImg, {$ENDIF} DiskInfo, FileCopy,
   DNUtil, fsinfo, Dos, Filediz, Collect, Math,
   iniengine, DnIni {-$VIV}
-  
+  {$IFNDEF DN_MINI}
   , UUCode 
-  
+  {$ENDIF}
   
   , panelwin, filepanel, FileType
-  
+  {$IFNDEF DN_MINI}
   , Arvid 
+  {$ENDIF}
   ;
 
 procedure TFilePanelRoot.IncDrawDisabled;
@@ -1531,10 +1532,10 @@ WrongArc:
         begin
         Dr := nil;
         Dr := TArcDrive.Create(S, S);
-        
+        {$IFNDEF DN_MINI}
         if Dr = nil then
           Dr := TArvidDrive.Create(S);
-        
+        {$ENDIF}
         if Dr = nil then
           Exit;
         if Drive.DriveType <> dtDisk then
@@ -2361,7 +2362,7 @@ WrongArc:
     CE;
     end;
 
-  
+  {$IFNDEF DN_MINI}
   procedure CallUuDecode;
     var
       FC: TCollection;
@@ -2376,7 +2377,7 @@ WrongArc:
       end;
     FC.Free;
     end;
-  
+  {$ENDIF}
 
   {JO}
   
@@ -2479,13 +2480,13 @@ WrongArc:
           end;
         cmReboundPanel:
           Rebound;
-        
+        {$IFNDEF DN_MINI}
         cmPrintFile:
           begin
           CM_Print(Self);
           CE
           end;
-        
+        {$ENDIF}
         cmSetPassword, cmExtractTo,
         cmArcTest, cmRereadForced,
         cmMakeForced
@@ -2707,7 +2708,7 @@ WrongArc:
             Drive.OpenDirectory(DirectoryName, True));
           CE
           end;
-        
+        {$IFNDEF DN_MINI}
         cmUUDecodeFile:
           begin
           if Drive.DriveType < dtArcFind then
@@ -2724,11 +2725,12 @@ WrongArc:
             UUEncode(MakeNormName(PF^.Owner^, PF^.FlName[uLfn]));
           CE;
           end;
-        
+        {$ENDIF}
         cmChangeNameCase:
           if  (PF <> nil) and (Drive.DriveType < dtArcFind)
           then
             CM_ChangeCase(Self);
+        {$IFNDEF DN_MINI}
         cmUnpDiskImg:
           begin
           if  (Drive.DriveType < dtArcFind) then
@@ -2736,6 +2738,7 @@ WrongArc:
               GetSelection(Self, False));
           CE;
           end;
+        {$ENDIF}
         cmChangeDirectory:
           begin
           Self.ChDir(PString(Event.Message.InfoPtr)^);

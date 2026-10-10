@@ -267,7 +267,7 @@ implementation
 uses DnPath,
   Lfn, Dos, DNUtf8, osdep, Commands, DNHelp, strutil, fileutil, keymap, TvGlyphs
   , editcore, Macro, linepos, Math, Messages, mainapp, Startup, Dialogs,
-  Decoder,  {piwamoto}
+  {$IFNDEF DN_MINI} Decoder, {$ENDIF} {piwamoto}
    {Cat}
   fileerrors, {AK155}
   DiskInfo, uselfn,
@@ -1290,8 +1290,9 @@ procedure TFileViewer.Draw;
     HP: String[6];
     CC: array[1..8] of Byte;
     SaveXDelta: Word;
-    
+    {$IFNDEF DN_MINI}
     D: XCHGData; {GRM!}
+    {$ENDIF}
     
     SearchLineNum: Integer;
     {screen line number with the found text, or -1 }
@@ -1523,6 +1524,7 @@ procedure TFileViewer.Draw;
       
       end;
     {GRM!}
+    {$IFNDEF DN_MINI}
     vmAsm:
       begin
       DisableCommands(CommandSetOf([cmUnWrap]));
@@ -1564,6 +1566,7 @@ procedure TFileViewer.Draw;
       end
       {GRM!}
        {DisAsm}
+    {$ENDIF}
     else {case}
       begin {vmText}
       ExposedLine := 0;
@@ -1887,8 +1890,9 @@ procedure TFileViewer.MakeLines;
     TabSize: Integer;
     CurChar, NextChar: Byte;
     WrappedLine: Boolean;
-    
+    {$IFNDEF DN_MINI}
     X: XCHGData; {GRM!}
+    {$ENDIF}
     
   label
     LineBegin;
@@ -1914,6 +1918,7 @@ procedure TFileViewer.MakeLines;
       
       end;
     {GRM!}
+    {$IFNDEF DN_MINI}
     vmAsm:
       begin
       MaxX := 255;
@@ -1930,6 +1935,7 @@ procedure TFileViewer.MakeLines;
         end;
       end
       {GRM!}
+    {$ENDIF}
       
     else {vmText}
       begin
@@ -2622,6 +2628,7 @@ DoSave:
                 end;
               
               vmDump:
+                {$IFNDEF DN_MINI}
                 if  ( (EditorDefaults.ViOpt and vbfDisAsm) <> 0) then
                   begin
                   ViewMode := vmAsm;
@@ -2630,6 +2637,7 @@ DoSave:
                   Cur.X := 10;
                   end {GRM!}
                 else
+                {$ENDIF}
                   begin
                   ViewMode := vmText;
                   MakeLines
@@ -3229,9 +3237,10 @@ procedure TFileViewer.DoHighlite
 the vmAsm-related parts were gathered together but not tested}
 
 procedure TFileViewer.CountDown;
-  
+  {$IFNDEF DN_MINI}
   var
     D: XCHGData; {GRM!}
+  {$ENDIF}
     
   var
     NewPos: TFileSize;
@@ -3259,7 +3268,7 @@ procedure TFileViewer.CountDown;
       end {vmHex, vmDump};
 
      {GRM!}
-
+    {$IFNDEF DN_MINI}
     vmAsm:
       begin
       if  (Lines[ANumber].Pos < 0) or (Lines[Size.Y].Pos < 0) then
@@ -3282,6 +3291,7 @@ procedure TFileViewer.CountDown;
         Dec(Cur.Y);
       Cur.X := 10;
       end {vmAsm};
+    {$ENDIF}
      {GRM!}
 
     else {vmText}
@@ -3321,8 +3331,9 @@ procedure TFileViewer.CountUp;
     NextLineStart: LongInt;
     NewFilePos: TFileSize;
     ReadLen: LongInt;
-    
+    {$IFNDEF DN_MINI}
     D: XCHGData; {GRM!}
+    {$ENDIF}
     
     N: LongInt;
     MaxX: LongInt;
@@ -3461,10 +3472,10 @@ procedure TFileViewer.CountUp;
     begin BufPos := 0; MakeLines; end; {AK155: IMHO that never happens}
 *)
   NextLineStart := BufPos;
-  
+  {$IFNDEF DN_MINI}
   D.MemBuff := Buf; {GRM!}
   D.Offset := BufPos; {GRM!}
-  
+  {$ENDIF}
   if Wrap > wmNone then
     MaxX := Size.X
   else
@@ -3483,12 +3494,13 @@ procedure TFileViewer.CountUp;
         LineStart := Max(0, NextLineStart-HexPos);
         LineEnd := NextLineStart;
         end;
-      
+      {$IFNDEF DN_MINI}
       vmAsm:
         begin
         ScanUp(D);
         LineStart := BufPos-D.InstrLen;
         end;
+      {$ENDIF}
       
     end {case};
     {GRM!}
