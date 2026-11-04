@@ -17,6 +17,9 @@ function PollCancel(var Token: TCancelToken): Boolean;
 
 implementation
 
+uses
+  MainApp;
+
 procedure Reset(var Token: TCancelToken);
   begin
   Token.Cancelled := False;
