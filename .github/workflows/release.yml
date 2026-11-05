@@ -75,15 +75,18 @@ jobs:
           release: '14.3'
           usesh: true
           prepare: pkg install -y fpc python3 git bash
+          # the run step is a fresh shell in the VM: it has no RUNNER_TEMP and none of the workflow env, so what the build and the
+          # packing need is named here, and the output goes to the workspace (the VM works in it and syncs it back)
+          envs: 'TAG DN_BUILD_REV DN_RELEASE'
           run: |
             set -e
             git config --global --add safe.directory '*'
-            tools/build.sh freebsd64 "$RUNNER_TEMP/out/dn"
-            tools/dn-pack.sh "$RUNNER_TEMP/out/dn" freebsd64 tar "$RUNNER_TEMP/pack" "$TAG"
+            tools/build.sh freebsd64 out/dn
+            tools/dn-pack.sh out/dn freebsd64 tar pack "$TAG"
       - uses: actions/upload-artifact@v4
         with:
           name: release-freebsd64
-          path: ${{ runner.temp }}/pack/*
+          path: pack/*
 
   linux32:
     runs-on: ubuntu-24.04
