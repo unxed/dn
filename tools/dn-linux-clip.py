@@ -49,6 +49,8 @@ out = os.path.abspath(sys.argv[1])
 dirs = []
 try:
     d, w = install(out); dirs.append(d)
+    with open(os.path.join(d, 'dn.ini'), 'w') as f:
+        f.write('[FilePanels]\nFarUxMode=1\n')
     t = start(d, w)
     t.send('\x1b[B', 0.3); t.send('\x1bOS', 1.0)                 # F4 on a.txt
     t.raw = b''
@@ -61,6 +63,9 @@ try:
     check('hello clipboardhello' in t.text(), 'paste in DN: the copied text comes back at the cursor', t.text())
     t.send('\x1b[200~PASTED text\x1b[201~', 0.8)                   # the terminal pastes
     check('PASTED text' in t.text(), 'bracketed paste: the text of the terminal goes into the editor', t.text())
+    t.send('\x1b\x7f', 0.8)                                         # Alt-BkSp: undo the paste
+    check('PASTED text' not in t.text() and 'hello clipboard' in t.text(),
+          'Far UX mode: one undo removes the whole bracketed paste', t.text())
     t.send('\x1b', 0.3); t.send('n', 0.8)                          # leave the editor without saving (if it asks)
     t.send('\x1b', 0.3)
     t.send('\x1b[200~echo from-paste\x1b[201~', 0.8)

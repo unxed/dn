@@ -61,7 +61,7 @@ interface
 
 uses
   Defines, Streams, Drivers, Views, basics, Menus, Commands, ObjType, keymap, Collect,
-  TveDoc, TveView, TveSearch;
+  TveDoc, TveView, TveSearch, farux;
 
 const
   ClipBoard: TCollection = nil;
@@ -1853,6 +1853,13 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
     N, Sel: Integer;
   begin
   Result := False;
+  if FarUxEnabled and ((Event.KeyDown.ControlKeyState and kbPaste) <> 0) then
+    begin
+    if TextEvent(Event, T) then
+      TypeAt(T);
+    ClearEvent(Event);
+    Exit(True);
+    end;
   {$IFNDEF DN_MINI}
   if fASCIITable then
     begin
