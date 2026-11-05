@@ -63,7 +63,7 @@ try:
     check('hello clipboardhello' in t.text(), 'paste in DN: the copied text comes back at the cursor', t.text())
     t.send('\x1b[200~PASTED text\x1b[201~', 0.8)                   # the terminal pastes
     check('PASTED text' in t.text(), 'bracketed paste: the text of the terminal goes into the editor', t.text())
-    t.send('\x1a', 0.8)                                              # Ctrl+Z: undo the paste
+    t.send('\x1b\x7f', 0.8)                                         # Alt-BkSp: undo the paste
     check('PASTED text' not in t.text() and 'hello clipboard' in t.text(),
           'Far UX mode: one undo removes the whole bracketed paste', t.text())
     t.send('\x1b', 0.3); t.send('n', 0.8)                          # leave the editor without saving (if it asks)
