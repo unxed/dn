@@ -2094,6 +2094,12 @@ from other windows. Any text you cut or copy to Clipboard.
 Text in Clipboard is the text Dos Navigator uses when you
 choose Paste.
 
+ In a remote session (for example over SSH) without the far2l
+extensions and without a clipboard program of the system, paste
+with the paste key of your terminal (for example Ctrl+Shift+V
+or the right mouse button): it brings the text of your clipboard.
+Shift+Ins pastes only what Dos Navigator itself has copied.
+
 .topic ScreenGrabber=11024
 .title Screen Grabber
 
