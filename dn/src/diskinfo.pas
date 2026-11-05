@@ -51,7 +51,7 @@ unit DiskInfo;
 interface
 
 uses SysUtils,
-  Defines, Streams, Drivers, Views, Collect, topview
+  Defines, Streams, Drivers, Views, Collect, topview, Cancel
   ;
 
 type
@@ -166,15 +166,6 @@ uses
 
 const
   MaxTeam = Ord(dlTeam150)-Ord(dlTeamAll)+1;
-
-function ESC_Pressed: Boolean;
-  var
-    E: TEvent;
-  begin
-  Application.Idle;
-  GetKeyEvent(E);
-  ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
-  end;
 
 constructor TTeamView.Create(const R: TRect);
   begin
@@ -645,8 +636,10 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
     L: TSize;
     SR: lSearchRec;
     DC: TDirCol;
+    CancelToken: TCancelToken;
   begin
   NewTimer(Tmr, 50);
+  Reset(CancelToken);
   ClusterLen := 0;
   L := 0;
   NumFiles := 0;
@@ -665,7 +658,7 @@ function CountDirLen(const Dir: String; Recurse: Boolean; var ClusterLen: TSize;
     if TimerExpired(Tmr) then
       begin
       NewTimer(Tmr, 150);
-      if ESC_Pressed then
+      if PollCancel(CancelToken) then
         begin
         Abort := True;
         L := 0;

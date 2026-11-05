@@ -55,7 +55,7 @@ interface
 uses
   Collect, Defines, objutil, Streams, Views,
   FilesCol, DiskInfo,
-  Drives, Commands, Archiver, FStorage
+  Drives, Commands, Archiver, FStorage, Cancel
   ;
 
 type
@@ -1850,15 +1850,6 @@ procedure TArcDrive.GetDirLength(PF: PFileRec);
   begin
   end;
 
-function ESC_Pressed: Boolean;
-  var
-    E: TEvent;
-  begin
-  Application.Idle;
-  GetKeyEvent(E);
-  ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
-  end;
-
 function TArcDrive.OpenDirectory(const Dir: String;
                                        PutDirs: Boolean): TDrive;
   var
@@ -1876,8 +1867,10 @@ function TArcDrive.OpenDirectory(const Dir: String;
     PI: TView;
     MemReq: LongInt;
     MAvail: LongInt;
+    CancelToken: TCancelToken;
   begin
   NewTimer(tmr, 0);
+  Reset(CancelToken);
   Dirs := TStringCollection.Create($10, $10, False);
   PI := WriteMsg(GetString(dlReadingList));
   Fils := TFilesCollection.Create($10, $10);
@@ -1943,7 +1936,7 @@ function TArcDrive.OpenDirectory(const Dir: String;
       if TimerExpired(tmr) then
         begin
         NewTimer(tmr, 50);
-        if ESC_Pressed then
+        if PollCancel(CancelToken) then
           Break;
         end;
       end;
@@ -1974,9 +1967,11 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
     PI: TView;
     MemReq: LongInt;
     MAvail: LongInt;
+    CancelToken: TCancelToken;
 
   begin
   NewTimer(tmr, 0);
+  Reset(CancelToken);
   FindRec.AddChar := '';
 //JO: since ArcFindRec shares storage with FindRec via absolute,
 //    after the dialog we can just use FindRec
@@ -2098,7 +2093,7 @@ procedure TArcDrive.DrvFindFile(FC: TFilesCollection);
         if TimerExpired(tmr) then
           begin
           NewTimer(tmr, 50);
-          if ESC_Pressed then
+          if PollCancel(CancelToken) then
             Break;
           end;
         end;

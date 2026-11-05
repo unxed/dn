@@ -173,6 +173,7 @@ no silent gaps (post-class criterion A).
 | `archread.pas` | reading archive member streams for viewers / extract |
 | `archset.pas` | archiver setup dialogs and `ARCHIVER.INI` editing |
 | `arvidtdr.pas` | Arvid tape drive low-level (historic) |
+| `cancel.pas` (ours) | cancellation token; polls Esc while pumping application idle work |
 | `asciitab.pas` | ASCII table dialog: subclasses of the views of tv/ `TvAscii` (DN key codes, report text, palette, help) |
 | `colors.pas` | Colors dialog, highlight groups, Window Manager list |
 | `dbwatch.pas` | DBF viewer field / watch helpers |

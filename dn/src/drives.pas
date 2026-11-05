@@ -52,7 +52,7 @@ interface
 
 uses
   Defines, objutil, Streams, Views, Drivers,
-  FilesCol, DiskInfo, Collect
+  FilesCol, DiskInfo, Collect, Cancel
   , panelsetup
   ;
 
@@ -180,15 +180,6 @@ type
     function Compare(P1, P2: Pointer): Integer; override;
     end;
     {`}
-
-function ESC_Pressed: Boolean;
-  var
-    E: TEvent;
-  begin
-  Application.Idle;
-  GetKeyEvent(E);
-  ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
-  end;
 
 {-DataCompBoy-}
 procedure TDIZCol.FreeItem(P: Pointer);
@@ -1163,6 +1154,7 @@ function TDrive.OpenDirectory(const Dir: String;
     tmr: TEventTimer;
     MemReq: LongInt;
     MAvail: LongInt;
+    CancelToken: TCancelToken;
 
   procedure AddDirectory(S: String);
     { add directory to the processing list }
@@ -1228,6 +1220,7 @@ function TDrive.OpenDirectory(const Dir: String;
 
   begin { TDrive.OpenDirectory }
   NewTimer(tmr, 0);
+  Reset(CancelToken);
   Dirs := TStringCollection.Create($10, $10, False);
   DirsToProcess := TStringCollection.Create($10, $10, False);
 
@@ -1250,7 +1243,7 @@ function TDrive.OpenDirectory(const Dir: String;
     if TimerExpired(tmr) then
       begin
       NewTimer(tmr, 50);
-      if ESC_Pressed then
+      if PollCancel(CancelToken) then
         Abort := True;
       end;
     I := DirsToProcess.Count-1;

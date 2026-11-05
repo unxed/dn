@@ -53,7 +53,7 @@ interface
 
 uses
   Defines, objutil, Streams, Views, Dialogs, Drivers,
-  FilesCol, Drives, progress, DiskInfo, Collect
+  FilesCol, Drives, progress, DiskInfo, Collect, Cancel
   ;
 
 type
@@ -247,15 +247,6 @@ var
   FAdr: Word;
   UsM: Word;
   RD, Ofs: Word;
-
-function ESC_Pressed: Boolean;
-  var
-    E: TEvent;
-  begin
-  Application.Idle;
-  GetKeyEvent(E);
-  ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
-  end;
 
 function ReadingListMsg: TView;
   begin

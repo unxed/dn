@@ -51,7 +51,7 @@ unit Tree;
 interface
 
 uses
-  Collect, Drivers, Defines, Streams,
+  Collect, Drivers, Defines, Streams, Cancel,
   Dialogs, Views, FilesCol
   ;
 
@@ -254,15 +254,6 @@ const
   cmRevert = 200;
   cmDirChanged = 201;
 
-function ESC_Pressed: Boolean;
-  var
-    E: TEvent;
-  begin
-  Application.Idle;
-  GetKeyEvent(E);
-  ESC_Pressed := (E.What = evKeyDown) and (DNKeyCode(E) = kbESC)
-  end;
-
 var
   { A host without drives has the one tree of files, drive C. The tree of a panel is made of the file system that its folder is on, so each such file system
     is a drive of its own here (C, D, ...), with its own tree in DrvTrees and its own root in MountRoots. }
@@ -328,6 +319,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
     Dr: array[1..255] of Integer;
     DC: TDirCollection;
     Tmr: TEventTimer;
+    ScanCancel: TCancelToken;
 
   { the directories are read for a long time on a big disk and nothing else is seen: a line in the middle of the screen }
   procedure ShowProgress;
@@ -358,7 +350,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
     if TimerExpired(Tmr) then
       begin
       NewTimer(Tmr, 150);
-      Abort := ESC_Pressed;
+      Abort := PollCancel(ScanCancel);
       ShowProgress;
       end;
     end;
@@ -452,6 +444,7 @@ procedure ReadTree(C: Char; CountLen: Boolean);
   P^.Attr := 0;
   DC.Insert(P);
   Abort := False;
+  Reset(ScanCancel);
   RemoteDrive := False;
   begin
   Info := WriteMsg(GetString(dlScanningDirs));

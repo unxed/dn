@@ -5,7 +5,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 | Class | Files |
 |---|---|
-| Our files (MIT, see `LICENSE`) | 51 |
+| Our files (MIT, see `LICENSE`) | 52 |
 | Carved (the license of DN) | 4 |
 | Code of DN (the license of DN) | 119 |
 | Contributors of DN OSP | 8 |
@@ -15,7 +15,7 @@ The files that are not in the tables are not in the repository: the Borland-orig
 
 The replacements of the units that were excluded (their code is of Borland origin or of the Virtual Pascal runtime), the adapters to `tv/`, the system layer. They carry the MIT notice of this project in their head; the audit (`dn/audit`) checks them against the archive.
 
-`asciitab.pas`, `cfgdir.pas`, `cfgstate.pas`, `copyjobs.pas`, `country.pas`, `dlglayout.pas`, `dnactions.pas`, `dnactreg.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnrundos.pas`, `dnrunlinux.pas`, `dnrunother.pas`, `dnscreen.pas`, `dnstddlg.pas`, `dnutf8.pas`, `dosharness.pas`, `drivers.pas`, `evnames.pas`, `farux.pas`, `fatalerr.pas`, `fishfs.pas`, `flightrec.pas`, `ftpfs.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `netopen.pas`, `netproc.pas`, `netsplit.pas`, `netssh.pas`, `objutil.pas`, `osdep.pas`, `osnamesunix.pas`, `osrun.pas`, `osrundos.pas`, `osrununix.pas`, `osrunwindows.pas`, `osstartscreen.pas`, `ossystem.pas`, `ossystemdos.pas`, `ossystemother.pas`, `realmode.pas`, `remotedrive.pas`, `remotefs.pas`, `renmask.pas`, `sftpfs.pas`, `strview.pas`, `version.inc`
+`asciitab.pas`, `cancel.pas`, `cfgdir.pas`, `cfgstate.pas`, `copyjobs.pas`, `country.pas`, `dlglayout.pas`, `dnactions.pas`, `dnactreg.pas`, `dnerrlog.pas`, `dnrun.pas`, `dnrundos.pas`, `dnrunlinux.pas`, `dnrunother.pas`, `dnscreen.pas`, `dnstddlg.pas`, `dnutf8.pas`, `dosharness.pas`, `drivers.pas`, `evnames.pas`, `farux.pas`, `fatalerr.pas`, `fishfs.pas`, `flightrec.pas`, `ftpfs.pas`, `helpfile.pas`, `helpkern.pas`, `listmakr.pas`, `mainapp.pas`, `messages.pas`, `netopen.pas`, `netproc.pas`, `netsplit.pas`, `netssh.pas`, `objutil.pas`, `osdep.pas`, `osnamesunix.pas`, `osrun.pas`, `osrundos.pas`, `osrununix.pas`, `osrunwindows.pas`, `osstartscreen.pas`, `ossystem.pas`, `ossystemdos.pas`, `ossystemother.pas`, `realmode.pas`, `remotedrive.pas`, `remotefs.pas`, `renmask.pas`, `sftpfs.pas`, `strview.pas`, `version.inc`
 
 ## Carved (the license of DN)
 
