@@ -66,6 +66,11 @@ try:
     t.send('\x1b\x7f', 0.8)                                         # Alt-BkSp: undo the paste
     check('PASTED text' not in t.text() and 'hello clipboard' in t.text(),
           'Far UX mode: one undo removes the whole bracketed paste', t.text())
+    t.send('\x1b[200~  (open\n    next\x1b[201~', 0.8)                # a paste of two lines: indent, no closing bracket
+    check('(open' in t.text() and '(open)' not in t.text(), 'bracketed paste: no closing bracket is added', t.text())
+    check(re.search(r'(?:^|[^ ]) {4}next', t.text(), re.M) is not None, 'bracketed paste: no auto-indent is added to the next line', t.text())
+    t.send('\x1b\x7f', 0.8)                                         # Alt-BkSp: undo the paste
+    check('(open' not in t.text() and 'next' not in t.text(), 'Far UX mode: one undo removes the whole two-line paste', t.text())
     t.send('\x1b', 0.3); t.send('n', 0.8)                          # leave the editor without saving (if it asks)
     t.send('\x1b', 0.3)
     t.send('\x1b[200~echo from-paste\x1b[201~', 0.8)
