@@ -95,12 +95,15 @@ type
   private
     FLastUndo, FLastRedo: Integer;
     FLastSel, FLastMod: Boolean;
+    FPasteGroup: Boolean;               { a bracketed paste is on: its events are one undo step until another event comes }
     function HostCommand(Sender: TTveSender; Cmd: Integer): Boolean;
     function LineAttrHook(Sender: TTveSender; Line: Int64; var Attr: TColorAttr): Boolean;
     procedure ClipSet(const Text: AnsiString; Column: Boolean);
     function ClipGet(out Text: AnsiString; out Column: Boolean): Boolean;
     function KeyDown(var Event: TEvent): Boolean;
     procedure TypeAt(const S: AnsiString);
+    procedure PasteAt(const S: AnsiString);
+    procedure EndPaste;
     procedure FindAndShow(Reverse: Boolean);
     procedure DoReplace(const Opt: TTveSearchOptions);
   protected
@@ -427,6 +430,7 @@ function TFileEditor.Read(Ip: ipstream): Pointer;
 
 destructor TFileEditor.Destroy;
   begin
+  EndPaste;
   DisposeStr(MenuItemStr[False]);
   DisposeStr(MenuItemStr[True]);
   if Macros <> nil then
@@ -1843,6 +1847,29 @@ procedure TFileEditor.TypeAt(const S: AnsiString);
     Refresh;
   end;
 
+{ The text of a bracketed paste goes in as it is: no auto-indent, no closing bracket, no wrap (the typing aids are for typed keys). The events of one paste are one undo step:
+  the group is opened with the first of them and closed by EndPaste when some other event comes. }
+procedure TFileEditor.PasteAt(const S: AnsiString);
+  begin
+  if S = '' then
+    Exit;
+  if not FPasteGroup then
+    begin
+    Editor.Doc.BeginGroup;
+    FPasteGroup := True;
+    end;
+  if Editor.PasteText(S, False) then
+    Refresh;
+  end;
+
+procedure TFileEditor.EndPaste;
+  begin
+  if not FPasteGroup then
+    Exit;
+  FPasteGroup := False;
+  Editor.Doc.EndGroup;
+  end;
+
 function TFileEditor.KeyDown(var Event: TEvent): Boolean;
   var
     I: Integer;
@@ -1856,10 +1883,11 @@ function TFileEditor.KeyDown(var Event: TEvent): Boolean;
   if FarUxEnabled and ((Event.KeyDown.ControlKeyState and kbPaste) <> 0) then
     begin
     if TextEvent(Event, T) then
-      TypeAt(T);
+      PasteAt(T);
     ClearEvent(Event);
     Exit(True);
     end;
+  EndPaste;
   {$IFNDEF DN_MINI}
   if fASCIITable then
     begin
@@ -2006,6 +2034,7 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
   case Event.What of
     evCommand:
       begin
+      EndPaste;
       if HandleCommand(Event) then
         begin
         ClearEvent(Event);
@@ -2020,6 +2049,8 @@ procedure TFileEditor.HandleEvent(var Event: TEvent);
     evKeyDown:
       if KeyDown(Event) then
         Exit;
+    evMouseDown:
+      EndPaste;
     evBroadcast:
       if Event.Message.Command = cmFindEdit then
         if PString(Event.Message.InfoPtr)^ = EditName then
