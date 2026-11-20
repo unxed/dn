@@ -1947,6 +1947,13 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     CommandHandle(Event);
     Exit;
     end;
+  if  (Event.What = evKeyDown) and (CommandLine <> nil) and
+      (CmdLine.Str <> '') and
+      ((KeyCode = kbCtrlY and $FFFF) or (KeyCode = kbCtrlK and $FFFF))
+  then
+    CommandLine.HandleEvent(Event);
+  if Event.What = evNothing then
+    Exit;
   if  (Event.What = evKeyDown) and (CommandLine <> nil) then
     if  ( (I and (kbRightShift+kbLeftShift) <> 0) and
           ( (KeyCode = kbDown and $FFFF) or

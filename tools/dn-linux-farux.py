@@ -191,6 +191,17 @@ try:
     check('alpha1' in cmdline_row(t),
           'FarUx on: Ctrl+Ins with text inserts the name into the command line', t)
     t.send(w32(0x1B), 0.6)                       # Esc clears the command line
+    empty_command = cmdline_row(t)
+    t.send('abc', 0.5)
+    check(cmdline_row(t).rstrip().endswith('abc'),
+          'FarUx on: text is entered into the command line', t)
+    t.send(w32(0x25), 0.5)                       # Left: position before c
+    t.send(w32(0x4B, 11, 4), 0.8)                # Ctrl+K
+    check(cmdline_row(t).rstrip().endswith('a'),
+          'FarUx on: Ctrl+K deletes from the cursor to the end of the command line', t)
+    t.send(w32(0x59, 25, 4), 0.8)                # Ctrl+Y
+    check(cmdline_row(t) == empty_command,
+          'FarUx on: Ctrl+Y clears the command line', t)
     for vk, what in ((0x79, 'Alt+F10 opens the folder tree'), (0x7B, 'Alt+F12 opens the folder history')):
         before = t.text()
         t.send(w32(vk, 0, 2), 1.2)               # Alt+F10 / Alt+F12
