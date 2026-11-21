@@ -468,9 +468,6 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
   label
     EndLFN;
   begin { TCommandLine.HandleEvent }
-  inherited HandleEvent(Event);
-  if Event.What = evNothing then
-    Exit;
   if (Event.What = evKeyDown) and FarUxEnabled and
      ((Event.KeyDown.ControlKeyState and 4) <> 0) and
      ((Event.KeyDown.ControlKeyState and 8) = 0) then
@@ -483,6 +480,9 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
         11: SetDNKeyCode(Event, kbCtrlK);
       end;
     end;
+  inherited HandleEvent(Event);
+  if Event.What = evNothing then
+    Exit;
   QueryCursorVisible;
   S := Str;
   Changed := False;
