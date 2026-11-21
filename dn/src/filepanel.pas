@@ -1956,7 +1956,7 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
       11:
         SetDNKeyCode(Event, kbCtrlK);
     end;
-  if Event.What = evKeyDown and FarUxEnabled and (CommandLine <> nil) and
+  if (Event.What = evKeyDown) and FarUxEnabled and (CommandLine <> nil) and
      (CmdLine.Str <> '') and
      ((DNKeyCode(Event) = kbCtrlY) or (DNKeyCode(Event) = kbCtrlK)) then
     CommandLine.HandleEvent(Event);
