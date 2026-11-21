@@ -679,20 +679,22 @@ RIT Labs DN also wobbled but seemed to fetch correctly.
           else {case}
             case DNKeyCode(Event) of
               kbCtrlY:
-                begin
-                Str := '';
-                CurX := 0;
-                StrCleared := True;
-                StrModified := True;
-                CE2;
-                end;
+                if FarUxEnabled then
+                  begin
+                  Str := '';
+                  CurX := 0;
+                  StrCleared := True;
+                  StrModified := True;
+                  CE2;
+                  end;
               kbCtrlK:
-                begin
-                Delete(Str, CurX + 1, Length(Str) - CurX);
-                StrCleared := Str = '';
-                StrModified := True;
-                CE2;
-                end;
+                if FarUxEnabled then
+                  begin
+                  Delete(Str, CurX + 1, Length(Str) - CurX);
+                  StrCleared := Str = '';
+                  StrModified := True;
+                  CE2;
+                  end;
               kbCtrlBack:
                 begin
                 while (CurX > 0) and not (Str[CurX] in Separators) do
