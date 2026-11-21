@@ -471,6 +471,18 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
   inherited HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
+  if (Event.What = evKeyDown) and FarUxEnabled and
+     ((Event.KeyDown.ControlKeyState and 4) <> 0) and
+     ((Event.KeyDown.ControlKeyState and 8) = 0) then
+    case Event.KeyDown.VirtualKey of
+      $59: SetDNKeyCode(Event, kbCtrlY);
+      $4B: SetDNKeyCode(Event, kbCtrlK);
+    else
+      case Event.KeyDown.CharScan.CharCode of
+        25: SetDNKeyCode(Event, kbCtrlY);
+        11: SetDNKeyCode(Event, kbCtrlK);
+      end;
+    end;
   QueryCursorVisible;
   S := Str;
   Changed := False;
