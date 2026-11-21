@@ -108,7 +108,7 @@ uses DnPath,
   , editcore, histories, FViewer, panelroot
   , Idlers 
   , osdep, dnscreen, Lfn, UserMenu, Menus
-  , DnIni, Math
+  , DnIni, Math, FarUx
   ;
 
 { The line holds UTF-8 in the build DNUTF8 (a character is 1..4 bytes: the cursor, Backspace, Delete, the scrolling and the mouse go by characters),
