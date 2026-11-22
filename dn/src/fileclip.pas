@@ -141,6 +141,7 @@ function FileClipUriListToPaths(const Data: AnsiString; out Paths: TFileClipPath
 var
   Start, I, N: Integer;
   Line: AnsiString;
+  P: UnicodeString;
 begin
   SetLength(Paths, 0);
   Err := '';
