@@ -480,7 +480,9 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
         11: SetDNKeyCode(Event, kbCtrlK);
       end;
     end;
-  inherited HandleEvent(Event);
+  if not ((Event.What = evKeyDown) and FarUxEnabled and
+      ((DNKeyCode(Event) = kbCtrlY) or (DNKeyCode(Event) = kbCtrlK))) then
+    inherited HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
   QueryCursorVisible;
