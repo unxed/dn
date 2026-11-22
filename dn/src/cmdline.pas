@@ -480,9 +480,27 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
         11: SetDNKeyCode(Event, kbCtrlK);
       end;
     end;
-  if not ((Event.What = evKeyDown) and FarUxEnabled and
-      ((DNKeyCode(Event) = kbCtrlY) or (DNKeyCode(Event) = kbCtrlK))) then
-    inherited HandleEvent(Event);
+  if (Event.What = evKeyDown) and FarUxEnabled then
+    case DNKeyCode(Event) of
+      kbCtrlY:
+        begin
+        Str := '';
+        CurX := 0;
+        StrCleared := True;
+        StrModified := True;
+        CE2;
+        Exit;
+        end;
+      kbCtrlK:
+        begin
+        Delete(Str, CurX + 1, Length(Str) - CurX);
+        StrCleared := Str = '';
+        StrModified := True;
+        CE2;
+        Exit;
+        end;
+    end;
+  inherited HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
   QueryCursorVisible;
@@ -692,23 +710,6 @@ RIT Labs DN also wobbled but seemed to fetch correctly.
             end;
           else {case}
             case DNKeyCode(Event) of
-              kbCtrlY:
-                if FarUxEnabled then
-                  begin
-                  Str := '';
-                  CurX := 0;
-                  StrCleared := True;
-                  StrModified := True;
-                  CE2;
-                  end;
-              kbCtrlK:
-                if FarUxEnabled then
-                  begin
-                  Delete(Str, CurX + 1, Length(Str) - CurX);
-                  StrCleared := Str = '';
-                  StrModified := True;
-                  CE2;
-                  end;
               kbCtrlBack:
                 begin
                 while (CurX > 0) and not (Str[CurX] in Separators) do
