@@ -173,6 +173,8 @@ var
 begin
   Drop := '';
   Err := '';
+  if Length(Paths) = 0 then
+    begin Drop := #0#0; Result := True; Exit; end;
   for I := 0 to High(Paths) do
     begin
       if not (IsDrivePath(Paths[I]) or IsUncPath(Paths[I])) then
