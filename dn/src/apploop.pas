@@ -71,7 +71,7 @@ implementation
 
 uses
   
-  osdep, dirwatch, fileutil, mainapp, gadgets,
+  osdep, dirwatch, fileutil, mainapp, CmdLine, gadgets,
   Drives, basics, envutil, Commands,
   boot, UserMenu, Messages, Startup,
   panelroot, Macro, farux, panelwinx, CopyJobs
@@ -119,6 +119,24 @@ function FarUxSortKey(var Event: TEvent): Boolean;
       and (ActivePanel <> nil) and ActivePanel.GetState(sfFocused))
   then
     Exit;
+  if (CommandLine <> nil) and (CmdLine.Str <> '') and
+     (((Event.KeyDown.ControlKeyState and 4) <> 0) and
+      ((Event.KeyDown.ControlKeyState and 8) = 0)) and
+     ((Event.KeyDown.VirtualKey = $4B) or (Event.KeyDown.VirtualKey = $59)) then
+    begin
+    { The status line otherwise consumes Ctrl+K/Ctrl+Y before the command line sees them. }
+    CommandLine.HandleEvent(Event);
+    FarUxSortKey := Event.What = evNothing;
+    Exit;
+    end;
+  if (CommandLine <> nil) and (CmdLine.Str <> '') and
+     ((Event.KeyDown.CharScan.CharCode = 11) or
+      (Event.KeyDown.CharScan.CharCode = 25)) then
+    begin
+    CommandLine.HandleEvent(Event);
+    FarUxSortKey := Event.What = evNothing;
+    Exit;
+    end;
   K := FarAltGrayKey(DNKeyCode(Event), Event.KeyDown.VirtualKey);
   if K <> 0 then
   begin

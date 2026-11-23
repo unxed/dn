@@ -1912,6 +1912,25 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
   
   uLfn := PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0;
   
+  { Handle Far UX command-line keys before the panel base class can consume them. }
+  if FarUxEnabled and (Event.What = evKeyDown) and (CommandLine <> nil) and
+     (CmdLine.Str <> '') then
+    begin
+    if ((Event.KeyDown.ControlKeyState and 4) <> 0) and
+       ((Event.KeyDown.ControlKeyState and 8) = 0) then
+      case Event.KeyDown.VirtualKey of
+        $59: SetDNKeyCode(Event, kbCtrlY);
+        $4B: SetDNKeyCode(Event, kbCtrlK);
+      end;
+    case Event.KeyDown.CharScan.CharCode of
+      25: SetDNKeyCode(Event, kbCtrlY);
+      11: SetDNKeyCode(Event, kbCtrlK);
+    end;
+    if (DNKeyCode(Event) = kbCtrlY) or (DNKeyCode(Event) = kbCtrlK) then
+      CommandLine.HandleEvent(Event);
+    end;
+  if Event.What = evNothing then
+    Exit;
   inherited HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
@@ -1947,6 +1966,8 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     CommandHandle(Event);
     Exit;
     end;
+  if Event.What = evNothing then
+    Exit;
   if  (Event.What = evKeyDown) and (CommandLine <> nil) then
     if  ( (I and (kbRightShift+kbLeftShift) <> 0) and
           ( (KeyCode = kbDown and $FFFF) or

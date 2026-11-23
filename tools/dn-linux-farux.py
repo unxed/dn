@@ -191,6 +191,27 @@ try:
     check('alpha1' in cmdline_row(t),
           'FarUx on: Ctrl+Ins with text inserts the name into the command line', t)
     t.send(w32(0x1B), 0.6)                       # Esc clears the command line
+    empty_command = cmdline_row(t)
+    t.send('abc', 0.5)
+    check(cmdline_row(t).rstrip().endswith('abc'),
+          'FarUx on: text is entered into the command line', t)
+    command_line = [(y, ''.join(c for c, _ in row))
+                    for y, row in enumerate(t.screen.cells)
+                    if '>abc' in ''.join(c for c, _ in row)]
+    if command_line:
+        y, row = command_line[0]
+        x = row.index('>abc') + 1                      # the column of "a"
+        t.send('\x1b[<0;%d;%dM\x1b[<0;%d;%dm' % (x + 2, y + 1, x + 2, y + 1), 0.5)
+    t.send(w32(0x4B, 11, 4), 0.8)                # Ctrl+K
+    after_ctrl_k = cmdline_row(t).rstrip()
+    check(after_ctrl_k.endswith('a'),
+          'FarUx on: Ctrl+K deletes from the cursor to the end of the command line '
+          '(line=%r)' % after_ctrl_k, t)
+    t.send(w32(0x59, 25, 4), 0.8)                # Ctrl+Y
+    after_ctrl_y = cmdline_row(t)
+    check(after_ctrl_y == empty_command,
+          'FarUx on: Ctrl+Y clears the command line (line=%r, expected=%r)' %
+          (after_ctrl_y, empty_command), t)
     for vk, what in ((0x79, 'Alt+F10 opens the folder tree'), (0x7B, 'Alt+F12 opens the folder history')):
         before = t.text()
         t.send(w32(vk, 0, 2), 1.2)               # Alt+F10 / Alt+F12

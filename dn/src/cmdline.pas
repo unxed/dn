@@ -108,7 +108,7 @@ uses DnPath,
   , editcore, histories, FViewer, panelroot
   , Idlers 
   , osdep, dnscreen, Lfn, UserMenu, Menus
-  , DnIni, Math
+  , DnIni, Math, FarUx
   ;
 
 { The line holds UTF-8 in the build DNUTF8 (a character is 1..4 bytes: the cursor, Backspace, Delete, the scrolling and the mouse go by characters),
@@ -468,6 +468,54 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
   label
     EndLFN;
   begin { TCommandLine.HandleEvent }
+  if (Event.What = evKeyDown) and FarUxEnabled then
+    begin
+    if ((Event.KeyDown.ControlKeyState and 4) <> 0) and
+       ((Event.KeyDown.ControlKeyState and 8) = 0) then
+      case Event.KeyDown.VirtualKey of
+        $59: { Ctrl+Y; consume the Win32 event before normal key dispatch }
+          begin
+          Str := '';
+          CurX := 0;
+          StrCleared := True;
+          StrModified := True;
+          CE2;
+          Exit;
+          end;
+        $4B: { Ctrl+K }
+          begin
+          Delete(Str, CurX + 1, Length(Str) - CurX);
+          StrCleared := Str = '';
+          StrModified := True;
+          CE2;
+          Exit;
+          end;
+      end;
+    case Event.KeyDown.CharScan.CharCode of
+      25: SetDNKeyCode(Event, kbCtrlY);
+      11: SetDNKeyCode(Event, kbCtrlK);
+    end;
+    end;
+  if (Event.What = evKeyDown) and FarUxEnabled then
+    case DNKeyCode(Event) of
+      kbCtrlY:
+        begin
+        Str := '';
+        CurX := 0;
+        StrCleared := True;
+        StrModified := True;
+        CE2;
+        Exit;
+        end;
+      kbCtrlK:
+        begin
+        Delete(Str, CurX + 1, Length(Str) - CurX);
+        StrCleared := Str = '';
+        StrModified := True;
+        CE2;
+        Exit;
+        end;
+    end;
   inherited HandleEvent(Event);
   if Event.What = evNothing then
     Exit;
