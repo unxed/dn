@@ -472,8 +472,23 @@ procedure TCommandLine.HandleEvent(var Event: TEvent);
      ((Event.KeyDown.ControlKeyState and 4) <> 0) and
      ((Event.KeyDown.ControlKeyState and 8) = 0) then
     case Event.KeyDown.VirtualKey of
-      $59: SetDNKeyCode(Event, kbCtrlY);
-      $4B: SetDNKeyCode(Event, kbCtrlK);
+      $59: { Ctrl+Y; consume the Win32 event before normal key dispatch }
+        begin
+        Str := '';
+        CurX := 0;
+        StrCleared := True;
+        StrModified := True;
+        CE2;
+        Exit;
+        end;
+      $4B: { Ctrl+K }
+        begin
+        Delete(Str, CurX + 1, Length(Str) - CurX);
+        StrCleared := Str = '';
+        StrModified := True;
+        CE2;
+        Exit;
+        end;
     else
       case Event.KeyDown.CharScan.CharCode of
         25: SetDNKeyCode(Event, kbCtrlY);
