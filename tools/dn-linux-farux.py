@@ -197,11 +197,15 @@ try:
           'FarUx on: text is entered into the command line', t)
     t.send(w32(0x25), 0.5)                       # Left: position before c
     t.send(w32(0x4B, 11, 4), 0.8)                # Ctrl+K
-    check(cmdline_row(t).rstrip().endswith('a'),
-          'FarUx on: Ctrl+K deletes from the cursor to the end of the command line', t)
+    after_ctrl_k = cmdline_row(t).rstrip()
+    check(after_ctrl_k.endswith('a'),
+          'FarUx on: Ctrl+K deletes from the cursor to the end of the command line '
+          '(line=%r)' % after_ctrl_k, t)
     t.send(w32(0x59, 25, 4), 0.8)                # Ctrl+Y
-    check(cmdline_row(t) == empty_command,
-          'FarUx on: Ctrl+Y clears the command line', t)
+    after_ctrl_y = cmdline_row(t)
+    check(after_ctrl_y == empty_command,
+          'FarUx on: Ctrl+Y clears the command line (line=%r, expected=%r)' %
+          (after_ctrl_y, empty_command), t)
     for vk, what in ((0x79, 'Alt+F10 opens the folder tree'), (0x7B, 'Alt+F12 opens the folder history')):
         before = t.text()
         t.send(w32(vk, 0, 2), 1.2)               # Alt+F10 / Alt+F12
