@@ -1947,21 +1947,23 @@ procedure TFilePanel.HandleEvent(var Event: TEvent);
     CommandHandle(Event);
     Exit;
     end;
-  if  FarUxEnabled and (Event.What = evKeyDown) and (CommandLine <> nil) and
-      (CmdLine.Str <> '') and ((Event.KeyDown.ControlKeyState and 4) <> 0) and
-      ((Event.KeyDown.ControlKeyState and 8) = 0) then
-    case Event.KeyDown.VirtualKey of
-      $59: { Ctrl+Y; Win32 input may not put the control character in CharCode }
-        SetDNKeyCode(Event, kbCtrlY);
-      $4B: { Ctrl+K }
-        SetDNKeyCode(Event, kbCtrlK);
-    else
-      case Event.KeyDown.CharScan.CharCode of
-        25:
+  if FarUxEnabled and (Event.What = evKeyDown) and (CommandLine <> nil) and
+     (CmdLine.Str <> '') then
+    begin
+    if ((Event.KeyDown.ControlKeyState and 4) <> 0) and
+       ((Event.KeyDown.ControlKeyState and 8) = 0) then
+      case Event.KeyDown.VirtualKey of
+        $59: { Ctrl+Y; Win32 input may not put the control character in CharCode }
           SetDNKeyCode(Event, kbCtrlY);
-        11:
+        $4B: { Ctrl+K }
           SetDNKeyCode(Event, kbCtrlK);
       end;
+    case Event.KeyDown.CharScan.CharCode of
+      25:
+        SetDNKeyCode(Event, kbCtrlY);
+      11:
+        SetDNKeyCode(Event, kbCtrlK);
+    end;
     end;
   if (Event.What = evKeyDown) and FarUxEnabled and (CommandLine <> nil) and
      (CmdLine.Str <> '') and
