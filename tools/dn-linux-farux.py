@@ -195,7 +195,13 @@ try:
     t.send('abc', 0.5)
     check(cmdline_row(t).rstrip().endswith('abc'),
           'FarUx on: text is entered into the command line', t)
-    t.send(w32(0x25), 0.5)                       # Left: position before c
+    command_line = [(y, ''.join(c for c, _ in row))
+                    for y, row in enumerate(t.screen.cells)
+                    if '>abc' in ''.join(c for c, _ in row)]
+    if command_line:
+        y, row = command_line[0]
+        x = row.index('>abc') + 1                      # the column of "a"
+        t.send('\x1b[<0;%d;%dM\x1b[<0;%d;%dm' % (x + 2, y + 1, x + 2, y + 1), 0.5)
     t.send(w32(0x4B, 11, 4), 0.8)                # Ctrl+K
     after_ctrl_k = cmdline_row(t).rstrip()
     check(after_ctrl_k.endswith('a'),
