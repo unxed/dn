@@ -137,6 +137,17 @@ function FarUxSortKey(var Event: TEvent): Boolean;
     FarUxSortKey := Event.What = evNothing;
     Exit;
     end;
+  if (DNKeyCode(Event) = kbCtrlJ) or
+     (((Event.KeyDown.ControlKeyState and 4) <> 0) and
+      ((Event.KeyDown.ControlKeyState and 8) = 0) and
+      (Event.KeyDown.VirtualKey = $4A)) or
+     (Event.KeyDown.CharScan.CharCode = 10) then
+    begin
+    SetDNKeyCode(Event, kbCtrlJ);
+    ActivePanel.HandleEvent(Event);
+    FarUxSortKey := Event.What = evNothing;
+    Exit;
+    end;
   K := FarAltGrayKey(DNKeyCode(Event), Event.KeyDown.VirtualKey);
   if K <> 0 then
   begin

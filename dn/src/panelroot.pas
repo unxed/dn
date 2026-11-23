@@ -2253,6 +2253,11 @@ WrongArc:
           _CtrlIns;
       kbCtrlEnter, kbCtrlShiftEnter, kbCtrlAltEnter:
         _CtrlEnter;
+      kbCtrlJ:
+        if FarUxEnabled then
+          _CtrlEnter
+        else
+          CommandHandle(Event);
       kbLeft:
         if  (Size.X+2 > LineLength) then
           if  (Delta > 0) or

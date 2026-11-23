@@ -192,6 +192,10 @@ try:
           'FarUx on: Ctrl+Ins with text inserts the name into the command line', t)
     t.send(w32(0x1B), 0.6)                       # Esc clears the command line
     empty_command = cmdline_row(t)
+    t.send(w32(0x4A, 10, 4), 0.8)                # Ctrl+J
+    check(cmdline_row(t).rstrip().endswith('alpha1.txt') and 'Press Enter' not in t.text(),
+          'FarUx on: Ctrl+J inserts the current file name and does not run the command', t)
+    t.send(w32(0x1B), 0.6)                       # Esc clears the command line
     t.send('abc', 0.5)
     check(cmdline_row(t).rstrip().endswith('abc'),
           'FarUx on: text is entered into the command line', t)
