@@ -138,6 +138,7 @@ try:
     t.send(w32(0x1B), 1.0)                       # Esc
     check('Search:' not in t.text(), 'FarUx on: Esc leaves the search', t)
     t.send(w32(0x09, 9), 0.5)                    # Tab to passive panel
+    t.send(w32(0x52, ord('r'), 4), 0.5)          # Ctrl+R loads its directory
     t.send('\x1b[B', 0.5)                        # Down -> alpha2 in passive panel
     t.send(w32(0x09, 9), 0.5)                    # Tab back to active panel
     t.send(w32(0x0D, 13, 20), 1.0)              # Ctrl+Shift+Enter
