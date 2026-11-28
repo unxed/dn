@@ -137,11 +137,13 @@ function FarUxSortKey(var Event: TEvent): Boolean;
     FarUxSortKey := Event.What = evNothing;
     Exit;
     end;
-  if (DNKeyCode(Event) = kbCtrlJ) or
-     (((Event.KeyDown.ControlKeyState and 4) <> 0) and
-      ((Event.KeyDown.ControlKeyState and 8) = 0) and
-      (Event.KeyDown.VirtualKey = $4A)) or
-     (Event.KeyDown.CharScan.CharCode = 10) then
+  { Ctrl+Enter can also carry character 10; keep it on its existing path. }
+  if (Event.KeyDown.VirtualKey <> $0D) and
+     ((DNKeyCode(Event) = kbCtrlJ) or
+      (((Event.KeyDown.ControlKeyState and 4) <> 0) and
+       ((Event.KeyDown.ControlKeyState and 8) = 0) and
+       (Event.KeyDown.VirtualKey = $4A)) or
+      (Event.KeyDown.CharScan.CharCode = 10)) then
     begin
     SetDNKeyCode(Event, kbCtrlJ);
     ActivePanel.HandleEvent(Event);
