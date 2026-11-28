@@ -186,6 +186,7 @@ no silent gaps (post-class criterion A).
 | `filelst.pas` | file-list helpers for dialogs and histories |
 | `filetype.pas` | file-type / extension classification for panels |
 | `findobj.pas` | find-object UI pieces for file find |
+| `fileclip.pas` (ours) | conversion between file paths, `text/uri-list` and Windows file-drop lists (unxed/dn#178) |
 | `hash.pas` | hash-table helpers (file collections, etc.) |
 | `ftpfs.pas` | `TFtpFS`, the file system of a remote host over FTP: the control channel, passive data connections (EPSV, PASV), lists by MLSD or LIST and stat by MLST, files read and written as streams (RETR, STOR), MkDir/Remove/Rename/SetMode; the listings of MLSD/MLST (RFC 3659) and of LIST as `ls -l`, DOS/IIS and NetWare write it (unxed/dn#90 step 11); empty in DOS and DN_MINI |
 | `helpfile.pas` | help file reader (Borland help format glue) |

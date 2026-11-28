@@ -15,6 +15,9 @@ and it has real faults (a Unix file name that holds a backslash is cut in two; "
 * The members of an archive keep `\` on every host (`ArcSep`): that is the format DN's archive code has always used, it is not a host path.
 * Code that needs drives (the drive menu, `D:` hotkeys, the drive bar of a panel) asks `HasDrives` and is absent on Unix. On Unix the
   places to go are mount points, home, `/`, bookmarks.
+* `dn/src/fileclip.pas` is the exception for external clipboard formats: URI-list and `CF_HDROP` encode foreign paths, so their `/`, `\\`, and
+  drive-letter syntax describe the wire format rather than a path on this host. `DnPath` cannot normalize those values; the ratchet records
+  only this converter's required syntax.
 * Text typed by the user is taken in either form on DOS and Windows; on Unix only `/` separates. The functions of the RTL that split or
   expand a name (`ExtractFileName`, `ExtractFileDir`, `ExpandFileName`, `IncludeTrailingPathDelimiter`, `FSplit`, `FExpand`) take `\`
   as a separator on Unix too: DN calls `lFSplit`, `lFExpand` and `TvPath` instead.

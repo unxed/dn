@@ -3,6 +3,7 @@ calcwin.pas 1
 cmdline.pas 1
 dnexec.pas 1
 editcore.pas 2
+fileclip.pas 10
 fsinfo.pas 1
 highlite.pas 1
 paneldlgs.pas 1
