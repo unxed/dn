@@ -137,6 +137,19 @@ function FarUxSortKey(var Event: TEvent): Boolean;
     FarUxSortKey := Event.What = evNothing;
     Exit;
     end;
+  { The terminal form may include Enter’s character byte; normalize this key before panel dispatch. }
+  if FarUxEnabled and
+     (((DNKeyCode(Event) shr 8) = (kbCtrlShiftEnter shr 8)) or
+      ((Event.KeyDown.VirtualKey = $0D) and
+       ((Event.KeyDown.ControlKeyState and $14) = $14))) then
+    SetDNKeyCode(Event, kbCtrlShiftEnter);
+  if DNKeyCode(Event) = kbCtrlShiftEnter then
+    begin
+    { Keep the passive-panel shortcut from being consumed by the status line. }
+    ActivePanel.HandleEvent(Event);
+    FarUxSortKey := Event.What = evNothing;
+    Exit;
+    end;
   { Ctrl+Enter can also carry character 10; keep it on its existing path. }
   if (Event.KeyDown.VirtualKey <> $0D) and
      ((DNKeyCode(Event) = kbCtrlJ) or

@@ -1748,11 +1748,25 @@ WrongArc:
       PF: PFileRec;
     begin
     CE;
-    if Files.Count = 0 then
-      Exit;
-    PF := Files.At(CurPos);
-    if  (PF <> nil) then
+    if DNKeyCode(Event) = kbCtrlShiftEnter then
       begin
+      if (PassivePanel = nil) or (PassivePanel.Files = nil) or
+         (PassivePanel.Files.Count = 0) then
+        Exit;
+      PF := PassivePanel.Files.At(PassivePanel.ScrollBar.Value);
+      if PF = nil then
+        Exit;
+      ExecLFN := PassivePanel.PanSetup.Show.ColumnsMask and
+        psLFN_InColumns <> 0;
+      S := PF^.FlName[ExecLFN];
+      end
+    else
+      begin
+      if Files.Count = 0 then
+        Exit;
+      PF := Files.At(CurPos);
+      if PF = nil then
+        Exit;
       ExecLFN := uLfn;
       if  (ShiftState and kbAltShift <> 0) then
         ExecLFN := ExecLFN xor InvLFN;
@@ -1761,9 +1775,8 @@ WrongArc:
       (*
     if (PF^.Attr and Directory = 0) and
        (PosChar('.', S) = 0) then AddStr(S, '.');
-*)
+ *)
       if Copy(S, 1, 2) = '..' then
-        
         if PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0 then
           if  (ShiftState and kbAltShift <> 0)
           then
@@ -1775,9 +1788,7 @@ WrongArc:
           S := PF^.Owner^+DnSep
         else
           S := lfGetShortFileName(PF^.Owner^)+DnSep
-        
       else if ShiftState and 3 <> 0 then
-        
         if PanSetup.Show.ColumnsMask and psLFN_InColumns <> 0 then
           if  (ShiftState and kbAltShift <> 0)
           then
@@ -1789,12 +1800,10 @@ WrongArc:
           S := MakeNormName(PF^.Owner^, S)
         else
           S := MakeNormName(lfGetShortFileName(PF^.Owner^), S)
-        
           ;
-      S := SquashesName(S);
-      
-      Message(CommandLine, evCommand, cmInsertName, @S);
       end;
+    S := SquashesName(S);
+    Message(CommandLine, evCommand, cmInsertName, @S);
     end { _CtrlEnter };
 
   function _AltEnter: Boolean;

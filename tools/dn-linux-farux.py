@@ -137,6 +137,15 @@ try:
           'FarUx on: Ctrl+Shift+Enter moves back', t)
     t.send(w32(0x1B), 1.0)                       # Esc
     check('Search:' not in t.text(), 'FarUx on: Esc leaves the search', t)
+    t.send(w32(0x09, 9), 0.5)                    # Tab to passive panel
+    t.send(w32(0x52, ord('r'), 4), 0.5)          # Ctrl+R loads its directory
+    t.send('\x1b[B', 0.5)                        # Down -> alpha1 (after ..)
+    t.send('\x1b[B', 0.5)                        # Down -> alpha2 in passive panel
+    t.send(w32(0x09, 9), 0.5)                    # Tab back to active panel
+    t.send(w32(0x0D, 13, 20), 1.0)              # Ctrl+Shift+Enter
+    check(cmdline_row(t).rstrip().endswith('alpha2.txt'),
+          'FarUx on: Ctrl+Shift+Enter inserts the passive-panel filename', t)
+    t.send(w32(0x1B), 0.5)                       # clear the command line
     t.send(w32(0x42, ord('b'), 2), 1.0)           # Alt+B: the sort menu of DN's status line
     check('Search:' in t.text() and cursor_file(t) is not None and 'beta' in cursor_file(t),
           'FarUx on: Alt+B is fast find (the cursor on beta), not the sort menu', t)
