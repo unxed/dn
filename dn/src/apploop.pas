@@ -137,6 +137,10 @@ function FarUxSortKey(var Event: TEvent): Boolean;
     FarUxSortKey := Event.What = evNothing;
     Exit;
     end;
+  { The terminal form may include Enter’s character byte; normalize this key before panel dispatch. }
+  if FarUxEnabled and
+     ((DNKeyCode(Event) shr 8) = (kbCtrlShiftEnter shr 8)) then
+    SetDNKeyCode(Event, kbCtrlShiftEnter);
   { Ctrl+Enter can also carry character 10; keep it on its existing path. }
   if (Event.KeyDown.VirtualKey <> $0D) and
      ((DNKeyCode(Event) = kbCtrlJ) or
